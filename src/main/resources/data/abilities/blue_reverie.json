@@ -208,7 +208,6 @@
         "name": "Thwart (2 Dishonor)",
         "faction": "toldar",
         "permanentEffect": "After you replenish commodities, take up to 2 commodities from any combination of your neighbors.",
-        "notes": "Not automated, have your neighbors subtract with `/player stats`.",
         "source": "blue_reverie"
     },
     {

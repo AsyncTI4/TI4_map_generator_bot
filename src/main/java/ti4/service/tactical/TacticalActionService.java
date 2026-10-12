@@ -373,9 +373,7 @@ public class TacticalActionService {
                     "Units Travelled Through Weird Wormhole",
                     MiscEmojis.WHalpha));
         }
-        if (player.hasUnexhaustedLeader("sardakkagent")) {
-            buttons.addAll(ButtonHelperAgents.getSardakkAgentButtons(game));
-        }
+
         if (player.hasUnexhaustedLeader("nomadagentmercer")) {
             buttons.addAll(ButtonHelperAgents.getMercerAgentInitialButtons(game, player));
         }

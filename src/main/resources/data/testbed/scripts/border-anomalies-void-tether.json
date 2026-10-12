@@ -1,0 +1,46 @@
+{
+  "name": "border-anomalies-void-tether",
+  "description": "Preset borders load with lower-case ids (the legacy SPATIAL_TEAR spelling too); Empyrean places a Void Tether between 000 and 101 through the buttons, then removes it.",
+  "preset": "border-anomalies-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "note": "Precondition: all ten preset borders are on the map, normalised to lower-case ids." },
+    {
+      "expect": {
+        "state": "game.borderAnomalies",
+        "contains": [
+          "202:0:spatial_tear",
+          "202:1:gravity_wave",
+          "202:2:nebula",
+          "205:0:asteroid",
+          "205:2:minefield",
+          "208:0:core_border",
+          "208:1:rim_border",
+          "211:0:yellow",
+          "211:1:redorange",
+          "211:3:spatial_tear"
+        ],
+        "notContains": ["SPATIAL_TEAR", "void_tether"]
+      }
+    },
+
+    { "note": "Open the Void Tether flow the way the breakthrough's fix button does." },
+    { "as": "empyrean", "pressId": "FFCC_{empyrean.faction}_addVoidTetherStep1" },
+    { "expect": { "in": "empyrean", "contains": "choose a system with your ships" } },
+    { "as": "empyrean", "press": "addVoidTetherStep2_101", "in": "empyrean" },
+    { "expect": { "in": "empyrean", "contains": "decide where to put your Void Tether" } },
+    { "as": "empyrean", "press": "addVoidTetherStep3_000", "in": "empyrean" },
+    { "as": "empyrean", "press": "newVoidTether_000", "in": "empyrean" },
+    { "expect": { "in": "empyrean", "contains": "choose where to put your new token" } },
+    { "as": "empyrean", "press": "placeVoidTether_000_0", "in": "empyrean" },
+
+    { "label": "Tether stored with the new id", "expect": { "state": "game.borderAnomalies", "contains": "000:0:void_tether" } },
+    { "expect": { "in": "empyrean", "contains": "token between", "count": 1 } },
+
+    { "note": "Removing it goes through the id check that used to be an enum ==." },
+    { "as": "empyrean", "pressId": "FFCC_{empyrean.faction}_removeVoidTether_000_0" },
+    { "label": "Tether removed", "expect": { "state": "game.borderAnomalies", "notContains": "void_tether" } },
+    { "expect": { "in": "empyrean", "contains": "Removed Void Tether token from between" } },
+    { "label": "Other borders untouched", "expect": { "state": "game.borderAnomalies", "contains": ["202:0:spatial_tear", "211:3:spatial_tear"] } }
+  ]
+}

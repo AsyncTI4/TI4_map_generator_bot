@@ -68,6 +68,13 @@ public class MapOverviewGenerator {
         return image;
     }
 
+    static int fractureYbump(Game game) {
+        int bump = 0;
+        if (FractureService.isFractureRegionOnMap(game)) bump = 400;
+        if (FractureService.isFractureExpandedRegionOnMap(game)) bump += 600;
+        return bump;
+    }
+
     private static void drawTiles(Game game, Graphics2D graphics, Layout layout) {
         TileGenerator tileGenerator = new TileGenerator(game, null, DisplayType.map);
         Map<String, Tile> tiles = new TreeMap<>(game.getTileMap());
@@ -121,7 +128,7 @@ public class MapOverviewGenerator {
             Rectangle content, double scale, int fractureYbump, Rectangle leftColumn, Rectangle rightColumn) {
 
         static Layout of(Game game) {
-            int fractureYbump = fractureYbump(game);
+            int fractureYbump = MapOverviewGenerator.fractureYbump(game);
             Set<String> gridPositions = new HashSet<>(game.getTileMap().keySet());
             gridPositions.removeIf(position -> CORNER_POSITIONS.contains(position.toLowerCase()));
             Rectangle content = MapFrame.bounds(game, gridPositions, fractureYbump, 0, 0);
@@ -151,13 +158,6 @@ public class MapOverviewGenerator {
 
         private static boolean hasCorner(Game game, String corner) {
             return game.getTileByPosition(corner) != null;
-        }
-
-        private static int fractureYbump(Game game) {
-            int bump = 0;
-            if (FractureService.isFractureRegionOnMap(game)) bump = 400;
-            if (FractureService.isFractureExpandedRegionOnMap(game)) bump += 600;
-            return bump;
         }
 
         int width() {
@@ -194,23 +194,10 @@ public class MapOverviewGenerator {
         }
 
         Polygon hexPolygon(Rectangle hex) {
-            int quarter = hex.width / 4;
-            int[] xs = {
-                hex.x + quarter,
-                hex.x + hex.width - quarter,
-                hex.x + hex.width,
-                hex.x + hex.width - quarter,
-                hex.x + quarter,
-                hex.x
-            };
-            int[] ys = {
-                hex.y, hex.y, hex.y + hex.height / 2, hex.y + hex.height, hex.y + hex.height, hex.y + hex.height / 2
-            };
-            Polygon polygon = new Polygon();
-            for (int i = 0; i < xs.length; i++) {
-                polygon.addPoint(toCanvasX(xs[i]), toCanvasY(ys[i]));
-            }
-            return polygon;
+            int left = toCanvasX(hex.x);
+            int top = toCanvasY(hex.y);
+            return MapFrame.hexPolygon(
+                    new Rectangle(left, top, toCanvasX(hex.x + hex.width) - left, toCanvasY(hex.y + hex.height) - top));
         }
     }
 }

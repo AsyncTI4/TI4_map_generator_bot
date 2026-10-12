@@ -33,7 +33,7 @@ class AddTile extends GameStateSubcommand {
         Set<String> positions = Helper.getSetFromCSV(positionOption);
 
         for (String position : positions) {
-            if (!PositionMapper.isTilePositionValid(position)) {
+            if (!PositionMapper.isTilePositionValid(getGame(), position)) {
                 MessageHelper.replyToMessage(event, "Position `" + position + "` not allowed");
                 return;
             }

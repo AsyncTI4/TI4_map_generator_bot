@@ -2,6 +2,7 @@ package ti4.contest.replay.service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -249,7 +250,7 @@ public class CombatReplaySideBetPayoutService {
                 hitModifiers,
                 extraRollModifiers,
                 CombatRollType.AFB);
-        Map<Integer, Double> lossDistribution = new java.util.HashMap<>();
+        Map<Integer, Double> lossDistribution = new HashMap<>();
         for (Map.Entry<Integer, Double> entry : hitDistribution.entrySet()) {
             int fighterLosses = Math.min(targetFighterCount, entry.getKey());
             lossDistribution.merge(fighterLosses, entry.getValue(), Double::sum);
@@ -299,7 +300,7 @@ public class CombatReplaySideBetPayoutService {
     }
 
     private static Map<UnitModel, Integer> collectAfbUnits(Tile tile, Player player) {
-        Map<String, Integer> unitsByAsyncId = new java.util.HashMap<>();
+        Map<String, Integer> unitsByAsyncId = new HashMap<>();
         String colorId = Mapper.getColorID(player.getColor());
         for (UnitHolder holder : tile.getUnitHolders().values()) {
             for (Map.Entry<String, Integer> entry :
@@ -308,7 +309,7 @@ public class CombatReplaySideBetPayoutService {
             }
         }
 
-        Map<UnitModel, Integer> afbUnits = new java.util.HashMap<>();
+        Map<UnitModel, Integer> afbUnits = new HashMap<>();
         for (Map.Entry<String, Integer> entry : unitsByAsyncId.entrySet()) {
             UnitModel unit = player.getPriorityUnitByAsyncID(entry.getKey(), null);
             if (unit != null && unit.getAfbDieCount(player) > 0) {
@@ -407,7 +408,7 @@ public class CombatReplaySideBetPayoutService {
             List<NamedCombatModifierModel> hitModifiers,
             List<NamedCombatModifierModel> extraRollModifiers,
             CombatRollType rollType) {
-        Map<Integer, Double> distribution = new java.util.HashMap<>();
+        Map<Integer, Double> distribution = new HashMap<>();
         distribution.put(0, 1.0);
 
         List<UnitModel> playerUnitTypes = new ArrayList<>(unitCounts.keySet());
@@ -440,7 +441,7 @@ public class CombatReplaySideBetPayoutService {
     private static Map<Integer, Double> addDice(Map<Integer, Double> distribution, int diceCount, double hitChance) {
         Map<Integer, Double> updated = distribution;
         for (int die = 0; die < diceCount; die++) {
-            Map<Integer, Double> next = new java.util.HashMap<>();
+            Map<Integer, Double> next = new HashMap<>();
             for (Map.Entry<Integer, Double> entry : updated.entrySet()) {
                 next.merge(entry.getKey(), entry.getValue() * (1.0 - hitChance), Double::sum);
                 next.merge(entry.getKey() + 1, entry.getValue() * hitChance, Double::sum);
@@ -459,8 +460,8 @@ public class CombatReplaySideBetPayoutService {
     }
 
     private Map<UnitModel, Integer> removeFighters(Map<UnitModel, Integer> unitCounts, int fighterLosses) {
-        if (fighterLosses <= 0) return new java.util.HashMap<>(unitCounts);
-        Map<UnitModel, Integer> survivingUnits = new java.util.HashMap<>();
+        if (fighterLosses <= 0) return new HashMap<>(unitCounts);
+        Map<UnitModel, Integer> survivingUnits = new HashMap<>();
         int remainingLosses = fighterLosses;
         for (Map.Entry<UnitModel, Integer> entry : unitCounts.entrySet()) {
             UnitModel unit = entry.getKey();

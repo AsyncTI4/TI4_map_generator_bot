@@ -1600,6 +1600,10 @@ public final class FoWHelper {
         if (!game.isFowMode() || game.isHasEnded()) {
             return true;
         }
+        return isGameMasterInGmRoom(game, event);
+    }
+
+    public static boolean isGameMasterInGmRoom(Game game, GenericInteractionCreateEvent event) {
         return isGameMaster(event.getUser().getId(), game) && isGmRoom(game, event.getChannel());
     }
 

@@ -35,6 +35,7 @@ public class SREStats {
     // New: button runtime metric names
     private static final String BUTTON_PROCESSING_TIMER_NAME = "ti4.bot.button.runtime.processing";
     private static final String BUTTON_PREPROCESSING_TIMER_NAME = "ti4.bot.button.runtime.preprocess";
+    private static final String BUTTON_STAGE_TIMER_NAME = "ti4.bot.button.runtime.stage";
 
     private static final List<Tag> BOT_TAGS = List.of(Tag.of("component", "bot"));
     private static final List<Tag> HTTP_TAGS = List.of(Tag.of("component", "http"));
@@ -291,6 +292,17 @@ public class SREStats {
     public static void recordButtonPreprocessingMillis(long millis) {
         if (millis < 0) return;
         buttonPreprocessingTimer().record(Duration.ofMillis(millis));
+    }
+
+    public static void recordButtonStageMillis(String stage, long millis) {
+        if (millis < 0) return;
+        Timer.builder(BUTTON_STAGE_TIMER_NAME)
+                .description("Time spent in one stage of a button interaction")
+                .tags(BUTTON_TAGS)
+                .tag("stage", stage)
+                .publishPercentileHistogram(true)
+                .register(registry())
+                .record(Duration.ofMillis(millis));
     }
 
     // Request counters

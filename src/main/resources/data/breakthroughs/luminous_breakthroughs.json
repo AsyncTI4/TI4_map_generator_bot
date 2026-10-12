@@ -8,7 +8,7 @@
             "BIOTIC",
             "CYBERNETIC"
         ],
-        "text": "When researching a technology you may treat this card as a planet with a green technology specialty symbol.\n\nYou may produce 1 additional infantry for their cost. These infantry do not count against your PRODUCTION limit.",
+        "text": "If you have the Cruiser II unit upgrade technology, flip this card and place it on top of Cruiser II.",
         "source": "luminous"
     },
     {
@@ -20,7 +20,7 @@
             "PROPULSION",
             "WARFARE"
         ],
-        "text": "Each system or planet can contain a number of structures equal to +1 the number of structures that game effects or abilities would allow. You may exhaust this card at the start of your turn during the action phase; remove up to 2 of your structures from the game board and place them in a system you control.",
+        "text": "Each system or planet can contain a number of structures equal to +1 the number of structures that game effects or abilities would allow.\n\n Each planet in a system that contains 1 or more of your structures, increases its Resources and Influence by 1.\n\n You may exhaust this card at the start of your turn during the action phase; remove up to 2 of your structures from the game board and place them in a system you control.",
         "source": "luminous"
     },
     {
@@ -32,7 +32,8 @@
             "PROPULSION",
             "CYBERNETIC"
         ],
-        "text": "When you gain this card, place an additional broken planet token in your Homesystem. Then Gain that broken planet token Card and ready it. Then all Broken Planet Planets are now treated as stations with no other planet type for the rest of the game. All units and structures on each Broken planet are moved to space if possible, or returned to the unit owner’s unit pool.\n\nAfter you activate a system: You may treat all systems that contain a Space Station as being adjacent to each other during a tactical action.",
+        "text": "When you gain this card, place an additional Station Planet Token in your Homesystem. Then Gain that Station Planet Token Card and ready it. Then all Station Planet Planets are now treated as space stations with no other planet type for the rest of the game.\n\n After you activate a system: You may treat all systems that contain a Space Station as being adjacent to each other during a tactical action.",
+        "notes": "When you gain this Breakthrough: All units and structures on each Broken planet are moved to space if possible, or returned to the unit owner’s unit pool.",
         "source": "luminous"
     }
 ]

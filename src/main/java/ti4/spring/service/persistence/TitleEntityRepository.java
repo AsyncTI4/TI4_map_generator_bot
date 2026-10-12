@@ -14,6 +14,10 @@ public interface TitleEntityRepository extends JpaRepository<TitleEntity, Long> 
     @Query("SELECT t FROM TitleEntity t JOIN FETCH t.user")
     List<TitleEntity> findAllWithUsers();
 
+    @Query("SELECT new ti4.spring.service.persistence.EarnedTitle(t.title, t.game.gameName) FROM TitleEntity t"
+            + " WHERE t.user.id = :userId AND t.game.endedEpochMilliseconds IS NOT NULL")
+    List<EarnedTitle> findEndedGameTitlesByUserId(@Param("userId") String userId);
+
     @Modifying
     @Query("DELETE FROM TitleEntity t WHERE t.game.gameName = :gameName")
     void deleteByGameName(@Param("gameName") String gameName);

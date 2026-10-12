@@ -817,10 +817,18 @@ class GameSaveService {
             writer.write(Constants.FOG_FILTER + " " + fogColor);
             writer.write(System.lineSeparator());
 
+            if (!player.isFogGhostHexes()) {
+                writer.write(Constants.FOG_GHOST_HEXES + " false");
+                writer.write(System.lineSeparator());
+            }
+
             writer.write(Constants.PASSED + " " + player.isPassed());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.READY_TO_PASS_BAG + " " + player.isReadyToPassBag());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.OPLUSPLUS_COUNCIL_CONFIRMED + " " + player.isOplusplusCouncilConfirmed());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.AUTO_PASS_WHENS_N_AFTERS + " " + player.isAutoPassOnWhensAfters());

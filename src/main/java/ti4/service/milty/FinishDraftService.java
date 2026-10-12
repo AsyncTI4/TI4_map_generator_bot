@@ -41,10 +41,11 @@ class FinishDraftService {
         return null;
     }
 
-    public void finishDraft(GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game) {
+    public boolean finishDraft(GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game) {
         MessageChannel mainGameChannel = game.getMainGameChannel();
+        boolean mapChanged = false;
         try {
-            MiltyDraftHelper.buildPartialMap(game, event);
+            mapChanged = MiltyDraftHelper.buildPartialMap(game);
             boolean keleresExists = false;
             for (String playerId : manager.getPlayers()) {
                 Player player = game.getPlayer(playerId);
@@ -117,5 +118,6 @@ class FinishDraftService {
             MessageHelper.sendMessageToChannel(mainGameChannel, error.toString());
             BotLogger.error(new LogOrigin(event, game), e.getMessage(), e);
         }
+        return mapChanged;
     }
 }

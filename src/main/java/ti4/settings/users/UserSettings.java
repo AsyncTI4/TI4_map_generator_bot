@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.StringJoiner;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -114,24 +115,23 @@ public class UserSettings {
         return getHotHours(activeHours);
     }
 
-    public void addActiveHour(int utcHour) {
+    public void addActiveHourCheckins(int[] checkinsByUtcHour) {
         if (!activityTracking) {
             return;
         }
         if (isBlank(activeHours)) {
             activeHours = "0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0";
         }
-        int x = 0;
-        StringBuilder newActiveHours = new StringBuilder();
-        for (String hourStr : activeHours.split(";")) {
-            int hour = Integer.parseInt(hourStr);
-            if (x == utcHour) {
-                hour++;
+        String[] storedCheckins = activeHours.split(";");
+        StringJoiner newActiveHours = new StringJoiner(";");
+        for (int hour = 0; hour < storedCheckins.length; hour++) {
+            int checkins = Integer.parseInt(storedCheckins[hour]);
+            if (hour < checkinsByUtcHour.length) {
+                checkins += checkinsByUtcHour[hour];
             }
-            newActiveHours.append(hour).append(";");
-            x++;
+            newActiveHours.add(String.valueOf(checkins));
         }
-        activeHours = newActiveHours.substring(0, newActiveHours.length() - 1);
+        activeHours = newActiveHours.toString();
     }
 
     public static String summarizeActiveHours(String activity) {

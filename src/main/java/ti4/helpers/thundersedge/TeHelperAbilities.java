@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -36,6 +37,9 @@ import ti4.model.UnitModel;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.ParsedUnit;
+import ti4.service.unit.RemoveUnitService;
+import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
 public final class TeHelperAbilities {
 
@@ -434,5 +438,62 @@ public final class TeHelperAbilities {
         buttons.add(Buttons.gray(
                 player.factionButtonChecker() + "startSurvival_" + destination.getPosition(), "Done With This System"));
         return buttons;
+    }
+
+    private static final List<UnitType> MINIATURIZED_STRUCTURE_TYPES = List.of(UnitType.Pds, UnitType.Spacedock);
+
+    public static void offerStrandedStructureRemoval(
+            GenericInteractionCreateEvent event, Game game, List<RemovedUnit> destroyedUnits) {
+        Set<String> offered = new HashSet<>();
+        for (RemovedUnit destroyed : destroyedUnits) {
+            Tile tile = destroyed.tile();
+            if (tile == null
+                    || destroyed.uh() == null
+                    || !Constants.SPACE.equals(destroyed.uh().getName())) continue;
+            Player player = game.getPlayerFromColorOrFaction(destroyed.unitKey().colorID());
+            if (player == null || !player.hasAbility("miniaturization")) continue;
+            if (!offered.add(player.getFaction() + tile.getPosition())) continue;
+            if (FoWHelper.playerHasActualShipsInSystem(player, tile) || !hasStructuresInSpace(player, tile)) continue;
+
+            List<Button> buttons = List.of(
+                    Buttons.red(
+                            player.factionButtonChecker() + "removeStrandedStructures_" + tile.getPosition(),
+                            "Remove Structures in Space"),
+                    Buttons.gray("deleteButtons", "Keep Them"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", you no longer have any ships in "
+                            + tile.getRepresentationForButtons(game, player)
+                            + ", so the structures in its space area have nothing to transport them."
+                            + " You should remove them.",
+                    buttons);
+        }
+    }
+
+    private static boolean hasStructuresInSpace(Player player, Tile tile) {
+        UnitHolder space = tile.getSpaceUnitHolder();
+        return space != null
+                && MINIATURIZED_STRUCTURE_TYPES.stream()
+                        .anyMatch(type -> space.getUnitCount(type, player.getColor()) > 0);
+    }
+
+    @ButtonHandler("removeStrandedStructures_")
+    public static void removeStrandedStructures(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Tile tile = game.getTileByPosition(buttonID.replace("removeStrandedStructures_", ""));
+        ButtonHelper.deleteMessage(event);
+        if (tile == null) return;
+        UnitHolder space = tile.getSpaceUnitHolder();
+        if (space == null) return;
+        for (UnitType type : MINIATURIZED_STRUCTURE_TYPES) {
+            int count = space.getUnitCount(type, player.getColor());
+            if (count < 1) continue;
+            UnitKey unitKey = Units.getUnitKey(type, player.getColorID());
+            RemoveUnitService.removeUnit(event, tile, game, new ParsedUnit(unitKey, count, Constants.SPACE));
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " removed their structures from the space area of "
+                        + tile.getRepresentationForButtons(game, player) + ".");
     }
 }

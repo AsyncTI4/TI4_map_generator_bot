@@ -63,7 +63,7 @@
         "title": "Orator",
         "abilityWindow": "When a player exhausts a planet during the agenda phase",
         "abilityText": "Exhaust this card to allow that player to treat the combined value of that planet's resources and influence as if it were resources or influence. Then, ready that planet.",
-        "notes": "Not automated in the bot yet. You can add votes with the modify votes button before final submission, and ready planet and exhaust agent with slash commands.",
+        "notes": "Exhaust the planet first, then use this.",
         "unlockCondition": "Always Unlocked",
         "source": "blue_reverie"
     },
@@ -292,7 +292,7 @@
         "title": "Pirate Queen",
         "abilityName": "Todlys Unbound - The Leviathan",
         "abilityWindow": "When you pass:",
-        "abilityText": "When you pass, you may place 1 neutral war sun in a system that contains neutral units. Then, for each secret objective you have scored, you may resolve 1 tactical action as if you control all neutral units, instead of your own.\nNeutral war suns have the abilities on the Leviathan ability card.",
+        "abilityText": "When you pass, you may place 1 neutral war sun in a system that contains neutral units. Then, for each secret objective you have scored, you may resolve 1 tactical action as if you control all neutral units, instead of your own.\nNeutral war suns have the abilities on the Leviathan ability card.\n\nLeviathan:\nDouble hits produced by this unit's combat rolls during the first round of combat. If this unit produces 1 or more hits during a round of combat, cancel 2 hits produced against it.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "blue_reverie"
     },

@@ -512,7 +512,9 @@ class AgendaResolveButtonHandler {
             Player oldSpeaker = game.getPlayer(game.getStoredValue("oldSpeakerExecutiveOrder"));
             game.setSpeaker(oldSpeaker);
             game.setPhaseOfGame("action");
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);
+            MessageChannel turnChannel =
+                    game.isFowMode() ? executiveOrderPlayer.getCorrectChannel() : event.getChannel();
+            MessageHelper.sendMessageToChannelWithButtons(turnChannel, voteMessage, buttons);
         }
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);

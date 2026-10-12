@@ -5,9 +5,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.awt.Point;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.zip.CRC32;
 import javax.annotation.Nullable;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -24,6 +30,8 @@ import ti4.service.emoji.TileEmojis;
 
 @Data
 public class TileModel implements ModelInterface, EmbeddableModel {
+
+    private static final Map<String, String> IMAGE_VERSIONS = new ConcurrentHashMap<>();
 
     public enum TileBack {
         GREEN,
@@ -117,12 +125,11 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         // Image
         TI4Emoji emoji = getEmoji();
         if (emoji != null && emoji.asEmoji() instanceof CustomEmoji customEmoji) {
+            String altText = Optional.ofNullable(name).orElse(id);
             if (emoji.name().endsWith("Back") && !StringUtils.isEmpty(imagePath)) {
-                eb.setThumbnail(
-                        "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tiles/"
-                                + imagePath + "?raw=true");
+                eb.setThumbnail(buildGithubImageUrl(), altText);
             } else {
-                eb.setThumbnail(customEmoji.getImageUrl());
+                eb.setThumbnail(customEmoji.getImageUrl(), altText);
             }
         }
 
@@ -137,6 +144,25 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         if (!getNameNullSafe().isEmpty())
             sb.append("__").append(getNameNullSafe()).append("__");
         return sb.toString();
+    }
+
+    private String buildGithubImageUrl() {
+        String url = "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tiles/"
+                + imagePath + "?raw=true";
+        String version = IMAGE_VERSIONS.computeIfAbsent(imagePath, TileModel::computeImageVersion);
+        return version.isEmpty() ? url : url + "&v=" + version;
+    }
+
+    private static String computeImageVersion(String imagePath) {
+        String filePath = ResourceHelper.getTileFile(imagePath);
+        if (filePath == null) return "";
+        try {
+            CRC32 crc = new CRC32();
+            crc.update(Files.readAllBytes(Path.of(filePath)));
+            return Long.toHexString(crc.getValue());
+        } catch (IOException e) {
+            return "";
+        }
     }
 
     @JsonIgnore

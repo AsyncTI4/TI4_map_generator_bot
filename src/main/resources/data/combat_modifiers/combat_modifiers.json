@@ -1024,6 +1024,7 @@
         "value": "+1",
         "valueScalingType": "code",
         "persistenceType": "ALWAYS",
+        "condition": "toldar_mech_owner",
         "scope": "mf",
         "related": [
             {

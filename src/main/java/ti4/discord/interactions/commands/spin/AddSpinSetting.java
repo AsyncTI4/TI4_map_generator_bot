@@ -62,7 +62,7 @@ class AddSpinSetting extends GameStateSubcommand {
         Set<String> stepsInput = Helper.getSetFromCSV(event.getOption(STEPS).getAsString());
         String position = event.getOption(Constants.POSITION, "000", OptionMapping::getAsString);
         if (PositionMapper.getPositionsInRing("corners", game).contains(position)
-                || !PositionMapper.isTilePositionValid(position)) {
+                || !PositionMapper.isTilePositionValid(getGame(), position)) {
             MessageHelper.replyToMessage(event, "Invalid position");
             return;
         }

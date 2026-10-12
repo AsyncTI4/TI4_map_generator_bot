@@ -51,6 +51,13 @@ class MapGeneratorFrameTest extends BaseTi4Test {
     }
 
     @Test
+    void segmentTitleIsSwappedForTheEasterEggOnlyOnARollOfZero() {
+        assertTrue(MapGenerator.isEasterEggRoll(0));
+        assertFalse(MapGenerator.isEasterEggRoll(1));
+        assertFalse(MapGenerator.isEasterEggRoll(199));
+    }
+
+    @Test
     void nonFogMapKeepsTheClassicRingBasedCanvas() {
         try (MapGenerator generator = render(game, DisplayType.map, null)) {
             assertEquals(Math.max(1000, MapGenerator.getMapWidth(game)), generator.imageWidth());
@@ -211,6 +218,20 @@ class MapGeneratorFrameTest extends BaseTi4Test {
         MapSegment.put(twoMaps, new MapSegment("south", "1237", 1));
         try (MapGenerator generator = render(twoMaps, DisplayType.map, "south")) {
             assertTrue(generator.isInShownRegion("br"));
+        }
+    }
+
+    @Test
+    void askingForTheMainMapShowsItEvenWhenNamedSectorsExist() {
+        // The core around 000 is a named sector; 401 sits outside every sector on the main map.
+        game.setFowMode(true);
+        MapSegment.put(game, new MapSegment("core", "000", 1));
+
+        try (MapGenerator generator = render(game, DisplayType.map, MapSegment.MAIN)) {
+            assertNull(generator.shownSegmentName(), "main is the main view, not a fallback sector");
+        }
+        try (MapGenerator generator = render(game, DisplayType.map, null)) {
+            assertEquals("core", generator.shownSegmentName(), "no request still opens the default sector");
         }
     }
 }

@@ -56,4 +56,16 @@ class GameSaveServiceTest extends BaseTi4Test {
             assertThat(reloaded.getFowVisionGrant()).containsExactly("red", "blue");
         }
     }
+
+    @Test
+    void shouldRoundTripRulesLinksOptIn() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = harness.load();
+            game.setInjectRulesLinks(true);
+
+            assertThat(GameSaveService.save(game, "test")).isTrue();
+
+            assertThat(harness.load().isInjectRulesLinks()).isTrue();
+        }
+    }
 }

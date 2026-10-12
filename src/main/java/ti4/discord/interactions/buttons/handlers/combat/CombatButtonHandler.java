@@ -163,12 +163,13 @@ class CombatButtonHandler {
             msg +=
                     "\n> Since they have Jack Hallard, the Nokar commander, this means they may cancel 2 hits in this coming combat round.";
         }
-        String combatName =
-                "combatRoundTracker" + game.getActivePlayer().getFaction() + game.getActiveSystem() + "space";
-        if (game.getActivePlayer() != null
-                && game.getActivePlayer() != player
-                && game.getActivePlayer().hasAbility("cargo_raiders")
-                && game.getStoredValue(combatName).isEmpty()) {
+        Player activePlayer = game.getActivePlayer();
+        if (activePlayer != null
+                && activePlayer != player
+                && activePlayer.hasAbility("cargo_raiders")
+                && game.getStoredValue(
+                                "combatRoundTracker" + activePlayer.getFaction() + game.getActiveSystem() + "space")
+                        .isEmpty()) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("pay1tgToAnnounceARetreat", "Pay 1 Trade Good"));
             buttons.add(Buttons.red("deleteButtons", "I Don't Have to Pay"));

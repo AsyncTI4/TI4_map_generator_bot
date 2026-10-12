@@ -46,7 +46,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.Dr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
@@ -1953,18 +1953,7 @@ public class PlayerAreaGenerator {
         String CC_TAG = "cc";
         UnitTokenPosition reinforcementsPosition = PositionMapper.getReinforcementsPosition(CC_TAG);
         if (reinforcementsPosition != null && playerColor != null) {
-            int positionCount = reinforcementsPosition.getPositionCount(CC_TAG);
-            if (!game.getStoredValue("ccLimit").isEmpty()) {
-                positionCount = Integer.parseInt(game.getStoredValue("ccLimit"));
-            }
-            if (!game.getStoredValue("ccLimit" + playerColor).isEmpty()) {
-                positionCount = Integer.parseInt(game.getStoredValue("ccLimit" + playerColor));
-            }
-            if (game.getPlayerFromColorOrFaction(playerColor) != null
-                    && game.getPlayerFromColorOrFaction(playerColor).hasRelic("endurance_steroids")) {
-                positionCount += 2;
-            }
-            int remainingReinforcements = positionCount - ccCount;
+            int remainingReinforcements = player.getCommandTokenLimit() - ccCount;
             if (remainingReinforcements > 0) {
                 for (int i = 0; i < remainingReinforcements && i < 16; i++) {
                     try {
@@ -2419,7 +2408,7 @@ public class PlayerAreaGenerator {
             Set<PlanetType> types = EnumSet.noneOf(PlanetType.class);
             if (model != null && model.getPlanetTypes() != null) types.addAll(model.getPlanetTypes());
 
-            if (types.contains(PlanetType.FAKE)) {
+            if (types.contains(PlanetType.FAKE) || types.contains(PlanetType.SPACESTATION)) {
                 fakePlanets.add(planet);
             } else if (game.getTileFromPlanet(planet) == null) {
                 nonTile.add(planet);

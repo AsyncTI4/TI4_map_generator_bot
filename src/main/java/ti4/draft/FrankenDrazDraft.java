@@ -431,7 +431,7 @@ public class FrankenDrazDraft extends FrankenDraft {
     }
 
     private List<Container> buildPostDraftCategoryContainers(Player player, DraftCategory category) {
-        List<DraftItem> all = player.getDraftHand().getCategory(category);
+        List<DraftItem> all = player.getDraftHand().getDistinctCategory(category);
         if (all.isEmpty()) {
             return List.of();
         }

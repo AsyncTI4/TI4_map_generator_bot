@@ -113,3 +113,25 @@ A single action row can hold **either** up to 5 buttons **or** one select menu â
   in. `SlashCommandLimitsTest` now fails the build first. Before adding a subcommand, check
   the parent's current count â€” if it is full, put the command under a different parent
   rather than freeing a slot.
+- **Reach Spring beans through a static `getBean()` on the bean's own class.** Non-Spring
+  code (static helpers, listeners, commands) should call `MyService.getBean()`, not
+  `SpringContext.getBean(MyService.class)` directly. Give the service
+  `public static MyService getBean() { return SpringContext.getBean(MyService.class); }`
+  (see `SavedBotMessagesService.getBean()` or `GameMessageService.getBean()`). Use this for
+  new code and when touching existing call sites.
+- **Component-specific rules live in [COMPONENT_RULES.md](COMPONENT_RULES.md).** Open it only
+  when your change touches a component listed below; otherwise skip it.
+  - Border anomalies: any file or class named `BorderAnomaly*` or `border_anomal*`.
+
+### Testing of new functionality and/or bug fixes
+The repo includes a testbed: a developer-only feature for testing on a live Discord dev bot
+run by the developer. It sets up games with virtual seats and drives them through JSON
+scripts, presets and shortcuts under `src/main/resources/data/testbed/`. See
+[DEVELOPER_TESTBED.md](DEVELOPER_TESTBED.md) and [TESTBED_AGENT_GUIDE.md](TESTBED_AGENT_GUIDE.md).
+
+- Do not create or edit testbed scripts, presets or shortcuts unless the developer explicitly
+  asks for it, or a private instruction set from the developer allows it.
+- You may suggest that a change would benefit from a testbed check.
+- This rule covers only the testbed. Writing JUnit tests in `src/test/java` and running the
+  normal Maven build (including `TestBedDataTest`) are always allowed and encouraged.
+

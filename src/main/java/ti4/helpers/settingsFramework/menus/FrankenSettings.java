@@ -367,26 +367,24 @@ public class FrankenSettings extends SettingsMenu {
         Map<String, Set<String>> banListSources = selectedBanListSources(Constants.BAN_FACTION);
         Set<String> effectiveBans = new HashSet<>(bannedFactions.getKeys());
         effectiveBans.addAll(banListSources.keySet());
-        if (!banAllDsFactions.isVal()) {
-            Mapper.getFactionsValues().stream()
-                    .filter(f -> f.getSource() == ComponentSource.ds)
-                    .map(FactionModel::getAlias)
-                    .filter(alias -> !ALWAYS_DISABLED_FACTIONS.contains(alias))
-                    .forEach(effectiveBans::add);
-        }
+        Set<ComponentSource> fullyBannedSources = new HashSet<>();
+        if (!banAllDsFactions.isVal()) fullyBannedSources.add(ComponentSource.ds);
+        if (!banAllBrFactions.isVal()) fullyBannedSources.add(ComponentSource.blue_reverie);
 
-        if (!banAllBrFactions.isVal()) {
-            Mapper.getFactionsValues().stream()
-                    .filter(f -> f.getSource() == ComponentSource.blue_reverie)
-                    .map(FactionModel::getAlias)
-                    .filter(alias -> !ALWAYS_DISABLED_FACTIONS.contains(alias))
-                    .forEach(effectiveBans::add);
-        }
-        List<String> values = effectiveBans.stream()
+        List<String> values = new ArrayList<>();
+        if (fullyBannedSources.contains(ComponentSource.ds)) values.add("All DS factions");
+        if (fullyBannedSources.contains(ComponentSource.blue_reverie)) values.add("All BR factions");
+        effectiveBans.stream()
+                .filter(key -> !isFromSource(key, fullyBannedSources))
                 .map(key -> factionBanLabel(key, banListSources.getOrDefault(key, Set.of())))
                 .sorted()
-                .toList();
+                .forEach(values::add);
         return "[" + String.join(",", values) + "]";
+    }
+
+    private static boolean isFromSource(String factionAlias, Set<ComponentSource> sources) {
+        FactionModel faction = Mapper.getFaction(factionAlias);
+        return faction != null && sources.contains(faction.getSource());
     }
 
     private static String frankenNotes() {

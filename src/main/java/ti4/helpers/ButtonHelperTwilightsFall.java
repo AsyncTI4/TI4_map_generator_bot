@@ -291,8 +291,9 @@ public final class ButtonHelperTwilightsFall {
             draft.setSlice(mslice);
         }
 
+        boolean mapChanged = false;
         try {
-            MiltyDraftHelper.buildPartialMap(game, event);
+            mapChanged = MiltyDraftHelper.buildPartialMap(game);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event, game), "err", e);
         }
@@ -311,6 +312,9 @@ public final class ButtonHelperTwilightsFall {
             }
         }
         game.setShowMapSetup(false);
+        if (mapChanged) {
+            ButtonHelper.updateMap(game, event);
+        }
     }
 
     @ButtonHandler("startFrankenMantisBuild")
@@ -327,6 +331,7 @@ public final class ButtonHelperTwilightsFall {
             }
         }
 
+        boolean mapChanged = false;
         try {
             // Ensure map template is set
             String mapTemplate = game.getMapTemplateID();
@@ -342,7 +347,7 @@ public final class ButtonHelperTwilightsFall {
             }
 
             // Place draft tiles
-            MiltyDraftHelper.buildPartialMap(game, event);
+            mapChanged = MiltyDraftHelper.buildPartialMap(game);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event, game), "err", e);
         }
@@ -350,6 +355,9 @@ public final class ButtonHelperTwilightsFall {
         // Send buttons for map build
         MantisMapBuildContext mapBuildContext = FrankenMapBuildContextHelper.createContext(game);
         MantisMapBuildService.initializeMapBuilding(mapBuildContext);
+        if (mapChanged) {
+            ButtonHelper.updateMap(game, event);
+        }
     }
 
     private static boolean setPositionAndSendHomeFleetButtons(Game game, Player player) {

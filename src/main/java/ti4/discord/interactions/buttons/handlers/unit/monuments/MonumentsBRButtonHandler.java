@@ -202,11 +202,14 @@ public class MonumentsBRButtonHandler {
                 && !MonumentsService.isMonumentOnBoard(game, player, "sarcosa_monument")
                 && tile != null
                 && planet != null
+                && FoWHelper.knowsTile(game, player, tile.getPosition())
                 && !tile.isHomeSystem(game)
                 && !tile.isFracture()
                 && game.getTileMap().values().stream()
                         .filter(system -> FoWHelper.playerHasUnitsInSystem(player, system)
-                                || (neutral != null && FoWHelper.playerHasUnitsInSystem(neutral, system)))
+                                || (neutral != null
+                                        && FoWHelper.knowsTile(game, player, system.getPosition())
+                                        && FoWHelper.playerHasUnitsInSystem(neutral, system)))
                         .flatMap(system ->
                                 FoWHelper.getAdjacentTilesAndNotThisTile(game, system.getPosition(), player, false)
                                         .stream())
@@ -540,7 +543,8 @@ public class MonumentsBRButtonHandler {
     }
 
     public static boolean removesSustainDamage(Game game, Player player, Tile tile) {
-        return game != null
+        return !player.hasTech("dsxinystar")
+                && game != null
                 && game.getRealPlayersNNeutral().stream()
                         .anyMatch(other -> other != player
                                 && hasArmageddonProjectSuperweapon(game, other, "superweaponglatison")

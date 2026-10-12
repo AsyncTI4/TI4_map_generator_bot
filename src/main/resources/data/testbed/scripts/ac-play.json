@@ -1,0 +1,16 @@
+{
+  "name": "ac-play",
+  "description": "Sol plays Economic Initiative from hand: the card leaves the hand, reaches the discard, and Hacan gets a Sabotage window it can decline.",
+  "preset": "ac-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "expect": { "state": "game.activePlayer", "equals": "sol" } },
+    { "expect": { "state": "sol.acIds", "contains": "economic_initiative" } },
+    { "as": "sol", "press": "ac_play_from_hand_{ac:economic_initiative}", "in": "sol:cards-info" },
+    { "expect": { "state": "sol.acIds", "notContains": "economic_initiative" } },
+    { "expect": { "state": "game.acDiscard", "contains": "economic_initiative" } },
+    { "expect": { "in": "main", "contains": "Economic Initiative" } },
+    { "as": "hacan", "press": "no_sabotage", "in": "main" },
+    { "expect": { "state": "hacan.acIds", "contains": "sabo1" } }
+  ]
+}

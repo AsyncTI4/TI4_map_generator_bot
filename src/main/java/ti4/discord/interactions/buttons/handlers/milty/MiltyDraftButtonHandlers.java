@@ -35,6 +35,16 @@ class MiltyDraftButtonHandlers {
         manager.doMiltyPick(event, game, buttonID, player);
     }
 
+    @ButtonHandler("restartAllMiltyQueue")
+    private void restartAllMiltyQueue(ButtonInteractionEvent event, Game game, String buttonID) {
+        ButtonHelper.deleteMessage(event);
+        for (Player player : game.getPlayers().values()) {
+            game.setStoredValue(player.getUserID() + "queuedMiltyPick", "");
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), "All players' milty draft queues have been reset.");
+    }
+
     @ButtonHandler("restartMiltyQueue")
     private void restartMiltyQueue(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         ButtonHelper.deleteMessage(event);
@@ -137,15 +147,12 @@ class MiltyDraftButtonHandlers {
                 displayFactions.addAll(game.getMiltyDraftManager().remainingFactions());
         }
 
-        boolean first = true;
         List<MessageEmbed> embeds =
                 displayFactions.stream().map(FactionModel::fancyEmbed).toList();
-        for (MessageEmbed e : embeds) {
-            String message = "";
-            if (first) message = player.getRepresentationUnfogged() + " Here's an overview of the factions:";
-            MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
-            first = false;
-        }
+        MessageHelper.sendMessageToChannelWithEmbeds(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + " Here's an overview of the factions:",
+                embeds);
         if (!game.isTwilightsFallMode() && game.isThundersEdge()) {
             List<MessageEmbed> teEmbeds = new ArrayList<>();
             for (FactionModel faction : displayFactions) {
@@ -157,15 +164,11 @@ class MiltyDraftButtonHandlers {
                     teEmbeds.add(Mapper.getBreakthrough(btId).getRepresentationEmbed());
                 }
             }
-            first = true;
-            for (MessageEmbed e : teEmbeds) {
-                String message = "";
-                if (first) {
-                    message =
-                            player.getRepresentationUnfogged() + ", here is an overview of the faction breakthroughs.";
-                }
-                MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
-                first = false;
+            if (!teEmbeds.isEmpty()) {
+                MessageHelper.sendMessageToChannelWithEmbeds(
+                        player.getCardsInfoThread(),
+                        player.getRepresentationUnfogged() + ", here is an overview of the faction breakthroughs.",
+                        teEmbeds);
             }
         }
     }

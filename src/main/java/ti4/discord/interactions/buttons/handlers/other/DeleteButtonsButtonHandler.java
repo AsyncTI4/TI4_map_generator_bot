@@ -501,15 +501,6 @@ class DeleteButtonsButtonHandler {
                     && game.getStoredValue("ASN" + player.getFaction()).isEmpty()) {
                 ButtonHelperTacticalAction.endOfTacticalActionThings(player, game, event);
                 List<Button> systemButtons2;
-                if (player.hasUnexhaustedLeader("sardakkagent")) {
-                    String message = player.getRepresentationUnfogged() + ", you may use "
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                            + "T'ro, the N'orr" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                            + " agent.";
-                    systemButtons2 = new ArrayList<>(ButtonHelperAgents.getSardakkAgentButtons(game));
-                    systemButtons2.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
-                }
                 systemButtons2 = new ArrayList<>();
                 if (player.hasUnexhaustedLeader("nomadagentmercer")) {
                     String message = player.getRepresentationUnfogged() + ", you may use "

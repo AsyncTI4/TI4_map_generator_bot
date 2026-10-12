@@ -5,6 +5,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.ButtonHelper;
+import ti4.message.MessageHelper;
 import ti4.service.game.SwapFactionService;
 
 @UtilityClass
@@ -15,5 +17,13 @@ class SwapFactionButtonHandler {
         String faction = buttonID.replace("swapToFaction_", "");
         SwapFactionService.secondHalfOfSwap(
                 game, player, game.getPlayerFromColorOrFaction(faction), event.getUser(), event);
+    }
+
+    @ButtonHandler(value = "getSwapButtons_", save = false)
+    public static void showAllianceSwapButtons(ButtonInteractionEvent event, Player player, Game game) {
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                "Swap",
+                ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, game, true));
     }
 }

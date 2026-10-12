@@ -34,13 +34,16 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Exploratio
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.AtokeraAgentHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.xan.XanAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
@@ -82,6 +85,7 @@ import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.testbed.TestBedService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
@@ -427,6 +431,7 @@ public final class AgendaHelper {
                             player.getCorrectChannel(), Helper.buildSpentThingsMessageForVoting(player, game, false));
                 }
             }
+            AtokeraAgentHandler.clearVotes(player, game);
 
             if (!game.isFowMode()) {
                 Button eraseAndReVote = Buttons.red("eraseMyVote", "Erase my vote & have me vote again");
@@ -626,20 +631,52 @@ public final class AgendaHelper {
                         VeylorLeadersHandler.isVeylorAgendaPhase(game) && player.hasReadyBreakthrough("veylorbt"))
                 .findFirst()
                 .orElse(null);
-        List<Button> resolutions;
-        if (filibusterPlayer == null) {
-            resolutions = new ArrayList<>(List.of(
-                    Buttons.blue("agendaResolution_" + winner, "Resolve with Current Winner"),
-                    Buttons.red("autoresolve_manual", "Resolve it Manually")));
-        } else {
+        Player veiledNetworkingPlayer = XinTechHandler.getVeiledNetworkingSteelPlayer(game, winner);
+        if (filibusterPlayer != null) {
             message.append('\n')
                     .append(filibusterPlayer.getRepresentationNoPing())
                     .append(" may exhaust _Filibustered Legislation_ before this agenda is resolved.");
-            resolutions = new ArrayList<>(List.of(
-                    VeylorBreakthroughHandler.offerFilibusterButton(filibusterPlayer, game),
-                    VeylorBreakthroughHandler.offerDeclineFilibusterButton(filibusterPlayer, winner)));
         }
+        if (veiledNetworkingPlayer != null) {
+            message.append('\n')
+                    .append(veiledNetworkingPlayer.getRepresentationNoPing())
+                    .append(" may spend 1 strategy token to resolve _Veiled Networking_ (Steel).");
+        }
+        if (filibusterPlayer != null && veiledNetworkingPlayer != null) {
+            message.append('\n')
+                    .append("Reminder that abilities get resolved in speaker order during the agenda phase.");
+        }
+        List<Button> resolutions = getAgendaResolutionButtons(game, winner, true, true);
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message.toString(), resolutions);
+    }
+
+    public static List<Button> getAgendaResolutionButtons(
+            Game game, String winner, boolean includeFilibuster, boolean includeVeiledNetworking) {
+        List<Button> resolutions = new ArrayList<>();
+        Player filibusterPlayer = includeFilibuster
+                ? game.getRealPlayers().stream()
+                        .filter(player -> VeylorLeadersHandler.isVeylorAgendaPhase(game)
+                                && player.hasReadyBreakthrough("veylorbt"))
+                        .findFirst()
+                        .orElse(null)
+                : null;
+        Player veiledNetworkingPlayer =
+                includeVeiledNetworking ? XinTechHandler.getVeiledNetworkingSteelPlayer(game, winner) : null;
+        if (filibusterPlayer != null) {
+            resolutions.add(VeylorBreakthroughHandler.offerFilibusterButton(filibusterPlayer, game));
+            resolutions.add(VeylorBreakthroughHandler.offerDeclineFilibusterButton(
+                    filibusterPlayer, winner, veiledNetworkingPlayer != null));
+        }
+        if (veiledNetworkingPlayer != null) {
+            resolutions.add(XinTechHandler.getVeiledNetworkingSteelButton(veiledNetworkingPlayer, winner));
+            resolutions.add(XinTechHandler.getDeclineVeiledNetworkingSteelButton(
+                    veiledNetworkingPlayer, winner, filibusterPlayer != null));
+        }
+        if (resolutions.isEmpty()) {
+            resolutions.add(Buttons.blue("agendaResolution_" + winner, "Resolve with Current Winner"));
+            resolutions.add(Buttons.red("autoresolve_manual", "Resolve it Manually"));
+        }
+        return resolutions;
     }
 
     private static void handleShenanigans(Game game, String winner) {
@@ -1638,10 +1675,27 @@ public final class AgendaHelper {
     @ButtonHandler("presetCommitteeFormation")
     public static void presetCommitteeFormation(ButtonInteractionEvent event, Player player, Game game) {
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.red("removeCommitteeFormation", "Remove Committee Formation"));
+        MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation() + " you successfully preset a play of _Committee Formation_.");
+                player.getRepresentation()
+                        + " you successfully preset a play of _Committee Formation_. You can use this button to undo it.",
+                buttons);
         game.setStoredValue("CommFormPreset", player.getFaction());
+    }
+
+    @ButtonHandler("removeCommitteeFormation")
+    public static void removeCommitteeFormation(ButtonInteractionEvent event, Player player, Game game) {
+        ButtonHelper.deleteMessage(event);
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("presetCommitteeFormation", "Preset Committee Formation"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentation()
+                        + " you successfully removed a preset of _Committee Formation_. You can use this button to redo it.",
+                buttons);
+        game.removeStoredValue("CommFormPreset");
     }
 
     @ButtonHandler("exhaustForVotes_")
@@ -1933,7 +1987,26 @@ public final class AgendaHelper {
                 "Exhaust All Voting Planets (" + totalPlanetVotes + ")"));
         planetButtons.add(
                 Buttons.red(player.factionButtonChecker() + "proceedToFinalizingVote", "Done exhausting planets."));
+        planetButtons.add(Buttons.gray(player.factionButtonChecker() + "resetMyVote", "Reset My Vote"));
         return planetButtons;
+    }
+
+    public static void undoThingsSpentOnThisVote(Game game, Player player) {
+        List<String> spentThings = player.getSpentThingsThisWindow();
+        if (spentThings.stream().anyMatch(thing -> thing.startsWith("predictive_"))) {
+            game.setStoredValue(
+                    "riskedPredictive", game.getStoredValue("riskedPredictive").replace(player.getFaction(), ""));
+        }
+        boolean prevoting =
+                !game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
+        if (prevoting) {
+            player.resetSpentThings();
+            return;
+        }
+        if (spentThings.stream().anyMatch(thing -> thing.startsWith("dsghotg_"))) {
+            player.refreshTech("dsghotg");
+        }
+        Helper.refreshPlanetsOnTheRevote(player, game);
     }
 
     @ButtonHandler("refreshAgenda")
@@ -2362,6 +2435,11 @@ public final class AgendaHelper {
     private static Map<String, Integer> getAdditionalVotesFromOtherSources(Game game, Player player) {
         Map<String, Integer> additionalVotesAndSources = new LinkedHashMap<>();
 
+        int atokeraVotes = AtokeraAgentHandler.getVotes(player, game);
+        if (atokeraVotes > 0) {
+            additionalVotesAndSources.put(FactionEmojis.atokera + " _Magruda, the Atokera Agent_", atokeraVotes);
+        }
+
         if (getVoteCountFromPlanets(game, player) == 0) {
             return additionalVotesAndSources;
         }
@@ -2771,13 +2849,13 @@ public final class AgendaHelper {
             String agendaName2 = agendaName;
             while (!notEmergency) {
                 if ("Emergency Session".equalsIgnoreCase(agendaName2)) {
-                    game.revealAgenda(false);
+                    game.revealAgenda(revealFromBottom);
                     MessageHelper.sendMessageToChannel(
                             channel,
                             game.getPing()
                                     + " _Emergency Session_ revealed underneath _Covert Legislation_, discarding it.");
                 }
-                String id2 = game.getNextAgenda(false);
+                String id2 = game.getNextAgenda(revealFromBottom);
                 AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
                 agendaTarget = agendaDetails2.getTarget();
                 agendaType = agendaDetails2.getType();
@@ -2787,7 +2865,7 @@ public final class AgendaHelper {
                 if ((agendaTarget.toLowerCase().contains("elect law") || "constitution".equalsIgnoreCase(id2))
                         && game.getLaws().isEmpty()) {
                     notEmergency = false;
-                    game.revealAgenda(false);
+                    game.revealAgenda(revealFromBottom);
                     MessageHelper.sendMessageToChannel(
                             channel,
                             game.getPing() + ", an \"elect law\" agenda (" + agendaName2
@@ -2805,7 +2883,7 @@ public final class AgendaHelper {
                                     + ") was hidden under _Covert Legislation_ when no secret objectives have been scored."
                                     + " As such, both that agenda and _Covert Legislation_ have been discarded, and the next agenda is being flipped.");
                     notEmergency = false;
-                    game.revealAgenda(false);
+                    game.revealAgenda(revealFromBottom);
                     aCount -= 1;
                     game.setStoredValue("agendaCount", aCount + "");
                     revealAgenda(event, revealFromBottom, game, channel);
@@ -2825,6 +2903,10 @@ public final class AgendaHelper {
                         List<MessageEmbed> embeds =
                                 List.of(Mapper.getAgenda(id2).getRepresentationEmbed());
                         MessageHelper.sendMessageEmbedsToCardsInfoThread(speaker, sb, embeds);
+                        if (revealFromBottom) {
+                            id2 = game.revealAgenda(true);
+                            game.putAgendaBackIntoDeckOnTop(id2);
+                        }
                         game.drawAgenda();
                     }
                 }
@@ -2852,6 +2934,7 @@ public final class AgendaHelper {
         MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
         String revealMessage = game.getPing() + ", an agenda has been revealed.";
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
+        KaltrimUnitHandler.offerJewelOfTheRose(game, agendaID);
         if (!action && aCount == 1) {
             VeylorAbilitiesHandler.offerTightScheduling(game);
         }
@@ -2897,6 +2980,7 @@ public final class AgendaHelper {
 
         if (!action && aCount == 1) {
             pingAboutDebt(game);
+            ButtonHelperFactionSpecific.offerKaltrimAmbassadors(game);
             String politicsHolder = "round" + game.getRound() + "PoliticsHolder";
             String key = "round" + game.getRound() + "AgendaPlacement";
             if (!game.getStoredValue(key).isEmpty() && !game.isFowMode()) {
@@ -3136,7 +3220,10 @@ public final class AgendaHelper {
     }
 
     public static void showDiscards(Game game, GenericInteractionCreateEvent event) {
-        if (!RiftSetModeService.deckInfoAvailable(game.getPlayer(event.getUser().getId()), game)) {
+        if (!RiftSetModeService.deckInfoAvailable(
+                TestBedService.resolveActingPlayer(
+                        game, event, game.getPlayer(event.getUser().getId())),
+                game)) {
             return;
         }
         StringBuilder sb2 = new StringBuilder();

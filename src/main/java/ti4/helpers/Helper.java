@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,6 +54,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.AtokeraAgentHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrAbilitiesHandler;
@@ -65,9 +70,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -1408,6 +1413,17 @@ public final class Helper {
                     msg.append("Got 4 votes from voting the same way as another _Blood Pact_ member.\n");
             }
         }
+        int atokeraVotes = AtokeraAgentHandler.getVotes(player, game);
+        if (atokeraVotes > 0) {
+            votes += atokeraVotes;
+            if (!justVoteTotal) {
+                msg.append("> Used _Magruda, the Atokera Agent_ for ")
+                        .append(atokeraVotes)
+                        .append(" vote")
+                        .append(atokeraVotes == 1 ? "" : "s")
+                        .append(".\n");
+            }
+        }
         // Dreaming Throne Commander
         if (votes > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "dreamcommander")) {
             int count = DreamLeadersHandler.getDreamCommanderVoteCount(game, player);
@@ -1490,8 +1506,14 @@ public final class Helper {
     public static void refreshPlanetsOnTheRespend(Player player, Game game) {
         List<String> spentThings = new ArrayList<>(player.getSpentThingsThisWindow());
         int tg = player.getSpentTgsThisWindow();
+        int kaldurCapturedInfantry = KaltrimTechHandler.getCapturedInfantrySpent(player);
 
         player.setTg(player.getTg() + tg);
+        if (kaldurCapturedInfantry > 0) {
+            player.getNombox()
+                    .addUnit(Units.getUnitKey(UnitType.Infantry, player.getColorID()), kaldurCapturedInfantry);
+            player.getSpentThingsThisWindow().removeIf(thing -> thing.startsWith("kaldurCapturedInfantry_"));
+        }
         for (String thing : spentThings) {
             if (thing.contains("tg_")) {
                 player.removeSpentThing(thing);
@@ -1514,6 +1536,24 @@ public final class Helper {
     }
 
     public static String buildSpentThingsMessage(Player player, Game game, String resOrInfOrBoth) {
+        String message = buildSpentThingsMessage(player, game, resOrInfOrBoth, false);
+        if (message.length() <= Message.MAX_CONTENT_LENGTH) {
+            return message;
+        }
+        return buildSpentThingsMessage(player, game, resOrInfOrBoth, true);
+    }
+
+    private static String buildSpentThingsMessage(
+            Player player, Game game, String resOrInfOrBoth, boolean withoutPlanetEmojis) {
+        Function<String, String> planetWithResourcesAndInfluence = withoutPlanetEmojis
+                ? planet -> getPlanetRepresentation(planet, game)
+                : planet -> getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game);
+        Function<String, String> planetWithResources = withoutPlanetEmojis
+                ? planet -> getPlanetRepresentation(planet, game)
+                : planet -> getPlanetRepresentationPlusEmojiPlusResources(planet, game);
+        Function<String, String> planetWithInfluence = withoutPlanetEmojis
+                ? planet -> getPlanetRepresentation(planet, game)
+                : planet -> getPlanetRepresentationPlusEmojiPlusInfluence(planet, game);
         List<String> spentThings = player.getSpentThingsThisWindow();
         StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + " exhausted the following: \n");
         int res = 0;
@@ -1526,6 +1566,7 @@ public final class Helper {
         boolean countResourcesAsInfluence =
                 "inf".equalsIgnoreCase(resOrInfOrBoth) && WildlifePreservationLLButtonHandler.isActive(game, player);
         int tg = player.getSpentTgsThisWindow();
+        int kaldurCapturedInfantry = KaltrimTechHandler.getCapturedInfantrySpent(player);
         boolean xxchaHero = player.hasLeaderUnlocked("xxchahero");
         boolean xxchaBt = player.hasUnlockedBreakthrough("xxchabt");
         int bestRes = 0;
@@ -1566,7 +1607,7 @@ public final class Helper {
                 Planet planet = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetName));
                 if (planet != null) {
                     msg.append("> Used _Nature's Boon_ for ")
-                            .append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game))
+                            .append(planetWithResourcesAndInfluence.apply(planetName))
                             .append('\n');
                     if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
                         inf += planet.getResources();
@@ -1580,6 +1621,9 @@ public final class Helper {
                 found = true;
             }
             if (thing.startsWith("blacktfCapturedInfantry_")) {
+                found = true;
+            }
+            if (thing.startsWith("kaldurCapturedInfantry_")) {
                 found = true;
             }
             if (!found
@@ -1631,23 +1675,23 @@ public final class Helper {
                     }
                     if ("res".equalsIgnoreCase(resOrInfOrBoth)) {
                         if (xxchaHero) {
-                            msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                            msg.append(planetWithResourcesAndInfluence.apply(thing))
                                     .append('\n');
                             res += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
-                            msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                            msg.append(planetWithResourcesAndInfluence.apply(thing))
                                     .append('\n');
                             res += planet.getMaxResInf();
                         } else {
                             if (countInfluenceAsResources) {
-                                msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                msg.append(planetWithResourcesAndInfluence.apply(thing))
                                         .append(" (using its higher value due to _Emergency Appropriations_)\n");
                                 resourceValue = planet.getMaxResInf();
                             } else if (Math.min(gledgeMech, planet.getInfluence()) > 0) {
-                                msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                msg.append(planetWithResourcesAndInfluence.apply(thing))
                                         .append('\n');
                             } else {
-                                msg.append(getPlanetRepresentationPlusEmojiPlusResources(thing, game));
+                                msg.append(planetWithResources.apply(thing));
                                 if (resourceDonor != null) {
                                     msg.append(" (counting as ")
                                             .append(resourceValue)
@@ -1659,27 +1703,25 @@ public final class Helper {
                         }
                     } else if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
                         if (xxchaHero) {
-                            msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                            msg.append(planetWithResourcesAndInfluence.apply(thing))
                                     .append('\n');
                             inf += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
-                            msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                            msg.append(planetWithResourcesAndInfluence.apply(thing))
                                     .append('\n');
                             inf += planet.getMaxResInf();
                         } else {
                             if (countResourcesAsInfluence) {
-                                msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                msg.append(planetWithResourcesAndInfluence.apply(thing))
                                         .append(" (using its higher value due to _Wildlife Preservation_)\n");
                                 inf += planet.getMaxResInf();
                             } else {
-                                msg.append(getPlanetRepresentationPlusEmojiPlusInfluence(thing, game))
-                                        .append('\n');
+                                msg.append(planetWithInfluence.apply(thing)).append('\n');
                                 inf += planet.getInfluence();
                             }
                         }
                     } else if ("freelancers".equalsIgnoreCase(resOrInfOrBoth)) {
-                        msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
-                                .append('\n');
+                        msg.append(planetWithResourcesAndInfluence.apply(thing)).append('\n');
                         if (xxchaHero) {
                             res += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
@@ -1688,8 +1730,7 @@ public final class Helper {
                             res += planet.getMaxResInf();
                         }
                     } else {
-                        msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
-                                .append('\n');
+                        msg.append(planetWithResourcesAndInfluence.apply(thing)).append('\n');
                         if (xxchaHero) {
                             inf += planet.getSumResourcesInfluence();
                             res += planet.getSumResourcesInfluence();
@@ -1817,8 +1858,8 @@ public final class Helper {
                     .append(priorityRequisitionDiscount)
                     .append(" resource discount.\n");
         }
-        res += tg + keleresAgent;
-        inf += tg + keleresAgent;
+        res += tg + keleresAgent + kaldurCapturedInfantry;
+        inf += tg + keleresAgent + kaldurCapturedInfantry;
         if (tg > 0) {
             msg.append("> Spent ")
                     .append(tg)
@@ -1832,9 +1873,17 @@ public final class Helper {
                     .append(player.getTg())
                     .append(") \n");
         }
-        if (player.hasTech("mc") && tg + keleresAgent > 0) {
-            res += tg + keleresAgent;
-            inf += tg + keleresAgent;
+        if (kaldurCapturedInfantry > 0) {
+            msg.append("> Spent ")
+                    .append(kaldurCapturedInfantry)
+                    .append(" captured infantry")
+                    .append(" as trade good")
+                    .append(kaldurCapturedInfantry == 1 ? "" : "s")
+                    .append(" with _Kaldur Arrest Field_\n");
+        }
+        if (player.hasTech("mc") && tg + keleresAgent + kaldurCapturedInfantry > 0) {
+            res += tg + keleresAgent + kaldurCapturedInfantry;
+            inf += tg + keleresAgent + kaldurCapturedInfantry;
             msg.append("> Counted the trade goods twice due to _Mirror Computing_\n");
         }
 
@@ -1993,8 +2042,8 @@ public final class Helper {
                             .append("!");
                 }
             } else if (activeSystem != null
-                    && tile == activeSystem
-                    && getProductionValue(player, game, tile, false) > 0) {
+                    && ((tile == activeSystem && getProductionValue(player, game, tile, false) > 0)
+                            || XinTechHandler.getVeiledNetworkingStarProductionValue(player, game, tile) > 0)) {
                 if (!player.hasUnit("arborec_mech")
                         && !player.hasUnit("arborec_infantry")
                         && !player.hasUnit("tf-lataniwarrior")
@@ -2002,7 +2051,9 @@ public final class Helper {
                         && !player.hasUnit("arborec_infantry2")) {
 
                     int productionLimit;
-                    productionLimit = getProductionValue(player, game, tile, false);
+                    productionLimit = Math.max(
+                            getProductionValue(player, game, tile, false),
+                            XinTechHandler.getVeiledNetworkingStarProductionValue(player, game, tile));
                     boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
                     if (warM) {
                         productionLimit += 4;
@@ -2224,11 +2275,21 @@ public final class Helper {
                 }
                 productionValueTotal += productionValue * uH.getUnits().get(unit);
                 productionValueTotal += XytherisLeadersHandler.getMyrixAgentBonus(game, player, tile, uH, unit);
-            } else if (ThurvialiTechHandler.canUseCoexistingStructure(game, player, uH, unit)) {
+            } else {
+                boolean graveholdControlled =
+                        SarcosaBreakthroughHandler.canControlNeutralStructure(game, player, uH, unit);
+                if (!ThurvialiTechHandler.canUseCoexistingStructure(game, player, uH, unit) && !graveholdControlled) {
+                    continue;
+                }
                 Player structureOwner = game.getPlayerByColorID(unit.colorID()).orElse(null);
-                UnitModel structure = structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unit);
+                UnitModel structure = graveholdControlled
+                        ? SarcosaBreakthroughHandler.getControlledNeutralStructureModel(game, player, uH, unit)
+                        : structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unit);
                 if (structure != null) {
                     int productionValue = structure.getProductionValue();
+                    if (graveholdControlled && "sd".equals(structure.getAsyncId())) {
+                        productionValue = 3;
+                    }
                     if ("mech".equalsIgnoreCase(structure.getBaseType())
                             && ButtonHelper.isLawInPlay(game, "articles_war")) {
                         productionValue = 0;
@@ -2288,9 +2349,9 @@ public final class Helper {
                                     && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)))) {
                 productionValueTotal += 5;
             } else {
-                if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Warsun)
-                                .contains(tile)
-                        && player.hasTech("tf-mr")) {
+                if (player.hasTech("tf-mr")
+                        && tile.containsPlayersUnitsWithKeyCondition(
+                                player, unit -> unit.unitType() == UnitType.Warsun)) {
                     productionValueTotal += 5;
                 }
             }
@@ -2535,13 +2596,14 @@ public final class Helper {
         if (tile.isScar(game)
                 && !player.hasUnlockedBreakthrough("nivynbt")
                 && !player.hasTech("tf-singularitypoint")
+                && !XinTechHandler.hasVeiledNetworkingStar(player)
                 && !ignoreScar) {
             return 0;
         }
         if (TeHelperUnits.affectedByQuietus(game, player, tile)) {
             return 0;
         }
-        if (game.isTwilightsFallMode()) {
+        if (game.isTwilightsFallMode() && !XinTechHandler.hasVeiledNetworkingStar(player)) {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.hasTech("tf-smotheringpresence")) {
                     for (String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
@@ -2617,12 +2679,23 @@ public final class Helper {
                         if (productionValue > highestProd) {
                             highestProd = productionValue;
                         }
-                    } else if (ThurvialiTechHandler.canUseCoexistingStructure(game, player, uH, unit)) {
+                    } else {
+                        boolean graveholdControlled =
+                                SarcosaBreakthroughHandler.canControlNeutralStructure(game, player, uH, unit);
+                        if (!ThurvialiTechHandler.canUseCoexistingStructure(game, player, uH, unit)
+                                && !graveholdControlled) {
+                            continue;
+                        }
                         Player structureOwner =
                                 game.getPlayerByColorID(unit.colorID()).orElse(null);
-                        UnitModel structure = structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unit);
+                        UnitModel structure = graveholdControlled
+                                ? SarcosaBreakthroughHandler.getControlledNeutralStructureModel(game, player, uH, unit)
+                                : structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unit);
                         if (structure != null) {
                             int productionValue = structure.getProductionValue();
+                            if (graveholdControlled && "sd".equals(structure.getAsyncId())) {
+                                productionValue = 3;
+                            }
                             if ("mech".equalsIgnoreCase(structure.getBaseType())
                                     && ButtonHelper.isLawInPlay(game, "articles_war")) {
                                 productionValue = 0;
@@ -2857,6 +2930,11 @@ public final class Helper {
             Tile tile,
             String warfareNOtherstuff,
             String placePrefix) {
+        List<Button> veiledNetworkingButtons = XinTechHandler.getVeiledNetworkingStarProductionButtons(
+                game, player, tile, warfareNOtherstuff, placePrefix);
+        if (!veiledNetworkingButtons.isEmpty()) {
+            return veiledNetworkingButtons;
+        }
         List<Button> unitButtons = new ArrayList<>();
         player.resetProducedUnits();
         boolean asn = warfareNOtherstuff.contains("asn");
@@ -3480,24 +3558,12 @@ public final class Helper {
     }
 
     private static void informUserCCOverLimit(Game game, String color, int ccCount) {
-        int limit = 16;
-        if (!game.getStoredValue("ccLimit").isEmpty()) {
-            limit = Integer.parseInt(game.getStoredValue("ccLimit"));
+        Player player = game.getPlayerFromColorOrFaction(color);
+        if (player == null || !game.isCcNPlasticLimit()) {
+            return;
         }
-        if (!game.getStoredValue("ccLimit" + color).isEmpty()) {
-            limit = Integer.parseInt(game.getStoredValue("ccLimit" + color));
-        }
-        if (game.getPlayerFromColorOrFaction(color) != null
-                && game.getPlayerFromColorOrFaction(color).hasRelic("endurance_steroids")) {
-            limit += 2;
-        }
-        boolean ccCountIsOver = ccCount > limit;
-        if (ccCountIsOver && game.isCcNPlasticLimit()) {
-            Player player = game.getPlayerFromColorOrFaction(color);
-            if (player == null) {
-                return;
-            }
-
+        int limit = player.getCommandTokenLimit();
+        if (ccCount > limit) {
             String msg = player.getRepresentationUnfogged() + " is over the command token limit of " + limit
                     + ". Command tokens used: " + ccCount;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## " + msg);

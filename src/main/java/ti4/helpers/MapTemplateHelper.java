@@ -177,8 +177,7 @@ public final class MapTemplateHelper {
         return null;
     }
 
-    public static void buildPartialMapFromMiltyData(
-            Game game, GenericInteractionCreateEvent event, String mapTemplate) {
+    public static boolean buildPartialMapFromMiltyData(Game game, String mapTemplate) {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         MapTemplateModel template = Mapper.getMapTemplate(mapTemplate);
         List<Player> players =
@@ -233,10 +232,7 @@ public final class MapTemplateHelper {
                 }
             }
         }
-
-        if (somethingHappened) {
-            ButtonHelper.updateMap(game, event);
-        }
+        return somethingHappened;
     }
 
     public static FileUpload generateTemplatePreviewImage(

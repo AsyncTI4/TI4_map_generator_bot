@@ -111,6 +111,7 @@ public class SarcosaAgentHandler {
     private static boolean isEligibleSystem(Game game, Player target, Tile destination) {
         return destination != null
                 && !destination.getTileModel().isHyperlane()
+                && FoWHelper.knowsTile(game, target, destination.getPosition())
                 && game.getTileMap().values().stream()
                         .anyMatch(source -> FoWHelper.playerHasUnitsInSystem(target, source)
                                 && (source == destination

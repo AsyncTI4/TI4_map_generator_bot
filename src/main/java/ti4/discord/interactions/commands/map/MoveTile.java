@@ -41,7 +41,7 @@ public class MoveTile extends GameStateSubcommand {
                     event.getChannel(), "Oops, a tile already exists here: " + tileToPosition);
             return;
         }
-        if (!PositionMapper.isTilePositionValid(tileToPosition)) {
+        if (!PositionMapper.isTilePositionValid(getGame(), tileToPosition)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid position: " + tileToPosition);
             return;
         }

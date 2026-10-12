@@ -1,297 +1,137 @@
 package ti4.message;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
-import ti4.game.persistence.GameManager;
-import ti4.game.persistence.ManagedGame;
+import ti4.helpers.StringHelper;
 import ti4.json.PersistenceManager;
 import ti4.logging.BotLogger;
+import ti4.settings.GlobalSettings;
+import ti4.settings.GlobalSettings.ImplementedSettings;
+import ti4.spring.service.gamemessage.GameMessageService;
 
 @UtilityClass
 public class GameMessageManager {
 
-    private static final String GAME_MESSAGES_FILE = "GameMessages.json";
+    @Deprecated(forRemoval = true, since = "2026-10")
+    private static final String LEGACY_GAME_MESSAGES_FILE = "GameMessages.json";
 
-    public static synchronized void add(String gameName, GameMessage gameMessage) {
-        GameMessages allGameMessages = readFile();
-        if (allGameMessages == null) {
-            allGameMessages = new GameMessages(new HashMap<>());
-        }
-
-        List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
-        if (messages.stream().anyMatch(message -> message.messageId().equals(gameMessage.messageId()))) {
-            return;
-        }
-
-        messages.add(gameMessage);
-
-        persistFile(allGameMessages);
+    public static void add(String gameName, GameMessage gameMessage) {
+        run("add", service -> service.add(gameName, gameMessage));
     }
 
-    public static synchronized String replace(String gameName, GameMessage gameMessage) {
-        GameMessages allGameMessages = readFile();
-        if (allGameMessages == null) {
-            allGameMessages = new GameMessages(new HashMap<>());
-        }
-
-        List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
-
-        String replacedMessageId = null;
-        GameMessage oldMessage = messages.stream()
-                .filter(message ->
-                        message.type() == gameMessage.type() && Objects.equals(message.key(), gameMessage.key()))
-                .findFirst()
+    @Nullable
+    public static String replace(String gameName, GameMessage gameMessage) {
+        return call("replace", service -> service.replace(gameName, gameMessage), Optional.<String>empty())
                 .orElse(null);
-        if (oldMessage != null) {
-            replacedMessageId = oldMessage.messageId();
-            messages.remove(oldMessage);
-        }
-
-        messages.add(gameMessage);
-
-        persistFile(allGameMessages);
-
-        return replacedMessageId;
     }
 
-    public static synchronized void remove(Collection<String> gameNames) {
-        if (gameNames.isEmpty()) return;
-
-        GameMessages allGameMessages = readFile();
-        if (allGameMessages == null) {
-            return;
-        }
-
-        gameNames.forEach(allGameMessages.gameNameToMessages::remove);
-
-        persistFile(allGameMessages);
+    public static void remove(Collection<String> gameNames) {
+        run("remove games from", service -> service.removeGames(gameNames));
     }
 
-    public static synchronized void removeAfter(String gameName, long gameSaveTime) {
-        GameMessages allGameMessages = readFile();
-        if (allGameMessages == null) {
-            return;
-        }
-
-        List<GameMessage> messages = allGameMessages.gameNameToMessages.get(gameName);
-        if (messages == null) {
-            return;
-        }
-
-        messages.removeIf(message -> message.gameSaveTime() > gameSaveTime);
-
-        persistFile(allGameMessages);
+    public static void removeAfter(String gameName, long gameSaveTime) {
+        run("roll back", service -> service.removeSavedAfter(gameName, gameSaveTime));
     }
 
-    public static synchronized Optional<String> remove(String gameName, GameMessageType type) {
+    public static Optional<String> remove(String gameName, GameMessageType type) {
         return remove(gameName, type, null);
     }
 
-    public static synchronized Optional<String> remove(String gameName, GameMessageType type, @Nullable String key) {
-        GameMessages allGameMessages = readFile();
-        if (allGameMessages == null) {
-            return Optional.empty();
-        }
-
-        List<GameMessage> messages = allGameMessages.gameNameToMessages.get(gameName);
-        if (messages == null) {
-            return Optional.empty();
-        }
-
-        GameMessage message = messages.stream()
-                .filter(m -> m.type() == type && Objects.equals(m.key(), key))
-                .findFirst()
-                .orElse(null);
-        if (message == null) {
-            return Optional.empty();
-        }
-
-        messages.remove(message);
-
-        persistFile(allGameMessages);
-
-        return Optional.of(message.messageId());
+    public static Optional<String> remove(String gameName, GameMessageType type, @Nullable String key) {
+        return call("remove", service -> service.remove(gameName, type, key), Optional.empty());
     }
 
-    public static synchronized void remove(String gameName, String messageId) {
-        GameMessages allGameMessages = readFile();
-        if (allGameMessages == null) {
-            return;
-        }
-
-        List<GameMessage> messages = allGameMessages.gameNameToMessages.get(gameName);
-        if (messages == null) {
-            return;
-        }
-
-        messages.removeIf(message -> message.messageId().equals(messageId));
-
-        persistFile(allGameMessages);
+    public static void remove(String gameName, String messageId) {
+        run("remove", service -> service.remove(gameName, messageId));
     }
 
-    public static synchronized Optional<GameMessage> getOne(String gameName, GameMessageType type) {
+    public static Optional<GameMessage> getOne(String gameName, GameMessageType type) {
         return getOne(gameName, type, null);
     }
 
-    public static synchronized Optional<GameMessage> getOne(
-            String gameName, GameMessageType type, @Nullable String key) {
-        return getOne(gameName, message -> message.type() == type && Objects.equals(message.key(), key));
+    public static Optional<GameMessage> getOne(String gameName, GameMessageType type, @Nullable String key) {
+        return call("read", service -> service.getOne(gameName, type, key), Optional.empty());
     }
 
-    public static synchronized Optional<GameMessage> getOne(String gameName, String messageId) {
-        return getOne(gameName, message -> message.messageId().equals(messageId));
+    public static Optional<GameMessage> getOne(String gameName, String messageId) {
+        return call("read", service -> service.getOne(gameName, messageId), Optional.empty());
     }
 
-    private static synchronized Optional<GameMessage> getOne(String gameName, Predicate<GameMessage> filter) {
-        GameMessages allGameMessages = readFile();
-        if (allGameMessages == null) {
-            return Optional.empty();
-        }
-
-        List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
-        return messages.stream().filter(filter).findFirst();
+    public static Map<String, List<GameMessage>> getAllByGame(GameMessageType type) {
+        return call("read", service -> service.getAllByGame(type), Collections.emptyMap());
     }
 
-    public static synchronized Map<String, List<GameMessage>> getAllByGame(GameMessageType type) {
-        GameMessages allGameMessages = readFile();
-        if (allGameMessages == null) {
-            return Collections.emptyMap();
-        }
-
-        Map<String, List<GameMessage>> result = new HashMap<>();
-        for (var entry : allGameMessages.gameNameToMessages.entrySet()) {
-            List<GameMessage> filtered = null;
-            for (GameMessage message : entry.getValue()) {
-                if (message.type() == type) {
-                    if (filtered == null) {
-                        filtered = new ArrayList<>();
-                    }
-                    filtered.add(message);
-                }
-            }
-            if (filtered != null) {
-                result.put(entry.getKey(), filtered);
-            }
-        }
-        return Collections.unmodifiableMap(result);
+    public static void cleanupStaleEntries() {
+        run("clean up", GameMessageService::cleanupStaleEntries);
     }
 
-    public static synchronized void cleanupStaleEntries() {
-        GameMessages allGameMessages = readFile();
-        if (allGameMessages == null) {
-            return;
-        }
-
-        var removedGames = new HashSet<>();
-        boolean removedMessages = false;
-        var iterator = allGameMessages.gameNameToMessages.entrySet().iterator();
-        while (iterator.hasNext()) {
-            var entry = iterator.next();
-            String gameName = entry.getKey();
-            List<GameMessage> messages = entry.getValue();
-            ManagedGame game = GameManager.getManagedGame(gameName);
-            if (game == null || game.isHasEnded() || messages.isEmpty()) {
-                iterator.remove();
-                removedGames.add(gameName);
-                continue;
-            }
-
-            int playerCount = game.getRealPlayers().size();
-            long twoWeeksAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(14);
-            boolean removed = messages.removeIf(
-                    msg -> (playerCount > 0 && msg.factionsThatReacted().size() >= playerCount)
-                            || msg.gameSaveTime() <= twoWeeksAgo);
-            if (removed) {
-                removedMessages = true;
-                BotLogger.info("GameMessageCleanupCron removed GameMessages for " + gameName);
-            }
-
-            if (messages.isEmpty()) {
-                iterator.remove();
-                removedGames.add(gameName);
-            }
-        }
-
-        if (!removedGames.isEmpty() || removedMessages) {
-            if (!removedGames.isEmpty())
-                BotLogger.info("GameMessageCleanupCron removed the following games " + removedGames);
-            persistFile(allGameMessages);
-        }
+    public static List<GameMessage> getAll(String gameName, GameMessageType type) {
+        return call("read", service -> service.getAll(gameName, type), Collections.emptyList());
     }
 
-    public static synchronized List<GameMessage> getAll(String gameName, GameMessageType type) {
-        GameMessages allGameMessages = readFile();
-        if (allGameMessages == null) {
-            return Collections.emptyList();
-        }
-
-        List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
-        return messages.stream().filter(m -> m.type() == type).toList();
-    }
-
-    public static synchronized void addReaction(String gameName, String faction, GameMessageType type) {
+    public static void addReaction(String gameName, String faction, GameMessageType type) {
         addReaction(gameName, faction, type, null);
     }
 
-    public static synchronized void addReaction(String gameName, String faction, GameMessageType type, String key) {
-        addReaction(gameName, faction, message -> message.type() == type && Objects.equals(message.key(), key));
+    public static void addReaction(String gameName, String faction, GameMessageType type, String key) {
+        run("add a reaction to", service -> service.addReaction(gameName, faction, type, key));
     }
 
-    public static synchronized void addReaction(String gameName, String faction, String messageId) {
-        addReaction(gameName, faction, message -> message.messageId().equals(messageId));
+    public static void addReaction(String gameName, String faction, String messageId) {
+        run("add a reaction to", service -> service.addReaction(gameName, faction, messageId));
     }
 
-    private static void addReaction(String gameName, String faction, Predicate<GameMessage> filter) {
-        GameMessages allGameMessages = readFile();
-        if (allGameMessages == null) {
-            return;
+    // TODO: Remove this one-time GameMessages.json import (run via /developer custom_command on 2026-10-04) and
+    // GAME_MESSAGES_IMPORTED_TO_DATABASE once every environment has run it; then delete pm_json/GameMessages.json.
+    @Deprecated(forRemoval = true, since = "2026-10")
+    public static String importLegacyFile() {
+        if (ImplementedSettings.GAME_MESSAGES_IMPORTED_TO_DATABASE.getAsBoolean(false)) {
+            return LEGACY_GAME_MESSAGES_FILE + " was already imported into the database. Nothing to do.";
         }
-
-        List<GameMessage> messages = allGameMessages.gameNameToMessages.get(gameName);
-        if (messages == null) {
-            return;
-        }
-
-        messages.stream().filter(filter).findFirst().ifPresent(message -> {
-            message.factionsThatReacted().add(faction);
-            persistFile(allGameMessages);
-        });
-    }
-
-    private static GameMessages readFile() {
         try {
-            GameMessages gameMessages =
-                    PersistenceManager.readObjectFromJsonFile(GAME_MESSAGES_FILE, GameMessages.class);
-            return gameMessages != null ? gameMessages : new GameMessages(new HashMap<>());
-        } catch (IOException e) {
-            BotLogger.error("Failed to read json data for GameMessages.", e);
-            return null;
-        }
-    }
-
-    private static void persistFile(GameMessages toPersist) {
-        try {
-            PersistenceManager.writeObjectToJsonFile(GAME_MESSAGES_FILE, toPersist);
+            LegacyGameMessages legacy =
+                    PersistenceManager.readObjectFromJsonFile(LEGACY_GAME_MESSAGES_FILE, LegacyGameMessages.class);
+            int imported = legacy == null || legacy.gameNameToMessages() == null
+                    ? 0
+                    : GameMessageService.getBean().importMissing(legacy.gameNameToMessages());
+            GlobalSettings.setSetting(ImplementedSettings.GAME_MESSAGES_IMPORTED_TO_DATABASE, true);
+            String result = "Imported " + StringHelper.pluralize(imported, "game message") + " from "
+                    + LEGACY_GAME_MESSAGES_FILE + " into the database.";
+            BotLogger.info(result);
+            return result;
         } catch (Exception e) {
-            BotLogger.error("Failed to write json data for GameMessages.", e);
+            BotLogger.error("Failed to import " + LEGACY_GAME_MESSAGES_FILE + " into the database.", e);
+            return "Failed to import " + LEGACY_GAME_MESSAGES_FILE + " into the database: " + e.getMessage()
+                    + ". See the bot log; it is safe to run again.";
         }
     }
 
-    private record GameMessages(Map<String, List<GameMessage>> gameNameToMessages) {}
+    private static void run(String action, Consumer<GameMessageService> operation) {
+        call(
+                action,
+                service -> {
+                    operation.accept(service);
+                    return null;
+                },
+                null);
+    }
+
+    private static <T> T call(String action, Function<GameMessageService, T> operation, T fallback) {
+        try {
+            return operation.apply(GameMessageService.getBean());
+        } catch (Exception e) {
+            BotLogger.error("Failed to " + action + " game messages.", e);
+            return fallback;
+        }
+    }
+
+    @Deprecated(forRemoval = true, since = "2026-10")
+    private record LegacyGameMessages(Map<String, List<GameMessage>> gameNameToMessages) {}
 }

@@ -14,6 +14,9 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinPnHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionPromissoryHandler;
@@ -246,9 +249,24 @@ public class PromissoryNoteHelper {
         }
         PromissoryNoteModel pn = Mapper.getPromissoryNote(id);
         String pnName = pn.getName();
-        GameEventService.commit(game, GameEventType.CARD_PLAY_PROMISSORY_NOTE, player, Map.of("cardId", id));
-        // String pnOwner = Mapper.getPromissoryNoteOwner(id);
         Player owner = game.getPNOwner(id);
+        boolean keepingPromissoryNote = XinPnHandler.consumeReplacedReturn(game, player, id);
+        keepingPromissoryNote |= KaltrimBreakthroughHandler.consumeEchoOperativesReturn(game, player, id);
+
+        boolean wouldReturnPromissoryNote = !pn.getPlayArea() || player.isPlayerMemberOfAlliance(owner);
+
+        if (wouldReturnPromissoryNote
+                && !keepingPromissoryNote
+                && KaltrimBreakthroughHandler.offerEchoOperatives(game, player, owner, id)) {
+            return;
+        }
+
+        if (wouldReturnPromissoryNote
+                && !keepingPromissoryNote
+                && XinPnHandler.offerStatecraftMentor(game, player, owner, id)) {
+            return;
+        }
+        GameEventService.commit(game, GameEventType.CARD_PLAY_PROMISSORY_NOTE, player, Map.of("cardId", id));
         if ("bepnta".equalsIgnoreCase(id)
                 && !TaPromissoryHandler.hasLegalAdvancedStructuralEngineeringTargets(player, game)) {
             MessageHelper.sendMessageToChannel(
@@ -257,9 +275,19 @@ public class PromissoryNoteHelper {
                             + ", there are no legal non-home planets for _Advanced Structural Engineering_.");
             return;
         }
+        if ("dspnphar".equalsIgnoreCase(id)) {
+            if (owner != null && owner.isPassed()) {
+                ButtonHelperFactionSpecific.resolveDeathBinding(game, player, event);
+            }
+            return;
+        }
+        if ("dspnkalt".equalsIgnoreCase(id)) {
+            ButtonHelperFactionSpecific.startKaltrimAmbassadors(game, player);
+            return;
+        }
         if (pn.getPlayArea() && !player.isPlayerMemberOfAlliance(owner)) {
             player.addPromissoryNoteToPlayArea(id);
-        } else {
+        } else if (!keepingPromissoryNote) {
             if (!"malevolency".equalsIgnoreCase(id)) {
                 player.removePromissoryNote(id);
                 if (!"dspncymi".equalsIgnoreCase(id)) {
@@ -471,7 +499,9 @@ public class PromissoryNoteHelper {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             buttons = new ArrayList<>();
             for (Player p2 : player.getNeighbouringPlayers(true)) {
-                buttons.add(Buttons.green("passMalevolencyTo_" + p2.getFaction(), p2.getFactionNameOrColor()));
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + "passMalevolencyTo_" + p2.getFaction(),
+                        p2.getFactionNameOrColor()));
             }
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
@@ -650,7 +680,9 @@ public class PromissoryNoteHelper {
             ButtonHelperFactionSpecific.rollForBelkoseaPN(player);
         }
         if ("gift".equalsIgnoreCase(id)) {
-            StartPhaseService.startActionPhase(event, game, false);
+            if ("action".equalsIgnoreCase(game.getPhaseOfGame())) {
+                StartPhaseService.startActionPhase(event, game, false);
+            }
             // in case Naalu gets eliminated and the PN goes away
             game.setStoredValue("naaluPNUser", player.getFaction());
         }
@@ -794,6 +826,14 @@ public class PromissoryNoteHelper {
     }
 
     public void showAll(Player player, Player targetPlayer, Game game) {
+        if (XinTechHandler.hasAstromanticCloakSteel(player) && player != targetPlayer) {
+            MessageHelper.sendMessageToChannel(
+                    targetPlayer.getCorrectChannel(),
+                    targetPlayer.getRepresentation()
+                            + ", you cannot look at " + player.getRepresentationNoPing() + "'s"
+                            + " Promissory Notes because they have _Astromantic Cloak (Steel)!");
+            return;
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(game.getName()).append('\n');
         sb.append("Player: ").append(player.getUserName()).append('\n');

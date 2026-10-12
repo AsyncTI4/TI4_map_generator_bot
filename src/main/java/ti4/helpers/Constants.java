@@ -104,6 +104,7 @@ public final class Constants {
 
     // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
+    public static final String OPLUSPLUS_COUNCIL_CONFIRMED = "oplusplus_council_confirmed";
     public static final String TEN_MIN_REMINDER = "ten_min_reminder";
     public static final String PREFERS_DISTANCE = "prefers_distance";
     public static final String AUTO_PASS_WHENS_N_AFTERS = "auto_pass_whens_n_afters";
@@ -556,6 +557,7 @@ public final class Constants {
     public static final String FOW_SYSTEMS = "fow_systems";
     public static final String FOG_FILTER = "fog_filter";
     public static final String SET_FOG_FILTER = "set_fog_filter";
+    public static final String FOG_GHOST_HEXES = "fog_ghost_hexes";
     public static final String CHECK_CHANNELS = "check_channels";
     public static final String PING_SYSTEM = "ping_system";
     public static final String TARGET_PLANET_PING = "target_planet";
@@ -670,6 +672,7 @@ public final class Constants {
     public static final String GAME = "game";
     public static final String MAP = "map";
     public static final String INFO = "info";
+    public static final String GAME_INFO = "game_info";
     public static final String SHUFFLE_EXPLORES = "shuffle_explores";
     public static final String CHANGE_TYPE = "change_type";
     public static final String START_FRANKEN_DRAFT = "start_franken_draft";
@@ -1479,6 +1482,7 @@ public final class Constants {
     public static final String FACTION_RECORD_OF_TECH = "faction_record_of_tech";
     public static final String FACTION_RECORD_OF_SCPICK = "faction_record_of_scpick";
     public static final String FACTION_TOP_COLORS = "faction_top_colors";
+    public static final String FOW_ENDED_STATS = "ended_stats";
     public static final String ACTION_CARD_STATS = "action_card_stats";
     public static final String SPENDS = "spends";
     public static final String TOP_LIMIT = "top_limit";

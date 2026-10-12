@@ -40,6 +40,12 @@ class TacticalActionButtonHandlers {
     @ButtonHandler("unitTacticalMove")
     @ButtonHandler("unitTacticalRemove")
     public static void newTacticalMoveUnits(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (StringUtils.isBlank(game.getActiveSystem())) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "There is no active tactical action, so these buttons are no longer usable.");
+            return;
+        }
+
         String regexSingleUnit = "unitTactical(?<type>Move|Remove)";
         regexSingleUnit += "_" + RegexHelper.posRegex(game);
         regexSingleUnit += "_" + RegexHelper.intRegex("amt");

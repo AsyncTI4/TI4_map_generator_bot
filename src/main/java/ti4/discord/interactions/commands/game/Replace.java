@@ -24,6 +24,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.statistics.StatsTrackingButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
+import ti4.discord.utility.DiscordThreadUtility;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -198,7 +199,10 @@ class Replace extends GameStateSubcommand {
                         .replace(
                                 oldPlayerUserName.replace("/", ""),
                                 replacedPlayer.getUserName().replace("/", ""));
-                cardsInfo.getManager().setName(newCardsInfoName).queue(Consumers.nop(), BotLogger::catchRestError);
+                cardsInfo
+                        .getManager()
+                        .setName(DiscordThreadUtility.fitThreadName(newCardsInfoName))
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
                 if (oldMember != null) {
                     cardsInfo.removeThreadMember(oldMember).queue(Consumers.nop(), BotLogger::catchRestError);
                 }

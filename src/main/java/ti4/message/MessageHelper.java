@@ -53,12 +53,12 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.utility.DiscordThreadUtility;
 import ti4.executors.CircuitBreaker;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
@@ -71,6 +71,7 @@ import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.game.GameNameService;
 import ti4.service.game.GameUndoNameService;
+import ti4.service.testbed.TestBedService;
 
 @UtilityClass
 public class MessageHelper {
@@ -720,9 +721,8 @@ public class MessageHelper {
         buttons = sanitizeButtons(buttons, channel);
 
         String gameName = GameNameService.getGameNameFromChannel(channel);
-        ManagedGame managedGame = GameManager.getManagedGame(gameName);
-        if (managedGame != null && !managedGame.isInjectRules()) {
-            messageText = injectRules(messageText);
+        if (shouldInjectRules(GameManager.getManagedGame(gameName))) {
+            messageText = RulesLinkInjector.inject(messageText);
         }
 
         String finalMessageText = messageText;
@@ -925,13 +925,17 @@ public class MessageHelper {
             String successText) {
         if (messageText == null || messageText.isEmpty()) return true; // blank message counts as a success
         User user = player == null ? null : JdaService.jda.getUserById(player.getUserID());
-        if (user == null) {
+        if (player == null || (user == null && !TestBedService.isVirtualSeatInTestBed(game, player))) {
             sendMessageToChannel(feedbackChannel, failText);
             return false;
         } else {
             MessageChannel privateChannel = player.getPrivateChannel();
             if (!game.isFowMode()) {
                 privateChannel = player.getCardsInfoThread();
+            }
+            if (privateChannel == null && user == null) {
+                sendMessageToChannel(feedbackChannel, failText);
+                return false;
             }
             if (privateChannel == null) {
                 sendMessageToUser(game.getName() + " " + messageText, user, feedbackChannel, failText);
@@ -1281,7 +1285,7 @@ public class MessageHelper {
                 || messageToSend.isEmpty()) return;
         if (channel instanceof TextChannel) {
             channel.asTextChannel()
-                    .createThreadChannel(threadName)
+                    .createThreadChannel(DiscordThreadUtility.fitThreadName(threadName))
                     .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
                     .queueAfter(500, TimeUnit.MILLISECONDS, t -> sendMessageToChannel(t, messageToSend));
         } else if (channel instanceof ThreadChannel) {
@@ -1300,7 +1304,7 @@ public class MessageHelper {
         if (messages.isEmpty()) return;
         if (channel instanceof TextChannel) {
             channel.asTextChannel()
-                    .createThreadChannel(threadName)
+                    .createThreadChannel(DiscordThreadUtility.fitThreadName(threadName))
                     .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
                     .queueAfter(
                             500,
@@ -1327,7 +1331,7 @@ public class MessageHelper {
         }
         if (channel instanceof TextChannel) {
             channel.asTextChannel()
-                    .createThreadChannel(threadName)
+                    .createThreadChannel(DiscordThreadUtility.fitThreadName(threadName))
                     .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
                     .queueAfter(
                             500,
@@ -1339,7 +1343,7 @@ public class MessageHelper {
                                     error));
         } else if (channel instanceof ThreadChannel thread) {
             if (embeds.size() > 8 && thread.getParentChannel() instanceof TextChannel chan) {
-                chan.createThreadChannel(threadName)
+                chan.createThreadChannel(DiscordThreadUtility.fitThreadName(threadName))
                         .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
                         .queueAfter(
                                 500,
@@ -1426,30 +1430,7 @@ public class MessageHelper {
         return newButtons;
     }
 
-    private static String injectRules(String message) {
-        if (message == null) {
-            return null;
-        }
-        try {
-            StringBuilder edited = new StringBuilder(message);
-            StringBuilder copy = new StringBuilder(message.toLowerCase());
-            for (String keyWord : AliasHandler.getInjectedRules()) {
-                if ("bombardment".equals(keyWord) && message.contains("Tactical Bombardment")) continue;
-                if ("production".equals(keyWord) && message.contains("Monopolize Production")) continue;
-                if (copy.indexOf(keyWord) > -1) {
-                    String replace = "](https://www.tirules.com/" + AliasHandler.getInjectedRule(keyWord) + ")";
-                    int firstIndex = copy.indexOf(keyWord);
-                    int lastIndex = firstIndex + keyWord.length() + 1;
-                    copy.insert(firstIndex, "[");
-                    copy.insert(lastIndex, replace);
-                    edited.insert(firstIndex, "[");
-                    edited.insert(lastIndex, replace);
-                }
-            }
-            return edited.toString();
-        } catch (Exception e) {
-            BotLogger.error("Issue injecting Rules into message: " + message, e);
-            return message;
-        }
+    static boolean shouldInjectRules(ManagedGame managedGame) {
+        return managedGame != null && managedGame.isInjectRules() && !managedGame.isFowMode();
     }
 }

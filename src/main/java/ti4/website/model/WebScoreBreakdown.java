@@ -100,7 +100,7 @@ public class WebScoreBreakdown {
             CUSTOM_PO_STYX,
             CUSTOM_PO_SUPPORT_FOR_THRONE);
 
-    public static WebScoreBreakdown fromPlayer(Player player, Game game) {
+    public static WebScoreBreakdown fromPlayer(Player player, Game game, WebObjectives webObjectives) {
         if (player == null || game == null) {
             WebScoreBreakdown breakdown = new WebScoreBreakdown();
             breakdown.entries = new ArrayList<>();
@@ -111,7 +111,7 @@ public class WebScoreBreakdown {
         breakdown.entries = new ArrayList<>();
 
         addScoredEntries(player, game, breakdown.entries);
-        addQualifiesAndPotentialEntries(player, game, breakdown.entries);
+        addQualifiesAndPotentialEntries(player, game, webObjectives, breakdown.entries);
         addUnscoredEntries(player, game, breakdown.entries);
 
         return breakdown;
@@ -273,7 +273,17 @@ public class WebScoreBreakdown {
         entries.addAll(agendaEntries);
     }
 
-    private static void addQualifiesAndPotentialEntries(Player player, Game game, List<ScoreBreakdownEntry> entries) {
+    private static int computeProgress(String objectiveKey, Game game, Player player) {
+        try {
+            return ListPlayerInfoService.getPlayerProgressOnObjective(objectiveKey, game, player);
+        } catch (Exception e) {
+            // If we can't calculate progress (e.g., due to invalid tech data), default to 0
+            return 0;
+        }
+    }
+
+    private static void addQualifiesAndPotentialEntries(
+            Player player, Game game, WebObjectives webObjectives, List<ScoreBreakdownEntry> entries) {
         if (player == null || game == null || entries == null) {
             return;
         }
@@ -318,13 +328,9 @@ public class WebScoreBreakdown {
                 EntryType type = typeOpt.get();
 
                 // Get progress and threshold
-                int progress;
-                try {
-                    progress = ListPlayerInfoService.getPlayerProgressOnObjective(poKey, game, player);
-                } catch (Exception e) {
-                    // If we can't calculate progress (e.g., due to invalid tech data), default to 0
-                    progress = 0;
-                }
+                int progress = webObjectives
+                        .findFactionProgress(poKey, player.getFaction())
+                        .orElseGet(() -> computeProgress(poKey, game, player));
                 int threshold = ListPlayerInfoService.getObjectiveThreshold(poKey, game);
 
                 // Determine if QUALIFIES or POTENTIAL

@@ -48,12 +48,13 @@ public class PlanetInfoService {
         } else {
             sb.append("Exhausted: ");
         }
-        sb.append(MiscEmojis.getResourceEmoji(planet.getResources()))
-                .append(MiscEmojis.getInfluenceEmoji(planet.getInfluence()))
+        int resources = planet != null ? planet.getResources() : planetModel.getResources();
+        int influence = planet != null ? planet.getInfluence() : planetModel.getInfluence();
+        sb.append(MiscEmojis.getResourceEmoji(resources))
+                .append(MiscEmojis.getInfluenceEmoji(influence))
                 .append('\n');
         eb.setDescription(sb.toString());
-        Mapper.getTokensToName();
-        if (!planet.getTokenList().isEmpty())
+        if (planet != null && !planet.getTokenList().isEmpty())
             eb.addField(
                     "Attachments",
                     planet.getTokenList().stream()

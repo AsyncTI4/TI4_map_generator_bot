@@ -22,9 +22,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Ka
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
@@ -1494,10 +1494,7 @@ public final class ButtonHelperSCs {
             buttons.add(ArdentiaPromissoryHandler.getUsurpersLeaseButton(player));
         }
         int ccCount = Helper.getCCCount(game, player.getColor());
-        int limit = 16;
-        if (!game.getStoredValue("ccLimit").isEmpty()) {
-            limit = Integer.parseInt(game.getStoredValue("ccLimit"));
-        }
+        int limit = player.getCommandTokenLimit();
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),

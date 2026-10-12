@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import ti4.discord.utility.DiscordThreadUtility;
 import ti4.logging.BotLogger;
 
 @UtilityClass
@@ -67,16 +68,17 @@ public class ThreadGetter {
             boolean createIfDoesntExist,
             boolean createAsPrivate,
             Consumer<ThreadChannel> consumer) {
+        String fittedName = DiscordThreadUtility.fitThreadName(threadName);
         // ATTEMPT TO FIND BY NAME
         try {
             // SEARCH FOR EXISTING OPEN THREAD
             channel.getThreadChannels().stream()
-                    .filter(threadChannel -> threadChannel.getName().equals(threadName))
+                    .filter(threadChannel -> threadChannel.getName().equals(fittedName))
                     .findFirst()
                     .ifPresentOrElse(
                             consumer,
                             () -> searchForArchivedThreadOrCreateNew(
-                                    channel, threadName, createIfDoesntExist, createAsPrivate, consumer));
+                                    channel, fittedName, createIfDoesntExist, createAsPrivate, consumer));
         } catch (Exception e) {
             BotLogger.error(
                     String.format(

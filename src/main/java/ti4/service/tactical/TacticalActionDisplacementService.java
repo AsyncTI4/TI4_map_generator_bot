@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
@@ -133,9 +134,22 @@ public class TacticalActionDisplacementService {
 
         List<Integer> statesMoved = uh.removeUnit(unitKey, amt, state);
         fakeUh.addUnitsWithStates(unitKey, statesMoved);
-        displaced.put(unitKey, fakeUh.getUnitsByState().get(unitKey));
-        game.getTacticalActionDisplacement().put(uhKey, displaced);
+        List<Integer> newStates = fakeUh.getUnitsByState().get(unitKey);
+        if (newStates != null) {
+            displaced.put(unitKey, newStates);
+        }
+        if (!displaced.isEmpty()) {
+            game.getTacticalActionDisplacement().put(uhKey, displaced);
+        }
+        removeEmptyDisplacement(game.getTacticalActionDisplacement());
         return game.getTacticalActionDisplacement();
+    }
+
+    public void removeEmptyDisplacement(Map<String, Map<UnitKey, List<Integer>>> displacement) {
+        if (displacement == null) return;
+        displacement.values().removeIf(Objects::isNull);
+        displacement.values().forEach(units -> units.values().removeIf(Objects::isNull));
+        displacement.values().removeIf(Map::isEmpty);
     }
 
     public Map<String, Map<UnitKey, List<Integer>>> reverseSingleUnit(
@@ -179,6 +193,7 @@ public class TacticalActionDisplacementService {
     public boolean applyDisplacementToActiveSystem(Game game, Tile tile) {
         boolean moved = false;
         UnitHolder activeSystemSpace = tile.getSpaceUnitHolder();
+        removeEmptyDisplacement(game.getTacticalActionDisplacement());
         GameEventDraft.stageMovement(game, tile.getPosition(), game.getTacticalActionDisplacement());
         for (Entry<String, Map<UnitKey, List<Integer>>> e :
                 game.getTacticalActionDisplacement().entrySet()) {
