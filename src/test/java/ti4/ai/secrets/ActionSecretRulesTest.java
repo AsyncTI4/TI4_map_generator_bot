@@ -15,6 +15,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.image.PositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 class ActionSecretRulesTest extends BaseTi4Test {
@@ -165,5 +166,69 @@ class ActionSecretRulesTest extends BaseTi4Test {
         destroy(test.sol, UnitType.Flagship, 1);
 
         assertThat(tick(scoreButtons("dtgs")).map(AiTestGame::pressedId)).contains(scoreId("dtgs"));
+    }
+
+    private void enemyBeyondTheBattlefield() {
+        String position = PositionMapper.getAdjacentTilePositions(battlefield.getPosition()).stream()
+                .filter(candidate -> !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate))
+                .findFirst()
+                .orElseThrow();
+        Tile beyond = test.place("47", position);
+        test.units(beyond, "space", test.sol, UnitType.Destroyer, 1);
+    }
+
+    // Only one action secret is scored per combat, so when a combat meets two, the rarer one goes first: Darken the
+    // Skies (scored by 45% of the copies kept) over Unveil Flagship (65%). The battlefield is Sol's home system, and
+    // the seat wins there with its flagship.
+    @Test
+    void scoresTheRarerOfTwoSecretsACombatMeets() {
+        battlefield = test.place("01", battlefield.getPosition());
+        test.nekro.setSecret("uf");
+        test.nekro.setSecret("dts");
+        test.units(battlefield, "space", test.nekro, UnitType.Flagship, 1);
+        test.units(battlefield, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(battlefield, "space", test.sol, UnitType.Destroyer, 1);
+        tick();
+        roundsRolled(test.nekro, 1);
+        roundsRolled(test.sol, 1);
+        destroy(test.sol, UnitType.Destroyer, 1);
+
+        assertThat(tick(scoreButtons("uf", "dts")).map(AiTestGame::pressedId)).contains(scoreId("dts"));
+    }
+
+    // The same goes for the two a flagship and two dreadnoughts meet at once: Unveil Flagship (65%) before
+    // Demonstrate Your Power (70%).
+    @Test
+    void scoresUnveilFlagshipBeforeDemonstrateYourPower() {
+        test.nekro.setSecret("dyp");
+        test.nekro.setSecret("uf");
+        test.units(battlefield, "space", test.nekro, UnitType.Flagship, 1);
+        test.units(battlefield, "space", test.nekro, UnitType.Dreadnought, 2);
+        test.units(battlefield, "space", test.sol, UnitType.Destroyer, 1);
+        tick();
+        roundsRolled(test.nekro, 1);
+        roundsRolled(test.sol, 1);
+        destroy(test.sol, UnitType.Destroyer, 1);
+
+        assertThat(tick(scoreButtons("uf", "dyp")).map(AiTestGame::pressedId)).contains(scoreId("uf"));
+    }
+
+    // Patience is about not going out of the way to meet a condition. Here the seat is on 4 against 3 with many rounds
+    // left, three dreadnoughts and an enemy a move away, a position in which it would not hurry to fight for
+    // Demonstrate Your Power (see ActionSecretTimingTest). The combat has already met it, so the point is scored.
+    @Test
+    void scoresASecretACombatHasMetEvenWhenItWouldNotHaveHurriedToMeetIt() {
+        test.nekro.setSecret("dyp");
+        test.points(test.nekro, 4);
+        test.points(test.sol, 3);
+        test.units(battlefield, "space", test.nekro, UnitType.Dreadnought, 3);
+        enemyBeyondTheBattlefield();
+        test.units(battlefield, "space", test.sol, UnitType.Destroyer, 1);
+        tick();
+        roundsRolled(test.nekro, 1);
+        roundsRolled(test.sol, 1);
+        destroy(test.sol, UnitType.Destroyer, 1);
+
+        assertThat(tick(scoreButtons("dyp")).map(AiTestGame::pressedId)).contains(scoreId("dyp"));
     }
 }

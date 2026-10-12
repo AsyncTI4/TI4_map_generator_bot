@@ -107,6 +107,30 @@ class ActionSecretOddsTest extends BaseTi4Test {
         assertThat(perRound("dtgs")).isEqualTo(0.10);
     }
 
+    // An enemy a move away lifts the chance to 0.6 a round, but the lasting chance (what can be counted on in later
+    // rounds) never exceeds the ordinary rate for that secret.
+    @Test
+    void theLastingChanceIsCappedAtTheOrdinaryRate() {
+        assertThat(ActionSecretOdds.lastingPerRound(test.game, test.nekro, "dyp"))
+                .isEqualTo(0.21);
+
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 3);
+        assertThat(ActionSecretOdds.lastingPerRound(test.game, test.nekro, "dyp"))
+                .isEqualTo(0.30);
+
+        enemyNextDoor();
+        assertThat(perRound("dyp")).isEqualTo(0.60);
+        assertThat(ActionSecretOdds.lastingPerRound(test.game, test.nekro, "dyp"))
+                .isEqualTo(0.30);
+
+        test.units(home, "space", test.nekro, UnitType.Flagship, 1);
+        assertThat(perRound("uf")).isEqualTo(0.60);
+        assertThat(ActionSecretOdds.lastingPerRound(test.game, test.nekro, "uf"))
+                .isEqualTo(0.19);
+        assertThat(ActionSecretOdds.lastingPerRound(test.game, test.nekro, "fwp"))
+                .isEqualTo(0.06);
+    }
+
     @Test
     void anythingElseIsFivePercentARound() {
         assertThat(perRound("survey")).isEqualTo(0.05);

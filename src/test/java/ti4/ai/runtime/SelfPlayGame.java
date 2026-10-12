@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.ai.AiSettings;
+import ti4.ai.secrets.SecretPhase;
 import ti4.ai.selfplay.SelfPlaySetup;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -60,6 +61,7 @@ final class SelfPlayGame {
             List<Map<String, Double>> stateAtRoundStart,
             int seats,
             TradeSummary trade,
+            SecretSummary secrets,
             String report,
             long wallSeconds) {
 
@@ -132,6 +134,10 @@ final class SelfPlayGame {
             int settlementsSent,
             int settlementsAccepted,
             List<String> violations) {}
+
+    // Secret objectives scored over the whole table by the phase they score in, and the round in which each action
+    // secret was sent to be scored.
+    record SecretSummary(int action, int status, int agenda, int other, List<Integer> actionSecretRounds) {}
 
     private static final String TRADE_GOODS = "TGs";
     private static final String COMMODITIES = "Comms";
@@ -418,8 +424,24 @@ final class SelfPlayGame {
                 List.copyOf(stateAtRoundStart),
                 game == null ? 0 : game.getRealPlayers().size(),
                 tradeSummary(ending, game),
+                secretSummary(game),
                 report(ending, game, ticks),
                 (System.nanoTime() - wallStart) / 1_000_000_000L);
+    }
+
+    private SecretSummary secretSummary(Game game) {
+        if (game == null) return new SecretSummary(0, 0, 0, 0, List.of());
+        Map<SecretPhase, Integer> scored = new java.util.EnumMap<>(SecretPhase.class);
+        for (Player player : game.getRealPlayers()) {
+            for (String secret : player.getSecretsScored().keySet())
+                scored.merge(SecretPhase.of(secret), 1, Integer::sum);
+        }
+        return new SecretSummary(
+                scored.getOrDefault(SecretPhase.ACTION, 0),
+                scored.getOrDefault(SecretPhase.STATUS, 0),
+                scored.getOrDefault(SecretPhase.AGENDA, 0),
+                scored.getOrDefault(SecretPhase.UNKNOWN, 0),
+                List.copyOf(env.actionSecretRounds.values()));
     }
 
     private List<SelfPlayEnvironment.TradeRecord> ledger() {

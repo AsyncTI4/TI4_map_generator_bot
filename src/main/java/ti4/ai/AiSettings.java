@@ -35,6 +35,7 @@ public class AiSettings {
     public static final String PACE_KEY = "aiPace";
     public static final String FAST_PACE = "fast";
     public static final String TRADING_PROPERTY = "ai.trading";
+    public static final String SECRET_HOLD_PROPERTY = "ai.secrets.hold";
     private static final Duration FAST_REFEREE_DELAY = Duration.ofSeconds(10);
     private static final Duration FAST_STALL_THRESHOLD = Duration.ofMinutes(1);
     private static final int FAST_MAX_ACTIONS_PER_HOUR = 600;
@@ -63,6 +64,10 @@ public class AiSettings {
 
     public static boolean isTradingEnabled() {
         return !"false".equalsIgnoreCase(System.getProperty(TRADING_PROPERTY, "true"));
+    }
+
+    public static boolean isSecretHoldEnabled() {
+        return !"false".equalsIgnoreCase(System.getProperty(SECRET_HOLD_PROPERTY, "true"));
     }
 
     public static boolean isFastPace(Game game) {

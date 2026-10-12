@@ -769,6 +769,49 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(TacticalPlanner.bestScore(List.of())).isZero();
     }
 
+    private double secretBonusForThreeDreadnoughtsAttackingTheNeighbour(Tile target) {
+        List<UnitMove> ships = List.of(new UnitMove(AiTestGame.HOME, "space", UnitType.Dreadnought, 3));
+        return TacticalPlanner.actionSecretBonus(test.game, test.nekro, target, test.sol, ships, true, false);
+    }
+
+    private Tile neighbourWithSolDestroyerAndThreeDreadnoughtsAtHome() {
+        Tile target = test.place("46", neighbour);
+        test.units(target, "space", test.sol, UnitType.Destroyer, 1);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 3);
+        return target;
+    }
+
+    // Three dreadnoughts attacking Sol's destroyer meet Demonstrate Your Power. In round 2 with nobody scoring there
+    // are rounds to meet it later (1 - 0.7^4 = 0.76), so the seat is patient: the fight is only worth a quarter of a
+    // point of secret bonus. With an opponent on 6 of 10 the end is in sight and it is worth a full point.
+    @Test
+    void leansOnlySlightlyTowardsASecretItIsPatientWith() {
+        Tile target = neighbourWithSolDestroyerAndThreeDreadnoughtsAtHome();
+        test.nekro.setSecret("dyp");
+
+        double early = secretBonusForThreeDreadnoughtsAttackingTheNeighbour(target);
+        test.points(test.sol, 6);
+        double late = secretBonusForThreeDreadnoughtsAttackingTheNeighbour(target);
+
+        assertThat(early).isEqualTo(0.25 * ObjectiveValue.VICTORY_POINT_VALUE);
+        assertThat(late).isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
+    }
+
+    // The fight meets two secrets but is one space combat, so only the more valuable one counts: Destroy Their
+    // Greatest Ship (rare, pursued, a full point) rather than the patient Demonstrate Your Power (0.25 of a point;
+    // with Destroy Their Greatest Ship in hand too its chance is 0.3 * 0.85 a round, 1 - 0.745^4 = 0.69, still
+    // patient in round 2).
+    @Test
+    void countsTheHighestValuedSecretsUpToTheNumberOfCombats() {
+        Tile target = neighbourWithSolDestroyerAndThreeDreadnoughtsAtHome();
+        test.units(target, "space", test.sol, UnitType.Flagship, 1);
+        test.nekro.setSecret("dyp");
+        test.nekro.setSecret("dtgs");
+
+        assertThat(secretBonusForThreeDreadnoughtsAttackingTheNeighbour(target))
+                .isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
+    }
+
     private static boolean movesOutOfHome(TacticalPlan plan) {
         return plan.moves().stream().anyMatch(move -> AiTestGame.HOME.equals(move.origin()));
     }

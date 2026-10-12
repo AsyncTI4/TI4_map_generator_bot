@@ -1,6 +1,7 @@
 package ti4.ai.secrets;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
@@ -33,6 +34,13 @@ public class ActionSecretOdds {
     private static final int DEMONSTRATION_SHIPS = 3;
     private static final int FLEET_MOVE = 1;
     private static final double ENGINEERABLE = 0.60;
+    private static final double DEMONSTRATION_EVIDENCED = 0.30;
+    private static final double VOID_EVIDENCED = 0.18;
+    private static final double FLAGSHIP_EVIDENCED = 0.19;
+    private static final Map<String, Double> EVIDENCED_CAP = Map.of(
+            DEMONSTRATE_YOUR_POWER, DEMONSTRATION_EVIDENCED,
+            BRAVE_THE_VOID, VOID_EVIDENCED,
+            UNVEIL_FLAGSHIP, FLAGSHIP_EVIDENCED);
     private static final double OTHER_SECRET = 0.05;
 
     public static double perRound(Game game, Player seat, String secretId) {
@@ -53,6 +61,10 @@ public class ActionSecretOdds {
         };
     }
 
+    public static double lastingPerRound(Game game, Player seat, String secretId) {
+        return Math.min(perRound(game, seat, secretId), EVIDENCED_CAP.getOrDefault(secretId, 1.0));
+    }
+
     public static double beforeGameEnds(Game game, Player seat, String secretId) {
         return atLeastOnce(perRound(game, seat, secretId), GameHorizon.roundsLeft(game));
     }
@@ -68,7 +80,7 @@ public class ActionSecretOdds {
                 .anyMatch(stack -> reaches(game, seat, stack, FLEET_MOVE, tile -> hasEnemyShips(game, seat, tile)))) {
             return ENGINEERABLE;
         }
-        return stacks.isEmpty() ? 0.21 : 0.30;
+        return stacks.isEmpty() ? 0.21 : DEMONSTRATION_EVIDENCED;
     }
 
     private static double braveTheVoid(Game game, Player seat) {
@@ -82,7 +94,7 @@ public class ActionSecretOdds {
                         tile -> tile.isAnomaly(game, seat) && hasEnemyShips(game, seat, tile)))) {
             return ENGINEERABLE;
         }
-        return fleets.stream().anyMatch(fleet -> inOrBesideAnomaly(game, seat, fleet)) ? 0.18 : 0.09;
+        return fleets.stream().anyMatch(fleet -> inOrBesideAnomaly(game, seat, fleet)) ? VOID_EVIDENCED : 0.09;
     }
 
     private static double unveilFlagship(Game game, Player seat) {
@@ -92,7 +104,7 @@ public class ActionSecretOdds {
                 .anyMatch(ship -> reaches(game, seat, ship, move, tile -> hasEnemyShips(game, seat, tile)))) {
             return ENGINEERABLE;
         }
-        return flagships.isEmpty() ? 0.10 : 0.19;
+        return flagships.isEmpty() ? 0.10 : FLAGSHIP_EVIDENCED;
     }
 
     private static boolean reaches(Game game, Player seat, Tile origin, int move, Predicate<Tile> target) {

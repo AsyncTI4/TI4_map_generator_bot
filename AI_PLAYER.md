@@ -188,10 +188,25 @@ to build one by hand:
       Martyr_ and _Prove Endurance_. Earned secrets wait in a queue, so two combats in one turn can score two.
       _Make an Example of Their World_ scores when its bombardment destroys the last ground forces on a planet
       before it lands; it builds ships with bombardment for it and keeps the secret while it has some.
+      When a combat meets two, the rarer one (by how often real players finished it) is scored.
+    - **Patience.** Saving an action secret means not going out of its way to meet the condition early; a combat
+      that has already met it is always scored. The tactical planner counts a qualifying secret as a full point when it
+      should pursue it now and as a quarter of a point when it can be patient. Human tables usually finish by round 5
+      of a ten point game, so it pursues every secret once the last round looks near: the round is at least half the
+      goal, or any player is within 4 of the goal (6 of 10). Before that it is patient only while it expects to meet
+      the condition in a later round anyway: the chance of meeting it in the rounds before the likely last round and
+      in that last round (its ordinary per-round rate, never counting on an enemy staying within reach, times 0.85 for
+      each other combat secret in hand as they compete for the same combats) must be at least 0.4. So rare secrets
+      are pursued at once. `-Dai.secrets.hold=false` turns patience off.
     - **Agenda phase:** no limit: _Dictate Policy_ (3 laws in play) and _Drive the Debate_ (it or its planet is
       elected by the agenda just resolved, never one from an earlier round), for which it also votes for itself.
-    - It keeps the secrets it can achieve (weighted by how achievable they are for it) and uses Imperial to replace
-      the rest; it never pursues _Mechanize the Military_, _Occupy the Fringe_ or _Strengthen Bonds_ yet.
+    - **Keeping secrets.** When it holds too many it discards the one with the lowest keep value: the chance the
+      secret gets scored times what a point from its phase is worth (action 1.2). The chance blends how often real
+      players finished the secret (`SecretStatistics`) with the board: progress for a status secret, and for an action
+      secret the chance per round of meeting its condition (`ActionSecretOdds`), higher with a ship placed for it and
+      0.6 when it can make the condition happen next turn. A secret it can score right now is worth a flat 2.0, and a
+      status secret is halved when other scorable ones already fill the rounds left. It uses Imperial to replace the
+      rest; it never pursues _Mechanize the Military_, _Occupy the Fringe_ or _Strengthen Bonds_ yet.
 - **Command tokens** (`CommandTokenPolicy`). Every gain (status phase, Leadership, Propagation) goes to the first
   unmet level of one priority list, and status-phase redistribution moves a token out of any pool above its share
   (fleet first, then strategy, then tactic) and gains it back where the list needs it, so each move brings the pools
@@ -626,6 +641,8 @@ Four small generic changes don't reference `ti4.ai`:
     starts with only its own faction note and the five generic notes; the scoreboard lists the notes each seat holds,
     received and has in its play area.
   - `-Dai.trading=false` plays without trading, for an A/B comparison of the batch summary.
+  - `-Dai.secrets.hold=false` plays without patience with action secrets. The batch prints the secrets scored per seat
+    by phase and the average round in which the action secrets were scored.
 - In a dev guild:
   1. `/testbed apply` a preset that starts in `setup`, or create a game for self-play.
   2. `/ai add` once per AI seat.

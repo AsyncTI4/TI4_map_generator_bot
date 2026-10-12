@@ -101,6 +101,7 @@ class AiSelfPlayTest extends BaseTi4Test {
                                 java.util.TreeMap::new,
                                 java.util.stream.Collectors.counting())));
         printTrading(outcomes);
+        printSecrets(outcomes);
         System.out.println("Tactical actions per seat each round: "
                 + perRoundDecimal(
                         outcomes.stream()
@@ -136,6 +137,49 @@ class AiSelfPlayTest extends BaseTi4Test {
                                     .toList(),
                             2));
         }
+    }
+
+    // Secret objectives scored per seat by phase, and the average round in which the action secrets were scored (run
+    // once with -Dai.secrets.hold=false to compare how patience moves the timing).
+    private static void printSecrets(List<SelfPlayGame.Outcome> outcomes) {
+        int seats = Math.max(
+                1, outcomes.stream().mapToInt(SelfPlayGame.Outcome::seats).sum());
+        int action = outcomes.stream()
+                .mapToInt(outcome -> outcome.secrets().action())
+                .sum();
+        int status = outcomes.stream()
+                .mapToInt(outcome -> outcome.secrets().status())
+                .sum();
+        int agenda = outcomes.stream()
+                .mapToInt(outcome -> outcome.secrets().agenda())
+                .sum();
+        int other =
+                outcomes.stream().mapToInt(outcome -> outcome.secrets().other()).sum();
+        List<Integer> rounds = outcomes.stream()
+                .flatMap(outcome -> outcome.secrets().actionSecretRounds().stream())
+                .toList();
+        System.out.printf(
+                "Secrets %s: scored per seat per game action %.2f, status %.2f, agenda %.2f, other %.2f; the %d action secrets were"
+                        + " scored in round %.1f on average; average final round %.1f, leader victory points %.1f, table total %.1f%n",
+                AiSettings.isSecretHoldEnabled() ? "patient" : "pursue at once",
+                (double) action / seats,
+                (double) status / seats,
+                (double) agenda / seats,
+                (double) other / seats,
+                rounds.size(),
+                rounds.stream().mapToInt(Integer::intValue).average().orElse(0),
+                outcomes.stream()
+                        .mapToInt(SelfPlayGame.Outcome::round)
+                        .average()
+                        .orElse(0),
+                outcomes.stream()
+                        .mapToInt(SelfPlayGame.Outcome::leaderVictoryPoints)
+                        .average()
+                        .orElse(0),
+                outcomes.stream()
+                        .mapToInt(SelfPlayGame.Outcome::totalVictoryPoints)
+                        .average()
+                        .orElse(0));
     }
 
     // What trading did over the batch, next to the strength measures it should move (run once with -Dai.trading=false

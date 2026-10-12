@@ -31,6 +31,7 @@ import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
+import ti4.ai.secrets.ActionSecretTiming;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Game;
@@ -67,6 +68,7 @@ public class TacticalPlanner {
     private static final String CONQUER_THE_WEAK = "conquer";
     private static final String MAKE_AN_EXAMPLE = "mew";
     private static final int DEMONSTRATION_SHIPS = 3;
+    private static final double PATIENT_SHARE = 0.25;
     private static final double GROUP_MOVE_COST = 0.3;
     private static final double FORWARD_GROUND_FORCE_VALUE = 0.5;
     private static final double FIGHTER_ESCORT_VALUE = 0.15;
@@ -652,7 +654,7 @@ public class TacticalPlanner {
                 && !ObjectivePolicy.hasScored(game, seat, CONQUER_THE_WEAK);
     }
 
-    private static double actionSecretBonus(
+    static double actionSecretBonus(
             Game game,
             Player seat,
             Tile tile,
@@ -661,32 +663,38 @@ public class TacticalPlanner {
             boolean spaceCombat,
             boolean groundCombat) {
         if (!spaceCombat && !groundCombat) return 0;
-        java.util.Set<String> held = seat.getSecretsUnscored().keySet();
-        int qualifying = 0;
-        if (held.contains("sar") && opponent.getTotalVictoryPoints() == game.getHighestScore()) qualifying++;
-        if (held.contains("btv") && tile.isAnomaly(game, seat)) qualifying++;
+        Set<String> held = seat.getSecretsUnscored().keySet();
+        List<String> qualifying = new ArrayList<>();
+        if (held.contains("sar") && opponent.getTotalVictoryPoints() == game.getHighestScore()) qualifying.add("sar");
+        if (held.contains("btv") && tile.isAnomaly(game, seat)) qualifying.add("btv");
         if (held.contains(DARKEN_THE_SKIES) && tile.isHomeSystem(game) && tile != seat.getHomeSystemTile()) {
-            qualifying++;
+            qualifying.add(DARKEN_THE_SKIES);
         }
         if (held.contains("baf")
                 && seat.getPromissoryNotesInPlayArea().stream().anyMatch(note -> game.getPNOwner(note) == opponent)) {
-            qualifying++;
+            qualifying.add("baf");
         }
         if (spaceCombat) {
             UnitHolder space = BoardView.space(tile);
             int arriving = movedNonFighterShips(ships) + BoardView.nonFighterShips(space, seat);
             boolean flagship = ships.stream().anyMatch(move -> move.type() == UnitType.Flagship);
-            if (held.contains("uf") && flagship) qualifying++;
-            if (held.contains("dyp") && arriving >= DEMONSTRATION_SHIPS) qualifying++;
+            if (held.contains("uf") && flagship) qualifying.add("uf");
+            if (held.contains("dyp") && arriving >= DEMONSTRATION_SHIPS) qualifying.add("dyp");
             if (held.contains("dtgs")
                     && BoardView.count(space, opponent, UnitType.Flagship)
                                     + BoardView.count(space, opponent, UnitType.Warsun)
                             > 0) {
-                qualifying++;
+                qualifying.add("dtgs");
             }
         }
         int combats = (spaceCombat ? 1 : 0) + (groundCombat ? 1 : 0);
-        return ObjectiveValue.VICTORY_POINT_VALUE * Math.min(qualifying, combats);
+        double points = qualifying.stream()
+                .map(secret -> ActionSecretTiming.pursueNow(game, seat, secret) ? 1.0 : PATIENT_SHARE)
+                .sorted(Comparator.reverseOrder())
+                .limit(combats)
+                .mapToDouble(Double::doubleValue)
+                .sum();
+        return ObjectiveValue.VICTORY_POINT_VALUE * points;
     }
 
     private static Optional<TacticalPlan> produce(Context context, Tile tile) {

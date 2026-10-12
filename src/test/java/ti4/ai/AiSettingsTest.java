@@ -28,6 +28,26 @@ class AiSettingsTest extends BaseTi4Test {
         assertThat(AiSettings.stallThreshold(withHuman.game)).isEqualTo(AiSettings.STALL_THRESHOLD);
     }
 
+    // Patience with action secrets (not hurrying to meet their conditions) is on unless the JVM is started with
+    // -Dai.secrets.hold=false (used for A/B self-play runs).
+    @Test
+    void secretPatienceCanBeSwitchedOff() {
+        String before = System.getProperty(AiSettings.SECRET_HOLD_PROPERTY);
+        try {
+            System.clearProperty(AiSettings.SECRET_HOLD_PROPERTY);
+            assertThat(AiSettings.isSecretHoldEnabled()).isTrue();
+
+            System.setProperty(AiSettings.SECRET_HOLD_PROPERTY, "FALSE");
+            assertThat(AiSettings.isSecretHoldEnabled()).isFalse();
+
+            System.setProperty(AiSettings.SECRET_HOLD_PROPERTY, "true");
+            assertThat(AiSettings.isSecretHoldEnabled()).isTrue();
+        } finally {
+            if (before == null) System.clearProperty(AiSettings.SECRET_HOLD_PROPERTY);
+            else System.setProperty(AiSettings.SECRET_HOLD_PROPERTY, before);
+        }
+    }
+
     // Trading is on unless the JVM is started with -Dai.trading=false (used for A/B self-play runs).
     @Test
     void tradingCanBeSwitchedOff() {

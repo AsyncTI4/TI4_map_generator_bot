@@ -84,6 +84,8 @@ final class SelfPlayEnvironment implements AutoCloseable {
     final Map<String, Integer> pressedHandlers = new java.util.TreeMap<>();
     final Map<String, Integer> decisionReasons = new java.util.TreeMap<>();
     final Map<Integer, Map<String, Integer>> actionsByRound = new java.util.TreeMap<>();
+    // The round in which each action secret was first sent to be scored, by "faction|secret".
+    final Map<String, Integer> actionSecretRounds = new java.util.concurrent.ConcurrentHashMap<>();
     // Trading: every accepted offer (read from the offerer's items just before the Accept press), the presses each seat
     // made by handler family, and the Trade settlements each holder sent and had accepted.
     final List<TradeRecord> tradeLedger = new ArrayList<>();
@@ -352,6 +354,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
                 noteOffer(context.faction(), decision);
                 rememberReason(decision);
                 countRoundAction(decision, context.game().getRound());
+                noteActionSecretScored(context, decision);
                 return decision;
             }
         };
@@ -382,6 +385,18 @@ final class SelfPlayEnvironment implements AutoCloseable {
             actionsByRound
                     .computeIfAbsent(round, ignored -> new java.util.TreeMap<>())
                     .merge(kind, 1, Integer::sum);
+        }
+    }
+
+    private static final java.util.regex.Pattern ACTION_SECRET_SCORED =
+            java.util.regex.Pattern.compile("^score (\\w+) after a combat$");
+
+    private void noteActionSecretScored(AiTurnContext context, AiDecision decision) {
+        if (!(decision instanceof AiDecision.Press press)) return;
+        java.util.regex.Matcher scored = ACTION_SECRET_SCORED.matcher(press.reason());
+        if (scored.matches()) {
+            actionSecretRounds.putIfAbsent(
+                    context.faction() + "|" + scored.group(1), context.game().getRound());
         }
     }
 

@@ -41,7 +41,7 @@ public class ActionSecretRules {
     private static final String BOMBARD_KEY = "bombardWatch|";
     private static final String FIELD = "~";
     private static final int DEMONSTRATION_SHIPS = 3;
-    private static final List<String> COMBAT_SECRETS = List.of("dtgs", "uf", "dts", "btv", "sar", "baf", "fwp", "dyp");
+    static final List<String> COMBAT_SECRETS = List.of("dtgs", "dts", "baf", "fwp", "btv", "uf", "sar", "dyp");
 
     record Watch(
             String key,
