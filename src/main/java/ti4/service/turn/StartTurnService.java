@@ -1026,6 +1026,9 @@ public class StartTurnService {
             startButtons.add(Buttons.gray(
                     "getAgentSelection_hyperagent", "Use Hyper Genome on Someone Else", FactionEmojis.Mentak));
         }
+        if (player.hasTechReady("l4_br")) {
+            startButtons.add(Buttons.gray("repairUnitsL4", "Repair All Your Damaged Units", FactionEmojis.Letnev));
+        }
 
         if (game.isVeiledHeartMode()
                 && !game.getStoredValue("veiledCards" + player.getFaction()).isEmpty()) {

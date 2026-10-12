@@ -2022,9 +2022,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (leader.isEmpty()) {
             leader = getLeaderByType(leaderIdOrType);
         }
-        if (leader.isEmpty() && leaderIdOrType.contains("agent")) {
-            leader = getLeaderByID("yssarilagent");
-        }
         return leader;
     }
 
@@ -2060,14 +2057,14 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             return Optional.of(new Leader("keleresagent", "agent"));
         }
         if (leaderId.contains("agent")) {
-            for (Leader leader : leaders) {
-                if ("yssarilagent".equals(leader.getId())) {
-                    if (!leader.isExhausted()) {
-                        return Optional.of(leader);
-                    }
-                    if (exhaustedFallbackLeader == null) {
-                        exhaustedFallbackLeader = leader;
-                    }
+            Optional<Leader> externalAgent = getExternalAgent(leaderId);
+            if (externalAgent.isPresent()) {
+                Leader leader = externalAgent.get();
+                if (!leader.isExhausted()) {
+                    return Optional.of(leader);
+                }
+                if (exhaustedFallbackLeader == null) {
+                    exhaustedFallbackLeader = leader;
                 }
             }
         }
@@ -2089,8 +2086,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                     && game.getStoredValue("keleresAgentTarget").equalsIgnoreCase(getFaction())) {
                 return true;
             }
-            return hasExternalAccessToLeader(leaderId)
-                    && !getLeaderByID("yssarilagent").map(Leader::isExhausted).orElse(true);
+            return getExternalAgent(leaderId)
+                    .map(leader -> !leader.isExhausted())
+                    .orElse(false);
         }
     }
 
@@ -2104,19 +2102,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public Optional<Leader> getLeaderByID(String leaderID) {
-        for (Leader leader : leaders) {
-            if (leader.getId().equalsIgnoreCase(leaderID)) {
-                return Optional.of(leader);
-            }
-        }
-        if (leaderID.contains("agent")) {
-            for (Leader leader : leaders) {
-                if ("yssarilagent".equals(leader.getId())) {
-                    return Optional.of(leader);
-                }
-            }
-        }
-        return Optional.empty();
+        Optional<Leader> leader = getDirectLeaderByID(leaderID);
+        return leader.isPresent() ? leader : getExternalAgent(leaderID);
     }
 
     public List<String> getLeaderIDs() {
@@ -2129,10 +2116,31 @@ public class Player extends PlayerProperties implements StoredValueHelper {
      *         Yssaril Agent
      */
     public boolean hasExternalAccessToLeader(String leaderID) {
-        if (!hasLeader(leaderID) && leaderID.contains("agent") && getLeaderIDs().contains("yssarilagent")) {
+        if (!hasLeader(leaderID) && leaderID.contains("agent") && hasLeader("yssarilagent")) {
             return game.isLeaderInGame(leaderID);
         }
-        return false;
+        return !hasLeader(leaderID)
+                && leaderID.contains("agent")
+                && hasLeader("yssarilagent_br")
+                && game.getRealPlayersExcludingThis(this).stream()
+                        .anyMatch(player -> player.hasLeader(leaderID)
+                                && player.getDirectLeaderByID(leaderID)
+                                        .map(Leader::isExhausted)
+                                        .orElse(false));
+    }
+
+    private Optional<Leader> getDirectLeaderByID(String leaderID) {
+        return leaders.stream()
+                .filter(leader -> leader.getId().equalsIgnoreCase(leaderID))
+                .findFirst();
+    }
+
+    private Optional<Leader> getExternalAgent(String leaderID) {
+        if (!leaderID.contains("agent") || !hasExternalAccessToLeader(leaderID)) {
+            return Optional.empty();
+        }
+        Optional<Leader> yssarilAgent = getDirectLeaderByID("yssarilagent");
+        return yssarilAgent.isPresent() ? yssarilAgent : getDirectLeaderByID("yssarilagent_br");
     }
 
     public boolean hasLeader(String leaderID) {
@@ -2315,11 +2323,18 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         List<String> promissoryNotesInPlayArea = getPromissoryNotesInPlayArea();
         int vpCount = 0;
         for (String id : promissoryNotesInPlayArea) {
-            if (id.endsWith("_sftt")) {
+            if (givesSupportForTheThroneVictoryPoint(id)) {
                 vpCount++;
             }
         }
         return vpCount;
+    }
+
+    public boolean givesSupportForTheThroneVictoryPoint(String promissoryNoteId) {
+        if (promissoryNoteId == null || !promissoryNoteId.endsWith("_sftt")) {
+            return false;
+        }
+        return !promissoryNoteId.endsWith("_br_sftt") || getPromissoryNotes().containsKey(getColor() + "_br_sftt");
     }
 
     public int getTotalVictoryPoints() {

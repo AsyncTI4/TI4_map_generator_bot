@@ -225,7 +225,7 @@ public class SecretObjectiveHelper {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
 
-        if (player.hasTech("tf-plausibled")) {
+        if (player.hasTech("tf-plausibled") || player.hasAbility("plausible_deniability_br")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
             buttons.add(Buttons.red("deleteButtons", "Done"));

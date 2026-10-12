@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.EscapeClauseActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimBreakthroughHandler;
@@ -254,6 +255,10 @@ public class PromissoryNoteHelper {
         keepingPromissoryNote |= KaltrimBreakthroughHandler.consumeEchoOperativesReturn(game, player, id);
 
         boolean wouldReturnPromissoryNote = !pn.getPlayArea() || player.isPlayerMemberOfAlliance(owner);
+
+        if (id.endsWith("_ta") && EscapeClauseActionCardHandler.triggerPreset(event, game, player, owner, id)) {
+            return;
+        }
 
         if (wouldReturnPromissoryNote
                 && !keepingPromissoryNote

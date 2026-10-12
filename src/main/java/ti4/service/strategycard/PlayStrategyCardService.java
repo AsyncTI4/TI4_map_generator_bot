@@ -206,6 +206,9 @@ public class PlayStrategyCardService {
 
         // GET BUTTONS
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero, isOverrule, player));
+        if ("br5trade".equals(scModel.getId())) {
+            scButtons.add(BRTradeStrategyCardService.getPlaceOrMoveStationButton(player));
+        }
         if (isOverrule) {
             scButtons.removeIf(button -> {
                 String id = button.getCustomId();
