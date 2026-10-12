@@ -6,6 +6,7 @@ import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
+import ti4.ai.secrets.SecretDrawValue;
 import ti4.ai.strategy.CardPlan.Benefit;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.game.Game;
@@ -32,7 +33,7 @@ class ImperialUses {
                 new Benefit(CardUse.IMPERIAL_MECATOL, mecatolValue(in), mecatolPosition(game)),
                 new Benefit(
                         CardUse.IMPERIAL_SECRET,
-                        !holdsMecatol && hasRoomForSecret(seat) ? CardValueScale.SECRET_DRAW : 0));
+                        !holdsMecatol && hasRoomForSecret(seat) ? SecretDrawValue.of(game, seat) : 0));
     }
 
     static boolean holdsThreatenedMecatol(PlanInputs in) {

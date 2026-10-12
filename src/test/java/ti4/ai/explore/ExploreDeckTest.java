@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
+import ti4.ai.secrets.SecretDrawValue;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -108,7 +109,7 @@ class ExploreDeckTest extends BaseTi4Test {
         assertThat(value("frontier")).isCloseTo(2.0, within(EXACT));
 
         deck("dv1");
-        assertThat(value("frontier")).isCloseTo(ExploreValues.SECRET_OBJECTIVE, within(EXACT));
+        assertThat(value("frontier")).isCloseTo(SecretDrawValue.of(test.game, test.nekro), within(EXACT));
     }
 
     // A full exploration deck is worth about a resource a card, which is what the planner adds for taking a planet

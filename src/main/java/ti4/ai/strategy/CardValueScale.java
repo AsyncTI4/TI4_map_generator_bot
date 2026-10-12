@@ -14,7 +14,6 @@ class CardValueScale {
     static final double TOKEN_ACTION_SHARE = 0.6;
     static final double STRATEGY_TOKEN = 1.0;
     static final double ACTION_CARD = ActionCardPrior.AVERAGE_CARD;
-    static final double SECRET_DRAW = STRATEGY_TOKEN;
     static final double SPEAKER = 1.5;
     static final double SPEAKER_FOR_IMPERIAL = 1.5;
     static final double AGENDA_PEEK = 0.5;

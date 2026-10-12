@@ -2,12 +2,12 @@ package ti4.ai.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.secrets.SecretDrawValue;
 import ti4.ai.strategy.CardPlan.Benefit;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
@@ -73,18 +73,27 @@ class StrategyCardPlannerTest extends BaseTi4Test {
         changed();
     }
 
-    // The reported mistake: Imperial picked with nothing to score and no Mecatol Rex. The secret it would draw is
-    // available to anyone following Imperial, so it is worth a strategy token at most, and Imperial falls below every
-    // card with a real use.
+    // Imperial picked with nothing to score and no Mecatol Rex was once a reported mistake, when a secret was worth a
+    // strategy token. The experts rank a fresh secret among the best things a card can give, so the secret is now
+    // valued as what it will probably score (SecretDrawValue), and it is all Imperial is worth here.
     @Test
-    void valuesImperialOnlyAsASecretWhenItCanScoreNothing() {
+    void valuesImperialAsAFreshSecretWhenItCanScoreNothing() {
         test.game.setRound(3);
         changed();
 
         assertThat(plan(IMPERIAL).benefits()).extracting(Benefit::use).containsExactly(CardUse.IMPERIAL_SECRET);
-        for (int card : List.of(LEADERSHIP, POLITICS, CONSTRUCTION, TRADE)) {
-            assertThat(value(IMPERIAL)).as("Imperial against card " + card).isLessThan(value(card));
-        }
+        assertThat(plan(IMPERIAL).benefits().getFirst().value()).isEqualTo(SecretDrawValue.of(test.game, test.nekro));
+    }
+
+    @Test
+    void valuesNoSecretWhenTheHandHasNoRoomForIt() {
+        test.game.setRound(3);
+        test.nekro.setSecret("dhw");
+        test.nekro.setSecret("gamf");
+        test.nekro.setSecret("mtm");
+        changed();
+
+        assertThat(plan(IMPERIAL).benefits()).extracting(Benefit::use).doesNotContain(CardUse.IMPERIAL_SECRET);
     }
 
     @Test

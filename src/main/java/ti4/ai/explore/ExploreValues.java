@@ -25,8 +25,6 @@ public class ExploreValues {
     public static final double MERCENARY_OUTFIT = 0.75;
     public static final double FREELANCERS = 1.5;
     public static final int FREELANCERS_TYPICAL_COST = 2;
-    public static final double SECRET_OBJECTIVE = 1.5;
-    public static final double CROWDED_SECRET_OBJECTIVE = 0.3;
     public static final double ENIGMATIC_DEVICE = 1.0;
     public static final double FRONTIER_CARD = 1.5;
     public static final double DEMILITARIZED_ZONE = -1.5;

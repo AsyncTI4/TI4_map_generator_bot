@@ -18,6 +18,7 @@ import ti4.ai.actioncards.SabotagePolicy;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.scoring.ScoringStakes;
+import ti4.ai.secrets.SecretDrawValue;
 import ti4.ai.secrets.SecretOdds;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
@@ -133,6 +134,7 @@ class HiddenInfoGuardTest extends BaseTi4Test {
         ScoringStakes.anyOpponentIsContender(table.game, table.nekro);
         SecretOdds.chanceReady(table.game, table.nekro, spy);
         SecretOdds.unseenPool(table.game, table.nekro);
+        SecretDrawValue.of(table.game, table.nekro);
         for (String title : titles) {
             CardScoring.pointsFor(title, table.game, spy);
             AiPrompt window = AiTestGame.prompt(

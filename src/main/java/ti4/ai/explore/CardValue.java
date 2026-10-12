@@ -4,6 +4,7 @@ import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.PlanetStake;
+import ti4.ai.secrets.SecretDrawValue;
 import ti4.ai.trade.ComponentValues;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -44,7 +45,7 @@ public class CardValue {
             case "aw" -> Math.max(convertedWarehouses(game, seat), gainedWarehouses(game, seat));
             case "ms" -> Math.max(convertedMerchants(game, seat), replenishedMerchants(game, seat));
             case "lc" -> ExploreValues.actionCardsFromLostCrew(game, seat);
-            case "dv" -> secretObjective(seat);
+            case "dv" -> SecretDrawValue.of(seat.getGame(), seat);
             case "ed" -> ExploreValues.ENIGMATIC_DEVICE;
             case "mirage" -> mirage();
             case "dmz" -> ExploreValues.DEMILITARIZED_ZONE - PlanetStake.structures(site.holder(), seat);
@@ -106,11 +107,6 @@ public class CardValue {
 
     public static double replenishedMerchants(Game game, Player seat) {
         return ExploreValues.gainedCommodities(game, seat, ExploreValues.commodityRoom(seat));
-    }
-
-    private static double secretObjective(Player seat) {
-        boolean room = seat.getSecretsUnscored().size() < Math.max(0, seat.getMaxSOCount() - seat.getSoScored());
-        return room ? ExploreValues.SECRET_OBJECTIVE : ExploreValues.CROWDED_SECRET_OBJECTIVE;
     }
 
     private static double mirage() {

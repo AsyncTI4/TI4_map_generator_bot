@@ -3,12 +3,14 @@ package ti4.ai.actioncards;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleBiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.AiCard.Window;
+import ti4.ai.brain.AiTurnContext;
 import ti4.ai.nekro.CommandTokenPolicy;
 import ti4.ai.tactical.Stall;
 import ti4.game.Game;
@@ -68,6 +70,7 @@ public class AiActionCards {
             TableCards.seizeArtifact(),
             TableCards.repealLaw(),
             TableCards.brilliance(),
+            SecretCards.impersonation(),
             new AiCard(
                     SABOTAGE,
                     ActionCardHelper::isSabotageOrShatter,
@@ -114,6 +117,25 @@ public class AiActionCards {
     static AiCard component(
             String key, Evaluator evaluator, String resolveHandler, List<String> targetPrefixes, TargetStep target) {
         return card(key, Window.COMPONENT_ACTION, withStall(evaluator), resolveHandler, targetPrefixes, target);
+    }
+
+    static AiCard componentWithResolveHook(
+            String key,
+            Evaluator evaluator,
+            String resolveHandler,
+            List<String> targetPrefixes,
+            TargetStep target,
+            Consumer<AiTurnContext> onResolve) {
+        return new AiCard(
+                key,
+                key::equals,
+                Window.COMPONENT_ACTION,
+                withStall(evaluator),
+                ALWAYS,
+                resolveHandler,
+                targetPrefixes,
+                target,
+                onResolve);
     }
 
     static AiCard componentOfCopies(
@@ -165,10 +187,6 @@ public class AiActionCards {
                 resolveHandler,
                 List.of(),
                 target);
-    }
-
-    static Evaluator stalling(Evaluator evaluator) {
-        return withStall(evaluator);
     }
 
     private static Evaluator withStall(Evaluator evaluator) {

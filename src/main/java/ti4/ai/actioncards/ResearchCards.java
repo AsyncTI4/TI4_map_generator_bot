@@ -15,7 +15,6 @@ import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.strategy.ResearchPolicy;
 import ti4.ai.strategy.StrategyCardRules;
-import ti4.ai.tactical.ProductionPlanner;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperActionCards;
@@ -36,8 +35,6 @@ class ResearchCards {
     private static final int FOCUSED_RESEARCH_TRADE_GOODS = 4;
     private static final int PLAGIARIZE_INFLUENCE = 5;
     private static final double TRADE_GOOD = 1.0;
-    private static final double INFLUENCE_OPPORTUNITY = 0.25;
-    private static final double UNSPENT_SHARE = 0.3;
 
     static AiCard focusedResearch() {
         return AiActionCards.component(
@@ -135,7 +132,7 @@ class ResearchCards {
     static Optional<Plan> plagiarizePlan(Game game, Player seat) {
         Optional<Wallet.Payment> payment = payment(game, seat);
         if (payment.isEmpty()) return Optional.empty();
-        double cost = costOf(game, payment.get());
+        double cost = InfluencePayments.cost(game, payment.get());
         return copyable(game, seat).stream()
                 .map(alias -> Plan.aimedAt(
                         ResearchPolicy.TECH_TEMPO * ResearchPolicy.value(game, seat, alias)
@@ -158,19 +155,7 @@ class ResearchCards {
     }
 
     private static Optional<Wallet.Payment> payment(Game game, Player seat) {
-        SpendCost cost = SpendCost.influence(PLAGIARIZE_INFLUENCE);
-        return ScoringReserve.planAfterReserve(game, seat, cost)
-                .or(() -> Wallet.of(game, seat).plan(cost));
-    }
-
-    private static double costOf(Game game, Wallet.Payment payment) {
-        double perResource = ProductionPlanner.fillerValuePerResource(game) * UNSPENT_SHARE;
-        double planets = 0;
-        for (String name : payment.forInfluence()) {
-            planets += INFLUENCE_OPPORTUNITY * game.getPlanetsInfo().get(name).getInfluence()
-                    + perResource * game.getPlanetsInfo().get(name).getResources();
-        }
-        return planets + payment.tradeGoods() * TRADE_GOOD;
+        return InfluencePayments.payment(game, seat, PLAGIARIZE_INFLUENCE);
     }
 
     private static Optional<AiDecision> copy(AiTurnContext context, String key, CardPlay play) {

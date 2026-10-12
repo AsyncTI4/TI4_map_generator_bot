@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
-import ti4.ai.actioncards.AiCard.Window;
 import ti4.ai.actioncards.CardChains.Source;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.eval.BoardView;
@@ -58,12 +57,9 @@ class NeutralUnitCards {
     }
 
     static AiCard pirateFleet() {
-        return new AiCard(
+        return AiActionCards.componentWithResolveHook(
                 PIRATE_FLEET,
-                PIRATE_FLEET::equals,
-                Window.COMPONENT_ACTION,
-                AiActionCards.stalling(NeutralUnitCards::pirateFleetPlan),
-                (game, seat) -> 1.0,
+                NeutralUnitCards::pirateFleetPlan,
                 "pirateFleet",
                 List.of(FLEET_SYSTEM_PREFIX),
                 CardChains.chain(CardChains.last(
