@@ -1429,7 +1429,7 @@ public class ButtonHelper {
                 } else {
                     types.add(deck);
                 }
-                ExploreService.secondHalfOfExpInfo(types, event, player, game, false);
+                ExploreService.secondHalfOfExpInfo(types, event, game, false);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
             case "tiles" -> EventHelper.showRemainingTiles(game, event);
@@ -1449,10 +1449,12 @@ public class ButtonHelper {
             types.add(Constants.INDUSTRIAL);
             types.add(Constants.HAZARDOUS);
             types.add(Constants.FRONTIER);
-            ExploreService.secondHalfOfExpInfo(types, event.getMessageChannel(), player, game, false, true);
+            ExploreService.secondHalfOfExpInfo(
+                    types, event.getMessageChannel(), event.getUser().getId(), game, false, true);
         } else {
             types.add(type);
-            ExploreService.secondHalfOfExpInfo(types, event.getMessageChannel(), player, game, false, true);
+            ExploreService.secondHalfOfExpInfo(
+                    types, event.getMessageChannel(), event.getUser().getId(), game, false, true);
         }
         deleteMessage(event);
     }

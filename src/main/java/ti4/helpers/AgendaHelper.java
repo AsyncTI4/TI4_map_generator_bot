@@ -3231,10 +3231,10 @@ public final class AgendaHelper {
     }
 
     public static void showDiscards(Game game, GenericInteractionCreateEvent event) {
-        if (!RiftSetModeService.deckInfoAvailable(
-                TestBedService.resolveActingPlayer(
-                        game, event, game.getPlayer(event.getUser().getId())),
-                game)) {
+        Player actingPlayer = TestBedService.resolveActingPlayer(
+                game, event, game.getPlayer(event.getUser().getId()));
+        String viewerId = actingPlayer == null ? event.getUser().getId() : actingPlayer.getUserID();
+        if (!RiftSetModeService.deckInfoAvailable(game, viewerId, event.getMessageChannel())) {
             return;
         }
         StringBuilder sb2 = new StringBuilder();
