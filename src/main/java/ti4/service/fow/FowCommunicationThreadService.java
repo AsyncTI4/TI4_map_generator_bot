@@ -1,6 +1,7 @@
 package ti4.service.fow;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -8,12 +9,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -34,6 +37,9 @@ public class FowCommunicationThreadService {
 
     private static final String YES_CHAR = "↔";
     private static final String NO_CHAR = "X";
+    private static final String GUILD_SHIPS = "guild_ships";
+    private static final String COLOR_SEPARATOR = "-";
+    static final String ENCOUNTERED_KEY_PREFIX = "fowCommsEncountered_";
     public static final Pattern THREAD_NAME_PATTERN =
             Pattern.compile("^(\\w+)\\s*(?:" + YES_CHAR + "|" + NO_CHAR + ")\\s*(\\w+)");
 
@@ -48,11 +54,12 @@ public class FowCommunicationThreadService {
     }
 
     public static void checkNewCommPartners(Game game, Player player) {
+        if (!AnonymousCommsService.isActive(game) && !isActive(game)) return;
+        Map<Player, Set<Player>> basePartners = recordEncounters(game);
         if (AnonymousCommsService.isActive(game)) {
-            AnonymousCommsService.refreshPartners(game);
+            AnonymousCommsService.refreshPartners(game, basePartners);
             return;
         }
-        if (!isActive(game)) return;
 
         Set<String> checkedPairs = new HashSet<>();
         getGameThreadChannels(game).thenAccept(threads -> {
@@ -91,11 +98,27 @@ public class FowCommunicationThreadService {
     }
 
     static Set<Player> getCommPartners(Game game, Player player) {
+        return getCommPartners(game, player, null);
+    }
+
+    static Set<Player> getCommPartners(Game game, Player player, @Nullable Set<Player> basePartners) {
         if (areAllowedToTalkInAgenda(game)) {
             Set<Player> allPlayers = new HashSet<>(game.getRealPlayers());
             allPlayers.remove(player);
             return allPlayers;
         }
+        Set<Player> commPartners = new HashSet<>(basePartners == null ? baseCommPartners(game, player) : basePartners);
+        if (AnonymousCommsService.isActive(game) && hasGuildShips(player)) {
+            commPartners.addAll(guildShipsPartners(game, player));
+        }
+        return commPartners;
+    }
+
+    static boolean hasGuildShips(Player player) {
+        return player.hasAbility(GUILD_SHIPS);
+    }
+
+    private static Set<Player> baseCommPartners(Game game, Player player) {
         Set<Player> commPartners = new HashSet<>(player.getNeighbouringPlayers(true));
         if (player.hasSpaceStation()) {
             game.getRealPlayers().stream()
@@ -103,6 +126,33 @@ public class FowCommunicationThreadService {
                     .forEach(commPartners::add);
         }
         return commPartners;
+    }
+
+    private static Set<Player> guildShipsPartners(Game game, Player player) {
+        Set<String> encountered = encounteredColors(game, player);
+        return game.getRealPlayers().stream()
+                .filter(other -> !other.equals(player) && encountered.contains(other.getColor()))
+                .collect(Collectors.toSet());
+    }
+
+    public static Set<String> encounteredColors(Game game, Player player) {
+        String stored = game.getStoredValue(ENCOUNTERED_KEY_PREFIX + player.getColor());
+        return Arrays.stream(stored.split(COLOR_SEPARATOR))
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    static Map<Player, Set<Player>> recordEncounters(Game game) {
+        Map<Player, Set<Player>> basePartners = new HashMap<>();
+        for (Player player : game.getRealPlayers()) {
+            Set<Player> partners = baseCommPartners(game, player);
+            basePartners.put(player, partners);
+            Set<String> encountered = encounteredColors(game, player);
+            partners.stream().filter(Player::isRealPlayer).map(Player::getColor).forEach(encountered::add);
+            if (encountered.isEmpty()) continue;
+            game.setStoredValue(ENCOUNTERED_KEY_PREFIX + player.getColor(), String.join(COLOR_SEPARATOR, encountered));
+        }
+        return basePartners;
     }
 
     public static CompletableFuture<List<ThreadChannel>> getGameThreadChannels(Game game) {

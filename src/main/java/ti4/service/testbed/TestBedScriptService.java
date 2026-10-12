@@ -33,7 +33,7 @@ public class TestBedScriptService {
     public static final String ALL_SEATS = "all";
     public static final String YOU = "you";
     public static final Set<String> SHARED_SCOPES = Set.of("main", "actions", "gm");
-    public static final Set<String> SEAT_SCOPES = Set.of("private", "cards-info", "combat");
+    public static final Set<String> SEAT_SCOPES = Set.of("private", "cards-info", "combat", "comms-inbox");
     public static final String VIRTUAL_SEAT_NAME = "seat";
     private static final int BUTTON_ID_LIMIT = 100;
 
@@ -295,6 +295,10 @@ public class TestBedScriptService {
             }
             case "removeStored" -> requireValue(step.getKey(), "key", label, errors);
             case "setActivePlayer" -> requireSeat(step, label, errors);
+            case "sendAnonComms" -> {
+                requireSeat(step, label, errors);
+                requireValue(step.getValue(), "value", label, errors);
+            }
             case "actAs" -> requireValue(step.getAs(), "as", label, errors);
             case "hand" -> {
                 requireValue(step.getAs(), "as", label, errors);
@@ -323,10 +327,14 @@ public class TestBedScriptService {
             if (problem != null) errors.add(label + ": " + problem + ".");
             if (expect.getEquals() == null
                     && expect.getContains().isEmpty()
-                    && expect.getNotContains().isEmpty()) {
-                errors.add(label + ": a `state` check needs `equals`, `contains` or `notContains`.");
+                    && expect.getNotContains().isEmpty()
+                    && expect.getMatches() == null) {
+                errors.add(label + ": a `state` check needs `equals`, `contains`, `notContains` or `matches`.");
             }
-            rejectFields(label, "a `state` check", messageOnlyFields(expect), errors);
+            validateRegex(expect, label, errors);
+            List<String> extra = new ArrayList<>(messageOnlyFields(expect));
+            extra.remove("matches");
+            rejectFields(label, "a `state` check", extra, errors);
         }
         if (expect.getEphemeral() != null || expect.getModal() != null) {
             kinds += (expect.getEphemeral() != null ? 1 : 0) + (expect.getModal() != null ? 1 : 0);
@@ -366,12 +374,15 @@ public class TestBedScriptService {
                 && !Expect.SINCE_STEP.equals(expect.getSince())) {
             errors.add(label + ": `since` must be `" + Expect.SINCE_STEP + "` or `" + Expect.SINCE_START + "`.");
         }
-        if (expect.getMatches() != null) {
-            try {
-                Pattern.compile(expect.getMatches());
-            } catch (PatternSyntaxException e) {
-                errors.add(label + ": `matches` is not a valid regex: " + e.getDescription() + ".");
-            }
+        validateRegex(expect, label, errors);
+    }
+
+    private static void validateRegex(Expect expect, String label, List<String> errors) {
+        if (expect.getMatches() == null) return;
+        try {
+            Pattern.compile(expect.getMatches());
+        } catch (PatternSyntaxException e) {
+            errors.add(label + ": `matches` is not a valid regex: " + e.getDescription() + ".");
         }
     }
 
@@ -403,7 +414,7 @@ public class TestBedScriptService {
         }
         if (colon >= 0 && !SEAT_SCOPES.contains(scope.substring(colon + 1))) {
             errors.add(label + ": unknown scope `" + scope + "`; use main, actions, gm, <seat>, <seat>:private,"
-                    + " <seat>:cards-info or <seat>:combat.");
+                    + " <seat>:cards-info, <seat>:combat or <seat>:comms-inbox.");
         }
     }
 }

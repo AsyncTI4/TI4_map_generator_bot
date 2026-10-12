@@ -1,0 +1,47 @@
+{
+  "name": "anon-comms-inbox",
+  "description": "Anonymous comms inbox: only the first message pings until the receiver acts, the comms hub stays the last inbox message, notification lines carry no buttons, and Hacan (Guild Ships) keeps comms with colors it has encountered.",
+  "preset": "fog-comms-4p",
+  "settleSeconds": 2,
+  "steps": [
+    { "note": "you = red, seat1 = blue, seat2 = green (Hacan), seat3 = yellow. Red and Green both neighbour Blue only." },
+    { "label": "GM enables Anonymous comms", "as": "you", "in": "gm", "pressId": "fowOption_GAME_true_anonymous_comms" },
+    { "label": "Turn start runs the partner check", "do": "setActivePlayer", "as": "you" },
+    { "expect": { "state": "stored:fowCommsEncountered_red", "equals": "blue" } },
+    { "expect": { "state": "stored:fowCommsEncountered_green", "equals": "blue" } },
+    { "expect": { "state": "stored:anonCommsPingAt_blue", "equals": "" }, "stopOnFail": true },
+
+    { "label": "Red sends Blue a first message", "do": "sendAnonComms", "as": "you", "value": "seat1" },
+    { "label": "First message pings Blue", "expect": { "state": "stored:anonCommsPingAt_blue", "matches": "^\\d+$" } },
+    { "expect": { "in": "seat1:comms-inbox", "contains": "test bed comms message" } },
+    { "label": "Hub follows with an Open button for Red", "expect": { "in": "seat1:comms-inbox", "buttons": ["anonCommsOpen_red"] } },
+    { "label": "Notification line has no Reply button", "expect": { "in": "seat1:comms-inbox", "noButtons": ["anonCommsReply_red~MDL"] } },
+
+    { "label": "Pretend Blue's ping is still unacknowledged", "do": "setStored", "key": "anonCommsPingAt_blue", "value": "4102444800000" },
+    { "label": "Red sends Blue a second message", "do": "sendAnonComms", "as": "you", "value": "seat1" },
+    { "label": "Second message stays silent", "expect": { "state": "stored:anonCommsPingAt_blue", "equals": "4102444800000" } },
+    { "label": "Exactly one new hub", "expect": { "in": "seat1:comms-inbox", "contains": "closed, read back only", "count": 1 } },
+    { "note": "Check: Blue's inbox shows two 📨 lines without buttons, only the first with a mention, and a single 📇 hub at the bottom (Red green)." },
+
+    { "label": "Blue opens Red from the hub", "as": "seat1", "in": "seat1:comms-inbox", "press": "anonCommsOpen_red" },
+    { "expect": { "ephemeral": "Conversation with" } },
+    { "label": "Opening re-arms Blue's ping", "expect": { "state": "stored:anonCommsPingAt_blue", "equals": "" } },
+    { "label": "Red's own inbox has a hub too", "expect": { "in": "you:comms-inbox", "buttons": ["anonCommsOpen_blue"], "since": "start" } },
+
+    { "label": "Guild Ships alone does not reach a stranger", "expect": { "state": "stored:anonCommsPartners_green", "equals": "blue" } },
+    { "label": "Pretend Green met Red earlier", "do": "setStored", "key": "fowCommsEncountered_green", "value": "blue-red" },
+    { "label": "Next turn start reruns the partner check", "do": "setActivePlayer", "as": "seat1" },
+    { "label": "Hacan reaches encountered Red", "expect": { "state": "stored:anonCommsPartners_green", "equals": "blue-red" } },
+    { "label": "Red's partners do not reveal Guild Ships", "expect": { "state": "stored:anonCommsPartners_red", "equals": "blue" } },
+    { "expect": { "in": "you:comms-inbox", "notContains": "Comms opened with" } },
+    { "expect": { "state": "stored:anonCommsGuildReply_red_green", "equals": "" } },
+    { "label": "Hacan writes to Red", "do": "sendAnonComms", "as": "seat2", "value": "you" },
+    { "expect": { "in": "you:comms-inbox", "contains": "test bed comms message" } },
+    { "label": "Red may now answer Hacan", "expect": { "state": "stored:anonCommsGuildReply_red_green", "equals": "true" } },
+    { "label": "Red answers Hacan", "do": "sendAnonComms", "as": "you", "value": "seat2" },
+    { "expect": { "in": "seat2:comms-inbox", "contains": "test bed comms message" } },
+    { "note": "Check: before Hacan wrote, Red's hub showed Green red (or not at all); after it, Green is a green button. Yellow is absent." },
+
+    { "expect": { "in": "main", "noFactionLeak": true, "since": "start" } }
+  ]
+}
