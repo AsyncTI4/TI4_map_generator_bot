@@ -31,6 +31,8 @@ public class AiConfusionService {
     private static final int LABEL_LENGTH = 80;
     private static final List<String> DECLINE_HINTS =
             List.of("decline", "pass", "no_", "not follow", "deletebuttons", "done", "skip", "cancel");
+    private static final List<String> HIT_CANCEL_HANDLERS =
+            List.of("cancelSpaceHits_", "cancelPdsOffenseHits_", "cancelGroundHits_", "cancelAFBHits_");
     private static final Set<String> CLAIMED_DELEGATIONS = ConcurrentHashMap.newKeySet();
 
     public static boolean claim(String delegationMessageId) {
@@ -83,6 +85,7 @@ public class AiConfusionService {
     public static Optional<PromptButton> safeDefault(AiPrompt prompt) {
         List<PromptButton> enabled = prompt.enabledButtons().stream()
                 .filter(button -> !AiActuator.opensModal(button.customId()))
+                .filter(button -> !cancelsHits(button))
                 .toList();
         for (String hint : DECLINE_HINTS) {
             Optional<PromptButton> declining = enabled.stream()
@@ -100,7 +103,13 @@ public class AiConfusionService {
                 .or(() -> prompt.enabledButtons().stream()
                         .filter(button -> !AiActuator.opensModal(button.customId()))
                         .filter(button -> !button.handlerId().startsWith("ultimateUndo"))
+                        .filter(button -> !cancelsHits(button))
                         .findFirst());
+    }
+
+    private static boolean cancelsHits(PromptButton button) {
+        return HIT_CANCEL_HANDLERS.stream()
+                .anyMatch(prefix -> button.handlerId().startsWith(prefix));
     }
 
     public static void announceLoop(Game game, Player seat, String reason, int times, boolean selfPlay) {

@@ -38,6 +38,18 @@ class AiConfusionServiceTest extends BaseTi4Test {
         assertThat(AiConfusionService.safeDefault(prompt)).isEmpty();
     }
 
+    // Cancel-a-hit buttons contain "cancel" but throw away a free hit; they are never a safe choice.
+    @Test
+    void safeDefaultAndSelfPlayNeverCancelHits() {
+        for (String handler :
+                List.of("cancelSpaceHits_", "cancelPdsOffenseHits_", "cancelGroundHits_", "cancelAFBHits_")) {
+            AiPrompt prompt = prompt(handler + "1_2");
+
+            assertThat(AiConfusionService.safeDefault(prompt)).isEmpty();
+            assertThat(AiConfusionService.selfPlayChoice(prompt)).isEmpty();
+        }
+    }
+
     @Test
     void claimingADelegationSucceedsOnlyOnce() {
         assertThat(AiConfusionService.claim("delegation-message-1")).isTrue();
