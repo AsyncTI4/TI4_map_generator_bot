@@ -40,9 +40,11 @@ class CardMessages {
     private static Optional<AiPrompt> overruledMessage(AiTurnContext context, int initiative) {
         long turnStart = Prompts.turnStart(context);
         String name = Helper.getSCName(initiative, context.game());
+        String emojis = context.game().getSCEmojiWordRepresentation(initiative);
         return Prompts.newestFirst(context.prompts()).stream()
                 .filter(prompt -> !prompt.isHidden() && prompt.createdAtMillis() >= turnStart)
-                .filter(prompt -> prompt.content().contains(OVERRULED) && containsIgnoreCase(prompt.content(), name))
+                .filter(prompt -> prompt.content().contains(OVERRULED)
+                        && (prompt.content().contains(emojis) || containsIgnoreCase(prompt.content(), name)))
                 .filter(prompt -> prompt.buttons().stream().anyMatch(button -> button.isOwnedBy(context.faction())))
                 .findFirst();
     }

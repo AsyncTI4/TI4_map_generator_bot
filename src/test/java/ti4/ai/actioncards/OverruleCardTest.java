@@ -231,6 +231,24 @@ class OverruleCardTest extends BaseTi4Test {
         assertThat(AiTestGame.pressedId(primary.orElseThrow())).isEqualTo("FFCC_nekro_acquireATechWithSC_first");
     }
 
+    // The bot names the overruled card by its emojis alone (the card's name is not in the text), so the message is
+    // found by those.
+    @Test
+    void theOverruledCardsMessageIsFoundByItsEmojisAlone() {
+        onlyThese(StrategyCard.TECHNOLOGY);
+        int technology = initiativeOf(StrategyCard.TECHNOLOGY);
+        playsAndResolves();
+        ActionCardRules.continuePlay(table.test.contextAt(SETTLED, cardChoices(technology)));
+        AiPrompt message = AiTestGame.withContent(
+                prompt("overruled", PromptSource.PUBLIC, SETTLED, "FFCC_nekro_acquireATechWithSC_first"),
+                table.game.getSCEmojiWordRepresentation(technology) + " overruled by " + table.nekro.getRepresentation()
+                        + ".\n\n");
+
+        Optional<AiDecision> primary = StrategyCardRules.resolvePrimary(table.test.contextAt(SETTLED, message));
+
+        assertThat(AiTestGame.pressedId(primary.orElseThrow())).isEqualTo("FFCC_nekro_acquireATechWithSC_first");
+    }
+
     @Test
     void overruleIsPickedUpAgainAfterTheMemoryIsLost() {
         onlyThese(StrategyCard.TECHNOLOGY);

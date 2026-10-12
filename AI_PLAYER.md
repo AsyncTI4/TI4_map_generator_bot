@@ -451,7 +451,8 @@ to build one by hand:
     card is never wasted: if the reserve would hold every use back it takes the best.
   - **Overrule, playing.** The bot plays the primary of the chosen card as if it were played, but nothing is marked played, nobody can
     follow, and its message names the card as overruled with the seat's own buttons. The AI therefore starts the primary
-    itself (it remembers the card as played this turn, finds the message by the word overruled and the card's name), never
+    itself (it remembers the card as played this turn, finds the message by the word overruled and the card's emojis, which is
+    all the bot's wording names it by), never
     waits for secondaries, and never touches the card's follow queue. Warfare, Leadership, Politics and the rest are left
     out until their steps can run from that message; Trade would announce a replenishment the bot refuses.
   - **Honest play.** It never plays while censured, over the hand limit, or passed against Transparasteel, and keeps
