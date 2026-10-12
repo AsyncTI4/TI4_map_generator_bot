@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -1611,16 +1612,31 @@ public class ExploreService {
     }
 
     public static void secondHalfOfExpInfo(
-            List<String> types, GenericInteractionCreateEvent event, Player player, Game game, boolean overRide) {
-        secondHalfOfExpInfo(types, event.getMessageChannel(), player, game, overRide, false);
+            List<String> types, GenericInteractionCreateEvent event, Game game, boolean overRide) {
+        secondHalfOfExpInfo(types, event.getMessageChannel(), event.getUser().getId(), game, overRide, false);
     }
 
     public static void secondHalfOfExpInfo(
-            List<String> types, MessageChannel channel, Player player, Game game, boolean overRide, boolean fullText) {
-        if (!FOWPlusService.deckInfoAvailable(player, game) || !RiftSetModeService.deckInfoAvailable(player, game)) {
+            List<String> types,
+            MessageChannel channel,
+            @Nullable String viewerId,
+            Game game,
+            boolean overRide,
+            boolean fullText) {
+        if (!FOWPlusService.deckInfoAvailable(game, viewerId, channel)
+                || !RiftSetModeService.deckInfoAvailable(game, viewerId, channel)) {
             return;
         }
-        boolean isGM = player != null && game.getPlayersWithGMRole().contains(player);
+        boolean hiddenByFog = game.isFowMode()
+                && "action".equalsIgnoreCase(game.getPhaseOfGame())
+                && !overRide
+                && !FoWHelper.isGameMaster(viewerId, game);
+        if (hiddenByFog) {
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
+            return;
+        }
         for (String currentType : types) {
             StringBuilder info = new StringBuilder();
             List<String> deck = game.getExploreDeck(currentType);
@@ -1658,18 +1674,7 @@ public class ExploreService {
                 info.append("​"); // add a zero width space at the end to cement newlines between sets of explores
             }
 
-            if (player == null || player.getSCs().isEmpty() || overRide || !game.isFowMode() || isGM) {
-                MessageHelper.sendMessageToChannel(channel, info.toString());
-            }
-        }
-        if (player != null
-                && "action".equalsIgnoreCase(game.getPhaseOfGame())
-                && game.isFowMode()
-                && !overRide
-                && !isGM) {
-            MessageHelper.sendMessageToChannel(
-                    channel,
-                    "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
+            MessageHelper.sendMessageToChannel(channel, info.toString());
         }
     }
 
