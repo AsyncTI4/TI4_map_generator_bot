@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.AiCard.Window;
 import ti4.ai.nekro.CommandTokenPolicy;
+import ti4.ai.tactical.Stall;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
@@ -95,7 +96,7 @@ public class AiActionCards {
 
     static AiCard component(
             String key, Evaluator evaluator, String resolveHandler, List<String> targetPrefixes, TargetStep target) {
-        return card(key, Window.COMPONENT_ACTION, evaluator, resolveHandler, targetPrefixes, target);
+        return card(key, Window.COMPONENT_ACTION, withStall(evaluator), resolveHandler, targetPrefixes, target);
     }
 
     static AiCard reaction(
@@ -124,11 +125,20 @@ public class AiActionCards {
                 alias,
                 matches,
                 Window.ECONOMY,
-                (game, seat) -> Optional.of(Plan.of(ActionCardValue.playValue(game, seat, alias))),
+                (game, seat) -> Optional.of(Plan.of(economyValue(game, seat, alias))),
                 ALWAYS,
                 resolveHandler,
                 List.of(),
                 target);
+    }
+
+    private static Evaluator withStall(Evaluator evaluator) {
+        return (game, seat) -> evaluator.plan(game, seat).map(plan -> plan.plus(Stall.actionValue(game, seat)));
+    }
+
+    private static double economyValue(Game game, Player seat, String alias) {
+        double value = ActionCardValue.playValue(game, seat, alias);
+        return value > 0 ? value + Stall.actionValue(game, seat) : 0;
     }
 
     private static double summitValue(Game game, Player seat) {

@@ -49,6 +49,7 @@ public class ActionCardValue {
     record Candidate(String alias, double value) {}
 
     public static Optional<Candidate> bestComponentPlay(Game game, Player seat) {
+        if (!AiSettings.usesLegacyActionCards(seat)) return bestNewComponentPlay(game, seat);
         boolean nearLimit = seat.getAcCount() >= ButtonHelper.getACLimit(game, seat) - 1;
         double threshold = nearLimit ? NEAR_LIMIT_THRESHOLD : PLAY_THRESHOLD;
         return COMPONENT_CARDS.stream()
@@ -59,26 +60,26 @@ public class ActionCardValue {
     }
 
     static Optional<Candidate> bestNewComponentPlay(Game game, Player seat) {
-        return bestPlay(game, seat, Window.COMPONENT_ACTION);
+        return bestPlay(game, seat, Window.ECONOMY, Window.COMPONENT_ACTION);
     }
 
     static Optional<Candidate> bestReactionPlay(Game game, Player seat, Window window) {
         return bestPlay(game, seat, window);
     }
 
-    private static Optional<Candidate> bestPlay(Game game, Player seat, Window window) {
+    private static Optional<Candidate> bestPlay(Game game, Player seat, Window... windows) {
         if (AiSettings.usesLegacyActionCards(seat)) return Optional.empty();
         double share = seat.getAcCount() >= ButtonHelper.getACLimit(game, seat) - 1 ? NEAR_LIMIT_PRIOR_SHARE : 1.0;
         return seat.getActionCards().keySet().stream()
-                .map(alias -> candidate(game, seat, alias, window))
+                .map(alias -> candidate(game, seat, alias, List.of(windows)))
                 .flatMap(Optional::stream)
                 .filter(candidate -> candidate.value() >= share * ActionCardPrior.keepPrior(candidate.alias()))
                 .max(Comparator.comparingDouble(Candidate::value));
     }
 
-    private static Optional<Candidate> candidate(Game game, Player seat, String alias, Window window) {
+    private static Optional<Candidate> candidate(Game game, Player seat, String alias, List<Window> windows) {
         return AiActionCards.of(alias)
-                .filter(card -> card.window() == window)
+                .filter(card -> windows.contains(card.window()))
                 .flatMap(card -> card.planFor(game, seat))
                 .map(plan -> new Candidate(alias, plan.value()));
     }

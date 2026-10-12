@@ -52,7 +52,8 @@ class ComponentCardPlansTest extends BaseTi4Test {
         Plan plan = plan("spy").orElseThrow();
 
         assertThat(plan.target()).isEqualTo("sol");
-        assertThat(plan.value()).isCloseTo(ActionCardPrior.AVERAGE_CARD * TableStanding.CONTENDER, within(1e-9));
+        assertThat(plan.value())
+                .isCloseTo(ActionCardPrior.AVERAGE_CARD * TableStanding.CONTENDER + table.stall(), within(1e-9));
     }
 
     @Test
@@ -165,12 +166,12 @@ class ComponentCardPlansTest extends BaseTi4Test {
     // A fighter fits in a system with a space dock (3 fighters) or with a ship that has capacity left.
     @Test
     void fighterConscriptionCountsTheSystemsWhereAFighterFits() {
-        assertThat(plan("f_conscription").orElseThrow().value()).isCloseTo(0.5, within(1e-9));
+        assertThat(plan("f_conscription").orElseThrow().value()).isCloseTo(0.5 + table.stall(), within(1e-9));
 
         Tile outpost = table.system("46", AiTestGame.neighbourOf(AiTestGame.HOME));
         table.ships(table.nekro, outpost, UnitType.Carrier, 1);
 
-        assertThat(plan("f_conscription").orElseThrow().value()).isCloseTo(1.0, within(1e-9));
+        assertThat(plan("f_conscription").orElseThrow().value()).isCloseTo(1.0 + table.stall(), within(1e-9));
     }
 
     @Test
@@ -179,7 +180,7 @@ class ComponentCardPlansTest extends BaseTi4Test {
         table.ships(table.nekro, outpost, UnitType.Carrier, 1);
         table.ships(table.sol, outpost, UnitType.Destroyer, 1);
 
-        assertThat(plan("f_conscription").orElseThrow().value()).isCloseTo(0.5, within(1e-9));
+        assertThat(plan("f_conscription").orElseThrow().value()).isCloseTo(0.5 + table.stall(), within(1e-9));
     }
 
     @Test
@@ -217,8 +218,8 @@ class ComponentCardPlansTest extends BaseTi4Test {
 
         table.ships(table.nekro, table.game.getTileByPosition(AiTestGame.HOME), UnitType.Cruiser, 1);
 
-        assertThat(alone).isCloseTo(1.0, within(1e-9));
-        assertThat(plan("ghost_ship").orElseThrow().value()).isCloseTo(2.0, within(1e-9));
+        assertThat(alone).isCloseTo(1.0 + table.stall(), within(1e-9));
+        assertThat(plan("ghost_ship").orElseThrow().value()).isCloseTo(2.0 + table.stall(), within(1e-9));
         assertThat(alpha).isNotNull();
     }
 
@@ -239,7 +240,7 @@ class ComponentCardPlansTest extends BaseTi4Test {
         Plan plan = plan("probe").orElseThrow();
 
         assertThat(plan.target()).isEqualTo(token.getPosition());
-        assertThat(plan.value()).isEqualTo(ti4.ai.explore.ExploreValues.FRONTIER_CARD);
+        assertThat(plan.value()).isCloseTo(ti4.ai.explore.ExploreValues.FRONTIER_CARD + table.stall(), within(1e-9));
     }
 
     @Test
@@ -286,7 +287,7 @@ class ComponentCardPlansTest extends BaseTi4Test {
         Plan plan = plan("refit").orElseThrow();
 
         assertThat(List.of(plan.target().split(","))).containsExactly("mordaiii", "mordaiii");
-        assertThat(plan.value()).isCloseTo(2 * (2.0 - 0.7), within(1e-9));
+        assertThat(plan.value()).isCloseTo(2 * (2.0 - 0.7) + table.stall(), within(1e-9));
     }
 
     @Test
@@ -294,7 +295,7 @@ class ComponentCardPlansTest extends BaseTi4Test {
         Tile home = table.game.getTileByPosition(AiTestGame.HOME);
         table.test.units(home, "mordaiii", table.nekro, UnitType.Infantry, 1);
 
-        assertThat(plan("refit").orElseThrow().value()).isCloseTo(1.3, within(1e-9));
+        assertThat(plan("refit").orElseThrow().value()).isCloseTo(1.3 + table.stall(), within(1e-9));
     }
 
     @Test

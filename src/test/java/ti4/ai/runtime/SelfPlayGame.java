@@ -139,7 +139,10 @@ final class SelfPlayGame {
 
     // The action cards played in one game, and which seats played with the pre-existing (legacy) card rules in an
     // A/B run (-Dai.actioncards.ab=true).
-    record ActionCardSummary(List<ActionCardUse> plays, java.util.Set<String> legacySeats) {}
+    // heldCards holds "faction|alias" for every card a seat had in its hand at any point of the game, so a card's play
+    // rate can be taken per draw.
+    record ActionCardSummary(
+            List<ActionCardUse> plays, java.util.Set<String> legacySeats, java.util.Set<String> heldCards) {}
 
     private static final String TRADE_GOODS = "TGs";
     private static final String COMMODITIES = "Comms";
@@ -158,6 +161,7 @@ final class SelfPlayGame {
     private long wallStart = System.nanoTime();
     private final int slot;
     private final java.util.Set<String> legacySeats = new java.util.LinkedHashSet<>();
+    private final java.util.Set<String> heldCards = new java.util.LinkedHashSet<>();
 
     SelfPlayGame(SelfPlayEnvironment env, String name) {
         this(env, name, 0);
@@ -259,6 +263,7 @@ final class SelfPlayGame {
                     lane.finish();
                 }
                 ticks++;
+                recordHands(game);
                 stampTurnStart(now);
                 ageAgendaFlipGuard();
             }
@@ -451,6 +456,12 @@ final class SelfPlayGame {
                 (System.nanoTime() - wallStart) / 1_000_000_000L);
     }
 
+    private void recordHands(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            for (String alias : player.getActionCards().keySet()) heldCards.add(player.getFaction() + "|" + alias);
+        }
+    }
+
     private ActionCardSummary actionCardSummary(Game game) {
         List<ActionCardUse> uses = new ArrayList<>();
         if (game != null) {
@@ -462,7 +473,9 @@ final class SelfPlayGame {
                                 new ActionCardUse(player.getFaction(), play.getActionCard(), play.isCanceled())));
             }
         }
-        return new ActionCardSummary(List.copyOf(uses), java.util.Set.copyOf(legacySeats));
+        if (game != null) recordHands(game);
+        return new ActionCardSummary(
+                List.copyOf(uses), java.util.Set.copyOf(legacySeats), java.util.Set.copyOf(heldCards));
     }
 
     private List<SelfPlayEnvironment.TradeRecord> ledger() {

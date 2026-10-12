@@ -14,7 +14,6 @@ import ti4.ai.tactical.TacticalRules;
 @UtilityClass
 class ComponentFlow {
 
-    static final double STALL_ACTION_VALUE = 1.5;
     private static final String KEY = "relicAction|";
     private static final String FIELD = "~";
     private static final String COMPONENT_ACTION = "componentAction";

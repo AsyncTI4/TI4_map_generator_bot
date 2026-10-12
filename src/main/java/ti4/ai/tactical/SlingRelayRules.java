@@ -38,7 +38,6 @@ public class SlingRelayRules {
     private static final String DONE = "done";
     private static final String FIELD = "~";
     private static final double STALL_VALUE = 0.5;
-    private static final double STALL_ACTION_VALUE = 1.5;
     private static final double UNLOCKED_SHIP_VALUE = 1.0;
     private static final double TRADE_GOOD_VALUE = 0.6;
 
@@ -75,7 +74,7 @@ public class SlingRelayRules {
 
     private static double actionValue(Choice choice, double perResource) {
         BuildOrder ship = choice.ship();
-        double value = ship.value() - perResource * ship.cost() + STALL_ACTION_VALUE;
+        double value = ship.value() - perResource * ship.cost() + Stall.ACTION_VALUE;
         return ship.scoring() ? value + UNLOCKED_SHIP_VALUE : value;
     }
 

@@ -1,10 +1,8 @@
 package ti4.ai.actioncards;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiSettings;
@@ -55,12 +53,7 @@ public class ActionCardRules {
         Player seat = context.seat();
         String key = PlayMemory.turnKey(context);
         if (context.memory().has(key) || !mayPlay(game, seat) || keepsSpyNetworkCards(seat)) return Optional.empty();
-        Optional<ActionCardValue.Candidate> best = Stream.of(
-                        ActionCardValue.bestComponentPlay(game, seat), ActionCardValue.bestNewComponentPlay(game, seat))
-                .flatMap(Optional::stream)
-                .max(Comparator.comparingDouble(ActionCardValue.Candidate::value));
-        if (best.isEmpty()) return Optional.empty();
-        return startPlay(context, key, best.get().alias());
+        return ActionCardValue.bestComponentPlay(game, seat).flatMap(best -> startPlay(context, key, best.alias()));
     }
 
     public static Optional<AiDecision> insteadOfTacticalAction(AiTurnContext context) {

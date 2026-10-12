@@ -3,6 +3,7 @@ package ti4.ai.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import ti4.ai.AiSettings;
 import ti4.ai.actioncards.ActionCardPrior;
+import ti4.ai.actioncards.AiActionCards;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.testUtils.BaseTi4Test;
@@ -227,8 +229,62 @@ class AiSelfPlayTest extends BaseTi4Test {
                 .toList();
         System.out.println("Action card plays per seat (per game; human first-play rate when drawn): "
                 + String.join(", ", perCard));
+        printActionCardDraws(outcomes);
         if (!AiSettings.isActionCardAbTest()) return;
         printActionCardAb(outcomes);
+    }
+
+    // How often a seat plays a card it was dealt, to set beside how often human players play it when they draw it. A
+    // card the AI plays in under half the human share of draws is flagged as a likely valuation bug. In an A/B run
+    // only the seats with the new rules count. A "draw" is a seat holding a copy at any point of the game.
+    private static void printActionCardDraws(List<SelfPlayGame.Outcome> outcomes) {
+        Map<String, Long> draws = new java.util.HashMap<>();
+        Map<String, Long> plays = new java.util.HashMap<>();
+        Map<String, Boolean> hasRule = new java.util.HashMap<>();
+        for (SelfPlayGame.Outcome outcome : outcomes) {
+            java.util.Set<String> legacy = outcome.actionCards().legacySeats();
+            for (String held : outcome.actionCards().heldCards()) {
+                String faction = held.substring(0, held.indexOf('|'));
+                if (legacy.contains(faction)) continue;
+                String alias = held.substring(held.indexOf('|') + 1);
+                String name = ActionCardPrior.nameOf(alias);
+                draws.merge(name, 1L, Long::sum);
+                hasRule.merge(name, AiActionCards.usable(alias), (known, now) -> known || now);
+            }
+            outcome.actionCards().plays().stream()
+                    .filter(play -> !legacy.contains(play.faction()))
+                    .forEach(play -> plays.merge(play.card(), 1L, Long::sum));
+        }
+        List<String> ruled = draws.keySet().stream()
+                .filter(name -> hasRule.get(name))
+                .sorted(Comparator.comparing((String name) -> draws.get(name))
+                        .reversed()
+                        .thenComparing(name -> name))
+                .toList();
+        List<String> flagged = new ArrayList<>();
+        List<String> perDraw = new ArrayList<>();
+        for (String name : ruled) {
+            double rate = (double) plays.getOrDefault(name, 0L) / draws.get(name);
+            double human = ActionCardPrior.firstPlayRateOfName(name);
+            boolean below = human > 0 && rate < human / 2;
+            perDraw.add(String.format(
+                    "%s %d/%d = %.2f (human %.2f)%s",
+                    name, plays.getOrDefault(name, 0L), draws.get(name), rate, human, below ? " FLAGGED" : ""));
+            if (below) flagged.add(String.format("%s %.2f vs %.2f", name, rate, human));
+        }
+        System.out.println("Action card plays per draw (plays/draws, human first-play rate when drawn): "
+                + String.join(", ", perDraw));
+        System.out.println("Action cards played in under half the human rate: "
+                + (flagged.isEmpty() ? "none" : String.join(", ", flagged)));
+        String unplayed = draws.keySet().stream()
+                .filter(name -> !hasRule.get(name))
+                .sorted(Comparator.comparing((String name) -> draws.get(name))
+                        .reversed()
+                        .thenComparing(name -> name))
+                .limit(15)
+                .map(name -> name + " " + draws.get(name))
+                .collect(java.util.stream.Collectors.joining(", "));
+        System.out.println("Action cards drawn that no rule plays (draws): " + unplayed);
     }
 
     private static void printActionCardAb(List<SelfPlayGame.Outcome> outcomes) {

@@ -162,6 +162,31 @@ class ActionCardRulesTest extends BaseTi4Test {
                 .isEmpty();
     }
 
+    // One industrial planet gains 1: not worth the card by itself, but playing it is also a turn spent while the
+    // other players still have theirs to take.
+    @Test
+    void playsASmallEconomyCardForTheStallOnlyWhileAnotherPlayerStillActs() {
+        test.place("19", AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.nekro.addPlanet("wellon");
+        test.nekro.setActionCard("industrial_initiative", 9);
+        assertThat(ActionCardValue.playValue(test.game, test.nekro, "industrial_initiative"))
+                .isEqualTo(1.0);
+
+        assertThat(pressed(ActionCardRules.playBeforePassing(test.context(hand("ac_play_from_hand_9")))))
+                .isEqualTo("ac_play_from_hand_9");
+    }
+
+    @Test
+    void keepsASmallEconomyCardOnceEveryOtherPlayerHasPassed() {
+        test.place("19", AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.nekro.addPlanet("wellon");
+        test.nekro.setActionCard("industrial_initiative", 9);
+        test.sol.setPassed(true);
+
+        assertThat(ActionCardRules.playBeforePassing(test.context(hand("ac_play_from_hand_9"))))
+                .isEmpty();
+    }
+
     // Form a Spy Network needs 5 cards in hand.
     @Test
     void keepsItsCardsForFormASpyNetwork() {

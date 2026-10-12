@@ -2,6 +2,7 @@ package ti4.ai.actioncards;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static ti4.ai.AiTestGame.NOW;
 import static ti4.ai.AiTestGame.prompt;
@@ -22,6 +23,7 @@ import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.scoring.PaymentRules;
 import ti4.ai.strategy.ResearchPolicy;
 import ti4.ai.strategy.StrategyCardRules;
+import ti4.ai.tactical.Stall;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
@@ -31,9 +33,11 @@ class ResearchCardTest extends BaseTi4Test {
 
     private static final long SETTLED = NOW + 11_000L;
     private static final double EXACT = 1e-9;
+    private static final int HAND_INDEX = 4;
 
     private CardTable table;
     private MockedStatic<GameMessageManager> messages;
+    private MockedStatic<ResearchPolicy> research;
 
     @BeforeEach
     void setUp() {
@@ -52,6 +56,7 @@ class ResearchCardTest extends BaseTi4Test {
     @AfterEach
     void tearDown() {
         messages.close();
+        if (research != null) research.close();
     }
 
     private Optional<Plan> plan(String alias) {
@@ -75,12 +80,16 @@ class ResearchCardTest extends BaseTi4Test {
     // ---- Focused Research --------------------------------------------------------------------
 
     @Test
-    void focusedResearchIsWorthTheBestTechnologyLessItsFourTradeGoods() {
+    void focusedResearchIsWorthTheBestTechnologyAtItsTempoLessItsFourTradeGoodsPlusTheStall() {
         table.nekro.setTg(6);
         String best = ResearchPolicy.bestResearchable(table.game, table.nekro).orElseThrow();
 
         assertThat(plan("f_researched").orElseThrow().value())
-                .isCloseTo(ResearchPolicy.researchValue(table.game, table.nekro, best) - 4, within(EXACT));
+                .isCloseTo(
+                        ResearchPolicy.TECH_TEMPO * ResearchPolicy.researchValue(table.game, table.nekro, best)
+                                - 4
+                                + Stall.ACTION_VALUE,
+                        within(EXACT));
     }
 
     @Test
@@ -125,14 +134,86 @@ class ResearchCardTest extends BaseTi4Test {
                 .isPresent();
     }
 
+    // ---- stall and tech tempo ---------------------------------------------------------------
+
+    private void bestTechIsWorth(double researchValue) {
+        research = Mockito.mockStatic(ResearchPolicy.class, Mockito.CALLS_REAL_METHODS);
+        research.when(() -> ResearchPolicy.bestResearchable(any(), any())).thenReturn(Optional.of("gd"));
+        research.when(() -> ResearchPolicy.researchValue(any(), any(), anyString()))
+                .thenReturn(researchValue);
+    }
+
+    private Optional<AiDecision> triesToPlayFocusedResearch() {
+        table.nekro.setActionCard("f_researched", HAND_INDEX);
+        AiPrompt hand = prompt("hand", PromptSource.AI_THREAD, NOW, "ac_play_from_hand_" + HAND_INDEX, "cardsInfo");
+        return ActionCardRules.playBeforePassing(table.test.context(hand));
+    }
+
+    // 3 x 5/3 - 4 + 1.5 = 2.5, which clears the 1.33 the card is worth in hand.
+    @Test
+    void focusedResearchIsPlayedForATechnologyWorthFollowingForWhileOthersStillAct() {
+        table.nekro.setTg(4);
+        bestTechIsWorth(ResearchPolicy.WORTH_FOLLOWING_FOR);
+
+        assertThat(plan("f_researched").orElseThrow().value()).isCloseTo(2.5, within(EXACT));
+        assertThat(AiTestGame.pressedId(triesToPlayFocusedResearch().orElseThrow()))
+                .isEqualTo("ac_play_from_hand_" + HAND_INDEX);
+    }
+
+    // 2 x 5/3 - 4 + 1.5 = 0.83: the technology is not worth the card.
+    @Test
+    void focusedResearchIsHeldForATechnologyWorthTwo() {
+        table.nekro.setTg(4);
+        bestTechIsWorth(2.0);
+
+        assertThat(plan("f_researched").orElseThrow().value()).isCloseTo(5.0 / 3 * 2 - 4 + 1.5, within(EXACT));
+        assertThat(triesToPlayFocusedResearch()).isEmpty();
+    }
+
+    @Test
+    void noStallCountsOnceEveryOtherPlayerHasPassed() {
+        table.nekro.setTg(4);
+        bestTechIsWorth(ResearchPolicy.WORTH_FOLLOWING_FOR);
+        table.sol.setPassed(true);
+
+        assertThat(Stall.actionValue(table.game, table.nekro)).isZero();
+        assertThat(plan("f_researched").orElseThrow().value()).isCloseTo(1.0, within(EXACT));
+        assertThat(triesToPlayFocusedResearch()).isEmpty();
+    }
+
+    @Test
+    void aTechnologyAtExactlyTheFollowThresholdLeavesFocusedResearchWithAPositiveValue() {
+        table.nekro.setTg(4);
+        bestTechIsWorth(ResearchPolicy.WORTH_FOLLOWING_FOR);
+
+        assertThat(plan("f_researched").orElseThrow().value()).isPositive();
+        table.sol.setPassed(true);
+        assertThat(plan("f_researched").orElseThrow().value()).isPositive();
+    }
+
+    // The tempo is what the Technology follow pays (4 resources and a strategy token) for a technology worth 3.
+    @Test
+    void techTempoAgreesWithWhatTheTechnologyFollowPays() {
+        assertThat(ResearchPolicy.TECH_TEMPO * ResearchPolicy.WORTH_FOLLOWING_FOR)
+                .isCloseTo(5.0, within(EXACT));
+    }
+
     // ---- Divert Funding ----------------------------------------------------------------------
 
     @Test
     void divertFundingReturnsTheLeastValuableTechnologyItMayReturn() {
         Plan plan = plan("divert_funding").orElseThrow();
 
+        String gained = ResearchPolicy.bestResearchable(table.game, table.nekro).orElseThrow();
+
         assertThat(plan.target()).isEqualTo("gls");
-        assertThat(plan.value()).isLessThan(ResearchPolicy.heldValue("nm") + ResearchPolicy.heldValue("gls"));
+        assertThat(plan.value())
+                .isCloseTo(
+                        ResearchPolicy.TECH_TEMPO
+                                        * (ResearchPolicy.researchValue(table.game, table.nekro, gained)
+                                                - ResearchPolicy.heldValue("gls"))
+                                + Stall.ACTION_VALUE,
+                        within(EXACT));
     }
 
     @Test
@@ -204,7 +285,9 @@ class ResearchCardTest extends BaseTi4Test {
         Plan plan = plan("plagiarize").orElseThrow();
 
         assertThat(plan.target()).isEqualTo("gd");
-        assertThat(plan.value()).isLessThan(ResearchPolicy.value(table.game, table.nekro, "gd"));
+        assertThat(plan.value())
+                .isLessThan(ResearchPolicy.TECH_TEMPO * ResearchPolicy.value(table.game, table.nekro, "gd")
+                        + Stall.ACTION_VALUE);
         assertThat(plan.value()).isPositive();
     }
 

@@ -332,14 +332,19 @@ to build one by hand:
     limit, _Form a Spy Network_, Nekro's agent) follow this order. Nekro's agent only spends a card worth less than
     its 2 trade goods.
   - **When it plays.** Only on its own turn, in the action phase, and a component action card is the turn's action:
-    the turn ends once it is resolved. The economy cards are played when the seat is about to pass, as before:
-    _Mining Initiative_ (trade goods equal to its best planet's resources), _Industrial Initiative_ (its industrial
-    planets), _Economic Initiative_ (readying its cultural planets), _Rise of a Messiah_ (3 or more planets),
-    _Frontline Deployment_ (on a planet a dock or carrier can pick the infantry up from, or next to enemy ships) and
-    _War Effort_ (a cruiser where the fleet pool and cruiser limit allow it). A card that unlocks a spend objective is
-    worth the points it scores (30 if they win the game). The cards below are played when what they do now is worth
-    at least their keep prior (half of it near the hand limit), either instead of a tactical action that scores less,
-    or when it is about to pass. _Summit_ is pre-played as soon as it is drawn.
+    the turn ends once it is resolved. A component action also stalls: it takes the turn without committing
+    anything while the other players keep acting, which is worth 1.5 trade goods (`Stall.ACTION_VALUE`, the same
+    figure relics, _Enigmatic Device_ and the _Sling Relay_ use) as long as at least one other player has not passed.
+    That is added to what every component action card does now, but only when the card does something at all. The
+    economy cards are _Mining Initiative_ (trade goods equal to its best planet's resources), _Industrial Initiative_
+    (its industrial planets), _Economic Initiative_ (readying its cultural planets), _Rise of a Messiah_ (3 or more
+    planets), _Frontline Deployment_ (on a planet a dock or carrier can pick the infantry up from, or next to enemy
+    ships) and _War Effort_ (a cruiser where the fleet pool and cruiser limit allow it). A card that unlocks a spend
+    objective is worth the points it scores (30 if they win the game). Economy cards and the cards below are played
+    when what they do now, with the stall, is worth at least their keep prior (half of it near the hand limit), either
+    instead of a tactical action that scores less, or when it is about to pass. Seats on the earlier rules (the A/B
+    flag) play the economy cards only when about to pass and worth 2 (1 near the limit) without the stall.
+    _Summit_ is pre-played as soon as it is drawn.
     | Card | Worth | Target |
     | --- | --- | --- |
     | Fighter Conscription | 0.5 per fighter that fits the capacity of a system with its dock or capacity units and no other player's ships | none |
@@ -351,9 +356,16 @@ to build one by hand:
     | Archaeological Expedition | three draws from the deck of a planet trait it holds, times the value of the relic fragments in it | the best deck |
     | Refit Troops | 1.3 per infantry replaced by a mech (1 or 2), while it has mechs in reinforcements | its planets with infantry, spread out |
     | Forward Supply Base | 3 trade goods; played after another player activates a system holding its units | the player with the fewest points, not the active player when it can avoid it |
-    | Focused Research | the best technology it could research (and the objective it completes) less the 4 trade goods, when the scoring reserve can spare them | the technology the Technology card would pick |
-    | Divert Funding | the best technology it could research less the value of the one it returns (never a unit upgrade or faction technology) | the least valuable technology it can return; it never researches that one again |
-    | Plagiarize | a non-faction technology a neighbour owns (and the objective it completes) less the 5 influence, paid with the planets it can best spare | the best such technology |
+    | Focused Research | the best technology it could research at the tech tempo (and the objective it completes) less the 4 trade goods, when the scoring reserve can spare them | the technology the Technology card would pick |
+    | Divert Funding | the tech tempo times what the technology it gains is worth more than the one it returns (never a unit upgrade or faction technology), plus the objective it completes | the least valuable technology it can return; it never researches that one again |
+    | Plagiarize | the tech tempo times a non-faction technology a neighbour owns (and the objective it completes) less the 5 influence, paid with the planets it can best spare | the best such technology |
+
+    Every row of this table, and the economy cards, also adds the stall. The *tech tempo* converts a technology's value to
+    trade goods: technology comes from few sources, so the Technology follow pays 4 resources and a strategy token
+    for a technology worth 3 (`ResearchPolicy.WORTH_FOLLOWING_FOR`), and the research cards value a technology at
+    (4 + 1) / 3 = 1.67 trade goods per point (`ResearchPolicy.TECH_TEMPO`) so the two rules agree. A technology worth 3
+    makes _Focused Research_ worth 3 × 1.67 − 4 + 1.5 = 2.5 and it is played; one worth 2 makes it worth 0.83 and it is
+    held; once every other player has passed the stall is gone and a technology worth 3 gives 1.
 
     _Standing_ is 3 for a contender, 1.3 for a player alone in the lead and ahead of the seat, 0.6 for a player two
     points or more behind the seat, otherwise 1. Nekro cannot research, so it never plays _Focused Research_ or
@@ -726,7 +738,9 @@ Six small generic changes don't reference `ti4.ai`:
   - `-Dai.selfplay.give=<alias,...>` deals those action cards to every seat, to watch a card's flow end to end.
   - The batch summary counts the action cards: plays per seat per game, plays a Sabotage cancelled (per game and as a
     share of all plays), Sabotage plays per game, and each card's plays per seat per game next to the rate at which
-    human players play it when they draw it. `-Dai.actioncards.ab=true` plays half of the seats, a different half in
+    human players play it when they draw it. It also prints each card's plays per draw (a seat holding a copy at any
+    point of a game is one draw), flags every card a rule plays in under half the human first-play rate, and lists
+    the cards drawn most that no rule plays. `-Dai.actioncards.ab=true` plays half of the seats, a different half in
     each game, with the action card rules from before the statistics, and the summary compares the two groups: average
     final victory points, action cards played per seat per game and top finishes, with their seat counts.
 - In a dev guild:

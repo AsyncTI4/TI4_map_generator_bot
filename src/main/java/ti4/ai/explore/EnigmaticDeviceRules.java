@@ -16,6 +16,7 @@ import ti4.ai.scoring.Wallet;
 import ti4.ai.strategy.ResearchPolicy;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.tactical.ProductionPlanner;
+import ti4.ai.tactical.Stall;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -43,7 +44,7 @@ class EnigmaticDeviceRules {
         Game game = context.game();
         double net =
                 researchValue(game, context.seat()) - ProductionPlanner.fillerValuePerResource(game) * RESEARCH_COST;
-        if (ComponentFlow.tacticalActionBeats(context, net + ComponentFlow.STALL_ACTION_VALUE)) {
+        if (ComponentFlow.tacticalActionBeats(context, net + Stall.ACTION_VALUE)) {
             return Optional.empty();
         }
         return open(context, thisTurn, "research with the Enigmatic Device instead of a weak tactical action");

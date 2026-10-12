@@ -376,6 +376,7 @@ class ComponentCardFlowTest extends BaseTi4Test {
         table.cards(table.sol, "intercept");
         play("spy");
         cardLeavesHand("spy", "Spy");
+        ActionCardRules.continuePlay(table.test.context(announcement("Spy")));
         table.game.getGameStats().markLatestPlayCanceled("Spy");
         reacted("nekro", "sol", "hacan");
 

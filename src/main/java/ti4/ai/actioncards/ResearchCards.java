@@ -69,12 +69,13 @@ class ResearchCards {
             return Optional.empty();
         }
         return ResearchPolicy.bestResearchable(game, seat)
-                .map(tech -> Plan.of(researchGain(game, seat, tech) - FOCUSED_RESEARCH_TRADE_GOODS * TRADE_GOOD));
+                .map(tech -> Plan.of(researchGain(game, seat, tech, 0) - FOCUSED_RESEARCH_TRADE_GOODS * TRADE_GOOD));
     }
 
-    private static double researchGain(Game game, Player seat, String tech) {
+    private static double researchGain(Game game, Player seat, String tech, double valueGivenUp) {
         int points = ResearchPolicy.publicPointsCompletedBy(game, seat, tech);
-        return ResearchPolicy.researchValue(game, seat, tech) + ScoringStakes.scoreValue(game, seat, points);
+        double tempo = ResearchPolicy.TECH_TEMPO * (ResearchPolicy.researchValue(game, seat, tech) - valueGivenUp);
+        return tempo + ScoringStakes.scoreValue(game, seat, points);
     }
 
     private static Optional<AiDecision> getTechnology(AiTurnContext context, String key, CardPlay play) {
@@ -92,7 +93,7 @@ class ResearchCards {
         Optional<String> returned = returnable(seat).stream().min(heldValueOrder());
         Optional<String> gained = ResearchPolicy.bestResearchable(game, seat);
         if (returned.isEmpty() || gained.isEmpty()) return Optional.empty();
-        double value = researchGain(game, seat, gained.get()) - ResearchPolicy.heldValue(returned.get());
+        double value = researchGain(game, seat, gained.get(), ResearchPolicy.heldValue(returned.get()));
         return Optional.of(Plan.aimedAt(value, returned.get(), "returning " + nameOf(returned.get()) + "."));
     }
 
@@ -137,7 +138,7 @@ class ResearchCards {
         double cost = costOf(game, payment.get());
         return copyable(game, seat).stream()
                 .map(alias -> Plan.aimedAt(
-                        ResearchPolicy.value(game, seat, alias)
+                        ResearchPolicy.TECH_TEMPO * ResearchPolicy.value(game, seat, alias)
                                 + ScoringStakes.scoreValue(
                                         game, seat, ResearchPolicy.publicPointsCompletedBy(game, seat, alias))
                                 - cost,

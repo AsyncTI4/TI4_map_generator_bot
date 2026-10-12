@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiSettings;
 import ti4.ai.AiTestGame;
+import ti4.ai.tactical.Stall;
 import ti4.testUtils.BaseTi4Test;
 
 class ActionCardValueTest extends BaseTi4Test {
@@ -45,7 +46,51 @@ class ActionCardValueTest extends BaseTi4Test {
         double playValue = ActionCardValue.playValue(test.game, test.nekro, "mining_initiative");
 
         assertThat(playValue).isGreaterThan(ActionCardPrior.keepPrior("mining_initiative"));
-        assertThat(keep("mining_initiative")).isEqualTo(Math.min(playValue, ActionCardValue.ECONOMY_CAP));
+        assertThat(keep("mining_initiative"))
+                .isEqualTo(Math.min(playValue + Stall.ACTION_VALUE, ActionCardValue.ECONOMY_CAP));
+    }
+
+    private double economyPlanValue(String alias) {
+        return AiActionCards.of(alias)
+                .orElseThrow()
+                .planFor(test.game, test.nekro)
+                .orElseThrow()
+                .value();
+    }
+
+    @Test
+    void anEconomyCardIsWorthWhatItGainsPlusTheStallWhileAnotherPlayerStillActs() {
+        double gain = ActionCardValue.playValue(test.game, test.nekro, "mining_initiative");
+
+        assertThat(gain).isPositive();
+        assertThat(economyPlanValue("mining_initiative")).isEqualTo(gain + Stall.ACTION_VALUE);
+    }
+
+    @Test
+    void anEconomyCardIsWorthOnlyWhatItGainsOnceEveryOtherPlayerHasPassed() {
+        test.sol.setPassed(true);
+        double gain = ActionCardValue.playValue(test.game, test.nekro, "mining_initiative");
+
+        assertThat(economyPlanValue("mining_initiative")).isEqualTo(gain);
+    }
+
+    @Test
+    void anEconomyCardThatGainsNothingIsNotWorthTheStall() {
+        test.nekro.getPlanets().clear();
+
+        assertThat(ActionCardValue.playValue(test.game, test.nekro, "industrial_initiative"))
+                .isZero();
+        assertThat(economyPlanValue("industrial_initiative")).isZero();
+    }
+
+    @Test
+    void aLegacySeatValuesAnEconomyCardWithoutTheStall() {
+        AiSettings.markLegacyActionCards(test.nekro);
+        test.nekro.setActionCard("mining_initiative", 1);
+
+        assertThat(ActionCardValue.bestComponentPlay(test.game, test.nekro))
+                .hasValueSatisfying(best -> assertThat(best.value())
+                        .isEqualTo(ActionCardValue.playValue(test.game, test.nekro, "mining_initiative")));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package ti4.ai.actioncards;
 
 import ti4.ai.AiTestGame;
+import ti4.ai.tactical.Stall;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -34,6 +35,11 @@ final class CardTable {
         test.nekroHome();
         game.addCustomPO(CUSTODIANS, 0);
         for (int card = 1; card <= STRATEGY_CARDS; card++) game.setScTradeGood(card, 0);
+    }
+
+    // What a component action is worth on its own while another player still has a turn to take.
+    double stall() {
+        return Stall.actionValue(game, nekro);
     }
 
     Player third(String faction, String color) {
