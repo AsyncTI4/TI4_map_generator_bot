@@ -13,6 +13,7 @@ import ti4.ai.eval.CombatOdds;
 import ti4.ai.eval.CombatOdds.Combatant;
 import ti4.ai.eval.CombatOdds.Force;
 import ti4.ai.eval.FactionAggression;
+import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.PlanetStake;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.IncomingForces.Exclusion;
@@ -346,8 +347,12 @@ public final class DefenseOutlook {
                 planets = Math.max(
                         planets, PlanetStake.of(game, seat, planet, own()) + PlanetStake.structures(planet, seat));
             }
-            return planets + (isHome(tile) ? publicScoringLock() : 0) + mecatolHandover(tile);
+            return planets + (isHome(tile) ? publicScoringLock() : 0) + mecatolHandover(tile) + mecatolHold(tile);
         });
+    }
+
+    private double mecatolHold(Tile tile) {
+        return controlsMecatol(tile) ? MecatolStake.holdValue(game, seat) : 0;
     }
 
     private double mecatolHandover(Tile tile) {

@@ -18,6 +18,7 @@ import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CombatModifiers.Side;
+import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.Territory;
 import ti4.ai.explore.ExploreDeck;
@@ -292,6 +293,7 @@ public class TacticalPlanner {
                     + planetTempo(context.game)
                     + context.exploreValue(tile, planet, landing[INFANTRY], landing[MECH]);
             if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
+            if (context.game.mecatols().contains(planet.getName())) value += MecatolStake.holdValue(context.game, seat);
             value += context.expansionZoneBonus(tile);
         }
         int spareForces = unitCount(cargo) - landed;

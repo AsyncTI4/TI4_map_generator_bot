@@ -8,6 +8,8 @@ record StrikeValue(
         double objectiveDenial,
         double homeBlock,
         double imperial,
+        double mecatolHold,
+        double mecatolDenial,
         double kills,
         double blockade,
         double nekroGain,

@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FactionAggression;
+import ti4.ai.eval.MecatolStake;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.SpendCost;
@@ -34,6 +35,7 @@ final class OffenseOutlook {
     private static final double HARM_CAP_PER_THREAT = 2.0;
     private static final double ANGER_SHARE = 0.15;
     private static final double SENSITIVE_ANGER_FACTOR = 3.0;
+    private static final double MECATOL_ANGER_FACTOR = 1.5;
     private static final double RETALIATION_NORM = 1.2;
     private static final double LIMITED_REACH_RETALIATION = 0.5;
     private static final double NULLIFICATION_CHANCE = 0.8;
@@ -81,6 +83,8 @@ final class OffenseOutlook {
         double ownObjective = w * terms.ownObjectiveGain() * meanGround;
         double planets = 0;
         double territory = 0;
+        double mecatolHold = 0;
+        double mecatolDenial = 0;
         double heldPlanetValue = 0;
         for (Planet planet : landed) {
             double g = estimate.groundWins().get(planet.getName());
@@ -89,6 +93,12 @@ final class OffenseOutlook {
             double custodians = BoardView.hasCustodians(planet) ? VP : 0;
             planets += w * g * (base + explore + custodians);
             territory += w * g * terms.territoryValues().getOrDefault(planet.getName(), 0.0);
+            if (isMecatol(planet)) {
+                mecatolHold += w * g * MecatolStake.holdValue(game, seat);
+                if (BoardView.controller(game, planet.getName()) == opponent) {
+                    mecatolDenial += w * g * standings.denialWeight(opponent) * MecatolStake.holdValue(game, opponent);
+                }
+            }
             if (BoardView.controller(game, planet.getName()) == opponent) heldPlanetValue += w * g * base;
         }
         double hurt = standings.hurtWeight(opponent);
@@ -102,12 +112,19 @@ final class OffenseOutlook {
         double defenseTerm = defenseRelief(strike, estimate, !full);
         double existing = existing(estimate, terms, landed);
         double harmCap = VP * (HARM_CAP_BASE + HARM_CAP_PER_THREAT * standings.winThreat(opponent));
-        double harmTerms = heldPlanetValue + economyDenial + denial.objective() + denial.homeBlock() + kills + blockade;
+        double harmTerms = heldPlanetValue
+                + economyDenial
+                + denial.objective()
+                + denial.homeBlock()
+                + kills
+                + blockade
+                + mecatolDenial;
         double cappedHarm = Math.min(harmTerms, harmCap);
         double imperial = imperial(strike, estimate, landed, after, planetsAfter);
         double value = ownObjective
                 + (planets - heldPlanetValue)
                 + territory
+                + mecatolHold
                 + cappedHarm
                 + imperial
                 + nekroGain
@@ -139,6 +156,8 @@ final class OffenseOutlook {
                 denial.objective(),
                 denial.homeBlock(),
                 imperial,
+                mecatolHold,
+                mecatolDenial,
                 kills,
                 blockade,
                 nekroGain,
@@ -431,18 +450,22 @@ final class OffenseOutlook {
                 Math.clamp(defense.fleetCostTotal(opponent) / Math.max(1, defense.fleetCostTotal(seat)), 0.0, 1.0);
         double reach = threatensGuardedSystems(opponent) ? 1 : LIMITED_REACH_RETALIATION;
         double retaliation = ratio * FactionAggression.of(opponent).factor() / RETALIATION_NORM * reach;
-        Tile target = strike.target();
-        boolean sensitive = target == opponent.getHomeSystemTile() || holdsMecatol(target);
         return ANGER_SHARE
                 * harm
                 * retaliation
-                * (sensitive ? SENSITIVE_ANGER_FACTOR : 1)
+                * angerSensitivity(game, strike.target(), opponent)
                 * (1 - standings.winThreat(opponent));
     }
 
-    private boolean holdsMecatol(Tile tile) {
-        return tile.getPlanetUnitHolders().stream()
+    static double angerSensitivity(Game game, Tile target, Player opponent) {
+        if (target == opponent.getHomeSystemTile()) return SENSITIVE_ANGER_FACTOR;
+        boolean holdsMecatol = target.getPlanetUnitHolders().stream()
                 .anyMatch(planet -> game.mecatols().contains(planet.getName()));
+        return holdsMecatol ? MECATOL_ANGER_FACTOR : 1;
+    }
+
+    private boolean isMecatol(Planet planet) {
+        return game.mecatols().contains(planet.getName());
     }
 
     private boolean threatensGuardedSystems(Player opponent) {
@@ -456,7 +479,10 @@ final class OffenseOutlook {
     private double counterstrike(
             Strike strike, StrikeEstimate estimate, Defenders after, List<Planet> planetsAfter, List<Planet> landed) {
         double shipStake = 0.5 * after.shipCost(seat);
-        double planetStake = landed.stream().mapToDouble(BoardView::planetValue).sum();
+        double planetStake = landed.stream()
+                .mapToDouble(planet ->
+                        BoardView.planetValue(planet) + (isMecatol(planet) ? MecatolStake.holdValue(game, seat) : 0))
+                .sum();
         return world(strike, estimate)
                 .counterstrike(strike.target(), after, planetsAfter, shipStake, planetStake, strike.opponent());
     }
