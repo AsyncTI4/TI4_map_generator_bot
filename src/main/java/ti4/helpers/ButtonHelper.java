@@ -562,7 +562,16 @@ public class ButtonHelper {
             return;
         }
 
-        Helper.fixGameChannelPermissions(gameToPing.getActionsChannel().getGuild(), gameToPing);
+        Guild gameGuild = gameToPing.getGuild();
+        if (gameGuild == null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Could not find the server for game " + gameToPing.getName()
+                            + ". Its channels may not exist yet or may have been deleted.");
+            return;
+        }
+
+        Helper.fixGameChannelPermissions(gameGuild, gameToPing);
         MessageHelper.sendMessageToChannel(
                 gameToPing.getBotMapUpdatesThread(), "Pinging game" + gameToPing.getPing() + ".");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attempted to ping the game.");
