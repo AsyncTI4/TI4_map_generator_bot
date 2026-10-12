@@ -69,6 +69,15 @@ class ActionCardButtonHandler {
             return;
         }
 
+        if ("ac".equalsIgnoreCase(type) && !SabotageService.isWindowOpen(game, event.getMessageId())) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentation() + ", _" + acName
+                            + "_ can no longer be canceled: its window has closed or it was already canceled."
+                            + " Your _Sabotage_ was not played.");
+            return;
+        }
+
         String message = game.getPing() + ", the action card _" + acName + "_ played by " + target
                 + " has been canceled by " + player.getRepresentationUnfogged() + " with ";
         GameMessageManager.remove(game.getName(), event.getMessageId());
@@ -148,7 +157,9 @@ class ActionCardButtonHandler {
             AgendaRiderHelper.reverseRider("reverse_" + acName, game, player);
         }
         if (sendReact) {
-            game.getGameStats().markLatestPlayCanceled(acName);
+            if (game.getGameStats().markLatestPlayCanceled(acName)) {
+                SabotageService.undoEffectsOfCanceledCard(game, targetPlayer, acName);
+            }
             if ("Relitigate".equals(acName) && targetPlayer != null) {
                 RelitigateLLButtonHandler.onRelitigateSabotaged(game, targetPlayer);
             }
