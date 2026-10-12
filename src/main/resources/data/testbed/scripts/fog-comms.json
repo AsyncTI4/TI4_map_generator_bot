@@ -24,7 +24,7 @@
     { "note": "YOUR TURN (60s): as yourself (no act-as), type `toblue test` in Red's fow…-comms-inbox-private thread." },
     { "wait": 60 },
     { "note": "Check: Red's inbox says 📤 Sent to Blue · #thread; Red's Blue thread shows `📤 You: test`." },
-    { "note": "Check: Blue's inbox has `📨 Blue-tag Red: test` with Reply/Open buttons; Blue's comms-red thread shows `:red: test` (emoji only, no name)." },
+    { "note": "Check: Blue's inbox has `📨 Blue-tag Red: test` (no buttons) followed by the 📇 hub; Blue's comms-red thread shows `:red: test` (emoji only, no name)." },
     { "note": "Check: Green and Yellow got nothing; no Discord name or @mention of another seat anywhere." },
 
     { "label": "Threads hide instantly", "do": "setStored", "key": "anonCommsHideHours", "value": "0" },
