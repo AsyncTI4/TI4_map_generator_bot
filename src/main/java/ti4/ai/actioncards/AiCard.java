@@ -1,5 +1,7 @@
 package ti4.ai.actioncards;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleBiFunction;
 import ti4.game.Game;
@@ -9,13 +11,16 @@ record AiCard(
         String key,
         Predicate<String> matches,
         Window window,
-        ToDoubleBiFunction<Game, Player> playValue,
+        Evaluator evaluator,
         ToDoubleBiFunction<Game, Player> availability,
         String resolveHandler,
+        List<String> targetPrefixes,
         TargetStep target) {
 
     enum Window {
+        ECONOMY,
         COMPONENT_ACTION,
+        AFTER_ACTIVATION,
         PRE_PLAY,
         REACTION
     }
@@ -24,12 +29,24 @@ record AiCard(
         return target != null;
     }
 
+    boolean hasResolveButton() {
+        return resolveHandler != null;
+    }
+
     boolean isSabotage() {
         return window == Window.REACTION && AiActionCards.SABOTAGE.equals(key);
     }
 
+    boolean isComponentAction() {
+        return window == Window.ECONOMY || window == Window.COMPONENT_ACTION;
+    }
+
+    Optional<Plan> planFor(Game game, Player seat) {
+        return evaluator.plan(game, seat);
+    }
+
     double playValueFor(Game game, Player seat) {
-        return playValue.applyAsDouble(game, seat);
+        return planFor(game, seat).map(Plan::value).orElse(0.0);
     }
 
     double availabilityFor(Game game, Player seat) {

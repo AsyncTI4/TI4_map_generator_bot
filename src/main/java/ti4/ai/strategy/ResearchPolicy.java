@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.scoring.ObjectivePolicy;
@@ -169,6 +170,43 @@ public class ResearchPolicy {
         return baseValue(tech)
                 + OBJECTIVE_WEIGHT * objectiveGain(game, seat, tech)
                 + steppingStoneValue(game, seat, tech);
+    }
+
+    public static double heldValue(String alias) {
+        TechnologyModel tech = Mapper.getTech(alias);
+        return tech == null ? 0 : baseValue(tech);
+    }
+
+    public static int publicPointsCompletedBy(Game game, Player player, String alias) {
+        TechnologyModel tech = Mapper.getTech(alias);
+        if (tech == null) return 0;
+        return unscoredPublicsWithAThreshold(game, player)
+                .filter(id -> {
+                    int threshold = ListPlayerInfoService.getObjectiveThreshold(id, game);
+                    return progress(game, id, player, null) < threshold
+                            && progress(game, id, player, tech) >= threshold;
+                })
+                .mapToInt(id -> Math.max(1, ObjectivePolicy.victoryPoints(id)))
+                .max()
+                .orElse(0);
+    }
+
+    public static int publicPointsOneTechShort(Game game, Player player) {
+        return unscoredPublicsWithAThreshold(game, player)
+                .filter(id -> {
+                    int threshold = ListPlayerInfoService.getObjectiveThreshold(id, game);
+                    return progress(game, id, player, null) < threshold
+                            && techsStillNeeded(id, player, null, threshold) == 1;
+                })
+                .mapToInt(id -> Math.max(1, ObjectivePolicy.victoryPoints(id)))
+                .max()
+                .orElse(0);
+    }
+
+    private static Stream<String> unscoredPublicsWithAThreshold(Game game, Player player) {
+        return game.getRevealedPublicObjectives().keySet().stream()
+                .filter(id -> !ObjectivePolicy.hasScored(game, player, id))
+                .filter(id -> ListPlayerInfoService.getObjectiveThreshold(id, game) > 0);
     }
 
     static double baseValue(TechnologyModel tech) {

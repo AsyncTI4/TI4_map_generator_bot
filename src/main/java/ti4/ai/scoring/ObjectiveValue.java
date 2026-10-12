@@ -27,7 +27,7 @@ public final class ObjectiveValue {
     private static final double WITHIN_REACH_SHARE = 0.9;
     private static final int STEPS_WITHIN_REACH = 3;
     private static final int STAGE_TWO_POINTS = 2;
-    private static final int NOT_MODELLED = -1;
+    public static final int NOT_MODELLED = -1;
 
     private record Target(String id, int threshold, int points, int before) {}
 
@@ -127,7 +127,7 @@ public final class ObjectiveValue {
         };
     }
 
-    int progress(String id, Footprint footprint) {
+    public int progress(String id, Footprint footprint) {
         return switch (id) {
             case "expand_borders", "subdue" -> countPlanets(footprint, this::outsideHomeSystems);
             case "corner", "unify_colonies" ->

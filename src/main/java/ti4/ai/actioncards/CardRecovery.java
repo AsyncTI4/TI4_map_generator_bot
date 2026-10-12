@@ -1,0 +1,95 @@
+package ti4.ai.actioncards;
+
+import java.util.Optional;
+import lombok.experimental.UtilityClass;
+import ti4.ai.actioncards.AiCard.Window;
+import ti4.ai.actioncards.CardPlay.Stage;
+import ti4.ai.brain.AiTurnContext;
+import ti4.ai.brain.Prompts;
+import ti4.ai.brain.Prompts.Match;
+import ti4.ai.perception.AiPrompt;
+
+@UtilityClass
+class CardRecovery {
+
+    private static final long CONFIRM_MILLIS = 60_000L;
+
+    static void recover(AiTurnContext context) {
+        if (!"action".equalsIgnoreCase(context.game().getPhaseOfGame())) return;
+        if (context.isActivePlayer()) {
+            recoverOwnTurn(context);
+        } else {
+            recoverReaction(context);
+        }
+    }
+
+    private static void recoverOwnTurn(AiTurnContext context) {
+        String key = PlayMemory.turnKey(context);
+        if (context.memory().has(key)) return;
+        for (AiCard card : AiActionCards.componentCards()) {
+            if (resolvePending(context, key, card) || targetPending(context, key, card)) return;
+        }
+    }
+
+    private static void recoverReaction(AiTurnContext context) {
+        if (context.game().getActiveSystem().isBlank()) return;
+        String key = PlayMemory.reactionKey(context);
+        if (context.memory().has(key)) return;
+        for (AiCard card : AiActionCards.inWindow(Window.AFTER_ACTIVATION)) {
+            if (resolvePending(context, key, card)) return;
+        }
+    }
+
+    private static boolean resolvePending(AiTurnContext context, String key, AiCard card) {
+        if (!card.hasResolveButton()) return false;
+        Optional<Match> resolve =
+                CardPrompts.ownedPublic(context, Prompts.turnStart(context), card.resolveHandler()::equals);
+        if (resolve.isEmpty()) return false;
+        long playedAt = resolve.get().prompt().createdAtMillis() - CONFIRM_MILLIS;
+        Optional<AiPrompt> announcement = SabotageWindow.announcement(context, card.key(), playedAt);
+        CardPlay rebuilt = new CardPlay(
+                Stage.WINDOW,
+                context.now(),
+                playedAt,
+                card.key(),
+                announcement.map(AiPrompt::messageId).orElse(""),
+                announcement.isPresent(),
+                SabotageWindow.lastPlayIndex(context.game(), context.seat(), card.key()),
+                "");
+        PlayMemory.store(context, key, announcement.isPresent() ? rebuilt : rebuilt.at(Stage.RESOLVE, context.now()));
+        return true;
+    }
+
+    private static boolean targetPending(AiTurnContext context, String key, AiCard card) {
+        if (!card.hasTarget() || context.seat().getActionCards().containsKey(card.key())) return false;
+        long since = Prompts.turnStart(context);
+        for (String prefix : card.targetPrefixes()) {
+            Optional<AiPrompt> prompt = Prompts.newestFirst(context.prompts()).stream()
+                    .filter(candidate -> !candidate.isHidden() && candidate.createdAtMillis() >= since)
+                    .filter(candidate -> candidate.hasHandlerPrefix(prefix))
+                    .filter(candidate -> offeredToSeat(context, candidate))
+                    .findFirst();
+            if (prompt.isEmpty()) continue;
+            long playedAt = prompt.get().createdAtMillis() - CardPrompts.CLOCK_SKEW_MILLIS;
+            PlayMemory.store(
+                    context,
+                    key,
+                    new CardPlay(
+                            Stage.TARGET,
+                            context.now(),
+                            playedAt,
+                            card.key(),
+                            "",
+                            false,
+                            SabotageWindow.lastPlayIndex(context.game(), context.seat(), card.key()),
+                            ""));
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean offeredToSeat(AiTurnContext context, AiPrompt prompt) {
+        boolean owned = prompt.buttons().stream().anyMatch(button -> button.isOwnedBy(context.faction()));
+        return owned || Prompts.mentions(prompt, context.seat());
+    }
+}

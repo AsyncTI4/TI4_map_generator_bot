@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.dv8tion.jda.api.utils.TimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiSeats;
@@ -105,6 +107,9 @@ public class NekroBrain implements FactionBrain {
             "addIonStorm_",
             "crownofemphidiaexplore",
             "acquireATech");
+    private static final Set<String> WINDOW_PREFIXES = Stream.concat(
+                    PUBLIC_WINDOW_PREFIXES.stream(), ActionCardRules.targetPrefixes().stream())
+            .collect(Collectors.toUnmodifiableSet());
     private static final String NO_SABOTAGE = "no_sabotage";
     private static final long MIN_SELF_PLAY_PASS_DELAY_SECONDS = 5;
     private static final int SELF_PLAY_PASS_DELAY_SPREAD_SECONDS = 10;
@@ -145,6 +150,7 @@ public class NekroBrain implements FactionBrain {
             NekroLeaderRules::chooseAgentTarget,
             NekroLeaderRules::continueHero,
             ActionCardRules::continuePlay,
+            ActionCardRules::afterActivation,
             ActionCardRules::presetSummit,
             PromissoryRules::continuePlay,
             this::queueProveEndurance,
@@ -193,7 +199,7 @@ public class NekroBrain implements FactionBrain {
 
     @Override
     public Set<String> publicWindowHandlerPrefixes() {
-        return PUBLIC_WINDOW_PREFIXES;
+        return WINDOW_PREFIXES;
     }
 
     @Override
@@ -420,6 +426,8 @@ public class NekroBrain implements FactionBrain {
         if (relicAction.isPresent()) return relicAction;
         Optional<AiDecision> planned = StrategyCardTurn.playIfDue(context, thisTurn);
         if (planned.isPresent()) return planned;
+        Optional<AiDecision> cardAction = ActionCardRules.insteadOfTacticalAction(context);
+        if (cardAction.isPresent()) return cardAction;
         Optional<AiDecision> tactical = TacticalRules.start(context);
         if (tactical.isPresent()) return tactical;
         for (AiPrompt prompt : thisTurn) {

@@ -46,6 +46,7 @@ public class StrategyCardRules {
 
     private static final String PLAYED_KEY = "scPlayed|";
     private static final String RESEARCH_KEY = "research|";
+    private static final String RESEARCH_EXCLUDED_KEY = "researchExcluded|";
     private static final String TOKEN_GAIN_KEY = "tokenGain|";
     private static final String STRUCTURE_KEY = "structure|";
     private static final String READY_KEY = "readyPlanets|";
@@ -561,6 +562,12 @@ public class StrategyCardRules {
 
     public static void expectResearch(AiTurnContext context, int cost) {
         context.memory().put(requestKey(context, RESEARCH_KEY), context.now() + "|" + cost);
+        context.memory().remove(requestKey(context, RESEARCH_EXCLUDED_KEY));
+    }
+
+    public static void expectResearchOtherThan(AiTurnContext context, int cost, String excludedTech) {
+        context.memory().put(requestKey(context, RESEARCH_KEY), context.now() + "|" + cost);
+        context.memory().put(requestKey(context, RESEARCH_EXCLUDED_KEY), excludedTech);
     }
 
     public static Optional<AiDecision> chooseTechnology(AiTurnContext context) {
@@ -569,10 +576,13 @@ public class StrategyCardRules {
         long since = request.get()[0] - CLOCK_SKEW_MILLIS;
         int cost = (int) request.get()[1];
         Map<String, Match> options = new LinkedHashMap<>();
+        String excluded =
+                context.memory().get(requestKey(context, RESEARCH_EXCLUDED_KEY)).orElse("");
         for (AiPrompt prompt : CardMessages.hiddenSince(context, since)) {
             for (PromptButton button : prompt.enabledButtons()) {
                 if (!button.isOwnedBy(context.faction()) || !button.handlerId().startsWith(GET_TECH)) continue;
                 String alias = StringUtils.substringBefore(StringUtils.removeStart(button.handlerId(), GET_TECH), "__");
+                if (alias.equals(excluded)) continue;
                 options.putIfAbsent(alias, new Match(prompt, button));
             }
         }
@@ -580,6 +590,7 @@ public class StrategyCardRules {
         Game game = context.game();
         Player seat = context.seat();
         context.memory().remove(requestKey(context, RESEARCH_KEY));
+        context.memory().remove(requestKey(context, RESEARCH_EXCLUDED_KEY));
         Optional<String> best = ResearchPolicy.best(game, seat, options.keySet());
         if (best.isEmpty()) return Optional.empty();
         PrerequisiteSkips.Plan skips = PrerequisiteSkips.of(game, seat, Mapper.getTech(best.get()));

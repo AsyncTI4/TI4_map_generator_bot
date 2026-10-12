@@ -7,9 +7,11 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiSettings;
+import ti4.ai.actioncards.AiCard.Window;
 import ti4.ai.eval.BoardView;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendUnlock;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -33,7 +35,6 @@ public class ActionCardValue {
     static final double ECONOMY_CAP = 3.0;
     private static final double PLAY_THRESHOLD = 2.0;
     private static final double NEAR_LIMIT_THRESHOLD = 1.0;
-    private static final double UNLOCKS_OBJECTIVE = 10.0;
     private static final double INFANTRY_VALUE = 0.5;
     private static final double MESSIAH_BASE = 0.5;
     private static final double FRONTLINE_VALUE = 2.0;
@@ -41,8 +42,9 @@ public class ActionCardValue {
     private static final int MIN_MESSIAH_PLANETS = 3;
     private static final String TRIAD = "triad";
     private static final double NOT_USABLE = 0.0;
-    private static final double EXTRA_SABOTAGE_SHARE = 0.6;
+    static final double EXTRA_SABOTAGE_SHARE = 0.6;
     private static final double SPARE_BELOW = 2.0;
+    private static final double NEAR_LIMIT_PRIOR_SHARE = 0.5;
 
     record Candidate(String alias, double value) {}
 
@@ -56,18 +58,44 @@ public class ActionCardValue {
                 .max(Comparator.comparingDouble(Candidate::value));
     }
 
+    static Optional<Candidate> bestNewComponentPlay(Game game, Player seat) {
+        return bestPlay(game, seat, Window.COMPONENT_ACTION);
+    }
+
+    static Optional<Candidate> bestReactionPlay(Game game, Player seat, Window window) {
+        return bestPlay(game, seat, window);
+    }
+
+    private static Optional<Candidate> bestPlay(Game game, Player seat, Window window) {
+        if (AiSettings.usesLegacyActionCards(seat)) return Optional.empty();
+        double share = seat.getAcCount() >= ButtonHelper.getACLimit(game, seat) - 1 ? NEAR_LIMIT_PRIOR_SHARE : 1.0;
+        return seat.getActionCards().keySet().stream()
+                .map(alias -> candidate(game, seat, alias, window))
+                .flatMap(Optional::stream)
+                .filter(candidate -> candidate.value() >= share * ActionCardPrior.keepPrior(candidate.alias()))
+                .max(Comparator.comparingDouble(Candidate::value));
+    }
+
+    private static Optional<Candidate> candidate(Game game, Player seat, String alias, Window window) {
+        return AiActionCards.of(alias)
+                .filter(card -> card.window() == window)
+                .flatMap(card -> card.planFor(game, seat))
+                .map(plan -> new Candidate(alias, plan.value()));
+    }
+
     static double playValue(Game game, Player seat, String alias) {
         return switch (alias) {
             case MINING -> {
                 int gain = miningGain(game, seat);
-                yield gain + (SpendUnlock.unlocks(game, seat, List.of(), gain) ? UNLOCKS_OBJECTIVE : 0);
+                yield gain + ScoringStakes.scoreValue(game, seat, SpendUnlock.pointDelta(game, seat, gain));
             }
             case INDUSTRIAL -> {
                 int gain = ButtonHelper.getNumberOfXTypePlanets(seat, game, "industrial", true);
-                yield gain + (SpendUnlock.unlocks(game, seat, List.of(), gain) ? UNLOCKS_OBJECTIVE : 0);
+                yield gain + ScoringStakes.scoreValue(game, seat, SpendUnlock.pointDelta(game, seat, gain));
             }
             case ECONOMIC ->
-                SpendUnlock.unlocks(game, seat, exhaustedCulturalPlanets(game, seat), 0) ? UNLOCKS_OBJECTIVE : 0;
+                ScoringStakes.scoreValue(
+                        game, seat, SpendUnlock.pointsUnlocked(game, seat, exhaustedCulturalPlanets(game, seat), 0));
             case MESSIAH -> {
                 int planets = messiahPlanets(game, seat);
                 yield planets >= MIN_MESSIAH_PLANETS ? MESSIAH_BASE + INFANTRY_VALUE * planets : 0;

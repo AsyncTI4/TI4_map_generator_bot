@@ -156,7 +156,8 @@ to build one by hand:
   - Nekro: Propagation's command tokens from any source, the commander's card draw, Dacxive Animators' infantry,
     and its agent and hero (below);
   - paying for a Nekro agent that names it (any AI seat);
-  - playing economy action cards and answering cards that target it (below);
+  - playing component action cards and _Forward Supply Base_, valued by what they score and by human play statistics,
+    and answering cards that target it (below);
   - playing the promissory notes other players gave it, and respecting its own notes played against it (below);
   - trading (below).
 - **Scoring comes first.** Victory points drive most choices:
@@ -298,24 +299,18 @@ to build one by hand:
     not own (`CopiedTechPolicy`), and the other players' units the hero destroys there. It walks the component
     action menu, the planet and the technology, then ends its turn. The hero is purged as soon as it is played, so
     it never starts it without a worthwhile planet.
-- **Action cards** (`ti4.ai.actioncards`, first stage).
-  - **When it plays.** On its own turn, when it is about to pass (no tactical action worth taking, every strategy card
-    played), it plays the most valuable of: _Mining Initiative_ (trade goods equal to its best planet's resources),
-    _Industrial Initiative_ (2 or more industrial planets), _Economic Initiative_ (only when readying its cultural
-    planets lets it pay for a spend objective), _Rise of a Messiah_ (3 or more planets), _Frontline Deployment_ (on a
-    planet a dock or carrier can pick the infantry up from, or next to enemy ships) and _War Effort_ (a cruiser where
-    the fleet pool and cruiser limit allow it). A card that would unlock a spend objective is worth far more. It plays
-    sooner when its hand is near the limit. _Summit_ is pre-played as soon as it is drawn.
-  - **Honest play.** It never plays while censured, over the hand limit, or passed against Transparasteel, and keeps
-    5 cards while it holds _Form a Spy Network_. The bot posts the resolve button at once, so the AI holds its turn
-    until every other player has answered the Sabotage window (at most a day), waits a few seconds more in case a
-    Sabotage is landing, and never resolves a sabotaged card. With no window it still waits a while if someone could
-    cancel with Instinct Training or the Watcher mech. It remembers the resolve button in case the channel moves on,
-    and after an undo or a restart it picks an unfinished play up again from the board.
-  - **Answering others.** Every AI seat answers each Sabotage window after the same seeded delay, including windows
-    that have scrolled out of the messages it reads.
-  - **When targeted** (once the card's Sabotage window has closed). It hands a card to a _Spy_ (if it has one), gives the least harmful promissory note to _Diplomatic Pressure_
-    (keeping Support for the Throne), and under _Extreme Duress_ plays its strategy card rather than lose its hand.
+- **Action cards** (`ti4.ai.actioncards`).
+  - **Scoring decides.** Victory points are the first reason to play, keep or cancel a card, valued on one scale
+    (`ScoringStakes`): a point is worth 6 trade goods, rising to 12 near the goal, and a score that reaches the goal is
+    worth 30. A *contender* is a player within 2 points of the goal, or whose points in reach by the next status phase
+    would get there. The points in reach are the public objectives the player qualifies for (limited by its scoring
+    chances), Imperial's extra public and the Mecatol Rex point while the player holds Imperial, and the chance that
+    one of its secrets is ready. `SecretOdds` works that chance out by card counting, as a human would: the unseen
+    secrets are the deck less every scored secret and the viewing seat's own hand; each one is judged against the
+    player's public board (certain when the player meets it, half when one step short, nothing otherwise, 0.15 for
+    secrets the objective model does not cover); the player's chance is the chance that at least one of the secrets it
+    holds is ready, and only the number of secrets in its hand is read. Nothing in this section reads another player's
+    hand.
   - **What a card is worth** (`ActionCardPrior`, `ActionCardValue`). Human players' statistics for the Thunder's
     Edge action card deck (`data/ai/action_card_stats.json`, made from a pasted statistics report by
     `scripts/ai-action-card-stats.mjs`) give every card an Impact Score, win, play and cancel rate, and for single
@@ -329,13 +324,58 @@ to build one by hand:
     | cancel appetite | the card's cancel rate, shrunk towards the average with 50 plays, over the average cancel rate of 4.4%, at most 4; 0 for a card that cannot be cancelled | how much human players want the card cancelled |
     | first-play rate | single copy cards: first plays over the 1072 games a copy is drawn in; four-of cards: the play rate | what the self-play report compares each card's rate with (never a decision input) |
     | retrieval | single copy cards: replays per first play (0.065 on average) | choosing a card from the discard pile, later |
-  - **Keeping and discarding** (`AiActionCards`). A card is *usable* when a rule of the AI plays it: today the six
-    economy cards, _Summit_ and _Sabotage_ (more as their rules arrive). A card no rule plays is worth 0 and goes
-    first; between such cards the lower keep prior goes first. A usable card is worth the larger of its keep prior and
-    what playing it is worth now (at most 3); a second _Sabotage_ in the hand is worth 0.6 of the first. Discards (hand
+  - **Keeping and discarding** (`AiActionCards`). A card is *usable* when a rule of the AI plays it: the economy
+    cards, _Summit_, _Sabotage_ and the cards in the table below. A card no rule plays is worth 0 and goes first;
+    between such cards the lower keep prior goes first. A usable card is worth the larger of its keep prior and what
+    playing it is worth now (at most 3); a second _Sabotage_ in the hand is worth 0.6 of the first. Discards (hand
     limit, _Form a Spy Network_, Nekro's agent) follow this order. Nekro's agent only spends a card worth less than
     its 2 trade goods.
-  - Not yet: combat cards (_Morale Boost_, _Shields Holding_), agenda riders and _Sabotage_ against others.
+  - **When it plays.** Only on its own turn, in the action phase, and a component action card is the turn's action:
+    the turn ends once it is resolved. The economy cards are played when the seat is about to pass, as before:
+    _Mining Initiative_ (trade goods equal to its best planet's resources), _Industrial Initiative_ (its industrial
+    planets), _Economic Initiative_ (readying its cultural planets), _Rise of a Messiah_ (3 or more planets),
+    _Frontline Deployment_ (on a planet a dock or carrier can pick the infantry up from, or next to enemy ships) and
+    _War Effort_ (a cruiser where the fleet pool and cruiser limit allow it). A card that unlocks a spend objective is
+    worth the points it scores (30 if they win the game). The cards below are played when what they do now is worth
+    at least their keep prior (half of it near the hand limit), either instead of a tactical action that scores less,
+    or when it is about to pass. _Summit_ is pre-played as soon as it is drawn.
+    | Card | Worth | Target |
+    | --- | --- | --- |
+    | Fighter Conscription | 0.5 per fighter that fits the capacity of a system with its dock or capacity units and no other player's ships | none |
+    | Uprising | the resources it gains (plus the score they unlock), plus a quarter of the planet's resources and influence while its owner has not passed, times the owner's standing, plus the points exhausting the planet would take from the owner's spend objective | a readied planet outside a home system, the best by that value |
+    | Insubordination | a tactic token (0.75) times the owner's standing | a contender first, else the strongest player with a tactic token who has not passed |
+    | Spy | an action card (1.2) times the owner's standing | a contender first, else the player with the most action cards |
+    | Ghost Ship | a destroyer (1), and 1 more next to its own ships or where it advances an objective | a wormhole system outside the home systems without other players' ships |
+    | Exploration Probe | a frontier exploration (1.5) | a frontier token in or next to a system with its ships |
+    | Archaeological Expedition | three draws from the deck of a planet trait it holds, times the value of the relic fragments in it | the best deck |
+    | Refit Troops | 1.3 per infantry replaced by a mech (1 or 2), while it has mechs in reinforcements | its planets with infantry, spread out |
+    | Forward Supply Base | 3 trade goods; played after another player activates a system holding its units | the player with the fewest points, not the active player when it can avoid it |
+    | Focused Research | the best technology it could research (and the objective it completes) less the 4 trade goods, when the scoring reserve can spare them | the technology the Technology card would pick |
+    | Divert Funding | the best technology it could research less the value of the one it returns (never a unit upgrade or faction technology) | the least valuable technology it can return; it never researches that one again |
+    | Plagiarize | a non-faction technology a neighbour owns (and the objective it completes) less the 5 influence, paid with the planets it can best spare | the best such technology |
+
+    _Standing_ is 3 for a contender, 1.3 for a player alone in the lead and ahead of the seat, 0.6 for a player two
+    points or more behind the seat, otherwise 1. Nekro cannot research, so it never plays _Focused Research_ or
+    _Divert Funding_; _Plagiarize_ gains a technology without researching.
+  - **How it plays.** It presses the card's `ac_play_from_hand` button in its private thread; when the thread has
+    scrolled past it, it asks the bot to post its cards again once and waits. Where the card names a target, it picks
+    it before playing and announces it in the main channel straight after, as the bot asks humans to. The bot posts the
+    resolve button at once, so the AI holds its turn until every other player has answered the Sabotage window (at most
+    a day), waits a few seconds more in case a Sabotage is landing, and never resolves a sabotaged card. With no window
+    it still waits a while if someone could cancel with Instinct Training or the Watcher mech. It then presses the
+    resolve button and the target buttons. Most target buttons are not tied to a player, so it presses one only in a
+    message that addresses it and was posted after the play. If the target it picked is no longer on offer it takes the
+    best one that is. It remembers the resolve button in case the channel moves on, and after an undo or a restart it
+    picks a play up again from the board: the resolve button, or a target message addressed to it. Plays outside its
+    own turn (_Forward Supply Base_) are tracked by the activation that triggered them, one play per activation.
+  - **Honest play.** It never plays while censured, over the hand limit, or passed against Transparasteel, and keeps
+    5 cards while it holds _Form a Spy Network_.
+  - **Answering others.** Every AI seat answers each Sabotage window after the same seeded delay, including windows
+    that have scrolled out of the messages it reads.
+  - **When targeted** (once the card's Sabotage window has closed). It hands a card to a _Spy_ (if it has one), gives the least harmful promissory note to _Diplomatic Pressure_
+    (keeping Support for the Throne), and under _Extreme Duress_ plays its strategy card rather than lose its hand.
+  - Not yet: combat and agenda cards, _Overrule_, _Strategize_, _War Machine_, _Rally_, _Counterstroke_, _Parley_ and the
+    remaining component action cards.
 - **Promissory notes** (`ti4.ai.promissory`). It plays the notes other players gave it, only through the bot's own
   buttons and only in the note's timing window:
   - _Trade Agreement_ when its owner replenishes (if they have commodities), _Research Agreement_ for a technology
@@ -659,7 +699,7 @@ Four small generic changes don't reference `ti4.ai`:
 | Version | Scope |
 | --- | --- |
 | V0 | Seat, runtime, actuation, fallback, `/ai` commands; simple phase decisions. |
-| **V1 (in progress)** | Full turn play. Done: tactical actions, combat (including bombardment), Technological Singularity, several AI seats and self-play, scoring (spend objectives, custodians, Imperial), strategy card primaries and secondaries including Warfare's, research, status, action and agenda-phase secrets, agenda voting and Galactic Threat, Nekro's agent and hero, economy action cards, promissory notes, trading (offers, counter-offers, Trade card terms, debt), Diplomacy and Politics follows, action card values from human play statistics. Still to do: combat and agenda action cards, Sabotage, the mech secrets (Mechanize the Military, Occupy the Fringe), Strengthen Bonds. |
+| **V1 (in progress)** | Full turn play. Done: tactical actions, combat (including bombardment), Technological Singularity, several AI seats and self-play, scoring (spend objectives, custodians, Imperial), strategy card primaries and secondaries including Warfare's, research, status, action and agenda-phase secrets, agenda voting and Galactic Threat, Nekro's agent and hero, component action cards (economy, Spy, Uprising, research and the rest) and action card values from human play statistics and scoring stakes, promissory notes, trading (offers, counter-offers, Trade card terms, debt), Diplomacy and Politics follows. Still to do: combat and agenda action cards, the mech secrets (Mechanize the Military, Occupy the Fringe), Strengthen Bonds. |
 | V1.1 | Draft participation (factions reserved for AI seats, other picks made by the table). |
 | V2 | Hidden aggression levels with drift and lock; attacks gated by aggression. |
 | V3 | Deeper deals: votes for trade goods, multi-party pacts. |

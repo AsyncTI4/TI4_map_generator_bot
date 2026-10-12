@@ -25,6 +25,7 @@ import ti4.ai.eval.MovementGraph;
 import ti4.ai.explore.ExploreDeck;
 import ti4.ai.explore.ExploreOutlook;
 import ti4.ai.explore.ExploreSite;
+import ti4.ai.explore.ExploreValues;
 import ti4.ai.promissory.PlayAreaNotes;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectivePolicy;
@@ -54,7 +55,7 @@ public class TacticalPlanner {
     private static final double DISTANCE_COST = 0.2;
     private static final double TECH_STEAL_VALUE = 3.0;
     private static final double PLANET_TEMPO_VALUE = 0.8;
-    private static final double FRONTIER_CARD_VALUE = 1.5;
+    private static final double FRONTIER_CARD_VALUE = ExploreValues.FRONTIER_CARD;
     private static final double FRONTIER_POSITION_VALUE = 1.0;
     private static final String DARK_ENERGY_TAP = "det";
     private static final String HAZARDOUS = "hazardous";

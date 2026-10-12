@@ -2,8 +2,11 @@ package ti4.ai.actioncards;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleBiFunction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.AiCard.Window;
 import ti4.ai.nekro.CommandTokenPolicy;
@@ -16,7 +19,7 @@ public class AiActionCards {
 
     static final String SABOTAGE = "sabotage";
     private static final ToDoubleBiFunction<Game, Player> ALWAYS = (game, seat) -> 1.0;
-    private static final ToDoubleBiFunction<Game, Player> NEVER = (game, seat) -> 0.0;
+    private static final Evaluator NEVER = (game, seat) -> Optional.empty();
     private static final double SUMMIT_TOKEN_VALUE = 2.0;
 
     private static final List<AiCard> CARDS = List.of(
@@ -30,11 +33,32 @@ public class AiActionCards {
                     ActionCardValue.SUMMIT,
                     ActionCardValue.SUMMIT::equals,
                     Window.PRE_PLAY,
-                    AiActionCards::summitValue,
+                    (game, seat) -> Optional.of(Plan.of(summitValue(game, seat))),
                     ALWAYS,
                     "resolveSummit",
+                    List.of(),
                     EconomyTargets::summitTokens),
-            new AiCard(SABOTAGE, ActionCardHelper::isSabotageOrShatter, Window.REACTION, NEVER, ALWAYS, null, null));
+            PlayerTargetCards.spy(),
+            PlayerTargetCards.insubordination(),
+            PlayerTargetCards.forwardSupplyBase(),
+            PlanetTargetCards.uprising(),
+            PlanetTargetCards.archaeologicalExpedition(),
+            SystemTargetCards.ghostShip(),
+            SystemTargetCards.explorationProbe(),
+            BoardCards.fighterConscription(),
+            BoardCards.refitTroops(),
+            ResearchCards.focusedResearch(),
+            ResearchCards.divertFunding(),
+            ResearchCards.plagiarize(),
+            new AiCard(
+                    SABOTAGE,
+                    ActionCardHelper::isSabotageOrShatter,
+                    Window.REACTION,
+                    NEVER,
+                    ALWAYS,
+                    null,
+                    List.of(),
+                    null));
 
     public static boolean usable(String alias) {
         return of(alias).isPresent();
@@ -44,16 +68,54 @@ public class AiActionCards {
         return of(alias).filter(AiCard::isSabotage).isPresent();
     }
 
+    public static Set<String> targetPrefixes() {
+        return CARDS.stream().flatMap(card -> card.targetPrefixes().stream()).collect(Collectors.toUnmodifiableSet());
+    }
+
     static Optional<AiCard> of(String alias) {
         return CARDS.stream().filter(card -> card.matches().test(alias)).findFirst();
     }
 
-    static Optional<AiCard> playable(String alias) {
-        return of(alias).filter(card -> card.window() != Window.REACTION);
-    }
-
     static List<AiCard> inWindow(Window window) {
         return CARDS.stream().filter(card -> card.window() == window).toList();
+    }
+
+    static List<AiCard> componentCards() {
+        return CARDS.stream().filter(AiCard::isComponentAction).toList();
+    }
+
+    static Stream<AiCard> all() {
+        return CARDS.stream();
+    }
+
+    static AiCard component(
+            String key, Evaluator evaluator, String resolveHandler, String targetPrefix, TargetStep target) {
+        return component(key, evaluator, resolveHandler, List.of(targetPrefix), target);
+    }
+
+    static AiCard component(
+            String key, Evaluator evaluator, String resolveHandler, List<String> targetPrefixes, TargetStep target) {
+        return card(key, Window.COMPONENT_ACTION, evaluator, resolveHandler, targetPrefixes, target);
+    }
+
+    static AiCard reaction(
+            String key,
+            Window window,
+            Evaluator evaluator,
+            String resolveHandler,
+            String targetPrefix,
+            TargetStep target) {
+        return card(key, window, evaluator, resolveHandler, List.of(targetPrefix), target);
+    }
+
+    private static AiCard card(
+            String key,
+            Window window,
+            Evaluator evaluator,
+            String resolveHandler,
+            List<String> targetPrefixes,
+            TargetStep target) {
+        return new AiCard(key, key::equals, window, evaluator, ALWAYS, resolveHandler, targetPrefixes, target);
     }
 
     private static AiCard economy(String alias, String resolveHandler, TargetStep target) {
@@ -61,10 +123,11 @@ public class AiActionCards {
         return new AiCard(
                 alias,
                 matches,
-                Window.COMPONENT_ACTION,
-                (game, seat) -> ActionCardValue.playValue(game, seat, alias),
+                Window.ECONOMY,
+                (game, seat) -> Optional.of(Plan.of(ActionCardValue.playValue(game, seat, alias))),
                 ALWAYS,
                 resolveHandler,
+                List.of(),
                 target);
     }
 

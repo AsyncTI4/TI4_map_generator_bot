@@ -30,8 +30,4 @@ class Standings {
     static List<Player> others(Game game, Player player) {
         return players(game).stream().filter(other -> !same(other, player)).toList();
     }
-
-    static boolean anyoneAtLeast(Game game, int points) {
-        return players(game).stream().anyMatch(player -> vp(player) >= points);
-    }
 }

@@ -64,6 +64,20 @@ class SabotageWindow {
         return !entry.get().factionsThatReacted().containsAll(others);
     }
 
+    static int lastPlayIndex(Game game, Player seat, String alias) {
+        String title = title(alias);
+        String playerId = GameStats.getTrackedPlayerId(seat);
+        List<GameStats.ActionCardPlay> plays = game.getGameStats().getActionCardPlays();
+        for (int index = plays.size() - 1; index >= 0; index--) {
+            if (title.equals(plays.get(index).getActionCard())
+                    && playerId != null
+                    && playerId.equals(plays.get(index).getPlayerId())) {
+                return index;
+            }
+        }
+        return 0;
+    }
+
     static boolean canceled(Game game, Player seat, String alias, int playsBefore) {
         String title = title(alias);
         String playerId = GameStats.getTrackedPlayerId(seat);

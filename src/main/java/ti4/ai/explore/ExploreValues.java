@@ -28,6 +28,7 @@ public class ExploreValues {
     public static final double SECRET_OBJECTIVE = 1.5;
     public static final double CROWDED_SECRET_OBJECTIVE = 0.3;
     public static final double ENIGMATIC_DEVICE = 1.0;
+    public static final double FRONTIER_CARD = 1.5;
     public static final double DEMILITARIZED_ZONE = -1.5;
     private static final int ACTION_CARDS_DRAWN_BY_LOST_CREW = 2;
 

@@ -1,6 +1,7 @@
 package ti4.ai.scoring;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
@@ -12,9 +13,38 @@ import ti4.helpers.Helper;
 public class SpendUnlock {
 
     public static boolean unlocks(Game game, Player player, Collection<String> readiedPlanets, int extraTradeGoods) {
+        return pointsUnlocked(game, player, readiedPlanets, extraTradeGoods) > 0;
+    }
+
+    public static int pointsUnlocked(Game game, Player player, Collection<String> readiedPlanets, int extraTradeGoods) {
         Wallet now = Wallet.of(game, player);
         Wallet after = now.withPlanets(game, readiedPlanets).withTradeGoods(now.tradeGoods() + extraTradeGoods);
-        return unlockedPoints(game, player, now, after) > 0;
+        return unlockedPoints(game, player, now, after);
+    }
+
+    public static int pointsLostByExhausting(Game game, Player player, String planet) {
+        if (!hasUnscoredSpendObjective(game, player)) return 0;
+        Wallet now = Wallet.of(game, player);
+        Wallet after = now.without(new Wallet.Payment(List.of(planet), List.of(), 0, 0));
+        return Math.max(0, scorablePoints(game, player, now) - scorablePoints(game, player, after));
+    }
+
+    private static boolean hasUnscoredSpendObjective(Game game, Player player) {
+        return game.getRevealedPublicObjectives().keySet().stream()
+                .anyMatch(objective -> !ObjectivePolicy.hasScored(game, player, objective)
+                        && ObjectiveCatalog.spendCost(objective).isPresent());
+    }
+
+    private static int scorablePoints(Game game, Player player, Wallet wallet) {
+        if (!Helper.canPlayerScorePOs(game, player)) return 0;
+        int chances = ScoringReserve.scoringChances(game, player);
+        return game.getRevealedPublicObjectives().keySet().stream()
+                .filter(objective -> ObjectivePolicy.qualifies(game, player, wallet, objective))
+                .map(ObjectivePolicy::victoryPoints)
+                .sorted(Comparator.reverseOrder())
+                .limit(chances)
+                .mapToInt(Integer::intValue)
+                .sum();
     }
 
     public static int pointDelta(Game game, Player player, int tradeGoodDelta) {
