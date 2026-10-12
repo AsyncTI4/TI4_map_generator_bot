@@ -32,6 +32,7 @@ public class CombatRules {
     static final long AI_ROLL_GRACE_MILLIS = 10_000L;
     private static final String ROLL_PREFIX = "combatRoll_";
     private static final String AUTOMATE_PREFIX = "automateGroundCombat_";
+    private static final String CONFIRMED_SUFFIX = "_confirmed";
     private static final String ASSIGN_PREFIX = "autoAssign";
     private static final String AFB_SUFFIX = "_afb";
     private static final String SPACE_CANNON_OFFENCE_SUFFIX = "_spacecannonoffence";
@@ -77,9 +78,8 @@ public class CombatRules {
         if (groundHit.isPresent()) return groundHit;
         Optional<AiDecision> magen = magenDefenseGrid(context, prompts);
         if (magen.isPresent()) return magen;
-        Optional<Match> automate = Prompts.owned(
-                prompts, context.faction(), id -> id.startsWith(AUTOMATE_PREFIX) && id.endsWith("_confirmed"));
-        if (automate.isPresent()) return Optional.of(automate.get().press("automate ground combat"));
+        Optional<AiDecision> automation = confirmAutomation(context, prompts, hook);
+        if (automation.isPresent()) return automation;
         Optional<AiDecision> spaceCannon = spaceCannonOffence(context, prompts);
         if (spaceCannon.isPresent()) return spaceCannon;
         Optional<AiDecision> assaultCannon = assaultCannon(context, prompts);
@@ -341,6 +341,69 @@ public class CombatRules {
                 .anyMatch(other -> BoardView.nonFighterShips(space, other) > 0);
     }
 
+    private static Optional<AiDecision> confirmAutomation(
+            AiTurnContext context, List<AiPrompt> prompts, CombatCardHook hook) {
+        Optional<Match> confirmation = Prompts.owned(
+                prompts, context.faction(), id -> id.startsWith(AUTOMATE_PREFIX) && id.endsWith(CONFIRMED_SUFFIX));
+        if (confirmation.isEmpty()) return Optional.empty();
+        Optional<ReadyForDice.Round> round = automationRound(context, prompts, confirmation.get());
+        if (round.isEmpty() || ReadyForDice.decided(context, round.get())) {
+            return Optional.of(confirmation.get().press("automate ground combat"));
+        }
+        return ReadyForDice.decide(context, round.get(), hook);
+    }
+
+    private static Optional<ReadyForDice.Round> automationRound(
+            AiTurnContext context, List<AiPrompt> prompts, Match confirmation) {
+        String planet = confirmation.button().handlerId().split("_")[3];
+        for (AiPrompt prompt : prompts) {
+            if (prompt.source() != PromptSource.COMBAT_THREAD) continue;
+            for (PromptButton roll : prompt.enabledButtons()) {
+                if (!isRoundRoll(roll) || !roll.handlerId().endsWith("_" + planet)) continue;
+                Optional<Combat> combat = combatOf(context.game(), context.seat(), roll);
+                if (combat.isEmpty() || !startsRound(context, prompts, roll, combat.get())) continue;
+                CombatMoment moment = new CombatMoment(
+                        positionOf(roll), planet, true, combat.get().mine());
+                return Optional.of(ReadyForDice.forAutomation(
+                        context, confirmation, moment, combat.get().opponents()));
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static boolean startsRound(
+            AiTurnContext context, List<AiPrompt> prompts, PromptButton roll, Combat combat) {
+        return combat.mine() == combat.theirs()
+                && positionOf(roll).equals(context.game().getActiveSystem())
+                && !hitsPending(prompts, roll);
+    }
+
+    private static Optional<ReadyForDice.Round> readyRound(
+            AiTurnContext context, List<AiPrompt> prompts, AiPrompt prompt, PromptButton roll) {
+        Optional<Combat> combat = combatOf(context.game(), context.seat(), roll);
+        if (combat.isEmpty() || !startsRound(context, prompts, roll, combat.get())) return Optional.empty();
+        String holder = roll.handlerId().split("_")[2];
+        boolean ground = !BoardView.SPACE.equals(holder);
+        if (ground && automationUnderWay(prompts, holder)) return Optional.empty();
+        CombatMoment moment =
+                new CombatMoment(positionOf(roll), holder, ground, combat.get().mine());
+        return ReadyForDice.forRoll(
+                context, prompts, prompt, moment, combat.get().opponents());
+    }
+
+    private static Optional<AiDecision> readyStep(
+            AiTurnContext context,
+            List<AiPrompt> prompts,
+            ReadyForDice.Round round,
+            AiPrompt prompt,
+            PromptButton roll,
+            RollTiming timing,
+            CombatCardHook hook) {
+        if (!ReadyForDice.decided(context, round)) return ReadyForDice.decide(context, round, hook);
+        if (timing == RollTiming.NOT_NOW) return Optional.empty();
+        return Optional.of(ReadyForDice.rollOrWait(context, prompts, round, prompt, roll));
+    }
+
     private static Optional<AiDecision> combatRound(
             AiTurnContext context, List<AiPrompt> prompts, CombatCardHook hook) {
         Optional<AiDecision> waiting = Optional.empty();
@@ -351,6 +414,14 @@ public class CombatRules {
                 RollTiming timing = rollAllowed(context, roll);
                 if (timing == RollTiming.NOW) {
                     return Optional.of(AiDecision.press(prompt, roll, "roll a combat round"));
+                }
+                Optional<ReadyForDice.Round> round = readyRound(context, prompts, prompt, roll);
+                if (round.isPresent()) {
+                    Optional<AiDecision> step = readyStep(context, prompts, round.get(), prompt, roll, timing, hook);
+                    if (step.isEmpty()) continue;
+                    if (!(step.get() instanceof AiDecision.Wait)) return step;
+                    if (waiting.isEmpty()) waiting = step;
+                    continue;
                 }
                 if (timing != RollTiming.AFTER_GRACE) continue;
                 long grace = onlyAiOpponents(context.game(), context.seat(), roll)
@@ -380,17 +451,19 @@ public class CombatRules {
             return Optional.empty();
         }
         boolean ground = !BoardView.SPACE.equals(parts[2]);
-        if (ground && groundCombatMayBeAutomated(prompts, parts[2])) return Optional.empty();
+        if (ground && automationUnderWay(prompts, parts[2])) return Optional.empty();
         return hook.atRoundStart(
                 context,
                 new CombatMoment(parts[1], parts[2], ground, combat.get().mine()));
     }
 
-    private static boolean groundCombatMayBeAutomated(List<AiPrompt> prompts, String planet) {
+    private static boolean automationUnderWay(List<AiPrompt> prompts, String planet) {
         return prompts.stream()
                 .flatMap(prompt -> prompt.enabledButtons().stream())
                 .map(PromptButton::handlerId)
-                .anyMatch(id -> id.startsWith(AUTOMATE_PREFIX) && id.contains("_" + planet + "_"));
+                .anyMatch(id -> id.startsWith(AUTOMATE_PREFIX)
+                        && id.endsWith(CONFIRMED_SUFFIX)
+                        && id.contains("_" + planet + "_"));
     }
 
     private static List<PromptButton> rolls(AiPrompt prompt, String suffix) {
@@ -428,7 +501,7 @@ public class CombatRules {
         return RollTiming.AFTER_GRACE;
     }
 
-    private record Combat(List<Player> opponents, int mine, int theirs) {}
+    record Combat(List<Player> opponents, int mine, int theirs) {}
 
     private static Optional<Combat> combatOf(Game game, Player seat, PromptButton roll) {
         String[] parts = roll.handlerId().split("_");

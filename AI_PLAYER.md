@@ -590,9 +590,9 @@ to build one by hand:
     seat would roll its combat round, through a hook `CombatRules` calls just before it presses that roll, after its
     own space cannon, anti-fighter barrage, assault cannon and bombardment have been dealt with. The hook is only called
     when both sides have rolled the same number of rounds (once the opponent has rolled, its dice are known), no hits
-    are pending, the combat is in the active system and, for a ground combat, no ground combat automation is still on
-    offer (an automated combat has no window). The seat is idle at that moment whatever it holds, so the timing says
-    nothing about its hand, and no other player's hand is read. A card is played when its swing reaches its keep prior:
+    are pending, the combat is in the active system and, for a ground combat, no one has asked to automate it (see
+    below). The seat is idle at that moment whatever it holds, so the timing says nothing about its hand, and no other
+    player's hand is read. A card is played when its swing reaches its keep prior:
     ```
     swing = (chance to win with the card - chance to win without it) x stake
     stake = unit cost of both sides + score value of the objective points riding on the system
@@ -609,6 +609,28 @@ to build one by hand:
     AI seats pass after 10 to 40 minutes, a human can hold the window to the 24 hour ceiling, and the opponent AI waits
     too since the card is aimed at it, so a combat card can freeze a combat for that long. The combat cards used to be
     worth nothing in the hand and the first to be discarded at the hand limit; they are now kept at their prior.
+  - **Ready for dice** (`ReadyForDice`, `CombatRules`). Human players press "Declare Ready To Throw Dice" in the combat
+    thread when they have no more cards or abilities to play, so the AI does the same. At the start of every round
+    (both sides level, no hits pending, the combat in the active system, the button still in the thread's history) each
+    AI seat in the combat makes one round-start decision after a seeded pause (3 to 10 seconds against AI seats only,
+    15 to 45 otherwise; the seed is the game, combat, round, seat and the seat's profile, never its hand): it plays a
+    combat card if one is worth it, and when that card has resolved (or at once if none is) it presses
+    `announceReadyForDice_`, once per round (`ready|<position>@<holder>#<round>`). The pause, and the press when
+    nothing is played, are the same whatever the seat holds. The seat then rolls first only once the opponent has said
+    it is ready (a ready message naming the seat that is newer than the round's start, which is the newest bot message
+    in the thread that is not a declaration) or has rolled. Against a human who never presses it the usual 120 seconds
+    after the thread's newest message still apply; against an AI seat that never declares the seat gives up after 3
+    minutes. A non-active AI defender now makes its decision before the attacker rolls (it used to wait for the
+    attacker's roll, so it never had a start-of-round window); it still does not roll first. Without the button (fog
+    of war, or it scrolled out of the thread's history) the earlier behaviour applies: a pause after the newest
+    message, then the hook, then the roll.
+  - **Ground combat automation.** Pressing "Automate Combat" asks the opponent to confirm; only then do the bot's
+    automated rolls run, and they move a pending one-round modifier in on each side's first automated roll
+    (`CombatRollService` takes the same path as a manual roll), so a _Morale Boost_ played first applies to round 1
+    of an automated combat. An offer nobody has accepted therefore no longer blocks ground combat cards. When the
+    opponent asks the AI to confirm, the AI first makes its round-0 decision (cards, after the same seeded pause) and
+    confirms afterwards, whatever it played. Once the confirmation is on the table no ground card is played, and the
+    AI never starts an automation itself.
   - Not yet: the other combat cards (see the known limitations), _War Machine_, _Rally_, _Parley_,
     _Exchange Program_ (its agreement needs a negotiation, and the other way costs both players a fleet token) and the
     remaining component action cards. Every other card of the deck's Action window is played, so none is discarded as
@@ -1078,11 +1100,15 @@ Seven small generic changes don't reference `ti4.ai`:
     Holding_ and _Maneuvering Jets_ (they post nothing: the player presses "Cancel a Hit" on the hit message, and the
     second cancel button is unowned, so the AI needs perception and a two-step play first), and _Fire Team_ (its extra
     hits are posted as text only, with no hit-assignment buttons, so the AI could neither take them nor assign them).
-  - No ground combat card is played in a combat that may still be automated, which includes any combat where the
-    "Automate Combat" button is still on offer. Ground cards are therefore only played where no one offered automation.
-  - The play comes at the seat's roll moment: when the opponent rolls first, the seat plays nothing that round (an AI
-    defender never plays a start-of-round card in round 1 against an AI attacker, which rolls first). _Emergency
-    Repairs_ is only played at the start of a round, never at its end.
+  - No ground combat card is played once a player has asked to automate the combat (the confirmation is on the table).
+    An unaccepted "Automate Combat" offer no longer blocks them.
+  - The play comes at the seat's round-start decision: when the opponent rolls before the seat has declared, the seat
+    plays nothing that round (a human attacker who rolls without waiting). An AI defender now gets its window against
+    an AI attacker, which waits for the defender's ready. _Emergency Repairs_ is only played at the start of a round,
+    never at its end.
+  - The seat waits for an opponent's "ready" up to 120 seconds after the thread's newest message (a human) or 3 minutes
+    (an AI seat), so a combat against a human who plays cards slowly is no longer rolled before the human is done, but
+    a human who never presses the button still delays the AI by two minutes a round.
   - _Wild Wild Galaxy_'s +2 _Morale Boost_ is valued as +1.
   - Left to humans: _Direct Hit_ (the bot asks for the ship in chat), _Skilled Retreat_, _Rout_, _Intercept_,
     _Parley_ and _Ghost Squad_ (retreat and invasion windows), _Courageous to the End_ (the AI cannot answer its

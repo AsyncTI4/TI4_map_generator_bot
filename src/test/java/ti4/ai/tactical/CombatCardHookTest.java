@@ -132,9 +132,9 @@ class CombatCardHookTest extends BaseTi4Test {
         assertThat(offered).isEmpty();
     }
 
-    // A ground combat that may still be automated runs without any card window.
+    // The automation offer is only a button on the table: nobody has accepted it, so the round still has its window.
     @Test
-    void isNotOfferedWhileTheGroundCombatMayStillBeAutomated() {
+    void isOfferedWhileTheGroundCombatOnlyHasAnUnacceptedAutomationOffer() {
         Tile tile = test.game.getTileByPosition(position);
         test.units(tile, "lodor", test.nekro, UnitType.Infantry, 2);
         test.units(tile, "lodor", test.sol, UnitType.Infantry, 1);
@@ -145,13 +145,27 @@ class CombatCardHookTest extends BaseTi4Test {
                 "automateGroundCombat_nekro_sol_lodor_unconfirmed",
                 "combatRoll_" + position + "_lodor");
 
-        assertThat(pressedId(CombatRules.next(test.contextAt(AFTER_GRACE, automate), spy)
+        CombatRules.next(test.contextAt(AFTER_GRACE, automate), spy);
+
+        assertThat(offered).containsExactly(new CombatMoment(position, "lodor", true, 0));
+    }
+
+    // Once the opponent has asked for the automation, the whole combat runs without a card window.
+    @Test
+    void isNotOfferedOnceTheOpponentHasAskedForTheAutomation() {
+        Tile tile = test.game.getTileByPosition(position);
+        test.units(tile, "lodor", test.nekro, UnitType.Infantry, 2);
+        test.units(tile, "lodor", test.sol, UnitType.Infantry, 1);
+        AiPrompt asked = prompt(
+                "asked",
+                PromptSource.COMBAT_THREAD,
+                NOW,
+                "FFCC_sol_automateGroundCombat_nekro_sol_lodor_confirmed",
+                "combatRoll_" + position + "_lodor");
+
+        assertThat(pressedId(CombatRules.next(test.contextAt(AFTER_GRACE, asked), spy)
                         .orElseThrow()))
                 .isEqualTo("combatRoll_" + position + "_lodor");
         assertThat(offered).isEmpty();
-
-        CombatRules.next(test.contextAt(AFTER_GRACE, roll("lodor")), spy);
-
-        assertThat(offered).containsExactly(new CombatMoment(position, "lodor", true, 0));
     }
 }
