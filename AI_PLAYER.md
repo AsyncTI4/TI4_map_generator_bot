@@ -886,6 +886,10 @@ Seven small generic changes don't reference `ti4.ai`:
   - `-Dai.trading=false` plays without trading, for an A/B comparison of the batch summary.
   - `SabotageSelfPlayTest` plays a contender's _Overrule_ in a six-seat game and checks that an AI seat cancels it with the bot's real buttons.
   - `-Dai.selfplay.give=<alias,...>` deals those action cards to every seat, to watch a card's flow end to end.
+  - Every action card play carries the round it was first seen in, and the batch summary prints the plays by round
+    for the whole batch and each card's average round. `Overrule` gets its own block: its plays by round, the strategy
+    cards its picks chose, how many of those picks raised the seat's points before its turn ended, and how many seats
+    still held the card when the game ended.
   - The batch summary counts the action cards: plays per seat per game, plays a Sabotage cancelled (per game and as a
     share of all plays), Sabotage plays per game, and each card's plays per seat per game next to the rate at which
     human players play it when they draw it. It also prints each card's plays per draw (a seat holding a copy at any
@@ -903,7 +907,7 @@ Seven small generic changes don't reference `ti4.ai`:
 | Version | Scope |
 | --- | --- |
 | V0 | Seat, runtime, actuation, fallback, `/ai` commands; simple phase decisions. |
-| **V1 (in progress)** | Full turn play. Done: tactical actions, combat (including bombardment), Technological Singularity, several AI seats and self-play, scoring (spend objectives, custodians, Imperial), strategy card primaries and secondaries including Warfare's, research, status, action and agenda-phase secrets, agenda voting and Galactic Threat, Nekro's agent and hero, component action cards (economy, Spy, Uprising, research and the rest), Sabotage and action card values from human play statistics and scoring stakes, promissory notes, trading (offers, counter-offers, Trade card terms, debt), Diplomacy and Politics follows. Still to do: combat and agenda action cards, the mech secrets (Mechanize the Military, Occupy the Fringe), Strengthen Bonds. |
+| **V1 (in progress)** | Full turn play. Done: tactical actions, combat (including bombardment), Technological Singularity, several AI seats and self-play, scoring (spend objectives, custodians, Imperial), strategy card primaries and secondaries including Warfare's, research, status, action and agenda-phase secrets, agenda voting and Galactic Threat, Nekro's agent and hero, component action cards (economy, Spy, Uprising, research and the rest), Sabotage and action card values from human play statistics and scoring stakes, promissory notes, trading (offers, counter-offers, Trade card terms, debt), Diplomacy and Politics follows, an agenda outcome forecast with riders, Veto and the shenanigans courtesy. Still to do: combat action cards and the rest of the agenda ones, the mech secrets (Mechanize the Military, Occupy the Fringe), Strengthen Bonds. |
 | V1.1 | Draft participation (factions reserved for AI seats, other picks made by the table). |
 | V2 | Hidden aggression levels with drift and lock; attacks gated by aggression. |
 | V3 | Deeper deals: votes for trade goods, multi-party pacts. |
