@@ -822,3 +822,28 @@ Six small generic changes don't reference `ti4.ai`:
   have pressed follow; the bot does not expose their later steps (technology choice, payment, placement).
 - **Secondary ordering, undo.** Rolling the game back with `/game undo` clears the secondary queue, so the AIs
   re-derive who has followed from the game state alone.
+- **Action cards, stalls.** Every component action card is worth at least a stall while another player is still
+  acting, so the AI plays its weakest cards as soon as it has nothing better to do. In smoke runs it played _Master
+  Plan_ on 75% of draws, against 38% for human players. The stall value (1.5) and the "spend the card that gains most
+  over keeping it" rule are not yet checked against human play rates in a large self-play batch.
+- **Action cards, Overrule.** It only performs Imperial and Technology. The bot cannot yet run the other primaries
+  from an overruled card, though human players also overrule Warfare (10% of plays), Construction (9%) and
+  Leadership (6%).
+- **Action cards, Strategize.** Never Technology (the bot's button grants the technology without collecting its 4
+  resources, so the AI could not pay honestly) or Leadership (the strategy token taken up front has to be regained by
+  hand).
+- **Action cards, Exchange Program.** Not played: its agreement needs a negotiation, and the other way costs both
+  players a fleet token.
+- **Action cards, fog of war.** Cards aimed at a player, planet or system, and _Overrule_, are never played in
+  fog-of-war games.
+- **Action cards, Fleet Logistics.** Wiring _Master Plan_ exposed that the Fleet Logistics second action had never
+  started. It now does, so every AI seat with Fleet Logistics takes second actions it did not take before; the effect
+  on results is not yet measured.
+- **Action cards, Sabotage.** Self-play rarely puts an AI in front of a game-deciding card, so the cancel policy
+  (involvement, standing, scoring stakes, the reserve for _Overrule_) is covered by unit tests more than by games.
+- **Action cards, rounds left.** The secret draw value and other end-of-game reasoning estimate the rounds left from
+  the leader's points at 2 a round, which misjudges tables that score faster or slower.
+- **Action cards, priors.** The experts' tiers stop at _Overrule_; the cards after it alphabetically (_Strategize_
+  among them) are valued from the human statistics alone.
+- **Action cards, legacy switch.** `-Dai.actioncards.ab=true` and the stored value `aiLegacyActionCards` keep the
+  rules from before the statistics for comparison, until the large A/B batch at the end of the project.
