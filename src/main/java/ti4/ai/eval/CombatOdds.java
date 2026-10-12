@@ -85,9 +85,21 @@ public class CombatOdds {
         return resolveDetailed(attacker, defender).outcome();
     }
 
+    public static Outcome resolveFirstRound(Force attacker, Force defender, Force firstAttacker, Force firstDefender) {
+        return resolveDetailed(attacker, defender, firstAttacker, firstDefender, 0, 0)
+                .outcome();
+    }
+
     public static Detailed resolveDetailed(Force attacker, Force defender) {
+        return resolveDetailed(attacker, defender, attacker, defender, 0, 0);
+    }
+
+    public static Detailed resolveDetailed(
+            Force attacker, Force defender, Force firstAttacker, Force firstDefender, int absorbedA, int absorbedD) {
         Side a = new Side(attacker);
         Side d = new Side(defender);
+        Side firstA = firstAttacker == attacker ? a : new Side(firstAttacker);
+        Side firstD = firstDefender == defender ? d : new Side(firstDefender);
         if (a.hitPoints() == 0) return new Detailed(new Outcome(0, 1, 0), 0, 0, 0, 0, 0);
         if (d.hitPoints() == 0) return new Detailed(new Outcome(1, 0, 0), 0, 0, 0, 0, 0);
         double attackerWins = 0;
@@ -95,14 +107,16 @@ public class CombatOdds {
         double bothDestroyed = 0;
         double[] losses = new double[5];
         Map<Long, Double> states = new HashMap<>();
-        states.put(key(0, 0), 1.0);
+        states.put(key(absorbedA, absorbedD), 1.0);
         for (int round = 0; round < MAX_ROUNDS && !states.isEmpty(); round++) {
             Map<Long, Double> next = new HashMap<>();
             for (Map.Entry<Long, Double> state : states.entrySet()) {
                 int absorbedByA = (int) (state.getKey() >> 32);
                 int absorbedByD = (int) (state.getKey() & 0xffffffffL);
-                double[] hitsOnD = a.hitDistribution(absorbedByA, d.lostAUnit(absorbedByD));
-                double[] hitsOnA = d.hitDistribution(absorbedByD, a.lostAUnit(absorbedByA));
+                Side rollingA = round == 0 ? firstA : a;
+                Side rollingD = round == 0 ? firstD : d;
+                double[] hitsOnD = rollingA.hitDistribution(absorbedByA, d.lostAUnit(absorbedByD));
+                double[] hitsOnA = rollingD.hitDistribution(absorbedByD, a.lostAUnit(absorbedByA));
                 for (int x = 0; x < hitsOnD.length; x++) {
                     if (hitsOnD[x] == 0) continue;
                     for (int y = 0; y < hitsOnA.length; y++) {

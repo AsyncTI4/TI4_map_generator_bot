@@ -134,8 +134,7 @@ class CombatForces {
         return CombatOdds.resolve(attack, defence).defenderWins();
     }
 
-    private static Force current(
-            Game game, Tile tile, UnitHolder holder, Player player, Player opponent, boolean ground) {
+    static Force current(Game game, Tile tile, UnitHolder holder, Player player, Player opponent, boolean ground) {
         Side side = new Side(
                 player, ground ? unitsOf(holder, player, BoardView.GROUND_FORCES) : BoardView.ships(holder, player));
         Side other = new Side(
@@ -173,19 +172,19 @@ class CombatForces {
         return ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(seat, opponent, new ArrayList<>(), game);
     }
 
-    private static double win(Force own, Force enemy, boolean seatAttacks) {
+    static double win(Force own, Force enemy, boolean seatAttacks) {
         return seatAttacks
                 ? CombatOdds.resolve(own, enemy).attackerWins()
                 : CombatOdds.resolve(enemy, own).defenderWins();
     }
 
-    private static double stake(Force own, Force enemy) {
+    static double stake(Force own, Force enemy) {
         return Stream.concat(own.units().stream(), enemy.units().stream())
                 .mapToDouble(Combatant::cost)
                 .sum();
     }
 
-    private static Map<UnitType, Integer> unitsOf(UnitHolder holder, Player player, Iterable<UnitType> types) {
+    static Map<UnitType, Integer> unitsOf(UnitHolder holder, Player player, Iterable<UnitType> types) {
         Map<UnitType, Integer> units = new java.util.EnumMap<>(UnitType.class);
         for (UnitType type : types) {
             int count = BoardView.count(holder, player, type);
@@ -194,7 +193,7 @@ class CombatForces {
         return units;
     }
 
-    private static Map<UnitType, Integer> damaged(UnitHolder holder, Side side) {
+    static Map<UnitType, Integer> damaged(UnitHolder holder, Side side) {
         Map<UnitType, Integer> damaged = new java.util.EnumMap<>(UnitType.class);
         side.units().forEach((type, count) -> {
             int hurt = Math.min(count, BoardView.damaged(holder, side.player(), type));

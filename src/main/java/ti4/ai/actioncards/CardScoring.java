@@ -1,23 +1,18 @@
 package ti4.ai.actioncards;
 
-import java.util.ArrayList;
-import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.ai.agenda.AgendaForecast;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.brain.StrategyCard;
-import ti4.ai.eval.BoardView;
-import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendUnlock;
+import ti4.ai.scoring.SystemStake;
 import ti4.ai.strategy.ResearchPolicy;
 import ti4.ai.strategy.StrategyCardRanking;
 import ti4.game.Game;
-import ti4.game.Planet;
 import ti4.game.Player;
-import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 
 @UtilityClass
@@ -64,7 +59,7 @@ public class CardScoring {
     }
 
     public static double pointsDenied(String title, Game game, Player seat) {
-        if (Involvement.isCombatCard(title)) return systemStake(game, seat);
+        if (Involvement.isCombatCard(title)) return SystemStake.points(game, seat);
         return switch (title) {
             case "Public Disgrace", "Coup d'Etat", "Crisis" -> strategicPlayStake(game, seat);
             case "Extreme Duress" -> Math.max(0, -SpendUnlock.pointDelta(game, seat, -seat.getTg()));
@@ -96,24 +91,5 @@ public class CardScoring {
     private static double imperialStake(Game game, Player seat) {
         boolean extraPublic = ObjectivePolicy.scorablePublics(game, seat).size() >= IMPERIAL_WITH_ANOTHER_PUBLIC;
         return (extraPublic ? ONE_POINT : 0) + mecatolPoint(seat);
-    }
-
-    private static double systemStake(Game game, Player seat) {
-        Tile tile = game.getActiveSystem().isBlank() ? null : game.getTileByPosition(game.getActiveSystem());
-        if (tile == null) return 0;
-        ObjectiveValue objectives = new ObjectiveValue(game, seat);
-        Footprint before = objectives.before();
-        double lost = -objectives.gain(before.withoutShipsIn(tile.getPosition()));
-        List<String> invaded = new ArrayList<>();
-        for (Planet planet : tile.getPlanetUnitHolders()) {
-            if (seat.getPlanets().contains(planet.getName())) {
-                lost += -objectives.gain(before.withoutPlanet(planet.getName()));
-            } else if (BoardView.groundForces(planet, seat) > 0) {
-                invaded.add(planet.getName());
-            }
-        }
-        double gained = objectives.gain(before.after(tile.getPosition(), List.of(), invaded));
-        double points = Math.max(lost, gained) / ObjectiveValue.VICTORY_POINT_VALUE;
-        return Math.floor(points + 1e-9);
     }
 }
