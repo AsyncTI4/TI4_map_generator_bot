@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.ai.AiSettings;
+import ti4.ai.secrets.SecretPhase;
 import ti4.ai.selfplay.SelfPlaySetup;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -62,6 +63,8 @@ final class SelfPlayGame {
             int seats,
             TradeSummary trade,
             ActionCardSummary actionCards,
+            SecretSummary secrets,
+            MecatolTracker.Summary mecatol,
             String report,
             long wallSeconds) {
 
@@ -76,6 +79,12 @@ final class SelfPlayGame {
                 values.add(seats == 0 ? 0 : (double) count / seats);
             }
             return values;
+        }
+
+        int total(String kind) {
+            return actionsByRound.values().stream()
+                    .mapToInt(round -> round.getOrDefault(kind, 0))
+                    .sum();
         }
 
         // The table's average of one seat value at the start of round 2, 3 and so on.
@@ -154,6 +163,10 @@ final class SelfPlayGame {
             java.util.Set<String> heldCards,
             List<OverruleUse> overrules,
             List<String> heldAtEnd) {}
+
+    // Secret objectives scored over the whole table by the phase they score in, and the round in which each action
+    // secret was sent to be scored.
+    record SecretSummary(int action, int status, int agenda, int other, List<Integer> actionSecretRounds) {}
 
     private static final String TRADE_GOODS = "TGs";
     private static final String COMMODITIES = "Comms";
@@ -467,6 +480,8 @@ final class SelfPlayGame {
                 game == null ? 0 : game.getRealPlayers().size(),
                 tradeSummary(ending, game),
                 actionCardSummary(game),
+                secretSummary(game),
+                env.mecatol.summary(),
                 report(ending, game, ticks),
                 (System.nanoTime() - wallStart) / 1_000_000_000L);
     }
@@ -543,6 +558,21 @@ final class SelfPlayGame {
                 java.util.Set.copyOf(heldCards),
                 overruleUses(game),
                 List.copyOf(heldAtEnd));
+    }
+
+    private SecretSummary secretSummary(Game game) {
+        if (game == null) return new SecretSummary(0, 0, 0, 0, List.of());
+        Map<SecretPhase, Integer> scored = new java.util.EnumMap<>(SecretPhase.class);
+        for (Player player : game.getRealPlayers()) {
+            for (String secret : player.getSecretsScored().keySet())
+                scored.merge(SecretPhase.of(secret), 1, Integer::sum);
+        }
+        return new SecretSummary(
+                scored.getOrDefault(SecretPhase.ACTION, 0),
+                scored.getOrDefault(SecretPhase.STATUS, 0),
+                scored.getOrDefault(SecretPhase.AGENDA, 0),
+                scored.getOrDefault(SecretPhase.UNKNOWN, 0),
+                List.copyOf(env.actionSecretRounds.values()));
     }
 
     private List<SelfPlayEnvironment.TradeRecord> ledger() {

@@ -40,6 +40,7 @@ public final class AiTestGame {
     public final Player sol;
     public final AiMemory memory = new AiMemory();
     private final Map<String, AiMemory> otherMemories = new HashMap<>();
+    private int customObjectives;
 
     public AiTestGame() {
         this(HUMAN_ID);
@@ -88,6 +89,25 @@ public final class AiTestGame {
                 .orElseThrow();
     }
 
+    /**
+     * Sol's home system (tile 01, Jord, held by Sol) beside {@code position} and two steps from {@link #HOME}, so that
+     * {@code position} lies on the border between the two homes and gets neither a slice bonus nor a foreign penalty
+     * from the territory zones.
+     */
+    public Tile solHomeBeside(String position) {
+        List<String> nearHome = PositionMapper.getAdjacentTilePositions(HOME);
+        String spot = PositionMapper.getAdjacentTilePositions(position).stream()
+                .filter(candidate -> !"x".equals(candidate)
+                        && !HOME.equals(candidate)
+                        && !nearHome.contains(candidate)
+                        && game.getTileByPosition(candidate) == null)
+                .findFirst()
+                .orElseThrow();
+        Tile tile = place("01", spot);
+        sol.addPlanet("jord");
+        return tile;
+    }
+
     public Tile place(String tileId, String position) {
         Tile tile = new Tile(tileId, position);
         game.setTile(tile);
@@ -96,6 +116,11 @@ public final class AiTestGame {
 
     public void units(Tile tile, String holder, Player player, UnitType type, int count) {
         tile.addUnit(holder, Units.getUnitKey(type, player.getColor()), count);
+    }
+
+    /** Gives {@code player} victory points through a custom public objective, which no seat can score itself. */
+    public void points(Player player, int points) {
+        game.scorePublicObjective(player.getUserID(), game.addCustomPO("Test points " + ++customObjectives, points));
     }
 
     public void aiIsActive(String phase) {

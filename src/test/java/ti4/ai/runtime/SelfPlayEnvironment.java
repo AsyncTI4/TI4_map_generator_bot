@@ -31,11 +31,17 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.FactionBrain;
 import ti4.ai.brain.FactionBrainRegistry;
+import ti4.ai.brain.StrategyCard;
+import ti4.ai.eval.Territory;
+import ti4.ai.tactical.TacticalPlan;
+import ti4.ai.tactical.TacticalPlanner;
+import ti4.ai.tactical.TacticalRules;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.executors.CircuitBreaker;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.Storage;
 import ti4.image.MapRenderPipeline;
 import ti4.logging.BotLogger;
@@ -85,6 +91,9 @@ final class SelfPlayEnvironment implements AutoCloseable {
     final Map<String, Integer> pressedHandlers = new java.util.TreeMap<>();
     final Map<String, Integer> decisionReasons = new java.util.TreeMap<>();
     final Map<Integer, Map<String, Integer>> actionsByRound = new java.util.TreeMap<>();
+    // The round in which each action secret was first sent to be scored, by "faction|secret".
+    final Map<String, Integer> actionSecretRounds = new java.util.concurrent.ConcurrentHashMap<>();
+    final MecatolTracker mecatol = new MecatolTracker();
     // Trading: every accepted offer (read from the offerer's items just before the Accept press), the presses each seat
     // made by handler family, and the Trade settlements each holder sent and had accepted.
     final List<TradeRecord> tradeLedger = new ArrayList<>();
@@ -398,6 +407,11 @@ final class SelfPlayEnvironment implements AutoCloseable {
                 noteOffer(context.faction(), decision);
                 rememberReason(decision);
                 countRoundAction(decision, context.game().getRound());
+                noteActionSecretScored(context, decision);
+                mecatol.observe(context.game());
+                countTacticalAction(context, decision);
+                countPlanKind(context, decision);
+                timeRanked(context, decision);
                 return decision;
             }
         };
@@ -430,6 +444,130 @@ final class SelfPlayEnvironment implements AutoCloseable {
                     .merge(kind, 1, Integer::sum);
         }
     }
+
+    private static final java.util.regex.Pattern ACTION_SECRET_SCORED =
+            java.util.regex.Pattern.compile("^score (\\w+) after a combat$");
+
+    private void noteActionSecretScored(AiTurnContext context, AiDecision decision) {
+        if (!(decision instanceof AiDecision.Press press)) return;
+        java.util.regex.Matcher scored = ACTION_SECRET_SCORED.matcher(press.reason());
+        if (scored.matches()) {
+            actionSecretRounds.putIfAbsent(
+                    context.faction() + "|" + scored.group(1), context.game().getRound());
+        }
+    }
+
+    // Every tactical action a seat starts, with the system its plan targets, for the custodians statistics.
+    private void countTacticalAction(AiTurnContext context, AiDecision decision) {
+        if (!(decision instanceof AiDecision.Press press)) return;
+        if (!TACTICAL_ACTION.equals(actionKind(press.reason()))) return;
+        Optional<String> target = press.reason().startsWith("start a tactical action")
+                ? TacticalRules.rememberedPlan(context).map(TacticalPlan::target)
+                : Optional.empty();
+        mecatol.tacticalAction(context.game(), context.seat(), target);
+    }
+
+    // What kind of plan each tactical action followed, and how many attacks hit another player's home system, landed
+    // there, hit Mecatol Rex, landed on it, or stood between the Imperial holder and Mecatol Rex.
+    private void countPlanKind(AiTurnContext context, AiDecision decision) {
+        if (!(decision instanceof AiDecision.Press press)) return;
+        if (!press.reason().startsWith("start a tactical action")) return;
+        Optional<TacticalPlan> plan = TacticalRules.rememberedPlan(context);
+        if (plan.isEmpty()) return;
+        List<String> kinds = new ArrayList<>();
+        kinds.add(PLAN_PREFIX + plan.get().kind().name().toLowerCase());
+        if (plan.get().kind() == TacticalPlan.Kind.EXPAND) {
+            kinds.add(PLAN_PREFIX + expansionZone(context, plan.get()));
+        }
+        if (plan.get().kind() == TacticalPlan.Kind.ATTACK) {
+            Game game = context.game();
+            Tile target = game.getTileByPosition(plan.get().target());
+            boolean otherHome = target != null
+                    && target.isHomeSystem(game)
+                    && target != context.seat().getHomeSystemTile();
+            if (otherHome) kinds.add(PLAN_PREFIX + "attack on another home");
+            if (otherHome && !plan.get().landings().isEmpty()) kinds.add(PLAN_PREFIX + "attack landing on a home");
+            if (target != null && target.isMecatol(game)) {
+                kinds.add(PLAN_PREFIX + "attack on Mecatol");
+                if (plan.get().landings().keySet().stream().anyMatch(game.mecatols()::contains)) {
+                    kinds.add(PLAN_PREFIX + "attack landing on Mecatol");
+                }
+            }
+            if (target != null && target.isMecatol(game) && anotherPlayerHoldsImperial(game, context.seat())) {
+                kinds.add(PLAN_PREFIX + "attack on Mecatol against Imperial");
+            }
+        }
+        synchronized (actionsByRound) {
+            Map<String, Integer> round =
+                    actionsByRound.computeIfAbsent(context.game().getRound(), ignored -> new java.util.TreeMap<>());
+            kinds.forEach(kind -> round.merge(kind, 1, Integer::sum));
+        }
+    }
+
+    // Where an expansion goes, by the territory zone of its target and the round band, for the zone split in the batch
+    // summary.
+    private static String expansionZone(AiTurnContext context, TacticalPlan plan) {
+        Game game = context.game();
+        Tile target = game.getTileByPosition(plan.target());
+        Territory.Zone zone = target == null
+                ? Territory.Zone.NEUTRAL
+                : Territory.of(game, context.seat()).zone(target);
+        String area =
+                switch (zone) {
+                    case HOME, LANE, SLICE -> EXPAND_OWN_AREA;
+                    case BORDER -> EXPAND_BORDER;
+                    case FOREIGN, OTHER_HOME -> EXPAND_ANOTHERS_AREA;
+                    case MECATOL -> EXPAND_MECATOL;
+                    case NEUTRAL -> EXPAND_ELSEWHERE;
+                };
+        return area + " " + roundBand(game.getRound());
+    }
+
+    static final String EXPAND_OWN_AREA = "expand in own area";
+    static final String EXPAND_BORDER = "expand on a border";
+    static final String EXPAND_ANOTHERS_AREA = "expand in another's area";
+    static final String EXPAND_MECATOL = "expand on Mecatol";
+    static final String EXPAND_ELSEWHERE = "expand elsewhere";
+    static final List<String> ROUND_BANDS = List.of("r1-2", "r3-4", "r5+");
+
+    static String roundBand(int round) {
+        if (round <= 2) return ROUND_BANDS.get(0);
+        return round <= 4 ? ROUND_BANDS.get(1) : ROUND_BANDS.get(2);
+    }
+
+    // Every eighth tactical action, the planner ranks the same board again and the time it takes is kept, to compare
+    // the
+    // cost of planning between versions of the planner on real mid-game boards.
+    static final java.util.concurrent.atomic.LongAdder RANKED_NANOS = new java.util.concurrent.atomic.LongAdder();
+    static final java.util.concurrent.atomic.LongAdder RANKED_SAMPLES = new java.util.concurrent.atomic.LongAdder();
+    static final java.util.concurrent.atomic.AtomicLong RANKED_MAX_NANOS = new java.util.concurrent.atomic.AtomicLong();
+    // Sampled rankings that held at least one STAGE plan, next to the stage plans that were chosen.
+    static final java.util.concurrent.atomic.LongAdder RANKED_WITH_STAGE = new java.util.concurrent.atomic.LongAdder();
+    private static final java.util.concurrent.atomic.AtomicInteger TACTICAL_PRESSES =
+            new java.util.concurrent.atomic.AtomicInteger();
+
+    private static void timeRanked(AiTurnContext context, AiDecision decision) {
+        if (!(decision instanceof AiDecision.Press press)) return;
+        if (!press.reason().startsWith("start a tactical action")) return;
+        if (TACTICAL_PRESSES.incrementAndGet() % 8 != 0) return;
+        long start = System.nanoTime();
+        List<TacticalPlan> ranked = TacticalPlanner.ranked(context.game(), context.seat());
+        long elapsed = System.nanoTime() - start;
+        RANKED_NANOS.add(elapsed);
+        RANKED_SAMPLES.increment();
+        RANKED_MAX_NANOS.accumulateAndGet(elapsed, Math::max);
+        if (ranked.stream().anyMatch(plan -> plan.kind() == TacticalPlan.Kind.STAGE)) RANKED_WITH_STAGE.increment();
+    }
+
+    private static boolean anotherPlayerHoldsImperial(Game game, Player seat) {
+        return game.getRealPlayers().stream()
+                .filter(player -> player != seat)
+                .flatMap(player -> player.getSCs().stream())
+                .anyMatch(initiative -> StrategyCard.of(game, initiative) == StrategyCard.IMPERIAL
+                        && !game.getPlayedSCs().contains(initiative));
+    }
+
+    static final String PLAN_PREFIX = "plan: ";
 
     private void rememberReason(AiDecision decision) {
         String reason =

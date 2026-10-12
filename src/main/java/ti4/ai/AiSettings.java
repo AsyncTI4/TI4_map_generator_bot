@@ -38,6 +38,7 @@ public class AiSettings {
     public static final String TRADING_PROPERTY = "ai.trading";
     public static final String ACTION_CARDS_AB_PROPERTY = "ai.actioncards.ab";
     public static final String LEGACY_ACTION_CARDS_KEY = "aiLegacyActionCards";
+    public static final String SECRET_HOLD_PROPERTY = "ai.secrets.hold";
     private static final Duration FAST_REFEREE_DELAY = Duration.ofSeconds(10);
     private static final Duration FAST_STALL_THRESHOLD = Duration.ofMinutes(1);
     private static final int FAST_MAX_ACTIONS_PER_HOUR = 600;
@@ -78,6 +79,10 @@ public class AiSettings {
 
     public static void markLegacyActionCards(Player seat) {
         seat.setStoredValue(LEGACY_ACTION_CARDS_KEY, "true");
+    }
+
+    public static boolean isSecretHoldEnabled() {
+        return !"false".equalsIgnoreCase(System.getProperty(SECRET_HOLD_PROPERTY, "true"));
     }
 
     public static boolean isFastPace(Game game) {

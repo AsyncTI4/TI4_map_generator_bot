@@ -1,7 +1,9 @@
 package ti4.ai.strategy;
 
 import java.util.List;
+import java.util.OptionalInt;
 import lombok.experimental.UtilityClass;
+import ti4.ai.eval.CustodiansRace.Snapshot;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.secrets.SpyNetwork;
 import ti4.ai.strategy.CardPlan.Benefit;
@@ -29,7 +31,8 @@ class PoliticsUses {
     }
 
     private static double speakerValue(PlanInputs in) {
-        return speakerValue(in.game(), in.seat());
+        double value = speakerValue(in.game(), in.seat());
+        return isSpeaker(in.game(), in.seat()) ? value : value + speakerRaceValue(in);
     }
 
     private static double speakerValue(Game game, Player seat) {
@@ -42,6 +45,25 @@ class PoliticsUses {
 
     private static boolean isSpeaker(Game game, Player seat) {
         return seat.getUserID().equals(game.getSpeakerUserID());
+    }
+
+    private static double speakerRaceValue(PlanInputs in) {
+        Player seat = in.seat();
+        Snapshot race = in.race();
+        if (!race.isOpen() || seat.hasTheZeroToken()) return 0;
+        OptionalInt arrival = race.arrival(seat);
+        int nextRound = in.round() + 1;
+        if (arrival.isEmpty() || arrival.getAsInt() != nextRound) return 0;
+        List<Player> rivals = in.game().getRealPlayers().stream()
+                .filter(other -> other != seat)
+                .toList();
+        if (rivals.stream().noneMatch(other -> race.arrival(other).orElse(0) == nextRound)) return 0;
+        long arrivingNow = rivals.stream()
+                .filter(other -> race.arrival(other).orElse(0) == in.round())
+                .count();
+        return CardValueScale.SPEAKER_RACE_SHARE
+                * CardValueScale.VICTORY_POINT
+                * Math.pow(CardValueScale.SPEAKER_RACE_RIVAL_NOW, arrivingNow);
     }
 
     private static boolean wantsImperialNextRound(Game game, Player seat) {

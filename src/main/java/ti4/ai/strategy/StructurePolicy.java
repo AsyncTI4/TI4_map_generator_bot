@@ -123,6 +123,7 @@ class StructurePolicy {
         return rich + nearby;
     }
 
+    // TODO: could use ti4.ai.eval.Territory instead of its own slice search
     private static boolean inSlice(Game game, Player seat, Planet planet) {
         Tile home = seat.getHomeSystemTile();
         Tile tile = game.getTileFromPlanet(planet.getName());

@@ -106,6 +106,10 @@ class AiSelfPlayTest extends BaseTi4Test {
                                 java.util.stream.Collectors.counting())));
         printTrading(outcomes);
         printActionCards(outcomes);
+        printSecrets(outcomes);
+        printPlanKinds(outcomes);
+        printMecatol(outcomes);
+        printExpansionZones(outcomes);
         System.out.println("Tactical actions per seat each round: "
                 + perRoundDecimal(
                         outcomes.stream()
@@ -141,6 +145,173 @@ class AiSelfPlayTest extends BaseTi4Test {
                                     .toList(),
                             2));
         }
+    }
+
+    // Secret objectives scored per seat by phase, and the average round in which the action secrets were scored (run
+    // once with -Dai.secrets.hold=false to compare how patience moves the timing).
+    private static void printSecrets(List<SelfPlayGame.Outcome> outcomes) {
+        int seats = Math.max(
+                1, outcomes.stream().mapToInt(SelfPlayGame.Outcome::seats).sum());
+        int action = outcomes.stream()
+                .mapToInt(outcome -> outcome.secrets().action())
+                .sum();
+        int status = outcomes.stream()
+                .mapToInt(outcome -> outcome.secrets().status())
+                .sum();
+        int agenda = outcomes.stream()
+                .mapToInt(outcome -> outcome.secrets().agenda())
+                .sum();
+        int other =
+                outcomes.stream().mapToInt(outcome -> outcome.secrets().other()).sum();
+        List<Integer> rounds = outcomes.stream()
+                .flatMap(outcome -> outcome.secrets().actionSecretRounds().stream())
+                .toList();
+        System.out.printf(
+                "Secrets %s: scored per seat per game action %.2f, status %.2f, agenda %.2f, other %.2f; the %d action secrets were"
+                        + " scored in round %.1f on average; average final round %.1f, leader victory points %.1f, table total %.1f%n",
+                AiSettings.isSecretHoldEnabled() ? "patient" : "pursue at once",
+                (double) action / seats,
+                (double) status / seats,
+                (double) agenda / seats,
+                (double) other / seats,
+                rounds.size(),
+                rounds.stream().mapToInt(Integer::intValue).average().orElse(0),
+                outcomes.stream()
+                        .mapToInt(SelfPlayGame.Outcome::round)
+                        .average()
+                        .orElse(0),
+                outcomes.stream()
+                        .mapToInt(SelfPlayGame.Outcome::leaderVictoryPoints)
+                        .average()
+                        .orElse(0),
+                outcomes.stream()
+                        .mapToInt(SelfPlayGame.Outcome::totalVictoryPoints)
+                        .average()
+                        .orElse(0));
+    }
+
+    // Tactical actions by the kind of plan behind them, per game over the batch: attacks, attacks on another player's
+    // home (and those that landed), attacks on Mecatol Rex (and those that landed, or stood against an Imperial
+    // holder), and positioning moves.
+    private static void printPlanKinds(List<SelfPlayGame.Outcome> outcomes) {
+        int games = Math.max(1, outcomes.size());
+        List<String> kinds = List.of(
+                "expand",
+                "attack",
+                "produce",
+                "position",
+                "defend",
+                "stage",
+                "attack on another home",
+                "attack landing on a home",
+                "attack on Mecatol",
+                "attack landing on Mecatol",
+                "attack on Mecatol against Imperial");
+        List<String> parts = new ArrayList<>();
+        for (String kind : kinds) {
+            int total = outcomes.stream()
+                    .mapToInt(outcome -> outcome.total(SelfPlayEnvironment.PLAN_PREFIX + kind))
+                    .sum();
+            parts.add(String.format("%s %.2f", kind, (double) total / games));
+        }
+        System.out.println("Tactical plans per game: " + String.join(", ", parts));
+        long samples = SelfPlayEnvironment.RANKED_SAMPLES.sum();
+        System.out.printf(
+                "TacticalPlanner.ranked on real boards: mean %.1f ms, max %.1f ms over %d samples%n",
+                samples == 0 ? 0 : SelfPlayEnvironment.RANKED_NANOS.sum() / 1e6 / samples,
+                SelfPlayEnvironment.RANKED_MAX_NANOS.get() / 1e6,
+                samples);
+        System.out.printf(
+                "Stage plans: chosen %.2f per game, present in %d of %d sampled rankings%n",
+                (double) outcomes.stream()
+                                .mapToInt(outcome -> outcome.total(SelfPlayEnvironment.PLAN_PREFIX + "stage"))
+                                .sum()
+                        / games,
+                SelfPlayEnvironment.RANKED_WITH_STAGE.sum(),
+                samples);
+    }
+
+    // Where expansions went, by the territory zone of the target, as a share of the expansions in each round band and
+    // as a count per game.
+    private static void printExpansionZones(List<SelfPlayGame.Outcome> outcomes) {
+        int games = Math.max(1, outcomes.size());
+        List<String> areas = List.of(
+                SelfPlayEnvironment.EXPAND_OWN_AREA,
+                SelfPlayEnvironment.EXPAND_BORDER,
+                SelfPlayEnvironment.EXPAND_ANOTHERS_AREA,
+                SelfPlayEnvironment.EXPAND_MECATOL,
+                SelfPlayEnvironment.EXPAND_ELSEWHERE);
+        for (String band : SelfPlayEnvironment.ROUND_BANDS) {
+            List<Integer> counts = areas.stream()
+                    .map(area -> outcomes.stream()
+                            .mapToInt(outcome -> outcome.total(SelfPlayEnvironment.PLAN_PREFIX + area + " " + band))
+                            .sum())
+                    .toList();
+            int all = counts.stream().mapToInt(Integer::intValue).sum();
+            List<String> parts = new ArrayList<>();
+            for (int i = 0; i < areas.size(); i++) {
+                parts.add(String.format(
+                        "%s %.2f per game (%.0f%%)",
+                        areas.get(i).substring("expand ".length()),
+                        (double) counts.get(i) / games,
+                        all == 0 ? 0 : 100.0 * counts.get(i) / all));
+            }
+            System.out.println("Expansion targets " + band + ": " + String.join(", ", parts));
+        }
+    }
+
+    // The custodians race over the batch: the round the token went, who took it and whether they went first, the
+    // Politics, speaker and Leadership chain, and how often Mecatol Rex changed hands afterwards.
+    private static void printMecatol(List<SelfPlayGame.Outcome> outcomes) {
+        List<MecatolTracker.Summary> summaries =
+                outcomes.stream().map(SelfPlayGame.Outcome::mecatol).toList();
+        int lastRound = summaries.stream()
+                .mapToInt(MecatolTracker.Summary::custodiansRound)
+                .max()
+                .orElse(0);
+        List<String> byRound = new ArrayList<>();
+        for (int round = 1; round <= lastRound; round++) {
+            int taken = round;
+            long games = summaries.stream()
+                    .filter(summary -> summary.custodiansRound() == taken)
+                    .count();
+            byRound.add("r" + round + " " + games);
+        }
+        byRound.add("never "
+                + summaries.stream().filter(summary -> !summary.taken()).count());
+        java.util.Map<String, Long> takers = summaries.stream()
+                .filter(summary -> summary.taken() && !summary.taker().isEmpty())
+                .collect(java.util.stream.Collectors.groupingBy(
+                        MecatolTracker.Summary::taker, java.util.TreeMap::new, java.util.stream.Collectors.counting()));
+        System.out.println("Custodians taken by round: " + String.join(", ", byRound) + "; takers " + takers
+                + "; taker had initiative <=1 "
+                + summaries.stream()
+                        .filter(MecatolTracker.Summary::takerWentFirst)
+                        .count()
+                + ", was speaker "
+                + summaries.stream()
+                        .filter(summary -> summary.taken() && summary.takerWasSpeaker())
+                        .count()
+                + ", first action "
+                + summaries.stream()
+                        .filter(summary -> summary.taken() && summary.takerFirstAction())
+                        .count());
+        System.out.println("Round 1 Politics then round 2 speaker and Leadership by the same seat: "
+                + summaries.stream()
+                        .filter(MecatolTracker.Summary::politicsSpeakerLeadershipChain)
+                        .count()
+                + " games");
+        long takenGames =
+                summaries.stream().filter(MecatolTracker.Summary::taken).count();
+        System.out.printf(
+                "Mecatol control changes per game after custodians: %.2f (over %d games that took them)%n",
+                takenGames == 0
+                        ? 0
+                        : (double) summaries.stream()
+                                        .mapToInt(MecatolTracker.Summary::controlChanges)
+                                        .sum()
+                                / takenGames,
+                takenGames);
     }
 
     // What trading did over the batch, next to the strength measures it should move (run once with -Dai.trading=false

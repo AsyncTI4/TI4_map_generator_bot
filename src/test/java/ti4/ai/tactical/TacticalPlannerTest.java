@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.eval.BoardView;
 import ti4.ai.scoring.ObjectiveValue;
-import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.strategy.MecatolCash;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
@@ -311,8 +310,8 @@ class TacticalPlannerTest extends BaseTi4Test {
                 .isEmpty();
     }
 
-    // Four infantry against three on Lodor fall short of the 80% bar. X-89 Bacterial Weapon ΩΩ doubles their ground
-    // combat hits, which makes the same invasion worth it.
+    // Four infantry against four on Lodor are a clear underdog (about 30% to take the planet), below even the relaxed
+    // landing bar. X-89 Bacterial Weapon ΩΩ doubles their ground combat hits, which makes the same invasion worth it.
     @Test
     void x89MakesAnInvasionWorthIt() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
@@ -320,7 +319,7 @@ class TacticalPlannerTest extends BaseTi4Test {
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
         Tile lodor = test.place("26", neighbour);
         test.sol.addPlanet("lodor");
-        test.units(lodor, "lodor", test.sol, UnitType.Infantry, 3);
+        test.units(lodor, "lodor", test.sol, UnitType.Infantry, 4);
 
         assertThat(attackOn(neighbour)).isEmpty();
 
@@ -377,7 +376,8 @@ class TacticalPlannerTest extends BaseTi4Test {
     }
 
     // Copying a technology after a combat is Nekro's Technological Singularity. A seat without that ability must
-    // not count it, so a marginal attack that only the copy made worthwhile is dropped.
+    // not count it, so a marginal attack (three defenders on Lodor, on the border with Sol's area so that the territory
+    // bonus is small) that only the copy made worthwhile is dropped.
     @Test
     void onlyASeatWithTechnologicalSingularityValuesCopyingATechnology() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
@@ -385,7 +385,8 @@ class TacticalPlannerTest extends BaseTi4Test {
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
         Tile lodor = test.place("26", neighbour);
         test.sol.addPlanet("lodor");
-        test.units(lodor, "lodor", test.sol, UnitType.Infantry, 1);
+        test.units(lodor, "lodor", test.sol, UnitType.Infantry, 3);
+        test.solHomeBeside(neighbour);
 
         assertThat(attackOn(neighbour)).isPresent();
 
@@ -397,7 +398,8 @@ class TacticalPlannerTest extends BaseTi4Test {
     // Xanhact (0/1) is the only free planet left once Cealdri is held. Early in the game any free planet is worth a
     // tactical action, so the expansion clears the bar (0.6 + 0.8 tempo - 0.2 distance); by round 8 the tempo has
     // faded and the same planet (0.4) is no longer worth a token on its own. The explore decks are empty, so that
-    // exploring the planet adds nothing to the numbers.
+    // exploring the planet adds nothing to the numbers. Sol's home is placed so that the planet lies on the border,
+    // where the territory bonus is only 0.3 a planet.
     @Test
     void takesALoneSmallPlanetEarlyButNotLate() {
         test.game.setExploreDeck(new ArrayList<>());
@@ -406,6 +408,7 @@ class TacticalPlannerTest extends BaseTi4Test {
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
         test.place("73", neighbour);
         test.nekro.addPlanet("cealdri");
+        test.solHomeBeside(neighbour);
 
         test.game.setRound(2);
         TacticalPlan early = expansionTo(neighbour).orElseThrow();
@@ -458,8 +461,8 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(attackOn(neighbour)).isPresent();
     }
 
-    // Destroyer II's barrage (3 dice on 6 each) is expected to shoot down all three of Sol's fighters before the
-    // combat, leaving a lone carrier. Plain destroyers (2 dice on 9) only get one, and the fight stays even.
+    // Destroyer II's barrage (3 dice on 6 each) is expected to shoot down all five of Sol's fighters before the
+    // combat, leaving a lone carrier. Plain destroyers (2 dice on 9) only get one, and the rest of the swarm wins.
     @Test
     void countsAntiFighterBarrageBeforeTheSpaceCombat() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
@@ -468,7 +471,7 @@ class TacticalPlannerTest extends BaseTi4Test {
         Tile lodor = test.place("26", neighbour);
         test.sol.addPlanet("lodor");
         test.units(lodor, "space", test.sol, UnitType.Carrier, 1);
-        test.units(lodor, "space", test.sol, UnitType.Fighter, 3);
+        test.units(lodor, "space", test.sol, UnitType.Fighter, 5);
         test.nekro.setFleetCC(5);
         assertThat(attackOn(neighbour)).isEmpty();
 
@@ -497,17 +500,18 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(attackOn(neighbour)).isPresent();
     }
 
-    // A carrier and a dreadnought attack Sol's two cruisers: not safe enough. Non-Euclidean Shielding lets the
-    // dreadnought's sustain cancel two hits, and the attack is on. (Nothing threatens home, so no second dreadnought
-    // is kept back as a guard.)
+    // A carrier and two dreadnoughts attack Sol's four cruisers: they would win more often than not, but the expected
+    // losses (about five resources) eat the prize. Non-Euclidean Shielding lets each dreadnought's sustain cancel two
+    // hits, which cuts those losses and the attack is on. (Nothing threatens home, so no dreadnought is kept back as
+    // a guard.)
     @Test
     void countsNonEuclideanShieldingInTheOdds() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
-        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 2);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
         Tile lodor = test.place("26", neighbour);
         test.sol.addPlanet("lodor");
-        test.units(lodor, "space", test.sol, UnitType.Cruiser, 2);
+        test.units(lodor, "space", test.sol, UnitType.Cruiser, 4);
         test.nekro.setFleetCC(5);
         assertThat(attackOn(neighbour)).isEmpty();
 
@@ -772,6 +776,49 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(TacticalPlanner.bestScore(List.of())).isZero();
     }
 
+    private double secretBonusForThreeDreadnoughtsAttackingTheNeighbour(Tile target) {
+        List<UnitMove> ships = List.of(new UnitMove(AiTestGame.HOME, "space", UnitType.Dreadnought, 3));
+        return TacticalPlanner.actionSecretBonus(test.game, test.nekro, target, test.sol, ships, true, false);
+    }
+
+    private Tile neighbourWithSolDestroyerAndThreeDreadnoughtsAtHome() {
+        Tile target = test.place("46", neighbour);
+        test.units(target, "space", test.sol, UnitType.Destroyer, 1);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 3);
+        return target;
+    }
+
+    // Three dreadnoughts attacking Sol's destroyer meet Demonstrate Your Power. In round 2 with nobody scoring there
+    // are rounds to meet it later (1 - 0.7^4 = 0.76), so the seat is patient: the fight is only worth a quarter of a
+    // point of secret bonus. With an opponent on 6 of 10 the end is in sight and it is worth a full point.
+    @Test
+    void leansOnlySlightlyTowardsASecretItIsPatientWith() {
+        Tile target = neighbourWithSolDestroyerAndThreeDreadnoughtsAtHome();
+        test.nekro.setSecret("dyp");
+
+        double early = secretBonusForThreeDreadnoughtsAttackingTheNeighbour(target);
+        test.points(test.sol, 6);
+        double late = secretBonusForThreeDreadnoughtsAttackingTheNeighbour(target);
+
+        assertThat(early).isEqualTo(0.25 * ObjectiveValue.VICTORY_POINT_VALUE);
+        assertThat(late).isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
+    }
+
+    // The fight meets two secrets but is one space combat, so only the more valuable one counts: Destroy Their
+    // Greatest Ship (rare, pursued, a full point) rather than the patient Demonstrate Your Power (0.25 of a point;
+    // with Destroy Their Greatest Ship in hand too its chance is 0.3 * 0.85 a round, 1 - 0.745^4 = 0.69, still
+    // patient in round 2).
+    @Test
+    void countsTheHighestValuedSecretsUpToTheNumberOfCombats() {
+        Tile target = neighbourWithSolDestroyerAndThreeDreadnoughtsAtHome();
+        test.units(target, "space", test.sol, UnitType.Flagship, 1);
+        test.nekro.setSecret("dyp");
+        test.nekro.setSecret("dtgs");
+
+        assertThat(secretBonusForThreeDreadnoughtsAttackingTheNeighbour(target))
+                .isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
+    }
+
     private static boolean movesOutOfHome(TacticalPlan plan) {
         return plan.moves().stream().anyMatch(move -> AiTestGame.HOME.equals(move.origin()));
     }
@@ -810,7 +857,8 @@ class TacticalPlannerTest extends BaseTi4Test {
     }
 
     // Taking Mecatol Rex lets the Imperial point be cashed: the point Imperial gives for holding it, once with its own
-    // unplayed Imperial and once more through Overrule, which performs Imperial's primary again.
+    // unplayed Imperial and once more through Overrule, which performs Imperial's primary again. Each point counts as
+    // the offense outlook's own-Imperial share of a victory point (0.8 of 8).
     @Test
     void takingMecatolRexIsWorthTheImperialPointsItCanCash() {
         lateGame();
@@ -818,20 +866,19 @@ class TacticalPlannerTest extends BaseTi4Test {
         test.place("18", "000");
         carrierWithInfantryNextTo("000", 2);
         double plain = expansionTo("000").orElseThrow().score();
-        double point = ScoringStakes.scoreValue(test.game, test.nekro, 1);
+        double point = 0.8 * ObjectiveValue.VICTORY_POINT_VALUE;
 
         test.nekro.setActionCard("overrule", 1);
         double withOverrule = expansionTo("000").orElseThrow().score();
-        assertThat(withOverrule - plain).isCloseTo(0.75 * point, within(EXACT));
+        assertThat(withOverrule - plain).isCloseTo(point, within(EXACT));
 
         test.nekro.addSC(IMPERIAL);
         double withBoth = expansionTo("000").orElseThrow().score();
-        assertThat(withBoth - plain)
-                .isCloseTo(0.75 * ScoringStakes.scoreValue(test.game, test.nekro, 2), within(EXACT));
+        assertThat(withBoth - plain).isCloseTo(2 * point, within(EXACT));
 
         test.nekro.getActionCards().clear();
         double withImperial = expansionTo("000").orElseThrow().score();
-        assertThat(withImperial - plain).isCloseTo(0.75 * point, within(EXACT));
+        assertThat(withImperial - plain).isCloseTo(point, within(EXACT));
     }
 
     // Early in the game the Overrule is being saved, so it cashes no point yet.

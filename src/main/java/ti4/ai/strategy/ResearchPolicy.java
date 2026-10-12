@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.ai.eval.CustodiansRace;
+import ti4.ai.eval.GameHorizon;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.secrets.SecretValue;
@@ -127,12 +129,12 @@ public class ResearchPolicy {
             Map.entry("x89", 1.0));
     private static final Set<String> UNIT_UPGRADE_OBJECTIVES = Set.of("develop", "revolutionize");
     private static final Set<String> COLOUR_PAIR_OBJECTIVES = Set.of("diversify", "master_science");
+    private static final String GRAVITY_DRIVE = "gd";
+    private static final double GRAVITY_DRIVE_RACE_SHARE = 0.5;
     private static final String PRODUCE_EN_MASSE = "pem";
     private static final String LAWS_OF_PHYSICS = "mlp";
     private static final String ADAPT_NEW_STRATEGIES = "ans";
     private static final int PAIR = 2;
-    private static final int DEFAULT_VICTORY_POINTS = 10;
-    private static final double LEADER_POINTS_PER_ROUND = 2.0;
     private static final double RESEARCHES_PER_ROUND = 1.5;
     private static final String SPACE_DOCK_UPGRADE = "sd2";
     private static final int DOCK_UPGRADE_PRODUCTION = 2;
@@ -179,7 +181,18 @@ public class ResearchPolicy {
         if (tech == null || seat.hasTech(alias)) return 0;
         return baseValue(tech)
                 + OBJECTIVE_WEIGHT * objectiveGain(game, seat, tech)
-                + steppingStoneValue(game, seat, tech);
+                + steppingStoneValue(game, seat, tech)
+                + custodiansRaceValue(game, seat, alias);
+    }
+
+    private static double custodiansRaceValue(Game game, Player seat, String alias) {
+        if (!GRAVITY_DRIVE.equals(alias) || !CustodiansRace.open(game)) return 0;
+        CustodiansRace.Snapshot race = CustodiansRace.of(game, seat);
+        double withDrive =
+                race.raceValue(seat, race.arrivalWith(seat, CustodiansRace.Drive.LIKELY), CustodiansRace.Order.UNKNOWN);
+        double without =
+                race.raceValue(seat, race.arrivalWith(seat, CustodiansRace.Drive.OWNED), CustodiansRace.Order.UNKNOWN);
+        return GRAVITY_DRIVE_RACE_SHARE * Math.max(0, withDrive - without);
     }
 
     public static double heldValue(String alias) {
@@ -275,13 +288,7 @@ public class ResearchPolicy {
     }
 
     static int researchesLeft(Game game) {
-        int goal = game.getVp() > 0 ? game.getVp() : DEFAULT_VICTORY_POINTS;
-        int leader = game.getRealPlayers().stream()
-                .mapToInt(Player::getTotalVictoryPoints)
-                .max()
-                .orElse(0);
-        int roundsLeft = (int) Math.ceil(Math.max(0, goal - leader) / LEADER_POINTS_PER_ROUND);
-        return Math.max(1, (int) Math.floor(roundsLeft * RESEARCHES_PER_ROUND));
+        return Math.max(1, (int) Math.floor(GameHorizon.roundsLeft(game) * RESEARCHES_PER_ROUND));
     }
 
     static boolean withinReach(Game game, Player seat, String objective) {
