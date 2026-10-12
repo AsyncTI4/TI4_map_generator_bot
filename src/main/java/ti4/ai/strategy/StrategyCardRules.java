@@ -46,6 +46,7 @@ import ti4.image.Mapper;
 public class StrategyCardRules {
 
     private static final String PLAYED_KEY = "scPlayed|";
+    private static final String OVERRULED_KEY = "scOverruled|";
     private static final String RESEARCH_KEY = "research|";
     private static final String RESEARCH_EXCLUDED_KEY = "researchExcluded|";
     private static final String TOKEN_GAIN_KEY = "tokenGain|";
@@ -122,14 +123,24 @@ public class StrategyCardRules {
         return AiDecision.press(prompt, button, reason);
     }
 
+    public static void beginOverruledPrimary(AiTurnContext context, int initiative) {
+        context.memory().put(PLAYED_KEY + context.turnKey(), String.valueOf(initiative));
+        context.memory().put(OVERRULED_KEY + context.turnKey(), String.valueOf(initiative));
+    }
+
+    private static boolean overruledThisTurn(AiTurnContext context) {
+        return context.memory().has(OVERRULED_KEY + context.turnKey());
+    }
+
     public static boolean playedThisTurn(AiTurnContext context) {
         return context.memory().has(PLAYED_KEY + context.turnKey());
     }
 
     public static Optional<AiDecision> resolvePrimary(AiTurnContext context) {
         Optional<AiDecision> step = resolvePrimaryStep(context);
-        if (step.isEmpty())
+        if (step.isEmpty() && !overruledThisTurn(context)) {
             playedInitiative(context).ifPresent(card -> SecondaryQueue.primaryResolved(context.game(), card));
+        }
         return step;
     }
 
@@ -160,6 +171,7 @@ public class StrategyCardRules {
     }
 
     private static Optional<String> unfinishedSecondary(AiTurnContext context) {
+        if (overruledThisTurn(context)) return Optional.empty();
         return playedInitiative(context)
                 .flatMap(initiative -> SecondaryQueue.unfinished(context.game(), initiative, context.now()));
     }

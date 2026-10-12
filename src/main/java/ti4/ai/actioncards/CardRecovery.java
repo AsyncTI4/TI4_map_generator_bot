@@ -98,6 +98,10 @@ class CardRecovery {
 
     private static boolean offeredToSeat(AiTurnContext context, AiPrompt prompt) {
         boolean owned = prompt.buttons().stream().anyMatch(button -> button.isOwnedBy(context.faction()));
-        return owned || Prompts.mentions(prompt, context.seat());
+        return owned || Prompts.mentions(prompt, context.seat()) || namesNobody(context, prompt);
+    }
+
+    private static boolean namesNobody(AiTurnContext context, AiPrompt prompt) {
+        return context.game().getRealPlayers().stream().noneMatch(player -> Prompts.mentions(prompt, player));
     }
 }

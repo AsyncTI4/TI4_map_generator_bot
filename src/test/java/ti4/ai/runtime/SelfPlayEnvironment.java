@@ -48,6 +48,7 @@ import ti4.spring.context.SpringContext;
 import ti4.spring.service.deploy.ActiveLeaseService;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gamemessage.GameMessageService;
+import ti4.spring.service.statistics.overrule.OverruleStatsService;
 import ti4.spring.service.title.PlayerTitleService;
 import ti4.testUtils.discord.DiscordRouter;
 import ti4.testUtils.discord.FakeDiscord;
@@ -131,6 +132,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
         beans.put(CombatReplayService.class, mock(CombatReplayService.class, quiet()));
         beans.put(PlayerTitleService.class, mock(PlayerTitleService.class, quiet()));
         beans.put(GameEventService.class, mock(GameEventService.class, quiet()));
+        beans.put(OverruleStatsService.class, mock(OverruleStatsService.class, quiet()));
         beans.put(ActiveLeaseService.class, mock(ActiveLeaseService.class, quiet(invocation -> {
             Class<?> type = invocation.getMethod().getReturnType();
             if (type == boolean.class)

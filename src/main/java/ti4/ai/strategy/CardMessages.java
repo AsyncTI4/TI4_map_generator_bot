@@ -8,6 +8,7 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
+import ti4.helpers.Helper;
 import ti4.message.GameMessage;
 import ti4.service.strategycard.StrategyCardMessageService;
 
@@ -15,6 +16,7 @@ import ti4.service.strategycard.StrategyCardMessageService;
 class CardMessages {
 
     private static final String STEP_KEY = "scStep|";
+    private static final String OVERRULED = " overruled";
 
     static Optional<AiPrompt> playedThisTurn(AiTurnContext context, int initiative) {
         long turnStart = Prompts.turnStart(context);
@@ -26,12 +28,27 @@ class CardMessages {
         Optional<String> recorded = StrategyCardMessageService.getStrategyCardMessage(
                         context.game().getName(), context.game().getRound(), initiative)
                 .map(GameMessage::messageId);
-        return Prompts.newestFirst(context.prompts()).stream()
+        Optional<AiPrompt> played = Prompts.newestFirst(context.prompts()).stream()
                 .filter(prompt -> !prompt.isHidden())
                 .filter(prompt -> recorded.map(prompt.messageId()::equals).orElse(true))
                 .filter(prompt -> prompt.buttons().stream()
                         .anyMatch(button -> button.isUnowned() && noFollow.equals(button.handlerId())))
                 .findFirst();
+        return played.or(() -> overruledMessage(context, initiative));
+    }
+
+    private static Optional<AiPrompt> overruledMessage(AiTurnContext context, int initiative) {
+        long turnStart = Prompts.turnStart(context);
+        String name = Helper.getSCName(initiative, context.game());
+        return Prompts.newestFirst(context.prompts()).stream()
+                .filter(prompt -> !prompt.isHidden() && prompt.createdAtMillis() >= turnStart)
+                .filter(prompt -> prompt.content().contains(OVERRULED) && containsIgnoreCase(prompt.content(), name))
+                .filter(prompt -> prompt.buttons().stream().anyMatch(button -> button.isOwnedBy(context.faction())))
+                .findFirst();
+    }
+
+    private static boolean containsIgnoreCase(String text, String part) {
+        return text.toLowerCase().contains(part.toLowerCase());
     }
 
     static Optional<AiDecision> pressOnce(AiTurnContext context, AiPrompt prompt, String handlerId, String reason) {

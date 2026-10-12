@@ -175,24 +175,25 @@ class ActionCardValueTest extends BaseTi4Test {
         assertThat(keep("sabo3")).isEqualTo(SabotagePolicy.OVERRULE_RESERVE);
     }
 
+    // Overrule has not been seen, so the only Sabotage is kept for it (worth 3), above a stall card (worth 1.5).
     @Test
     void aCardNoRulePlaysIsDiscardedBeforeOneThatIsUsable() {
-        test.nekro.setActionCard("overrule", 1);
+        test.nekro.setActionCard("rout", 1);
         test.nekro.setActionCard("industrial_initiative", 2);
         test.nekro.setActionCard("sabo1", 3);
 
         assertThat(ActionCardValue.discardOrder(test.game, test.nekro))
-                .containsExactly("overrule", "sabo1", "industrial_initiative");
+                .containsExactly("rout", "industrial_initiative", "sabo1");
     }
 
     // Among cards that are worth nothing the weaker one goes first.
     @Test
     void cardsNoRulePlaysAreSortedByTheirPrior() {
-        test.nekro.setActionCard("overrule", 1);
+        test.nekro.setActionCard("rout", 1);
         test.nekro.setActionCard("mjets1", 2);
         test.nekro.setActionCard("mb1", 3);
 
-        assertThat(ActionCardValue.discardOrder(test.game, test.nekro)).containsExactly("mjets1", "mb1", "overrule");
+        assertThat(ActionCardValue.discardOrder(test.game, test.nekro)).containsExactly("mjets1", "mb1", "rout");
     }
 
     @Test

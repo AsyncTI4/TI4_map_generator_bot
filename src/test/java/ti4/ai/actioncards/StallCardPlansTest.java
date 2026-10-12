@@ -24,7 +24,7 @@ class StallCardPlansTest extends BaseTi4Test {
     private static final double EXACT = 1e-9;
 
     // Exchange Program: the agreement path needs a negotiation, and the other path costs the seat a fleet token too.
-    private static final Set<String> DEFERRED = Set.of("Exchange Program", "Overrule");
+    private static final Set<String> DEFERRED = Set.of("Exchange Program");
 
     private CardTable table;
 
