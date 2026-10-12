@@ -91,6 +91,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
     final Map<Integer, Map<String, Integer>> actionsByRound = new java.util.TreeMap<>();
     // The round in which each action secret was first sent to be scored, by "faction|secret".
     final Map<String, Integer> actionSecretRounds = new java.util.concurrent.ConcurrentHashMap<>();
+    final MecatolTracker mecatol = new MecatolTracker();
     // Trading: every accepted offer (read from the offerer's items just before the Accept press), the presses each seat
     // made by handler family, and the Trade settlements each holder sent and had accepted.
     final List<TradeRecord> tradeLedger = new ArrayList<>();
@@ -360,6 +361,8 @@ final class SelfPlayEnvironment implements AutoCloseable {
                 rememberReason(decision);
                 countRoundAction(decision, context.game().getRound());
                 noteActionSecretScored(context, decision);
+                mecatol.observe(context.game());
+                countTacticalAction(context, decision);
                 countPlanKind(context, decision);
                 timeRanked(context, decision);
                 return decision;
@@ -407,8 +410,18 @@ final class SelfPlayEnvironment implements AutoCloseable {
         }
     }
 
+    // Every tactical action a seat starts, with the system its plan targets, for the custodians statistics.
+    private void countTacticalAction(AiTurnContext context, AiDecision decision) {
+        if (!(decision instanceof AiDecision.Press press)) return;
+        if (!TACTICAL_ACTION.equals(actionKind(press.reason()))) return;
+        Optional<String> target = press.reason().startsWith("start a tactical action")
+                ? TacticalRules.rememberedPlan(context).map(TacticalPlan::target)
+                : Optional.empty();
+        mecatol.tacticalAction(context.game(), context.seat(), target);
+    }
+
     // What kind of plan each tactical action followed, and how many attacks hit another player's home system, landed
-    // there, or stood between the Imperial holder and Mecatol Rex.
+    // there, hit Mecatol Rex, landed on it, or stood between the Imperial holder and Mecatol Rex.
     private void countPlanKind(AiTurnContext context, AiDecision decision) {
         if (!(decision instanceof AiDecision.Press press)) return;
         if (!press.reason().startsWith("start a tactical action")) return;
@@ -424,6 +437,12 @@ final class SelfPlayEnvironment implements AutoCloseable {
                     && target != context.seat().getHomeSystemTile();
             if (otherHome) kinds.add(PLAN_PREFIX + "attack on another home");
             if (otherHome && !plan.get().landings().isEmpty()) kinds.add(PLAN_PREFIX + "attack landing on a home");
+            if (target != null && target.isMecatol(game)) {
+                kinds.add(PLAN_PREFIX + "attack on Mecatol");
+                if (plan.get().landings().keySet().stream().anyMatch(game.mecatols()::contains)) {
+                    kinds.add(PLAN_PREFIX + "attack landing on Mecatol");
+                }
+            }
             if (target != null && target.isMecatol(game) && anotherPlayerHoldsImperial(game, context.seat())) {
                 kinds.add(PLAN_PREFIX + "attack on Mecatol against Imperial");
             }
@@ -441,6 +460,8 @@ final class SelfPlayEnvironment implements AutoCloseable {
     static final java.util.concurrent.atomic.LongAdder RANKED_NANOS = new java.util.concurrent.atomic.LongAdder();
     static final java.util.concurrent.atomic.LongAdder RANKED_SAMPLES = new java.util.concurrent.atomic.LongAdder();
     static final java.util.concurrent.atomic.AtomicLong RANKED_MAX_NANOS = new java.util.concurrent.atomic.AtomicLong();
+    // Sampled rankings that held at least one STAGE plan, next to the stage plans that were chosen.
+    static final java.util.concurrent.atomic.LongAdder RANKED_WITH_STAGE = new java.util.concurrent.atomic.LongAdder();
     private static final java.util.concurrent.atomic.AtomicInteger TACTICAL_PRESSES =
             new java.util.concurrent.atomic.AtomicInteger();
 
@@ -449,11 +470,12 @@ final class SelfPlayEnvironment implements AutoCloseable {
         if (!press.reason().startsWith("start a tactical action")) return;
         if (TACTICAL_PRESSES.incrementAndGet() % 8 != 0) return;
         long start = System.nanoTime();
-        TacticalPlanner.ranked(context.game(), context.seat());
+        List<TacticalPlan> ranked = TacticalPlanner.ranked(context.game(), context.seat());
         long elapsed = System.nanoTime() - start;
         RANKED_NANOS.add(elapsed);
         RANKED_SAMPLES.increment();
         RANKED_MAX_NANOS.accumulateAndGet(elapsed, Math::max);
+        if (ranked.stream().anyMatch(plan -> plan.kind() == TacticalPlan.Kind.STAGE)) RANKED_WITH_STAGE.increment();
     }
 
     private static boolean anotherPlayerHoldsImperial(Game game, Player seat) {

@@ -62,6 +62,7 @@ final class SelfPlayGame {
             int seats,
             TradeSummary trade,
             SecretSummary secrets,
+            MecatolTracker.Summary mecatol,
             String report,
             long wallSeconds) {
 
@@ -431,6 +432,7 @@ final class SelfPlayGame {
                 game == null ? 0 : game.getRealPlayers().size(),
                 tradeSummary(ending, game),
                 secretSummary(game),
+                env.mecatol.summary(),
                 report(ending, game, ticks),
                 (System.nanoTime() - wallStart) / 1_000_000_000L);
     }

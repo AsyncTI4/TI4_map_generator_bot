@@ -103,6 +103,7 @@ class AiSelfPlayTest extends BaseTi4Test {
         printTrading(outcomes);
         printSecrets(outcomes);
         printPlanKinds(outcomes);
+        printMecatol(outcomes);
         System.out.println("Tactical actions per seat each round: "
                 + perRoundDecimal(
                         outcomes.stream()
@@ -184,7 +185,8 @@ class AiSelfPlayTest extends BaseTi4Test {
     }
 
     // Tactical actions by the kind of plan behind them, per game over the batch: attacks, attacks on another player's
-    // home (and those that landed), attacks on Mecatol Rex against an Imperial holder, and positioning moves.
+    // home (and those that landed), attacks on Mecatol Rex (and those that landed, or stood against an Imperial
+    // holder), and positioning moves.
     private static void printPlanKinds(List<SelfPlayGame.Outcome> outcomes) {
         int games = Math.max(1, outcomes.size());
         List<String> kinds = List.of(
@@ -196,6 +198,8 @@ class AiSelfPlayTest extends BaseTi4Test {
                 "stage",
                 "attack on another home",
                 "attack landing on a home",
+                "attack on Mecatol",
+                "attack landing on Mecatol",
                 "attack on Mecatol against Imperial");
         List<String> parts = new ArrayList<>();
         for (String kind : kinds) {
@@ -211,6 +215,68 @@ class AiSelfPlayTest extends BaseTi4Test {
                 samples == 0 ? 0 : SelfPlayEnvironment.RANKED_NANOS.sum() / 1e6 / samples,
                 SelfPlayEnvironment.RANKED_MAX_NANOS.get() / 1e6,
                 samples);
+        System.out.printf(
+                "Stage plans: chosen %.2f per game, present in %d of %d sampled rankings%n",
+                (double) outcomes.stream()
+                                .mapToInt(outcome -> outcome.total(SelfPlayEnvironment.PLAN_PREFIX + "stage"))
+                                .sum()
+                        / games,
+                SelfPlayEnvironment.RANKED_WITH_STAGE.sum(),
+                samples);
+    }
+
+    // The custodians race over the batch: the round the token went, who took it and whether they went first, the
+    // Politics, speaker and Leadership chain, and how often Mecatol Rex changed hands afterwards.
+    private static void printMecatol(List<SelfPlayGame.Outcome> outcomes) {
+        List<MecatolTracker.Summary> summaries =
+                outcomes.stream().map(SelfPlayGame.Outcome::mecatol).toList();
+        int lastRound = summaries.stream()
+                .mapToInt(MecatolTracker.Summary::custodiansRound)
+                .max()
+                .orElse(0);
+        List<String> byRound = new ArrayList<>();
+        for (int round = 1; round <= lastRound; round++) {
+            int taken = round;
+            long games = summaries.stream()
+                    .filter(summary -> summary.custodiansRound() == taken)
+                    .count();
+            byRound.add("r" + round + " " + games);
+        }
+        byRound.add("never "
+                + summaries.stream().filter(summary -> !summary.taken()).count());
+        java.util.Map<String, Long> takers = summaries.stream()
+                .filter(summary -> summary.taken() && !summary.taker().isEmpty())
+                .collect(java.util.stream.Collectors.groupingBy(
+                        MecatolTracker.Summary::taker, java.util.TreeMap::new, java.util.stream.Collectors.counting()));
+        System.out.println("Custodians taken by round: " + String.join(", ", byRound) + "; takers " + takers
+                + "; taker had initiative <=1 "
+                + summaries.stream()
+                        .filter(MecatolTracker.Summary::takerWentFirst)
+                        .count()
+                + ", was speaker "
+                + summaries.stream()
+                        .filter(summary -> summary.taken() && summary.takerWasSpeaker())
+                        .count()
+                + ", first action "
+                + summaries.stream()
+                        .filter(summary -> summary.taken() && summary.takerFirstAction())
+                        .count());
+        System.out.println("Round 1 Politics then round 2 speaker and Leadership by the same seat: "
+                + summaries.stream()
+                        .filter(MecatolTracker.Summary::politicsSpeakerLeadershipChain)
+                        .count()
+                + " games");
+        long takenGames =
+                summaries.stream().filter(MecatolTracker.Summary::taken).count();
+        System.out.printf(
+                "Mecatol control changes per game after custodians: %.2f (over %d games that took them)%n",
+                takenGames == 0
+                        ? 0
+                        : (double) summaries.stream()
+                                        .mapToInt(MecatolTracker.Summary::controlChanges)
+                                        .sum()
+                                / takenGames,
+                takenGames);
     }
 
     // What trading did over the batch, next to the strength measures it should move (run once with -Dai.trading=false
