@@ -293,6 +293,9 @@ public class NekroBrain implements FactionBrain {
     private Optional<AiDecision> declineWhens(AiTurnContext context) {
         if (context.game().getStoredValue("declinedWhens").contains(context.faction() + "_")) return Optional.empty();
         if (AgendaQueue.holdsQueuedWhen(context.game(), context.seat())) return Optional.empty();
+        if (AgendaCardRules.holdsPlayedVeto(context)) return Optional.empty();
+        Optional<AiDecision> veto = AgendaCardRules.queueVeto(context);
+        if (veto.isPresent()) return veto;
         return firstHandler(context, "declineToQueueAWhen", "pass on playing a \"when\"");
     }
 

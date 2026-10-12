@@ -538,6 +538,19 @@ to build one by hand:
     when the rider was cancelled, placed, or refused by the bot (a seat over the hand limit), and when voting has begun it
     drops a still queued rider and still places a played one. The AI never re-decides once it has locked the rider in,
     and every seat decides on the same table, so several seats may ride one agenda.
+  - **Veto**: a "when" card, worth its keep prior in the hand. It is queued (`queueAWhen`, `queueWhen_ac_veto`) when the
+    seat's "when" slot is empty (a Political Secret or Political Favor note takes priority and keeps the card) and the
+    agenda's expected election costs the seat 5 units or more, the rule Political Favor uses
+    (`AgendaPolicy.worthDiscarding`, the forecast-weighted policy score). When the queue plays it the bot halts the
+    queue and posts the card's buttons; the seat recovers the play in the agenda phase like it recovers an unfinished
+    action phase play, waits out the Sabotage window, and presses "Reveal next Agenda" (`resolveVeto`) once it is at
+    least 7 seconds after the previous reveal (the bot refuses within 6 and has already counted the Veto by then). While
+    the Veto is played and not resolved the seat does not pass on "when"s, which would set the halted queue going (any
+    pass does, so every seat that had a Veto queued plays it in turn; with one Veto in the deck that is only a test
+    artefact of dealing everyone one). It does not wait: it keeps answering Sabotage windows, since seats that each
+    played a Veto would otherwise wait on one another, and the stall detector does not call it stuck. It gives up after
+    five minutes if the bot never posted the buttons. A cancelled Veto resumes the queue through the bot (see
+    Segregation).
   - Not yet: combat cards, _War Machine_, _Rally_, _Parley_,
     _Exchange Program_ (its agreement needs a negotiation, and the other way costs both players a fleet token) and the
     remaining component action cards. Every other card of the deck's Action window is played, so none is discarded as
@@ -801,7 +814,7 @@ list. Today the seams are:
 | `SlashCommandManager` registers `AiCommand` | the `/ai` command |
 | `TestBedService.findNonDeveloper` skips AI seats | test-bed games with an AI can still be reset and scripted |
 
-Six small generic changes don't reference `ti4.ai`:
+Seven small generic changes don't reference `ti4.ai`:
 - `GlobalSettings.ImplementedSettings.AI_PLAYERS_ENABLED`, the kill switch.
 - A public `TestBedPress.standInEvent` with a configurable repost header.
 - The Nekro hero's casualty and trade-good report goes to the player's game channel (`getCorrectChannel`) rather
@@ -816,6 +829,9 @@ Six small generic changes don't reference `ti4.ai`:
 - A canceled _War Machine_ or _Flank Speed_ takes its effect back (the card player's spent `warmachine`, the
   `flankspeedBoost` of the active tactical action) instead of leaving it for the player to undo by hand. It acts on the
   card's player, not on the player who pressed the button.
+- A cancelled _Veto_ resumes the agenda's "when" queue, which halts at a Veto and which nothing started again (only
+  while the agenda is in the "when" window and the Veto's player was the last to play a "when"). The same button
+  erases a rider only when the Sabotage really cancels the card; before, a press by a player with no Sabotage erased it.
 
 ## Testing
 

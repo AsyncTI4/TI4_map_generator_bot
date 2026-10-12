@@ -341,6 +341,7 @@ public class ActionCardRules {
         if (SabotageWindow.canceled(game, seat, play.alias(), play.playsBefore())) {
             return stop(context, key, play, Stage.CANCELED);
         }
+        if (!card.get().readyToResolve(context)) return Optional.empty();
         Stage after = card.get().hasTarget() ? Stage.TARGET : Stage.DONE;
         if (!card.get().hasResolveButton()) return move(context, key, play.at(after, context.now()));
         String handler = card.get().resolveHandler();

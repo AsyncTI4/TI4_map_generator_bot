@@ -9,6 +9,7 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.agenda.AgendaClock;
 import ti4.ai.agenda.AgendaForecast;
+import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.agenda.AgendaQueue;
 import ti4.ai.agenda.AgendaVoting;
 import ti4.ai.agenda.RiderPayoff;
@@ -30,6 +31,13 @@ public class AgendaCardRules {
     private static final String FIELD = "~";
     private static final String WAITING_PHASE = "agendawaiting";
     private static final String OPEN_AFTERS = "queueAnAfter";
+    private static final String OPEN_WHENS = "queueAWhen";
+    private static final String QUEUED_WHENS = "queuedWhens";
+    private static final String DECLINED_WHENS = "declinedWhens";
+    private static final String QUEUED_WHEN_OF = "queuedWhensFor";
+    private static final String VETO_SEEN_KEY = "agendaVetoPlayed|";
+    private static final String QUEUE_WHEN_PREFIX = "queueWhen_ac_";
+    private static final String WHENS_RESOLVED = "whensResolved";
     private static final String QUEUE_PREFIX = "queueAfter_ac_";
     private static final String QUEUED_CARD = "ac_";
     private static final String LOCK = "lockAftersIn";
@@ -74,6 +82,52 @@ public class AgendaCardRules {
         if (placed(game, seat, title) || canceled(game, seat, title, entry.get().playsBefore())) return false;
         if (!playedSince(game, seat, title, entry.get().playsBefore())) return false;
         return context.now() - playedSeenAt(context) < GIVE_UP_MILLIS;
+    }
+
+    public static boolean holdsPlayedVeto(AiTurnContext context) {
+        if (!vetoPlayedAndPending(context.game(), context.seat())) return false;
+        Optional<CardPlay> play =
+                context.memory().get(PlayMemory.agendaKey(context)).flatMap(CardPlay::decode);
+        if (play.isPresent()) return play.get().active();
+        return context.now() - vetoSeenAt(context) < GIVE_UP_MILLIS;
+    }
+
+    public static boolean vetoPlayedAndPending(Game game, Player seat) {
+        boolean whensOpen = WAITING_PHASE.equalsIgnoreCase(game.getPhaseOfGame())
+                && game.getStoredValue(WHENS_RESOLVED).isEmpty();
+        boolean consumed = !game.getStoredValue(QUEUED_WHENS).contains(seat.getFaction() + SEPARATOR)
+                && !game.getStoredValue(DECLINED_WHENS).contains(seat.getFaction() + SEPARATOR);
+        boolean vetoSlot = Optional.of(game.getStoredValue(QUEUED_WHEN_OF + seat.getFaction()))
+                .filter(queued -> queued.startsWith(QUEUED_CARD))
+                .map(queued -> StringUtils.removeStart(queued, QUEUED_CARD))
+                .filter(alias -> AgendaCards.VETO_TITLE.equals(SabotageWindow.title(alias)))
+                .isPresent();
+        return whensOpen && consumed && vetoSlot && !SabotageWindow.canceledPlay(game, seat, AgendaCards.VETO_TITLE, 0);
+    }
+
+    private static long vetoSeenAt(AiTurnContext context) {
+        String key = VETO_SEEN_KEY + context.game().getCurrentAgendaInfo();
+        Optional<String> seen = context.memory().get(key).filter(StringUtils::isNumeric);
+        if (seen.isPresent()) return Long.parseLong(seen.get());
+        context.memory().put(key, String.valueOf(context.now()));
+        return context.now();
+    }
+
+    public static Optional<AiDecision> queueVeto(AiTurnContext context) {
+        Game game = context.game();
+        Player seat = context.seat();
+        boolean whensOpen = WAITING_PHASE.equalsIgnoreCase(game.getPhaseOfGame())
+                && game.getStoredValue(WHENS_RESOLVED).isEmpty();
+        if (!whensOpen || AgendaQueue.holdsQueuedWhen(game, seat) || !ActionCardRules.mayPlay(game, seat)) {
+            return Optional.empty();
+        }
+        Optional<String> veto = seat.getActionCards().keySet().stream()
+                .sorted()
+                .filter(alias -> AgendaCards.VETO_TITLE.equals(SabotageWindow.title(alias)))
+                .findFirst();
+        if (veto.isEmpty() || !AgendaPolicy.worthDiscarding(game, seat)) return Optional.empty();
+        return pressHidden(context, QUEUE_WHEN_PREFIX + veto.get(), "queue Veto")
+                .or(() -> pressHidden(context, OPEN_WHENS, "look at its when options to play Veto"));
     }
 
     public static Optional<AiDecision> queueRider(AiTurnContext context) {

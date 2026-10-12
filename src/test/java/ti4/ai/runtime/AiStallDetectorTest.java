@@ -95,11 +95,20 @@ class AiStallDetectorTest extends BaseTi4Test {
                 .containsExactly("a \"when\"/\"after\" decision");
 
         game.setStoredValue("queuedWhens", "nekro_");
-        game.setStoredValue("queuedWhensFornekro", "ac_veto");
+        game.setStoredValue("queuedWhensFornekro", "pn_blue_ps");
         assertThat(AiStallDetector.waitReasons(game, nekro, List.of(passOnWhens)))
                 .isEmpty();
 
         game.removeStoredValue("queuedWhens");
+        assertThat(AiStallDetector.waitReasons(game, nekro, List.of(passOnWhens)))
+                .extracting(WaitReason::description)
+                .containsExactly("a \"when\"/\"after\" decision");
+
+        game.setStoredValue("queuedWhensFornekro", "ac_veto");
+        assertThat(AiStallDetector.waitReasons(game, nekro, List.of(passOnWhens)))
+                .isEmpty();
+
+        game.removeStoredValue("queuedWhensFornekro");
         game.setStoredValue("queuedAfters", "nekro_");
         game.setStoredValue("queuedAftersFornekro", "ac_imp_rider");
         assertThat(AiStallDetector.waitReasons(game, nekro, List.of(passOnAfters)))

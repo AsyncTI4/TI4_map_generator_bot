@@ -65,6 +65,7 @@ public class AgendaPolicy {
     private static final Set<String> BAD_FOR_PLANET_OWNER =
             Set.of("core_mining", "demilitarized_zone", "disarmament", "redistribution");
     private static final double FAVOURITE_CHANCE = 0.5;
+    private static final double DISCARD_THRESHOLD = 5.0;
     private static final String ELECT_PLAYER = "elect player";
     private static final Set<String> POINT_ELECTIONS = Set.of("censure", "shard_of_the_throne", "crown_of_emphidia");
 
@@ -118,6 +119,10 @@ public class AgendaPolicy {
                     .max(Comparator.comparingInt(button -> victoryPoints(ownerOf(game, button))));
         }
         return owners.stream().max(Comparator.comparingInt(button -> planetCount(ownerOf(game, button))));
+    }
+
+    public static boolean worthDiscarding(Game game, Player seat) {
+        return predictedElectionScore(game, seat, null) <= -DISCARD_THRESHOLD;
     }
 
     public static boolean wouldElectToAPoint(Game game, Player seat) {

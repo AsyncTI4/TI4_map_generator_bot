@@ -15,6 +15,7 @@ class PlayMemory {
     static final String MESSAGE_SCOPE = "msg:";
     static final String SUMMIT_SCOPE = "summit";
     static final String MASTER_PLAN_SCOPE = "plan:";
+    static final String AGENDA_SCOPE = "agenda:";
     private static final String ANNOUNCE_KEY = "acAnnounce|";
 
     static String turnKey(AiTurnContext context) {
@@ -29,13 +30,18 @@ class PlayMemory {
         return PLAY_KEY + SUMMIT_SCOPE;
     }
 
+    static String agendaKey(AiTurnContext context) {
+        return PLAY_KEY + AGENDA_SCOPE + context.game().getCurrentAgendaInfo();
+    }
+
     static String reactionKey(AiTurnContext context) {
         return PLAY_KEY + MESSAGE_SCOPE + context.turnKey() + "@"
                 + context.game().getActiveSystem();
     }
 
     static List<String> activeKeys(AiTurnContext context) {
-        List<String> keys = new ArrayList<>(List.of(turnKey(context), masterPlanKey(context), summitKey()));
+        List<String> keys =
+                new ArrayList<>(List.of(turnKey(context), masterPlanKey(context), summitKey(), agendaKey(context)));
         keys.addAll(context.memory().keysStartingWith(PLAY_KEY + MESSAGE_SCOPE));
         return keys;
     }

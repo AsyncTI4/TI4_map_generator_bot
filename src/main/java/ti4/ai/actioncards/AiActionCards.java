@@ -76,6 +76,7 @@ public class AiActionCards {
             SecretCards.impersonation(),
             StrategizeCard.strategize(),
             OverruleCard.overrule(),
+            AgendaCards.veto(),
             AgendaCards.rider(RiderPayoff.IMPERIAL),
             AgendaCards.rider(RiderPayoff.TRADE),
             AgendaCards.rider(RiderPayoff.POLITICS),

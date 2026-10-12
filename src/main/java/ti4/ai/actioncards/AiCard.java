@@ -63,6 +63,10 @@ record AiCard(
         AGENDA_AFTER
     }
 
+    boolean readyToResolve(AiTurnContext context) {
+        return window != Window.AGENDA_WHEN || AgendaCards.revealSettled(context);
+    }
+
     boolean hasTarget() {
         return target != null;
     }

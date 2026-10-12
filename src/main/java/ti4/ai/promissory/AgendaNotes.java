@@ -25,7 +25,6 @@ class AgendaNotes {
     private static final String POLITICAL_SECRET = "_ps";
     private static final String ABSOL = "absol";
     private static final String POLITICAL_FAVOR = "favor";
-    private static final double FAVOR_THRESHOLD = 5.0;
     private static final double SECRET_MIN_GAIN = 3.0;
 
     static Optional<AiDecision> queue(AiTurnContext context) {
@@ -60,9 +59,7 @@ class AgendaNotes {
 
     private static boolean favorWorthIt(Game game, Player seat) {
         Player xxcha = game.getPNOwner(POLITICAL_FAVOR);
-        return xxcha != null
-                && xxcha.getStrategicCC() > 0
-                && AgendaPolicy.predictedElectionScore(game, seat, null) <= -FAVOR_THRESHOLD;
+        return xxcha != null && xxcha.getStrategicCC() > 0 && AgendaPolicy.worthDiscarding(game, seat);
     }
 
     private static boolean secretWorthIt(Game game, Player seat, Player owner) {

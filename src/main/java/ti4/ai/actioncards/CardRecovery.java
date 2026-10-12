@@ -4,6 +4,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.AiCard.Window;
 import ti4.ai.actioncards.CardPlay.Stage;
+import ti4.ai.agenda.AgendaClock;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
@@ -15,11 +16,25 @@ class CardRecovery {
     private static final long CONFIRM_MILLIS = 60_000L;
 
     static void recover(AiTurnContext context) {
-        if (!"action".equalsIgnoreCase(context.game().getPhaseOfGame())) return;
+        String phase = context.game().getPhaseOfGame();
+        if (phase.toLowerCase().startsWith("agenda")) {
+            recoverAgenda(context);
+            return;
+        }
+        if (!"action".equalsIgnoreCase(phase)) return;
         if (context.isActivePlayer()) {
             recoverOwnTurn(context);
         } else {
             recoverReaction(context);
+        }
+    }
+
+    private static void recoverAgenda(AiTurnContext context) {
+        String key = PlayMemory.agendaKey(context);
+        if (context.memory().has(key)) return;
+        long since = AgendaClock.seenAt(context) - CardPrompts.CLOCK_SKEW_MILLIS;
+        for (AiCard card : AiActionCards.inWindow(Window.AGENDA_WHEN)) {
+            if (resolvePending(context, key, card, since)) return;
         }
     }
 
@@ -41,9 +56,12 @@ class CardRecovery {
     }
 
     private static boolean resolvePending(AiTurnContext context, String key, AiCard card) {
+        return resolvePending(context, key, card, Prompts.turnStart(context));
+    }
+
+    private static boolean resolvePending(AiTurnContext context, String key, AiCard card, long since) {
         if (!card.hasResolveButton()) return false;
-        Optional<Match> resolve =
-                CardPrompts.ownedPublic(context, Prompts.turnStart(context), card.resolveHandler()::equals);
+        Optional<Match> resolve = CardPrompts.ownedPublic(context, since, card.resolveHandler()::equals);
         if (resolve.isEmpty()) return false;
         long playedAt = resolve.get().prompt().createdAtMillis() - CONFIRM_MILLIS;
         Optional<AiPrompt> announcement = SabotageWindow.announcement(context, card.key(), playedAt);
