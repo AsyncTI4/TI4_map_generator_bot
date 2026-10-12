@@ -230,6 +230,8 @@ class AiSelfPlayTest extends BaseTi4Test {
         System.out.println("Action card plays per seat (per game; human first-play rate when drawn): "
                 + String.join(", ", perCard));
         printActionCardDraws(outcomes);
+        printActionCardRounds(outcomes);
+        printOverrule(outcomes);
         if (!AiSettings.isActionCardAbTest()) return;
         printActionCardAb(outcomes);
     }
@@ -285,6 +287,88 @@ class AiSelfPlayTest extends BaseTi4Test {
                 .map(name -> name + " " + draws.get(name))
                 .collect(java.util.stream.Collectors.joining(", "));
         System.out.println("Action cards drawn that no rule plays (draws): " + unplayed);
+    }
+
+    // The rounds the action cards were played in: the whole batch by round, then each card's average round.
+    private static void printActionCardRounds(List<SelfPlayGame.Outcome> outcomes) {
+        List<SelfPlayGame.ActionCardUse> plays = outcomes.stream()
+                .flatMap(outcome -> outcome.actionCards().plays().stream())
+                .toList();
+        Map<Integer, Long> byRound = plays.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        SelfPlayGame.ActionCardUse::round,
+                        java.util.TreeMap::new,
+                        java.util.stream.Collectors.counting()));
+        System.out.println("Action card plays by round, whole batch: "
+                + byRound.entrySet().stream()
+                        .map(entry -> "r" + entry.getKey() + " " + entry.getValue())
+                        .collect(java.util.stream.Collectors.joining(", ")));
+        Map<String, java.util.DoubleSummaryStatistics> byCard = plays.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        SelfPlayGame.ActionCardUse::card,
+                        java.util.TreeMap::new,
+                        java.util.stream.Collectors.summarizingDouble(SelfPlayGame.ActionCardUse::round)));
+        System.out.println("Action card average round of play: "
+                + byCard.entrySet().stream()
+                        .map(entry -> String.format(
+                                "%s r%.1f (%d)",
+                                entry.getKey(),
+                                entry.getValue().getAverage(),
+                                entry.getValue().getCount()))
+                        .collect(java.util.stream.Collectors.joining(", ")));
+    }
+
+    // Overrule over the batch: how many were played and cancelled, in which rounds, on which strategy card, how many of
+    // them raised the seat's victory points before its turn ended, and how many seats still held the card at the end.
+    private static void printOverrule(List<SelfPlayGame.Outcome> outcomes) {
+        List<SelfPlayGame.ActionCardUse> plays = outcomes.stream()
+                .flatMap(outcome -> outcome.actionCards().plays().stream())
+                .filter(play -> "Overrule".equals(play.card()))
+                .toList();
+        List<SelfPlayGame.OverruleUse> picks = outcomes.stream()
+                .flatMap(outcome -> outcome.actionCards().overrules().stream())
+                .toList();
+        long held = outcomes.stream()
+                .flatMap(outcome -> outcome.actionCards().heldAtEnd().stream())
+                .filter(card -> card.endsWith("|overrule"))
+                .count();
+        long cancelled =
+                plays.stream().filter(SelfPlayGame.ActionCardUse::canceled).count();
+        System.out.printf(
+                "Overrule: %d plays (%d cancelled), %d strategy cards picked, %d picks raised the seat's points that"
+                        + " turn, %d seats ended the game still holding it, over %d seats%n",
+                plays.size(),
+                cancelled,
+                picks.size(),
+                picks.stream().filter(SelfPlayGame.OverruleUse::scored).count(),
+                held,
+                outcomes.stream().mapToInt(SelfPlayGame.Outcome::seats).sum());
+        System.out.println("  plays by round: "
+                + plays.stream()
+                        .collect(java.util.stream.Collectors.groupingBy(
+                                SelfPlayGame.ActionCardUse::round,
+                                java.util.TreeMap::new,
+                                java.util.stream.Collectors.counting())));
+        System.out.println("  picks by target (picked/scored): "
+                + picks.stream()
+                        .collect(java.util.stream.Collectors.groupingBy(
+                                SelfPlayGame.OverruleUse::strategyCard,
+                                java.util.TreeMap::new,
+                                java.util.stream.Collectors.collectingAndThen(
+                                        java.util.stream.Collectors.toList(),
+                                        list -> list.size() + "/"
+                                                + list.stream()
+                                                        .filter(SelfPlayGame.OverruleUse::scored)
+                                                        .count()))));
+        for (int game = 0; game < outcomes.size(); game++) {
+            int number = game + 1;
+            outcomes.get(game)
+                    .actionCards()
+                    .overrules()
+                    .forEach(pick -> System.out.println("  game " + number + ": "
+                            + pick.faction() + " overruled " + pick.strategyCard() + " in round " + pick.round()
+                            + (pick.scored() ? " and scored" : " without scoring")));
+        }
     }
 
     private static void printActionCardAb(List<SelfPlayGame.Outcome> outcomes) {

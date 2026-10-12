@@ -92,10 +92,29 @@ final class SelfPlayEnvironment implements AutoCloseable {
     final Map<String, Integer> settlementsSent = new java.util.TreeMap<>();
     final Map<String, Integer> settlementsAccepted = new java.util.TreeMap<>();
     private final Map<String, String> lastOfferLabel = new HashMap<>();
+    // Every strategy card an Overrule play picked, in order; the game closes each one when the seat's turn is over.
+    final List<OverrulePick> overrulePicks = new ArrayList<>();
     volatile String lastDecisionReason = "";
     Supplier<Game> game = () -> null;
 
     record TradeRecord(int round, String from, String to, List<String> items) {}
+
+    // The strategy card (by initiative) a seat overruled, the round it did so in, and the seat's victory points when it
+    // did and when its turn ended (-1 while the turn is still running).
+    static final class OverrulePick {
+        final String faction;
+        final int round;
+        final int initiative;
+        final int pointsBefore;
+        int pointsAfter = -1;
+
+        OverrulePick(String faction, int round, int initiative, int pointsBefore) {
+            this.faction = faction;
+            this.round = round;
+            this.initiative = initiative;
+            this.pointsBefore = pointsBefore;
+        }
+    }
 
     static final String SEND_PREFIX = "trade: send the ";
     static final String SETTLEMENT_LABEL = "Trade settlement";
@@ -256,6 +275,9 @@ final class SelfPlayEnvironment implements AutoCloseable {
         boolean press = "press".equals(invocation.getMethod().getName());
         Optional<TradeRecord> offered =
                 press ? offerAboutToBeAccepted(invocation.getArgument(0), invocation.getArgument(1)) : Optional.empty();
+        Optional<OverrulePick> overruled = press
+                ? overrulePickAboutToBeMade(invocation.getArgument(0), invocation.getArgument(1))
+                : Optional.empty();
         Object result = invocation.callRealMethod();
         if (press && result instanceof AiActuator.Result outcome) {
             AiActuator.PressTarget target = invocation.getArgument(1);
@@ -270,11 +292,33 @@ final class SelfPlayEnvironment implements AutoCloseable {
                             .merge(family, 1, Integer::sum);
                 }
                 offered.filter(this::accepted).ifPresent(this::recordTrade);
+                overruled.ifPresent(this::recordOverrulePick);
             }
             record(seat.faction() + " pressed " + target.customId() + " -> " + outcome.outcome() + " ("
                     + outcome.detail() + ")");
         }
         return result;
+    }
+
+    // The strategy card an Overrule pick press will start, read with the seat's points before the press runs.
+    private Optional<OverrulePick> overrulePickAboutToBeMade(
+            AiActuator.SeatIdentity seat, AiActuator.PressTarget target) {
+        String customId = target.customId();
+        if (!"winnuHero".equals(handlerFamily(customId)) || !customId.endsWith("_overrule")) return Optional.empty();
+        Game current = game.get();
+        Player player = current == null ? null : current.getPlayerFromColorOrFaction(seat.faction());
+        if (player == null) return Optional.empty();
+        String initiative = org.apache.commons.lang3.StringUtils.substringBefore(
+                org.apache.commons.lang3.StringUtils.substringAfter(customId, "winnuHero_"), "_");
+        if (initiative.isEmpty() || !initiative.chars().allMatch(Character::isDigit)) return Optional.empty();
+        return Optional.of(new OverrulePick(
+                seat.faction(), current.getRound(), Integer.parseInt(initiative), player.getTotalVictoryPoints()));
+    }
+
+    private void recordOverrulePick(OverrulePick pick) {
+        synchronized (overrulePicks) {
+            overrulePicks.add(pick);
+        }
     }
 
     // The offer an Accept press would carry out, read from the offerer's items before the press clears them.

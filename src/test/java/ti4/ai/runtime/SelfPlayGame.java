@@ -21,6 +21,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
+import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.testUtils.discord.FakeChannel;
@@ -134,15 +135,25 @@ final class SelfPlayGame {
             int settlementsAccepted,
             List<String> violations) {}
 
-    // One action card play, with who made it and whether a Sabotage cancelled it.
-    record ActionCardUse(String faction, String card, boolean canceled) {}
+    // One action card play, with who made it, the round it was made in and whether a Sabotage cancelled it.
+    record ActionCardUse(String faction, String card, int round, boolean canceled) {}
+
+    // One Overrule pick: who overruled which strategy card in which round, and whether the seat's victory points rose
+    // between the pick and the end of that turn.
+    record OverruleUse(String faction, int round, String strategyCard, boolean scored) {}
 
     // The action cards played in one game, and which seats played with the pre-existing (legacy) card rules in an
     // A/B run (-Dai.actioncards.ab=true).
     // heldCards holds "faction|alias" for every card a seat had in its hand at any point of the game, so a card's play
     // rate can be taken per draw.
+    // overrules lists the strategy cards Overrule plays picked; heldAtEnd holds "faction|alias" for the cards still in
+    // a hand when the game ended.
     record ActionCardSummary(
-            List<ActionCardUse> plays, java.util.Set<String> legacySeats, java.util.Set<String> heldCards) {}
+            List<ActionCardUse> plays,
+            java.util.Set<String> legacySeats,
+            java.util.Set<String> heldCards,
+            List<OverruleUse> overrules,
+            List<String> heldAtEnd) {}
 
     private static final String TRADE_GOODS = "TGs";
     private static final String COMMODITIES = "Comms";
@@ -162,6 +173,7 @@ final class SelfPlayGame {
     private final int slot;
     private final java.util.Set<String> legacySeats = new java.util.LinkedHashSet<>();
     private final java.util.Set<String> heldCards = new java.util.LinkedHashSet<>();
+    private final List<Integer> playRounds = new ArrayList<>();
 
     SelfPlayGame(SelfPlayEnvironment env, String name) {
         this(env, name, 0);
@@ -238,6 +250,8 @@ final class SelfPlayGame {
             Game game = managed == null ? null : managed.getGame();
             if (game == null) return outcome(Ending.LOST_GAME, null, ticks);
             recordVictoryPoints(game);
+            recordPlayRounds(game);
+            closeOverrulePicks(game, false);
             if (stopWhen.test(game)) return outcome(Ending.STOP_CONDITION, game, ticks);
             if (AiTickRunner.reachedVictoryPoints(game)) return outcome(Ending.VICTORY_POINTS, game, ticks);
             if (announcedGameOver()) return outcome(Ending.OBJECTIVES_EXHAUSTED, game, ticks);
@@ -371,7 +385,7 @@ final class SelfPlayGame {
         return points;
     }
 
-    private static List<String> scoreboard(Game game) {
+    private List<String> scoreboard(Game game) {
         List<String> lines = new ArrayList<>();
         Map<String, List<String>> scored = game.getScoredPublicObjectives();
         game.getRevealedPublicObjectives().keySet().forEach(id -> {
@@ -397,7 +411,8 @@ final class SelfPlayGame {
             String playerId = ti4.game.GameStats.getTrackedPlayerId(player);
             List<String> plays = game.getGameStats().getActionCardPlays().stream()
                     .filter(play -> playerId != null && playerId.equals(play.getPlayerId()))
-                    .map(play -> play.getActionCard() + (play.isCanceled() ? " (sabotaged)" : ""))
+                    .map(play -> play.getActionCard() + " r" + roundOfPlay(game, play)
+                            + (play.isCanceled() ? " (sabotaged)" : ""))
                     .toList();
             lines.add(player.getFaction() + " action cards played " + plays);
         }
@@ -456,6 +471,49 @@ final class SelfPlayGame {
                 (System.nanoTime() - wallStart) / 1_000_000_000L);
     }
 
+    // A play is stamped with the round the game was in when it was first seen, which is within one tick of the play.
+    private void recordPlayRounds(Game game) {
+        int plays = game.getGameStats().getActionCardPlays().size();
+        while (playRounds.size() < plays) playRounds.add(game.getRound());
+    }
+
+    private int roundOfPlay(Game game, ti4.game.GameStats.ActionCardPlay play) {
+        recordPlayRounds(game);
+        int index = game.getGameStats().getActionCardPlays().indexOf(play);
+        return index < 0 || index >= playRounds.size() ? game.getRound() : playRounds.get(index);
+    }
+
+    // A pick is closed with the seat's points once the turn it was made in is over (another seat is active, or the
+    // round
+    // moved on); at the end of the game every pick still open is closed with the final points.
+    private void closeOverrulePicks(Game game, boolean gameOver) {
+        synchronized (env.overrulePicks) {
+            for (SelfPlayEnvironment.OverrulePick pick : env.overrulePicks) {
+                if (pick.pointsAfter >= 0) continue;
+                Player seat = game.getPlayerFromColorOrFaction(pick.faction);
+                if (seat == null) continue;
+                boolean turnOver = gameOver
+                        || game.getRound() != pick.round
+                        || !seat.getUserID().equals(game.getActivePlayerID());
+                if (turnOver) pick.pointsAfter = seat.getTotalVictoryPoints();
+            }
+        }
+    }
+
+    private List<OverruleUse> overruleUses(Game game) {
+        if (game == null) return List.of();
+        closeOverrulePicks(game, true);
+        synchronized (env.overrulePicks) {
+            return env.overrulePicks.stream()
+                    .map(pick -> new OverruleUse(
+                            pick.faction,
+                            pick.round,
+                            Helper.getSCName(pick.initiative, game),
+                            pick.pointsAfter > pick.pointsBefore))
+                    .toList();
+        }
+    }
+
     private void recordHands(Game game) {
         for (Player player : game.getRealPlayers()) {
             for (String alias : player.getActionCards().keySet()) heldCards.add(player.getFaction() + "|" + alias);
@@ -464,18 +522,27 @@ final class SelfPlayGame {
 
     private ActionCardSummary actionCardSummary(Game game) {
         List<ActionCardUse> uses = new ArrayList<>();
+        List<String> heldAtEnd = new ArrayList<>();
         if (game != null) {
             for (Player player : game.getRealPlayers()) {
                 String playerId = ti4.game.GameStats.getTrackedPlayerId(player);
                 game.getGameStats().getActionCardPlays().stream()
                         .filter(play -> playerId != null && playerId.equals(play.getPlayerId()))
-                        .forEach(play -> uses.add(
-                                new ActionCardUse(player.getFaction(), play.getActionCard(), play.isCanceled())));
+                        .forEach(play -> uses.add(new ActionCardUse(
+                                player.getFaction(),
+                                play.getActionCard(),
+                                roundOfPlay(game, play),
+                                play.isCanceled())));
+                for (String alias : player.getActionCards().keySet()) heldAtEnd.add(player.getFaction() + "|" + alias);
             }
         }
         if (game != null) recordHands(game);
         return new ActionCardSummary(
-                List.copyOf(uses), java.util.Set.copyOf(legacySeats), java.util.Set.copyOf(heldCards));
+                List.copyOf(uses),
+                java.util.Set.copyOf(legacySeats),
+                java.util.Set.copyOf(heldCards),
+                overruleUses(game),
+                List.copyOf(heldAtEnd));
     }
 
     private List<SelfPlayEnvironment.TradeRecord> ledger() {
