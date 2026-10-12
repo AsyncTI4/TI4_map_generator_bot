@@ -151,6 +151,16 @@ class AgendaCardRulesTest extends BaseTi4Test {
         assertThat(AgendaCardRules.queueRider(context(nekro, options))).isEmpty();
     }
 
+    // A seat on the rules from before the statistics (the A/B flag) plays none of the agenda cards.
+    @Test
+    void aSeatOnTheEarlierRulesQueuesNoRider() {
+        holds(nekro, IMPERIAL);
+        ti4.ai.AiSettings.markLegacyActionCards(nekro);
+        AiPrompt window = hidden("after", "queueAnAfter", "declineToQueueAnAfter");
+
+        assertThat(AgendaCardRules.queueRider(context(nekro, window))).isEmpty();
+    }
+
     @Test
     void doesNotQueueARiderOutsideTheAfterWindow() {
         holds(nekro, IMPERIAL);

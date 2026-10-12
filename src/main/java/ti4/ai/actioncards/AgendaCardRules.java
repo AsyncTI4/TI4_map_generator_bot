@@ -123,7 +123,7 @@ public class AgendaCardRules {
         Player seat = context.seat();
         boolean whensOpen = WAITING_PHASE.equalsIgnoreCase(game.getPhaseOfGame())
                 && game.getStoredValue(WHENS_RESOLVED).isEmpty();
-        if (!whensOpen || AgendaQueue.holdsQueuedWhen(game, seat) || !ActionCardRules.mayPlay(game, seat)) {
+        if (!whensOpen || AgendaQueue.holdsQueuedWhen(game, seat) || !ActionCardRules.mayPlayNow(game, seat)) {
             return Optional.empty();
         }
         Optional<String> veto = seat.getActionCards().keySet().stream()
@@ -142,7 +142,7 @@ public class AgendaCardRules {
         if (!waiting || entry(context).isPresent() || AgendaQueue.holdsQueuedAfter(game, seat)) {
             return Optional.empty();
         }
-        if (!ActionCardRules.mayPlay(game, seat)) return Optional.empty();
+        if (!ActionCardRules.mayPlayNow(game, seat)) return Optional.empty();
         Optional<Choice> best = bestRider(context);
         if (best.isEmpty()) return Optional.empty();
         Optional<AiDecision> queue = pressHidden(

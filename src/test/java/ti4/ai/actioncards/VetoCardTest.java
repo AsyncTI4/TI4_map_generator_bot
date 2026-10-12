@@ -128,6 +128,13 @@ class VetoCardTest extends BaseTi4Test {
     }
 
     @Test
+    void aSeatOnTheEarlierRulesQueuesNoVeto() {
+        ti4.ai.AiSettings.markLegacyActionCards(nekro);
+
+        assertThat(AgendaCardRules.queueVeto(context(whenOffer()))).isEmpty();
+    }
+
+    @Test
     void doesNotQueueAVetoWithoutOne() {
         nekro.getActionCards().clear();
 
