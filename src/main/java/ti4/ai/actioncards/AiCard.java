@@ -37,6 +37,7 @@ record AiCard(
         COMPONENT_ACTION,
         AFTER_ACTIVATION,
         PRE_PLAY,
+        AFTER_ACTION,
         REACTION
     }
 

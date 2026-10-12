@@ -420,6 +420,12 @@ to build one by hand:
     it played and that was not cancelled, and a target button must match the card's own id (a Technology strategy card
     button is not a research card's). Plays outside its
     own turn (_Forward Supply Base_) are tracked by the activation that triggered them, one play per activation.
+  - **Master Plan** ("after you perform an action, perform an additional action"). It is played from the hand once the
+    first action has concluded, when the bot offers another action ("Use Ability To Do Another Action" after a tactical
+    action, "Do Another Action" after a strategy card) and a second action is worth it: the same test Fleet Logistics
+    uses, a tactical action that attacks or is worth most of a point, or an Imperial that scores right away. With Fleet
+    Logistics too it plays Master Plan first. Once the Sabotage window has closed on it, the seat presses the bot's
+    button for the extra action and takes it the way Fleet Logistics does; a Sabotaged Master Plan gives nothing.
   - **Overrule.** The bot plays the primary of the chosen card as if it were played, but nothing is marked played, nobody can
     follow, and its message names the card as overruled with the seat's own buttons. The AI therefore starts the primary
     itself (it remembers the card as played this turn, finds the message by the word overruled and the card's name), never

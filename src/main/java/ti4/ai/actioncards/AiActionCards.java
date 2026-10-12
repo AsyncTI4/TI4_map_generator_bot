@@ -73,6 +73,7 @@ public class AiActionCards {
             SecretCards.impersonation(),
             StrategizeCard.strategize(),
             OverruleCard.overrule(),
+            ExtraActionCard.masterPlan(),
             new AiCard(
                     SABOTAGE,
                     ActionCardHelper::isSabotageOrShatter,
@@ -138,6 +139,10 @@ public class AiActionCards {
                 targetPrefixes,
                 target,
                 onResolve);
+    }
+
+    static AiCard afterAction(String key, Predicate<String> matches, TargetStep target) {
+        return new AiCard(key, matches, Window.AFTER_ACTION, NEVER, ALWAYS, null, List.of(), target);
     }
 
     static AiCard componentOfCopies(

@@ -397,6 +397,8 @@ public class NekroBrain implements FactionBrain {
         if (primary.isPresent()) return primary;
         if (StrategyCardRules.awaitingSecondaries(context)) return Optional.empty();
         List<AiPrompt> thisTurn = promptsThisTurn(context);
+        Optional<AiDecision> masterPlan = ActionCardRules.masterPlan(context, secondActionIsWorthIt(context, thisTurn));
+        if (masterPlan.isPresent()) return masterPlan;
         Optional<AiDecision> secondAction =
                 TacticalRules.secondAction(context, thisTurn).or(() -> secondStrategicAction(context, thisTurn));
         if (secondAction.isPresent()) return secondAction;
@@ -442,9 +444,27 @@ public class NekroBrain implements FactionBrain {
         return Optional.empty();
     }
 
+    private static boolean secondActionIsWorthIt(AiTurnContext context, List<AiPrompt> thisTurn) {
+        if (TacticalRules.anotherActionButton(context, thisTurn).isEmpty()
+                || TacticalRules.secondActionStarted(context)
+                || TacticalRules.inProgress(context.game(), context.seat())) {
+            return false;
+        }
+        return TacticalRules.secondTacticalActionIsWorthIt(context) || strategicActionIsWorthIt(context, thisTurn);
+    }
+
+    private static boolean strategicActionIsWorthIt(AiTurnContext context, List<AiPrompt> thisTurn) {
+        return thisTurn.stream()
+                .anyMatch(prompt -> prompt.firstEnabled(button -> button.isOwnedBy(context.faction())
+                                && button.handlerId().startsWith("strategicAction_")
+                                && unplayed(context.game(), StrategyCardRanking.initiative(button))
+                                && worthPlayingNow(context, StrategyCardRanking.initiative(button)))
+                        .isPresent());
+    }
+
     private static Optional<AiDecision> secondStrategicAction(AiTurnContext context, List<AiPrompt> thisTurn) {
-        if (!context.seat().hasTech(FLEET_LOGISTICS)
-                || !TacticalRules.actionTaken(context)
+        if (!TacticalRules.mayTakeAnotherAction(context)
+                || !TacticalRules.firstActionConcluded(context, thisTurn)
                 || TacticalRules.secondActionStarted(context)) {
             return Optional.empty();
         }

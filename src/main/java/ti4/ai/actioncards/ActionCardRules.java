@@ -3,6 +3,7 @@ package ti4.ai.actioncards;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiSettings;
@@ -96,11 +97,34 @@ public class ActionCardRules {
         return best.flatMap(card -> startPlay(context, key, card.alias()));
     }
 
+    public static Optional<AiDecision> masterPlan(AiTurnContext context, boolean secondActionIsWorthIt) {
+        Game game = context.game();
+        Player seat = context.seat();
+        String key = PlayMemory.masterPlanKey(context);
+        if (!secondActionIsWorthIt
+                || context.memory().has(key)
+                || AiSettings.usesLegacyActionCards(seat)
+                || !mayPlay(game, seat)
+                || keepsSpyNetworkCards(seat)) {
+            return Optional.empty();
+        }
+        return seat.getActionCards().keySet().stream()
+                .filter(alias -> AiActionCards.of(alias)
+                        .filter(card -> card.window() == Window.AFTER_ACTION)
+                        .isPresent())
+                .sorted()
+                .findFirst()
+                .flatMap(alias -> startPlay(context, key, alias));
+    }
+
     public static Optional<AiDecision> holdOwnTurn(AiTurnContext context) {
         if (!context.isActivePlayer()) return Optional.empty();
-        Optional<CardPlay> play =
-                context.memory().get(PlayMemory.turnKey(context)).flatMap(CardPlay::decode);
-        if (play.isEmpty() || !play.get().active()) return Optional.empty();
+        Optional<CardPlay> play = Stream.of(PlayMemory.turnKey(context), PlayMemory.masterPlanKey(context))
+                .map(key -> context.memory().get(key).flatMap(CardPlay::decode))
+                .flatMap(Optional::stream)
+                .filter(CardPlay::active)
+                .findFirst();
+        if (play.isEmpty()) return Optional.empty();
         String title = SabotageWindow.title(play.get().alias());
         return Optional.of(new AiDecision.Wait(context.now() + HOLD_MILLIS, "the " + title + " action card"));
     }
@@ -187,7 +211,8 @@ public class ActionCardRules {
             return Optional.of(play.get().press("play " + title));
         }
         Optional<AiDecision> refresh = ActionCardHand.requestHand(context, key);
-        return refresh.isPresent() ? refresh : openMenu(context, key, alias, plan, title);
+        if (refresh.isPresent() || !card.get().isComponentAction()) return refresh;
+        return openMenu(context, key, alias, plan, title);
     }
 
     private static Optional<AiDecision> openMenu(

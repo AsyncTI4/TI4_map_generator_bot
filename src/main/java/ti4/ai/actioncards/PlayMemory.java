@@ -14,10 +14,15 @@ class PlayMemory {
     static final String TURN_SCOPE = "turn:";
     static final String MESSAGE_SCOPE = "msg:";
     static final String SUMMIT_SCOPE = "summit";
+    static final String MASTER_PLAN_SCOPE = "plan:";
     private static final String ANNOUNCE_KEY = "acAnnounce|";
 
     static String turnKey(AiTurnContext context) {
         return PLAY_KEY + TURN_SCOPE + context.turnKey();
+    }
+
+    static String masterPlanKey(AiTurnContext context) {
+        return PLAY_KEY + MASTER_PLAN_SCOPE + context.turnKey();
     }
 
     static String summitKey() {
@@ -30,7 +35,7 @@ class PlayMemory {
     }
 
     static List<String> activeKeys(AiTurnContext context) {
-        List<String> keys = new ArrayList<>(List.of(turnKey(context), summitKey()));
+        List<String> keys = new ArrayList<>(List.of(turnKey(context), masterPlanKey(context), summitKey()));
         keys.addAll(context.memory().keysStartingWith(PLAY_KEY + MESSAGE_SCOPE));
         return keys;
     }

@@ -47,12 +47,14 @@ public class TacticalRules {
     static final String EXHAUSTED_ORIGIN_KEY = "exhaustedOrigin|";
     static final String COMBAT_EXPECTED_KEY = "combatExpectedSince|";
     static final String SECOND_ACTION_KEY = "secondAction|";
+    private static final String EXTRA_ACTION_KEY = "extraAction|";
+    private static final String ANOTHER_PRESSED_KEY = "anotherActionPressed|";
     private static final String SECOND_ACTION_SUFFIX = "#2";
     private static final String FLEET_LOGISTICS = "fl";
     private static final double URGENT_SCORE = 0.75 * ObjectiveValue.VICTORY_POINT_VALUE;
     private static final String HAZARDOUS = "hazardous";
     private static final String TACTICAL_ACTION = "tacticalAction";
-    private static final String ANOTHER_ACTION = "doAnotherAction";
+    private static final List<String> ANOTHER_ACTION_BUTTONS = List.of("doAnotherAction", "confirmSecondAction");
     private static final String FIELD = "|";
     private static final int MAX_PICKER_PRESSES = 4;
     private static final String RING_TILE_PREFIX = "ringTile_";
@@ -95,23 +97,50 @@ public class TacticalRules {
         context.memory().put(SECOND_ACTION_KEY + context.turnKey(), firstTarget + FIELD + context.now());
     }
 
+    public static Optional<Match> anotherActionButton(AiTurnContext context, List<AiPrompt> thisTurn) {
+        return Prompts.owned(thisTurn, context.faction(), ANOTHER_ACTION_BUTTONS::contains)
+                .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
+    }
+
+    public static boolean firstActionConcluded(AiTurnContext context, List<AiPrompt> thisTurn) {
+        return actionTaken(context)
+                || context.memory().has(ANOTHER_PRESSED_KEY + context.turnKey())
+                || anotherActionButton(context, thisTurn).isPresent();
+    }
+
+    public static void allowAnotherAction(AiTurnContext context) {
+        context.memory().put(EXTRA_ACTION_KEY + context.turnKey(), String.valueOf(context.now()));
+    }
+
+    public static boolean mayTakeAnotherAction(AiTurnContext context) {
+        return context.seat().hasTech(FLEET_LOGISTICS) || context.memory().has(EXTRA_ACTION_KEY + context.turnKey());
+    }
+
+    public static boolean secondTacticalActionIsWorthIt(AiTurnContext context) {
+        return TacticalPlanner.best(context.game(), context.seat())
+                .filter(TacticalRules::urgent)
+                .isPresent();
+    }
+
     public static Optional<AiDecision> secondAction(AiTurnContext context, List<AiPrompt> thisTurn) {
-        if (!context.seat().hasTech(FLEET_LOGISTICS)) return Optional.empty();
+        if (!mayTakeAnotherAction(context)) return Optional.empty();
         if (secondActionStarted(context)) return pickingSecondSystem(context) ? start(context) : Optional.empty();
-        if (!actionTaken(context) || inProgress(context.game(), context.seat())) return Optional.empty();
+        if (!firstActionConcluded(context, thisTurn) || inProgress(context.game(), context.seat())) {
+            return Optional.empty();
+        }
         Optional<TacticalPlan> plan = TacticalPlanner.best(context.game(), context.seat());
         if (plan.isEmpty() || !urgent(plan.get())) return Optional.empty();
         Optional<Match> again = Prompts.owned(thisTurn, context.faction(), TACTICAL_ACTION::equals)
                 .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
         if (again.isEmpty()) {
-            return Prompts.owned(thisTurn, context.faction(), ANOTHER_ACTION::equals)
-                    .filter(match -> !context.alreadyPressed(match.prompt(), match.button()))
-                    .map(match -> match.press("take another action with Fleet Logistics"));
+            return anotherActionButton(context, thisTurn).map(match -> {
+                context.memory().put(ANOTHER_PRESSED_KEY + context.turnKey(), String.valueOf(context.now()));
+                return match.press("take another action");
+            });
         }
         markSecondAction(context, true);
         context.memory().put(PLAN_KEY + actionKey(context), plan.get().encode());
-        return Optional.of(
-                again.get().press("take a second tactical action with Fleet Logistics: " + describe(plan.get())));
+        return Optional.of(again.get().press("take a second tactical action: " + describe(plan.get())));
     }
 
     private static boolean urgent(TacticalPlan plan) {
