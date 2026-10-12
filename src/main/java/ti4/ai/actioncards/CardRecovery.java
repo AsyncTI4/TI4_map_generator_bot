@@ -22,6 +22,7 @@ class CardRecovery {
             return;
         }
         if (!"action".equalsIgnoreCase(phase)) return;
+        recoverCombat(context);
         if (context.isActivePlayer()) {
             recoverOwnTurn(context);
         } else {
@@ -60,22 +61,37 @@ class CardRecovery {
     }
 
     private static boolean resolvePending(AiTurnContext context, String key, AiCard card, long since) {
+        return resolvePending(context, key, card, card.key(), since);
+    }
+
+    private static boolean resolvePending(AiTurnContext context, String key, AiCard card, String alias, long since) {
         if (!card.hasResolveButton()) return false;
-        Optional<Match> resolve = CardPrompts.ownedPublic(context, since, card.resolveHandler()::equals);
+        String handler = card.resolveHandler();
+        Optional<Match> resolve = CardPrompts.ownedPublic(context, since, id -> CardPrompts.matches(id, handler));
         if (resolve.isEmpty()) return false;
         long playedAt = resolve.get().prompt().createdAtMillis() - CONFIRM_MILLIS;
-        Optional<AiPrompt> announcement = SabotageWindow.announcement(context, card.key(), playedAt);
+        Optional<AiPrompt> announcement = SabotageWindow.announcement(context, alias, playedAt);
         CardPlay rebuilt = new CardPlay(
                 Stage.WINDOW,
                 context.now(),
                 playedAt,
-                card.key(),
+                alias,
                 announcement.map(AiPrompt::messageId).orElse(""),
                 announcement.isPresent(),
-                SabotageWindow.lastPlayIndex(context.game(), context.seat(), card.key()),
+                SabotageWindow.lastPlayIndex(context.game(), context.seat(), alias),
                 "");
         PlayMemory.store(context, key, announcement.isPresent() ? rebuilt : rebuilt.at(Stage.RESOLVE, context.now()));
         return true;
+    }
+
+    private static void recoverCombat(AiTurnContext context) {
+        String position = context.game().getActiveSystem();
+        if (position.isBlank() || CombatCardRules.tracksAPlay(context)) return;
+        String key = PlayMemory.combatKey(position, CombatCardRules.RECOVERED, 0);
+        long since = Prompts.turnStart(context);
+        for (AiCard card : AiActionCards.inWindow(Window.COMBAT_ROUND)) {
+            if (playedUncanceled(context, card) && resolvePending(context, key, card, since)) return;
+        }
     }
 
     private static boolean targetPending(AiTurnContext context, String key, AiCard card) {

@@ -12,6 +12,7 @@ import ti4.ai.actioncards.ActionCardResponses;
 import ti4.ai.actioncards.ActionCardRules;
 import ti4.ai.actioncards.ActionCardValue;
 import ti4.ai.actioncards.AgendaCardRules;
+import ti4.ai.actioncards.CombatCardRules;
 import ti4.ai.actioncards.SabotageRules;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.agenda.AgendaQueue;
@@ -162,7 +163,8 @@ public class NekroBrain implements FactionBrain {
             PromissoryRules::playCeasefire,
             PromissoryRules::playCombatNotes,
             SingularityRules::next,
-            CombatRules::next,
+            CombatCardRules::hold,
+            context -> CombatRules.next(context, CombatCardRules::atRoundStart),
             ActionSecretRules::next,
             SecretRules::scoreAgendaSecret,
             PromissoryRules::queueAgendaNote,

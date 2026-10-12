@@ -604,6 +604,8 @@ public class CombatRollService {
             }
         }
 
+        // TODO Bunker's -4 waits in the defender's new temp mods until the defender rolls, so it probably never
+        // reaches the attacker's bombardment.
         // Check for temp mods
         CombatTempModHelper.ensureValidTempMods(player, tileModel, combatOnHolder);
         CombatTempModHelper.initializeNewTempMods(player, tileModel, combatOnHolder);

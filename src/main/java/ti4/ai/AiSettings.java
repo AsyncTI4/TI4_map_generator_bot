@@ -36,6 +36,7 @@ public class AiSettings {
     public static final String PACE_KEY = "aiPace";
     public static final String FAST_PACE = "fast";
     public static final String TRADING_PROPERTY = "ai.trading";
+    public static final String COMBAT_CARDS_PROPERTY = "ai.combatcards";
     public static final String ACTION_CARDS_AB_PROPERTY = "ai.actioncards.ab";
     public static final String LEGACY_ACTION_CARDS_KEY = "aiLegacyActionCards";
     public static final String SECRET_HOLD_PROPERTY = "ai.secrets.hold";
@@ -67,6 +68,10 @@ public class AiSettings {
 
     public static boolean isTradingEnabled() {
         return !"false".equalsIgnoreCase(System.getProperty(TRADING_PROPERTY, "true"));
+    }
+
+    public static boolean isCombatCardsEnabled() {
+        return !"false".equalsIgnoreCase(System.getProperty(COMBAT_CARDS_PROPERTY, "true"));
     }
 
     public static boolean isActionCardAbTest() {

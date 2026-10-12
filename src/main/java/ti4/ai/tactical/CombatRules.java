@@ -31,6 +31,7 @@ public class CombatRules {
     static final long ROLL_GRACE_MILLIS = 120_000L;
     static final long AI_ROLL_GRACE_MILLIS = 10_000L;
     private static final String ROLL_PREFIX = "combatRoll_";
+    private static final String AUTOMATE_PREFIX = "automateGroundCombat_";
     private static final String ASSIGN_PREFIX = "autoAssign";
     private static final String AFB_SUFFIX = "_afb";
     private static final String SPACE_CANNON_OFFENCE_SUFFIX = "_spacecannonoffence";
@@ -54,6 +55,10 @@ public class CombatRules {
             List.of("autoAssignSpaceHits_", "autoAssignSpaceCannonOffenceHits_", AutoAssignGroundHitsButtonIds.PREFIX);
 
     public static Optional<AiDecision> next(AiTurnContext context) {
+        return next(context, CombatCardHook.NONE);
+    }
+
+    public static Optional<AiDecision> next(AiTurnContext context, CombatCardHook hook) {
         List<AiPrompt> prompts = Prompts.newestFirst(context.prompts()).stream()
                 .filter(prompt -> !prompt.isHidden())
                 .toList();
@@ -73,7 +78,7 @@ public class CombatRules {
         Optional<AiDecision> magen = magenDefenseGrid(context, prompts);
         if (magen.isPresent()) return magen;
         Optional<Match> automate = Prompts.owned(
-                prompts, context.faction(), id -> id.startsWith("automateGroundCombat_") && id.endsWith("_confirmed"));
+                prompts, context.faction(), id -> id.startsWith(AUTOMATE_PREFIX) && id.endsWith("_confirmed"));
         if (automate.isPresent()) return Optional.of(automate.get().press("automate ground combat"));
         Optional<AiDecision> spaceCannon = spaceCannonOffence(context, prompts);
         if (spaceCannon.isPresent()) return spaceCannon;
@@ -85,7 +90,7 @@ public class CombatRules {
         if (afb.isPresent()) return afb;
         Optional<AiDecision> retreat = RetreatRules.next(context, prompts);
         if (retreat.isPresent()) return retreat;
-        return combatRound(context, prompts);
+        return combatRound(context, prompts, hook);
     }
 
     public static boolean awaitsSeat(Game game, Player seat, List<AiPrompt> prompts, AiPrompt prompt) {
@@ -336,7 +341,8 @@ public class CombatRules {
                 .anyMatch(other -> BoardView.nonFighterShips(space, other) > 0);
     }
 
-    private static Optional<AiDecision> combatRound(AiTurnContext context, List<AiPrompt> prompts) {
+    private static Optional<AiDecision> combatRound(
+            AiTurnContext context, List<AiPrompt> prompts, CombatCardHook hook) {
         Optional<AiDecision> waiting = Optional.empty();
         for (AiPrompt prompt : prompts) {
             if (prompt.source() != PromptSource.COMBAT_THREAD) continue;
@@ -352,6 +358,8 @@ public class CombatRules {
                         : ROLL_GRACE_MILLIS;
                 long readyAt = newestInChannel(prompts, prompt.channelId()) + grace;
                 if (context.now() >= readyAt) {
+                    Optional<AiDecision> card = roundStartCard(context, prompts, roll, hook);
+                    if (card.isPresent()) return card;
                     return Optional.of(AiDecision.press(prompt, roll, "roll a combat round"));
                 }
                 if (waiting.isEmpty())
@@ -359,6 +367,30 @@ public class CombatRules {
             }
         }
         return waiting;
+    }
+
+    private static Optional<AiDecision> roundStartCard(
+            AiTurnContext context, List<AiPrompt> prompts, PromptButton roll, CombatCardHook hook) {
+        Optional<Combat> combat = combatOf(context.game(), context.seat(), roll);
+        String[] parts = roll.handlerId().split("_");
+        if (combat.isEmpty()
+                || combat.get().mine() != combat.get().theirs()
+                || !parts[1].equals(context.game().getActiveSystem())
+                || hitsPending(prompts, roll)) {
+            return Optional.empty();
+        }
+        boolean ground = !BoardView.SPACE.equals(parts[2]);
+        if (ground && groundCombatMayBeAutomated(prompts, parts[2])) return Optional.empty();
+        return hook.atRoundStart(
+                context,
+                new CombatMoment(parts[1], parts[2], ground, combat.get().mine()));
+    }
+
+    private static boolean groundCombatMayBeAutomated(List<AiPrompt> prompts, String planet) {
+        return prompts.stream()
+                .flatMap(prompt -> prompt.enabledButtons().stream())
+                .map(PromptButton::handlerId)
+                .anyMatch(id -> id.startsWith(AUTOMATE_PREFIX) && id.contains("_" + planet + "_"));
     }
 
     private static List<PromptButton> rolls(AiPrompt prompt, String suffix) {

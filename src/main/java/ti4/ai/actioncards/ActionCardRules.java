@@ -202,7 +202,7 @@ public class ActionCardRules {
         return SpyNetwork.holds(seat) && seat.getAcCount() <= SpyNetwork.CARDS;
     }
 
-    private static Optional<AiDecision> startPlay(AiTurnContext context, String key, String alias, PlayMoment moment) {
+    static Optional<AiDecision> startPlay(AiTurnContext context, String key, String alias, PlayMoment moment) {
         Integer index = context.seat().getActionCards().get(alias);
         Optional<AiCard> card = AiActionCards.of(alias);
         if (index == null || card.isEmpty()) return Optional.empty();
@@ -249,6 +249,9 @@ public class ActionCardRules {
         Optional<CardPlay> stored = context.memory().get(key).flatMap(CardPlay::decode);
         if (stored.isEmpty() || !stored.get().active()) return Optional.empty();
         CardPlay play = stored.get();
+        if (key.startsWith(PlayMemory.COMBAT_PREFIX) && CombatCardRules.outdated(context, key)) {
+            return stop(context, key, play, Stage.CANCELED);
+        }
         return switch (play.stage()) {
             case MENU -> fromMenu(context, key, play);
             case PRESET -> afterPreset(context, key, play);
@@ -346,7 +349,9 @@ public class ActionCardRules {
         if (!card.get().hasResolveButton()) return move(context, key, play.at(after, context.now()));
         String handler = card.get().resolveHandler();
         Optional<Match> button = CardPrompts.ownedPublic(
-                        context, play.playedAt() - CardPrompts.CLOCK_SKEW_MILLIS, handler::equals)
+                        context,
+                        play.playedAt() - CardPrompts.CLOCK_SKEW_MILLIS,
+                        id -> CardPrompts.matches(id, handler))
                 .or(() -> rememberedResolveButton(context, key, handler));
         if (button.isEmpty()) {
             return expired(context, play, PROMPT_MILLIS) ? stop(context, key, play, Stage.DONE) : Optional.empty();
@@ -361,7 +366,10 @@ public class ActionCardRules {
         String handler =
                 AiActionCards.of(play.alias()).map(AiCard::resolveHandler).orElse(null);
         if (handler == null || context.memory().has(REF_KEY + key)) return;
-        CardPrompts.ownedPublic(context, play.playedAt() - CardPrompts.CLOCK_SKEW_MILLIS, handler::equals)
+        CardPrompts.ownedPublic(
+                        context,
+                        play.playedAt() - CardPrompts.CLOCK_SKEW_MILLIS,
+                        id -> CardPrompts.matches(id, handler))
                 .ifPresent(match -> context.memory()
                         .put(
                                 REF_KEY + key,

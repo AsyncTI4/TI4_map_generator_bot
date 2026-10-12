@@ -16,6 +16,8 @@ class PlayMemory {
     static final String SUMMIT_SCOPE = "summit";
     static final String MASTER_PLAN_SCOPE = "plan:";
     static final String AGENDA_SCOPE = "agenda:";
+    static final String COMBAT_PREFIX = PLAY_KEY + "combat:";
+    private static final String START_SUFFIX = ":start";
     private static final String ANNOUNCE_KEY = "acAnnounce|";
 
     static String turnKey(AiTurnContext context) {
@@ -39,10 +41,20 @@ class PlayMemory {
                 + context.game().getActiveSystem();
     }
 
+    static String combatKey(String position, String holder, int round) {
+        return COMBAT_PREFIX + position + "@" + holder + "#" + round + START_SUFFIX;
+    }
+
+    static String combatPosition(String key) {
+        String scope = key.substring(COMBAT_PREFIX.length());
+        return scope.substring(0, Math.max(0, scope.indexOf('@')));
+    }
+
     static List<String> activeKeys(AiTurnContext context) {
         List<String> keys =
                 new ArrayList<>(List.of(turnKey(context), masterPlanKey(context), summitKey(), agendaKey(context)));
         keys.addAll(context.memory().keysStartingWith(PLAY_KEY + MESSAGE_SCOPE));
+        keys.addAll(context.memory().keysStartingWith(COMBAT_PREFIX));
         return keys;
     }
 
