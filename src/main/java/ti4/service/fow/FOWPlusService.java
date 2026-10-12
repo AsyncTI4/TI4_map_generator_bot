@@ -300,7 +300,9 @@ public final class FOWPlusService {
         if (!isActive(game) && !game.getFowOption(FOWOption.HIDE_EXPLORES)
                 || game.getPlayersWithGMRole().contains(player)) return true;
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Deck info not available.");
+        if (player != null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Deck info not available.");
+        }
         return false;
     }
 

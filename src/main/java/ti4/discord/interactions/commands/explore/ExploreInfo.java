@@ -6,15 +6,17 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.service.explore.ExploreService;
 
 class ExploreInfo extends GameStateSubcommand {
 
     ExploreInfo() {
-        super(Constants.INFO, "Display cards in exploration decks and discards.", false, true);
+        super(Constants.INFO, "Display cards in exploration decks and discards.", false, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.")
                 .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.OVERRIDE_FOW, "TRUE if override fog"));
@@ -39,6 +41,7 @@ class ExploreInfo extends GameStateSubcommand {
             types.add(Constants.FRONTIER);
         }
         Game game = getGame();
-        ExploreService.secondHalfOfExpInfo(types, event, getPlayer(), game, over);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
+        ExploreService.secondHalfOfExpInfo(types, event, player, game, over);
     }
 }
