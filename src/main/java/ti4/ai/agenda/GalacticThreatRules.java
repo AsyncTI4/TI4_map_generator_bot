@@ -112,15 +112,30 @@ public class GalacticThreatRules {
                     .filter(button -> !context.alreadyPressed(prompt, button))
                     .toList();
             if (riders.isEmpty()) continue;
+            AgendaForecast forecast = AgendaForecast.of(game, context.seat());
             PromptButton choice = riders.stream()
-                    .max(Comparator.comparingDouble(button -> likelihood(game, context.seat(), button)))
+                    .max(Comparator.comparingDouble(button -> likelihood(game, context.seat(), forecast, button)))
                     .orElseThrow();
             return Optional.of(AiDecision.press(prompt, choice, "predict the agenda's outcome"));
         }
         return Optional.empty();
     }
 
-    private static double likelihood(Game game, Player seat, PromptButton rider) {
+    private static double likelihood(Game game, Player seat, AgendaForecast forecast, PromptButton rider) {
+        if (forecast.isEmpty()) return votesBasedLikelihood(game, seat, rider);
+        String id = rider.handlerId();
+        if (id.startsWith(PLANET_RIDER_PREFIX)) {
+            Player owner = game.getPlayerFromColorOrFaction(
+                    StringUtils.substringBefore(StringUtils.removeStart(id, PLANET_RIDER_PREFIX), "_"));
+            return owner == null
+                    ? 0
+                    : forecast.expected(outcome -> owner.getPlanets().contains(outcome) ? 1 : 0);
+        }
+        String target = StringUtils.substringBefore(StringUtils.removeStart(id, RIDER_PREFIX), "_" + RIDER_SUFFIX);
+        return forecast.chance(StringUtils.substringAfter(target, ";"));
+    }
+
+    private static double votesBasedLikelihood(Game game, Player seat, PromptButton rider) {
         String id = rider.handlerId();
         if (id.startsWith(PLANET_RIDER_PREFIX)) {
             Player owner = game.getPlayerFromColorOrFaction(

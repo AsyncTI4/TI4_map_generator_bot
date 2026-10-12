@@ -3,6 +3,7 @@ package ti4.ai.actioncards;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import ti4.ai.agenda.AgendaForecast;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.BoardView;
@@ -22,6 +23,7 @@ import ti4.helpers.ButtonHelper;
 @UtilityClass
 public class CardScoring {
 
+    private static final String IMPERIAL_RIDER = "Imperial Rider";
     private static final double IMPERIAL_RIDER_CHANCE = 0.6;
     private static final double IMPERIAL_HOLDER_CHANCE = 0.5;
     private static final int UPRISING_TYPICAL_GAIN = 2;
@@ -31,7 +33,7 @@ public class CardScoring {
     public static double pointsFor(String title, Game game, Player player) {
         return switch (title) {
             case "Overrule" -> ScoringStakes.overrulePoints(game, player);
-            case "Imperial Rider" -> IMPERIAL_RIDER_CHANCE;
+            case IMPERIAL_RIDER -> IMPERIAL_RIDER_CHANCE;
             case "Political Stability", "Puppets on a String", "Master Plan" ->
                 ScoringStakes.holdsUnplayedImperial(game, player) ? IMPERIAL_HOLDER_CHANCE : 0;
             case "Mining Initiative" -> SpendUnlock.pointDelta(game, player, ActionCardValue.miningGain(game, player));
@@ -45,6 +47,20 @@ public class CardScoring {
                 ResearchPolicy.publicPointsOneTechShort(game, player) > 0 ? ONE_POINT : 0;
             default -> 0;
         };
+    }
+
+    public static double rivalStake(String title, Game game, Player viewer, Player cardPlayer) {
+        if (!IMPERIAL_RIDER.equals(title)) {
+            return ScoringStakes.rivalStake(game, cardPlayer, pointsFor(title, game, cardPlayer));
+        }
+        return imperialRiderChance(game, viewer, cardPlayer) * ScoringStakes.rivalStake(game, cardPlayer, ONE_POINT);
+    }
+
+    private static double imperialRiderChance(Game game, Player viewer, Player owner) {
+        AgendaForecast forecast = AgendaForecast.of(game, viewer);
+        return forecast.riderOutcome(owner, IMPERIAL_RIDER)
+                .map(forecast::chance)
+                .orElse(IMPERIAL_RIDER_CHANCE);
     }
 
     public static double pointsDenied(String title, Game game, Player seat) {

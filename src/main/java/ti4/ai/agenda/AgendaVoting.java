@@ -1,6 +1,5 @@
 package ti4.ai.agenda;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -196,21 +195,7 @@ public class AgendaVoting {
                 .mapToInt(planet -> AgendaHelper.getSpecificPlanetsVoteWorth(seat, game, planet))
                 .sum();
         if (available <= 0) return Optional.empty();
-        String target = model.getTarget().toLowerCase();
-        List<String> outcomes = new ArrayList<>();
-        if (target.contains("for/against")) {
-            outcomes.add("for");
-            outcomes.add("against");
-        } else if (target.contains("elect player")) {
-            game.getRealPlayers().forEach(player -> outcomes.add(player.getFaction()));
-        } else if (target.contains("planet")) {
-            game.getRealPlayers()
-                    .forEach(player -> player.getPlanets().stream()
-                            .filter(planet -> electable(game, agenda, target, planet))
-                            .forEach(outcomes::add));
-        } else {
-            return Optional.empty();
-        }
+        List<String> outcomes = AgendaOutcomes.of(game);
         Optional<String> best = outcomes.stream()
                 .filter(outcome -> score(game, seat, agenda, outcome, available) > 0)
                 .max(Comparator.comparingDouble(outcome -> score(game, seat, agenda, outcome, available)));
@@ -225,21 +210,6 @@ public class AgendaVoting {
             owner = planetOwner.getFaction();
         }
         return Optional.of(new Ballot(best.get(), owner, votes));
-    }
-
-    private static boolean electable(Game game, String agenda, String target, String planetName) {
-        Planet planet = game.getPlanetsInfo().get(planetName);
-        if (planet == null || planet.isSpaceStation(game) || !AgendaPolicy.hasRequiredTrait(agenda, planet)) {
-            return false;
-        }
-        for (String trait : List.of("cultural", "industrial", "hazardous")) {
-            if (target.contains(trait) && !planet.getPlanetTypes().contains(trait)) return false;
-        }
-        if (target.contains("non-home")) {
-            ti4.game.Tile tile = game.getTileFromPlanet(planetName);
-            if (tile == null || tile.isHomeSystem(game) || tile.isMecatol(game)) return false;
-        }
-        return true;
     }
 
     private static double score(Game game, Player seat, String agenda, String outcome, int available) {

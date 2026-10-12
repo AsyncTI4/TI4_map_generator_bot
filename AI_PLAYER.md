@@ -292,6 +292,24 @@ to build one by hand:
     player with the most votes), and on a correct prediction takes the best technology (`CopiedTechPolicy`, which
     also caps copied faction technologies at its two Valefar Assimilators). It never researches: every research is
     replaced by Propagation's command tokens, all of them, within its reinforcements.
+  - **Forecast** (`AgendaForecast`). For an agenda that elects a player, a planet or For/Against, the chance of each
+    outcome winning, from public information only: the votes each seat had at the reveal less the votes already cast,
+    which players have voted (those before the active voter), and the riders placed (a rider's owner casts nothing
+    without the Xxcha commander alliance, nor does a seat in the _Assassinate Representative_ list, nor Nekro). Every
+    seat that still has votes casts them all for one outcome drawn from a softmax over what the outcome is worth to it
+    (temperature 4 trade goods): a point election is worth the point to the elected seat and minus a quarter of a point
+    to everybody else (the whole game when it wins the elected player the game), any other agenda is its policy score
+    clamped to two units of 4 trade goods (never reading Drive the Debate for another seat), a seat's own placed rider
+    adds its payoff and a rival's _Imperial Rider_ takes away the rival's point (`RiderPayoff`). A seat that sees
+    nothing between the outcomes (within one trade good) abstains three times in ten and otherwise chooses at random.
+    256 draws, one per seat and sample that every hypothetical (`withRider`, `withVotes`, `without`) shares, decide
+    the winner by the most votes, a tie going to the speaker's own choice. The draws are seeded by the game, agenda and
+    viewer, so the same table gives the same numbers. It is empty in fog of war, Hidden Agenda and Omega modes, outside
+    the agenda phase and for agendas it cannot list the outcomes of, and the readers below then use the votes at the
+    reveal as before. Galactic Threat predicts the outcome with the best chance; the Political Secret, Political Favor
+    and "elected to a point" tests take expectations over it, which makes them a little less sure than the single
+    expected winner they used to assume: a 9 vote leader now wins about three times in four, so the leader has to be
+    7 points ahead, not 6, before Political Favor is worth discarding the agenda.
   - **Queued entries.** A seat whose "when" or "after" slot holds an entry (a Political Secret or Political Favor
     note, Galactic Threat) never presses the "Pass On" button the bot posts for it, which would unqueue it, and never
     holds its turn while the entry waits (`AgendaQueue`). It used to wait quietly, which meant it never answered the
@@ -481,7 +499,7 @@ to build one by hand:
     phase and 0.35 otherwise; standing is as above (3 for a contender). The points a card can give its player
     (`CardScoring`) are: for _Overrule_, what its seat's Imperial primary would score (`ScoringStakes.overrulePlay`:
     one more public objective, 2 for a stage II, and the Mecatol Rex point) while Imperial is still to be played, and
-    the whole game when that reaches the goal; 0.6 for an _Imperial Rider_; 0.5 for _Political Stability_, _Puppets on a String_ and _Master Plan_ while
+    the whole game when that reaches the goal; 0.6 for an _Imperial Rider_ before it is placed (an _Imperial Rider_ is worth its chance of winning, 0.6 until it sits on an outcome and then the forecast's chance of that outcome, times the whole of the owner's point, which is the game for a rival at match point, instead of a quarter of 0.6 of a point); 0.5 for _Political Stability_, _Puppets on a String_ and _Master Plan_ while
     the player holds Imperial; the spend objective an economy card or _Uprising_ unlocks; and a technology objective
     that is one technology short for a research card. The points a card aimed at the seat would stop it scoring are
     what its planned strategy card scores (_Public Disgrace_, _Coup d'Etat_, _Crisis_), its reserved trade goods

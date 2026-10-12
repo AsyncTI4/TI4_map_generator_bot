@@ -59,7 +59,7 @@ public class SabotagePolicy {
                 ActionCardPrior.cancelAppetite(alias),
                 Involvement.level(context, title, cardPlayer),
                 TableStanding.of(game, seat, cardPlayer));
-        double rival = ScoringStakes.rivalStake(game, cardPlayer, CardScoring.pointsFor(title, game, cardPlayer));
+        double rival = CardScoring.rivalStake(title, game, seat, cardPlayer);
         double denied = Involvement.aimedAtSeat(context, title, cardPlayer)
                 ? ScoringStakes.scoreValue(game, seat, CardScoring.pointsDenied(title, game, seat))
                 : 0;

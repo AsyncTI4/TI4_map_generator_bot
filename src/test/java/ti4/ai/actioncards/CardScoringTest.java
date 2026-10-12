@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.within;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
@@ -48,6 +49,58 @@ class CardScoringTest extends BaseTi4Test {
     void anImperialRiderIsAGuess() {
         assertThat(CardScoring.pointsFor("Imperial Rider", table.game, table.sol))
                 .isCloseTo(0.6, within(EXACT));
+    }
+
+    private void votingOnArmsReduction(String startVotes) {
+        table.game.setPhaseOfGame("agendaVoting");
+        table.game.setCurrentAgendaInfo("Directive_For/Against_7_arms_reduction");
+        table.game.setStoredValue("agendaStartVoteCounts", startVotes);
+    }
+
+    // The point an Imperial Rider is worth to a rival is the chance that it wins times the whole of that point:
+    // the game itself for a rival at match point, not a quarter of 0.6 of a point.
+    @Test
+    void anImperialRiderNobodyHasPlacedYetIsWorthSixTenthsOfTheRivalsPoint() {
+        table.points(table.sol, 9);
+
+        assertThat(CardScoring.rivalStake("Imperial Rider", table.game, table.nekro, table.sol))
+                .isCloseTo(0.6 * ScoringStakes.WIN_VALUE, within(EXACT));
+    }
+
+    @Test
+    void anImperialRiderOnTheOutcomeNobodyCanStopCountsAsTheWin() {
+        table.third("xxcha", "red");
+        table.points(table.sol, 9);
+        votingOnArmsReduction("{\"blue\":0,\"red\":8,\"black\":0}");
+        table.game.setCurrentAgendaVote("for", "red_8;blue_Imperial Rider");
+
+        assertThat(CardScoring.rivalStake("Imperial Rider", table.game, table.nekro, table.sol))
+                .isCloseTo(ScoringStakes.WIN_VALUE, within(EXACT));
+    }
+
+    // A voter who still has votes to cast votes the rider down when it would win the game, so it is worth little.
+    @Test
+    void anImperialRiderTheOtherVotersCanStillVoteDownIsWorthLittle() {
+        table.third("xxcha", "red");
+        table.points(table.sol, 9);
+        votingOnArmsReduction("{\"blue\":0,\"red\":8,\"black\":0}");
+        table.game.setCurrentAgendaVote("for", "blue_Imperial Rider");
+
+        assertThat(CardScoring.rivalStake("Imperial Rider", table.game, table.nekro, table.sol))
+                .isLessThan(1.0);
+    }
+
+    @Test
+    void otherCardsKeepTheirPointsForTheRivalStake() {
+        table.points(table.sol, 8);
+
+        assertThat(CardScoring.rivalStake("Mining Initiative", table.game, table.nekro, table.sol))
+                .isCloseTo(
+                        ScoringStakes.rivalStake(
+                                table.game,
+                                table.sol,
+                                CardScoring.pointsFor("Mining Initiative", table.game, table.sol)),
+                        within(EXACT));
     }
 
     @Test

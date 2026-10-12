@@ -64,6 +64,7 @@ public class AgendaPolicy {
             "rt_warfare");
     private static final Set<String> BAD_FOR_PLANET_OWNER =
             Set.of("core_mining", "demilitarized_zone", "disarmament", "redistribution");
+    private static final double FAVOURITE_CHANCE = 0.5;
     private static final String ELECT_PLAYER = "elect player";
     private static final Set<String> POINT_ELECTIONS = Set.of("censure", "shard_of_the_throne", "crown_of_emphidia");
 
@@ -116,14 +117,23 @@ public class AgendaPolicy {
 
     public static boolean wouldElectToAPoint(Game game, Player seat) {
         String agenda = currentAgenda(game);
-        return POINT_ELECTIONS.contains(agenda)
-                && electsPlayer(agenda)
-                && mostVotes(game, null).filter(seat::equals).isPresent();
+        if (!POINT_ELECTIONS.contains(agenda) || !electsPlayer(agenda)) return false;
+        AgendaForecast forecast = AgendaForecast.of(game, seat);
+        if (forecast.isEmpty())
+            return mostVotes(game, null).filter(seat::equals).isPresent();
+        return forecast.chance(seat.getFaction()) >= FAVOURITE_CHANCE;
     }
 
     public static double predictedElectionScore(Game game, Player seat, @Nullable Player silenced) {
         String agenda = currentAgenda(game);
         if (!electsPlayer(agenda)) return 0;
+        AgendaForecast forecast = AgendaForecast.of(game, seat);
+        if (forecast.isEmpty()) return scoreOfTheLeadingVoter(game, seat, agenda, silenced);
+        AgendaForecast view = silenced == null ? forecast : forecast.without(silenced);
+        return view.expected(outcome -> score(game, seat, agenda, outcome));
+    }
+
+    private static double scoreOfTheLeadingVoter(Game game, Player seat, String agenda, @Nullable Player silenced) {
         Optional<Player> elected =
                 BAD_FOR_ELECTED_PLAYER.contains(agenda) ? pointsLeader(game, seat) : mostVotes(game, silenced);
         return elected.map(player -> score(game, seat, agenda, player.getFaction()))
@@ -155,6 +165,10 @@ public class AgendaPolicy {
         if (info == null) return "";
         String[] parts = StringUtils.split(info, "_", 4);
         return parts.length == 4 ? parts[3] : "";
+    }
+
+    static double publicScore(Game game, Player voter, String agenda, String outcome) {
+        return outcomeScore(game, voter, agenda, outcome);
     }
 
     static double score(Game game, Player speaker, String agenda, String outcome) {

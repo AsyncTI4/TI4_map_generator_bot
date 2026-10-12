@@ -33,6 +33,52 @@ class AgendaPolicyTest extends BaseTi4Test {
                 .map(PromptButton::customId);
     }
 
+    private void shardRevealed(int solVotes, int nekroVotes) {
+        test.game.setPhaseOfGame("agendawaiting");
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":" + solVotes + ",\"black\":" + nekroVotes + "}");
+    }
+
+    // The seat is expected to be elected to a point when it is the favourite in the forecast, which also counts what
+    // the other voters will do with their votes.
+    @Test
+    void expectsToBeElectedToAPointWhenItIsTheFavourite() {
+        shardRevealed(0, 0);
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":2,\"black\":0}");
+        assertThat(AgendaPolicy.wouldElectToAPoint(test.game, test.sol)).isTrue();
+        assertThat(AgendaPolicy.wouldElectToAPoint(test.game, test.nekro)).isFalse();
+    }
+
+    @Test
+    void expectsNoPointFromAnAgendaThatGivesNone() {
+        shardRevealed(2, 0);
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_minister_war");
+
+        assertThat(AgendaPolicy.wouldElectToAPoint(test.game, test.sol)).isFalse();
+    }
+
+    // Without a usable forecast (no agenda phase) the predictions read the votes at the start of the agenda.
+    @Test
+    void fallsBackOnTheVotesWhenThereIsNoForecast() {
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":5}");
+
+        assertThat(AgendaPolicy.wouldElectToAPoint(test.game, test.sol)).isTrue();
+    }
+
+    // A voter silenced by a Political Secret has no votes in the prediction, so the leader's grip on a point election
+    // loosens and the seat expects a better election.
+    @Test
+    void anElectionScoreImprovesWhenTheLeadingRivalIsSilenced() {
+        test.addSeat("200000000000000002", "xxcha", "red");
+        shardRevealed(9, 0);
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":9,\"red\":4,\"black\":0}");
+        test.game.scorePublicObjective(test.sol.getUserID(), test.game.addCustomPO("Test points", 6));
+
+        assertThat(AgendaPolicy.predictedElectionScore(test.game, test.nekro, test.sol))
+                .isGreaterThan(AgendaPolicy.predictedElectionScore(test.game, test.nekro, null));
+    }
+
     // With nobody voting, the speaker decides: an agenda that hands the elected player a victory point goes to
     // the speaker itself.
     @Test

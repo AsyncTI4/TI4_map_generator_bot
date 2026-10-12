@@ -15,6 +15,8 @@ import org.mockito.Mockito;
 import ti4.ai.AiTestGame;
 import ti4.ai.actioncards.CardScoring;
 import ti4.ai.actioncards.SabotagePolicy;
+import ti4.ai.agenda.AgendaForecast;
+import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.scoring.ScoringStakes;
@@ -148,6 +150,27 @@ class HiddenInfoGuardTest extends BaseTi4Test {
             SabotagePolicy.cancelWith(table.test.contextFor(table.nekro, Set.of(), AiTestGame.NOW, window), window);
             SabotagePolicy.aimedAtSeat(table.test.contextFor(table.nekro, Set.of(), AiTestGame.NOW, window), window);
         }
+
+        neverPeeked();
+    }
+
+    // Forecasting an agenda uses the votes at the start, the votes and riders on the table, points and planets, never
+    // the secrets that could make a player vote for itself (Drive the Debate) or any other hand.
+    @Test
+    void forecastingAnAgendaNeverPeeks() {
+        table.game.setPhaseOfGame("agendawaiting");
+        table.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+        table.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":5,\"red\":3,\"black\":0}");
+        table.sol.setSecret("dtd");
+
+        AgendaForecast forecast = AgendaForecast.of(table.game, table.nekro);
+        forecast.chances();
+        forecast.withRider(spy, "Imperial Rider", "sol").chances();
+        forecast.withVotes(table.nekro, "sol", 2).expectedUtility(table.nekro);
+        forecast.without(spy).mostLikely();
+        AgendaPolicy.wouldElectToAPoint(table.game, table.nekro);
+        AgendaPolicy.predictedElectionScore(table.game, table.nekro, spy);
+        CardScoring.rivalStake("Imperial Rider", table.game, table.nekro, spy);
 
         neverPeeked();
     }

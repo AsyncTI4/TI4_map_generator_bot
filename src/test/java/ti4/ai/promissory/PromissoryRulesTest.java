@@ -352,10 +352,13 @@ class PromissoryRulesTest extends BaseTi4Test {
                 .isEqualTo("queueAWhen");
     }
 
-    // An election that hands the leader a point is discarded with Political Favor while Xxcha has a strategy token.
+    // An election that hands the leader a point is discarded with Political Favor while Xxcha has a strategy token. The
+    // forecast gives a 9 vote leader about three chances in four rather than the certainty the old reading of the
+    // votes did, so the leader has to be 7 points ahead of the others, not 6, to cost the seat the 5 units that
+    // Political Favor asks for.
     @Test
     void discardsAnAgendaThatRewardsTheLeaderWithPoliticalFavor() {
-        electionRevealed(6);
+        electionRevealed(7);
         aiHolds(xxcha, "favor");
         xxcha.setStrategicCC(1);
 

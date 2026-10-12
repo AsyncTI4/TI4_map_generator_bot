@@ -67,6 +67,45 @@ class GalacticThreatRulesTest extends BaseTi4Test {
         assertThat(press(riders)).isEqualTo("FFCC_nekro_rider_player;sol_Galactic Threat Rider");
     }
 
+    // With the agenda in view the prediction follows the forecast, which counts the votes a rider has already taken
+    // out of the election: Sol has the most votes at the start, but its own rider is on Xxcha.
+    @Test
+    void predictsTheOutcomeTheForecastFavoursNotJustTheMostVotes() {
+        test.addSeat("200000000000000002", "xxcha", "red");
+        test.game.setStoredValue("galacticThreatUsed", "Yes");
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":9,\"red\":4,\"black\":0}");
+        AiPrompt riders = prompt(
+                "riders",
+                PromptSource.PUBLIC,
+                NOW,
+                "FFCC_nekro_rider_player;sol_Galactic Threat Rider",
+                "FFCC_nekro_rider_player;xxcha_Galactic Threat Rider");
+        assertThat(press(riders)).isEqualTo("FFCC_nekro_rider_player;sol_Galactic Threat Rider");
+
+        test.game.setCurrentAgendaVote("xxcha", "blue_Technology Rider");
+        assertThat(press(riders)).isEqualTo("FFCC_nekro_rider_player;xxcha_Galactic Threat Rider");
+    }
+
+    // A planet rider is aimed at a player's planets: the player whose planets are most likely to be elected.
+    @Test
+    void predictsAPlanetOwnerByTheChanceOfItsPlanetsWinning() {
+        test.addSeat("200000000000000002", "xxcha", "red");
+        test.place("01", "304");
+        test.sol.addPlanet("jord");
+        test.game.setStoredValue("galacticThreatUsed", "Yes");
+        test.game.setCurrentAgendaInfo("Directive_Elect Planet_7_disarmament");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":9,\"red\":4,\"black\":0}");
+        AiPrompt riders = prompt(
+                "riders",
+                PromptSource.PUBLIC,
+                NOW,
+                "FFCC_nekro_planetRider_xxcha_Galactic Threat Rider",
+                "FFCC_nekro_planetRider_sol_Galactic Threat Rider");
+
+        assertThat(press(riders)).isEqualTo("FFCC_nekro_planetRider_sol_Galactic Threat Rider");
+    }
+
     // A Political Secret played on Nekro bars its faction abilities until the agenda is resolved; pressing
     // queueAnAfter would also take Nekro back out of the declined afters the bot put it in.
     @Test

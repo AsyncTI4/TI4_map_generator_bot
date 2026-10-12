@@ -199,6 +199,20 @@ class SabotagePolicyTest extends BaseTi4Test {
         assertThat(cancels("Imperial Rider")).isTrue();
     }
 
+    // The rider is on the outcome that the votes already cast carry, and its owner is a point from winning: the
+    // card is worth the game, whatever the seat's keep floor.
+    @Test
+    void cancelsAnImperialRiderThatCannotBeVotedDownFromARivalAtMatchPoint() {
+        table.third("xxcha", "red");
+        table.points(table.sol, 9);
+        table.game.setPhaseOfGame("agendaVoting");
+        table.game.setCurrentAgendaInfo("Directive_For/Against_7_arms_reduction");
+        table.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":0,\"red\":8,\"black\":0}");
+        table.game.setCurrentAgendaVote("for", "red_8;blue_Imperial Rider");
+
+        assertThat(cancels("Imperial Rider")).isTrue();
+    }
+
     // ---- the reserve -------------------------------------------------------------------------
 
     // While anyone could win, the last Sabotage is kept for what threatens a point.

@@ -24,12 +24,24 @@ class PoliticsUses {
                 new Benefit(CardUse.POLITICS_AGENDA, in.agendaPhaseActive() ? CardValueScale.AGENDA_PEEK : 0));
     }
 
+    static double tokenValue(Game game, Player seat) {
+        return isSpeaker(game, seat) ? 0 : speakerValue(game, seat);
+    }
+
     private static double speakerValue(PlanInputs in) {
-        if (in.isSpeaker()) return CardValueScale.SPEAKER_HANDOFF_SHARE * CardValueScale.SPEAKER;
+        return speakerValue(in.game(), in.seat());
+    }
+
+    private static double speakerValue(Game game, Player seat) {
+        if (isSpeaker(game, seat)) return CardValueScale.SPEAKER_HANDOFF_SHARE * CardValueScale.SPEAKER;
         double value = CardValueScale.SPEAKER;
-        if (wantsImperialNextRound(in.game(), in.seat())) value += CardValueScale.SPEAKER_FOR_IMPERIAL;
-        if (in.agendaPhaseActive()) value += CardValueScale.AGENDA_PEEK;
+        if (wantsImperialNextRound(game, seat)) value += CardValueScale.SPEAKER_FOR_IMPERIAL;
+        if (game.isCustodiansScored()) value += CardValueScale.AGENDA_PEEK;
         return value;
+    }
+
+    private static boolean isSpeaker(Game game, Player seat) {
+        return seat.getUserID().equals(game.getSpeakerUserID());
     }
 
     private static boolean wantsImperialNextRound(Game game, Player seat) {
