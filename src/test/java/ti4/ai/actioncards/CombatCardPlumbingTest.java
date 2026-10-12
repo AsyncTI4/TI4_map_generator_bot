@@ -40,7 +40,7 @@ class CombatCardPlumbingTest extends BaseTi4Test {
     }
 
     private void store(Stage stage) {
-        CardPlay play = new CardPlay(stage, NOW, NOW, "mb1", "", false, 0, "");
+        CardPlay play = new CardPlay(stage, NOW, NOW, "emergency", "", false, 0, "");
         table.test.memory.put(key, play.encode());
     }
 

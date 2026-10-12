@@ -30,7 +30,7 @@ class ActionCardValueTest extends BaseTi4Test {
     void aCardNoRulePlaysIsWorthNothing() {
         assertThat(keep("intercept")).isZero();
         assertThat(keep("rout")).isZero();
-        assertThat(keep("mb1")).isZero();
+        assertThat(keep("sh1")).isZero();
     }
 
     @Test
@@ -191,9 +191,9 @@ class ActionCardValueTest extends BaseTi4Test {
     void cardsNoRulePlaysAreSortedByTheirPrior() {
         test.nekro.setActionCard("rout", 1);
         test.nekro.setActionCard("mjets1", 2);
-        test.nekro.setActionCard("mb1", 3);
+        test.nekro.setActionCard("sh1", 3);
 
-        assertThat(ActionCardValue.discardOrder(test.game, test.nekro)).containsExactly("mjets1", "mb1", "rout");
+        assertThat(ActionCardValue.discardOrder(test.game, test.nekro)).containsExactly("mjets1", "sh1", "rout");
     }
 
     @Test

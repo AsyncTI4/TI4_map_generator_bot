@@ -23,6 +23,8 @@ import ti4.ai.tactical.CombatCardHook;
 import ti4.ai.tactical.CombatMoment;
 import ti4.ai.tactical.CombatRules;
 import ti4.game.Tile;
+import ti4.helpers.CombatTempModHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.message.GameMessage;
@@ -252,5 +254,171 @@ class CombatCardFlowTest extends BaseTi4Test {
         assertThat(pressedId(ActionCardRules.continuePlay(table.test.contextAt(SETTLED, announce, resolve))
                         .orElseThrow()))
                 .isEqualTo(resolveId);
+    }
+
+    private static final String MORALE_BOOST_RESOLVE = "FFCC_nekro_applytempcombatmod__action_cards__";
+
+    private Optional<AiDecision> atRoundStart(CombatMoment moment) {
+        return CombatCardRules.atRoundStart(table.test.context(hand()), moment);
+    }
+
+    private void evenSpaceFight() {
+        table.ships(table.nekro, tile, UnitType.Dreadnought, 4);
+        table.ships(table.sol, tile, UnitType.Dreadnought, 4);
+    }
+
+    @Test
+    void moraleBoostIsPlayedInAnEvenFight() {
+        evenSpaceFight();
+        table.nekro.setActionCard("mb1", HAND_INDEX);
+
+        assertThat(pressedId(atRoundStart().orElseThrow())).isEqualTo("ac_play_from_hand_" + HAND_INDEX);
+    }
+
+    @Test
+    void moraleBoostIsKeptWhenTheFightIsDecidedAnyway() {
+        table.ships(table.nekro, tile, UnitType.Dreadnought, 6);
+        table.ships(table.sol, tile, UnitType.Fighter, 1);
+        table.nekro.setActionCard("mb1", HAND_INDEX);
+
+        assertThat(atRoundStart()).isEmpty();
+    }
+
+    @Test
+    void moraleBoostResolvesOnlyItsOwnModifierButton() {
+        evenSpaceFight();
+        table.nekro.setActionCard("mb2", HAND_INDEX);
+        playsThroughItsWindow("Morale Boost", MORALE_BOOST_RESOLVE + "mb3");
+        AiPrompt announce = announcement("Morale Boost");
+        AiPrompt other = prompt("other", PromptSource.PUBLIC, NOW, MORALE_BOOST_RESOLVE + "mb3");
+        AiPrompt own = prompt("own", PromptSource.PUBLIC, NOW, MORALE_BOOST_RESOLVE + "mb2");
+
+        assertThat(ActionCardRules.continuePlay(table.test.contextAt(SETTLED, announce, other)))
+                .isEmpty();
+        assertThat(pressedId(ActionCardRules.continuePlay(table.test.contextAt(SETTLED, announce, other, own))
+                        .orElseThrow()))
+                .isEqualTo(MORALE_BOOST_RESOLVE + "mb2");
+    }
+
+    // The modifier is moved in by the seat's next roll of any kind, so the roll waits until it shows.
+    @Test
+    void theRollWaitsForTheModifierToAppearAfterTheCardResolves() {
+        CardPlay done = new CardPlay(Stage.DONE, NOW, NOW, "mb1", "", true, 0, "");
+        table.test.memory.put(key(), done.encode());
+
+        assertThat(CombatCardRules.hold(table.test.contextAt(NOW + 1_000L, rolls()))
+                        .orElseThrow())
+                .isInstanceOf(AiDecision.Wait.class);
+
+        table.nekro.addNewTempCombatMod(
+                CombatTempModHelper.getPossibleTempModifier(Constants.AC, "mb1", table.nekro.getNumberOfTurns()));
+
+        assertThat(CombatCardRules.hold(table.test.contextAt(NOW + 1_000L, rolls())))
+                .isEmpty();
+    }
+
+    @Test
+    void theRollDoesNotWaitForeverForAModifierThatNeverComes() {
+        CardPlay done = new CardPlay(Stage.DONE, NOW, NOW, "mb1", "", true, 0, "");
+        table.test.memory.put(key(), done.encode());
+
+        assertThat(CombatCardRules.hold(table.test.contextAt(NOW + 60_000L, rolls())))
+                .isEmpty();
+    }
+
+    @Test
+    void noCardIsPlayedWhileAModifierIsAlreadyWaiting() {
+        evenSpaceFight();
+        table.nekro.setActionCard("mb1", HAND_INDEX);
+        table.nekro.addNewTempCombatMod(
+                CombatTempModHelper.getPossibleTempModifier(Constants.AC, "mb2", table.nekro.getNumberOfTurns()));
+
+        assertThat(atRoundStart()).isEmpty();
+    }
+
+    @Test
+    void moraleBoostIsPlayedInAGroundCombat() {
+        for (var player : List.of(table.nekro, table.sol)) {
+            table.test.units(tile, "lodor", player, UnitType.Mech, 4);
+            table.test.units(tile, "lodor", player, UnitType.Infantry, 4);
+        }
+        table.nekro.setActionCard("mb1", HAND_INDEX);
+
+        assertThat(pressedId(atRoundStart(new CombatMoment(position, "lodor", true, 0))
+                        .orElseThrow()))
+                .isEqualTo("ac_play_from_hand_" + HAND_INDEX);
+    }
+
+    @Test
+    void fighterPrototypeIsPlayedOnlyInTheFirstRoundOfASpaceCombat() {
+        table.ships(table.nekro, tile, UnitType.Fighter, 8);
+        table.ships(table.sol, tile, UnitType.Fighter, 8);
+        table.nekro.setActionCard("f_prototype", HAND_INDEX);
+
+        assertThat(atRoundStart(new CombatMoment(position, SPACE, false, 1))).isEmpty();
+        assertThat(pressedId(atRoundStart().orElseThrow())).isEqualTo("ac_play_from_hand_" + HAND_INDEX);
+    }
+
+    @Test
+    void fighterPrototypeIsNotPlayedInAGroundCombat() {
+        table.test.units(tile, "lodor", table.nekro, UnitType.Infantry, 3);
+        table.test.units(tile, "lodor", table.sol, UnitType.Infantry, 3);
+        table.ships(table.nekro, tile, UnitType.Fighter, 8);
+        table.nekro.setActionCard("f_prototype", HAND_INDEX);
+
+        assertThat(atRoundStart(new CombatMoment(position, "lodor", true, 0))).isEmpty();
+    }
+
+    @Test
+    void fighterPrototypeIsNotPlayedWithoutFighters() {
+        evenSpaceFight();
+        table.nekro.setActionCard("f_prototype", HAND_INDEX);
+
+        assertThat(atRoundStart()).isEmpty();
+    }
+
+    // Anti-fighter barrage is rolled first and would use the modifier up, so the card waits for it.
+    @Test
+    void noModifierCardIsPlayedBeforeTheSeatsOwnAntiFighterBarrage() {
+        table.ships(table.nekro, tile, UnitType.Destroyer, 2);
+        table.ships(table.sol, tile, UnitType.Fighter, 4);
+        table.ships(table.sol, tile, UnitType.Destroyer, 2);
+        table.nekro.setActionCard("mb1", HAND_INDEX);
+        AiPrompt barrage = prompt(
+                "barrage",
+                PromptSource.COMBAT_THREAD,
+                NOW,
+                "combatRoll_" + position + "_space_afb",
+                "combatRoll_" + position + "_space");
+
+        Optional<AiDecision> decision =
+                CombatRules.next(table.test.contextAt(AFTER_GRACE, barrage, hand()), CombatCardRules::atRoundStart);
+
+        assertThat(pressedId(decision.orElseThrow())).isEqualTo("combatRoll_" + position + "_space_afb");
+    }
+
+    @Test
+    void aMoraleBoostIsPickedUpAgainFromItsVisibleResolveButton() {
+        evenSpaceFight();
+        table.game.getGameStats().recordAcPlay("Morale Boost", table.nekro);
+        AiPrompt announce = announcement("Morale Boost");
+        AiPrompt resolve = prompt("resolve", PromptSource.PUBLIC, NOW, MORALE_BOOST_RESOLVE + "mb2");
+
+        ActionCardRules.continuePlay(table.test.contextAt(NOW + 1_000L, announce, resolve));
+
+        assertThat(CombatCardRules.hold(table.test.contextAt(NOW + 1_000L, announce, resolve)))
+                .isPresent();
+        assertThat(pressedId(ActionCardRules.continuePlay(table.test.contextAt(SETTLED, announce, resolve))
+                        .orElseThrow()))
+                .isEqualTo(MORALE_BOOST_RESOLVE + "mb2");
+    }
+
+    @Test
+    void theCombatCardsAreKeptAtTheirPriorInsteadOfBeingDiscardedFirst() {
+        for (String alias : List.of("mb1", "f_prototype", "emergency")) {
+            assertThat(ActionCardValue.keepValue(table.game, table.nekro, alias))
+                    .as(alias)
+                    .isEqualTo(ActionCardPrior.keepPrior(alias));
+        }
     }
 }
