@@ -44,6 +44,7 @@ import ti4.ai.strategy.StrategyCardRanking;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.strategy.StrategyCardTurn;
 import ti4.ai.tactical.CombatRules;
+import ti4.ai.tactical.FleetSupplyRules;
 import ti4.ai.tactical.IntegratedEconomyRules;
 import ti4.ai.tactical.SingularityRules;
 import ti4.ai.tactical.SlingRelayRules;
@@ -107,7 +108,8 @@ public class NekroBrain implements FactionBrain {
             "crownofemphidiaexplore",
             "acquireATech",
             "generic_button_id_",
-            "genericReact4");
+            "genericReact4",
+            FleetSupplyRules.OPEN_PREFIX);
     private static final Set<String> WINDOW_PREFIXES = Stream.concat(
                     PUBLIC_WINDOW_PREFIXES.stream(), ActionCardRules.targetPrefixes().stream())
             .collect(Collectors.toUnmodifiableSet());
@@ -143,6 +145,7 @@ public class NekroBrain implements FactionBrain {
             StrategyCardRules::gainTokens,
             StrategyCardRules::placeStructure,
             StrategyCardRules::readyPlanets,
+            FleetSupplyRules::removeExcessShips,
             StrategyCardRules::buildWithWarfare,
             StrategyCardRules::buildWithConstruction,
             NekroLeaderRules::chooseAgentTarget,

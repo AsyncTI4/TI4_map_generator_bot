@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.agenda.AgendaPeek;
@@ -16,6 +17,7 @@ import ti4.ai.brain.Prompts.Match;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.strategy.CardPlan.Benefit;
+import ti4.ai.tactical.DefenseOutlook;
 import ti4.ai.tactical.ProductionPlanner;
 import ti4.ai.tactical.ProductionPlanner.BuildPlan;
 import ti4.ai.tactical.TacticalPlan;
@@ -50,6 +52,7 @@ class PlannedPrimaries {
     private static final long CLOCK_SKEW_MILLIS = 5_000L;
     private static final long STEP_WAIT_MILLIS = 60_000L;
     private static final long PRODUCTION_WINDOW_MILLIS = 15 * 60_000L;
+    private static final Set<CardUse> PRODUCTION_USES = Set.of(CardUse.CONSTRUCTION_PRODUCE, CardUse.OPENING_EXPANSION);
 
     static Optional<TacticalPlan> warfareTarget(AiTurnContext context, int initiative) {
         Game game = context.game();
@@ -189,7 +192,13 @@ class PlannedPrimaries {
         if (pick.isPresent()) {
             CardMessages.markDone(context, CONSTRUCTION_PICK_STEP);
             Tile tile = context.game().getTileByPosition(dock);
-            BuildPlan plan = ProductionPlanner.plan(context.game(), context.seat(), tile);
+            BuildPlan plan = ProductionPlanner.plan(
+                    context.game(),
+                    context.seat(),
+                    tile,
+                    0,
+                    new DefenseOutlook(context.game(), context.seat()),
+                    OpeningOutlook.overSupplyCarriers(context.game(), context.seat(), tile));
             context.memory().put(buildKey(context), context.now() + "|" + dock + "|" + plan.encode());
             return Optional.of(pick.get().press("produce at " + dock + " with Construction"));
         }
@@ -204,7 +213,7 @@ class PlannedPrimaries {
         CardPlan plan = StrategyCardPlanner.plan(in, initiative);
         return plan.benefit(CardUse.CONSTRUCTION_PRODUCE)
                 .filter(benefit -> plan.main()
-                        .filter(main -> main.use() == CardUse.CONSTRUCTION_PRODUCE)
+                        .filter(main -> PRODUCTION_USES.contains(main.use()))
                         .isPresent())
                 .map(Benefit::target)
                 .filter(position -> ConstructionUses.canProduceAt(game, seat, position));

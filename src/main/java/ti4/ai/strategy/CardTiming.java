@@ -28,6 +28,7 @@ class CardTiming {
     }
 
     static Timing of(PlanInputs in, CardPlan plan) {
+        if (movesOutBeforeConstruction(in, plan)) return Timing.FALLBACK;
         if (opensTheRound(in, plan)) return Timing.NOW;
         if (plan.card() == StrategyCard.WARFARE) return warfare(in, plan);
         if (plan.card() == StrategyCard.IMPERIAL && yieldsToOverrule(in)) return Timing.FALLBACK;
@@ -37,10 +38,24 @@ class CardTiming {
     }
 
     private static boolean opensTheRound(PlanInputs in, CardPlan plan) {
-        if (plan.benefit(CardUse.OPENING_EXPANSION)
-                .filter(benefit -> benefit.value() > 0)
-                .isPresent()) return true;
+        if (expandsTheOpening(plan)) return true;
         return plan.card() == StrategyCard.TECHNOLOGY && researchesGravityDriveForTheOpening(in.game(), in.seat());
+    }
+
+    private static boolean expandsTheOpening(CardPlan plan) {
+        return plan.benefit(CardUse.OPENING_EXPANSION)
+                .filter(benefit -> benefit.value() > 0)
+                .isPresent();
+    }
+
+    private static boolean movesOutBeforeConstruction(PlanInputs in, CardPlan plan) {
+        if (plan.card() != StrategyCard.CONSTRUCTION || !expandsTheOpening(plan)) return false;
+        Game game = in.game();
+        Player seat = in.seat();
+        Tile home = seat.getHomeSystemTile();
+        if (home == null || seat.getTacticalCC() <= 0) return false;
+        if (ConstructionUses.movingOutOf(in.ranked(), home.getPosition()).isEmpty()) return false;
+        return !OpeningOutlook.producesBeforeMoving(game, seat);
     }
 
     static boolean researchesGravityDriveForTheOpening(Game game, Player seat) {

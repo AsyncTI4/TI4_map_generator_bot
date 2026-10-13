@@ -187,6 +187,46 @@ class PlannedPrimariesTest extends BaseTi4Test {
                 .contains("FFCC_nekro_deleteButtons_construction_" + AiTestGame.HOME);
     }
 
+    // Round 1: the one system in reach opens onto two more, and the opening outlook wants two loaded carriers to move
+    // forward together. Construction's production is planned with a carrier past the fleet limit (the destroyer is
+    // removed for it afterwards), even though the opening, not the units themselves, is what the card is played for.
+    @Test
+    void producesACarrierPastTheFleetLimitForTheOpening() {
+        test.game.setRound(1);
+        test.nekro.setTacticalCC(3);
+        test.nekro.setFleetCC(3);
+        test.nekro.setTg(3);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Destroyer, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
+        String neighbour = AiTestGame.neighbourOf(AiTestGame.HOME);
+        test.place("27", neighbour);
+        List<String> nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        List<String> past = PositionMapper.getAdjacentTilePositions(neighbour).stream()
+                .filter(candidate ->
+                        !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate) && !nearHome.contains(candidate))
+                .toList();
+        test.place("28", past.get(0));
+        test.place("30", past.get(1));
+        changed();
+        AiPrompt card = prompt(
+                "construction",
+                PromptSource.PUBLIC,
+                NOW,
+                "sc_no_follow_4",
+                "constructionPrimary_produce",
+                "construction_pds",
+                "construction_spacedock");
+        play(card, 4);
+        assertThat(resolve(card)).isEqualTo("constructionPrimary_produce");
+
+        AiPrompt docks = prompt("docks", PromptSource.PUBLIC, NOW, "FFCC_nekro_constructionBuild_" + AiTestGame.HOME);
+        assertThat(resolve(card, docks)).isEqualTo("FFCC_nekro_constructionBuild_" + AiTestGame.HOME);
+
+        assertThat(test.memory.get("constructionBuild|1").orElseThrow()).contains("carrier~" + AiTestGame.HOME);
+    }
+
     @Test
     void placesStructuresWithPokConstruction() {
         test.game.setStrategyCardSet("pok");
