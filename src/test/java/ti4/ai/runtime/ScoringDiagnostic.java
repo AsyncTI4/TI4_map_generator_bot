@@ -226,7 +226,8 @@ final class ScoringDiagnostic {
                                     + " tg" + seat.getTg() + " comm " + seat.getCommodities() + " exhausted "
                                     + new java.util.TreeSet<>(exhausted
                                             .getOrDefault(round, Map.of())
-                                            .getOrDefault(faction, Set.of())));
+                                            .getOrDefault(faction, Set.of()))
+                                    + completableByOneAction(game, seat));
             crowded.put(faction, crowdedList);
         }
         standings.put(round, byFaction);
@@ -235,6 +236,46 @@ final class ScoringDiagnostic {
         Map<String, Map<String, Spend>> copy = new HashMap<>();
         spends.getOrDefault(round, Map.of()).forEach((faction, map) -> copy.put(faction, new TreeMap<>(map)));
         spendsAtStatus.put(round, copy);
+    }
+
+    // With a tactic token left at status, the first ranked tactical action that would have completed a public objective
+    // the seat had not met (" | one action completes <objective> by <plan> score <s> rank <r>"), or "" if none would.
+    private static String completableByOneAction(Game game, Player seat) {
+        if (seat.getTacticalCC() <= 0) return "";
+        ti4.ai.scoring.ObjectiveValue value = ti4.ai.scoring.ObjectiveValue.publicOnly(game, seat);
+        ti4.ai.scoring.Footprint before = value.before();
+        Wallet wallet = Wallet.of(game, seat);
+        List<String> open = game.getRevealedPublicObjectives().keySet().stream()
+                .filter(id -> ti4.image.Mapper.getPublicObjective(id) != null)
+                .filter(id -> !ObjectivePolicy.hasScored(game, seat, id))
+                .filter(id -> !ObjectivePolicy.qualifies(game, seat, wallet, id))
+                .filter(id -> ListPlayerInfoService.getObjectiveThreshold(id, game) > 0)
+                .filter(id -> value.progress(id, before) != ti4.ai.scoring.ObjectiveValue.NOT_MODELLED)
+                .toList();
+        if (open.isEmpty()) return "";
+        List<ti4.ai.tactical.TacticalPlan> ranked;
+        try {
+            ranked = ti4.ai.tactical.TacticalPlanner.ranked(game, seat);
+        } catch (RuntimeException e) {
+            return " | planner failed " + e.getClass().getSimpleName();
+        }
+        for (int rank = 0; rank < ranked.size(); rank++) {
+            ti4.ai.tactical.TacticalPlan plan = ranked.get(rank);
+            List<ti4.ai.scoring.Footprint.Move> moves = plan.moves().stream()
+                    .map(move -> new ti4.ai.scoring.Footprint.Move(move.origin(), move.type(), move.count()))
+                    .toList();
+            ti4.ai.scoring.Footprint after =
+                    before.after(plan.target(), moves, plan.landings().keySet());
+            for (String id : open) {
+                int threshold = ListPlayerInfoService.getObjectiveThreshold(id, game);
+                if (value.progress(id, before) < threshold && value.progress(id, after) >= threshold) {
+                    return String.format(
+                            " | one action completes %s by %s %s score %.1f rank %d",
+                            id, plan.kind().name().toLowerCase(), plan.target(), plan.score(), rank + 1);
+                }
+            }
+        }
+        return " | no single action (of " + ranked.size() + " ranked) completes " + open;
     }
 
     private void afterScoring(Game game, int round) {
@@ -465,6 +506,18 @@ final class ScoringDiagnostic {
                 "SCOREDIAG   r%d %d seats scored no public after an action-phase spend took an affordable spend"
                         + " objective out of reach: %s%n",
                 round, brokeAndMissed, breaks);
+
+        long withTokens = seats.stream()
+                .filter(seat -> seat.board().contains("one action completes")
+                        || seat.board().contains("no single action"))
+                .count();
+        long completable = seats.stream()
+                .filter(seat -> seat.board().contains("one action completes"))
+                .count();
+        System.out.printf(
+                "SCOREDIAG   r%d %d seats ended the action phase with a tactic token and an unmet public objective; one"
+                        + " ranked tactical action would have completed one for %d%n",
+                round, withTokens, completable);
 
         Map<String, Integer> byCards = new TreeMap<>();
         Map<String, Integer> byCardsScored = new TreeMap<>();
