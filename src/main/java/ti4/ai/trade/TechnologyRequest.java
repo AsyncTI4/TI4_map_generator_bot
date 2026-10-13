@@ -122,7 +122,6 @@ class TechnologyRequest {
         Game game = context.game();
         Player seat = context.seat();
         if (!holdsTechnology(game, seat) || committed(context)) return Optional.empty();
-        double holdCost = TechnologyTiming.holdCost(game, seat);
         List<Player> payers = partners.stream()
                 .filter(partner -> TechnologyTiming.deniable(game, partner))
                 .filter(partner -> OwnTurnDeals.mayApproach(context, partner))
@@ -133,7 +132,8 @@ class TechnologyRequest {
             double trust = Trust.of(context, payer);
             Optional<Plan> plan = payment(game, payer, seat)
                     .filter(payment ->
-                            TradeValue.of(game, seat, payer, payment, trust).selfGain() >= holdCost)
+                            TradeValue.of(game, seat, payer, payment, trust).selfGain()
+                                    >= TechnologyTiming.holdCost(game, seat, payer))
                     .filter(payment -> worthPaying(game, payer, seat, payment, trust))
                     .map(payment -> new Plan(payer, payment, Ask.HOLD, true));
             if (plan.isPresent()) return plan;
@@ -183,12 +183,13 @@ class TechnologyRequest {
     static Optional<Deal> payment(Game game, Player payer, Player holder) {
         String from = payer.getFaction();
         String to = holder.getFaction();
-        if (TradeBudget.spareTradeGoods(game, payer, holder) >= PAYMENT
-                && TechnologyTiming.followsLaterAfterPaying(game, payer, PAYMENT)) {
-            return Optional.of(Deal.EMPTY.adjust(from, to, ItemType.TRADE_GOODS, PAYMENT));
+        int amount = TechnologyTiming.holdPayment(game, payer);
+        if (TradeBudget.spareTradeGoods(game, payer, holder) >= amount
+                && TechnologyTiming.followsLaterAfterPaying(game, payer, amount)) {
+            return Optional.of(Deal.EMPTY.adjust(from, to, ItemType.TRADE_GOODS, amount));
         }
-        if (DebtRules.room(payer, holder) >= PAYMENT) {
-            return Optional.of(Deal.EMPTY.adjust(from, to, ItemType.SEND_DEBT, PAYMENT));
+        if (DebtRules.room(payer, holder) >= amount) {
+            return Optional.of(Deal.EMPTY.adjust(from, to, ItemType.SEND_DEBT, amount));
         }
         return Optional.empty();
     }
@@ -200,7 +201,7 @@ class TechnologyRequest {
                 .selfGain();
         if (ask == Ask.HOLD) {
             return !context.memory().has(OpeningNeeds.technologyRequestedKey(game))
-                    && paid >= TechnologyTiming.holdCost(game, seat);
+                    && paid >= TechnologyTiming.holdCost(game, seat, offerer);
         }
         return !context.memory().has(TechnologyTiming.heldKey(game)) && paid >= TechnologyTiming.earlyCost(game, seat);
     }

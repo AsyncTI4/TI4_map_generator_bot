@@ -23,6 +23,7 @@ import ti4.testUtils.BaseTi4Test;
 // it now denies the secondary to rivals who cannot follow yet but could later. A holder paid to wait holds it.
 class TechnologyTimingTest extends BaseTi4Test {
 
+    private static final int TRADE = 5;
     private static final int TECHNOLOGY = 7;
     private static final String LODOR_SPOT = "305";
     private static final String RIVAL_ID = "7100000555555555";
@@ -138,6 +139,73 @@ class TechnologyTimingTest extends BaseTi4Test {
         changed();
 
         assertThat(solTurn().map(AiTestGame::pressedId)).contains("FFCC_sol_strategicAction_7");
+    }
+
+    // Hacan waits on the wash Sol will settle once it plays Trade (Hacan follows Trade for free). The hold outlasts
+    // Hacan's next turn while that Trade is still to come, and ends once Trade is played and nothing is left to wash.
+    @Test
+    void holdLastsWhileARivalTradeWashIsStillToCome() {
+        Player hacan = rivalShortOfResources();
+        hacan.setCommodities(0);
+        hacanBesideSol(hacan);
+        sol.addSC(TRADE);
+        hacan.setInRoundTurnCount(1);
+        TechnologyTiming.grantHold(test.game, test.memoryOf(sol), hacan);
+        hacan.setInRoundTurnCount(2);
+        changed();
+
+        assertThat(TechnologyTiming.awaitsTradeWash(test.game, hacan)).isTrue();
+        assertThat(TechnologyTiming.heldBack(test.game, sol, test.memoryOf(sol)))
+                .isTrue();
+
+        test.game.setSCPlayed(TRADE, true);
+        changed();
+
+        assertThat(TechnologyTiming.heldBack(test.game, sol, test.memoryOf(sol)))
+                .isFalse();
+    }
+
+    // However long the wash takes, a hold never stalls the holder past the second seat to pass.
+    @Test
+    void holdEndsOnceTwoSeatsHavePassed() {
+        Player hacan = rivalShortOfResources();
+        hacanBesideSol(hacan);
+        sol.addSC(TRADE);
+        TechnologyTiming.grantHold(test.game, test.memoryOf(sol), hacan);
+        Player third = test.addSeat("7100000666666666", "letnev", "green");
+        third.setPassed(true);
+        changed();
+
+        assertThat(TechnologyTiming.heldBack(test.game, sol, test.memoryOf(sol)))
+                .isTrue();
+
+        test.nekro.setPassed(true);
+        changed();
+
+        assertThat(TechnologyTiming.heldBack(test.game, sol, test.memoryOf(sol)))
+                .isFalse();
+    }
+
+    // Waiting on a Trade still to come is a longer hold: the holder charges more for it, and asks for two.
+    @Test
+    void aLongerHoldCostsMore() {
+        Player hacan = rivalShortOfResources();
+        hacan.setCommodities(0);
+        double shortHold = TechnologyTiming.holdCost(test.game, sol, hacan);
+        assertThat(TechnologyTiming.holdPayment(test.game, hacan)).isEqualTo(1);
+
+        hacanBesideSol(hacan);
+        sol.addSC(TRADE);
+        changed();
+
+        assertThat(TechnologyTiming.holdCost(test.game, sol, hacan)).isGreaterThan(shortHold);
+        assertThat(TechnologyTiming.holdPayment(test.game, hacan)).isEqualTo(2);
+    }
+
+    private void hacanBesideSol(Player hacan) {
+        Tile lodor = test.place("26", LODOR_SPOT);
+        test.units(lodor, "space", hacan, UnitType.Carrier, 1);
+        changed();
     }
 
     @Test

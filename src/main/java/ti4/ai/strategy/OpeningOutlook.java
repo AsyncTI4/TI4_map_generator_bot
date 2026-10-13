@@ -55,10 +55,17 @@ class OpeningOutlook {
     private static final int OVER_SUPPLY_CARRIERS = 1;
     private static final int BEFORE_ANY_ACTION = -1;
     private static final int NEVER = Integer.MAX_VALUE;
+    private static final int AFTER_ONE_ACTION = 1;
+    private static final int FROM_THE_NEXT_ACTION = 0;
 
     private record Transport(UnitType type, int capacity, int move) {}
 
-    private record Scenario(Boost boost, Order order, boolean overSupply, int actions) {}
+    private record Scenario(Boost boost, Order order, boolean overSupply, int actions, int driveFrom) {
+
+        Scenario(Boost boost, Order order, boolean overSupply, int actions) {
+            this(boost, order, overSupply, actions, AFTER_ONE_ACTION);
+        }
+    }
 
     private static final class Carrier {
         private final Transport transport;
@@ -83,14 +90,13 @@ class OpeningOutlook {
     static double gain(Game game, Player seat, Boost boost) {
         if (game.getRound() > LAST_OPENING_ROUND || boost == Boost.NONE) return 0;
         if (boost != Boost.GRAVITY_DRIVE) return planetGain(game, seat, boost);
-        return gravityDriveGain(
-                game,
-                seat,
-                holdsTechnology(game, seat) || canAffordToFollow(game, seat, expectedTradeGoods(game, seat)));
+        if (holdsTechnology(game, seat)) return gravityDriveGain(game, seat, true, AFTER_ONE_ACTION);
+        int driveFrom = holdsStallCard(game, seat) ? FROM_THE_NEXT_ACTION : AFTER_ONE_ACTION;
+        return gravityDriveGain(game, seat, canAffordToFollow(game, seat, expectedTradeGoods(game, seat)), driveFrom);
     }
 
     static double gravityDriveGainAsTechnologyHolder(Game game, Player seat) {
-        return gravityDriveGain(game, seat, true);
+        return gravityDriveGain(game, seat, true, AFTER_ONE_ACTION);
     }
 
     static double gravityDriveGainFromTrade(Game game, Player seat, boolean picking) {
@@ -101,7 +107,8 @@ class OpeningOutlook {
         }
         int washed = RaisableTradeGoods.byWashing(game, seat);
         if (canAffordToFollow(game, seat, washed)) return 0;
-        return gravityDriveGain(game, seat, canAffordToFollow(game, seat, washed + TRADE_PRIMARY_GOODS));
+        return gravityDriveGain(
+                game, seat, canAffordToFollow(game, seat, washed + TRADE_PRIMARY_GOODS), AFTER_ONE_ACTION);
     }
 
     static int expectedTradeGoods(Game game, Player seat) {
@@ -112,9 +119,21 @@ class OpeningOutlook {
         return RaisableTradeGoods.byWashing(game, seat) + (holdsUnplayedTrade(game, seat) ? TRADE_PRIMARY_GOODS : 0);
     }
 
-    private static double gravityDriveGain(Game game, Player seat, boolean funded) {
+    private static double gravityDriveGain(Game game, Player seat, boolean funded, int driveFrom) {
         if (game.getRound() > LAST_OPENING_ROUND || !funded || !canResearchGravityDrive(seat)) return 0;
-        return planetGain(game, seat, Boost.GRAVITY_DRIVE);
+        Optional<Opening> opening = Opening.of(game, seat);
+        if (opening.isEmpty()) return 0;
+        int actions = seat.getTacticalCC();
+        double base = opening.get().value(new Scenario(Boost.NONE, Order.PRODUCE_FIRST, false, actions));
+        double driven =
+                opening.get().value(new Scenario(Boost.GRAVITY_DRIVE, Order.PRODUCE_FIRST, false, actions, driveFrom));
+        return Math.max(0, driven - base);
+    }
+
+    private static boolean holdsStallCard(Game game, Player seat) {
+        return seat.getSCs().stream()
+                .anyMatch(initiative -> !game.getPlayedSCs().contains(initiative)
+                        && StrategyCard.of(game, initiative) != StrategyCard.TECHNOLOGY);
     }
 
     static double planetValue(Game game, Player seat, Boost boost) {
@@ -259,7 +278,7 @@ class OpeningOutlook {
         }
 
         private Optional<Hop> bestHop(int action) {
-            int bonusMove = scenario.boost() == Boost.GRAVITY_DRIVE && action > 0 ? 1 : 0;
+            int bonusMove = scenario.boost() == Boost.GRAVITY_DRIVE && action >= scenario.driveFrom() ? 1 : 0;
             Hop best = null;
             for (Carrier carrier : carriers) {
                 boolean firstHop = !carrier.moved;

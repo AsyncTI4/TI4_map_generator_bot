@@ -152,6 +152,23 @@ class GravityDriveOpeningTest extends BaseTi4Test {
                 .sum();
     }
 
+    // With one tactical action left, waiting for the secondary would spend it, so Gravity Drive adds nothing; a
+    // strategy
+    // card still to play is a free stall, and the last action can then use the drive.
+    @Test
+    void aStrategyCardToStallWithLetsTheLastActionUseGravityDrive() {
+        test.sol.addSC(TECHNOLOGY);
+        hacan.setTg(1);
+        hacan.setTacticalCC(1);
+        changed();
+        assertThat(OpeningOutlook.gain(test.game, hacan, Boost.GRAVITY_DRIVE)).isZero();
+
+        hacan.addSC(LEADERSHIP);
+        changed();
+
+        assertThat(OpeningOutlook.gain(test.game, hacan, Boost.GRAVITY_DRIVE)).isGreaterThan(0);
+    }
+
     // Commodities with no one to wash them with raise nothing.
     @Test
     void commoditiesWithoutAPartnerRaiseNothing() {

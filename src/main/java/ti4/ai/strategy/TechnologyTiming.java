@@ -21,6 +21,9 @@ public class TechnologyTiming {
     private static final int TRADE_PRIMARY_TRADE_GOODS = 3;
     private static final double EARLY_PLAY_SHARE = 0.2;
     private static final double HOLD_DELAY_COST = 0.5;
+    private static final int HOLD_PAYMENT = 1;
+    private static final int LONG_HOLD_PAYMENT = 2;
+    private static final int PASSES_ENDING_A_HOLD = 2;
     private static final String HELD = "technologyHeld|";
     private static final char GRANT_SEPARATOR = '|';
 
@@ -33,6 +36,22 @@ public class TechnologyTiming {
     public static double earlyCost(Game game, Player holder) {
         PlanInputs in = PlanInputs.of(game, holder, PlanMoment.ACTION);
         return Math.max(0, earlyPlayCost(in) - denialGain(game, holder));
+    }
+
+    public static double holdCost(Game game, Player holder, Player payer) {
+        double cost = holdCost(game, holder);
+        return awaitsTradeWash(game, payer) ? cost + HOLD_DELAY_COST : cost;
+    }
+
+    public static int holdPayment(Game game, Player payer) {
+        return awaitsTradeWash(game, payer) ? LONG_HOLD_PAYMENT : HOLD_PAYMENT;
+    }
+
+    public static boolean awaitsTradeWash(Game game, Player payer) {
+        int washed = RaisableTradeGoods.fromRivalTrade(game, payer) + RaisableTradeGoods.byWashing(game, payer);
+        return washed > 0
+                && payer.getStrategicCC() > 0
+                && affords(game, payer, StrategyCardRules.FOLLOW_TECH_COST - washed);
     }
 
     public static double holdCost(Game game, Player holder) {
@@ -86,9 +105,12 @@ public class TechnologyTiming {
         if (grant.isEmpty() || grant.get().length != 2 || !StringUtils.isNumeric(grant.get()[1])) return false;
         Player payer = game.getPlayerFromColorOrFaction(grant.get()[0]);
         if (payer == null || CardTiming.researchesGravityDriveForTheOpening(game, holder)) return false;
-        return !payer.isPassed()
-                && !followsNow(game, payer)
-                && !nextTurnOver(game, payer, Integer.parseInt(grant.get()[1]));
+        if (payer.isPassed() || followsNow(game, payer) || roundWindingDown(game)) return false;
+        return !nextTurnOver(game, payer, Integer.parseInt(grant.get()[1])) || awaitsTradeWash(game, payer);
+    }
+
+    private static boolean roundWindingDown(Game game) {
+        return game.getRealPlayers().stream().filter(Player::isPassed).count() >= PASSES_ENDING_A_HOLD;
     }
 
     public static void grantHold(Game game, AiMemory memory, Player payer) {
