@@ -118,6 +118,7 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
 import ti4.service.franken.FrankenUnitService;
+import ti4.service.game.BlueReverieExtrasService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.map.FractureService;
 import ti4.service.strategycard.PlayStrategyCardService;
@@ -1730,6 +1731,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         setFaction(faction);
         initLeaders();
         initAbilities(game);
+        BlueReverieExtrasService.synchronizePlayer(this, game);
     }
 
     /**

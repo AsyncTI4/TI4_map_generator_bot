@@ -91,6 +91,7 @@ public class Mapper {
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties specialCase = new Properties();
     private static final Properties tokensFromProperties = new Properties();
+    private static final Set<String> EXCLUDED_DYNAMIC_EXPLORE_CARDS = Set.of("warforgeruins", "arcaneshieldemitter");
 
     // TODO: Finish moving all files over from properties to json
     private static final Map<String, AbilityModel> abilities = new HashMap<>();
@@ -648,11 +649,17 @@ public class Mapper {
     // Decks
 
     public static Map<String, DeckModel> getDecks() {
-        return new HashMap<>(decks);
+        Map<String, DeckModel> availableDecks = new HashMap<>(decks);
+        addDynamicDecks(availableDecks);
+        return availableDecks;
     }
 
     public static DeckModel getDeck(String deckID) {
         return getDecks().get(deckID);
+    }
+
+    public static boolean isDynamicDeck(String deckID) {
+        return deckID != null && deckID.startsWith("dynamic_");
     }
 
     public static DeckModel getDeck(String deckID, Game game) {
@@ -660,13 +667,21 @@ public class Mapper {
 
         switch (deckID) {
             case "relic" -> {
-                return getDynamicRelicDeck(game);
+                return getDeck(getDynamicRelicDeckID(
+                        game.isUnchartedSpaceStuff(), game.isAbsolMode(), game.isBlueReverieExtras()));
             }
             case "ac" -> {
-                return getDynamicACDeck(game);
+                return getDeck(getDynamicActionCardDeckID(game.isUnchartedSpaceStuff(), game.isBlueReverieExtras()));
             }
             case "explore" -> {
-                return getDynamicExploreDeck(game);
+                return getDeck(getDynamicExploreDeckID(game.isUnchartedSpaceStuff(), game.isBlueReverieExtras()));
+            }
+            case "tech" -> {
+                return getDeck(getDynamicTechnologyDeckID(
+                        game.isDiscordantStarsMode(),
+                        game.isUnchartedSpaceStuff(),
+                        game.isAbsolMode(),
+                        game.isBlueReverieExtras()));
             }
             default -> {
                 return null;
@@ -674,96 +689,183 @@ public class Mapper {
         }
     }
 
-    private static DeckModel getDynamicExploreDeck(Game game) {
+    public static String getDynamicActionCardDeckID(boolean unchartedSpace, boolean blueReverieExtras) {
+        return "dynamic_ac" + (unchartedSpace ? "_us" : "") + (blueReverieExtras ? "_br" : "");
+    }
+
+    public static String getDynamicRelicDeckID(boolean unchartedSpace, boolean absol, boolean blueReverieExtras) {
+        return "dynamic_relic"
+                + (unchartedSpace ? "_us" : "")
+                + (absol ? "_absol" : "")
+                + (blueReverieExtras ? "_br" : "");
+    }
+
+    public static String getDynamicExploreDeckID(boolean unchartedSpace, boolean blueReverieExtras) {
+        return "dynamic_explore" + (unchartedSpace ? "_us" : "") + (blueReverieExtras ? "_br" : "");
+    }
+
+    public static String getDynamicTechnologyDeckID(
+            boolean discordantStars, boolean unchartedSpace, boolean absol, boolean blueReverieExtras) {
+        return "dynamic_tech"
+                + (discordantStars ? "_ds" : "")
+                + (unchartedSpace ? "_us" : "")
+                + (absol ? "_absol" : "")
+                + (blueReverieExtras ? "_br" : "");
+    }
+
+    private static void addDynamicDecks(Map<String, DeckModel> availableDecks) {
+        for (boolean unchartedSpace : List.of(false, true)) {
+            for (boolean blueReverieExtras : List.of(false, true)) {
+                DeckModel actionCards = buildDynamicActionCardDeck(unchartedSpace, blueReverieExtras);
+                availableDecks.put(actionCards.getAlias(), actionCards);
+                DeckModel explores = buildDynamicExploreDeck(unchartedSpace, blueReverieExtras);
+                availableDecks.put(explores.getAlias(), explores);
+                for (boolean absol : List.of(false, true)) {
+                    DeckModel relics = buildDynamicRelicDeck(unchartedSpace, absol, blueReverieExtras);
+                    availableDecks.put(relics.getAlias(), relics);
+                    for (boolean discordantStars : List.of(false, true)) {
+                        DeckModel technologies =
+                                buildDynamicTechnologyDeck(discordantStars, unchartedSpace, absol, blueReverieExtras);
+                        availableDecks.put(technologies.getAlias(), technologies);
+                    }
+                }
+            }
+        }
+    }
+
+    private static DeckModel buildDynamicExploreDeck(boolean unchartedSpace, boolean blueReverieExtras) {
         DeckModel deck = new DeckModel();
         deck.setType(DeckType.EXPLORE);
         deck.setName("Dynamic Explore Deck");
-        deck.setAlias("explore");
+        deck.setAlias(getDynamicExploreDeckID(unchartedSpace, blueReverieExtras));
         deck.setDescription("A dynamic explore deck for the game.");
-        List<String> cards = new ArrayList<>();
-        for (String explore : getExplores().keySet()) {
-            ExploreModel exploreModel = getExplore(explore);
-            if (exploreModel.getSource().isPok() && game.isProphecyOfKings()) {
-                cards.add(explore);
-            }
-            if (exploreModel.getSource() == ComponentSource.uncharted_space && game.isUnchartedSpaceStuff()) {
-                cards.add(explore);
-            }
-            if (exploreModel.getSource() == ComponentSource.blue_reverie && game.isBlueReverieMode()) {
-                cards.add(explore);
-            }
-        }
+        List<String> cards = new ArrayList<>(decks.get("explores_pok").getNewDeck());
+        getExplores().values().stream()
+                .filter(explore -> !EXCLUDED_DYNAMIC_EXPLORE_CARDS.contains(explore.getAlias()))
+                .filter(explore -> isEnabledDynamicDeckSource(
+                        explore.getSource(), getEnabledDynamicSources(false, unchartedSpace, false, blueReverieExtras)))
+                .sorted(dynamicDeckCardComparator(ExploreModel::getSource, ExploreModel::getAlias))
+                .forEach(explore -> addReplacementCard(
+                        cards,
+                        explore.getAlias(),
+                        explore.getHomebrewReplacesID(),
+                        existingCardID -> Optional.ofNullable(explores.get(existingCardID))
+                                .flatMap(ExploreModel::getHomebrewReplacesID)));
         deck.setCardIDs(cards);
+        deck.setSource(ComponentSource.other);
         return deck;
     }
 
-    private static DeckModel getDynamicRelicDeck(Game game) {
+    private static DeckModel buildDynamicRelicDeck(boolean unchartedSpace, boolean absol, boolean blueReverieExtras) {
         DeckModel deck = new DeckModel();
         deck.setType(DeckType.RELIC);
         deck.setName("Dynamic Relic Deck");
-        deck.setAlias("relic");
+        deck.setAlias(getDynamicRelicDeckID(unchartedSpace, absol, blueReverieExtras));
         deck.setDescription("A dynamic relic deck for the game.");
-        List<String> cards = new ArrayList<>();
-        for (String relic : getRelics().keySet()) {
-            RelicModel relicModel = getRelic(relic);
-            if (relicModel.isFakeRelic()) {
-                continue;
-            }
-            if (relicModel.getSource().isPok() && game.isProphecyOfKings() && !game.isAbsolMode()) {
-                cards.add(relic);
-            }
-            if (relicModel.getSource() == ComponentSource.absol && game.isAbsolMode()) {
-                cards.add(relic);
-            }
-            if (relicModel.getSource() == ComponentSource.thunders_edge && game.isThundersEdge()) {
-                cards.add(relic);
-            }
-            if (relicModel.getSource() == ComponentSource.uncharted_space && game.isUnchartedSpaceStuff()) {
-                cards.add(relic);
-            }
-            if (relicModel.getSource() == ComponentSource.blue_reverie && game.isBlueReverieMode()) {
-                cards.add(relic);
-            }
-        }
+        List<String> cards = new ArrayList<>(decks.get("relics_pok").getNewDeck());
+        getRelics().values().stream()
+                .filter(relic -> !relic.isFakeRelic())
+                .filter(relic -> isEnabledDynamicDeckSource(
+                        getDynamicDeckSource(relic.getSource(), relic.getActualSource()),
+                        getEnabledDynamicSources(false, unchartedSpace, absol, blueReverieExtras)))
+                .sorted(dynamicDeckCardComparator(
+                        relic -> getDynamicDeckSource(relic.getSource(), relic.getActualSource()),
+                        RelicModel::getAlias))
+                .forEach(relic -> addReplacementCard(
+                        cards,
+                        relic.getAlias(),
+                        relic.getHomebrewReplacesID(),
+                        existingCardID -> Optional.ofNullable(relics.get(existingCardID))
+                                .flatMap(RelicModel::getHomebrewReplacesID)));
         deck.setCardIDs(cards);
+        deck.setSource(ComponentSource.other);
         return deck;
     }
 
-    private static DeckModel getDynamicACDeck(Game game) {
-        // Implementation for dynamic AC deck
+    private static DeckModel buildDynamicActionCardDeck(boolean unchartedSpace, boolean blueReverieExtras) {
         DeckModel deck = new DeckModel();
         deck.setType(DeckType.ACTION_CARD);
         deck.setName("Dynamic AC Deck");
-        deck.setAlias("ac");
+        deck.setAlias(getDynamicActionCardDeckID(unchartedSpace, blueReverieExtras));
         deck.setDescription("A dynamic AC deck for the game.");
-        List<String> cards = new ArrayList<>();
-        for (String actionCard : getActionCards().keySet()) {
-            ActionCardModel actionCardModel = getActionCard(actionCard);
-            if (actionCardModel.getSource().isPok()
-                    && game.isProphecyOfKings()
-                    && (!game.isAcd2()
-                            || getDeck("action_deck_2_te").getNewDeck().contains(actionCard))
-                    && !game.isTwilightsFallMode()) {
-                cards.add(actionCard);
-            }
-            if (actionCardModel.getSource() == ComponentSource.action_deck_2 && game.isAcd2()) {
-                cards.add(actionCard);
-            }
-            if (actionCardModel.getSource() == ComponentSource.thunders_edge
-                    && game.isThundersEdge()
-                    && !game.isAcd2()
-                    && !game.isTwilightsFallMode()) {
-                cards.add(actionCard);
-            }
-            if (actionCardModel.getSource() == ComponentSource.uncharted_space && game.isUnchartedSpaceStuff()) {
-                cards.add(actionCard);
-            }
-            if (actionCardModel.getSource() == ComponentSource.blue_reverie && game.isBlueReverieMode()) {
-                cards.add(actionCard);
-            }
-        }
+        List<String> cards = new ArrayList<>(decks.get("action_cards_pok").getNewDeck());
+        getActionCards().values().stream()
+                .filter(actionCard -> isEnabledDynamicDeckSource(
+                        getDynamicDeckSource(actionCard.getSource(), actionCard.getActualSource()),
+                        getEnabledDynamicSources(false, unchartedSpace, false, blueReverieExtras)))
+                .sorted(dynamicDeckCardComparator(
+                        actionCard -> getDynamicDeckSource(actionCard.getSource(), actionCard.getActualSource()),
+                        ActionCardModel::getAlias))
+                .forEach(actionCard -> addReplacementCard(
+                        cards,
+                        actionCard.getAlias(),
+                        actionCard.getHomebrewReplacesID(),
+                        existingCardID -> Optional.ofNullable(actionCards.get(existingCardID))
+                                .flatMap(ActionCardModel::getHomebrewReplacesID)));
         deck.setCardIDs(cards);
+        deck.setSource(ComponentSource.other);
         return deck;
+    }
+
+    private static DeckModel buildDynamicTechnologyDeck(
+            boolean discordantStars, boolean unchartedSpace, boolean absol, boolean blueReverieExtras) {
+        DeckModel deck = new DeckModel();
+        deck.setType(DeckType.TECHNOLOGY);
+        deck.setName("Dynamic Technology Deck");
+        deck.setAlias(getDynamicTechnologyDeckID(discordantStars, unchartedSpace, absol, blueReverieExtras));
+        deck.setDescription("A dynamic technology deck for the game.");
+        List<String> cards = new ArrayList<>(decks.get("techs_pok_c4").getNewDeck());
+        getTechs().values().stream()
+                .filter(tech -> isEnabledDynamicDeckSource(
+                        tech.getSource(),
+                        getEnabledDynamicSources(discordantStars, unchartedSpace, absol, blueReverieExtras)))
+                .sorted(dynamicDeckCardComparator(TechnologyModel::getSource, TechnologyModel::getAlias))
+                .forEach(tech -> addReplacementCard(
+                        cards,
+                        tech.getAlias(),
+                        tech.getHomebrewReplacesID(),
+                        existingCardID -> Optional.ofNullable(technologies.get(existingCardID))
+                                .flatMap(TechnologyModel::getHomebrewReplacesID)));
+        deck.setCardIDs(cards);
+        deck.setSource(ComponentSource.other);
+        return deck;
+    }
+
+    private static List<ComponentSource> getEnabledDynamicSources(
+            boolean discordantStars, boolean unchartedSpace, boolean absol, boolean blueReverieExtras) {
+        List<ComponentSource> enabledSources = new ArrayList<>();
+        if (discordantStars) enabledSources.add(ComponentSource.ds);
+        if (unchartedSpace) enabledSources.add(ComponentSource.uncharted_space);
+        if (blueReverieExtras) enabledSources.add(ComponentSource.blue_reverie);
+        if (absol) enabledSources.add(ComponentSource.absol);
+        return enabledSources;
+    }
+
+    private static boolean isEnabledDynamicDeckSource(ComponentSource source, List<ComponentSource> enabledSources) {
+        return enabledSources.contains(source);
+    }
+
+    private static ComponentSource getDynamicDeckSource(ComponentSource source, ComponentSource actualSource) {
+        return actualSource == null ? source : actualSource;
+    }
+
+    private static <T> Comparator<T> dynamicDeckCardComparator(
+            Function<T, ComponentSource> source, Function<T, String> alias) {
+        return Comparator.comparing((T card) -> source.apply(card) == ComponentSource.absol)
+                .thenComparing(alias);
+    }
+
+    private static void addReplacementCard(
+            List<String> cards,
+            String cardID,
+            Optional<String> replacedCardID,
+            Function<String, Optional<String>> existingCardReplacement) {
+        replacedCardID.ifPresent(replaced -> cards.removeIf(existingCardID -> replaced.equals(existingCardID)
+                || existingCardReplacement
+                        .apply(existingCardID)
+                        .map(replaced::equals)
+                        .orElse(false)));
+        if (!cards.contains(cardID)) cards.add(cardID);
     }
 
     public static boolean isValidDeck(String deckID) {

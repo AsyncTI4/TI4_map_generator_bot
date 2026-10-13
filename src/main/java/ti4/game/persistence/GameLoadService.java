@@ -605,6 +605,8 @@ class GameLoadService {
                 case Constants.SHOW_MAP_SETUP -> game.setShowMapSetup(parseBooleanOrDefault(info, false));
                 case Constants.DISCORDANT_STARS_MODE -> game.setDiscordantStarsMode(parseBooleanOrDefault(info, false));
                 case Constants.BLUE_REVERIE_MODE -> game.setBlueReverieMode(parseBooleanOrDefault(info, false));
+                case Constants.BLUE_REVERIE_EXTRAS -> game.setBlueReverieExtras(parseBooleanOrDefault(info, false));
+                case Constants.DYNAMIC_DECK_OVERRIDE -> game.setDynamicDeckOverride(parseBooleanOrDefault(info, false));
                 case Constants.UNCHARTED_SPACE_STUFF -> game.setUnchartedSpaceStuff(parseBooleanOrDefault(info, false));
                 case Constants.VERBOSITY -> game.setOutputVerbosity(info);
                 case Constants.BETA_TEST_MODE -> game.setTestBetaFeaturesMode(parseBooleanOrDefault(info, false));

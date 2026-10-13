@@ -33,6 +33,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private String flavorText;
     private String imageURL;
     private String automationID;
+    private String homebrewReplacesID;
     private PlayTiming playTiming = PlayTiming.NONE;
     private ComponentSource source;
     private ComponentSource actualSource;
@@ -85,6 +86,10 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     public String getAutomationID() {
         if (automationID == null) return alias;
         return automationID;
+    }
+
+    public Optional<String> getHomebrewReplacesID() {
+        return Optional.ofNullable(homebrewReplacesID);
     }
 
     public PlayTiming getPlayTiming() {

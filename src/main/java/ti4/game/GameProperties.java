@@ -171,6 +171,8 @@ public class GameProperties {
     private @ExportableField boolean absolMode;
     private @ExportableField boolean discordantStarsMode;
     private @ExportableField boolean blueReverieMode;
+    private @ExportableField boolean blueReverieExtras;
+    private @ExportableField boolean dynamicDeckOverride;
     private @ExportableField boolean unchartedSpaceStuff;
     private @ExportableField boolean miltyModMode;
     private @ExportableField boolean promisesPromisesMode;

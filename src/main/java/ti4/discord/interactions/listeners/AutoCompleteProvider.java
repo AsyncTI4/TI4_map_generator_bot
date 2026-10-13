@@ -512,6 +512,7 @@ class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Map<String, DeckModel> decks = Mapper.getDecks();
                 List<Command.Choice> options = decks.values().stream()
+                        .filter(deck -> !Mapper.isDynamicDeck(deck.getAlias()))
                         .filter(value -> value.getAlias().contains(enteredValue))
                         .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
                         .limit(25)
@@ -522,6 +523,7 @@ class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Map<String, DeckModel> decks = Mapper.getDecks();
                 List<Command.Choice> options = decks.values().stream()
+                        .filter(deckModel -> !Mapper.isDynamicDeck(deckModel.getAlias()))
                         .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.ACTION_CARD)
                         .filter(value -> value.getAlias().contains(enteredValue))
                         .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
@@ -531,6 +533,7 @@ class AutoCompleteProvider {
             }
             case Constants.SO_DECK -> {
                 List<DeckModel> secretDecks = Mapper.getDecks().values().stream()
+                        .filter(deckModel -> !Mapper.isDynamicDeck(deckModel.getAlias()))
                         .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.SECRET_OBJECTIVE)
                         .toList();
                 List<Command.Choice> options = searchModels(event, secretDecks, null);
@@ -538,6 +541,7 @@ class AutoCompleteProvider {
             }
             case Constants.STAGE_1_PUBLIC_DECK -> {
                 List<DeckModel> public1Decks = Mapper.getDecks().values().stream()
+                        .filter(deckModel -> !Mapper.isDynamicDeck(deckModel.getAlias()))
                         .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.PUBLIC_STAGE_1_OBJECTIVE)
                         .toList();
                 List<Command.Choice> options = searchModels(event, public1Decks, null);
@@ -545,6 +549,7 @@ class AutoCompleteProvider {
             }
             case Constants.STAGE_2_PUBLIC_DECK -> {
                 List<DeckModel> public2Decks = Mapper.getDecks().values().stream()
+                        .filter(deckModel -> !Mapper.isDynamicDeck(deckModel.getAlias()))
                         .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.PUBLIC_STAGE_2_OBJECTIVE)
                         .toList();
                 List<Command.Choice> options = searchModels(event, public2Decks, null);
@@ -552,6 +557,7 @@ class AutoCompleteProvider {
             }
             case Constants.RELIC_DECK -> {
                 List<DeckModel> relicDecks = Mapper.getDecks().values().stream()
+                        .filter(deckModel -> !Mapper.isDynamicDeck(deckModel.getAlias()))
                         .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.RELIC)
                         .toList();
                 List<Command.Choice> options = searchModels(event, relicDecks, null);
@@ -559,6 +565,7 @@ class AutoCompleteProvider {
             }
             case Constants.AGENDA_DECK -> {
                 List<DeckModel> agendaDecks = Mapper.getDecks().values().stream()
+                        .filter(deckModel -> !Mapper.isDynamicDeck(deckModel.getAlias()))
                         .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.AGENDA)
                         .toList();
                 List<Command.Choice> options = searchModels(event, agendaDecks, null);
@@ -566,6 +573,7 @@ class AutoCompleteProvider {
             }
             case Constants.EVENT_DECK -> {
                 List<DeckModel> eventDecks = Mapper.getDecks().values().stream()
+                        .filter(deckModel -> !Mapper.isDynamicDeck(deckModel.getAlias()))
                         .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.EVENT)
                         .toList();
                 List<Command.Choice> options = searchModels(event, eventDecks, null);
@@ -573,6 +581,7 @@ class AutoCompleteProvider {
             }
             case Constants.EXPLORATION_DECKS -> {
                 List<DeckModel> exploreDecks = Mapper.getDecks().values().stream()
+                        .filter(deckModel -> !Mapper.isDynamicDeck(deckModel.getAlias()))
                         .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.EXPLORE)
                         .toList();
                 List<Command.Choice> options = searchModels(event, exploreDecks, null);
@@ -580,6 +589,7 @@ class AutoCompleteProvider {
             }
             case Constants.TECHNOLOGY_DECK -> {
                 List<DeckModel> techDecks = Mapper.getDecks().values().stream()
+                        .filter(deckModel -> !Mapper.isDynamicDeck(deckModel.getAlias()))
                         .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.TECHNOLOGY)
                         .toList();
                 List<Command.Choice> options = searchModels(event, techDecks, null);

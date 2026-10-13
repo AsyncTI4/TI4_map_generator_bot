@@ -44,6 +44,7 @@ import ti4.model.Source;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.game.BlueReverieExtrasService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.AbilityInfoService;
 import ti4.service.info.CardsInfoService;
@@ -303,6 +304,8 @@ public class PlayerSetupService {
         if (game.isTwilightsFallMode()) {
             player.addOwnedUnitByID("tf_warsun");
         }
+
+        BlueReverieExtrasService.synchronize(game);
 
         // Don't do special stuff if Franken Faction
         if (faction.startsWith("franken")) {

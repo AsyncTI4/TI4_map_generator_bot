@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -33,6 +34,7 @@ public class ChoiceSetting<T> extends SettingInterface {
     private Function<T, String> show;
     private Function<T, String> getEmoji;
     private Function<T, String> getExtraInfo;
+    private Predicate<T> isVisible = value -> true;
     private String lang = "pick";
 
     public ChoiceSetting(String id, String name, String defaultKey) {
@@ -104,6 +106,10 @@ public class ChoiceSetting<T> extends SettingInterface {
         }
     }
 
+    public void setVisibility(Predicate<T> visibility) {
+        isVisible = visibility;
+    }
+
     private String changeValue(GenericInteractionCreateEvent event, String action) {
         String suffix = action.replace("change" + id, "");
         List<Map.Entry<String, T>> items = new ArrayList<>(allValues.entrySet());
@@ -122,7 +128,7 @@ public class ChoiceSetting<T> extends SettingInterface {
                 return "Too many values were selected";
             }
 
-            if (allValues.containsKey(itemToChoose)) {
+            if (allValues.containsKey(itemToChoose) && isVisible.test(allValues.get(itemToChoose))) {
                 chosenKey = itemToChoose;
                 if (getExtraInfo != null) setExtraInfo(getExtraInfo.apply(getValue()));
                 return null;
@@ -137,7 +143,10 @@ public class ChoiceSetting<T> extends SettingInterface {
         String prefixID = buttonEvent.getButton().getCustomId();
         List<ActionRow> rows = new ArrayList<>();
         int x = 0;
-        for (List<Map.Entry<String, T>> menu : ListUtils.partition(entries, 25)) {
+        List<Map.Entry<String, T>> visibleEntries = entries.stream()
+                .filter(entry -> isVisible.test(entry.getValue()))
+                .toList();
+        for (List<Map.Entry<String, T>> menu : ListUtils.partition(visibleEntries, 25)) {
             List<SelectOption> options = menu.stream()
                     .map(entry -> SelectOption.of(show.apply(entry.getValue()), entry.getKey()))
                     .toList();

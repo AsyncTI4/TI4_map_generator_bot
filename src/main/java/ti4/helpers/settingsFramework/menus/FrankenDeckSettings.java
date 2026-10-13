@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.game.Game;
+import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
@@ -19,6 +20,7 @@ class FrankenDeckSettings extends SettingsMenu {
     private final ChoiceSetting<DeckModel> actionCards;
     private final ChoiceSetting<DeckModel> relics;
     private final ChoiceSetting<DeckModel> explores;
+    private final BooleanSetting dynamicDeckOverride;
 
     FrankenDeckSettings(Game game, JsonNode json, SettingsMenu parent) {
         super("frankenDecks", "Set Decks", "Choose the card decks used for this Franken draft.", parent);
@@ -26,6 +28,9 @@ class FrankenDeckSettings extends SettingsMenu {
         actionCards = deckChoice("ACs", "Action Cards", game.getAcDeckID(), DeckModel.DeckType.ACTION_CARD);
         relics = deckChoice("Relics", "Relics", game.getRelicDeckID(), DeckModel.DeckType.RELIC);
         explores = deckChoice("Explores", "Explores", game.getExplorationDeckID(), DeckModel.DeckType.EXPLORE);
+        dynamicDeckOverride =
+                new BooleanSetting("DynamicDeckOverride", "Manual Deck Override", game.isDynamicDeckOverride());
+        dynamicDeckOverride.setExtraInfo("Prevents enabled sources from automatically selecting or changing decks.");
 
         actionCards.setEmoji(CardEmojis.ActionCard);
         relics.setEmoji(CardEmojis.RelicCard);
@@ -38,12 +43,13 @@ class FrankenDeckSettings extends SettingsMenu {
             actionCards.initialize(json.get("actionCards"));
             relics.initialize(json.get("relics"));
             explores.initialize(json.get("explores"));
+            dynamicDeckOverride.initialize(json.get("dynamicDeckOverride"));
         }
     }
 
     @Override
     protected List<SettingInterface> settings() {
-        return List.of(actionCards, relics, explores);
+        return List.of(actionCards, relics, explores, dynamicDeckOverride);
     }
 
     @Override
@@ -67,6 +73,7 @@ class FrankenDeckSettings extends SettingsMenu {
                 .filter(deck -> deck.getType() == deckType)
                 .collect(Collectors.toMap(DeckModel::getAlias, deck -> deck)));
         choice.setShow(DeckModel::getName);
+        choice.setVisibility(deck -> !Mapper.isDynamicDeck(deck.getAlias()));
         return choice;
     }
 }

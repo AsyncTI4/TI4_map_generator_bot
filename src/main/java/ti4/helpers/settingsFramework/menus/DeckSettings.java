@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import ti4.game.Game;
+import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
@@ -31,6 +32,7 @@ public class DeckSettings extends SettingsMenu {
     private final ChoiceSetting<DeckModel> relics;
     private final ChoiceSetting<DeckModel> explores;
     private final ChoiceSetting<StrategyCardSetModel> stratCards;
+    private final BooleanSetting dynamicDeckOverride;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -44,6 +46,7 @@ public class DeckSettings extends SettingsMenu {
         choice.setEmoji(deckType.deckEmoji());
         choice.setShow(DeckModel::getName);
         choice.setAllValues(decks.stream().collect(Collectors.toMap(DeckModel::getAlias, x -> x)));
+        choice.setVisibility(deck -> !Mapper.isDynamicDeck(deck.getAlias()));
         return choice;
     }
 
@@ -80,6 +83,9 @@ public class DeckSettings extends SettingsMenu {
         stratCards.setEmoji(CardEmojis.SCFrontBlank);
         stratCards.setAllValues(Mapper.getStrategyCardSets());
         stratCards.setShow(StrategyCardSetModel::getName);
+        dynamicDeckOverride =
+                new BooleanSetting("DynamicDeckOverride", "Manual Deck Override", game.isDynamicDeckOverride());
+        dynamicDeckOverride.setExtraInfo("Prevents enabled sources from automatically selecting or changing decks.");
 
         // Get the correct JSON node for initialization if applicable.
         // Add additional names here to support new generated JSON as needed.
@@ -99,6 +105,7 @@ public class DeckSettings extends SettingsMenu {
             relics.initialize(json.get("relics"));
             explores.initialize(json.get("explores"));
             stratCards.initialize(json.get("stratCards"));
+            dynamicDeckOverride.initialize(json.get("dynamicDeckOverride"));
         }
     }
 
@@ -117,6 +124,7 @@ public class DeckSettings extends SettingsMenu {
         ls.add(relics);
         ls.add(explores);
         ls.add(stratCards);
+        ls.add(dynamicDeckOverride);
         return ls;
     }
 }

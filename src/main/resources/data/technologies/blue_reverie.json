@@ -288,7 +288,7 @@
         ],
         "requirements": "RR",
         "source": "blue_reverie",
-        "text": "When you win a combat you may either exhaust this card to take one of your opponent's action cards, at random, or ready this card."
+        "text": "When you win a combat you may either exhaust this card to take one of your opponent's action cards, at random, or ready this card.\n\nYour units cannot be destroyed by action cards, or hits produced by those cards."
     },
     {
         "alias": "ve",

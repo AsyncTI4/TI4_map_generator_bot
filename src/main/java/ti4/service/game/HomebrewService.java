@@ -32,7 +32,8 @@ public class HomebrewService {
         HBABSOLRELICSAGENDAS("Absol Relics/Agendas", "Use Absol Relics and Agendas", SourceEmojis.Absol),
         HBABSOLTECHSMECHS("Absol Techs/Mechs", "Use Absol Techs and Mechs", SourceEmojis.Absol),
         HBDSFACTIONS("DS Factions", "Discordant Stars Factions", SourceEmojis.DiscordantStars),
-        HBBRFACTIONS("BR Factions", "Blue Reverie Factions", SourceEmojis.DiscordantStars),
+        HBBRFACTIONS("BR Factions", "Blue Reverie Factions", SourceEmojis.BlueReverie),
+        HBBREXTRAS("BR Extras", "Blue Reverie cards, relics, explores, and technologies", SourceEmojis.BlueReverie),
         HBDSEXPLORES(
                 "US Explores/Relics/ACs",
                 "Uncharted Space Explores, Relics and Action Cards",
@@ -95,10 +96,14 @@ public class HomebrewService {
 
     @ButtonHandler("setupHomebrewNone")
     public static void removeHomebrew(Game game, ButtonInteractionEvent event) {
+        boolean blueReverieStrategyCards = "bluerevstrat"
+                        .equals(game.getStrategyCardSet().getAlias())
+                || "bluerevstrat_monuments".equals(game.getStrategyCardSet().getAlias());
         game.setHomebrewSCMode(false);
         game.setRedTapeMode(false);
         game.setDiscordantStarsMode(false);
         game.setBlueReverieMode(false);
+        game.setBlueReverieExtras(false);
         game.setUnchartedSpaceStuff(false);
         game.setAbsolMode(false);
         game.setOmegaPhaseMode(false);
@@ -107,9 +112,16 @@ public class HomebrewService {
         game.setOplusplusRegularMode(false);
         game.setOplusplusCouncilMode(false);
         game.setStoredValue("homebrewMode", "");
+        if (blueReverieStrategyCards && !game.isDynamicDeckOverride()) {
+            game.setStrategyCardSet(BlueReverieExtrasService.getStrategyCardSetID(false, false));
+        }
+        boolean manualDeckOverride = game.isDynamicDeckOverride();
+        DynamicDeckService.applyEnabledSourceDecks(game, event);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                "Set all homebrew options off. You need manually check and fix decks, VPs, objectives etc. that might've been set.");
+                manualDeckOverride
+                        ? "Set all homebrew options off. Manual Deck Override left the selected decks unchanged; check VPs, objectives, and other manually configured settings."
+                        : "Set all homebrew options off. Rebuilt enabled-source decks; check VPs, objectives, and other manually configured settings.");
     }
 
     @ButtonHandler("setupHomebrew_")
@@ -151,14 +163,15 @@ public class HomebrewService {
             }
             case HBABSOLRELICSAGENDAS -> {
                 game.setAbsolMode(true);
-                game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"));
-                if (game.isUnchartedSpaceStuff() && game.getRelicDeckID().contains("ds")) {
-                    game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol_ds"));
-                } else {
-                    game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol"));
+                if (!game.isDynamicDeckOverride()) {
+                    game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"));
                 }
+                if (!DynamicDeckService.applyEnabledSourceDecks(game, event)) return;
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "Set the relics and agendas to Absol stuff");
+                        event.getMessageChannel(),
+                        game.isDynamicDeckOverride()
+                                ? "Enabled Absol relics and agendas. Manual Deck Override left the selected decks unchanged."
+                                : "Set the relics and agendas to Absol content.");
             }
             case HBIGNISAURORA -> {
                 game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_baldrick"));
@@ -179,31 +192,13 @@ public class HomebrewService {
             }
             case HBABSOLTECHSMECHS -> {
                 game.setAbsolMode(true);
-                if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
-                    game.setTechnologyDeckID("techs_ds_absol");
-                } else {
-                    game.setTechnologyDeckID("techs_absol");
-                }
+                if (!DynamicDeckService.applyEnabledSourceDecks(game, event)) return;
                 game.swapInVariantUnits("absol");
-                game.swapInVariantTechs();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set the techs & mechs to Absol stuff.");
             }
             case HBDSEXPLORES -> {
                 game.setUnchartedSpaceStuff(true);
-                game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"));
-                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"));
-                if (game.isAbsolMode()) {
-                    if (game.getTechnologyDeckID().contains("absol")) {
-                        game.setTechnologyDeckID("techs_ds_absol");
-                    }
-                    if (game.getRelicDeckID().contains("absol")) {
-                        game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol_ds"));
-                    }
-
-                } else {
-                    game.validateAndSetRelicDeck(Mapper.getDeck("relics_ds"));
-                    game.setTechnologyDeckID("techs_ds");
-                }
+                if (!DynamicDeckService.applyEnabledSourceDecks(game, event)) return;
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), "Set the explores/action cards/relics to Uncharted Space stuff.");
             }
@@ -218,11 +213,7 @@ public class HomebrewService {
             }
             case HBDSFACTIONS -> {
                 game.setDiscordantStarsMode(true);
-                if (game.getTechnologyDeckID().contains("absol")) {
-                    game.setTechnologyDeckID("techs_ds_absol");
-                } else {
-                    game.setTechnologyDeckID("techs_ds");
-                }
+                if (!DynamicDeckService.applyEnabledSourceDecks(game, event)) return;
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "Set game to Discordant Stars mode. Only includes factions and planets unless you also click/clicked the Discordant Stars Explores button.");
@@ -230,6 +221,16 @@ public class HomebrewService {
             case HBBRFACTIONS -> {
                 game.setBlueReverieMode(true);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set game to Blue Reverie faction mode.");
+            }
+            case HBBREXTRAS -> {
+                game.setBlueReverieExtras(true);
+                if (!DynamicDeckService.applyEnabledSourceDecks(game, event)) return;
+                if (!game.isDynamicDeckOverride()) {
+                    game.setStrategyCardSet(game.isMonumentsMode() ? "bluerevstrat_monuments" : "bluerevstrat");
+                }
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Added Blue Reverie cards, relics, explores, and technologies. Leader, unit, and ability replacements are applied after draft setup.");
             }
             case HBHBSC -> {
                 game.setHomebrewSCMode(true);

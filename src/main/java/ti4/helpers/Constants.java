@@ -95,6 +95,8 @@ public final class Constants {
     public static final String FLAGSHIPPING = "flagshipping";
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
     public static final String BLUE_REVERIE_MODE = "blue_reverie_mode";
+    public static final String BLUE_REVERIE_EXTRAS = "blue_reverie_extras";
+    public static final String DYNAMIC_DECK_OVERRIDE = "dynamic_deck_override";
     public static final String UNCHARTED_SPACE_STUFF = "uncharted_space_stuff";
     public static final String TWILIGHT_DS = "twilight_ds";
     public static final String TWILIGHT_KART = "twilight_kart";

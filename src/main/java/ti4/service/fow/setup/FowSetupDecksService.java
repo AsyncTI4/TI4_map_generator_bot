@@ -27,6 +27,7 @@ import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.service.game.DeckConfigImportService;
+import ti4.service.game.DynamicDeckService;
 import ti4.service.game.SetDeckService;
 
 /** DECKS step of the FoW setup wizard: pick decks (and the Strategy Card set), or import a Deck-editor config. */
@@ -73,12 +74,20 @@ final class FowSetupDecksService {
                 .append("see the info thread for details).\n")
                 .append("**Import a Deck-editor config:** the button below takes a URL. Discord buttons/modals ")
                 .append("can't accept file uploads, so if you have a `.json` file instead, run ")
-                .append("`/special2 import_deck_config` yourself with its `file` attachment option.\n");
+                .append("`/special2 import_deck_config` yourself with its `file` attachment option.\n")
+                .append("**Dynamic decks:** Deck composition is based on enabled sources.\n")
+                .append("To set decks manually, enable Manual Deck Override.");
+        sb.append("> Manual Deck Override: **")
+                .append(game.isDynamicDeckOverride() ? "ON" : "OFF")
+                .append("**\n");
 
         for (DeckSlot slot : DECK_SLOTS) {
             buttons.add(Buttons.gray("fowSetupDeckPick_" + slot.constantKey(), "Set " + slot.label() + " Deck"));
         }
         buttons.add(Buttons.gray("fowSetupDeckPickSC", "Set Strategy Card Set"));
+        buttons.add(Buttons.gray(
+                "fowSetupDeckToggleDynamicOverride",
+                game.isDynamicDeckOverride() ? "Disable Manual Deck Override" : "Enable Manual Deck Override"));
         buttons.add(Buttons.blue("fowSetupDeckConfigImportExplain", "Import Deck-editor Config (URL)"));
     }
 
@@ -115,6 +124,7 @@ final class FowSetupDecksService {
 
         List<DeckModel> options = Mapper.getDecks().values().stream()
                 .filter(deck -> deck.getType() == slot.type())
+                .filter(deck -> !Mapper.isDynamicDeck(deck.getAlias()))
                 .sorted(Comparator.comparing(DeckModel::getName))
                 .toList();
         if (options.isEmpty()) {
@@ -187,6 +197,16 @@ final class FowSetupDecksService {
             return;
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Strategy Card Set set to **" + alias + "**.");
+        FowSetupWizardService.openOrRefresh(game);
+    }
+
+    @ButtonHandler("fowSetupDeckToggleDynamicOverride")
+    static void toggleDynamicDeckOverride(ButtonInteractionEvent event, Game game) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
+        game.setDynamicDeckOverride(!game.isDynamicDeckOverride());
+        if (!game.isDynamicDeckOverride()) {
+            DynamicDeckService.applyEnabledSourceDecks(game, event);
+        }
         FowSetupWizardService.openOrRefresh(game);
     }
 

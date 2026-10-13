@@ -18,6 +18,8 @@ import ti4.game.Game;
 import ti4.helpers.TIGLHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.game.BlueReverieExtrasService;
+import ti4.service.game.DynamicDeckService;
 import ti4.service.game.HomebrewService;
 import ti4.service.game.HomebrewService.Homebrew;
 
@@ -45,6 +47,7 @@ final class FowSetupGameOptionsService {
                         Homebrew.HBABSOLRELICSAGENDAS,
                         Homebrew.HBABSOLTECHSMECHS,
                         Homebrew.HBDSEXPLORES,
+                        Homebrew.HBBREXTRAS,
                         Homebrew.HBACDECK2)),
         // Not Homebrew-enum-driven like the others - special-cased in postCategoryButtons, same as
         // how HOMEBREW already special-cases its TIGL/Alliance/Remove-All extras.
@@ -171,6 +174,7 @@ final class FowSetupGameOptionsService {
             case HBREMOVESFTT -> "true".equals(game.getStoredValue("removeSupports"));
             case HBDSFACTIONS -> game.isDiscordantStarsMode();
             case HBBRFACTIONS -> game.isBlueReverieMode();
+            case HBBREXTRAS -> game.isBlueReverieExtras();
             case HBDSEXPLORES -> game.isUnchartedSpaceStuff();
             case HBACDECK2 -> game.isAcd2();
             // Both toggles share Game.absolMode - no single flag can tell them apart, so this is
@@ -200,6 +204,15 @@ final class FowSetupGameOptionsService {
             state.getEnabledGameOptions().add(hb.name());
         } else {
             String caveat = applyOff(game, state, hb);
+            if (usesDynamicDecks(hb)) {
+                boolean manualDeckOverride = game.isDynamicDeckOverride();
+                boolean decksUpdated = DynamicDeckService.applyEnabledSourceDecks(game, event);
+                if (manualDeckOverride) {
+                    caveat = appendCaveat(caveat, "Manual Deck Override left the selected decks unchanged.");
+                } else if (!decksUpdated) {
+                    caveat = appendCaveat(caveat, "Decks containing used cards were not changed.");
+                }
+            }
             state.getEnabledGameOptions().remove(hb.name());
             leadNote = hb.name + " turned **off**." + (caveat == null ? "" : " " + caveat);
         }
@@ -218,6 +231,17 @@ final class FowSetupGameOptionsService {
                 game.setBlueReverieMode(false);
                 yield null;
             }
+            case HBBREXTRAS -> {
+                game.setBlueReverieExtras(false);
+                if (!game.isDynamicDeckOverride()
+                        && ("bluerevstrat".equals(game.getStrategyCardSet().getAlias())
+                                || "bluerevstrat_monuments"
+                                        .equals(game.getStrategyCardSet().getAlias()))) {
+                    game.setStrategyCardSet(
+                            BlueReverieExtrasService.getStrategyCardSetID(false, game.isMonumentsMode()));
+                }
+                yield null;
+            }
             case HBVOTC -> {
                 game.setVotcMode(false);
                 yield "The agenda/tech/strategy-card/action-card decks it swapped in were not reverted - "
@@ -229,11 +253,11 @@ final class FowSetupGameOptionsService {
             }
             case HBDSFACTIONS -> {
                 game.setDiscordantStarsMode(false);
-                yield "The technology deck it may have changed was not reverted.";
+                yield null;
             }
             case HBDSEXPLORES -> {
                 game.setUnchartedSpaceStuff(false);
-                yield "The explore/action-card/relic decks it changed were not reverted.";
+                yield null;
             }
             case HBABSOLRELICSAGENDAS, HBABSOLTECHSMECHS -> {
                 Homebrew other = hb == Homebrew.HBABSOLRELICSAGENDAS
@@ -241,13 +265,24 @@ final class FowSetupGameOptionsService {
                         : Homebrew.HBABSOLRELICSAGENDAS;
                 // Both toggles share Game.absolMode - only clear it once neither is tracked as on.
                 game.setAbsolMode(state.getEnabledGameOptions().contains(other.name()));
-                yield "The decks it changed were not reverted.";
+                yield null;
             }
             case HBACDECK2 ->
                 "No deck change was made, so this will still show as enabled - pick a different Action "
                         + "Card deck in the Decks step if you want to actually move off Action Card Deck 2.";
             default -> null;
         };
+    }
+
+    private static boolean usesDynamicDecks(Homebrew homebrew) {
+        return switch (homebrew) {
+            case HBABSOLRELICSAGENDAS, HBABSOLTECHSMECHS, HBDSFACTIONS, HBBREXTRAS, HBDSEXPLORES -> true;
+            default -> false;
+        };
+    }
+
+    private static String appendCaveat(String caveat, String appendedCaveat) {
+        return caveat == null ? appendedCaveat : caveat + " " + appendedCaveat;
     }
 
     @ButtonHandler("fowSetupOptionsRemoveAllHomebrews_")

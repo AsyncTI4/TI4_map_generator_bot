@@ -23,6 +23,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     private String flavorText;
     private String imageURL;
     private ComponentSource source;
+    private String homebrewReplacesID;
     private List<String> searchTags = new ArrayList<>();
 
     @Override
@@ -43,6 +44,10 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getAttachmentId() {
         return Optional.ofNullable(attachmentId);
+    }
+
+    public Optional<String> getHomebrewReplacesID() {
+        return Optional.ofNullable(homebrewReplacesID);
     }
 
     private Optional<String> getFlavorText() {

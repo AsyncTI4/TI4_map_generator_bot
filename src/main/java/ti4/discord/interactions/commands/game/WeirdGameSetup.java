@@ -23,6 +23,7 @@ import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.game.DynamicDeckService;
 import ti4.service.game.MonumentsService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.option.TEOptionService;
@@ -42,6 +43,10 @@ public class WeirdGameSetup extends GameStateSubcommand {
                 "True to add the Discordant Stars factions to the pool."));
         addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.BLUE_REVERIE_MODE, "True to add the Blue Reverie factions to the pool."));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.BLUE_REVERIE_EXTRAS,
+                "True to add Blue Reverie cards, relics, explores, and technologies."));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.UNCHARTED_SPACE_STUFF,
@@ -125,24 +130,17 @@ public class WeirdGameSetup extends GameStateSubcommand {
         if (nofracture != null) game.setNoFractureMode(nofracture);
 
         Boolean uncharted = event.getOption(Constants.UNCHARTED_SPACE_STUFF, null, OptionMapping::getAsBoolean);
-        if (uncharted != null) {
-            game.setUnchartedSpaceStuff(uncharted);
-            if (uncharted) {
-                game.setHomebrew(true);
-                game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"));
-                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"));
-                if (game.isAbsolMode()) {
-                    if (game.getTechnologyDeckID().contains("absol")) {
-                        game.setTechnologyDeckID("techs_ds_absol");
-                    }
-                    if (game.getRelicDeckID().contains("absol")) {
-                        game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol_ds"));
-                    }
-
-                } else {
-                    game.validateAndSetRelicDeck(Mapper.getDeck("relics_ds"));
-                    game.setTechnologyDeckID("techs_ds");
-                }
+        Boolean blueReverieExtras = event.getOption(Constants.BLUE_REVERIE_EXTRAS, null, OptionMapping::getAsBoolean);
+        if (uncharted != null || blueReverieExtras != null) {
+            if (uncharted != null) game.setUnchartedSpaceStuff(uncharted);
+            if (blueReverieExtras != null) game.setBlueReverieExtras(blueReverieExtras);
+            game.setHomebrew(game.isHomebrew() || game.isUnchartedSpaceStuff() || game.isBlueReverieExtras());
+            if (!DynamicDeckService.applyEnabledSourceDecks(game, event)) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), "Unable to change the enabled-source decks while cards are in use.");
+            }
+            if (game.isBlueReverieExtras() && !game.isDynamicDeckOverride()) {
+                game.setStrategyCardSet(game.isMonumentsMode() ? "bluerevstrat_monuments" : "bluerevstrat");
             }
         }
 
@@ -400,7 +398,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
             game.setBaseGameMode(false);
             game.swapInVariantUnits("absol");
             game.swapInVariantTechs();
-            return true;
+            return DynamicDeckService.applyEnabledSourceDecks(game, event);
         }
 
         // JUST DS
@@ -503,6 +501,9 @@ public class WeirdGameSetup extends GameStateSubcommand {
             }
         }
 
+        if (!votcMode && !baseGameMode && !miltyModMode) {
+            return DynamicDeckService.applyEnabledSourceDecks(game, event);
+        }
         return true;
     }
 

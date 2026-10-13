@@ -111,6 +111,7 @@ import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftTileManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
+import ti4.service.game.DynamicDeckService;
 import ti4.service.game.MonumentsService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -946,6 +947,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isMiltyModMode()
                 || isDiscordantStarsMode()
                 || isBlueReverieMode()
+                || isBlueReverieExtras()
                 || isHomebrewSCMode()
                 || isFowMode();
         if (hasAlwaysIncompatibleMode || (!isFracturedTIGL && hasStandardOnlyIncompatibleMode)) {
@@ -1065,6 +1067,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put(SourceEmojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
         gameModes.put(SourceEmojis.DiscordantStars + " Twilight DiscordantStars", isTwilightDS());
         gameModes.put("BlueReverie", isBlueReverieMode());
+        gameModes.put("BlueReverie Extras", isBlueReverieExtras());
         gameModes.put("HomebrewSC", isHomebrewSCMode());
         gameModes.put("AC Deck 2", isAcd2());
         gameModes.put("Omega Phase", isOmegaPhaseMode());
@@ -3518,8 +3521,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public boolean loadGameSettingsFromSettings(GenericInteractionCreateEvent event, MiltySettings miltySettings) {
         SourceSettings sources = miltySettings.getSourceSettings();
-        if (sources.getAbsol().isVal()) setAbsolMode(true);
-        setMonumentsMode(sources.getMonuments().isVal());
+        applySourceSettings(sources);
 
         GameSettings settings = miltySettings.getGameSettings();
         setVp(settings.getPointTotal().getVal());
@@ -3548,8 +3550,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             GenericInteractionCreateEvent event, DraftSystemSettings draftSettings) {
         GameSetupSettings gameSetupSettings = draftSettings.getGameSetupSettings();
         SourceSettings sources = draftSettings.getSourceSettings();
-        if (sources.getAbsol().isVal()) setAbsolMode(true);
-        setMonumentsMode(sources.getMonuments().isVal());
+        applySourceSettings(sources);
 
         setVp(gameSetupSettings.getPointTotal().getVal());
 
@@ -3570,8 +3571,18 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 gameSetupSettings.getStage2s().getVal());
     }
 
+    private void applySourceSettings(SourceSettings sources) {
+        setDiscordantStarsMode(sources.getDiscoStars().isVal());
+        setBlueReverieMode(sources.getBlueReverie().isVal());
+        setBlueReverieExtras(sources.getBlueReverieExtras().isVal());
+        setUnchartedSpaceStuff(sources.getUnchartedSpace().isVal());
+        setAbsolMode(sources.getAbsol().isVal());
+        setMonumentsMode(sources.getMonuments().isVal());
+    }
+
     private boolean validateAndSetAllDecks(
             GenericInteractionCreateEvent event, DeckSettings deckSettings, int stage1Count, int stage2Count) {
+        setDynamicDeckOverride(deckSettings.getDynamicDeckOverride().isVal());
         boolean success = true;
         // &= is the "and operator". It will assign true to success iff success is true and the result is true.
         // else it will propagate a false value to the end
@@ -3600,7 +3611,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
 
-        if (isAbsolMode() && !deckSettings.getAgendas().getChosenKey().contains("absol")) {
+        if (isAbsolMode()
+                && !isDynamicDeckOverride()
+                && !deckSettings.getAgendas().getChosenKey().contains("absol")) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "This game seems to be using Absol mode, so the agenda deck you chose will be overridden.");
@@ -3609,7 +3622,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             success &= validateAndSetAgendaDeck(event, deckSettings.getAgendas().getValue());
         }
 
-        if (isAbsolMode() && !deckSettings.getRelics().getChosenKey().contains("absol")) {
+        if (isAbsolMode()
+                && !isDynamicDeckOverride()
+                && !deckSettings.getRelics().getChosenKey().contains("absol")) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "This game seems to be using Absol mode, so the relic deck you chose will be overridden.");
@@ -3620,7 +3635,15 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
         MonumentsService.applyMonuments(this);
 
+        if (usesDynamicDecks()) {
+            success &= DynamicDeckService.applyEnabledSourceDecks(this, event);
+        }
+
         return success;
+    }
+
+    private boolean usesDynamicDecks() {
+        return isDiscordantStarsMode() || isUnchartedSpaceStuff() || isAbsolMode() || isBlueReverieExtras();
     }
 
     public boolean validateAndSetPublicObjectivesStage1Deck(GenericInteractionCreateEvent event, DeckModel deck) {
@@ -3674,7 +3697,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean validateAndSetActionCardDeck(GenericInteractionCreateEvent event, DeckModel deck) {
-        if (getAcDeckID().equals(deck.getAlias())) return true;
+        if (getAcDeckID().equals(deck.getAlias())) {
+            synchronizeUnusedActionCardDeck(deck);
+            return true;
+        }
 
         boolean shuffledExtrasIn = false;
         List<String> oldDeck = new ArrayList<>(Mapper.getDeck(getAcDeckID()).getNewShuffledDeck());
@@ -3735,11 +3761,35 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean validateAndSetRelicDeck(DeckModel deck) {
-        if (getRelicDeckID().equals(deck.getAlias())) return true;
+        if (getRelicDeckID().equals(deck.getAlias())) {
+            synchronizeUnstartedRelicDeck(deck);
+            return true;
+        }
 
         setRelicDeckID(deck.getAlias());
         setRelics(deck.getNewShuffledDeck());
         return true;
+    }
+
+    private void synchronizeUnusedActionCardDeck(DeckModel deck) {
+        boolean actionCardsHaveBeenUsed = !getDiscardActionCards().isEmpty()
+                || !getDiscardACStatus().isEmpty()
+                || !getPlayedActionCards().isEmpty()
+                || players.values().stream()
+                        .anyMatch(player -> !player.getActionCards().isEmpty());
+        if (!actionCardsHaveBeenUsed) {
+            setActionCards(deck.getNewShuffledDeck());
+            removeOverruleIfPurged();
+        }
+    }
+
+    private void synchronizeUnstartedRelicDeck(DeckModel deck) {
+        boolean gameHasStarted = !getPhaseOfGame().isBlank();
+        boolean aRelicHasBeenDrawn =
+                players.values().stream().anyMatch(player -> !player.getRelics().isEmpty());
+        if (!gameHasStarted && !aRelicHasBeenDrawn) {
+            setRelics(deck.getNewShuffledDeck());
+        }
     }
 
     public void shuffleDecks() {
@@ -3767,7 +3817,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean validateAndSetExploreDeck(GenericInteractionCreateEvent event, DeckModel deck) {
-        if (getExplorationDeckID().equals(deck.getAlias())) return true;
+        if (getExplorationDeckID().equals(deck.getAlias())) {
+            removeExploresNotInDeck(deck);
+            return true;
+        }
 
         if (!discardExplore.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -3779,6 +3832,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         setExplorationDeckID(deck.getAlias());
         explore = deck.getNewShuffledDeck();
         return true;
+    }
+
+    private void removeExploresNotInDeck(DeckModel deck) {
+        List<String> deckCards = deck.getNewDeck();
+        explore.removeIf(explore -> !deckCards.contains(explore));
+        discardExplore.removeIf(explore -> !deckCards.contains(explore));
     }
 
     public boolean validateAndSetAgendaDeck(GenericInteractionCreateEvent event, DeckModel deck) {
@@ -3864,7 +3923,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return true;
     }
 
-    private boolean validateAndSetTechnologyDeck(DeckModel deck) {
+    public boolean validateAndSetTechnologyDeck(DeckModel deck) {
         if (getTechnologyDeckID().equals(deck.getAlias())) return true;
 
         swapOutVariantTechs();
@@ -5010,6 +5069,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isRedTapeMode()
                 || isDiscordantStarsMode()
                 || isBlueReverieMode()
+                || isBlueReverieExtras()
                 || isUnchartedSpaceStuff()
                 || isFrankenGame()
                 || isMiltyModMode()

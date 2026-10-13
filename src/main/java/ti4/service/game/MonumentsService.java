@@ -65,7 +65,9 @@ public class MonumentsService {
         }
 
         game.setHomebrew(true);
-        game.setStrategyCardSet("monuments");
+        if (!game.isDynamicDeckOverride()) {
+            game.setStrategyCardSet(game.isBlueReverieExtras() ? "bluerevstrat_monuments" : "monuments");
+        }
 
         List<String> actionCards = Mapper.getActionCards().values().stream()
                 .filter(card -> card.getSource() == ComponentSource.monuments)
@@ -104,7 +106,9 @@ public class MonumentsService {
         }
 
         game.setHomebrew(true);
-        game.setStrategyCardSet("monuments_tf");
+        if (!game.isDynamicDeckOverride()) {
+            game.setStrategyCardSet("monuments_tf");
+        }
 
         List<String> secretObjectives = Mapper.getSecretObjectives().values().stream()
                 .filter(objective -> objective.getSource() == ComponentSource.monuments)

@@ -33,6 +33,7 @@ import ti4.service.franken.FrankenBanList;
 import ti4.service.franken.FrankenDraftMode;
 import ti4.service.franken.FrankenDraftStartService;
 import ti4.service.franken.FrankenUnitService;
+import ti4.service.game.BlueReverieExtrasService;
 import ti4.service.game.MonumentsService;
 import tools.jackson.databind.JsonNode;
 
@@ -294,14 +295,43 @@ public class FrankenSettings extends SettingsMenu {
     void applyHomebrewSettings() {
         game.setDiscordantStarsMode(isEffectiveDiscordantStarsEnabled());
         game.setBlueReverieMode(isEffectiveBlueReverieEnabled());
+        game.setBlueReverieExtras(homebrewSettings.getBlueReverieExtras().isVal());
+        game.setMonumentsMode(homebrewSettings.getMonuments().isVal());
+        game.setDynamicDeckOverride(deckSettings.getDynamicDeckOverride().isVal());
         game.setUnchartedSpaceStuff(homebrewSettings.getUnchartedSpace().isVal());
+        if (!game.isDynamicDeckOverride()) {
+            deckSettings
+                    .getActionCards()
+                    .setChosenKey(Mapper.getDynamicActionCardDeckID(
+                            game.isUnchartedSpaceStuff(), game.isBlueReverieExtras()));
+            deckSettings
+                    .getRelics()
+                    .setChosenKey(Mapper.getDynamicRelicDeckID(
+                            game.isUnchartedSpaceStuff(), game.isAbsolMode(), game.isBlueReverieExtras()));
+            deckSettings
+                    .getExplores()
+                    .setChosenKey(
+                            Mapper.getDynamicExploreDeckID(game.isUnchartedSpaceStuff(), game.isBlueReverieExtras()));
+            game.validateAndSetTechnologyDeck(Mapper.getDeck(Mapper.getDynamicTechnologyDeckID(
+                    game.isDiscordantStarsMode(),
+                    game.isUnchartedSpaceStuff(),
+                    game.isAbsolMode(),
+                    game.isBlueReverieExtras())));
+        }
+        if (!game.isDynamicDeckOverride()
+                && (game.isBlueReverieExtras()
+                        || "bluerevstrat".equals(game.getStrategyCardSet().getAlias())
+                        || "bluerevstrat_monuments"
+                                .equals(game.getStrategyCardSet().getAlias()))) {
+            game.setStrategyCardSet(
+                    BlueReverieExtrasService.getStrategyCardSetID(game.isBlueReverieExtras(), game.isMonumentsMode()));
+        }
         game.setStoredValue(
                 Constants.INCLUDE_ERONOUS_TILES,
                 Boolean.toString(homebrewSettings.getEronous().isVal()));
         game.setStoredValue(
                 Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,
                 Boolean.toString(homebrewSettings.getEchoesOfYggdrasil().isVal()));
-        game.setMonumentsMode(homebrewSettings.getMonuments().isVal());
     }
 
     private FrankenDraftMode selectedDraftMode() {

@@ -17,6 +17,7 @@ import ti4.logging.BotLogger;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.SourceEmojis;
+import ti4.service.game.BlueReverieExtrasService;
 import tools.jackson.databind.JsonNode;
 
 // This is a sub-menu
@@ -34,6 +35,7 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting betaTestMode;
     private final BooleanSetting unchartedSpace;
     private final BooleanSetting blueReverie;
+    private final BooleanSetting blueReverieExtras;
     private final BooleanSetting absol;
     private final BooleanSetting ignis;
     private final BooleanSetting eronous;
@@ -63,7 +65,8 @@ public class SourceSettings extends SettingsMenu {
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
         teDemo = new BooleanSetting("ThundersEdge", "Thunders Edge", game.isThundersEdge());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
-        blueReverie = new BooleanSetting("BlueReverie", "Blue Reverie", game.isBlueReverieMode());
+        blueReverie = new BooleanSetting("BlueReverie", "BR Factions", game.isBlueReverieMode());
+        blueReverieExtras = new BooleanSetting("BlueReverieExtras", "BR Extras", game.isBlueReverieExtras());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());
         ignis = new BooleanSetting(
                 "Ignis",
@@ -83,6 +86,7 @@ public class SourceSettings extends SettingsMenu {
         discoStars.setEmoji(SourceEmojis.DiscordantStars);
         unchartedSpace.setEmoji(SourceEmojis.DiscordantStars);
         blueReverie.setEmoji(SourceEmojis.BlueReverie);
+        blueReverieExtras.setEmoji(SourceEmojis.BlueReverie);
         absol.setEmoji(SourceEmojis.Absol);
         eronous.setEmoji(SourceEmojis.Eronous);
         actionCardDeck2.setEmoji(SourceEmojis.ActionDeck2);
@@ -93,6 +97,8 @@ public class SourceSettings extends SettingsMenu {
         // Other Initialization
         discoStars.setExtraInfo("Adds Discordant Stars factions only.");
         blueReverie.setExtraInfo("Adds Blue Reverie factions only.");
+        blueReverieExtras.setExtraInfo(
+                "Adds Blue Reverie cards, relics, explores, and technologies. Leader, unit, and ability replacements are applied after draft setup.");
         unchartedSpace.setExtraInfo("Adds Uncharted Space content.");
         lostLegacies.setExtraInfo("Adds Lost Legacies factions only.");
         monuments.setExtraInfo(
@@ -117,6 +123,7 @@ public class SourceSettings extends SettingsMenu {
             teDemo.initialize(json.get("teDemo"));
             unchartedSpace.initialize(json.get("unchartedSpace"));
             blueReverie.initialize(json.get("blueReverie"));
+            blueReverieExtras.initialize(json.get("blueReverieExtras"));
             absol.initialize(json.get("absol"));
             ignis.initialize(json.get("ignis"));
             eronous.initialize(json.get("eronous"));
@@ -143,6 +150,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(teDemo);
         ls.add(discoStars);
         ls.add(blueReverie);
+        ls.add(blueReverieExtras);
         ls.add(unchartedSpace);
         ls.add(absol);
         ls.add(ignis);
@@ -207,12 +215,15 @@ public class SourceSettings extends SettingsMenu {
     private void afterChangeSources(ButtonInteractionEvent event, String setting) {
         Game game = null;
         DeckSettings decks = null;
+        boolean manualDeckOverride = false;
         if (parent instanceof MiltySettings ms) {
             game = ms.getGame();
             decks = ms.getGameSettings().getDecks();
+            manualDeckOverride = decks.getDynamicDeckOverride().isVal();
         } else if (parent instanceof DraftSystemSettings dss) {
             game = dss.getGame();
             decks = dss.getGameSetupSettings().getDecks();
+            manualDeckOverride = decks.getDynamicDeckOverride().isVal();
         }
         if (game == null || decks == null) return;
 
@@ -230,12 +241,21 @@ public class SourceSettings extends SettingsMenu {
                         .sendMessage("This setting doesn't really do much. It only disables Keleres.")
                         .setEphemeral(true)
                         .queue(Consumers.nop(), BotLogger::catchRestError);
-            case "DiscoStars" ->
+            case "DiscoStars" -> {
+                if (!manualDeckOverride) {
+                    decks.getTechs()
+                            .setChosenKey(Mapper.getDynamicTechnologyDeckID(
+                                    discoStars.isVal(),
+                                    unchartedSpace.isVal(),
+                                    absol.isVal(),
+                                    blueReverieExtras.isVal()));
+                }
                 event.getHook()
                         .sendMessage(
-                                "This setting only controls factions. If you want technologies, relics, explores, etc, you need to also enable **__Uncharted Space__**.")
+                                "This setting adds Discordant Stars factions and technologies. Enable **__Uncharted Space__** for its cards, relics, and explores.")
                         .setEphemeral(true)
                         .queue(Consumers.nop(), BotLogger::catchRestError);
+            }
             case "ThundersEdge" -> {
                 game.setThundersEdge(true);
                 game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
@@ -250,7 +270,7 @@ public class SourceSettings extends SettingsMenu {
                 // Decks for ABSOL
                 String agenda = ignis ? "agendas_baldrick" : "agendas_pok";
 
-                String sc = ignis ? "ignis_aurora" : "pok";
+                String sc = ignis ? "ignis_aurora" : "te";
 
                 game.setStrategyCardSet(sc);
                 game.setEventDeckID("events_baldrick");
@@ -266,32 +286,44 @@ public class SourceSettings extends SettingsMenu {
                         .setEphemeral(true)
                         .queue(Consumers.nop(), BotLogger::catchRestError);
             }
-            case "UnchartSpace", "Absol", "ActionCardDeck2" -> {
+            case "UnchartSpace", "Absol", "BlueReverieExtras", "ActionCardDeck2" -> {
+                if (manualDeckOverride) {
+                    event.getHook()
+                            .sendMessage(
+                                    "Manual deck override is enabled. Source changes will not alter deck selections.")
+                            .setEphemeral(true)
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
+                    break;
+                }
                 boolean abs = absol.isVal();
                 boolean us = unchartedSpace.isVal();
-                boolean both = abs && us;
+                boolean br = blueReverieExtras.isVal();
                 boolean acd2 = actionCardDeck2.isVal();
 
-                // Decks with both
-                String relic = both ? "relics_absol_ds" : (abs ? "relics_absol" : (us ? "relics_ds" : "relics_pok"));
-                String techs = both ? "techs_ds_absol" : (abs ? "techs_absol" : (us ? "techs_ds" : "techs_pok_c4"));
+                String relic = Mapper.getDynamicRelicDeckID(us, abs, br);
+                String techs = Mapper.getDynamicTechnologyDeckID(discoStars.isVal(), us, abs, br);
 
                 // Decks for ABSOL
                 String agenda = abs ? "agendas_absol" : "agendas_pok";
 
                 // Decks for Uncharted Space
-                String explore = us ? "explores_DS" : "explores_pok";
-                String acs = acd2 ? getAcd2Version(pok, teDemo) : (us ? "action_cards_ds" : "action_cards_pok");
+                String explore = Mapper.getDynamicExploreDeckID(us, br);
+                String acs = acd2 ? getAcd2Version(pok, teDemo) : Mapper.getDynamicActionCardDeckID(us, br);
 
                 decks.getRelics().setChosenKey(relic);
                 decks.getTechs().setChosenKey(techs);
                 decks.getAgendas().setChosenKey(agenda);
                 decks.getExplores().setChosenKey(explore);
                 decks.getActionCards().setChosenKey(acs);
+                if (br || isBlueReverieStrategyCardSet(decks.getStratCards().getChosenKey())) {
+                    decks.getStratCards()
+                            .setChosenKey(BlueReverieExtrasService.getStrategyCardSetID(br, monuments.isVal()));
+                }
 
                 var inclusions = new ArrayList<String>();
                 if (abs) inclusions.add("Absol Mod");
                 if (us) inclusions.add("Uncharted Space");
+                if (br) inclusions.add("Blue Reverie Extras");
                 if (acd2) inclusions.add("Action Deck 2");
                 String message = inclusions.isEmpty()
                         ? "Reset your decks to include only PoK cards."
@@ -302,7 +334,12 @@ public class SourceSettings extends SettingsMenu {
                         .queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case "Eronous" -> {}
-            case "Monuments" -> game.setMonumentsMode(monuments.isVal());
+            case "Monuments" -> {
+                game.setMonumentsMode(monuments.isVal());
+                if (!manualDeckOverride && blueReverieExtras.isVal()) {
+                    decks.getStratCards().setChosenKey(monuments.isVal() ? "bluerevstrat_monuments" : "bluerevstrat");
+                }
+            }
             case "EchoesOfYggdrasil" ->
                 game.setStoredValue(
                         ti4.helpers.Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,
@@ -314,5 +351,9 @@ public class SourceSettings extends SettingsMenu {
         // when TE is fully implemented, this needs to check for _pok, _pok_te, or _te.
         String suffix = pok.isVal() ? "_pok" : teDemo.isVal() ? "_te" : "";
         return "action_deck_2" + suffix;
+    }
+
+    private static boolean isBlueReverieStrategyCardSet(String strategyCardSetID) {
+        return "bluerevstrat".equals(strategyCardSetID) || "bluerevstrat_monuments".equals(strategyCardSetID);
     }
 }

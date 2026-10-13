@@ -16,6 +16,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
 
     private final BooleanSetting discoStars;
     private final BooleanSetting blueReverie;
+    private final BooleanSetting blueReverieExtras;
     private final BooleanSetting unchartedSpace;
     private final BooleanSetting eronous;
     private final BooleanSetting lostLegacies;
@@ -30,7 +31,8 @@ class FrankenHomebrewSettings extends SettingsMenu {
                 parent);
 
         discoStars = new BooleanSetting("DiscoStars", "Discordant Stars", game.isDiscordantStarsMode());
-        blueReverie = new BooleanSetting("BlueReverie", "Blue Reverie", game.isBlueReverieMode());
+        blueReverie = new BooleanSetting("BlueReverie", "BR Factions", game.isBlueReverieMode());
+        blueReverieExtras = new BooleanSetting("BlueReverieExtras", "BR Extras", game.isBlueReverieExtras());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
         eronous = new BooleanSetting("Eronous", "Eronous Tiles", false);
         lostLegacies = new BooleanSetting("LostLegacies", "Lost Legacies", false);
@@ -38,11 +40,15 @@ class FrankenHomebrewSettings extends SettingsMenu {
         echoesOfYggdrasil = new BooleanSetting("EchoesOfYggdrasil", "Echoes of Yggdrasil", false);
 
         discoStars.setEmoji(SourceEmojis.DiscordantStars);
+        blueReverie.setEmoji(SourceEmojis.BlueReverie);
+        blueReverieExtras.setEmoji(SourceEmojis.BlueReverie);
         unchartedSpace.setEmoji(SourceEmojis.DiscordantStars);
         eronous.setEmoji(SourceEmojis.Eronous);
         monuments.setEmoji(SourceEmojis.Monuments);
-        discoStars.setExtraInfo("Adds Discordant Stars faions only.");
+        discoStars.setExtraInfo("Adds Discordant Stars factions only.");
         blueReverie.setExtraInfo("Adds Blue Reverie factions only.");
+        blueReverieExtras.setExtraInfo(
+                "Adds Blue Reverie cards, relics, explores, and technologies. Leader, unit, and ability replacements are applied after draft setup.");
         unchartedSpace.setExtraInfo("Adds Uncharted Space content.");
         lostLegacies.setExtraInfo("Adds Lost Legacies factions only.");
         monuments.setExtraInfo("Adds Monuments+ cards and enables Monument drafting.");
@@ -54,6 +60,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
                 && "homebrewSettings".equals(json.get("menuId").asString(""))) {
             discoStars.initialize(json.get("discoStars"));
             blueReverie.initialize(json.get("blueReverie"));
+            blueReverieExtras.initialize(json.get("blueReverieExtras"));
             unchartedSpace.initialize(json.get("unchartedSpace"));
             eronous.initialize(json.get("eronous"));
             lostLegacies.initialize(json.get("lostLegacies"));
@@ -72,8 +79,15 @@ class FrankenHomebrewSettings extends SettingsMenu {
 
     @Override
     protected List<SettingInterface> settings() {
-        return new ArrayList<>(
-                List.of(discoStars, blueReverie, unchartedSpace, eronous, lostLegacies, monuments, echoesOfYggdrasil));
+        return new ArrayList<>(List.of(
+                discoStars,
+                blueReverie,
+                blueReverieExtras,
+                unchartedSpace,
+                eronous,
+                lostLegacies,
+                monuments,
+                echoesOfYggdrasil));
     }
 
     @Override
