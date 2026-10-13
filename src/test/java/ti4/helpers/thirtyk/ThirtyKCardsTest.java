@@ -106,7 +106,41 @@ class ThirtyKCardsTest extends BaseTi4Test {
         assertThat(ThirtyKCards.baseId("conflagration30k2")).isEqualTo("conflagration30k");
         assertThat(ThirtyKCards.baseId("siphonfundsjmsc4")).isEqualTo("siphonfundsjmsc");
         assertThat(ThirtyKCards.baseId("tourismbureau30k")).isEqualTo("tourismbureau30k");
+        // Explore copies in the x3 combined deck carry the bot's extra1/extra2 suffix.
+        assertThat(ThirtyKCards.baseId("pilotrecoveryprogram30k2extra1")).isEqualTo("pilotrecoveryprogram30k");
+        assertThat(ThirtyKCards.baseId("tourismbureau30kextra2")).isEqualTo("tourismbureau30k");
         assertThat(ThirtyKCards.isActionCard("conflagration30k1")).isTrue();
         assertThat(ThirtyKCards.isActionCard("sabo1")).isFalse();
+    }
+
+    // Combined decks are PoK/TE plus 30k plus JMSC; action cards and explores three times over.
+    @Test
+    void combinedDecksAreTheSumOfTheirParts() {
+        assertThat(cards("action_cards_pok_te_30k_jmsc"))
+                .hasSize(3
+                        * (cards("action_cards_te").size()
+                                + cards("action_cards_30k").size()
+                                + cards("action_cards_jmsc").size()))
+                .contains("siphonfundsjmsc1extra2")
+                .doesNotHaveDuplicates();
+        assertThat(cards("relics_pok_te_30k_jmsc"))
+                .hasSize(cards("relics_pok_te").size()
+                        + cards("relics_30k").size()
+                        + cards("relics_jmsc").size());
+        assertThat(cards("secret_objectives_pok_te_30k_jmsc"))
+                .hasSize(cards("secret_objectives_pok").size()
+                        + cards("secret_objectives_30k").size()
+                        + cards("secret_objectives_jmsc").size());
+        assertThat(cards("explores_pok_te_30k_jmsc"))
+                .hasSize(3
+                        * (cards("explores_pok").size()
+                                + cards("explores_30k").size()
+                                + cards("explores_jmsc").size()))
+                .contains("tourismbureau30k", "tourismbureau30kextra1", "tourismbureau30kextra2")
+                .doesNotHaveDuplicates();
+    }
+
+    private static List<String> cards(String deckAlias) {
+        return Mapper.getDeck(deckAlias).getCardIDs();
     }
 }

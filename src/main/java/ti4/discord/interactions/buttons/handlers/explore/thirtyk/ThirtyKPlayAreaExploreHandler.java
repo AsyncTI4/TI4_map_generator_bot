@@ -15,6 +15,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.thirtyk.ThirtyKCards;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
@@ -55,7 +56,7 @@ public class ThirtyKPlayAreaExploreHandler {
 
     public static void moveToPlayArea(GenericInteractionCreateEvent event, Game game, Player player, String cardID) {
         game.purgeExplore(cardID);
-        player.addRelic(cardID);
+        player.addRelic(ThirtyKCards.baseId(cardID));
         MessageHelper.sendMessageToEventChannel(
                 event, "Card has been added to play area.\nAdded as a relic (not actually a relic).");
     }

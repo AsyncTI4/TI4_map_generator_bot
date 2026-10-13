@@ -12,7 +12,7 @@ import ti4.model.Source.ComponentSource;
 @UtilityClass
 public class ThirtyKCards {
 
-    private static final Pattern COPY_NUMBER = Pattern.compile("(30k|jmsc)\\d+$");
+    private static final Pattern COPY_NUMBER = Pattern.compile("(30k|jmsc)\\d*(extra\\d)?$");
 
     public static String baseId(String cardId) {
         if (cardId == null) return "";
