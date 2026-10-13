@@ -9,6 +9,7 @@ import ti4.game.Game;
 public class ThirtyKTurnState {
 
     public static void clearEndOfTurn(Game game) {
+        if (!ThirtyKCards.inUse(game)) return;
         ThirtyKTransactions.clearTurnGrants(game);
         ThirtyKAcState.clearTurnState(game);
         ThirtyKRelicHooks.clearTechSupport(game);
@@ -18,6 +19,7 @@ public class ThirtyKTurnState {
     }
 
     public static void clearActionPhase(Game game) {
+        if (!ThirtyKCards.inUse(game)) return;
         clearEndOfTurn(game);
         ThirtyKTransactions.clearAllGrants(game);
     }

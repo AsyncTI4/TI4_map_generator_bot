@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import ti4.game.Game;
 import ti4.image.Mapper;
 import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
@@ -111,6 +112,21 @@ class ThirtyKCardsTest extends BaseTi4Test {
         assertThat(ThirtyKCards.baseId("tourismbureau30kextra2")).isEqualTo("tourismbureau30k");
         assertThat(ThirtyKCards.isActionCard("conflagration30k1")).isTrue();
         assertThat(ThirtyKCards.isActionCard("sabo1")).isFalse();
+    }
+
+    // Hooks are cut short unless one of the game's decks holds a 30k card. Once seen, the flag sticks, so 30k
+    // cards still in play keep working after a deck is switched away mid-game.
+    @Test
+    void inUseFollowsTheDecksAndSticks() {
+        Game game = new Game();
+        assertThat(ThirtyKCards.inUse(game)).isFalse();
+        assertThat(game.getStoredValueMap()).doesNotContainKey(ThirtyKCards.IN_USE_KEY);
+
+        game.setExplorationDeckID("explores_pok_te_30k_jmsc");
+        assertThat(ThirtyKCards.inUse(game)).isTrue();
+
+        game.setExplorationDeckID("explores_pok");
+        assertThat(ThirtyKCards.inUse(game)).isTrue();
     }
 
     // Combined decks are PoK/TE plus 30k plus JMSC; action cards and explores three times over.

@@ -34,6 +34,7 @@ public class ThirtyKActionCardHooks {
     static final String OBJECTION_GAMBIT = "objectiongambit30k";
 
     public static void onRiderPlaced(Game game, Player player, String outcome, String rider) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (ThirtyKAgendaRiders.isCopyable(outcome, rider)) {
             offerRiderCopies(game, rider, outcome);
         }
@@ -71,11 +72,13 @@ public class ThirtyKActionCardHooks {
     }
 
     public static void onAgendaVotesReset(Game game) {
+        if (!ThirtyKCards.inUse(game)) return;
         ThirtyKAcState.clearDummyRider(game);
         ThirtyKAcState.clearRiderCards(game);
     }
 
     public static void resolveAgendaPredictions(Game game, String winner, GenericInteractionCreateEvent event) {
+        if (!ThirtyKCards.inUse(game)) return;
         for (ThirtyKAgendaRiders.RiderEntry entry : ThirtyKAgendaRiders.riderEntries(game.getCurrentAgendaVotes())) {
             Player predictor =
                     game.getPlayerFromColorOrFaction(entry.identifier().toLowerCase());
@@ -119,6 +122,7 @@ public class ThirtyKActionCardHooks {
     }
 
     public static void onPlanetControlChanged(Game game, Player newOwner, Player previousOwner, String planet) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (previousOwner == null || previousOwner == newOwner || !previousOwner.isRealPlayer()) return;
         if (!holdsActionCard(previousOwner, CONFLAGRATION)) return;
         ThirtyKAcState.setPlanetLoss(game, previousOwner, planet, newOwner);
@@ -133,6 +137,7 @@ public class ThirtyKActionCardHooks {
     }
 
     public static void onStrategyPhaseStart(GenericInteractionCreateEvent event, Game game) {
+        if (!ThirtyKCards.inUse(game)) return;
         ThirtyKTurnState.clearActionPhase(game);
         for (Player player : game.getRealPlayers()) {
             int payout = ThirtyKAcState.collectCompoundInterest(game, player);
@@ -145,6 +150,7 @@ public class ThirtyKActionCardHooks {
     }
 
     public static void onTransactionAccepted(Game game, Player p1, Player p2) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (ThirtyKAcState.takeExtendedCampaigning(game, p1, p2)) {
             ThirtyKPoliticsAcButtonHandler.offerAgentReady(game, p2);
         }
@@ -155,6 +161,7 @@ public class ThirtyKActionCardHooks {
 
     // TODO: when both fleets die, the backed player may be paid before the other side assigns its lethal hits.
     public static void afterCombatHitsAssigned(Game game, Tile tile, String assignHitsType) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (tile == null || !"spacecombat".equalsIgnoreCase(assignHitsType)) return;
         List<String> remaining = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile).stream()
                 .map(Player::getFaction)
@@ -182,6 +189,7 @@ public class ThirtyKActionCardHooks {
     }
 
     public static void onFragmentsPurged(Game game, Player purger, List<String> fragments) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (fragments == null || fragments.isEmpty()) return;
         List<Player> holders = holdersOf(game, PRESERVATION_ACT).stream()
                 .filter(holder -> holder != purger && !holder.isNeighboursWith(purger))
@@ -198,6 +206,7 @@ public class ThirtyKActionCardHooks {
     }
 
     public static void afterUnitsDestroyed(GenericInteractionCreateEvent event, Game game, List<RemovedUnit> units) {
+        if (!ThirtyKCards.inUse(game)) return;
         List<Player> holders = holdersOf(game, ANTIDISESTABLISHMENTARIANISM);
         if (holders.isEmpty()) return;
         for (RemovedUnit unit : units) {

@@ -27,12 +27,14 @@ public class ThirtyKTransactions {
     }
 
     public static boolean mayTransact(Game game, Player player, Player other) {
+        if (!ThirtyKCards.inUse(game)) return false;
         if (player == null || other == null) return false;
         return grants(game).stream().anyMatch(grant -> grant.isLive(game) && grant.covers(player, other))
                 || ThirtyKRelicHooks.deepNetworksAllows(game, player, other);
     }
 
     public static Set<Player> partnersOf(Game game, Player player) {
+        if (!ThirtyKCards.inUse(game)) return new HashSet<>();
         Set<Player> partners = new HashSet<>();
         for (Player other : game.getRealPlayers()) {
             if (other != player && mayTransact(game, player, other)) partners.add(other);

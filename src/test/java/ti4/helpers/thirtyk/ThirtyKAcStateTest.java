@@ -21,6 +21,7 @@ class ThirtyKAcStateTest extends BaseTi4Test {
     void setUp() {
         game = new Game();
         game.setName("thirtyk-ac-state-test");
+        game.setAcDeckID("action_cards_30k");
         sol = addPlayer("sol-id", "sol", "blue");
         hacan = addPlayer("hacan-id", "hacan", "green");
     }

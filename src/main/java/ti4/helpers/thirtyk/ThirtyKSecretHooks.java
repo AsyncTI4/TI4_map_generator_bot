@@ -65,6 +65,7 @@ public class ThirtyKSecretHooks {
     }
 
     public static void onPlanetLost(Game game, Player previousOwner, UnitHolder planet) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (game == null || previousOwner == null || planet == null || !previousOwner.isRealPlayer()) return;
         String planetName = Mapper.getPlanet(planet.getName()) == null
                 ? planet.getName()
@@ -107,6 +108,7 @@ public class ThirtyKSecretHooks {
     }
 
     public static void afterCombatHits(Game game, Player player, Tile tile, UnitHolder holder, String assignHitsType) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (game == null || player == null || tile == null || assignHitsType == null) return;
         if (!assignHitsType.contains("combat")) return;
         boolean ground = assignHitsType.contains("ground") || (holder != null && holder instanceof Planet);
@@ -174,6 +176,7 @@ public class ThirtyKSecretHooks {
     }
 
     public static void onPassed(Game game, Player player) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (game == null || player == null) return;
         boolean anyoneElsePassed =
                 game.getRealPlayers().stream().filter(p -> p != player).anyMatch(Player::isPassed);
@@ -182,6 +185,7 @@ public class ThirtyKSecretHooks {
     }
 
     public static void onAgendaResolved(Game game) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (game == null) return;
         Map<String, Map<Player, Integer>> votesByOutcome = votesByOutcome(game);
         if (anyoneHolds(game, POLICY_INDIFFERENCE)) {
@@ -268,6 +272,7 @@ public class ThirtyKSecretHooks {
     }
 
     public static void onAgendaPhaseEnd(Game game) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (game == null || !game.getPhaseOfGame().toLowerCase().contains("agenda")) return;
         Set<String> voters = votersThisRound(game);
         for (Player player : game.getRealPlayers()) {
@@ -284,6 +289,7 @@ public class ThirtyKSecretHooks {
 
     // TODO: fog - the prompt tells the holder that someone scored via Imperial (minor; the scorer is not named).
     public static void onImperialPointScored(Game game, Player scorer) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (game == null || scorer == null) return;
         Tile mecatol = game.getMecatolTile();
         Tile scorerHome = scorer.getHomeSystemTile();
@@ -306,6 +312,7 @@ public class ThirtyKSecretHooks {
     }
 
     public static void onTurnStart(Game game, Player player) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (game == null || player == null) return;
         if (!player.getSecretsUnscored().containsKey(A_GRAND_ENTRANCE)) return;
         String key = FLAGSHIP_START_KEY + player.getFaction();

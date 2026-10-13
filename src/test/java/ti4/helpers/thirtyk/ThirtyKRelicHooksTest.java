@@ -22,6 +22,7 @@ class ThirtyKRelicHooksTest extends BaseTi4Test {
     void setUp() {
         game = new Game();
         game.setName("thirtyk-relic-hooks-test");
+        game.setAcDeckID("action_cards_30k");
         sol = addPlayer("sol-id", "sol", "blue");
         hacan = addPlayer("hacan-id", "hacan", "green");
         addPlayer("xxcha-id", "xxcha", "red");

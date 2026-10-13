@@ -24,6 +24,7 @@ class ThirtyKTransactionsTest extends BaseTi4Test {
     void setUp() {
         game = new Game();
         game.setName("thirtyk-transactions-test");
+        game.setAcDeckID("action_cards_30k");
         game.setPhaseOfGame("action");
         sol = addPlayer("sol-id", "sol", "blue");
         hacan = addPlayer("hacan-id", "hacan", "green");
@@ -77,6 +78,7 @@ class ThirtyKTransactionsTest extends BaseTi4Test {
     // The hooks run in every game; the legacy Public Outcry shares the 30k card's name.
     @Test
     void gamesWithoutThirtyKCardsAreLeftUntouched() {
+        game.setAcDeckID("action_cards_te");
         game.setCurrentAgendaVote("for", "sol_Public Outcry");
 
         ThirtyKSecretHooks.onTurnStart(game, sol);
@@ -94,6 +96,10 @@ class ThirtyKTransactionsTest extends BaseTi4Test {
     @Test
     void thirtyKPublicOutcryBecomesARider() {
         game.setCurrentAgendaVote("for", "sol_Public Outcry");
+        // The legacy card with the same name stays a plain entry even in a 30k game.
+        ThirtyKActionCardHooks.onRiderPlaced(game, sol, "for", "Public Outcry");
+        assertThat(game.getCurrentAgendaVotes().get("for")).isEqualTo("sol_Public Outcry");
+
         ThirtyKAcState.markRiderCard(game, sol, "Public Outcry");
 
         ThirtyKActionCardHooks.onRiderPlaced(game, sol, "for", "Public Outcry");

@@ -27,6 +27,7 @@ public class ThirtyKRelicHooks {
     private static final int SOCIAL_DISSONANCE_CAPACITY = 3;
 
     public static void onLeadershipGain(Game game, Player player) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (game == null || player == null || !player.hasRelicReady(ThirtyKRelics.RAZZLING_MESSAGE)) return;
         player.addExhaustedRelic(ThirtyKRelics.RAZZLING_MESSAGE);
         MessageHelper.sendMessageToChannel(
@@ -36,6 +37,7 @@ public class ThirtyKRelicHooks {
     }
 
     public static int applyProductionDiscount(Player player, int cost) {
+        if (!ThirtyKCards.inUse(player == null ? null : player.getGame())) return cost;
         if (player == null || !player.hasRelic(ThirtyKRelics.SOVEREIGN_REFUGEES)) return cost;
         boolean producedFlagship = player.getCurrentProducedUnits().entrySet().stream()
                 .anyMatch(e -> "fs".equals(e.getKey().split("_")[0]) && e.getValue() > 0);
@@ -43,6 +45,7 @@ public class ThirtyKRelicHooks {
     }
 
     public static void afterProduction(Game game, Player player) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (game == null || player == null || !player.hasRelic(ThirtyKRelics.OVERPOPULATION_MANAGEMENT)) return;
         List<String> planets = infantryProductionPlanets(player.getCurrentProducedUnits());
         if (planets.isEmpty()) return;
@@ -73,6 +76,7 @@ public class ThirtyKRelicHooks {
     }
 
     public static void onTransactionAccepted(Game game, Player p1, Player p2) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (game == null || p1 == null || p2 == null) return;
         resolveTechSupport(game, p1, p2);
         resolveTechSupport(game, p2, p1);
@@ -138,6 +142,7 @@ public class ThirtyKRelicHooks {
     }
 
     public static int commodityBonus(Game game, Player player) {
+        if (!ThirtyKCards.inUse(game)) return 0;
         if (game == null || player == null) return 0;
         List<String> tokens = socialDissonanceTokens(game);
         if (tokens.isEmpty()) return 0;
@@ -171,6 +176,7 @@ public class ThirtyKRelicHooks {
     }
 
     public static void onTurnStart(Game game, Player player) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (game == null || player == null) return;
         List<String> entries = chronoEntries(game);
         List<String> remaining = new ArrayList<>();
@@ -219,6 +225,7 @@ public class ThirtyKRelicHooks {
 
     // TODO: fog - the prompt tells the holder that a nearby planet was exhausted, even one they cannot see.
     public static void onPlanetExhausted(Game game, Player owner, String planetName) {
+        if (!ThirtyKCards.inUse(game)) return;
         if (game == null || planetName == null) return;
         if (game.getRealPlayers().stream().noneMatch(p -> p.hasRelicReady(ThirtyKRelics.DEFIANT_PROPAGANDA))) return;
         Tile tile = game.getTileFromPlanet(planetName);
