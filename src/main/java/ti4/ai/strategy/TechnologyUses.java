@@ -19,9 +19,11 @@ class TechnologyUses {
             return List.of(
                     new Benefit(CardUse.TECHNOLOGY_PROPAGATION, TokenValue.tacticTokens(in, PROPAGATION_TOKENS)));
         }
-        double research = ResearchPolicy.bestResearchable(game, seat)
-                .map(alias -> ResearchPolicy.value(game, seat, alias))
-                .orElse(0.0);
+        double research = in.moment() == PlanMoment.PICK
+                ? ResearchPolicy.bestValueAsTechnologyHolder(game, seat)
+                : ResearchPolicy.bestResearchable(game, seat)
+                        .map(alias -> ResearchPolicy.value(game, seat, alias))
+                        .orElse(0.0);
         boolean paysForSecond = StrategyCardRules.worthPayingForResearch(
                 game, seat, StrategyCardRules.SECOND_TECH_COST, ResearchPolicy.WORTH_PAYING_FOR, Wallet.of(game, seat));
         double value = paysForSecond ? research * (1 + CardValueScale.SECOND_RESEARCH_SHARE) : research;

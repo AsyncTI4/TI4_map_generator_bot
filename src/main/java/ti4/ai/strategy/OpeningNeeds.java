@@ -5,6 +5,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
+import ti4.ai.scoring.Wallet;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -32,8 +33,15 @@ public class OpeningNeeds {
     }
 
     public static boolean canFollowTechnologyAfterPaying(Game game, Player seat, int tradeGoods) {
-        SpendCost follow = SpendCost.resources(StrategyCardRules.FOLLOW_TECH_COST + tradeGoods);
-        return ScoringReserve.planAfterReserve(game, seat, follow).isPresent();
+        return canFollowTechnology(game, seat, tradeGoods, OpeningOutlook.raisableTradeGoods(game, seat));
+    }
+
+    static boolean canFollowTechnology(Game game, Player seat, int paying, int raisedTradeGoods) {
+        Wallet wallet = Wallet.of(game, seat);
+        Wallet raised = wallet.withTradeGoods(wallet.tradeGoods() + raisedTradeGoods);
+        SpendCost follow = SpendCost.resources(StrategyCardRules.FOLLOW_TECH_COST + paying);
+        return ScoringReserve.planAfterReserve(raised, ScoringReserve.of(game, seat), follow)
+                .isPresent();
     }
 
     public static String technologyRequestedKey(Game game) {
