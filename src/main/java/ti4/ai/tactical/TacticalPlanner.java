@@ -320,8 +320,16 @@ public class TacticalPlanner {
                 .filter(tile -> tile.hasPlayerCC(seat) || ButtonHelper.canActivateTile(game, seat, tile))
                 .map(tile -> bestFor(context, tile))
                 .flatMap(Optional::stream)
-                .filter(plan -> plan.score() >= MIN_SCORE)
-                .max(Comparator.comparingDouble(TacticalPlan::score));
+                .filter(plan -> plan.score() >= 0)
+                .max(Comparator.comparingDouble(TacticalPlan::score))
+                .or(() -> freeStep(context));
+    }
+
+    private static Optional<TacticalPlan> freeStep(Context context) {
+        return context.origins().stream()
+                .map(origin -> stepTowardNeighbour(context, origin, Set.of()))
+                .flatMap(Optional::stream)
+                .findFirst();
     }
 
     public static Optional<TacticalPlan> forWarfareTarget(Game game, Player seat, String target) {

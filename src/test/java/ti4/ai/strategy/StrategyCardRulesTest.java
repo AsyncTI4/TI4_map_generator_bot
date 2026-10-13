@@ -534,6 +534,23 @@ class StrategyCardRulesTest extends BaseTi4Test {
                 .contains("FFCC_nekro_beginTacticalTeWarfare");
     }
 
+    // A game where Xxcha "resolved Warfare without a tactical action" because it had nothing to spend: the action
+    // places
+    // no token, so a ship that can move should always use it, even for a small step, rather than waste it.
+    @Test
+    void usesTheFreeWarfareActionEvenWithNothingWorthActivating() {
+        ti4.game.Tile home = test.nekroHome();
+        test.units(home, "space", test.nekro, UnitType.Destroyer, 1);
+        test.nekro.exhaustPlanet("mordaiii");
+        test.nekro.setTg(0);
+        test.place("47", AiTestGame.neighbourOf(AiTestGame.HOME));
+        AiPrompt card = prompt("warfare", PromptSource.PUBLIC, NOW, "sc_no_follow_6", "primaryOfTeWarfare");
+        StrategyCardRules.play(test.context(card), card, card.buttons().getFirst(), WARFARE);
+
+        assertThat(StrategyCardRules.resolvePrimary(test.context(card)).map(AiTestGame::pressedId))
+                .contains("primaryOfTeWarfare");
+    }
+
     // aiwatch6, round 1: Sol played Warfare as its fallback with every ship locked under its own command tokens and
     // every planet exhausted. Nothing could move or produce, so skipping the tactical action was right, but the AI
     // ended its turn in silence and looked like it had forgotten the primary. It now says why it skips.
