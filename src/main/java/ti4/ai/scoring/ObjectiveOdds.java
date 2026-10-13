@@ -1,6 +1,7 @@
 package ti4.ai.scoring;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
@@ -19,24 +20,53 @@ public class ObjectiveOdds {
     private static final double[] SPEND_SHORT_BY = {0.6, 0.6, 0.45};
     private static final int FARTHEST_COUNTED = 3;
 
+    private record Chance(double byStatus, boolean metNow) {}
+
+    public static double extraScoreWithImperial(Game game, Player seat) {
+        List<Chance> chances = chances(game, seat);
+        Optional<Chance> lockedIn =
+                chances.stream().filter(Chance::metNow).min(Comparator.comparingDouble(Chance::byStatus));
+        if (lockedIn.isEmpty()) return atLeastTwo(byStatus(chances));
+        List<Chance> rest = new ArrayList<>(chances);
+        rest.remove(lockedIn.get());
+        return atLeastOne(byStatus(rest));
+    }
+
     public static double atLeastTwoByStatus(Game game, Player seat) {
-        if (!Helper.canPlayerScorePOs(game, seat)) return 0;
+        return atLeastTwo(byStatus(chances(game, seat)));
+    }
+
+    private static List<Chance> chances(Game game, Player seat) {
+        if (!Helper.canPlayerScorePOs(game, seat)) return List.of();
         Wallet wallet = Wallet.of(game, seat);
-        List<Double> chances = new ArrayList<>();
+        List<Chance> chances = new ArrayList<>();
         double bestSpend = 0;
+        boolean spendMetNow = false;
         for (String objective : game.getRevealedPublicObjectives().keySet()) {
             if (Mapper.getPublicObjective(objective) == null || ObjectivePolicy.hasScored(game, seat, objective)) {
                 continue;
             }
+            boolean metNow = ObjectivePolicy.qualifies(game, seat, wallet, objective);
             Optional<SpendCost> cost = ObjectiveCatalog.spendCost(objective);
             if (cost.isPresent()) {
                 bestSpend = Math.max(bestSpend, spendChance(wallet, cost.get()));
+                spendMetNow |= metNow;
             } else {
-                chances.add(boardChance(game, seat, objective));
+                chances.add(new Chance(boardChance(game, seat, objective), metNow));
             }
         }
-        if (bestSpend > 0) chances.add(bestSpend);
-        return atLeastTwo(chances);
+        if (bestSpend > 0) chances.add(new Chance(bestSpend, spendMetNow));
+        return chances;
+    }
+
+    private static List<Double> byStatus(List<Chance> chances) {
+        return chances.stream().map(Chance::byStatus).toList();
+    }
+
+    static double atLeastOne(List<Double> chances) {
+        double none = 1;
+        for (double chance : chances) none *= 1 - chance;
+        return 1 - none;
     }
 
     static double spendChance(Wallet wallet, SpendCost cost) {

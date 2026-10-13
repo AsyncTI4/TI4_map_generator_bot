@@ -59,4 +59,19 @@ class ObjectiveOddsTest extends BaseTi4Test {
         test.nekro.setTg(0);
         assertThat(ObjectiveOdds.atLeastTwoByStatus(test.game, test.nekro)).isCloseTo(0.45 * 0.12, within(1e-9));
     }
+
+    // Imperial played at once locks in an objective met now, so its extra point only needs one more by status:
+    // Monument is scored with Imperial and Expand Borders (0.12) is the extra. Monument alone gains nothing, since
+    // the status phase would score it anyway; with nothing met now Imperial needs two by status.
+    @Test
+    void imperialLocksInAnObjectiveMetNow() {
+        reveal("monument");
+        assertThat(ObjectiveOdds.extraScoreWithImperial(test.game, test.nekro)).isZero();
+
+        reveal("expand_borders");
+        assertThat(ObjectiveOdds.extraScoreWithImperial(test.game, test.nekro)).isCloseTo(0.12, within(1e-9));
+
+        test.nekro.setTg(0);
+        assertThat(ObjectiveOdds.extraScoreWithImperial(test.game, test.nekro)).isCloseTo(0.45 * 0.12, within(1e-9));
+    }
 }

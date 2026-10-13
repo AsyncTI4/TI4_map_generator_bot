@@ -83,7 +83,7 @@ class ImperialUses {
     }
 
     private static double extraPublicScore(Game game, Player seat) {
-        return ObjectiveOdds.atLeastTwoByStatus(game, seat);
+        return ObjectiveOdds.extraScoreWithImperial(game, seat);
     }
 
     private static boolean takesCustodiansThisRound(Game game, Player seat) {
