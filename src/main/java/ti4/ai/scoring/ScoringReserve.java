@@ -23,7 +23,9 @@ public class ScoringReserve {
         if (!isActionPhase(game) || !Helper.canPlayerScorePOs(game, seat)) {
             return Optional.empty();
         }
-        Optional<Reserved> spend = bestAffordableSpend(game, seat, Wallet.of(game, seat));
+        Wallet wallet = Wallet.of(game, seat);
+        Optional<Reserved> spend =
+                bestAffordableSpend(game, seat, wallet).or(() -> bestProjectedSpend(game, seat, wallet));
         if (spend.isEmpty()) return Optional.empty();
         int spendPoints = ObjectivePolicy.victoryPoints(spend.get().objectiveId());
         long freeScoresWorthAsMuch = ObjectivePolicy.scorablePublics(game, seat).stream()
@@ -60,6 +62,16 @@ public class ScoringReserve {
                 .max(Comparator.comparingInt(
                                 (Reserved candidate) -> ObjectivePolicy.victoryPoints(candidate.objectiveId()))
                         .thenComparingInt(candidate -> -weight(candidate.cost())));
+    }
+
+    private static Optional<Reserved> bestProjectedSpend(Game game, Player seat, Wallet wallet) {
+        int expected = ExpectedTradeGoods.beforeStatus(game, seat);
+        if (expected <= 0) return Optional.empty();
+        Wallet projected = wallet.withTradeGoods(wallet.tradeGoods() + expected);
+        return bestAffordableSpend(game, seat, projected)
+                .map(spend -> new Reserved(
+                        spend.objectiveId(), ExpectedTradeGoods.netOf(spend.cost(), expected, wallet.tradeGoodValue())))
+                .filter(spend -> wallet.canPay(spend.cost()));
     }
 
     private static int weight(SpendCost cost) {
