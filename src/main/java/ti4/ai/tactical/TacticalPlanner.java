@@ -496,7 +496,7 @@ public class TacticalPlanner {
         int landed = Math.min(Math.min(capacity, available), free.size());
         int loadable = Math.max(landed, Math.min(capacity, available - reserved));
         boolean approaching = context.approaches(tile);
-        if (approaching) loadable = Math.max(loadable, Math.min(landed + 1, Math.min(capacity, available)));
+        if (approaching) loadable = Math.max(loadable, Math.min(landed + 1, Math.min(capacity, available - reserved)));
         List<Planet> targets = free.subList(0, landed);
         List<UnitMove> ordered = mechsFirstForHazardousPlanets(groundForces, targets);
         List<UnitMove> cargo = take(ordered, loadable);
@@ -2334,7 +2334,7 @@ public class TacticalPlanner {
         private int otherExpansionNeed(Tile origin, Tile target, UnitType transport) {
             return game.getTileMap().values().stream()
                     .filter(other -> other != target && other != origin)
-                    .filter(other -> reaches(origin, other, transport))
+                    .filter(other -> reachesWithGravityDrive(origin, other, transport))
                     .mapToInt(this::claimablePlanets)
                     .max()
                     .orElse(0);

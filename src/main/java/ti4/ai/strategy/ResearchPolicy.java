@@ -186,6 +186,16 @@ public class ResearchPolicy {
                 + openingReachValue(game, seat, alias);
     }
 
+    static double bestValueAsTechnologyHolder(Game game, Player seat) {
+        double best = bestResearchable(game, seat)
+                .map(alias -> value(game, seat, alias))
+                .orElse(0.0);
+        double holderReach = OpeningOutlook.gravityDriveGainAsTechnologyHolder(game, seat);
+        if (holderReach <= openingReachValue(game, seat, GRAVITY_DRIVE)) return best;
+        double drive = value(game, seat, GRAVITY_DRIVE) - openingReachValue(game, seat, GRAVITY_DRIVE) + holderReach;
+        return Math.max(best, drive);
+    }
+
     private static double openingReachValue(Game game, Player seat, String alias) {
         if (!GRAVITY_DRIVE.equals(alias)) return 0;
         return OpeningOutlook.gain(game, seat, OpeningOutlook.Boost.GRAVITY_DRIVE);

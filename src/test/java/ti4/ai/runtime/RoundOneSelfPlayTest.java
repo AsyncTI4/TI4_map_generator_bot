@@ -165,9 +165,17 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
             Map<Integer, double[]> byRound = new TreeMap<>();
             java.util.concurrent.atomic.AtomicReference<Game> live =
                     new java.util.concurrent.atomic.AtomicReference<>(game);
+            String[] probeState = {"", "", ""};
+            if (PROBE != null) {
+                synchronized (env) {
+                    env.watched.add("[probe] seating " + seating + ", speaker "
+                            + game.getPlayer(game.getSpeakerUserID()).getFaction());
+                }
+            }
             SelfPlayGame.Outcome outcome = selfPlay.run(
                     current -> {
                         live.set(current);
+                        if (PROBE != null) probe(env, current, probeState);
                         boolean acting = "action".equalsIgnoreCase(current.getPhaseOfGame());
                         if (acting && !current.getActivePlayerID().equals(lastActive[0])) {
                             lastActive[0] = current.getActivePlayerID();
@@ -204,6 +212,18 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
                     (1 + ROUNDS) * VIRTUAL_DAY,
                     40_000 * ROUNDS);
             if (Boolean.getBoolean("ai.selfplay.report") && slot == 0) System.out.println(outcome.report());
+            if (PROBE != null) {
+                StringBuilder dump = new StringBuilder();
+                synchronized (env) {
+                    for (String line : env.watched)
+                        dump.append("PROBE g")
+                                .append(slot)
+                                .append(' ')
+                                .append(line)
+                                .append('\n');
+                }
+                System.out.print(dump);
+            }
             Game end = live.get();
             List<SeatResult> seats = new ArrayList<>();
             for (Player seat : end.getRealPlayers()) {
@@ -229,6 +249,76 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
                     new ArrayList<>(live.get().getRevealedPublicObjectives().keySet());
             objectives.add("technology played on turn " + technologyTurn[0]);
             return new GameResult(outcome.ending(), seats, objectives, byRound);
+        }
+    }
+
+    // -Dai.selfplay.probe=<faction> logs that seat's pick values and Gravity Drive outlook at each of its picks, and
+    // its
+    // board state whenever the active seat, played cards, follows, tokens or its fleet change. Combine with
+    // -Dai.selfplay.watch=<regex> so the seat's decisions land in the same per-game log.
+    private static final String PROBE = System.getProperty("ai.selfplay.probe");
+
+    private static void probe(SelfPlayEnvironment env, Game game, String[] state) {
+        Player seat = game.getRealPlayers().stream()
+                .filter(player -> PROBE.equals(player.getFaction()))
+                .findFirst()
+                .orElse(null);
+        if (seat == null || game.getRound() > ROUNDS) return;
+        String phase = game.getPhaseOfGame();
+        Player active = game.getActivePlayer();
+        String activeFaction = active == null ? "-" : active.getFaction();
+        if ("strategy".equalsIgnoreCase(phase) && active == seat) {
+            String key = game.getRound() + "|" + seat.getSCs();
+            if (!key.equals(state[0])) {
+                state[0] = key;
+                add(
+                        env,
+                        "[probe] PICK r" + game.getRound() + " " + ti4.ai.strategy.OpeningProbe.pickValues(game, seat));
+                add(env, "[probe] PICK-GD " + ti4.ai.strategy.OpeningProbe.gravityDrive(game, seat));
+                add(env, "[probe] GOALS " + ti4.ai.strategy.OpeningProbe.goals(game, seat));
+            }
+            return;
+        }
+        if (!"action".equalsIgnoreCase(phase)) return;
+        List<String> played = new ArrayList<>();
+        for (int initiative : game.getPlayedSCs()) {
+            String holder = game.getRealPlayers().stream()
+                    .filter(player -> player.getSCs().contains(initiative))
+                    .map(Player::getFaction)
+                    .findFirst()
+                    .orElse("?");
+            played.add(initiative + StrategyCard.of(game, initiative).name().substring(0, 4) + "@" + holder
+                    + (seat.hasFollowedSC(initiative) ? "+followed" : ""));
+        }
+        List<String> fleet = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            var space = BoardView.space(tile);
+            int carriers = BoardView.count(space, seat, ti4.helpers.Units.UnitType.Carrier);
+            int ships = BoardView.nonFighterShips(space, seat);
+            if (ships == 0) continue;
+            fleet.add(tile.getPosition() + ":cv" + carriers + "/ships" + ships + "/gf"
+                    + BoardView.groundForces(space, seat) + (tile.hasPlayerCC(seat) ? "*" : ""));
+        }
+        String board = "r" + game.getRound() + " active " + activeFaction + " passed " + seat.isPassed() + " played "
+                + played + " tech " + seat.getTechs() + " planets "
+                + seat.getPlanets().size() + " tg " + seat.getTg()
+                + " comm " + seat.getCommodities() + " tokens t" + seat.getTacticalCC() + " s" + seat.getStrategicCC()
+                + " ac " + seat.getActionCards().size() + " fleet " + fleet;
+        if (board.equals(state[1])) return;
+        state[1] = board;
+        add(env, "[probe] " + board);
+        if (active == seat) add(env, "[probe]   GD " + ti4.ai.strategy.OpeningProbe.gravityDrive(game, seat));
+        String turnKey = activeFaction + "|" + seat.getInRoundTurnCount() + "|"
+                + game.getPlayedSCs().size();
+        if (active == seat && !turnKey.equals(state[2])) {
+            state[2] = turnKey;
+            add(env, "[probe]   RANKED " + ti4.ai.strategy.OpeningProbe.rankedPlans(game, seat, 5));
+        }
+    }
+
+    private static void add(SelfPlayEnvironment env, String line) {
+        synchronized (env) {
+            env.watched.add(line);
         }
     }
 
