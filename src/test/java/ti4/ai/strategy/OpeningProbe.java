@@ -82,10 +82,12 @@ public final class OpeningProbe {
         Wallet wallet = Wallet.of(game, seat);
         return String.format(
                 Locale.ROOT,
-                "gd prereq %s, holdsTech %s, affordFollow %s (wallet res %d tg %d, reserve %s), gain GD %.2f EXTRA %.2f"
+                "gd prereq %s, raisable %d, holderGain %.2f, holdsTech %s, affordFollow %s (wallet res %d tg %d, reserve %s), gain GD %.2f EXTRA %.2f"
                         + " HOME %.2f, planetValue none %.2f gd %.2f, bestResearchable %s (%.2f; gd %.2f),"
                         + " researchesGdForOpening %s, wantsTechSoon %s, wantsToFollowTech %s, tokens t%d s%d f%d",
                 prereq,
+                OpeningOutlook.raisableTradeGoods(game, seat),
+                OpeningOutlook.gravityDriveGainAsTechnologyHolder(game, seat),
                 seat.getSCs().stream().anyMatch(i -> StrategyCard.of(game, i) == StrategyCard.TECHNOLOGY),
                 affordFollow,
                 wallet.resources(),
