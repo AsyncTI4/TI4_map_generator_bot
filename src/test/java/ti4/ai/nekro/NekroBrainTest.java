@@ -538,6 +538,30 @@ class NekroBrainTest extends BaseTi4Test {
         }
     }
 
+    // Self-play stalled with the defender's Morale Boost (or Emergency Repairs) stuck in its Sabotage window: the
+    // active
+    // player, mid-combat, kept waiting for the combat and never passed, while the defender held its card until the
+    // window closed. The active player answers open windows before it waits on its own action.
+    @Test
+    void passesOnSabotageWhileWaitingOnItsOwnCombat() {
+        AiTestGame table = AiTestGame.withSolAi();
+        table.aiIsActive("action");
+        ti4.game.Tile contested = table.nekroHome();
+        table.units(contested, "space", table.nekro, ti4.helpers.Units.UnitType.Carrier, 1);
+        table.units(contested, "space", table.sol, ti4.helpers.Units.UnitType.Destroyer, 1);
+        table.game.setActiveSystem(AiTestGame.HOME);
+        table.game.setStoredValue("currentActionSummarynekro", "Nekro Activated 301");
+        try (MockedStatic<GameMessageManager> messages = Mockito.mockStatic(GameMessageManager.class)) {
+            messages.when(() -> GameMessageManager.getOne(anyString(), anyString()))
+                    .thenAnswer(
+                            call -> Optional.of(new GameMessage(call.getArgument(1), GameMessageType.ACTION_CARD, 0L)));
+            AiPrompt window = publicPrompt("window", NOW - 30_000L, "no_sabotage");
+            AiPrompt combat = prompt("roll", PromptSource.COMBAT_THREAD, NOW, "combatRoll_301_space");
+
+            assertPressed(brain.decide(table.contextFor(table.nekro, Set.of(), NOW, window, combat)), "no_sabotage");
+        }
+    }
+
     // In a busy channel (the start of the strategy phase, when Summit is played) a sabotage window can scroll out of
     // the messages the AI reads before its delay is up. It still answers it, from the bot's list of open windows, or
     // the card's owner would wait forever.

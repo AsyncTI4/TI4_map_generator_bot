@@ -159,6 +159,7 @@ public class NekroBrain implements FactionBrain {
             ActionCardResponses::respond,
             SabotageRules::answerWindowsAimedAtSeat,
             SabotageRules::followUp,
+            SabotageRules::answerWindows,
             PromissoryRules::answerOffers,
             PromissoryRules::playCeasefire,
             PromissoryRules::playCombatNotes,
@@ -191,7 +192,6 @@ public class NekroBrain implements FactionBrain {
             this::scorePublicObjective,
             SecretRules::scoreStatusSecret,
             this::startStatusHomework,
-            SabotageRules::answerWindows,
             StrategyCardRules::awaitSecondaries,
             StrategyCardRules::awaitFollowTurn);
 
