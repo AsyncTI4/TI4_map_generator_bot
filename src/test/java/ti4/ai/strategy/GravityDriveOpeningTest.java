@@ -21,6 +21,7 @@ import ti4.testUtils.BaseTi4Test;
 class GravityDriveOpeningTest extends BaseTi4Test {
 
     private static final String THIRD_ID = "7100000555555555";
+    private static final int LEADERSHIP = 1;
     private static final int TRADE = 5;
     private static final int TECHNOLOGY = 7;
 
@@ -102,6 +103,29 @@ class GravityDriveOpeningTest extends BaseTi4Test {
         assertThat(TechnologyTiming.deniable(test.game, hacan)).isTrue();
         TacticalPlan plan = TacticalPlanner.best(test.game, hacan, List.of()).orElseThrow();
         assertThat(carriersLeavingHome(plan)).isLessThan(2);
+    }
+
+    // One carrier is home and the system a move away is already Hacan's. Its best tactical action would take that
+    // carrier out (or build at home, which places a token on it and spends the resources the secondary needs). Holding
+    // Leadership, it plays that instead of a tactical action and keeps the carrier for Gravity Drive.
+    @Test
+    void stallsWithAStrategyCardRatherThanBuildingAtHome() {
+        test.sol.addSC(TECHNOLOGY);
+        test.sol.addSC(TRADE);
+        Tile home = test.game.getTileByPosition(AiTestGame.HOME);
+        home.removeUnit("space", ti4.helpers.Units.getUnitKey(UnitType.Carrier, hacan.getColor()), 1);
+        test.units(home, "arretze", hacan, UnitType.Spacedock, 1);
+        hacan.addPlanet("lodor");
+        neighbourSol();
+        assertThat(OpeningHold.awaitsGravityDrive(test.game, hacan)).isTrue();
+        TacticalPlan alone = TacticalPlanner.best(test.game, hacan, List.of()).orElseThrow();
+        assertThat(AiTestGame.HOME.equals(alone.target()) || carriersLeavingHome(alone) == 1)
+                .isTrue();
+
+        hacan.addSC(LEADERSHIP);
+        changed();
+
+        assertThat(TacticalPlanner.best(test.game, hacan, List.of())).isEmpty();
     }
 
     // With no Trade to come there is nothing to wait for: both carriers go, the second to press on next round.

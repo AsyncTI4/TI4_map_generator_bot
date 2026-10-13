@@ -150,6 +150,7 @@ public class TacticalPlanner {
         List<TacticalPlan> all = candidates(context, tile -> activatable(game, seat, tile), STALL_MIN_SCORE);
         Optional<TacticalPlan> hold = holdForWarfareBuild(context, all).or(() -> holdForGravityDrive(context, all));
         if (hold.isPresent()) return hold;
+        if (stallsWithAStrategyCard(context, all)) return Optional.empty();
         List<TacticalPlan> plans = withinTokenBudget(all, seat.getTacticalCC() - reservedTokens);
         if (plans.isEmpty()) return Optional.empty();
         TacticalPlan top = plans.getFirst();
@@ -200,6 +201,14 @@ public class TacticalPlanner {
                 .filter(plan -> plan.score() >= MIN_SCORE && keepsATransportHome(context, plan, home))
                 .findFirst()
                 .or(() -> stepTowardNeighbour(context, home, goals));
+    }
+
+    private static boolean stallsWithAStrategyCard(Context context, List<TacticalPlan> plans) {
+        Tile home = context.seat.getHomeSystemTile();
+        if (home == null || plans.isEmpty() || !context.expectsGravityDrive()) return false;
+        if (keepsATransportHome(context, plans.getFirst(), home)) return false;
+        return context.seat.getSCs().stream()
+                .anyMatch(initiative -> !context.game.getPlayedSCs().contains(initiative));
     }
 
     private static boolean keepsATransportHome(Context context, TacticalPlan plan, Tile home) {
