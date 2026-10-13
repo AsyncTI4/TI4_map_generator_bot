@@ -4,12 +4,14 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 
 @UtilityClass
 public class OpeningHold {
 
     private static final int LAST_OPENING_ROUND = 1;
     private static final int FIRST_TURN = 1;
+    private static final String GRAVITY_DRIVE = "gd";
 
     public static boolean awaitsWarfareBuild(Game game, Player seat) {
         if (game.getRound() > LAST_OPENING_ROUND || seat.getInRoundTurnCount() > FIRST_TURN) return false;
@@ -18,6 +20,13 @@ public class OpeningHold {
         if (!StrategyCardRules.hasSpareStrategyToken(game, seat, StrategyCard.WARFARE)) return false;
         if (!StrategyCardRules.wantsToFollow(game, seat, StrategyCard.WARFARE)) return false;
         return OpeningOutlook.holdsCarriersForHomeBuild(game, seat);
+    }
+
+    public static boolean awaitsGravityDrive(Game game, Player seat) {
+        if (game.getRound() > LAST_OPENING_ROUND || seat.hasTech(GRAVITY_DRIVE)) return false;
+        Tile home = seat.getHomeSystemTile();
+        if (home == null || home.hasPlayerCC(seat)) return false;
+        return OpeningNeeds.wantsTechnologySoon(game, seat);
     }
 
     private static boolean holdsWarfare(Game game, Player seat) {

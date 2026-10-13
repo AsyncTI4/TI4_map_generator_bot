@@ -222,6 +222,18 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
                                 .append(line)
                                 .append('\n');
                 }
+                var mainChannel = live.get().getMainGameChannel();
+                if (mainChannel != null) {
+                    for (var message :
+                            env.discord.channel(mainChannel.getIdLong()).liveMessages()) {
+                        if (!message.content().startsWith(ti4.ai.perception.AiPrompt.TABLE_TALK)) continue;
+                        dump.append("PROBE g")
+                                .append(slot)
+                                .append(" [table talk] ")
+                                .append(message.content())
+                                .append('\n');
+                    }
+                }
                 System.out.print(dump);
             }
             Game end = live.get();

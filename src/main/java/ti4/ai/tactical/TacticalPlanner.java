@@ -148,7 +148,7 @@ public class TacticalPlanner {
         if (!coversReserve(seat, reservedTokens)) return Optional.empty();
         Context context = new Context(game, seat, Set.of(), hints);
         List<TacticalPlan> all = candidates(context, tile -> activatable(game, seat, tile), STALL_MIN_SCORE);
-        Optional<TacticalPlan> hold = holdForWarfareBuild(context, all);
+        Optional<TacticalPlan> hold = holdForWarfareBuild(context, all).or(() -> holdForGravityDrive(context, all));
         if (hold.isPresent()) return hold;
         List<TacticalPlan> plans = withinTokenBudget(all, seat.getTacticalCC() - reservedTokens);
         if (plans.isEmpty()) return Optional.empty();
@@ -186,6 +186,31 @@ public class TacticalPlanner {
                 .filter(plan -> !leavesWithTransports(plan, home) && !goals.contains(plan.target()))
                 .findFirst()
                 .or(() -> stepTowardNeighbour(context, home, goals));
+    }
+
+    private static Optional<TacticalPlan> holdForGravityDrive(Context context, List<TacticalPlan> plans) {
+        Tile home = context.seat.getHomeSystemTile();
+        if (home == null || plans.isEmpty() || !context.expectsGravityDrive()) return Optional.empty();
+        if (keepsATransportHome(context, plans.getFirst(), home)) return Optional.empty();
+        Set<String> goals = new HashSet<>();
+        context.goals().goals().stream()
+                .filter(RoundGoals.Goal::needsTransport)
+                .forEach(goal -> goals.add(goal.position()));
+        return plans.stream()
+                .filter(plan -> plan.score() >= MIN_SCORE && keepsATransportHome(context, plan, home))
+                .findFirst()
+                .or(() -> stepTowardNeighbour(context, home, goals));
+    }
+
+    private static boolean keepsATransportHome(Context context, TacticalPlan plan, Tile home) {
+        if (plan.target().equals(home.getPosition())) return false;
+        UnitHolder space = BoardView.space(home);
+        int transports = 0;
+        for (UnitType type : TRANSPORT_PREFERENCE) {
+            if (BoardView.capacity(context.seat, type) <= 0) continue;
+            transports += BoardView.undamaged(space, context.seat, type) - countOf(movesFrom(home, plan.moves()), type);
+        }
+        return transports > 0;
     }
 
     private static boolean leavesWithTransports(TacticalPlan plan, Tile home) {
@@ -2173,6 +2198,7 @@ public class TacticalPlanner {
         private List<Tile> origins;
         private ObjectiveValue objectives;
         private Boolean canPayCustodians;
+        private Boolean expectsGravityDrive;
         private Double mecatolCash;
         private DefenseOutlook defense;
         private OffenseOutlook offense;
@@ -2327,6 +2353,18 @@ public class TacticalPlanner {
             return value.gain(value.before().withBuilt(tile.getPosition(), built));
         }
 
+        boolean expectsGravityDrive() {
+            if (expectsGravityDrive == null) expectsGravityDrive = OpeningHold.awaitsGravityDrive(game, seat);
+            return expectsGravityDrive;
+        }
+
+        private boolean reachesForAnotherAction(Tile origin, Tile target, UnitType transport) {
+            if (reachesWithGravityDrive(origin, target, transport)) return true;
+            if (!expectsGravityDrive()) return false;
+            int move = BoardView.moveValue(seat, transport) + 1;
+            return reach(origin, move).containsKey(target.getPosition());
+        }
+
         boolean canPayCustodians() {
             if (canPayCustodians == null) {
                 canPayCustodians = ScoringReserve.planAfterReserve(game, seat, SpendCost.influence(CUSTODIANS_COST))
@@ -2408,7 +2446,7 @@ public class TacticalPlanner {
         private int otherExpansionNeed(Tile origin, Tile target, UnitType transport) {
             return game.getTileMap().values().stream()
                     .filter(other -> other != target && other != origin)
-                    .filter(other -> reachesWithGravityDrive(origin, other, transport))
+                    .filter(other -> reachesForAnotherAction(origin, other, transport))
                     .mapToInt(this::claimablePlanets)
                     .max()
                     .orElse(0);

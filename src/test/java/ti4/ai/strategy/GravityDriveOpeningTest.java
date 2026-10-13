@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.strategy.OpeningOutlook.Boost;
+import ti4.ai.tactical.TacticalPlan;
+import ti4.ai.tactical.TacticalPlanner;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
@@ -84,6 +86,46 @@ class GravityDriveOpeningTest extends BaseTi4Test {
 
         assertThat(OpeningOutlook.gain(test.game, hacan, Boost.GRAVITY_DRIVE)).isGreaterThan(0);
         assertThat(OpeningNeeds.wantsTechnologySoon(test.game, hacan)).isTrue();
+    }
+
+    // A neighbouring AI still holds Trade: Hacan follows it for free (Masters of Trade) and the holder washes the
+    // replenished commodities, so the secondary will be paid for once Trade comes round. Until then Hacan keeps a
+    // carrier at home for the system two moves out, and is worth denying for a Technology holder.
+    @Test
+    void expectsTheRivalTradeWashAndKeepsACarrierHome() {
+        test.sol.addSC(TECHNOLOGY);
+        test.sol.addSC(TRADE);
+        neighbourSol();
+
+        assertThat(OpeningOutlook.gain(test.game, hacan, Boost.GRAVITY_DRIVE)).isGreaterThan(0);
+        assertThat(OpeningHold.awaitsGravityDrive(test.game, hacan)).isTrue();
+        assertThat(TechnologyTiming.deniable(test.game, hacan)).isTrue();
+        TacticalPlan plan = TacticalPlanner.best(test.game, hacan, List.of()).orElseThrow();
+        assertThat(carriersLeavingHome(plan)).isLessThan(2);
+    }
+
+    // With no Trade to come there is nothing to wait for: both carriers go, the second to press on next round.
+    @Test
+    void doesNotWaitWithoutAnExpectedWash() {
+        test.sol.addSC(TECHNOLOGY);
+        neighbourSol();
+
+        assertThat(OpeningHold.awaitsGravityDrive(test.game, hacan)).isFalse();
+        TacticalPlan plan = TacticalPlanner.best(test.game, hacan, List.of()).orElseThrow();
+        assertThat(carriersLeavingHome(plan)).isEqualTo(2);
+    }
+
+    private void neighbourSol() {
+        Tile next = test.place("25", otherNeighbour());
+        test.units(next, "space", test.sol, UnitType.Carrier, 1);
+        changed();
+    }
+
+    private static int carriersLeavingHome(TacticalPlan plan) {
+        return plan.moves().stream()
+                .filter(move -> AiTestGame.HOME.equals(move.origin()) && move.type() == UnitType.Carrier)
+                .mapToInt(TacticalPlan.UnitMove::count)
+                .sum();
     }
 
     // Commodities with no one to wash them with raise nothing.

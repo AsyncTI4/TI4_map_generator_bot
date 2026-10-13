@@ -86,7 +86,7 @@ class OpeningOutlook {
         return gravityDriveGain(
                 game,
                 seat,
-                holdsTechnology(game, seat) || canAffordToFollow(game, seat, raisableTradeGoods(game, seat)));
+                holdsTechnology(game, seat) || canAffordToFollow(game, seat, expectedTradeGoods(game, seat)));
     }
 
     static double gravityDriveGainAsTechnologyHolder(Game game, Player seat) {
@@ -102,6 +102,10 @@ class OpeningOutlook {
         int washed = RaisableTradeGoods.byWashing(game, seat);
         if (canAffordToFollow(game, seat, washed)) return 0;
         return gravityDriveGain(game, seat, canAffordToFollow(game, seat, washed + TRADE_PRIMARY_GOODS));
+    }
+
+    static int expectedTradeGoods(Game game, Player seat) {
+        return raisableTradeGoods(game, seat) + RaisableTradeGoods.fromRivalTrade(game, seat);
     }
 
     static int raisableTradeGoods(Game game, Player seat) {

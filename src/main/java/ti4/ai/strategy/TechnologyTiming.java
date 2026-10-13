@@ -9,6 +9,7 @@ import ti4.ai.brain.StrategyCard;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.tactical.TacticalPlan;
+import ti4.ai.trade.RaisableTradeGoods;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -125,7 +126,7 @@ public class TechnologyTiming {
 
     private static int expectedIncome(Game game, Player seat) {
         int trade = holdsUnplayed(game, seat, StrategyCard.TRADE) ? TRADE_PRIMARY_TRADE_GOODS : 0;
-        return seat.getCommodities() + trade;
+        return trade + Math.max(seat.getCommodities(), RaisableTradeGoods.fromRivalTrade(game, seat));
     }
 
     private static boolean affords(Game game, Player seat, int resources) {
