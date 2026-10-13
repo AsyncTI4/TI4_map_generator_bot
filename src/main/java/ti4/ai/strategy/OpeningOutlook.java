@@ -202,9 +202,15 @@ class OpeningOutlook {
             if (home == null) return Optional.empty();
             List<Goal> goals = RoundGoals.of(game, seat).goals().stream()
                     .filter(Goal::needsTransport)
+                    .filter(goal -> stillToActivate(game, seat, goal))
                     .toList();
             if (goals.isEmpty()) return Optional.empty();
             return Optional.of(new Opening(game, seat, home, goals));
+        }
+
+        private static boolean stillToActivate(Game game, Player seat, Goal goal) {
+            Tile tile = game.getTileByPosition(goal.position());
+            return tile != null && !tile.hasPlayerCC(seat);
         }
 
         Production bestProduction(int actions) {
@@ -269,12 +275,18 @@ class OpeningOutlook {
                 } else if (producing) {
                     produce(action);
                     producing = false;
+                } else if (awaitsTheDrive(action)) {
+                    action++;
                 } else {
                     break;
                 }
             }
             if (producing) produce(action);
             return value + nextRound() - lostShips;
+        }
+
+        private boolean awaitsTheDrive(int action) {
+            return scenario.boost() == Boost.GRAVITY_DRIVE && action < scenario.driveFrom();
         }
 
         private Optional<Hop> bestHop(int action) {

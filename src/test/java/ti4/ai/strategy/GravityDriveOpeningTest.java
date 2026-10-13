@@ -169,6 +169,27 @@ class GravityDriveOpeningTest extends BaseTi4Test {
         assertThat(OpeningOutlook.gain(test.game, hacan, Boost.GRAVITY_DRIVE)).isGreaterThan(0);
     }
 
+    // Mid-round, mid-action: one carrier has just moved its infantry into the system a move away (the token is down,
+    // the planets not yet landed on) and the other waits at home. That system is no longer a target for the carrier
+    // at home, and the rest of the slice is reachable only with the drive, so the drive is still worth waiting for.
+    @Test
+    void keepsCreditingTheDriveForTheCarrierStillAtHome() {
+        test.sol.addSC(TECHNOLOGY);
+        hacan.setTg(1);
+        hacan.setTacticalCC(2);
+        Tile home = test.game.getTileByPosition(AiTestGame.HOME);
+        home.removeUnit("space", ti4.helpers.Units.getUnitKey(UnitType.Carrier, hacan.getColor()), 1);
+        home.removeUnit("arretze", ti4.helpers.Units.getUnitKey(UnitType.Infantry, hacan.getColor()), 2);
+        Tile neighbour = test.game.getTileByPosition(AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.units(neighbour, "space", hacan, UnitType.Carrier, 1);
+        test.units(neighbour, "space", hacan, UnitType.Infantry, 2);
+        neighbour.addCC(ti4.image.Mapper.getCCID(hacan.getColor()));
+        changed();
+
+        assertThat(OpeningOutlook.gain(test.game, hacan, Boost.GRAVITY_DRIVE)).isGreaterThan(0);
+        assertThat(OpeningHold.awaitsGravityDrive(test.game, hacan)).isTrue();
+    }
+
     // Commodities with no one to wash them with raise nothing.
     @Test
     void commoditiesWithoutAPartnerRaiseNothing() {
