@@ -2221,7 +2221,7 @@ public class TacticalPlanner {
         double exposure(Tile tile, List<UnitMove> arriving, List<UnitMove> landed) {
             if (exposure == null) exposure = new Exposure(game, seat, defense());
             Defenders after = defense().defendersAt(tile).arriving(arriving).minus(landed);
-            return exposure.added(tile, after);
+            return exposure.added(tile, after, arriving);
         }
 
         Optional<TacticalPlan> attackPlan(Tile tile) {

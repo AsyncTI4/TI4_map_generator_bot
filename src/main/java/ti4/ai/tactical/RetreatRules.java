@@ -192,7 +192,7 @@ class RetreatRules {
         return SPARE_SYSTEM_RETREAT - (SPARE_SYSTEM_RETREAT - CRITICAL_SYSTEM_RETREAT) * criticality;
     }
 
-    static boolean hasDestination(Game game, Player seat, Tile tile) {
+    private static boolean hasDestination(Game game, Player seat, Tile tile) {
         return FoWHelper.getAdjacentTiles(game, tile.getPosition(), seat, false).stream()
                 .map(game::getTileByPosition)
                 .filter(destination -> destination != null && destination != tile)
@@ -200,10 +200,15 @@ class RetreatRules {
     }
 
     private static boolean canRetreatTo(Game game, Player seat, Tile destination) {
+        return canRetreatTo(
+                game, seat, destination, Tile.playerCanRetreatHere(seat).test(destination));
+    }
+
+    static boolean canRetreatTo(Game game, Player seat, Tile destination, boolean held) {
         if (destination.isAsteroidField() && !seat.hasTech(ANTIMASS_DEFLECTORS)) return false;
         if (destination.isSupernova() && !seat.hasTech(MAGMUS_REACTOR)) return false;
         if (BoardView.hasEnemyShips(game, seat, destination)) return false;
-        if (Tile.playerCanRetreatHere(seat).test(destination)) return true;
+        if (held) return true;
         return seat.hasTech(DARK_ENERGY_TAP) && !BoardView.hasEnemyUnits(game, seat, destination);
     }
 

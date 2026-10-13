@@ -10,64 +10,109 @@ import ti4.ai.eval.CombatModifiers.Side;
 import ti4.ai.eval.CombatOdds.Combatant;
 import ti4.ai.tactical.IncomingForces.Horizon;
 import ti4.ai.tactical.IncomingForces.IncomingForce;
+import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
 
 final class Exposure {
+
+    private static final double CAUGHT_IN_RETREAT = 0.5;
 
     private record Unit(UnitType type, double cost, int capacity) {}
 
     private final Game game;
     private final Player seat;
     private final DefenseOutlook defense;
+    private final double extraActionCost;
     private final Map<String, Double> losses = new HashMap<>();
-    private final Map<String, Boolean> retreats = new HashMap<>();
 
     Exposure(Game game, Player seat, DefenseOutlook defense) {
+        this(game, seat, defense, 0);
+    }
+
+    Exposure(Game game, Player seat, DefenseOutlook defense, double extraActionCost) {
         this.game = game;
         this.seat = seat;
         this.defense = defense;
+        this.extraActionCost = extraActionCost;
     }
 
-    double added(Tile tile, Defenders after) {
-        return Math.max(0, expectedLoss(tile, after) - expectedLoss(tile, defense.defendersAt(tile)));
+    double added(Tile tile, Defenders after, List<UnitMove> moves) {
+        return Math.max(0, expectedLoss(tile, after, moves) - expectedLoss(tile, defense.defendersAt(tile), List.of()));
     }
 
-    double expectedLoss(Tile tile, Defenders group) {
+    double expectedLoss(Tile tile, Defenders group, List<UnitMove> moves) {
         if (group.ships().isEmpty()) return 0;
         String key = tile.getPosition() + "|" + group.shipsKey() + "|"
-                + group.groundInSpace().key();
+                + group.groundInSpace().key() + "|" + departures(moves);
         Double known = losses.get(key);
         if (known != null) return known;
         double worst = 0;
         for (Player enemy : game.getRealPlayers()) {
             if (enemy == seat) continue;
             for (Horizon horizon : Horizon.values()) {
-                worst = Math.max(worst, defense.weight(enemy, horizon) * lossFrom(enemy, tile, horizon, group));
+                worst = Math.max(worst, defense.weight(enemy, horizon) * lossFrom(enemy, tile, horizon, group, moves));
             }
         }
         losses.put(key, worst);
         return worst;
     }
 
-    private double lossFrom(Player enemy, Tile tile, Horizon horizon, Defenders group) {
+    private static String departures(List<UnitMove> moves) {
+        return moves.stream()
+                .map(move -> move.origin() + ":" + move.holder() + ":" + move.type() + ":" + move.count())
+                .sorted()
+                .toList()
+                .toString();
+    }
+
+    private double lossFrom(Player enemy, Tile tile, Horizon horizon, Defenders group, List<UnitMove> moves) {
         IncomingForce force = defense.force(enemy, tile, horizon);
         if (force.isEmpty()) return 0;
         double win = defense.chances(enemy, tile, horizon, group).space();
         if (win <= 0) return 0;
-        double atRisk = valueAtRisk(group);
-        double lossIfAttacked = win * atRisk;
-        if (canRetreat(tile)) lossIfAttacked = Math.min(lossIfAttacked, firstRoundLoss(tile, force, group));
+        double lossIfAttacked = win * valueAtRisk(group);
+        if (canRetreat(enemy, horizon, tile, group, moves)) {
+            lossIfAttacked = Math.min(lossIfAttacked, firstRoundLoss(tile, force, group));
+        }
         double attackerLoss =
                 (1 - win) * force.fleetCost() + win * (1 - win) * Math.min(force.fleetCost(), group.shipCost(seat));
-        return defense.attackLikelihood(enemy, tile, lossIfAttacked - attackerLoss) * lossIfAttacked;
+        double netGain = lossIfAttacked - attackerLoss - extraActionCost;
+        return defense.attackLikelihood(enemy, tile, horizon, netGain) * lossIfAttacked;
     }
 
-    private boolean canRetreat(Tile tile) {
-        return retreats.computeIfAbsent(tile.getPosition(), position -> RetreatRules.hasDestination(game, seat, tile));
+    private boolean canRetreat(Player enemy, Horizon horizon, Tile tile, Defenders group, List<UnitMove> moves) {
+        return FoWHelper.getAdjacentTiles(game, tile.getPosition(), seat, false).stream()
+                .map(game::getTileByPosition)
+                .filter(destination -> destination != null && destination != tile)
+                .anyMatch(destination -> safeRetreat(enemy, horizon, destination, group, moves));
+    }
+
+    private boolean safeRetreat(
+            Player enemy, Horizon horizon, Tile destination, Defenders group, List<UnitMove> moves) {
+        Defenders left = defense.defendersAt(destination).minus(movesFrom(destination, moves));
+        if (!RetreatRules.canRetreatTo(game, seat, destination, holdsAfterMove(destination, left))) return false;
+        IncomingForce pursuit = defense.force(enemy, destination, horizon);
+        if (pursuit.isEmpty()) return true;
+        return defense.chances(enemy, destination, horizon, left.joinedInSpaceBy(group))
+                        .space()
+                < CAUGHT_IN_RETREAT;
+    }
+
+    private boolean holdsAfterMove(Tile destination, Defenders left) {
+        return !left.isEmpty()
+                || destination.getPlanetUnitHolders().stream()
+                        .anyMatch(planet -> seat.getPlanets().contains(planet.getName()));
+    }
+
+    private static List<UnitMove> movesFrom(Tile origin, List<UnitMove> moves) {
+        return moves.stream()
+                .filter(move -> move.origin().equals(origin.getPosition()))
+                .toList();
     }
 
     private double valueAtRisk(Defenders group) {
