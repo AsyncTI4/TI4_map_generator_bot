@@ -167,23 +167,37 @@ class StrategyCardTurnTest extends BaseTi4Test {
                 .isTrue();
     }
 
-    // Round 1 opening: Thunder's Edge Warfare's free tactical action places no token, so the fleet it moves can move
-    // again next turn. Players fire it on turn 1 to push the home fleet into their slice, rather than hold it.
+    // Thunder's Edge Warfare's tactical action places no token, so the fleet it moves can move again. Rather than spend
+    // a token on the first worthwhile tactical action of the round and waste the card later (Xxcha played it on its 6th
+    // turn to move nothing), the AI uses Warfare for that action, in round 1 and after.
     @Test
-    void playsThundersEdgeWarfareOnTheFirstTurnOfRoundOne() {
+    void usesThundersEdgeWarfareForTheFirstWorthwhileTacticalAction() {
         test.nekro.addSC(WARFARE);
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
         test.units(home, "space", test.nekro, UnitType.Infantry, 2);
         test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));
         changed();
+
         assertThat(StrategyCardTurn.dueNow(test.context(turnStart(WARFARE)), WARFARE))
-                .isFalse();
+                .isTrue();
 
         test.game.setRound(1);
         changed();
 
         assertThat(StrategyCardTurn.dueNow(test.context(turnStart(WARFARE)), WARFARE))
                 .isTrue();
+    }
+
+    // With nothing worth activating yet the card is kept for later in the round, not spent on a token-free shuffle.
+    @Test
+    void keepsThundersEdgeWarfareWhileNothingIsWorthActivating() {
+        test.nekro.addSC(WARFARE);
+        test.units(home, "space", test.nekro, UnitType.Destroyer, 1);
+        test.place("47", AiTestGame.neighbourOf(AiTestGame.HOME));
+        changed();
+
+        assertThat(StrategyCardTurn.dueNow(test.context(turnStart(WARFARE)), WARFARE))
+                .isFalse();
     }
 
     // The free action brings both carriers and the spare ground forces along, not just the one carrier the expansion

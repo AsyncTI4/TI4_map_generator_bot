@@ -101,10 +101,20 @@ class CardTiming {
         Optional<TacticalPlan> warfare = TacticalPlanner.bestForWarfare(game, seat);
         if (warfare.isEmpty()) return Timing.FALLBACK;
         if (seat.getTacticalCC() == 0 || in.round() <= LAST_ADVANCE_ROUND) return Timing.NOW;
-        if (TacticalPlanner.movesAGroup(warfare.get())) return Timing.NOW;
         Tile target = tileAt(game, warfare.get().target());
         boolean reactivates = target != null && target.hasPlayerCC(seat);
-        return reactivates && warfare.get().score() >= TE_WARFARE_REACTIVATION_MIN ? Timing.NOW : Timing.FALLBACK;
+        if (reactivates) return warfare.get().score() >= TE_WARFARE_REACTIVATION_MIN ? Timing.NOW : Timing.FALLBACK;
+        if (warfare.get().score() < TacticalPlanner.MIN_SCORE) return Timing.FALLBACK;
+        return savesForAHomeReactivation(seat, plan) ? Timing.FALLBACK : Timing.NOW;
+    }
+
+    private static boolean savesForAHomeReactivation(Player seat, CardPlan plan) {
+        Tile home = seat.getHomeSystemTile();
+        if (home == null || home.hasPlayerCC(seat)) return false;
+        return plan.main()
+                .map(Benefit::use)
+                .filter(use -> use == CardUse.WARFARE_DOUBLE_BUILD || use == CardUse.WARFARE_BUILD_THEN_MOVE)
+                .isPresent();
     }
 
     private static Tile tileAt(Game game, String position) {

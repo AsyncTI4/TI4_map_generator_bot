@@ -43,9 +43,12 @@ class FleetLogisticsTest extends BaseTi4Test {
         assertThat(pressedId(brain.decide(test.context(turn())))).isEqualTo("FFCC_nekro_strategicAction_6");
     }
 
+    // Without Fleet Logistics there is no second action to follow up with, but Thunder's Edge Warfare still makes the
+    // same
+    // attack without spending a command token or locking the attackers in, so it is used rather than held.
     @Test
-    void attacksWithATacticalActionWithoutFleetLogistics() {
-        assertThat(pressedId(brain.decide(test.context(turn())))).isEqualTo("FFCC_nekro_tacticalAction");
+    void attacksWithWarfareEvenWithoutFleetLogistics() {
+        assertThat(pressedId(brain.decide(test.context(turn())))).isEqualTo("FFCC_nekro_strategicAction_6");
     }
 
     private static AiPrompt turn() {

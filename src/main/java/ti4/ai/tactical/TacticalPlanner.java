@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -112,8 +111,6 @@ public class TacticalPlanner {
     private static final int MECATOL_GARRISON = 1;
     private static final List<UnitType> TRANSPORT_PREFERENCE =
             List.of(UnitType.Carrier, UnitType.Flagship, UnitType.Dreadnought, UnitType.Warsun);
-    private static final Set<Kind> WARFARE_ADVANCES = EnumSet.of(Kind.EXPAND, Kind.POSITION, Kind.STAGE);
-    private static final int GROUP_ADVANCE_SHIPS = 3;
     private static final double FOLLOWER_SHARE = 0.25;
     private static final double FORWARD_POSITION_SHARE = 0.15;
     private static final double LOCKED_FORWARD_SHARE = 0.5;
@@ -335,10 +332,6 @@ public class TacticalPlanner {
     public static Optional<TacticalPlan> forWarfareTarget(Game game, Player seat, String target) {
         Tile tile = game.getTileByPosition(target);
         return tile == null ? Optional.empty() : bestFor(Context.tokenFree(game, seat), tile);
-    }
-
-    public static boolean movesAGroup(TacticalPlan plan) {
-        return WARFARE_ADVANCES.contains(plan.kind()) && movedNonFighterShips(plan.moves()) >= GROUP_ADVANCE_SHIPS;
     }
 
     static double ownAreaBonus(Territory.Zone zone) {
