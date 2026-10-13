@@ -336,4 +336,27 @@ class OfferBuilderTest extends BaseTi4Test {
         assertThat(pressed(tick(offering()))).isEqualTo("resetOffer_blue");
         assertThat(PendingOffers.with(context(), sol)).isFalse();
     }
+
+    // A payment that asks for a favour (playing or holding Technology) gives something for nothing in the deal itself,
+    // so it is sent once it is covered rather than judged as a proposal, which it would never pass.
+    @Test
+    void sendsAPaymentForAFavourThatAProposalWouldAbandon() {
+        table.stock(nekro, 0, 2);
+        start(deal("sendingnekro_receivingsol_TGs_1"), Purpose.TECHNOLOGY_HOLD);
+        tick(playerPicker());
+        nekro.addTransactionItem("sendingnekro_receivingsol_TGs_1");
+
+        assertThat(pressed(tick(offering()))).isEqualTo("sendOffer_blue");
+        assertThat(PendingOffers.with(context(), sol)).isTrue();
+    }
+
+    @Test
+    void abandonsTheSameGiftAsAProposal() {
+        table.stock(nekro, 0, 2);
+        start(deal("sendingnekro_receivingsol_TGs_1"), Purpose.SELL);
+        tick(playerPicker());
+        nekro.addTransactionItem("sendingnekro_receivingsol_TGs_1");
+
+        assertThat(pressed(tick(offering()))).isEqualTo("resetOffer_blue");
+    }
 }

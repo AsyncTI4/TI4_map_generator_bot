@@ -94,4 +94,14 @@ class AiPerceptionTest extends BaseTi4Test {
                 .mapToObj(i -> PromptButton.of(i, Button.secondary(customIds[i], "Option " + i)))
                 .toList();
     }
+
+    @Test
+    void keepsAiTableTalkFromTheMainChannelButNoOtherButtonlessMessage() {
+        assertThat(AiPerception.kept(PromptSource.PUBLIC, List.of(), AiPrompt.TABLE_TALK + "Sol sends Hacan 1 debt"))
+                .isTrue();
+        assertThat(AiPerception.kept(PromptSource.PUBLIC, List.of(), "🤖 Sol is still thinking"))
+                .isFalse();
+        assertThat(AiPerception.kept(PromptSource.AI_THREAD, List.of(), AiPrompt.TABLE_TALK + "Sol sends Hacan 1 debt"))
+                .isFalse();
+    }
 }
