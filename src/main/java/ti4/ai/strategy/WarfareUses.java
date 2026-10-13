@@ -35,6 +35,9 @@ class WarfareUses {
         options.add(farReach(in));
         unblock(in).ifPresent(options::add);
         if (thundersEdge) extraAction(in).ifPresent(options::add);
+        options.add(new Benefit(
+                CardUse.OPENING_EXPANSION,
+                OpeningOutlook.gain(in.game(), in.seat(), OpeningOutlook.Boost.EXTRA_ACTION)));
         Benefit best =
                 options.stream().max(Comparator.comparingDouble(Benefit::value)).orElseThrow();
         if (thundersEdge) return List.of(best);

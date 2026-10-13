@@ -24,6 +24,7 @@ import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.Territory;
+import ti4.ai.eval.Threats;
 import ti4.ai.explore.ExploreDeck;
 import ti4.ai.explore.ExploreOutlook;
 import ti4.ai.explore.ExploreSite;
@@ -56,6 +57,8 @@ import ti4.model.UnitModel;
 public class TacticalPlanner {
 
     public static final double MIN_SCORE = 1.0;
+    private static final double STALL_MIN_SCORE = 0.3;
+    private static final double ADVANCE_SHARE = 0.5;
     private static final double MIN_WIN = 0.5;
     private static final double DESPERATE_MIN_WIN = 0.3;
     private static final double DESPERATE_THREAT = 0.5;
@@ -140,7 +143,9 @@ public class TacticalPlanner {
         int reservedTokens = ScoringReserve.of(game, seat).tokens();
         if (!coversReserve(seat, reservedTokens)) return Optional.empty();
         Context context = new Context(game, seat, Set.of(), hints);
-        List<TacticalPlan> plans = candidates(context, tile -> activatable(game, seat, tile));
+        List<TacticalPlan> plans = withinTokenBudget(
+                candidates(context, tile -> activatable(game, seat, tile), STALL_MIN_SCORE),
+                seat.getTacticalCC() - reservedTokens);
         if (plans.isEmpty()) return Optional.empty();
         TacticalPlan top = plans.getFirst();
         boolean anotherActionAfter =
@@ -152,6 +157,16 @@ public class TacticalPlanner {
                         plan.moves().stream().anyMatch(move -> move.origin().equals(top.target())))
                 .findFirst()
                 .or(() -> Optional.of(top));
+    }
+
+    private static List<TacticalPlan> withinTokenBudget(List<TacticalPlan> plans, int spareTokens) {
+        long worthwhile = plans.stream()
+                .filter(plan -> plan.score() >= MIN_SCORE)
+                .map(TacticalPlan::target)
+                .distinct()
+                .count();
+        if (spareTokens > worthwhile) return plans;
+        return plans.stream().filter(plan -> plan.score() >= MIN_SCORE).toList();
     }
 
     public static List<TacticalPlan> ranked(Game game, Player seat) {
@@ -174,6 +189,10 @@ public class TacticalPlanner {
     }
 
     private static List<TacticalPlan> candidates(Context context, Predicate<Tile> activatable) {
+        return candidates(context, activatable, MIN_SCORE);
+    }
+
+    private static List<TacticalPlan> candidates(Context context, Predicate<Tile> activatable, double minScore) {
         List<TacticalPlan> plans = new ArrayList<>(context.game.getTileMap().values().stream()
                 .filter(activatable)
                 .map(tile -> bestFor(context, tile))
@@ -181,7 +200,7 @@ public class TacticalPlanner {
                 .toList());
         plans.addAll(stage(context, activatable));
         return plans.stream()
-                .filter(plan -> plan.score() >= MIN_SCORE)
+                .filter(plan -> plan.score() >= minScore)
                 .sorted(Comparator.comparingDouble(TacticalPlan::score).reversed())
                 .toList();
     }
@@ -386,6 +405,7 @@ public class TacticalPlanner {
         attack(context, tile).ifPresent(plans::add);
         produce(context, tile).ifPresent(plans::add);
         position(context, tile).ifPresent(plans::add);
+        advance(context, tile).ifPresent(plans::add);
         defend(context, tile).ifPresent(plans::add);
         return plans.stream()
                 .map(plan -> plan.withScore(PlayAreaNotes.adjustedScore(context.game, context.seat, tile, plan)
@@ -1534,6 +1554,42 @@ public class TacticalPlanner {
         return Math.max(0, 1 - EARLY_GAME_FADE_PER_ROUND * roundsPastEarlyGame);
     }
 
+    private static Optional<TacticalPlan> advance(Context context, Tile tile) {
+        Game game = context.game;
+        Player seat = context.seat;
+        if (tile.isHomeSystem(game) || BoardView.hasEnemyUnits(game, seat, tile)) return Optional.empty();
+        if (context.coveredByEnemySpaceCannon(tile)) return Optional.empty();
+        if (Threats.anyEnemyCanReach(game, seat, tile)) return Optional.empty();
+        TacticalPlan best = null;
+        for (Tile origin : context.origins()) {
+            if (origin == tile) continue;
+            for (UnitType type : TRANSPORT_PREFERENCE) {
+                if (BoardView.undamaged(BoardView.space(origin), seat, type) == 0
+                        || BoardView.capacity(seat, type) <= 0
+                        || !context.reaches(origin, tile, type)) {
+                    continue;
+                }
+                double gain = context.lockShare()
+                        * context.goals().forwardGain(origin, tile, BoardView.moveValue(seat, type), true);
+                if (gain <= 0) continue;
+                List<UnitMove> transport = List.of(new UnitMove(origin.getPosition(), BoardView.SPACE, type, 1));
+                List<UnitMove> cargo = take(
+                        availableGroundForces(game, seat, origin, context.defense(), transport),
+                        Math.min(BoardView.capacity(seat, type), context.forwardNeed(tile, type)));
+                if (cargo.isEmpty()) continue;
+                Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, concat(transport, cargo));
+                if (legal.isEmpty()) continue;
+                double score = ADVANCE_SHARE * gain
+                        - DISTANCE_COST * context.distance(origin, tile, type)
+                        - context.defense().leaveCost(origin, legal.get());
+                if (best == null || score > best.score()) {
+                    best = new TacticalPlan(Kind.POSITION, tile.getPosition(), legal.get(), Map.of(), score);
+                }
+            }
+        }
+        return Optional.ofNullable(best);
+    }
+
     private static Optional<TacticalPlan> position(Context context, Tile tile) {
         Game game = context.game;
         Player seat = context.seat;
@@ -1872,7 +1928,7 @@ public class TacticalPlanner {
         for (Planet planet : origin.getPlanetUnitHolders()) {
             if (!seat.getPlanets().contains(planet.getName())) continue;
             int planetMechs = BoardView.count(planet, seat, UnitType.Mech);
-            int garrison = garrison(game, origin, planet, defense, shipsLeaving, blend);
+            int garrison = garrison(game, seat, origin, planet, defense, shipsLeaving, blend);
             int mechsStaying = Math.min(planetMechs, garrison);
             int infantryStaying = garrison - mechsStaying;
             int planetInfantry = BoardView.count(planet, seat, UnitType.Infantry);
@@ -1889,15 +1945,31 @@ public class TacticalPlanner {
 
     private static int garrison(
             Game game,
+            Player seat,
             Tile origin,
             Planet planet,
             DefenseOutlook defense,
             List<UnitMove> shipsLeaving,
             @Nullable Blend blend) {
         if (origin.isHomeSystem(game)) {
-            return Math.max(HOME_GARRISON, defense.groundToKeep(origin, planet, shipsLeaving, blend));
+            boolean standing = isGarrisonPlanet(seat, origin, planet) && defense.needsStandingGarrison(origin);
+            int floor = standing ? HOME_GARRISON : 0;
+            return defense.groundToKeep(origin, planet, shipsLeaving, floor, blend);
         }
         return game.mecatols().contains(planet.getName()) ? MECATOL_GARRISON : 0;
+    }
+
+    private static boolean isGarrisonPlanet(Player owner, Tile home, Planet planet) {
+        return home.getPlanetUnitHolders().stream()
+                .filter(candidate -> owner.getPlanets().contains(candidate.getName()))
+                .max(Comparator.comparingInt((Planet candidate) -> BoardView.groundForces(candidate, owner) > 0
+                                        && BoardView.count(candidate, owner, UnitType.Spacedock) > 0
+                                ? 1
+                                : 0)
+                        .thenComparingInt(candidate -> BoardView.groundForces(candidate, owner))
+                        .thenComparing(Planet::getName, Comparator.reverseOrder()))
+                .map(garrison -> garrison.getName().equals(planet.getName()))
+                .orElse(true);
     }
 
     private static int unitCount(List<UnitMove> moves) {

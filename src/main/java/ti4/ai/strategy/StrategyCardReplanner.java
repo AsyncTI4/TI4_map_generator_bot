@@ -10,6 +10,7 @@ import ti4.ai.brain.StrategyCard;
 import ti4.ai.strategy.CardPlan.Benefit;
 import ti4.ai.tactical.SetupHint;
 import ti4.ai.tactical.TacticalPlan;
+import ti4.ai.tactical.TacticalPlanner;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -53,9 +54,26 @@ class StrategyCardReplanner {
         for (CardPlan plan : plans) {
             setupHint(in, plan).ifPresent(hints::add);
         }
+        hints.addAll(holdHomeForGravityDrive(in));
         String key = SetupHint.key(context.game());
         context.memory().remove(key);
         context.memory().put(key, SetupHint.encodeAll(hints));
+    }
+
+    private static List<SetupHint> holdHomeForGravityDrive(PlanInputs in) {
+        Game game = in.game();
+        Player seat = in.seat();
+        Tile home = seat.getHomeSystemTile();
+        if (home == null || home.hasPlayerCC(seat) || seat.getStrategicCC() <= 0) return List.of();
+        if (!OpeningNeeds.wantsTechnologySoon(game, seat)) return List.of();
+        boolean somethingElseToDo = in.ranked().stream()
+                .anyMatch(
+                        plan -> !plan.target().equals(home.getPosition()) && plan.score() >= TacticalPlanner.MIN_SCORE);
+        if (!somethingElseToDo) return List.of();
+        double reach = OpeningOutlook.gain(game, seat, OpeningOutlook.Boost.GRAVITY_DRIVE);
+        return List.of(
+                new SetupHint(TacticalPlan.Kind.PRODUCE, home.getPosition(), -reach),
+                new SetupHint(TacticalPlan.Kind.DEFEND, home.getPosition(), -reach));
     }
 
     private static Optional<SetupHint> setupHint(PlanInputs in, CardPlan plan) {

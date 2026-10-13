@@ -64,7 +64,8 @@ class OwnTurnDeals {
         Optional<AiDecision> payment = payDebt(context, partners);
         if (payment.isPresent()) return payment;
         if (TradeMemory.count(context.memory(), turnDraftsKey(context)) >= OWN_TURN_DRAFTS) return Optional.empty();
-        Optional<AiDecision> started = desperation(context, partners)
+        Optional<AiDecision> started = TechnologyRequest.propose(context, partners)
+                .or(() -> desperation(context, partners))
                 .or(() -> wash(context, partners, partner -> true))
                 .or(() -> NoteDeals.propose(context, partners))
                 .or(() -> sell(context, partners))

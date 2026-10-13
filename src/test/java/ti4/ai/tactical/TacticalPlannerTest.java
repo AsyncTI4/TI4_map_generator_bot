@@ -30,6 +30,7 @@ class TacticalPlannerTest extends BaseTi4Test {
     @BeforeEach
     void setUp() {
         test = new AiTestGame();
+        test.game.setRound(3);
         home = test.nekroHome();
         neighbour = AiTestGame.neighbourOf(AiTestGame.HOME);
     }
@@ -126,6 +127,50 @@ class TacticalPlannerTest extends BaseTi4Test {
                 .filter(move -> move.type() == type)
                 .mapToInt(UnitMove::count)
                 .sum();
+    }
+
+    // aiwatch6, round 1: Hacan's four infantry sat one or two to a home planet, and the AI kept one on every home
+    // planet,
+    // so only one could go and it took one of the two planets next door. The garrison is one infantry for the home
+    // system, not one per planet, so two go and both planets are taken.
+    @Test
+    void keepsOneInfantryForTheWholeHomeSystemNotOnePerPlanet() {
+        AiTestGame table = new AiTestGame();
+        Tile hacanHome = table.place("16", AiTestGame.HOME);
+        for (String planet : List.of("arretze", "hercant", "kamdorn")) table.nekro.addPlanet(planet);
+        table.units(hacanHome, "arretze", table.nekro, UnitType.Spacedock, 1);
+        table.units(hacanHome, "arretze", table.nekro, UnitType.Infantry, 2);
+        table.units(hacanHome, "hercant", table.nekro, UnitType.Infantry, 1);
+        table.units(hacanHome, "kamdorn", table.nekro, UnitType.Infantry, 1);
+        table.units(hacanHome, "space", table.nekro, UnitType.Carrier, 1);
+        table.place("27", neighbour);
+
+        TacticalPlan plan = TacticalPlanner.forTarget(table.game, table.nekro, neighbour)
+                .filter(found -> found.kind() == Kind.EXPAND)
+                .orElseThrow();
+
+        assertThat(plan.landings()).containsOnlyKeys("newalbion", "starpoint");
+    }
+
+    // Nothing claimable is in reach this turn; the free planets are two systems out. With tokens to spare the carrier
+    // and
+    // its infantry move to the empty system between, to take them next time, rather than wait at home. The move is too
+    // small to count as a planned activation.
+    @Test
+    void advancesACarrierTowardPlanetsOutOfReachWhenTokensAreSpare() {
+        test.game.setRound(1);
+        test.nekro.setTacticalCC(3);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
+        test.place("47", neighbour);
+        test.place("27", twoSystemsFromHome());
+
+        TacticalPlan plan = TacticalPlanner.best(test.game, test.nekro).orElseThrow();
+
+        assertThat(plan.kind()).isEqualTo(Kind.POSITION);
+        assertThat(plan.target()).isEqualTo(neighbour);
+        assertThat(movedShips(plan, UnitType.Infantry)).isPositive();
+        assertThat(TacticalPlanner.ranked(test.game, test.nekro)).isEmpty();
     }
 
     // It never empties its home system of infantry to expand.

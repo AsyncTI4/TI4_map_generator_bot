@@ -17,6 +17,8 @@ public class StrategyCardTurn {
 
     public static Optional<AiDecision> playIfDue(AiTurnContext context, List<AiPrompt> thisTurn) {
         if (!ACTION_PHASE.equalsIgnoreCase(context.game().getPhaseOfGame())) return Optional.empty();
+        Optional<AiDecision> requested = playRequestedTechnology(context, thisTurn);
+        if (requested.isPresent()) return requested;
         List<CardPlan> plans = StrategyCardReplanner.refresh(context);
         PlanInputs in = PlanInputs.of(context.game(), context.seat(), PlanMoment.ACTION);
         for (CardPlan plan : plans) {
@@ -25,6 +27,17 @@ public class StrategyCardTurn {
             if (play.isPresent()) return play;
         }
         return Optional.empty();
+    }
+
+    private static Optional<AiDecision> playRequestedTechnology(AiTurnContext context, List<AiPrompt> thisTurn) {
+        Game game = context.game();
+        if (!context.memory().has(OpeningNeeds.technologyRequestedKey(game))) return Optional.empty();
+        return context.seat().getSCs().stream()
+                .filter(initiative -> !game.getPlayedSCs().contains(initiative))
+                .filter(initiative ->
+                        ti4.ai.brain.StrategyCard.of(game, initiative) == ti4.ai.brain.StrategyCard.TECHNOLOGY)
+                .findFirst()
+                .flatMap(initiative -> play(context, thisTurn, initiative));
     }
 
     public static boolean dueNow(AiTurnContext context, int initiative) {

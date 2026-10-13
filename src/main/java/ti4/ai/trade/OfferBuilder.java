@@ -43,6 +43,7 @@ class OfferBuilder {
             Purpose.SELL,
             Purpose.NOTE_DEAL,
             Purpose.DESPERATION,
+            Purpose.TECHNOLOGY_REQUEST,
             Purpose.DEBT_PAYMENT,
             Purpose.DEBT_COLLECTION);
     private static final List<Order> ORDER = List.of(

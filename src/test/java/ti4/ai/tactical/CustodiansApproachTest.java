@@ -91,10 +91,13 @@ class CustodiansApproachTest extends BaseTi4Test {
         assertThat(approachPlans()).isEmpty();
     }
 
-    // The infantry that guards the home system is not spare, so there is nothing for the carrier to bring.
+    // With a rival ship in reach of home, the infantry that guards the home system is not spare, so there is nothing
+    // for the carrier to bring.
     @Test
     void doesNotApproachWithoutSpareGroundForces() {
         board(1);
+        Tile nextToHome = test.place(EMPTY_SYSTEM, AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.units(nextToHome, "space", test.sol, UnitType.Destroyer, 1);
 
         assertThat(approachPlans()).isEmpty();
     }

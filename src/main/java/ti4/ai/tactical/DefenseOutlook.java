@@ -15,6 +15,7 @@ import ti4.ai.eval.CombatOdds.Force;
 import ti4.ai.eval.FactionAggression;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.PlanetStake;
+import ti4.ai.eval.Threats;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.IncomingForces.Exclusion;
 import ti4.ai.tactical.IncomingForces.Horizon;
@@ -34,6 +35,7 @@ import ti4.model.UnitModel;
 public final class DefenseOutlook {
 
     static final double GARRISON_TOLERANCE = 0.5;
+    private static final int ALWAYS_GARRISON_ROUND = 3;
     static final double HOLD_MIN_GAIN = 0.3;
     static final double PUBLIC_SCORING_LOCK = 8.0;
     private static final double NEAR_WIN_SCORING_LOCK = 12.0;
@@ -91,6 +93,7 @@ public final class DefenseOutlook {
     private final Map<String, Double> spaceGains;
     private final Map<String, Map<String, Double>> alternatives;
     private final Map<String, Double> spaceChances;
+    private final Map<String, Boolean> reachable = new HashMap<>();
     private final Map<String, Double> groundChances;
     private final Map<String, Double> fearCeilings = new HashMap<>();
     private final Map<String, Double> fleetCosts = new HashMap<>();
@@ -226,18 +229,26 @@ public final class DefenseOutlook {
         return leaving;
     }
 
+    boolean needsStandingGarrison(Tile home) {
+        if (game.getRound() >= ALWAYS_GARRISON_ROUND) return true;
+        return reachable.computeIfAbsent(home.getPosition(), position -> Threats.anyEnemyCanReach(game, seat, home));
+    }
+
     int groundToKeep(Tile home, Planet planet, List<UnitMove> shipsLeaving) {
         return groundToKeep(home, planet, shipsLeaving, null);
     }
 
     int groundToKeep(Tile home, Planet planet, List<UnitMove> shipsLeaving, @Nullable Blend blend) {
+        return groundToKeep(home, planet, shipsLeaving, TacticalPlanner.HOME_GARRISON, blend);
+    }
+
+    int groundToKeep(Tile home, Planet planet, List<UnitMove> shipsLeaving, int floor, @Nullable Blend blend) {
         Defenders current = defendersAt(home);
         int present = current.groundOn(planet.getName());
-        if (present <= TacticalPlanner.HOME_GARRISON || !isGuarded(home))
-            return Math.min(present, TacticalPlanner.HOME_GARRISON);
+        if (present <= floor || !isGuarded(home)) return Math.min(present, floor);
         Defenders baseline = current.minus(movesFrom(home, shipsLeaving));
         double base = blendedCost(home, current, blend);
-        for (int keep = TacticalPlanner.HOME_GARRISON; keep < present; keep++) {
+        for (int keep = floor; keep < present; keep++) {
             if (blendedCost(home, baseline.withGround(planet.getName(), keep), blend) - base <= GARRISON_TOLERANCE) {
                 return keep;
             }

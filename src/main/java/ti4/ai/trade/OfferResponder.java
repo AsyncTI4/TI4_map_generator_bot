@@ -171,6 +171,7 @@ class OfferResponder {
                     .ifPresent(alias -> NoteGiving.owe(context, offerer.getFaction(), alias));
         }
         if (honour) TradeCardRules.honoured(context, offerer);
+        TechnologyRequest.noteGift(context, offerer, deal);
         offer.markAnswered(context);
         return Optional.of(
                 AiDecision.press(offer.prompt(), offer.accept(), "trade: accept offer from " + offerer.getFaction()));

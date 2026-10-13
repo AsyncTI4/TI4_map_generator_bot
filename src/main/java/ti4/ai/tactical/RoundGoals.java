@@ -18,7 +18,7 @@ import ti4.image.Mapper;
 
 public final class RoundGoals {
 
-    public record Goal(String position, double value, boolean needsTransport) {}
+    public record Goal(String position, double value, boolean needsTransport, int planets) {}
 
     private static final Set<Territory.Zone> OWN_AREA =
             Set.of(Territory.Zone.LANE, Territory.Zone.SLICE, Territory.Zone.BORDER);
@@ -45,8 +45,8 @@ public final class RoundGoals {
         for (Tile tile : game.getTileMap().values()) {
             double claim = expansionValue(game, seat, territory, tile);
             double presence = mecatolValue(game, seat, tile) + frontierValue(seat, tile);
-            if (claim > 0) goals.add(new Goal(tile.getPosition(), claim, true));
-            if (presence > 0) goals.add(new Goal(tile.getPosition(), presence, false));
+            if (claim > 0) goals.add(new Goal(tile.getPosition(), claim, true, claimablePlanets(game, tile)));
+            if (presence > 0) goals.add(new Goal(tile.getPosition(), presence, false, 0));
         }
         return new RoundGoals(game, seat, List.copyOf(goals));
     }
@@ -88,6 +88,13 @@ public final class RoundGoals {
             value += BoardView.planetValue(planet) + TacticalPlanner.ownAreaBonus(zone);
         }
         return value;
+    }
+
+    private static int claimablePlanets(Game game, Tile tile) {
+        return (int) tile.getPlanetUnitHolders().stream()
+                .filter(planet ->
+                        BoardView.controller(game, planet.getName()) == null && !BoardView.hasCustodians(planet))
+                .count();
     }
 
     private static double mecatolValue(Game game, Player seat, Tile tile) {

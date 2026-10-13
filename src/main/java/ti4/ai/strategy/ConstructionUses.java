@@ -30,6 +30,8 @@ class ConstructionUses {
         if (production.isEmpty()) return structures;
         List<Benefit> produce = new ArrayList<>();
         produce.add(production.get());
+        double opening = OpeningOutlook.gain(in.game(), in.seat(), OpeningOutlook.Boost.HOME_PRODUCTION);
+        if (opening > 0) produce.add(new Benefit(CardUse.OPENING_EXPANSION, opening));
         structure(in, StructurePolicy.next(in.game(), in.seat()), "").ifPresent(produce::add);
         if (StructurePolicy.structureShortfall(in.game(), in.seat()) <= ONE_STRUCTURE) produce.add(objective());
         return total(produce) > total(structures) ? produce : structures;

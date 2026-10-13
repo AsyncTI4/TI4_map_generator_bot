@@ -182,7 +182,13 @@ public class ResearchPolicy {
         return baseValue(tech)
                 + OBJECTIVE_WEIGHT * objectiveGain(game, seat, tech)
                 + steppingStoneValue(game, seat, tech)
-                + custodiansRaceValue(game, seat, alias);
+                + custodiansRaceValue(game, seat, alias)
+                + openingReachValue(game, seat, alias);
+    }
+
+    private static double openingReachValue(Game game, Player seat, String alias) {
+        if (!GRAVITY_DRIVE.equals(alias)) return 0;
+        return OpeningOutlook.gain(game, seat, OpeningOutlook.Boost.GRAVITY_DRIVE);
     }
 
     private static double custodiansRaceValue(Game game, Player seat, String alias) {

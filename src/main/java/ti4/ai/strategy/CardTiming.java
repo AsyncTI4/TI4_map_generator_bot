@@ -19,6 +19,8 @@ class CardTiming {
     private static final int READY_USE_WORTH_PLAYING = 3;
     private static final double TE_WARFARE_REACTIVATION_MIN = 2 * TacticalPlanner.MIN_SCORE;
     private static final int LAST_ADVANCE_ROUND = 1;
+    private static final String GRAVITY_DRIVE = "gd";
+    private static final int EARLY_TECHNOLOGY_ROUND = 1;
 
     enum Timing {
         NOW,
@@ -26,11 +28,26 @@ class CardTiming {
     }
 
     static Timing of(PlanInputs in, CardPlan plan) {
+        if (opensTheRound(in, plan)) return Timing.NOW;
         if (plan.card() == StrategyCard.WARFARE) return warfare(in, plan);
         if (plan.card() == StrategyCard.IMPERIAL && yieldsToOverrule(in)) return Timing.FALLBACK;
         Optional<Benefit> main = plan.main();
         if (main.isEmpty()) return Timing.FALLBACK;
         return dueNow(in, main.get()) ? Timing.NOW : Timing.FALLBACK;
+    }
+
+    private static boolean opensTheRound(PlanInputs in, CardPlan plan) {
+        if (plan.benefit(CardUse.OPENING_EXPANSION)
+                .filter(benefit -> benefit.value() > 0)
+                .isPresent()) return true;
+        return plan.card() == StrategyCard.TECHNOLOGY && researchesGravityDriveForTheOpening(in.game(), in.seat());
+    }
+
+    static boolean researchesGravityDriveForTheOpening(Game game, Player seat) {
+        return OpeningOutlook.gain(game, seat, OpeningOutlook.Boost.GRAVITY_DRIVE) > 0
+                && ResearchPolicy.bestResearchable(game, seat)
+                        .filter(GRAVITY_DRIVE::equals)
+                        .isPresent();
     }
 
     private static boolean dueNow(PlanInputs in, Benefit main) {
@@ -41,6 +58,7 @@ class CardTiming {
             case DIPLOMACY_PROTECT -> main.hasTarget() && in.isThreatened(tileAt(in.game(), main.target()));
             case DIPLOMACY_READY -> main.value() >= CardValueScale.READY_SHARE * READY_USE_WORTH_PLAYING;
             case CONSTRUCTION_PRODUCE -> main.value() >= in.bestScore();
+            case TECHNOLOGY_RESEARCH -> in.round() <= EARLY_TECHNOLOGY_ROUND && seat.getInRoundTurnCount() >= 2;
             case CONSTRUCTION_PDS -> main.hasTarget() && in.round() >= FIRST_ROUND_FOR_EARLY_PDS;
             case CONSTRUCTION_DOCK -> in.round() <= CardValueScale.LAST_EARLY_DOCK_ROUND;
             case IMPERIAL_MECATOL -> ImperialUses.holdsThreatenedMecatol(in);

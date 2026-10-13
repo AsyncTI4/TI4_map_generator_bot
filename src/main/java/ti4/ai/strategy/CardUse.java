@@ -27,6 +27,7 @@ public enum CardUse {
     IMPERIAL_SCORE("score an extra public objective"),
     IMPERIAL_MECATOL("Imperial point for Mecatol Rex"),
     IMPERIAL_SECRET("draw a secret"),
+    OPENING_EXPANSION("take more planets this round"),
     OTHER_CARD("homebrew card");
 
     private final String label;
