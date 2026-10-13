@@ -16,8 +16,21 @@ public class ExpectedTradeGoods {
         return primary + washableCommodities(game, seat);
     }
 
+    public static int ifHoldingTrade(Game game, Player seat) {
+        return TRADE_PRIMARY + (canWash(game) ? seat.getCommoditiesTotal() : 0);
+    }
+
+    public static int ifFollowingTrade(Game game, Player seat) {
+        if (!canWash(game)) return 0;
+        return seat.getStrategicCC() > 0 ? seat.getCommoditiesTotal() : seat.getCommodities();
+    }
+
+    private static boolean canWash(Game game) {
+        return AiSettings.isTradingEnabled() && game.getRealPlayers().size() >= 2;
+    }
+
     private static int washableCommodities(Game game, Player seat) {
-        if (!AiSettings.isTradingEnabled() || game.getRealPlayers().size() < 2) return 0;
+        if (!canWash(game)) return 0;
         int held = Math.max(
                 0, seat.getCommodities() - PromisedTradeGoods.sent(seat, PromisedTradeGoods.COMMODITIES, null));
         if (!tradeStillToBePlayed(game)) return held;
@@ -37,6 +50,15 @@ public class ExpectedTradeGoods {
     private static boolean isUnplayedTrade(Game game, int initiative) {
         return StrategyCard.of(game, initiative) == StrategyCard.TRADE
                 && !game.getPlayedSCs().contains(initiative);
+    }
+
+    public static int tradeGoodsUsed(SpendCost cost, int tradeGoods, int tradeGoodValue) {
+        SpendCost net = netOf(cost, tradeGoods, tradeGoodValue);
+        int covered = cost.tradeGoods()
+                - net.tradeGoods()
+                + Math.ceilDiv(cost.resources() - net.resources(), tradeGoodValue)
+                + Math.ceilDiv(cost.influence() - net.influence(), tradeGoodValue);
+        return Math.min(Math.max(0, tradeGoods), covered);
     }
 
     public static SpendCost netOf(SpendCost cost, int tradeGoods, int tradeGoodValue) {

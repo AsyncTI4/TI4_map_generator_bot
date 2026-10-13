@@ -23,6 +23,8 @@ class GravityDriveReserveTest extends BaseTi4Test {
 
     private static final String THIRD_ID = "7100000555555555";
     private static final int TECHNOLOGY = 7;
+    private static final int TRADE = 5;
+    private static final int TRADE_PRIMARY = 3;
     private static final int FOLLOW_COST = 4;
     // Sarween Tools takes 1 off a build, so a build costing 1 spends nothing.
     private static final double SARWEEN_DISCOUNT = 1;
@@ -77,6 +79,26 @@ class GravityDriveReserveTest extends BaseTi4Test {
         assertThat(OpeningHold.awaitsGravityDrive(test.game, hacan)).isTrue();
         assertThat(StrategyCardRules.hasSpareStrategyToken(test.game, hacan, StrategyCard.DIPLOMACY))
                 .isFalse();
+    }
+
+    // Holding Trade, the seat expects 3 trade goods from the primary (and 6 washed commodities). Negotiate Trade Routes
+    // (5 trade goods) counts on those 3 and more, so they are not counted again against the Gravity Drive follow: the
+    // full 4 resources stay reserved for it instead of 4 - 3 = 1.
+    @Test
+    void tradeGoodsASpendObjectiveCountsOnAreNotCountedAgainForTheFollow() {
+        test.sol.addSC(TECHNOLOGY);
+        hacan.addSC(TRADE);
+        changed();
+        assertThat(OpeningHold.awaitsGravityDrive(test.game, hacan)).isTrue();
+        assertThat(OpeningHold.gravityDriveReserve(test.game, hacan).resources())
+                .isEqualTo(FOLLOW_COST - TRADE_PRIMARY);
+
+        test.game.getRevealedPublicObjectives().put("trade_routes", 1);
+        changed();
+
+        assertThat(ti4.ai.scoring.ScoringReserve.expectedTradeGoodsCounted(test.game, hacan))
+                .isEqualTo(5);
+        assertThat(ProductionPlanner.reserve(test.game, hacan).resources()).isEqualTo(FOLLOW_COST);
     }
 
     // Nobody holds Technology: there is nothing to wait for, and the same seat may spend freely.
