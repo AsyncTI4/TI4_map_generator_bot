@@ -24,7 +24,6 @@ import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.Territory;
-import ti4.ai.eval.Threats;
 import ti4.ai.explore.ExploreDeck;
 import ti4.ai.explore.ExploreOutlook;
 import ti4.ai.explore.ExploreSite;
@@ -117,6 +116,9 @@ public class TacticalPlanner {
     private static final double FORWARD_POSITION_SHARE = 0.15;
     private static final double LOCKED_FORWARD_SHARE = 0.5;
     private static final List<UnitType> GROUND_FORCE_ORDER = List.of(UnitType.Infantry, UnitType.Mech);
+    private static final List<UnitType> ESCORTS = List.of(UnitType.Destroyer, UnitType.Cruiser);
+    private static final int MAX_ESCORTS = 3;
+    private static final double EXPAND_EXPOSURE_SHARE = 0.5;
     private static final List<UnitType> POSITION_SHIPS = List.of(
             UnitType.Destroyer,
             UnitType.Cruiser,
@@ -532,10 +534,21 @@ public class TacticalPlanner {
                         * context.distance(origin, tile, transports.getFirst().type())
                 - GROUP_MOVE_COST * (movedNonFighterShips(transports) - 1)
                 - context.defense().leaveCost(origin, legal.get())
+                - EXPAND_EXPOSURE_SHARE * context.exposure(tile, legal.get(), landedFrom(tile, forces))
                 + forwardPositionGain(
                         context, origin, tile, transports.getFirst().type());
         TacticalPlan plan = new TacticalPlan(Kind.EXPAND, tile.getPosition(), legal.get(), landings, score);
         return Optional.of(withFollowers(context, tile, plan));
+    }
+
+    private static List<UnitMove> landedFrom(Tile tile, Map<Planet, int[]> forces) {
+        int infantry =
+                forces.values().stream().mapToInt(landing -> landing[INFANTRY]).sum();
+        int mechs = forces.values().stream().mapToInt(landing -> landing[MECH]).sum();
+        List<UnitMove> landed = new ArrayList<>();
+        addMove(landed, tile.getPosition(), BoardView.SPACE, UnitType.Infantry, infantry);
+        addMove(landed, tile.getPosition(), BoardView.SPACE, UnitType.Mech, mechs);
+        return landed;
     }
 
     private static Defenders defendersAfterExpanding(
@@ -1559,7 +1572,6 @@ public class TacticalPlanner {
         Player seat = context.seat;
         if (tile.isHomeSystem(game) || BoardView.hasEnemyUnits(game, seat, tile)) return Optional.empty();
         if (context.coveredByEnemySpaceCannon(tile)) return Optional.empty();
-        if (Threats.anyEnemyCanReach(game, seat, tile)) return Optional.empty();
         TacticalPlan best = null;
         for (Tile origin : context.origins()) {
             if (origin == tile) continue;
@@ -1579,15 +1591,83 @@ public class TacticalPlanner {
                 if (cargo.isEmpty()) continue;
                 Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, concat(transport, cargo));
                 if (legal.isEmpty()) continue;
-                double score = ADVANCE_SHARE * gain
-                        - DISTANCE_COST * context.distance(origin, tile, type)
-                        - context.defense().leaveCost(origin, legal.get());
+                double base = ADVANCE_SHARE * gain - DISTANCE_COST * context.distance(origin, tile, type);
+                List<UnitMove> moves = withEscorts(context, tile, base, legal.get());
+                double score = advanceScore(context, tile, base, moves);
                 if (best == null || score > best.score()) {
-                    best = new TacticalPlan(Kind.POSITION, tile.getPosition(), legal.get(), Map.of(), score);
+                    best = new TacticalPlan(Kind.POSITION, tile.getPosition(), moves, Map.of(), score);
                 }
             }
         }
         return Optional.ofNullable(best);
+    }
+
+    private static double advanceScore(Context context, Tile tile, double base, List<UnitMove> moves) {
+        double leaveCost = originsOf(context, moves).stream()
+                .mapToDouble(origin -> context.defense().leaveCost(origin, moves))
+                .sum();
+        return base
+                - leaveCost
+                - GROUP_MOVE_COST * (movedNonFighterShips(moves) - 1)
+                - context.exposure(tile, moves, List.of());
+    }
+
+    private static List<UnitMove> withEscorts(Context context, Tile tile, double base, List<UnitMove> moves) {
+        List<UnitMove> best = moves;
+        double bestScore = advanceScore(context, tile, base, moves);
+        for (int added = 0; added < MAX_ESCORTS && context.exposure(tile, best, List.of()) > 0; added++) {
+            List<UnitMove> improved = null;
+            for (UnitMove escort : escortCandidates(context, tile, best)) {
+                Optional<List<UnitMove>> joined = withEscort(context, tile, best, escort);
+                if (joined.isEmpty()) continue;
+                double score = advanceScore(context, tile, base, joined.get());
+                if (score > bestScore) {
+                    improved = joined.get();
+                    bestScore = score;
+                }
+            }
+            if (improved == null) break;
+            best = improved;
+        }
+        return best;
+    }
+
+    private static List<UnitMove> escortCandidates(Context context, Tile tile, List<UnitMove> moves) {
+        List<UnitMove> candidates = new ArrayList<>();
+        for (Tile origin : context.origins()) {
+            if (origin == tile) continue;
+            List<UnitMove> leaving = movesFrom(origin, moves);
+            List<UnitMove> idle = new ArrayList<>();
+            for (UnitType type : ESCORTS) {
+                if (!context.reaches(origin, tile, type)) continue;
+                int spare = BoardView.count(BoardView.space(origin), context.seat, type) - countOf(leaving, type);
+                if (spare > 0) idle.add(new UnitMove(origin.getPosition(), BoardView.SPACE, type, 1));
+            }
+            int room = capacityOf(context.seat, shipsIn(leaving)) - cargoIn(leaving);
+            int fighters = BoardView.count(BoardView.space(origin), context.seat, UnitType.Fighter)
+                    - countOf(leaving, UnitType.Fighter);
+            if (room > 0 && fighters > 0) {
+                idle.add(new UnitMove(origin.getPosition(), BoardView.SPACE, UnitType.Fighter, 1));
+            }
+            candidates.addAll(context.defense().holdBack(origin, leaving, idle));
+        }
+        return candidates;
+    }
+
+    private static Optional<List<UnitMove>> withEscort(
+            Context context, Tile tile, List<UnitMove> moves, UnitMove escort) {
+        List<UnitMove> merged = merge(concat(moves, List.of(escort)));
+        if (BoardView.nonFighterShips(BoardView.space(tile), context.seat) + movedNonFighterShips(merged)
+                > context.seat.getFleetCC()) {
+            return Optional.empty();
+        }
+        Tile origin = context.game.getTileByPosition(escort.origin());
+        Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, movesFrom(origin, merged));
+        if (legal.isEmpty()) return Optional.empty();
+        List<UnitMove> joined = new ArrayList<>(merged);
+        joined.removeIf(move -> move.origin().equals(escort.origin()));
+        joined.addAll(legal.get());
+        return Optional.of(merge(joined));
     }
 
     private static Optional<TacticalPlan> position(Context context, Tile tile) {
@@ -2022,6 +2102,7 @@ public class TacticalPlanner {
         private Double mecatolCash;
         private DefenseOutlook defense;
         private OffenseOutlook offense;
+        private Exposure exposure;
         private final Map<String, Optional<TacticalPlan>> attacks = new HashMap<>();
         private final Map<String, Double> futureScores = new HashMap<>();
         private ExploreOutlook exploreOutlook;
@@ -2135,6 +2216,12 @@ public class TacticalPlanner {
         OffenseOutlook offense() {
             if (offense == null) offense = new OffenseOutlook(game, seat, defense());
             return offense;
+        }
+
+        double exposure(Tile tile, List<UnitMove> arriving, List<UnitMove> landed) {
+            if (exposure == null) exposure = new Exposure(game, seat, defense());
+            Defenders after = defense().defendersAt(tile).arriving(arriving).minus(landed);
+            return exposure.added(tile, after);
         }
 
         Optional<TacticalPlan> attackPlan(Tile tile) {

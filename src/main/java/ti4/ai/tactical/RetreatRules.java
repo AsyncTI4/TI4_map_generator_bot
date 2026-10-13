@@ -192,7 +192,7 @@ class RetreatRules {
         return SPARE_SYSTEM_RETREAT - (SPARE_SYSTEM_RETREAT - CRITICAL_SYSTEM_RETREAT) * criticality;
     }
 
-    private static boolean hasDestination(Game game, Player seat, Tile tile) {
+    static boolean hasDestination(Game game, Player seat, Tile tile) {
         return FoWHelper.getAdjacentTiles(game, tile.getPosition(), seat, false).stream()
                 .map(game::getTileByPosition)
                 .filter(destination -> destination != null && destination != tile)

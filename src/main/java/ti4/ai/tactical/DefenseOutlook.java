@@ -579,9 +579,19 @@ public final class DefenseOutlook {
         double attackerLoss = (1 - space) * force.fleetCost()
                 + space * (1 - space) * Math.min(force.fleetCost(), defenders.shipCost(seat))
                 + space * (1 - chances.groundMax()) * force.groundCost();
-        double action =
-                IncomingForces.holdsUnplayedThundersEdgeWarfare(game, enemy) ? THUNDERS_EDGE_ACTION_COST : ACTION_COST;
-        return chances.take() * prize + space * spaceGain - attackerLoss - action;
+        return chances.take() * prize + space * spaceGain - attackerLoss - actionCost(enemy);
+    }
+
+    private double actionCost(Player enemy) {
+        return IncomingForces.holdsUnplayedThundersEdgeWarfare(game, enemy) ? THUNDERS_EDGE_ACTION_COST : ACTION_COST;
+    }
+
+    double attackLikelihood(Player enemy, Tile tile, double netGain) {
+        double appetite = netGain - actionCost(enemy);
+        if (appetite <= 0) return 0;
+        double alternative = alternative(enemy, tile) - ACTION_COST;
+        double share = appetite / Math.max(Math.max(appetite, alternative), APPETITE_SCALE);
+        return clamp(aggression(enemy) * share * ceasefire(enemy), 0, 1);
     }
 
     private double planetPrize(Tile tile) {
