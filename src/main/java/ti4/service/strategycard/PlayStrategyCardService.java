@@ -178,18 +178,18 @@ public class PlayStrategyCardService {
                 }
             }
 
-            if (!gamePing.isEmpty()) {
+            if (!winnuHero && !gamePing.isEmpty()) {
                 message.append(gamePing).append(", please indicate your choice with these buttons.");
             } else {
                 message.append("Please indicate your choice with these buttons.");
             }
 
-            for (Player player2 : playersToFollow) {
-                player2.removeFollowedSC(scToPlay);
-                player2.getCardsInfoThread(); // force thread to open if closed
-            }
-
             if (!winnuHero) {
+                for (Player player2 : playersToFollow) {
+                    player2.removeFollowedSC(scToPlay);
+                    player2.getCardsInfoThread(); // force thread to open if closed
+                }
+
                 game.setSCPlayed(scToPlay, Boolean.TRUE);
                 GameEventService.commit(
                         game, GameEventType.SC_PLAYED, player, Map.of("scNumber", scToPlay, "scName", stratCardName));
@@ -209,14 +209,10 @@ public class PlayStrategyCardService {
         if ("br5trade".equals(scModel.getId())) {
             scButtons.add(BRTradeStrategyCardService.getPlaceOrMoveStationButton(player));
         }
+        if (isOverrule || winnuHero) {
+            removeFollowButtons(scButtons);
+        }
         if (isOverrule) {
-            scButtons.removeIf(button -> {
-                String id = button.getCustomId();
-                return id != null
-                        && (id.startsWith("sc_follow_")
-                                || "sc_trade_follow".equals(id)
-                                || id.startsWith("sc_no_follow_"));
-            });
             String ffcc = player.factionButtonChecker();
             scButtons.replaceAll(button -> {
                 String id = button.getCustomId();
@@ -978,6 +974,14 @@ public class PlayStrategyCardService {
 
         String key = "factionsThatAreNotDiscardingSOs";
         game.setStoredValue(key, game.getStoredValue(key) + player.getFaction() + "*");
+    }
+
+    private static void removeFollowButtons(List<Button> scButtons) {
+        scButtons.removeIf(button -> {
+            String id = button.getCustomId();
+            return id != null
+                    && (id.startsWith("sc_follow_") || "sc_trade_follow".equals(id) || id.startsWith("sc_no_follow_"));
+        });
     }
 
     private static List<Button> getSCButtons(int sc, Game game, boolean winnuHero, boolean isOverrule, Player player) {
