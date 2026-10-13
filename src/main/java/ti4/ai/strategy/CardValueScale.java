@@ -34,7 +34,6 @@ class CardValueScale {
     static final double NEAR_WIN_MULTIPLIER = 1.5;
     static final int NEAR_WIN_GAP = 3;
     static final double SPEND_UNLOCK_SHARE = 0.8;
-    static final double ONE_STEP_SHORT_CHANCE = 0.25;
     static final double MECATOL_THREATENED_SHARE = 0.75;
     static final double MECATOL_TAKE_SHARE = 0.5;
     static final double SPEAKER_RACE_SHARE = 0.2;

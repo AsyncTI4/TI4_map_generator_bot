@@ -84,6 +84,15 @@ public record Wallet(
                 tradeGoodValue);
     }
 
+    public int shortfall(SpendCost cost, int limit) {
+        int tokensShort = Math.max(0, cost.tokens() - tokens());
+        Wallet withTokens = new Wallet(planets, tradeGoods, tacticTokens + tokensShort, strategyTokens, tradeGoodValue);
+        for (int extra = 0; extra < limit; extra++) {
+            if (withTokens.withTradeGoods(tradeGoods + extra).canPay(cost)) return extra + tokensShort;
+        }
+        return limit + tokensShort;
+    }
+
     public boolean canPay(SpendCost cost) {
         return plan(cost).isPresent();
     }
