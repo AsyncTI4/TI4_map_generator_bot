@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
@@ -34,6 +35,7 @@ import ti4.model.UnitModel;
 public class ProductionPlanner {
 
     static final int MIN_UNITS = 4;
+    private static final int OPENING_ROUND = 1;
     private static final int OLD_FIELD_COUNT = 7;
     private static final int WANTED_CARRIERS = 2;
     private static final int WANTED_DREADNOUGHTS = 3;
@@ -189,19 +191,18 @@ public class ProductionPlanner {
     }
 
     public static BuildPlan plan(Game game, Player seat, Tile tile, int extraResources, DefenseOutlook defense) {
+        return plan(game, seat, tile, extraResources, defense, 0);
+    }
+
+    public static BuildPlan plan(
+            Game game, Player seat, Tile tile, int extraResources, DefenseOutlook defense, int overSupplyCarriers) {
         if (BoardView.hasEnemyShips(game, seat, tile)) return new BuildPlan(List.of());
-        Builder builder = new Builder(
-                game,
-                seat,
-                tile,
-                new Budget(
-                        Helper.getProductionValue(seat, game, tile, false),
-                        spendableResources(game, seat)
-                                + extraResources
-                                + (seat.hasTech("st") ? 1 : 0)
-                                + aidaDiscount(seat),
-                        seat.getFleetCC() - BoardView.nonFighterShips(BoardView.space(tile), seat)),
-                defense);
+        Budget budget = new Budget(
+                Helper.getProductionValue(seat, game, tile, false),
+                spendableResources(game, seat) + extraResources + (seat.hasTech("st") ? 1 : 0) + aidaDiscount(seat),
+                seat.getFleetCC() - BoardView.nonFighterShips(BoardView.space(tile), seat));
+        budget.overSupply = Math.max(0, overSupplyCarriers);
+        Builder builder = new Builder(game, seat, tile, budget, defense);
         planScoringUnits(builder);
         planDefensiveUnits(builder);
         planCoreUnits(builder);
@@ -338,8 +339,21 @@ public class ProductionPlanner {
         }
     }
 
+    public static OptionalDouble cheapestShipToScrap(Player seat, Tile tile) {
+        double carrier =
+                BoardView.model(seat, UnitType.Carrier).map(UnitModel::getCost).orElse(Float.MAX_VALUE);
+        return BoardView.ships(BoardView.space(tile), seat).keySet().stream()
+                .filter(type -> type != UnitType.Fighter)
+                .map(type -> BoardView.model(seat, type))
+                .flatMap(Optional::stream)
+                .mapToDouble(UnitModel::getCost)
+                .filter(cost -> cost < carrier)
+                .min();
+    }
+
     private static void planCoreUnits(Builder builder) {
         builder.shipsUpTo(UnitType.Carrier, WANTED_CARRIERS, CARRIER_VALUE, false);
+        builder.overSuppliedCarriersUpTo(WANTED_CARRIERS);
         int spare = TacticalPlanner.movableGroundForces(builder.game, builder.seat, builder.tile, builder.defense);
         builder.infantry(WANTED_SPARE_INFANTRY - spare, NEEDED_INFANTRY_VALUE);
         int wantedMechs =
@@ -394,6 +408,11 @@ public class ProductionPlanner {
     }
 
     private static void fillProduction(Builder builder) {
+        if (builder.game.getRound() <= OPENING_ROUND) {
+            builder.infantry(builder.budget.units, builder.fillerValue(UnitType.Infantry));
+            builder.fighters(builder.fillerValue(UnitType.Fighter));
+            return;
+        }
         builder.fighters(builder.fillerValue(UnitType.Fighter));
         builder.infantry(builder.budget.units, builder.fillerValue(UnitType.Infantry));
     }
@@ -462,6 +481,7 @@ public class ProductionPlanner {
         private int units;
         private double resources;
         private int fleetRoom;
+        private int overSupply;
 
         Budget(int units, double resources, int fleetRoom) {
             this.units = units;
@@ -538,6 +558,19 @@ public class ProductionPlanner {
         void shipsUpTo(UnitType type, int target, double value, boolean scoring) {
             while (count(type) < target) {
                 if (!ship(type, value, scoring)) return;
+            }
+        }
+
+        void overSuppliedCarriersUpTo(int target) {
+            OptionalDouble scrap = cheapestShipToScrap(seat, tile);
+            if (scrap.isEmpty()) return;
+            while (budget.overSupply > 0 && budget.fleetRoom <= 0 && count(UnitType.Carrier) < target) {
+                budget.overSupply--;
+                budget.fleetRoom++;
+                if (!ship(UnitType.Carrier, CARRIER_VALUE - scrap.getAsDouble(), false)) {
+                    budget.fleetRoom--;
+                    return;
+                }
             }
         }
 

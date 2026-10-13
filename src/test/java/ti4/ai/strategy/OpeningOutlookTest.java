@@ -97,6 +97,113 @@ class OpeningOutlookTest extends BaseTi4Test {
                 .isZero();
     }
 
+    // Nekro's real start: a dreadnought, a carrier and a cruiser fill all three fleet tokens, and two infantry wait
+    // on Mordai II. Two free systems lie next to home. Producing first finds no fleet room for a second carrier, so the
+    // carrier moves out first and Construction then builds the second carrier and its infantry for the other system.
+    @Test
+    void movesOutFirstWhenTwoSystemsAreInReach() {
+        nekroStartingFleet(UnitType.Cruiser);
+        test.place("27", neighbour);
+        test.place("28", otherNeighbour());
+
+        OpeningOutlook.Production production =
+                OpeningOutlook.bestProduction(test.game, test.nekro).orElseThrow();
+
+        assertThat(production.order()).isEqualTo(OpeningOutlook.Order.MOVE_FIRST);
+        assertThat(production.overSupply()).isFalse();
+        assertThat(OpeningOutlook.producesBeforeMoving(test.game, test.nekro)).isFalse();
+        assertThat(OpeningOutlook.gain(test.game, test.nekro, Boost.HOME_PRODUCTION))
+                .isGreaterThan(0);
+    }
+
+    // Only one system with planets is in reach and the rest of the slice lies past it. A second carrier would have
+    // nowhere to go, so Construction comes first and builds infantry: the carrier lands two and carries two more
+    // forward for the system past it next round.
+    @Test
+    void producesFirstWhenOnlyOneSystemIsInReach() {
+        nekroStartingFleet(UnitType.Cruiser);
+        test.place("27", neighbour);
+        test.place("28", beyond(neighbour));
+
+        OpeningOutlook.Production production =
+                OpeningOutlook.bestProduction(test.game, test.nekro).orElseThrow();
+
+        assertThat(production.order()).isEqualTo(OpeningOutlook.Order.PRODUCE_FIRST);
+        assertThat(production.overSupply()).isFalse();
+        assertThat(OpeningOutlook.gain(test.game, test.nekro, Boost.HOME_PRODUCTION))
+                .isGreaterThan(0);
+    }
+
+    // The single system in reach opens onto two more. With trade goods to pay for it, a carrier built past the fleet
+    // limit (the destroyer is removed to make room) lets two loaded carriers move forward together and take both
+    // systems next round, which is worth more than the destroyer.
+    @Test
+    void overSuppliesACarrierWhenTwoLoadedCarriersForwardOpenTheNextRound() {
+        nekroStartingFleet(UnitType.Destroyer);
+        test.nekro.setTg(3);
+        test.place("27", neighbour);
+        List<String> past = allBeyond(neighbour);
+        test.place("28", past.get(0));
+        test.place("30", past.get(1));
+
+        OpeningOutlook.Production production =
+                OpeningOutlook.bestProduction(test.game, test.nekro).orElseThrow();
+
+        assertThat(production.order()).isEqualTo(OpeningOutlook.Order.PRODUCE_FIRST);
+        assertThat(production.overSupply()).isTrue();
+        assertThat(OpeningOutlook.overSupplyCarriers(test.game, test.nekro, home))
+                .isEqualTo(1);
+    }
+
+    // Without a ship cheaper than a carrier to give up, building past the fleet limit is never planned.
+    @Test
+    void neverOverSuppliesWithoutAShipCheaperThanACarrier() {
+        test.nekro.setFleetCC(1);
+        test.nekro.setTg(3);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
+        test.place("27", neighbour);
+        List<String> past = allBeyond(neighbour);
+        test.place("28", past.get(0));
+        test.place("30", past.get(1));
+
+        assertThat(OpeningOutlook.overSupplyCarriers(test.game, test.nekro, home))
+                .isZero();
+    }
+
+    // Another seat holds Warfare. With one system in reach, following its secondary before the carrier leaves fills
+    // the carrier with fresh infantry, worth spending a turn on a cheap move; with two systems in reach the carrier
+    // should go at once and the home build can follow it.
+    @Test
+    void holdsTheCarriersForTheWarfareBuildOnlyWhenOneSystemIsInReach() {
+        nekroStartingFleet(UnitType.Destroyer);
+        test.place("27", neighbour);
+        test.place("28", beyond(neighbour));
+        assertThat(OpeningOutlook.holdsCarriersForHomeBuild(test.game, test.nekro))
+                .isTrue();
+
+        test.place("29", otherNeighbour());
+
+        assertThat(OpeningOutlook.holdsCarriersForHomeBuild(test.game, test.nekro))
+                .isFalse();
+    }
+
+    private void nekroStartingFleet(UnitType lightShip) {
+        test.nekro.setFleetCC(3);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, lightShip, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
+    }
+
+    private static List<String> allBeyond(String position) {
+        List<String> nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        return PositionMapper.getAdjacentTilePositions(position).stream()
+                .filter(candidate ->
+                        !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate) && !nearHome.contains(candidate))
+                .toList();
+    }
+
     private String otherNeighbour() {
         return PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position) && !position.equals(neighbour))

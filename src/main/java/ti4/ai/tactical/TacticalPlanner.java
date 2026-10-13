@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.secrets.ActionSecretTiming;
 import ti4.ai.strategy.MecatolCash;
+import ti4.ai.strategy.OpeningHold;
 import ti4.ai.tactical.DefenseOutlook.Blend;
 import ti4.ai.tactical.IncomingForces.Exclusion;
 import ti4.ai.tactical.TacticalPlan.Kind;
@@ -57,6 +59,7 @@ public class TacticalPlanner {
 
     public static final double MIN_SCORE = 1.0;
     private static final double STALL_MIN_SCORE = 0.3;
+    private static final int NEIGHBOUR_SEARCH_RANGE = 6;
     private static final double ADVANCE_SHARE = 0.5;
     private static final double MIN_WIN = 0.5;
     private static final double DESPERATE_MIN_WIN = 0.3;
@@ -145,9 +148,10 @@ public class TacticalPlanner {
         int reservedTokens = ScoringReserve.of(game, seat).tokens();
         if (!coversReserve(seat, reservedTokens)) return Optional.empty();
         Context context = new Context(game, seat, Set.of(), hints);
-        List<TacticalPlan> plans = withinTokenBudget(
-                candidates(context, tile -> activatable(game, seat, tile), STALL_MIN_SCORE),
-                seat.getTacticalCC() - reservedTokens);
+        List<TacticalPlan> all = candidates(context, tile -> activatable(game, seat, tile), STALL_MIN_SCORE);
+        Optional<TacticalPlan> hold = holdForWarfareBuild(context, all);
+        if (hold.isPresent()) return hold;
+        List<TacticalPlan> plans = withinTokenBudget(all, seat.getTacticalCC() - reservedTokens);
         if (plans.isEmpty()) return Optional.empty();
         TacticalPlan top = plans.getFirst();
         boolean anotherActionAfter =
@@ -169,6 +173,76 @@ public class TacticalPlanner {
                 .count();
         if (spareTokens > worthwhile) return plans;
         return plans.stream().filter(plan -> plan.score() >= MIN_SCORE).toList();
+    }
+
+    private static Optional<TacticalPlan> holdForWarfareBuild(Context context, List<TacticalPlan> plans) {
+        Tile home = context.seat.getHomeSystemTile();
+        if (home == null || plans.isEmpty() || !leavesWithTransports(plans.getFirst(), home)) return Optional.empty();
+        if (!OpeningHold.awaitsWarfareBuild(context.game, context.seat)) return Optional.empty();
+        Set<String> goals = new HashSet<>();
+        context.goals().goals().stream()
+                .filter(RoundGoals.Goal::needsTransport)
+                .forEach(goal -> goals.add(goal.position()));
+        return plans.stream()
+                .filter(plan -> !leavesWithTransports(plan, home) && !goals.contains(plan.target()))
+                .findFirst()
+                .or(() -> stepTowardNeighbour(context, home, goals));
+    }
+
+    private static boolean leavesWithTransports(TacticalPlan plan, Tile home) {
+        if (plan.target().equals(home.getPosition())) return true;
+        return plan.moves().stream()
+                .anyMatch(move -> move.origin().equals(home.getPosition())
+                        && (move.type() == UnitType.Carrier || BoardView.GROUND_FORCES.contains(move.type())));
+    }
+
+    private static Optional<TacticalPlan> stepTowardNeighbour(Context context, Tile home, Set<String> goals) {
+        Game game = context.game;
+        Player seat = context.seat;
+        UnitHolder space = BoardView.space(home);
+        List<UnitType> steppers = POSITION_SHIPS.stream()
+                .filter(type -> type != UnitType.Carrier && BoardView.undamaged(space, seat, type) > 0)
+                .sorted(Comparator.comparingDouble(type -> cost(seat, type)))
+                .toList();
+        for (UnitType type : steppers) {
+            List<UnitMove> step = List.of(new UnitMove(home.getPosition(), BoardView.SPACE, type, 1));
+            Optional<TacticalPlan> best = Optional.empty();
+            int bestDistance = Integer.MAX_VALUE;
+            for (String position : MovementGraph.reach(game, seat, home.getPosition(), BoardView.moveValue(seat, type))
+                    .keySet()) {
+                Tile tile = game.getTileByPosition(position);
+                if (tile == null || tile == home || goals.contains(position) || !holdsStep(context, tile)) continue;
+                Optional<List<UnitMove>> legal = legalMoves(context, home, tile, step);
+                if (legal.isEmpty() || groundForcesFromSpace(legal.get()) > 0) continue;
+                if (context.defense().leaveCost(home, legal.get()) > 0) continue;
+                int distance = distanceToNearestNeighbour(game, seat, tile);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    best = Optional.of(
+                            new TacticalPlan(Kind.POSITION, position, legal.get(), Map.of(), STALL_MIN_SCORE));
+                }
+            }
+            if (best.isPresent()) return best;
+        }
+        return Optional.empty();
+    }
+
+    private static boolean holdsStep(Context context, Tile tile) {
+        return activatable(context.game, context.seat, tile)
+                && MovementGraph.canEnter(context.game, context.seat, tile)
+                && !BoardView.hasEnemyUnits(context.game, context.seat, tile)
+                && !context.coveredByEnemySpaceCannon(tile);
+    }
+
+    private static int distanceToNearestNeighbour(Game game, Player seat, Tile tile) {
+        Map<String, Integer> around = MovementGraph.reach(game, seat, tile.getPosition(), NEIGHBOUR_SEARCH_RANGE);
+        return game.getRealPlayers().stream()
+                .filter(other -> other != seat && other.getHomeSystemTile() != null)
+                .map(other -> around.get(other.getHomeSystemTile().getPosition()))
+                .filter(Objects::nonNull)
+                .mapToInt(Integer::intValue)
+                .min()
+                .orElse(NEIGHBOUR_SEARCH_RANGE + 1);
     }
 
     public static List<TacticalPlan> ranked(Game game, Player seat) {

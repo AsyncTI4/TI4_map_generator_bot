@@ -18,6 +18,7 @@ import ti4.ai.tactical.SetupHint;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
 import ti4.game.Tile;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
@@ -27,6 +28,7 @@ import ti4.testUtils.BaseTi4Test;
 class StrategyCardTurnTest extends BaseTi4Test {
 
     private static final int DIPLOMACY = 2;
+    private static final int CONSTRUCTION = 4;
     private static final int WARFARE = 6;
     private static final int IMPERIAL = 8;
     private static final String MECATOL = "000";
@@ -203,6 +205,63 @@ class StrategyCardTurnTest extends BaseTi4Test {
         assertThat(plan.target()).isEqualTo(forward.getPosition());
         assertThat(moved(plan, UnitType.Carrier)).isEqualTo(2);
         assertThat(moved(plan, UnitType.Infantry)).isGreaterThan(1);
+    }
+
+    // Round 1 with Thunder's Edge Construction and Nekro's real start (the fleet pool is full). With two systems in
+    // reach the carrier moves out first, which frees the fleet room Construction needs for the second carrier; once
+    // it has gone, Construction is played.
+    @Test
+    void movesOutBeforeConstructionWhenTwoSystemsAreInReach() {
+        openingWithConstruction();
+        Tile first = test.place("27", AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.place("28", otherNeighbour());
+        changed();
+
+        assertThat(StrategyCardTurn.dueNow(test.context(turnStart(CONSTRUCTION)), CONSTRUCTION))
+                .isFalse();
+
+        home.removeUnit("space", Units.getUnitKey(UnitType.Carrier, test.nekro.getColor()), 1);
+        home.removeUnit("mordaiii", Units.getUnitKey(UnitType.Infantry, test.nekro.getColor()), 2);
+        test.units(first, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(first, "newalbion", test.nekro, UnitType.Infantry, 1);
+        test.units(first, "starpoint", test.nekro, UnitType.Infantry, 1);
+        test.nekro.addPlanet("newalbion");
+        test.nekro.addPlanet("starpoint");
+        changed();
+
+        assertThat(StrategyCardTurn.dueNow(test.context(turnStart(CONSTRUCTION)), CONSTRUCTION))
+                .isTrue();
+    }
+
+    // Only one system with planets is in reach: Construction comes first and fills the carrier with infantry.
+    @Test
+    void playsConstructionFirstWhenOnlyOneSystemIsInReach() {
+        openingWithConstruction();
+        Tile first = test.place("27", AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.place("28", beyond(first.getPosition()));
+        changed();
+
+        assertThat(StrategyCardTurn.dueNow(test.context(turnStart(CONSTRUCTION)), CONSTRUCTION))
+                .isTrue();
+    }
+
+    private void openingWithConstruction() {
+        test.game.setRound(1);
+        test.nekro.addSC(CONSTRUCTION);
+        test.nekro.setTacticalCC(3);
+        test.nekro.setFleetCC(3);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Cruiser, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
+    }
+
+    private static String otherNeighbour() {
+        String neighbour = AiTestGame.neighbourOf(AiTestGame.HOME);
+        return ti4.image.PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+                .filter(position -> !"x".equals(position) && !position.equals(neighbour))
+                .findFirst()
+                .orElseThrow();
     }
 
     private static String beyond(String position) {
