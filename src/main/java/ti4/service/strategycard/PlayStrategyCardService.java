@@ -178,18 +178,18 @@ public class PlayStrategyCardService {
                 }
             }
 
-            if (!gamePing.isEmpty()) {
+            if (!winnuHero && !gamePing.isEmpty()) {
                 message.append(gamePing).append(", please indicate your choice with these buttons.");
             } else {
                 message.append("Please indicate your choice with these buttons.");
             }
 
-            for (Player player2 : playersToFollow) {
-                player2.removeFollowedSC(scToPlay);
-                player2.getCardsInfoThread(); // force thread to open if closed
-            }
-
             if (!winnuHero) {
+                for (Player player2 : playersToFollow) {
+                    player2.removeFollowedSC(scToPlay);
+                    player2.getCardsInfoThread(); // force thread to open if closed
+                }
+
                 game.setSCPlayed(scToPlay, Boolean.TRUE);
                 GameEventService.commit(
                         game, GameEventType.SC_PLAYED, player, Map.of("scNumber", scToPlay, "scName", stratCardName));
@@ -986,14 +986,19 @@ public class PlayStrategyCardService {
             return getGenericButtons(sc);
         }
 
-        String scAutomationID = scModel.getBotSCAutomationID();
-
-        // Handle Special Cases
-        if (!isOverrule && "pok8imperial".equals(scAutomationID)) {
+        if (!isOverrule && "pok8imperial".equals(scModel.getBotSCAutomationID())) {
             handleSOQueueing(game, winnuHero);
         }
+        return getStrategyCardButtons(sc, game, player);
+    }
 
-        // Return Buttons
+    public static List<Button> getStrategyCardButtons(int sc, Game game, Player player) {
+        StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
+        if (scModel == null) {
+            return getGenericButtons(sc);
+        }
+
+        String scAutomationID = scModel.getBotSCAutomationID();
         return switch (scAutomationID) {
             case "pok1leadership" -> getLeadershipButtons(sc);
             case "pok2diplomacy" -> getDiplomacyButtons(sc, player);
