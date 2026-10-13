@@ -5,6 +5,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.brain.StrategyCard;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.game.Game;
@@ -22,20 +23,30 @@ public class StrategyCardTurn {
         List<CardPlan> plans = StrategyCardReplanner.refresh(context);
         PlanInputs in = PlanInputs.of(context.game(), context.seat(), PlanMoment.ACTION);
         for (CardPlan plan : plans) {
-            if (CardTiming.of(in, plan) != CardTiming.Timing.NOW) continue;
+            if (timing(context, in, plan) != CardTiming.Timing.NOW) continue;
             Optional<AiDecision> play = play(context, thisTurn, plan.initiative());
             if (play.isPresent()) return play;
         }
         return Optional.empty();
     }
 
+    private static CardTiming.Timing timing(AiTurnContext context, PlanInputs in, CardPlan plan) {
+        if (plan.card() == StrategyCard.TECHNOLOGY && heldBack(context)) return CardTiming.Timing.FALLBACK;
+        return CardTiming.of(in, plan);
+    }
+
+    private static boolean heldBack(AiTurnContext context) {
+        return TechnologyTiming.heldBack(context.game(), context.seat(), context.memory());
+    }
+
     private static Optional<AiDecision> playRequestedTechnology(AiTurnContext context, List<AiPrompt> thisTurn) {
         Game game = context.game();
-        if (!context.memory().has(OpeningNeeds.technologyRequestedKey(game))) return Optional.empty();
+        if (!context.memory().has(OpeningNeeds.technologyRequestedKey(game)) || heldBack(context)) {
+            return Optional.empty();
+        }
         return context.seat().getSCs().stream()
                 .filter(initiative -> !game.getPlayedSCs().contains(initiative))
-                .filter(initiative ->
-                        ti4.ai.brain.StrategyCard.of(game, initiative) == ti4.ai.brain.StrategyCard.TECHNOLOGY)
+                .filter(initiative -> StrategyCard.of(game, initiative) == StrategyCard.TECHNOLOGY)
                 .findFirst()
                 .flatMap(initiative -> play(context, thisTurn, initiative));
     }
@@ -44,7 +55,7 @@ public class StrategyCardTurn {
         Game game = context.game();
         if (!context.seat().getSCs().contains(initiative) || game.getPlayedSCs().contains(initiative)) return false;
         PlanInputs in = PlanInputs.of(game, context.seat(), PlanMoment.ACTION);
-        return CardTiming.of(in, StrategyCardPlanner.plan(in, initiative)) == CardTiming.Timing.NOW;
+        return timing(context, in, StrategyCardPlanner.plan(in, initiative)) == CardTiming.Timing.NOW;
     }
 
     public static String playReason(AiTurnContext context, int initiative) {

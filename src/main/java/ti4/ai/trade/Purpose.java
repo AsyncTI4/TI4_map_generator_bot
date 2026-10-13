@@ -14,6 +14,7 @@ enum Purpose {
     NOTE_DEAL("promissory note deal"),
     DESPERATION("purchase"),
     TECHNOLOGY_REQUEST("payment to play Technology soon"),
+    TECHNOLOGY_HOLD("payment to hold Technology until later"),
     DEBT_PAYMENT("debt payment"),
     DEBT_COLLECTION("debt collection"),
     COUNTER("counter-offer"),
@@ -21,7 +22,9 @@ enum Purpose {
     ADOPTED("offer");
 
     private static final Set<Purpose> SETTLEMENTS = EnumSet.of(SETTLEMENT, SETTLEMENT_FEE, EVEN_WASH);
-    private static final Set<Purpose> PROPOSALS = EnumSet.of(WASH, SELL, NOTE_DEAL, DESPERATION, TECHNOLOGY_REQUEST);
+    private static final Set<Purpose> PROPOSALS =
+            EnumSet.of(WASH, SELL, NOTE_DEAL, DESPERATION, TECHNOLOGY_REQUEST, TECHNOLOGY_HOLD);
+    private static final Set<Purpose> FAVORS = EnumSet.of(TECHNOLOGY_REQUEST, TECHNOLOGY_HOLD);
     private static final Set<Purpose> LONG_HUMAN_REPLY = EnumSet.of(SETTLEMENT, SETTLEMENT_FEE, DEBT_COLLECTION);
 
     private final String label;
@@ -46,6 +49,10 @@ enum Purpose {
 
     boolean proposes() {
         return PROPOSALS.contains(this);
+    }
+
+    boolean asksAFavor() {
+        return FAVORS.contains(this);
     }
 
     boolean waitsLongForHumans() {

@@ -145,6 +145,7 @@ class PendingOffers {
     private static void accepted(AiTurnContext context, Player partner, Pending pending) {
         Trust.record(context, partner, Trust.Event.ACCEPTED_OFFER);
         TradeLegality.useWindow(context, partner);
+        TechnologyRequest.noteProposalAccepted(context, partner, pending.purpose());
         if (pending.purpose().settles()) {
             context.memory().put(TradeCardRules.settledKey(context.game(), partner), ACCEPTED);
         }
