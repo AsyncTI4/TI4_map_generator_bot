@@ -37,8 +37,8 @@ public final class DefenseOutlook {
     static final double GARRISON_TOLERANCE = 0.5;
     static final double HOLD_MIN_GAIN = 0.3;
     private static final double REACH_FLEET_COST = 10.0;
-    private static final double POSTURE_BASE = 0.25;
-    private static final double POSTURE_PER_ROUND = 0.15;
+    private static final double POSTURE_BASE = 0.1;
+    private static final double POSTURE_PER_ROUND = 0.2;
     private static final int POSTURE_ROUNDS = 4;
     private static final double POSTURE_PER_POINT_OF_LEAD = 0.1;
     private static final int POSTURE_MAX_LEAD = 3;
