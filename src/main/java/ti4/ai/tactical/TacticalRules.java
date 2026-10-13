@@ -576,9 +576,11 @@ public class TacticalRules {
             for (BuildOrder order : plan.get().orders()) {
                 if (produced(context.seat(), order.type()) >= plan.get().units(order.type())) continue;
                 AiPrompt prompt = done.get().prompt();
-                Optional<PromptButton> button = prompt.enabledHandler(order.handlerId())
-                        .or(() ->
-                                order.units() > 1 ? prompt.enabledHandler(order.singleHandlerId()) : Optional.empty());
+                Optional<PromptButton> all = prompt.enabledHandler(order.handlerId());
+                Optional<PromptButton> button = all.or(
+                        () -> order.units() > 1 ? prompt.enabledHandler(order.singleHandlerId()) : Optional.empty());
+                double added = all.isPresent() ? order.cost() : order.cost() / Math.max(1, order.units());
+                if (button.isPresent() && breaksReserve(context.game(), context.seat(), added)) continue;
                 if (button.isPresent()) {
                     return Optional.of(AiDecision.press(prompt, button.get(), "build " + order.unitId()));
                 }
@@ -591,6 +593,27 @@ public class TacticalRules {
                 TechRules.startSelfAssembly(context, done.get().prompt());
         if (assembly.isPresent()) return assembly;
         return Optional.of(done.get().press("done building"));
+    }
+
+    static boolean breaksReserve(Game game, Player seat, double addedCost) {
+        SpendCost reserve = ProductionPlanner.reserve(game, seat);
+        if (reserve.isNone()) return false;
+        int discounts = (seat.hasTech("st") ? 1 : 0) + ProductionPlanner.aidaDiscount(seat);
+        int owed = (int) Math.ceil(producedCost(seat) + addedCost - discounts);
+        if (owed <= 0) return false;
+        return ScoringReserve.planAfterReserve(Wallet.of(game, seat), reserve, SpendCost.resources(owed))
+                .isEmpty();
+    }
+
+    private static double producedCost(Player seat) {
+        double cost = 0;
+        for (UnitType type : UnitType.values()) {
+            int count = produced(seat, type);
+            if (count == 0) continue;
+            cost += count
+                    * BoardView.model(seat, type).map(model -> model.getCost()).orElse(0f);
+        }
+        return cost;
     }
 
     private static int produced(Player seat, UnitType type) {
@@ -626,7 +649,8 @@ public class TacticalRules {
             }
         }
         if (owed > 0) {
-            Optional<PromptButton> planet = PaymentPlanner.keepingReserve(game, seat, payment, owed)
+            SpendCost reserve = ProductionPlanner.reserve(game, seat);
+            Optional<PromptButton> planet = PaymentPlanner.keepingReserve(game, seat, payment, owed, reserve)
                     .or(() -> PaymentPlanner.choosePlanet(game, payment, owed));
             if (planet.isPresent()) return Optional.of(AiDecision.press(payment, planet.get(), "pay for units"));
             if (seat.getTg() > 0) {

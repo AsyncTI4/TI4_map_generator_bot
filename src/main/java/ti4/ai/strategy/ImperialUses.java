@@ -2,7 +2,7 @@ package ti4.ai.strategy;
 
 import java.util.List;
 import lombok.experimental.UtilityClass;
-import ti4.ai.scoring.ObjectiveCatalog;
+import ti4.ai.scoring.ObjectiveOdds;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
@@ -13,16 +13,10 @@ import ti4.ai.tactical.TacticalPlanner;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.helpers.Helper;
-import ti4.image.Mapper;
-import ti4.service.info.ListPlayerInfoService;
 
 @UtilityClass
 class ImperialUses {
 
-    private static final int STATUS_PHASE_PUBLIC_SCORES = 1;
-    private static final int IMPERIAL_PUBLIC_SCORES = 1;
-    private static final int RESERVED_SPEND_SCORES = 1;
     private static final int CUSTODIANS_COST = 6;
 
     static List<Benefit> benefits(PlanInputs in, int initiative) {
@@ -38,7 +32,8 @@ class ImperialUses {
     }
 
     private static double secretOverFollowing(Game game, Player seat) {
-        return Math.min(SecretDrawValue.of(game, seat), CardValueScale.STRATEGY_TOKEN);
+        double draw = SecretDrawValue.of(game, seat);
+        return seat.getStrategicCC() > 0 ? Math.min(draw, CardValueScale.STRATEGY_TOKEN) : draw;
     }
 
     static boolean holdsThreatenedMecatol(PlanInputs in) {
@@ -88,27 +83,7 @@ class ImperialUses {
     }
 
     private static double extraPublicScore(Game game, Player seat) {
-        List<String> scorable = ObjectivePolicy.scorablePublics(game, seat);
-        long free =
-                scorable.stream().filter(id -> !ObjectiveCatalog.isSpend(id)).count();
-        long spend = Math.min(RESERVED_SPEND_SCORES, scorable.size() - free);
-        double expected = free + spend + CardValueScale.ONE_STEP_SHORT_CHANCE * oneStepShortPublics(game, seat);
-        return Math.clamp(expected - STATUS_PHASE_PUBLIC_SCORES, 0, IMPERIAL_PUBLIC_SCORES);
-    }
-
-    private static long oneStepShortPublics(Game game, Player seat) {
-        if (!Helper.canPlayerScorePOs(game, seat)) return 0;
-        return game.getRevealedPublicObjectives().keySet().stream()
-                .filter(id -> Mapper.getPublicObjective(id) != null && !ObjectiveCatalog.isSpend(id))
-                .filter(id -> !ObjectivePolicy.hasScored(game, seat, id))
-                .filter(id -> isOneStepShort(game, seat, id))
-                .count();
-    }
-
-    private static boolean isOneStepShort(Game game, Player seat, String objectiveId) {
-        int threshold = ListPlayerInfoService.getObjectiveThreshold(objectiveId, game);
-        return threshold > 1
-                && ListPlayerInfoService.getPlayerProgressOnObjective(objectiveId, game, seat) == threshold - 1;
+        return ObjectiveOdds.extraScoreWithImperial(game, seat);
     }
 
     private static boolean takesCustodiansThisRound(Game game, Player seat) {

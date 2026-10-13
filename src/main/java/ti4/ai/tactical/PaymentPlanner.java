@@ -22,29 +22,61 @@ class PaymentPlanner {
     private static final String ONE_TRADE_GOOD = "reduceTG_1_res";
 
     static Optional<PromptButton> choosePlanet(Game game, AiPrompt payment, double owed) {
-        List<PromptButton> planets = payment.enabledButtons().stream()
+        return choose(game, offeredPlanets(game, payment), owed);
+    }
+
+    static Optional<PromptButton> keepingReserve(Game game, Player seat, AiPrompt payment, double owed) {
+        return keepingReserve(game, seat, payment, owed, ProductionPlanner.reserve(game, seat));
+    }
+
+    static Optional<PromptButton> keepingReserve(
+            Game game, Player seat, AiPrompt payment, double owed, SpendCost reserve) {
+        Wallet wallet = Wallet.of(game, seat);
+        int wanted = (int) Math.ceil(owed);
+        Optional<Wallet.Payment> plan = ScoringReserve.planAfterReserve(wallet, reserve, SpendCost.resources(wanted));
+        if (plan.isPresent()) {
+            Optional<PromptButton> planet = plan.get().forResources().stream()
+                    .map(name -> payment.enabledHandler(SPEND_PREFIX + name + RESOURCE_SUFFIX))
+                    .flatMap(Optional::stream)
+                    .findFirst();
+            if (planet.isPresent()) return planet;
+            if (plan.get().tradeGoods() > 0) {
+                Optional<PromptButton> tradeGood = payment.enabledHandler(ONE_TRADE_GOOD);
+                if (tradeGood.isPresent()) return tradeGood;
+            }
+        }
+        List<PromptButton> keepingIt = offeredPlanets(game, payment).stream()
+                .filter(button -> wallet.without(exhausting(planetOf(button))).canPay(reserve))
+                .toList();
+        return choose(game, keepingIt, owed).or(() -> spareTradeGood(wallet, payment, reserve));
+    }
+
+    private static Optional<PromptButton> spareTradeGood(Wallet wallet, AiPrompt payment, SpendCost reserve) {
+        if (wallet.tradeGoods() <= 0
+                || !wallet.withTradeGoods(wallet.tradeGoods() - 1).canPay(reserve)) {
+            return Optional.empty();
+        }
+        return payment.enabledHandler(ONE_TRADE_GOOD);
+    }
+
+    private static Wallet.Payment exhausting(String planet) {
+        return new Wallet.Payment(List.of(planet), List.of(), 0, 0);
+    }
+
+    private static List<PromptButton> offeredPlanets(Game game, AiPrompt payment) {
+        return payment.enabledButtons().stream()
                 .filter(button -> button.handlerId().startsWith(SPEND_PREFIX))
                 .filter(button -> button.handlerId().endsWith(RESOURCE_SUFFIX))
                 .filter(button -> resources(game, button) > 0)
                 .toList();
+    }
+
+    private static Optional<PromptButton> choose(Game game, List<PromptButton> planets, double owed) {
         Optional<PromptButton> smallestCovering = planets.stream()
                 .filter(button -> resources(game, button) >= owed)
                 .min(Comparator.comparingInt(button -> resources(game, button)));
         if (smallestCovering.isPresent()) return smallestCovering;
         return planets.stream().max(Comparator.comparingInt(button -> resources(game, button)));
-    }
-
-    static Optional<PromptButton> keepingReserve(Game game, Player seat, AiPrompt payment, double owed) {
-        int wanted = (int) Math.ceil(owed);
-        Optional<Wallet.Payment> plan = ScoringReserve.planAfterReserve(
-                Wallet.of(game, seat), ProductionPlanner.reserve(game, seat), SpendCost.resources(wanted));
-        if (plan.isEmpty()) return Optional.empty();
-        Optional<PromptButton> planet = plan.get().forResources().stream()
-                .map(name -> payment.enabledHandler(SPEND_PREFIX + name + RESOURCE_SUFFIX))
-                .flatMap(Optional::stream)
-                .findFirst();
-        if (planet.isPresent() || plan.get().tradeGoods() == 0) return planet;
-        return payment.enabledHandler(ONE_TRADE_GOOD);
     }
 
     static String planetOf(PromptButton button) {

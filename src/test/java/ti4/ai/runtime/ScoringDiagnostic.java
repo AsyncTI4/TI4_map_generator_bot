@@ -113,6 +113,11 @@ final class ScoringDiagnostic {
     private final Map<Integer, Map<String, List<String>>> crowdedOut = new HashMap<>();
     private final Map<Integer, Map<String, Map<String, Spend>>> spendsAtStatus = new HashMap<>();
     private final Map<Integer, Map<String, String>> statusBoard = new HashMap<>();
+    // How far short each seat was of each unscored public at the start of the action phase, by round.
+    private final Map<Integer, Map<String, Map<String, Integer>>> shortAtStart = new HashMap<>();
+    // Across games: "r<round> <spend|board> short <n>" -> {seats, met at status}; and "r<round> met <a> at start" ->
+    // {seats, meeting two or more at status}. Calibrates how likely an objective is to be met by the status phase.
+    static final Map<String, int[]> CALIBRATION = new java.util.concurrent.ConcurrentHashMap<>();
     private final Map<Integer, Map<String, List<String>>> cards = new HashMap<>();
     // Planets each seat exhausted while it still held them, by round: what it would have had ready at status time.
     private final Map<Integer, Map<String, Set<String>>> exhausted = new HashMap<>();
@@ -148,6 +153,20 @@ final class ScoringDiagnostic {
                                 .toList());
             }
             scoredAtRoundStart.put(round, start);
+            Map<String, Map<String, Integer>> shorts = new HashMap<>();
+            for (Player seat : game.getRealPlayers()) {
+                Wallet wallet = Wallet.of(game, seat);
+                Map<String, Integer> bySeat = new HashMap<>();
+                for (String objective : game.getRevealedPublicObjectives().keySet()) {
+                    if (ObjectivePolicy.hasScored(game, seat, objective)) continue;
+                    if (ti4.image.Mapper.getPublicObjective(objective) == null) continue;
+                    bySeat.put(
+                            objective,
+                            publicStanding(game, seat, wallet, objective).shortBy());
+                }
+                shorts.put(seat.getFaction(), bySeat);
+            }
+            shortAtStart.put(round, shorts);
             cards.put(round, held);
         }
         boolean scoring = "statusScoring".equalsIgnoreCase(phase);
@@ -231,6 +250,7 @@ final class ScoringDiagnostic {
             crowded.put(faction, crowdedList);
         }
         standings.put(round, byFaction);
+        calibrate(round, byFaction);
         scoredBeforeStatus.put(round, scoredSoFar);
         crowdedOut.put(round, crowded);
         Map<String, Map<String, Spend>> copy = new HashMap<>();
@@ -396,6 +416,45 @@ final class ScoringDiagnostic {
     }
 
     // ---- reporting across games ----
+
+    private void calibrate(int round, Map<String, List<Standing>> byFaction) {
+        Map<String, Map<String, Integer>> shorts = shortAtStart.get(round);
+        if (shorts == null) return;
+        shorts.forEach((faction, bySeat) -> {
+            List<Standing> atStatus = byFaction.getOrDefault(faction, List.of());
+            int metAtStart = 0;
+            int metAtStatus = 0;
+            for (Map.Entry<String, Integer> entry : bySeat.entrySet()) {
+                Optional<Standing> standing = atStatus.stream()
+                        .filter(s -> s.id().equals(entry.getKey()))
+                        .findFirst();
+                boolean met = standing.map(Standing::met).orElse(true);
+                String kind = ObjectiveCatalog.isSpend(entry.getKey()) ? "spend" : "board";
+                int shortBy = Math.min(3, entry.getValue());
+                int[] tally =
+                        CALIBRATION.computeIfAbsent("r" + round + " " + kind + " short " + shortBy, key -> new int[2]);
+                synchronized (tally) {
+                    tally[0]++;
+                    if (met) tally[1]++;
+                }
+                if (entry.getValue() == 0) metAtStart++;
+                if (met) metAtStatus++;
+            }
+            int[] pair = CALIBRATION.computeIfAbsent(
+                    "r" + round + " met " + Math.min(2, metAtStart) + " at start", key -> new int[2]);
+            synchronized (pair) {
+                pair[0]++;
+                if (metAtStatus >= 2) pair[1]++;
+            }
+        });
+    }
+
+    static void reportCalibration() {
+        new TreeMap<>(CALIBRATION)
+                .forEach((key, tally) -> System.out.printf(
+                        "SCOREDIAG CALIBRATION %-26s seats %4d met-at-status %4d (%.0f%%)%n",
+                        key, tally[0], tally[1], 100.0 * tally[1] / Math.max(1, tally[0])));
+    }
 
     static void report(List<SeatRound> all) {
         Map<Integer, List<SeatRound>> byRound =

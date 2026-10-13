@@ -1,6 +1,8 @@
 package ti4.ai.scoring;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
@@ -11,7 +13,7 @@ import ti4.helpers.Helper;
 @UtilityClass
 public class ScoringReserve {
 
-    public record Reserved(String objectiveId, SpendCost cost) {}
+    public record Reserved(String objectiveId, SpendCost cost, int expectedTradeGoods) {}
 
     public static SpendCost of(Game game, Player seat) {
         if (!isActionPhase(game)) return SpendCost.NONE;
@@ -56,7 +58,7 @@ public class ScoringReserve {
     private static Optional<Reserved> bestAffordableSpend(Game game, Player seat, Wallet wallet) {
         return game.getRevealedPublicObjectives().keySet().stream()
                 .filter(id -> !ObjectivePolicy.hasScored(game, seat, id))
-                .map(id -> ObjectiveCatalog.spendCost(id).map(cost -> new Reserved(id, cost)))
+                .map(id -> ObjectiveCatalog.spendCost(id).map(cost -> new Reserved(id, cost, 0)))
                 .flatMap(Optional::stream)
                 .filter(candidate -> wallet.canPay(candidate.cost()))
                 .max(Comparator.comparingInt(
@@ -64,14 +66,40 @@ public class ScoringReserve {
                         .thenComparingInt(candidate -> -weight(candidate.cost())));
     }
 
+    public static int expectedTradeGoodsCounted(Game game, Player seat) {
+        return reserved(game, seat).map(Reserved::expectedTradeGoods).orElse(0);
+    }
+
     private static Optional<Reserved> bestProjectedSpend(Game game, Player seat, Wallet wallet) {
         int expected = ExpectedTradeGoods.beforeStatus(game, seat);
-        if (expected <= 0) return Optional.empty();
-        Wallet projected = wallet.withTradeGoods(wallet.tradeGoods() + expected);
+        List<Wallet.PlanetValue> readied = ExpectedReadying.beforeStatus(game, seat);
+        if (expected <= 0 && readied.isEmpty()) return Optional.empty();
+        Wallet projected = new Wallet(
+                concat(wallet.planets(), readied),
+                wallet.tradeGoods() + expected,
+                wallet.tacticTokens(),
+                wallet.strategyTokens(),
+                wallet.tradeGoodValue());
         return bestAffordableSpend(game, seat, projected)
-                .map(spend -> new Reserved(
-                        spend.objectiveId(), ExpectedTradeGoods.netOf(spend.cost(), expected, wallet.tradeGoodValue())))
+                .map(spend -> netOfIncome(spend, expected, readied, wallet.tradeGoodValue()))
                 .filter(spend -> wallet.canPay(spend.cost()));
+    }
+
+    private static Reserved netOfIncome(
+            Reserved spend, int expected, List<Wallet.PlanetValue> readied, int tradeGoodValue) {
+        SpendCost afterReadying = ExpectedReadying.netOf(spend.cost(), readied);
+        return new Reserved(
+                spend.objectiveId(),
+                ExpectedTradeGoods.netOf(afterReadying, expected, tradeGoodValue),
+                ExpectedTradeGoods.tradeGoodsUsed(afterReadying, expected, tradeGoodValue));
+    }
+
+    private static List<Wallet.PlanetValue> concat(List<Wallet.PlanetValue> first, List<Wallet.PlanetValue> second) {
+        List<Wallet.PlanetValue> all = new ArrayList<>(first);
+        second.stream()
+                .filter(planet -> all.stream().noneMatch(held -> held.name().equals(planet.name())))
+                .forEach(all::add);
+        return all;
     }
 
     private static int weight(SpendCost cost) {

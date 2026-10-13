@@ -2,6 +2,7 @@ package ti4.ai.strategy;
 
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -32,7 +33,9 @@ public class OpeningHold {
 
     public static SpendCost gravityDriveReserve(Game game, Player seat) {
         if (!awaitsGravityDrive(game, seat)) return SpendCost.NONE;
-        int fromTradeGoodsToCome = OpeningOutlook.expectedTradeGoods(game, seat);
+        int fromTradeGoodsToCome = Math.max(
+                0,
+                OpeningOutlook.expectedTradeGoods(game, seat) - ScoringReserve.expectedTradeGoodsCounted(game, seat));
         return SpendCost.resources(Math.max(0, StrategyCardRules.FOLLOW_TECH_COST - fromTradeGoodsToCome));
     }
 

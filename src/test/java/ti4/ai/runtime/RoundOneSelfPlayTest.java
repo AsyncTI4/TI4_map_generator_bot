@@ -64,6 +64,7 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
                 result.scoring().forEach(seat -> System.out.println(ScoringDiagnostic.line(seat)));
         }
         ScoringDiagnostic.report(scoring);
+        ScoringDiagnostic.reportCalibration();
     }
 
     private static void report(List<GameResult> results) {
