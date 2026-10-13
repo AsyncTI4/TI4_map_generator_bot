@@ -76,7 +76,10 @@ public class AddPlanetService {
         } else {
             player.exhaustPlanet(planet);
         }
-        if ("mirage".equals(planet) || "avernus".equals(planet) || "thundersedge".equals(planet)) {
+        if ("mirage".equals(planet)
+                || "avernus".equals(planet)
+                || "thundersedge".equals(planet)
+                || "oceanus".equals(planet)) {
             game.clearPlanetsCache();
         }
         Tile tile = game.getTileFromPlanet(planet);
