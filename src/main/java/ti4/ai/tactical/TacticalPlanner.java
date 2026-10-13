@@ -2247,7 +2247,7 @@ public class TacticalPlanner {
         private int otherExpansionNeed(Tile origin, Tile target, UnitType transport) {
             return game.getTileMap().values().stream()
                     .filter(other -> other != target && other != origin)
-                    .filter(other -> reaches(origin, other, transport))
+                    .filter(other -> reachesWithGravityDrive(origin, other, transport))
                     .mapToInt(this::claimablePlanets)
                     .max()
                     .orElse(0);
