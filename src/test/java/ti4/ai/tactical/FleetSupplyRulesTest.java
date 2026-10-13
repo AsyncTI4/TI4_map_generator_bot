@@ -81,6 +81,36 @@ class FleetSupplyRulesTest extends BaseTi4Test {
         assertThat(decide(warning(), removals())).isEqualTo("deleteButtons");
     }
 
+    // The limit is the bot's own: Armada raises it by two, so four ships under three fleet tokens are legal and a
+    // stale warning gets no removal at all.
+    @Test
+    void removesNothingWhenAFleetRaisingAbilityMakesTheFleetLegal() {
+        test.nekro.addAbility("armada");
+        test.game.setStoredValue("nekrolatestAssignHits", "remove");
+
+        assertThat(decide(warning())).isEqualTo("nothing");
+        assertThat(decide(warning(), removals())).isEqualTo("nothing");
+    }
+
+    // A carrier is cheaper than the dreadnought, but its eight infantry fill the space area's capacity: removing a
+    // carrier would break the bot's capacity check, so the dreadnought goes instead.
+    @Test
+    void keepsALoadedCarrierWhoseCargoWouldNoLongerFit() {
+        test.nekro.setFleetCC(2);
+        home.removeUnit("space", ti4.helpers.Units.getUnitKey(UnitType.Cruiser, "black"), 1);
+        test.units(home, "space", test.nekro, UnitType.Infantry, 8);
+        test.game.setStoredValue("nekrolatestAssignHits", "remove");
+
+        AiPrompt removals = prompt(
+                "remove",
+                PromptSource.PUBLIC,
+                NOW + 1,
+                List.of(REMOVE + "dn_black", REMOVE + "cv_black", REMOVE + "ff_black", "deleteButtons"),
+                List.of());
+
+        assertThat(decide(warning(), removals)).isEqualTo(REMOVE + "dn_black");
+    }
+
     // Within the fleet limit (another seat's warning, or one already resolved) the AI leaves its ships alone.
     @Test
     void leavesItsShipsAloneWithinTheFleetLimit() {

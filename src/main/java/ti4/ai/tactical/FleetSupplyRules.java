@@ -8,12 +8,12 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
-import ti4.ai.eval.BoardView;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
 
@@ -38,11 +38,6 @@ public class FleetSupplyRules {
         return finishRemoval(context, prompts);
     }
 
-    public static int excessShips(Player seat, Tile tile) {
-        int supply = seat.getFleetCC() + tile.getFleetSupplyBonusForPlayer(seat);
-        return BoardView.nonFighterShips(BoardView.space(tile), seat) - supply;
-    }
-
     private static Optional<AiDecision> removeCheapestShip(AiTurnContext context, List<AiPrompt> prompts) {
         if (!removing(context)) return Optional.empty();
         Game game = context.game();
@@ -52,6 +47,7 @@ public class FleetSupplyRules {
                     .filter(button -> button.isOwnedBy(context.faction()) && removesOneShip(seat, button))
                     .filter(button -> !context.alreadyPressed(prompt, button))
                     .filter(button -> overSupplied(game, seat, positionOf(button)))
+                    .filter(button -> keepsCargoAboard(game, seat, button))
                     .min(Comparator.comparingDouble(button -> CombatRules.lossCost(seat, button)));
             if (cheapest.isPresent()) {
                 return Optional.of(
@@ -111,12 +107,19 @@ public class FleetSupplyRules {
         return model != null && model.getIsShip() && model.getUnitType() != UnitType.Fighter;
     }
 
+    private static boolean keepsCargoAboard(Game game, Player seat, PromptButton button) {
+        int capacity = seat.getUnitFromAsyncID(button.handlerId().split("_")[3]).getCapacityValue();
+        if (capacity <= 0) return true;
+        Tile tile = game.getTileByPosition(positionOf(button));
+        return tile != null && ButtonHelper.fleetCheck(seat, game, tile).capacitySlack() >= capacity;
+    }
+
     private static String positionOf(PromptButton button) {
         return button.handlerId().split("_")[1];
     }
 
     private static boolean overSupplied(Game game, Player seat, String position) {
         Tile tile = game.getTileByPosition(position);
-        return tile != null && excessShips(seat, tile) > 0;
+        return tile != null && ButtonHelper.fleetCheck(seat, game, tile).fleetSupplyViolated();
     }
 }
