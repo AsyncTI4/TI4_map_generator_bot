@@ -122,6 +122,37 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(movedShips(plan, UnitType.Carrier)).isEqualTo(1);
     }
 
+    // Round 1, and only one system with planets is in reach. Sol holds Thunder's Edge Warfare, which almost always
+    // comes out on its first turn; following it builds infantry at home before the carrier leaves, so the carrier
+    // waits and the destroyer steps into the empty system next to home instead. Without a rival Warfare the carrier
+    // goes at once.
+    @Test
+    void holdsTheCarrierHomeForARivalsWarfareBuild() {
+        test.game.setRound(1);
+        test.nekro.setTacticalCC(3);
+        test.nekro.setStrategicCC(2);
+        test.nekro.setFleetCC(3);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Destroyer, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
+        test.place("27", neighbour);
+        test.place("28", twoSystemsFromHome());
+        String empty = otherNeighbourOfHome();
+        test.place("47", empty);
+
+        TacticalPlan rushing = TacticalPlanner.best(test.game, test.nekro).orElseThrow();
+        assertThat(movedShips(rushing, UnitType.Carrier)).isEqualTo(1);
+
+        test.sol.addSC(6);
+
+        TacticalPlan holding = TacticalPlanner.best(test.game, test.nekro).orElseThrow();
+        assertThat(movedShips(holding, UnitType.Carrier)).isZero();
+        assertThat(movedShips(holding, UnitType.Infantry)).isZero();
+        assertThat(holding.target()).isEqualTo(empty);
+        assertThat(movedShips(holding, UnitType.Destroyer)).isEqualTo(1);
+    }
+
     private static int movedShips(TacticalPlan plan, UnitType type) {
         return plan.moves().stream()
                 .filter(move -> move.type() == type)

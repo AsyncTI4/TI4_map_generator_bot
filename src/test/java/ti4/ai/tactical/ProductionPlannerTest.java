@@ -225,6 +225,40 @@ class ProductionPlannerTest extends BaseTi4Test {
         assertThat(ProductionPlanner.spendableResources(test.game, test.nekro)).isEqualTo(5);
     }
 
+    // Nekro's start fills all three fleet tokens. Normally no ship can be added, but when the opening asks for it a
+    // second carrier is built past the limit; it is priced net of the destroyer that has to be removed for it.
+    @Test
+    void buildsACarrierPastTheFleetLimitOnlyWhenAsked() {
+        test.nekro.setFleetCC(3);
+        test.nekro.setTg(3);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Destroyer, 1);
+        assertThat(plan().units(UnitType.Carrier)).isZero();
+
+        BuildPlan overSupplied =
+                ProductionPlanner.plan(test.game, test.nekro, home, 0, new DefenseOutlook(test.game, test.nekro), 1);
+
+        assertThat(overSupplied.units(UnitType.Carrier)).isEqualTo(1);
+        assertThat(overSupplied.units(UnitType.Destroyer) + overSupplied.units(UnitType.Cruiser))
+                .isZero();
+        assertThat(ProductionPlanner.cheapestShipToScrap(test.nekro, home)).hasValue(1.0);
+    }
+
+    // In round 1 the dock's spare production goes to infantry for the expansion before fighters.
+    @Test
+    void fillsWithInfantryBeforeFightersInRoundOne() {
+        test.game.setRound(1);
+        test.nekro.setFleetCC(1);
+        test.nekro.setTg(3);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 4);
+
+        BuildPlan plan = plan();
+
+        assertThat(plan.units(UnitType.Infantry)).isGreaterThan(plan.units(UnitType.Fighter));
+    }
+
     private BuildPlan plan() {
         return ProductionPlanner.plan(test.game, test.nekro, home);
     }
