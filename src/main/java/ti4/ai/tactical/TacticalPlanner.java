@@ -105,7 +105,6 @@ public class TacticalPlanner {
     private static final double SHIP_COST_WEIGHT = 0.05;
     private static final double HOME_DEFENCE_VALUE = 6.0;
     private static final int CUSTODIANS_COST = 6;
-    static final int HOME_GARRISON = 1;
     private static final int REINFORCEMENT_BUNDLE = 3;
     private static final double CHEAPEST_UNIT_COST = 0.5;
     private static final int MECATOL_GARRISON = 1;
@@ -1951,25 +1950,26 @@ public class TacticalPlanner {
             DefenseOutlook defense,
             List<UnitMove> shipsLeaving,
             @Nullable Blend blend) {
-        if (origin.isHomeSystem(game)) {
-            boolean standing = isGarrisonPlanet(seat, origin, planet) && defense.needsStandingGarrison(origin);
-            int floor = standing ? HOME_GARRISON : 0;
-            return defense.groundToKeep(origin, planet, shipsLeaving, floor, blend);
-        }
+        if (origin.isHomeSystem(game)) return defense.groundToKeep(origin, planet, shipsLeaving, blend);
         return game.mecatols().contains(planet.getName()) ? MECATOL_GARRISON : 0;
     }
 
-    private static boolean isGarrisonPlanet(Player owner, Tile home, Planet planet) {
-        return home.getPlanetUnitHolders().stream()
-                .filter(candidate -> owner.getPlanets().contains(candidate.getName()))
-                .max(Comparator.comparingInt((Planet candidate) -> BoardView.groundForces(candidate, owner) > 0
-                                        && BoardView.count(candidate, owner, UnitType.Spacedock) > 0
-                                ? 1
-                                : 0)
-                        .thenComparingInt(candidate -> BoardView.groundForces(candidate, owner))
-                        .thenComparing(Planet::getName, Comparator.reverseOrder()))
-                .map(garrison -> garrison.getName().equals(planet.getName()))
-                .orElse(true);
+    public static int groundKeptHomeWhileTransportsLeave(Game game, Player seat) {
+        Tile home = seat.getHomeSystemTile();
+        if (home == null) return 0;
+        UnitHolder space = BoardView.space(home);
+        List<UnitMove> transports = new ArrayList<>();
+        for (UnitType type : BoardView.MOVING_SHIPS) {
+            int count = BoardView.count(space, seat, type);
+            if (count > 0 && BoardView.capacity(seat, type) > 0) {
+                transports.add(new UnitMove(home.getPosition(), BoardView.SPACE, type, count));
+            }
+        }
+        int present = home.getUnitHolders().values().stream()
+                .mapToInt(holder -> BoardView.groundForces(holder, seat))
+                .sum();
+        DefenseOutlook defense = new DefenseOutlook(game, seat);
+        return present - unitCount(availableGroundForces(game, seat, home, defense, transports));
     }
 
     private static int unitCount(List<UnitMove> moves) {

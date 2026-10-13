@@ -1,6 +1,7 @@
 package ti4.ai.tactical;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,6 @@ import ti4.ai.eval.CombatOdds.Force;
 import ti4.ai.eval.FactionAggression;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.PlanetStake;
-import ti4.ai.eval.Threats;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.IncomingForces.Exclusion;
 import ti4.ai.tactical.IncomingForces.Horizon;
@@ -35,8 +35,17 @@ import ti4.model.UnitModel;
 public final class DefenseOutlook {
 
     static final double GARRISON_TOLERANCE = 0.5;
-    private static final int ALWAYS_GARRISON_ROUND = 3;
     static final double HOLD_MIN_GAIN = 0.3;
+    private static final double REACH_FLEET_COST = 10.0;
+    private static final double POSTURE_BASE = 0.25;
+    private static final double POSTURE_PER_ROUND = 0.15;
+    private static final int POSTURE_ROUNDS = 4;
+    private static final double POSTURE_PER_POINT_OF_LEAD = 0.1;
+    private static final int POSTURE_MAX_LEAD = 3;
+    private static final int POSTURE_MAX_DEFICIT = 2;
+    private static final double POSTURE_NEAR_WIN = 0.2;
+    private static final double POSTURE_SPACE_FLOOR = 0.2;
+    private static final double MULTI_PLANET_GROUND_LEVEL = 0.6;
     static final double PUBLIC_SCORING_LOCK = 8.0;
     private static final double NEAR_WIN_SCORING_LOCK = 12.0;
     private static final double SCORING_CRITICAL = 4.0;
@@ -93,12 +102,15 @@ public final class DefenseOutlook {
     private final Map<String, Double> spaceGains;
     private final Map<String, Map<String, Double>> alternatives;
     private final Map<String, Double> spaceChances;
-    private final Map<String, Boolean> reachable = new HashMap<>();
+    private Double homeDefenseLevel;
+    private Planet anchor;
+    private boolean anchorKnown;
     private final Map<String, Double> groundChances;
     private final Map<String, Double> fearCeilings = new HashMap<>();
     private final Map<String, Double> fleetCosts = new HashMap<>();
     private final Map<String, Double> costs = new HashMap<>();
     private final Map<String, Double> threats = new HashMap<>();
+    private final Map<String, Double> postures = new HashMap<>();
 
     public DefenseOutlook(Game game, Player seat) {
         this(game, seat, new IncomingForces(game), null, null);
@@ -229,9 +241,83 @@ public final class DefenseOutlook {
         return leaving;
     }
 
-    boolean needsStandingGarrison(Tile home) {
-        if (game.getRound() >= ALWAYS_GARRISON_ROUND) return true;
-        return reachable.computeIfAbsent(home.getPosition(), position -> Threats.anyEnemyCanReach(game, seat, home));
+    double homeDefenseLevel() {
+        if (homeDefenseLevel == null) homeDefenseLevel = computeHomeDefenseLevel();
+        return homeDefenseLevel;
+    }
+
+    private double computeHomeDefenseLevel() {
+        Tile tile = home();
+        if (tile == null) return 0;
+        return enemyReach(tile) * homePressure();
+    }
+
+    private double enemyReach(Tile tile) {
+        double unthreatened = 1;
+        for (Player enemy : enemies()) {
+            double fleetCost = incoming.of(enemy, tile, Horizon.NEXT_ROUND).fleetCost();
+            unthreatened *= 1 - clamp(fleetCost / REACH_FLEET_COST, 0, 1);
+        }
+        return 1 - unthreatened;
+    }
+
+    private double homePressure() {
+        int roundsPlayed = Math.min(POSTURE_ROUNDS, Math.max(0, game.getRound() - 1));
+        int lead = Math.clamp(pointLead(), -POSTURE_MAX_DEFICIT, POSTURE_MAX_LEAD);
+        double pressure = POSTURE_BASE
+                + POSTURE_PER_ROUND * roundsPlayed
+                + POSTURE_PER_POINT_OF_LEAD * lead
+                + (nearWin() ? POSTURE_NEAR_WIN : 0);
+        return clamp(pressure, 0, 1);
+    }
+
+    private int pointLead() {
+        int best =
+                enemies().stream().mapToInt(Player::getTotalVictoryPoints).max().orElse(0);
+        return seat.getTotalVictoryPoints() - best;
+    }
+
+    private double posture(Tile tile, Defenders defenders) {
+        double level = homeDefenseLevel();
+        if (level <= 0) return 0;
+        double tolerated = 1 - level * (1 - POSTURE_SPACE_FLOOR);
+        double groundShare = groundShare(tile, level);
+        Planet held = groundShare > 0 ? anchorPlanet() : null;
+        double worst = 0;
+        for (Player enemy : enemies()) {
+            IncomingForce force = incoming.of(enemy, tile, Horizon.NEXT_ROUND);
+            if (force.isEmpty()) continue;
+            double space = spaceChance(tile, force, defenders);
+            double exposed = Math.max(0, space - tolerated);
+            if (held != null && force.carriesGround()) {
+                double take = space * groundChance(tile, force, held, defenders);
+                exposed += groundShare * Math.max(0, take - tolerated);
+            }
+            worst = Math.max(worst, exposed);
+        }
+        return level * stake(tile) * worst;
+    }
+
+    private double groundShare(Tile tile, double level) {
+        if (seatPlanets(tile).size() <= 1) return 1;
+        return clamp((level - MULTI_PLANET_GROUND_LEVEL) / (1 - MULTI_PLANET_GROUND_LEVEL), 0, 1);
+    }
+
+    @Nullable
+    Planet anchorPlanet() {
+        if (!anchorKnown) {
+            Tile tile = home();
+            anchor = tile == null
+                    ? null
+                    : seatPlanets(tile).stream()
+                            .max(Comparator.comparingInt(
+                                            (Planet planet) -> BoardView.count(planet, seat, UnitType.Spacedock))
+                                    .thenComparingDouble(BoardView::planetValue)
+                                    .thenComparing(Planet::getName, Comparator.reverseOrder()))
+                            .orElse(null);
+            anchorKnown = true;
+        }
+        return anchor;
     }
 
     int groundToKeep(Tile home, Planet planet, List<UnitMove> shipsLeaving) {
@@ -239,16 +325,12 @@ public final class DefenseOutlook {
     }
 
     int groundToKeep(Tile home, Planet planet, List<UnitMove> shipsLeaving, @Nullable Blend blend) {
-        return groundToKeep(home, planet, shipsLeaving, TacticalPlanner.HOME_GARRISON, blend);
-    }
-
-    int groundToKeep(Tile home, Planet planet, List<UnitMove> shipsLeaving, int floor, @Nullable Blend blend) {
         Defenders current = defendersAt(home);
         int present = current.groundOn(planet.getName());
-        if (present <= floor || !isGuarded(home)) return Math.min(present, floor);
+        if (present == 0 || !isGuarded(home)) return 0;
         Defenders baseline = current.minus(movesFrom(home, shipsLeaving));
         double base = blendedCost(home, current, blend);
-        for (int keep = floor; keep < present; keep++) {
+        for (int keep = 0; keep < present; keep++) {
             if (blendedCost(home, baseline.withGround(planet.getName(), keep), blend) - base <= GARRISON_TOLERANCE) {
                 return keep;
             }
@@ -257,9 +339,15 @@ public final class DefenseOutlook {
     }
 
     private double blendedCost(Tile tile, Defenders defenders, @Nullable Blend blend) {
-        double standing = cost(tile, defenders);
+        double standing = departureCost(tile, defenders);
         if (blend == null) return standing;
-        return blend.w0() * blend.excluded().cost(tile, defenders) + (1 - blend.w0()) * standing;
+        return blend.w0() * blend.excluded().departureCost(tile, defenders) + (1 - blend.w0()) * standing;
+    }
+
+    private double departureCost(Tile tile, Defenders defenders) {
+        double threat = cost(tile, defenders);
+        if (!isHome(tile)) return threat;
+        return Math.max(threat, cached(postures, defenders.key(), () -> posture(tile, defenders)));
     }
 
     double fear(Player enemy, Tile tile, Horizon horizon, Defenders defenders) {

@@ -1,5 +1,6 @@
 package ti4.ai.tactical;
 
+import java.util.function.Function;
 import ti4.ai.AiTestGame;
 import ti4.ai.eval.BoardView;
 import ti4.game.Player;
@@ -25,10 +26,15 @@ final class DefenseScenario {
     final Tile staging;
 
     DefenseScenario() {
+        this(AiTestGame::nekroHome);
+    }
+
+    /** The same board with another home system for the Nekro seat, built by {@code homeBuilder} at {@link AiTestGame#HOME}. */
+    DefenseScenario(Function<AiTestGame, Tile> homeBuilder) {
         test.game.setRound(4);
         test.nekro.setTacticalCC(3);
         test.nekro.setFleetCC(5);
-        home = test.nekroHome();
+        home = homeBuilder.apply(test);
         sardakk = test.addSeat(SARDAKK_ID, "sardakk", "red");
         sardakk.setFleetCC(5);
         placeSardakkHome();

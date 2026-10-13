@@ -547,6 +547,9 @@ class OffenseTest extends BaseTi4Test {
 
     private StrikeValue naaluThreatensTheDockSystem(int strategyTokens) {
         board = new DefenseScenario();
+        // Round 3, not the scenario's round 4: from round 4 the home posture holds cruisers back against this stack,
+        // and an attack by fewer cruisers is no longer one the stack flees from, which is not what this test is about.
+        board.test.game.setRound(3);
         board.test.units(board.home, "space", nekro(), UnitType.Cruiser, 4);
         nekro().setFleetCC(6);
         String target = board.beyondStaging();

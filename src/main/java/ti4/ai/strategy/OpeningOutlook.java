@@ -10,11 +10,11 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.MovementGraph;
-import ti4.ai.eval.Threats;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.tactical.RoundGoals;
 import ti4.ai.tactical.RoundGoals.Goal;
+import ti4.ai.tactical.TacticalPlanner;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -36,7 +36,6 @@ class OpeningOutlook {
     }
 
     private static final int LAST_OPENING_ROUND = 1;
-    private static final int HOME_GARRISON = 1;
     private static final int INFANTRY_PER_RESOURCE = 2;
     private static final String GRAVITY_DRIVE = "gd";
 
@@ -71,7 +70,7 @@ class OpeningOutlook {
         if (goals.isEmpty()) return 0;
         List<Carrier> carriers = new ArrayList<>();
         for (Transport transport : transportsAt(seat, home)) carriers.add(new Carrier(transport, home.getPosition()));
-        int garrison = Threats.anyEnemyCanReach(game, seat, home) ? HOME_GARRISON : 0;
+        int garrison = TacticalPlanner.groundKeptHomeWhileTransportsLeave(game, seat);
         int infantry = Math.max(0, groundForcesAt(seat, home) - garrison);
         if (boost == Boost.HOME_PRODUCTION) infantry += produce(game, seat, home, carriers, goals.size());
         int actions = seat.getTacticalCC() + (boost == Boost.EXTRA_ACTION ? 1 : 0);

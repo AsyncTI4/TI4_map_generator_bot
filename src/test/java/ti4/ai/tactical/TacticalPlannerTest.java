@@ -66,8 +66,8 @@ class TacticalPlannerTest extends BaseTi4Test {
                         plan.target().equals(neighbour) && plan.landings().containsKey("lodor"));
     }
 
-    // The classic opening: a carrier takes one infantry to an empty neighbouring planet, leaving one infantry
-    // and the dreadnought at home.
+    // The classic opening: a carrier takes infantry to an empty neighbouring planet, leaving the dreadnought at home.
+    // Nothing can reach home, so no infantry has to stay: the second rides along to move on from Lodor.
     @Test
     void expandsToAFreeNeighbouringPlanet() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
@@ -83,8 +83,8 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(plan.get().moves())
                 .containsExactlyInAnyOrder(
                         new UnitMove(AiTestGame.HOME, "space", UnitType.Carrier, 1),
-                        new UnitMove(AiTestGame.HOME, "mordaiii", UnitType.Infantry, 1));
-        assertThat(plan.get().landings()).containsEntry("lodor", 1);
+                        new UnitMove(AiTestGame.HOME, "mordaiii", UnitType.Infantry, 2));
+        assertThat(plan.get().landings()).containsKey("lodor");
     }
 
     // The slice continues past the neighbour, so the idle second carrier rides along to be one step closer to it next
@@ -173,16 +173,35 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(TacticalPlanner.ranked(test.game, test.nekro)).isEmpty();
     }
 
-    // It never empties its home system of infantry to expand.
+    // With no enemy ship able to reach home there is no standing garrison: the last infantry may go to expand.
     @Test
-    void keepsOneInfantryAtHome() {
+    void takesTheLastInfantryWhenNothingCanReachHome() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 1);
         test.place("26", neighbour);
 
-        Optional<TacticalPlan> plan = TacticalPlanner.forTarget(test.game, test.nekro, neighbour);
+        TacticalPlan plan = expansionTo(neighbour).orElseThrow();
 
-        assertThat(plan.filter(found -> found.kind() == Kind.EXPAND)).isEmpty();
+        assertThat(plan.moves()).contains(new UnitMove(AiTestGame.HOME, "mordaiii", UnitType.Infantry, 1));
+    }
+
+    // A Sol landing party next to home changes that: with the carrier gone Mordai II would be empty against two
+    // infantry, so the last infantry stays and there is nothing to expand with.
+    @Test
+    void keepsTheLastInfantryWhenALandingPartyCanReachHome() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 1);
+        test.place("26", neighbour);
+        solLandingPartyNextToHome();
+
+        assertThat(expansionTo(neighbour)).isEmpty();
+    }
+
+    private void solLandingPartyNextToHome() {
+        Tile staging = test.place("46", otherNeighbourOfHome());
+        test.units(staging, "space", test.sol, UnitType.Carrier, 1);
+        test.units(staging, "space", test.sol, UnitType.Cruiser, 2);
+        test.units(staging, "space", test.sol, UnitType.Infantry, 2);
     }
 
     // Quann is two systems away and a carrier moves one. Gravity Drive gives one ship a move of +1 on each tactical
@@ -221,13 +240,15 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(plan.moves()).noneMatch(move -> move.type() == UnitType.Dreadnought);
     }
 
-    // A mech is the better garrison: with one at home, the last infantry is free to take Lodor.
+    // A mech is the better garrison: when home needs one against a landing party, the mech stays and the last
+    // infantry is free to take Lodor.
     @Test
     void aMechGarrisonFreesTheLastInfantry() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 1);
         test.units(home, "mordaiii", test.nekro, UnitType.Mech, 1);
         test.place("26", neighbour);
+        solLandingPartyNextToHome();
 
         TacticalPlan plan = expansionTo(neighbour).orElseThrow();
 
@@ -403,7 +424,7 @@ class TacticalPlannerTest extends BaseTi4Test {
     void x89MakesAnInvasionWorthIt() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
         test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
-        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 4);
         Tile lodor = test.place("26", neighbour);
         test.sol.addPlanet("lodor");
         test.units(lodor, "lodor", test.sol, UnitType.Infantry, 4);
@@ -682,7 +703,7 @@ class TacticalPlannerTest extends BaseTi4Test {
     void leavesSpareInfantryHomeWhileAnotherCarrierIsThere() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 2);
         test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
-        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 6);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
         test.place("26", neighbour);
         test.place("25", otherNeighbourOfHome());
 
@@ -777,7 +798,7 @@ class TacticalPlannerTest extends BaseTi4Test {
     void landsAMechOnAHazardousPlanet() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
         test.units(home, "space", test.nekro, UnitType.Mech, 1);
-        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
         test.place("24", neighbour);
 
         TacticalPlan plan = expansionTo(neighbour).orElseThrow();
@@ -820,7 +841,7 @@ class TacticalPlannerTest extends BaseTi4Test {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
         test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
         test.units(home, "space", test.nekro, UnitType.Fighter, 2);
-        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
         test.place("26", neighbour);
 
         TacticalPlan plan = expansionTo(neighbour).orElseThrow();

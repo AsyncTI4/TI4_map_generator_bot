@@ -91,14 +91,22 @@ class CustodiansApproachTest extends BaseTi4Test {
         assertThat(approachPlans()).isEmpty();
     }
 
-    // With a rival ship in reach of home, the infantry that guards the home system is not spare, so there is nothing
-    // for the carrier to bring.
+    // With no infantry at home there is nothing for the carrier to bring.
     @Test
     void doesNotApproachWithoutSpareGroundForces() {
+        board(0);
+
+        assertThat(approachPlans()).isEmpty();
+    }
+
+    // A lone rival destroyer in reach of home in round 1 cannot land and is no reason for a standing garrison, so the
+    // last infantry is spare and rides along.
+    @Test
+    void aLoneDestroyerInReachOfHomeDoesNotPinTheLastInfantry() {
         board(1);
         Tile nextToHome = test.place(EMPTY_SYSTEM, AiTestGame.neighbourOf(AiTestGame.HOME));
         test.units(nextToHome, "space", test.sol, UnitType.Destroyer, 1);
 
-        assertThat(approachPlans()).isEmpty();
+        assertThat(approachPlans()).isNotEmpty();
     }
 }
