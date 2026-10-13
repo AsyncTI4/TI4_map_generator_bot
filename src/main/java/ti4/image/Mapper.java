@@ -103,6 +103,7 @@ public class Mapper {
     private static final Map<String, ColorModel> colors = new HashMap<>();
     private static final Map<String, CombatModifierModel> combatModifiers = new HashMap<>();
     private static final Map<String, DeckModel> decks = new HashMap<>();
+    private static final Map<String, DeckModel> dynamicDecks = new HashMap<>();
     private static final Map<String, EventModel> events = new HashMap<>();
     private static final Map<String, ExploreModel> explores = new HashMap<>();
     private static final Map<String, FactionModel> factions = new HashMap<>();
@@ -153,6 +154,7 @@ public class Mapper {
     }
 
     static void loadData() throws Exception {
+        clearDynamicDecks();
         // must be first for validating later models
         importJsonObjectsFromFolder("factions", factions, FactionModel.class);
 
@@ -650,8 +652,19 @@ public class Mapper {
 
     public static Map<String, DeckModel> getDecks() {
         Map<String, DeckModel> availableDecks = new HashMap<>(decks);
-        addDynamicDecks(availableDecks);
+        availableDecks.putAll(getDynamicDecks());
         return availableDecks;
+    }
+
+    private static synchronized Map<String, DeckModel> getDynamicDecks() {
+        if (dynamicDecks.isEmpty()) {
+            addDynamicDecks(dynamicDecks);
+        }
+        return dynamicDecks;
+    }
+
+    private static synchronized void clearDynamicDecks() {
+        dynamicDecks.clear();
     }
 
     public static DeckModel getDeck(String deckID) {
