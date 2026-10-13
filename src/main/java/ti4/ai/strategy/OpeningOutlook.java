@@ -454,6 +454,7 @@ class OpeningOutlook {
     }
 
     private static boolean canAffordToFollow(Game game, Player seat, int raisedTradeGoods) {
-        return seat.getStrategicCC() > 0 && OpeningNeeds.canFollowTechnology(game, seat, 0, raisedTradeGoods);
+        return StrategyCardRules.hasSpareStrategyToken(game, seat, StrategyCard.TECHNOLOGY)
+                && OpeningNeeds.canFollowTechnology(game, seat, 0, raisedTradeGoods);
     }
 }
