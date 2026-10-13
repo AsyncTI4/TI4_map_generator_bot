@@ -86,6 +86,48 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(plan.get().landings()).containsEntry("lodor", 1);
     }
 
+    // The slice continues past the neighbour, so the idle second carrier rides along to be one step closer to it next
+    // round instead of waiting at home. The destroyer cannot claim planets and has no fight ahead, so it stays.
+    @Test
+    void bringsAnIdleShipForwardWhenTheSliceContinues() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 2);
+        test.units(home, "space", test.nekro, UnitType.Destroyer, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 4);
+        test.place("26", neighbour);
+        test.place("27", twoSystemsFromHome());
+
+        TacticalPlan plan = TacticalPlanner.best(test.game, test.nekro).orElseThrow();
+
+        assertThat(plan.target()).isEqualTo(neighbour);
+        assertThat(movedShips(plan, UnitType.Carrier)).isEqualTo(2);
+        assertThat(movedShips(plan, UnitType.Destroyer)).isZero();
+    }
+
+    // A second carrier that another free system next to home still needs stays behind for that expansion.
+    @Test
+    void keepsACarrierHomeThatAnotherExpansionNeeds() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 2);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 4);
+        test.place("26", neighbour);
+        test.place("27", twoSystemsFromHome());
+        String otherNeighbour = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+                .filter(position -> !"x".equals(position) && !position.equals(neighbour))
+                .findFirst()
+                .orElseThrow();
+        test.place("25", otherNeighbour);
+
+        TacticalPlan plan = TacticalPlanner.best(test.game, test.nekro).orElseThrow();
+
+        assertThat(movedShips(plan, UnitType.Carrier)).isEqualTo(1);
+    }
+
+    private static int movedShips(TacticalPlan plan, UnitType type) {
+        return plan.moves().stream()
+                .filter(move -> move.type() == type)
+                .mapToInt(UnitMove::count)
+                .sum();
+    }
+
     // It never empties its home system of infantry to expand.
     @Test
     void keepsOneInfantryAtHome() {

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.strategy.TokenPlan;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -31,6 +32,7 @@ public class CommandTokenPolicy {
     private static final int SHIPS_BUILT_PER_ROUND = 2;
     private static final String FLEET_REGULATIONS = "regulations";
     private static final int REGULATED_FLEET = 4;
+    private static final String ACTION_PHASE = "action";
 
     public enum Pool {
         TACTIC("tactic"),
@@ -130,10 +132,37 @@ public class CommandTokenPolicy {
         return allocation;
     }
 
+    public static Optional<String> midRoundSurplus(Game game, Player seat) {
+        Map<Pool, Integer> ideal = ideal(game, seat, totalTokens(seat));
+        for (Pool pool : List.of(Pool.STRATEGY, Pool.TACTIC)) {
+            if (pool.count(seat) > ideal.get(pool)) return Optional.of(pool.shrink());
+        }
+        return Optional.empty();
+    }
+
+    public static String poolToRefill(Game game, Player seat) {
+        Map<Pool, Integer> ideal = ideal(game, seat, totalTokens(seat) - netGainSoFar(game, seat));
+        return List.of(Pool.TACTIC, Pool.STRATEGY).stream()
+                .max(Comparator.comparingInt(pool -> ideal.get(pool) - pool.count(seat)))
+                .orElse(Pool.TACTIC)
+                .grow();
+    }
+
     private static List<Level> priorities(Game game, Player seat) {
         int largest = largestStack(game, seat);
         int bonus = fleetBonus(seat);
         int cap = fleetCap(game);
+        if (ACTION_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) {
+            TokenPlan plan = TokenPlan.of(game, seat);
+            return List.of(
+                    new Level(Pool.FLEET, Math.min(cap, largest) - bonus),
+                    new Level(Pool.TACTIC, 1),
+                    new Level(Pool.FLEET, Math.min(cap, BASE_FLEET) - bonus),
+                    new Level(Pool.STRATEGY, plan.strategy()),
+                    new Level(Pool.TACTIC, plan.tactic()),
+                    new Level(Pool.FLEET, Math.min(cap, objectiveFleet(game, seat, largest, cap)) - bonus),
+                    new Level(Pool.FLEET, Math.min(cap, stackingFleet(game, seat, largest)) - bonus));
+        }
         return List.of(
                 new Level(Pool.FLEET, Math.min(cap, largest) - bonus),
                 new Level(Pool.TACTIC, TACTIC_FIRST),

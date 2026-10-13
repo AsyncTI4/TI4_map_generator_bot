@@ -469,6 +469,93 @@ class StrategyCardRulesTest extends BaseTi4Test {
                 .contains("ringTile_" + AiTestGame.HOME);
     }
 
+    // Thunder's Edge Warfare lets the player redistribute command tokens before its tactical action. With no secondary
+    // left worth following, the round plan has no use for three strategy tokens, so the AI moves them into tactics one
+    // at a time, closes the prompt, then starts the tactical action. The fleet pool is never touched mid-round.
+    @Test
+    void rebalancesSpareStrategyTokensIntoTacticsBeforeTheWarfareAction() {
+        ti4.game.Tile home = test.nekroHome();
+        home.addCC(ti4.image.Mapper.getCCID(test.nekro.getColor()));
+        test.nekro.setTg(10);
+        test.nekro.setTacticalCC(1);
+        test.nekro.setFleetCC(3);
+        test.nekro.setStrategicCC(3);
+        AiPrompt card = prompt("warfare", PromptSource.PUBLIC, NOW, "sc_no_follow_6", "primaryOfTeWarfare");
+        StrategyCardRules.play(test.context(card), card, card.buttons().getFirst(), WARFARE);
+        assertThat(StrategyCardRules.resolvePrimary(test.context(card)).map(AiTestGame::pressedId))
+                .contains("primaryOfTeWarfare");
+
+        AiPrompt primary = prompt(
+                "primary",
+                PromptSource.PUBLIC,
+                NOW,
+                "FFCC_nekro_redistributeCCButtons_deleteThisButton",
+                "FFCC_nekro_beginTacticalTeWarfare");
+        assertThat(StrategyCardRules.resolvePrimary(test.context(card, primary)).map(AiTestGame::pressedId))
+                .contains("FFCC_nekro_redistributeCCButtons_deleteThisButton");
+
+        test.game.setStoredValue("originalCCsFornekro", test.nekro.getCCRepresentation());
+        AiPrompt tokens = prompt(
+                "tokens",
+                PromptSource.AI_THREAD,
+                NOW + 10,
+                List.of(
+                        "FFCC_nekro_increase_tactic_cc",
+                        "FFCC_nekro_increase_fleet_cc",
+                        "FFCC_nekro_increase_strategy_cc",
+                        "FFCC_nekro_decrease_tactic_cc",
+                        "FFCC_nekro_decrease_fleet_cc",
+                        "FFCC_nekro_decrease_strategy_cc",
+                        "FFCC_nekro_deleteButtons"),
+                List.of(
+                        "Gain 1 Tactic Token",
+                        "Gain 1 Fleet Token",
+                        "Gain 1 Strategy Token",
+                        "Lose 1 Tactic Token",
+                        "Lose 1 Fleet Token",
+                        "Lose 1 Strategy Token",
+                        "Done Redistributing Command Tokens"));
+        for (int moved = 0; moved < 3; moved++) {
+            assertThat(StrategyCardRules.resolvePrimary(test.context(card, primary, tokens))
+                            .map(AiTestGame::pressedId))
+                    .contains("FFCC_nekro_decrease_strategy_cc");
+            test.nekro.setStrategicCC(test.nekro.getStrategicCC() - 1);
+            assertThat(StrategyCardRules.resolvePrimary(test.context(card, primary, tokens))
+                            .map(AiTestGame::pressedId))
+                    .contains("FFCC_nekro_increase_tactic_cc");
+            test.nekro.setTacticalCC(test.nekro.getTacticalCC() + 1);
+        }
+        assertThat(StrategyCardRules.resolvePrimary(test.context(card, primary, tokens))
+                        .map(AiTestGame::pressedId))
+                .contains("FFCC_nekro_deleteButtons");
+        assertThat(test.nekro.getFleetCC()).isEqualTo(3);
+
+        assertThat(StrategyCardRules.resolvePrimary(test.context(card, primary)).map(AiTestGame::pressedId))
+                .contains("FFCC_nekro_beginTacticalTeWarfare");
+    }
+
+    // aiwatch6, round 1: Sol played Warfare as its fallback with every ship locked under its own command tokens and
+    // every planet exhausted. Nothing could move or produce, so skipping the tactical action was right, but the AI
+    // ended its turn in silence and looked like it had forgotten the primary. It now says why it skips.
+    @Test
+    void explainsWhyWarfareHasNothingToActivate() {
+        Tile home = test.nekroHome();
+        home.addCC(ti4.image.Mapper.getCCID(test.nekro.getColor()));
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.nekro.exhaustPlanet("mordaiii");
+        test.nekro.setTg(0);
+        AiPrompt card = prompt("warfare", PromptSource.PUBLIC, NOW, "sc_no_follow_6", "primaryOfTeWarfare");
+        StrategyCardRules.play(test.context(card), card, card.buttons().getFirst(), WARFARE);
+
+        Optional<AiDecision> skip = StrategyCardRules.resolvePrimary(test.context(card));
+        assertThat(skip).containsInstanceOf(AiDecision.Announce.class);
+        assertThat(((AiDecision.Announce) skip.orElseThrow()).text())
+                .contains("without a tactical action")
+                .contains("already hold its command tokens")
+                .contains("nothing left to spend on production");
+        assertThat(StrategyCardRules.resolvePrimary(test.context(card))).isEmpty();
+    }
+
     private static final int DIPLOMACY = 2;
     private static final int TRADE = 5;
     private static final int WARFARE = 6;

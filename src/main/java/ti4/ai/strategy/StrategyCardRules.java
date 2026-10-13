@@ -229,7 +229,7 @@ public class StrategyCardRules {
             Optional<TacticalPlan> plan = PlannedPrimaries.warfareTarget(context, initiative);
             if (plan.isEmpty()) {
                 CardMessages.markDone(context, WARFARE_FINISHED);
-                return Optional.empty();
+                return Optional.of(new AiDecision.Announce(WarfareIdle.announcement(game, context.seat())));
             }
             TacticalRules.remember(context, plan.get());
             context.memory().put(warfareStepKey(context), String.valueOf(context.now()));
@@ -239,6 +239,8 @@ public class StrategyCardRules {
                     "primaryOfTeWarfare",
                     "use Warfare for a tactical action: " + TacticalRules.describe(plan.get()));
         }
+        Optional<AiDecision> tokens = WarfareTokens.rebalance(context);
+        if (tokens.isPresent()) return tokens;
         if (!CardMessages.done(context, "warfareBegin")) {
             Optional<Match> begin =
                     Prompts.owned(Prompts.thisTurn(context), context.faction(), "beginTacticalTeWarfare"::equals);
@@ -410,7 +412,7 @@ public class StrategyCardRules {
         return wantsToFollow(context.game(), context.seat(), card);
     }
 
-    private static boolean wantsToFollow(Game game, Player seat, StrategyCard card) {
+    static boolean wantsToFollow(Game game, Player seat, StrategyCard card) {
         return switch (card) {
             case IMPERIAL -> hasRoomForSecret(seat);
             case TECHNOLOGY ->

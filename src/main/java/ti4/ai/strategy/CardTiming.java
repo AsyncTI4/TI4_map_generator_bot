@@ -18,6 +18,7 @@ class CardTiming {
     private static final int FIRST_ROUND_FOR_EARLY_PDS = 2;
     private static final int READY_USE_WORTH_PLAYING = 3;
     private static final double TE_WARFARE_REACTIVATION_MIN = 2 * TacticalPlanner.MIN_SCORE;
+    private static final int LAST_ADVANCE_ROUND = 1;
 
     enum Timing {
         NOW,
@@ -67,7 +68,8 @@ class CardTiming {
         Player seat = in.seat();
         Optional<TacticalPlan> warfare = TacticalPlanner.bestForWarfare(game, seat);
         if (warfare.isEmpty()) return Timing.FALLBACK;
-        if (seat.getTacticalCC() == 0) return Timing.NOW;
+        if (seat.getTacticalCC() == 0 || in.round() <= LAST_ADVANCE_ROUND) return Timing.NOW;
+        if (TacticalPlanner.movesAGroup(warfare.get())) return Timing.NOW;
         Tile target = tileAt(game, warfare.get().target());
         boolean reactivates = target != null && target.hasPlayerCC(seat);
         return reactivates && warfare.get().score() >= TE_WARFARE_REACTIVATION_MIN ? Timing.NOW : Timing.FALLBACK;

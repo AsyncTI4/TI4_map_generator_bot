@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -107,6 +108,11 @@ public class TacticalPlanner {
     private static final int MECATOL_GARRISON = 1;
     private static final List<UnitType> TRANSPORT_PREFERENCE =
             List.of(UnitType.Carrier, UnitType.Flagship, UnitType.Dreadnought, UnitType.Warsun);
+    private static final Set<Kind> WARFARE_ADVANCES = EnumSet.of(Kind.EXPAND, Kind.POSITION, Kind.STAGE);
+    private static final int GROUP_ADVANCE_SHIPS = 3;
+    private static final double FOLLOWER_SHARE = 0.25;
+    private static final double FORWARD_POSITION_SHARE = 0.15;
+    private static final double LOCKED_FORWARD_SHARE = 0.5;
     private static final List<UnitType> GROUND_FORCE_ORDER = List.of(UnitType.Infantry, UnitType.Mech);
     private static final List<UnitType> POSITION_SHIPS = List.of(
             UnitType.Destroyer,
@@ -181,13 +187,185 @@ public class TacticalPlanner {
     }
 
     public static Optional<TacticalPlan> bestForWarfare(Game game, Player seat) {
-        Context context = new Context(game, seat);
+        Context context = Context.tokenFree(game, seat);
         return game.getTileMap().values().stream()
                 .filter(tile -> tile.hasPlayerCC(seat) || ButtonHelper.canActivateTile(game, seat, tile))
                 .map(tile -> bestFor(context, tile))
                 .flatMap(Optional::stream)
                 .filter(plan -> plan.score() >= MIN_SCORE)
                 .max(Comparator.comparingDouble(TacticalPlan::score));
+    }
+
+    public static Optional<TacticalPlan> forWarfareTarget(Game game, Player seat, String target) {
+        Tile tile = game.getTileByPosition(target);
+        return tile == null ? Optional.empty() : bestFor(Context.tokenFree(game, seat), tile);
+    }
+
+    public static boolean movesAGroup(TacticalPlan plan) {
+        return WARFARE_ADVANCES.contains(plan.kind()) && movedNonFighterShips(plan.moves()) >= GROUP_ADVANCE_SHIPS;
+    }
+
+    static double ownAreaBonus(Territory.Zone zone) {
+        return switch (zone) {
+            case LANE -> LANE_PLANET_BONUS;
+            case SLICE -> SLICE_PLANET_BONUS;
+            case BORDER -> BORDER_PLANET_BONUS;
+            default -> 0;
+        };
+    }
+
+    static double frontierCardValue() {
+        return FRONTIER_CARD_VALUE;
+    }
+
+    private record Follower(Tile origin, UnitType type, int idle, double gain) {}
+
+    private record Followers(List<UnitMove> moves, double value) {}
+
+    private static TacticalPlan withFollowers(Context context, Tile target, TacticalPlan plan) {
+        Followers followers = followers(context, target, plan.moves());
+        if (followers.moves().isEmpty()) return plan;
+        List<UnitMove> moves = new ArrayList<>(plan.moves());
+        int landed =
+                plan.landings().values().stream().mapToInt(Integer::intValue).sum();
+        String mainOrigin = shipsIn(plan.moves()).isEmpty()
+                ? ""
+                : shipsIn(plan.moves()).getFirst().origin();
+        for (Tile origin : originsOf(context, followers.moves())) {
+            List<UnitMove> fromOrigin = movesFrom(origin, merge(concat(plan.moves(), followers.moves())));
+            List<UnitMove> cargo = origin.getPosition().equals(mainOrigin)
+                    ? forwardCargo(context, origin, target, fromOrigin, landed)
+                    : List.of();
+            Optional<List<UnitMove>> legal = legalMoves(context, origin, target, concat(fromOrigin, cargo));
+            if (legal.isEmpty()) return plan;
+            moves.removeIf(move -> move.origin().equals(origin.getPosition()));
+            moves.addAll(legal.get());
+        }
+        if (BoardView.nonFighterShips(BoardView.space(target), context.seat) + movedNonFighterShips(moves)
+                > context.seat.getFleetCC()) {
+            return plan;
+        }
+        return new TacticalPlan(
+                plan.kind(), plan.target(), merge(moves), plan.landings(), plan.score() + followers.value());
+    }
+
+    private static Followers followers(Context context, Tile target, List<UnitMove> base) {
+        List<Follower> candidates = new ArrayList<>();
+        for (Tile origin : context.origins()) {
+            if (origin == target) continue;
+            candidates.addAll(idleShips(context, origin, target, base));
+        }
+        candidates.sort(Comparator.comparingDouble(Follower::gain).reversed());
+        int room = context.seat.getFleetCC()
+                - BoardView.nonFighterShips(BoardView.space(target), context.seat)
+                - movedNonFighterShips(base);
+        List<UnitMove> moves = new ArrayList<>();
+        double value = 0;
+        int joined = 0;
+        for (Follower follower : candidates) {
+            int taken = 0;
+            while (taken < follower.idle() && room > 0) {
+                double marginal = FOLLOWER_SHARE * follower.gain() / (joined + 1) - GROUP_MOVE_COST;
+                if (marginal <= 0) break;
+                value += marginal;
+                taken++;
+                joined++;
+                room--;
+            }
+            if (taken > 0) {
+                moves.add(new UnitMove(follower.origin().getPosition(), BoardView.SPACE, follower.type(), taken));
+            }
+        }
+        return new Followers(moves, value);
+    }
+
+    private static List<Follower> idleShips(Context context, Tile origin, Tile target, List<UnitMove> base) {
+        Player seat = context.seat;
+        UnitHolder space = BoardView.space(origin);
+        List<UnitMove> idle = new ArrayList<>();
+        for (UnitType type : BoardView.MOVING_SHIPS) {
+            if (!context.reaches(origin, target, type)) continue;
+            int count = BoardView.count(space, seat, type)
+                    - countOf(movesFrom(origin, base), type)
+                    - reservedShips(context, origin, target, type);
+            if (count > 0) idle.add(new UnitMove(origin.getPosition(), BoardView.SPACE, type, count));
+        }
+        List<Follower> followers = new ArrayList<>();
+        for (UnitMove move : context.defense().holdBack(origin, movesFrom(origin, base), idle)) {
+            double gain = context.lockShare()
+                    * context.goals()
+                            .forwardGain(
+                                    origin,
+                                    target,
+                                    BoardView.moveValue(seat, move.type()),
+                                    BoardView.capacity(seat, move.type()) > 0);
+            if (gain > 0) followers.add(new Follower(origin, move.type(), move.count(), gain));
+        }
+        return followers;
+    }
+
+    private static int reservedShips(Context context, Tile origin, Tile target, UnitType type) {
+        int capacity = BoardView.capacity(context.seat, type);
+        if (capacity <= 0) return 0;
+        int need = context.otherExpansionNeed(origin, target, type);
+        return need <= 0 ? 0 : (need + capacity - 1) / capacity;
+    }
+
+    private static List<UnitMove> forwardCargo(
+            Context context, Tile origin, Tile target, List<UnitMove> group, int landed) {
+        List<UnitMove> ships = shipsIn(group);
+        if (ships.isEmpty()) return List.of();
+        int alreadyForward = Math.max(0, unitCount(groundIn(group)) - landed);
+        int spare = Math.min(
+                capacityOf(context.seat, ships) - cargoIn(group),
+                context.forwardNeed(target, ships.getFirst().type()) - alreadyForward);
+        List<UnitMove> taken = new ArrayList<>();
+        for (UnitMove available : availableGroundForces(context.game, context.seat, origin, context.defense(), ships)) {
+            if (spare <= 0) break;
+            if (BoardView.SPACE.equals(available.holder())) continue;
+            int alreadyMoving = group.stream()
+                    .filter(move -> move.holder().equals(available.holder()) && move.type() == available.type())
+                    .mapToInt(UnitMove::count)
+                    .sum();
+            int count = Math.min(spare, available.count() - alreadyMoving);
+            if (count <= 0) continue;
+            taken.add(new UnitMove(available.origin(), available.holder(), available.type(), count));
+            spare -= count;
+        }
+        return taken;
+    }
+
+    private static List<UnitMove> groundIn(List<UnitMove> moves) {
+        return moves.stream()
+                .filter(move -> BoardView.GROUND_FORCES.contains(move.type()))
+                .toList();
+    }
+
+    private static List<Tile> originsOf(Context context, List<UnitMove> moves) {
+        return moves.stream()
+                .map(UnitMove::origin)
+                .distinct()
+                .map(context.game::getTileByPosition)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    private static List<UnitMove> movesFrom(Tile origin, List<UnitMove> moves) {
+        return moves.stream()
+                .filter(move -> move.origin().equals(origin.getPosition()))
+                .toList();
+    }
+
+    private static double forwardPositionGain(Context context, Tile origin, Tile target, UnitType transport) {
+        return FORWARD_POSITION_SHARE
+                * context.lockShare()
+                * context.goals().forwardGain(origin, target, BoardView.moveValue(context.seat, transport), true);
+    }
+
+    private static List<UnitMove> concat(List<UnitMove> first, List<UnitMove> second) {
+        List<UnitMove> all = new ArrayList<>(first);
+        all.addAll(second);
+        return all;
     }
 
     public static boolean worthProducingAt(Game game, Player seat, Tile tile) {
@@ -333,8 +511,11 @@ public class TacticalPlanner {
                 - DISTANCE_COST
                         * context.distance(origin, tile, transports.getFirst().type())
                 - GROUP_MOVE_COST * (movedNonFighterShips(transports) - 1)
-                - context.defense().leaveCost(origin, legal.get());
-        return Optional.of(new TacticalPlan(Kind.EXPAND, tile.getPosition(), legal.get(), landings, score));
+                - context.defense().leaveCost(origin, legal.get())
+                + forwardPositionGain(
+                        context, origin, tile, transports.getFirst().type());
+        TacticalPlan plan = new TacticalPlan(Kind.EXPAND, tile.getPosition(), legal.get(), landings, score);
+        return Optional.of(withFollowers(context, tile, plan));
     }
 
     private static Defenders defendersAfterExpanding(
@@ -788,15 +969,6 @@ public class TacticalPlanner {
         Map<String, Double> values = new HashMap<>();
         tile.getPlanetUnitHolders().forEach(planet -> values.put(planet.getName(), bonus));
         return values;
-    }
-
-    private static double ownAreaBonus(Territory.Zone zone) {
-        return switch (zone) {
-            case LANE -> LANE_PLANET_BONUS;
-            case SLICE -> SLICE_PLANET_BONUS;
-            case BORDER -> BORDER_PLANET_BONUS;
-            default -> 0;
-        };
     }
 
     private static Optional<TacticalPlan> finalPlan(Context context, Tile tile, List<Candidate> pool) {
@@ -1787,6 +1959,8 @@ public class TacticalPlanner {
         private final Map<String, Optional<TacticalPlan>> expansions = new HashMap<>();
         private final Map<String, Double> approachGains = new HashMap<>();
         private final Map<String, List<UnitMove>> stageGroups = new HashMap<>();
+        private boolean tokenFree;
+        private RoundGoals goals;
 
         Context(Game game, Player seat) {
             this(game, seat, Set.of());
@@ -1801,6 +1975,21 @@ public class TacticalPlanner {
             this.seat = seat;
             this.freed = freed;
             this.hints = hints;
+        }
+
+        static Context tokenFree(Game game, Player seat) {
+            Context context = new Context(game, seat);
+            context.tokenFree = true;
+            return context;
+        }
+
+        double lockShare() {
+            return tokenFree ? 1 : LOCKED_FORWARD_SHARE;
+        }
+
+        RoundGoals goals() {
+            if (goals == null) goals = RoundGoals.of(game, seat, territory());
+            return goals;
         }
 
         double exploreValue(Tile tile, Planet planet, int infantry, int mechs) {

@@ -165,6 +165,62 @@ class StrategyCardTurnTest extends BaseTi4Test {
                 .isTrue();
     }
 
+    // Round 1 opening: Thunder's Edge Warfare's free tactical action places no token, so the fleet it moves can move
+    // again next turn. Players fire it on turn 1 to push the home fleet into their slice, rather than hold it.
+    @Test
+    void playsThundersEdgeWarfareOnTheFirstTurnOfRoundOne() {
+        test.nekro.addSC(WARFARE);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Infantry, 2);
+        test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));
+        changed();
+        assertThat(StrategyCardTurn.dueNow(test.context(turnStart(WARFARE)), WARFARE))
+                .isFalse();
+
+        test.game.setRound(1);
+        changed();
+
+        assertThat(StrategyCardTurn.dueNow(test.context(turnStart(WARFARE)), WARFARE))
+                .isTrue();
+    }
+
+    // The free action brings both carriers and the spare ground forces along, not just the one carrier the expansion
+    // needs: nothing it moves is locked under a token afterwards, and the rest of the slice lies past the system it
+    // takes.
+    @Test
+    void thundersEdgeWarfareAdvancesTheWholeHomeFleet() {
+        test.game.setRound(1);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 2);
+        test.units(home, "space", test.nekro, UnitType.Destroyer, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 4);
+        Tile forward = test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.place("27", beyond(forward.getPosition()));
+        changed();
+
+        TacticalPlan plan =
+                TacticalPlanner.bestForWarfare(test.game, test.nekro).orElseThrow();
+
+        assertThat(plan.target()).isEqualTo(forward.getPosition());
+        assertThat(moved(plan, UnitType.Carrier)).isEqualTo(2);
+        assertThat(moved(plan, UnitType.Infantry)).isGreaterThan(1);
+    }
+
+    private static String beyond(String position) {
+        List<String> nearHome = ti4.image.PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        return ti4.image.PositionMapper.getAdjacentTilePositions(position).stream()
+                .filter(candidate ->
+                        !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate) && !nearHome.contains(candidate))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    private static int moved(TacticalPlan plan, UnitType type) {
+        return plan.moves().stream()
+                .filter(move -> move.type() == type)
+                .mapToInt(TacticalPlan.UnitMove::count)
+                .sum();
+    }
+
     // A held card's setup bonus steers the tactical planner into the first step of the card's plan.
     @Test
     void aSetupHintSteersTheTacticalPlannerToTheHintedStep() {

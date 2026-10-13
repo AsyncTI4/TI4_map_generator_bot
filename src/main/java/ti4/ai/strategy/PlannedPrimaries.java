@@ -58,11 +58,12 @@ class PlannedPrimaries {
         Optional<TacticalPlan> planned = CardPlanMemory.read(context, initiative)
                 .flatMap(CardPlan::main)
                 .filter(Benefit::hasTarget)
-                .flatMap(benefit -> TacticalPlanner.forTarget(game, seat, benefit.target()))
+                .flatMap(benefit -> TacticalPlanner.forWarfareTarget(game, seat, benefit.target()))
                 .filter(plan -> plan.score() >= TacticalPlanner.MIN_SCORE && activatableByWarfare(game, seat, plan));
         if (planned.isEmpty()) return best;
         double bestScore = best.map(TacticalPlan::score).orElse(0.0);
-        return planned.get().score() >= bestScore - CardValueScale.REPLAN_DELTA ? planned : best;
+        if (planned.get().score() < bestScore - CardValueScale.REPLAN_DELTA) return best;
+        return planned;
     }
 
     private static boolean activatableByWarfare(Game game, Player seat, TacticalPlan plan) {

@@ -186,4 +186,50 @@ class CommandTokenPolicyTest extends BaseTi4Test {
         if (handler.contains("fleet")) test.nekro.setFleetCC(test.nekro.getFleetCC() + delta);
         if (handler.contains("strategy")) test.nekro.setStrategicCC(test.nekro.getStrategicCC() + delta);
     }
+
+    // Once the cards are picked, the strategy pool only needs one token per secondary the AI means to follow: here
+    // Sol's Imperial, for a secret objective. The rest of the round's tokens are worth more as tactic tokens.
+    @Test
+    void midRoundStrategyPoolMatchesTheSecondariesItMeansToFollow() {
+        tokens(3, 3, 3);
+        test.aiIsActive("action");
+        test.sol.addSC(IMPERIAL);
+
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 9))
+                .containsEntry(CommandTokenPolicy.Pool.STRATEGY, 1)
+                .containsEntry(CommandTokenPolicy.Pool.FLEET, 3)
+                .containsEntry(CommandTokenPolicy.Pool.TACTIC, 5);
+        assertThat(CommandTokenPolicy.midRoundSurplus(test.game, test.nekro)).contains("decrease_strategy_cc");
+    }
+
+    // With nothing to follow, the strategy pool is empty and every spare token goes to tactics.
+    @Test
+    void midRoundSurplusGoesToTactics() {
+        tokens(3, 3, 3);
+        test.aiIsActive("action");
+
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 9))
+                .containsEntry(CommandTokenPolicy.Pool.STRATEGY, 0)
+                .containsEntry(CommandTokenPolicy.Pool.TACTIC, 6);
+        assertThat(CommandTokenPolicy.poolToGrow(test.game, test.nekro)).isEqualTo("increase_tactic_cc");
+    }
+
+    // Before the next round's cards are known, the status phase keeps its standing split.
+    @Test
+    void statusPhaseKeepsItsStandingSplit() {
+        tokens(3, 3, 3);
+        test.game.setPhaseOfGame("statusHomework");
+        test.sol.addSC(IMPERIAL);
+
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 9))
+                .containsEntry(CommandTokenPolicy.Pool.STRATEGY, 2);
+    }
+
+    private static final int IMPERIAL = 8;
+
+    private void tokens(int tactic, int fleet, int strategy) {
+        test.nekro.setTacticalCC(tactic);
+        test.nekro.setFleetCC(fleet);
+        test.nekro.setStrategicCC(strategy);
+    }
 }

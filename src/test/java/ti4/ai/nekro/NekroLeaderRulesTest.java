@@ -139,8 +139,9 @@ class NekroLeaderRulesTest extends BaseTi4Test {
                 .isEqualTo("ac_discard_from_hand_2");
     }
 
-    // Without an action card it gives up a command token instead. The bot rewrites the token prompt after the first
-    // token, so the AI recognises the prompt by its message afterwards.
+    // Without an action card it gives up a command token instead. Mid-round only this round's needs count, since the
+    // status phase rearranges every pool: with no secondary worth following, a strategy token is the one to spare. The
+    // bot rewrites the token prompt after the first token, so the AI recognises the prompt by its message afterwards.
     @Test
     void paysForTheAgentWithATokenWhenItHasNoActionCards() {
         test.nekro.setTacticalCC(4);
@@ -149,13 +150,13 @@ class NekroLeaderRulesTest extends BaseTi4Test {
                 + "! Your current command tokens are 4/3/2. Use buttons to lose tokens.");
 
         assertThat(pressed(NekroLeaderRules.payAgentCost(test.context(tokens))))
-                .isEqualTo("FFCC_nekro_decrease_tactic_cc");
+                .isEqualTo("FFCC_nekro_decrease_strategy_cc");
 
-        test.nekro.setTacticalCC(3);
+        test.nekro.setStrategicCC(1);
         AiPrompt rewritten = loseTokens(
-                test.nekro.getRepresentation() + " command tokens have gone from 4/3/2 -> 3/3/2. Net gain of: -1.");
+                test.nekro.getRepresentation() + " command tokens have gone from 4/3/2 -> 4/3/1. Net gain of: -1.");
         assertThat(pressed(NekroLeaderRules.payAgentCost(
-                        test.context(Set.of("tokens|FFCC_nekro_decrease_tactic_cc"), rewritten))))
+                        test.context(Set.of("tokens|FFCC_nekro_decrease_strategy_cc"), rewritten))))
                 .isEqualTo("FFCC_nekro_deleteButtons");
     }
 
