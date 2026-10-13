@@ -47,7 +47,8 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
             SelfPlayGame.Ending ending,
             List<SeatResult> seats,
             List<String> objectives,
-            Map<Integer, double[]> byRound) {}
+            Map<Integer, double[]> byRound,
+            List<ScoringDiagnostic.SeatRound> scoring) {}
 
     @Test
     @EnabledIfSystemProperty(named = "ai.selfplay.roundone", matches = "true")
@@ -56,6 +57,13 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
         int threads = Math.clamp(Integer.getInteger("ai.selfplay.threads", 6), 1, games);
         List<GameResult> results = playAll(games, threads);
         report(results);
+        List<ScoringDiagnostic.SeatRound> scoring = new ArrayList<>();
+        for (GameResult result : results) {
+            scoring.addAll(result.scoring());
+            if (Boolean.getBoolean("ai.selfplay.scorediag.lines"))
+                result.scoring().forEach(seat -> System.out.println(ScoringDiagnostic.line(seat)));
+        }
+        ScoringDiagnostic.report(scoring);
     }
 
     private static void report(List<GameResult> results) {
@@ -166,6 +174,8 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
             java.util.concurrent.atomic.AtomicReference<Game> live =
                     new java.util.concurrent.atomic.AtomicReference<>(game);
             String[] probeState = {"", "", ""};
+            ScoringDiagnostic diagnostic = new ScoringDiagnostic();
+            env.decisionListener = diagnostic::onDecision;
             if (PROBE != null) {
                 synchronized (env) {
                     env.watched.add("[probe] seating " + seating + ", speaker "
@@ -175,6 +185,7 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
             SelfPlayGame.Outcome outcome = selfPlay.run(
                     current -> {
                         live.set(current);
+                        diagnostic.observe(current);
                         if (PROBE != null) probe(env, current, probeState);
                         boolean acting = "action".equalsIgnoreCase(current.getPhaseOfGame());
                         if (acting && !current.getActivePlayerID().equals(lastActive[0])) {
@@ -225,6 +236,7 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
                 System.out.print(dump);
             }
             Game end = live.get();
+            diagnostic.finish(end);
             List<SeatResult> seats = new ArrayList<>();
             for (Player seat : end.getRealPlayers()) {
                 Map<String, Double> weights = ownArea.get(seat.getFaction());
@@ -248,7 +260,7 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
             List<String> objectives =
                     new ArrayList<>(live.get().getRevealedPublicObjectives().keySet());
             objectives.add("technology played on turn " + technologyTurn[0]);
-            return new GameResult(outcome.ending(), seats, objectives, byRound);
+            return new GameResult(outcome.ending(), seats, objectives, byRound, diagnostic.results);
         }
     }
 

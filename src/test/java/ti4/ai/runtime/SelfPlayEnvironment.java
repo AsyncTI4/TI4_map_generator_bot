@@ -106,6 +106,8 @@ final class SelfPlayEnvironment implements AutoCloseable {
     final List<OverrulePick> overrulePicks = new ArrayList<>();
     volatile String lastDecisionReason = "";
     Supplier<Game> game = () -> null;
+    // Sees every decision a seat makes, with the board it made it on; a harness sets it to follow what seats spend.
+    volatile java.util.function.BiConsumer<AiTurnContext, AiDecision> decisionListener = (context, decision) -> {};
 
     record TradeRecord(int round, String from, String to, List<String> items) {}
 
@@ -413,6 +415,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
             @Override
             public AiDecision decide(AiTurnContext context) {
                 AiDecision decision = brain.decide(context);
+                decisionListener.accept(context, decision);
                 if (!(decision instanceof AiDecision.Idle))
                     record(context.faction() + " decided " + describe(decision));
                 countReason(decision);

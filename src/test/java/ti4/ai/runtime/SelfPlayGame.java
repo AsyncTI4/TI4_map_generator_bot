@@ -232,12 +232,29 @@ final class SelfPlayGame {
                 }
             }
         }
+        revealChosenObjectives(game);
         GameManager.save(game, "AI self-play setup");
         if (!GameManager.isValid(name) || GameManager.getManagedGame(name) == null) {
             throw new IllegalStateException(
                     "The game was not registered after setup: valid=" + GameManager.isValid(name));
         }
         return game;
+    }
+
+    // -Dai.selfplay.objectives=intimidate,monument puts these stage one objectives on top of the deck, so the start of
+    // the game reveals them and a batch can study how seats play towards particular objectives.
+    private static void revealChosenObjectives(Game game) {
+        List<String> chosen = java.util.Arrays.stream(
+                        System.getProperty("ai.selfplay.objectives", "").split(","))
+                .map(String::trim)
+                .filter(id -> !id.isEmpty())
+                .toList();
+        if (chosen.isEmpty()) return;
+        List<String> peekable = game.getPublicObjectives1Peekable();
+        List<String> deck = game.getPublicObjectives1();
+        peekable.removeAll(chosen);
+        deck.removeAll(chosen);
+        (peekable.isEmpty() ? deck : peekable).addAll(0, chosen);
     }
 
     // -Dai.actioncards.ab=true plays half of the seats with the action card rules from before the statistics, rotating
