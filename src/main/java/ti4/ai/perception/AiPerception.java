@@ -55,7 +55,8 @@ public class AiPerception {
                 }
             }
             for (AiPrompt prompt : main) {
-                if (isRelevant(PromptSource.PUBLIC, prompt.buttons(), faction, publicWindowPrefixes)) {
+                if (isRelevant(PromptSource.PUBLIC, prompt.buttons(), faction, publicWindowPrefixes)
+                        || prompt.isTableTalk()) {
                     prompts.add(prompt);
                 }
             }
@@ -115,6 +116,11 @@ public class AiPerception {
         return seat.getCardsInfoThread();
     }
 
+    static boolean kept(PromptSource source, List<PromptButton> buttons, String content) {
+        if (source == PromptSource.COMBAT_THREAD) return true;
+        return source == PromptSource.PUBLIC && AiPrompt.isTableTalk(buttons, content);
+    }
+
     static boolean isRelevant(PromptSource source, List<PromptButton> buttons, String faction, Set<String> prefixes) {
         if (buttons.stream().anyMatch(button -> button.handlerId().startsWith(DELEGATION_PREFIX))) return false;
         if (source == PromptSource.COMBAT_THREAD) return true;
@@ -138,7 +144,7 @@ public class AiPerception {
             boolean fromBot = botId.equals(message.getAuthor().getId());
             if (!fromBot && source != PromptSource.COMBAT_THREAD) continue;
             List<PromptButton> buttons = fromBot ? buttonsOf(message) : List.of();
-            if (buttons.isEmpty() && source != PromptSource.COMBAT_THREAD) continue;
+            if (buttons.isEmpty() && !kept(source, buttons, fromBot ? message.getContentRaw() : "")) continue;
             prompts.add(new AiPrompt(
                     channel.getId(),
                     message.getId(),

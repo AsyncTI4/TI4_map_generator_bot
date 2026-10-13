@@ -55,6 +55,8 @@ public final class DefenseOutlook {
     private static final double ACTION_COST = 2.0;
     private static final double THUNDERS_EDGE_ACTION_COST = 0.5;
     private static final double APPETITE_SCALE = 3.0;
+    private static final double APPETITE_MARGIN = 0.5;
+    private static final double SOFT_POSITIVE_LINEAR = 30;
     private static final double NEXT_ROUND_APPETITE_FLOOR = 0.5;
     private static final double SCORING_REASON_SCALE = 8.0;
     private static final double DENIAL_PER_REASON = 4.0;
@@ -667,9 +669,28 @@ public final class DefenseOutlook {
         double attackerLoss = (1 - space) * force.fleetCost()
                 + space * (1 - space) * Math.min(force.fleetCost(), defenders.shipCost(seat))
                 + space * (1 - chances.groundMax()) * force.groundCost();
-        double action =
-                IncomingForces.holdsUnplayedThundersEdgeWarfare(game, enemy) ? THUNDERS_EDGE_ACTION_COST : ACTION_COST;
-        return chances.take() * prize + space * spaceGain - attackerLoss - action;
+        return chances.take() * prize + space * spaceGain - attackerLoss - actionCost(enemy);
+    }
+
+    private double actionCost(Player enemy) {
+        return IncomingForces.holdsUnplayedThundersEdgeWarfare(game, enemy) ? THUNDERS_EDGE_ACTION_COST : ACTION_COST;
+    }
+
+    double attackLikelihood(Player enemy, Tile tile, Horizon horizon, double netGain) {
+        double alternative = Math.max(alternative(enemy, tile) - ACTION_COST, APPETITE_SCALE);
+        double share = attackShare(netGain - actionCost(enemy), alternative);
+        return clamp(roundFactor(horizon) * aggression(enemy) * share * ceasefire(enemy), 0, 1);
+    }
+
+    static double attackShare(double appetite, double alternative) {
+        double eagerness = softPositive(appetite);
+        return eagerness / (eagerness + alternative);
+    }
+
+    private static double softPositive(double value) {
+        double scaled = value / APPETITE_MARGIN;
+        if (scaled > SOFT_POSITIVE_LINEAR) return value;
+        return APPETITE_MARGIN * Math.log1p(Math.exp(scaled));
     }
 
     private double planetPrize(Tile tile) {

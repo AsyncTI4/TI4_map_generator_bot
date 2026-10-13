@@ -101,6 +101,12 @@ class OfferResponder {
         if (DebtRules.repays(context, offerer, deal) && TradeValue.commitmentOk(context, offerer, deal)) {
             return Verdict.accepted();
         }
+        Optional<Boolean> technology = TechnologyRequest.accepts(context, offerer, deal);
+        if (technology.isPresent()) {
+            return technology.get() && TradeValue.commitmentOk(context, offerer, deal)
+                    ? Verdict.accepted()
+                    : Verdict.rejected();
+        }
         double trust = Trust.of(context, offerer);
         if (deal.hasUnsupported()) return withoutUnsupported(context, offerer, deal);
         if (!TradeValue.ourSideCovered(context, offerer, deal)) return nearest(context, offerer, deal);
@@ -171,7 +177,7 @@ class OfferResponder {
                     .ifPresent(alias -> NoteGiving.owe(context, offerer.getFaction(), alias));
         }
         if (honour) TradeCardRules.honoured(context, offerer);
-        TechnologyRequest.noteGift(context, offerer, deal);
+        TechnologyRequest.noteAccepted(context, offerer, deal);
         offer.markAnswered(context);
         return Optional.of(
                 AiDecision.press(offer.prompt(), offer.accept(), "trade: accept offer from " + offerer.getFaction()));

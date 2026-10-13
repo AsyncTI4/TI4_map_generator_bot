@@ -20,7 +20,6 @@ class CardTiming {
     private static final double TE_WARFARE_REACTIVATION_MIN = 2 * TacticalPlanner.MIN_SCORE;
     private static final int LAST_ADVANCE_ROUND = 1;
     private static final String GRAVITY_DRIVE = "gd";
-    private static final int EARLY_TECHNOLOGY_ROUND = 1;
 
     enum Timing {
         NOW,
@@ -58,7 +57,7 @@ class CardTiming {
             case DIPLOMACY_PROTECT -> main.hasTarget() && in.isThreatened(tileAt(in.game(), main.target()));
             case DIPLOMACY_READY -> main.value() >= CardValueScale.READY_SHARE * READY_USE_WORTH_PLAYING;
             case CONSTRUCTION_PRODUCE -> main.value() >= in.bestScore();
-            case TECHNOLOGY_RESEARCH -> in.round() <= EARLY_TECHNOLOGY_ROUND && seat.getInRoundTurnCount() >= 2;
+            case TECHNOLOGY_RESEARCH -> TechnologyTiming.playsNow(in);
             case CONSTRUCTION_PDS -> main.hasTarget() && in.round() >= FIRST_ROUND_FOR_EARLY_PDS;
             case CONSTRUCTION_DOCK -> in.round() <= CardValueScale.LAST_EARLY_DOCK_ROUND;
             case IMPERIAL_MECATOL -> ImperialUses.holdsThreatenedMecatol(in);

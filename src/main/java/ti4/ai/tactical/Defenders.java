@@ -131,6 +131,37 @@ record Defenders(Stack ships, Stack groundInSpace, Map<String, Stack> planets) {
         return new Defenders(newShips, newSpaceGround, newPlanets);
     }
 
+    Defenders arriving(List<UnitMove> moves) {
+        Stack newShips = ships;
+        Stack newSpaceGround = groundInSpace;
+        for (UnitMove move : moves) {
+            if (BoardView.GROUND_FORCES.contains(move.type())) {
+                newSpaceGround = newSpaceGround.plus(move.type(), move.count(), 0);
+            } else {
+                newShips = newShips.plus(move.type(), move.count(), 0);
+            }
+        }
+        return new Defenders(newShips, newSpaceGround, planets);
+    }
+
+    Defenders joinedInSpaceBy(Defenders other) {
+        Stack newShips = ships;
+        Stack newSpaceGround = groundInSpace;
+        for (Map.Entry<UnitType, Integer> ship : other.ships().units().entrySet()) {
+            newShips = newShips.plus(ship.getKey(), ship.getValue(), 0);
+        }
+        for (Map.Entry<UnitType, Integer> ground : other.groundInSpace().units().entrySet()) {
+            newSpaceGround = newSpaceGround.plus(ground.getKey(), ground.getValue(), 0);
+        }
+        return new Defenders(newShips, newSpaceGround, planets);
+    }
+
+    boolean isEmpty() {
+        return ships.isEmpty()
+                && groundInSpace.isEmpty()
+                && planets.values().stream().allMatch(Stack::isEmpty);
+    }
+
     Defenders plusShips(UnitType type, int count, int damagedCount) {
         return new Defenders(ships.plus(type, count, damagedCount), groundInSpace, planets);
     }

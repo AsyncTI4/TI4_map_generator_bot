@@ -10,11 +10,10 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.MovementGraph;
-import ti4.ai.scoring.ScoringReserve;
-import ti4.ai.scoring.SpendCost;
 import ti4.ai.tactical.RoundGoals;
 import ti4.ai.tactical.RoundGoals.Goal;
 import ti4.ai.tactical.TacticalPlanner;
+import ti4.ai.trade.RaisableTradeGoods;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -38,6 +37,7 @@ class OpeningOutlook {
     private static final int LAST_OPENING_ROUND = 1;
     private static final int INFANTRY_PER_RESOURCE = 2;
     private static final String GRAVITY_DRIVE = "gd";
+    private static final int TRADE_PRIMARY_GOODS = 3;
 
     private record Transport(UnitType type, int capacity, int move) {}
 
@@ -57,7 +57,38 @@ class OpeningOutlook {
 
     static double gain(Game game, Player seat, Boost boost) {
         if (game.getRound() > LAST_OPENING_ROUND || boost == Boost.NONE) return 0;
-        if (boost == Boost.GRAVITY_DRIVE && !canReachGravityDrive(game, seat)) return 0;
+        if (boost != Boost.GRAVITY_DRIVE) return planetGain(game, seat, boost);
+        return gravityDriveGain(
+                game,
+                seat,
+                holdsTechnology(game, seat) || canAffordToFollow(game, seat, raisableTradeGoods(game, seat)));
+    }
+
+    static double gravityDriveGainAsTechnologyHolder(Game game, Player seat) {
+        return gravityDriveGain(game, seat, true);
+    }
+
+    static double gravityDriveGainFromTrade(Game game, Player seat, boolean picking) {
+        if (!(picking || holdsUnplayedTrade(game, seat))
+                || holdsTechnology(game, seat)
+                || OpeningNeeds.technologyHolder(game, seat).isEmpty()) {
+            return 0;
+        }
+        int washed = RaisableTradeGoods.byWashing(game, seat);
+        if (canAffordToFollow(game, seat, washed)) return 0;
+        return gravityDriveGain(game, seat, canAffordToFollow(game, seat, washed + TRADE_PRIMARY_GOODS));
+    }
+
+    static int raisableTradeGoods(Game game, Player seat) {
+        return RaisableTradeGoods.byWashing(game, seat) + (holdsUnplayedTrade(game, seat) ? TRADE_PRIMARY_GOODS : 0);
+    }
+
+    private static double gravityDriveGain(Game game, Player seat, boolean funded) {
+        if (game.getRound() > LAST_OPENING_ROUND || !funded || !canResearchGravityDrive(seat)) return 0;
+        return planetGain(game, seat, Boost.GRAVITY_DRIVE);
+    }
+
+    private static double planetGain(Game game, Player seat, Boost boost) {
         return Math.max(0, planetValue(game, seat, boost) - planetValue(game, seat, Boost.NONE));
     }
 
@@ -160,11 +191,10 @@ class OpeningOutlook {
                 .sum();
     }
 
-    private static boolean canReachGravityDrive(Game game, Player seat) {
+    private static boolean canResearchGravityDrive(Player seat) {
         if (seat.hasTech(GRAVITY_DRIVE)) return false;
         TechnologyModel drive = Mapper.getTech(GRAVITY_DRIVE);
-        if (drive == null || ResearchPolicy.missingPrerequisites(seat, drive, null) != 0) return false;
-        return holdsTechnology(game, seat) || canAffordToFollow(game, seat);
+        return drive != null && ResearchPolicy.missingPrerequisites(seat, drive, null) == 0;
     }
 
     private static boolean holdsTechnology(Game game, Player seat) {
@@ -172,9 +202,13 @@ class OpeningOutlook {
                 .anyMatch(initiative -> StrategyCard.of(game, initiative) == StrategyCard.TECHNOLOGY);
     }
 
-    private static boolean canAffordToFollow(Game game, Player seat) {
-        return seat.getStrategicCC() > 0
-                && ScoringReserve.planAfterReserve(game, seat, SpendCost.resources(StrategyCardRules.FOLLOW_TECH_COST))
-                        .isPresent();
+    private static boolean holdsUnplayedTrade(Game game, Player seat) {
+        return seat.getSCs().stream()
+                .anyMatch(initiative -> !game.getPlayedSCs().contains(initiative)
+                        && StrategyCard.of(game, initiative) == StrategyCard.TRADE);
+    }
+
+    private static boolean canAffordToFollow(Game game, Player seat, int raisedTradeGoods) {
+        return seat.getStrategicCC() > 0 && OpeningNeeds.canFollowTechnology(game, seat, 0, raisedTradeGoods);
     }
 }

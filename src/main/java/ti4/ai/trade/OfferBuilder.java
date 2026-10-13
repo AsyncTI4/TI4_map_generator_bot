@@ -44,6 +44,7 @@ class OfferBuilder {
             Purpose.NOTE_DEAL,
             Purpose.DESPERATION,
             Purpose.TECHNOLOGY_REQUEST,
+            Purpose.TECHNOLOGY_HOLD,
             Purpose.DEBT_PAYMENT,
             Purpose.DEBT_COLLECTION);
     private static final List<Order> ORDER = List.of(
@@ -281,6 +282,7 @@ class OfferBuilder {
         Deal deal = build.draft().target();
         Purpose purpose = build.draft().purpose();
         double trust = Trust.of(build.context(), partner);
+        if (purpose.asksAFavor()) return TradeValue.commitmentOk(game, seat, partner, deal);
         if (purpose.proposes()) {
             return TradeValue.coverable(game, seat, partner, deal)
                     && TradeValue.proposable(game, seat, partner, deal, trust);
