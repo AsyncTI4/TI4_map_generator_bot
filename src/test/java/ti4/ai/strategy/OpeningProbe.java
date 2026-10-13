@@ -72,6 +72,24 @@ public final class OpeningProbe {
                 .collect(java.util.stream.Collectors.joining(" || "));
     }
 
+    public static String homeState(Game game, Player seat) {
+        ti4.game.Tile home = seat.getHomeSystemTile();
+        if (home == null) return "no home";
+        int ground = home.getUnitHolders().values().stream()
+                .mapToInt(holder -> ti4.ai.eval.BoardView.groundForces(holder, seat))
+                .sum();
+        long goals = ti4.ai.tactical.RoundGoals.of(game, seat).goals().stream()
+                .filter(ti4.ai.tactical.RoundGoals.Goal::needsTransport)
+                .count();
+        return "home carriers "
+                + ti4.ai.eval.BoardView.count(
+                        ti4.ai.eval.BoardView.space(home), seat, ti4.helpers.Units.UnitType.Carrier)
+                + " ground " + ground + " garrison "
+                + ti4.ai.tactical.TacticalPlanner.groundKeptHomeWhileTransportsLeave(game, seat)
+                + " transport goals " + goals + " awaitsGD " + OpeningHold.awaitsGravityDrive(game, seat)
+                + " | " + goals(game, seat);
+    }
+
     public static String gravityDrive(Game game, Player seat) {
         String best = ResearchPolicy.bestResearchable(game, seat).orElse("none");
         boolean prereq = Mapper.getTech("gd") != null

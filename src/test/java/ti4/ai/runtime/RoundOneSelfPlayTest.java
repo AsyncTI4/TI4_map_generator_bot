@@ -319,7 +319,10 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
         if (board.equals(state[1])) return;
         state[1] = board;
         add(env, "[probe] " + board);
-        if (active == seat) add(env, "[probe]   GD " + ti4.ai.strategy.OpeningProbe.gravityDrive(game, seat));
+        if (active == seat) {
+            add(env, "[probe]   GD " + ti4.ai.strategy.OpeningProbe.gravityDrive(game, seat));
+            add(env, "[probe]   HOME " + ti4.ai.strategy.OpeningProbe.homeState(game, seat));
+        }
         String turnKey = activeFaction + "|" + seat.getInRoundTurnCount() + "|"
                 + game.getPlayedSCs().size();
         if (active == seat && !turnKey.equals(state[2])) {
