@@ -1,0 +1,646 @@
+[
+    {
+        "id": "sharedwealth30k",
+        "name": "Shared Wealth",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Each player with units adjacent to this planet may draw up to 1 action card. For each player that draws an action card, gain 1 trade good.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "tourismbureau30k",
+        "name": "Tourism Bureau",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "For each adjacent wormhole, anomaly, or legendary planet, gain 1 commodity.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "directimport30k",
+        "name": "Direct import",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Gain a commodity, then you may move up to 1 of your ships from an adjacent system to this system.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "initialinvestmentsurplus30k",
+        "name": "Initial Investment Surplus",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Spend 1 commodity or trade good to ready this planet.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "crossspeciesmingling30k",
+        "name": "Cross-species Mingling",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Place X infantry on this planet, with X being the number of planets in or adjacent to this system containing infantry not belonging to you, +1.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "emergencyabortsignal30k",
+        "name": "Emergency Abort Signal",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "Attach: When the planet owner declares a retreat, if this system is within 3 tiles of the active system, they may target this system, and repair up to 1 damaged unit on successful retreat.",
+        "attachmentId": "emergencyabortsignal30k",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "imperialisticgates30k",
+        "name": "Imperialistic Gates",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "Attach: after activating Mecatol Rex, Purge this attachment. Then, all ships that begin their movement in this planet's system may be treated to adjacent to Mecatol Rex.",
+        "attachmentId": "imperialisticgates30k",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "localtariffs30k",
+        "name": "Local Tariffs",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "Attach: After a player activates a system, you may allow that player to move through this system as if it contained no ships. If they do, you may take 1 trade good from that player, and gain 1 commodity.",
+        "attachmentId": "localtariffs30k",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "fauxaltruisticfestivals30k",
+        "name": "Faux Altruistic Festivals",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Each of your neighbors may give you a promissory note from their hand. Each that does may draw an action card. Then, draw an action card.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "distractionefforts30k",
+        "name": "Distraction Efforts",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain 3 trade goods, and you may make an extra Component Action.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "wastefulpirates30k",
+        "name": "Wasteful Pirates",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Roll 5 die. For each roll above 5, assign 1 hit to your ships, and gain 1 trade good for each hit assigned.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "richhostages30k",
+        "name": "Rich hostages",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. When scoring a 1 point objective requires you to spend trade goods, influence, resources, or command tokens, purge this card to reduce the cost by 3.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "subjectivityequasion30k",
+        "name": "Subjectivity Equasion",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 3 trade goods, or spend 5 resources to Research any Blue technology.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "destructiveelements30k",
+        "name": "Destructive Elements",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 3 trade goods, or spend 5 resources to Research any Red technology.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "ancientbiologicalspecimens30k",
+        "name": "Ancient Biological Specimens",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 3 trade goods, or spend 5 resources to Research any Green technology.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "hyperalgorithms30k",
+        "name": "Hyper Algorithms",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 3 trade goods, or spend 5 resources to Research any Yellow technology.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "faultyemergencysignal30k",
+        "name": "Faulty Emergency Signal",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Choose any number of your ships in the active system, and move them to your home system if no other player's ships are in the system.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "insatiablefuelsource30k",
+        "name": "Insatiable Fuel Source",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "All players with command tokens in this system remove them, and add them to their Tactics pools.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "replicationarrays30k",
+        "name": "Replication Arrays",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Discard 2 action cards from your hand if able, and draw 1 action card from the Action Discard pile.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "interestingcontagion30k",
+        "name": "Interesting Contagion",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Place a frontier token in each system adjacent to this one that contains no planets or frontier tokens.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "emergentdefenses30k",
+        "name": "Emergent Defenses",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet or if you remove 1 infantry from this planet, place 1 PDS from your reinforcements on this planet.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "pilotrecoveryprogram30k1",
+        "name": "Pilot Recovery Program",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet or if you remove 1 infantry from this planet, place a command token in your fleet pool.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "pilotrecoveryprogram30k2",
+        "name": "Pilot Recovery Program",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet or if you remove 1 infantry from this planet, place a command token in your fleet pool.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "lostandfound30k1",
+        "name": "Lost and Found",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet or if you remove 1 infantry from this planet, place a destroyer in the space area of this planet if no other player's ships are in it's space area.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "lostandfound30k2",
+        "name": "Lost and Found",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet or if you remove 1 infantry from this planet, place a destroyer in the space area of this planet if no other player's ships are in it's space area.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "imitationfactories30k1",
+        "name": "Imitation Factories",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "Choose a card from the Hazardous discard pile and play it as if it was explored on the current planet. Then, purge this card.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "imitationfactories30k2",
+        "name": "Imitation Factories",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "Choose a card from the Hazardous discard pile and play it as if it was explored on the current planet. Then, purge this card.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "imitationfactories30k3",
+        "name": "Imitation Factories",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "Choose a card from the Hazardous discard pile and play it as if it was explored on the current planet. Then, purge this card.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "imitationfactories30k4",
+        "name": "Imitation Factories",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "Choose a card from the Hazardous discard pile and play it as if it was explored on the current planet. Then, purge this card.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "corrosivediscovery30k1",
+        "name": "Corrosive Discovery",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "Roll 3 dice. For each roll above 4, gain a trade good. For each below 3, one hit is produced against your ground forces on this planet.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "corrosivediscovery30k2",
+        "name": "Corrosive Discovery",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "Roll 3 dice. For each roll above 4, gain a trade good. For each below 3, one hit is produced against your ground forces on this planet.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "precisionlaserdefenses30k",
+        "name": "Precision Laser Defenses",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "Attach: This planet gains Space Cannon 3 when it is the active system.",
+        "attachmentId": "precisionlaserdefenses30k",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "inhospitableenvironment30k",
+        "name": "Inhospitable Environment",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "Attach: For each infantry committed to, or produced on this planet, roll a die. For each number 3 or less, destroy 1 infantry.",
+        "attachmentId": "inhospitableenvironment30k",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "electromagneticflux30k",
+        "name": "Electromagnetic Flux",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "Attach: Mechs not owned by the owner of this planet lose their text and sustain damage abilities during ground combat.",
+        "attachmentId": "electromagneticflux30k",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "defensivebastion30k",
+        "name": "Defensive Bastion",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "Attach: When this system is retreated into by your ships, if this system does not contain one of your command tokens, add up to 4 fighters from your reinforcement to the space area.",
+        "attachmentId": "defensivebastion30k",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "repurposedfacilities30k",
+        "name": "Repurposed Facilities",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may spend 5 resources to place a space dock from your reinforcements on this planet. If you don't, gain 1 trade good.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "ancientexcavators30k",
+        "name": "Ancient Excavators",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 1 trade good, or spend 2 resources to gain the Scanlink Drone Network technology. This card may be used in a transaction.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "dauntingweaponsschematics30k",
+        "name": "Daunting Weapons Schematics",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 1 trade good, or spend 5 resources to gain the Dreadnaught II unit upgrade. This card may be used in a transaction.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "enhancedmobilitycore30k",
+        "name": "Enhanced Mobility Core",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. If you have Grav Drive researched, it grants 2 additional movement instead of 1. This card may be used in a transaction.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "militaryproceduraldocuments30k1",
+        "name": "Military Procedural Documents",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "If there are no mechs on this planet, you may replace 1 infantry on this planet with 1 mech from your reinforcements. Otherwise, gain a commodity.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "militaryproceduraldocuments30k2",
+        "name": "Military Procedural Documents",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "If there are no mechs on this planet, you may replace 1 infantry on this planet with 1 mech from your reinforcements. Otherwise, gain a commodity.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "profitablefactories30k",
+        "name": "Profitable Factories",
+        "type": "Industrial",
+        "resolution": "Attach",
+        "text": "Attach: When this planet is exhausted, gain 1 trade good and exhaust this card.",
+        "attachmentId": "profitablefactories30k",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "carbonconsciousness30k",
+        "name": "Carbon Consciousness",
+        "type": "Industrial",
+        "resolution": "Attach",
+        "text": "Attach: When this planet is exhausted, you may spend influence equal to this planet's resource value to ready this planet. If you do, place an infantry on the planet.",
+        "attachmentId": "carbonconsciousness30k",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "efficiencytechniques30k",
+        "name": "Efficiency Techniques",
+        "type": "Industrial",
+        "resolution": "Attach",
+        "text": "Attach: If anything on this planet contains the Production skill, this planet gains 2 production.",
+        "attachmentId": "efficiencytechniques30k",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "affordablemassproduction30k",
+        "name": "Affordable Mass Production",
+        "type": "Industrial",
+        "resolution": "Attach",
+        "text": "Attach: When Fighters are made using the Production skill of units within this system, reduce the combined cost of the produced units by 1.",
+        "attachmentId": "affordablemassproduction30k",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "foresightofindustry30k1",
+        "name": "Foresight of Industry",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 2 commodities, or you may spend 1 influence to reveal and resolve the next Industrial exploration card on this planet",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "foresightofindustry30k2",
+        "name": "Foresight of Industry",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 2 commodities, or you may spend 1 influence to reveal and resolve the next Industrial exploration card on this planet",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "foresightofindustry30k3",
+        "name": "Foresight of Industry",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 2 commodities, or you may spend 1 influence to reveal and resolve the next Industrial exploration card on this planet",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "foresightofindustry30k4",
+        "name": "Foresight of Industry",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 2 commodities, or you may spend 1 influence to reveal and resolve the next Industrial exploration card on this planet",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "foresightofindustryb30k1",
+        "name": "Foresight of Industry",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 1 commodity for each attachment on a different planet in or adjacent to this planet. If that number is zero, reveal and resolve the next industrial exploration card on this planet.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "foresightofindustryb30k2",
+        "name": "Foresight of Industry",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 1 commodity for each attachment on a different planet in or adjacent to this planet. If that number is zero, reveal and resolve the next industrial exploration card on this planet.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "foresightofindustryb30k3",
+        "name": "Foresight of Industry",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 1 commodity for each attachment on a different planet in or adjacent to this planet. If that number is zero, reveal and resolve the next industrial exploration card on this planet.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "foresightofindustryb30k4",
+        "name": "Foresight of Industry",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 1 commodity for each attachment on a different planet in or adjacent to this planet. If that number is zero, reveal and resolve the next industrial exploration card on this planet.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "datainterchangehubjmsc",
+        "name": "Data Interchange Hub",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "Attach: During the owner of this planet's turn, they may transact with any player with ships in the same system as a wormhole.",
+        "attachmentId": "datainterchangehubjmsc",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "itsatrapjmsc",
+        "name": "It's a trap!",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "A random player in last place with a home system more than 5 hexes away from this system places up to 4 destroyers in this system, instantly engaging in space combat with any player with ships in the active system.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "systematicsympathiesjmsc",
+        "name": "Systematic Sympathies",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Destroy all units in this system. Players who lose four resources or more of ships from this effect permanently gain a Victory Point. Otherwise, they gain a trade good.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "ponderingthenebulaejmsc",
+        "name": "Pondering the Nebulae",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "You may discard 1 unscored secret objective. If you do, draw 1 secret objective.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "werelostcaptainjmsc",
+        "name": "We're Lost, Captain",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "The speaker may choose any system that does not contain a planet or another player's ships. Move all ships from the frontier token system into the empty system, and place a command token from the player's reinforcements in the system if able.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "macguffianoutpostjmsc",
+        "name": "MacGuffian Outpost",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. When you lose a space combat, you and the winner both gain 2 trade goods.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "unseendangerjmsc",
+        "name": "Unseen Danger",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Destroy all of your ships in this system, and place an Asteroid Field Token in this tile. If you destroyed any ships, you may gain the Anti-mass technology if you don't own it.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "foregonediscoveriesjmsc",
+        "name": "Foregone Discoveries",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Reveal the top card of the Relic deck. Choose a player to gain that relic. The chosen player may transact with you during this action phase regardless of if you are neighbors.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "overchargedtargetingsystemjmsc",
+        "name": "Overcharged Targeting System",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "Attach: All Space Cannon units on this planet have +1 added to their Space Cannon rolls",
+        "attachmentId": "overchargedtargetingsystemjmsc",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "id": "productionrelayjmsc",
+        "name": "Production Relay",
+        "type": "Industrial",
+        "resolution": "Attach",
+        "text": "Attach: When Fighters are made using the Production skill of units within this system, choose a player. They place 2 fighters in their home system if it contains no other player's ships.",
+        "attachmentId": "productionrelayjmsc",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    }
+]

@@ -36,6 +36,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKTransactions;
 import ti4.image.Mapper;
 import ti4.image.TransactionGenerator;
 import ti4.logging.BotLogger;
@@ -2297,7 +2298,8 @@ public class TransactionHelper {
                 || player.getPromissoryNotesInPlayArea().contains("viability_trade_convoys")
                 || player2.getPromissoryNotesInPlayArea().contains("viability_trade_convoys")
                 || player2.getNeighbouringPlayers(false).contains(player)
-                || player.getNeighbouringPlayers(false).contains(player2);
+                || player.getNeighbouringPlayers(false).contains(player2)
+                || ThirtyKTransactions.mayTransact(game, player, player2);
     }
 
     public static void checkTransactionLegality(Game game, Player player, Player player2) {

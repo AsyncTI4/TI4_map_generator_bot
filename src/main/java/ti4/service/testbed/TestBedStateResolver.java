@@ -39,6 +39,9 @@ public class TestBedStateResolver {
             "revealedPos",
             "purgedPns",
             "exploreDiscard",
+            "exploreDeck",
+            "relicDeck",
+            "decks",
             "borderAnomalies");
     public static final List<String> SEAT_FIELDS = List.of(
             "tg",
@@ -125,6 +128,11 @@ public class TestBedStateResolver {
             case "revealedPos" -> joinSorted(game.getRevealedPublicObjectives().keySet());
             case "purgedPns" -> joinSorted(game.getPurgedPN());
             case "exploreDiscard" -> joinSorted(game.getAllExploreDiscard());
+            case "exploreDeck" -> joinSorted(game.getAllExplores());
+            case "relicDeck" -> joinSorted(game.getAllRelics());
+            case "decks" ->
+                "ac:" + game.getAcDeckID() + ",so:" + game.getSoDeckID() + ",relic:" + game.getRelicDeckID()
+                        + ",explore:" + game.getExplorationDeckID() + ",agenda:" + game.getAgendaDeckID();
             case "borderAnomalies" ->
                 joinSorted(game.getBorderAnomalies().stream()
                         .map(border -> border.getTile() + ":" + border.getDirection() + ":" + border.getType())

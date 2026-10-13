@@ -1,0 +1,275 @@
+[
+    {
+        "alias": "unspentreserves30k",
+        "name": "Unspent Reserves",
+        "phase": "Status",
+        "text": "Have your maximum Commodity value as Commodities.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "braveextinction30k",
+        "name": "Brave Extinction",
+        "phase": "Status",
+        "text": "Have less than 4 infantry on the game board in total",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "lightmilitary30k",
+        "name": "Light Military",
+        "phase": "Status",
+        "text": "Have more than 8 non-fighter ships on the game board, while also having no Dreadnaughts, War Suns, or Flagships on the game board.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "typecast30k",
+        "name": "Typecast",
+        "phase": "Status",
+        "text": "Have more than half of your planets be the same trait (Hazardous, Cultural, or Industrial)",
+        "points": 1,
+        "notes": "This does count home planets as typeless, and is thus harder for factions with multiple home planets.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "participationtrophy30k",
+        "name": "Participation Trophy",
+        "phase": "Status",
+        "text": "Score no public objective, and have no other secret objectives unscored in your hand.",
+        "points": 1,
+        "notes": "A player scoring this cannot opt into scoring a public objective AFTER scoring this during the status phase",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "relinquishtechnology30k",
+        "name": "Relinquish Technology",
+        "phase": "Action",
+        "text": "Lose control of a planet with an attachment",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "options30k",
+        "name": "Options",
+        "phase": "Status",
+        "text": "Have 7 or more action cards in your hand.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "plannedobsolescence30k",
+        "name": "Planned Obsolescence",
+        "phase": "Action",
+        "text": "Lose control of a planet with a structure",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "reclusivenature30k",
+        "name": "Reclusive Nature",
+        "phase": "Status",
+        "text": "Have ships in no system aside from your home system and adjacent systems.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "nothingtolose30k",
+        "name": "Nothing to lose",
+        "phase": "Status",
+        "text": "Have zero action cards, trade goods, and unexhausted planets in your play area. (May be scored after your public objective)",
+        "points": 1,
+        "notes": "If a public objective requires spending any of the following, and you qualify AFTER spending, then this is valid, but only if reaching zero in ALL of these.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "preparationforwar30k",
+        "name": "Preparation for War",
+        "phase": "Status",
+        "text": "Have a total of 8 tokens in your fleet, strategy and tactics pools.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "unnecessarypredictions30k",
+        "name": "Unnecessary Predictions",
+        "phase": "Status",
+        "text": "Have 3 or more Strategy tokens unused on your sheet.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "policyindifference30k",
+        "name": "Policy Indifference",
+        "phase": "Agenda",
+        "text": "End an agenda phase where you did not play any before/after agenda action cards or cast any votes with all your planets unexhausted.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "policydefiance30k",
+        "name": "Policy Defiance",
+        "phase": "Agenda",
+        "text": "During the agenda phase, be the only player to vote for either For or Against",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "longdistancerelationsjmsc",
+        "name": "Long-distance Relations",
+        "phase": "Status",
+        "text": "Have an Alliance card of a player whose home system is more than 5 hexes away.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "wordofmouthjmsc",
+        "name": "Word of Mouth",
+        "phase": "Status",
+        "text": "Have a Support for the Throne card of a player whose home system is more than 5 hexes away.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "payingrespectsjmsc",
+        "name": "Paying Respects",
+        "phase": "Status",
+        "text": "Have ships in a system adjacent to an eliminated player's home system.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "newworldsjmsc",
+        "name": "New worlds",
+        "phase": "Status",
+        "text": "Control 2 planets that are both more than 5 hexes away from your home system.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "agrandentrancejmsc",
+        "name": "A Grand Entrance",
+        "phase": "Action",
+        "text": "Win a space combat with your flagship in a system more than 5 hexes away from where your flagship was located at the start of this action.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "observingthepossibilitiesjmsc",
+        "name": "Observing the Possibilities",
+        "phase": "Status",
+        "text": "Have units in 4 systems containing different wormhole types.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "reprimandedjmsc",
+        "name": "Reprimanded",
+        "phase": "Action",
+        "text": "Lose a space combat in a system adjacent to Mecatol Rex, or Mecatol Rex itself.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "underoursupervisionjmsc",
+        "name": "Under Our Supervision",
+        "phase": "Action",
+        "text": "Have another player gain a victory point via Imperial with ships in an adjacent system to either Mecatol Rex, or that player's Home system.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "policymakerjmsc",
+        "name": "Policy Maker",
+        "phase": "Agenda",
+        "text": "During the agenda phase, vote more than any other player for any outcome.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "distantflagsjmsc",
+        "name": "Distant Flags",
+        "phase": "Status",
+        "text": "Have two structures on the board more than 5 hexes away from your home system.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "proudflagbearerjmsc",
+        "name": "Proud Flagbearer",
+        "phase": "Status",
+        "text": "Have your flagship in a system more than 5 hexes away from your home system with no other non-fighter ships",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "exploitexhaustionjmsc",
+        "name": "Exploit Exhaustion",
+        "phase": "Action",
+        "text": "Win a ground combat against a player who had Passed.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "quickdeliberationsjmsc",
+        "name": "Quick Deliberations",
+        "phase": "Action",
+        "text": "Be the first player to Pass their turn.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    }
+]

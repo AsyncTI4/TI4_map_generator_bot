@@ -1,0 +1,407 @@
+[
+    {
+        "alias": "warprofiteering30k",
+        "name": "War Profiteering",
+        "phase": "Action",
+        "window": "When two players enter a space combat, and both players' flagships are in the active system",
+        "text": "Choose 1 player. If they win the space combat, gain 4 trade goods.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "extendedcampaigning30k",
+        "name": "Extended Campaigning",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Target a player you are not neighbors with. You may resolve a transaction with that player, and if they accept, the player may ready their agent.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "tradeships30k",
+        "name": "Trade Ships",
+        "phase": "Action",
+        "window": "At the start of your turn",
+        "text": "You may choose 1 other player. You and this player may resolve a transaction this turn as if you were neighbors.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "finalstand30k",
+        "name": "Final Stand",
+        "phase": "Action",
+        "window": "At the start of a round of ground combat",
+        "text": "For the rest of ground combat on a planet you control, if you have exactly 1 infantry on a planet, you roll additional dice equal to the planet's influence.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "publicreprimand30k",
+        "name": "Public Reprimand",
+        "phase": "Action",
+        "window": "After another player gains trade goods from the use of an action card",
+        "text": "The player pays 3 influence, or loses all of their trade goods.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "compoundinterest30k",
+        "name": "Compound Interest",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Place this action card and up to 4 trade goods in your play area. At the start of the next strategy phase, remove this card and gain double the number of trade goods on this card.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "preservationact30k",
+        "name": "Preservation Act",
+        "phase": "Action",
+        "window": "When a player you are not neighbors with purges any number of relic fragments",
+        "text": "You instead gain up to two of the relic fragments being purged.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "devisiveplot30k",
+        "name": "Devisive Plot",
+        "phase": "Action",
+        "window": "When you win a ground combat against a player with an unplayed strategy card",
+        "text": "You may perform the secondary action of their strategy card, using a strategy token from your reinforcements.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "conflagration30k1",
+        "name": "Conflagration",
+        "phase": "Action",
+        "window": "After another player gains control of a planet you control",
+        "text": "Destroy all but one of their infantry. Mechs aren't affected.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "conflagration30k2",
+        "name": "Conflagration",
+        "phase": "Action",
+        "window": "After another player gains control of a planet you control",
+        "text": "Destroy all but one of their infantry. Mechs aren't affected.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "denounceleadership30k",
+        "name": "Denounce Leadership",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Purge a Support for the Throne card in your play area. Draw a secret objective.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "embassyrider30k",
+        "name": "Embassy Rider",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, draw a secret objective.",
+        "playTiming": "AGENDA_AFTER",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "dummyrider30k",
+        "name": "Dummy Rider",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, draw an action card. If your prediction is not correct, add this card back to your hand.",
+        "playTiming": "AGENDA_AFTER",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "publicoutcry30k",
+        "name": "Public Outcry",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. Players cannot vote against your prediction without placing a command token from their reinforcements in a system that contains one or more of their non-fighter ships.",
+        "playTiming": "AGENDA_AFTER",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "hidewithinthefineprint30k",
+        "name": "Hide within the fine print",
+        "phase": "Agenda",
+        "window": "After a player plays a Rider on an agenda with a for or against outcome other than Politics Rider",
+        "text": "You may also follow the text of the action card as though you had played it on the same outcome.",
+        "playTiming": "AGENDA_AFTER",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "objectiongambit30k",
+        "name": "Objection Gambit",
+        "phase": "Agenda",
+        "window": "After a player plays a Rider on an agenda with a for or against outcome other than Politics Rider",
+        "text": "You may also follow the text of the action card as though you had played it on the opposing outcome",
+        "playTiming": "AGENDA_AFTER",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "siphonfundsjmsc1",
+        "name": "Siphon Funds",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Target two players who both have home systems more than 5 hexes away. You may take up to 1 Commodity or Trade good from each of them.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "siphonfundsjmsc2",
+        "name": "Siphon Funds",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Target two players who both have home systems more than 5 hexes away. You may take up to 1 Commodity or Trade good from each of them.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "siphonfundsjmsc3",
+        "name": "Siphon Funds",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Target two players who both have home systems more than 5 hexes away. You may take up to 1 Commodity or Trade good from each of them.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "siphonfundsjmsc4",
+        "name": "Siphon Funds",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Target two players who both have home systems more than 5 hexes away. You may take up to 1 Commodity or Trade good from each of them.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "priceofinformationjmsc1",
+        "name": "Price of Information",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose a player with a home system more than 5 hexes away that you aren't neighbors with. If the player shows you one of their unscored Secret objectives, they gain 2 Commodities.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "priceofinformationjmsc2",
+        "name": "Price of Information",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose a player with a home system more than 5 hexes away that you aren't neighbors with. If the player shows you one of their unscored Secret objectives, they gain 2 Commodities.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "andthentheyblewupjmsc",
+        "name": "And then they blew up!",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Target a system more than 5 hexes away from your Home system. Destroy up to 2 fighters in that system.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "foldingofspacetimejmsc",
+        "name": "Folding of Spacetime",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Target a system on the edge of the game board. Players with ships in this system may move these ships to any other system on the edge of the game board not containing another player's ships.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "antidisestablishmentarianismjmsc",
+        "name": "Antidisestablishmentarianism",
+        "phase": "Action",
+        "window": "When a player's structure is destroyed on a planet more than 5 hexes away from your home system",
+        "text": "Replenish your commodities and the player who lost a structure may replenish theirs.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "distantmapsjmsc1",
+        "name": "Distant Maps",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose a planet more than 5 hexes away from your home system. Reveal the top card of the exploration deck appropriate to this planet. The owner of the planet may pay you 2 trade goods to explore the planet.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "distantmapsjmsc2",
+        "name": "Distant Maps",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose a planet more than 5 hexes away from your home system. Reveal the top card of the exploration deck appropriate to this planet. The owner of the planet may pay you 2 trade goods to explore the planet.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "unverifiedforgeriesjmsc",
+        "name": "Unverified Forgeries",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose a player whose home system is more than 5 hexes away from yours. If the player doesn't spend 2 trade goods and is able to, you may take up to 2 of their relic fragments.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "subjectivejusticejmsc1",
+        "name": "Subjective Justice",
+        "phase": "Agenda",
+        "window": "After a player whose home system is more than 5 hexes away from yours casts votes during the agenda phase",
+        "text": "You may cast 5 additional votes for that outcome.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "subjectivejusticejmsc2",
+        "name": "Subjective Justice",
+        "phase": "Agenda",
+        "window": "After a player whose home system is more than 5 hexes away from yours casts votes during the agenda phase",
+        "text": "You may cast 5 additional votes for that outcome.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "extremerenewaljmsc",
+        "name": "Extreme Renewal",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose another player. That player may choose to remove all of their units from the board and all units from their home system, and place units in their home system equal to their starting units. If they do, they draw 2 Action Cards, and refresh their Commodities.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "ultimatetrickshotjmsc1",
+        "name": "Ultimate Trickshot",
+        "phase": "Action",
+        "window": "When a player uses Sustain Damage in an active system more than 5 hexes away from your home system that does not contain your units",
+        "text": "Destroy that unit.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "ultimatetrickshotjmsc2",
+        "name": "Ultimate Trickshot",
+        "phase": "Action",
+        "window": "When a player uses Sustain Damage in an active system more than 5 hexes away from your home system that does not contain your units",
+        "text": "Destroy that unit.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "cumulativesupportjmsc",
+        "name": "Cumulative Support",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Place infantry on a planet equal to it's distance from your home system, up to a maximum of 4.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "realitydisruptionjmsc1",
+        "name": "Reality Disruption",
+        "phase": "Action",
+        "window": "After activating a system in the Fracture with no planets and no other player's ships",
+        "text": "You may treat this system as adjacent to all wormholes.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "realitydisruptionjmsc2",
+        "name": "Reality Disruption",
+        "phase": "Action",
+        "window": "After activating a system in the Fracture with no planets and no other player's ships",
+        "text": "You may treat this system as adjacent to all wormholes.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "corruptmanifestationjmsc",
+        "name": "Corrupt Manifestation",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Pay 2 influence to choose 1 planet in the Fracture, and place 2 neutral infantry on it. If this planet contains another player's units, the neutral units resolve invasion and ground combat.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "creationofgloryjmsc",
+        "name": "Creation of Glory",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Reveal the top card of the relic deck. You may pay 5 resources to gain that relic immediately. If not, place it at the bottom of the relic deck.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "propheticdeclarationjmsc",
+        "name": "Prophetic Declaration",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Reveal the top card of the relic deck. You may pay 5 influence to gain that relic immediately. If not, place it at the bottom of the relic deck.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    },
+    {
+        "alias": "resourcecondensationjmsc",
+        "name": "Resource Condensation",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Reveal the top card of the relic deck. You may remove 2 command tokens from your sheet to gain that relic immediately. If not, place it at the bottom of the relic deck.",
+        "source": "thirtyk",
+        "automation": "MANUAL",
+        "automationNotes": "Not automated yet. Resolve the card text yourself."
+    }
+]
