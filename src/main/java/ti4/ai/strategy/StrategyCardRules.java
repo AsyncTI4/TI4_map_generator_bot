@@ -421,11 +421,12 @@ public class StrategyCardRules {
                                 && ScoringReserve.planAfterReserve(game, seat, SpendCost.resources(FOLLOW_TECH_COST))
                                         .isPresent()
                         : worthPayingForResearch(
-                                game,
-                                seat,
-                                FOLLOW_TECH_COST,
-                                ResearchPolicy.WORTH_FOLLOWING_FOR,
-                                Wallet.of(game, seat));
+                                        game,
+                                        seat,
+                                        FOLLOW_TECH_COST,
+                                        ResearchPolicy.WORTH_FOLLOWING_FOR,
+                                        Wallet.of(game, seat))
+                                || OpeningHold.awaitsGravityDrive(game, seat);
             case DIPLOMACY -> DiplomacyUse.worthFollowing(game, seat);
             case WARFARE -> homeBuild(game, seat).isPresent();
             case CONSTRUCTION -> StructurePolicy.nearsStructureObjective(game, seat);

@@ -2,6 +2,7 @@ package ti4.ai.strategy;
 
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.scoring.SpendCost;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -27,6 +28,12 @@ public class OpeningHold {
         Tile home = seat.getHomeSystemTile();
         if (home == null || home.hasPlayerCC(seat)) return false;
         return OpeningNeeds.wantsTechnologySoon(game, seat);
+    }
+
+    public static SpendCost gravityDriveReserve(Game game, Player seat) {
+        if (!awaitsGravityDrive(game, seat)) return SpendCost.NONE;
+        int fromTradeGoodsToCome = OpeningOutlook.expectedTradeGoods(game, seat);
+        return SpendCost.resources(Math.max(0, StrategyCardRules.FOLLOW_TECH_COST - fromTradeGoodsToCome));
     }
 
     private static boolean holdsWarfare(Game game, Player seat) {

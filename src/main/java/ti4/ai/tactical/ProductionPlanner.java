@@ -19,6 +19,7 @@ import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
+import ti4.ai.strategy.OpeningHold;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.strategy.TokenPurchase;
 import ti4.game.Game;
@@ -264,7 +265,8 @@ public class ProductionPlanner {
 
     public static SpendCost reserve(Game game, Player seat) {
         SpendCost scoring = ScoringReserve.of(game, seat);
-        return scoring.plus(TokenPurchase.influenceToKeep(game, seat, scoring));
+        return scoring.plus(TokenPurchase.influenceToKeep(game, seat, scoring))
+                .plus(OpeningHold.gravityDriveReserve(game, seat));
     }
 
     static int spendableResources(Game game, Player seat) {

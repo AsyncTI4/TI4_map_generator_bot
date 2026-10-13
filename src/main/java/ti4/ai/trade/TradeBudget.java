@@ -4,7 +4,9 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.scoring.PromisedTradeGoods;
 import ti4.ai.scoring.ScoringReserve;
+import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
+import ti4.ai.strategy.OpeningHold;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -46,8 +48,13 @@ class TradeBudget {
     }
 
     static int reservedTradeGoods(Game game, Player seat) {
-        return ScoringReserve.reserved(game, seat)
-                .flatMap(reserved -> Wallet.of(game, seat).plan(reserved.cost()))
+        SpendCost reserve = ScoringReserve.reserved(game, seat)
+                .map(ScoringReserve.Reserved::cost)
+                .orElse(SpendCost.NONE)
+                .plus(OpeningHold.gravityDriveReserve(game, seat));
+        if (reserve.isNone()) return 0;
+        return Wallet.of(game, seat)
+                .plan(reserve)
                 .map(Wallet.Payment::tradeGoods)
                 .orElse(0);
     }
