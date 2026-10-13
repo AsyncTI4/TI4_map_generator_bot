@@ -9,6 +9,7 @@ import ti4.game.Player;
 public class PromisedTradeGoods {
 
     public static final String TRADE_GOODS = "TGs";
+    public static final String COMMODITIES = "Comms";
     private static final String SENDING = "sending";
     private static final String RECEIVING = "_receiving";
     private static final String SEPARATOR = "_";
