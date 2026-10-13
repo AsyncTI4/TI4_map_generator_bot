@@ -95,7 +95,7 @@ class HiddenInfoGuardTest extends BaseTi4Test {
             Stinginess.pillageLeak(table.game, spy, table.nekro, deal);
             for (DealItem item : deal.items()) {
                 if (item.isTo("nekro")) ComponentValues.receive(table.game, table.nekro, spy, item, TRUST);
-                if (item.isFrom("nekro")) ComponentValues.give(table.game, table.nekro, spy, item, TRUST, true);
+                if (item.isFrom("nekro")) ComponentValues.give(table.game, table.nekro, spy, item, TRUST);
             }
         }
         Stinginess.nearWin(table.game, spy);

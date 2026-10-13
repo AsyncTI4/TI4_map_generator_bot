@@ -659,10 +659,33 @@ to build one by hand:
   offerer holds, never from message text.
   - **Valuation**, in trade goods. A trade good or a received commodity is worth 1; its own commodity 0.6 when it could
     wash it with someone else, otherwise 0.3; debt it is owed is worth the debtor's trust × how soon they can pay (0.9
-    while they can trade with it, less otherwise) × 0.5 near the end; promissory notes follow a table (its own
-    _Support for the Throne_ and _Alliance_ only when desperate, and only to a player well behind). A victory point is
+    while they can trade with it, less otherwise) × 0.5 near the end; promissory notes as below. A victory point is
     worth 6 trade goods, rising to 12 near the goal and 30 for a winning score, so a deal that completes a spend
     objective is worth paying extra for (**desperation**, never more than 3/4 of the point).
+  - **Promissory note values**, the same for the note given and the note received, from public information only:
+    - _Support for the Throne_ (`ThroneValue`, its weights in one record). Received: the point (6 to 12, or 30 if it
+      wins) × the chance of keeping it for the rounds left (a small loss per round, more beside its owner and per
+      system the two share), less the systems it fences off for every round left (beside the owner, each shared system,
+      Mecatol Rex while the owner sits on it), so an early swap with a neighbour rarely pays. Its own given away: the
+      option of a better deal once the threats are clearer (1/8 of a point per round left, at most 3/4), less the
+      peace it buys on a border (the receiver now loses the point for
+      activating its units; more against a stronger, more aggressive neighbour). The point handed over is charged by
+      the stinginess term like any other gain of the partner's, so it swaps with a peer and never feeds a leader or a
+      player one point from winning. It is never the "least harmful" note a TBD request takes.
+    - _Alliance_ (`AllianceValue`): its owner's commander, rated per faction (Keleres 3, Jol-Nar 2.5, Hacan, Xxcha, Sol
+      and Nekro 2, others 0.5 to 1.5), half while locked; nothing for Mahact. Its own costs 0.3, so it sells one for 1
+      or 2 trade goods and swaps them freely.
+    - _Trade Agreement_: its owner's commodity value less 1.
+    - _Political Secret_: 1 per agenda phase still to come, through round 5's (the current round counts once the
+      custodians are taken).
+    - _Ceasefire_ (`CeasefireValue`): traded under duress. A seat is under duress from another whose fleet could take
+      its home system or the Mecatol Rex it holds (ships worth at least 8 resources can reach it, and at least 1.5 times
+      what defends it): it values that seat's
+      Ceasefire at 3/4 of the stake (a point's worth + 2 for home, half a point for Mecatol) and its own at 0.5 to them.
+      Otherwise its own costs 2.5 (or half of what it could take from the receiver), and one received is worth 0.5 from
+      a neighbour, 0.2 from afar.
+    - Anything the engine cannot enforce (votes, attacks, territory) is not part of a deal and is worth nothing: every
+      deal it values is delivered in full when it is accepted.
   - **Stinginess** (public information only). It subtracts what the deal gives the partner, weighted by how far the
     partner leads (fully for a player close to winning), and refuses to give a point to a player who could win with it
     or to a clear leader. It accepts deals worth at least 0.3 to it (from an AI) or 0.5 (from a human) after that, and
@@ -672,8 +695,12 @@ to build one by hand:
     resets on undo or restart.
   - **What it starts.** On its own turn, before its action (at most 2 offers a turn): paying its own debt, buying the
     trade goods it is short for a spend objective (the cheapest package of commodities, debt or a note the lender would
-    accept, at most twice a round), a 1:1 commodity wash, selling commodities when nobody has any to wash, and
-    collecting debt from human players. In the agenda phase: paying debt (with the "Send" buttons of the bot's debt
+    accept, at most twice a round), a 1:1 commodity wash, a promissory note deal, selling commodities when nobody has
+    any to wash, and collecting debt from human players. A **note deal** (`NoteDeals`) is the best of: one of its own
+    colour notes sold for 1 to 6 trade goods, the partner's _Support for the Throne_ or _Alliance_ (while in their hand,
+    which their play areas show) or, under duress, _Ceasefire_ bought for 1 to 6, or a one-for-one note swap with or
+    without a trade good; it must clear the usual margins for both sides (at most 2 a round, one per partner). The
+    partner's note is picked in the builder by its name, never by its hand number. In the agenda phase: paying debt (with the "Send" buttons of the bot's debt
     reminder, never "Erase"), collecting debt and washing (with another AI only when its faction sorts first). At
     most 12 new offers an hour, 3 waiting for an answer, and one unsolicited offer per human player per round.
   - **Trade card.** As holder it bills each follower once (its pending offers wait up to 30 minutes for trade goods to
@@ -693,7 +720,9 @@ to build one by hand:
   - **Self-play statistics.** Every accepted offer is logged (round, parties, items). The report lists per seat its
     commodities, debts, offers sent, accepted, rescinded and countered, the trade goods and commodities that moved, and
     Trade settlements accepted out of sent, followed by `TRADE_INVARIANT` lines. A batch prints the trades per game,
-    the acceptance rate and the trade goods gained by trading per seat.
+    the acceptance rate and the trade goods gained by trading per seat. Promissory notes are tracked on their own
+    (`PromissoryTracker`): every change of holder between ticks, every play (from the engine's play event), the notes
+    still unplayed in another seat's hand and those that never left their owner; a batch prints these per note.
 - **Checks and Balances.** When it must give its picked card away, it plans the card and the recipient together,
   among the players who can still receive a card: if the strongest of them is ahead of it (or leads the game), it
   gives them the card least useful to them; otherwise it gives the player with the fewest points the card most

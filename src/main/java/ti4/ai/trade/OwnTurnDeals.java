@@ -66,6 +66,7 @@ class OwnTurnDeals {
         if (TradeMemory.count(context.memory(), turnDraftsKey(context)) >= OWN_TURN_DRAFTS) return Optional.empty();
         Optional<AiDecision> started = desperation(context, partners)
                 .or(() -> wash(context, partners, partner -> true))
+                .or(() -> NoteDeals.propose(context, partners))
                 .or(() -> sell(context, partners))
                 .or(() -> collect(context, partners));
         started.ifPresent(ignored -> TradeMemory.increment(context.memory(), turnDraftsKey(context)));
@@ -184,7 +185,7 @@ class OwnTurnDeals {
         for (int debt = needed; debt <= Math.min(debtRoom, needed + EXTRA_DEBT); debt++) {
             packages.add(ask.adjust(ours, theirs, ItemType.SEND_DEBT, debt));
         }
-        NotesForTrade.leastHarmful(game, seat, lender, true)
+        NotesForTrade.leastHarmful(game, seat, lender)
                 .map(alias -> seat.getPromissoryNotes().get(alias))
                 .filter(Objects::nonNull)
                 .ifPresent(id -> packages.add(
@@ -192,7 +193,7 @@ class OwnTurnDeals {
         double trust = Trust.of(context, lender);
         Map<String, Deal> distinct = new LinkedHashMap<>();
         for (Deal deal : packages) {
-            if (DealSearch.giveCost(game, seat, lender, deal, trust, true) <= spendCap) {
+            if (DealSearch.giveCost(game, seat, lender, deal, trust) <= spendCap) {
                 distinct.putIfAbsent(deal.fingerprint(), deal);
             }
         }
@@ -287,7 +288,7 @@ class OwnTurnDeals {
         return Optional.empty();
     }
 
-    private static boolean mayApproach(AiTurnContext context, Player partner) {
+    static boolean mayApproach(AiTurnContext context, Player partner) {
         if (AiSeats.isAiSeat(partner)) return true;
         return Trust.of(context, partner) >= Trust.UNSOLICITED
                 && TradeMemory.count(context.memory(), unsolicitedKey(context, partner)) < MAX_UNSOLICITED;

@@ -195,6 +195,35 @@ class OfferBuilderTest extends BaseTi4Test {
         assertThat(pressed(tick(picker("PNs", nekro, sol, "8", "7")))).isEqualTo("offerToTransact_PNs_black_blue_7");
     }
 
+    // A swap asks for the partner's note by its name: the picker numbers the partner's hand, which the AI must not
+    // read, so the button is matched on its label. The picked number then counts as the note asked for.
+    @Test
+    void asksForThePartnersNoteByName() {
+        nekro.setPromissoryNote("black_sftt", 7);
+        sol.setPromissoryNote("blue_cf", 12);
+        sol.setPromissoryNote("blue_sftt", 13);
+        start(
+                deal("sendingnekro_receivingsol_PNs_7", "sendingsol_receivingnekro_PNs_bluefin9sftt"),
+                Purpose.SETTLEMENT);
+        tick(playerPicker());
+        tick(offering());
+        tick(picker("PNs", nekro, sol, "7"));
+        nekro.addTransactionItem("sendingnekro_receivingsol_PNs_7");
+
+        assertThat(pressed(tick(offering()))).isEqualTo("getNewTransaction_blue_black");
+        assertThat(pressed(tick(asking()))).isEqualTo("newTransact_PNs_blue_black");
+        AiPrompt solsNotes = AiTestGame.prompt(
+                nextId(),
+                AiPrompt.PromptSource.AI_THREAD,
+                posted(),
+                List.of("offerToTransact_PNs_blue_black_12", "offerToTransact_PNs_blue_black_13"),
+                List.of("Ceasefire", "Support for the Throne"));
+        assertThat(pressed(tick(solsNotes))).isEqualTo("offerToTransact_PNs_blue_black_13");
+        nekro.addTransactionItem("sendingsol_receivingnekro_PNs_13");
+
+        assertThat(pressed(tick(asking()))).isEqualTo("sendOffer_blue");
+    }
+
     // Items the target does not hold mean the builder went wrong: start over from the builder's own Reset. An old
     // offer from Sol sits in the thread with the same Reset id; it is not the one pressed.
     @Test

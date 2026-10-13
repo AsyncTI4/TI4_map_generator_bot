@@ -22,6 +22,8 @@ import ti4.ai.trade.BuilderPrompts.Pick;
 import ti4.ai.trade.BuilderPrompts.Step;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.image.Mapper;
+import ti4.model.PromissoryNoteModel;
 
 @UtilityClass
 class OfferBuilder {
@@ -36,8 +38,13 @@ class OfferBuilder {
     private static final String SEPARATOR = "_";
     private static final Set<ItemType> REQUESTABLE =
             EnumSet.of(ItemType.TRADE_GOODS, ItemType.COMMODITIES, ItemType.SEND_DEBT, ItemType.CLEAR_DEBT);
-    private static final Set<Purpose> TURN_BOUND =
-            EnumSet.of(Purpose.WASH, Purpose.SELL, Purpose.DESPERATION, Purpose.DEBT_PAYMENT, Purpose.DEBT_COLLECTION);
+    private static final Set<Purpose> TURN_BOUND = EnumSet.of(
+            Purpose.WASH,
+            Purpose.SELL,
+            Purpose.NOTE_DEAL,
+            Purpose.DESPERATION,
+            Purpose.DEBT_PAYMENT,
+            Purpose.DEBT_COLLECTION);
     private static final List<Order> ORDER = List.of(
             new Order(true, ItemType.COMMODITIES),
             new Order(true, ItemType.TRADE_GOODS),
@@ -47,7 +54,8 @@ class OfferBuilder {
             new Order(false, ItemType.SEND_DEBT),
             new Order(false, ItemType.COMMODITIES),
             new Order(false, ItemType.TRADE_GOODS),
-            new Order(false, ItemType.PROMISSORY));
+            new Order(false, ItemType.PROMISSORY),
+            new Order(true, ItemType.PROMISSORY));
 
     private record Order(boolean fromPartner, ItemType type) {}
 
@@ -155,7 +163,7 @@ class OfferBuilder {
                 context,
                 draft,
                 partner,
-                Deal.between(context.seat(), partner),
+                Deal.between(context.seat(), partner).withNotesNamedAs(partner.getFaction(), draft.target()),
                 BuilderPrompts.newest(context, partner, since));
         if (draft.aborting()) return finishAbort(build);
         if (mustAbort(build)) return abort(build);
@@ -198,15 +206,22 @@ class OfferBuilder {
         }
         List<Pick> picks = BuilderPrompts.picks(picker);
         Optional<Pick> choice = missing.type() == ItemType.PROMISSORY
-                ? picks.stream()
-                        .filter(pick -> pick.detail().equals(missing.detail()))
-                        .findFirst()
+                ? picks.stream().filter(pick -> picksNote(build, missing, pick)).findFirst()
                 : picks.stream()
                         .filter(pick -> amount(pick).isPresent() && amount(pick).getAsInt() <= missing.remaining())
                         .max(Comparator.comparingInt(pick -> amount(pick).getAsInt()));
         if (choice.isEmpty()) return abort(build);
         return press(
                 build, picker.prompt(), choice.get().button(), "trade: put " + describe(missing) + " in the offer");
+    }
+
+    private static boolean picksNote(Build build, Missing missing, Pick pick) {
+        if (Standings.same(missing.sender(), build.seat())) return pick.detail().equals(missing.detail());
+        String name = NotesForTrade.aliasOf(missing.sender(), missing.detail())
+                .map(Mapper::getPromissoryNote)
+                .map(PromissoryNoteModel::getName)
+                .orElse("");
+        return !name.isEmpty() && name.equals(pick.button().label());
     }
 
     private static OptionalInt amount(Pick pick) {
@@ -430,11 +445,15 @@ class OfferBuilder {
         String theirs = partner.getFaction();
         if (!DealItem.tradable(theirs) || target.notes(ours).size() > 1) return false;
         return target.items().stream().allMatch(item -> {
-            if (item.isFrom(theirs) && item.isTo(ours)) return REQUESTABLE.contains(item.type());
+            if (item.isFrom(theirs) && item.isTo(ours)) return REQUESTABLE.contains(item.type()) || namedNote(item);
             if (!item.isFrom(ours) || !item.isTo(theirs)) return false;
             if (item.type() == ItemType.PROMISSORY) return StringUtils.isNumeric(item.detail());
             return REQUESTABLE.contains(item.type());
         });
+    }
+
+    private static boolean namedNote(DealItem item) {
+        return item.type() == ItemType.PROMISSORY && !item.isGenericNote() && !StringUtils.isNumeric(item.detail());
     }
 
     static String scopeKey(Game game, Purpose purpose, Deal target) {

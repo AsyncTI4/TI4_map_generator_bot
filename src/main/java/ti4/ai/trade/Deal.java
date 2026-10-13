@@ -55,6 +55,21 @@ record Deal(List<DealItem> items) {
                 .toList();
     }
 
+    Deal withNotesNamedAs(String sender, Deal target) {
+        List<String> named = target.notes(sender);
+        List<DealItem> aligned = new ArrayList<>();
+        int next = 0;
+        for (DealItem item : items) {
+            boolean note = item.isFrom(sender) && item.type() == ItemType.PROMISSORY;
+            if (note && next < named.size()) {
+                aligned.add(new DealItem(item.sender(), item.receiver(), item.type(), named.get(next++)));
+            } else {
+                aligned.add(item);
+            }
+        }
+        return new Deal(aligned);
+    }
+
     boolean isDebtOnly() {
         return items.stream().allMatch(item -> item.type().isDebt());
     }

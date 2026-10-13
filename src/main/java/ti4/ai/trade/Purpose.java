@@ -11,6 +11,7 @@ enum Purpose {
     EVEN_WASH("Trade settlement"),
     WASH("wash"),
     SELL("sale"),
+    NOTE_DEAL("promissory note deal"),
     DESPERATION("purchase"),
     DEBT_PAYMENT("debt payment"),
     DEBT_COLLECTION("debt collection"),
@@ -19,7 +20,7 @@ enum Purpose {
     ADOPTED("offer");
 
     private static final Set<Purpose> SETTLEMENTS = EnumSet.of(SETTLEMENT, SETTLEMENT_FEE, EVEN_WASH);
-    private static final Set<Purpose> PROPOSALS = EnumSet.of(WASH, SELL, DESPERATION);
+    private static final Set<Purpose> PROPOSALS = EnumSet.of(WASH, SELL, NOTE_DEAL, DESPERATION);
     private static final Set<Purpose> LONG_HUMAN_REPLY = EnumSet.of(SETTLEMENT, SETTLEMENT_FEE, DEBT_COLLECTION);
 
     private final String label;

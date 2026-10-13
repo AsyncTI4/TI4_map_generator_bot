@@ -61,6 +61,14 @@ public class BoardView {
                 .sum();
     }
 
+    public static double shipCost(@Nullable UnitHolder holder, Player player) {
+        return ships(holder, player).entrySet().stream()
+                .filter(entry -> entry.getKey() != UnitType.Fighter)
+                .mapToDouble(entry ->
+                        model(player, entry.getKey()).map(UnitModel::getCost).orElse(0f) * entry.getValue())
+                .sum();
+    }
+
     public static int undamaged(@Nullable UnitHolder holder, Player player, UnitType type) {
         return holder == null ? 0 : holder.getUnitCountForState(type, player, UnitState.none);
     }

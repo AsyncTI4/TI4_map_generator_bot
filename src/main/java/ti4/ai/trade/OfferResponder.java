@@ -167,7 +167,7 @@ class OfferResponder {
         if (!deal.isDebtOnly()) TradeLegality.useWindow(context, offerer);
         if (paysDebtToUs(seat, offerer, deal)) Trust.record(context, offerer, Trust.Event.PAID_DEBT);
         if (asksForAnyNote(seat, deal)) {
-            NotesForTrade.leastHarmful(context.game(), seat, offerer, false)
+            NotesForTrade.leastHarmful(context.game(), seat, offerer)
                     .ifPresent(alias -> NoteGiving.owe(context, offerer.getFaction(), alias));
         }
         if (honour) TradeCardRules.honoured(context, offerer);

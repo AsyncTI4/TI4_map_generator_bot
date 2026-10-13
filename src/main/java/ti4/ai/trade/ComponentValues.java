@@ -49,18 +49,11 @@ public class ComponentValues {
         };
     }
 
-    static double give(Game game, Player seat, Player to, DealItem item, double trustInTo, boolean desperate) {
-        return give(game, seat, to, item, trustInTo, desperate, false);
+    static double give(Game game, Player seat, Player to, DealItem item, double trustInTo) {
+        return give(game, seat, to, item, trustInTo, false);
     }
 
-    static double give(
-            Game game,
-            Player seat,
-            Player to,
-            DealItem item,
-            double trustInTo,
-            boolean desperate,
-            boolean seatPrivate) {
+    static double give(Game game, Player seat, Player to, DealItem item, double trustInTo, boolean seatPrivate) {
         int amount = item.amount();
         return switch (item.type()) {
             case TRADE_GOODS -> TRADE_GOOD * amount;
@@ -68,7 +61,7 @@ public class ComponentValues {
             case SEND_DEBT -> DEBT_LIABILITY * amount;
             case CLEAR_DEBT -> debtReceivable(game, seat, to, amount, trustInTo);
             case FRAGMENTS -> NotesForTrade.INFINITE;
-            case PROMISSORY -> givenNote(game, seat, to, item, desperate, seatPrivate);
+            case PROMISSORY -> givenNote(game, seat, to, item, seatPrivate);
             case UNSUPPORTED -> 0;
         };
     }
@@ -108,16 +101,15 @@ public class ComponentValues {
                 .orElse(NotesForTrade.OTHER_NOTE);
     }
 
-    private static double givenNote(
-            Game game, Player seat, Player to, DealItem item, boolean desperate, boolean seatPrivate) {
+    private static double givenNote(Game game, Player seat, Player to, DealItem item, boolean seatPrivate) {
         if (item.isGenericNote()) {
             if (seatPrivate) return NotesForTrade.UNKNOWN_NOTE_COST * item.amount();
-            return NotesForTrade.leastHarmful(game, seat, to, false)
-                    .map(alias -> NotesForTrade.giveCost(game, seat, to, alias, false) * item.amount())
+            return NotesForTrade.leastHarmful(game, seat, to)
+                    .map(alias -> NotesForTrade.giveCost(game, seat, to, alias) * item.amount())
                     .orElse(NotesForTrade.INFINITE);
         }
         return NotesForTrade.aliasOf(seat, item.detail())
-                .map(alias -> NotesForTrade.giveCost(game, seat, to, alias, desperate))
+                .map(alias -> NotesForTrade.giveCost(game, seat, to, alias))
                 .orElse(NotesForTrade.INFINITE);
     }
 

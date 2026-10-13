@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import ti4.ai.scoring.SpendUnlock;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -88,7 +89,7 @@ class Stinginess {
         double gain = 0;
         for (DealItem item : deal.items()) {
             if (item.isTo(faction)) gain += valueToPartner(game, partner, seat, item, rate, seatPrivate);
-            if (item.isFrom(faction)) gain -= costToPartner(item, rate);
+            if (item.isFrom(faction)) gain -= costToPartner(game, partner, seat, item, rate);
         }
         int net = deal.netTradeGoodsTo(faction);
         int points = net > 0 ? Math.max(0, SpendUnlock.pointDelta(game, partner, net)) : 0;
@@ -104,7 +105,7 @@ class Stinginess {
     static List<Veto> vetoes(Game game, Player seat, Player partner, Deal deal) {
         List<Veto> vetoes = new ArrayList<>();
         int net = deal.netTradeGoodsTo(partner.getFaction());
-        int points = net > 0 ? SpendUnlock.pointDelta(game, partner, net) : 0;
+        int points = (net > 0 ? SpendUnlock.pointDelta(game, partner, net) : 0) + thronePoints(game, partner, deal);
         if (points > 0 && Standings.vp(partner) + points >= Standings.goal(game)) vetoes.add(Veto.WIN);
         if (points > 0 && rivalry(game, seat, partner) >= FEEDS_LEADER) vetoes.add(Veto.LEADER);
         if (deal.hasUnsupported()) vetoes.add(Veto.UNSUPPORTED);
@@ -114,6 +115,13 @@ class Stinginess {
         }
         if (!TradeLegality.isLegal(game, seat, partner, deal)) vetoes.add(Veto.ILLEGAL);
         return vetoes;
+    }
+
+    static int thronePoints(Game game, Player receiver, Deal deal) {
+        return (int) deal.items().stream()
+                .filter(item -> item.isTo(receiver.getFaction()))
+                .filter(item -> NotesForTrade.grantsThrone(game, item, receiver))
+                .count();
     }
 
     static double pillageLeak(Game game, Player seat, Player partner, Deal deal) {
@@ -151,13 +159,16 @@ class Stinginess {
         };
     }
 
-    private static double costToPartner(DealItem item, double rate) {
+    private static double costToPartner(Game game, Player partner, Player seat, DealItem item, double rate) {
         int amount = item.amount();
         return switch (item.type()) {
             case TRADE_GOODS -> rate * amount;
             case COMMODITIES -> PARTNER_COMMODITY * amount;
             case SEND_DEBT, CLEAR_DEBT -> PARTNER_DEBT * amount;
-            case PROMISSORY -> PARTNER_NOTE * amount;
+            case PROMISSORY ->
+                namedNoteOfPartner(item)
+                        .map(alias -> NotesForTrade.giveCost(game, partner, seat, alias))
+                        .orElse(PARTNER_NOTE * amount);
             case FRAGMENTS -> PARTNER_FRAGMENT * amount;
             case UNSUPPORTED -> 0;
         };
@@ -166,11 +177,15 @@ class Stinginess {
     private static double noteFromSeat(Game game, Player partner, Player seat, DealItem item, boolean seatPrivate) {
         if (item.isGenericNote() && seatPrivate) return PARTNER_NOTE * item.amount();
         Optional<String> alias = item.isGenericNote()
-                ? NotesForTrade.leastHarmful(game, seat, partner, false)
+                ? NotesForTrade.leastHarmful(game, seat, partner)
                 : NotesForTrade.aliasOf(seat, item.detail());
-        if (alias.isEmpty()) return NotesForTrade.OTHER_NOTE;
-        double cost = NotesForTrade.giveCost(game, seat, partner, alias.get(), true);
-        return Double.isFinite(cost) ? cost : NotesForTrade.receiveValue(game, partner, alias.get());
+        return alias.map(note -> NotesForTrade.receiveValue(game, partner, note))
+                .orElse(NotesForTrade.OTHER_NOTE);
+    }
+
+    private static Optional<String> namedNoteOfPartner(DealItem item) {
+        if (item.isGenericNote() || StringUtils.isNumeric(item.detail())) return Optional.empty();
+        return Optional.of(item.detail().replace(DealItem.ALIAS_UNDERSCORE, "_"));
     }
 
     private static double thresholdBonus(Player partner, int net) {

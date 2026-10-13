@@ -67,12 +67,11 @@ class TradeValue {
     private static Valuation evaluate(
             Game game, Player self, Player other, Deal deal, double trust, boolean selfPrivate) {
         String faction = self.getFaction();
-        boolean desperate = Desperation.tradeGoodsShort(game, self).isPresent();
         double components = 0;
         for (DealItem item : deal.items()) {
             if (item.isTo(faction)) components += ComponentValues.receive(game, self, other, item, trust, selfPrivate);
             if (item.isFrom(faction)) {
-                components -= ComponentValues.give(game, self, other, item, trust, desperate, selfPrivate);
+                components -= ComponentValues.give(game, self, other, item, trust, selfPrivate);
             }
         }
         double leak = Stinginess.pillageLeak(game, self, other, deal);
@@ -127,7 +126,7 @@ class TradeValue {
         return deal.items().stream()
                 .filter(item -> item.isFrom(faction) && item.type() == ItemType.PROMISSORY)
                 .allMatch(item -> item.isGenericNote()
-                        ? NotesForTrade.leastHarmful(game, seat, partner, false).isPresent()
+                        ? NotesForTrade.leastHarmful(game, seat, partner).isPresent()
                         : NotesForTrade.aliasOf(seat, item.detail())
                                 .filter(alias -> NotesForTrade.inHand(seat, alias))
                                 .isPresent());

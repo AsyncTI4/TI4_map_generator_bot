@@ -83,7 +83,7 @@ class CounterOffers {
                 .filter(item -> item.isFrom(ours) && item.type() == ItemType.PROMISSORY)
                 .map(item -> heldNote(game, seat, partner, item))
                 .flatMap(Optional::stream)
-                .min(Comparator.comparingDouble(alias -> NotesForTrade.giveCost(game, seat, partner, alias, false)))
+                .min(Comparator.comparingDouble(alias -> NotesForTrade.giveCost(game, seat, partner, alias)))
                 .map(alias -> without.with(new DealItem(
                         ours,
                         partner.getFaction(),
@@ -93,7 +93,7 @@ class CounterOffers {
     }
 
     private static Optional<String> heldNote(Game game, Player seat, Player partner, DealItem item) {
-        if (item.isGenericNote()) return NotesForTrade.leastHarmful(game, seat, partner, false);
+        if (item.isGenericNote()) return NotesForTrade.leastHarmful(game, seat, partner);
         return NotesForTrade.aliasOf(seat, item.detail()).filter(alias -> NotesForTrade.inHand(seat, alias));
     }
 
