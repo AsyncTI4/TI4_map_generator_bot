@@ -63,22 +63,23 @@ class HomeDefenseTest extends BaseTi4Test {
     }
 
     // Two Sardakk dreadnoughts and two cruisers next door carry no ground forces, so the threat model sees nothing
-    // to lose. Late in the game a battle fleet in reach of home is still reason to keep the home fleet there: it
-    // would otherwise blockade the dock and clear the way for a landing.
+    // to lose. Late in the game a battle fleet in reach of home is still reason to keep part of the home fleet there:
+    // it would otherwise blockade the dock and clear the way for a landing. With nothing to land, its motive is at the
+    // floor, so part of the fleet may still go.
     @Test
     void aStrongFleetNextDoorLateInTheGameKeepsShipsHome() {
         board.test.game.setRound(5);
         board.test.units(board.staging, "space", board.sardakk, UnitType.Dreadnought, 2);
         board.test.units(board.staging, "space", board.sardakk, UnitType.Cruiser, 2);
-        board.test.units(board.home, "space", board.test.nekro, UnitType.Dreadnought, 3);
-        List<UnitMove> fleet = List.of(fromHome(UnitType.Dreadnought, 3));
+        board.test.units(board.home, "space", board.test.nekro, UnitType.Dreadnought, 4);
+        board.test.units(board.home, "space", board.test.nekro, UnitType.Cruiser, 2);
+        List<UnitMove> fleet = List.of(fromHome(UnitType.Dreadnought, 4), fromHome(UnitType.Cruiser, 2));
         DefenseOutlook outlook = outlook();
 
         List<UnitMove> mayLeave = outlook.holdBack(board.home, List.of(), fleet);
 
         assertThat(outlook.cost(board.home, board.defenders().minus(fleet))).isZero();
-        assertThat(outlook.homeDefenseLevel()).isGreaterThan(0.8);
-        assertThat(count(mayLeave)).isLessThan(2);
+        assertThat(count(mayLeave)).isBetween(1, count(fleet) - 1);
         assertThat(outlook.leaveCost(board.home, fleet)).isGreaterThan(DefenseOutlook.GARRISON_TOLERANCE);
     }
 
@@ -136,6 +137,7 @@ class HomeDefenseTest extends BaseTi4Test {
         board.test.game.setRound(6);
         board.test.points(board.test.nekro, 3);
         board.raidingFleet(1, 2, 2);
+        board.test.units(board.staging, "space", board.sardakk, UnitType.Dreadnought, 1);
         board.test.units(board.home, "space", board.test.nekro, UnitType.Carrier, 1);
         for (String name : HACAN_PLANETS) board.test.units(board.home, name, board.test.nekro, UnitType.Infantry, 3);
         List<UnitMove> fleet = List.of(fromHome(UnitType.Carrier, 1));
@@ -144,6 +146,7 @@ class HomeDefenseTest extends BaseTi4Test {
         int onDock = outlook.groundToKeep(board.home, planet(HACAN_DOCK_PLANET), fleet);
 
         assertThat(outlook.anchorPlanet().getName()).isEqualTo(HACAN_DOCK_PLANET);
+        assertThat(outlook.homeDefenseLevel()).isGreaterThan(0.6);
         assertThat(onDock).isGreaterThanOrEqualTo(2);
         assertThat(outlook.groundToKeep(board.home, planet("hercant"), fleet)).isLessThan(onDock);
         assertThat(outlook.groundToKeep(board.home, planet("kamdorn"), fleet)).isLessThan(onDock);
@@ -167,6 +170,56 @@ class HomeDefenseTest extends BaseTi4Test {
         assertThat(kept)
                 .isEqualTo(outlook()
                         .groundToKeep(board.home, planet(HOME_PLANET), List.of(fromHome(UnitType.Carrier, 1))));
+    }
+
+    // The same Sardakk landing party next door, once with nothing better to do and once with Bereg and Lirta IV free
+    // beside it: an easier prize lowers its motive to attack home, so less of the home fleet has to stay. The motive
+    // has a floor, so the fleet is never released entirely.
+    @Test
+    void aFleetWithAJuicierTargetHoldsLessOfTheHomeFleet() {
+        int focused = keptAgainstALandingParty(false);
+        int distracted = keptAgainstALandingParty(true);
+
+        assertThat(distracted).isLessThan(focused);
+        assertThat(distracted).isPositive();
+    }
+
+    private int keptAgainstALandingParty(boolean alternative) {
+        board = new DefenseScenario();
+        board.test.game.setRound(5);
+        board.raidingFleet(1, 2, 4);
+        board.test.units(board.staging, "space", board.sardakk, UnitType.Dreadnought, 1);
+        if (alternative) board.test.place("35", board.beyondStaging());
+        board.test.units(board.home, "space", board.test.nekro, UnitType.Dreadnought, 2);
+        board.test.units(board.home, "space", board.test.nekro, UnitType.Cruiser, 3);
+        board.test.units(board.home, HOME_PLANET, board.test.nekro, UnitType.Infantry, 4);
+        List<UnitMove> fleet = List.of(fromHome(UnitType.Dreadnought, 2), fromHome(UnitType.Cruiser, 3));
+        DefenseOutlook outlook = outlook();
+        return count(fleet) - count(outlook.holdBack(board.home, List.of(), fleet));
+    }
+
+    // Round 1 must stay free for the opening. Nobody within two moves of home: nothing at all. A neighbour's whole
+    // starting fleet two moves out: the scale barely moves, and no ship or infantry is held for it.
+    @Test
+    void roundOneOpeningsStayFree() {
+        board.test.game.setRound(1);
+        board.test.units(board.home, "space", board.test.nekro, UnitType.Carrier, 2);
+        board.test.units(board.home, "space", board.test.nekro, UnitType.Dreadnought, 1);
+        board.test.units(board.home, "space", board.test.nekro, UnitType.Destroyer, 1);
+        board.test.units(board.home, HOME_PLANET, board.test.nekro, UnitType.Infantry, 4);
+        List<UnitMove> fleet = List.of(
+                fromHome(UnitType.Carrier, 2), fromHome(UnitType.Dreadnought, 1), fromHome(UnitType.Destroyer, 1));
+        Tile far = board.test.place("47", board.beyondStaging());
+        board.test.units(far, "space", board.sardakk, UnitType.Carrier, 2);
+        board.test.units(far, "space", board.sardakk, UnitType.Dreadnought, 1);
+        board.test.units(far, "space", board.sardakk, UnitType.Destroyer, 1);
+        board.test.units(far, "space", board.sardakk, UnitType.Infantry, 4);
+        board.test.units(far, "space", board.sardakk, UnitType.Fighter, 2);
+        DefenseOutlook outlook = outlook();
+
+        assertThat(outlook.homeDefenseLevel()).isPositive().isLessThan(0.2);
+        assertThat(outlook.holdBack(board.home, List.of(), fleet)).isEqualTo(fleet);
+        assertThat(outlook.groundToKeep(board.home, planet(HOME_PLANET), fleet)).isZero();
     }
 
     // Three points ahead of Sardakk the seat is the table's target and keeps more of its fleet home against two

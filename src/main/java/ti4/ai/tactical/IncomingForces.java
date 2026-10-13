@@ -71,6 +71,8 @@ final class IncomingForces {
     record Exclusion(Player owner, Tile tile) {}
 
     private static final String THUNDERS_EDGE_WARFARE = "te6warfare";
+    private static final int ONE_MOVE = 1;
+    private static final int TWO_MOVES = 2;
 
     private record Slot(Tile origin, UnitType type, double cost) {}
 
@@ -127,7 +129,15 @@ final class IncomingForces {
     IncomingForce of(Player enemy, Tile target, Horizon horizon) {
         if (base != null && exclusion != null && enemy != exclusion.owner()) return base.of(enemy, target, horizon);
         return forces.computeIfAbsent(
-                enemy.getFaction() + "#" + target.getPosition() + "#" + horizon, key -> scan(enemy, target, horizon));
+                enemy.getFaction() + "#" + target.getPosition() + "#" + horizon,
+                key -> scan(enemy, target, horizon, ONE_MOVE));
+    }
+
+    IncomingForce approaching(Player enemy, Tile target) {
+        if (base != null && exclusion != null && enemy != exclusion.owner()) return base.approaching(enemy, target);
+        return forces.computeIfAbsent(
+                enemy.getFaction() + "#" + target.getPosition() + "#approaching",
+                key -> scan(enemy, target, Horizon.NEXT_ROUND, TWO_MOVES));
     }
 
     Map<String, Integer> reach(Player enemy, Tile origin, int move) {
@@ -136,7 +146,7 @@ final class IncomingForces {
                 key -> MovementGraph.reach(game, enemy, origin.getPosition(), move));
     }
 
-    private IncomingForce scan(Player enemy, Tile target, Horizon horizon) {
+    private IncomingForce scan(Player enemy, Tile target, Horizon horizon, int moves) {
         if (blocked(enemy, target, horizon)) return IncomingForce.none(enemy, horizon);
         Map<Tile, Map<UnitType, Integer>> reaching = new LinkedHashMap<>();
         Slot gravityDriveShip = null;
@@ -150,10 +160,10 @@ final class IncomingForces {
             Map<UnitType, Integer> arriving = new EnumMap<>(UnitType.class);
             for (Map.Entry<UnitType, Integer> ship : nonFighterShips(BoardView.ships(BoardView.space(origin), enemy))
                     .entrySet()) {
-                int move = BoardView.moveValue(enemy, ship.getKey());
+                int move = BoardView.moveValue(enemy, ship.getKey()) * moves;
                 if (reaches(enemy, origin, target, move)) {
                     arriving.put(ship.getKey(), ship.getValue());
-                } else if (enemy.hasTech("gd") && reaches(enemy, origin, target, move + 1)) {
+                } else if (enemy.hasTech("gd") && reaches(enemy, origin, target, move + moves)) {
                     Slot candidate = new Slot(origin, ship.getKey(), cost(enemy, ship.getKey()));
                     if (gravityDriveShip == null || candidate.cost() > gravityDriveShip.cost()) {
                         gravityDriveShip = candidate;

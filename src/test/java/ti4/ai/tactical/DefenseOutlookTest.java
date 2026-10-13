@@ -224,9 +224,8 @@ class DefenseOutlookTest extends BaseTi4Test {
         assertThat(outlook().isGuarded(solHome)).isTrue();
     }
 
-    // Against a round-4 Sardakk landing party, home with six infantry needs four of them for the threat model alone.
-    // The round-4 posture of a one-planet home with that party in reach asks for the take to stay below about 0.6,
-    // which a fifth infantry brings it to (0.66 with four, 0.39 with five): only the last one is free to go.
+    // Against a round-4 Sardakk landing party, home with six infantry needs four of them: the last two are free to go.
+    // The home posture, weighed by how much Sardakk wants home, asks for no more.
     @Test
     void keepsOnlyTheGarrisonTheThreatAndThePostureNeed() {
         board.raidingFleet(1, 2, 4);
@@ -235,7 +234,7 @@ class DefenseOutlookTest extends BaseTi4Test {
 
         int keep = outlook().groundToKeep(board.home, mordai, List.of());
 
-        assertThat(keep).isEqualTo(5);
+        assertThat(keep).isEqualTo(4);
     }
 
     // Round 4, but no enemy ship can reach home: there is no standing garrison to keep, not even one infantry.

@@ -46,6 +46,9 @@ public final class DefenseOutlook {
     private static final double POSTURE_NEAR_WIN = 0.2;
     private static final double POSTURE_SPACE_FLOOR = 0.2;
     private static final double MULTI_PLANET_GROUND_LEVEL = 0.6;
+    private static final double TWO_MOVE_WEIGHT = 0.5;
+    private static final double MOTIVE_FLOOR = 0.4;
+    private static final double MIN_STANDING_LEVEL = 0.2;
     static final double PUBLIC_SCORING_LOCK = 8.0;
     private static final double NEAR_WIN_SCORING_LOCK = 12.0;
     private static final double SCORING_CRITICAL = 4.0;
@@ -257,10 +260,22 @@ public final class DefenseOutlook {
     private double enemyReach(Tile tile) {
         double unthreatened = 1;
         for (Player enemy : enemies()) {
-            double fleetCost = incoming.of(enemy, tile, Horizon.NEXT_ROUND).fleetCost();
-            unthreatened *= 1 - clamp(fleetCost / REACH_FLEET_COST, 0, 1);
+            IncomingForce near = incoming.of(enemy, tile, Horizon.NEXT_ROUND);
+            IncomingForce approaching = incoming.approaching(enemy, tile);
+            double fleetCost =
+                    near.fleetCost() + TWO_MOVE_WEIGHT * Math.max(0, approaching.fleetCost() - near.fleetCost());
+            if (fleetCost <= 0) continue;
+            double strength = clamp(fleetCost / REACH_FLEET_COST, 0, 1);
+            unthreatened *= 1 - motive(enemy, tile, near.isEmpty() ? approaching : near) * strength;
         }
         return 1 - unthreatened;
+    }
+
+    private double motive(Player enemy, Tile tile, IncomingForce force) {
+        Defenders current = defendersAt(tile);
+        Defenders emptied = new Defenders(Defenders.Stack.EMPTY, current.groundInSpace(), current.planets());
+        double gain = appetite(enemy, tile, force, emptied, chances(tile, force, emptied)) + actionCost(enemy);
+        return Math.max(MOTIVE_FLOOR, attackLikelihood(enemy, tile, Horizon.NEXT_ROUND, gain));
     }
 
     private double homePressure() {
@@ -281,23 +296,36 @@ public final class DefenseOutlook {
 
     private double posture(Tile tile, Defenders defenders) {
         double level = homeDefenseLevel();
-        if (level <= 0) return 0;
+        if (level < MIN_STANDING_LEVEL) return 0;
         double tolerated = 1 - level * (1 - POSTURE_SPACE_FLOOR);
         double groundShare = groundShare(tile, level);
         Planet held = groundShare > 0 ? anchorPlanet() : null;
         double worst = 0;
         for (Player enemy : enemies()) {
-            IncomingForce force = incoming.of(enemy, tile, Horizon.NEXT_ROUND);
-            if (force.isEmpty()) continue;
-            double space = spaceChance(tile, force, defenders);
-            double exposed = Math.max(0, space - tolerated);
-            if (held != null && force.carriesGround()) {
-                double take = space * groundChance(tile, force, held, defenders);
-                exposed += groundShare * Math.max(0, take - tolerated);
-            }
-            worst = Math.max(worst, exposed);
+            IncomingForce near = incoming.of(enemy, tile, Horizon.NEXT_ROUND);
+            IncomingForce approaching = incoming.approaching(enemy, tile);
+            worst = Math.max(worst, exposure(tile, near, defenders, tolerated, groundShare, held));
+            worst = Math.max(
+                    worst, TWO_MOVE_WEIGHT * exposure(tile, approaching, defenders, tolerated, groundShare, held));
         }
         return level * stake(tile) * worst;
+    }
+
+    private double exposure(
+            Tile tile,
+            IncomingForce force,
+            Defenders defenders,
+            double tolerated,
+            double groundShare,
+            @Nullable Planet held) {
+        if (force.isEmpty()) return 0;
+        double space = spaceChance(tile, force, defenders);
+        double exposed = Math.max(0, space - tolerated);
+        if (held != null && force.carriesGround()) {
+            double take = space * groundChance(tile, force, held, defenders);
+            exposed += groundShare * Math.max(0, take - tolerated);
+        }
+        return exposed;
     }
 
     private double groundShare(Tile tile, double level) {
