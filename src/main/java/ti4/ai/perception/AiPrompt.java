@@ -18,6 +18,16 @@ public record AiPrompt(
         COMBAT_THREAD
     }
 
+    public static final String TABLE_TALK = "🤖 💬 ";
+
+    public boolean isTableTalk() {
+        return source == PromptSource.PUBLIC && isTableTalk(buttons, content);
+    }
+
+    public static boolean isTableTalk(List<PromptButton> buttons, String content) {
+        return buttons.isEmpty() && content != null && content.startsWith(TABLE_TALK);
+    }
+
     public boolean isHidden() {
         return source == PromptSource.AI_THREAD;
     }

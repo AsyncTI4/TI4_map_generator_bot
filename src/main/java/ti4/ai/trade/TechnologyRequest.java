@@ -1,11 +1,14 @@
 package ti4.ai.trade;
 
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
+import ti4.ai.AiSeats;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.StrategyCard;
@@ -20,8 +23,10 @@ class TechnologyRequest {
     private static final int PAYMENT = 1;
     private static final int MAX_READ_PAYMENT = 2;
     private static final int LAST_REQUEST_ROUND = 1;
+    private static final long ANNOUNCEMENT_TTL_MILLIS = Duration.ofMinutes(20).toMillis();
+    private static final String ANNOUNCED_KEY = "technologyAskAnnounced|";
     private static final String SENT_KEY = "technologyRequestSent|";
-    private static final String HOLD_SENT_KEY = "technologyHoldSent|";
+    private static final char SEPARATOR = '|';
     private static final Set<ItemType> PAYMENT_TYPES = EnumSet.of(ItemType.TRADE_GOODS, ItemType.SEND_DEBT);
 
     enum Ask {
@@ -29,44 +34,94 @@ class TechnologyRequest {
         HOLD
     }
 
-    static Optional<AiDecision> propose(AiTurnContext context, List<Player> partners) {
-        Game game = context.game();
-        Player seat = context.seat();
-        String sentKey = SENT_KEY + game.getRound();
-        if (game.getRound() > LAST_REQUEST_ROUND || context.memory().has(sentKey)) return Optional.empty();
-        if (seat.getTg() < PAYMENT || !OpeningNeeds.wantsTechnologySoon(game, seat)) return Optional.empty();
-        if (!OpeningNeeds.canFollowTechnologyAfterPaying(game, seat, PAYMENT)) return Optional.empty();
-        Optional<Player> holder = OpeningNeeds.technologyHolder(game, seat).filter(partners::contains);
-        if (holder.isEmpty()) return Optional.empty();
-        Deal deal = Deal.EMPTY.adjust(seat.getFaction(), holder.get().getFaction(), ItemType.TRADE_GOODS, PAYMENT);
-        Optional<AiDecision> start = OfferBuilder.start(context, holder.get(), deal, Purpose.TECHNOLOGY_REQUEST);
-        start.ifPresent(ignored -> context.memory().put(sentKey, holder.get().getFaction()));
-        return start;
+    record Plan(Player partner, Deal deal, Ask ask, boolean byHolder) {
+
+        Purpose purpose() {
+            return ask == Ask.EARLY ? Purpose.TECHNOLOGY_REQUEST : Purpose.TECHNOLOGY_HOLD;
+        }
+
+        String signature() {
+            return partner.getFaction() + SEPARATOR + ask + SEPARATOR + byHolder;
+        }
+
+        String announcement(Player seat) {
+            return byHolder
+                    ? TechnologyAnnouncements.fee(seat, partner, deal)
+                    : TechnologyAnnouncements.payment(seat, partner, deal, ask);
+        }
     }
 
-    static Optional<AiDecision> offerToWait(AiTurnContext context, List<Player> partners) {
+    static Optional<AiDecision> announce(AiTurnContext context, List<Player> partners) {
         Game game = context.game();
-        Player seat = context.seat();
-        String sentKey = HOLD_SENT_KEY + game.getRound();
-        if (!dealRound(game) || context.memory().has(sentKey) || !TechnologyTiming.deniable(game, seat)) {
+        if (context.memory().has(announcedKey(game)) || context.memory().has(sentKey(game))) return Optional.empty();
+        Optional<Plan> plan = plan(context, partners);
+        if (plan.isEmpty()) return Optional.empty();
+        context.memory().put(announcedKey(game), plan.get().signature() + SEPARATOR + context.now());
+        return Optional.of(new AiDecision.Announce(plan.get().announcement(context.seat())));
+    }
+
+    static Optional<AiDecision> start(AiTurnContext context, List<Player> partners) {
+        Game game = context.game();
+        Optional<String> announced = context.memory().get(announcedKey(game));
+        if (announced.isEmpty() || context.memory().has(sentKey(game))) return Optional.empty();
+        Optional<Plan> plan = plan(context, partners);
+        if (plan.isEmpty() || !stillAnnounced(context, announced.get(), plan.get())) {
+            context.memory().put(sentKey(game), "abandoned");
             return Optional.empty();
         }
-        Optional<Player> holder = OpeningNeeds.technologyHolder(game, seat).filter(partners::contains);
-        if (holder.isEmpty()) return Optional.empty();
-        Optional<Deal> deal = payment(game, seat, holder.get())
-                .filter(payment -> worthPaying(game, seat, holder.get(), payment, Trust.of(context, holder.get())));
-        if (deal.isEmpty()) return Optional.empty();
-        Optional<AiDecision> start = OfferBuilder.start(context, holder.get(), deal.get(), Purpose.TECHNOLOGY_HOLD);
-        start.ifPresent(ignored -> context.memory().put(sentKey, holder.get().getFaction()));
+        Optional<AiDecision> start = OfferBuilder.start(
+                context, plan.get().partner(), plan.get().deal(), plan.get().purpose());
+        start.ifPresent(
+                ignored -> context.memory().put(sentKey(game), plan.get().signature()));
         return start;
     }
 
-    static Optional<AiDecision> askToWait(AiTurnContext context, List<Player> partners) {
+    static Optional<Plan> plan(AiTurnContext context, List<Player> partners) {
+        if (!dealRound(context.game())) return Optional.empty();
+        return requestEarly(context, partners)
+                .or(() -> offerToWait(context, partners))
+                .or(() -> askToWait(context, partners));
+    }
+
+    private static boolean stillAnnounced(AiTurnContext context, String announced, Plan plan) {
+        String[] parts = StringUtils.split(announced, SEPARATOR);
+        if (parts.length != 4 || !StringUtils.isNumeric(parts[3])) return false;
+        String signature = String.join(String.valueOf(SEPARATOR), parts[0], parts[1], parts[2]);
+        return signature.equals(plan.signature())
+                && context.now() - Long.parseLong(parts[3]) <= ANNOUNCEMENT_TTL_MILLIS;
+    }
+
+    private static Optional<Plan> requestEarly(AiTurnContext context, List<Player> partners) {
         Game game = context.game();
         Player seat = context.seat();
-        String sentKey = HOLD_SENT_KEY + game.getRound();
-        if (!dealRound(game) || context.memory().has(sentKey) || !holdsTechnology(game, seat)) return Optional.empty();
-        if (committed(context)) return Optional.empty();
+        if (game.getRound() > LAST_REQUEST_ROUND) return Optional.empty();
+        if (seat.getTg() < PAYMENT || !OpeningNeeds.wantsTechnologySoon(game, seat)) return Optional.empty();
+        if (!OpeningNeeds.canFollowTechnologyAfterPaying(game, seat, PAYMENT)) return Optional.empty();
+        return OpeningNeeds.technologyHolder(game, seat)
+                .filter(partners::contains)
+                .map(holder -> new Plan(
+                        holder,
+                        Deal.EMPTY.adjust(seat.getFaction(), holder.getFaction(), ItemType.TRADE_GOODS, PAYMENT),
+                        Ask.EARLY,
+                        false));
+    }
+
+    private static Optional<Plan> offerToWait(AiTurnContext context, List<Player> partners) {
+        Game game = context.game();
+        Player seat = context.seat();
+        if (!TechnologyTiming.deniable(game, seat)) return Optional.empty();
+        Optional<Player> holder = OpeningNeeds.technologyHolder(game, seat).filter(partners::contains);
+        if (holder.isEmpty()) return Optional.empty();
+        double trust = Trust.of(context, holder.get());
+        return payment(game, seat, holder.get())
+                .filter(payment -> worthPaying(game, seat, holder.get(), payment, trust))
+                .map(payment -> new Plan(holder.get(), payment, Ask.HOLD, false));
+    }
+
+    private static Optional<Plan> askToWait(AiTurnContext context, List<Player> partners) {
+        Game game = context.game();
+        Player seat = context.seat();
+        if (!holdsTechnology(game, seat) || committed(context)) return Optional.empty();
         double holdCost = TechnologyTiming.holdCost(game, seat);
         List<Player> payers = partners.stream()
                 .filter(partner -> TechnologyTiming.deniable(game, partner))
@@ -76,16 +131,12 @@ class TechnologyRequest {
                 .toList();
         for (Player payer : payers) {
             double trust = Trust.of(context, payer);
-            Optional<Deal> deal = payment(game, payer, seat)
+            Optional<Plan> plan = payment(game, payer, seat)
                     .filter(payment ->
                             TradeValue.of(game, seat, payer, payment, trust).selfGain() >= holdCost)
-                    .filter(payment -> worthPaying(game, payer, seat, payment, trust));
-            if (deal.isEmpty()) continue;
-            Optional<AiDecision> start = OfferBuilder.start(context, payer, deal.get(), Purpose.TECHNOLOGY_HOLD);
-            if (start.isPresent()) {
-                context.memory().put(sentKey, payer.getFaction());
-                return start;
-            }
+                    .filter(payment -> worthPaying(game, payer, seat, payment, trust))
+                    .map(payment -> new Plan(payer, payment, Ask.HOLD, true));
+            if (plan.isPresent()) return plan;
         }
         return Optional.empty();
     }
@@ -95,9 +146,12 @@ class TechnologyRequest {
         Player seat = context.seat();
         if (!dealRound(game)) return Optional.empty();
         if (holdsTechnology(game, seat) && pays(deal, offerer, seat)) {
-            return Optional.of(acceptsAsk(context, offerer, deal));
+            return askOf(context, offerer).map(ask -> acceptsAsk(context, offerer, deal, ask));
         }
         if (holdsTechnology(game, offerer) && pays(deal, seat, offerer)) {
+            if (AiSeats.isAiSeat(offerer) && !TechnologyAnnouncements.feeAsked(context, offerer, seat)) {
+                return Optional.empty();
+            }
             return Optional.of(TechnologyTiming.deniable(game, seat)
                     && worthPaying(game, seat, offerer, deal, Trust.of(context, offerer)));
         }
@@ -108,20 +162,22 @@ class TechnologyRequest {
         Game game = context.game();
         Player seat = context.seat();
         if (!dealRound(game) || !holdsTechnology(game, seat) || !pays(deal, offerer, seat)) return;
-        String key = ask(game, offerer) == Ask.HOLD
-                ? TechnologyTiming.heldKey(game)
-                : OpeningNeeds.technologyRequestedKey(game);
-        context.memory().put(key, offerer.getFaction());
+        askOf(context, offerer).ifPresent(ask -> {
+            if (ask == Ask.HOLD) TechnologyTiming.grantHold(game, context.memory(), offerer);
+            else context.memory().put(OpeningNeeds.technologyRequestedKey(game), offerer.getFaction());
+        });
     }
 
     static void noteProposalAccepted(AiTurnContext context, Player partner, Purpose purpose) {
         Game game = context.game();
         if (purpose != Purpose.TECHNOLOGY_HOLD || !holdsTechnology(game, context.seat())) return;
-        context.memory().put(TechnologyTiming.heldKey(game), partner.getFaction());
+        TechnologyTiming.grantHold(game, context.memory(), partner);
     }
 
-    static Ask ask(Game game, Player offerer) {
-        return TechnologyTiming.followsNow(game, offerer) ? Ask.EARLY : Ask.HOLD;
+    static Optional<Ask> askOf(AiTurnContext context, Player payer) {
+        Optional<Ask> announced = TechnologyAnnouncements.paymentAsk(context, payer, context.seat());
+        if (announced.isPresent() || AiSeats.isAiSeat(payer)) return announced;
+        return Optional.of(TechnologyTiming.followsNow(context.game(), payer) ? Ask.EARLY : Ask.HOLD);
     }
 
     static Optional<Deal> payment(Game game, Player payer, Player holder) {
@@ -137,12 +193,12 @@ class TechnologyRequest {
         return Optional.empty();
     }
 
-    private static boolean acceptsAsk(AiTurnContext context, Player offerer, Deal deal) {
+    private static boolean acceptsAsk(AiTurnContext context, Player offerer, Deal deal, Ask ask) {
         Game game = context.game();
         Player seat = context.seat();
         double paid = TradeValue.of(game, seat, offerer, deal, Trust.of(context, offerer))
                 .selfGain();
-        if (ask(game, offerer) == Ask.HOLD) {
+        if (ask == Ask.HOLD) {
             return !context.memory().has(OpeningNeeds.technologyRequestedKey(game))
                     && paid >= TechnologyTiming.holdCost(game, seat);
         }
@@ -178,5 +234,13 @@ class TechnologyRequest {
 
     private static boolean dealRound(Game game) {
         return game.getRound() <= TechnologyTiming.LAST_DEAL_ROUND;
+    }
+
+    private static String announcedKey(Game game) {
+        return ANNOUNCED_KEY + game.getRound();
+    }
+
+    private static String sentKey(Game game) {
+        return SENT_KEY + game.getRound();
     }
 }

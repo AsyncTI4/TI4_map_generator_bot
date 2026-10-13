@@ -114,7 +114,7 @@ class TechnologyTimingTest extends BaseTi4Test {
     @Test
     void holdsTechnologyForTheSeatThatPaidUntilItCanFollow() {
         Player hacan = rivalShortOfResources();
-        test.memoryOf(sol).put(TechnologyTiming.heldKey(test.game), "hacan");
+        TechnologyTiming.grantHold(test.game, test.memoryOf(sol), hacan);
 
         assertThat(solTurn()).isEmpty();
 
@@ -122,6 +122,33 @@ class TechnologyTimingTest extends BaseTi4Test {
         changed();
 
         assertThat(solTurn().map(AiTestGame::pressedId)).contains("FFCC_sol_strategicAction_7");
+    }
+
+    // The hold lasts only through Hacan's next turn: granted during Hacan's first turn, it still holds while Sol takes
+    // its own turn, and is over once Hacan has started (and so, with Sol active again, finished) its second.
+    @Test
+    void holdEndsAfterThePayersNextTurn() {
+        Player hacan = rivalShortOfResources();
+        hacan.setInRoundTurnCount(1);
+        TechnologyTiming.grantHold(test.game, test.memoryOf(sol), hacan);
+
+        assertThat(solTurn()).isEmpty();
+
+        hacan.setInRoundTurnCount(2);
+        changed();
+
+        assertThat(solTurn().map(AiTestGame::pressedId)).contains("FFCC_sol_strategicAction_7");
+    }
+
+    @Test
+    void holdEndsWhenThePayerPasses() {
+        Player hacan = rivalShortOfResources();
+        TechnologyTiming.grantHold(test.game, test.memoryOf(sol), hacan);
+        hacan.setPassed(true);
+        changed();
+
+        assertThat(TechnologyTiming.heldBack(test.game, sol, test.memoryOf(sol)))
+                .isFalse();
     }
 
     // A seat without a strategy token can still follow later when it holds Leadership, whose primary gives tokens.

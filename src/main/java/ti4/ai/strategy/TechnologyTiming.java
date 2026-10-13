@@ -3,6 +3,7 @@ package ti4.ai.strategy;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import ti4.ai.brain.AiMemory;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.scoring.ScoringReserve;
@@ -20,6 +21,7 @@ public class TechnologyTiming {
     private static final double EARLY_PLAY_SHARE = 0.2;
     private static final double HOLD_DELAY_COST = 0.5;
     private static final String HELD = "technologyHeld|";
+    private static final char GRANT_SEPARATOR = '|';
 
     static boolean playsNow(PlanInputs in) {
         if (in.round() > LAST_TIMED_ROUND) return false;
@@ -79,9 +81,22 @@ public class TechnologyTiming {
     }
 
     public static boolean heldBack(Game game, Player holder, AiMemory memory) {
-        Optional<Player> payer = memory.get(heldKey(game)).map(game::getPlayerFromColorOrFaction);
-        if (payer.isEmpty() || CardTiming.researchesGravityDriveForTheOpening(game, holder)) return false;
-        return !followsNow(game, payer.get());
+        Optional<String[]> grant = memory.get(heldKey(game)).map(value -> StringUtils.split(value, GRANT_SEPARATOR));
+        if (grant.isEmpty() || grant.get().length != 2 || !StringUtils.isNumeric(grant.get()[1])) return false;
+        Player payer = game.getPlayerFromColorOrFaction(grant.get()[0]);
+        if (payer == null || CardTiming.researchesGravityDriveForTheOpening(game, holder)) return false;
+        return !payer.isPassed()
+                && !followsNow(game, payer)
+                && !nextTurnOver(game, payer, Integer.parseInt(grant.get()[1]));
+    }
+
+    public static void grantHold(Game game, AiMemory memory, Player payer) {
+        memory.put(heldKey(game), payer.getFaction() + GRANT_SEPARATOR + payer.getInRoundTurnCount());
+    }
+
+    private static boolean nextTurnOver(Game game, Player payer, int turnsWhenGranted) {
+        return payer.getInRoundTurnCount() > turnsWhenGranted
+                && !payer.getUserID().equals(game.getActivePlayerID());
     }
 
     public static String heldKey(Game game) {
