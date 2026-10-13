@@ -1635,7 +1635,9 @@ public class CombatRollService {
             if (xytherisHeroBonus) {
                 modifierToHit += 4;
             }
-            modifierToHit += ThirtyKExploreHooks.spaceCannonRollBonus(rollType, unitModel, perUnitHolder);
+            int thirtyKBonus = ThirtyKExploreHooks.spaceCannonRollBonus(rollType, unitModel, perUnitHolder);
+            modifierToHit += thirtyKBonus;
+            resultBuilder.append(ThirtyKExploreHooks.spaceCannonBonusNote(unitModel, thirtyKBonus));
             List<NamedCombatModifierModel> availableExtraRolls = extraRolls.stream()
                     .filter(m -> !consumedBestMods.contains(m.getModifier().getAlias()))
                     .collect(Collectors.toList());

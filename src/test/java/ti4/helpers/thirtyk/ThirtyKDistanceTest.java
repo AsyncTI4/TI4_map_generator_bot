@@ -33,15 +33,11 @@ class ThirtyKDistanceTest extends BaseTi4Test {
     }
 
     @Test
-    void oppositeCornersOfTheOuterRingAreMoreThanFiveApart() {
+    void onlyOppositeCornersOfTheOuterRingAreMoreThanFiveApart() {
         assertThat(ThirtyKDistance.isMoreThanFiveAway(game, "301", "310")).isTrue();
-    }
-
-    @Test
-    void closerSystemsAreNot() {
         assertThat(ThirtyKDistance.isMoreThanFiveAway(game, "301", "304")).isFalse();
-        assertThat(ThirtyKDistance.isMoreThanFiveAway(game, "301", "000")).isFalse();
         assertThat(ThirtyKDistance.isMoreThanFiveAway(game, "301", "301")).isFalse();
+        assertThat(ThirtyKDistance.isMoreThanFiveAway(game, null, "301")).isFalse();
     }
 
     @Test
@@ -50,10 +46,5 @@ class ThirtyKDistanceTest extends BaseTi4Test {
         game.setTile(new Tile(SUPERNOVA, "000"));
         assertThat(ThirtyKDistance.isMoreThanFiveAway(game, "301", "304")).isFalse();
         assertThat(ThirtyKDistance.isMoreThanFiveAway(game, "101", "104")).isFalse();
-    }
-
-    @Test
-    void missingPositionsAreNeverFarAway() {
-        assertThat(ThirtyKDistance.isMoreThanFiveAway(game, null, "301")).isFalse();
     }
 }

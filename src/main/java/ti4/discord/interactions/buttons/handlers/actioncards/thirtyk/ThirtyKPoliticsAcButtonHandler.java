@@ -15,7 +15,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.helpers.RelicHelper;
+import ti4.helpers.thirtyk.ThirtyKAcState;
+import ti4.helpers.thirtyk.ThirtyKRelics;
 import ti4.helpers.thirtyk.ThirtyKTransactions;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -177,6 +178,15 @@ public class ThirtyKPoliticsAcButtonHandler {
             return;
         }
         grantTransaction(event, game, player, target, "Extended Campaigning");
+        ThirtyKAcState.setExtendedCampaigning(game, player, target);
+        MessageHelper.sendMessageToChannel(
+                target.getCorrectChannel(),
+                target.getRepresentationUnfogged() + ", " + FoWHelper.factionEmojiOrAnon(game, player, "a player")
+                        + " may resolve a transaction with you through _Extended Campaigning_. If you accept it, you"
+                        + " may ready your agent.");
+    }
+
+    public static void offerAgentReady(Game game, Player target) {
         List<Button> agents = new ArrayList<>();
         for (Leader leader : target.getLeaders()) {
             if (!"agent".equalsIgnoreCase(leader.getType()) || !leader.isExhausted()) continue;
@@ -186,9 +196,8 @@ public class ThirtyKPoliticsAcButtonHandler {
         agents.add(Buttons.gray(target.factionButtonChecker() + "deleteButtons", "No Agent To Ready"));
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),
-                target.getRepresentationUnfogged() + ", " + FoWHelper.factionEmojiOrAnon(game, player, "a player")
-                        + " may resolve a transaction with you through _Extended Campaigning_. If you accept it, you"
-                        + " may ready your agent.",
+                target.getRepresentationUnfogged()
+                        + ", you accepted the _Extended Campaigning_ transaction, so you may ready your agent.",
                 agents);
     }
 
@@ -295,16 +304,8 @@ public class ThirtyKPoliticsAcButtonHandler {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), PlanetTargetService.fizzleMessage());
             return false;
         }
-        String relicID = game.drawRelic(0);
-        player.addRelic(relicID);
-        RelicModel relicModel = Mapper.getRelic(relicID);
-        String message = player.getRepresentation() + " gained the _" + relicModel.getName() + "_ relic.";
-        if (game.isFowMode()) {
-            FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
-        }
-        MessageHelper.sendMessageToChannelWithEmbed(
-                player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
-        RelicHelper.resolveRelicEffects(event, game, player, relicID);
+        String relicID = game.drawRelic(0).replace("extra1", "").replace("extra2", "");
+        ThirtyKRelics.gainRelic(event, game, player, relicID);
         return true;
     }
 

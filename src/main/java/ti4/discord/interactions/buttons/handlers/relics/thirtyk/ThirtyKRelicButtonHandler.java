@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -24,6 +25,8 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.ExploreModel;
+import ti4.model.RelicModel;
+import ti4.service.explore.ExploreService;
 import ti4.service.unit.DestroyUnitService;
 
 @UtilityClass
@@ -63,7 +66,7 @@ class ThirtyKRelicButtonHandler {
         for (String card : ThirtyKRelics.rediscoveryOptions(game, planet)) {
             ExploreModel model = Mapper.getExplore(card);
             buttons.add(Buttons.green(
-                    player.factionButtonChecker() + "resolve_explore_" + card + "_" + choice, model.getName()));
+                    player.factionButtonChecker() + "thirtyKRediscoverCard_" + card + "_" + choice, model.getName()));
             if (buttons.size() == 24) break;
         }
         MessageHelper.sendMessageToChannelWithButtons(
@@ -75,10 +78,28 @@ class ThirtyKRelicButtonHandler {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("thirtyKRediscoverCard_")
+    public static void rediscoverCard(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String cardAndPlanet = buttonID.replace("thirtyKRediscoverCard_", "");
+        String card = StringUtils.substringBefore(cardAndPlanet, "_");
+        Planet planet = game.getPlanetsInfo().get(StringUtils.substringAfter(cardAndPlanet, "_"));
+        if (planet == null || !ThirtyKRelics.rediscoveryOptions(game, planet).contains(card)) {
+            noLongerValid(event, ThirtyKRelics.REDISCOVERY);
+            return;
+        }
+        if (!ThirtyKRelics.exhaustIfReady(game, player, event, ThirtyKRelics.REDISCOVERY)) return;
+        ExploreService.resolveExplore(event, player, "resolve_explore_" + cardAndPlanet, game);
+    }
+
     @ButtonHandler("thirtyKRansomTarget_")
     public static void ransomTarget(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = game.getPlayerFromColorOrFaction(buttonID.replace("thirtyKRansomTarget_", ""));
         if (target == null) return;
+        if (!ThirtyKRelics.ransomCannonTargets(game, player).contains(target)) {
+            noLongerValid(event, ThirtyKRelics.RANSOM_CANNON);
+            return;
+        }
+        if (!ThirtyKRelics.exhaustIfReady(game, player, event, ThirtyKRelics.RANSOM_CANNON)) return;
         List<Button> buttons = new ArrayList<>(ButtonHelper.getForcedPNSendButtons(game, player, target));
         buttons.add(Buttons.red(
                 target.factionButtonChecker() + "thirtyKRansomDestroy_" + player.getFaction(),
@@ -124,6 +145,11 @@ class ThirtyKRelicButtonHandler {
     public static void deadlineTarget(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = game.getPlayerFromColorOrFaction(buttonID.replace("thirtyKDeadlineTarget_", ""));
         if (target == null) return;
+        if (!game.getRealPlayers().contains(target)) {
+            noLongerValid(event, ThirtyKRelics.DEADLINE_DOCUMENTATION);
+            return;
+        }
+        if (!ThirtyKRelics.exhaustIfReady(game, player, event, ThirtyKRelics.DEADLINE_DOCUMENTATION)) return;
         if (target.getTacticalCC() < 1) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -173,6 +199,11 @@ class ThirtyKRelicButtonHandler {
     public static void techSupportTarget(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = game.getPlayerFromColorOrFaction(buttonID.replace("thirtyKTechSupportTarget_", ""));
         if (target == null) return;
+        if (!ThirtyKRelics.techSupportTargets(game, player).contains(target)) {
+            noLongerValid(event, ThirtyKRelics.TECH_SUPPORT_HOTLINE);
+            return;
+        }
+        if (!ThirtyKRelics.exhaustIfReady(game, player, event, ThirtyKRelics.TECH_SUPPORT_HOTLINE)) return;
         ThirtyKTransactions.allowForThisTurn(game, player, target);
         ThirtyKRelicHooks.rememberTechSupport(game, player, target);
         String actor = FoWHelper.identityOrColorIfCanSeeStats(game, player, target, player.getRepresentationNoPing());
@@ -191,6 +222,11 @@ class ThirtyKRelicButtonHandler {
     public static void spyTarget(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = game.getPlayerFromColorOrFaction(buttonID.replace("thirtyKSpyTarget_", ""));
         if (target == null) return;
+        if (!ThirtyKRelics.spyReportTargets(game, player).contains(target)) {
+            noLongerValid(event, ThirtyKRelics.SPY_REPORTS);
+            return;
+        }
+        if (!ThirtyKRelics.exhaustIfReady(game, player, event, ThirtyKRelics.SPY_REPORTS)) return;
         List<String> cards = new ArrayList<>(target.getActionCards().keySet());
         Collections.shuffle(cards);
         List<String> shown = cards.subList(0, Math.min(2, cards.size()));
@@ -222,11 +258,21 @@ class ThirtyKRelicButtonHandler {
             return;
         }
         game.setStoredValue(ThirtyKRelics.SOVEREIGN_REFUGEES_USED_KEY + player.getFaction(), eliminated.getFaction());
+        ThirtyKRelics.addActionSummary(game, player, ThirtyKRelics.SOVEREIGN_REFUGEES);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " used _Sovereign Refugees_ to gain access to the flagship of "
                         + eliminated.getColorIfCanSeeStats(player)
                         + ". Track and use that flagship manually.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static void noLongerValid(ButtonInteractionEvent event, String relicID) {
+        RelicModel relic = Mapper.getRelic(relicID);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                "That target is no longer valid for _" + (relic == null ? relicID : relic.getName())
+                        + "_, so it was not exhausted.");
         ButtonHelper.deleteMessage(event);
     }
 

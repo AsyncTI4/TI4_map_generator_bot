@@ -7,7 +7,7 @@
         "text": "Choose 1 player. If they win the space combat, gain 4 trade goods.",
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "Offered in the space combat card list. Pick the player; if they are the only one with ships left after hits are assigned, you gain 4 trade goods. Check the both-flagships condition yourself; wins by retreat are not detected."
+        "automationNotes": "Offered in the space combat card list. Pick a player with ships in the active system; if they are the only one with ships left after hits are assigned, you gain 4 trade goods. Check the both-flagships condition yourself. Wins by retreat are not detected and the bet ends with the turn. If both fleets die, the bot may pay out before the last hits are assigned; correct that by hand."
     },
     {
         "alias": "extendedcampaigning30k",
@@ -17,7 +17,7 @@
         "text": "Target a player you are not neighbors with. You may resolve a transaction with that player, and if they accept, the player may ready their agent.",
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "Lists players you are not neighbors with and lets you transact with them this turn (also opens fog comms). The target gets buttons to ready an agent; the bot does not check they accepted the transaction."
+        "automationNotes": "Lists players you are not neighbors with and lets you transact with them this turn (also opens fog comms). Once the target accepts a transaction with you this turn, they get buttons to ready an agent."
     },
     {
         "alias": "tradeships30k",
@@ -37,7 +37,7 @@
         "text": "For the rest of ground combat on a planet you control, if you have exactly 1 infantry on a planet, you roll additional dice equal to the planet's influence.",
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "Gives a roll button per planet where you have exactly 1 infantry; press it each ground combat round to roll extra dice equal to the influence. Assign those hits yourself."
+        "automationNotes": "Gives a roll button per planet where you have exactly 1 infantry; press it once each ground combat round to roll extra dice equal to the influence (each roll posts the button for the next round). Assign those hits yourself."
     },
     {
         "alias": "publicreprimand30k",
@@ -136,7 +136,8 @@
         "playTiming": "AGENDA_AFTER",
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "The prediction is recorded and you are skipped when voting. The rule that others cannot vote against it without placing a command token is not enforced."
+        "automationNotes": "The prediction is recorded and you are skipped when voting. The rule that others cannot vote against it without placing a command token is not enforced.",
+        "notes": "Hide within the Fine Print and Objection Gambit cannot follow this card."
     },
     {
         "alias": "hidewithinthefineprint30k",
@@ -147,7 +148,8 @@
         "playTiming": "AGENDA_AFTER",
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "Offered when a Rider lands on For or Against; you follow a chosen Rider on the same outcome and the bot pays it out like that Rider. Riders the bot does not pay out are resolved by hand."
+        "automationNotes": "Offered when a Rider lands on For or Against; you follow a chosen Rider on the same outcome and the bot pays it out like that Rider. Riders the bot does not pay out are resolved by hand.",
+        "notes": "Cannot follow Public Outcry. If it follows a Dummy Rider and that prediction is wrong, this card returns to your hand."
     },
     {
         "alias": "objectiongambit30k",
@@ -158,7 +160,8 @@
         "playTiming": "AGENDA_AFTER",
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "Offered when a Rider lands on For or Against; you follow a chosen Rider on the opposing outcome and the bot pays it out like that Rider. Riders the bot does not pay out are resolved by hand."
+        "automationNotes": "Offered when a Rider lands on For or Against; you follow a chosen Rider on the opposing outcome and the bot pays it out like that Rider. Riders the bot does not pay out are resolved by hand.",
+        "notes": "Cannot follow Public Outcry. If it follows a Dummy Rider and that prediction is wrong, this card returns to your hand."
     },
     {
         "alias": "siphonfundsjmsc1",
@@ -166,7 +169,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Target two players who both have home systems more than 5 hexes away. You may take up to 1 Commodity or Trade good from each of them.",
-        "notes": "You may take from fewer than two players, or from none.",
+        "notes": "You may take from fewer than two players, or from none. Picking something a player does not have does not use up that player.",
         "source": "thirtyk",
         "automation": "FULL"
     },
@@ -176,7 +179,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Target two players who both have home systems more than 5 hexes away. You may take up to 1 Commodity or Trade good from each of them.",
-        "notes": "You may take from fewer than two players, or from none.",
+        "notes": "You may take from fewer than two players, or from none. Picking something a player does not have does not use up that player.",
         "source": "thirtyk",
         "automation": "FULL"
     },
@@ -186,7 +189,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Target two players who both have home systems more than 5 hexes away. You may take up to 1 Commodity or Trade good from each of them.",
-        "notes": "You may take from fewer than two players, or from none.",
+        "notes": "You may take from fewer than two players, or from none. Picking something a player does not have does not use up that player.",
         "source": "thirtyk",
         "automation": "FULL"
     },
@@ -196,7 +199,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Target two players who both have home systems more than 5 hexes away. You may take up to 1 Commodity or Trade good from each of them.",
-        "notes": "You may take from fewer than two players, or from none.",
+        "notes": "You may take from fewer than two players, or from none. Picking something a player does not have does not use up that player.",
         "source": "thirtyk",
         "automation": "FULL"
     },
@@ -245,7 +248,7 @@
         "text": "Replenish your commodities and the player who lost a structure may replenish theirs.",
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "Offered when a PDS or space dock is destroyed on a planet more than 5 hexes from your home; replenishes you and offers the other player a replenish. Structures removed without being destroyed are not detected."
+        "automationNotes": "Offered when a PDS or space dock is destroyed on a planet more than 5 hexes from your home; replenishes you and offers the other player a replenish. Only the latest destruction this turn can be answered. Structures removed without being destroyed are not detected."
     },
     {
         "alias": "distantmapsjmsc1",

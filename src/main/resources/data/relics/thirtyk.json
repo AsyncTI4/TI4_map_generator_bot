@@ -21,7 +21,8 @@
         "text": "Action: Exhaust this card and choose a planet. Choose an exploration card in the discard pile relevant to the chosen planet, and resolve the exploration.",
         "notes": "Any planet on the board can be chosen, not only planets you control.",
         "source": "thirtyk",
-        "automation": "FULL"
+        "automation": "FULL",
+        "automationNotes": "Use it from the component action menu: choose any planet with a matching card in the exploration discard pile, then the card to resolve. The relic is exhausted when you pick the card, so cancelling earlier keeps it ready."
     },
     {
         "alias": "ransomcannon30k",
@@ -44,7 +45,8 @@
         "name": "Deadline Documentation",
         "text": "Action: Exhaust this card, and choose a player. They move 1 token from their Tactics pool to either their Fleet, or Strategy pools.",
         "source": "thirtyk",
-        "automation": "FULL"
+        "automation": "FULL",
+        "automationNotes": "Use it from the component action menu and choose a player; the relic is exhausted then. That player gets buttons to move 1 token from their tactic pool to their fleet or strategy pool. A player with an empty tactic pool is unaffected."
     },
     {
         "alias": "defiantpropaganda30k",

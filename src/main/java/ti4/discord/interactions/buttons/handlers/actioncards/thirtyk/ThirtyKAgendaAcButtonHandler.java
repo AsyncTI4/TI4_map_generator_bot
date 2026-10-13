@@ -69,12 +69,13 @@ public class ThirtyKAgendaAcButtonHandler {
         game.setCurrentAgendaVote(
                 outcome,
                 ThirtyKAgendaRiders.withEntry(game.getCurrentAgendaVotes().get(outcome), identifier + "_" + rider));
+        ThirtyKAcState.markRiderCard(game, player, rider);
         if (ThirtyKAgendaRiders.forbidsVoting(rider)) {
             TransitRiderLLButtonHandler.registerPrediction(game, player);
         }
         if (ThirtyKAgendaRiders.DUMMY_RIDER.equals(rider)) {
             ThirtyKAcState.addDummyRiderCopy(
-                    game, player, OPPOSITE.equals(mode) ? "objectiongambit30k" : "hidewithinthefineprint30k");
+                    game, player, outcome, OPPOSITE.equals(mode) ? "objectiongambit30k" : "hidewithinthefineprint30k");
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(

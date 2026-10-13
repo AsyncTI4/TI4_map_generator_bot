@@ -10,6 +10,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.thirtyk.ThirtyKAcState;
 import ti4.message.MessageHelper;
 import ti4.service.fow.PlanetTargetService;
 
@@ -53,6 +54,25 @@ class ThirtyKAcTargets {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", _" + cardName + "_ has no legal target.");
+    }
+
+    static boolean takeChoice(ButtonInteractionEvent event, Game game, Player player, String choice) {
+        if (ThirtyKAcState.takeChoice(game, player, choice)) return true;
+        choiceAlreadyMade(event, player);
+        return false;
+    }
+
+    static boolean choiceOpen(ButtonInteractionEvent event, Game game, Player player, String choice) {
+        if (ThirtyKAcState.hasChoice(game, player, choice)) return true;
+        choiceAlreadyMade(event, player);
+        return false;
+    }
+
+    private static void choiceAlreadyMade(ButtonInteractionEvent event, Player player) {
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", that choice was already made for this card.");
     }
 
     static void send(Player player, String message, List<Button> buttons) {

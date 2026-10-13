@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -27,7 +28,7 @@ public class ThirtyKTransactions {
 
     public static boolean mayTransact(Game game, Player player, Player other) {
         if (player == null || other == null) return false;
-        return liveGrants(game).stream().anyMatch(grant -> grant.covers(player, other))
+        return grants(game).stream().anyMatch(grant -> grant.isLive(game) && grant.covers(player, other))
                 || ThirtyKRelicHooks.deepNetworksAllows(game, player, other);
     }
 
@@ -39,50 +40,56 @@ public class ThirtyKTransactions {
         return partners;
     }
 
+    static void clearTurnGrants(Game game) {
+        keepGrants(game, grant -> !TURN.equals(grant.scope()));
+    }
+
+    static void clearAllGrants(Game game) {
+        game.removeStoredValue(GRANTS_KEY);
+    }
+
+    private static void keepGrants(Game game, Predicate<Grant> keep) {
+        if (game.getStoredValue(GRANTS_KEY).isBlank()) return;
+        storeGrants(game, grants(game).stream().filter(keep).toList());
+    }
+
     private static void addGrant(Game game, Player player, Player other, String scope) {
-        Player active = game.getActivePlayer();
-        Grant grant = new Grant(
-                player.getFaction(),
-                other.getFaction(),
-                scope,
-                game.getRound(),
-                active == null ? "" : active.getFaction(),
-                active == null ? 0 : active.getNumberOfTurns());
-        List<Grant> grants = new ArrayList<>(liveGrants(game));
-        grants.add(grant);
-        game.setStoredValue(
-                GRANTS_KEY,
-                String.join(";", grants.stream().map(Grant::serialize).toList()));
+        List<Grant> grants = new ArrayList<>(grants(game));
+        grants.add(new Grant(player.getFaction(), other.getFaction(), scope));
+        storeGrants(game, grants);
         FowCommunicationThreadService.checkNewCommPartners(game, player);
         FowCommunicationThreadService.checkNewCommPartners(game, other);
     }
 
-    private static List<Grant> liveGrants(Game game) {
+    private static void storeGrants(Game game, List<Grant> grants) {
+        if (grants.isEmpty()) {
+            game.removeStoredValue(GRANTS_KEY);
+            return;
+        }
+        game.setStoredValue(
+                GRANTS_KEY,
+                String.join(";", grants.stream().map(Grant::serialize).toList()));
+    }
+
+    private static List<Grant> grants(Game game) {
         String stored = game.getStoredValue(GRANTS_KEY);
         if (stored.isBlank()) return List.of();
         return Arrays.stream(stored.split(";"))
                 .map(Grant::parse)
-                .filter(grant -> grant != null && grant.isLive(game))
+                .filter(grant -> grant != null)
                 .toList();
     }
 
-    private record Grant(
-            String faction, String otherFaction, String scope, int round, String activeFaction, int turns) {
+    private record Grant(String faction, String otherFaction, String scope) {
 
         String serialize() {
-            return String.join(
-                    "+", faction, otherFaction, scope, String.valueOf(round), activeFaction, String.valueOf(turns));
+            return String.join("+", faction, otherFaction, scope);
         }
 
         static Grant parse(String raw) {
             String[] parts = raw.split("\\+", -1);
-            if (parts.length != 6) return null;
-            try {
-                return new Grant(
-                        parts[0], parts[1], parts[2], Integer.parseInt(parts[3]), parts[4], Integer.parseInt(parts[5]));
-            } catch (NumberFormatException e) {
-                return null;
-            }
+            if (parts.length < 3) return null;
+            return new Grant(parts[0], parts[1], parts[2]);
         }
 
         boolean covers(Player player, Player other) {
@@ -91,10 +98,7 @@ public class ThirtyKTransactions {
         }
 
         boolean isLive(Game game) {
-            if (round != game.getRound()) return false;
-            if (ACTION_PHASE.equals(scope)) return "action".equalsIgnoreCase(game.getPhaseOfGame());
-            Player active = game.getActivePlayer();
-            return active != null && active.getFaction().equals(activeFaction) && active.getNumberOfTurns() == turns;
+            return !ACTION_PHASE.equals(scope) || "action".equalsIgnoreCase(game.getPhaseOfGame());
         }
     }
 }

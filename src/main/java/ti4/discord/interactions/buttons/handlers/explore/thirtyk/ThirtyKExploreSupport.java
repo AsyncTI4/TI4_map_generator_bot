@@ -18,14 +18,14 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
 
+// TODO: 30k explores and relics that place units do not check reinforcement limits.
 @UtilityClass
 public class ThirtyKExploreSupport {
 
     public static final int MAX_CHOICE_BUTTONS = 24;
 
-    public static MessageChannel channelFor(Game game, GenericInteractionCreateEvent event, Player target) {
-        if (game.isFowMode() || event == null) return target.getCorrectChannel();
-        return event.getMessageChannel();
+    public static MessageChannel channelFor(Player target) {
+        return target.getCorrectChannel();
     }
 
     public static Button decline(Player player) {

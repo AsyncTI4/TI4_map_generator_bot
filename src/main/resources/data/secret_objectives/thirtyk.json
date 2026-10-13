@@ -42,7 +42,7 @@
         "phase": "Status",
         "text": "Score no public objective, and have no other secret objectives unscored in your hand.",
         "points": 1,
-        "notes": "A player scoring this cannot opt into scoring a public objective AFTER scoring this during the status phase Only public objectives scored during the status phase count.",
+        "notes": "A player scoring this cannot opt into scoring a public objective AFTER scoring this during the status phase. Only public objectives scored during the status phase count.",
         "source": "thirtyk",
         "automation": "PARTIAL",
         "automationNotes": "The bot checks that you scored no public objective in this status phase and hold no other unscored secret. If you score this first, do not score a public objective afterwards; the bot does not stop you."
@@ -133,7 +133,7 @@
         "points": 1,
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "When a For/Against agenda resolves, the bot offers a Score button to a player who was the only one voting on one side. Votes added outside the vote buttons are not seen."
+        "automationNotes": "When a For/Against agenda resolves, the bot offers a Score button to a player who was the only one voting on one side. Votes added outside the vote buttons are not seen. In Fog of War games there is no prompt, so votes stay hidden; score it with the normal secret objective buttons."
     },
     {
         "alias": "longdistancerelationsjmsc",
@@ -219,7 +219,7 @@
         "points": 1,
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "When an agenda resolves, the bot offers a Score button to the player who cast strictly more votes than anyone else. Votes added outside the vote buttons are not seen."
+        "automationNotes": "When an agenda resolves, the bot offers a Score button to the player who cast strictly more votes than anyone else. Votes added outside the vote buttons are not seen. In Fog of War games there is no prompt, so votes stay hidden; score it with the normal secret objective buttons."
     },
     {
         "alias": "distantflagsjmsc",

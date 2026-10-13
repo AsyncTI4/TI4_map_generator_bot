@@ -36,6 +36,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKRelicHooks;
 import ti4.helpers.thirtyk.ThirtyKTransactions;
 import ti4.image.Mapper;
@@ -282,6 +283,7 @@ public class TransactionHelper {
                 p1,
                 Map.of("from", p1.getFaction(), "to", p2.getFaction(), "items", transactionItems));
         ThirtyKRelicHooks.onTransactionAccepted(game, p1, p2);
+        ThirtyKActionCardHooks.onTransactionAccepted(game, p1, p2);
         List<Player> players = new ArrayList<>();
         players.add(p1);
         players.add(p2);

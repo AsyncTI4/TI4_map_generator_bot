@@ -11,15 +11,21 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
@@ -90,18 +96,20 @@ public class ThirtyKRelics {
     }
 
     public static void resolveComponentAction(Game game, Player player, ButtonInteractionEvent event, String relicID) {
+        if (!SOVEREIGN_REFUGEES.equals(relicID) && !player.hasRelicReady(relicID)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), notReadyMessage(relicID));
+            return;
+        }
         String prefix = player.factionButtonChecker();
         switch (relicID) {
             case PLACEBOTRON -> offerPlacebotron(game, player, event);
             case REDISCOVERY -> {
-                exhaust(game, player, event, relicID);
                 send(
                         event,
                         player.getRepresentationUnfogged() + ", choose the planet for _Rediscovery_.",
                         page(rediscoveryPlanetButtons(game, player), prefix + "thirtyKRediscoverPlanet_", 0));
             }
             case RANSOM_CANNON -> {
-                exhaust(game, player, event, relicID);
                 List<Button> buttons = ransomCannonTargets(game, player).stream()
                         .map(p -> FoWHelper.fogSafeTargetButton(
                                 prefix + "thirtyKRansomTarget_" + p.getFaction(), "red", p, player))
@@ -112,7 +120,6 @@ public class ThirtyKRelics {
                         buttons);
             }
             case DEADLINE_DOCUMENTATION -> {
-                exhaust(game, player, event, relicID);
                 List<Button> buttons = game.getRealPlayers().stream()
                         .map(p -> FoWHelper.fogSafeTargetButton(
                                 prefix + "thirtyKDeadlineTarget_" + p.getFaction(), "gray", p, player))
@@ -123,7 +130,6 @@ public class ThirtyKRelics {
                         buttons);
             }
             case TECH_SUPPORT_HOTLINE -> {
-                exhaust(game, player, event, relicID);
                 List<Button> buttons = techSupportTargets(game, player).stream()
                         .map(p -> FoWHelper.fogSafeTargetButton(
                                 prefix + "thirtyKTechSupportTarget_" + p.getFaction(), "green", p, player))
@@ -134,7 +140,6 @@ public class ThirtyKRelics {
                         buttons);
             }
             case CHRONO_STASIS -> {
-                exhaust(game, player, event, relicID);
                 List<Button> buttons = chronoStasisTargets(game, player).stream()
                         .map(p -> FoWHelper.fogSafeTargetButton(
                                 prefix + "thirtyKChronoOwner_" + p.getFaction(), "gray", p, player))
@@ -146,7 +151,6 @@ public class ThirtyKRelics {
                         buttons);
             }
             case SPY_REPORTS -> {
-                exhaust(game, player, event, relicID);
                 List<Button> buttons = spyReportTargets(game, player).stream()
                         .map(p -> FoWHelper.fogSafeTargetButton(
                                 prefix + "thirtyKSpyTarget_" + p.getFaction(), "gray", p, player))
@@ -154,7 +158,6 @@ public class ThirtyKRelics {
                 send(event, player.getRepresentationUnfogged() + ", choose the player for _Spy Reports_.", buttons);
             }
             case DEEP_NETWORKS -> {
-                exhaust(game, player, event, relicID);
                 send(
                         event,
                         player.getRepresentationUnfogged()
@@ -196,6 +199,22 @@ public class ThirtyKRelics {
         send(event, player.getRepresentationUnfogged() + ", how do you use _Placebotron_?", buttons);
     }
 
+    public static boolean exhaustIfReady(Game game, Player player, ButtonInteractionEvent event, String relicID) {
+        if (!player.hasRelicReady(relicID)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), notReadyMessage(relicID));
+            ButtonHelper.deleteMessage(event);
+            return false;
+        }
+        exhaust(game, player, event, relicID);
+        return true;
+    }
+
+    private static String notReadyMessage(String relicID) {
+        RelicModel relic = Mapper.getRelic(relicID);
+        String name = relic == null ? relicID : relic.getName();
+        return "_" + name + "_ is not ready, so it cannot be used.";
+    }
+
     public static void exhaust(Game game, Player player, GenericInteractionCreateEvent event, String relicID) {
         player.addExhaustedRelic(relicID);
         announce(game, player, event, relicID, "exhausted");
@@ -207,13 +226,41 @@ public class ThirtyKRelics {
         announce(game, player, event, relicID, "purged");
     }
 
-    private static void announce(
-            Game game, Player player, GenericInteractionCreateEvent event, String relicID, String verb) {
+    public static void gainRelic(GenericInteractionCreateEvent event, Game game, Player player, String relicID) {
+        player.addRelic(relicID);
+        RelicModel relic = Mapper.getRelic(relicID);
+        String message =
+                player.getRepresentation() + " gained the _" + (relic == null ? relicID : relic.getName()) + "_ relic.";
+        if (game.isFowMode()) {
+            FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
+        }
+        if (relic == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        } else {
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(), message, relic.getRepresentationEmbed(false, true));
+        }
+        RelicHelper.resolveRelicEffects(event, game, player, relicID);
+        WhiteTfUnitHandler.resolveMonumentRelicDraw(event, game, player);
+        TeHelperUnits.serveIconoclastDeployAbility(game, player);
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")) {
+            OnyxxaLeaderHandler.onDrawRelic(player);
+        }
+        KairnBreakthroughHandler.offerRelicGainPrompts(game, player, relicID);
+    }
+
+    public static void addActionSummary(Game game, Player player, String relicID) {
         RelicModel relic = Mapper.getRelic(relicID);
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
-                game.getStoredValue("currentActionSummary" + player.getFaction()) + " Used the " + relic.getName()
-                        + " relic.");
+                game.getStoredValue("currentActionSummary" + player.getFaction()) + " Used the "
+                        + (relic == null ? relicID : relic.getName()) + " relic.");
+    }
+
+    private static void announce(
+            Game game, Player player, GenericInteractionCreateEvent event, String relicID, String verb) {
+        RelicModel relic = Mapper.getRelic(relicID);
+        addActionSummary(game, player, relicID);
         MessageHelper.sendMessageToChannelWithEmbed(
                 event == null ? player.getCorrectChannel() : event.getMessageChannel(),
                 player.getRepresentationNoPing() + " " + verb + " _" + relic.getName() + "_.",

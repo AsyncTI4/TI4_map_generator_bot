@@ -55,6 +55,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
@@ -2929,6 +2930,7 @@ public final class AgendaHelper {
         game.setStoredValue("Pass On Shenanigans", "");
         game.setStoredValue("Abstain On Agenda", "");
         game.resetCurrentAgendaVotes();
+        ThirtyKActionCardHooks.onAgendaVotesReset(game);
         game.setHasHackElectionBeenPlayed(false);
         game.removeStoredValue("hackElectionFaction");
         game.removeStoredValue("viabilityFavorXxcha");

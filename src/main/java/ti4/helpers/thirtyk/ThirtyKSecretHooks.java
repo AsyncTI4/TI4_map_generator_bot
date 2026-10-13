@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -25,6 +25,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.AttachmentModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
@@ -89,7 +90,10 @@ public class ThirtyKSecretHooks {
     }
 
     static boolean hasAttachment(UnitHolder planet) {
-        return planet.getTokenList().stream().anyMatch(token -> token.contains("attachment"));
+        return planet.getTokenList().stream().anyMatch(token -> {
+            AttachmentModel attachment = Mapper.getAttachmentInfo(token);
+            return attachment != null && attachment.isRealAttachment();
+        });
     }
 
     private static boolean hasStructure(Game game, UnitHolder planet) {
@@ -122,11 +126,15 @@ public class ThirtyKSecretHooks {
                 .toList();
         if (remaining.size() != 1) return;
         Player winner = remaining.getFirst();
+        boolean reprimanded =
+                loser.getSecretsUnscored().containsKey(REPRIMANDED) && isAtOrNextToMecatol(game, loser, tile);
+        boolean grandEntrance = winner.isRealPlayer() && flagshipEnteredFromAfar(game, winner, tile);
+        if (!reprimanded && !grandEntrance) return;
         if (!markOnce(game, "space+" + tile.getPosition() + "+" + loser.getFaction())) return;
-        if (isAtOrNextToMecatol(game, loser, tile)) {
+        if (reprimanded) {
             offerScore(loser, REPRIMANDED, "the bot thinks you just lost a space combat at or next to Mecatol Rex.");
         }
-        if (winner.isRealPlayer() && flagshipEnteredFromAfar(game, winner, tile)) {
+        if (grandEntrance) {
             offerScore(
                     winner,
                     A_GRAND_ENTRANCE,
@@ -145,7 +153,7 @@ public class ThirtyKSecretHooks {
         if (!winner.getSecretsUnscored().containsKey(A_GRAND_ENTRANCE)) return false;
         if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, winner) < 1) return false;
         if (game.getActivePlayer() != winner) return false;
-        String start = game.getStoredValue(FLAGSHIP_START_KEY + winner.getFaction());
+        String start = StringUtils.substringAfter(game.getStoredValue(FLAGSHIP_START_KEY + winner.getFaction()), ";");
         return start.isBlank() || ThirtyKDistance.isMoreThanFiveAway(game, start, tile.getPosition());
     }
 
@@ -176,14 +184,23 @@ public class ThirtyKSecretHooks {
     public static void onAgendaResolved(Game game) {
         if (game == null) return;
         Map<String, Map<Player, Integer>> votesByOutcome = votesByOutcome(game);
-        rememberVoters(game, votesByOutcome);
+        if (anyoneHolds(game, POLICY_INDIFFERENCE)) {
+            rememberVoters(game, votesByOutcome);
+        }
+        if (game.isFowMode()) return;
         offerPolicyDefiance(votesByOutcome);
         offerPolicyMaker(votesByOutcome);
+    }
+
+    private static boolean anyoneHolds(Game game, String soID) {
+        return game.getRealPlayers().stream()
+                .anyMatch(player -> player.getSecretsUnscored().containsKey(soID));
     }
 
     static Map<String, Map<Player, Integer>> votesByOutcome(Game game) {
         Map<String, Map<Player, Integer>> result = new HashMap<>();
         for (Map.Entry<String, String> entry : game.getCurrentAgendaVotes().entrySet()) {
+            if (entry.getKey() == null || entry.getValue() == null) continue;
             Map<Player, Integer> votes = new HashMap<>();
             StringTokenizer tokens = new StringTokenizer(entry.getValue(), ";");
             while (tokens.hasMoreTokens()) {
@@ -222,8 +239,6 @@ public class ThirtyKSecretHooks {
         return new HashSet<>(parts.subList(1, parts.size()));
     }
 
-    // TODO: fog leak - telling the holder they were the lone For/Against voter, or the top voter, reveals other
-    // players' votes.
     private static void offerPolicyDefiance(Map<String, Map<Player, Integer>> votesByOutcome) {
         for (String side : List.of("for", "against")) {
             Map<Player, Integer> votes = votesByOutcome.get(side);
@@ -267,6 +282,7 @@ public class ThirtyKSecretHooks {
         }
     }
 
+    // TODO: fog - the prompt tells the holder that someone scored via Imperial (minor; the scorer is not named).
     public static void onImperialPointScored(Game game, Player scorer) {
         if (game == null || scorer == null) return;
         Tile mecatol = game.getMecatolTile();
@@ -291,31 +307,29 @@ public class ThirtyKSecretHooks {
 
     public static void onTurnStart(Game game, Player player) {
         if (game == null || player == null) return;
+        if (!player.getSecretsUnscored().containsKey(A_GRAND_ENTRANCE)) return;
         String key = FLAGSHIP_START_KEY + player.getFaction();
-        if (!player.getSecretsUnscored().containsKey(A_GRAND_ENTRANCE)) {
-            game.removeStoredValue(key);
-            return;
-        }
+        if (!game.getStoredValue(key).isBlank()) return;
         String position = game.getTileMap().values().stream()
                 .filter(tile -> tile.getSpaceUnitHolder() != null
                         && tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, player) > 0)
                 .map(Tile::getPosition)
                 .findFirst()
                 .orElse("");
-        game.setStoredValue(key, position);
+        game.setStoredValue(key, "start;" + position);
+    }
+
+    static void clearTurnState(Game game) {
+        ThirtyKTurnState.removeKeysStartingWith(game, FLAGSHIP_START_KEY);
+        game.removeStoredValue(PROMPTED_KEY);
     }
 
     static boolean markOnce(Game game, String event) {
-        Player active = game.getActivePlayer();
-        String context = game.getRound() + "+" + (active == null ? "" : active.getFaction()) + "+"
-                + (active == null ? 0 : active.getNumberOfTurns());
         String stored = game.getStoredValue(PROMPTED_KEY);
-        List<String> entries = stored.isBlank() ? List.of() : Arrays.asList(stored.split(";"));
-        Set<String> seen = !entries.isEmpty() && entries.getFirst().equals(context)
-                ? new LinkedHashSet<>(entries.subList(1, entries.size()))
-                : new LinkedHashSet<>();
+        Set<String> seen =
+                stored.isBlank() ? new LinkedHashSet<>() : new LinkedHashSet<>(Arrays.asList(stored.split(";")));
         if (!seen.add(event)) return false;
-        game.setStoredValue(PROMPTED_KEY, context + ";" + seen.stream().collect(Collectors.joining(";")));
+        game.setStoredValue(PROMPTED_KEY, String.join(";", seen));
         return true;
     }
 }

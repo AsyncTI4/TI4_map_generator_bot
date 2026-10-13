@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -23,12 +24,13 @@ import ti4.helpers.DiceHelper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.RelicHelper;
+import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKDistance;
 import ti4.helpers.thirtyk.ThirtyKExploreMath;
+import ti4.helpers.thirtyk.ThirtyKRelics;
 import ti4.helpers.thirtyk.ThirtyKTransactions;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -49,8 +51,9 @@ public class ThirtyKFrontierExploreHandler {
     private static final String REPLICATION_COUNT_KEY = "thirtyKReplicationDiscards";
     private static final String TRAP_PLACE = "thirtyKTrapPlace_";
     private static final String PONDER_DISCARD = "thirtyKPonderDiscard_";
-    private static final String WERE_LOST_MOVE = "thirtyKWereLost_";
-    private static final String FOREGONE_GIVE = "thirtyKForegoneGive_";
+    private static final String WERE_LOST_MOVE = "thkWL_";
+    private static final String WERE_LOST_PENDING_KEY = "thirtyKWereLostPending";
+    private static final String FOREGONE_GIVE = "thkFgGive_";
     private static final String SYMPATHIES_OBJECTIVE = "Systematic Sympathies";
 
     public static void resolveDistractionEfforts(GenericInteractionCreateEvent event, Game game, Player player) {
@@ -144,9 +147,15 @@ public class ThirtyKFrontierExploreHandler {
                 removed.stream()
                         .map(r -> r.onUnitHolder(home.getSpaceUnitHolder()))
                         .toList());
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getRepresentationNoPing() + " moved 1 " + type.humanReadableName() + " to their home system.");
+        if (removed.stream()
+                        .mapToInt(RemoveUnitService.RemovedUnit::getTotalRemoved)
+                        .sum()
+                > 0) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing() + " moved 1 " + type.humanReadableName()
+                            + " to their home system.");
+        }
         ThirtyKExploreSupport.deleteMessage(event);
         sendFaultySignalButtons(event, game, player, tile, home);
     }
@@ -293,7 +302,7 @@ public class ThirtyKFrontierExploreHandler {
         }
         buttons.add(ThirtyKExploreSupport.decline(chosen));
         MessageHelper.sendMessageToChannelWithButtons(
-                ThirtyKExploreSupport.channelFor(game, event, chosen),
+                ThirtyKExploreSupport.channelFor(chosen),
                 chosen.getRepresentationUnfogged() + ", you were chosen by _It's a Trap!_ in "
                         + tile.getRepresentationForButtons(game, chosen)
                         + ". You may place up to 4 destroyers there; space combat starts right away.",
@@ -403,27 +412,61 @@ public class ThirtyKFrontierExploreHandler {
             MessageHelper.sendMessageToEventChannel(event, "There is no speaker to resolve _We're Lost, Captain_.");
             return;
         }
-        String prefix = WERE_LOST_MOVE + player.getFaction() + "_" + tile.getPosition();
-        List<Button> buttons = new ArrayList<>();
-        for (Tile target : game.getTileMap().values()) {
-            if (!isLostCaptainTarget(game, player, tile, target)) continue;
-            buttons.add(Buttons.gray(
-                    speaker.factionButtonChecker() + prefix + "_" + target.getPosition(),
-                    target.getRepresentationForButtons(game, speaker)));
+        if (!hasUnitsInSpace(player, tile)) {
+            MessageHelper.sendMessageToEventChannel(
+                    event, "You have no units in space in this system, so _We're Lost, Captain_ moves nothing.");
+            return;
         }
-        BlindSelectionService.filterForBlindPositionSelection(game, speaker, buttons, prefix);
-        if (buttons.isEmpty()) {
+        if (!game.isFowMode() && lostCaptainTargets(game, speaker, player, tile).isEmpty()) {
             MessageHelper.sendMessageToEventChannel(event, "No system qualifies for _We're Lost, Captain_.");
             return;
         }
+        game.setStoredValue(WERE_LOST_PENDING_KEY, player.getFaction() + "+" + tile.getPosition());
+        String movingShips = game.isFowMode()
+                ? "the exploring player's ships"
+                : "the ships in " + tile.getRepresentationForButtons(game, speaker);
         MessageHelper.sendMessageToEventChannel(
                 event, "The speaker chooses where the ships go for _We're Lost, Captain_.");
         MessageHelper.sendMessageToChannelWithButtons(
-                ThirtyKExploreSupport.channelFor(game, event, speaker),
-                speaker.getRepresentationUnfogged() + ", choose a system without planets or other players' ships;"
-                        + " the ships in " + tile.getRepresentationForButtons(game, speaker)
-                        + " move there (_We're Lost, Captain_).",
-                buttons);
+                ThirtyKExploreSupport.channelFor(speaker),
+                speaker.getRepresentationUnfogged() + ", choose a system without planets or other players' ships; "
+                        + movingShips + " move there (_We're Lost, Captain_).",
+                lostCaptainPage(game, speaker, player, tile, 0));
+    }
+
+    private static boolean hasUnitsInSpace(Player player, Tile tile) {
+        UnitHolder space = tile.getSpaceUnitHolder();
+        return space != null
+                && space.getUnitKeysForPlayer(player).stream().anyMatch(key -> space.getUnitCount(key) > 0);
+    }
+
+    private static List<Button> lostCaptainTargets(Game game, Player speaker, Player explorer, Tile origin) {
+        Set<String> visible = game.isFowMode() ? FoWHelper.getTilePositionsToShow(game, speaker) : null;
+        List<Button> buttons = new ArrayList<>();
+        for (Tile target : game.getTileMap().values()) {
+            if (visible != null && !visible.contains(target.getPosition())) continue;
+            if (!isLostCaptainTarget(game, explorer, origin, target)) continue;
+            buttons.add(Buttons.gray(
+                    wereLostPrefix(speaker, explorer, origin) + target.getPosition(),
+                    target.getRepresentationForButtons(game, speaker)));
+        }
+        return buttons;
+    }
+
+    private static List<Button> lostCaptainPage(Game game, Player speaker, Player explorer, Tile origin, int page) {
+        String prefix = wereLostPrefix(speaker, explorer, origin);
+        List<Button> extras = game.isFowMode()
+                ? List.of(BlindSelectionService.blindTargetButton(prefix.substring(0, prefix.length() - 1), false))
+                : List.of();
+        List<Button> targets = lostCaptainTargets(game, speaker, explorer, origin);
+        List<Button> result =
+                new ArrayList<>(NewStuffHelper.buttonPagination(targets, extras, prefix, 25, page, false));
+        if (targets.size() + extras.size() <= 25) result.addAll(extras);
+        return result;
+    }
+
+    private static String wereLostPrefix(Player speaker, Player explorer, Tile origin) {
+        return speaker.factionButtonChecker() + WERE_LOST_MOVE + explorer.getColor() + "_" + origin.getPosition() + "_";
     }
 
     private static boolean isLostCaptainTarget(Game game, Player player, Tile origin, Tile target) {
@@ -435,19 +478,36 @@ public class ThirtyKFrontierExploreHandler {
 
     @ButtonHandler(WERE_LOST_MOVE)
     public static void wereLostMove(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] parts = buttonID.substring(WERE_LOST_MOVE.length()).split("_");
-        Player explorer = game.getPlayerFromColorOrFaction(parts[0]);
-        Tile origin = game.getTileByPosition(parts[1]);
-        Tile target = game.getTileByPosition(parts[2]);
-        ThirtyKExploreSupport.deleteMessage(event);
+        String[] parts = buttonID.substring(WERE_LOST_MOVE.length()).split("_", 3);
+        String[] pending = game.getStoredValue(WERE_LOST_PENDING_KEY).split("\\+");
+        Player explorer = pending.length == 2 ? game.getPlayerFromColorOrFaction(pending[0]) : null;
+        Tile origin = pending.length == 2 ? game.getTileByPosition(pending[1]) : null;
         if (explorer == null
                 || origin == null
-                || target == null
-                || !isLostCaptainTarget(game, explorer, origin, target)) {
+                || parts.length != 3
+                || !parts[0].equals(explorer.getColor())
+                || !parts[1].equals(origin.getPosition())) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "That system cannot be chosen, so nothing moves.");
+                    event.getMessageChannel(), "_We're Lost, Captain_ has already been resolved.");
+            ThirtyKExploreSupport.deleteMessage(event);
             return;
         }
+        String choice = parts[2];
+        if (choice.startsWith("page")) {
+            int page = Integer.parseInt(choice.substring("page".length()));
+            MessageHelper.editMessageButtons(event, lostCaptainPage(game, player, explorer, origin, page));
+            return;
+        }
+        Tile target = game.getTileByPosition(choice);
+        ThirtyKExploreSupport.deleteMessage(event);
+        if (target == null || !isLostCaptainTarget(game, explorer, origin, target)) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    ThirtyKExploreSupport.channelFor(player),
+                    player.getRepresentationUnfogged() + ", not a valid choice, pick again.",
+                    lostCaptainPage(game, player, explorer, origin, 0));
+            return;
+        }
+        game.removeStoredValue(WERE_LOST_PENDING_KEY);
         UnitHolder from = origin.getSpaceUnitHolder();
         UnitHolder to = target.getSpaceUnitHolder();
         for (UnitKey key : new ArrayList<>(from.getUnitKeysForPlayer(explorer))) {
@@ -468,6 +528,10 @@ public class ThirtyKFrontierExploreHandler {
                             + target.getRepresentationForButtons(game, explorer)
                             + " and a command token was placed there (_We're Lost, Captain_).");
         }
+    }
+
+    public static void clearWereLost(Game game) {
+        game.removeStoredValue(WERE_LOST_PENDING_KEY);
     }
 
     public static void resolveUnseenDanger(GenericInteractionCreateEvent event, Game game, Player player, Tile tile) {
@@ -505,12 +569,16 @@ public class ThirtyKFrontierExploreHandler {
             MessageHelper.sendMessageToEventChannel(event, "The relic deck is empty.");
             return;
         }
-        RelicModel relic = Mapper.getRelic(relics.getFirst());
-        String relicName = relic == null ? relics.getFirst() : relic.getName();
+        String revealed = relics.getFirst();
+        RelicModel relic = Mapper.getRelic(revealed);
+        String relicName = relic == null ? revealed : relic.getName();
         List<Button> buttons = new ArrayList<>();
         for (Player other : game.getRealPlayers()) {
             buttons.add(FoWHelper.fogSafeTargetButton(
-                    player.factionButtonChecker() + FOREGONE_GIVE + other.getFaction(), "green", other, player));
+                    player.factionButtonChecker() + FOREGONE_GIVE + other.getColor() + "_" + revealed,
+                    "green",
+                    other,
+                    player));
         }
         MessageHelper.sendMessageToEventChannelWithButtons(
                 event,
@@ -521,10 +589,17 @@ public class ThirtyKFrontierExploreHandler {
 
     @ButtonHandler(FOREGONE_GIVE)
     public static void foregoneGive(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        Player chosen = game.getPlayerFromColorOrFaction(buttonID.substring(FOREGONE_GIVE.length()));
-        if (chosen == null) return;
+        String[] parts = buttonID.substring(FOREGONE_GIVE.length()).split("_", 2);
+        Player chosen = game.getPlayerFromColorOrFaction(parts[0]);
+        if (chosen == null || parts.length < 2) return;
         ThirtyKExploreSupport.deleteMessage(event);
-        RelicHelper.drawRelicAndNotify(chosen, event, game, 0, true);
+        if (!game.getAllRelics().remove(parts[1])) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "The revealed relic is no longer in the relic deck.");
+            return;
+        }
+        ThirtyKRelics.gainRelic(
+                event, game, chosen, parts[1].replace("extra1", "").replace("extra2", ""));
         if (chosen != player) {
             ThirtyKTransactions.allowForThisActionPhase(game, player, chosen);
             FoWHelper.notifyPlayerAndAffectedInFog(

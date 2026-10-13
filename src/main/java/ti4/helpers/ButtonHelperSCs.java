@@ -370,8 +370,9 @@ public final class ButtonHelperSCs {
         boolean used = addUsedSCPlayer(event.getMessageId() + "score_imperial", game, player);
         if (used) return;
         ButtonHelperFactionSpecific.keleresIIHQCCGainCheck(player, game);
+        int pointsBefore = player.getTotalVictoryPoints();
         ScorePublicObjectiveService.scorePO(event, game, player, 0);
-        ThirtyKSecretHooks.onImperialPointScored(game, player);
+        if (player.getTotalVictoryPoints() > pointsBefore) ThirtyKSecretHooks.onImperialPointScored(game, player);
     }
 
     @ButtonHandler("sc_trade_follow")

@@ -61,6 +61,7 @@ class ThirtyKRelicBoardButtonHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
+        if (!ThirtyKRelics.exhaustIfReady(game, player, event, ThirtyKRelics.CHRONO_STASIS)) return;
         RemoveUnitService.removeUnits(event, tile, game, owner.getColor(), "1 inf " + planetName);
         ThirtyKRelicHooks.rememberChronoStasis(game, owner, planetName);
         String planetRep = Helper.getPlanetRepresentation(planetName, game);
@@ -118,6 +119,7 @@ class ThirtyKRelicBoardButtonHandler {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "That planet is no longer eligible.");
             return;
         }
+        if (!ThirtyKRelics.exhaustIfReady(game, player, event, ThirtyKRelics.DEEP_NETWORKS)) return;
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + choice);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
@@ -150,7 +152,22 @@ class ThirtyKRelicBoardButtonHandler {
                     player.getRepresentationNoPing() + " removed 1 infantry from " + planetRep
                             + " due to _Overpopulation Management_.");
         }
-        ButtonHelper.deleteButtonsWithPartialID(event, "_" + planetName);
+        removeOverpopulationChoicesFor(event, planetName);
+    }
+
+    private static void removeOverpopulationChoicesFor(ButtonInteractionEvent event, String planetName) {
+        List<Button> remaining = event.getMessage().getComponentTree().findAll(Button.class).stream()
+                .filter(button ->
+                        button.getCustomId() == null || !button.getCustomId().endsWith("_" + planetName))
+                .toList();
+        boolean choicesLeft = remaining.stream()
+                .anyMatch(button ->
+                        button.getCustomId() != null && button.getCustomId().contains("thirtyKOverpop_"));
+        if (choicesLeft) {
+            MessageHelper.editMessageButtons(event, remaining);
+        } else {
+            ButtonHelper.deleteMessage(event);
+        }
     }
 
     @ButtonHandler("thirtyKSocialGive_")

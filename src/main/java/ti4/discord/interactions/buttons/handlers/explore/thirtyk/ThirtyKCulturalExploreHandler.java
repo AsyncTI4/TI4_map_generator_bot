@@ -55,8 +55,7 @@ public class ThirtyKCulturalExploreHandler {
             String message = other.getRepresentationUnfogged() + ", "
                     + FoWHelper.actorOrAnon(game, player, "a player") + " resolved _Shared Wealth_ next to your units."
                     + " You may draw 1 action card; if you do, they gain 1 trade good.";
-            MessageHelper.sendMessageToChannelWithButtons(
-                    ThirtyKExploreSupport.channelFor(game, event, other), message, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(ThirtyKExploreSupport.channelFor(other), message, buttons);
         }
     }
 

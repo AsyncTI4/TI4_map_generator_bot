@@ -47,7 +47,7 @@ public class ThirtyKExploreMath {
 
     public static String readyCycleMarker(int round, String phase) {
         String lowerPhase = phase == null ? "" : phase.toLowerCase();
-        boolean afterStatusReady = lowerPhase.contains("status") || lowerPhase.contains("agenda");
+        boolean afterStatusReady = "statushomework".equals(lowerPhase) || lowerPhase.contains("agenda");
         return round + (afterStatusReady ? "s" : "");
     }
 }

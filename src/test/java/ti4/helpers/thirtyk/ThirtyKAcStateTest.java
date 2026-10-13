@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.thirtyk.ThirtyKAcState.ProfiteeringResult;
 import ti4.testUtils.BaseTi4Test;
 
 /** Stored-value state the 30k action cards keep between playing a card and its payout. */
@@ -25,50 +26,91 @@ class ThirtyKAcStateTest extends BaseTi4Test {
     }
 
     @Test
-    void compoundInterestPaysDoubleOnceAndClears() {
+    void compoundInterestPaysDoubleOnce() {
         ThirtyKAcState.addCompoundInterest(game, sol, 3);
 
         assertThat(ThirtyKAcState.collectCompoundInterest(game, sol)).isEqualTo(6);
         assertThat(ThirtyKAcState.collectCompoundInterest(game, sol)).isZero();
-        assertThat(ThirtyKAcState.collectCompoundInterest(game, hacan)).isZero();
     }
 
     @Test
-    void warProfiteeringRemembersTargetAndSystem() {
+    void warProfiteeringPaysOnlyWhenTheBackedPlayerIsTheLastWithShips() {
+        assertThat(ThirtyKAcState.profiteeringResult("hacan", List.of("hacan"))).isEqualTo(ProfiteeringResult.WON);
+        assertThat(ThirtyKAcState.profiteeringResult("hacan", List.of("sol", "hacan")))
+                .isEqualTo(ProfiteeringResult.PENDING);
+        assertThat(ThirtyKAcState.profiteeringResult("hacan", List.of())).isEqualTo(ProfiteeringResult.LOST);
+    }
+
+    // Everything a card leaves open for "this turn" is gone after end of turn, so stale bets or windows
+    // can never pay out in a later turn. The stored values must also survive the save format (no , or :).
+    @Test
+    void endOfTurnClearsTurnState() {
         ThirtyKAcState.setWarProfiteering(game, sol, hacan, "201");
-
-        assertThat(ThirtyKAcState.warProfiteering(game, sol))
-                .isEqualTo(new ThirtyKAcState.WarProfiteering("hacan", "201"));
-        ThirtyKAcState.clearWarProfiteering(game, sol);
-        assertThat(ThirtyKAcState.warProfiteering(game, sol)).isNull();
-    }
-
-    @Test
-    void purgedFragmentsCanBeTakenOneByOne() {
-        ThirtyKAcState.setPurgedFragments(game, hacan, List.of("crf1", "crf2", "crf3"));
-        ThirtyKAcState.removePurgedFragment(game, "crf2");
-
-        ThirtyKAcState.PurgedFragments purged = ThirtyKAcState.purgedFragments(game);
-        assertThat(purged.purgerFaction()).isEqualTo("hacan");
-        assertThat(purged.fragments()).containsExactly("crf1", "crf3");
-    }
-
-    @Test
-    void storedValuesAvoidTheSaveFormatSeparators() {
         ThirtyKAcState.setPlanetLoss(game, sol, "mr", hacan);
-        ThirtyKAcState.setPurgedFragments(game, hacan, List.of("crf1"));
-        ThirtyKAcState.setWarProfiteering(game, sol, hacan, "201");
+        ThirtyKAcState.setExtendedCampaigning(game, sol, hacan);
+        ThirtyKAcState.openChoice(game, sol, "folding");
+        ThirtyKAcState.markFinalStandRoll(game, sol, "mr", "1");
+        assertThat(game.getStoredValueMap().values()).noneMatch(value -> value.contains(",") || value.contains(":"));
 
-        assertThat(game.getStoredValue(ThirtyKAcState.CONFLAGRATION + "sol")).doesNotContain(",", ":");
-        assertThat(game.getStoredValue(ThirtyKAcState.PURGED_FRAGMENTS)).doesNotContain(",", ":");
-        assertThat(ThirtyKAcState.planetLoss(game, sol)).isEqualTo(new ThirtyKAcState.PlanetLoss("mr", "hacan"));
+        ThirtyKTurnState.clearEndOfTurn(game);
+
+        assertThat(ThirtyKAcState.warProfiteering(game, sol)).isNull();
+        assertThat(ThirtyKAcState.planetLoss(game, sol)).isNull();
+        assertThat(ThirtyKAcState.takeExtendedCampaigning(game, sol, hacan)).isFalse();
+        assertThat(ThirtyKAcState.hasChoice(game, sol, "folding")).isFalse();
+        assertThat(ThirtyKAcState.markFinalStandRoll(game, sol, "mr", "1")).isTrue();
+    }
+
+    // Lists over 25 buttons are split across messages; only the first press of a play may resolve.
+    @Test
+    void oneShotChoiceIsTakenOnceByItsOwner() {
+        ThirtyKAcState.openChoice(game, sol, "folding");
+
+        assertThat(ThirtyKAcState.takeChoice(game, hacan, "folding")).isFalse();
+        assertThat(ThirtyKAcState.hasChoice(game, sol, "folding")).isTrue();
+        assertThat(ThirtyKAcState.takeChoice(game, sol, "folding")).isTrue();
+        assertThat(ThirtyKAcState.takeChoice(game, sol, "folding")).isFalse();
     }
 
     @Test
-    void cumulativeSupportIsCappedAtFour() {
-        assertThat(ThirtyKAcState.cumulativeSupportInfantry(0)).isZero();
-        assertThat(ThirtyKAcState.cumulativeSupportInfantry(3)).isEqualTo(3);
-        assertThat(ThirtyKAcState.cumulativeSupportInfantry(7)).isEqualTo(4);
+    void finalStandRollsOncePerPlanetPerRoundUntilPlayedAgain() {
+        assertThat(ThirtyKAcState.markFinalStandRoll(game, sol, "mr", "1")).isTrue();
+        assertThat(ThirtyKAcState.markFinalStandRoll(game, sol, "mr", "1")).isFalse();
+        assertThat(ThirtyKAcState.markFinalStandRoll(game, sol, "mr", "2")).isTrue();
+
+        // A second ground combat on the same planet starts with a fresh play of the card.
+        ThirtyKAcState.clearFinalStand(game, sol);
+        assertThat(ThirtyKAcState.markFinalStandRoll(game, sol, "mr", "1")).isTrue();
+    }
+
+    // Sol plays Dummy Rider on "for" and hedges with Objection Gambit on "against"; Hacan follows on "for".
+    // When "for" loses, each wrong entry returns exactly its own card, once.
+    @Test
+    void wrongDummyRiderReturnsOnlyTheCardOnThatOutcome() {
+        ThirtyKAcState.setDummyRider(game, sol, "For");
+        ThirtyKAcState.addDummyRiderCopy(game, sol, "against", "objectiongambit30k");
+        ThirtyKAcState.addDummyRiderCopy(game, hacan, "for", "hidewithinthefineprint30k");
+
+        assertThat(ThirtyKAcState.takeWrongDummyRiderCard(game, sol, "for")).isEqualTo("dummyrider30k");
+        assertThat(ThirtyKAcState.takeWrongDummyRiderCard(game, sol, "for")).isNull();
+        assertThat(ThirtyKAcState.takeWrongDummyRiderCard(game, hacan, "for")).isEqualTo("hidewithinthefineprint30k");
+        assertThat(ThirtyKAcState.takeWrongDummyRiderCard(game, sol, "against")).isEqualTo("objectiongambit30k");
+    }
+
+    // A vetoed or discarded agenda never resolves; the next agenda's vote reset must drop rider state,
+    // and only a played 30k card (not the legacy card with the same name) arms the rider hooks.
+    @Test
+    void riderStateIsPerCardAndClearsWithTheAgenda() {
+        ThirtyKAcState.setDummyRider(game, sol, "for");
+        ThirtyKAcState.markRiderCard(game, sol, "Public Outcry");
+        assertThat(ThirtyKAcState.playedRiderCard(game, sol, "Public Outcry")).isTrue();
+        assertThat(ThirtyKAcState.playedRiderCard(game, sol, "Dummy Rider")).isFalse();
+        assertThat(ThirtyKAcState.playedRiderCard(game, hacan, "Public Outcry")).isFalse();
+
+        ThirtyKActionCardHooks.onAgendaVotesReset(game);
+
+        assertThat(ThirtyKAcState.takeWrongDummyRiderCard(game, sol, "for")).isNull();
+        assertThat(ThirtyKAcState.playedRiderCard(game, sol, "Public Outcry")).isFalse();
     }
 
     private Player addPlayer(String userId, String faction, String color) {

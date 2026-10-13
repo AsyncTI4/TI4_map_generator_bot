@@ -81,12 +81,19 @@ public class ThirtyKRelicHooks {
     }
 
     public static void rememberTechSupport(Game game, Player holder, Player target) {
-        game.setStoredValue(TECH_SUPPORT_KEY, holder.getFaction() + "+" + target.getFaction() + "+" + game.getRound());
+        game.setStoredValue(TECH_SUPPORT_KEY, techSupportMarker(holder, target));
+    }
+
+    static String techSupportMarker(Player holder, Player target) {
+        return holder.getFaction() + "+" + target.getFaction();
+    }
+
+    static void clearTechSupport(Game game) {
+        game.removeStoredValue(TECH_SUPPORT_KEY);
     }
 
     private static void resolveTechSupport(Game game, Player holder, Player target) {
-        String expected = holder.getFaction() + "+" + target.getFaction() + "+" + game.getRound();
-        if (!expected.equals(game.getStoredValue(TECH_SUPPORT_KEY))) return;
+        if (!techSupportMarker(holder, target).equals(game.getStoredValue(TECH_SUPPORT_KEY))) return;
         game.removeStoredValue(TECH_SUPPORT_KEY);
         List<Button> buttons = ThirtyKTechSupport.noPrerequisiteTechButtons(game, target);
         if (buttons.isEmpty()) return;
@@ -210,8 +217,10 @@ public class ThirtyKRelicHooks {
                 .anyMatch(other -> planet.hasGroundForces(other) || planet.hasStructures(other));
     }
 
+    // TODO: fog - the prompt tells the holder that a nearby planet was exhausted, even one they cannot see.
     public static void onPlanetExhausted(Game game, Player owner, String planetName) {
         if (game == null || planetName == null) return;
+        if (game.getRealPlayers().stream().noneMatch(p -> p.hasRelicReady(ThirtyKRelics.DEFIANT_PROPAGANDA))) return;
         Tile tile = game.getTileFromPlanet(planetName);
         Planet planet = game.getPlanetsInfo().get(planetName);
         if (tile == null || planet == null || infantryOwners(game, planet).isEmpty()) return;

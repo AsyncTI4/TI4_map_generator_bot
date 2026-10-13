@@ -8,6 +8,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -53,14 +54,15 @@ public class ThirtyKBoardAcButtonHandler {
     private static final String BLEW_UP_FIGHTER = "thkAcBlewUpFighter_";
     private static final String CUMULATIVE_PLACE = "thkAcCumulativePlace_";
     private static final String DISTANT_MAPS_PLANET = "thkAcDistantMapsPlanet_";
-    private static final String DISTANT_MAPS_PAY = "thkAcDistantMapsPay_";
-    private static final String DISTANT_MAPS_TRAIT = "thkAcDistantMapsTrait_";
+    private static final String DISTANT_MAPS_PAY = "thkAcDmPay_";
+    private static final String DISTANT_MAPS_TRAIT = "thkAcDmTrait_";
     private static final String FOLDING_TILE = "thkAcFoldingTile_";
     private static final String FOLDING_MOVE = "thkAcFoldingMove_";
     private static final String CORRUPT_PLANETS = "thkAcCorruptPlanets";
     private static final String CORRUPT_PLACE = "thkAcCorruptPlace_";
     private static final String RENEWAL_ACCEPT = "thkAcRenewalAccept_";
     private static final String FINAL_STAND_ROLL = "thkAcFinalStandRoll_";
+    private static final String FOLDING_STAY = "thkAcFoldingStay";
     private static final List<String> EXPLORE_TRAITS = List.of("cultural", "industrial", "hazardous");
 
     @ButtonHandler(CONFLAGRATION)
@@ -68,7 +70,8 @@ public class ThirtyKBoardAcButtonHandler {
         ThirtyKAcState.PlanetLoss loss = ThirtyKAcState.planetLoss(game, player);
         Player newOwner = loss == null ? null : game.getPlayerFromColorOrFaction(loss.newOwnerFaction());
         Tile tile = loss == null ? null : game.getTileFromPlanet(loss.planet());
-        if (newOwner == null || tile == null) {
+        if (newOwner == null || tile == null || !newOwner.getPlanets().contains(loss.planet())) {
+            ThirtyKAcState.clearPlanetLoss(game, player);
             ThirtyKAcTargets.noTarget(event, player, "Conflagration");
             return;
         }
@@ -111,6 +114,7 @@ public class ThirtyKBoardAcButtonHandler {
             return;
         }
         ThirtyKAcState.clearFightersBlownUp(game, player);
+        ThirtyKAcState.openChoice(game, player, BLEW_UP);
         ButtonHelper.deleteMessage(event);
         ThirtyKAcTargets.send(
                 player,
@@ -131,6 +135,7 @@ public class ThirtyKBoardAcButtonHandler {
     public static void blewUpTile(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String position = buttonID.substring(BLEW_UP_TILE.length());
         Tile tile = game.getTileByPosition(position);
+        if (!ThirtyKAcTargets.takeChoice(event, game, player, BLEW_UP)) return;
         if (tile == null || !ThirtyKDistance.isMoreThanFiveFromHome(game, player, position)) {
             ThirtyKAcTargets.fizzle(event, player);
             return;
@@ -204,6 +209,7 @@ public class ThirtyKBoardAcButtonHandler {
             ThirtyKAcTargets.noTarget(event, player, "Cumulative Support");
             return;
         }
+        ThirtyKAcState.openChoice(game, player, CUMULATIVE);
         ButtonHelper.deleteMessage(event);
         ThirtyKAcTargets.send(
                 player,
@@ -226,6 +232,7 @@ public class ThirtyKBoardAcButtonHandler {
         int infantry = cumulativeInfantry(game, player, planet);
         Tile tile = game.getTileFromPlanet(planet);
         if (tile == null || infantry < 1) return;
+        if (!ThirtyKAcTargets.takeChoice(event, game, player, CUMULATIVE)) return;
         AddUnitService.addUnits(event, tile, game, player.getColor(), infantry + " inf " + planet);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
@@ -264,6 +271,7 @@ public class ThirtyKBoardAcButtonHandler {
             ThirtyKAcTargets.noTarget(event, player, "Distant Maps");
             return;
         }
+        ThirtyKAcState.openChoice(game, player, DISTANT_MAPS);
         ButtonHelper.deleteMessage(event);
         ThirtyKAcTargets.send(
                 player,
@@ -292,6 +300,7 @@ public class ThirtyKBoardAcButtonHandler {
     public static void distantMapsPlanet(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         PlanetTargetSpec spec = distantMapsSpec(game, player);
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
+        if (!ThirtyKAcTargets.takeChoice(event, game, player, DISTANT_MAPS)) return;
         var target = PlanetTargetService.resolve(
                 game, player, buttonID, spec, resolved -> isFarPlanet(game, player, resolved.planetId()));
         List<String> traits = target == null ? List.of() : explorableTraits(game, target.planetId());
@@ -306,7 +315,7 @@ public class ThirtyKBoardAcButtonHandler {
         }
         List<Button> buttons = traits.stream()
                 .map(trait -> Buttons.green(
-                        player.factionButtonChecker() + DISTANT_MAPS_TRAIT + trait + "_" + target.planetId(),
+                        player.factionButtonChecker() + DISTANT_MAPS_TRAIT + traitCode(trait) + "_" + target.planetId(),
                         "Reveal " + StringUtils.capitalize(trait)))
                 .toList();
         ThirtyKAcTargets.send(
@@ -316,7 +325,7 @@ public class ThirtyKBoardAcButtonHandler {
     @ButtonHandler(DISTANT_MAPS_TRAIT)
     public static void distantMapsTrait(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String rest = buttonID.substring(DISTANT_MAPS_TRAIT.length());
-        String trait = StringUtils.substringBefore(rest, "_");
+        String trait = traitFromCode(StringUtils.substringBefore(rest, "_"));
         String planet = StringUtils.substringAfter(rest, "_");
         Player owner = game.getPlayerThatControlsPlanet(planet, true);
         if (owner == null
@@ -328,6 +337,18 @@ public class ThirtyKBoardAcButtonHandler {
         }
         ButtonHelper.deleteMessage(event);
         revealDistantMap(game, player, owner, planet, trait);
+    }
+
+    private static String traitCode(String trait) {
+        return trait.substring(0, 1);
+    }
+
+    private static String traitFromCode(String code) {
+        if (code.length() != 1) return "";
+        return EXPLORE_TRAITS.stream()
+                .filter(trait -> trait.startsWith(code))
+                .findFirst()
+                .orElse("");
     }
 
     private static void revealDistantMap(Game game, Player player, Player owner, String planetId, String trait) {
@@ -359,7 +380,8 @@ public class ThirtyKBoardAcButtonHandler {
         List<Button> buttons = new ArrayList<>();
         if (owner.getTg() >= 2) {
             buttons.add(Buttons.green(
-                    owner.factionButtonChecker() + DISTANT_MAPS_PAY + player.getColor() + "_" + planetId,
+                    owner.factionButtonChecker() + DISTANT_MAPS_PAY + player.getColor() + "_" + traitCode(trait) + "_"
+                            + planetId,
                     "Pay 2 Trade Goods To Explore"));
         }
         buttons.add(Buttons.red(owner.factionButtonChecker() + "deleteButtons", "Decline"));
@@ -374,7 +396,9 @@ public class ThirtyKBoardAcButtonHandler {
     @ButtonHandler(DISTANT_MAPS_PAY)
     public static void distantMapsPay(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player actor = ThirtyKAcTargets.target(game, buttonID, DISTANT_MAPS_PAY);
-        String planet = ThirtyKAcTargets.afterTarget(buttonID, DISTANT_MAPS_PAY);
+        String rest = ThirtyKAcTargets.afterTarget(buttonID, DISTANT_MAPS_PAY);
+        String trait = traitFromCode(StringUtils.substringBefore(rest, "_"));
+        String planet = StringUtils.substringAfter(rest, "_");
         Planet holder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         if (actor == null
                 || holder == null
@@ -391,7 +415,12 @@ public class ThirtyKBoardAcButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", you paid 2 trade goods. Explore "
                         + Helper.getPlanetRepresentation(planet, game) + ".",
-                explore == null ? List.of() : explore);
+                explore == null
+                        ? List.of()
+                        : explore.stream()
+                                .filter(button -> button.getCustomId() != null
+                                        && button.getCustomId().endsWith("_" + trait))
+                                .toList());
     }
 
     @ButtonHandler(FOLDING)
@@ -412,6 +441,7 @@ public class ThirtyKBoardAcButtonHandler {
             ThirtyKAcTargets.noTarget(event, player, "Folding of Spacetime");
             return;
         }
+        ThirtyKAcState.openChoice(game, player, FOLDING);
         ButtonHelper.deleteMessage(event);
         ThirtyKAcTargets.send(
                 player,
@@ -422,6 +452,7 @@ public class ThirtyKBoardAcButtonHandler {
     @ButtonHandler(FOLDING_TILE)
     public static void foldingTile(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.substring(FOLDING_TILE.length()));
+        if (!ThirtyKAcTargets.takeChoice(event, game, player, FOLDING)) return;
         if (tile == null || !tile.isEdgeOfBoard(game)) {
             ThirtyKAcTargets.fizzle(event, player);
             return;
@@ -430,7 +461,8 @@ public class ThirtyKBoardAcButtonHandler {
         List<Player> movers = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile);
         for (Player mover : movers) {
             List<Button> buttons = foldingDestinations(game, mover, tile);
-            buttons.add(Buttons.red(mover.factionButtonChecker() + "deleteButtons", "Stay"));
+            buttons.add(Buttons.red(mover.factionButtonChecker() + FOLDING_STAY, "Stay"));
+            ThirtyKAcState.openChoice(game, mover, FOLDING_MOVE);
             MessageHelper.sendMessageToChannelWithButtons(
                     mover.getCorrectChannel(),
                     mover.getRepresentationUnfogged() + ", _Folding of Spacetime_ lets you move your ships in "
@@ -452,7 +484,6 @@ public class ThirtyKBoardAcButtonHandler {
             if (tile == origin || !tile.isEdgeOfBoard(game)) continue;
             if (known != null && !known.contains(tile.getPosition())) continue;
             if (FoWHelper.otherPlayersHaveShipsInSystem(mover, tile, game)) continue;
-            if (buttons.size() >= 24) break;
             buttons.add(Buttons.gray(
                     mover.factionButtonChecker() + FOLDING_MOVE + origin.getPosition() + "_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, mover)));
@@ -466,13 +497,17 @@ public class ThirtyKBoardAcButtonHandler {
         if (parts.length != 2) return;
         Tile from = game.getTileByPosition(parts[0]);
         Tile to = game.getTileByPosition(parts[1]);
-        if (from == null
-                || to == null
-                || !to.isEdgeOfBoard(game)
-                || FoWHelper.otherPlayersHaveShipsInSystem(player, to, game)) {
+        if (!ThirtyKAcTargets.choiceOpen(event, game, player, FOLDING_MOVE)) return;
+        if (from == null) {
+            ThirtyKAcState.takeChoice(game, player, FOLDING_MOVE);
             ThirtyKAcTargets.fizzle(event, player);
             return;
         }
+        if (to == null || !to.isEdgeOfBoard(game) || FoWHelper.otherPlayersHaveShipsInSystem(player, to, game)) {
+            reofferFolding(event, game, player, from);
+            return;
+        }
+        ThirtyKAcState.takeChoice(game, player, FOLDING_MOVE);
         List<RemovedUnit> moved = RemoveUnitService.removeAllPlayerNonStructureUnits(
                 event, game, player, from, from.getSpaceUnitHolder());
         AddUnitService.addUnits(
@@ -485,6 +520,23 @@ public class ThirtyKBoardAcButtonHandler {
                 player.getRepresentationUnfogged() + ", your ships moved from "
                         + from.getRepresentationForButtons(game, player) + " to "
                         + to.getRepresentationForButtons(game, player) + " with _Folding of Spacetime_.");
+    }
+
+    private static void reofferFolding(ButtonInteractionEvent event, Game game, Player mover, Tile from) {
+        ButtonHelper.deleteMessage(event);
+        List<Button> buttons = foldingDestinations(game, mover, from);
+        buttons.add(Buttons.red(mover.factionButtonChecker() + FOLDING_STAY, "Stay"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                mover.getCorrectChannel(),
+                mover.getRepresentationUnfogged() + ", that system cannot be chosen now. Pick again for _Folding of"
+                        + " Spacetime_, or stay.",
+                buttons);
+    }
+
+    @ButtonHandler(FOLDING_STAY)
+    public static void foldingStay(ButtonInteractionEvent event, Game game, Player player) {
+        ThirtyKAcState.takeChoice(game, player, FOLDING_MOVE);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler(CORRUPT)
@@ -603,6 +655,7 @@ public class ThirtyKBoardAcButtonHandler {
 
     @ButtonHandler(FINAL_STAND)
     public static void finalStand(ButtonInteractionEvent event, Game game, Player player) {
+        ThirtyKAcState.clearFinalStand(game, player);
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             Planet holder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
@@ -637,12 +690,35 @@ public class ThirtyKBoardAcButtonHandler {
                     event.getMessageChannel(), "You no longer have exactly 1 infantry on a planet you control there.");
             return;
         }
+        if (!ThirtyKAcState.markFinalStandRoll(game, player, planet, groundCombatRound(game, planet))) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "You already rolled _Final Stand_ on that planet this round of ground combat.");
+            return;
+        }
+        ButtonHelper.deleteTheOneButton(event);
         int dice = Math.max(0, holder.getInfluence());
         List<DiceHelper.Die> rolls = DiceHelper.rollDice(infantry.getCombatHitsOn(), dice);
-        MessageHelper.sendMessageToChannel(
+        MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " rolled " + dice + " _Final Stand_ dice for "
                         + Helper.getPlanetRepresentation(planet, game) + ": " + DiceHelper.formatDiceOutput(rolls)
-                        + " (" + DiceHelper.countSuccesses(rolls) + " hit(s)).");
+                        + " (" + DiceHelper.countSuccesses(rolls) + " hit(s)).",
+                List.of(Buttons.red(
+                        player.factionButtonChecker() + FINAL_STAND_ROLL + planet,
+                        "Roll Final Stand Next Round On " + Helper.getPlanetRepresentation(planet, game))));
+    }
+
+    private static String groundCombatRound(Game game, String planet) {
+        Tile tile = game.getTileFromPlanet(planet);
+        if (tile == null) return "0";
+        int round = 0;
+        for (Player combatant : game.getRealPlayersNNeutral()) {
+            round = Math.max(
+                    round,
+                    NumberUtils.toInt(game.getStoredValue(
+                            "combatRoundTracker" + combatant.getFaction() + tile.getPosition() + planet)));
+        }
+        return String.valueOf(round);
     }
 }

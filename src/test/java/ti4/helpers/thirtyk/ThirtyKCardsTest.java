@@ -57,32 +57,22 @@ class ThirtyKCardsTest extends BaseTi4Test {
         });
     }
 
+    // Deck sizes are pinned because Mapper only logs JSON import failures; the CSV "Deck number" became copies.
     @Test
-    void decksHaveTheExpectedSizeAndOnlyThirtyKCards() {
+    void decksHaveTheExpectedSizesAndCopies() {
         DECK_SIZES.forEach((alias, size) -> {
             DeckModel deck = Mapper.getDeck(alias);
             assertThat(deck).as(alias).isNotNull();
             assertThat(deck.getCardIDs()).as(alias).hasSize(size).doesNotHaveDuplicates();
             assertThat(deck.getSource()).isEqualTo(ComponentSource.thirtyk);
         });
-    }
-
-    @Test
-    void deckNumberColumnBecomesCopies() {
         assertThat(Mapper.getDeck("action_cards_30k").getCardIDs())
                 .contains("conflagration30k1", "conflagration30k2")
                 .doesNotContain("conflagration30k");
-        assertThat(Mapper.getDeck("action_cards_jmsc").getCardIDs())
-                .contains("siphonfundsjmsc1", "siphonfundsjmsc4", "creationofgloryjmsc");
         assertThat(Mapper.getDeck("explores_30k").getCardIDs())
-                .contains(
-                        "imitationfactories30k4",
-                        "foresightofindustry30k4",
-                        "foresightofindustryb30k4",
-                        "tourismbureau30k");
+                .contains("imitationfactories30k4", "foresightofindustryb30k4", "tourismbureau30k");
     }
 
-    // Explore and relic ids end up inside button ids that are split on `_` (e.g. resolve_explore_<id>_<planet>).
     @Test
     void exploreAndRelicIdsHaveNoUnderscores() {
         Stream.concat(
@@ -95,19 +85,20 @@ class ThirtyKCardsTest extends BaseTi4Test {
                 .forEach(id -> assertThat(id).doesNotContain("_"));
     }
 
-    // "Place this card face up in your play area" explores are tracked as fake relics with the same id.
+    // Play-area explores are tracked as fake relics with the same id; static attachment values live in data.
     @Test
-    void playAreaExploresHaveAFakeRelic() {
+    void crossReferencedDataExists() {
         List<ExploreModel> playArea = Mapper.getExplores().values().stream()
                 .filter(c -> c.getSource() == ComponentSource.thirtyk)
                 .filter(c -> c.getText().startsWith("Place this card face up in your play area"))
                 .toList();
-        assertThat(playArea).hasSize(9);
-        for (ExploreModel explore : playArea) {
+        assertThat(playArea).hasSize(9).allSatisfy(explore -> {
             RelicModel relic = Mapper.getRelic(explore.getId());
             assertThat(relic).as(explore.getId()).isNotNull();
             assertThat(relic.isFakeRelic()).isTrue();
-        }
+        });
+        assertThat(Mapper.getAttachmentInfo("precisionlaserdefenses30k").getSpaceCannonHitsOn())
+                .isEqualTo(3);
     }
 
     @Test

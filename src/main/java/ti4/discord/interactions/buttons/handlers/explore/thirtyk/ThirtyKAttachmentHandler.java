@@ -22,6 +22,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKExploreMath;
+import ti4.helpers.thirtyk.ThirtyKTurnState;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.planet.PlanetService;
@@ -42,6 +43,7 @@ public class ThirtyKAttachmentHandler {
 
     private static final String PROFITABLE_EXHAUSTED_KEY = "thirtyKProfitableFactories_";
     private static final String CARBON_READY = "thirtyKCarbonReady_";
+    private static final String CARBON_USED_KEY = "thirtyKCarbonUsed_";
     private static final String INHOSPITABLE_ROLL = "thirtyKInhospitableRoll_";
     private static final String RELAY_CHOOSE = "thirtyKRelayChoose_";
     private static final String BASTION_PLACE = "thirtyKBastionPlace_";
@@ -72,6 +74,7 @@ public class ThirtyKAttachmentHandler {
     }
 
     private static void offerCarbonConsciousness(Game game, Player player, Planet planet) {
+        if (carbonUsedThisTurn(game, planet.getName())) return;
         int cost = planet.getResources();
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -92,16 +95,32 @@ public class ThirtyKAttachmentHandler {
         Planet planet = game.getUnitHolderFromPlanet(planetID);
         if (tile == null || planet == null) return;
         ThirtyKExploreSupport.deleteMessage(event);
+        if (carbonUsedThisTurn(game, planetID)) return;
+        game.setStoredValue(CARBON_USED_KEY + planetID, "used");
         PlanetService.refreshPlanet(player, planetID);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planetID);
-        player.resetSpentThings();
         List<Button> buttons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, player, "inf"));
+        buttons.removeIf(button -> isSpendButtonFor(button, planetID));
         buttons.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " readied " + Helper.getPlanetRepresentation(planetID, game)
                         + " and placed 1 infantry on it. Please spend " + planet.getResources() + " influence.",
                 buttons);
+    }
+
+    private static boolean carbonUsedThisTurn(Game game, String planetID) {
+        return !game.getStoredValue(CARBON_USED_KEY + planetID).isBlank();
+    }
+
+    public static void clearCarbonUsed(Game game) {
+        ThirtyKTurnState.removeKeysStartingWith(game, CARBON_USED_KEY);
+    }
+
+    private static boolean isSpendButtonFor(Button button, String planetID) {
+        String id = button.getCustomId();
+        if (id == null || !id.startsWith("spend_")) return false;
+        return planetID.equals(id.split("_")[1]);
     }
 
     public static void afterLanding(Game game, Player player, Tile tile, String planetID, UnitType type, int amount) {

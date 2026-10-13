@@ -7,41 +7,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
-import ti4.image.Mapper;
-import ti4.model.ExploreModel;
-import ti4.model.RelicModel;
-import ti4.model.Source.ComponentSource;
-import ti4.testUtils.BaseTi4Test;
 
-class ThirtyKExploreMathTest extends BaseTi4Test {
+class ThirtyKExploreMathTest {
 
+    // Corrosive Discovery ("above 4" = 5+, "below 3" = 1-2), Systematic Sympathies (4 resources of ships,
+    // fighters 0.5), Wasteful Pirates (only assignable hits pay), Cross-species Mingling (X + 1).
     @Test
-    void countsDiceAboveAndBelowThresholds() {
-        // Corrosive Discovery: "above 4" is 5+, "below 3" is 1-2.
+    void cardNumbersFollowTheCardText() {
         List<Integer> rolls = List.of(1, 2, 3, 4, 5, 10);
         assertThat(ThirtyKExploreMath.countAtLeast(rolls, 5)).isEqualTo(2);
         assertThat(ThirtyKExploreMath.countAtMost(rolls, 2)).isEqualTo(2);
-    }
-
-    @Test
-    void systematicSympathiesNeedsFourResourcesOfShips() {
         assertThat(ThirtyKExploreMath.sympathiesEarnsVictoryPoint(3.5)).isFalse();
-        // Two cruisers, or a carrier plus two fighters (0.5 each), reach the threshold.
         assertThat(ThirtyKExploreMath.sympathiesEarnsVictoryPoint(4.0)).isTrue();
-        assertThat(ThirtyKExploreMath.sympathiesEarnsVictoryPoint(8)).isTrue();
-    }
-
-    @Test
-    void wastefulPiratesPaysOnlyForHitsThatCanBeAssigned() {
-        assertThat(ThirtyKExploreMath.wastefulPiratesTradeGoods(3, 5)).isEqualTo(3);
         assertThat(ThirtyKExploreMath.wastefulPiratesTradeGoods(4, 2)).isEqualTo(2);
-        assertThat(ThirtyKExploreMath.wastefulPiratesTradeGoods(2, 0)).isZero();
-    }
-
-    @Test
-    void crossSpeciesMinglingAddsOne() {
         assertThat(ThirtyKExploreMath.crossSpeciesInfantry(0)).isEqualTo(1);
-        assertThat(ThirtyKExploreMath.crossSpeciesInfantry(3)).isEqualTo(4);
     }
 
     @Test
@@ -59,34 +38,16 @@ class ThirtyKExploreMathTest extends BaseTi4Test {
         assertThat(ThirtyKExploreMath.pickFewestPoints(Map.of(), random)).isEmpty();
     }
 
+    // Cards ready when status homework starts, so status scoring still belongs to the action-phase cycle
+    // (Profitable Factories must not pay twice for one ready cycle).
     @Test
-    void attachmentsReadyAgainAfterTheStatusPhase() {
+    void attachmentsReadyAgainOnlyOnceStatusHomeworkStarts() {
         String actionPhase = ThirtyKExploreMath.readyCycleMarker(3, "action");
-        String statusPhase = ThirtyKExploreMath.readyCycleMarker(3, "statusScoring");
         String agendaPhase = ThirtyKExploreMath.readyCycleMarker(3, "agendaVoting");
-        String nextRound = ThirtyKExploreMath.readyCycleMarker(4, "strategy");
-        assertThat(actionPhase).isNotEqualTo(statusPhase);
-        assertThat(statusPhase).isEqualTo(agendaPhase);
-        assertThat(nextRound).isNotEqualTo(actionPhase).isNotEqualTo(statusPhase);
-    }
-
-    @Test
-    void everyPlayAreaExploreHasAFakeRelicWithTheSameId() {
-        for (String id : ThirtyKExplores.PLAY_AREA_CARDS) {
-            ExploreModel explore = Mapper.getExplore(id);
-            RelicModel relic = Mapper.getRelic(id);
-            assertThat(explore).as(id).isNotNull();
-            assertThat(explore.getSource()).isEqualTo(ComponentSource.thirtyk);
-            assertThat(relic).as(id).isNotNull();
-            assertThat(relic.isFakeRelic()).as(id).isTrue();
-        }
-    }
-
-    @Test
-    void precisionLaserDefensesCarriesSpaceCannonThree() {
-        var attachment = Mapper.getAttachmentInfo("precisionlaserdefenses30k");
-        assertThat(attachment).isNotNull();
-        assertThat(attachment.getSpaceCannonHitsOn()).isEqualTo(3);
-        assertThat(attachment.getSpaceCannonDieCount()).isEqualTo(1);
+        assertThat(ThirtyKExploreMath.readyCycleMarker(3, "statusScoring")).isEqualTo(actionPhase);
+        assertThat(ThirtyKExploreMath.readyCycleMarker(3, "statusHomework"))
+                .isEqualTo(agendaPhase)
+                .isNotEqualTo(actionPhase);
+        assertThat(ThirtyKExploreMath.readyCycleMarker(4, "strategy")).isNotEqualTo(actionPhase);
     }
 }

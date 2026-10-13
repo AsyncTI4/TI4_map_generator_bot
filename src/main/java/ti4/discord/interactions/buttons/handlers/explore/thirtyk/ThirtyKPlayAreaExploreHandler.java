@@ -84,11 +84,11 @@ public class ThirtyKPlayAreaExploreHandler {
             buttons.add(Buttons.blue(
                     player.factionButtonChecker() + RESEARCH + cardID,
                     "Spend " + card.cost() + " Resources To Research"));
-        } else if (!player.hasTech(card.techToGain())) {
+        } else if (!player.hasTech(techToGain(player, card))) {
             buttons.add(Buttons.blue(
                     player.factionButtonChecker() + GAIN_TECH + cardID,
                     "Spend " + card.cost() + " Resources For "
-                            + Mapper.getTech(card.techToGain()).getName()));
+                            + Mapper.getTech(techToGain(player, card)).getName()));
         }
         buttons.add(ThirtyKExploreSupport.decline(player));
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -141,8 +141,24 @@ public class ThirtyKPlayAreaExploreHandler {
                 event.getMessageChannel(),
                 player.getRepresentation() + ", gain the technology once you have paid.",
                 List.of(Buttons.green(
-                        player.factionButtonChecker() + "getTech_" + card.techToGain() + "__noPay__comp",
-                        "Gain " + Mapper.getTech(card.techToGain()).getName())));
+                        player.factionButtonChecker() + "getTech_" + techToGain(player, card) + "__noPay__comp",
+                        "Gain " + Mapper.getTech(techToGain(player, card)).getName())));
+    }
+
+    private static String techToGain(Player player, PlayAreaCard card) {
+        TechnologyModel generic = Mapper.getTech(card.techToGain());
+        if (generic == null || !generic.isUnitUpgrade()) return card.techToGain();
+        List<String> factionTechs = new ArrayList<>(player.getNotResearchedFactionTechs());
+        factionTechs.addAll(player.getTechs());
+        return factionTechs.stream()
+                .map(Mapper::getTech)
+                .filter(tech -> tech != null
+                        && tech.isUnitUpgrade()
+                        && card.techToGain()
+                                .equalsIgnoreCase(tech.getBaseUpgrade().orElse("")))
+                .map(TechnologyModel::getAlias)
+                .findFirst()
+                .orElse(card.techToGain());
     }
 
     private static void purgeCard(GenericInteractionCreateEvent event, Player player, String cardID) {

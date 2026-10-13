@@ -18,9 +18,10 @@ import ti4.testUtils.BaseTi4Test;
 
 class ThirtyKActionCardsTest extends BaseTi4Test {
 
-    // Cards whose resolve step is a target list that can legitimately be empty in this two-player fixture
-    // (no far-away homes, no voters yet, neighbours), or that are resolved by the rider prediction buttons.
+    // Target-list cards that can legitimately be empty in this two-player fixture (no far homes, no voters,
+    // no active system), and rider cards that are resolved by the prediction buttons instead.
     private static final Set<String> MAY_HAVE_NO_BUTTONS = Set.of(
+            "warprofiteering30k",
             "embassyrider30k",
             "dummyrider30k",
             "publicoutcry30k",
@@ -57,33 +58,25 @@ class ThirtyKActionCardsTest extends BaseTi4Test {
             if (!MAY_HAVE_NO_BUTTONS.contains(ThirtyKCards.baseId(card.getAlias()))) {
                 assertThat(buttons).as(card.getAlias()).isNotEmpty();
             }
+            if (buttons == null) continue;
             assertThat(buttons).as(card.getAlias()).hasSizeLessThanOrEqualTo(25);
             assertThat(buttons)
-                    .as(card.getAlias())
                     .allSatisfy(button -> assertThat(button.getCustomId()).hasSizeLessThanOrEqualTo(100));
         }
     }
 
+    // null = no resolve step (manual cards, riders); empty = "no legal target" message; otherwise choices.
     @Test
-    void manualCardsOfferNothing() {
+    void resolveButtonsSeparateManualNoTargetAndChoices() {
         assertThat(ThirtyKActionCards.resolveButtons(Mapper.getActionCard("realitydisruptionjmsc1"), sol))
+                .isNull();
+        assertThat(ThirtyKActionCards.resolveButtons(Mapper.getActionCard("dummyrider30k"), sol))
+                .isNull();
+        assertThat(ThirtyKActionCards.resolveButtons(Mapper.getActionCard("warprofiteering30k"), sol))
                 .isEmpty();
-        assertThat(ThirtyKActionCards.resolveButtons(Mapper.getActionCard("ultimatetrickshotjmsc2"), sol))
-                .isEmpty();
-    }
-
-    @Test
-    void compoundInterestOffersOnlyWhatYouCanAfford() {
-        // 3 trade goods: 0, 1, 2 or 3 may be placed, never 4.
+        // 3 trade goods: 0, 1, 2 or 3 may be placed on Compound Interest, never 4.
         assertThat(ThirtyKActionCards.resolveButtons(Mapper.getActionCard("compoundinterest30k"), sol))
                 .hasSize(4);
-    }
-
-    @Test
-    void playingDummyRiderRemembersWhoMayTakeItBack() {
-        ThirtyKActionCards.resolveButtons(Mapper.getActionCard("dummyrider30k"), sol);
-
-        assertThat(ThirtyKAcState.isDummyRiderPlayer(game, sol)).isTrue();
     }
 
     private Player addPlayer(String userId, String faction, String color) {

@@ -20,6 +20,11 @@ public class ThirtyKAcState {
     static final String DUMMY_RIDER_COPIES = "thkDummyRiderCopies";
     static final String SIPHON_TARGETS = "thkSiphon";
     static final String BLEW_UP = "thkBlewUp";
+    static final String EXTENDED_CAMPAIGNING = "thkExtCampaign";
+    static final String ONE_SHOT = "thkOneShot";
+    static final String FINAL_STAND = "thkFinalStand";
+    static final String RIDER_CARDS = "thkRiderCards";
+    static final String DUMMY_RIDER_CARD = "dummyrider30k";
     private static final String SEPARATOR = "+";
     private static final String SPLIT = "\\+";
 
@@ -28,6 +33,14 @@ public class ThirtyKAcState {
     public record PlanetLoss(String planet, String newOwnerFaction) {}
 
     public record PurgedFragments(String purgerFaction, List<String> fragments) {}
+
+    public record StructureLoss(String loserFaction, String position) {}
+
+    public enum ProfiteeringResult {
+        WON,
+        LOST,
+        PENDING
+    }
 
     public static int compoundInterest(Game game, Player player) {
         return NumberUtils.toInt(game.getStoredValue(COMPOUND_INTEREST + player.getFaction()), 0);
@@ -57,6 +70,12 @@ public class ThirtyKAcState {
 
     public static void clearWarProfiteering(Game game, Player player) {
         game.removeStoredValue(WAR_PROFITEERING + player.getFaction());
+    }
+
+    public static ProfiteeringResult profiteeringResult(String targetFaction, List<String> factionsWithShips) {
+        if (!factionsWithShips.contains(targetFaction)) return ProfiteeringResult.LOST;
+        if (factionsWithShips.size() == 1) return ProfiteeringResult.WON;
+        return ProfiteeringResult.PENDING;
     }
 
     public static void setPlanetLoss(Game game, Player previousOwner, String planet, Player newOwner) {
@@ -99,47 +118,58 @@ public class ThirtyKAcState {
         game.setStoredValue(PURGED_FRAGMENTS, String.join(SEPARATOR, parts));
     }
 
-    public static void setStructureLost(Game game, Player loser) {
-        game.setStoredValue(STRUCTURE_LOST, loser.getFaction());
+    public static void setStructureLost(Game game, Player loser, String position) {
+        game.setStoredValue(STRUCTURE_LOST, loser.getFaction() + SEPARATOR + position);
     }
 
-    public static Player structureLoser(Game game) {
-        String faction = game.getStoredValue(STRUCTURE_LOST);
-        return faction.isBlank() ? null : game.getPlayerFromColorOrFaction(faction);
+    public static StructureLoss structureLoss(Game game) {
+        String[] parts = game.getStoredValue(STRUCTURE_LOST).split(SPLIT);
+        if (parts.length != 2) return null;
+        return new StructureLoss(parts[0], parts[1]);
     }
 
-    public static void setDummyRiderPlayer(Game game, Player player) {
-        game.setStoredValue(DUMMY_RIDER_PLAYER, player.getFaction());
+    public static void clearStructureLost(Game game) {
+        game.removeStoredValue(STRUCTURE_LOST);
     }
 
-    public static boolean isDummyRiderPlayer(Game game, Player player) {
-        return player.getFaction().equals(game.getStoredValue(DUMMY_RIDER_PLAYER));
+    public static void setDummyRider(Game game, Player player, String outcome) {
+        game.setStoredValue(DUMMY_RIDER_PLAYER, player.getFaction() + SEPARATOR + outcome.toLowerCase());
     }
 
-    public static void clearDummyRiderPlayer(Game game) {
+    public static boolean isDummyRider(Game game, Player player, String outcome) {
+        return (player.getFaction() + SEPARATOR + outcome.toLowerCase())
+                .equals(game.getStoredValue(DUMMY_RIDER_PLAYER));
+    }
+
+    public static void clearDummyRider(Game game) {
         game.removeStoredValue(DUMMY_RIDER_PLAYER);
         game.removeStoredValue(DUMMY_RIDER_COPIES);
     }
 
-    public static void addDummyRiderCopy(Game game, Player player, String copyingCard) {
+    public static void addDummyRiderCopy(Game game, Player player, String outcome, String copyingCard) {
         List<String> copies = new ArrayList<>(dummyRiderCopies(game));
-        copies.add(player.getFaction() + SEPARATOR + copyingCard);
+        copies.add(copyEntry(player, outcome, copyingCard));
         game.setStoredValue(DUMMY_RIDER_COPIES, String.join(";", copies));
     }
 
-    public static List<String> takeDummyRiderCopies(Game game, Player player) {
-        List<String> remaining = new ArrayList<>();
-        List<String> taken = new ArrayList<>();
-        for (String copy : dummyRiderCopies(game)) {
-            String[] parts = copy.split(SPLIT, 2);
-            if (parts.length == 2 && parts[0].equals(player.getFaction())) {
-                taken.add(parts[1]);
-            } else {
-                remaining.add(copy);
-            }
+    public static String takeWrongDummyRiderCard(Game game, Player player, String outcome) {
+        if (isDummyRider(game, player, outcome)) {
+            game.removeStoredValue(DUMMY_RIDER_PLAYER);
+            return DUMMY_RIDER_CARD;
         }
-        game.setStoredValue(DUMMY_RIDER_COPIES, String.join(";", remaining));
-        return taken;
+        String prefix = player.getFaction() + SEPARATOR + outcome.toLowerCase() + SEPARATOR;
+        List<String> remaining = new ArrayList<>(dummyRiderCopies(game));
+        for (String copy : remaining) {
+            if (!copy.startsWith(prefix)) continue;
+            remaining.remove(copy);
+            game.setStoredValue(DUMMY_RIDER_COPIES, String.join(";", remaining));
+            return copy.substring(prefix.length());
+        }
+        return null;
+    }
+
+    private static String copyEntry(Player player, String outcome, String copyingCard) {
+        return player.getFaction() + SEPARATOR + outcome.toLowerCase() + SEPARATOR + copyingCard;
     }
 
     private static List<String> dummyRiderCopies(Game game) {
@@ -176,6 +206,74 @@ public class ThirtyKAcState {
 
     public static void clearFightersBlownUp(Game game, Player player) {
         game.removeStoredValue(BLEW_UP + player.getFaction());
+    }
+
+    public static void setExtendedCampaigning(Game game, Player player, Player target) {
+        game.setStoredValue(EXTENDED_CAMPAIGNING + target.getFaction(), player.getFaction());
+    }
+
+    public static boolean takeExtendedCampaigning(Game game, Player player, Player target) {
+        if (!player.getFaction().equals(game.getStoredValue(EXTENDED_CAMPAIGNING + target.getFaction()))) return false;
+        game.removeStoredValue(EXTENDED_CAMPAIGNING + target.getFaction());
+        return true;
+    }
+
+    public static void openChoice(Game game, Player player, String choice) {
+        game.setStoredValue(ONE_SHOT + choice + player.getFaction(), "open");
+    }
+
+    public static boolean hasChoice(Game game, Player player, String choice) {
+        return !game.getStoredValue(ONE_SHOT + choice + player.getFaction()).isBlank();
+    }
+
+    public static boolean takeChoice(Game game, Player player, String choice) {
+        return game.removeStoredValue(ONE_SHOT + choice + player.getFaction()) != null;
+    }
+
+    public static boolean markFinalStandRoll(Game game, Player player, String planet, String round) {
+        String key = finalStandPrefix(player) + planet;
+        String marker = game.getRound() + SEPARATOR + round;
+        if (marker.equals(game.getStoredValue(key))) return false;
+        game.setStoredValue(key, marker);
+        return true;
+    }
+
+    public static void clearFinalStand(Game game, Player player) {
+        ThirtyKTurnState.removeKeysStartingWith(game, finalStandPrefix(player));
+    }
+
+    private static String finalStandPrefix(Player player) {
+        return FINAL_STAND + player.getFaction() + SEPARATOR;
+    }
+
+    public static void markRiderCard(Game game, Player player, String rider) {
+        List<String> riders = new ArrayList<>(riderCards(game, player));
+        if (riders.contains(rider)) return;
+        riders.add(rider);
+        game.setStoredValue(RIDER_CARDS + player.getFaction(), String.join(SEPARATOR, riders));
+    }
+
+    public static boolean playedRiderCard(Game game, Player player, String rider) {
+        return riderCards(game, player).contains(rider);
+    }
+
+    private static List<String> riderCards(Game game, Player player) {
+        String stored = game.getStoredValue(RIDER_CARDS + player.getFaction());
+        if (stored.isBlank()) return List.of();
+        return Arrays.asList(stored.split(SPLIT));
+    }
+
+    public static void clearRiderCards(Game game) {
+        ThirtyKTurnState.removeKeysStartingWith(game, RIDER_CARDS);
+    }
+
+    static void clearTurnState(Game game) {
+        ThirtyKTurnState.removeKeysStartingWith(game, WAR_PROFITEERING);
+        ThirtyKTurnState.removeKeysStartingWith(game, CONFLAGRATION);
+        ThirtyKTurnState.removeKeysStartingWith(game, EXTENDED_CAMPAIGNING);
+        ThirtyKTurnState.removeKeysStartingWith(game, ONE_SHOT);
+        ThirtyKTurnState.removeKeysStartingWith(game, FINAL_STAND);
+        game.removeStoredValue(STRUCTURE_LOST);
     }
 
     public static int cumulativeSupportInfantry(int distanceFromHome) {

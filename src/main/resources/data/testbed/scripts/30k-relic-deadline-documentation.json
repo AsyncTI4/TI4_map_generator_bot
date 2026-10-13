@@ -7,8 +7,8 @@
     { "do": "hand", "as": "sol", "hand": { "relics": ["deadlinedocumentation30k"] } },
     { "expect": { "state": "hacan.ccs", "equals": "3/3/2" } },
     { "as": "sol", "pressId": "FFCC_sol_componentActionRes_relic_deadlinedocumentation30k" },
-    { "expect": { "state": "sol.exhaustedRelics", "contains": "deadlinedocumentation30k" } },
     { "as": "sol", "press": "thirtyKDeadlineTarget_hacan" },
+    { "expect": { "state": "sol.exhaustedRelics", "contains": "deadlinedocumentation30k" } },
     { "as": "hacan", "press": "thirtyKDeadlineMove_fleet", "in": "hacan:cards-info" },
     { "expect": { "state": "hacan.ccs", "equals": "2/4/2" } }
   ]

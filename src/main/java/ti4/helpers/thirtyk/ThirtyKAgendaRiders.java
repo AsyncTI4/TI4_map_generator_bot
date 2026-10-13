@@ -19,6 +19,7 @@ public class ThirtyKAgendaRiders {
     public static final String FOR = "for";
     public static final String AGAINST = "against";
     private static final String POLITICS_RIDER = "Politics Rider";
+    private static final Set<String> UNCOPYABLE_RIDERS = Set.of(POLITICS_RIDER, PUBLIC_OUTCRY, PUBLIC_OUTCRY_RIDER);
     private static final Set<String> NO_VOTE_RIDERS =
             Set.of(EMBASSY_RIDER, DUMMY_RIDER, PUBLIC_OUTCRY, PUBLIC_OUTCRY_RIDER);
 
@@ -44,13 +45,14 @@ public class ThirtyKAgendaRiders {
     }
 
     public static boolean isCopyable(String outcome, String rider) {
-        return isForAgainst(outcome) && rider.contains("Rider") && !POLITICS_RIDER.equals(rider);
+        return isForAgainst(outcome) && rider.contains("Rider") && !UNCOPYABLE_RIDERS.contains(rider);
     }
 
     public static List<RiderEntry> riderEntries(Map<String, String> votes) {
         List<RiderEntry> entries = new ArrayList<>();
         for (Map.Entry<String, String> outcome : votes.entrySet()) {
             for (String piece : pieces(outcome.getValue())) {
+                // TODO: faction ids containing '_' (pi_* factions) split at the wrong place here.
                 int separator = piece.indexOf('_');
                 if (separator < 1) continue;
                 String rider = piece.substring(separator + 1);

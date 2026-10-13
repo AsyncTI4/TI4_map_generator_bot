@@ -2,6 +2,7 @@ package ti4.helpers.thirtyk;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
@@ -18,10 +19,21 @@ import ti4.model.Source.ComponentSource;
 @UtilityClass
 public class ThirtyKActionCards {
 
+    private static final Set<String> RIDER_CARDS = Set.of("embassyrider30k", "dummyrider30k", "publicoutcry30k");
+
     public static boolean resolveActionCard(ActionCardModel card, Player player, String introMsg) {
         if (card.getSource() != ComponentSource.thirtyk) return false;
+        if (RIDER_CARDS.contains(ThirtyKCards.baseId(card.getAlias()))) {
+            ThirtyKAcState.markRiderCard(player.getGame(), player, card.getName());
+        }
         List<Button> buttons = resolveButtons(card, player);
-        if (buttons.isEmpty()) return false;
+        if (buttons == null) return false;
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", _" + card.getName() + "_ has no legal target.");
+            return true;
+        }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), introMsg, buttons);
         return true;
     }
@@ -37,7 +49,6 @@ public class ThirtyKActionCards {
                 buttons.add(Buttons.green(ffcc + ThirtyKBoardAcButtonHandler.CONFLAGRATION, resolve));
             case "denounceleadership30k" ->
                 buttons.add(Buttons.green(ffcc + ThirtyKPoliticsAcButtonHandler.DENOUNCE, resolve));
-            case "dummyrider30k" -> ThirtyKAcState.setDummyRiderPlayer(game, player);
             case "extendedcampaigning30k" ->
                 buttons.addAll(ThirtyKPoliticsAcButtonHandler.extendedCampaigningButtons(game, player));
             case "tradeships30k" -> buttons.addAll(ThirtyKPoliticsAcButtonHandler.tradeShipsButtons(game, player));
@@ -81,7 +92,9 @@ public class ThirtyKActionCards {
             case "propheticdeclarationjmsc" -> buttons.add(relicReveal(ffcc, ThirtyKPoliticsAcButtonHandler.INFLUENCE));
             case "resourcecondensationjmsc" ->
                 buttons.add(relicReveal(ffcc, ThirtyKPoliticsAcButtonHandler.COMMAND_TOKENS));
-            default -> {}
+            default -> {
+                return null;
+            }
         }
         return buttons;
     }

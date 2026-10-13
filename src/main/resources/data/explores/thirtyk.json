@@ -625,7 +625,7 @@
         "text": "Reveal the top card of the Relic deck. Choose a player to gain that relic. The chosen player may transact with you during this action phase regardless of if you are neighbors.",
         "source": "thirtyk",
         "automation": "FULL",
-        "automationNotes": "Shows the top relic, the chosen player draws it and may transact with you this action phase."
+        "automationNotes": "Shows the top relic; the chosen player gains exactly that relic and may transact with you this action phase."
     },
     {
         "id": "overchargedtargetingsystemjmsc",

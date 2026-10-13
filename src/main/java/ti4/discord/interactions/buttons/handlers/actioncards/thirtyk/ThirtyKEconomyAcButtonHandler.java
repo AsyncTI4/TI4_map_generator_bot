@@ -11,6 +11,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.FoWHelper;
@@ -117,25 +118,24 @@ public class ThirtyKEconomyAcButtonHandler {
             ThirtyKAcTargets.fizzle(event, player);
             return;
         }
-        ThirtyKAcState.addSiphonTarget(game, player, target);
-        boolean took = takeOne(target, tradeGood);
-        if (took) player.gainTG(1, true);
         String what = tradeGood ? "trade good" : "commodity";
-        String actorMessage = took
-                ? player.getRepresentationUnfogged() + ", you siphoned 1 " + what + " from "
-                        + ThirtyKAcTargets.name(game, target, player) + " and gained 1 trade good (" + player.getTg()
-                        + " now)."
-                : player.getRepresentationUnfogged() + ", "
-                        + (game.isFowMode()
-                                ? PlanetTargetService.fizzleMessage()
-                                : target.getRepresentationNoPing() + " had no " + what + " to take.");
+        if (!takeOne(target, tradeGood)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", nothing was taken; this pick was not used up.");
+            return;
+        }
+        ThirtyKAcState.addSiphonTarget(game, player, target);
+        player.gainTG(1, true);
+        String actorMessage = player.getRepresentationUnfogged() + ", you siphoned 1 " + what + " from "
+                + ThirtyKAcTargets.name(game, target, player) + " and gained 1 trade good (" + player.getTg()
+                + " now).";
         FoWHelper.notifyActorAndAffectedElsePublic(
                 game,
                 player,
                 actorMessage,
                 target,
-                target.getRepresentationUnfogged() + ", _Siphon Funds_ "
-                        + (took ? "took 1 " + what + " from you." : "found no " + what + " to take from you."),
+                target.getRepresentationUnfogged() + ", _Siphon Funds_ took 1 " + what + " from you.",
                 actorMessage);
         if (ThirtyKAcState.siphonTargets(game, player).size() >= 2) {
             ThirtyKAcState.clearSiphonTargets(game, player);
@@ -420,17 +420,37 @@ public class ThirtyKEconomyAcButtonHandler {
     }
 
     public static List<Button> warProfiteeringButtons(Game game, Player player) {
-        return ThirtyKAcTargets.otherPlayerButtons(game, player, WAR_PROFIT, null);
+        Tile active = activeSystem(game);
+        if (active == null) return List.of();
+        boolean hidden = game.isFowMode()
+                && !FoWHelper.getTilePositionsToShow(game, player).contains(active.getPosition());
+        List<Button> buttons = new ArrayList<>();
+        for (Player combatant : game.getRealPlayers()) {
+            if (!hidden && !FoWHelper.playerHasShipsInSystem(combatant, active)) continue;
+            buttons.add(FoWHelper.fogSafeTargetButton(
+                    player.factionButtonChecker() + WAR_PROFIT + combatant.getColor(), "gray", combatant));
+        }
+        return buttons;
+    }
+
+    private static Tile activeSystem(Game game) {
+        String position = game.getActiveSystem();
+        return position == null || position.isBlank() ? null : game.getTileByPosition(position);
     }
 
     @ButtonHandler(WAR_PROFIT)
     public static void warProfiteering(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = ThirtyKAcTargets.target(game, buttonID, WAR_PROFIT);
-        String position = game.getActiveSystem();
-        if (target == null || position == null || position.isBlank()) {
+        Tile active = activeSystem(game);
+        if (target == null || active == null) {
             ThirtyKAcTargets.noTarget(event, player, "War Profiteering");
             return;
         }
+        if (!FoWHelper.playerHasShipsInSystem(target, active)) {
+            ThirtyKAcTargets.fizzle(event, player);
+            return;
+        }
+        String position = active.getPosition();
         ThirtyKAcState.setWarProfiteering(game, player, target, position);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
@@ -442,10 +462,20 @@ public class ThirtyKEconomyAcButtonHandler {
 
     @ButtonHandler(ANTIDIS)
     public static void antidisestablishmentarianism(ButtonInteractionEvent event, Game game, Player player) {
+        ThirtyKAcState.StructureLoss loss = ThirtyKAcState.structureLoss(game);
+        Player loser = loss == null ? null : game.getPlayerFromColorOrFaction(loss.loserFaction());
+        if (loser == null) {
+            ThirtyKAcTargets.noTarget(event, player, "Antidisestablishmentarianism");
+            return;
+        }
+        if (!ThirtyKDistance.isMoreThanFiveFromHome(game, player, loss.position())) {
+            ThirtyKAcTargets.fizzle(event, player);
+            return;
+        }
+        ThirtyKAcState.clearStructureLost(game);
         ButtonHelper.deleteMessage(event);
         ButtonHelperStats.replenishComms(event, game, player, false);
-        Player loser = ThirtyKAcState.structureLoser(game);
-        if (loser == null || loser == player) return;
+        if (loser == player) return;
         MessageHelper.sendMessageToChannelWithButtons(
                 loser.getCorrectChannel(),
                 loser.getRepresentationUnfogged() + ", _Antidisestablishmentarianism_ lets you replenish your"
