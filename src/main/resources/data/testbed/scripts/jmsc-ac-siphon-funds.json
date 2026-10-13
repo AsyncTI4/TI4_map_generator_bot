@@ -1,0 +1,46 @@
+{
+  "name": "jmsc-ac-siphon-funds",
+  "description": "Sol plays Siphon Funds on Hacan, whose home is more than 5 hexes away, and takes 1 trade good.",
+  "preset": "jmsc-2p",
+  "stopOnFail": true,
+  "steps": [
+    {
+      "expect": {
+        "state": "hacan.tg",
+        "equals": "3"
+      }
+    },
+    {
+      "as": "sol",
+      "press": "ac_play_from_hand_{ac:siphonfundsjmsc1}",
+      "in": "sol:cards-info"
+    },
+    {
+      "as": "sol",
+      "press": "thkAcSiphonStart",
+      "in": "sol"
+    },
+    {
+      "as": "sol",
+      "press": "thkAcSiphon_{hacan.color}_tg",
+      "in": "sol"
+    },
+    {
+      "expect": {
+        "state": "hacan.tg",
+        "equals": "2"
+      }
+    },
+    {
+      "expect": {
+        "state": "sol.tg",
+        "equals": "4"
+      }
+    },
+    {
+      "as": "sol",
+      "press": "thkAcSiphonDone",
+      "in": "sol"
+    }
+  ]
+}

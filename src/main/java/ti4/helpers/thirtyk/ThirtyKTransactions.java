@@ -2,10 +2,13 @@ package ti4.helpers.thirtyk;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.service.fow.FowCommunicationThreadService;
 
 @UtilityClass
 public class ThirtyKTransactions {
@@ -24,7 +27,16 @@ public class ThirtyKTransactions {
 
     public static boolean mayTransact(Game game, Player player, Player other) {
         if (player == null || other == null) return false;
-        return liveGrants(game).stream().anyMatch(grant -> grant.covers(player, other));
+        return liveGrants(game).stream().anyMatch(grant -> grant.covers(player, other))
+                || ThirtyKRelicHooks.deepNetworksAllows(game, player, other);
+    }
+
+    public static Set<Player> partnersOf(Game game, Player player) {
+        Set<Player> partners = new HashSet<>();
+        for (Player other : game.getRealPlayers()) {
+            if (other != player && mayTransact(game, player, other)) partners.add(other);
+        }
+        return partners;
     }
 
     private static void addGrant(Game game, Player player, Player other, String scope) {
@@ -41,6 +53,8 @@ public class ThirtyKTransactions {
         game.setStoredValue(
                 GRANTS_KEY,
                 String.join(";", grants.stream().map(Grant::serialize).toList()));
+        FowCommunicationThreadService.checkNewCommPartners(game, player);
+        FowCommunicationThreadService.checkNewCommPartners(game, other);
     }
 
     private static List<Grant> liveGrants(Game game) {

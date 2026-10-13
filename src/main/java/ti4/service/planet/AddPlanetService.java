@@ -32,6 +32,8 @@ import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
+import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -213,6 +215,7 @@ public class AddPlanetService {
                         ButtonHelperAgents.resolveArtunoCheck(player_, 1);
                     }
                     player_.removePlanet(planet);
+                    ThirtyKSecretHooks.onPlanetLost(game, player_, unitHolder);
                     CommanderUnlockCheckService.checkPlayer(player_, "uydai");
                     List<String> relics = new ArrayList<>(player_.getRelics());
                     if ("mr".equalsIgnoreCase(planet)) {
@@ -320,6 +323,7 @@ public class AddPlanetService {
                 }
             }
         }
+        ThirtyKActionCardHooks.onPlanetControlChanged(game, player, previousOwner, planet);
         if ((!alreadyOwned && player.hasAbility("contagion_blex") || player.hasAbility("plague_reservoir"))
                 && player.hasTech("dxa")
                 && !doubleCheck

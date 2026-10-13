@@ -28,6 +28,7 @@ import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
+import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.message.MessageHelper;
 import ti4.service.game.MonumentsService;
 import ti4.service.unit.AddUnitService;
@@ -48,6 +49,7 @@ public class PassService {
         UydaiUnitHandler.offerDeathCommandosPlacement(event, game, player);
 
         player.setPassed(true);
+        ThirtyKSecretHooks.onPassed(game, player);
         GameEventService.commit(game, GameEventType.TURN, player, Map.of("passed", true));
         ButtonHelperFactionSpecific.offerDeathBinding(game, player);
         SarcosaHeroHandler.offerPassAbility(game, player);

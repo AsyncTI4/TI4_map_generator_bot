@@ -40,7 +40,8 @@ Action cards, explores, relics and secret objectives may carry an optional `auto
 - **Ids have no underscores** for explores and relics (button ids are split on `_`). Copies of a card
   end in a number (`conflagration30k1`); `ThirtyKCards.baseId` strips it.
 - **Card logic lives in `ti4.helpers.thirtyk`** (`ThirtyKActionCards`, `ThirtyKExplores`,
-  `ThirtyKRelics`, `ThirtyKSecrets`) and button handlers in
-  `ti4.discord.interactions.buttons.handlers.thirtyk`. Core files only call into these.
+  `ThirtyKRelics`, `ThirtyKSecrets`). Button handlers go in a `thirtyk` subfolder of the card
+  type's handler folder: `handlers/actioncards/thirtyk`, `handlers/explore/thirtyk` (attachments
+  too), `handlers/relics/thirtyk`, `handlers/objective/thirtyk`. Core files only call into these.
 - **"More than 5 hexes away"** is adjacency distance on the map: use `ThirtyKDistance`.
 - **"The Fracture"** is any tile where `Tile.isFracture()` is true.

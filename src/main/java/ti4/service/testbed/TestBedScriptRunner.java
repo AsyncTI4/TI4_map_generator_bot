@@ -36,6 +36,7 @@ import ti4.model.TestBedScript.Step;
 import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.GMService;
 import ti4.service.game.StartPhaseService;
+import ti4.service.info.CardsInfoService;
 import ti4.service.testbed.TestBedPress.PressResult;
 import ti4.service.testbed.TestBedPress.Recorder;
 import ti4.service.turn.StartTurnService;
@@ -524,10 +525,19 @@ public final class TestBedScriptRunner {
                 if (targets.isEmpty()) problems.add("no seat `" + step.getAs() + "`");
                 for (Player seat : targets) {
                     TestBedApplyService.applyHand(game, seat, step.getHand(), origin, problems);
+                    if (givesCards(step.getHand())) CardsInfoService.sendCardsInfo(game, seat);
                 }
             }
             default -> problems.add("unknown action `" + step.getAction() + "`");
         }
+    }
+
+    static boolean givesCards(TestBedPreset.Seat hand) {
+        return hand != null
+                && (hand.getAcs() != null
+                        || hand.getSos() != null
+                        || hand.getRelics() != null
+                        || (hand.getPns() != null && !hand.getPns().isEmpty()));
     }
 
     private record Check(boolean ok, String actual, boolean hit) {

@@ -1,0 +1,214 @@
+package ti4.helpers.thirtyk;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.helpers.ActionCardHelper;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperStats;
+import ti4.helpers.Constants;
+import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
+import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
+import ti4.service.objectives.DrawSecretService;
+import ti4.service.unit.RemoveUnitService.RemovedUnit;
+
+@UtilityClass
+public class ThirtyKActionCardHooks {
+
+    static final String CONFLAGRATION = "conflagration30k";
+    static final String PRESERVATION_ACT = "preservationact30k";
+    static final String ANTIDISESTABLISHMENTARIANISM = "antidisestablishmentarianismjmsc";
+    static final String FINE_PRINT = "hidewithinthefineprint30k";
+    static final String OBJECTION_GAMBIT = "objectiongambit30k";
+    static final String DUMMY_RIDER = "dummyrider30k";
+
+    public static void onRiderPlaced(Game game, Player player, String outcome, String rider) {
+        if (ThirtyKAgendaRiders.PUBLIC_OUTCRY.equals(rider)) {
+            String identifier = game.isFowMode() ? player.getColor() : player.getFaction();
+            game.setCurrentAgendaVote(
+                    outcome,
+                    ThirtyKAgendaRiders.renameEntry(
+                            game.getCurrentAgendaVotes().get(outcome),
+                            identifier + "_" + ThirtyKAgendaRiders.PUBLIC_OUTCRY,
+                            identifier + "_" + ThirtyKAgendaRiders.PUBLIC_OUTCRY_RIDER));
+        }
+        if (ThirtyKAgendaRiders.forbidsVoting(rider)) {
+            TransitRiderLLButtonHandler.registerPrediction(game, player);
+        }
+        if (ThirtyKAgendaRiders.isCopyable(outcome, rider)) {
+            offerRiderCopies(game, rider, outcome);
+        }
+    }
+
+    private static void offerRiderCopies(Game game, String rider, String outcome) {
+        for (Player holder : game.getRealPlayers()) {
+            offerPlay(
+                    holder,
+                    FINE_PRINT,
+                    "a _" + rider + "_ was placed on \"" + outcome + "\". You may play _Hide within the Fine Print_"
+                            + " to follow it on the same outcome.");
+            offerPlay(
+                    holder,
+                    OBJECTION_GAMBIT,
+                    "a _" + rider + "_ was placed on \"" + outcome + "\". You may play _Objection Gambit_"
+                            + " to follow it on the opposing outcome.");
+        }
+    }
+
+    public static void resolveAgendaPredictions(Game game, String winner, GenericInteractionCreateEvent event) {
+        boolean dummyReturned = false;
+        for (ThirtyKAgendaRiders.RiderEntry entry : ThirtyKAgendaRiders.riderEntries(game.getCurrentAgendaVotes())) {
+            Player predictor =
+                    game.getPlayerFromColorOrFaction(entry.identifier().toLowerCase());
+            if (predictor == null) continue;
+            boolean correct = entry.outcome().equalsIgnoreCase(winner);
+            if (ThirtyKAgendaRiders.EMBASSY_RIDER.equals(entry.rider()) && correct) {
+                MessageHelper.sendMessageToChannel(
+                        predictor.getCorrectChannel(),
+                        predictor.getRepresentationUnfogged()
+                                + ", your _Embassy Rider_ prediction was correct; you drew a secret objective.");
+                DrawSecretService.drawSO(null, game, predictor);
+            }
+            if (ThirtyKAgendaRiders.DUMMY_RIDER.equals(entry.rider()) && correct) {
+                ActionCardHelper.drawActionCards(predictor, 1);
+                MessageHelper.sendMessageToChannel(
+                        predictor.getCorrectChannel(),
+                        predictor.getRepresentationUnfogged()
+                                + ", your _Dummy Rider_ prediction was correct; you drew an action card.");
+            }
+            if (ThirtyKAgendaRiders.DUMMY_RIDER.equals(entry.rider()) && !correct) {
+                if (!dummyReturned && ThirtyKAcState.isDummyRiderPlayer(game, predictor)) {
+                    dummyReturned = returnToHand(game, predictor, DUMMY_RIDER);
+                } else {
+                    ThirtyKAcState.takeDummyRiderCopies(game, predictor)
+                            .forEach(copyingCard -> returnToHand(game, predictor, copyingCard));
+                }
+            }
+        }
+        ThirtyKAcState.clearDummyRiderPlayer(game);
+    }
+
+    private static boolean returnToHand(Game game, Player player, String baseId) {
+        Optional<Map.Entry<String, Integer>> card = game.getDiscardActionCards().entrySet().stream()
+                .filter(e -> baseId.equals(ThirtyKCards.baseId(e.getKey())))
+                .findFirst();
+        if (card.isEmpty()
+                || !game.pickActionCard(player.getUserID(), card.get().getValue())) return false;
+        ActionCardHelper.sendActionCardInfo(game, player);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", your _Dummy Rider_ prediction was wrong, so _"
+                        + Mapper.getActionCard(card.get().getKey()).getName() + "_ went back to your hand.");
+        return true;
+    }
+
+    public static void onPlanetControlChanged(Game game, Player newOwner, Player previousOwner, String planet) {
+        if (previousOwner == null || previousOwner == newOwner || !previousOwner.isRealPlayer()) return;
+        ThirtyKAcState.setPlanetLoss(game, previousOwner, planet, newOwner);
+        String planetName = Mapper.getPlanet(planet) == null
+                ? planet
+                : Mapper.getPlanet(planet).getName();
+        offerPlay(
+                previousOwner,
+                CONFLAGRATION,
+                "another player gained control of " + planetName
+                        + ". You may play _Conflagration_ to destroy all but one of their infantry there.");
+    }
+
+    public static void onStrategyPhaseStart(GenericInteractionCreateEvent event, Game game) {
+        for (Player player : game.getRealPlayers()) {
+            int payout = ThirtyKAcState.collectCompoundInterest(game, player);
+            if (payout <= 0) continue;
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", your _Compound Interest_ paid out.");
+            ButtonHelperStats.gainTGs(event, game, player, payout, false);
+        }
+    }
+
+    public static void afterCombatHitsAssigned(Game game, Tile tile, String assignHitsType) {
+        if (tile == null || !"spacecombat".equalsIgnoreCase(assignHitsType)) return;
+        List<Player> remaining = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile);
+        if (remaining.size() > 1) return;
+        Player winner = remaining.isEmpty() ? null : remaining.getFirst();
+        for (Player profiteer : game.getRealPlayers()) {
+            ThirtyKAcState.WarProfiteering bet = ThirtyKAcState.warProfiteering(game, profiteer);
+            if (bet == null || !bet.position().equals(tile.getPosition())) continue;
+            ThirtyKAcState.clearWarProfiteering(game, profiteer);
+            if (winner == null || !winner.getFaction().equals(bet.targetFaction())) {
+                MessageHelper.sendMessageToChannel(
+                        profiteer.getCorrectChannel(),
+                        profiteer.getRepresentationUnfogged()
+                                + ", the player you backed with _War Profiteering_ did not win the space combat.");
+                continue;
+            }
+            MessageHelper.sendMessageToChannel(
+                    profiteer.getCorrectChannel(),
+                    profiteer.getRepresentationUnfogged()
+                            + ", the player you backed with _War Profiteering_ won the space combat.");
+            ButtonHelperStats.gainTGs(null, game, profiteer, 4, false);
+        }
+    }
+
+    public static void onFragmentsPurged(Game game, Player purger, List<String> fragments) {
+        if (fragments == null || fragments.isEmpty()) return;
+        ThirtyKAcState.setPurgedFragments(game, purger, fragments);
+        for (Player holder : game.getRealPlayers()) {
+            if (holder == purger || holder.isNeighboursWith(purger)) continue;
+            offerPlay(
+                    holder,
+                    PRESERVATION_ACT,
+                    "a player you are not neighbors with purged " + fragments.size()
+                            + " relic fragment(s). You may play _Preservation Act_ to gain up to two of them.");
+        }
+    }
+
+    public static void afterUnitsDestroyed(GenericInteractionCreateEvent event, Game game, List<RemovedUnit> units) {
+        for (RemovedUnit unit : units) {
+            UnitType type = unit.unitKey().unitType();
+            if (type != UnitType.Pds && type != UnitType.Spacedock) continue;
+            if (unit.uh() == null || "space".equalsIgnoreCase(unit.uh().getName())) continue;
+            Player loser = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
+            if (loser == null || !loser.isRealPlayer()) continue;
+            ThirtyKAcState.setStructureLost(game, loser);
+            for (Player holder : game.getRealPlayers()) {
+                if (!ThirtyKDistance.isMoreThanFiveFromHome(
+                        game, holder, unit.tile().getPosition())) continue;
+                offerPlay(
+                        holder,
+                        ANTIDISESTABLISHMENTARIANISM,
+                        "a structure was destroyed on a planet more than 5 hexes from your home system."
+                                + " You may play _Antidisestablishmentarianism_.");
+            }
+            return;
+        }
+    }
+
+    private static void offerPlay(Player holder, String baseId, String reason) {
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, Integer> card : holder.getActionCards().entrySet()) {
+            if (!baseId.equals(ThirtyKCards.baseId(card.getKey()))) continue;
+            ActionCardModel model = Mapper.getActionCard(card.getKey());
+            buttons.add(Buttons.green(
+                    Constants.AC_PLAY_FROM_HAND + card.getValue(),
+                    "Play " + (model == null ? card.getKey() : model.getName())));
+            break;
+        }
+        if (buttons.isEmpty()) return;
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                holder.getCardsInfoThread(), holder.getRepresentationUnfogged() + ", " + reason, buttons);
+    }
+}

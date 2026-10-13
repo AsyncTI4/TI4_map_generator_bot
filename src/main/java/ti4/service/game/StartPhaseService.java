@@ -53,6 +53,7 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
@@ -250,6 +251,7 @@ public class StartPhaseService {
         //     }
         // }
         game.removeStoredValue("veylorBtExtraAgenda");
+        ThirtyKActionCardHooks.onStrategyPhaseStart(event, game);
 
         for (Player player2 : game.getRealPlayers()) {
             String id = "sigma_machinations";

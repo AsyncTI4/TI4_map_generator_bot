@@ -21,6 +21,8 @@
         "id": "precisionlaserdefenses30k",
         "name": "Precision Laser Defenses",
         "imagePath": "attachment_precisionlaserdefenses30k.png",
+        "spaceCannonHitsOn": 3,
+        "spaceCannonDieCount": 1,
         "source": "thirtyk"
     },
     {

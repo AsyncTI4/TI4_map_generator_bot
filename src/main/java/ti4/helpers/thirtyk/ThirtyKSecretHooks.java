@@ -1,0 +1,321 @@
+package ti4.helpers.thirtyk;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.stream.Collectors;
+import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
+import ti4.helpers.ButtonHelperModifyUnits;
+import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
+import ti4.message.MessageHelper;
+import ti4.model.SecretObjectiveModel;
+import ti4.model.UnitModel;
+import ti4.service.emoji.CardEmojis;
+
+@UtilityClass
+public class ThirtyKSecretHooks {
+
+    public static final String SCORE_BUTTON = "thirtyKScoreSO_";
+    static final String RELINQUISH_TECHNOLOGY = "relinquishtechnology30k";
+    static final String PLANNED_OBSOLESCENCE = "plannedobsolescence30k";
+    static final String POLICY_INDIFFERENCE = "policyindifference30k";
+    static final String POLICY_DEFIANCE = "policydefiance30k";
+    static final String POLICY_MAKER = "policymakerjmsc";
+    static final String UNDER_OUR_SUPERVISION = "underoursupervisionjmsc";
+    static final String A_GRAND_ENTRANCE = "agrandentrancejmsc";
+    static final String REPRIMANDED = "reprimandedjmsc";
+    static final String EXPLOIT_EXHAUSTION = "exploitexhaustionjmsc";
+    static final String QUICK_DELIBERATIONS = "quickdeliberationsjmsc";
+    static final String AGENDA_VOTERS_KEY = "thirtyKAgendaVoters";
+    static final String FLAGSHIP_START_KEY = "thirtyKFlagshipStart";
+    private static final String PROMPTED_KEY = "thirtyKSecretPrompts";
+
+    public static void offerScore(Player holder, String soID, String reason) {
+        if (holder == null || !holder.getSecretsUnscored().containsKey(soID)) return;
+        SecretObjectiveModel so = Mapper.getSecretObjective(soID);
+        if (so == null) return;
+        List<Button> buttons = List.of(
+                Buttons.green(
+                        holder.factionButtonChecker() + SCORE_BUTTON + soID,
+                        "Score " + so.getName(),
+                        CardEmojis.SecretObjective),
+                Buttons.red(holder.factionButtonChecker() + "deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                holder.getCardsInfoThread(),
+                holder.getRepresentationUnfogged() + ", " + reason + " If so, you may score _" + so.getName() + "_.",
+                buttons);
+    }
+
+    public static void onPlanetLost(Game game, Player previousOwner, UnitHolder planet) {
+        if (game == null || previousOwner == null || planet == null || !previousOwner.isRealPlayer()) return;
+        String planetName = Mapper.getPlanet(planet.getName()) == null
+                ? planet.getName()
+                : Mapper.getPlanet(planet.getName()).getName();
+        if (hasAttachment(planet)) {
+            offerScore(
+                    previousOwner,
+                    RELINQUISH_TECHNOLOGY,
+                    "you lost control of " + planetName + ", which has an attachment.");
+        }
+        if (hasStructure(game, planet)) {
+            offerScore(
+                    previousOwner,
+                    PLANNED_OBSOLESCENCE,
+                    "you lost control of " + planetName + ", which has a structure on it.");
+        } else if (previousOwner.getSecretsUnscored().containsKey(PLANNED_OBSOLESCENCE)) {
+            offerScore(
+                    previousOwner,
+                    PLANNED_OBSOLESCENCE,
+                    "you lost control of " + planetName
+                            + ". The bot sees no structure there now; if it held one when you lost control (and it was removed first), you qualify.");
+        }
+    }
+
+    static boolean hasAttachment(UnitHolder planet) {
+        return planet.getTokenList().stream().anyMatch(token -> token.contains("attachment"));
+    }
+
+    private static boolean hasStructure(Game game, UnitHolder planet) {
+        for (Player owner : game.getPlayers().values()) {
+            for (UnitKey key : planet.getUnitKeysForPlayer(owner)) {
+                UnitModel model = owner.getUnitFromUnitKey(key);
+                if (model != null && model.getIsStructure() && planet.getUnitCount(key) > 0) return true;
+            }
+        }
+        return false;
+    }
+
+    public static void afterCombatHits(Game game, Player player, Tile tile, UnitHolder holder, String assignHitsType) {
+        if (game == null || player == null || tile == null || assignHitsType == null) return;
+        if (!assignHitsType.contains("combat")) return;
+        boolean ground = assignHitsType.contains("ground") || (holder != null && holder instanceof Planet);
+        if (ground) {
+            List<UnitHolder> planets =
+                    holder instanceof Planet ? List.of(holder) : new ArrayList<>(tile.getPlanetUnitHolders());
+            planets.forEach(planet -> checkGroundCombatEnd(game, player, tile, planet));
+        } else {
+            checkSpaceCombatEnd(game, player, tile);
+        }
+    }
+
+    private static void checkSpaceCombatEnd(Game game, Player loser, Tile tile) {
+        if (FoWHelper.playerHasShipsInSystem(loser, tile)) return;
+        List<Player> remaining = game.getRealPlayersNNeutral().stream()
+                .filter(p -> p != loser && FoWHelper.playerHasShipsInSystem(p, tile))
+                .toList();
+        if (remaining.size() != 1) return;
+        Player winner = remaining.getFirst();
+        if (!markOnce(game, "space+" + tile.getPosition() + "+" + loser.getFaction())) return;
+        if (isAtOrNextToMecatol(game, loser, tile)) {
+            offerScore(loser, REPRIMANDED, "the bot thinks you just lost a space combat at or next to Mecatol Rex.");
+        }
+        if (winner.isRealPlayer() && flagshipEnteredFromAfar(game, winner, tile)) {
+            offerScore(
+                    winner,
+                    A_GRAND_ENTRANCE,
+                    "the bot thinks you just won a space combat with your flagship more than 5 hexes from where it started this action.");
+        }
+    }
+
+    private static boolean isAtOrNextToMecatol(Game game, Player player, Tile tile) {
+        Tile mecatol = game.getMecatolTile();
+        if (mecatol == null) return false;
+        return FoWHelper.getAdjacentTiles(game, mecatol.getPosition(), player, false, true)
+                .contains(tile.getPosition());
+    }
+
+    private static boolean flagshipEnteredFromAfar(Game game, Player winner, Tile tile) {
+        if (!winner.getSecretsUnscored().containsKey(A_GRAND_ENTRANCE)) return false;
+        if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, winner) < 1) return false;
+        if (game.getActivePlayer() != winner) return false;
+        String start = game.getStoredValue(FLAGSHIP_START_KEY + winner.getFaction());
+        return start.isBlank() || ThirtyKDistance.isMoreThanFiveAway(game, start, tile.getPosition());
+    }
+
+    private static void checkGroundCombatEnd(Game game, Player loser, Tile tile, UnitHolder planet) {
+        if (ButtonHelperModifyUnits.doesPlayerHaveGfOnPlanet(planet, loser)) return;
+        List<Player> remaining = game.getRealPlayersNNeutral().stream()
+                .filter(p -> p != loser && ButtonHelperModifyUnits.doesPlayerHaveGfOnPlanet(planet, p))
+                .toList();
+        if (remaining.size() != 1 || !loser.isPassed()) return;
+        Player winner = remaining.getFirst();
+        if (!winner.getSecretsUnscored().containsKey(EXPLOIT_EXHAUSTION)) return;
+        if (!markOnce(game, "ground+" + tile.getPosition() + "+" + planet.getName() + "+" + loser.getFaction())) return;
+        offerScore(
+                winner,
+                EXPLOIT_EXHAUSTION,
+                "the bot thinks you just won a ground combat on "
+                        + Helper.getPlanetRepresentation(planet.getName(), game) + " against a player who had passed.");
+    }
+
+    public static void onPassed(Game game, Player player) {
+        if (game == null || player == null) return;
+        boolean anyoneElsePassed =
+                game.getRealPlayers().stream().filter(p -> p != player).anyMatch(Player::isPassed);
+        if (anyoneElsePassed) return;
+        offerScore(player, QUICK_DELIBERATIONS, "you are the first player to pass this round.");
+    }
+
+    public static void onAgendaResolved(Game game) {
+        if (game == null) return;
+        Map<String, Map<Player, Integer>> votesByOutcome = votesByOutcome(game);
+        rememberVoters(game, votesByOutcome);
+        offerPolicyDefiance(votesByOutcome);
+        offerPolicyMaker(votesByOutcome);
+    }
+
+    static Map<String, Map<Player, Integer>> votesByOutcome(Game game) {
+        Map<String, Map<Player, Integer>> result = new HashMap<>();
+        for (Map.Entry<String, String> entry : game.getCurrentAgendaVotes().entrySet()) {
+            Map<Player, Integer> votes = new HashMap<>();
+            StringTokenizer tokens = new StringTokenizer(entry.getValue(), ";");
+            while (tokens.hasMoreTokens()) {
+                String vote = tokens.nextToken();
+                int split = vote.indexOf('_');
+                if (split < 1) continue;
+                Player voter = game.getPlayerFromColorOrFaction(vote.substring(0, split));
+                Integer amount = parseVotes(vote.substring(split + 1));
+                if (voter == null || amount == null || amount < 1) continue;
+                votes.merge(voter, amount, Integer::sum);
+            }
+            if (!votes.isEmpty()) result.put(entry.getKey().toLowerCase(), votes);
+        }
+        return result;
+    }
+
+    private static Integer parseVotes(String raw) {
+        try {
+            return Integer.parseInt(raw.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private static void rememberVoters(Game game, Map<String, Map<Player, Integer>> votesByOutcome) {
+        Set<String> voters = new LinkedHashSet<>(votersThisRound(game));
+        votesByOutcome.values().forEach(votes -> votes.keySet().forEach(p -> voters.add(p.getFaction())));
+        game.setStoredValue(AGENDA_VOTERS_KEY, game.getRound() + ";" + String.join(";", voters));
+    }
+
+    static Set<String> votersThisRound(Game game) {
+        String stored = game.getStoredValue(AGENDA_VOTERS_KEY);
+        if (stored.isBlank()) return Set.of();
+        List<String> parts = Arrays.asList(stored.split(";"));
+        if (!String.valueOf(game.getRound()).equals(parts.getFirst())) return Set.of();
+        return new HashSet<>(parts.subList(1, parts.size()));
+    }
+
+    // TODO: fog leak - telling the holder they were the lone For/Against voter, or the top voter, reveals other
+    // players' votes.
+    private static void offerPolicyDefiance(Map<String, Map<Player, Integer>> votesByOutcome) {
+        for (String side : List.of("for", "against")) {
+            Map<Player, Integer> votes = votesByOutcome.get(side);
+            if (votes == null || votes.size() != 1) continue;
+            Player lone = votes.keySet().iterator().next();
+            offerScore(lone, POLICY_DEFIANCE, "the bot thinks you were the only player to vote \"" + side + "\".");
+        }
+    }
+
+    private static void offerPolicyMaker(Map<String, Map<Player, Integer>> votesByOutcome) {
+        Map<Player, Integer> totals = new HashMap<>();
+        votesByOutcome.values().forEach(votes -> votes.forEach((p, amount) -> totals.merge(p, amount, Integer::sum)));
+        Player top = soleTopVoter(totals);
+        if (top != null) {
+            offerScore(top, POLICY_MAKER, "the bot thinks you cast more votes on this agenda than any other player.");
+        }
+    }
+
+    static <T> T soleTopVoter(Map<T, Integer> totals) {
+        int best = totals.values().stream().mapToInt(Integer::intValue).max().orElse(0);
+        if (best < 1) return null;
+        List<T> leaders = totals.entrySet().stream()
+                .filter(e -> e.getValue() == best)
+                .map(Map.Entry::getKey)
+                .toList();
+        return leaders.size() == 1 ? leaders.getFirst() : null;
+    }
+
+    public static void onAgendaPhaseEnd(Game game) {
+        if (game == null || !game.getPhaseOfGame().toLowerCase().contains("agenda")) return;
+        Set<String> voters = votersThisRound(game);
+        for (Player player : game.getRealPlayers()) {
+            if (voters.contains(player.getFaction())) continue;
+            boolean allReady = player.getExhaustedPlanets().stream().noneMatch(player.getPlanets()::contains);
+            if (!allReady) continue;
+            offerScore(
+                    player,
+                    POLICY_INDIFFERENCE,
+                    "the agenda phase is ending, you cast no votes and all your planets are ready. "
+                            + "Check that you also played no before/after agenda action cards.");
+        }
+    }
+
+    public static void onImperialPointScored(Game game, Player scorer) {
+        if (game == null || scorer == null) return;
+        Tile mecatol = game.getMecatolTile();
+        Tile scorerHome = scorer.getHomeSystemTile();
+        for (Player holder : game.getRealPlayers()) {
+            if (holder == scorer || !holder.getSecretsUnscored().containsKey(UNDER_OUR_SUPERVISION)) continue;
+            if (hasShipsAdjacentTo(game, holder, mecatol) || hasShipsAdjacentTo(game, holder, scorerHome)) {
+                offerScore(
+                        holder,
+                        UNDER_OUR_SUPERVISION,
+                        "another player gained a victory point via **Imperial** while you have ships next to Mecatol Rex or their home system.");
+            }
+        }
+    }
+
+    private static boolean hasShipsAdjacentTo(Game game, Player player, Tile center) {
+        if (center == null) return false;
+        return FoWHelper.getAdjacentTiles(game, center.getPosition(), player, false, false).stream()
+                .map(game::getTileByPosition)
+                .anyMatch(tile -> tile != null && FoWHelper.playerHasShipsInSystem(player, tile));
+    }
+
+    public static void onTurnStart(Game game, Player player) {
+        if (game == null || player == null) return;
+        String key = FLAGSHIP_START_KEY + player.getFaction();
+        if (!player.getSecretsUnscored().containsKey(A_GRAND_ENTRANCE)) {
+            game.removeStoredValue(key);
+            return;
+        }
+        String position = game.getTileMap().values().stream()
+                .filter(tile -> tile.getSpaceUnitHolder() != null
+                        && tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, player) > 0)
+                .map(Tile::getPosition)
+                .findFirst()
+                .orElse("");
+        game.setStoredValue(key, position);
+    }
+
+    static boolean markOnce(Game game, String event) {
+        Player active = game.getActivePlayer();
+        String context = game.getRound() + "+" + (active == null ? "" : active.getFaction()) + "+"
+                + (active == null ? 0 : active.getNumberOfTurns());
+        String stored = game.getStoredValue(PROMPTED_KEY);
+        List<String> entries = stored.isBlank() ? List.of() : Arrays.asList(stored.split(";"));
+        Set<String> seen = !entries.isEmpty() && entries.getFirst().equals(context)
+                ? new LinkedHashSet<>(entries.subList(1, entries.size()))
+                : new LinkedHashSet<>();
+        if (!seen.add(event)) return false;
+        game.setStoredValue(PROMPTED_KEY, context + ";" + seen.stream().collect(Collectors.joining(";")));
+        return true;
+    }
+}

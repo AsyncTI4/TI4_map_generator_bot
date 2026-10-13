@@ -1,0 +1,15 @@
+{
+  "name": "30k-explore-pilot-recovery",
+  "description": "Pilot Recovery Program on Mehar Xull: with no mech, Sol removes 1 infantry and gains 1 fleet token (the mech-or-infantry step shared with Emergent Defenses and Lost and Found).",
+  "preset": "30k-explore-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "expect": { "state": "sol.ccs", "equals": "3/3/2" } },
+    { "do": "stackExplore", "value": "pilotrecoveryprogram30k1" },
+    { "as": "sol", "pressId": "FFCC_{sol.faction}_movedNExplored_filler_meharxull_hazardous" },
+    { "expect": { "in": "sol", "contains": "remove 1 infantry", "noButtons": ["thirtyKMechOrInf_pilot_mech_meharxull"] } },
+    { "as": "sol", "press": "thirtyKMechOrInf_pilot_inf_meharxull" },
+    { "expect": { "state": "sol.ccs", "equals": "3/4/2" } },
+    { "expect": { "state": "planet.meharxull.units", "contains": "meharxull:{sol.color}_gf=1" } }
+  ]
+}

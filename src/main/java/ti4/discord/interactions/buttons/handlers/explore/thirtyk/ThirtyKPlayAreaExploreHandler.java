@@ -1,0 +1,223 @@
+package ti4.discord.interactions.buttons.handlers.explore.thirtyk;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperStats;
+import ti4.helpers.FoWHelper;
+import ti4.image.Mapper;
+import ti4.message.MessageHelper;
+import ti4.model.PublicObjectiveModel;
+import ti4.model.RelicModel;
+import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
+import ti4.service.tech.ListTechService;
+
+@UtilityClass
+public class ThirtyKPlayAreaExploreHandler {
+
+    public static final String RICH_HOSTAGES = "richhostages30k";
+    public static final String MACGUFFIAN_OUTPOST = "macguffianoutpostjmsc";
+
+    private static final String USE_CARD = "thirtyKPlayAreaUse_";
+    private static final String PURGE_FOR_TG = "thirtyKPlayAreaPurge_";
+    private static final String RESEARCH = "thirtyKPlayAreaResearch_";
+    private static final String GAIN_TECH = "thirtyKPlayAreaGainTech_";
+    private static final String RICH_HOSTAGES_PURGE = "thirtyKRichHostagesPurge_";
+
+    private static final Map<String, PlayAreaCard> START_OF_TURN_CARDS = Map.of(
+            "subjectivityequasion30k", PlayAreaCard.research(TechnologyType.PROPULSION),
+            "destructiveelements30k", PlayAreaCard.research(TechnologyType.WARFARE),
+            "ancientbiologicalspecimens30k", PlayAreaCard.research(TechnologyType.BIOTIC),
+            "hyperalgorithms30k", PlayAreaCard.research(TechnologyType.CYBERNETIC),
+            "ancientexcavators30k", PlayAreaCard.gain("sdn", 2),
+            "dauntingweaponsschematics30k", PlayAreaCard.gain("dn2", 5));
+
+    private record PlayAreaCard(int purgeTradeGoods, int cost, TechnologyType researchType, String techToGain) {
+        static PlayAreaCard research(TechnologyType type) {
+            return new PlayAreaCard(3, 5, type, null);
+        }
+
+        static PlayAreaCard gain(String techID, int cost) {
+            return new PlayAreaCard(1, cost, null, techID);
+        }
+    }
+
+    public static void moveToPlayArea(GenericInteractionCreateEvent event, Game game, Player player, String cardID) {
+        game.purgeExplore(cardID);
+        player.addRelic(cardID);
+        MessageHelper.sendMessageToEventChannel(
+                event, "Card has been added to play area.\nAdded as a relic (not actually a relic).");
+    }
+
+    public static List<Button> getStartOfTurnButtons(Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (String cardID : START_OF_TURN_CARDS.keySet()) {
+            if (!player.hasRelic(cardID)) continue;
+            RelicModel card = Mapper.getRelic(cardID);
+            buttons.add(Buttons.green(player.factionButtonChecker() + USE_CARD + cardID, "Use " + card.getName()));
+        }
+        return buttons;
+    }
+
+    @ButtonHandler(USE_CARD)
+    public static void useCard(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String cardID = buttonID.substring(USE_CARD.length());
+        PlayAreaCard card = START_OF_TURN_CARDS.get(cardID);
+        if (card == null || !player.hasRelic(cardID)) return;
+        String name = Mapper.getRelic(cardID).getName();
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green(
+                player.factionButtonChecker() + PURGE_FOR_TG + cardID,
+                "Purge For " + card.purgeTradeGoods() + " Trade Good" + (card.purgeTradeGoods() == 1 ? "" : "s")));
+        if (card.techToGain() == null) {
+            buttons.add(Buttons.blue(
+                    player.factionButtonChecker() + RESEARCH + cardID,
+                    "Spend " + card.cost() + " Resources To Research"));
+        } else if (!player.hasTech(card.techToGain())) {
+            buttons.add(Buttons.blue(
+                    player.factionButtonChecker() + GAIN_TECH + cardID,
+                    "Spend " + card.cost() + " Resources For "
+                            + Mapper.getTech(card.techToGain()).getName()));
+        }
+        buttons.add(ThirtyKExploreSupport.decline(player));
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), player.getRepresentation() + ", choose how to use _" + name + "_.", buttons);
+    }
+
+    @ButtonHandler(PURGE_FOR_TG)
+    public static void purgeForTradeGoods(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String cardID = buttonID.substring(PURGE_FOR_TG.length());
+        PlayAreaCard card = START_OF_TURN_CARDS.get(cardID);
+        if (card == null || !player.hasRelic(cardID)) return;
+        purgeCard(event, player, cardID);
+        ButtonHelperStats.gainTGs(event, game, player, card.purgeTradeGoods(), false);
+        ThirtyKExploreSupport.deleteMessage(event);
+    }
+
+    @ButtonHandler(RESEARCH)
+    public static void research(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String cardID = buttonID.substring(RESEARCH.length());
+        PlayAreaCard card = START_OF_TURN_CARDS.get(cardID);
+        if (card == null || card.researchType() == null || !player.hasRelic(cardID)) return;
+        List<TechnologyModel> techs =
+                ListTechService.getAllTechOfAType(game, card.researchType().toString(), player, false, true);
+        ThirtyKExploreSupport.deleteMessage(event);
+        if (techs.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "You meet the prerequisites for no technology of that colour.");
+            return;
+        }
+        purgeCard(event, player, cardID);
+        sendResourceSpendButtons(
+                event, game, player, card.cost(), Mapper.getRelic(cardID).getName());
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentation() + ", choose the technology to research.",
+                ThirtyKExploreSupport.capped(new ArrayList<>(ListTechService.getTechButtons(techs, player, "nopay"))));
+    }
+
+    @ButtonHandler(GAIN_TECH)
+    public static void gainTech(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String cardID = buttonID.substring(GAIN_TECH.length());
+        PlayAreaCard card = START_OF_TURN_CARDS.get(cardID);
+        if (card == null || card.techToGain() == null || !player.hasRelic(cardID)) return;
+        ThirtyKExploreSupport.deleteMessage(event);
+        purgeCard(event, player, cardID);
+        sendResourceSpendButtons(
+                event, game, player, card.cost(), Mapper.getRelic(cardID).getName());
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentation() + ", gain the technology once you have paid.",
+                List.of(Buttons.green(
+                        player.factionButtonChecker() + "getTech_" + card.techToGain() + "__noPay__comp",
+                        "Gain " + Mapper.getTech(card.techToGain()).getName())));
+    }
+
+    private static void purgeCard(GenericInteractionCreateEvent event, Player player, String cardID) {
+        player.removeRelic(cardID);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " purged _"
+                        + Mapper.getRelic(cardID).getName() + "_.");
+    }
+
+    private static void sendResourceSpendButtons(
+            GenericInteractionCreateEvent event, Game game, Player player, int cost, String cardName) {
+        player.resetSpentThings();
+        List<Button> buttons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, player, "res"));
+        buttons.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentation() + ", please spend " + cost + " resources for _" + cardName + "_.",
+                buttons);
+    }
+
+    public static void offerRichHostages(Game game, Player player, String objectiveID) {
+        if (!player.hasRelic(RICH_HOSTAGES)) return;
+        PublicObjectiveModel objective = Mapper.getPublicObjective(objectiveID);
+        if (objective == null || objective.getPoints() == null || objective.getPoints() != 1) return;
+        if (objective.getText() == null || !objective.getText().toLowerCase().contains("spend")) return;
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", you may purge _Rich Hostages_ to reduce the cost of _"
+                        + objective.getName() + "_ by 3.",
+                List.of(
+                        Buttons.green(
+                                player.factionButtonChecker() + RICH_HOSTAGES_PURGE + objectiveID,
+                                "Purge Rich Hostages (-3 Cost)"),
+                        ThirtyKExploreSupport.decline(player)));
+    }
+
+    @ButtonHandler(RICH_HOSTAGES_PURGE)
+    public static void richHostagesPurge(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!player.hasRelic(RICH_HOSTAGES)) return;
+        String objectiveID = buttonID.substring(RICH_HOSTAGES_PURGE.length());
+        player.removeRelic(RICH_HOSTAGES);
+        PublicObjectiveModel objective = Mapper.getPublicObjective(objectiveID);
+        String name = objective == null ? objectiveID : objective.getName();
+        if (name.contains("Negotiate Trade Routes")) {
+            ButtonHelperStats.gainTGs(event, game, player, 3, false);
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " purged _Rich Hostages_: the cost of _" + name
+                        + "_ is reduced by 3. Spend 3 less (ready anything you over-spent).");
+        ThirtyKExploreSupport.deleteMessage(event);
+    }
+
+    public static void checkMacGuffianOutpost(
+            GenericInteractionCreateEvent event, Game game, Player loser, Tile tile, String assignHitsType) {
+        if (tile == null || loser == null || !"spacecombat".equalsIgnoreCase(assignHitsType)) return;
+        if (!loser.hasRelic(MACGUFFIAN_OUTPOST) || FoWHelper.playerHasActualShipsInSystem(loser, tile)) return;
+        List<Player> remaining = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile).stream()
+                .filter(other -> other != loser && FoWHelper.playerHasActualShipsInSystem(other, tile))
+                .toList();
+        if (remaining.size() != 1) return;
+        String key = "thirtyKMacGuffian" + loser.getFaction();
+        String marker = game.getRound() + "_" + tile.getPosition() + "_" + game.getActivePlayerID();
+        if (marker.equals(game.getStoredValue(key))) return;
+        game.setStoredValue(key, marker);
+        Player winner = remaining.getFirst();
+        ButtonHelperStats.gainTGs(event, game, loser, 2, false);
+        ButtonHelperStats.gainTGs(event, game, winner, 2, false);
+        FoWHelper.notifyPlayerAndAffectedInFog(
+                game,
+                loser,
+                loser.getRepresentationNoPing() + " lost a space combat while holding _MacGuffian Outpost_: both "
+                        + "combatants gain 2 trade goods.",
+                winner,
+                winner.getRepresentationUnfogged() + ", your opponent's _MacGuffian Outpost_ gave you 2 trade goods.");
+    }
+}

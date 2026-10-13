@@ -1,0 +1,12 @@
+[
+    {
+        "alias": "plus1_corruption_engines",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "condition": "opponent_not_neutral",
+        "scope": "_ship_",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "relic", "alias": "corruptionenginesjmsc"}]
+    }
+]

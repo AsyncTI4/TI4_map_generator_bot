@@ -384,6 +384,11 @@ public class ComponentActionHelper {
                     && (game.getAllRelics().size() < 3 || game.getRealPlayers().size() < 2)) {
                 continue;
             }
+            if (ThirtyKRelics.handlesComponentAction(relic)) {
+                ThirtyKRelics.componentActionButton(game, p1, relic, factionChecker + prefix)
+                        .ifPresent(compButtons::add);
+                continue;
+            }
 
             if (Constants.ENIGMATIC_DEVICE.equalsIgnoreCase(relic)
                     || (!relic.contains("starchart")

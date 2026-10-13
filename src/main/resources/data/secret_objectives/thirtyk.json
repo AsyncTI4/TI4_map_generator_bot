@@ -6,8 +6,7 @@
         "text": "Have your maximum Commodity value as Commodities.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "braveextinction30k",
@@ -16,8 +15,7 @@
         "text": "Have less than 4 infantry on the game board in total",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "lightmilitary30k",
@@ -26,8 +24,7 @@
         "text": "Have more than 8 non-fighter ships on the game board, while also having no Dreadnaughts, War Suns, or Flagships on the game board.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "typecast30k",
@@ -37,8 +34,7 @@
         "points": 1,
         "notes": "This does count home planets as typeless, and is thus harder for factions with multiple home planets.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "participationtrophy30k",
@@ -46,10 +42,10 @@
         "phase": "Status",
         "text": "Score no public objective, and have no other secret objectives unscored in your hand.",
         "points": 1,
-        "notes": "A player scoring this cannot opt into scoring a public objective AFTER scoring this during the status phase",
+        "notes": "A player scoring this cannot opt into scoring a public objective AFTER scoring this during the status phase Only public objectives scored during the status phase count.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "The bot checks that you scored no public objective in this status phase and hold no other unscored secret. If you score this first, do not score a public objective afterwards; the bot does not stop you."
     },
     {
         "alias": "relinquishtechnology30k",
@@ -58,8 +54,8 @@
         "text": "Lose control of a planet with an attachment",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "When you lose control of a planet with an attachment, the bot offers a Score button. Losses the bot does not see (manual unit or planet edits) need /so score."
     },
     {
         "alias": "options30k",
@@ -68,8 +64,7 @@
         "text": "Have 7 or more action cards in your hand.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "plannedobsolescence30k",
@@ -77,9 +72,10 @@
         "phase": "Action",
         "text": "Lose control of a planet with a structure",
         "points": 1,
+        "notes": "Any player's structure counts, including one that was on the planet at the end of the combat in which you lost it.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "When you lose control of a planet, the bot offers a Score button and says whether it still sees a structure there. If the structure was already removed, confirm yourself that it held one."
     },
     {
         "alias": "reclusivenature30k",
@@ -87,9 +83,9 @@
         "phase": "Status",
         "text": "Have ships in no system aside from your home system and adjacent systems.",
         "points": 1,
+        "notes": "Having no ships on the game board at all also qualifies.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "nothingtolose30k",
@@ -99,8 +95,7 @@
         "points": 1,
         "notes": "If a public objective requires spending any of the following, and you qualify AFTER spending, then this is valid, but only if reaching zero in ALL of these.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "preparationforwar30k",
@@ -109,8 +104,7 @@
         "text": "Have a total of 8 tokens in your fleet, strategy and tactics pools.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "unnecessarypredictions30k",
@@ -119,8 +113,7 @@
         "text": "Have 3 or more Strategy tokens unused on your sheet.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "policyindifference30k",
@@ -129,8 +122,8 @@
         "text": "End an agenda phase where you did not play any before/after agenda action cards or cast any votes with all your planets unexhausted.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "At the end of the agenda phase the bot offers a Score button if you cast no votes and all your planets are ready. Check yourself that you played no before/after agenda action cards."
     },
     {
         "alias": "policydefiance30k",
@@ -139,8 +132,8 @@
         "text": "During the agenda phase, be the only player to vote for either For or Against",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "When a For/Against agenda resolves, the bot offers a Score button to a player who was the only one voting on one side. Votes added outside the vote buttons are not seen."
     },
     {
         "alias": "longdistancerelationsjmsc",
@@ -149,8 +142,7 @@
         "text": "Have an Alliance card of a player whose home system is more than 5 hexes away.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "wordofmouthjmsc",
@@ -159,8 +151,7 @@
         "text": "Have a Support for the Throne card of a player whose home system is more than 5 hexes away.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "payingrespectsjmsc",
@@ -169,8 +160,7 @@
         "text": "Have ships in a system adjacent to an eliminated player's home system.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "newworldsjmsc",
@@ -179,8 +169,7 @@
         "text": "Control 2 planets that are both more than 5 hexes away from your home system.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "agrandentrancejmsc",
@@ -189,8 +178,8 @@
         "text": "Win a space combat with your flagship in a system more than 5 hexes away from where your flagship was located at the start of this action.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "When a space combat ends during your turn with your flagship still there, the bot offers a Score button if the flagship started your turn more than 5 hexes away (or if it could not tell where it started). Mutual destruction and retreats are not detected; confirm the win yourself."
     },
     {
         "alias": "observingthepossibilitiesjmsc",
@@ -199,8 +188,7 @@
         "text": "Have units in 4 systems containing different wormhole types.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "reprimandedjmsc",
@@ -209,8 +197,8 @@
         "text": "Lose a space combat in a system adjacent to Mecatol Rex, or Mecatol Rex itself.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "When your last ship in a system at or next to Mecatol Rex is destroyed while another player still has ships there, the bot offers a Score button. Retreats are not detected; confirm the loss yourself."
     },
     {
         "alias": "underoursupervisionjmsc",
@@ -218,9 +206,10 @@
         "phase": "Action",
         "text": "Have another player gain a victory point via Imperial with ships in an adjacent system to either Mecatol Rex, or that player's Home system.",
         "points": 1,
+        "notes": "Only the Mecatol Rex victory point from Imperial counts, not public objectives scored with Imperial.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "When another player scores the Imperial Mecatol Rex point, the bot offers a Score button if you have ships next to Mecatol Rex or their home system."
     },
     {
         "alias": "policymakerjmsc",
@@ -229,8 +218,8 @@
         "text": "During the agenda phase, vote more than any other player for any outcome.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "When an agenda resolves, the bot offers a Score button to the player who cast strictly more votes than anyone else. Votes added outside the vote buttons are not seen."
     },
     {
         "alias": "distantflagsjmsc",
@@ -239,8 +228,7 @@
         "text": "Have two structures on the board more than 5 hexes away from your home system.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "proudflagbearerjmsc",
@@ -249,8 +237,7 @@
         "text": "Have your flagship in a system more than 5 hexes away from your home system with no other non-fighter ships",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "exploitexhaustionjmsc",
@@ -259,8 +246,8 @@
         "text": "Win a ground combat against a player who had Passed.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "When the last ground forces of a passed player on a planet are destroyed in ground combat, the bot offers the remaining player a Score button. Confirm the win yourself."
     },
     {
         "alias": "quickdeliberationsjmsc",
@@ -269,7 +256,6 @@
         "text": "Be the first player to Pass their turn.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     }
 ]

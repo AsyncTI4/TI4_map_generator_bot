@@ -295,7 +295,7 @@ and ids fail with every error listed at once; problems that only show while appl
 | `note` | `{ "note": "round 2 starts" }` |
 | `press` | `{ "as": "sol", "press": "strategicAction_3", "in": "main" }` |
 | `pressId` | `{ "as": "nekro", "pressId": "sc_follow_3" }` |
-| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck) |
+| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields; when it gives cards the seat's cards info is re-sent so the new hand buttons appear), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck) |
 | `wait` | `{ "wait": 5 }` (seconds) |
 | `expect` | one of the checks below |
 

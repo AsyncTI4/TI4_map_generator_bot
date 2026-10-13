@@ -3,9 +3,9 @@
         "alias": "placebotron30k",
         "name": "Placebotron",
         "text": "Action: Exhaust this card. Or, Purge this card, draw a Relic.",
+        "notes": "This is one action: exhaust it with no effect, or purge it to draw a relic. It cannot be purged while exhausted.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "cognitivebehaviouraltherapy30k",
@@ -13,95 +13,95 @@
         "text": "When one of your infantry is destroyed during a round of ground combat, your opponent produces 1 less hit in the following round of ground combat.",
         "source": "thirtyk",
         "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automationNotes": "Not automated. Apply the -1 hit to your opponent's next ground combat round yourself."
     },
     {
         "alias": "rediscovery30k",
         "name": "Rediscovery",
         "text": "Action: Exhaust this card and choose a planet. Choose an exploration card in the discard pile relevant to the chosen planet, and resolve the exploration.",
+        "notes": "Any planet on the board can be chosen, not only planets you control.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "ransomcannon30k",
         "name": "Ransom Cannon",
         "text": "Action: Exhaust this card and choose a player whose flagship is in a system adjacent to one of your ships. The player must give you a promissory note, or destroy their flagship. If a player destroys their flagship, purge this card.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "The bot lists players whose flagship is in a system adjacent to your ships, then gives the target buttons to send a promissory note or destroy their flagship (which purges this card). Ships in the same system as the flagship do not count as adjacent."
     },
     {
         "alias": "razzlingmessage30k",
         "name": "Razzling Message",
         "text": "When you gain command tokens from the Leadership Strategy Card, gain 1 additional command token, and exhaust this card.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "When you press the Leadership gain button, the bot exhausts this card and reminds you; take the extra command token with the Leadership gain buttons."
     },
     {
         "alias": "deadlinedocumentation30k",
         "name": "Deadline Documentation",
         "text": "Action: Exhaust this card, and choose a player. They move 1 token from their Tactics pool to either their Fleet, or Strategy pools.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "defiantpropaganda30k",
         "name": "Defiant Propaganda",
         "text": "When a planet adjacent to your units is exhausted, exhaust this card to destroy up to 2 infantry on that planet, and place an equal amount of infantry on your home planet if able.",
+        "notes": "Also triggers when a planet is exhausted because a player gains control of it.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "Whenever a planet with infantry in or next to a system with your units is exhausted, the bot offers to exhaust this card, destroy up to 2 infantry there and place as many on your first home planet. Gaining control of a planet also exhausts it and may trigger the offer; decline it if it does not apply."
     },
     {
         "alias": "techsupporthotline30k",
         "name": "Tech Support Hotline",
         "text": "Action: Exhaust this card and choose a player with a home system more than 5 hexes away from your own. They may transact with you, and upon a deal being made, may research 1 technology with no pre-requisites.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "chronostasis30k",
         "name": "Chrono Stasis",
         "text": "Action: Exhaust this card and remove 1 infantry from a planet. At the start of that player's turn, they may place the infantry back if that planet does not contain another player's ground units or structures.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "The bot removes 1 infantry and, at the start of the owner's next turn, offers to place it back if no other player has ground forces or structures there. The infantry goes back to reinforcements meanwhile."
     },
     {
         "alias": "spyreportsjmsc",
         "name": "Spy Reports",
         "text": "Action: Exhaust this card, and choose a player you are not neighbors with. They show you two action cards at random.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL"
     },
     {
         "alias": "overpopulationmanagementjmsc",
         "name": "Overpopulation management",
         "text": "After you use the Production ability to produce infantry, you may spend 2 resources to add 4 infantry to the planet. If you don't, remove 1 infantry from the planet.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "After you finish producing infantry on planets, the bot offers per planet: add 4 infantry and pay 2 resources, or remove 1 infantry. Production outside the normal production buttons is not seen."
     },
     {
         "alias": "socialdissonancejmsc",
         "name": "Social Dissonance",
         "text": "During a transaction, players may give you an ownership token to place over this card. If they do, and this card has more than 3 ownership tokens on it, they remove 1 ownership token. Players with tokens on this card have +1 commodity, and the owner has +1 for each token on this card.",
+        "notes": "Each player may have at most one ownership token on this card.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "After a transaction with the owner, the other player gets a button to place an ownership token; above 3 tokens they remove 1. Commodity values include the token bonus. Giving a token without a bot transaction needs a manual fix."
     },
     {
         "alias": "deepnetworksjmsc",
         "name": "Deep Networks",
         "text": "You may trade with the neighbors of your neighbors during your turn.\nAction: Exhaust this card, target a non-home planet more than 5 hexes away from your home system in a system containing no other player's units. Place 1 infantry from your reinforcements on this planet.",
+        "notes": "Neutral units count as another player's units.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "The Action is automated. Transactions with neighbours of your neighbours are allowed during your turn. In fog, only planets you can see are offered."
     },
     {
         "alias": "sovereignrefugeesjmsc",
@@ -109,16 +109,16 @@
         "text": "When producing a flagship, reduce the total cost by 2.\nAction: Choose an eliminated faction, and gain access to their flagship. This can only be done once.",
         "notes": "If a flagship synergises with other gameplay elements on a faction sheet, you do NOT get access to those things (such as capturing units with the cabal flagship, which WILL happen, but spending them will not, as that text isn't on the flagship)",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "Flagship cost -2 is applied when you finish production. The Action records which eliminated faction you chose; use that flagship manually."
     },
     {
         "alias": "corruptionenginesjmsc",
         "name": "Corruption Engines",
         "text": "When activating a system in the Fracture that doesn't contain neutral units, your ships outside the Fracture gain +1 movement. Your ships get a +1 boost to all space combat rolls when fighting a non-neutral player.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "The +1 to space combat rolls against non-neutral players is applied by the combat roller. Add the +1 movement into the Fracture yourself."
     },
     {
         "alias": "richhostages30k",
@@ -126,62 +126,68 @@
         "text": "Place this card face up in your play area. When scoring a 1 point objective requires you to spend trade goods, influence, resources, or command tokens, purge this card to reduce the cost by 3.",
         "isFakeRelic": true,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "Goes to your play area. When you score a 1 point spend objective you get a purge button; adjust the spending yourself (Negotiate Trade Routes refunds 3 trade goods). The bot's score check does not know the discount."
     },
     {
         "alias": "subjectivityequasion30k",
         "name": "Subjectivity Equasion",
         "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 3 trade goods, or spend 5 resources to Research any Blue technology.",
         "isFakeRelic": true,
+        "notes": "Using either option purges this card.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL",
+        "automationNotes": "Goes to your play area with a start-of-turn button: purge it for 3 trade goods, or purge it and spend 5 resources to research a blue technology."
     },
     {
         "alias": "destructiveelements30k",
         "name": "Destructive Elements",
         "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 3 trade goods, or spend 5 resources to Research any Red technology.",
         "isFakeRelic": true,
+        "notes": "Using either option purges this card.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL",
+        "automationNotes": "Goes to your play area with a start-of-turn button: purge it for 3 trade goods, or purge it and spend 5 resources to research a red technology."
     },
     {
         "alias": "ancientbiologicalspecimens30k",
         "name": "Ancient Biological Specimens",
         "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 3 trade goods, or spend 5 resources to Research any Green technology.",
         "isFakeRelic": true,
+        "notes": "Using either option purges this card.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL",
+        "automationNotes": "Goes to your play area with a start-of-turn button: purge it for 3 trade goods, or purge it and spend 5 resources to research a green technology."
     },
     {
         "alias": "hyperalgorithms30k",
         "name": "Hyper Algorithms",
         "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 3 trade goods, or spend 5 resources to Research any Yellow technology.",
         "isFakeRelic": true,
+        "notes": "Using either option purges this card.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL",
+        "automationNotes": "Goes to your play area with a start-of-turn button: purge it for 3 trade goods, or purge it and spend 5 resources to research a yellow technology."
     },
     {
         "alias": "ancientexcavators30k",
         "name": "Ancient Excavators",
         "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 1 trade good, or spend 2 resources to gain the Scanlink Drone Network technology. This card may be used in a transaction.",
         "isFakeRelic": true,
+        "notes": "Using either option purges this card.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL",
+        "automationNotes": "Goes to your play area with a start-of-turn button: purge it for 1 trade good, or purge it and spend 2 resources to gain Scanlink Drone Network. Can be traded as a relic in transactions."
     },
     {
         "alias": "dauntingweaponsschematics30k",
         "name": "Daunting Weapons Schematics",
         "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 1 trade good, or spend 5 resources to gain the Dreadnaught II unit upgrade. This card may be used in a transaction.",
         "isFakeRelic": true,
+        "notes": "Using either option purges this card.",
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "FULL",
+        "automationNotes": "Goes to your play area with a start-of-turn button: purge it for 1 trade good, or purge it and spend 5 resources to gain Dreadnought II. Can be traded as a relic in transactions."
     },
     {
         "alias": "enhancedmobilitycore30k",
@@ -190,7 +196,7 @@
         "isFakeRelic": true,
         "source": "thirtyk",
         "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automationNotes": "Goes to your play area and can be traded; the extra movement is not calculated."
     },
     {
         "alias": "macguffianoutpostjmsc",
@@ -198,7 +204,7 @@
         "text": "Place this card face up in your play area. When you lose a space combat, you and the winner both gain 2 trade goods.",
         "isFakeRelic": true,
         "source": "thirtyk",
-        "automation": "MANUAL",
-        "automationNotes": "Not automated yet. Resolve the card text yourself."
+        "automation": "PARTIAL",
+        "automationNotes": "Goes to your play area. Both players get 2 trade goods when you lose your last ship to the bot's assign-hits buttons. Losing it any other way is not detected."
     }
 ]
