@@ -105,6 +105,7 @@ class AiSelfPlayTest extends BaseTi4Test {
                                 java.util.TreeMap::new,
                                 java.util.stream.Collectors.counting())));
         printTrading(outcomes);
+        printPromissoryNotes(outcomes);
         printActionCards(outcomes);
         printSecrets(outcomes);
         printPlanKinds(outcomes);
@@ -362,6 +363,72 @@ class AiSelfPlayTest extends BaseTi4Test {
                 System.out.println("TRADE_INVARIANT game " + (game + 1) + " violated: " + violation);
             }
         }
+    }
+
+    // How often promissory notes change hands and get played, or sit unused: over the batch, then note by note (the
+    // colour versions of a generic note, such as Support for the Throne, count as one note). "Given" counts each note
+    // its owner gave away at least once; "unused" counts the notes still in their owner's hand that never left it.
+    private static void printPromissoryNotes(List<SelfPlayGame.Outcome> outcomes) {
+        int games = Math.max(1, outcomes.size());
+        List<PromissoryTracker.Summary> summaries =
+                outcomes.stream().map(SelfPlayGame.Outcome::promissory).toList();
+        long owned = summaries.stream().mapToLong(s -> s.ownedNotes().size()).sum();
+        long given = summaries.stream()
+                .mapToLong(PromissoryTracker.Summary::givenByOwners)
+                .sum();
+        long transfers = summaries.stream().mapToLong(s -> s.transfers().size()).sum();
+        long playedByOthers = summaries.stream()
+                .mapToLong(PromissoryTracker.Summary::playedByOthers)
+                .sum();
+        long playedOwn = summaries.stream().mapToLong(s -> s.plays().size()).sum() - playedByOthers;
+        long unused =
+                summaries.stream().mapToLong(s -> s.neverLeftOwner().size()).sum();
+        long heldUnplayed =
+                summaries.stream().mapToLong(s -> s.receivedUnplayed().size()).sum();
+        System.out.printf(
+                "Promissory notes: %.1f changes of hands per game; %.0f%% of notes given away by their owner (%d of"
+                        + " %d), %.0f%% never left their owner; %.1f plays of a received note and %.1f of an own note"
+                        + " per game; %.1f received notes still unplayed at the end per game%n",
+                (double) transfers / games,
+                owned == 0 ? 0 : 100.0 * given / owned,
+                given,
+                owned,
+                owned == 0 ? 0 : 100.0 * unused / owned,
+                (double) playedByOthers / games,
+                (double) playedOwn / games,
+                (double) heldUnplayed / games);
+
+        Map<String, long[]> byNote = new java.util.TreeMap<>();
+        for (PromissoryTracker.Summary summary : summaries) {
+            summary.ownedNotes().forEach(key -> byNote.computeIfAbsent(noteOf(key), ignored -> new long[5])[0]++);
+            summary.transfers().stream()
+                    .filter(PromissoryTracker.Transfer::givenByOwner)
+                    .map(transfer -> transfer.owner() + "|" + transfer.note())
+                    .distinct()
+                    .forEach(key -> byNote.computeIfAbsent(noteOf(key), ignored -> new long[5])[1]++);
+            summary.plays().forEach(play -> byNote.computeIfAbsent(play.note(), ignored -> new long[5])[2]++);
+            summary.neverLeftOwner().forEach(key -> byNote.computeIfAbsent(noteOf(key), ignored -> new long[5])[3]++);
+            summary.receivedUnplayed().forEach(key -> byNote.computeIfAbsent(noteOf(key), ignored -> new long[5])[4]++);
+        }
+        List<String> perNote = byNote.entrySet().stream()
+                .sorted(Comparator.comparingLong((Map.Entry<String, long[]> entry) -> entry.getValue()[0])
+                        .reversed()
+                        .thenComparing(Map.Entry.comparingByKey()))
+                .map(entry -> String.format(
+                        "%s: owned %d, given %d, played %d, unused %d, received but unplayed at end %d",
+                        entry.getKey(),
+                        entry.getValue()[0],
+                        entry.getValue()[1],
+                        entry.getValue()[2],
+                        entry.getValue()[3],
+                        entry.getValue()[4]))
+                .toList();
+        System.out.println("Promissory notes by note over " + outcomes.size() + " games:");
+        perNote.forEach(line -> System.out.println("  " + line));
+    }
+
+    private static String noteOf(String seatAndNote) {
+        return seatAndNote.substring(seatAndNote.indexOf('|') + 1);
     }
 
     // What the AI did with its action cards over the batch: how many it played and had cancelled, each card's rate next

@@ -94,6 +94,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
     // The round in which each action secret was first sent to be scored, by "faction|secret".
     final Map<String, Integer> actionSecretRounds = new java.util.concurrent.ConcurrentHashMap<>();
     final MecatolTracker mecatol = new MecatolTracker();
+    final PromissoryTracker promissory = new PromissoryTracker();
     // Trading: every accepted offer (read from the offerer's items just before the Accept press), the presses each seat
     // made by handler family, and the Trade settlements each holder sent and had accepted.
     final List<TradeRecord> tradeLedger = new ArrayList<>();
@@ -159,7 +160,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
         beans.put(CombatContestSettings.class, mock(CombatContestSettings.class, quiet()));
         beans.put(CombatReplayService.class, mock(CombatReplayService.class, quiet()));
         beans.put(PlayerTitleService.class, mock(PlayerTitleService.class, quiet()));
-        beans.put(GameEventService.class, mock(GameEventService.class, quiet()));
+        beans.put(GameEventService.class, mock(GameEventService.class, quiet(this::gameEvent)));
         beans.put(OverruleStatsService.class, mock(OverruleStatsService.class, quiet()));
         beans.put(ActiveLeaseService.class, mock(ActiveLeaseService.class, quiet(invocation -> {
             Class<?> type = invocation.getMethod().getReturnType();
@@ -265,6 +266,17 @@ final class SelfPlayEnvironment implements AutoCloseable {
         }
         if ("info".equals(name) || name.startsWith("log")) return null;
         return invocation.callRealMethod();
+    }
+
+    // Promissory note plays reach the event log; every other event is dropped as before.
+    private Object gameEvent(InvocationOnMock invocation) {
+        if (!"commitEvent".equals(invocation.getMethod().getName())) return null;
+        if (!ti4.spring.service.gameevent.GameEventType.CARD_PLAY_PROMISSORY_NOTE.equals(invocation.getArgument(1)))
+            return null;
+        Map<String, Object> payload = invocation.getArgument(3);
+        Object note = payload == null ? null : payload.get("cardId");
+        promissory.played(invocation.getArgument(0), invocation.getArgument(2), note == null ? null : note.toString());
+        return null;
     }
 
     private Object gameManager(InvocationOnMock invocation) throws Throwable {

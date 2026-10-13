@@ -65,6 +65,7 @@ final class SelfPlayGame {
             ActionCardSummary actionCards,
             SecretSummary secrets,
             MecatolTracker.Summary mecatol,
+            PromissoryTracker.Summary promissory,
             String report,
             long wallSeconds) {
 
@@ -264,6 +265,7 @@ final class SelfPlayGame {
             if (game == null) return outcome(Ending.LOST_GAME, null, ticks);
             recordVictoryPoints(game);
             recordPlayRounds(game);
+            env.promissory.observe(game);
             closeOverrulePicks(game, false);
             if (stopWhen.test(game)) return outcome(Ending.STOP_CONDITION, game, ticks);
             if (AiTickRunner.reachedVictoryPoints(game)) return outcome(Ending.VICTORY_POINTS, game, ticks);
@@ -482,6 +484,7 @@ final class SelfPlayGame {
                 actionCardSummary(game),
                 secretSummary(game),
                 env.mecatol.summary(),
+                env.promissory.summary(game),
                 report(ending, game, ticks),
                 (System.nanoTime() - wallStart) / 1_000_000_000L);
     }
@@ -663,6 +666,25 @@ final class SelfPlayGame {
         return lines;
     }
 
+    // Every promissory note that changed hands or was played, then the notes received and still unplayed.
+    private List<String> promissoryLines(Game game) {
+        PromissoryTracker.Summary summary = env.promissory.summary(game);
+        List<String> lines = new ArrayList<>();
+        for (PromissoryTracker.Transfer transfer : summary.transfers()) {
+            String whose = transfer.givenByOwner() ? "" : " (" + transfer.owner() + "'s)";
+            lines.add("round " + transfer.round() + ": " + transfer.from() + " gave " + transfer.note() + whose + " to "
+                    + transfer.to());
+        }
+        for (PromissoryTracker.Play play : summary.plays()) {
+            String whose = play.own() ? " (own)" : " (" + play.owner() + "'s)";
+            lines.add("round " + play.round() + ": " + play.player() + " played " + play.note() + whose);
+        }
+        lines.add("received and unplayed at the end: " + summary.receivedUnplayed());
+        lines.add("never left their owner: " + summary.neverLeftOwner().size() + " of "
+                + summary.ownedNotes().size());
+        return lines;
+    }
+
     private List<String> invariantViolations(Ending ending, Game game) {
         List<String> violations = new ArrayList<>();
         if (game == null) return violations;
@@ -745,6 +767,7 @@ final class SelfPlayGame {
         appendTail(report, "Scoreboard", scoreboard(game), 40);
         appendTail(report, "Trading", tradeLines(game), 30);
         appendTail(report, "Trade invariants", invariantLines(ending, game), 20);
+        appendTail(report, "Promissory note moves", promissoryLines(game), 30);
         report.append("Press outcomes: ").append(env.pressOutcomes).append('\n');
         report.append("Pressed handlers: ").append(env.pressedHandlers).append('\n');
         appendTail(
