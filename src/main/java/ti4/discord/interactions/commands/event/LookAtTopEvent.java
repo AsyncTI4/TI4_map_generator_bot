@@ -28,7 +28,9 @@ class LookAtTopEvent extends GameStateSubcommand {
             return;
         }
 
-        int count = Math.min(event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt), game.getEvents().size());
+        int count = Math.min(
+                event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt),
+                game.getEvents().size());
 
         StringBuilder sb = new StringBuilder();
         sb.append("-----------\n");
