@@ -67,6 +67,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
+import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
@@ -176,6 +178,7 @@ class AgendaResolveButtonHandler {
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "edyn");
         }
         List<Player> riders = AgendaHelper.getWinningRiders(winner, game, event);
+        ThirtyKActionCardHooks.resolveAgendaPredictions(game, winner, event);
         List<Player> voters = AgendaHelper.getWinningVoters(winner, game);
         VeylorLeadersHandler.resolveVeylorHeroLosingVote(game, winner);
         VeylorAbilitiesHandler.resolveLobbyistDues(event, game, winner);
@@ -183,6 +186,7 @@ class AgendaResolveButtonHandler {
         notifyIndoctrinationTeam(game, voters);
         checkFlorzenUnlock(voters, riders);
         processRiders(game, riders);
+        ThirtyKSecretHooks.onAgendaResolved(game);
         String resMes = buildResolutionMessage(game, winner);
         int aCount = computeNextAgendaCount(game);
         List<Button> buttons = buildNextButtons(game, aCount);

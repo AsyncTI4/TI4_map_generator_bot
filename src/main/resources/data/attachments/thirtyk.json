@@ -1,0 +1,88 @@
+[
+    {
+        "id": "emergencyabortsignal30k",
+        "name": "Emergency Abort Signal",
+        "imagePath": "attachment_emergencyabortsignal30k.png",
+        "source": "thirtyk"
+    },
+    {
+        "id": "imperialisticgates30k",
+        "name": "Imperialistic Gates",
+        "imagePath": "attachment_imperialisticgates30k.png",
+        "source": "thirtyk"
+    },
+    {
+        "id": "localtariffs30k",
+        "name": "Local Tariffs",
+        "imagePath": "attachment_localtariffs30k.png",
+        "source": "thirtyk"
+    },
+    {
+        "id": "precisionlaserdefenses30k",
+        "name": "Precision Laser Defenses",
+        "imagePath": "attachment_precisionlaserdefenses30k.png",
+        "spaceCannonHitsOn": 3,
+        "spaceCannonDieCount": 1,
+        "source": "thirtyk"
+    },
+    {
+        "id": "inhospitableenvironment30k",
+        "name": "Inhospitable Environment",
+        "imagePath": "attachment_inhospitableenvironment30k.png",
+        "source": "thirtyk"
+    },
+    {
+        "id": "electromagneticflux30k",
+        "name": "Electromagnetic Flux",
+        "imagePath": "attachment_electromagneticflux30k.png",
+        "source": "thirtyk"
+    },
+    {
+        "id": "defensivebastion30k",
+        "name": "Defensive Bastion",
+        "imagePath": "attachment_defensivebastion30k.png",
+        "source": "thirtyk"
+    },
+    {
+        "id": "profitablefactories30k",
+        "name": "Profitable Factories",
+        "imagePath": "attachment_profitablefactories30k.png",
+        "source": "thirtyk"
+    },
+    {
+        "id": "carbonconsciousness30k",
+        "name": "Carbon Consciousness",
+        "imagePath": "attachment_carbonconsciousness30k.png",
+        "source": "thirtyk"
+    },
+    {
+        "id": "efficiencytechniques30k",
+        "name": "Efficiency Techniques",
+        "imagePath": "attachment_efficiencytechniques30k.png",
+        "source": "thirtyk"
+    },
+    {
+        "id": "affordablemassproduction30k",
+        "name": "Affordable Mass Production",
+        "imagePath": "attachment_affordablemassproduction30k.png",
+        "source": "thirtyk"
+    },
+    {
+        "id": "datainterchangehubjmsc",
+        "name": "Data Interchange Hub",
+        "imagePath": "attachment_datainterchangehubjmsc.png",
+        "source": "thirtyk"
+    },
+    {
+        "id": "overchargedtargetingsystemjmsc",
+        "name": "Overcharged Targeting System",
+        "imagePath": "attachment_overchargedtargetingsystemjmsc.png",
+        "source": "thirtyk"
+    },
+    {
+        "id": "productionrelayjmsc",
+        "name": "Production Relay",
+        "imagePath": "attachment_productionrelayjmsc.png",
+        "source": "thirtyk"
+    }
+]

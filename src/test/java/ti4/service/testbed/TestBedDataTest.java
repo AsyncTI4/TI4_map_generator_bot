@@ -222,6 +222,36 @@ class TestBedDataTest extends BaseTi4Test {
         assertTrue(errors.stream().noneMatch(error -> error.contains("at `202`")), String.join("\n", errors));
     }
 
+    // Homebrew card tests switch decks in the preset and stack explores in scripts; wrong slots, unknown decks,
+    // decks of the wrong type and unknown explore ids must be caught before a live run.
+    @Test
+    void decksAndStackExploreAreValidated() {
+        TestBedPreset preset = TestBedPresetService.parse("""
+                {
+                  "you": { "faction": "sol" },
+                  "decks": { "ac": "action_cards_30k", "so": "relics_30k", "explore": "notadeck", "tech": "x" }
+                }""");
+        List<String> errors = TestBedPresetService.validate(preset);
+        assertContains(
+                errors,
+                "deck `relics_30k` is not a `so` deck",
+                "unknown deck `notadeck` for `decks.explore`",
+                "unknown `decks` slot `tech`");
+        assertTrue(errors.stream().noneMatch(error -> error.contains("action_cards_30k")), String.join("\n", errors));
+
+        List<String> scriptErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
+                { "preset": "30k-2p",
+                  "steps": [
+                    { "do": "stackExplore", "value": "notanexplore" },
+                    { "do": "stackExplore" },
+                    { "do": "stackExplore", "value": "tourismbureau30k" }
+                  ] }"""));
+        assertContains(scriptErrors, "unknown explore card `notanexplore`", "needs `value`");
+        assertTrue(
+                scriptErrors.stream().noneMatch(error -> error.contains("tourismbureau30k")),
+                String.join("\n", scriptErrors));
+    }
+
     // Short forms parse, typos in field names are rejected, steps survive the JSON round trip the runner uses, and
     // anything stored in a game avoids the `,` and `:` the save format splits on.
     @Test

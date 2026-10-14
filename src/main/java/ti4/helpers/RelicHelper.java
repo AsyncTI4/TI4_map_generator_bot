@@ -23,6 +23,7 @@ import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieReli
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
+import ti4.helpers.thirtyk.ThirtyKRelics;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
@@ -163,6 +164,7 @@ public class RelicHelper {
             GenericInteractionCreateEvent event, Game game, Player player, String relicID) {
         StringBuilder helpMessage = new StringBuilder();
         // Append helpful commands after relic draws and resolve effects:
+        ThirtyKRelics.resolveRelicGained(event, game, player, relicID);
         switch (relicID) {
             case "obsidian", "absol_obsidian" -> {
                 game.drawSecretObjective(player.getUserID());

@@ -59,6 +59,7 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKExplores;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
@@ -1496,6 +1497,7 @@ public class ExploreService {
         }
         RiftSetModeService.resolveExplore(ogID, player, game);
         FOWPlusService.resolveExplore(event, ogID, tile, planetID, player, game);
+        ThirtyKExplores.resolveExplore(event, cardID, tile, planetID, player, game);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
 
         if (player.hasAbility("fortune_seekers")

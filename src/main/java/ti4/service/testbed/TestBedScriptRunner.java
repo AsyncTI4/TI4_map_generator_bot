@@ -36,6 +36,7 @@ import ti4.model.TestBedScript.Step;
 import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.GMService;
 import ti4.service.game.StartPhaseService;
+import ti4.service.info.CardsInfoService;
 import ti4.service.testbed.TestBedPress.PressResult;
 import ti4.service.testbed.TestBedPress.Recorder;
 import ti4.service.turn.StartTurnService;
@@ -48,7 +49,7 @@ public final class TestBedScriptRunner {
     private static final long QUIET_MILLIS = 1000;
     private static final int MAX_DETAIL = 160;
     private static final int SNAPSHOT_MESSAGES = 5;
-    private static final Set<String> STATE_ONLY_ACTIONS = Set.of("setStored", "removeStored", "actAs");
+    private static final Set<String> STATE_ONLY_ACTIONS = Set.of("setStored", "removeStored", "actAs", "stackExplore");
 
     private enum Status {
         PASS,
@@ -485,6 +486,11 @@ public final class TestBedScriptRunner {
             case "startPhase" -> StartPhaseService.startPhase(origin, game, step.getValue());
             case "setStored" -> TestBedService.store(game, step.getKey(), step.getValue());
             case "removeStored" -> game.removeStoredValue(step.getKey());
+            case "stackExplore" -> {
+                if (!TestBedComponentService.stackExplore(game, step.getValue())) {
+                    problems.add("explore `" + step.getValue() + "` is not in this game's explore deck or discard");
+                }
+            }
             case "setActivePlayer" -> {
                 Player seat = seat(game, step.getAs());
                 if (seat == null) {
@@ -519,10 +525,19 @@ public final class TestBedScriptRunner {
                 if (targets.isEmpty()) problems.add("no seat `" + step.getAs() + "`");
                 for (Player seat : targets) {
                     TestBedApplyService.applyHand(game, seat, step.getHand(), origin, problems);
+                    if (givesCards(step.getHand())) CardsInfoService.sendCardsInfo(game, seat);
                 }
             }
             default -> problems.add("unknown action `" + step.getAction() + "`");
         }
+    }
+
+    static boolean givesCards(TestBedPreset.Seat hand) {
+        return hand != null
+                && (hand.getAcs() != null
+                        || hand.getSos() != null
+                        || hand.getRelics() != null
+                        || (hand.getPns() != null && !hand.getPns().isEmpty()));
     }
 
     private record Check(boolean ok, String actual, boolean hit) {

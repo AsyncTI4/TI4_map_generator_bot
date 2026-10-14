@@ -90,6 +90,7 @@ import ti4.game.persistence.ManagedGame;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.ImageHelper;
 import ti4.image.Mapper;
@@ -2337,6 +2338,7 @@ public final class Helper {
         if (unitsOnly) {
             return productionValueTotal;
         }
+        productionValueTotal += ThirtyKExploreHooks.extraPlanetProduction(uH, productionValueTotal);
         if (uH instanceof Planet planet) {
             if (TaPromissoryHandler.planetHasAdvancedStructuralEngineering(planet)
                     && player.getPlanets().contains(planet.getName())) {
@@ -2860,6 +2862,7 @@ public final class Helper {
             if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
                 cost = Math.max(0, cost - 1);
             }
+            cost = Math.max(0, cost - ThirtyKExploreHooks.productionDiscount(game, producedUnits));
             if (game.isMonumentsMode()) {
                 if (MonumentsService.isMonumentOnBoard(game, player, "rohdhna_monument")) {
                     Tile monumentTile = MonumentsService.getMonumentTile(game, player, "rohdhna_monument");

@@ -38,6 +38,8 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKRelicHooks;
+import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessage;
@@ -368,7 +370,9 @@ public final class ButtonHelperSCs {
         boolean used = addUsedSCPlayer(event.getMessageId() + "score_imperial", game, player);
         if (used) return;
         ButtonHelperFactionSpecific.keleresIIHQCCGainCheck(player, game);
+        int pointsBefore = player.getTotalVictoryPoints();
         ScorePublicObjectiveService.scorePO(event, game, player, 0);
+        if (player.getTotalVictoryPoints() > pointsBefore) ThirtyKSecretHooks.onImperialPointScored(game, player);
     }
 
     @ButtonHandler("sc_trade_follow")
@@ -1580,6 +1584,7 @@ public final class ButtonHelperSCs {
         message = player.getRepresentationUnfogged() + ", your current command tokens are "
                 + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+        ThirtyKRelicHooks.onLeadershipGain(game, player);
         Button getTactic = Buttons.green(player.factionButtonChecker() + "increase_tactic_cc", "Gain 1 Tactic Token");
         Button getFleet = Buttons.green(player.factionButtonChecker() + "increase_fleet_cc", "Gain 1 Fleet Token");
         Button getStrat =

@@ -18,4 +18,10 @@ public enum AutomationStatus {
     public boolean needsPlayerAttention() {
         return this == PARTIAL || this == MANUAL;
     }
+
+    public String cardLine(String notes) {
+        String line = "-# Bot: " + label;
+        if (notes == null || notes.isBlank()) return line;
+        return line + " — " + notes;
+    }
 }
