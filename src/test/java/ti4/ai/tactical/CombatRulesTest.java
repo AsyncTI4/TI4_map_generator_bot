@@ -129,6 +129,27 @@ class CombatRulesTest extends BaseTi4Test {
                 .isEqualTo("combatRoll_" + position + "_space_spacecannonoffence");
     }
 
+    // The engine offers the same Space Cannon Offense window twice on one tactical action: once in the main channel
+    // after movement, then again in the combat thread when the space combat starts. The AI fires in the first and
+    // must leave the second alone, since each PDS fires once per window.
+    @Test
+    void firesSpaceCannonOnceWhenTheCombatThreadReoffersIt() {
+        Tile tile = test.game.getTileByPosition(position);
+        test.nekro.addPlanet("lodor");
+        test.units(tile, "lodor", test.nekro, UnitType.Pds, 1);
+        test.game.setActiveSystem(position);
+        String fire = "combatRoll_" + position + "_space_spacecannonoffence";
+        AiPrompt mainChannel = prompt("main", PromptSource.PUBLIC, NOW - 500, fire);
+        AiPrompt combatThread = prompt("thread", PromptSource.COMBAT_THREAD, NOW, fire);
+
+        assertThat(pressedId(CombatRules.next(test.context(mainChannel)).orElseThrow()))
+                .isEqualTo(fire);
+        assertThat(CombatRules.next(test.context(mainChannel, combatThread))
+                        .filter(decision ->
+                                decision instanceof AiDecision.Press press && fire.equals(pressedId(press))))
+                .isEmpty();
+    }
+
     // Sol's fighters would soak up the space cannon hits; Graviton Laser System makes them land on the cruiser, so it
     // is exhausted before the roll.
     @Test

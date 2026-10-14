@@ -153,7 +153,7 @@ public class CombatRules {
             if (prompt.createdAtMillis() < turnStart) continue;
             for (PromptButton roll : rolls(prompt, SPACE_CANNON_OFFENCE_SUFFIX)) {
                 String position = positionOf(roll);
-                String key = "spaceCannon|" + prompt.messageId() + "|" + position;
+                String key = spaceCannonWindow(game, active, turnStart, position);
                 if (context.memory().has(key)) continue;
                 if (attacking && !position.equals(game.getActiveSystem())) continue;
                 if (!ButtonHelper.getPlayersWithPds2Cover(active, game, position)
@@ -169,6 +169,10 @@ public class CombatRules {
             }
         }
         return Optional.empty();
+    }
+
+    private static String spaceCannonWindow(Game game, Player active, long turnStart, String position) {
+        return "spaceCannon|" + game.getRound() + "|" + active.getFaction() + "|" + turnStart + "|" + position;
     }
 
     private static Optional<PromptButton> graviton(AiTurnContext context, AiPrompt prompt, Tile tile) {
