@@ -383,13 +383,5 @@
         "subcanal": "lil homebrew",
         "credits": "Goose",
         "description": "Homebrew from Goose"
-    },
-    {
-        "source": "thirtyk",
-        "name": "30k Content Lab",
-        "canal": "community",
-        "subcanal": "lil homebrew",
-        "credits": "Jason",
-        "description": "Jason's TI4 Content Laboratories: the 30k card set and the JMSC big-map card set"
     }
 ]

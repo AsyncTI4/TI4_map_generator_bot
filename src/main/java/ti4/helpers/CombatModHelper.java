@@ -732,7 +732,6 @@ public class CombatModHelper {
                 }
             }
             case "active_player" -> meetsCondition = game.getActivePlayer() == player;
-            case "opponent_not_neutral" -> meetsCondition = opponent != null && !opponent.isNeutral();
             case "rhodun_monument_combat" -> {
                 boolean opponentHasUnitUpgrade = opponent != null
                         && opponent.getTechs().stream()

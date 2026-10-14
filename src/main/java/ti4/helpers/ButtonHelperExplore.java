@@ -17,7 +17,6 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
@@ -269,7 +268,6 @@ public class ButtonHelperExplore {
 
     private static void resolvePurgedFragments(
             Game game, Player player, ButtonInteractionEvent event, List<String> fragmentsToPurge) {
-        ThirtyKActionCardHooks.onFragmentsPurged(game, player, fragmentsToPurge);
         StringBuilder message = new StringBuilder(player.getRepresentation() + " purged ");
         if (fragmentsToPurge.size() == 1) {
             String fragId = fragmentsToPurge.getFirst();

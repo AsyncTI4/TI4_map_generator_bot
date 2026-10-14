@@ -294,12 +294,6 @@ public class TestBedScriptService {
                 }
             }
             case "removeStored" -> requireValue(step.getKey(), "key", label, errors);
-            case "stackExplore" -> {
-                requireValue(step.getValue(), "value", label, errors);
-                if (step.getValue() != null && !Mapper.isValidExplore(step.getValue())) {
-                    errors.add(label + ": unknown explore card `" + step.getValue() + "`.");
-                }
-            }
             case "setActivePlayer" -> requireSeat(step, label, errors);
             case "sendAnonComms" -> {
                 requireSeat(step, label, errors);

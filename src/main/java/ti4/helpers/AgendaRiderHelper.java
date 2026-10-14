@@ -18,7 +18,6 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRid
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -130,7 +129,6 @@ public class AgendaRiderHelper {
                 ? identifier + "_" + rider
                 : existingData + ";" + identifier + "_" + rider;
         game.setCurrentAgendaVote(choice, existingData);
-        ThirtyKActionCardHooks.onRiderPlaced(game, player, choice, rider);
 
         MessageHelper.sendMessageToChannel(event.getChannel(), voteMessage);
         String summary = AgendaSummaryHelper.getSummaryOfVotes(game, true);

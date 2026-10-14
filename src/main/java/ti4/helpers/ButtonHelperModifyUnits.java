@@ -49,9 +49,6 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
-import ti4.helpers.thirtyk.ThirtyKExploreHooks;
-import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.helpers.twilight_kart.TkHelperStarflare;
@@ -582,7 +579,6 @@ public final class ButtonHelperModifyUnits {
             }
         }
         IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "groundcombat");
-        ThirtyKSecretHooks.afterCombatHits(game, player, tile, unitHolder, "groundcombat");
         LostLegaciesRelicHandler.finishNeutralReplacementBatch(event, game);
         event.getMessage();
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -1126,9 +1122,6 @@ public final class ButtonHelperModifyUnits {
         }
         if (!justSummarizing && event instanceof ButtonInteractionEvent bevent) {
             IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "spacecombat");
-            ThirtyKSecretHooks.afterCombatHits(game, player, tile, unitHolder, "spacecombat");
-            ThirtyKExploreHooks.afterSpaceCombatHits(event, game, player, tile, "spacecombat");
-            ThirtyKActionCardHooks.afterCombatHitsAssigned(game, tile, "spacecombat");
             if (sustainedFlagbearer) {
                 VanguardUnitHandler.offerFlagbearerAfterSustain(bevent, game, player, tile);
             }

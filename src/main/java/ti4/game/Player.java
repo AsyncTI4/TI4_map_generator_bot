@@ -81,7 +81,6 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.helpers.thirtyk.ThirtyKRelicHooks;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -1647,7 +1646,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (MonumentsDSButtonHandler.hasVaylerianMonumentCommodityBonus(game, this)) {
             bonus++;
         }
-        bonus += ThirtyKRelicHooks.commodityBonus(game, this);
 
         return bonus;
     }
@@ -2722,10 +2720,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 "mutagenhazardous",
                 "mutagenindustrial",
                 "mutagencultural",
-                "mutagenfrontier",
-                "ancientexcavators30k",
-                "dauntingweaponsschematics30k",
-                "enhancedmobilitycore30k");
+                "mutagenfrontier");
         return getRelics().stream()
                 .filter(Mapper::isValidRelic)
                 .filter(tradableRelics::contains)
@@ -3027,7 +3022,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             getExhaustedPlanets().add(planet);
             TheodisiOutpostActionCardHandler.offerOutpostEffects(game, this, planet);
             TaBreakthroughHandler.offerSafeHavensInfantry(game, this, planet);
-            ThirtyKRelicHooks.onPlanetExhausted(game, this, planet);
         }
         Game game = this.game;
         if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null
