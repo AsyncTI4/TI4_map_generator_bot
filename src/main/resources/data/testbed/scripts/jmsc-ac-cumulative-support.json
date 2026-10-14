@@ -1,0 +1,41 @@
+{
+  "name": "jmsc-ac-cumulative-support",
+  "description": "Sol controls Mecatol Rex, 3 hexes from home, and Cumulative Support places 3 infantry there.",
+  "preset": "jmsc-2p",
+  "stopOnFail": true,
+  "steps": [
+    {
+      "do": "hand",
+      "as": "sol",
+      "hand": {
+        "acs": [
+          "cumulativesupportjmsc"
+        ],
+        "planets": [
+          "mr"
+        ]
+      }
+    },
+    {
+      "as": "sol",
+      "press": "ac_play_from_hand_{ac:cumulativesupportjmsc}",
+      "in": "sol:cards-info"
+    },
+    {
+      "as": "sol",
+      "press": "thkAcCumulativeStart",
+      "in": "sol"
+    },
+    {
+      "as": "sol",
+      "press": "thkAcCumulativePlace_mr",
+      "in": "sol"
+    },
+    {
+      "expect": {
+        "state": "planet.mr.units",
+        "contains": "gf=3"
+      }
+    }
+  ]
+}

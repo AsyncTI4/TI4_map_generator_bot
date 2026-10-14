@@ -9,6 +9,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.model.Source.ComponentSource;
+import ti4.model.enums.AutomationStatus;
 import ti4.service.emoji.CardEmojis;
 
 @Data
@@ -18,6 +19,8 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
     private String phase;
     private String text;
     private String notes;
+    private AutomationStatus automation;
+    private String automationNotes;
     private int points;
     private String homebrewReplacesID;
     private String imageURL;
@@ -45,6 +48,8 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
         so.text = text.replace("<color>", newColor.getName());
         so.points = points;
         so.homebrewReplacesID = homebrewReplacesID;
+        so.automation = automation;
+        so.automationNotes = automationNotes;
         so.imageURL = imageURL;
         so.source = source;
         so.searchTags = new ArrayList<>(searchTags);
@@ -92,6 +97,7 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
         if (notes != null) {
             eb.setDescription(text + "\n-# [" + notes + "]");
         }
+        if (automation != null) eb.appendDescription("\n" + automation.cardLine(automationNotes));
 
         // FOOTER
         StringBuilder footer = new StringBuilder();

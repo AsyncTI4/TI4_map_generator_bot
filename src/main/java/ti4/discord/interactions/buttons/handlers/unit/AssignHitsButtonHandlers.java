@@ -23,6 +23,9 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
+import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -76,6 +79,9 @@ class AssignHitsButtonHandlers {
                             VanguardUnitHandler.recordSpaceCombatHitAssignment(game, player, tile, amt);
                         }
                         IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, holder, assignHitsType);
+                        ThirtyKSecretHooks.afterCombatHits(game, player, tile, holder, assignHitsType);
+                        ThirtyKExploreHooks.afterSpaceCombatHits(event, game, player, tile, assignHitsType);
+                        ThirtyKActionCardHooks.afterCombatHitsAssigned(game, tile, assignHitsType);
                     }
 
                     String verb = remove ? " removed " : " destroyed ";
@@ -111,6 +117,8 @@ class AssignHitsButtonHandlers {
                         case "All" -> {
                             DestroyUnitService.destroyAllPlayerUnitsInSystem(event, game, player, tile, combat);
                             IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, null, assignHitsType);
+                            ThirtyKSecretHooks.afterCombatHits(game, player, tile, null, assignHitsType);
+                            ThirtyKActionCardHooks.afterCombatHitsAssigned(game, tile, assignHitsType);
                             msg += tile.getRepresentationForButtons(game, player);
                         }
                         case "AllShips" -> {
@@ -127,6 +135,9 @@ class AssignHitsButtonHandlers {
                                 }
                             }
                             IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, space, assignHitsType);
+                            ThirtyKSecretHooks.afterCombatHits(game, player, tile, space, assignHitsType);
+                            ThirtyKExploreHooks.afterSpaceCombatHits(event, game, player, tile, assignHitsType);
+                            ThirtyKActionCardHooks.afterCombatHitsAssigned(game, tile, assignHitsType);
                             msg += "the space area of " + tile.getRepresentationForButtons(game, player);
                             msg +=
                                     ".\n-# Ground forces that were in space were removed, instead of destroyed. If this is not correct, please resolve it manually.";

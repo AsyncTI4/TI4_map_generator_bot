@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.game.Game;
 import ti4.model.Source.ComponentSource;
+import ti4.model.enums.AutomationStatus;
 import ti4.service.emoji.CardEmojis;
 
 @Data
@@ -30,6 +31,8 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private String window;
     private String text;
     private String notes;
+    private AutomationStatus automation;
+    private String automationNotes;
     private String flavorText;
     private String imageURL;
     private String automationID;
@@ -118,6 +121,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
         } else {
             eb.setDescription("\n***" + cardWindow + ":***\n" + cardText + "\n-# [" + notes + "]");
         }
+        if (automation != null) eb.appendDescription("\n" + automation.cardLine(automationNotes));
 
         // FLAVOUR TEXT
         if (includeFlavourText && getFlavorText().isPresent())

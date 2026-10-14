@@ -28,6 +28,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.thirtyk.ThirtyKTransactions;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -108,6 +109,7 @@ public class FowCommunicationThreadService {
             return allPlayers;
         }
         Set<Player> commPartners = new HashSet<>(basePartners == null ? baseCommPartners(game, player) : basePartners);
+        commPartners.addAll(ThirtyKTransactions.partnersOf(game, player));
         if (AnonymousCommsService.isActive(game) && hasGuildShips(player)) {
             commPartners.addAll(guildShipsPartners(game, player));
         }

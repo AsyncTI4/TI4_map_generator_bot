@@ -21,6 +21,7 @@ import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StatusHelper;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
@@ -72,6 +73,7 @@ public class ScorePublicObjectiveService {
         } else {
             StatusHelper.recordObjectiveScored(game, player, id, "PUBLIC");
             informAboutScoring(event, channel, game, player, poID);
+            ThirtyKExploreHooks.afterPublicObjectiveScored(game, player, id);
             if (player.hasAbility("primordial")) {
                 KaloraAbilityHandler.primordial(player, game);
             }

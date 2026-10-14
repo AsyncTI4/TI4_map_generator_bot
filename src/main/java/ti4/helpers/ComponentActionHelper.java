@@ -37,6 +37,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKRelics;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.helpers.thundersedge.TeHelperBreakthroughs;
 import ti4.image.Mapper;
@@ -381,6 +382,11 @@ public class ComponentActionHelper {
             }
             if ("quantum_entangler".equalsIgnoreCase(relic)
                     && (game.getAllRelics().size() < 3 || game.getRealPlayers().size() < 2)) {
+                continue;
+            }
+            if (ThirtyKRelics.handlesComponentAction(relic)) {
+                ThirtyKRelics.componentActionButton(game, p1, relic, factionChecker + prefix)
+                        .ifPresent(compButtons::add);
                 continue;
             }
 
@@ -1325,6 +1331,10 @@ public class ComponentActionHelper {
         }
         if ("volatile_mutagenics".equals(relicID)) {
             MutagenService.resolveMutagenPurge(event, game, player, true);
+            return;
+        }
+        if (ThirtyKRelics.handlesComponentAction(relicID)) {
+            ThirtyKRelics.resolveComponentAction(game, player, event, relicID);
             return;
         }
         game.setStoredValue(
