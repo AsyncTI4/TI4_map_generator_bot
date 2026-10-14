@@ -250,9 +250,14 @@ public final class ButtonHelperSCs {
         }
 
         List<Button> buttons = Helper.getPlanetRefreshButtons(player, game);
-        Button doneRefreshing = Buttons.red("deleteButtons_diplomacy", "Done Readying Planets"); // spitItOut
+        Button doneRefreshing = Buttons.red(
+                player.factionButtonChecker() + "deleteButtons_diplomacy", "Done Readying Planets"); // spitItOut
         buttons.add(doneRefreshing);
-        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
+        } else {
+            ButtonHelper.sendMessageToRightStratThread(player, game, message, "diplomacy", buttons);
+        }
         if (player.hasAbility("peace_accords") && !game.isTwilightsFallMode()) {
             List<Button> buttons2 = ButtonHelperAbilities.getXxchaPeaceAccordsButtons(
                     game, player, event, player.factionButtonChecker());
