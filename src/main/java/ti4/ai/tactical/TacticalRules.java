@@ -66,6 +66,7 @@ public class TacticalRules {
     private static final String DONE_PREFIX = "deleteButtons_";
     private static final String DONE_PRODUCING = "Done Producing Units";
     private static final String DONE_EXHAUSTING = "Done Exhausting Planets";
+    private static final int IGNORED_FIGHTERS_INDEX = 3;
     private static final String SARWEEN = "sarween";
     private static final String AIDA_EXHAUST = "exhaustTech_aida";
     private static final String AIDA_DISCOUNT = "aida_";
@@ -573,18 +574,8 @@ public class TacticalRules {
                         && DONE_PRODUCING.equals(button.label()));
         if (done.isEmpty()) return Optional.empty();
         if (plan.isPresent()) {
-            for (BuildOrder order : plan.get().orders()) {
-                if (produced(context.seat(), order.type()) >= plan.get().units(order.type())) continue;
-                AiPrompt prompt = done.get().prompt();
-                Optional<PromptButton> all = prompt.enabledHandler(order.handlerId());
-                Optional<PromptButton> button = all.or(
-                        () -> order.units() > 1 ? prompt.enabledHandler(order.singleHandlerId()) : Optional.empty());
-                double added = all.isPresent() ? order.cost() : order.cost() / Math.max(1, order.units());
-                if (button.isPresent() && breaksReserve(context.game(), context.seat(), added)) continue;
-                if (button.isPresent()) {
-                    return Optional.of(AiDecision.press(prompt, button.get(), "build " + order.unitId()));
-                }
-            }
+            Optional<AiDecision> next = nextPlacement(context, done.get().prompt(), plan.get());
+            if (next.isPresent()) return next;
         }
         Optional<AiDecision> spinner =
                 TechRules.startYinSpinner(context, done.get().prompt());
@@ -593,6 +584,40 @@ public class TacticalRules {
                 TechRules.startSelfAssembly(context, done.get().prompt());
         if (assembly.isPresent()) return assembly;
         return Optional.of(done.get().press("done building"));
+    }
+
+    private static Optional<AiDecision> nextPlacement(AiTurnContext context, AiPrompt prompt, BuildPlan plan) {
+        Game game = context.game();
+        Player seat = context.seat();
+        for (BuildOrder order : fightersLast(plan.orders())) {
+            int units = Math.min(order.units(), plan.units(order.type()) - produced(seat, order.type()));
+            if (order.type() == UnitType.Fighter) units = Math.min(units, fighterRoom(game, seat, order.location()));
+            if (units <= 0) continue;
+            Optional<PromptButton> whole =
+                    units == order.units() ? prompt.enabledHandler(order.handlerId()) : Optional.empty();
+            Optional<PromptButton> button = whole.or(() -> prompt.enabledHandler(order.singleHandlerId()));
+            if (button.isEmpty()) continue;
+            double added = whole.isPresent() ? order.cost() : order.cost() / Math.max(1, order.units());
+            if (breaksReserve(game, seat, added)) continue;
+            return Optional.of(AiDecision.press(prompt, button.get(), "build " + order.unitId()));
+        }
+        return Optional.empty();
+    }
+
+    private static List<BuildOrder> fightersLast(List<BuildOrder> orders) {
+        return orders.stream()
+                .sorted(Comparator.comparingInt(order -> order.type() == UnitType.Fighter ? 1 : 0))
+                .toList();
+    }
+
+    private static int fighterRoom(Game game, Player seat, String position) {
+        Tile tile = game.getTileByPosition(position);
+        if (tile == null) return 0;
+        ButtonHelper.FleetCheck check = ButtonHelper.fleetCheck(seat, game, tile);
+        if (check.capacitySlack() == Integer.MAX_VALUE) return Integer.MAX_VALUE;
+        int fighters = BoardView.count(BoardView.space(tile), seat, UnitType.Fighter);
+        int unusedAllowance = Math.max(0, check.counts()[IGNORED_FIGHTERS_INDEX] - fighters);
+        return Math.max(0, check.capacitySlack() + unusedAllowance);
     }
 
     static boolean breaksReserve(Game game, Player seat, double addedCost) {
