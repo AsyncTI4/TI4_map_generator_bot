@@ -50,12 +50,14 @@ public class GameDatabaseSyncPipeline {
                 EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
-    static void queueTask(String taskName, int executionTimeWarningThresholdSeconds, Runnable runnable) {
+    static boolean queueTask(String taskName, int executionTimeWarningThresholdSeconds, Runnable runnable) {
         var timedRunnable = new TimedRunnable(taskName, executionTimeWarningThresholdSeconds, runnable);
         try {
             ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
+            return true;
         } catch (RejectedExecutionException e) {
             BotLogger.error("`" + taskName + "` was rejected because the bot is shutting down.");
+            return false;
         }
     }
 
