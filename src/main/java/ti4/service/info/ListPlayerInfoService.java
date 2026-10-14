@@ -19,8 +19,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
-import ti4.helpers.thirtyk.ThirtyKCards;
-import ti4.helpers.thirtyk.ThirtyKSecrets;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -128,7 +126,7 @@ public class ListPlayerInfoService {
             case "control_borderlands_omegaphase" -> 4;
             case "imperium_rex_omegaphase" -> 0;
 
-            default -> ThirtyKSecrets.threshold(objID);
+            default -> 0;
         };
     }
 
@@ -494,7 +492,6 @@ public class ListPlayerInfoService {
                 return max;
             }
         }
-        if (ThirtyKCards.isSecretObjective(objID)) return ThirtyKSecrets.progress(objID, game, player);
         switch (objID) {
             case "push_boundaries", "push_boundaries_omegaphase" -> {
                 int aboveN = 0;

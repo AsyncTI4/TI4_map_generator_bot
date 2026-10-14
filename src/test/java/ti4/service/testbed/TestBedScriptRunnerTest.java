@@ -14,30 +14,11 @@ import net.dv8tion.jda.api.components.tree.MessageComponentTree;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.junit.jupiter.api.Test;
-import ti4.model.TestBedPreset;
 import ti4.model.TestBedScript.Expect;
 import ti4.service.testbed.TestBedScriptRunner.WaitMode;
 
 // Pieces of the script runner that decide how long an expect waits and what it can see.
 class TestBedScriptRunnerTest {
-
-    // A mid-script `do: hand` that gives cards must re-send cards info, otherwise the new hand buttons
-    // (e.g. ac_play_from_hand_<n>) never appear and the next press fails. Hands that only change numbers don't.
-    @Test
-    void handStepsThatGiveCardsRefreshCardsInfo() {
-        TestBedPreset.Seat cards = new TestBedPreset.Seat();
-        cards.setAcs(TestBedPreset.CardPick.from(List.of("sabo1")));
-        assertTrue(TestBedScriptRunner.givesCards(cards));
-
-        TestBedPreset.Seat secret = new TestBedPreset.Seat();
-        secret.setSos(TestBedPreset.CardPick.from(1));
-        assertTrue(TestBedScriptRunner.givesCards(secret));
-
-        TestBedPreset.Seat tradeGoods = new TestBedPreset.Seat();
-        tradeGoods.setTg(5);
-        assertFalse(TestBedScriptRunner.givesCards(tradeGoods));
-        assertFalse(TestBedScriptRunner.givesCards(null));
-    }
 
     // Positive checks stop as soon as they pass; negative ones keep watching until the channel goes quiet, so late
     // output (map renders, queued sends) is still checked.

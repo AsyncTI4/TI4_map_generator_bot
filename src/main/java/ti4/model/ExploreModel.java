@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.PatternHelper;
 import ti4.model.Source.ComponentSource;
-import ti4.model.enums.AutomationStatus;
 import ti4.service.emoji.ExploreEmojis;
 
 @Data
@@ -20,8 +19,6 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     private String resolution;
     private String text;
     private String notes;
-    private AutomationStatus automation;
-    private String automationNotes;
     private String attachmentId;
     private String flavorText;
     private String imageURL;
@@ -80,9 +77,6 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
         if (notes != null) {
             sb.append("\n> -# [").append(notes).append("]");
         }
-        if (automation != null) {
-            sb.append("\n> ").append(automation.cardLine(automationNotes));
-        }
         return sb.toString();
     }
 
@@ -111,7 +105,6 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
         if (notes != null) {
             eb.setDescription(text + "\n-# [" + notes + "]");
         }
-        if (automation != null) eb.appendDescription("\n" + automation.cardLine(automationNotes));
 
         if (includeID) {
             StringBuilder sb = new StringBuilder();

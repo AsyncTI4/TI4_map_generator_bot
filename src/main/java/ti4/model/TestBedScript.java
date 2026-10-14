@@ -12,15 +12,7 @@ public class TestBedScript {
 
     public static final List<String> VERBS = List.of("note", "press", "pressId", "do", "wait", "expect");
     public static final List<String> ACTIONS = List.of(
-            "startPhase",
-            "setActivePlayer",
-            "setStored",
-            "removeStored",
-            "runCron",
-            "hand",
-            "actAs",
-            "sendAnonComms",
-            "stackExplore");
+            "startPhase", "setActivePlayer", "setStored", "removeStored", "runCron", "hand", "actAs", "sendAnonComms");
 
     private String name;
     private String description;

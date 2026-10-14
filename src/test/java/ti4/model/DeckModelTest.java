@@ -66,12 +66,11 @@ class DeckModelTest extends BaseTi4Test {
         return false;
     }
 
-    // Like explores, action card decks may list extra copies as <id>extra1 / <id>extra2 (Mapper strips it).
     private static boolean validateActionCardDeck(DeckModel deckModel) {
-        if (deckModel.getNewDeck().stream().allMatch(cardID -> Mapper.getActionCard(cardID) != null)) return true;
+        if (Mapper.getActionCards().keySet().containsAll(deckModel.getNewDeck())) return true;
         List<String> missingCardIDs = new ArrayList<>();
         for (String cardID : deckModel.getNewDeck()) {
-            if (Mapper.getActionCard(cardID) == null) missingCardIDs.add(cardID);
+            if (!Mapper.getActionCards().containsKey(cardID)) missingCardIDs.add(cardID);
         }
         System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `"
                 + missingCardIDs + "`");
@@ -111,13 +110,11 @@ class DeckModelTest extends BaseTi4Test {
         return false;
     }
 
-    // Explore decks may list extra copies as <id>extra1 / <id>extra2, the same suffix the bot uses when it
-    // triplicates explores at runtime; Mapper.getExplore strips it.
     private static boolean validateExploreDecks(DeckModel deckModel) {
-        if (deckModel.getNewDeck().stream().allMatch(cardID -> Mapper.getExplore(cardID) != null)) return true;
+        if (Mapper.getExplores().keySet().containsAll(deckModel.getNewDeck())) return true;
         List<String> missingCardIDs = new ArrayList<>();
         for (String cardID : deckModel.getNewDeck()) {
-            if (Mapper.getExplore(cardID) == null) missingCardIDs.add(cardID);
+            if (!Mapper.getExplores().containsKey(cardID)) missingCardIDs.add(cardID);
         }
         System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `"
                 + missingCardIDs + "`");

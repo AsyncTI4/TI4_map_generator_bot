@@ -26,28 +26,3 @@ into `BorderAnomalyModel` by `Mapper`.
   boundaries (commands, game load, map import). Hot paths use `Mapper.getBorderAnomaly`.
 - **Adding or changing a type means updating `BorderAnomalyModelTest`.** `Mapper` only logs JSON
   import errors, and Jackson ignores misspelt keys, so the test asserts the exact ids and rule values.
-
-## Cards: automation line (30k Content Lab set)
-
-Action cards, explores, relics and secret objectives may carry an optional `automation`
-(`AutomationStatus`) and `automationNotes`. When set, the card embed shows a
-`-# Bot: <status> — <notes>` line so players know whether the bot enforces the card.
-
-- **Optional in general, required for source `thirtyk`.** `ThirtyKCardsTest` fails if a 30k or JMSC
-  card has no `automation`, or is `PARTIAL`/`MANUAL` without notes. Other sets may add it card by card.
-- **Keep it accurate.** When you automate more of a card, raise its status and rewrite the notes to
-  say what players still do themselves.
-- **Ids have no underscores** for explores and relics (button ids are split on `_`). Copies of a card
-  end in a number (`conflagration30k1`); `ThirtyKCards.baseId` strips it.
-- **Card logic lives in `ti4.helpers.thirtyk`** (`ThirtyKActionCards`, `ThirtyKExplores`,
-  `ThirtyKRelics`, `ThirtyKSecrets`). Button handlers go in a `thirtyk` subfolder of the card
-  type's handler folder: `handlers/actioncards/thirtyk`, `handlers/explore/thirtyk` (attachments
-  too), `handlers/relics/thirtyk`, `handlers/objective/thirtyk`. Core files only call into these.
-- **Every hook called from core starts with `if (!ThirtyKCards.inUse(game)) return …;`.**
-  - `inUse` is true once any of the game's action card, secret objective, relic or explore decks contains
-    a 30k card. It stays true for the rest of the game (stored value `thirtyKInUse`), so cards still in play
-    keep working after a deck switch.
-  - Games that never use such a deck do no 30k work and get nothing stored.
-  - A 30k card added by hand to such a game shows its text but is not automated.
-- **"More than 5 hexes away"** is adjacency distance on the map: use `ThirtyKDistance`.
-- **"The Fracture"** is any tile where `Tile.isFracture()` is true.
