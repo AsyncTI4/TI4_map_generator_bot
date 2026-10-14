@@ -111,6 +111,64 @@ class FleetSupplyRulesTest extends BaseTi4Test {
         assertThat(decide(warning(), removals)).isEqualTo(REMOVE + "dn_black");
     }
 
+    // Losing both carriers leaves six fighters beside a dreadnought (capacity 1) and the space dock (3 fighters free):
+    // two fighters too many. The bot posts a "violating carrying capacity" warning with the same remove-units button;
+    // the AI opens it, removes fighters rather than its cruiser or dreadnought, and closes the buttons once they fit.
+    @Test
+    void removesExcessFightersWhenOverCapacity() {
+        home.removeUnit("space", ti4.helpers.Units.getUnitKey(UnitType.Carrier, "black"), 2);
+        test.units(home, "space", test.nekro, UnitType.Fighter, 4);
+        AiPrompt warning = AiTestGame.withContent(
+                prompt("warning", PromptSource.PUBLIC, NOW, OPEN, "deleteButtons"),
+                test.nekro.getRepresentationUnfogged() + ", you are violating carrying capacity in tile 301.");
+        AiPrompt removals = prompt(
+                "remove",
+                PromptSource.PUBLIC,
+                NOW + 1,
+                List.of(REMOVE + "dn_black", REMOVE + "ca_black", REMOVE + "ff_black", "deleteButtons"),
+                List.of());
+
+        assertThat(decide(warning)).isEqualTo(OPEN);
+        test.game.setStoredValue("nekrolatestAssignHits", "remove");
+
+        assertThat(decide(warning, removals)).isEqualTo(REMOVE + "ff_black");
+        home.removeUnit("space", ti4.helpers.Units.getUnitKey(UnitType.Fighter, "black"), 1);
+        assertThat(decide(warning, removals)).isEqualTo(REMOVE + "ff_black");
+        home.removeUnit("space", ti4.helpers.Units.getUnitKey(UnitType.Fighter, "black"), 1);
+
+        assertThat(decide(warning, removals)).isEqualTo("deleteButtons");
+    }
+
+    // With Fighter II the fighters beyond capacity spill into the fleet pool instead of breaking capacity. When that
+    // spill breaks the fleet limit, dropping a fighter is cheaper than scrapping the cruiser.
+    @Test
+    void removesASpilledFighterIIBeforeAShip() {
+        test.nekro.addTech("ff2");
+        test.nekro.setFleetCC(2);
+        home.removeUnit("space", ti4.helpers.Units.getUnitKey(UnitType.Carrier, "black"), 2);
+        test.units(home, "space", test.nekro, UnitType.Fighter, 4);
+        test.game.setStoredValue("nekrolatestAssignHits", "remove");
+
+        assertThat(ti4.helpers.ButtonHelper.fleetCheck(test.nekro, test.game, home)
+                        .capacityViolated())
+                .isFalse();
+        assertThat(decide(warning(), removals())).isEqualTo(REMOVE + "ff_black");
+    }
+
+    // Fighters inside capacity are never removed, even while the remove buttons are open for a fleet supply problem.
+    @Test
+    void keepsFightersThatFitWhileFixingFleetSupply() {
+        test.game.setStoredValue("nekrolatestAssignHits", "remove");
+        AiPrompt removals = prompt(
+                "remove",
+                PromptSource.PUBLIC,
+                NOW + 1,
+                List.of(REMOVE + "ff_black", REMOVE + "cv_black", "deleteButtons"),
+                List.of());
+
+        assertThat(decide(warning(), removals)).isEqualTo(REMOVE + "cv_black");
+    }
+
     // Within the fleet limit (another seat's warning, or one already resolved) the AI leaves its ships alone.
     @Test
     void leavesItsShipsAloneWithinTheFleetLimit() {

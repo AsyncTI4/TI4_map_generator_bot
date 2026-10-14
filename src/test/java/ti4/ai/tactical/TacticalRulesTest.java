@@ -449,6 +449,105 @@ class TacticalRulesTest extends BaseTi4Test {
                 .isEqualTo("FFCC_nekro_deleteButtons_tacticalAction_301");
     }
 
+    // Three planned fighters come as a pair and a single. After the pair only one is left, so the AI presses the
+    // single button: pressing the pair again would build a fourth fighter the plan never had room for.
+    @Test
+    void buildsOnlyTheFightersLeftWhenAPairWouldOvershootThePlan() {
+        test.game.setStoredValue("currentActionSummarynekro", " Activated 301 (Mordai II).");
+        test.game.setActiveSystem(AiTestGame.HOME);
+        test.memory.put(
+                TacticalRules.BUILD_KEY + test.context().turnKey(),
+                new ProductionPlanner.BuildPlan(List.of(
+                                new ProductionPlanner.BuildOrder(
+                                        "2ff", AiTestGame.HOME, UnitType.Fighter, 2, 1.0, 0.2, false, false),
+                                new ProductionPlanner.BuildOrder(
+                                        "fighter", AiTestGame.HOME, UnitType.Fighter, 1, 0.5, 0.1, false, false)))
+                        .encode());
+        AiPrompt production = prompt(
+                "production",
+                PromptSource.PUBLIC,
+                NOW,
+                List.of(
+                        "FFCC_nekro_place_2ff_301",
+                        "FFCC_nekro_place_fighter_301",
+                        "FFCC_nekro_deleteButtons_tacticalAction_301"),
+                List.of("Produce 2 Fighters", "Produce 1 Fighter", "Done Producing Units"));
+
+        assertThat(pressedId(
+                        TacticalRules.continueAction(test.context(production)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_place_2ff_301");
+
+        test.nekro.produceUnit("ff_301_space");
+        test.nekro.produceUnit("ff_301_space");
+        test.units(home, "space", test.nekro, UnitType.Fighter, 2);
+        assertThat(pressedId(
+                        TacticalRules.continueAction(test.context(production)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_place_fighter_301");
+    }
+
+    // The planned fighters only fit aboard the planned carrier. Ships are placed before fighters, so the carrier goes
+    // down first even though the plan lists the fighters ahead of it.
+    @Test
+    void placesTheCarrierBeforeTheFightersItCarries() {
+        test.game.setStoredValue("currentActionSummarynekro", " Activated 301 (Mordai II).");
+        test.game.setActiveSystem(AiTestGame.HOME);
+        // Carrier (4) + dreadnought (1) + the dock's 3 free fighters: eight fighters already fill the space area.
+        test.units(home, "space", test.nekro, UnitType.Fighter, 8);
+        test.memory.put(TacticalRules.BUILD_KEY + test.context().turnKey(), fightersThenCarrier());
+        AiPrompt production = carrierAndFighterButtons();
+
+        assertThat(pressedId(
+                        TacticalRules.continueAction(test.context(production)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_place_carrier_301");
+
+        test.nekro.produceUnit("cv_301_space");
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        assertThat(pressedId(
+                        TacticalRules.continueAction(test.context(production)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_place_2ff_301");
+    }
+
+    // If the carrier the fighters were planned for cannot be built (here its button is missing), the AI checks the
+    // space area's real capacity and builds no fighters it would have to remove again.
+    @Test
+    void buildsNoFightersBeyondCapacityWhenTheirCarrierIsNotBuilt() {
+        test.game.setStoredValue("currentActionSummarynekro", " Activated 301 (Mordai II).");
+        test.game.setActiveSystem(AiTestGame.HOME);
+        test.units(home, "space", test.nekro, UnitType.Fighter, 8);
+        test.memory.put(TacticalRules.BUILD_KEY + test.context().turnKey(), fightersThenCarrier());
+        AiPrompt production = prompt(
+                "production",
+                PromptSource.PUBLIC,
+                NOW,
+                List.of("FFCC_nekro_place_2ff_301", "FFCC_nekro_deleteButtons_tacticalAction_301"),
+                List.of("Produce 2 Fighters", "Done Producing Units"));
+
+        assertThat(pressedId(
+                        TacticalRules.continueAction(test.context(production)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_deleteButtons_tacticalAction_301");
+    }
+
+    private static String fightersThenCarrier() {
+        return new ProductionPlanner.BuildPlan(List.of(
+                        new ProductionPlanner.BuildOrder(
+                                "2ff", AiTestGame.HOME, UnitType.Fighter, 2, 1.0, 0.2, false, false),
+                        new ProductionPlanner.BuildOrder(
+                                "carrier", AiTestGame.HOME, UnitType.Carrier, 1, 3.0, 2.5, false, false)))
+                .encode();
+    }
+
+    private static AiPrompt carrierAndFighterButtons() {
+        return prompt(
+                "production",
+                PromptSource.PUBLIC,
+                NOW,
+                List.of(
+                        "FFCC_nekro_place_2ff_301",
+                        "FFCC_nekro_place_carrier_301",
+                        "FFCC_nekro_deleteButtons_tacticalAction_301"),
+                List.of("Produce 2 Fighters", "Produce Carrier", "Done Producing Units"));
+    }
+
     // Only pairs of infantry or fighters have a single-unit fallback; a missing ship button means the AI is done
     // building.
     @Test
