@@ -60,7 +60,7 @@ public class ThirtyKSecretHooks {
                 Buttons.red(holder.factionButtonChecker() + "deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
                 holder.getCardsInfoThread(),
-                holder.getRepresentationUnfogged() + ", " + reason + " If so, you may score _" + so.getName() + "_.",
+                holder.getRepresentationUnfogged() + ", " + reason + " Score _" + so.getName() + "_ if you qualify.",
                 buttons);
     }
 
@@ -74,19 +74,19 @@ public class ThirtyKSecretHooks {
             offerScore(
                     previousOwner,
                     RELINQUISH_TECHNOLOGY,
-                    "you lost control of " + planetName + ", which has an attachment.");
+                    "you have handed over " + planetName + ", attachment and all.");
         }
         if (hasStructure(game, planet)) {
             offerScore(
                     previousOwner,
                     PLANNED_OBSOLESCENCE,
-                    "you lost control of " + planetName + ", which has a structure on it.");
+                    "you have abandoned " + planetName + " and the structure on it.");
         } else if (previousOwner.getSecretsUnscored().containsKey(PLANNED_OBSOLESCENCE)) {
             offerScore(
                     previousOwner,
                     PLANNED_OBSOLESCENCE,
-                    "you lost control of " + planetName
-                            + ". The bot sees no structure there now; if it held one when you lost control (and it was removed first), you qualify.");
+                    "you have abandoned " + planetName
+                            + ". No structure stands there now, but you qualify if one stood there when you lost control.");
         }
     }
 
@@ -134,13 +134,13 @@ public class ThirtyKSecretHooks {
         if (!reprimanded && !grandEntrance) return;
         if (!markOnce(game, "space+" + tile.getPosition() + "+" + loser.getFaction())) return;
         if (reprimanded) {
-            offerScore(loser, REPRIMANDED, "the bot thinks you just lost a space combat at or next to Mecatol Rex.");
+            offerScore(loser, REPRIMANDED, "the Council watched your fleet fall at or next to Mecatol Rex.");
         }
         if (grandEntrance) {
             offerScore(
                     winner,
                     A_GRAND_ENTRANCE,
-                    "the bot thinks you just won a space combat with your flagship more than 5 hexes from where it started this action.");
+                    "your flagship swept in from more than 5 hexes away and won the space combat.");
         }
     }
 
@@ -171,8 +171,8 @@ public class ThirtyKSecretHooks {
         offerScore(
                 winner,
                 EXPLOIT_EXHAUSTION,
-                "the bot thinks you just won a ground combat on "
-                        + Helper.getPlanetRepresentation(planet.getName(), game) + " against a player who had passed.");
+                "you caught a passed player off guard and won the ground combat on "
+                        + Helper.getPlanetRepresentation(planet.getName(), game) + ".");
     }
 
     public static void onPassed(Game game, Player player) {
@@ -181,7 +181,10 @@ public class ThirtyKSecretHooks {
         boolean anyoneElsePassed =
                 game.getRealPlayers().stream().filter(p -> p != player).anyMatch(Player::isPassed);
         if (anyoneElsePassed) return;
-        offerScore(player, QUICK_DELIBERATIONS, "you are the first player to pass this round.");
+        offerScore(
+                player,
+                QUICK_DELIBERATIONS,
+                "the debate was over before it began: you are the first player to pass this round.");
     }
 
     public static void onAgendaResolved(Game game) {
@@ -248,7 +251,7 @@ public class ThirtyKSecretHooks {
             Map<Player, Integer> votes = votesByOutcome.get(side);
             if (votes == null || votes.size() != 1) continue;
             Player lone = votes.keySet().iterator().next();
-            offerScore(lone, POLICY_DEFIANCE, "the bot thinks you were the only player to vote \"" + side + "\".");
+            offerScore(lone, POLICY_DEFIANCE, "you stood alone as the only player to vote \"" + side + "\".");
         }
     }
 
@@ -257,7 +260,10 @@ public class ThirtyKSecretHooks {
         votesByOutcome.values().forEach(votes -> votes.forEach((p, amount) -> totals.merge(p, amount, Integer::sum)));
         Player top = soleTopVoter(totals);
         if (top != null) {
-            offerScore(top, POLICY_MAKER, "the bot thinks you cast more votes on this agenda than any other player.");
+            offerScore(
+                    top,
+                    POLICY_MAKER,
+                    "your voice carried the chamber: you cast more votes on this agenda than any other player.");
         }
     }
 
@@ -282,7 +288,7 @@ public class ThirtyKSecretHooks {
             offerScore(
                     player,
                     POLICY_INDIFFERENCE,
-                    "the agenda phase is ending, you cast no votes and all your planets are ready. "
+                    "the agenda phase ends without a word from you: no votes cast and all your planets ready. "
                             + "Check that you also played no before/after agenda action cards.");
         }
     }
@@ -299,7 +305,7 @@ public class ThirtyKSecretHooks {
                 offerScore(
                         holder,
                         UNDER_OUR_SUPERVISION,
-                        "another player gained a victory point via **Imperial** while you have ships next to Mecatol Rex or their home system.");
+                        "another player claimed a victory point via **Imperial** while your ships watched from next to Mecatol Rex or their home system.");
             }
         }
     }

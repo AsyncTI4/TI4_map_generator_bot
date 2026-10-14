@@ -66,10 +66,10 @@ public class ThirtyKEconomyAcButtonHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", you placed " + amount
-                        + " trade goods on _Compound Interest_ (" + player.getTg() + " left). At the start of the next"
-                        + " strategy phase you gain " + ThirtyKAcState.compoundInterest(game, player) * 2
-                        + " trade goods.");
+                player.getRepresentationUnfogged() + ", your brokers lock " + amount
+                        + " trade goods into _Compound Interest_ (" + player.getTg() + " left); it pays out "
+                        + ThirtyKAcState.compoundInterest(game, player) * 2
+                        + " trade goods at the start of the next strategy phase.");
     }
 
     @ButtonHandler(SIPHON_START)
@@ -99,7 +99,7 @@ public class ThirtyKEconomyAcButtonHandler {
         ButtonHelper.deleteMessage(event);
         ThirtyKAcTargets.send(
                 player,
-                player.getRepresentationUnfogged() + ", take up to 1 commodity or trade good from each of two players"
+                player.getRepresentationUnfogged() + ", take up to 1 commodity or trade good from each of 2 players"
                         + " whose home systems are more than 5 hexes from yours.",
                 buttons);
     }
@@ -122,20 +122,21 @@ public class ThirtyKEconomyAcButtonHandler {
         if (!takeOne(target, tradeGood)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", nothing was taken; this pick was not used up.");
+                    player.getRepresentationUnfogged()
+                            + ", those coffers were already empty; nothing was taken and this pick is not used up.");
             return;
         }
         ThirtyKAcState.addSiphonTarget(game, player, target);
         player.gainTG(1, true);
-        String actorMessage = player.getRepresentationUnfogged() + ", you siphoned 1 " + what + " from "
-                + ThirtyKAcTargets.name(game, target, player) + " and gained 1 trade good (" + player.getTg()
-                + " now).";
+        String actorMessage = player.getRepresentationUnfogged() + ", unmarked transports slip out of "
+                + ThirtyKAcTargets.name(game, target, player) + "'s docks with 1 " + what
+                + " (_Siphon Funds_); you now have " + player.getTg() + " trade goods.";
         FoWHelper.notifyActorAndAffectedElsePublic(
                 game,
                 player,
                 actorMessage,
                 target,
-                target.getRepresentationUnfogged() + ", _Siphon Funds_ took 1 " + what + " from you.",
+                target.getRepresentationUnfogged() + ", your ledgers come up 1 " + what + " short (_Siphon Funds_).",
                 actorMessage);
         if (ThirtyKAcState.siphonTargets(game, player).size() >= 2) {
             ThirtyKAcState.clearSiphonTargets(game, player);
@@ -181,11 +182,13 @@ public class ThirtyKEconomyAcButtonHandler {
                             + (game.isFowMode()
                                     ? PlanetTargetService.fizzleMessage()
                                     : target.getRepresentationNoPing()
-                                            + " cannot spend 2 trade goods, so _Unverified Forgeries_ has no effect."));
+                                            + " cannot spend 2 trade goods, so the forged deeds go nowhere;"
+                                            + " _Unverified Forgeries_ has no effect."));
             MessageHelper.sendMessageToChannel(
                     target.getCorrectChannel(),
                     target.getRepresentationUnfogged()
-                            + ", _Unverified Forgeries_ targeted you, but you cannot spend 2 trade goods, so it has no effect.");
+                            + ", forged deeds bearing your seal surfaced, but you cannot spend 2 trade goods, so"
+                            + " _Unverified Forgeries_ has no effect.");
             return;
         }
         List<Button> buttons = List.of(
@@ -218,10 +221,13 @@ public class ThirtyKEconomyAcButtonHandler {
         FoWHelper.notifyActorAndAffectedElsePublic(
                 game,
                 player,
-                player.getRepresentationUnfogged() + ", you spent 2 trade goods against _Unverified Forgeries_.",
+                player.getRepresentationUnfogged()
+                        + ", you paid 2 trade goods to have the forged deeds burned (_Unverified Forgeries_).",
                 actor,
-                actor.getRepresentationUnfogged() + ", your target spent 2 trade goods; _Unverified Forgeries_ ends.",
-                player.getRepresentationNoPing() + " spent 2 trade goods against _Unverified Forgeries_.");
+                actor.getRepresentationUnfogged()
+                        + ", your target paid 2 trade goods to discredit the forgeries; _Unverified Forgeries_ ends.",
+                player.getRepresentationNoPing()
+                        + " paid 2 trade goods to have the forged deeds burned (_Unverified Forgeries_).");
     }
 
     @ButtonHandler(FORGERIES_REFUSE)
@@ -244,7 +250,9 @@ public class ThirtyKEconomyAcButtonHandler {
         buttons.add(Buttons.gray(actor.factionButtonChecker() + "deleteButtons", "Done"));
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", you refused to pay for _Unverified Forgeries_.");
+                player.getRepresentationUnfogged()
+                        + ", you refused to pay; the forgers now move on your relic fragments"
+                        + " (_Unverified Forgeries_).");
         MessageHelper.sendMessageToChannelWithButtons(
                 actor.getCorrectChannel(),
                 actor.getRepresentationUnfogged()
@@ -278,11 +286,13 @@ public class ThirtyKEconomyAcButtonHandler {
         FoWHelper.notifyActorAndAffectedElsePublic(
                 game,
                 player,
-                player.getRepresentationUnfogged() + ", you took _" + fragmentName + "_ with _Unverified Forgeries_.",
+                player.getRepresentationUnfogged() + ", forged deed in hand, you claim _" + fragmentName
+                        + "_ (_Unverified Forgeries_).",
                 target,
-                target.getRepresentationUnfogged() + ", _Unverified Forgeries_ took your _" + fragmentName + "_.",
-                player.getRepresentationNoPing() + " took _" + fragmentName + "_ from "
-                        + target.getRepresentationNoPing() + " with _Unverified Forgeries_.");
+                target.getRepresentationUnfogged() + ", a forged deed of transfer strips you of _" + fragmentName
+                        + "_ (_Unverified Forgeries_).",
+                player.getRepresentationNoPing() + " claimed _" + fragmentName + "_ from "
+                        + target.getRepresentationNoPing() + " with a forged deed (_Unverified Forgeries_).");
         if (taken + 1 >= 2) ButtonHelper.deleteMessage(event);
     }
 
@@ -337,12 +347,13 @@ public class ThirtyKEconomyAcButtonHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithEmbed(
                 actor.getCardsInfoThread(),
-                actor.getRepresentationUnfogged() + ", " + ThirtyKAcTargets.name(game, player, actor)
-                        + " showed you a secret objective for _Price of Information_:",
+                actor.getRepresentationUnfogged() + ", the information you paid for arrives from "
+                        + ThirtyKAcTargets.name(game, player, actor) + " (_Price of Information_):",
                 model.getRepresentationEmbed());
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", you showed _" + model.getName() + "_.");
+                player.getRepresentationUnfogged() + ", you let _" + model.getName()
+                        + "_ slip to your buyer for 2 commodities (_Price of Information_).");
         ButtonHelperStats.gainComms(event, game, player, 2, false);
     }
 
@@ -353,7 +364,8 @@ public class ThirtyKEconomyAcButtonHandler {
         if (actor == null) return;
         MessageHelper.sendMessageToChannel(
                 actor.getCorrectChannel(),
-                actor.getRepresentationUnfogged() + ", your target declined _Price of Information_.");
+                actor.getRepresentationUnfogged()
+                        + ", your target kept their secrets and declined _Price of Information_.");
     }
 
     public static List<Button> reprimandButtons(Game game, Player player) {
@@ -397,7 +409,7 @@ public class ThirtyKEconomyAcButtonHandler {
             MessageHelper.sendMessageToChannel(
                     actor.getCorrectChannel(),
                     actor.getRepresentationUnfogged()
-                            + ", your target chose to pay 3 influence for _Public Reprimand_.");
+                            + ", your target pays 3 influence to quiet the scandal (_Public Reprimand_).");
         }
     }
 
@@ -409,13 +421,14 @@ public class ThirtyKEconomyAcButtonHandler {
         player.setTg(0);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", you lost all " + lost
-                        + " of your trade goods to _Public Reprimand_.");
+                player.getRepresentationUnfogged() + ", the Council's censure costs you all " + lost
+                        + " of your trade goods (_Public Reprimand_).");
         if (actor != null) {
             MessageHelper.sendMessageToChannel(
                     actor.getCorrectChannel(),
                     actor.getRepresentationUnfogged()
-                            + ", your target chose to lose all of their trade goods for _Public Reprimand_.");
+                            + ", your target would not pay and must lose all of their trade goods"
+                            + " (_Public Reprimand_).");
         }
     }
 
@@ -455,9 +468,9 @@ public class ThirtyKEconomyAcButtonHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", you backed " + ThirtyKAcTargets.name(game, target, player)
-                        + " with _War Profiteering_. If they win the space combat in the active system, you gain 4"
-                        + " trade goods.");
+                player.getRepresentationUnfogged() + ", your financiers quietly bankroll "
+                        + ThirtyKAcTargets.name(game, target, player)
+                        + " (_War Profiteering_); if they win this space combat, you gain 4 trade goods.");
     }
 
     @ButtonHandler(ANTIDIS)
@@ -478,8 +491,8 @@ public class ThirtyKEconomyAcButtonHandler {
         if (loser == player) return;
         MessageHelper.sendMessageToChannelWithButtons(
                 loser.getCorrectChannel(),
-                loser.getRepresentationUnfogged() + ", _Antidisestablishmentarianism_ lets you replenish your"
-                        + " commodities after losing a structure.",
+                loser.getRepresentationUnfogged() + ", reconstruction funds arrive after your loss; you may"
+                        + " replenish your commodities (_Antidisestablishmentarianism_).",
                 List.of(
                         Buttons.green(loser.factionButtonChecker() + ANTIDIS_REPLENISH, "Replenish Commodities"),
                         Buttons.red(loser.factionButtonChecker() + "deleteButtons", "Decline")));
@@ -514,7 +527,7 @@ public class ThirtyKEconomyAcButtonHandler {
         ButtonHelper.deleteMessage(event);
         ThirtyKAcTargets.send(
                 player,
-                player.getRepresentationUnfogged() + ", gain up to two of the relic fragments that were purged.",
+                player.getRepresentationUnfogged() + ", gain up to 2 of the relic fragments that were purged.",
                 buttons);
     }
 
@@ -536,7 +549,8 @@ public class ThirtyKEconomyAcButtonHandler {
                 : Mapper.getExplore(fragment).getName();
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", you gained _" + name + "_ with _Preservation Act_.");
+                player.getRepresentationUnfogged() + ", your archivists rescue _" + name
+                        + "_ from destruction (_Preservation Act_).");
         if (gained + 1 >= 2) ButtonHelper.deleteMessage(event);
     }
 

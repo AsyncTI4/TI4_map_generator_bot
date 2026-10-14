@@ -61,7 +61,7 @@ public class ThirtyKIndustrialExploreHandler {
                 game,
                 player,
                 "res",
-                player.getRepresentationNoPing() + " placed a space dock on "
+                "The old facilities roar back to life: " + player.getRepresentationNoPing() + " places a space dock on "
                         + Helper.getPlanetRepresentation(planetID, game)
                         + " (_Repurposed Facilities_). Please spend 5 resources.");
     }
@@ -107,8 +107,9 @@ public class ThirtyKIndustrialExploreHandler {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "mech " + planetID);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " replaced 1 infantry with 1 mech on "
-                        + Helper.getPlanetRepresentation(planetID, game) + ".");
+                "Following the manual to the letter, " + player.getRepresentationNoPing()
+                        + " refits 1 infantry into 1 mech on " + Helper.getPlanetRepresentation(planetID, game)
+                        + " (_Military Procedural Documents_).");
         ThirtyKExploreSupport.deleteMessage(event);
     }
 
@@ -151,12 +152,17 @@ public class ThirtyKIndustrialExploreHandler {
         }
         if (attachments > 0) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "_Foresight of Industry_ counts " + attachments + " attachments on nearby planets.");
+                    event,
+                    "Survey reports pour in from " + attachments + " attachment" + (attachments == 1 ? "" : "s")
+                            + " on nearby planets: gain " + attachments + " commodit"
+                            + (attachments == 1 ? "y" : "ies") + " (_Foresight of Industry_).");
             ButtonHelperStats.gainComms(event, game, player, attachments, false);
             return;
         }
         MessageHelper.sendMessageToEventChannel(
-                event, "No nearby planet has an attachment, so the next industrial exploration card is resolved.");
+                event,
+                "No nearby industry to report on, so the surveyors dig deeper: the next industrial exploration card is"
+                        + " resolved (_Foresight of Industry_).");
         revealNextIndustrial(event, game, player, planetID);
     }
 

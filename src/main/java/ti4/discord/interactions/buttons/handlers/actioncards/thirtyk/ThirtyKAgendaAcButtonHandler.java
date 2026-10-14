@@ -33,7 +33,7 @@ public class ThirtyKAgendaAcButtonHandler {
     @ButtonHandler(RIDER_COPY_LIST)
     public static void riderCopyList(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String mode = buttonID.substring(RIDER_COPY_LIST.length());
-        String cardName = OPPOSITE.equals(mode) ? "Objection Gambit" : "Hide within the Fine Print";
+        String cardName = OPPOSITE.equals(mode) ? "Objection Gambit" : "Hide Within the Fine Print";
         List<Button> buttons = new ArrayList<>();
         for (RiderEntry entry : ThirtyKAgendaRiders.copyableRiders(game.getCurrentAgendaVotes())) {
             String outcome = OPPOSITE.equals(mode)
@@ -80,8 +80,8 @@ public class ThirtyKAgendaAcButtonHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 game.isFowMode() ? player.getCorrectChannel() : game.getMainGameChannel(),
-                FoWHelper.actorOrAnon(game, player, "A player") + " follows the text of a _" + rider + "_ on \""
-                        + StringUtils.capitalize(outcome) + "\".");
+                FoWHelper.actorOrAnon(game, player, "A player") + " invokes an obscure clause and follows the text"
+                        + " of a _" + rider + "_ on \"" + StringUtils.capitalize(outcome) + "\".");
     }
 
     public static List<Button> subjectiveJusticeButtons(Game game, Player player) {
@@ -111,8 +111,8 @@ public class ThirtyKAgendaAcButtonHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", you cast " + SUBJECTIVE_VOTES + " additional votes for \""
-                        + outcome + "\" with _Subjective Justice_.");
+                player.getRepresentationUnfogged() + ", seen from afar the verdict looks clear: you cast "
+                        + SUBJECTIVE_VOTES + " additional votes for \"" + outcome + "\" (_Subjective Justice_).");
     }
 
     private static String votedOutcome(Game game, Player voter) {

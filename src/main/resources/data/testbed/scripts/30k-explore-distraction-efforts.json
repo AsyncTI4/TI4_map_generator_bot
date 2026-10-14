@@ -8,7 +8,7 @@
     { "do": "stackExplore", "value": "distractionefforts30k" },
     { "as": "sol", "pressId": "FFCC_{sol.faction}_exploreFront_317" },
     { "expect": { "state": "sol.tg", "equals": "6" } },
-    { "expect": { "in": "sol:cards-info", "contains": "extra component action", "buttons": ["componentAction"] } },
+    { "expect": { "in": "sol:cards-info", "contains": "additional component action", "buttons": ["componentAction"] } },
     { "expect": { "state": "game.exploreDiscard", "contains": "distractionefforts30k" } }
   ]
 }

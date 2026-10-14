@@ -68,8 +68,9 @@ public class ThirtyKAttachmentHandler {
         game.setStoredValue(key, marker);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationNoPing() + " exhausted " + Helper.getPlanetRepresentation(planetID, game)
-                        + " and _Profitable Factories_ with it.");
+                "The factories on " + Helper.getPlanetRepresentation(planetID, game) + " turn a tidy profit: "
+                        + player.getRepresentationNoPing() + " gains 1 trade good and _Profitable Factories_ is"
+                        + " exhausted.");
         ButtonHelperStats.gainTGs(event, game, player, 1, false);
     }
 
@@ -104,8 +105,10 @@ public class ThirtyKAttachmentHandler {
         buttons.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " readied " + Helper.getPlanetRepresentation(planetID, game)
-                        + " and placed 1 infantry on it. Please spend " + planet.getResources() + " influence.",
+                "The colony rallies: " + player.getRepresentationNoPing() + " readies "
+                        + Helper.getPlanetRepresentation(planetID, game)
+                        + " and 1 infantry joins its garrison (_Carbon Consciousness_). Please spend "
+                        + planet.getResources() + " influence.",
                 buttons);
     }
 
@@ -155,7 +158,8 @@ public class ThirtyKAttachmentHandler {
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", " + amount + " infantry arrived on "
                         + Helper.getPlanetRepresentation(planetID, game)
-                        + ", which has _Inhospitable Environment_: roll 1 die each, every 3 or less destroys 1 infantry.",
+                        + ", which has _Inhospitable Environment_: roll 1 die for each, and each 3 or less destroys 1"
+                        + " infantry.",
                 List.of(Buttons.red(
                         player.factionButtonChecker() + INHOSPITABLE_ROLL + tile.getPosition() + "_" + amount + "_"
                                 + planetID,
@@ -180,8 +184,8 @@ public class ThirtyKAttachmentHandler {
         }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " rolled " + results + " for _Inhospitable Environment_ and lost "
-                        + destroyed + " infantry.");
+                "The hostile world takes its toll: " + player.getRepresentationNoPing() + " rolled " + results
+                        + " and lost " + destroyed + " infantry (_Inhospitable Environment_).");
     }
 
     private static void offerProductionRelay(GenericInteractionCreateEvent event, Game game, Player player) {
@@ -250,8 +254,8 @@ public class ThirtyKAttachmentHandler {
         AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " ff");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " placed " + amount + " fighter" + (amount == 1 ? "" : "s")
-                        + " with _Defensive Bastion_.");
+                "The bastion's hangars open: " + player.getRepresentationNoPing() + " launches " + amount + " fighter"
+                        + (amount == 1 ? "" : "s") + " (_Defensive Bastion_).");
     }
 
     public static int extraPlanetProduction(UnitHolder holder, int unitProduction) {

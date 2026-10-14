@@ -41,12 +41,14 @@ public class ThirtyKCulturalExploreHandler {
     public static void resolveSharedWealth(GenericInteractionCreateEvent event, Game game, Player player, Tile tile) {
         List<Player> eligible = playersWithUnitsInOrAdjacent(game, player, tile);
         if (eligible.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No player has units adjacent to this planet.");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "The colony opens its stores, but no player has units adjacent to this planet.");
             return;
         }
         MessageHelper.sendMessageToEventChannel(
                 event,
-                "Each player with units adjacent to this planet has been offered 1 action card through _Shared Wealth_.");
+                "The colony throws its stores open: each player with units adjacent to this planet may draw 1 action"
+                        + " card (_Shared Wealth_).");
         for (Player other : eligible) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green(
@@ -65,12 +67,14 @@ public class ThirtyKCulturalExploreHandler {
         ActionCardHelper.drawActionCards(player, 1);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " drew 1 action card through _Shared Wealth_.");
+                player.getRepresentationNoPing()
+                        + " accepts a share of the colony's stores and draws 1 action card (_Shared Wealth_).");
         if (explorer != null) {
             MessageHelper.sendMessageToChannel(
                     explorer.getCorrectChannel(),
                     explorer.getRepresentationUnfogged() + ", " + FoWHelper.actorOrAnon(game, player, "a player")
-                            + " drew an action card through your _Shared Wealth_.");
+                            + " accepted your hospitality and drew 1 action card; you gain 1 trade good"
+                            + " (_Shared Wealth_).");
             ButtonHelperStats.gainTGs(event, game, explorer, 1, false);
         }
         ThirtyKExploreSupport.deleteMessage(event);
@@ -86,8 +90,7 @@ public class ThirtyKCulturalExploreHandler {
                 if (planet.isLegendary() && !planet.getName().equals(planetID)) count++;
             }
         }
-        MessageHelper.sendMessageToEventChannel(
-                event, "_Tourism Bureau_ counts " + count + " adjacent wormholes, anomalies and legendary planets.");
+        MessageHelper.sendMessageToEventChannel(event, tourismMessage(count));
         if (count > 0) ButtonHelperStats.gainComms(event, game, player, count, false);
     }
 
@@ -107,7 +110,8 @@ public class ThirtyKCulturalExploreHandler {
             }
         }
         if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "You have no ships in adjacent systems to move.");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "The shipment arrives unescorted: you have no ships in adjacent systems to move.");
             return;
         }
         List<Button> choices = ThirtyKExploreSupport.capped(buttons);
@@ -140,8 +144,8 @@ public class ThirtyKCulturalExploreHandler {
                         .toList());
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " moved 1 " + type.humanReadableName() + " into "
-                        + to.getRepresentationForButtons(game, player) + " with _Direct Import_.");
+                player.getRepresentationNoPing() + " escorts the import convoy in: 1 " + type.humanReadableName()
+                        + " moves into " + to.getRepresentationForButtons(game, player) + " (_Direct Import_).");
         ThirtyKExploreSupport.deleteMessage(event);
     }
 
@@ -158,7 +162,9 @@ public class ThirtyKCulturalExploreHandler {
         }
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "You have no commodities or trade goods to spend on _Initial Investment Surplus_.");
+                    event,
+                    "The investors are willing, but you have no commodities or trade goods to spend (_Initial"
+                            + " Investment Surplus_).");
             return;
         }
         buttons.add(ThirtyKExploreSupport.decline(player));
@@ -185,8 +191,9 @@ public class ThirtyKCulturalExploreHandler {
         PlanetService.refreshPlanet(player, planetID);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " spent 1 " + (commodity ? "commodity" : "trade good") + " to ready "
-                        + Helper.getPlanetRepresentation(planetID, game) + ".");
+                player.getRepresentationNoPing() + " reinvests 1 " + (commodity ? "commodity" : "trade good")
+                        + " and " + Helper.getPlanetRepresentation(planetID, game)
+                        + " is back at work (_Initial Investment Surplus_).");
         ThirtyKExploreSupport.deleteMessage(event);
     }
 
@@ -203,8 +210,16 @@ public class ThirtyKCulturalExploreHandler {
         AddUnitService.addUnits(event, tile, game, player.getColor(), infantry + " inf " + planetID);
         MessageHelper.sendMessageToEventChannel(
                 event,
-                player.getRepresentationNoPing() + " placed " + infantry + " infantry on "
-                        + Helper.getPlanetRepresentation(planetID, game) + " with _Cross-species Mingling_.");
+                "Settlers of many species join the colony: " + player.getRepresentationNoPing() + " places "
+                        + infantry + " infantry on " + Helper.getPlanetRepresentation(planetID, game)
+                        + " (_Cross-species Mingling_).");
+    }
+
+    private static String tourismMessage(int count) {
+        if (count == 0) return "No wonders nearby draw a single tourist (_Tourism Bureau_).";
+        return "Tourists flock to " + count + " nearby wonder" + (count == 1 ? "" : "s")
+                + " (wormholes, anomalies and legendary planets): gain " + count + " commodit"
+                + (count == 1 ? "y" : "ies") + " (_Tourism Bureau_).";
     }
 
     private static boolean hasForeignInfantry(Player player, Planet planet) {
@@ -242,8 +257,9 @@ public class ThirtyKCulturalExploreHandler {
         ActionCardHelper.drawActionCards(player, 1);
         MessageHelper.sendMessageToEventChannel(
                 event,
-                player.getRepresentationNoPing()
-                        + " drew 1 action card; each neighbor has been offered the promissory note trade.");
+                "The festival opens to great fanfare: " + player.getRepresentationNoPing()
+                        + " draws 1 action card, and each neighbor may bring a promissory note as a gift (_Faux"
+                        + " Altruistic Festivals_).");
     }
 
     @ButtonHandler(FAUX_GIVE)
@@ -265,7 +281,8 @@ public class ThirtyKCulturalExploreHandler {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing()
-                        + " gave a promissory note and drew 1 action card (_Faux Altruistic Festivals_).");
+                        + " brings a promissory note to the festival and draws 1 action card in return (_Faux"
+                        + " Altruistic Festivals_).");
         ThirtyKExploreSupport.deleteMessage(event);
     }
 

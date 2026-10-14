@@ -83,16 +83,16 @@ public class ThirtyKPoliticsAcButtonHandler {
         }
         ButtonHelper.deleteMessage(event);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
-        String purged = player.getRepresentationUnfogged() + ", you purged a _Support for the Throne_ with"
-                + " _Denounce Leadership_ and drew a secret objective.";
+        String purged = player.getRepresentationUnfogged() + ", you publicly denounce your patron: _Support for the"
+                + " Throne_ is purged and you draw a secret objective (_Denounce Leadership_).";
         if (owner != null && owner != player) {
             FoWHelper.notifyPlayerAndAffectedInFog(
                     game,
                     player,
                     purged,
                     owner,
-                    owner.getRepresentationUnfogged() + ", your _Support for the Throne_ was purged by"
-                            + " _Denounce Leadership_.");
+                    owner.getRepresentationUnfogged() + ", your _Support for the Throne_ was torn up in a public"
+                            + " denunciation and purged (_Denounce Leadership_).");
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), purged);
         }
@@ -131,7 +131,7 @@ public class ThirtyKPoliticsAcButtonHandler {
                     sc + " " + Helper.getSCName(sc, game)));
         }
         if (buttons.isEmpty()) {
-            ThirtyKAcTargets.noTarget(event, player, "Devisive Plot");
+            ThirtyKAcTargets.noTarget(event, player, "Divisive Plot");
             return;
         }
         ButtonHelper.deleteMessage(event);
@@ -150,7 +150,7 @@ public class ThirtyKPoliticsAcButtonHandler {
         if (player.getStrategicCC() < 1) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "_Devisive Plot_ needs a command token from your strategy pool, and yours is empty.");
+                    "_Divisive Plot_ needs a command token from your strategy pool, and yours is empty.");
             return;
         }
         player.setStrategicCC(player.getStrategicCC() - 1);
@@ -159,8 +159,9 @@ public class ThirtyKPoliticsAcButtonHandler {
         buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Resolving"));
         ThirtyKAcTargets.send(
                 player,
-                player.getRepresentationUnfogged() + ", perform the secondary of " + Helper.getSCName(sc, game)
-                        + " with _Devisive Plot_. 1 command token was taken from your strategy pool."
+                player.getRepresentationUnfogged() + ", your agents subvert " + Helper.getSCName(sc, game)
+                        + ": 1 command token is spent from your strategy pool; resolve its secondary ability"
+                        + " (_Divisive Plot_)."
                         + (buttons.size() == 1 ? " This card has no secondary buttons; resolve it manually." : ""),
                 buttons);
     }
@@ -182,8 +183,8 @@ public class ThirtyKPoliticsAcButtonHandler {
         MessageHelper.sendMessageToChannel(
                 target.getCorrectChannel(),
                 target.getRepresentationUnfogged() + ", " + FoWHelper.factionEmojiOrAnon(game, player, "a player")
-                        + " may resolve a transaction with you through _Extended Campaigning_. If you accept it, you"
-                        + " may ready your agent.");
+                        + " sends envoys bearing gifts. If you accept a transaction with them this turn, you may ready"
+                        + " your agent (_Extended Campaigning_).");
     }
 
     public static void offerAgentReady(Game game, Player target) {
@@ -197,7 +198,7 @@ public class ThirtyKPoliticsAcButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),
                 target.getRepresentationUnfogged()
-                        + ", you accepted the _Extended Campaigning_ transaction, so you may ready your agent.",
+                        + ", the deal is struck, so you may ready your agent (_Extended Campaigning_).",
                 agents);
     }
 
@@ -216,7 +217,8 @@ public class ThirtyKPoliticsAcButtonHandler {
         MessageHelper.sendMessageToChannel(
                 target.getCorrectChannel(),
                 target.getRepresentationUnfogged() + ", " + FoWHelper.factionEmojiOrAnon(game, player, "a player")
-                        + " may resolve transactions with you this turn as if you were neighbors (_Trade Ships_).");
+                        + " sends trade ships your way; you may transact this turn as if you were neighbors"
+                        + " (_Trade Ships_).");
     }
 
     private static void grantTransaction(
@@ -225,9 +227,9 @@ public class ThirtyKPoliticsAcButtonHandler {
         ButtonHelper.deleteMessage(event);
         ThirtyKAcTargets.send(
                 player,
-                player.getRepresentationUnfogged() + ", you may transact with "
-                        + ThirtyKAcTargets.name(game, target, player) + " this turn as if you were neighbors (_"
-                        + cardName + "_).",
+                player.getRepresentationUnfogged() + ", a trade corridor opens to "
+                        + ThirtyKAcTargets.name(game, target, player)
+                        + "; you may transact this turn as if you were neighbors (_" + cardName + "_).",
                 List.of(Buttons.green(
                         player.factionButtonChecker() + "transactWith_" + target.getColor(), "Start Transaction")));
     }
@@ -244,7 +246,8 @@ public class ThirtyKPoliticsAcButtonHandler {
         RefreshLeaderService.refreshLeader(player, agent, game);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", you readied " + agent.getName() + " (_Extended Campaigning_).");
+                player.getRepresentationUnfogged() + ", " + agent.getName()
+                        + " is back in the field and ready (_Extended Campaigning_).");
     }
 
     @ButtonHandler(RELIC_REVEAL)
@@ -257,7 +260,7 @@ public class ThirtyKPoliticsAcButtonHandler {
         String relic = game.getAllRelics().getFirst();
         RelicModel model = Mapper.getRelic(relic.replace("extra1", "").replace("extra2", ""));
         ButtonHelper.deleteMessage(event);
-        String reveal = "revealed the top card of the relic deck:";
+        String reveal = "unearthed the top card of the relic deck:";
         if (model != null) {
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.isFowMode() ? player.getCorrectChannel() : game.getMainGameChannel(),
@@ -320,6 +323,6 @@ public class ThirtyKPoliticsAcButtonHandler {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
-                        + ", the revealed relic was placed on the bottom of the relic deck.");
+                        + ", the relic is sealed away again at the bottom of the relic deck.");
     }
 }

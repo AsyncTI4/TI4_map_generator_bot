@@ -42,7 +42,8 @@ public class ThirtyKExploreHooks {
 
     public static String spaceCannonBonusNote(UnitModel unit, int bonus) {
         if (bonus <= 0) return "";
-        return "Applied +" + bonus + " to the " + unit.getName() + " rolls with _Overcharged Targeting System_.\n";
+        return "Overcharged targeting arrays add +" + bonus + " to the " + unit.getName()
+                + " rolls (_Overcharged Targeting System_).\n";
     }
 
     public static int extraPlanetProduction(UnitHolder holder, int unitProduction) {

@@ -67,15 +67,16 @@ class ThirtyKRelicBoardButtonHandler {
         String planetRep = Helper.getPlanetRepresentation(planetName, game);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " removed 1 infantry of " + owner.getColorIfCanSeeStats(player)
-                        + " from " + planetRep + " with _Chrono Stasis_.");
+                player.getRepresentationNoPing() + " froze 1 infantry of " + owner.getColorIfCanSeeStats(player)
+                        + " on " + planetRep
+                        + " out of time: _Chrono Stasis_ removes it until the start of its owner's next turn.");
         if (owner != player) {
             String actor =
                     FoWHelper.identityOrColorIfCanSeeStats(game, player, owner, player.getRepresentationNoPing());
             MessageHelper.sendMessageToChannel(
                     owner.getCardsInfoThread(),
-                    owner.getRepresentationUnfogged() + ", " + actor + " removed 1 of your infantry from " + planetRep
-                            + " with _Chrono Stasis_. At the start of your next turn you may place it back.");
+                    owner.getRepresentationUnfogged() + ", " + actor + " caught 1 of your infantry on " + planetRep
+                            + " in a _Chrono Stasis_ field. At the start of your next turn you may place it back.");
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -94,8 +95,8 @@ class ThirtyKRelicBoardButtonHandler {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planetName);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " placed 1 infantry back on "
-                        + Helper.getPlanetRepresentation(planetName, game) + " after _Chrono Stasis_.");
+                "The _Chrono Stasis_ field collapses: " + player.getRepresentationNoPing()
+                        + " placed 1 infantry back on " + Helper.getPlanetRepresentation(planetName, game) + ".");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -123,7 +124,7 @@ class ThirtyKRelicBoardButtonHandler {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + choice);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " placed 1 infantry on "
+                "A sleeper cell stirs: " + player.getRepresentationNoPing() + " placed 1 infantry on "
                         + Helper.getPlanetRepresentation(choice, game) + " with _Deep Networks_.");
         ButtonHelper.deleteMessage(event);
     }
@@ -142,15 +143,15 @@ class ThirtyKRelicBoardButtonHandler {
             pay.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
-                    player.getRepresentationUnfogged() + " added 4 infantry to " + planetRep
-                            + " with _Overpopulation Management_. Please spend 2 resources.",
+                    player.getRepresentationUnfogged() + " packed 4 more infantry onto " + planetRep
+                            + " with _Overpopulation Management_. Spend 2 resources to pay for them.",
                     pay);
         } else {
             RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "1 inf " + planetName);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    player.getRepresentationNoPing() + " removed 1 infantry from " + planetRep
-                            + " due to _Overpopulation Management_.");
+                    player.getRepresentationNoPing() + " could not feed the crowds on " + planetRep
+                            + ": _Overpopulation Management_ removes 1 infantry there.");
         }
         removeOverpopulationChoicesFor(event, planetName);
     }
@@ -190,10 +191,12 @@ class ThirtyKRelicBoardButtonHandler {
         MessageHelper.sendMessageToChannel(
                 holder.getCardsInfoThread(),
                 holder.getRepresentationUnfogged() + ", " + giver
-                        + " placed an ownership token on _Social Dissonance_ (" + tokens.size() + " tokens).");
+                        + " bought into the scandal and placed an ownership token on _Social Dissonance_ ("
+                        + tokens.size() + " tokens).");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " placed an ownership token on _Social Dissonance_.");
+                player.getRepresentationNoPing()
+                        + " bought a stake in the scandal and placed an ownership token on _Social Dissonance_.");
         if (ThirtyKRelicHooks.socialDissonanceOverCapacity(tokens)) {
             offerTokenRemoval(game, player, tokens);
         }
@@ -224,7 +227,8 @@ class ThirtyKRelicBoardButtonHandler {
             ThirtyKRelicHooks.setSocialDissonanceTokens(game, tokens);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    player.getRepresentationNoPing() + " removed an ownership token from _Social Dissonance_ ("
+                    player.getRepresentationNoPing()
+                            + " pushed a shareholder out of _Social Dissonance_: 1 ownership token removed ("
                             + tokens.size() + " left).");
         }
         ButtonHelper.deleteMessage(event);
@@ -272,7 +276,8 @@ class ThirtyKRelicBoardButtonHandler {
         if (amount < 1) return;
         ThirtyKRelics.exhaust(game, player, event, ThirtyKRelics.DEFIANT_PROPAGANDA);
         DestroyUnitService.destroyUnits(event, tile, game, owner.getColor(), amount + " inf " + planetName, false);
-        String result = player.getRepresentationNoPing() + " destroyed " + amount + " infantry on "
+        String result = "The leaflets did their work: " + player.getRepresentationNoPing() + " destroyed " + amount
+                + " infantry on "
                 + Helper.getPlanetRepresentation(planetName, game) + " with _Defiant Propaganda_";
         UnitHolder home = ThirtyKRelics.firstHomePlanet(game, player);
         Tile homeTile = player.getHomeSystemTile();
@@ -286,7 +291,8 @@ class ThirtyKRelicBoardButtonHandler {
                     FoWHelper.identityOrColorIfCanSeeStats(game, player, owner, player.getRepresentationNoPing());
             MessageHelper.sendMessageToChannel(
                     owner.getCardsInfoThread(),
-                    owner.getRepresentationUnfogged() + ", " + actor + " destroyed " + amount + " of your infantry on "
+                    owner.getRepresentationUnfogged() + ", enemy leaflets have turned your troops: " + actor
+                            + " destroyed " + amount + " of your infantry on "
                             + Helper.getPlanetRepresentation(planetName, game) + " with _Defiant Propaganda_.");
         }
         ButtonHelper.deleteMessage(event);

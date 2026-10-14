@@ -61,7 +61,9 @@ public class ThirtyKFrontierExploreHandler {
         Button extraAction = Buttons.green(player.factionButtonChecker() + "componentAction", "Extra Component Action");
         MessageHelper.sendMessageToEventChannelWithButtons(
                 event,
-                player.getRepresentation() + ", _Distraction Efforts_ lets you make an extra component action.",
+                player.getRepresentation()
+                        + ", phantom distress calls pull every patrol away: you may perform 1 additional component"
+                        + " action (_Distraction Efforts_).",
                 List.of(extraAction, ThirtyKExploreSupport.decline(player)));
     }
 
@@ -74,7 +76,8 @@ public class ThirtyKFrontierExploreHandler {
                 : ThirtyKExploreMath.wastefulPiratesTradeGoods(
                         hits, ThirtyKExploreSupport.hitCapacityOfShips(player, tile));
         StringBuilder message = new StringBuilder(player.getRepresentationNoPing())
-                .append(" rolled for _Wasteful Pirates_.\n")
+                .append("'s ships come under wild pirate fire, and the raiders loot what they hit (_Wasteful")
+                .append(" Pirates_).\n")
                 .append(DiceHelper.formatDiceOutput(dice));
         if (hits == 0 || tile == null) {
             MessageHelper.sendMessageToEventChannel(event, message.toString());
@@ -98,12 +101,16 @@ public class ThirtyKFrontierExploreHandler {
             GenericInteractionCreateEvent event, Game game, Player player, Tile tile) {
         Tile home = player.getHomeSystemTile();
         if (tile == null || home == null || home == tile) {
-            MessageHelper.sendMessageToEventChannel(event, "_Faulty Emergency Signal_ has nothing to move.");
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "The recall signal sputters, but there is nothing to send home (_Faulty Emergency Signal_).");
             return;
         }
         if (ThirtyKExploreSupport.otherPlayersHaveShips(game, player, home)) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "Another player's ships are in your home system, so no ships can be moved there.");
+                    event,
+                    "The faulty signal calls your fleet home, but another player's ships hold your home system, so no"
+                            + " ships can return (_Faulty Emergency Signal_).");
             return;
         }
         sendFaultySignalButtons(event, game, player, tile, home);
@@ -153,8 +160,8 @@ public class ThirtyKFrontierExploreHandler {
                 > 0) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    player.getRepresentationNoPing() + " moved 1 " + type.humanReadableName()
-                            + " to their home system.");
+                    "Answering the faulty recall, " + player.getRepresentationNoPing() + " sends 1 "
+                            + type.humanReadableName() + " back to their home system (_Faulty Emergency Signal_).");
         }
         ThirtyKExploreSupport.deleteMessage(event);
         sendFaultySignalButtons(event, game, player, tile, home);
@@ -171,33 +178,37 @@ public class ThirtyKFrontierExploreHandler {
             affected.add(other);
         }
         if (affected.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No command tokens were in this system.");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "The fuel source has no command tokens to free in this system (_Insatiable Fuel Source_).");
             return;
         }
         MessageHelper.sendMessageToEventChannel(
                 event,
-                "_Insatiable Fuel Source_ returned " + affected.size()
-                        + " command token(s) from this system to their owners' tactic pools.");
+                "The fuel source tops up every fleet in reach: " + affected.size()
+                        + " command token(s) return from this system to their owners' tactic pools (_Insatiable Fuel"
+                        + " Source_).");
         for (Player other : affected) {
             if (other == player || !game.isFowMode()) continue;
             MessageHelper.sendMessageToChannel(
                     other.getCorrectChannel(),
                     other.getRepresentationUnfogged() + ", your command token in "
                             + tile.getRepresentationForButtons(game, other)
-                            + " returned to your tactic pool (_Insatiable Fuel Source_).");
+                            + " is free again and returns to your tactic pool (_Insatiable Fuel Source_).");
         }
     }
 
     public static void resolveReplicationArrays(GenericInteractionCreateEvent event, Game game, Player player) {
         game.setStoredValue(REPLICATION_COUNT_KEY + player.getFaction(), "0");
         if (player.getActionCards().isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "You have no action cards to discard.");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "The replication arrays find nothing to consume: you have no action cards to discard.");
             offerReplicationPick(game, player);
             return;
         }
         MessageHelper.sendMessageToEventChannel(
                 event,
-                "Discard 2 action cards (if able) in your cards info thread, then pick 1 from the discard pile.");
+                "The replication arrays hum to life: discard 2 action cards (if able) in your cards info thread,"
+                        + " then take 1 from the discard pile.");
         sendReplicationDiscardButtons(player);
     }
 
@@ -230,8 +241,8 @@ public class ThirtyKFrontierExploreHandler {
         }
         MessageHelper.sendMessageToChannel(
                 game.isFowMode() ? player.getCorrectChannel() : game.getMainGameChannel(),
-                player.getRepresentationNoPing() + " discarded _"
-                        + Mapper.getActionCard(cardID).getName() + "_ for _Replication Arrays_.");
+                player.getRepresentationNoPing() + " feeds _"
+                        + Mapper.getActionCard(cardID).getName() + "_ into the _Replication Arrays_.");
         ThirtyKExploreSupport.deleteMessage(event);
         String key = REPLICATION_COUNT_KEY + player.getFaction();
         int discarded = parseCount(game.getStoredValue(key)) + 1;
@@ -270,8 +281,9 @@ public class ThirtyKFrontierExploreHandler {
         }
         MessageHelper.sendMessageToEventChannel(
                 event,
-                "_Interesting Contagion_ placed " + placed.size() + " frontier token" + (placed.size() == 1 ? "" : "s")
-                        + " in adjacent empty systems.");
+                "The contagion drifts into the void: " + placed.size() + " frontier token"
+                        + (placed.size() == 1 ? "" : "s") + " placed in adjacent empty systems (_Interesting"
+                        + " Contagion_).");
     }
 
     public static void resolveItsATrap(GenericInteractionCreateEvent event, Game game, Player player, Tile tile) {
@@ -285,13 +297,15 @@ public class ThirtyKFrontierExploreHandler {
         Optional<Player> trapper = ThirtyKExploreMath.pickFewestPoints(candidates, ThreadLocalRandom.current());
         if (trapper.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "No player has a home system more than 5 hexes away, so _It's a Trap!_ does nothing.");
+                    event,
+                    "The trap is set, but no player's home system is more than 5 hexes away, so nobody springs it"
+                            + " (_It's a Trap!_).");
             return;
         }
         Player chosen = trapper.get();
         MessageHelper.sendMessageToEventChannel(
                 event,
-                FoWHelper.actorOrAnon(game, chosen, "A player in last place")
+                "Ambush! " + FoWHelper.actorOrAnon(game, chosen, "A player in last place")
                         + " springs _It's a Trap!_ and may place up to 4 destroyers in "
                         + tile.getRepresentationForButtons(game, player) + ".");
         List<Button> buttons = new ArrayList<>();
@@ -318,8 +332,8 @@ public class ThirtyKFrontierExploreHandler {
         AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " dd");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " placed " + amount + " destroyer" + (amount == 1 ? "" : "s")
-                        + " with _It's a Trap!_.");
+                player.getRepresentationNoPing() + "'s ambushers drop their cloaks: " + amount + " destroyer"
+                        + (amount == 1 ? "" : "s") + " arrive (_It's a Trap!_).");
         ThirtyKExploreSupport.deleteMessage(event);
         StartCombatService.combatCheck(game, event, tile);
     }
@@ -333,7 +347,10 @@ public class ThirtyKFrontierExploreHandler {
             shipCostByPlayer.put(other, destroyedShipCost(other, tile));
         }
         DestroyUnitService.destroyAllUnitsInSystem(event, tile, game, false);
-        MessageHelper.sendMessageToEventChannel(event, "_Systematic Sympathies_ destroyed all units in this system.");
+        MessageHelper.sendMessageToEventChannel(
+                event,
+                "A resonance cascade tears through the system and destroys every unit in it (_Systematic"
+                        + " Sympathies_).");
         shipCostByPlayer.forEach((other, cost) -> rewardSympathies(event, game, player, other, cost));
     }
 
@@ -359,7 +376,8 @@ public class ThirtyKFrontierExploreHandler {
                     explorer,
                     player,
                     FoWHelper.actorOrAnon(game, player, "A player") + " lost ships worth " + formatCost(cost)
-                            + " resources and permanently gains 1 victory point (_" + SYMPATHIES_OBJECTIVE + "_).");
+                            + " resources; the galaxy remembers the sacrifice, and they permanently gain 1"
+                            + " victory point (_" + SYMPATHIES_OBJECTIVE + "_).");
             Helper.checkEndGame(game, player);
             return;
         }
@@ -372,7 +390,8 @@ public class ThirtyKFrontierExploreHandler {
 
     public static void resolvePonderingTheNebulae(GenericInteractionCreateEvent event, Game game, Player player) {
         if (player.getSecretsUnscored().isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "You have no unscored secret objectives to discard.");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "You ponder the nebulae, but have no unscored secret objectives to reconsider.");
             return;
         }
         List<Button> buttons = new ArrayList<>();
@@ -390,7 +409,9 @@ public class ThirtyKFrontierExploreHandler {
                         + ", you may discard 1 unscored secret objective to draw 1 (_Pondering the Nebulae_).",
                 choices);
         MessageHelper.sendMessageToEventChannel(
-                event, "The secret objective choice for _Pondering the Nebulae_ is in your cards info thread.");
+                event,
+                "You gaze into the nebula's slow storms and reconsider your plans; the choice is in your cards info"
+                        + " thread (_Pondering the Nebulae_).");
     }
 
     @ButtonHandler(PONDER_DISCARD)
@@ -414,11 +435,14 @@ public class ThirtyKFrontierExploreHandler {
         }
         if (!hasUnitsInSpace(player, tile)) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "You have no units in space in this system, so _We're Lost, Captain_ moves nothing.");
+                    event,
+                    "The navigators are hopelessly lost, but you have no units in this system's space area to lead"
+                            + " astray (_We're Lost, Captain_).");
             return;
         }
         if (!game.isFowMode() && lostCaptainTargets(game, speaker, player, tile).isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No system qualifies for _We're Lost, Captain_.");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "The navigators find no empty system to drift into (_We're Lost, Captain_).");
             return;
         }
         game.setStoredValue(WERE_LOST_PENDING_KEY, player.getFaction() + "+" + tile.getPosition());
@@ -426,7 +450,9 @@ public class ThirtyKFrontierExploreHandler {
                 ? "the exploring player's ships"
                 : "the ships in " + tile.getRepresentationForButtons(game, speaker);
         MessageHelper.sendMessageToEventChannel(
-                event, "The speaker chooses where the ships go for _We're Lost, Captain_.");
+                event,
+                "The charts are wrong and the stars unfamiliar: the speaker chooses where the lost ships end up"
+                        + " (_We're Lost, Captain_).");
         MessageHelper.sendMessageToChannelWithButtons(
                 ThirtyKExploreSupport.channelFor(speaker),
                 speaker.getRepresentationUnfogged() + ", choose a system without planets or other players' ships; "
@@ -519,12 +545,13 @@ public class ThirtyKFrontierExploreHandler {
         }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                FoWHelper.actorOrAnon(game, explorer, "The exploring player") + "'s ships moved to "
-                        + target.getRepresentationForButtons(game, player) + " (_We're Lost, Captain_).");
+                FoWHelper.actorOrAnon(game, explorer, "The exploring player") + "'s lost fleet drops out of"
+                        + " hyperspace in " + target.getRepresentationForButtons(game, player)
+                        + " (_We're Lost, Captain_).");
         if (game.isFowMode() && explorer != player) {
             MessageHelper.sendMessageToChannel(
                     explorer.getCorrectChannel(),
-                    explorer.getRepresentationUnfogged() + ", your ships moved to "
+                    explorer.getRepresentationUnfogged() + ", your lost fleet drops out of hyperspace in "
                             + target.getRepresentationForButtons(game, explorer)
                             + " and a command token was placed there (_We're Lost, Captain_).");
         }
@@ -551,8 +578,8 @@ public class ThirtyKFrontierExploreHandler {
         tile.addToken(Mapper.getTokenID("asteroids"), Constants.SPACE);
         MessageHelper.sendMessageToEventChannel(
                 event,
-                "_Unseen Danger_ destroyed " + player.getRepresentationNoPing()
-                        + "'s ships in this system and placed an asteroid field token.");
+                "An asteroid field no sensor could see tears through " + player.getRepresentationNoPing()
+                        + "'s ships: all are destroyed, and an asteroid field token is placed (_Unseen Danger_).");
         if (!destroyedAny || player.hasTech("amd")) return;
         MessageHelper.sendMessageToEventChannelWithButtons(
                 event,
@@ -566,7 +593,8 @@ public class ThirtyKFrontierExploreHandler {
     public static void resolveForegoneDiscoveries(GenericInteractionCreateEvent event, Game game, Player player) {
         List<String> relics = game.getAllRelics();
         if (relics.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "The relic deck is empty.");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "The relic deck is empty; nothing remains to be rediscovered (_Foregone Discoveries_).");
             return;
         }
         String revealed = relics.getFirst();

@@ -33,7 +33,7 @@ public class ThirtyKRelicHooks {
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 player.getRepresentationUnfogged()
-                        + ", _Razzling Message_ has been exhausted: gain 1 additional command token with the **Leadership** gain buttons.");
+                        + ", fresh recruits rally to the _Razzling Message_ (exhausted): gain 1 additional command token with the **Leadership** gain buttons.");
     }
 
     public static int applyProductionDiscount(Player player, int cost) {
@@ -61,7 +61,7 @@ public class ThirtyKRelicHooks {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentationUnfogged()
-                        + ", you produced infantry. With _Overpopulation Management_ you may spend 2 resources to add 4 infantry to each such planet; if you don't, remove 1 infantry from it.",
+                        + ", the barracks are overflowing. For each planet below, choose with _Overpopulation Management_: spend 2 resources to add 4 infantry, or remove 1 infantry.",
                 buttons);
     }
 
@@ -106,7 +106,7 @@ public class ThirtyKRelicHooks {
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCardsInfoThread(),
                 target.getRepresentationUnfogged()
-                        + ", a deal was made through _Tech Support Hotline_. You may research 1 technology with no prerequisites.",
+                        + ", the deal is done and the technicians deliver: through the _Tech Support Hotline_ you may research 1 technology with no prerequisites.",
                 withDecline);
     }
 
@@ -203,14 +203,14 @@ public class ThirtyKRelicHooks {
         if (blockedForChronoReturn(game, owner, planet)) {
             MessageHelper.sendMessageToChannel(
                     owner.getCardsInfoThread(),
-                    owner.getRepresentationUnfogged() + ", your infantry held by _Chrono Stasis_ cannot return to "
-                            + name + " because another player has ground forces or structures there.");
+                    owner.getRepresentationUnfogged() + ", your infantry steps out of _Chrono Stasis_ to find " + name
+                            + " occupied: another player has ground forces or structures there, so it cannot return.");
             return;
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 owner.getCardsInfoThread(),
-                owner.getRepresentationUnfogged() + ", you may place back the infantry _Chrono Stasis_ removed from "
-                        + name + ".",
+                owner.getRepresentationUnfogged()
+                        + ", the _Chrono Stasis_ field is fading: you may place your infantry back on " + name + ".",
                 List.of(
                         Buttons.green(
                                 owner.factionButtonChecker() + "thirtyKChronoReturn_" + planetName, "Place It Back"),

@@ -109,11 +109,13 @@ public class ThirtyKHazardousExploreHandler {
                 switch (effect) {
                     case EMERGENT_DEFENSES -> {
                         AddUnitService.addUnits(event, tile, game, player.getColor(), "pds " + planetID);
-                        yield "placed 1 PDS on " + Helper.getPlanetRepresentation(planetID, game);
+                        yield "brought a buried defense battery online: 1 PDS placed on "
+                                + Helper.getPlanetRepresentation(planetID, game) + " (_Emergent Defenses_)";
                     }
                     case PILOT_RECOVERY -> {
                         player.setFleetCC(player.getFleetCC() + 1);
-                        yield "placed 1 command token in their fleet pool";
+                        yield "recovered the downed pilots: 1 command token placed in their fleet pool (_Pilot"
+                                + " Recovery Program_)";
                     }
                     case LOST_AND_FOUND -> placeLostAndFoundDestroyer(event, game, player, tile);
                     default -> "resolved the exploration";
@@ -127,10 +129,11 @@ public class ThirtyKHazardousExploreHandler {
     private static String placeLostAndFoundDestroyer(
             ButtonInteractionEvent event, Game game, Player player, Tile tile) {
         if (ThirtyKExploreSupport.otherPlayersHaveShips(game, player, tile)) {
-            return "could not place a destroyer, because another player's ships are in that space area";
+            return "found a working derelict, but another player's ships hold the space area, so no destroyer is"
+                    + " placed (_Lost and Found_)";
         }
         AddUnitService.addUnits(event, tile, game, player.getColor(), "dd");
-        return "placed 1 destroyer in the space area";
+        return "restored a derelict to service: 1 destroyer placed in the space area (_Lost and Found_)";
     }
 
     public static void resolveImitationFactories(
@@ -146,7 +149,9 @@ public class ThirtyKHazardousExploreHandler {
         if (buttons.isEmpty() || planetID == null) {
             game.purgeExplore(cardID);
             MessageHelper.sendMessageToEventChannel(
-                    event, "The hazardous discard pile has nothing to imitate; _Imitation Factories_ was purged.");
+                    event,
+                    "The factories find nothing in the hazardous discard pile to copy and shut down for good"
+                            + " (_Imitation Factories_ purged).");
             return;
         }
         game.setStoredValue(IMITATION_CARD_KEY + player.getFaction(), cardID);
@@ -171,13 +176,15 @@ public class ThirtyKHazardousExploreHandler {
         ThirtyKExploreSupport.deleteMessage(event);
         if ("none".equals(chosen) || !game.getExploreDiscard("hazardous").contains(chosen)) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "_Imitation Factories_ was purged without imitating a card.");
+                    event.getMessageChannel(),
+                    "The factories shut down without copying anything (_Imitation Factories_ purged).");
             return;
         }
         Tile tile = game.getTileFromPlanet(planetID);
-        String message = player.getRepresentationNoPing() + " used _Imitation Factories_ to resolve _"
-                + Mapper.getExplore(chosen).getName() + "_ on " + Helper.getPlanetRepresentation(planetID, game)
-                + ":";
+        String message = "The factories churn out a perfect copy of _"
+                + Mapper.getExplore(chosen).getName()
+                + "_ for " + player.getRepresentationNoPing() + " on " + Helper.getPlanetRepresentation(planetID, game)
+                + " (_Imitation Factories_):";
         ExploreService.resolveExplore(event, chosen, tile, planetID, message, player, game);
     }
 
@@ -188,7 +195,7 @@ public class ThirtyKHazardousExploreHandler {
         int tradeGoods = ThirtyKExploreMath.countAtLeast(results, 5);
         int hits = ThirtyKExploreMath.countAtMost(results, 2);
         StringBuilder message = new StringBuilder(player.getRepresentationNoPing())
-                .append(" rolled for _Corrosive Discovery_: ")
+                .append("'s prospectors brave the acid for _Corrosive Discovery_: ")
                 .append(results)
                 .append(". ")
                 .append(tradeGoods)

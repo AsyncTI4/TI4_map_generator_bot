@@ -186,7 +186,7 @@ public class ThirtyKRelics {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
-                            + ", _Sovereign Refugees_ lowers the cost of a flagship you produce by 2 automatically.");
+                            + ", refugee shipwrights have joined your docks: _Sovereign Refugees_ automatically reduces the cost of each flagship you produce by 2.");
         }
     }
 
@@ -263,8 +263,28 @@ public class ThirtyKRelics {
         addActionSummary(game, player, relicID);
         MessageHelper.sendMessageToChannelWithEmbed(
                 event == null ? player.getCorrectChannel() : event.getMessageChannel(),
-                player.getRepresentationNoPing() + " " + verb + " _" + relic.getName() + "_.",
+                player.getRepresentationNoPing() + " " + announcementLine(relicID, verb, relic.getName()),
                 relic.getRepresentationEmbed(false, true));
+    }
+
+    private static String announcementLine(String relicID, String verb, String name) {
+        if ("purged".equals(verb)) {
+            return PLACEBOTRON.equals(relicID)
+                    ? "cracked open the _Placebotron_ and found something real inside (purged to draw 1 relic)."
+                    : "purged _" + name + "_.";
+        }
+        return switch (relicID) {
+            case PLACEBOTRON -> "switched on the _Placebotron_. It hums and does nothing at all (exhausted).";
+            case REDISCOVERY -> "dusted off forgotten survey logs with _Rediscovery_ (exhausted).";
+            case RANSOM_CANNON -> "trained the _Ransom Cannon_ on an enemy flagship (exhausted).";
+            case DEADLINE_DOCUMENTATION -> "stamped the _Deadline Documentation_ and sent it off (exhausted).";
+            case DEFIANT_PROPAGANDA -> "dropped _Defiant Propaganda_ over an occupied world (exhausted).";
+            case TECH_SUPPORT_HOTLINE -> "dialled the _Tech Support Hotline_ (exhausted).";
+            case CHRONO_STASIS -> "powered up the _Chrono Stasis_ field (exhausted).";
+            case SPY_REPORTS -> "sent agents into the field with _Spy Reports_ (exhausted).";
+            case DEEP_NETWORKS -> "woke a sleeper cell through _Deep Networks_ (exhausted).";
+            default -> verb + " _" + name + "_.";
+        };
     }
 
     private static void send(ButtonInteractionEvent event, String message, List<Button> buttons) {

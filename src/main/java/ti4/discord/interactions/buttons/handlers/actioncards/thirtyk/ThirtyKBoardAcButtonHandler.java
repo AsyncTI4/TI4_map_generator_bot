@@ -88,13 +88,13 @@ public class ThirtyKBoardAcButtonHandler {
         FoWHelper.notifyActorAndAffectedElsePublic(
                 game,
                 player,
-                player.getRepresentationUnfogged() + ", _Conflagration_ destroyed " + destroyed + " infantry on "
-                        + planetName + ".",
+                player.getRepresentationUnfogged() + ", the fires you left behind consume " + destroyed
+                        + " infantry on " + planetName + " (_Conflagration_).",
                 newOwner,
-                newOwner.getRepresentationUnfogged() + ", _Conflagration_ destroyed " + destroyed
-                        + " of your infantry on " + planetName + ".",
-                player.getRepresentationNoPing() + " used _Conflagration_ to destroy " + destroyed + " of "
-                        + newOwner.getRepresentationNoPing() + "'s infantry on " + planetName + ".");
+                newOwner.getRepresentationUnfogged() + ", firestorms sweep " + planetName + " and destroy " + destroyed
+                        + " of your infantry (_Conflagration_).",
+                player.getRepresentationNoPing() + " set " + planetName + " ablaze with _Conflagration_, destroying "
+                        + destroyed + " of " + newOwner.getRepresentationNoPing() + "'s infantry.");
     }
 
     @ButtonHandler(BLEW_UP)
@@ -110,7 +110,7 @@ public class ThirtyKBoardAcButtonHandler {
                     tile.getRepresentationForButtons(game, player)));
         }
         if (buttons.isEmpty()) {
-            ThirtyKAcTargets.noTarget(event, player, "And then they blew up!");
+            ThirtyKAcTargets.noTarget(event, player, "And Then They Blew Up!");
             return;
         }
         ThirtyKAcState.clearFightersBlownUp(game, player);
@@ -178,12 +178,14 @@ public class ThirtyKBoardAcButtonHandler {
         FoWHelper.notifyActorAndAffectedElsePublic(
                 game,
                 player,
-                player.getRepresentationUnfogged() + ", you destroyed 1 fighter in " + where + ".",
+                player.getRepresentationUnfogged() + ", a hangar bay detonates in " + where
+                        + " and 1 fighter is lost (_And Then They Blew Up!_).",
                 owner,
-                owner.getRepresentationUnfogged() + ", _And then they blew up!_ destroyed 1 of your fighters in "
-                        + tile.getRepresentationForButtons(game, owner) + ".",
-                player.getRepresentationNoPing() + " destroyed 1 of " + owner.getRepresentationNoPing()
-                        + "'s fighters in " + where + " with _And then they blew up!_.");
+                owner.getRepresentationUnfogged() + ", 1 of your fighters in "
+                        + tile.getRepresentationForButtons(game, owner)
+                        + " explodes without warning (_And Then They Blew Up!_).",
+                player.getRepresentationNoPing() + " watched 1 of " + owner.getRepresentationNoPing()
+                        + "'s fighters in " + where + " blow up (_And Then They Blew Up!_).");
         if (destroyed + 1 >= 2) {
             ThirtyKAcState.clearFightersBlownUp(game, player);
             ButtonHelper.deleteMessage(event);
@@ -237,8 +239,9 @@ public class ThirtyKBoardAcButtonHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", you placed " + infantry + " infantry on "
-                        + Helper.getPlanetRepresentation(planet, game) + " with _Cumulative Support_.");
+                player.getRepresentationUnfogged() + ", volunteers gathered along the way rally to "
+                        + Helper.getPlanetRepresentation(planet, game) + ": " + infantry
+                        + " infantry placed (_Cumulative Support_).");
     }
 
     private static PlanetTargetSpec distantMapsSpec(Game game, Player player) {
@@ -361,7 +364,8 @@ public class ThirtyKBoardAcButtonHandler {
                     player.getRepresentationUnfogged() + ", the " + trait + " exploration deck is empty.");
             return;
         }
-        String reveal = "_Distant Maps_ revealed the top " + trait + " exploration card for " + planetName + ":";
+        String reveal = "old star charts show what waits on " + planetName + ", the top " + trait
+                + " exploration card (_Distant Maps_):";
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
@@ -374,7 +378,7 @@ public class ThirtyKBoardAcButtonHandler {
         } else {
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getMainGameChannel(),
-                    player.getRepresentationNoPing() + ": " + reveal,
+                    player.getRepresentationNoPing() + ", " + reveal,
                     top.getRepresentationEmbed());
         }
         List<Button> buttons = new ArrayList<>();
@@ -413,7 +417,7 @@ public class ThirtyKBoardAcButtonHandler {
         List<Button> explore = ButtonHelper.getPlanetExplorationButtons(game, holder, player);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", you paid 2 trade goods. Explore "
+                player.getRepresentationUnfogged() + ", you paid 2 trade goods for the charts. Explore "
                         + Helper.getPlanetRepresentation(planet, game) + ".",
                 explore == null
                         ? List.of()
@@ -465,15 +469,16 @@ public class ThirtyKBoardAcButtonHandler {
             ThirtyKAcState.openChoice(game, mover, FOLDING_MOVE);
             MessageHelper.sendMessageToChannelWithButtons(
                     mover.getCorrectChannel(),
-                    mover.getRepresentationUnfogged() + ", _Folding of Spacetime_ lets you move your ships in "
+                    mover.getRepresentationUnfogged() + ", you may move your ships in "
                             + tile.getRepresentationForButtons(game, mover)
-                            + " to another edge system that contains no other player's ships.",
+                            + " to another edge system without other players' ships (_Folding of Spacetime_).",
                     buttons);
         }
         if (!movers.contains(player)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", the players with ships there were offered the move.");
+                    player.getRepresentationUnfogged() + ", spacetime folds around that system; the players with"
+                            + " ships there were offered the move (_Folding of Spacetime_).");
         }
     }
 
@@ -517,9 +522,9 @@ public class ThirtyKBoardAcButtonHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", your ships moved from "
+                player.getRepresentationUnfogged() + ", space folds and your ships slip from "
                         + from.getRepresentationForButtons(game, player) + " to "
-                        + to.getRepresentationForButtons(game, player) + " with _Folding of Spacetime_.");
+                        + to.getRepresentationForButtons(game, player) + " (_Folding of Spacetime_).");
     }
 
     private static void reofferFolding(ButtonInteractionEvent event, Game game, Player mover, Tile from) {
@@ -588,7 +593,8 @@ public class ThirtyKBoardAcButtonHandler {
         String planetName = Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", you placed 2 neutral infantry on " + planetName + "."
+                player.getRepresentationUnfogged() + ", 2 neutral infantry claw their way out of the Fracture onto "
+                        + planetName + " (_Corrupt Manifestation_)."
                         + (contested
                                 ? " Another player has units there: the neutral infantry invade and resolve ground"
                                         + " combat. Start that combat manually."
@@ -645,11 +651,13 @@ public class ThirtyKBoardAcButtonHandler {
         ButtonHelperStats.replenishComms(event, game, player, false);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", your forces were reset with _Extreme Renewal_.");
+                player.getRepresentationUnfogged() + ", your forces are swept from the board and reborn at home;"
+                        + " you draw 2 action cards and replenish your commodities (_Extreme Renewal_).");
         if (actor != null) {
             MessageHelper.sendMessageToChannel(
                     actor.getCorrectChannel(),
-                    actor.getRepresentationUnfogged() + ", your target accepted _Extreme Renewal_.");
+                    actor.getRepresentationUnfogged()
+                            + ", your target accepted _Extreme Renewal_ and is rebuilding from nothing.");
         }
     }
 
@@ -701,8 +709,9 @@ public class ThirtyKBoardAcButtonHandler {
         List<DiceHelper.Die> rolls = DiceHelper.rollDice(infantry.getCombatHitsOn(), dice);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " rolled " + dice + " _Final Stand_ dice for "
-                        + Helper.getPlanetRepresentation(planet, game) + ": " + DiceHelper.formatDiceOutput(rolls)
+                player.getRepresentationNoPing() + "'s last infantry on "
+                        + Helper.getPlanetRepresentation(planet, game) + " makes a _Final Stand_, rolling " + dice
+                        + " dice: " + DiceHelper.formatDiceOutput(rolls)
                         + " (" + DiceHelper.countSuccesses(rolls) + " hit(s)).",
                 List.of(Buttons.red(
                         player.factionButtonChecker() + FINAL_STAND_ROLL + planet,

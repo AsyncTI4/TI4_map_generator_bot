@@ -61,7 +61,7 @@ public class ThirtyKActionCardHooks {
             offerPlay(
                     holder,
                     FINE_PRINT,
-                    "a _" + rider + "_ was placed on \"" + outcome + "\". You may play _Hide within the Fine Print_"
+                    "a _" + rider + "_ was placed on \"" + outcome + "\". You may play _Hide Within the Fine Print_"
                             + " to follow it on the same outcome.");
             offerPlay(
                     holder,
@@ -88,7 +88,8 @@ public class ThirtyKActionCardHooks {
                 MessageHelper.sendMessageToChannel(
                         predictor.getCorrectChannel(),
                         predictor.getRepresentationUnfogged()
-                                + ", your _Embassy Rider_ prediction was correct; you drew a secret objective.");
+                                + ", your _Embassy Rider_ prediction was correct; grateful friends in the embassy"
+                                + " slip you a secret objective.");
                 DrawSecretService.drawSO(null, game, predictor);
             }
             if (ThirtyKAgendaRiders.DUMMY_RIDER.equals(entry.rider()) && correct) {
@@ -96,7 +97,8 @@ public class ThirtyKActionCardHooks {
                 MessageHelper.sendMessageToChannel(
                         predictor.getCorrectChannel(),
                         predictor.getRepresentationUnfogged()
-                                + ", your _Dummy Rider_ prediction was correct; you drew an action card.");
+                                + ", your _Dummy Rider_ prediction was correct; the shell motion pays out 1 action"
+                                + " card.");
             }
             if (ThirtyKAgendaRiders.DUMMY_RIDER.equals(entry.rider()) && !correct) {
                 String card = ThirtyKAcState.takeWrongDummyRiderCard(game, predictor, entry.outcome());
@@ -117,8 +119,8 @@ public class ThirtyKActionCardHooks {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
-                        + ", your _Dummy Rider_ prediction was wrong, so _"
-                        + Mapper.getActionCard(card.get().getKey()).getName() + "_ went back to your hand.");
+                        + ", the _Dummy Rider_ prediction failed, but the paperwork was never filed: _"
+                        + Mapper.getActionCard(card.get().getKey()).getName() + "_ returns to your hand.");
     }
 
     public static void onPlanetControlChanged(Game game, Player newOwner, Player previousOwner, String planet) {
@@ -133,7 +135,7 @@ public class ThirtyKActionCardHooks {
                 previousOwner,
                 CONFLAGRATION,
                 "another player gained control of " + planetName
-                        + ". You may play _Conflagration_ to destroy all but one of their infantry there.");
+                        + ". You may play _Conflagration_ to destroy all but 1 of their infantry there.");
     }
 
     public static void onStrategyPhaseStart(GenericInteractionCreateEvent event, Game game) {
@@ -144,7 +146,7 @@ public class ThirtyKActionCardHooks {
             if (payout <= 0) continue;
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", your _Compound Interest_ paid out.");
+                    player.getRepresentationUnfogged() + ", your _Compound Interest_ matures and the brokers pay out.");
             ButtonHelperStats.gainTGs(event, game, player, payout, false);
         }
     }
@@ -177,13 +179,15 @@ public class ThirtyKActionCardHooks {
                 MessageHelper.sendMessageToChannel(
                         profiteer.getCorrectChannel(),
                         profiteer.getRepresentationUnfogged()
-                                + ", the player you backed with _War Profiteering_ did not win the space combat.");
+                                + ", the side you bankrolled lost the space combat; your _War Profiteering_ bet is"
+                                + " worthless.");
                 continue;
             }
             MessageHelper.sendMessageToChannel(
                     profiteer.getCorrectChannel(),
                     profiteer.getRepresentationUnfogged()
-                            + ", the player you backed with _War Profiteering_ won the space combat.");
+                            + ", the side you bankrolled won the space combat; _War Profiteering_ pays out 4 trade"
+                            + " goods.");
             ButtonHelperStats.gainTGs(null, game, profiteer, 4, false);
         }
     }
@@ -197,9 +201,9 @@ public class ThirtyKActionCardHooks {
         if (holders.isEmpty()) return;
         ThirtyKAcState.setPurgedFragments(game, purger, fragments);
         String reason = game.isFowMode()
-                ? "relic fragments are being purged. You may play _Preservation Act_ to gain up to two of them."
+                ? "relic fragments are being purged. You may play _Preservation Act_ to gain up to 2 of them."
                 : "a player you are not neighbors with purged " + fragments.size()
-                        + " relic fragment(s). You may play _Preservation Act_ to gain up to two of them.";
+                        + " relic fragment(s). You may play _Preservation Act_ to gain up to 2 of them.";
         for (Player holder : holders) {
             offerPlay(holder, PRESERVATION_ACT, reason);
         }

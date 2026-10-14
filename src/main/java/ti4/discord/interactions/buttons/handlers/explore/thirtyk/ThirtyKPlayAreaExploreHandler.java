@@ -56,9 +56,12 @@ public class ThirtyKPlayAreaExploreHandler {
 
     public static void moveToPlayArea(GenericInteractionCreateEvent event, Game game, Player player, String cardID) {
         game.purgeExplore(cardID);
-        player.addRelic(ThirtyKCards.baseId(cardID));
+        String baseId = ThirtyKCards.baseId(cardID);
+        player.addRelic(baseId);
         MessageHelper.sendMessageToEventChannel(
-                event, "Card has been added to play area.\nAdded as a relic (not actually a relic).");
+                event,
+                "The find is crated, catalogued and kept close: _"
+                        + Mapper.getRelic(baseId).getName() + "_ now sits face up in your play area.");
     }
 
     public static List<Button> getStartOfTurnButtons(Player player) {
@@ -166,8 +169,8 @@ public class ThirtyKPlayAreaExploreHandler {
         player.removeRelic(cardID);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " purged _"
-                        + Mapper.getRelic(cardID).getName() + "_.");
+                player.getRepresentationNoPing() + " puts the last of _"
+                        + Mapper.getRelic(cardID).getName() + "_ to use, and the card is purged.");
     }
 
     private static void sendResourceSpendButtons(
@@ -209,8 +212,9 @@ public class ThirtyKPlayAreaExploreHandler {
         }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " purged _Rich Hostages_: the cost of _" + name
-                        + "_ is reduced by 3. Spend 3 less (ready anything you over-spent).");
+                "The hostages go home for a handsome fee: " + player.getRepresentationNoPing()
+                        + " purges _Rich Hostages_ and _" + name
+                        + "_ costs 3 less (ready anything you over-spent).");
         ThirtyKExploreSupport.deleteMessage(event);
     }
 
@@ -232,9 +236,11 @@ public class ThirtyKPlayAreaExploreHandler {
         FoWHelper.notifyPlayerAndAffectedInFog(
                 game,
                 loser,
-                loser.getRepresentationNoPing() + " lost a space combat while holding _MacGuffian Outpost_: both "
-                        + "combatants gain 2 trade goods.",
+                "Victor and vanquished alike pick through the wreckage of the _MacGuffin Outpost_ convoy: "
+                        + loser.getRepresentationNoPing() + " and their opponent each gain 2 trade goods.",
                 winner,
-                winner.getRepresentationUnfogged() + ", your opponent's _MacGuffian Outpost_ gave you 2 trade goods.");
+                winner.getRepresentationUnfogged()
+                        + ", your salvage crews find a share of your opponent's _MacGuffin Outpost_ cargo: you gain 2"
+                        + " trade goods.");
     }
 }
