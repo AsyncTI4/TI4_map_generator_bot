@@ -23,7 +23,12 @@ class LookAtTopEvent extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
+        if (game.getEvents().isEmpty()) {
+            MessageHelper.replyToMessage(event, "The event deck is empty.");
+            return;
+        }
+
+        int count = Math.min(event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt), game.getEvents().size());
 
         StringBuilder sb = new StringBuilder();
         sb.append("-----------\n");
