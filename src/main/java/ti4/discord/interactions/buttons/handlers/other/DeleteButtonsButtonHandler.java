@@ -41,6 +41,7 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -208,6 +209,7 @@ class DeleteButtonsButtonHandler {
                     game.setStoredValue(
                             MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction(), buttonID + "|" + pos);
                 }
+                BlueReverieTechHelper.offerProductionBiomes(game, player);
             }
             if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)
                     && player.hasAbility("amalgamation")

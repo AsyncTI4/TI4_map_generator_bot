@@ -36,6 +36,7 @@ import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRel
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -52,6 +53,7 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.message.MessageHelper;
@@ -287,7 +289,7 @@ public class DestroyUnitService {
                 }
             }
             case Mech -> {
-                handleSelfAssemblyRoutines(player, totalAmount, game);
+                handleSelfAssemblyRoutines(event, player, totalAmount, game, combat, unit);
                 if (player != null && player.hasUnit("ashen_mech")) {
                     AshenUnitHandler.resolveAshenMechDestroy(game, player, unit);
                 }
@@ -482,7 +484,13 @@ public class DestroyUnitService {
         }
     }
 
-    private static void handleSelfAssemblyRoutines(Player player, int min, Game game) {
+    private static void handleSelfAssemblyRoutines(
+            GenericInteractionCreateEvent event,
+            Player player,
+            int min,
+            Game game,
+            boolean combat,
+            RemovedUnit destroyedMech) {
         if (player.hasActiveBreakthrough("naazbt")) {
             BreakthroughCommandHelper.deactivateBreakthrough(player, "naazbt");
         }
@@ -500,6 +508,10 @@ public class DestroyUnitService {
                 ButtonHelperAbilities.pillageCheck(player, game);
             }
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
+        }
+        if (combat && destroyedMech.uh() instanceof Planet) {
+            BlueReverieTechHelper.offerSelfAssemblyRoutinesGroundCombatChoice(
+                    event, game, player, destroyedMech.tile(), destroyedMech.uh(), min);
         }
     }
 }

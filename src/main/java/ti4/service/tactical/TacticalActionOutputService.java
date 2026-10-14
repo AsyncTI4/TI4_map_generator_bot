@@ -31,9 +31,11 @@ import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
@@ -150,6 +152,13 @@ public class TacticalActionOutputService {
 
         Tile activeTile = game.getTileByPosition(game.getActiveSystem());
         if (player.hasTech("scc") && tile.containsPlayersUnits(player) && activeTile.containsPlayersUnits(player)) {
+            distance = riftDistance = 1;
+        }
+        if (player.hasTech("scc_br")
+                && tile.containsPlayersUnits(player)
+                && activeTile.containsPlayersUnits(player)
+                && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)
+                && !FoWHelper.otherPlayersHaveUnitsInSystem(player, activeTile, game)) {
             distance = riftDistance = 1;
         }
 
@@ -293,10 +302,11 @@ public class TacticalActionOutputService {
             if (player.hasTech("gd")) {
                 maxBonus++;
                 output.append(", may have used _Gravity Drive_)");
-            } else {
-                if (!game.isTwilightsFallMode()) {
-                    output.append(", __does not have _Gravity Drive___)");
-                }
+            } else if (BlueReverieTechHelper.consumeGravityDriveBonus(game, player)) {
+                maxBonus++;
+                output.append(", used _Gravity Drive_)");
+            } else if (!player.hasTech("gd_br") && !game.isTwilightsFallMode()) {
+                output.append(", __does not have _Gravity Drive___)");
             }
             String cyclotronTilePosition = game.getStoredValue("dihmohnCyclotron_" + player.getFaction());
             if (!cyclotronTilePosition.isEmpty()) {
@@ -494,6 +504,13 @@ public class TacticalActionOutputService {
         if (player.hasUnit("scrapyard_flagship")
                 && ButtonHelper.doesPlayerHaveFSHere("scrapyard_flagship", player, tile)) {
             bonusMoveValue += 1;
+        }
+        Player nokarPlayer = Helper.getPlayerFromAbility(game, "desperados_br");
+        if (nokarPlayer != null
+                && nokarPlayer.hasAbility("desperados_br")
+                && nokarPlayer != player
+                && model.getUnitType() == UnitType.Destroyer) {
+            baseMoveValue++;
         }
 
         return baseMoveValue + bonusMoveValue;

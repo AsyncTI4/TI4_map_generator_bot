@@ -179,6 +179,7 @@ public class PlayerStatsDashboardPayload {
 
         // Supports
         player.getPromissoryNotesInPlayArea().stream()
+                .filter(player::givesSupportForTheThroneVictoryPoint)
                 .map(Mapper::getPromissoryNote)
                 .filter(Objects::nonNull)
                 .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))

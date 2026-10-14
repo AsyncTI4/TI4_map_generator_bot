@@ -224,6 +224,10 @@ public class GameManager {
         });
     }
 
+    public static boolean isWarmupFinished() {
+        return warmupFinishedLatch.getCount() == 0;
+    }
+
     public static List<ManagedGame> getManagedGames() {
         waitFor(warmupFinishedLatch);
         return List.copyOf(gameNameToManagedGame.values());

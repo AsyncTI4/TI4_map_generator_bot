@@ -391,6 +391,11 @@ public enum LeaderEmojis implements TI4Emoji {
             case "voicehero" -> XxchaHero;
             case "witchinghero" -> KeleresHeroOdlynn;
 
+            case "edynagent_br" -> EdynAgent;
+            case "gheminacommander_br" -> GheminaCommander;
+            case "yinhero_br" -> YinHero;
+            case "yssarilagent_br" -> YssarilAgent;
+
             // Franken
             case "mahactcommander_y" -> MahactCommander;
 

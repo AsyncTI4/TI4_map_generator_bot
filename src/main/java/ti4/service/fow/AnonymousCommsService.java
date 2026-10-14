@@ -4,12 +4,19 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -26,6 +33,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.cron.AnonymousCommsArchiveCron;
@@ -62,6 +70,12 @@ public class AnonymousCommsService {
     static final String INBOX_KEY_PREFIX = "anonCommsInbox_";
     static final String THREAD_KEY_PREFIX = "anonCommsThread_";
     static final String PARTNERS_KEY_PREFIX = "anonCommsPartners_";
+    static final String PING_KEY_PREFIX = "anonCommsPingAt_";
+    static final String HUB_KEY_PREFIX = "anonCommsHub_";
+    static final String REPLY_GRANT_KEY_PREFIX = "anonCommsGuildReply_";
+    static final int REPING_HOURS = 12;
+    private static final String INBOX_MARKER = "📨 ";
+    private static final String HUB_HEADER = "📇 **Comms** · 🟢 open · 🔴 closed, read back only";
     private static final String MODAL_SUFFIX = "~MDL";
     private static final String REPLY_RESOLVE_PREFIX = "anonCommsReplyResolve_";
     private static final String SETTINGS_RESOLVE = "anonCommsSettingsResolve";
@@ -69,7 +83,9 @@ public class AnonymousCommsService {
     private static final String MESSAGE_INPUT = "message";
     private static final String HOURS_INPUT = "hours";
     private static final String PARTNER_SEPARATOR = "-";
-    private static final Pattern THREAD_NAME = Pattern.compile("^\\w+-comms-(\\w+)-private$", Pattern.CASE_INSENSITIVE);
+    private static final String COMMS_SUFFIX = "-comms-private";
+    private static final Pattern THREAD_NAME =
+            Pattern.compile("^(?:\\w+-comms-(\\w+)|(?:\\S+\\s+)?(\\w+)-comms)-private$", Pattern.CASE_INSENSITIVE);
     private static final Pattern TO_PREFIX =
             Pattern.compile("^to(\\w+)[^\\w\\s]*\\s+(.+)$", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     private static final Pattern USER_MENTION = Pattern.compile("<@!?\\d+>");
@@ -84,6 +100,7 @@ public class AnonymousCommsService {
     // Discord's 24h auto-archive until the next relay; persisting activity needs startup registration in JdaService.
     private static final Map<String, ThreadActivity> LAST_ACTIVITY = new ConcurrentHashMap<>();
     private static final AtomicBoolean CRON_REGISTERED = new AtomicBoolean();
+    private static final Set<String> RENAME_ATTEMPTED = ConcurrentHashMap.newKeySet();
 
     record ThreadActivity(String gameName, Instant lastMessage) {}
 
@@ -102,7 +119,17 @@ public class AnonymousCommsService {
     @Nullable
     static String threadTarget(String threadName) {
         Matcher matcher = THREAD_NAME.matcher(threadName);
-        return matcher.matches() ? matcher.group(1).toLowerCase() : null;
+        if (!matcher.matches()) return null;
+        String target = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
+        return target.toLowerCase();
+    }
+
+    static String partnerThreadName(String color) {
+        return CommsColorMarker.of(color) + " " + StringUtils.capitalize(color) + COMMS_SUFFIX;
+    }
+
+    static String inboxThreadName() {
+        return INBOX_MARKER + StringUtils.capitalize(INBOX) + COMMS_SUFFIX;
     }
 
     public static boolean handleMessage(Game game, @Nullable Player sender, Message message) {
@@ -126,7 +153,12 @@ public class AnonymousCommsService {
             @Nullable Message replyTo) {
         String target = threadTarget(thread.getName());
         if (target == null) return false;
-        if (INBOX.equals(target)) return handleInboxMessage(game, sender, thread, text, attachments, replyTo);
+        acknowledge(game, sender);
+        if (INBOX.equals(target)) {
+            boolean sent = handleInboxMessage(game, sender, thread, text, attachments, replyTo);
+            refreshHub(game, sender, thread);
+            return sent;
+        }
         Player partner = playerWithColor(game, target);
         if (partner == null) {
             post(thread, "No player plays " + target + " in this game anymore.");
@@ -142,7 +174,7 @@ public class AnonymousCommsService {
             String text,
             List<String> attachments,
             @Nullable Message replyTo) {
-        Player repliedTo = replyTo == null ? null : playerWithColor(game, replyTargetColor(replyTo));
+        Player repliedTo = replyTo == null ? null : replyTarget(game, replyTo);
         if (repliedTo != null) return relay(game, sender, repliedTo, text, attachments, inbox);
 
         Matcher to = TO_PREFIX.matcher(text.trim());
@@ -162,8 +194,37 @@ public class AnonymousCommsService {
     }
 
     @Nullable
-    static String replyTargetColor(Message message) {
+    static Player replyTarget(Game game, Message message) {
         if (!message.getAuthor().isBot()) return null;
+        Player fromButton = playerWithColor(game, replyButtonColor(message));
+        if (fromButton != null) return fromButton;
+        Map<String, String> colorsByMarker = new HashMap<>();
+        for (Player player : game.getRealPlayers()) {
+            colorsByMarker.put(notificationMarker(player.getColor()), player.getColor());
+        }
+        return playerWithColor(game, earliestMarkerColor(message.getContentRaw(), colorsByMarker));
+    }
+
+    @Nullable
+    static String earliestMarkerColor(String content, Map<String, String> colorsByMarker) {
+        String earliest = null;
+        int earliestIndex = Integer.MAX_VALUE;
+        for (Map.Entry<String, String> entry : colorsByMarker.entrySet()) {
+            int index = content.indexOf(entry.getKey());
+            if (index >= 0 && index < earliestIndex) {
+                earliestIndex = index;
+                earliest = entry.getValue();
+            }
+        }
+        return earliest;
+    }
+
+    private static String notificationMarker(String color) {
+        return INBOX_MARKER + colorName(color) + ":";
+    }
+
+    @Nullable
+    private static String replyButtonColor(Message message) {
         return message.getComponentTree().findAll(Button.class).stream()
                 .map(Button::getCustomId)
                 .filter(id -> id != null && id.startsWith(REPLY_PREFIX))
@@ -189,8 +250,51 @@ public class AnonymousCommsService {
                 .orElse(null);
     }
 
+    public static boolean sendFromInbox(Game game, Player sender, Player receiver, String text) {
+        ThreadChannel senderInbox = inbox(game, sender);
+        if (senderInbox == null) return false;
+        boolean sent = relay(game, sender, receiver, text, List.of(), senderInbox);
+        refreshHub(game, sender, senderInbox);
+        return sent;
+    }
+
+    @Nullable
+    public static ThreadChannel existingInbox(Game game, Player owner) {
+        return findThread(owner, game.getStoredValue(inboxKey(owner)));
+    }
+
     public static boolean canTalk(Game game, Player sender, Player receiver) {
-        return FowCommunicationThreadService.getCommPartners(game, sender).contains(receiver);
+        if (FowCommunicationThreadService.getCommPartners(game, sender).contains(receiver)) return true;
+        return hasReplyGrant(game, sender, receiver)
+                && FowCommunicationThreadService.getCommPartners(game, receiver).contains(sender);
+    }
+
+    private static boolean hasReplyGrant(Game game, Player owner, Player guildShipsPlayer) {
+        return FowCommunicationThreadService.hasGuildShips(guildShipsPlayer)
+                && !game.getStoredValue(replyGrantKey(owner, guildShipsPlayer)).isEmpty();
+    }
+
+    static void grantReplyIfOneWay(Game game, Player sender, Player receiver) {
+        if (!FowCommunicationThreadService.hasGuildShips(sender)) return;
+        if (!game.getStoredValue(replyGrantKey(receiver, sender)).isEmpty()) return;
+        if (FowCommunicationThreadService.getCommPartners(game, receiver).contains(sender)) return;
+        game.setStoredValue(replyGrantKey(receiver, sender), "true");
+    }
+
+    static String replyGrantKey(Player owner, Player guildShipsPlayer) {
+        return REPLY_GRANT_KEY_PREFIX + owner.getColor() + "_" + guildShipsPlayer.getColor();
+    }
+
+    private static List<String> replyGrantColors(Game game, Player owner) {
+        String prefix = REPLY_GRANT_KEY_PREFIX + owner.getColor() + "_";
+        return game.getStoredValueMap().keySet().stream()
+                .filter(key -> key.startsWith(prefix))
+                .map(key -> key.substring(prefix.length()))
+                .filter(color -> {
+                    Player guildShipsPlayer = playerWithColor(game, color);
+                    return guildShipsPlayer != null && FowCommunicationThreadService.hasGuildShips(guildShipsPlayer);
+                })
+                .toList();
     }
 
     static boolean relay(
@@ -221,10 +325,11 @@ public class AnonymousCommsService {
         }
         boolean typedInConversation = senderThread.getId().equals(source.getId());
         if (!typedInConversation) post(senderThread, "📤 **You:** " + body);
-        notifyInbox(receiver, receiverInbox, sender, body, delivered);
+        notifyInbox(game, receiver, receiverInbox, sender, body, delivered);
         if (!typedInConversation) {
             post(source, "📤 Sent to " + colorName(receiver) + " · " + senderThread.getAsMention());
         }
+        grantReplyIfOneWay(game, sender, receiver);
         touch(game, senderThread);
         touch(game, receiverThread);
         return true;
@@ -245,19 +350,101 @@ public class AnonymousCommsService {
     }
 
     private static void notifyInbox(
-            Player receiver, ThreadChannel inbox, Player sender, String body, @Nullable Message delivered) {
+            Game game, Player receiver, ThreadChannel inbox, Player sender, String body, @Nullable Message delivered) {
         String preview = StringUtils.abbreviate(body.replace('\n', ' '), PREVIEW_LENGTH);
         String link = delivered == null ? "" : "\n-# [Open conversation](" + delivered.getJumpUrl() + ")";
-        String content = receiver.getPing() + " 📨 " + colorName(sender) + ": " + preview + link;
-        sendWithButtons(inbox, content, List.of(replyButton(sender), openButton(sender)));
+        String content = notificationMarker(sender.getColor()) + " " + preview + link;
+        Instant now = Instant.now();
+        boolean ping = shouldPing(lastPing(game, receiver), now);
+        if (ping) {
+            content = (receiver.getPing() + " " + content).trim();
+            game.setStoredValue(pingKey(receiver), String.valueOf(now.toEpochMilli()));
+        }
+        send(inbox, content, List.of(), !ping);
+        refreshHub(game, receiver, inbox);
     }
 
-    private static Button replyButton(Player partner) {
-        return Buttons.blue(REPLY_PREFIX + partner.getColor() + MODAL_SUFFIX, "Reply to " + colorTitle(partner));
+    static boolean shouldPing(@Nullable Long lastPingMillis, Instant now) {
+        return lastPingMillis == null || isQuiet(Instant.ofEpochMilli(lastPingMillis), REPING_HOURS, now);
     }
 
-    private static Button openButton(Player partner) {
-        return Buttons.gray(OPEN_PREFIX + partner.getColor(), "Open " + colorTitle(partner));
+    @Nullable
+    private static Long lastPing(Game game, Player player) {
+        String stored = game.getStoredValue(pingKey(player));
+        if (StringUtils.isBlank(stored)) return null;
+        try {
+            return Long.parseLong(stored.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private static void acknowledge(Game game, Player player) {
+        if (!game.getStoredValue(pingKey(player)).isEmpty()) game.removeStoredValue(pingKey(player));
+    }
+
+    static String pingKey(Player owner) {
+        return PING_KEY_PREFIX + owner.getColor();
+    }
+
+    static String hubKey(Player owner) {
+        return HUB_KEY_PREFIX + owner.getColor();
+    }
+
+    private static void refreshHub(Game game, Player owner, ThreadChannel inbox) {
+        refreshHub(game, owner, inbox, partnerColors(game, owner));
+    }
+
+    private static void refreshHub(Game game, Player owner, ThreadChannel inbox, List<String> partners) {
+        try {
+            unarchive(inbox);
+        } catch (Exception e) {
+            BotLogger.error("Could not unarchive anonymous comms inbox " + inbox.getName(), e);
+        }
+        deleteHub(game, owner, inbox);
+        Set<String> realColors =
+                game.getRealPlayers().stream().map(Player::getColor).collect(Collectors.toSet());
+        List<String> open = new ArrayList<>(partners);
+        open.addAll(replyGrantColors(game, owner));
+        Map<String, Boolean> styles = hubButtonStyles(knownColors(game, owner), open, realColors, owner.getColor());
+        List<Button> buttons = styles.entrySet().stream()
+                .map(entry -> hubButton(entry.getKey(), entry.getValue()))
+                .toList();
+        String text = buttons.isEmpty() ? HUB_HEADER + "\nNo colors encountered yet." : HUB_HEADER;
+        Message hub = send(inbox, text, buttons, true);
+        if (hub != null) game.setStoredValue(hubKey(owner), hub.getId());
+    }
+
+    private static void deleteHub(Game game, Player owner, ThreadChannel inbox) {
+        String hubId = game.getStoredValue(hubKey(owner));
+        if (StringUtils.isBlank(hubId)) return;
+        game.removeStoredValue(hubKey(owner));
+        inbox.deleteMessageById(hubId).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static Set<String> knownColors(Game game, Player owner) {
+        Set<String> known = new HashSet<>(FowCommunicationThreadService.encounteredColors(game, owner));
+        String threadPrefix = THREAD_KEY_PREFIX + owner.getColor() + "_";
+        game.getStoredValueMap().keySet().stream()
+                .filter(key -> key.startsWith(threadPrefix))
+                .map(key -> key.substring(threadPrefix.length()))
+                .forEach(known::add);
+        return known;
+    }
+
+    static Map<String, Boolean> hubButtonStyles(
+            Collection<String> known, Collection<String> partners, Collection<String> realColors, String ownColor) {
+        Map<String, Boolean> styles = new TreeMap<>();
+        Stream.concat(known.stream(), partners.stream())
+                .filter(realColors::contains)
+                .filter(color -> !color.equals(ownColor))
+                .forEach(color -> styles.put(color, partners.contains(color)));
+        return styles;
+    }
+
+    private static Button hubButton(String color, boolean open) {
+        String label = StringUtils.capitalize(color);
+        return open ? Buttons.green(OPEN_PREFIX + color, label) : Buttons.red(OPEN_PREFIX + color, label);
     }
 
     static String sanitize(String text) {
@@ -279,10 +466,6 @@ public class AnonymousCommsService {
         return ColorEmojis.getColorEmojiWithName(color);
     }
 
-    private static String colorTitle(Player player) {
-        return StringUtils.capitalize(player.getColor());
-    }
-
     @Nullable
     static Player ownerOf(Game game, ThreadChannel thread) {
         String parentId = thread.getParentChannel().getId();
@@ -302,14 +485,13 @@ public class AnonymousCommsService {
 
     @Nullable
     public static ThreadChannel inbox(Game game, Player owner) {
-        String name = game.getName() + "-comms-" + INBOX + "-private";
         return findOrCreateThread(
-                game, owner, inboxKey(owner), name, AutoArchiveDuration.TIME_1_WEEK, inboxIntro(game));
+                game, owner, inboxKey(owner), inboxThreadName(), AutoArchiveDuration.TIME_1_WEEK, inboxIntro(game));
     }
 
     @Nullable
     public static ThreadChannel partnerThread(Game game, Player owner, Player partner) {
-        String name = game.getName() + "-comms-" + partner.getColor() + "-private";
+        String name = partnerThreadName(partner.getColor());
         String intro = "## Comms with " + colorName(partner) + "\nType here to talk to " + colorName(partner)
                 + ". Your messages are relayed by the bot, so neither of you sees who is behind the other color.";
         return findOrCreateThread(
@@ -321,22 +503,26 @@ public class AnonymousCommsService {
                 + "Messages from the colors you have comms with arrive here. The bot relays every message, so nobody"
                 + " can see which Discord user plays which color.\n"
                 + "- **Send:** `to<color> message`, e.g. `tored want to trade?`\n"
-                + "- **Reply:** use Discord's reply on a 📨 message, or its **Reply** button\n"
+                + "- **Reply:** use Discord's reply on a 📨 message\n"
                 + "- **Conversations:** each color gets its own thread in this channel, where you type without a"
                 + " prefix. Quiet threads hide after " + hideHours(game) + " hours and come back with the next"
-                + " message.";
+                + " message. The 📇 buttons at the bottom open them: green while you have comms, red when you"
+                + " can only read back.\n"
+                + "- **Pings:** only the first new message pings you. The next ones arrive silently until you"
+                + " send a message or press a comms button, or " + REPING_HOURS + " hours have passed.";
     }
 
     @Nullable
     private static ThreadChannel findOrCreateThread(
             Game game, Player owner, String key, String name, AutoArchiveDuration duration, String intro) {
+        String fittedName = DiscordThreadUtility.fitThreadName(name);
         ThreadChannel existing = findThread(owner, game.getStoredValue(key));
-        if (existing != null) return existing;
+        if (existing != null) return renamedIfOutdated(existing, fittedName);
         TextChannel privateChannel = owner.getPrivateChannel();
         if (privateChannel == null) return null;
         try {
             ThreadChannel created = privateChannel
-                    .createThreadChannel(DiscordThreadUtility.fitThreadName(name))
+                    .createThreadChannel(fittedName)
                     .setAutoArchiveDuration(duration)
                     .complete();
             game.setStoredValue(key, created.getId());
@@ -346,6 +532,12 @@ public class AnonymousCommsService {
             BotLogger.error("Could not create anonymous comms thread " + name, e);
             return null;
         }
+    }
+
+    private static ThreadChannel renamedIfOutdated(ThreadChannel thread, String name) {
+        if (name.equals(thread.getName()) || !RENAME_ATTEMPTED.add(thread.getId())) return thread;
+        thread.getManager().setArchived(false).setName(name).queue(Consumers.nop(), BotLogger::catchRestError);
+        return thread;
     }
 
     private static String withMemberTags(Game game, Player owner, String intro) {
@@ -385,12 +577,16 @@ public class AnonymousCommsService {
         }
     }
 
-    private static void sendWithButtons(MessageChannel channel, String text, List<Button> buttons) {
+    @Nullable
+    private static Message send(MessageChannel channel, String text, List<Button> buttons, boolean silent) {
         try {
             unarchive(channel);
-            channel.sendMessage(text).addComponents(rowsOf(buttons)).complete();
+            MessageCreateAction action = channel.sendMessage(text).setSuppressedNotifications(silent);
+            if (!buttons.isEmpty()) action = action.addComponents(rowsOf(buttons));
+            return action.complete();
         } catch (Exception e) {
             BotLogger.error("Could not post to anonymous comms channel " + channel.getName(), e);
+            return null;
         }
     }
 
@@ -408,23 +604,28 @@ public class AnonymousCommsService {
         }
     }
 
-    public static void refreshPartners(Game game) {
+    static void refreshPartners(Game game, Map<Player, Set<Player>> basePartners) {
         if (!isActive(game)) return;
         for (Player player : game.getRealPlayers()) {
             if (player.getPrivateChannel() == null) continue;
-            List<String> partners = partnerColors(game, player);
+            List<String> partners = partnerColors(game, player, basePartners.get(player));
             List<String> previous = storedPartners(game, player);
             boolean hasInbox = !game.getStoredValue(inboxKey(player)).isEmpty();
             if (hasInbox && partners.equals(previous)) continue;
             ThreadChannel inbox = inbox(game, player);
             if (inbox == null) continue;
             announcePartnerChanges(inbox, previous, partners);
+            refreshHub(game, player, inbox, partners);
             game.setStoredValue(PARTNERS_KEY_PREFIX + player.getColor(), String.join(PARTNER_SEPARATOR, partners));
         }
     }
 
     public static List<String> partnerColors(Game game, Player player) {
-        return FowCommunicationThreadService.getCommPartners(game, player).stream()
+        return partnerColors(game, player, null);
+    }
+
+    private static List<String> partnerColors(Game game, Player player, @Nullable Set<Player> basePartners) {
+        return FowCommunicationThreadService.getCommPartners(game, player, basePartners).stream()
                 .filter(Player::isRealPlayer)
                 .map(Player::getColor)
                 .sorted()
@@ -450,16 +651,11 @@ public class AnonymousCommsService {
         if (!lost.isEmpty())
             message.append("📴 Comms lost with ").append(colorList(lost)).append(".\n");
         if (partners.isEmpty()) {
-            post(
-                    inbox,
-                    message.append("You have no comms with anyone right now.").toString());
-            return;
+            message.append("You have no comms with anyone right now.");
+        } else {
+            message.append("You can reach ").append(colorList(partners)).append('.');
         }
-        message.append("You can reach ").append(colorList(partners)).append('.');
-        List<Button> buttons = partners.stream()
-                .map(color -> Buttons.gray(OPEN_PREFIX + color, "Open " + StringUtils.capitalize(color)))
-                .toList();
-        sendWithButtons(inbox, message.toString(), buttons);
+        post(inbox, message.toString());
     }
 
     private static String colorList(List<String> colors) {
@@ -531,6 +727,10 @@ public class AnonymousCommsService {
                 game.removeStoredValue(key);
             }
             game.removeStoredValue(PARTNERS_KEY_PREFIX + player.getColor());
+            game.removeStoredValue(pingKey(player));
+            game.removeStoredValue(hubKey(player));
+            String grantPrefix = REPLY_GRANT_KEY_PREFIX + player.getColor() + "_";
+            game.getStoredValueMap().keySet().removeIf(key -> key.startsWith(grantPrefix));
         }
         return deleted;
     }
@@ -596,10 +796,14 @@ public class AnonymousCommsService {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not open that conversation.");
             return;
         }
+        acknowledge(game, player);
         unarchive(thread);
         touch(game, thread);
+        String closedNotice = canTalk(game, player, partner)
+                ? ""
+                : "\nComms are closed right now: you can read back, but your messages will not be relayed.";
         MessageHelper.sendEphemeralMessageToEventChannel(
-                event, "Conversation with " + colorName(partner) + ": " + thread.getAsMention());
+                event, "Conversation with " + colorName(partner) + ": " + thread.getAsMention() + closedNotice);
     }
 
     @ButtonHandler(value = REPLY_PREFIX, save = false)
@@ -616,6 +820,7 @@ public class AnonymousCommsService {
 
     @ModalHandler(REPLY_RESOLVE_PREFIX)
     public static void resolveReply(ModalInteractionEvent event, Game game, Player player) {
+        acknowledge(game, player);
         Player receiver = playerWithColor(game, event.getModalId().replace(REPLY_RESOLVE_PREFIX, ""));
         if (receiver == null) {
             event.getHook()

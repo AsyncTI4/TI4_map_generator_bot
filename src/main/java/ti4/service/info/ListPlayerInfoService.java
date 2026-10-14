@@ -483,7 +483,9 @@ public class ListPlayerInfoService {
         if (player.hasUnexhaustedLeader("keleresagent")) {
             comms = player.getCommodities();
         }
-        if (!plausibleD && player.hasTech("tf-plausibled") && Mapper.getSecretObjective(objID) != null) {
+        if (!plausibleD
+                && (player.hasTech("tf-plausibled") || player.hasAbility("plausible_deniability_br"))
+                && Mapper.getSecretObjective(objID) != null) {
             int max = 0;
             for (Player p2 : game.getRealPlayers()) {
                 max = Math.max(max, getPlayerProgressOnObjective(objID, game, p2, true));

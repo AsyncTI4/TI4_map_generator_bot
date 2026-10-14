@@ -1,7 +1,6 @@
 package ti4.helpers;
 
-import static java.util.Map.entry;
-import static java.util.Map.ofEntries;
+import static java.util.Map.*;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -154,6 +153,7 @@ public final class Constants {
     public static final String GAME_CUSTOM_NAME = "game_custom_name";
     public static final String LAST_IMAGE_FILE_NAME = "last_image_file_name";
     public static final String AVERNUS = "avernus";
+    public static final String OCEANUS = "oceanus";
     public static final String BROKENPLANET1 = "brokenplanet1";
     public static final String BROKENPLANET2 = "brokenplanet2";
     public static final String BROKENPLANET3 = "brokenplanet3";
@@ -488,6 +488,7 @@ public final class Constants {
             LOST_STATION,
             ILLUSTRION,
             AVERNUS,
+            OCEANUS,
             THUNDERSEDGE,
             BROKENPLANET1,
             BROKENPLANET2,

@@ -33,6 +33,7 @@ import ti4.model.TestBedPreset;
 import ti4.model.TestBedScript;
 import ti4.model.TestBedScript.Expect;
 import ti4.model.TestBedScript.Step;
+import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.GMService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.testbed.TestBedPress.PressResult;
@@ -42,6 +43,7 @@ import ti4.service.turn.StartTurnService;
 public final class TestBedScriptRunner {
 
     private static final String CARDS_INFO_LAST_TEXT = "You may whisper to people from here";
+    private static final String ANON_COMMS_TEXT = "test bed comms message";
     private static final long STATE_POLL_MILLIS = 250;
     private static final long QUIET_MILLIS = 1000;
     private static final int MAX_DETAIL = 160;
@@ -492,6 +494,17 @@ public final class TestBedScriptRunner {
                 game.updateActivePlayer(seat);
                 StartTurnService.turnStart(origin, game, seat);
             }
+            case "sendAnonComms" -> {
+                Player sender = seat(game, step.getAs());
+                Player receiver = seat(game, step.getValue());
+                if (sender == null || receiver == null) {
+                    problems.add("no seat `" + (sender == null ? step.getAs() : step.getValue()) + "`");
+                    return;
+                }
+                if (!AnonymousCommsService.sendFromInbox(game, sender, receiver, ANON_COMMS_TEXT)) {
+                    problems.add("comms not sent; see the sender's comms inbox");
+                }
+            }
             case "actAs" -> {
                 boolean you = TestBedScriptService.YOU.equals(step.getAs());
                 Player seat = you ? null : seat(game, step.getAs());
@@ -602,6 +615,9 @@ public final class TestBedScriptRunner {
                 ? expect.getEquals().trim().equalsIgnoreCase(actual.trim())
                 : expect.getContains().stream().allMatch(actual::contains)
                         && expect.getNotContains().stream().noneMatch(actual::contains);
+        if (expect.getMatches() != null) {
+            ok = ok && Pattern.compile(expect.getMatches()).matcher(actual).find();
+        }
         return new Check(ok, actual);
     }
 
@@ -750,6 +766,7 @@ public final class TestBedScriptRunner {
                 return switch (scope.substring(colon + 1)) {
                     case "private" -> seat.getPrivateChannel();
                     case "combat" -> TestBedCombatThreads.latest(game, seat);
+                    case "comms-inbox" -> AnonymousCommsService.existingInbox(game, seat);
                     default -> seat.getCardsInfoThread();
                 };
             }

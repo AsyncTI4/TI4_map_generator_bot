@@ -25,6 +25,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.EdynAgentHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.TnelisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantTechHandler;
@@ -1523,7 +1525,17 @@ public final class ButtonHelperModifyUnits {
                     }
                 }
             }
-            if (player != player2 && players.contains(player)) {
+            boolean deployedDaedalonIntoCoexistence =
+                    TnelisUnitHandler.consumeDeployCoexistence(game, player, tile, unitHolder);
+            if (player != player2 && players.contains(player) && !deployedDaedalonIntoCoexistence) {
+                boolean edynAgentCanBeUsedByLandingPlayer =
+                        EdynAgentHandler.canUseToAllowCoexistence(game, player, player, unitHolder);
+                boolean anotherEdynAgentCanBeUsed = game.getRealPlayers().stream()
+                        .anyMatch(agentOwner ->
+                                EdynAgentHandler.canUseToAllowCoexistence(game, agentOwner, player, unitHolder));
+                if (anotherEdynAgentCanBeUsed) {
+                    EdynAgentHandler.offerCoexistence(game, player, unitHolder);
+                }
                 if (!TwilightsFallMonumentsButtonHandler.preventsCoexistence(game, tile)
                         && (player2.hasUnlockedBreakthrough("titansbt")
                                 || player.hasUnlockedBreakthrough("titansbt")
@@ -1565,6 +1577,9 @@ public final class ButtonHelperModifyUnits {
                     } else {
                         buttons.add(Buttons.green(player.factionButtonChecker() + "deleteButtons", "Coexistence"));
                     }
+                    if (edynAgentCanBeUsedByLandingPlayer) {
+                        buttons.add(EdynAgentHandler.getCoexistenceButton(player, player, unitHolder.getName()));
+                    }
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
                     if (player2.getPlanets().contains(unitHolder.getName())
                             && (player2.hasAbility("researchteam")
@@ -1584,6 +1599,18 @@ public final class ButtonHelperModifyUnits {
                         MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), msg, buttons);
                     }
 
+                } else if (edynAgentCanBeUsedByLandingPlayer) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(EdynAgentHandler.getCoexistenceButton(player, player, unitHolder.getName()));
+                    buttons.add(Buttons.red(
+                            player.factionButtonChecker() + "startCombatOn_" + unitHolder.getName(),
+                            "Engage in Combat"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCorrectChannel(),
+                            player.getRepresentationNoPing()
+                                    + ", you may use Allant to allow your units to enter coexistence on "
+                                    + Helper.getPlanetRepresentation(unitHolder.getName(), game) + ".",
+                            buttons);
                 } else {
                     if (game.getStoredValue("coexistFlag").isEmpty()) {
                         StartCombatService.startGroundCombat(player, player2, game, event, unitHolder, tile);

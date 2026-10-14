@@ -18,6 +18,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.acd2.FracturedReali
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.TnelisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
@@ -38,6 +39,7 @@ import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
@@ -124,6 +126,8 @@ public class EndTurnService {
         RevenantLeadersHandler.clearPurpleLeaderActionState(game);
         MonumentsDSButtonHandler.clearForbiddenLibraryActionState(game, player);
         MonumentsDSButtonHandler.clearMirrorforgeActionState(game, player);
+        BlueReverieTechHelper.clearProductionBiomes(game, player);
+        TnelisUnitHandler.clearDeployState(game, player);
         if (player.hasAbility("phantom_energy")) {
             TyrisAbilityHandler.cleanupPhantomEnergy(game, player);
         }

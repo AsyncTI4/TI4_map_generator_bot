@@ -508,6 +508,7 @@ class AgendaResolveButtonHandler {
                     + ", please use this buttons to proceed after fully resolving the agenda.";
             buttons = StartTurnService.getStartOfTurnButtons(executiveOrderPlayer, game, true, event);
             game.removeStoredValue("executiveOrder");
+            game.removeStoredValue("executiveOrderBr");
             game.updateActivePlayer(executiveOrderPlayer);
             Player oldSpeaker = game.getPlayer(game.getStoredValue("oldSpeakerExecutiveOrder"));
             game.setSpeaker(oldSpeaker);

@@ -209,6 +209,9 @@ public class PlayStrategyCardService {
         if (isOverrule || winnuHero) {
             removeFollowButtons(scButtons);
         }
+        if ("br5trade".equals(scModel.getId())) {
+            scButtons.add(BRTradeStrategyCardService.getPlaceOrMoveStationButton(player));
+        }
         if (isOverrule) {
             String ffcc = player.factionButtonChecker();
             scButtons.replaceAll(button -> {
@@ -987,14 +990,19 @@ public class PlayStrategyCardService {
             return getGenericButtons(sc);
         }
 
-        String scAutomationID = scModel.getBotSCAutomationID();
-
-        // Handle Special Cases
-        if (!isOverrule && "pok8imperial".equals(scAutomationID)) {
+        if (!isOverrule && "pok8imperial".equals(scModel.getBotSCAutomationID())) {
             handleSOQueueing(game, winnuHero);
         }
+        return getStrategyCardButtons(sc, game, player);
+    }
 
-        // Return Buttons
+    public static List<Button> getStrategyCardButtons(int sc, Game game, Player player) {
+        StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
+        if (scModel == null) {
+            return getGenericButtons(sc);
+        }
+
+        String scAutomationID = scModel.getBotSCAutomationID();
         return switch (scAutomationID) {
             case "pok1leadership" -> getLeadershipButtons(sc);
             case "pok2diplomacy" -> getDiplomacyButtons(sc, player);

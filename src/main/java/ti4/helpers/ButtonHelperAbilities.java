@@ -17,6 +17,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.TnelisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisAbilityHandler;
@@ -2229,14 +2230,20 @@ public final class ButtonHelperAbilities {
     @ButtonHandler("enterCoexistence_")
     public static void enterCoexistence(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String planet = buttonID.split("_")[1];
-        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
-        Tile tile = game.getTileFromPlanet(planet);
-        if (TwilightsFallMonumentsButtonHandler.preventsCoexistence(game, tile)) {
+        if (!resolveCoexistence(event, game, player, planet)) {
             MessageHelper.sendEphemeralMessageToEventChannel(
                     event, "Units cannot enter coexistence in The Crown Of Thorns system.");
             return;
         }
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    public static boolean resolveCoexistence(ButtonInteractionEvent event, Game game, Player player, String planet) {
+        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
+        Tile tile = game.getTileFromPlanet(planet);
+        if (unitHolder == null || tile == null || TwilightsFallMonumentsButtonHandler.preventsCoexistence(game, tile)) {
+            return false;
+        }
         List<Player> playersWithUnitsOnPlanet = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, unitHolder);
         Optional<Player> enemyPlayer = playersWithUnitsOnPlanet.stream()
                 .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
@@ -2245,6 +2252,7 @@ public final class ButtonHelperAbilities {
             AddPlanetService.addPlanet(enemyPlayer.get(), planet, game);
         }
         ThurvialiBreakthroughHandler.offerNeurografting(event, game, player, unitHolder);
+        TnelisUnitHandler.offerStealthCorps(game, player, unitHolder);
         oceanBoundCheck(game);
         if (player.hasAbility("raider_coves")) {
             player.gainTG(2, true);
@@ -2253,6 +2261,7 @@ public final class ButtonHelperAbilities {
                     player.getRepresentation() + " gained 2tg due to their raider coves ability");
             ButtonHelperAgents.resolveArtunoCheck(player, 2);
         }
+        return true;
     }
 
     @ButtonHandler("claimPlanet_")

@@ -331,7 +331,8 @@ public class ListTechService {
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "zealotscommander")) {
                         wilds++;
                     } else {
-                        if (synergies.contains(TechnologyType.valueOf(type.toUpperCase()))) {
+                        if (synergies.stream()
+                                .anyMatch(synergy -> synergy.name().equalsIgnoreCase(type))) {
                             requirements = X.matcher(requirements).replaceFirst("");
                             if (player.hasAbility("ancient_knowledge")) {
                                 requirements = X.matcher(requirements).replaceFirst("");

@@ -292,7 +292,7 @@ and ids fail with every error listed at once; problems that only show while appl
 | `note` | `{ "note": "round 2 starts" }` |
 | `press` | `{ "as": "sol", "press": "strategicAction_3", "in": "main" }` |
 | `pressId` | `{ "as": "nekro", "pressId": "sc_follow_3" }` |
-| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields), `actAs` (as or `you`) |
+| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox) |
 | `wait` | `{ "wait": 5 }` (seconds) |
 | `expect` | one of the checks below |
 
@@ -300,7 +300,7 @@ Every step may also have a `label` for the report.
 
 | Check | Example | Passes when |
 | --- | --- | --- |
-| State | `{ "state": "hacan.tg", "equals": "3" }` | equals (as text, case ignored), or contains every `contains` and no `notContains` |
+| State | `{ "state": "hacan.tg", "equals": "3" }` | equals (as text, case ignored), or contains every `contains` and no `notContains`; `matches` (regex) must also find a match |
 | Messages | `{ "in": "hacan:cards-info", "contains": "Reminder", "count": 1 }` | among messages since the last `press` or `do`; also `notContains`, `noFactionLeak`, `matches` (regex), `attachment` (file name contains), `buttons`, `noButtons`, `since` |
 | Reply | `{ "ephemeral": "these buttons are for someone else" }` | a reply to the previous press contains it |
 | Modal | `{ "modal": "tradeModal_" }` | the previous press opened a modal whose id starts with it |
@@ -310,7 +310,7 @@ Every step may also have a `label` for the report.
 - **Scopes (`in`):** `main`, `actions` (normal games only; fog games have no actions channel), `gm` (fog games
   only), `<seat>` (the seat's own channel from `getCorrectChannel()`: its private channel when it has one, in fog
   or not, otherwise the main channel), `<seat>:private`, `<seat>:cards-info`, `<seat>:combat` (its newest combat
-  thread).
+  thread), `<seat>:comms-inbox` (its anonymous comms inbox thread, once it exists).
 - **State paths:** `<seat>.` + `tg`, `commodities`, `ccs`, `tacticalCcs`, `fleetCcs`, `strategyCcs`, `vp`,
   `debt`, `scs`, `passed`, `followed`, `acs` (count), `acIds`, `sos` (count), `soIds`, `pns`, `pnsInPlay`,
   `sosScored`, `posScored`, `fragments`, `breakthroughs`, `leaders`, `techs`, `exhaustedTechs`, `purgedTechs`,

@@ -366,7 +366,8 @@ public class RelicHelper {
     }
 
     public static void showRemaining(MessageChannel channel, boolean over, Game game, Player player) {
-        if (!FOWPlusService.deckInfoAvailable(player, game)) {
+        String viewerId = player == null ? null : player.getUserID();
+        if (!FOWPlusService.deckInfoAvailable(game, viewerId, channel)) {
             return;
         }
 

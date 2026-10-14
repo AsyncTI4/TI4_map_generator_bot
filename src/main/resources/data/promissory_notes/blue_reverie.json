@@ -82,5 +82,15 @@
         "playImmediately": false,
         "source": "blue_reverie",
         "text": "ACTION: Place this card face up in your play area. Once per action, when you win a combat against a player with more victory points than you, gain 3 commodities. You must spend 1 token from your fleet pool and return this card to the Toldar player to activate a system that contains that player's units."
+    },
+    {
+        "alias": "<color>_br_sftt",
+        "name": "Support for the Throne",
+        "color": "<color>",
+        "playArea": true,
+        "playImmediately": true,
+        "text": "When you receive this card and you are not the [color] player, place it in your play area.\n\nIf you have your “Support for the Throne” promissory note, you have 1 additional victory point. If you activate a system that contains a planet the [color] player controls, return this card to the [color] player.",
+        "homebrewReplacesID": "<color>_sftt",
+        "source": "blue_reverie"
     }
 ]
