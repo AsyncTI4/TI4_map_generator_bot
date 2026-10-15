@@ -1018,13 +1018,16 @@ public class ButtonHelperCommanders {
 
         String message = player.getFactionEmojiOrColor() + " moved 1 " + mechorInf + " from " + planetRepresentation2
                 + " to " + planetRepresentation + " using G'hom Sek'kus, the Sardakk Commander.";
-        RemoveUnitService.removeUnits(
-                event, game.getTileFromPlanet(planet2), game, player.getColor(), "1 " + mechorInf + " " + planet2);
-
-        FlipTileService.flipTileIfNeeded(event, game.getTileFromPlanet(planet1), game);
-        planet1 = planet1.replace("lockedm", "m");
-        AddUnitService.addUnits(
-                event, game.getTileFromPlanet(planet1), game, player.getColor(), "1 " + mechorInf + " " + planet1);
+        Tile origin = game.getTileFromPlanet(planet2);
+        planet1 = FlipTileService.unlockMalliceIfNeeded(event, planet1, game);
+        Tile destination = game.getTileFromPlanet(planet1);
+        if (origin == null || destination == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "Could not find " + planetRepresentation2 + " or " + planetRepresentation + " on the map.");
+            return;
+        }
+        RemoveUnitService.removeUnits(event, origin, game, player.getColor(), "1 " + mechorInf + " " + planet2);
+        AddUnitService.addUnits(event, destination, game, player.getColor(), "1 " + mechorInf + " " + planet1);
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         CommanderUnlockCheckService.checkPlayer(player, "naaz");

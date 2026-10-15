@@ -154,14 +154,8 @@ class YinHeroButtonHandler {
                         && (!blueReverie || !p.isLegendary()))
                 .withPageNavPrefix(planetPrefix + "_");
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
-        String planet = buttonID.replace(planetButtonPrefix + "_", "");
-        if ("lockedmallice".equalsIgnoreCase(planet)) {
-            planet = "mallice";
-            FlipTileService.flipTileIfNeeded(event, game.getTileFromPlanet("lockedmallice"), game);
-        } else if ("hexlockedmallice".equalsIgnoreCase(planet)) {
-            planet = "hexmallice";
-            FlipTileService.flipTileIfNeeded(event, game.getTileFromPlanet("hexlockedmallice"), game);
-        }
+        String planet =
+                FlipTileService.unlockMalliceIfNeeded(event, buttonID.replace(planetButtonPrefix + "_", ""), game);
         Tile targetTile = game.getTileFromPlanet(planet);
         Planet targetPlanet = game.getUnitHolderFromPlanet(planet);
         boolean mallice = planet.toLowerCase().contains("mallice");
