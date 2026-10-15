@@ -11,39 +11,22 @@ import ti4.game.Player;
 
 class PlayerGamesReportServiceTest {
 
+    // Any read of the seat (faction, color, VP, turn) could leak it, so fog rows must leave the player untouched.
+    // fow9 on the dev bot had fow_mode false but kept its fog channels, hence the name-based case.
     @Test
-    void activeFogGameNeverReadsThePlayersSeat() {
-        Game game = fogGame(false);
+    void fogRowsNeverReadThePlayersSeat() {
         Player player = mock(Player.class);
+        Game fowNamedWithFogOff = fogGame(false);
+        when(fowNamedWithFogOff.isFowMode()).thenReturn(false);
 
-        String block = PlayerGamesReportService.activeGameBlock(game, player, "target", true);
-
-        // Any read of the seat (faction, color, VP, turn) could leak it, so the player must stay untouched.
+        assertThat(PlayerGamesReportService.activeGameBlock(fogGame(false), player, "target", true))
+                .contains("fow42")
+                .doesNotContain("VP");
+        PlayerGamesReportService.activeGameBlock(fowNamedWithFogOff, player, "target", false);
+        assertThat(PlayerGamesReportService.endedGameLine(fogGame(true), player, "target"))
+                .contains("completed")
+                .doesNotContain("winner");
         verifyNoInteractions(player);
-        assertThat(block).contains("fow42").doesNotContain("VP");
-    }
-
-    @Test
-    void fowNamedGameWithFogSwitchedOffIsStillTreatedAsFog() {
-        // fow9 on the dev bot had fow_mode false but kept its fog channels and seats.
-        Game game = fogGame(false);
-        when(game.isFowMode()).thenReturn(false);
-        Player player = mock(Player.class);
-
-        PlayerGamesReportService.activeGameBlock(game, player, "target", false);
-
-        verifyNoInteractions(player);
-    }
-
-    @Test
-    void endedFogGameNeverReadsThePlayersSeat() {
-        Game game = fogGame(true);
-        Player player = mock(Player.class);
-
-        String line = PlayerGamesReportService.endedGameLine(game, player, "target");
-
-        verifyNoInteractions(player);
-        assertThat(line).contains("fow42").contains("completed").doesNotContain("winner");
     }
 
     @Test
@@ -58,9 +41,7 @@ class PlayerGamesReportServiceTest {
         when(game.isFowMode()).thenReturn(true);
         when(game.isHasEnded()).thenReturn(ended);
         when(game.getName()).thenReturn("fow42");
-        when(game.getRound()).thenReturn(3);
         when(game.hasWinner()).thenReturn(true);
-        when(game.getCreationDateTime()).thenReturn(0L);
         when(game.getEndedDate()).thenReturn(86_400_000L * 40);
         return game;
     }

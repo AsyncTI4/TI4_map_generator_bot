@@ -176,23 +176,17 @@ class TestBedDataTest extends BaseTi4Test {
     }
 
     @Test
-    void teamMateYouNeedsNoYouSeatAndOnlyOneTeamSeat() {
+    void teamSeatFieldsAreValidated() {
         TestBedPreset preset = TestBedPresetService.parse("""
                 {
                   "you": { "faction": "sol" },
-                  "seats": [{ "teamMateYou": true }, { "teamMateYou": true }]
+                  "seats": [{ "teamMateYou": true, "botAccount": true }, { "teamMateYou": true, "botAccount": true }]
                 }""");
         assertContains(
                 TestBedPresetService.validate(preset),
                 "`teamMateYou` needs a preset without `you`",
-                "Only one seat may set `teamMateYou`");
-    }
-
-    @Test
-    void onlyOneSeatMayBeTheBotAccount() {
-        TestBedPreset preset = TestBedPresetService.parse("""
-                { "seats": [{ "botAccount": true }, { "botAccount": true }] }""");
-        assertContains(TestBedPresetService.validate(preset), "Only one seat may set `botAccount`");
+                "Only one seat may set `teamMateYou`",
+                "Only one seat may set `botAccount`");
     }
 
     // Map and fog preset fields fail validation up front: bad positions, tiles, lane matrices and fog options, and

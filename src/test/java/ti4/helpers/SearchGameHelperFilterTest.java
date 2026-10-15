@@ -13,39 +13,28 @@ import ti4.game.persistence.ManagedPlayer;
 class SearchGameHelperFilterTest {
 
     private static final String USER = "user";
-    private static final String TEAMMATE = "teammate";
 
+    // Last flag: false = /search my_games (active fog hidden), true = /bothelper player_games (active fog shown).
     @Test
-    void myGamesKeepsHidingActiveFogGames() {
-        // /search my_games must stay unchanged: active fog hidden, ended fog shown only with ended games.
+    void activeFogGamesOnlyAppearInTheBothelperView() {
         assertThat(SearchGameHelper.gameFilter(USER, false, false, false, false, false)
                         .test(game(true, false)))
                 .isFalse();
+        assertThat(SearchGameHelper.gameFilter(USER, false, false, false, false, true)
+                        .test(game(true, false)))
+                .isTrue();
         assertThat(SearchGameHelper.gameFilter(USER, false, true, false, false, false)
                         .test(game(true, true)))
                 .isTrue();
-        assertThat(SearchGameHelper.gameFilter(USER, false, false, false, false, false)
-                        .test(game(false, false)))
-                .isTrue();
-    }
-
-    @Test
-    void bothelperViewIncludesActiveFogGames() {
-        assertThat(SearchGameHelper.gameFilter(USER, false, false, false, false, true)
-                        .test(game(true, false)))
-                .isTrue();
-        assertThat(SearchGameHelper.gameFilter(USER, false, false, false, false, true)
-                        .test(game(true, true)))
-                .isFalse();
     }
 
     @Test
     void teammateFindsTheGameAndItsTurn() {
         ManagedGame game = game(false, false);
-        when(game.getSeatUserId(TEAMMATE)).thenReturn(USER);
+        when(game.getSeatUserId("teammate")).thenReturn(USER);
         when(game.getActivePlayerId()).thenReturn(USER);
 
-        assertThat(SearchGameHelper.gameFilter(TEAMMATE, true, false, false, false, false)
+        assertThat(SearchGameHelper.gameFilter("teammate", true, false, false, false, false)
                         .test(game))
                 .isTrue();
         assertThat(SearchGameHelper.gameFilter("stranger", false, false, false, false, false)
