@@ -1053,12 +1053,7 @@ public class ButtonHelperHeroes {
 
     @ButtonHandler("gheminaLordHero_")
     public static void resolveGheminaLordHero(String buttonID, Player player, Game game, ButtonInteractionEvent event) {
-        String planetID = buttonID.split("_")[1];
-        if ("lockedmallice".equalsIgnoreCase(planetID)) {
-            planetID = "mallice";
-            Tile tile = game.getTileFromPlanet("lockedmallice");
-            FlipTileService.flipTileIfNeeded(event, tile, game);
-        }
+        String planetID = FlipTileService.unlockMalliceIfNeeded(event, buttonID.split("_")[1], game);
         AddPlanetService.addPlanet(player, planetID, game, event, false);
         PlanetService.refreshPlanet(player, planetID);
         String planetRep = Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game);

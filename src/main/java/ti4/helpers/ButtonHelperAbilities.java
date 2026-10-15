@@ -2688,16 +2688,7 @@ public final class ButtonHelperAbilities {
 
     @ButtonHandler("peaceAccords_")
     public static void resolvePeaceAccords(String buttonID, Player player, Game game, ButtonInteractionEvent event) {
-        String planetID = buttonID.split("_")[1];
-        if ("lockedmallice".equalsIgnoreCase(planetID)) {
-            planetID = "mallice";
-            Tile tile = game.getTileFromPlanet("lockedmallice");
-            FlipTileService.flipTileIfNeeded(event, tile, game);
-        } else if ("hexlockedmallice".equalsIgnoreCase(planetID)) {
-            planetID = "hexmallice";
-            Tile tile = game.getTileFromPlanet("hexlockedmallice");
-            FlipTileService.flipTileIfNeeded(event, tile, game);
-        }
+        String planetID = FlipTileService.unlockMalliceIfNeeded(event, buttonID.split("_")[1], game);
         AddPlanetService.addPlanet(player, planetID, game, event, false);
         String planetRep = Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game);
         String msg = player.getFactionEmojiOrColor() + " claimed the planet " + planetRep + " using the "

@@ -19,6 +19,26 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class FlipTileService {
 
+    public static String unlockMalliceIfNeeded(ButtonInteractionEvent event, String planet, Game game) {
+        String unlockedPlanet = unlockedMalliceName(planet);
+        if (unlockedPlanet.equals(planet)) {
+            return planet;
+        }
+        Tile lockedTile = game.getTileFromPlanet(planet.toLowerCase());
+        if (lockedTile != null) {
+            flipTileIfNeeded(event, lockedTile, game);
+        }
+        return unlockedPlanet;
+    }
+
+    private static String unlockedMalliceName(String planet) {
+        return switch (planet.toLowerCase()) {
+            case "lockedmallice" -> "mallice";
+            case "hexlockedmallice" -> "hexmallice";
+            default -> planet;
+        };
+    }
+
     @NotNull
     public static Tile flipTileIfNeeded(Tile tile, Game game) {
         return flipTileIfNeeded(null, tile, game);
