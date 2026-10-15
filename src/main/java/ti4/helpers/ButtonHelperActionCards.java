@@ -1612,6 +1612,12 @@ public final class ButtonHelperActionCards {
     @ButtonHandler("spyStep3_")
     public static void resolveSpyStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (p2 == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(), "Could not find the player to send the action card to.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         ActionCardHelper.sendRandomACPart2(event, game, player, p2);
         ButtonHelper.deleteMessage(event);
     }
