@@ -2590,6 +2590,13 @@ public class ActionCardHelper {
         List<String> actionCards = new ArrayList<>(actionCardsMap.keySet());
         if (actionCards.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No Action Cards in hand");
+            if (player2 != null) {
+                MessageHelper.sendMessageToChannel(
+                        player2.getCardsInfoThread(),
+                        player2.getRepresentation() + ", " + player.getFactionEmojiOrColor()
+                                + " had no action cards to send you.");
+            }
+            return;
         }
         Collections.shuffle(actionCards);
         String acID = actionCards.getFirst();
