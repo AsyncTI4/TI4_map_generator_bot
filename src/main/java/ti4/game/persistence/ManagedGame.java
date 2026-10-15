@@ -2,6 +2,7 @@ package ti4.game.persistence;
 
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -86,6 +87,9 @@ public class ManagedGame {
     }
 
     private static Map<String, String> collectTeamMates(Game game) {
+        if (!game.isCommunityMode()) {
+            return Collections.emptyMap();
+        }
         return game.getPlayers().values().stream()
                 .flatMap(player -> player.getTeamMateIDs().stream()
                         .filter(id -> !id.equals(player.getUserID()))
