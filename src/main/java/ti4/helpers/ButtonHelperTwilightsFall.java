@@ -1284,7 +1284,10 @@ public final class ButtonHelperTwilightsFall {
         }
         if ("units".equalsIgnoreCase(type)) {
             for (String card : cards) {
-                embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
+                UnitModel unit = Mapper.getUnit(card);
+                if (unit != null) {
+                    embeds.add(unit.getRepresentationEmbed());
+                }
             }
         }
         String message = String.format("These %d cards are left in the %s deck:", cards.size(), type);
@@ -1324,7 +1327,10 @@ public final class ButtonHelperTwilightsFall {
         }
         if ("units".equalsIgnoreCase(type)) {
             for (String card : cards) {
-                embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
+                UnitModel unit = Mapper.getUnit(card);
+                if (unit != null) {
+                    embeds.add(unit.getRepresentationEmbed());
+                }
             }
         }
         if (player != null && !player.hasTech("wavelength")) {
