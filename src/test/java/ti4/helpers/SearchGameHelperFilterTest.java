@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -12,6 +13,7 @@ import ti4.game.persistence.ManagedPlayer;
 class SearchGameHelperFilterTest {
 
     private static final String USER = "user";
+    private static final String TEAMMATE = "teammate";
 
     @Test
     void myGamesKeepsHidingActiveFogGames() {
@@ -37,6 +39,20 @@ class SearchGameHelperFilterTest {
                 .isFalse();
     }
 
+    @Test
+    void teammateFindsTheGameAndItsTurn() {
+        ManagedGame game = game(false, false);
+        when(game.getSeatUserId(TEAMMATE)).thenReturn(USER);
+        when(game.getActivePlayerId()).thenReturn(USER);
+
+        assertThat(SearchGameHelper.gameFilter(TEAMMATE, true, false, false, false, false)
+                        .test(game))
+                .isTrue();
+        assertThat(SearchGameHelper.gameFilter("stranger", false, false, false, false, false)
+                        .test(game))
+                .isFalse();
+    }
+
     private static ManagedGame game(boolean fog, boolean ended) {
         ManagedPlayer player = mock(ManagedPlayer.class);
         when(player.getId()).thenReturn(USER);
@@ -45,6 +61,7 @@ class SearchGameHelperFilterTest {
         when(game.isHasEnded()).thenReturn(ended);
         when(game.isHasWinner()).thenReturn(true);
         when(game.getPlayers()).thenReturn(Set.of(player));
+        when(game.getSeatUserId(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
         return game;
     }
 }

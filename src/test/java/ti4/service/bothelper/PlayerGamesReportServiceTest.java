@@ -16,7 +16,7 @@ class PlayerGamesReportServiceTest {
         Game game = fogGame(false);
         Player player = mock(Player.class);
 
-        String block = PlayerGamesReportService.activeGameBlock(game, player, true);
+        String block = PlayerGamesReportService.activeGameBlock(game, player, "target", true);
 
         // Any read of the seat (faction, color, VP, turn) could leak it, so the player must stay untouched.
         verifyNoInteractions(player);
@@ -30,7 +30,7 @@ class PlayerGamesReportServiceTest {
         when(game.isFowMode()).thenReturn(false);
         Player player = mock(Player.class);
 
-        PlayerGamesReportService.activeGameBlock(game, player, false);
+        PlayerGamesReportService.activeGameBlock(game, player, "target", false);
 
         verifyNoInteractions(player);
     }
@@ -40,7 +40,7 @@ class PlayerGamesReportServiceTest {
         Game game = fogGame(true);
         Player player = mock(Player.class);
 
-        String line = PlayerGamesReportService.endedGameLine(game, player);
+        String line = PlayerGamesReportService.endedGameLine(game, player, "target");
 
         verifyNoInteractions(player);
         assertThat(line).contains("fow42").contains("completed").doesNotContain("winner");

@@ -175,6 +175,26 @@ class TestBedDataTest extends BaseTi4Test {
         assertEquals(List.of(), missingScopes, "add these scopes to DEVELOPER_TESTBED.md");
     }
 
+    @Test
+    void teamMateYouNeedsNoYouSeatAndOnlyOneTeamSeat() {
+        TestBedPreset preset = TestBedPresetService.parse("""
+                {
+                  "you": { "faction": "sol" },
+                  "seats": [{ "teamMateYou": true }, { "teamMateYou": true }]
+                }""");
+        assertContains(
+                TestBedPresetService.validate(preset),
+                "`teamMateYou` needs a preset without `you`",
+                "Only one seat may set `teamMateYou`");
+    }
+
+    @Test
+    void onlyOneSeatMayBeTheBotAccount() {
+        TestBedPreset preset = TestBedPresetService.parse("""
+                { "seats": [{ "botAccount": true }, { "botAccount": true }] }""");
+        assertContains(TestBedPresetService.validate(preset), "Only one seat may set `botAccount`");
+    }
+
     // Map and fog preset fields fail validation up front: bad positions, tiles, lane matrices and fog options, and
     // maps A-G (fog-only) in a preset that is not a fog preset.
     @Test

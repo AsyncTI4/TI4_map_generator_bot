@@ -33,6 +33,7 @@ import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.game.TeamSeatService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.statistics.UserGameInfoService;
@@ -55,8 +56,8 @@ public class PlayerGamesReportService {
         List<GameSeat> seats = findSeats(targetId, includeEndedGames, ignoreAborted);
 
         String report = buildHeader(target, record)
-                + buildActiveSection(seats, showGameModes)
-                + buildEndedSection(seats)
+                + buildActiveSection(seats, targetId, showGameModes)
+                + buildEndedSection(seats, targetId)
                 + buildReplacedGames(record.replacedGameNames());
         List<Button> buttons = List.of(Buttons.gray(EDIT_TRACK_RECORD_BUTTON + "_" + targetId, "Edit Track Record"));
         for (MessageCreateData message : MessageHelper.getMessageCreateDataObjects(report, buttons)) {
@@ -95,7 +96,7 @@ public class PlayerGamesReportService {
         for (ManagedGame managedGame :
                 SearchGameHelper.findGamesIncludingActiveFog(targetId, includeEndedGames, ignoreAborted)) {
             Game game = managedGame.getGame();
-            Player player = game.getPlayer(targetId);
+            Player player = TeamSeatService.seatOf(game, targetId);
             if (player != null && !player.isSpectator()) {
                 seats.add(new GameSeat(game, player));
             }
@@ -200,7 +201,7 @@ public class PlayerGamesReportService {
         }
     }
 
-    private static String buildActiveSection(List<GameSeat> seats, boolean showModes) {
+    private static String buildActiveSection(List<GameSeat> seats, String targetId, boolean showModes) {
         List<GameSeat> active = seats.stream()
                 .filter(seat -> !seat.game().isHasEnded())
                 .sorted(Comparator.comparing(seat -> isFogGame(seat.game())))
@@ -211,12 +212,12 @@ public class PlayerGamesReportService {
             sb.append("_None._\n");
         }
         for (GameSeat seat : active) {
-            sb.append(activeGameBlock(seat.game(), seat.player(), showModes));
+            sb.append(activeGameBlock(seat.game(), seat.player(), targetId, showModes));
         }
         return sb.toString();
     }
 
-    private static String buildEndedSection(List<GameSeat> seats) {
+    private static String buildEndedSection(List<GameSeat> seats, String targetId) {
         List<GameSeat> ended =
                 seats.stream().filter(seat -> seat.game().isHasEnded()).toList();
         if (ended.isEmpty()) {
@@ -225,7 +226,7 @@ public class PlayerGamesReportService {
         StringBuilder sb =
                 new StringBuilder("\n### Ended (").append(ended.size()).append(")\n");
         for (GameSeat seat : ended) {
-            sb.append(endedGameLine(seat.game(), seat.player())).append('\n');
+            sb.append(endedGameLine(seat.game(), seat.player(), targetId)).append('\n');
         }
         return sb.toString();
     }
@@ -234,11 +235,11 @@ public class PlayerGamesReportService {
         return game.isFowMode() || game.getName().startsWith("fow");
     }
 
-    static String activeGameBlock(Game game, Player player, boolean showModes) {
+    static String activeGameBlock(Game game, Player player, String targetId, boolean showModes) {
         if (isFogGame(game)) {
             return fogGameTitle(game) + " · R" + game.getRound() + " · day " + gameAgeDays(game) + "\n";
         }
-        StringBuilder sb = new StringBuilder(gameTitle(game, player));
+        StringBuilder sb = new StringBuilder(gameTitle(game, player, targetId));
         appendChannelLink(sb, game);
         sb.append('\n')
                 .append(DETAIL_PREFIX)
@@ -265,7 +266,7 @@ public class PlayerGamesReportService {
         return sb.toString();
     }
 
-    static String endedGameLine(Game game, Player player) {
+    static String endedGameLine(Game game, Player player, String targetId) {
         long daysPlayed = Duration.ofMillis(game.getEndedDate() - game.getCreationDateTime())
                 .toDays();
         String outcome = game.hasWinner() ? "completed" : "aborted";
@@ -273,7 +274,7 @@ public class PlayerGamesReportService {
         if (isFogGame(game)) {
             return fogGameTitle(game) + " · " + duration + " · " + outcome;
         }
-        StringBuilder sb = new StringBuilder(gameTitle(game, player));
+        StringBuilder sb = new StringBuilder(gameTitle(game, player, targetId));
         if (game.getWinners().contains(player)) {
             sb.append(" 👑 winner");
         }
@@ -295,13 +296,16 @@ public class PlayerGamesReportService {
         }
     }
 
-    private static String gameTitle(Game game, Player player) {
+    private static String gameTitle(Game game, Player player, String targetId) {
         StringBuilder sb = new StringBuilder("**").append(game.getName()).append("** ");
         if (player.getColor() != null && !"null".equals(player.getColor())) {
             sb.append(ColorEmojis.getColorEmoji(player.getColor()));
         }
         if (Mapper.isValidFaction(player.getFaction())) {
             sb.append(player.getFactionEmoji());
+        }
+        if (!player.getUserID().equals(targetId)) {
+            sb.append(" · team seat");
         }
         return sb.toString();
     }

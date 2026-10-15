@@ -1447,7 +1447,12 @@ public class TransactionHelper {
         var userSettings = UserSettingsManager.get(userId);
         userSettings.setTrackRecord(thoughts.replace("\n", ""));
         UserSettingsManager.save(userSettings);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully edited the players track record.");
+        String confirmation = "Successfully edited the players track record.";
+        if (event.getMessage() == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), confirmation);
+            return;
+        }
+        event.getHook().sendMessage(confirmation).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("finishDealDetailsInvert_")

@@ -1,0 +1,12 @@
+{
+  "name": "my-games-fog-teammate",
+  "description": "Fog game where you are only a teammate on seat1: List My Games still lists this game in the fog section only you see.",
+  "preset": "fog-team-2p",
+  "settleSeconds": 3,
+  "steps": [
+    { "note": "You are only seat1's teammate. Acting as seat1 still sends the press as you, which is what makes this the teammate path." },
+    { "as": "seat1", "pressId": "searchMyGames" },
+    { "expect": { "ephemeral": "Fog games (only visible to you)" } },
+    { "expect": { "in": "main", "noFactionLeak": true, "since": "start" } }
+  ]
+}
