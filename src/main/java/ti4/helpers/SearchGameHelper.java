@@ -64,37 +64,12 @@ public class SearchGameHelper {
             User user2) {
         String userID = user.getId();
 
-        Predicate<ManagedGame> ignoreSpectateFilter = ignoreSpectate
-                ? game -> game.getRealPlayers().stream()
-                        .anyMatch(player -> player.getId().equals(user.getId()))
-                : game -> game.getPlayers().stream()
-                        .anyMatch(player -> player.getId().equals(user.getId()));
-
+        Predicate<ManagedGame> allFilterPredicates =
+                gameFilter(userID, onlyMyTurn, includeEndedGames, ignoreSpectate, ignoreAborted, false);
         if (user2 != null) {
-            Predicate<ManagedGame> ignoreSpectateFilter2 = ignoreSpectate
-                    ? game -> game.getRealPlayers().stream()
-                            .anyMatch(player -> player.getId().equals(user2.getId()))
-                    : game -> game.getPlayers().stream()
-                            .anyMatch(player -> player.getId().equals(user2.getId()));
-            ignoreSpectateFilter = ignoreSpectateFilter.and(ignoreSpectateFilter2);
+            allFilterPredicates = allFilterPredicates.and(participationFilter(user2.getId(), ignoreSpectate));
         }
-        Predicate<ManagedGame> onlyMyTurnFilter =
-                onlyMyTurn ? game -> Objects.equals(game.getActivePlayerId(), user.getId()) : game -> true;
-        Predicate<ManagedGame> endedGamesFilter =
-                includeEndedGames ? game -> true : game -> !game.isHasEnded() && !game.isFowMode();
-        Predicate<ManagedGame> onlyEndedFoWGames = game -> !game.isFowMode() || game.isHasEnded();
-        Predicate<ManagedGame> ignoreAbortedFilter =
-                ignoreAborted ? game -> !game.isHasEnded() || game.isHasWinner() : game -> true;
-        Predicate<ManagedGame> allFilterPredicates = ignoreSpectateFilter
-                .and(onlyMyTurnFilter)
-                .and(endedGamesFilter)
-                .and(onlyEndedFoWGames)
-                .and(ignoreAbortedFilter);
-
-        var filteredManagedGames = GameManager.getManagedGames().stream()
-                .filter(allFilterPredicates)
-                .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
-                .toList();
+        var filteredManagedGames = filterAndSort(allFilterPredicates);
 
         int index = 1;
         if (wantNum) {
@@ -127,28 +102,8 @@ public class SearchGameHelper {
             boolean pingGame,
             String msg) {
 
-        Predicate<ManagedGame> ignoreSpectateFilter = ignoreSpectate
-                ? game -> game.getRealPlayers().stream()
-                        .anyMatch(player -> player.getId().equals(user.getId()))
-                : game -> game.getPlayers().stream()
-                        .anyMatch(player -> player.getId().equals(user.getId()));
-        Predicate<ManagedGame> onlyMyTurnFilter =
-                onlyMyTurn ? game -> Objects.equals(game.getActivePlayerId(), user.getId()) : game -> true;
-        Predicate<ManagedGame> endedGamesFilter =
-                includeEndedGames ? game -> true : game -> !game.isHasEnded() && !game.isFowMode();
-        Predicate<ManagedGame> onlyEndedFoWGames = game -> !game.isFowMode() || game.isHasEnded();
-        Predicate<ManagedGame> ignoreAbortedFilter =
-                ignoreAborted ? game -> !game.isHasEnded() || game.isHasWinner() : game -> true;
-        Predicate<ManagedGame> allFilterPredicates = ignoreSpectateFilter
-                .and(onlyMyTurnFilter)
-                .and(endedGamesFilter)
-                .and(onlyEndedFoWGames)
-                .and(ignoreAbortedFilter);
-
-        var filteredManagedGames = GameManager.getManagedGames().stream()
-                .filter(allFilterPredicates)
-                .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
-                .toList();
+        var filteredManagedGames = filterAndSort(
+                gameFilter(user.getId(), onlyMyTurn, includeEndedGames, ignoreSpectate, ignoreAborted, false));
 
         for (var managedGame : filteredManagedGames) {
             if (managedGame.getTableTalkChannel() != null) {
@@ -167,6 +122,47 @@ public class SearchGameHelper {
                 MessageHelper.sendMessageToChannel(managedGame.getTableTalkChannel(), msg2);
             }
         }
+    }
+
+    public static List<ManagedGame> findGamesIncludingActiveFog(
+            String userId, boolean includeEndedGames, boolean ignoreAborted) {
+        return filterAndSort(gameFilter(userId, false, includeEndedGames, false, ignoreAborted, true));
+    }
+
+    private static List<ManagedGame> filterAndSort(Predicate<ManagedGame> filter) {
+        return GameManager.getManagedGames().stream()
+                .filter(filter)
+                .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
+                .toList();
+    }
+
+    static Predicate<ManagedGame> gameFilter(
+            String userId,
+            boolean onlyMyTurn,
+            boolean includeEndedGames,
+            boolean ignoreSpectate,
+            boolean ignoreAborted,
+            boolean includeActiveFog) {
+        Predicate<ManagedGame> onlyMyTurnFilter =
+                onlyMyTurn ? game -> Objects.equals(game.getActivePlayerId(), userId) : game -> true;
+        Predicate<ManagedGame> endedGamesFilter = includeEndedGames ? game -> true : game -> !game.isHasEnded();
+        Predicate<ManagedGame> activeFogFilter =
+                includeActiveFog ? game -> true : game -> !game.isFowMode() || game.isHasEnded();
+        Predicate<ManagedGame> ignoreAbortedFilter =
+                ignoreAborted ? game -> !game.isHasEnded() || game.isHasWinner() : game -> true;
+        return participationFilter(userId, ignoreSpectate)
+                .and(onlyMyTurnFilter)
+                .and(endedGamesFilter)
+                .and(activeFogFilter)
+                .and(ignoreAbortedFilter);
+    }
+
+    private static Predicate<ManagedGame> participationFilter(String userId, boolean ignoreSpectate) {
+        return ignoreSpectate
+                ? game -> game.getRealPlayers().stream()
+                        .anyMatch(player -> player.getId().equals(userId))
+                : game -> game.getPlayers().stream()
+                        .anyMatch(player -> player.getId().equals(userId));
     }
 
     private static String getPlayerMapListRepresentation(

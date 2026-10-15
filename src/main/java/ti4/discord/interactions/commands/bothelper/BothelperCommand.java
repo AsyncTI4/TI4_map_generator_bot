@@ -29,6 +29,7 @@ public class BothelperCommand implements ParentCommand {
                     new ListDeadGames(),
                     new RemoveTitle(),
                     new EditTrackRecord(),
+                    new PlayerGames(),
                     new SetGameLimit(),
                     new SetStatsTrackedUser(),
                     new ListStoredValues(),
