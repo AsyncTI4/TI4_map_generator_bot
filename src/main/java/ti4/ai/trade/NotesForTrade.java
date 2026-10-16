@@ -7,6 +7,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.promissory.NoteGiving;
+import ti4.ai.strategy.CardFacade;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -21,6 +22,8 @@ class NotesForTrade {
     static final String POLITICAL_SECRET = "_ps";
     static final int LAST_AGENDA_ROUND = 5;
     private static final double OWN_THRONE_BACK = 1.0;
+    private static final String POLITICAL_FAVOR = "favor";
+    private static final double FAVOR_PLAY_CHANCE = 0.25;
     private static final double TRADE_GOOD_PER_AGENDA = 1.0;
     private static final int AGREEMENT_DISCOUNT = 1;
     private static final double OWN_FACTION_NOTE_COST = 1.5;
@@ -83,6 +86,7 @@ class NotesForTrade {
         if (alias.endsWith(TRADE_AGREEMENT)) return agreementValue(seat);
         if (alias.endsWith(CEASEFIRE)) return CeasefireValue.givenCost(game, seat, receiver);
         if (alias.endsWith(POLITICAL_SECRET)) return politicalSecretValue(game);
+        if (POLITICAL_FAVOR.equals(alias)) return politicalFavorCost(game);
         return OWN_FACTION_NOTE_COST;
     }
 
@@ -114,8 +118,16 @@ class NotesForTrade {
     }
 
     static double politicalSecretValue(Game game) {
+        return TRADE_GOOD_PER_AGENDA * agendaPhasesLeft(game);
+    }
+
+    private static double politicalFavorCost(Game game) {
+        return CardFacade.strategyToken() * FAVOR_PLAY_CHANCE * agendaPhasesLeft(game);
+    }
+
+    private static int agendaPhasesLeft(Game game) {
         int first = game.isCustodiansScored() ? game.getRound() : game.getRound() + 1;
-        return TRADE_GOOD_PER_AGENDA * Math.max(0, LAST_AGENDA_ROUND - first + 1);
+        return Math.max(0, LAST_AGENDA_ROUND - first + 1);
     }
 
     private static double ownThroneBack(Game game, Player seat, String alias) {
