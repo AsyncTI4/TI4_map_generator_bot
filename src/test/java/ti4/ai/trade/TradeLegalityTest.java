@@ -67,6 +67,17 @@ class TradeLegalityTest extends BaseTi4Test {
         assertThat(TradeLegality.canTransact(table.game, hacan, table.sol)).isTrue();
     }
 
+    // An AI Hacan looks for partners across the whole table: Nekro and Sol are two systems away and neither is its
+    // neighbour, yet both are legal partners for its own-turn deals, while they still can't trade with each other.
+    @Test
+    void anAiHacanFindsPartnersBeyondItsNeighbours() {
+        Player hacan = table.aiSeat("hacan", "red");
+        table.presence(hacan, TradeTable.FAR_SPOT);
+
+        assertThat(TradeLegality.legalPartners(table.game, hacan)).containsExactlyInAnyOrder(table.nekro, table.sol);
+        assertThat(TradeLegality.legalPartners(table.game, table.nekro)).containsExactly(hacan);
+    }
+
     // Each version of Trade Convoys lifts the rule for whoever has it in their play area, in both directions.
     @Test
     void eachConvoysNoteLiftsTheNeighbourRule() {

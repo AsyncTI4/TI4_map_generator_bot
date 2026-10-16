@@ -71,6 +71,7 @@ class OwnTurnDeals {
                 .or(() -> wash(context, partners, partner -> true))
                 .or(() -> NoteDeals.propose(context, partners))
                 .or(() -> sell(context, partners))
+                .or(() -> CardSales.propose(context, partners))
                 .or(() -> collect(context, partners));
         started.ifPresent(ignored -> TradeMemory.increment(context.memory(), turnDraftsKey(context)));
         return started;

@@ -106,7 +106,7 @@ class NoteDeals {
         return seat.getPromissoryNotes().keySet().stream()
                 .filter(seat::ownsPromissoryNote)
                 .filter(alias -> NotesForTrade.inHand(seat, alias))
-                .filter(alias -> OWN_KINDS.stream().anyMatch(alias::endsWith))
+                .filter(alias -> OWN_KINDS.stream().anyMatch(alias::endsWith) || ConvoysValue.isConvoys(alias))
                 .filter(alias -> !alias.endsWith(NoteGiving.ALLIANCE) || !partner.hasAbility(AllianceValue.HUBRIS))
                 .sorted()
                 .toList();

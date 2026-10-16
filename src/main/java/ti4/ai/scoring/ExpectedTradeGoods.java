@@ -10,6 +10,7 @@ import ti4.game.Player;
 public class ExpectedTradeGoods {
 
     public static final int TRADE_PRIMARY = 3;
+    private static final String MASTERS_OF_TRADE = "master_of_trade";
 
     public static int beforeStatus(Game game, Player seat) {
         int primary = holdsUnplayedTrade(game, seat) ? TRADE_PRIMARY : 0;
@@ -22,7 +23,8 @@ public class ExpectedTradeGoods {
 
     public static int ifFollowingTrade(Game game, Player seat) {
         if (!canWash(game)) return 0;
-        return seat.getStrategicCC() > 0 ? seat.getCommoditiesTotal() : seat.getCommodities();
+        boolean canReplenish = seat.getStrategicCC() > 0 || seat.hasAbility(MASTERS_OF_TRADE);
+        return canReplenish ? seat.getCommoditiesTotal() : seat.getCommodities();
     }
 
     private static boolean canWash(Game game) {

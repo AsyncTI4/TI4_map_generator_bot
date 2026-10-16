@@ -42,6 +42,7 @@ final class TradeButtons {
         if (offerMode && (p1.getCommodities() > 0 || p2.getCommodities() > 0)) {
             ids.add("offerToTransact_washComms_" + seat.getColor() + "_" + p2.getColor() + "_0");
         }
+        if (TradeActionCards.tradable(p1, p2) && p1.getAcCount() > 0) ids.add("newTransact_ACs_" + pair);
         if (!p1.getPromissoryNotes().isEmpty()) ids.add("newTransact_PNs_" + pair);
         ids.add((offerMode ? "newTransact_Details_" : "newTransact_DetailsInvert_") + pair + "_~MDL");
         if (offerMode) {

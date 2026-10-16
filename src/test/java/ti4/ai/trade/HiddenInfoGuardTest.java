@@ -230,6 +230,32 @@ class HiddenInfoGuardTest extends BaseTi4Test {
         verify(spy, never()).getActionCards();
     }
 
+    // With Arbiters a card Sol offers is named in the offer by its hand number, like a note; that lookup is the only
+    // reason to open Sol's action cards, and its secrets and notes stay closed.
+    @Test
+    void anOfferedCardIsOnlyLookedUpByItsId() {
+        spy.addAbility("arbiters");
+        List<String> callers = new ArrayList<>();
+        doAnswer(invocation -> {
+                    callers.add(caller());
+                    return invocation.callRealMethod();
+                })
+                .when(spy)
+                .getActionCards();
+        int id = table.sol.getActionCards().get("sabo1");
+        Deal cardForTradeGoods = deal("sendingsol_receivingnekro_ACs_" + id, "sendingnekro_receivingsol_TGs_1");
+
+        double utility = TradeValue.of(table.game, table.nekro, spy, cardForTradeGoods, TRUST)
+                .utility();
+        TradeValue.predictedFor(table.game, spy, table.nekro, cardForTradeGoods);
+        Stinginess.partnerGain(table.game, spy, table.nekro, cardForTradeGoods);
+
+        assertThat(utility).isFinite();
+        assertThat(callers).isNotEmpty().allMatch("TradeActionCards.aliasOf"::equals);
+        verify(spy, never()).getSecretsUnscored();
+        verify(spy, never()).getPromissoryNotes();
+    }
+
     // The production method that asked for the hand: the first AI frame below this test's own answer.
     private static String caller() {
         return Arrays.stream(Thread.currentThread().getStackTrace())

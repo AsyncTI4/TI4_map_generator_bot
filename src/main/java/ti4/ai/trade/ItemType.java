@@ -11,10 +11,13 @@ enum ItemType {
     CLEAR_DEBT("ClearDebt"),
     PROMISSORY("PNs"),
     FRAGMENTS("Frags"),
+    ACTION_CARDS("ACs"),
+    PLANETS("Planets"),
     UNSUPPORTED("");
 
     private static final Set<ItemType> COUNTABLE = EnumSet.of(TRADE_GOODS, COMMODITIES, SEND_DEBT, CLEAR_DEBT);
     private static final Set<ItemType> DEBT = EnumSet.of(SEND_DEBT, CLEAR_DEBT);
+    private static final Set<ItemType> NAMED = EnumSet.of(PROMISSORY, ACTION_CARDS, PLANETS);
 
     private final String token;
 
@@ -33,12 +36,12 @@ enum ItemType {
                 .orElse(UNSUPPORTED);
     }
 
-    boolean buildable() {
-        return COUNTABLE.contains(this) || this == PROMISSORY;
-    }
-
     boolean countable() {
         return COUNTABLE.contains(this);
+    }
+
+    boolean named() {
+        return NAMED.contains(this);
     }
 
     boolean isDebt() {

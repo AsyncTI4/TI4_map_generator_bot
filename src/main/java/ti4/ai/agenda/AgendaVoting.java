@@ -33,6 +33,7 @@ public class AgendaVoting {
     private static final String PREDICTIVE_BUTTON = "exhaustForVotes_" + PREDICTIVE_VOTES;
     private static final String SPENT_PLANET_PREFIX = "planet_";
     private static final String VOTED_AT_KEY = "agendaVotedAt|";
+    private static final String GILA_KEY = "agendaGilaTradeGoods|";
     private static final long CLOCK_SKEW_MILLIS = 5_000L;
     private static final String MUTINY = "mutiny";
     private static final double ALL_IN_SCORE = 2;
@@ -183,7 +184,31 @@ public class AgendaVoting {
             if (planet.isPresent())
                 return Optional.of(AiDecision.press(prompt, planet.get(), "exhaust a planet for votes"));
         }
+        Optional<AiDecision> tradeGoods = spendTradeGoods(context, prompt, ballot, spent);
+        if (tradeGoods.isPresent()) return tradeGoods;
         return Optional.of(finish.get().press("finish casting its votes"));
+    }
+
+    private static Optional<AiDecision> spendTradeGoods(
+            AiTurnContext context, AiPrompt prompt, Ballot ballot, int planetVotes) {
+        Optional<PromptButton> spend =
+                prompt.firstEnabled(button -> button.isUnowned() && GilaVotes.BUTTON.equals(button.handlerId()));
+        if (spend.isEmpty() || ballot.votes() <= 0) return Optional.empty();
+        Game game = context.game();
+        Player seat = context.seat();
+        String key = GILA_KEY + game.getRound() + "|" + game.getCurrentAgendaInfo();
+        int planned = context.memory()
+                .get(key)
+                .filter(StringUtils::isNumeric)
+                .map(Integer::parseInt)
+                .orElseGet(() -> {
+                    int tradeGoods = GilaVotes.tradeGoodsToSpend(game, seat, ballot.outcome(), planetVotes);
+                    context.memory().put(key, String.valueOf(tradeGoods));
+                    return tradeGoods;
+                });
+        if (seat.getSpentTgsThisWindow() >= planned || seat.getTg() < 1) return Optional.empty();
+        return Optional.of(
+                AiDecision.press(prompt, spend.get(), "spend a trade good for 2 votes with Gila the Silvertongue"));
     }
 
     public static AgendaForecast forecastWithItsBallot(Game game, Player seat) {
