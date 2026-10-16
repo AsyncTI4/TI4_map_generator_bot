@@ -189,6 +189,51 @@ class ObjectiveValueTest extends BaseTi4Test {
         assertThat(value.gain(after)).isPositive().isLessThan(ObjectiveValue.VICTORY_POINT_VALUE);
     }
 
+    // An explore card that attaches to the explored planet is progress toward Discover Lost Outposts: with one
+    // attachment planet already held, the second completes the objective, so it is worth the whole point.
+    @Test
+    void anAttachmentThatCompletesLostOutpostsIsWorthAPoint() {
+        reveal("lost_outposts");
+        Tile held = test.place("19", neighbour);
+        held.getUnitHolders().get("wellon").addToken("attachment_cybernetic.png");
+        test.nekro.addPlanet("wellon");
+        test.place("20", otherNeighbour());
+        ObjectiveValue value = new ObjectiveValue(test.game, test.nekro);
+
+        assertThat(value.attachmentGain("vefutii")).isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
+        assertThat(value.attachmentGain("wellon")).isZero();
+    }
+
+    // Without the objective revealed, an attachment is worth only its planet values, which the explore deck counts.
+    @Test
+    void anAttachmentIsWorthNothingExtraWithoutAnAttachmentObjective() {
+        test.place("20", neighbour);
+        ObjectiveValue value = new ObjectiveValue(test.game, test.nekro);
+
+        assertThat(value.attachmentGain("vefutii")).isZero();
+        assertThat(value.specialtyGain("vefutii")).isZero();
+    }
+
+    // A research facility gives a planet without a technology specialty one, which is a step toward Found Research
+    // Outposts; a planet that already has a specialty gains nothing toward it.
+    @Test
+    void aResearchFacilityOnAPlanetWithoutASpecialtyIsProgressTowardResearchOutposts() {
+        reveal("research_outposts");
+        test.place("20", neighbour);
+        test.place("19", otherNeighbour());
+        ObjectiveValue value = new ObjectiveValue(test.game, test.nekro);
+
+        assertThat(value.specialtyGain("vefutii")).isPositive().isLessThan(ObjectiveValue.VICTORY_POINT_VALUE);
+        assertThat(value.specialtyGain("wellon")).isZero();
+    }
+
+    private String otherNeighbour() {
+        return PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+                .filter(position -> !"x".equals(position) && !neighbour.equals(position))
+                .findFirst()
+                .orElseThrow();
+    }
+
     // Foster Cohesion needs the seat to neighbour every other player. Moving a ship next to the one player it doesn't
     // yet touch completes it.
     @Test

@@ -14,6 +14,7 @@ import ti4.ai.eval.PlanetStake;
 import ti4.ai.eval.Threats;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectivePolicy;
+import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.tactical.ProductionPlanner;
 import ti4.game.Game;
@@ -37,6 +38,7 @@ public final class ExploreOutlook {
     private List<Planet> claimablePlanets;
     private Boolean spendsMore;
     private Boolean fundsFreelancers;
+    private ObjectiveValue objectives;
 
     public ExploreOutlook(Game game, Player seat) {
         this.game = game;
@@ -126,6 +128,19 @@ public final class ExploreOutlook {
 
     public double planetStake(Planet planet) {
         return PlanetStake.of(game, seat, planet);
+    }
+
+    public double attachmentObjectiveGain(Planet planet) {
+        return objectives().attachmentGain(planet.getName());
+    }
+
+    public double specialtyObjectiveGain(Planet planet) {
+        return objectives().specialtyGain(planet.getName());
+    }
+
+    private ObjectiveValue objectives() {
+        if (objectives == null) objectives = new ObjectiveValue(game, seat);
+        return objectives;
     }
 
     private List<Planet> computeClaimablePlanets() {

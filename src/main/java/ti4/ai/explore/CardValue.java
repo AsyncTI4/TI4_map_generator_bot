@@ -49,12 +49,12 @@ public class CardValue {
             case "ed" -> ExploreValues.ENIGMATIC_DEVICE;
             case "mirage" -> mirage();
             case "dmz" -> ExploreValues.DEMILITARIZED_ZONE - PlanetStake.structures(site.holder(), seat);
-            case "ds" -> attachment(2, 1);
-            case "pw" -> attachment(0, 2);
-            case "ls" -> attachment(1, 2);
-            case "mw" -> attachment(2, 0);
-            case "rw" -> attachment(1, 0);
-            case "toe" -> attachment(0, 1);
+            case "ds" -> attachment(site, 2, 1);
+            case "pw" -> attachment(site, 0, 2);
+            case "ls" -> attachment(site, 1, 2);
+            case "mw" -> attachment(site, 2, 0);
+            case "rw" -> attachment(site, 1, 0);
+            case "toe" -> attachment(site, 0, 1);
             case "warfare", "biotic", "cybernetic", "propulsion" -> researchFacility(site);
             default -> 0;
         };
@@ -116,13 +116,20 @@ public class CardValue {
         return model.isLegendary() ? value + BoardView.LEGENDARY_VALUE : value;
     }
 
+    private static double attachment(ExploreSite site, int resources, int influence) {
+        return attachment(resources, influence) + site.outlook().attachmentObjectiveGain(site.holder());
+    }
+
     private static double attachment(int resources, int influence) {
         return resources + BoardView.INFLUENCE_WEIGHT * influence;
     }
 
     private static double researchFacility(ExploreSite site) {
         Planet planet = site.holder();
-        if (planet.getTechSpecialities().isEmpty()) return BoardView.TECH_SPECIALTY_VALUE;
-        return attachment(1, 1);
+        double objectives = site.outlook().attachmentObjectiveGain(planet);
+        if (planet.getTechSpecialities().isEmpty()) {
+            return BoardView.TECH_SPECIALTY_VALUE + objectives + site.outlook().specialtyObjectiveGain(planet);
+        }
+        return attachment(1, 1) + objectives;
     }
 }
