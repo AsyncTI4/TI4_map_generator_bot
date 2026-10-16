@@ -143,12 +143,14 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
             int[] cardsRecordedForRound = {0};
             int[] agendasSkipped = {0};
             AtomicReference<Game> live = new AtomicReference<>(game);
+            String[] probeState = {"", ""};
             ScoringDiagnostic diagnostic = new ScoringDiagnostic();
             env.decisionListener = diagnostic::onDecision;
             SelfPlayGame.Outcome outcome = selfPlay.run(
                     current -> {
                         live.set(current);
                         diagnostic.observe(current);
+                        if (PICK_PROBE) pickProbe(name, current, probeState);
                         int round = current.getRound();
                         if (round > 1 && pointsAfterRoundOne.isEmpty()) {
                             for (Player seat : current.getRealPlayers())
@@ -209,6 +211,49 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
                     name);
         }
     }
+
+    // -Dai.selfplay.roundtwo.picks=true prints every seat's pick values when it picks, and each strategy card play
+    // with the player's points and scored publics just after it, all prefixed with PROBE and the game name.
+    private static final boolean PICK_PROBE = Boolean.getBoolean("ai.selfplay.roundtwo.picks");
+
+    private static void pickProbe(String name, Game game, String[] state) {
+        Player active = game.getActivePlayer();
+        String phase = game.getPhaseOfGame();
+        if ("strategy".equalsIgnoreCase(phase) && active != null) {
+            String key = game.getRound() + "|" + active.getFaction() + "|" + active.getSCs();
+            if (key.equals(state[0])) return;
+            state[0] = key;
+            System.out.println("PROBE PICK " + name + " r" + game.getRound() + " " + active.getFaction() + " vp "
+                    + active.getTotalVictoryPoints() + " scorable "
+                    + ti4.ai.scoring.ObjectivePolicy.scorablePublics(game, active) + " mecatol "
+                    + active.controlsMecatol(true) + " | " + ti4.ai.strategy.OpeningProbe.pickValues(game, active));
+            return;
+        }
+        if (!inActionPhase(game)) return;
+        String played = game.getRound() + "|" + game.getPlayedSCs();
+        if (played.equals(state[1])) return;
+        state[1] = played;
+        for (int initiative : game.getPlayedSCs()) {
+            Player holder = game.getRealPlayers().stream()
+                    .filter(player -> player.getSCs().contains(initiative))
+                    .findFirst()
+                    .orElse(null);
+            if (holder == null) continue;
+            String card = StrategyCard.of(game, initiative).name().toLowerCase(Locale.ROOT);
+            String line = "PROBE PLAY " + name + " r" + game.getRound() + " " + holder.getFaction() + " " + card;
+            if (!playedLines.add(line)) continue;
+            System.out.println(line + " vp " + holder.getTotalVictoryPoints() + " scored "
+                    + scoredPublics(game, holder) + " scorable "
+                    + ti4.ai.scoring.ObjectivePolicy.scorablePublics(game, holder) + " secrets "
+                    + holder.getSecretsUnscored().size() + "+" + holder.getSoScored() + " strat "
+                    + holder.getStrategicCC() + " mecatol " + holder.controlsMecatol(true) + " active "
+                    + (game.getActivePlayer() == null
+                            ? "-"
+                            : game.getActivePlayer().getFaction()));
+        }
+    }
+
+    private static final java.util.Set<String> playedLines = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
     // -Dai.selfplay.roundtwo.forceagenda=true credits the first seat with the custodians before round 1, so every
     // status phase leads into an agenda phase. It exists to check the agenda skip, not to measure play.
