@@ -53,6 +53,8 @@ import ti4.ai.tactical.TacticalPlanner;
 import ti4.ai.tactical.TacticalRules;
 import ti4.ai.tech.TechRules;
 import ti4.ai.trade.TradeRules;
+import ti4.ai.xxcha.PeaceAccordsRules;
+import ti4.ai.xxcha.QuashRules;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -145,6 +147,7 @@ public class NekroBrain implements FactionBrain {
             StrategyCardRules::gainTokens,
             StrategyCardRules::placeStructure,
             StrategyCardRules::readyPlanets,
+            PeaceAccordsRules::resolve,
             FleetSupplyRules::removeExcessShips,
             StrategyCardRules::buildWithWarfare,
             StrategyCardRules::buildWithConstruction,
@@ -308,6 +311,8 @@ public class NekroBrain implements FactionBrain {
         if (AgendaCardRules.holdsPlayedVeto(context)) return Optional.empty();
         Optional<AiDecision> veto = AgendaCardRules.queueVeto(context);
         if (veto.isPresent()) return veto;
+        Optional<AiDecision> quash = QuashRules.queue(context);
+        if (quash.isPresent()) return quash;
         return firstHandler(context, "declineToQueueAWhen", "pass on playing a \"when\"");
     }
 

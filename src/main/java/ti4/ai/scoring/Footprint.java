@@ -102,6 +102,12 @@ public final class Footprint {
         return new Footprint(newUnits, newShips, newNonFighter, newHeavy, planets, dreadnoughts);
     }
 
+    public Footprint withPlanet(String planet) {
+        Set<String> newPlanets = new HashSet<>(planets);
+        newPlanets.add(planet);
+        return new Footprint(units, ships, nonFighterShips, heavyShips, newPlanets, dreadnoughts);
+    }
+
     public Footprint withoutPlanet(String planet) {
         Set<String> newPlanets = new HashSet<>(planets);
         newPlanets.remove(planet);

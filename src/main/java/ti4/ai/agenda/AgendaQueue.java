@@ -8,10 +8,17 @@ import ti4.game.Player;
 @UtilityClass
 public class AgendaQueue {
 
+    private static final String WHEN_WINDOW_PHASE = "agendawaiting";
+    private static final String WHENS_RESOLVED = "whensResolved";
     private static final String QUEUED_WHENS = "queuedWhens";
     private static final String QUEUED_WHEN_OF = "queuedWhensFor";
     private static final String QUEUED_AFTERS = "queuedAfters";
     private static final String QUEUED_AFTER_OF = "queuedAftersFor";
+
+    public static boolean whenWindowOpen(Game game) {
+        return WHEN_WINDOW_PHASE.equalsIgnoreCase(game.getPhaseOfGame())
+                && game.getStoredValue(WHENS_RESOLVED).isEmpty();
+    }
 
     public static boolean holdsQueuedWhen(Game game, Player seat) {
         return queuedWhen(game, seat).isPresent();

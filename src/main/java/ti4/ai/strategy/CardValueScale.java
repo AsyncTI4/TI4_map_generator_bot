@@ -27,6 +27,8 @@ class CardValueScale {
     static final double BUILD_THEN_MOVE_SHARE = 0.5;
     static final double FAR_REACH_SHARE = 0.5;
     static final double READY_SHARE = 0.5;
+    static final double PEACE_ACCORDS_SHARE = 1.0;
+    static final double PEACE_ACCORDS_PLAY_MIN = 2.0;
     static final double READY_SPEND_BONUS = 1.5;
     static final int READY_FORECAST_CAP = 6;
     static final double PROTECT_SHARE = 0.5;

@@ -27,6 +27,7 @@ import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.secrets.SecretDrawValue;
 import ti4.ai.secrets.SpyNetwork;
+import ti4.ai.tactical.PeaceAccords;
 import ti4.ai.tactical.ProductionPlanner;
 import ti4.ai.tactical.ProductionPlanner.BuildPlan;
 import ti4.ai.tactical.TacticalPlan;
@@ -962,9 +963,10 @@ public class StrategyCardRules {
         if (CardMessages.done(context, "diplomacyReady")) return Optional.empty();
         CardMessages.markDone(context, "diplomacyReady");
         Player seat = context.seat();
-        if (seat.getExhaustedPlanets().isEmpty()) return Optional.empty();
-        Optional<AiDecision> press =
-                CardMessages.pressOnce(context, card.get(), DIPLOMACY_READY_BUTTON, "ready planets with Diplomacy");
+        boolean claims = PeaceAccords.bestValue(context.game(), seat) > 0;
+        if (seat.getExhaustedPlanets().isEmpty() && !claims) return Optional.empty();
+        String reason = claims ? "ready planets and claim one with Peace Accords" : "ready planets with Diplomacy";
+        Optional<AiDecision> press = CardMessages.pressOnce(context, card.get(), DIPLOMACY_READY_BUTTON, reason);
         press.ifPresent(decision ->
                 requestReadying(context, DiplomacyUse.best(context.game(), seat, seat.getExhaustedPlanets())));
         return press;
@@ -1112,12 +1114,7 @@ public class StrategyCardRules {
     public static Optional<Double> secondaryValue(Game game, Player seat, StrategyCard card) {
         return switch (card) {
             case IMPERIAL -> hasRoomForSecret(seat) ? Optional.of(SecretDrawValue.of(game, seat)) : Optional.empty();
-            case DIPLOMACY ->
-                DiplomacyUse.bestToFollow(game, seat)
-                        .filter(choice -> DiplomacyUse.worthFollowing(game, seat))
-                        .map(choice -> choice.unlocksScore()
-                                ? CardValueScale.SPEND_UNLOCK_SHARE * CardValueScale.VICTORY_POINT
-                                : CardValueScale.READY_SHARE * choice.use());
+            case DIPLOMACY -> diplomacyFollowValue(game, seat);
             case CONSTRUCTION ->
                 StructurePolicy.nearsStructureObjective(game, seat)
                         ? Optional.of(CardValueScale.STRUCTURE_OBJECTIVE_SHARE * CardValueScale.VICTORY_POINT)
@@ -1130,6 +1127,19 @@ public class StrategyCardRules {
                         : Optional.empty();
             default -> Optional.empty();
         };
+    }
+
+    private static Optional<Double> diplomacyFollowValue(Game game, Player seat) {
+        double readying = DiplomacyUse.bestToFollow(game, seat)
+                .filter(choice -> DiplomacyUse.readyingWorthFollowing(game, seat))
+                .map(choice -> choice.unlocksScore()
+                        ? CardValueScale.SPEND_UNLOCK_SHARE * CardValueScale.VICTORY_POINT
+                        : CardValueScale.READY_SHARE * choice.use())
+                .orElse(0.0);
+        double claim = DiplomacyUse.claimsWorthFollowing(game, seat)
+                ? CardValueScale.PEACE_ACCORDS_SHARE * PeaceAccords.bestValue(game, seat)
+                : 0;
+        return readying + claim > 0 ? Optional.of(readying + claim) : Optional.empty();
     }
 
     private static Optional<Double> politicsValue(Game game, Player seat) {

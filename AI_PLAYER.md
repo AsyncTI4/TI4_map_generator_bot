@@ -245,7 +245,7 @@ to build one by hand:
   | Card | Uses it plans for |
   | --- | --- |
   | Leadership | the tactical actions its 3 tokens unlock (the plans it could not otherwise afford), and acting first in a race for the custodians |
-  | Diplomacy | locking a system with its planets that an enemy fleet can reach (home most, by what an attack on it before the seat's next turn would cost it; more when close to winning), and readying its best 2 planets (more with a spend objective revealed). Base-game Diplomacy has no buttons to resolve, so it is worth only its trade goods |
+  | Diplomacy | locking a system with its planets that an enemy fleet can reach (home most, by what an attack on it before the seat's next turn would cost it; more when close to winning), and readying its best 2 planets (more with a spend objective revealed). For the Xxcha's _Peace Accords_ it is also worth the best empty planet next to one it controls (`PeaceAccords`: the planet's value, the expansion bonus a landing there would get, the objective progress and, for a planet a rival holds, half its value again), and the card is played at once when that beats its best tactical action. Base-game Diplomacy has no buttons to resolve, so it is worth only its trade goods |
   | Politics | becoming speaker (more when it will want Imperial next round or is racing a rival for the custodians next round; a loss when it is already speaker, since the card hands the token away), 2 action cards (a point when they complete _Form a Spy Network_), and looking at the agenda deck once the custodians are taken |
   | Construction | a space dock early, PDS (more under threat), a structure objective it would complete; for the Thunder's Edge card also production at a dock without placing a token, so the units can move out this round |
   | Trade | 3 trade goods, its commodities, a spend objective they make payable, and leverage for deals |
@@ -273,7 +273,7 @@ to build one by hand:
   | Leadership | 3 command tokens, plus up to 3 more bought with spare influence, within its reinforcements | spare influence buys up to 3 command tokens (3 influence each, no strategy token) |
   | Politics | makes itself speaker (or the player furthest behind), draws 2 action cards, and once the custodians are taken looks at the top 2 agendas, burying _Public Execution_ while it leads on points, agendas that punish the planet owner while it holds the most planets, and elections it would lose on influence (a work in progress that needs a redesign: votes are unknown in the action phase) | with a spare strategy token when _Form a Spy Network_ needs cards (right after Imperial when 2 cards complete it), or with 2 or more spare strategy tokens and room for 2 cards; never with no strategy token, a full hand or _Hold No Action Cards_ |
   | Construction | the Thunder's Edge card produces at the dock its plan chose (no token placed) and then places one structure; otherwise two structures: a space dock while it has a site, otherwise PDS on planets without structures. A dock site is another planet in a home system with more than one planet, or a planet worth 2 or more resources elsewhere, preferring planets worth 3 or more and those in its own slice (next to home or on the way to Mecatol Rex; Styx counts too); any planet for _Fuel the War Machine_ | a revealed or held structure objective is 1 or 2 structures short |
-  | Diplomacy | first locks the threatened system its plan chose (PoK card only), then readies the 2 exhausted planets it can use best (the same test as a follow), otherwise its 2 most valuable | its best 2 exhausted planets make a spend objective payable at the status phase (even after passing), or, while it still has actions, pay at least 3 towards production it would actually build or the custodians (both need a tactic token), research (a Technology follow it still has a strategy token for, or the 6-resource second technology of its own primary; never Nekro's free Propagation) or Leadership tokens (within its reinforcements). It readies those planets. |
+  | Diplomacy | first locks the threatened system its plan chose (PoK card only), then readies the 2 exhausted planets it can use best (the same test as a follow), otherwise its 2 most valuable | with _Peace Accords_, a planet worth more than the strategy token can be claimed (the ready button is pressed even with nothing exhausted, and `PeaceAccordsRules` then claims the best planet the prompt offers, or declines); otherwise its best 2 exhausted planets make a spend objective payable at the status phase (even after passing), or, while it still has actions, pay at least 3 towards production it would actually build or the custodians (both need a tactic token), research (a Technology follow it still has a strategy token for, or the 6-resource second technology of its own primary; never Nekro's free Propagation) or Leadership tokens (within its reinforcements). It readies those planets. |
   | Warfare | Thunder's Edge: a tactical action without a command token, which may reactivate a system that already holds its token (for example a second production at home), at the target its plan chose while that is still close to the best; PoK: takes back the token whose removal unlocks the best tactical action | producing at home is worth as much as a tactical action's production would need to be (carriers, infantry for free planets, ships for objectives, or enough filler) |
   | Trade | the bot resolves the primary; an AI holder then announces X−k terms per player (k = 2 for 4 or more commodities or a player ahead of it, otherwise 1; none for a player close to winning, the leader, a bad payer or one the commodities would let score) and sends each follower the deal: their commodities for that many minus k trade goods (k debt when they are not neighbours, k trade goods after Replenish and Wash), an even wash for Hacan and for players who spent a strategy token | for free when an AI holder's terms are worth it (it holds its own _Trade Agreement_, gains commodities, and the deal or the debt is worth more than what it gives up), always as Hacan, and with a strategy token for a human holder only for 4 or more new commodities and somewhere to wash them |
 
@@ -317,6 +317,9 @@ to build one by hand:
     player with the most votes), and on a correct prediction takes the best technology (`CopiedTechPolicy`, which
     also caps copied faction technologies at its two Valefar Assimilators). It never researches: every research is
     replaced by Propagation's command tokens, all of them, within its reinforcements.
+  - **Xxcha commander (Elder Qanoj)**: the bot's vote count adds one vote per planet, so the AI's ballot, the planets it
+    exhausts for it (influence-less planets included, highest first until the ballot is covered) and the forecast
+    all use it; a rider owner or a Nekro with the commander keeps voting (`XxchaCommanderVotingTest`).
   - **Forecast** (`AgendaForecast`). For an agenda that elects a player, a planet or For/Against, the chance of each
     outcome winning, from public information only: the votes each seat had at the reveal less the votes already cast,
     which players have voted (those before the active voter), and the riders placed (a rider's owner casts nothing
@@ -583,6 +586,11 @@ to build one by hand:
     played a Veto would otherwise wait on one another, and the stall detector does not call it stuck. It gives up after
     five minutes if the bot never posted the buttons. A cancelled Veto resumes the queue through the bot (see
     Segregation).
+  - **Quash** (Xxcha, `QuashRules`): queued (`queueAWhen`, `queueWhen_ability_quash`) after the Veto check when the seat
+    has a strategy token and the revealed agenda is expected to cost it more than that token is worth
+    (`AgendaPolicy.expectedLoss` over the forecast with the seat's own planned ballot, against
+    `CardFacade.strategyToken()`); the next agenda is judged afresh. Without a forecast (fog) it uses the Political
+    Favor rule.
   - **Combat cards** (`CombatCardRules`, `CombatCards`): _Morale Boost_ (every copy), _Fighter Prototype_ and
     _Emergency Repairs_. The bot has no card window in a combat: the start of a round is the gap before someone presses
     the unowned combat roll, and a one-round modifier is moved in by the seat's next roll of any kind (anti-fighter
@@ -678,6 +686,8 @@ to build one by hand:
     - _Trade Agreement_: its owner's commodity value less 1.
     - _Political Secret_: 1 per agenda phase still to come, through round 5's (the current round counts once the
       custodians are taken).
+    - _Political Favor_ given by its owner (the Xxcha): a quarter of a strategy token per agenda phase still to come,
+      since a holder who plays it costs a token but the card comes back.
     - _Ceasefire_ (`CeasefireValue`): traded under duress. A seat is under duress from another whose fleet could take
       its home system or the Mecatol Rex it holds (ships worth at least 8 resources can reach it, and at least 1.5 times
       what defends it): it values that seat's
