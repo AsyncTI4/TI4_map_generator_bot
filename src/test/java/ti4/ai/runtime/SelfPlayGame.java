@@ -232,7 +232,7 @@ final class SelfPlayGame {
                 }
             }
         }
-        revealChosenObjectives(game);
+        revealChosenObjectives(game, slot);
         GameManager.save(game, "AI self-play setup");
         if (!GameManager.isValid(name) || GameManager.getManagedGame(name) == null) {
             throw new IllegalStateException(
@@ -243,15 +243,26 @@ final class SelfPlayGame {
 
     // -Dai.selfplay.objectives=intimidate,monument puts these stage one objectives on top of the deck, so the start of
     // the game reveals them and a batch can study how seats play towards particular objectives.
-    private static void revealChosenObjectives(Game game) {
+    // -Dai.selfplay.objectiveseed=N instead stacks a stage one order drawn from N and the game slot. Two batches run
+    // with the same seed reveal the same objectives in each slot (same seating, same map), so they can be compared
+    // game by game, which removes the objective draw from the noise of an A/B comparison.
+    private static void revealChosenObjectives(Game game, int slot) {
+        List<String> peekable = game.getPublicObjectives1Peekable();
+        List<String> deck = game.getPublicObjectives1();
         List<String> chosen = java.util.Arrays.stream(
                         System.getProperty("ai.selfplay.objectives", "").split(","))
                 .map(String::trim)
                 .filter(id -> !id.isEmpty())
                 .toList();
+        Integer seed = Integer.getInteger("ai.selfplay.objectiveseed");
+        if (chosen.isEmpty() && seed != null) {
+            List<String> all = new ArrayList<>(peekable);
+            all.addAll(deck);
+            java.util.Collections.sort(all);
+            java.util.Collections.shuffle(all, new java.util.Random(seed * 1009L + slot));
+            chosen = List.copyOf(all.subList(0, Math.min(5, all.size())));
+        }
         if (chosen.isEmpty()) return;
-        List<String> peekable = game.getPublicObjectives1Peekable();
-        List<String> deck = game.getPublicObjectives1();
         peekable.removeAll(chosen);
         deck.removeAll(chosen);
         (peekable.isEmpty() ? deck : peekable).addAll(0, chosen);

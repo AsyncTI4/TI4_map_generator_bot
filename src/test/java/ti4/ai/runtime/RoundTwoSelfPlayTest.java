@@ -35,7 +35,8 @@ import ti4.testUtils.discord.FakeMessage;
 //
 // Run with -Dai.selfplay.roundtwo=true -Dai.selfplay.games=N -Dai.selfplay.threads=T. Add
 // -Dai.selfplay.roundtwo.lines=true for one line per seat and -Dai.selfplay.scorediag.lines=true for the per-seat
-// scoring diagnostic.
+// scoring diagnostic; both name the game, so the lines can be matched to traces. -Dai.selfplay.objectiveseed=N fixes
+// the stage one objectives of each game slot, so two batches with the same seed can be compared game by game.
 class RoundTwoSelfPlayTest extends BaseTi4Test {
 
     private static final List<String> FACTIONS = AiSettings.SUPPORTED_FACTIONS.subList(0, 6);
@@ -62,7 +63,8 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
             int agendasSkipped,
             List<String> revealedPublics,
             List<SeatResult> seats,
-            List<ScoringDiagnostic.SeatRound> scoring) {
+            List<ScoringDiagnostic.SeatRound> scoring,
+            String name) {
 
         double meanPoints() {
             return seats.stream().mapToInt(SeatResult::points).average().orElse(0);
@@ -95,7 +97,9 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
         for (GameResult result : results) {
             scoring.addAll(result.scoring());
             if (Boolean.getBoolean("ai.selfplay.scorediag.lines"))
-                result.scoring().forEach(seat -> System.out.println(ScoringDiagnostic.line(seat)));
+                result.scoring()
+                        .forEach(seat -> System.out.println(
+                                ScoringDiagnostic.line(seat).replaceFirst(" g ", " " + result.name() + " ")));
         }
         ScoringDiagnostic.report(scoring);
     }
@@ -121,8 +125,8 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
 
     private static GameResult playOne(long clockStart, int slot) throws Exception {
         try (SelfPlayEnvironment env = new SelfPlayEnvironment(clockStart)) {
-            SelfPlayGame selfPlay = new SelfPlayGame(
-                    env, "aiselfplay" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000), slot);
+            String name = "aiselfplay" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000);
+            SelfPlayGame selfPlay = new SelfPlayGame(env, name, slot);
             List<String> seating = new ArrayList<>(FACTIONS);
             Collections.rotate(seating, slot);
             Game game = selfPlay.setUp(seating);
@@ -201,7 +205,8 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
                     agendasSkipped[0],
                     new ArrayList<>(end.getRevealedPublicObjectives().keySet()),
                     seats,
-                    diagnostic.results);
+                    diagnostic.results,
+                    name);
         }
     }
 
@@ -311,7 +316,8 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
         reportCards(seats);
         if (Boolean.getBoolean("ai.selfplay.roundtwo.lines")) {
             for (GameResult result : results) {
-                System.out.println("ROUND2 game " + result.ending() + " publics " + result.revealedPublics());
+                System.out.println("ROUND2 game " + result.ending() + " publics " + result.revealedPublics() + " "
+                        + result.name());
                 for (SeatResult seat : result.seats()) {
                     System.out.printf(
                             "ROUND2   %-8s %d -> %d VP, publics %s, secrets %s (holding %s), cards %s%n",
