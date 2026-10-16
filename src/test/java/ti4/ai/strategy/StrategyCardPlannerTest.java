@@ -90,6 +90,20 @@ class StrategyCardPlannerTest extends BaseTi4Test {
         }
     }
 
+    // The guard above rests on someone else picking Imperial for the seat to follow. The last seat to pick has no one
+    // left after it, so leaving Imperial means nobody plays it this round and its secret is only had by picking it.
+    @Test
+    void valuesTheWholeSecretWhenNoOneElseIsLeftToPickImperial() {
+        test.game.setRound(3);
+        test.sol.addSC(LEADERSHIP);
+        changed();
+
+        assertThat(test.nekro.getStrategicCC()).isPositive();
+        assertThat(plan(IMPERIAL).benefit(CardUse.IMPERIAL_SECRET))
+                .map(Benefit::value)
+                .contains(SecretDrawValue.of(test.game, test.nekro));
+    }
+
     @Test
     void valuesNoSecretWhenTheHandHasNoRoomForIt() {
         test.game.setRound(3);

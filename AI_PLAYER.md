@@ -251,7 +251,7 @@ to build one by hand:
   | Trade | 3 trade goods, its commodities, a spend objective they make payable, and leverage for deals |
   | Warfare | PoK: a command token plus one reactivation; Thunder's Edge: a free tactical action. Reactivations are a second build at home, building at home and then moving out, moving twice to reach a far system, or activating a system that holds its token |
   | Technology | the best technology it can research (and a second worth 6 resources; Gravity Drive is worth more while the custodians are still to be taken and it saves the seat a round); for Nekro, Propagation's tokens |
-  | Imperial | an extra public objective this round, the Mecatol Rex point (less while an enemy fleet can reach it, half when it can take Mecatol this round), or a secret (only the strategy token a follow would cost, since following Imperial draws the same secret); plus denying the card to a Mecatol Rex holder still to pick |
+  | Imperial | an extra public objective this round, the Mecatol Rex point (less while an enemy fleet can reach it, half when it can take Mecatol this round), or a secret (only the strategy token a follow would cost, since following Imperial draws the same secret, except for the last seat to pick: nobody else is left to play Imperial, so the whole secret counts); plus denying the card to a Mecatol Rex holder still to pick |
 
   The pick adds the trade goods on a card and a small nudge (at most an eighth of a point) from how often human Nekro
   players take that card in that round (`PickPrior`), and remembers the plan. During the action phase it re-plans
@@ -389,7 +389,7 @@ to build one by hand:
     pool of `SecretOdds`, judged against the seat's own public board) raised towards 1 by a quarter for each round the
     game is expected to last (the leader's points to go over 2), times what a point is worth to the seat. Only one
     secret scores in each status phase, so secrets already in the hand take rounds away, and a full hand makes a draw
-    worth the swap, 0.3, at most. Following _Imperial_, an exploration's secret, _Impersonation_ and _Strategize_ use it. Picking _Imperial_ only for its secret still counts just the strategy token it saves over following.
+    worth the swap, 0.3, at most. Following _Imperial_, an exploration's secret, _Impersonation_ and _Strategize_ use it. Picking _Imperial_ only for its secret still counts just the strategy token it saves over following, unless the seat is the last to pick and nobody else could play Imperial for it to follow.
   - **Expert tiers** (`ExpertTiers`, `data/ai/action_card_expert_tiers.json`). A podcast tier list by three experienced players
     ranks every card from _Ancient Burial Sites_ to _Overrule_ (S, A, B, C, D, best first within a tier). The Impact
     Score misjudges some cards (_Impersonation_ and _Leadership Rider_ rate lower than the experts put them, _Morale

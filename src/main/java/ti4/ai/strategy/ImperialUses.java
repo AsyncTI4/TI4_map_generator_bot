@@ -28,12 +28,23 @@ class ImperialUses {
                 new Benefit(CardUse.IMPERIAL_MECATOL, mecatolValue(in), mecatolPosition(game)),
                 new Benefit(
                         CardUse.IMPERIAL_SECRET,
-                        !holdsMecatol && hasRoomForSecret(seat) ? secretOverFollowing(game, seat) : 0));
+                        !holdsMecatol && hasRoomForSecret(seat) ? secretOverFollowing(in) : 0));
     }
 
-    private static double secretOverFollowing(Game game, Player seat) {
+    private static double secretOverFollowing(PlanInputs in) {
+        Game game = in.game();
+        Player seat = in.seat();
         double draw = SecretDrawValue.of(game, seat);
-        return seat.getStrategicCC() > 0 ? Math.min(draw, CardValueScale.STRATEGY_TOKEN) : draw;
+        if (seat.getStrategicCC() <= 0 || isLastToPick(in)) return draw;
+        return Math.min(draw, CardValueScale.STRATEGY_TOKEN);
+    }
+
+    private static boolean isLastToPick(PlanInputs in) {
+        Game game = in.game();
+        return in.moment() == PlanMoment.PICK
+                && game.getRealPlayers().stream()
+                        .filter(other -> other != in.seat())
+                        .noneMatch(other -> other.getSCs().size() < Math.max(1, game.getStrategyCardsPerPlayer()));
     }
 
     static boolean holdsThreatenedMecatol(PlanInputs in) {
