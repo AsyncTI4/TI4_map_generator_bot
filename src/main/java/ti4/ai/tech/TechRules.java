@@ -259,7 +259,8 @@ public class TechRules {
                 .filter(prompt -> !prompt.isHidden())
                 .toList();
         if (BIOMES_MENU.equals(state)) {
-            Optional<Match> exhaust = Prompts.owned(visible, context.faction(), BIOMES_EXHAUST::equals);
+            Optional<Match> exhaust =
+                    Prompts.owned(Prompts.newestFirst(context.prompts()), context.faction(), BIOMES_EXHAUST::equals);
             exhaust.ifPresent(match -> context.memory().put(key, BIOMES_RECIPIENT));
             return exhaust.map(match -> match.press("exhaust Production Biomes"));
         }

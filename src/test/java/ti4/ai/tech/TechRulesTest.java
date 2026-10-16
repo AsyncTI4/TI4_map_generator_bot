@@ -89,14 +89,15 @@ class TechRulesTest extends BaseTi4Test {
     }
 
     // With a strategy token to spare, Production Biomes' 4 trade goods are a better last action than passing; the
-    // other 2 go to the player furthest behind.
+    // other 2 go to the player furthest behind. The component action menu is ephemeral, so it is reposted to the
+    // seat's private thread.
     @Test
     void takesProductionBiomesTradeGoodsInsteadOfPassing() {
         test.nekro.addTech("pm");
         test.nekro.setStrategicCC(2);
         AiPrompt start =
                 prompt("start", PromptSource.PUBLIC, NOW, "FFCC_nekro_componentAction", "FFCC_nekro_passForRound");
-        AiPrompt menu = prompt("menu", PromptSource.PUBLIC, NOW, "FFCC_nekro_exhaustTech_pm");
+        AiPrompt menu = prompt("menu", PromptSource.AI_THREAD, NOW, "FFCC_nekro_exhaustTech_pm");
         AiPrompt recipients = prompt("recipients", PromptSource.PUBLIC, NOW, "productionBiomes_sol");
 
         assertThat(pressedId(TechRules.beforePassing(test.context(start), List.of(start))
