@@ -6,9 +6,9 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
-import ti4.ai.eval.PeaceAccords;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.tactical.PeaceAccords;
 
 @UtilityClass
 public class PeaceAccordsRules {

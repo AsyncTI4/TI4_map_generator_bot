@@ -1670,6 +1670,15 @@ public class TacticalPlanner {
         return PLANET_TEMPO_VALUE * earlyGameWeight(game);
     }
 
+    private static double zoneBonus(Game game, Territory.Zone zone) {
+        if (zone == Territory.Zone.FOREIGN) return -FOREIGN_PLANET_PENALTY * earlyGameWeight(game);
+        return ownAreaBonus(zone);
+    }
+
+    public static double claimedPlanetBonus(Game game, Territory territory, Tile tile) {
+        return planetTempo(game) + zoneBonus(game, territory.zone(tile));
+    }
+
     static double earlyGameWeight(Game game) {
         int roundsPastEarlyGame = Math.max(0, game.getRound() - LAST_EARLY_ROUND);
         return Math.max(0, 1 - EARLY_GAME_FADE_PER_ROUND * roundsPastEarlyGame);
@@ -2313,9 +2322,7 @@ public class TacticalPlanner {
         }
 
         double expansionZoneBonus(Tile tile) {
-            Territory.Zone zone = territory().zone(tile);
-            if (zone == Territory.Zone.FOREIGN) return -FOREIGN_PLANET_PENALTY * earlyGameWeight(game);
-            return ownAreaBonus(zone);
+            return zoneBonus(game, territory().zone(tile));
         }
 
         DefenseOutlook defense() {

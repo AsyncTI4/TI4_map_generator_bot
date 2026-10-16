@@ -1,4 +1,4 @@
-package ti4.ai.eval;
+package ti4.ai.tactical;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
