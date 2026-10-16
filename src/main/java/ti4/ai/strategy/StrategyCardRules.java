@@ -34,6 +34,7 @@ import ti4.ai.tactical.TacticalPlanner;
 import ti4.ai.tactical.TacticalRules;
 import ti4.ai.trade.TradeCardRules;
 import ti4.ai.trade.TradeCardRules.FollowChoice;
+import ti4.ai.trade.TradeTerms;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -553,7 +554,8 @@ public class StrategyCardRules {
         Player seat = context.seat();
         Player holder = Helper.getPlayerWithThisSC(context.game(), initiative);
         if (!AiSettings.isTradingEnabled()) {
-            if (!AiSeats.isAiSeat(holder) || seat.getCommodities() >= seat.getCommoditiesTotal()) {
+            boolean free = AiSeats.isAiSeat(holder) || TradeTerms.mastersOfTrade(seat);
+            if (!free || seat.getCommodities() >= seat.getCommoditiesTotal()) {
                 return Optional.empty();
             }
             return CardMessages.pressOnce(

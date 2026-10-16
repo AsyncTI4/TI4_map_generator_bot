@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiSettings;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
@@ -831,6 +832,47 @@ class StrategyCardRulesTest extends BaseTi4Test {
         human.nekro.setTacticalCC(3);
         human.nekro.setCommoditiesTotal(3);
         human.nekro.setCommodities(0);
+        human.sol.addSC(TRADE);
+        human.game.setSCPlayed(TRADE, true);
+
+        assertThat(StrategyCardRules.follow(human.context(tradeCard()))).isEmpty();
+    }
+
+    // Masters of Trade: Hacan resolves Trade's secondary without a command token, so it replenishes from a human's
+    // Trade even with an empty strategy pool, pressing the free "Replenish Commodities" (never the token follow).
+    @Test
+    void mastersOfTradeReplenishesFromAHumansTradeWithoutATokenWhetherOrNotTradingIsOn() {
+        String before = System.getProperty(AiSettings.TRADING_PROPERTY);
+        try {
+            for (String trading : List.of("true", "false")) {
+                System.setProperty(AiSettings.TRADING_PROPERTY, trading);
+                AiTestGame human = new AiTestGame();
+                human.aiIsActive("action");
+                human.nekro.addAbility("master_of_trade");
+                human.nekro.setStrategicCC(0);
+                human.nekro.setCommoditiesBase(6);
+                human.nekro.setCommodities(1);
+                human.sol.addSC(TRADE);
+                human.game.setSCPlayed(TRADE, true);
+
+                assertThat(StrategyCardRules.follow(human.context(tradeCard())).map(AiTestGame::pressedId))
+                        .as("trading " + trading)
+                        .contains("sc_refresh");
+            }
+        } finally {
+            if (before == null) System.clearProperty(AiSettings.TRADING_PROPERTY);
+            else System.setProperty(AiSettings.TRADING_PROPERTY, before);
+        }
+    }
+
+    // With its commodities already full there is nothing to replenish, so Hacan leaves the follow alone.
+    @Test
+    void mastersOfTradeSkipsTheFollowWhenCommoditiesAreFull() {
+        AiTestGame human = new AiTestGame();
+        human.aiIsActive("action");
+        human.nekro.addAbility("master_of_trade");
+        human.nekro.setCommoditiesBase(6);
+        human.nekro.setCommodities(6);
         human.sol.addSC(TRADE);
         human.game.setSCPlayed(TRADE, true);
 
