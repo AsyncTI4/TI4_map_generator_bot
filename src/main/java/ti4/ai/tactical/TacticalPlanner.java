@@ -1657,7 +1657,8 @@ public class TacticalPlanner {
     private static Optional<TacticalPlan> produce(Context context, Tile tile) {
         Player seat = context.seat;
         if (!hasDock(seat, tile)) return Optional.empty();
-        ProductionPlanner.BuildPlan build = ProductionPlanner.plan(context.game, seat, tile, 0, context.defense());
+        ProductionPlanner.BuildPlan build = ProductionPlanner.freeBuild(context.game, seat, tile, context.defense())
+                .orElseGet(() -> ProductionPlanner.plan(context.game, seat, tile, 0, context.defense()));
         if (build.isEmpty()) return Optional.empty();
         double objectiveGain = context.builtGain(tile, build);
         boolean forScoring = build.scoring() || objectiveGain > 0;

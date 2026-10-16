@@ -85,6 +85,14 @@ public class ProductionPlanner {
     private static final String AI_DEVELOPMENT = "aida";
     private static final int AIDA_MIN_DISCOUNT = 2;
     private static final List<UnitType> HEAVY_SHIPS = List.of(UnitType.Flagship, UnitType.Warsun);
+    private static final String HACAN_HERO = "hacanhero";
+    private static final int FREE_BUILD_RESOURCES = 1000;
+    private static final double HERO_MIN_SAVING = 10;
+    private static final String AUTO_FACTORIES = "hacanbt";
+    private static final int AUTO_FACTORIES_SHIPS = 3;
+    private static final double FLEET_TOKEN_VALUE = 1.0;
+    private static final String FLEET_REGULATIONS = "regulations";
+    private static final int REGULATED_FLEET = 4;
 
     public record BuildOrder(
             String unitId,
@@ -208,8 +216,37 @@ public class ProductionPlanner {
         planDefensiveUnits(builder);
         planCoreUnits(builder);
         planSurplusShips(builder);
+        planAutoFactories(builder);
         fillProduction(builder);
         return new BuildPlan(builder.orders);
+    }
+
+    public static Optional<BuildPlan> freeBuild(Game game, Player seat, Tile tile, DefenseOutlook defense) {
+        if (!seat.hasLeaderUnlocked(HACAN_HERO) || BoardView.hasEnemyShips(game, seat, tile)) return Optional.empty();
+        BuildPlan free = plan(game, seat, tile, FREE_BUILD_RESOURCES, defense);
+        int capacity = Helper.getProductionValue(seat, game, tile, false);
+        if (free.totalCost() < HERO_MIN_SAVING || free.units() < capacity) return Optional.empty();
+        return Optional.of(free);
+    }
+
+    private static void planAutoFactories(Builder builder) {
+        Player seat = builder.seat;
+        if (!seat.hasUnlockedBreakthrough(AUTO_FACTORIES)) return;
+        if (ButtonHelper.isLawInPlay(builder.game, FLEET_REGULATIONS)
+                && seat.getEffectiveFleetCC() >= REGULATED_FLEET) {
+            return;
+        }
+        int ships = builder.plannedNonFighterShips();
+        int missing = AUTO_FACTORIES_SHIPS - ships;
+        if (ships == 0 || missing <= 0) return;
+        double cost = builder.cost(UnitType.Destroyer);
+        if (seat.getUnitByType(UnitType.Destroyer) == null || !builder.budget.allowsShips(missing, cost * missing)) {
+            return;
+        }
+        double value = builder.fillerValue(UnitType.Destroyer) + FLEET_TOKEN_VALUE / missing;
+        for (int added = 0; added < missing; added++) {
+            if (!builder.ship(UnitType.Destroyer, value, false)) return;
+        }
     }
 
     public static int aidaDiscount(Player seat) {
@@ -772,6 +809,13 @@ public class ProductionPlanner {
             String asyncId =
                     BoardView.model(seat, type).map(UnitModel::getAsyncId).orElse(type.getValue());
             return ButtonHelper.getNumberOfUnitsOnTheBoard(game, seat, asyncId);
+        }
+
+        int plannedNonFighterShips() {
+            return orders.stream()
+                    .filter(order -> BoardView.MOVING_SHIPS.contains(order.type()))
+                    .mapToInt(BuildOrder::units)
+                    .sum();
         }
 
         int planned(UnitType type) {

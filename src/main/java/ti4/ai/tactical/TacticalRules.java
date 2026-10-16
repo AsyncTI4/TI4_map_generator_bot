@@ -71,6 +71,10 @@ public class TacticalRules {
     private static final String AIDA_EXHAUST = "exhaustTech_aida";
     private static final String AIDA_DISCOUNT = "aida_";
     private static final int CUSTODIANS_COST = 6;
+    static final String FREE_BUILD_KEY = "hacanHeroBuild|";
+    private static final String FREE_BUILD_PLANNED = "planned";
+    private static final String FREE_BUILD_PURGED = "purged";
+    private static final String PURGE_HACAN_HERO = "purgeHacanHero";
     private static final Set<String> STATE_SEGMENTS =
             Set.of(UnitState.dmg.name(), UnitState.glv.name(), UnitState.dmg_glv.name());
 
@@ -556,9 +560,15 @@ public class TacticalRules {
         Optional<Match> build = Prompts.owned(turn, faction, ("tacticalActionBuild_" + tile.getPosition())::equals);
         Optional<Match> conclude = Prompts.owned(turn, faction, "doneWithTacticalAction"::equals);
         if (build.isPresent()) {
-            BuildPlan plan = ProductionPlanner.plan(context.game(), context.seat(), tile);
+            Optional<BuildPlan> free = ProductionPlanner.freeBuild(
+                    context.game(), context.seat(), tile, new DefenseOutlook(context.game(), context.seat()));
+            BuildPlan plan = free.orElseGet(() -> ProductionPlanner.plan(context.game(), context.seat(), tile));
             if (!plan.isEmpty()) {
                 context.memory().put(BUILD_KEY + actionKey(context), plan.encode());
+                if (free.isPresent()) {
+                    context.memory().put(FREE_BUILD_KEY + actionKey(context), FREE_BUILD_PLANNED);
+                    return Optional.of(build.get().press("build units for free with Harrugh Gefhara"));
+                }
                 return Optional.of(build.get().press("build units"));
             }
         }
@@ -598,7 +608,7 @@ public class TacticalRules {
             Optional<PromptButton> button = whole.or(() -> prompt.enabledHandler(order.singleHandlerId()));
             if (button.isEmpty()) continue;
             double added = whole.isPresent() ? order.cost() : order.cost() / Math.max(1, order.units());
-            if (breaksReserve(game, seat, added)) continue;
+            if (!freeBuild(context) && breaksReserve(game, seat, added)) continue;
             return Optional.of(AiDecision.press(prompt, button.get(), "build " + order.unitId()));
         }
         return Optional.empty();
@@ -662,6 +672,10 @@ public class TacticalRules {
                         && DONE_EXHAUSTING.equals(button.label()));
         if (done.isEmpty()) return Optional.empty();
         AiPrompt payment = done.get().prompt();
+        if (TACTICAL_SOURCE.equals(source)) {
+            Optional<AiDecision> hero = payWithHero(context, payment, done.get());
+            if (hero.isPresent()) return hero;
+        }
         double owed = parseDouble(cost) - spent(game, seat);
         if (owed > 0 && !seat.getSpentThingsThisWindow().contains(SARWEEN)) {
             Optional<PromptButton> sarween = payment.enabledHandler("useTech_st");
@@ -686,6 +700,26 @@ public class TacticalRules {
             }
         }
         return Optional.of(done.get().press("done paying"));
+    }
+
+    private static boolean freeBuild(AiTurnContext context) {
+        return context.memory().has(FREE_BUILD_KEY + actionKey(context));
+    }
+
+    private static Optional<AiDecision> payWithHero(AiTurnContext context, AiPrompt payment, Match done) {
+        String key = FREE_BUILD_KEY + actionKey(context);
+        String state = context.memory().get(key).orElse("");
+        if (FREE_BUILD_PURGED.equals(state))
+            return Optional.of(done.press("done paying: Harrugh Gefhara made the units free"));
+        if (!FREE_BUILD_PLANNED.equals(state)) return Optional.empty();
+        Optional<PromptButton> purge = payment.enabledHandler(PURGE_HACAN_HERO);
+        if (purge.isEmpty()) {
+            context.memory().remove(key);
+            return Optional.empty();
+        }
+        context.memory().put(key, FREE_BUILD_PURGED);
+        return Optional.of(
+                AiDecision.press(payment, purge.get(), "purge Harrugh Gefhara to reduce the cost of the units to 0"));
     }
 
     private static double spent(Game game, Player seat) {
