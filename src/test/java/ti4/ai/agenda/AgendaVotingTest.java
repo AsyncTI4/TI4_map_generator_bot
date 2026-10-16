@@ -193,4 +193,70 @@ class AgendaVotingTest extends BaseTi4Test {
                 List.of("Jord (4)", "Done exhausting planets."));
         assertThat(press(planets)).isEqualTo("FFCC_sol_proceedToFinalizingVote");
     }
+
+    // Shard of the Throne: Xxcha has already cast 6 votes for itself and Sol's Jord (influence 2) has 2. Gila the
+    // Silvertongue (the Hacan commander) casts 2 more votes per trade good, so 3 trade goods (8 votes) win Sol the
+    // point; a 4th would buy nothing.
+    private void outvotedForTheShard(int tradeGoods) {
+        Player xxcha = test.addSeat("200000000000000002", "xxcha", "red");
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":2,\"red\":6,\"black\":0}");
+        test.game.setCurrentAgendaVote("xxcha", "red_6");
+        sol.addLeader("hacancommander");
+        sol.unsafeGetLeader("hacancommander").setLocked(false);
+        sol.setTg(tradeGoods);
+        assertThat(xxcha.getFaction()).isEqualTo("xxcha");
+    }
+
+    @Test
+    void gilaSpendsJustEnoughTradeGoodsToSwingAPoint() {
+        outvotedForTheShard(6);
+
+        assertThat(GilaVotes.tradeGoodsToSpend(test.game, sol, "sol", 2)).isEqualTo(3);
+    }
+
+    // With Gila, Jord spent and 3 trade goods planned, it spends them one press at a time, then finishes.
+    @Test
+    void gilaPressesForEachTradeGoodAfterThePlanets() {
+        outvotedForTheShard(6);
+        AiPrompt start = prompt("start", PromptSource.PUBLIC, NOW, "FFCC_sol_vote", "FFCC_sol_resolveAgendaVote_0");
+        assertThat(press(start)).isEqualTo("FFCC_sol_vote");
+        AiPrompt planets = prompt(
+                "planets",
+                PromptSource.PUBLIC,
+                NOW,
+                List.of(
+                        "exhaustForVotes_planet_jord",
+                        "exhaustForVotes_hacanCommanderTg",
+                        "FFCC_sol_proceedToFinalizingVote"),
+                List.of("Jord (2)", "Spend Trade Goods for 2 Votes Each", "Done exhausting planets."));
+        assertThat(press(planets)).isEqualTo("exhaustForVotes_planet_jord");
+        sol.addSpentThing("planet_jord");
+
+        assertThat(press(planets)).isEqualTo("exhaustForVotes_hacanCommanderTg");
+        sol.setTg(5);
+        sol.increaseTgsSpentThisWindow(1);
+        assertThat(press(planets)).isEqualTo("exhaustForVotes_hacanCommanderTg");
+        sol.setTg(4);
+        sol.increaseTgsSpentThisWindow(1);
+        assertThat(press(planets)).isEqualTo("exhaustForVotes_hacanCommanderTg");
+        sol.setTg(3);
+        sol.increaseTgsSpentThisWindow(1);
+        assertThat(press(planets)).isEqualTo("FFCC_sol_proceedToFinalizingVote");
+    }
+
+    // Trade goods a revealed spend objective will need next round are kept: Negotiate Trade Routes takes 5, so of 6
+    // only 1 is spare, too few to swing the vote, and Gila spends nothing. Without the commander nothing is spent.
+    @Test
+    void gilaKeepsTradeGoodsASpendObjectiveNeeds() {
+        outvotedForTheShard(6);
+        test.game.getRevealedPublicObjectives().put("trade_routes", 5);
+
+        assertThat(GilaVotes.spendable(test.game, sol)).isEqualTo(1);
+        assertThat(GilaVotes.tradeGoodsToSpend(test.game, sol, "sol", 2)).isZero();
+
+        test.game.getRevealedPublicObjectives().remove("trade_routes");
+        sol.unsafeGetLeader("hacancommander").setLocked(true);
+        assertThat(GilaVotes.tradeGoodsToSpend(test.game, sol, "sol", 2)).isZero();
+    }
 }
