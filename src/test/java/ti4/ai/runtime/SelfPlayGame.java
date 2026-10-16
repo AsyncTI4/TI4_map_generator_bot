@@ -232,6 +232,7 @@ final class SelfPlayGame {
                 }
             }
         }
+        giveChosenTechs(game);
         revealChosenObjectives(game, slot);
         GameManager.save(game, "AI self-play setup");
         if (!GameManager.isValid(name) || GameManager.getManagedGame(name) == null) {
@@ -239,6 +240,19 @@ final class SelfPlayGame {
                     "The game was not registered after setup: valid=" + GameManager.isValid(name));
         }
         return game;
+    }
+
+    // -Dai.selfplay.techs=pm,qdn gives each listed technology to the seats whose faction technologies include it (or to
+    // every seat for a generic technology), so a batch can exercise a faction technology from round one.
+    private static void giveChosenTechs(Game game) {
+        for (String alias : System.getProperty("ai.selfplay.techs", "").split(",")) {
+            String tech = alias.trim();
+            if (tech.isEmpty()) continue;
+            List<Player> owners = game.getRealPlayers().stream()
+                    .filter(seat -> seat.getFactionTechs().contains(tech))
+                    .toList();
+            for (Player seat : owners.isEmpty() ? game.getRealPlayers() : owners) seat.addTech(tech);
+        }
     }
 
     // -Dai.selfplay.objectives=intimidate,monument puts these stage one objectives on top of the deck, so the start of
