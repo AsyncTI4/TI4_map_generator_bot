@@ -47,30 +47,34 @@ class ThirtyKAcStateTest extends BaseTi4Test {
     @Test
     void endOfTurnClearsTurnState() {
         ThirtyKAcState.setWarProfiteering(game, sol, hacan, "201");
-        ThirtyKAcState.setPlanetLoss(game, sol, "mr", hacan);
         ThirtyKAcState.setExtendedCampaigning(game, sol, hacan);
-        ThirtyKAcState.openChoice(game, sol, "folding");
+        // Saves from before the paged target lists still carry one-shot choice keys.
+        game.setStoredValue("thkOneShotthkAcFoldingStartsol", "open");
         ThirtyKAcState.markFinalStandRoll(game, sol, "mr", "1");
         assertThat(game.getStoredValueMap().values()).noneMatch(value -> value.contains(",") || value.contains(":"));
 
         ThirtyKTurnState.clearEndOfTurn(game);
 
         assertThat(ThirtyKAcState.warProfiteering(game, sol)).isNull();
-        assertThat(ThirtyKAcState.planetLoss(game, sol)).isNull();
         assertThat(ThirtyKAcState.takeExtendedCampaigning(game, sol, hacan)).isFalse();
-        assertThat(ThirtyKAcState.hasChoice(game, sol, "folding")).isFalse();
+        assertThat(game.getStoredValue("thkOneShotthkAcFoldingStartsol")).isEmpty();
         assertThat(ThirtyKAcState.markFinalStandRoll(game, sol, "mr", "1")).isTrue();
     }
 
-    // Lists over 25 buttons are split across messages; only the first press of a play may resolve.
+    // Conflagration and Antidisestablishmentarianism are answered by a player who is not active, often after
+    // the active player's turn has ended, so their windows last until the next strategy phase.
     @Test
-    void oneShotChoiceIsTakenOnceByItsOwner() {
-        ThirtyKAcState.openChoice(game, sol, "folding");
+    void reactionWindowsOutliveTheTurnButNotTheActionPhase() {
+        ThirtyKAcState.setPlanetLoss(game, sol, "mr", hacan);
+        ThirtyKAcState.setStructureLost(game, hacan, "201");
 
-        assertThat(ThirtyKAcState.takeChoice(game, hacan, "folding")).isFalse();
-        assertThat(ThirtyKAcState.hasChoice(game, sol, "folding")).isTrue();
-        assertThat(ThirtyKAcState.takeChoice(game, sol, "folding")).isTrue();
-        assertThat(ThirtyKAcState.takeChoice(game, sol, "folding")).isFalse();
+        ThirtyKTurnState.clearEndOfTurn(game);
+        assertThat(ThirtyKAcState.planetLoss(game, sol)).isNotNull();
+        assertThat(ThirtyKAcState.structureLoss(game)).isNotNull();
+
+        ThirtyKTurnState.clearActionPhase(game);
+        assertThat(ThirtyKAcState.planetLoss(game, sol)).isNull();
+        assertThat(ThirtyKAcState.structureLoss(game)).isNull();
     }
 
     @Test

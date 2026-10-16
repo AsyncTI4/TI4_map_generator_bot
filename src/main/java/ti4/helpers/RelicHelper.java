@@ -141,15 +141,25 @@ public class RelicHelper {
         }
         relicID = relicID.replace("extra1", "");
         relicID = relicID.replace("extra2", "");
+        gainRelicAndNotify(player, event, game, relicID, "drew");
+        if (checked) game.shuffleRelics();
+    }
+
+    public static void gainRelicAndNotify(
+            Player player, GenericInteractionCreateEvent event, Game game, String relicID, String verb) {
         player.addRelic(relicID);
         RelicModel relicModel = Mapper.getRelic(relicID);
-
-        String message = player.getRepresentation() + " drew the _" + relicModel.getName() + "_ relic.";
+        String relicName = relicModel == null ? relicID : relicModel.getName();
+        String message = player.getRepresentation() + " " + verb + " the _" + relicName + "_ relic.";
         if (game.isFowMode()) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
         }
-        MessageHelper.sendMessageToChannelWithEmbed(
-                player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
+        if (relicModel == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        } else {
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
+        }
         resolveRelicEffects(event, game, player, relicID);
         WhiteTfUnitHandler.resolveMonumentRelicDraw(event, game, player);
         TeHelperUnits.serveIconoclastDeployAbility(game, player);
@@ -157,7 +167,6 @@ public class RelicHelper {
             OnyxxaLeaderHandler.onDrawRelic(player);
         }
         KairnBreakthroughHandler.offerRelicGainPrompts(game, player, relicID);
-        if (checked) game.shuffleRelics();
     }
 
     public static void resolveRelicEffects(

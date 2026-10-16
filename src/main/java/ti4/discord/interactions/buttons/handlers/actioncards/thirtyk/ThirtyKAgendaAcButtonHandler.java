@@ -19,6 +19,7 @@ import ti4.helpers.thirtyk.ThirtyKAgendaRiders;
 import ti4.helpers.thirtyk.ThirtyKAgendaRiders.RiderEntry;
 import ti4.helpers.thirtyk.ThirtyKDistance;
 import ti4.message.MessageHelper;
+import ti4.service.fow.PlanetTargetService;
 
 @UtilityClass
 public class ThirtyKAgendaAcButtonHandler {
@@ -100,7 +101,7 @@ public class ThirtyKAgendaAcButtonHandler {
         Player voter = ThirtyKAcTargets.target(game, buttonID, SUBJECTIVE);
         String outcome = voter == null ? null : votedOutcome(game, voter);
         if (outcome == null || voter == player || !ThirtyKDistance.homesMoreThanFiveApart(game, player, voter)) {
-            ThirtyKAcTargets.fizzle(event, player);
+            PlanetTargetService.fizzle(event, player);
             return;
         }
         String identifier = game.isFowMode() ? player.getColor() : player.getFaction();

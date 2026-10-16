@@ -13,10 +13,9 @@ import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.thirtyk.ThirtyKAcState;
-import ti4.helpers.thirtyk.ThirtyKRelics;
 import ti4.helpers.thirtyk.ThirtyKTransactions;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -116,7 +115,7 @@ public class ThirtyKPoliticsAcButtonHandler {
     public static void devisivePlot(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = ThirtyKAcTargets.target(game, buttonID, DEVISIVE);
         if (target == null || target == player) {
-            ThirtyKAcTargets.fizzle(event, player);
+            PlanetTargetService.fizzle(event, player);
             return;
         }
         List<Integer> cards = game.isFowMode()
@@ -128,7 +127,7 @@ public class ThirtyKPoliticsAcButtonHandler {
         for (Integer sc : cards) {
             buttons.add(Buttons.gray(
                     player.factionButtonChecker() + DEVISIVE_SC + target.getColor() + "_" + sc,
-                    sc + " " + Helper.getSCName(sc, game)));
+                    sc + " " + game.getSCName(sc)));
         }
         if (buttons.isEmpty()) {
             ThirtyKAcTargets.noTarget(event, player, "Divisive Plot");
@@ -144,7 +143,7 @@ public class ThirtyKPoliticsAcButtonHandler {
         Player target = ThirtyKAcTargets.target(game, buttonID, DEVISIVE_SC);
         int sc = NumberUtils.toInt(ThirtyKAcTargets.afterTarget(buttonID, DEVISIVE_SC), -1);
         if (target == null || !unplayedCards(game, target).contains(sc)) {
-            ThirtyKAcTargets.fizzle(event, player);
+            PlanetTargetService.fizzle(event, player);
             return;
         }
         if (player.getStrategicCC() < 1) {
@@ -159,7 +158,7 @@ public class ThirtyKPoliticsAcButtonHandler {
         buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Resolving"));
         ThirtyKAcTargets.send(
                 player,
-                player.getRepresentationUnfogged() + ", your agents subvert " + Helper.getSCName(sc, game)
+                player.getRepresentationUnfogged() + ", your agents subvert " + game.getSCName(sc)
                         + ": 1 command token is spent from your strategy pool; resolve its secondary ability"
                         + " (_Divisive Plot_)."
                         + (buttons.size() == 1 ? " This card has no secondary buttons; resolve it manually." : ""),
@@ -175,7 +174,7 @@ public class ThirtyKPoliticsAcButtonHandler {
     public static void extendedCampaigning(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = ThirtyKAcTargets.target(game, buttonID, EXTENDED_CAMPAIGNING);
         if (target == null || target == player || player.isNeighboursWith(target)) {
-            ThirtyKAcTargets.fizzle(event, player);
+            PlanetTargetService.fizzle(event, player);
             return;
         }
         grantTransaction(event, game, player, target, "Extended Campaigning");
@@ -210,7 +209,7 @@ public class ThirtyKPoliticsAcButtonHandler {
     public static void tradeShips(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = ThirtyKAcTargets.target(game, buttonID, TRADE_SHIPS);
         if (target == null || target == player) {
-            ThirtyKAcTargets.fizzle(event, player);
+            PlanetTargetService.fizzle(event, player);
             return;
         }
         grantTransaction(event, game, player, target, "Trade Ships");
@@ -308,7 +307,7 @@ public class ThirtyKPoliticsAcButtonHandler {
             return false;
         }
         String relicID = game.drawRelic(0).replace("extra1", "").replace("extra2", "");
-        ThirtyKRelics.gainRelic(event, game, player, relicID);
+        RelicHelper.gainRelicAndNotify(player, event, game, relicID, "gained");
         return true;
     }
 

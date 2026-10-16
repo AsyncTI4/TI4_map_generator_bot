@@ -8,7 +8,7 @@
     { "expect": { "state": "hacan.passed", "equals": "false" } },
     { "as": "sol", "pressId": "FFCC_sol_passForRound" },
     { "expect": { "in": "sol:cards-info", "contains": "first player to pass" } },
-    { "as": "sol", "press": "thirtyKScoreSO_quickdeliberationsjmsc", "in": "sol:cards-info" },
+    { "as": "sol", "press": "so_score_hand_{so:quickdeliberationsjmsc}", "in": "sol:cards-info" },
     { "expect": { "state": "sol.sosScored", "contains": "quickdeliberationsjmsc" } }
   ]
 }

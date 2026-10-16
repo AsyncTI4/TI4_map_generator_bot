@@ -5,14 +5,11 @@ import java.util.List;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -21,12 +18,6 @@ import ti4.model.UnitModel;
 // TODO: 30k explores and relics that place units do not check reinforcement limits.
 @UtilityClass
 public class ThirtyKExploreSupport {
-
-    public static final int MAX_CHOICE_BUTTONS = 24;
-
-    public static MessageChannel channelFor(Player target) {
-        return target.getCorrectChannel();
-    }
 
     public static Button decline(Player player) {
         return Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline");
@@ -69,14 +60,5 @@ public class ThirtyKExploreSupport {
 
     public static boolean hasUnitOfType(Player player, UnitHolder holder, UnitType type) {
         return holder != null && holder.getUnitCount(type, player) > 0;
-    }
-
-    public static List<Button> capped(List<Button> buttons) {
-        if (buttons.size() <= MAX_CHOICE_BUTTONS) return buttons;
-        return new ArrayList<>(buttons.subList(0, MAX_CHOICE_BUTTONS));
-    }
-
-    public static void deleteMessage(GenericInteractionCreateEvent event) {
-        ButtonHelper.deleteMessage(event);
     }
 }

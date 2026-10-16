@@ -15,13 +15,14 @@ public class ThirtyKTurnState {
         ThirtyKRelicHooks.clearTechSupport(game);
         ThirtyKSecretHooks.clearTurnState(game);
         ThirtyKAttachmentHandler.clearCarbonUsed(game);
-        ThirtyKFrontierExploreHandler.clearWereLost(game);
     }
 
     public static void clearActionPhase(Game game) {
         if (!ThirtyKCards.inUse(game)) return;
         clearEndOfTurn(game);
         ThirtyKTransactions.clearAllGrants(game);
+        ThirtyKAcState.clearActionPhaseState(game);
+        ThirtyKFrontierExploreHandler.clearWereLost(game);
     }
 
     public static void removeKeysStartingWith(Game game, String prefix) {

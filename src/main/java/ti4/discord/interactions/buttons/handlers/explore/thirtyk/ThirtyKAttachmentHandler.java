@@ -21,7 +21,6 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
-import ti4.helpers.thirtyk.ThirtyKExploreMath;
 import ti4.helpers.thirtyk.ThirtyKTurnState;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
@@ -60,10 +59,16 @@ public class ThirtyKAttachmentHandler {
         }
     }
 
+    static String readyCycleMarker(int round, String phase) {
+        String lowerPhase = phase == null ? "" : phase.toLowerCase();
+        boolean afterStatusReady = "statushomework".equals(lowerPhase) || lowerPhase.contains("agenda");
+        return round + (afterStatusReady ? "s" : "");
+    }
+
     private static void resolveProfitableFactories(
             GenericInteractionCreateEvent event, Game game, Player player, String planetID) {
         String key = PROFITABLE_EXHAUSTED_KEY + planetID;
-        String marker = ThirtyKExploreMath.readyCycleMarker(game.getRound(), game.getPhaseOfGame());
+        String marker = readyCycleMarker(game.getRound(), game.getPhaseOfGame());
         if (marker.equals(game.getStoredValue(key))) return;
         game.setStoredValue(key, marker);
         MessageHelper.sendMessageToChannel(
@@ -95,7 +100,7 @@ public class ThirtyKAttachmentHandler {
         Tile tile = game.getTileFromPlanet(planetID);
         Planet planet = game.getUnitHolderFromPlanet(planetID);
         if (tile == null || planet == null) return;
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
         if (carbonUsedThisTurn(game, planetID)) return;
         game.setStoredValue(CARBON_USED_KEY + planetID, "used");
         PlanetService.refreshPlanet(player, planetID);
@@ -173,11 +178,12 @@ public class ThirtyKAttachmentHandler {
         int amount = Integer.parseInt(parts[1]);
         String planetID = parts[2];
         if (tile == null || tile.getUnitHolders().get(planetID) == null) return;
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
         List<Die> dice = DiceHelper.rollDice(4, amount);
         List<Integer> results = dice.stream().map(Die::getResult).toList();
         int onPlanet = tile.getUnitHolders().get(planetID).getUnitCount(UnitType.Infantry, player);
-        int destroyed = Math.min(onPlanet, ThirtyKExploreMath.countAtMost(results, 3));
+        int destroyed = Math.min(
+                onPlanet, (int) results.stream().filter(result -> result <= 3).count());
         if (destroyed > 0) {
             DestroyUnitService.destroyUnits(
                     event, tile, game, player.getColor(), destroyed + " inf " + planetID, false);
@@ -198,14 +204,14 @@ public class ThirtyKAttachmentHandler {
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", you produced fighters next to _Production Relay_. Choose a player;"
                         + " they place 2 fighters in their home system if no other player's ships are there.",
-                ThirtyKExploreSupport.capped(buttons));
+                buttons);
     }
 
     @ButtonHandler(RELAY_CHOOSE)
     public static void relayChoose(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player chosen = game.getPlayerFromColorOrFaction(buttonID.substring(RELAY_CHOOSE.length()));
         if (chosen == null) return;
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
         Tile home = chosen.getHomeSystemTile();
         boolean blocked = home == null || ThirtyKExploreSupport.otherPlayersHaveShips(game, chosen, home);
         if (!blocked) {
@@ -250,7 +256,7 @@ public class ThirtyKAttachmentHandler {
         Tile tile = game.getTileByPosition(parts[0]);
         int amount = Integer.parseInt(parts[1]);
         if (tile == null) return;
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
         AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " ff");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),

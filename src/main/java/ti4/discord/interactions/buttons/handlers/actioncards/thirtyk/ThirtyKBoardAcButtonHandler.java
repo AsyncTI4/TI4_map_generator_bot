@@ -3,7 +3,6 @@ package ti4.discord.interactions.buttons.handlers.actioncards.thirtyk;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -23,8 +22,10 @@ import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKAcState;
+import ti4.helpers.thirtyk.ThirtyKCards;
 import ti4.helpers.thirtyk.ThirtyKDistance;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -99,28 +100,36 @@ public class ThirtyKBoardAcButtonHandler {
 
     @ButtonHandler(BLEW_UP)
     public static void blewUp(ButtonInteractionEvent event, Game game, Player player) {
-        Set<String> visible = game.isFowMode() ? FoWHelper.getTilePositionsToShow(game, player) : null;
+        List<Button> buttons = blewUpTileButtons(game, player);
+        if (buttons.isEmpty()) {
+            ThirtyKAcTargets.noTarget(event, player, "And Then They Blew Up!");
+            return;
+        }
+        ThirtyKAcState.clearFightersBlownUp(game, player);
+        ButtonHelper.deleteMessage(event);
+        NewStuffHelper.sendPaginated(
+                player.getCorrectChannel(),
+                blewUpMessage(player),
+                buttons,
+                List.of(),
+                player.factionButtonChecker() + BLEW_UP_TILE);
+    }
+
+    private static List<Button> blewUpTileButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (visible != null && !visible.contains(tile.getPosition())) continue;
+        for (Tile tile : ThirtyKCards.visibleTiles(game, player)) {
             if (fighterOwners(game, tile).isEmpty()) continue;
             if (!ThirtyKDistance.isMoreThanFiveFromHome(game, player, tile.getPosition())) continue;
             buttons.add(Buttons.gray(
                     player.factionButtonChecker() + BLEW_UP_TILE + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
         }
-        if (buttons.isEmpty()) {
-            ThirtyKAcTargets.noTarget(event, player, "And Then They Blew Up!");
-            return;
-        }
-        ThirtyKAcState.clearFightersBlownUp(game, player);
-        ThirtyKAcState.openChoice(game, player, BLEW_UP);
-        ButtonHelper.deleteMessage(event);
-        ThirtyKAcTargets.send(
-                player,
-                player.getRepresentationUnfogged()
-                        + ", choose a system more than 5 hexes from your home system to destroy up to 2 fighters in.",
-                buttons);
+        return buttons;
+    }
+
+    private static String blewUpMessage(Player player) {
+        return player.getRepresentationUnfogged()
+                + ", choose a system more than 5 hexes from your home system to destroy up to 2 fighters in.";
     }
 
     private static List<Player> fighterOwners(Game game, Tile tile) {
@@ -133,14 +142,21 @@ public class ThirtyKBoardAcButtonHandler {
 
     @ButtonHandler(BLEW_UP_TILE)
     public static void blewUpTile(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String position = buttonID.substring(BLEW_UP_TILE.length());
-        Tile tile = game.getTileByPosition(position);
-        if (!ThirtyKAcTargets.takeChoice(event, game, player, BLEW_UP)) return;
-        if (tile == null || !ThirtyKDistance.isMoreThanFiveFromHome(game, player, position)) {
-            ThirtyKAcTargets.fizzle(event, player);
+        if (NewStuffHelper.turnPage(
+                event,
+                buttonID,
+                blewUpMessage(player),
+                () -> blewUpTileButtons(game, player),
+                List.of(),
+                player.factionButtonChecker() + BLEW_UP_TILE)) {
             return;
         }
-        ThirtyKAcState.setFightersBlownUp(game, player, position, 0);
+        String position = buttonID.substring(BLEW_UP_TILE.length());
+        Tile tile = game.getTileByPosition(position);
+        if (tile == null || !ThirtyKDistance.isMoreThanFiveFromHome(game, player, position)) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
         List<Button> buttons = new ArrayList<>();
         for (Player owner : fighterOwners(game, tile)) {
             String label = game.isFowMode()
@@ -194,10 +210,23 @@ public class ThirtyKBoardAcButtonHandler {
 
     @ButtonHandler(CUMULATIVE)
     public static void cumulativeSupport(ButtonInteractionEvent event, Game game, Player player) {
+        List<Button> buttons = cumulativeButtons(game, player);
+        if (buttons.isEmpty()) {
+            ThirtyKAcTargets.noTarget(event, player, "Cumulative Support");
+            return;
+        }
+        ButtonHelper.deleteMessage(event);
+        NewStuffHelper.sendPaginated(
+                player.getCorrectChannel(),
+                cumulativeMessage(player),
+                buttons,
+                List.of(),
+                player.factionButtonChecker() + CUMULATIVE_PLACE);
+    }
+
+    private static List<Button> cumulativeButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        Set<String> visible = game.isFowMode() ? FoWHelper.getTilePositionsToShow(game, player) : null;
-        for (Tile tile : game.getTileMap().values()) {
-            if (visible != null && !visible.contains(tile.getPosition())) continue;
+        for (Tile tile : ThirtyKCards.visibleTiles(game, player)) {
             for (Planet holder : tile.getPlanetUnitHolders()) {
                 String planet = holder.getName();
                 int infantry = cumulativeInfantry(game, player, planet);
@@ -207,17 +236,12 @@ public class ThirtyKBoardAcButtonHandler {
                         Helper.getPlanetRepresentation(planet, game) + " (" + infantry + " Infantry)"));
             }
         }
-        if (buttons.isEmpty()) {
-            ThirtyKAcTargets.noTarget(event, player, "Cumulative Support");
-            return;
-        }
-        ThirtyKAcState.openChoice(game, player, CUMULATIVE);
-        ButtonHelper.deleteMessage(event);
-        ThirtyKAcTargets.send(
-                player,
-                player.getRepresentationUnfogged() + ", choose a planet. You place infantry on it equal"
-                        + " to its distance from your home system, up to 4.",
-                buttons);
+        return buttons;
+    }
+
+    private static String cumulativeMessage(Player player) {
+        return player.getRepresentationUnfogged() + ", choose a planet. You place infantry on it equal"
+                + " to its distance from your home system, up to 4.";
     }
 
     private static int cumulativeInfantry(Game game, Player player, String planet) {
@@ -225,16 +249,24 @@ public class ThirtyKBoardAcButtonHandler {
         Tile tile = game.getTileFromPlanet(planet);
         if (home == null || tile == null) return 0;
         Map<String, Integer> distances = CheckDistanceHelper.getTileDistances(game, null, home.getPosition(), 4, true);
-        return ThirtyKAcState.cumulativeSupportInfantry(distances.getOrDefault(tile.getPosition(), 4));
+        return Math.min(4, distances.getOrDefault(tile.getPosition(), 4));
     }
 
     @ButtonHandler(CUMULATIVE_PLACE)
     public static void cumulativePlace(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (NewStuffHelper.turnPage(
+                event,
+                buttonID,
+                cumulativeMessage(player),
+                () -> cumulativeButtons(game, player),
+                List.of(),
+                player.factionButtonChecker() + CUMULATIVE_PLACE)) {
+            return;
+        }
         String planet = buttonID.substring(CUMULATIVE_PLACE.length());
         int infantry = cumulativeInfantry(game, player, planet);
         Tile tile = game.getTileFromPlanet(planet);
         if (tile == null || infantry < 1) return;
-        if (!ThirtyKAcTargets.takeChoice(event, game, player, CUMULATIVE)) return;
         AddUnitService.addUnits(event, tile, game, player.getColor(), infantry + " inf " + planet);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
@@ -257,30 +289,47 @@ public class ThirtyKBoardAcButtonHandler {
 
     @ButtonHandler(DISTANT_MAPS)
     public static void distantMaps(ButtonInteractionEvent event, Game game, Player player) {
-        List<Button> buttons = new ArrayList<>();
-        if (!game.isFowMode()) {
-            for (Tile tile : game.getTileMap().values()) {
-                for (Planet planet : tile.getPlanetUnitHolders()) {
-                    if (!isDistantMapsTarget(game, player, planet.getName())) continue;
-                    buttons.add(Buttons.gray(
-                            player.factionButtonChecker() + DISTANT_MAPS_PLANET + BlindSelectionService.TBD_FACTION
-                                    + "_" + planet.getName(),
-                            Helper.getPlanetRepresentation(planet.getName(), game)));
-                }
+        if (game.isFowMode()) {
+            List<Button> buttons =
+                    PlanetTargetService.targetButtons(game, player, distantMapsSpec(game, player), List.of());
+            if (buttons.isEmpty()) {
+                ThirtyKAcTargets.noTarget(event, player, "Distant Maps");
+                return;
             }
+            ButtonHelper.deleteMessage(event);
+            ThirtyKAcTargets.send(player, distantMapsMessage(player), buttons);
+            return;
         }
-        buttons = PlanetTargetService.targetButtons(game, player, distantMapsSpec(game, player), buttons);
+        List<Button> buttons = distantMapsButtons(game, player);
         if (buttons.isEmpty()) {
             ThirtyKAcTargets.noTarget(event, player, "Distant Maps");
             return;
         }
-        ThirtyKAcState.openChoice(game, player, DISTANT_MAPS);
         ButtonHelper.deleteMessage(event);
-        ThirtyKAcTargets.send(
-                player,
-                player.getRepresentationUnfogged()
-                        + ", choose a planet more than 5 hexes from your home system for _Distant Maps_.",
-                buttons);
+        NewStuffHelper.sendPaginated(
+                player.getCorrectChannel(), distantMapsMessage(player), buttons, List.of(), distantMapsNav(player));
+    }
+
+    private static List<Button> distantMapsButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                if (!isDistantMapsTarget(game, player, planet.getName())) continue;
+                buttons.add(Buttons.gray(
+                        distantMapsNav(player) + planet.getName(),
+                        Helper.getPlanetRepresentation(planet.getName(), game)));
+            }
+        }
+        return buttons;
+    }
+
+    private static String distantMapsNav(Player player) {
+        return player.factionButtonChecker() + DISTANT_MAPS_PLANET + BlindSelectionService.TBD_FACTION + "_";
+    }
+
+    private static String distantMapsMessage(Player player) {
+        return player.getRepresentationUnfogged()
+                + ", choose a planet more than 5 hexes from your home system for _Distant Maps_.";
     }
 
     private static boolean isDistantMapsTarget(Game game, Player player, String planet) {
@@ -301,14 +350,23 @@ public class ThirtyKBoardAcButtonHandler {
 
     @ButtonHandler(DISTANT_MAPS_PLANET)
     public static void distantMapsPlanet(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!game.isFowMode()
+                && NewStuffHelper.turnPage(
+                        event,
+                        buttonID,
+                        distantMapsMessage(player),
+                        () -> distantMapsButtons(game, player),
+                        List.of(),
+                        distantMapsNav(player))) {
+            return;
+        }
         PlanetTargetSpec spec = distantMapsSpec(game, player);
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
-        if (!ThirtyKAcTargets.takeChoice(event, game, player, DISTANT_MAPS)) return;
         var target = PlanetTargetService.resolve(
                 game, player, buttonID, spec, resolved -> isFarPlanet(game, player, resolved.planetId()));
         List<String> traits = target == null ? List.of() : explorableTraits(game, target.planetId());
         if (target == null || target.owner() == player || traits.isEmpty()) {
-            ThirtyKAcTargets.fizzle(event, player);
+            PlanetTargetService.fizzle(event, player);
             return;
         }
         ButtonHelper.deleteMessage(event);
@@ -335,7 +393,7 @@ public class ThirtyKBoardAcButtonHandler {
                 || owner == player
                 || !isFarPlanet(game, player, planet)
                 || !explorableTraits(game, planet).contains(trait)) {
-            ThirtyKAcTargets.fizzle(event, player);
+            PlanetTargetService.fizzle(event, player);
             return;
         }
         ButtonHelper.deleteMessage(event);
@@ -429,10 +487,23 @@ public class ThirtyKBoardAcButtonHandler {
 
     @ButtonHandler(FOLDING)
     public static void folding(ButtonInteractionEvent event, Game game, Player player) {
-        Set<String> visible = game.isFowMode() ? FoWHelper.getTilePositionsToShow(game, player) : null;
+        List<Button> buttons = foldingTileButtons(game, player);
+        if (buttons.isEmpty()) {
+            ThirtyKAcTargets.noTarget(event, player, "Folding of Spacetime");
+            return;
+        }
+        ButtonHelper.deleteMessage(event);
+        NewStuffHelper.sendPaginated(
+                player.getCorrectChannel(),
+                foldingMessage(player),
+                buttons,
+                List.of(),
+                player.factionButtonChecker() + FOLDING_TILE);
+    }
+
+    private static List<Button> foldingTileButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (visible != null && !visible.contains(tile.getPosition())) continue;
+        for (Tile tile : ThirtyKCards.visibleTiles(game, player)) {
             if (!tile.isEdgeOfBoard(game)
                     || ButtonHelper.getPlayersWithShipsInTheSystem(game, tile).isEmpty()) {
                 continue;
@@ -441,38 +512,33 @@ public class ThirtyKBoardAcButtonHandler {
                     player.factionButtonChecker() + FOLDING_TILE + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
         }
-        if (buttons.isEmpty()) {
-            ThirtyKAcTargets.noTarget(event, player, "Folding of Spacetime");
-            return;
-        }
-        ThirtyKAcState.openChoice(game, player, FOLDING);
-        ButtonHelper.deleteMessage(event);
-        ThirtyKAcTargets.send(
-                player,
-                player.getRepresentationUnfogged() + ", choose a system on the edge of the game board.",
-                buttons);
+        return buttons;
+    }
+
+    private static String foldingMessage(Player player) {
+        return player.getRepresentationUnfogged() + ", choose a system on the edge of the game board.";
     }
 
     @ButtonHandler(FOLDING_TILE)
     public static void foldingTile(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (NewStuffHelper.turnPage(
+                event,
+                buttonID,
+                foldingMessage(player),
+                () -> foldingTileButtons(game, player),
+                List.of(),
+                player.factionButtonChecker() + FOLDING_TILE)) {
+            return;
+        }
         Tile tile = game.getTileByPosition(buttonID.substring(FOLDING_TILE.length()));
-        if (!ThirtyKAcTargets.takeChoice(event, game, player, FOLDING)) return;
         if (tile == null || !tile.isEdgeOfBoard(game)) {
-            ThirtyKAcTargets.fizzle(event, player);
+            PlanetTargetService.fizzle(event, player);
             return;
         }
         ButtonHelper.deleteMessage(event);
         List<Player> movers = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile);
         for (Player mover : movers) {
-            List<Button> buttons = foldingDestinations(game, mover, tile);
-            buttons.add(Buttons.red(mover.factionButtonChecker() + FOLDING_STAY, "Stay"));
-            ThirtyKAcState.openChoice(game, mover, FOLDING_MOVE);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    mover.getCorrectChannel(),
-                    mover.getRepresentationUnfogged() + ", you may move your ships in "
-                            + tile.getRepresentationForButtons(game, mover)
-                            + " to another edge system without other players' ships (_Folding of Spacetime_).",
-                    buttons);
+            offerFolding(game, mover, tile);
         }
         if (!movers.contains(player)) {
             MessageHelper.sendMessageToChannel(
@@ -483,11 +549,9 @@ public class ThirtyKBoardAcButtonHandler {
     }
 
     private static List<Button> foldingDestinations(Game game, Player mover, Tile origin) {
-        Set<String> known = game.isFowMode() ? FoWHelper.getTilePositionsToShow(game, mover) : null;
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : ThirtyKCards.visibleTiles(game, mover)) {
             if (tile == origin || !tile.isEdgeOfBoard(game)) continue;
-            if (known != null && !known.contains(tile.getPosition())) continue;
             if (FoWHelper.otherPlayersHaveShipsInSystem(mover, tile, game)) continue;
             buttons.add(Buttons.gray(
                     mover.factionButtonChecker() + FOLDING_MOVE + origin.getPosition() + "_" + tile.getPosition(),
@@ -496,23 +560,56 @@ public class ThirtyKBoardAcButtonHandler {
         return buttons;
     }
 
+    private static void offerFolding(Game game, Player mover, Tile origin) {
+        NewStuffHelper.sendPaginated(
+                mover.getCorrectChannel(),
+                foldingMoveMessage(game, mover, origin),
+                foldingDestinations(game, mover, origin),
+                stayButton(mover),
+                foldingMoveNav(mover, origin));
+    }
+
+    private static String foldingMoveMessage(Game game, Player mover, Tile origin) {
+        return mover.getRepresentationUnfogged() + ", you may move your ships in "
+                + origin.getRepresentationForButtons(game, mover)
+                + " to another edge system without other players' ships (_Folding of Spacetime_).";
+    }
+
+    private static String foldingMoveNav(Player mover, Tile origin) {
+        return mover.factionButtonChecker() + FOLDING_MOVE + origin.getPosition() + "_";
+    }
+
+    private static List<Button> stayButton(Player mover) {
+        return List.of(Buttons.red(mover.factionButtonChecker() + FOLDING_STAY, "Stay"));
+    }
+
     @ButtonHandler(FOLDING_MOVE)
     public static void foldingMove(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] parts = buttonID.substring(FOLDING_MOVE.length()).split("_");
         if (parts.length != 2) return;
         Tile from = game.getTileByPosition(parts[0]);
+        if (from == null || !FoWHelper.playerHasShipsInSystem(player, from)) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
+        if (NewStuffHelper.turnPage(
+                event,
+                buttonID,
+                foldingMoveMessage(game, player, from),
+                () -> foldingDestinations(game, player, from),
+                stayButton(player),
+                foldingMoveNav(player, from))) {
+            return;
+        }
         Tile to = game.getTileByPosition(parts[1]);
-        if (!ThirtyKAcTargets.choiceOpen(event, game, player, FOLDING_MOVE)) return;
-        if (from == null) {
-            ThirtyKAcState.takeChoice(game, player, FOLDING_MOVE);
-            ThirtyKAcTargets.fizzle(event, player);
-            return;
-        }
         if (to == null || !to.isEdgeOfBoard(game) || FoWHelper.otherPlayersHaveShipsInSystem(player, to, game)) {
-            reofferFolding(event, game, player, from);
+            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", that system cannot be chosen now; pick again.");
+            offerFolding(game, player, from);
             return;
         }
-        ThirtyKAcState.takeChoice(game, player, FOLDING_MOVE);
         List<RemovedUnit> moved = RemoveUnitService.removeAllPlayerNonStructureUnits(
                 event, game, player, from, from.getSpaceUnitHolder());
         AddUnitService.addUnits(
@@ -527,20 +624,8 @@ public class ThirtyKBoardAcButtonHandler {
                         + to.getRepresentationForButtons(game, player) + " (_Folding of Spacetime_).");
     }
 
-    private static void reofferFolding(ButtonInteractionEvent event, Game game, Player mover, Tile from) {
-        ButtonHelper.deleteMessage(event);
-        List<Button> buttons = foldingDestinations(game, mover, from);
-        buttons.add(Buttons.red(mover.factionButtonChecker() + FOLDING_STAY, "Stay"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                mover.getCorrectChannel(),
-                mover.getRepresentationUnfogged() + ", that system cannot be chosen now. Pick again for _Folding of"
-                        + " Spacetime_, or stay.",
-                buttons);
-    }
-
     @ButtonHandler(FOLDING_STAY)
-    public static void foldingStay(ButtonInteractionEvent event, Game game, Player player) {
-        ThirtyKAcState.takeChoice(game, player, FOLDING_MOVE);
+    public static void foldingStay(ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
     }
 
@@ -609,7 +694,7 @@ public class ThirtyKBoardAcButtonHandler {
     public static void renewal(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = ThirtyKAcTargets.target(game, buttonID, RENEWAL);
         if (target == null || target == player) {
-            ThirtyKAcTargets.fizzle(event, player);
+            PlanetTargetService.fizzle(event, player);
             return;
         }
         ButtonHelper.deleteMessage(event);

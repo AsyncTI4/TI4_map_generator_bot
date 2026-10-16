@@ -12,13 +12,14 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
 import ti4.helpers.thirtyk.ThirtyKCards;
-import ti4.helpers.thirtyk.ThirtyKExploreMath;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
@@ -123,7 +124,7 @@ public class ThirtyKHazardousExploreHandler {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + (removeInfantry ? " removed 1 infantry and " : " ") + outcome + ".");
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
     }
 
     private static String placeLostAndFoundDestroyer(
@@ -138,14 +139,7 @@ public class ThirtyKHazardousExploreHandler {
 
     public static void resolveImitationFactories(
             GenericInteractionCreateEvent event, Game game, Player player, String cardID, String planetID) {
-        List<Button> buttons = new ArrayList<>();
-        for (String discarded : new LinkedHashSet<>(game.getExploreDiscard("hazardous"))) {
-            if (ThirtyKCards.baseId(discarded).equals(ThirtyKCards.baseId(cardID))) continue;
-            ExploreModel model = Mapper.getExplore(discarded);
-            if (model == null) continue;
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + IMITATE + discarded + "_" + planetID, model.getName()));
-        }
+        List<Button> buttons = imitationButtons(game, player, cardID, planetID);
         if (buttons.isEmpty() || planetID == null) {
             game.purgeExplore(cardID);
             MessageHelper.sendMessageToEventChannel(
@@ -155,25 +149,60 @@ public class ThirtyKHazardousExploreHandler {
             return;
         }
         game.setStoredValue(IMITATION_CARD_KEY + player.getFaction(), cardID);
-        List<Button> choices = ThirtyKExploreSupport.capped(buttons);
-        choices.add(Buttons.red(player.factionButtonChecker() + IMITATE + "none_" + planetID, "Decline"));
-        MessageHelper.sendMessageToEventChannelWithButtons(
-                event,
-                player.getRepresentation()
-                        + ", choose a hazardous exploration card from the discard pile to resolve on "
-                        + Helper.getPlanetRepresentation(planetID, game) + ". _Imitation Factories_ is then purged.",
-                choices);
+        NewStuffHelper.sendPaginated(
+                event.getMessageChannel(),
+                imitationMessage(game, player, planetID),
+                buttons,
+                imitationDecline(player, planetID),
+                imitationNav(player, planetID));
+    }
+
+    private static List<Button> imitationButtons(Game game, Player player, String cardID, String planetID) {
+        List<Button> buttons = new ArrayList<>();
+        for (String discarded : new LinkedHashSet<>(game.getExploreDiscard("hazardous"))) {
+            if (ThirtyKCards.baseId(discarded).equals(ThirtyKCards.baseId(cardID))) continue;
+            ExploreModel model = Mapper.getExplore(discarded);
+            if (model == null) continue;
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + IMITATE + discarded + "_" + planetID, model.getName()));
+        }
+        return buttons;
+    }
+
+    private static String imitationMessage(Game game, Player player, String planetID) {
+        return player.getRepresentation()
+                + ", choose a hazardous exploration card from the discard pile to resolve on "
+                + Helper.getPlanetRepresentation(planetID, game) + ". _Imitation Factories_ is then purged.";
+    }
+
+    private static List<Button> imitationDecline(Player player, String planetID) {
+        return List.of(Buttons.red(player.factionButtonChecker() + IMITATE + "none_" + planetID, "Decline"));
+    }
+
+    private static String imitationNav(Player player, String planetID) {
+        return player.factionButtonChecker() + IMITATE + planetID + "_";
     }
 
     @ButtonHandler(IMITATE)
     public static void imitate(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] parts = buttonID.substring(IMITATE.length()).split("_", 2);
+        String cardKey = IMITATION_CARD_KEY + player.getFaction();
+        if (NewStuffHelper.turnPage(
+                event,
+                buttonID,
+                imitationMessage(game, player, parts[0]),
+                () -> imitationButtons(game, player, game.getStoredValue(cardKey), parts[0]),
+                imitationDecline(player, parts[0]),
+                imitationNav(player, parts[0]))) {
+            return;
+        }
+        if (parts.length < 2) return;
         String chosen = parts[0];
         String planetID = parts[1];
         String key = IMITATION_CARD_KEY + player.getFaction();
         game.purgeExplore(game.getStoredValue(key));
         game.removeStoredValue(key);
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
         if ("none".equals(chosen) || !game.getExploreDiscard("hazardous").contains(chosen)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -192,8 +221,8 @@ public class ThirtyKHazardousExploreHandler {
             GenericInteractionCreateEvent event, Game game, Player player, Tile tile, String planetID) {
         List<Die> dice = DiceHelper.rollDice(5, 3);
         List<Integer> results = dice.stream().map(Die::getResult).toList();
-        int tradeGoods = ThirtyKExploreMath.countAtLeast(results, 5);
-        int hits = ThirtyKExploreMath.countAtMost(results, 2);
+        int tradeGoods = DiceHelper.countSuccesses(dice);
+        int hits = (int) results.stream().filter(result -> result <= 2).count();
         StringBuilder message = new StringBuilder(player.getRepresentationNoPing())
                 .append("'s prospectors brave the acid for _Corrosive Discovery_: ")
                 .append(results)

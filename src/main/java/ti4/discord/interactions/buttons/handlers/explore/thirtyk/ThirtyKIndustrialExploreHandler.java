@@ -55,7 +55,7 @@ public class ThirtyKIndustrialExploreHandler {
         Tile tile = game.getTileFromPlanet(planetID);
         if (tile == null) return;
         AddUnitService.addUnits(event, tile, game, player.getColor(), "sd " + planetID);
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
         sendSpendButtons(
                 event,
                 game,
@@ -69,7 +69,7 @@ public class ThirtyKIndustrialExploreHandler {
     @ButtonHandler(REPURPOSE_TG)
     public static void repurposeTradeGood(ButtonInteractionEvent event, Game game, Player player) {
         ButtonHelperStats.gainTGs(event, game, player, 1, false);
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void resolveMilitaryProceduralDocuments(
@@ -110,7 +110,7 @@ public class ThirtyKIndustrialExploreHandler {
                 "Following the manual to the letter, " + player.getRepresentationNoPing()
                         + " refits 1 infantry into 1 mech on " + Helper.getPlanetRepresentation(planetID, game)
                         + " (_Military Procedural Documents_).");
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void resolveForesightOfIndustry(
@@ -130,13 +130,13 @@ public class ThirtyKIndustrialExploreHandler {
     @ButtonHandler(FORESIGHT_COMMODITIES)
     public static void foresightCommodities(ButtonInteractionEvent event, Game game, Player player) {
         ButtonHelperStats.gainComms(event, game, player, 2, false);
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler(FORESIGHT_REVEAL)
     public static void foresightReveal(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String planetID = buttonID.substring(FORESIGHT_REVEAL.length());
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
         sendSpendButtons(event, game, player, "inf", player.getRepresentationNoPing() + ", please spend 1 influence.");
         revealNextIndustrial(event, game, player, planetID);
     }

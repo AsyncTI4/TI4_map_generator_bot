@@ -275,7 +275,7 @@
         "flavorText": "No one on the Council could pronounce the Winnu reconstruction act, but every delegate voted to fund it.",
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "Offered when a PDS or space dock is destroyed on a planet more than 5 hexes from your home; replenishes you and offers the other player a replenish. Only the latest destruction this turn can be answered. Structures removed without being destroyed are not detected."
+        "automationNotes": "Offered when a PDS or space dock is destroyed on a planet more than 5 hexes from your home; replenishes you and offers the other player a replenish. Only the latest destruction can be answered, until the next strategy phase. Structures removed without being destroyed are not detected."
     },
     {
         "alias": "distantmapsjmsc1",

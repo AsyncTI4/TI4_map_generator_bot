@@ -1,12 +1,17 @@
 package ti4.helpers.thirtyk;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.helpers.FoWHelper;
 import ti4.image.Mapper;
 import ti4.model.ActionCardModel;
 import ti4.model.DeckModel;
@@ -21,6 +26,14 @@ public class ThirtyKCards {
     static final String IN_USE_KEY = "thirtyKInUse";
     private static final Pattern COPY_NUMBER = Pattern.compile("(30k|jmsc)\\d*(extra\\d)?$");
     private static final Map<String, Boolean> DECK_HAS_THIRTYK = new ConcurrentHashMap<>();
+
+    public static List<Tile> visibleTiles(Game game, Player viewer) {
+        if (!game.isFowMode()) return List.copyOf(game.getTileMap().values());
+        Set<String> visible = FoWHelper.getTilePositionsToShow(game, viewer);
+        return game.getTileMap().values().stream()
+                .filter(tile -> visible.contains(tile.getPosition()))
+                .toList();
+    }
 
     public static boolean inUse(Game game) {
         if (game == null) return false;

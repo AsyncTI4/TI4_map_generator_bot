@@ -16,7 +16,9 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKCards;
 import ti4.helpers.thirtyk.ThirtyKRelicHooks;
 import ti4.helpers.thirtyk.ThirtyKRelics;
 import ti4.message.MessageHelper;
@@ -27,19 +29,16 @@ import ti4.service.unit.RemoveUnitService;
 @UtilityClass
 class ThirtyKRelicBoardButtonHandler {
 
-    private static final int MAX_CHOICES = 24;
-
     @ButtonHandler("thirtyKChronoOwner_")
     public static void chronoOwner(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player owner = game.getPlayerFromColorOrFaction(buttonID.replace("thirtyKChronoOwner_", ""));
         if (owner == null) return;
         List<Button> buttons = new ArrayList<>();
-        for (Planet planet : ThirtyKRelics.infantryPlanets(game, owner, ThirtyKRelics.visiblePositions(game, player))) {
+        for (Planet planet : ThirtyKRelics.infantryPlanets(ThirtyKCards.visibleTiles(game, player), owner)) {
             buttons.add(Buttons.red(
                     player.factionButtonChecker() + "thirtyKChronoPlanet_" + owner.getFaction() + "_"
                             + planet.getName(),
                     Helper.getPlanetRepresentation(planet.getName(), game)));
-            if (buttons.size() == MAX_CHOICES) break;
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
@@ -102,17 +101,16 @@ class ThirtyKRelicBoardButtonHandler {
 
     @ButtonHandler("thirtyKDeepNet_")
     public static void deepNetworks(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String choice = buttonID.replace("thirtyKDeepNet_", "");
-        if (choice.startsWith("page")) {
-            int page = Integer.parseInt(choice.replace("page", ""));
-            MessageHelper.editMessageButtons(
-                    event,
-                    ThirtyKRelicButtonHandler.withCancel(ThirtyKRelics.page(
-                            ThirtyKRelics.deepNetworkButtons(game, player),
-                            player.factionButtonChecker() + "thirtyKDeepNet_",
-                            page)));
+        if (NewStuffHelper.turnPage(
+                event,
+                buttonID,
+                ThirtyKRelics.deepNetworksMessage(player),
+                () -> ThirtyKRelics.deepNetworkButtons(game, player),
+                ThirtyKRelics.cancel(),
+                player.factionButtonChecker() + "thirtyKDeepNet_")) {
             return;
         }
+        String choice = buttonID.replace("thirtyKDeepNet_", "");
         boolean eligible = ThirtyKRelics.deepNetworkPlanets(game, player).stream()
                 .anyMatch(planet -> planet.getName().equals(choice));
         Tile tile = game.getTileFromPlanet(choice);

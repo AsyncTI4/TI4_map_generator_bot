@@ -218,18 +218,6 @@ public class ThirtyKAcState {
         return true;
     }
 
-    public static void openChoice(Game game, Player player, String choice) {
-        game.setStoredValue(ONE_SHOT + choice + player.getFaction(), "open");
-    }
-
-    public static boolean hasChoice(Game game, Player player, String choice) {
-        return !game.getStoredValue(ONE_SHOT + choice + player.getFaction()).isBlank();
-    }
-
-    public static boolean takeChoice(Game game, Player player, String choice) {
-        return game.removeStoredValue(ONE_SHOT + choice + player.getFaction()) != null;
-    }
-
     public static boolean markFinalStandRoll(Game game, Player player, String planet, String round) {
         String key = finalStandPrefix(player) + planet;
         String marker = game.getRound() + SEPARATOR + round;
@@ -269,14 +257,13 @@ public class ThirtyKAcState {
 
     static void clearTurnState(Game game) {
         ThirtyKTurnState.removeKeysStartingWith(game, WAR_PROFITEERING);
-        ThirtyKTurnState.removeKeysStartingWith(game, CONFLAGRATION);
         ThirtyKTurnState.removeKeysStartingWith(game, EXTENDED_CAMPAIGNING);
         ThirtyKTurnState.removeKeysStartingWith(game, ONE_SHOT);
         ThirtyKTurnState.removeKeysStartingWith(game, FINAL_STAND);
-        game.removeStoredValue(STRUCTURE_LOST);
     }
 
-    public static int cumulativeSupportInfantry(int distanceFromHome) {
-        return Math.max(0, Math.min(4, distanceFromHome));
+    static void clearActionPhaseState(Game game) {
+        ThirtyKTurnState.removeKeysStartingWith(game, CONFLAGRATION);
+        game.removeStoredValue(STRUCTURE_LOST);
     }
 }

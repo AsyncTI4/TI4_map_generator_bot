@@ -16,6 +16,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKRelicHooks;
@@ -49,38 +50,63 @@ class ThirtyKRelicButtonHandler {
 
     @ButtonHandler("thirtyKRediscoverPlanet_")
     public static void rediscoverPlanet(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String choice = buttonID.replace("thirtyKRediscoverPlanet_", "");
-        if (choice.startsWith("page")) {
-            int page = Integer.parseInt(choice.replace("page", ""));
-            MessageHelper.editMessageButtons(
-                    event,
-                    withCancel(ThirtyKRelics.page(
-                            ThirtyKRelics.rediscoveryPlanetButtons(game, player),
-                            player.factionButtonChecker() + "thirtyKRediscoverPlanet_",
-                            page)));
+        if (NewStuffHelper.turnPage(
+                event,
+                buttonID,
+                ThirtyKRelics.rediscoveryMessage(player),
+                () -> ThirtyKRelics.rediscoveryPlanetButtons(game, player),
+                ThirtyKRelics.cancel(),
+                player.factionButtonChecker() + "thirtyKRediscoverPlanet_")) {
             return;
         }
+        String choice = buttonID.replace("thirtyKRediscoverPlanet_", "");
         Planet planet = game.getPlanetsInfo().get(choice);
         if (planet == null) return;
+        NewStuffHelper.sendPaginated(
+                event.getMessageChannel(),
+                rediscoveryCardMessage(game, player, choice),
+                rediscoveryCardButtons(game, player, planet),
+                ThirtyKRelics.cancel(),
+                rediscoveryCardNav(player, choice));
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static List<Button> rediscoveryCardButtons(Game game, Player player, Planet planet) {
         List<Button> buttons = new ArrayList<>();
         for (String card : ThirtyKRelics.rediscoveryOptions(game, planet)) {
             ExploreModel model = Mapper.getExplore(card);
             buttons.add(Buttons.green(
-                    player.factionButtonChecker() + "thirtyKRediscoverCard_" + card + "_" + choice, model.getName()));
-            if (buttons.size() == 24) break;
+                    player.factionButtonChecker() + "thirtyKRediscoverCard_" + card + "_" + planet.getName(),
+                    model.getName()));
         }
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                player.getRepresentationUnfogged()
-                        + ", choose the exploration card from the discard pile to resolve on "
-                        + Helper.getPlanetRepresentation(choice, game) + ".",
-                withCancel(buttons));
-        ButtonHelper.deleteMessage(event);
+        return buttons;
+    }
+
+    private static String rediscoveryCardMessage(Game game, Player player, String planet) {
+        return player.getRepresentationUnfogged()
+                + ", choose the exploration card from the discard pile to resolve on "
+                + Helper.getPlanetRepresentation(planet, game) + ".";
+    }
+
+    private static String rediscoveryCardNav(Player player, String planet) {
+        return player.factionButtonChecker() + "thirtyKRediscoverCard_" + planet + "_";
     }
 
     @ButtonHandler("thirtyKRediscoverCard_")
     public static void rediscoverCard(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String cardAndPlanet = buttonID.replace("thirtyKRediscoverCard_", "");
+        String pagedPlanet = StringUtils.substringBeforeLast(cardAndPlanet, "_");
+        Planet pagedHolder = game.getPlanetsInfo().get(pagedPlanet);
+        if (pagedHolder != null
+                && NewStuffHelper.turnPage(
+                        event,
+                        buttonID,
+                        rediscoveryCardMessage(game, player, pagedPlanet),
+                        () -> rediscoveryCardButtons(game, player, pagedHolder),
+                        ThirtyKRelics.cancel(),
+                        rediscoveryCardNav(player, pagedPlanet))) {
+            return;
+        }
         String card = StringUtils.substringBefore(cardAndPlanet, "_");
         Planet planet = game.getPlanetsInfo().get(StringUtils.substringAfter(cardAndPlanet, "_"));
         if (planet == null || !ThirtyKRelics.rediscoveryOptions(game, planet).contains(card)) {

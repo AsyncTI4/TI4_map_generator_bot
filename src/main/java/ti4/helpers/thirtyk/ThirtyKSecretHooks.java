@@ -19,6 +19,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelperModifyUnits;
+import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
@@ -33,7 +34,6 @@ import ti4.service.emoji.CardEmojis;
 @UtilityClass
 public class ThirtyKSecretHooks {
 
-    public static final String SCORE_BUTTON = "thirtyKScoreSO_";
     static final String RELINQUISH_TECHNOLOGY = "relinquishtechnology30k";
     static final String PLANNED_OBSOLESCENCE = "plannedobsolescence30k";
     static final String POLICY_INDIFFERENCE = "policyindifference30k";
@@ -54,7 +54,9 @@ public class ThirtyKSecretHooks {
         if (so == null) return;
         List<Button> buttons = List.of(
                 Buttons.green(
-                        holder.factionButtonChecker() + SCORE_BUTTON + soID,
+                        holder.factionButtonChecker()
+                                + Constants.SO_SCORE_FROM_HAND
+                                + holder.getSecretsUnscored().get(soID),
                         "Score " + so.getName(),
                         CardEmojis.SecretObjective),
                 Buttons.red(holder.factionButtonChecker() + "deleteButtons", "Decline"));

@@ -59,7 +59,8 @@ public class ThirtyKSecrets {
     public static int progress(String objID, Game game, Player player) {
         return switch (objID) {
             case "unspentreserves30k" -> asProgress(hasFullCommodities(player));
-            case "braveextinction30k" -> asProgress(infantryOnBoard(game, player) < 4);
+            case "braveextinction30k" ->
+                asProgress(ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "infantry", false) < 4);
             case "lightmilitary30k" -> asProgress(hasLightMilitary(game, player));
             case "typecast30k" -> asProgress(isTypecast(game, player));
             case "participationtrophy30k" -> asProgress(earnsParticipationTrophy(game, player, objID));
@@ -86,10 +87,6 @@ public class ThirtyKSecrets {
     private static boolean hasFullCommodities(Player player) {
         int max = player.getCommoditiesTotal();
         return max > 0 && player.getCommodities() >= max;
-    }
-
-    private static int infantryOnBoard(Game game, Player player) {
-        return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "infantry", false);
     }
 
     private static boolean hasLightMilitary(Game game, Player player) {

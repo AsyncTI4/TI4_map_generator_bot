@@ -115,7 +115,7 @@ public class ThirtyKEconomyAcButtonHandler {
             return;
         }
         if (!ThirtyKDistance.homesMoreThanFiveApart(game, player, target)) {
-            ThirtyKAcTargets.fizzle(event, player);
+            PlanetTargetService.fizzle(event, player);
             return;
         }
         String what = tradeGood ? "trade good" : "commodity";
@@ -171,7 +171,7 @@ public class ThirtyKEconomyAcButtonHandler {
     public static void forgeries(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = ThirtyKAcTargets.target(game, buttonID, FORGERIES);
         if (target == null || target == player || !ThirtyKDistance.homesMoreThanFiveApart(game, player, target)) {
-            ThirtyKAcTargets.fizzle(event, player);
+            PlanetTargetService.fizzle(event, player);
             return;
         }
         ButtonHelper.deleteMessage(event);
@@ -314,7 +314,7 @@ public class ThirtyKEconomyAcButtonHandler {
     public static void priceOfInformation(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = ThirtyKAcTargets.target(game, buttonID, PRICE);
         if (target == null || target == player || !isPriceTarget(game, player, target)) {
-            ThirtyKAcTargets.fizzle(event, player);
+            PlanetTargetService.fizzle(event, player);
             return;
         }
         ButtonHelper.deleteMessage(event);
@@ -376,7 +376,7 @@ public class ThirtyKEconomyAcButtonHandler {
     public static void reprimand(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = ThirtyKAcTargets.target(game, buttonID, REPRIMAND);
         if (target == null || target == player) {
-            ThirtyKAcTargets.fizzle(event, player);
+            PlanetTargetService.fizzle(event, player);
             return;
         }
         ButtonHelper.deleteMessage(event);
@@ -460,7 +460,7 @@ public class ThirtyKEconomyAcButtonHandler {
             return;
         }
         if (!FoWHelper.playerHasShipsInSystem(target, active)) {
-            ThirtyKAcTargets.fizzle(event, player);
+            PlanetTargetService.fizzle(event, player);
             return;
         }
         String position = active.getPosition();
@@ -482,7 +482,7 @@ public class ThirtyKEconomyAcButtonHandler {
             return;
         }
         if (!ThirtyKDistance.isMoreThanFiveFromHome(game, player, loss.position())) {
-            ThirtyKAcTargets.fizzle(event, player);
+            PlanetTargetService.fizzle(event, player);
             return;
         }
         ThirtyKAcState.clearStructureLost(game);

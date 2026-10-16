@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -18,6 +17,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper;
@@ -25,12 +25,12 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKCards;
 import ti4.helpers.thirtyk.ThirtyKDistance;
-import ti4.helpers.thirtyk.ThirtyKExploreMath;
-import ti4.helpers.thirtyk.ThirtyKRelics;
 import ti4.helpers.thirtyk.ThirtyKTransactions;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -55,6 +55,7 @@ public class ThirtyKFrontierExploreHandler {
     private static final String WERE_LOST_PENDING_KEY = "thirtyKWereLostPending";
     private static final String FOREGONE_GIVE = "thkFgGive_";
     private static final String SYMPATHIES_OBJECTIVE = "Systematic Sympathies";
+    private static final double SYMPATHIES_VICTORY_POINT_COST = 4.0;
 
     public static void resolveDistractionEfforts(GenericInteractionCreateEvent event, Game game, Player player) {
         ButtonHelperStats.gainTGs(event, game, player, 3, false);
@@ -71,10 +72,7 @@ public class ThirtyKFrontierExploreHandler {
             GenericInteractionCreateEvent event, Game game, Player player, Tile tile) {
         List<Die> dice = DiceHelper.rollDice(6, 5);
         int hits = DiceHelper.countSuccesses(dice);
-        int tradeGoods = tile == null
-                ? 0
-                : ThirtyKExploreMath.wastefulPiratesTradeGoods(
-                        hits, ThirtyKExploreSupport.hitCapacityOfShips(player, tile));
+        int tradeGoods = tile == null ? 0 : Math.min(hits, ThirtyKExploreSupport.hitCapacityOfShips(player, tile));
         StringBuilder message = new StringBuilder(player.getRepresentationNoPing())
                 .append("'s ships come under wild pirate fire, and the raiders loot what they hit (_Wasteful")
                 .append(" Pirates_).\n")
@@ -130,7 +128,7 @@ public class ThirtyKFrontierExploreHandler {
             MessageHelper.sendMessageToEventChannel(event, "You have no ships left in this system to move.");
             return;
         }
-        List<Button> choices = ThirtyKExploreSupport.capped(buttons);
+        List<Button> choices = new ArrayList<>(buttons);
         choices.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Moving Ships"));
         MessageHelper.sendMessageToEventChannelWithButtons(
                 event,
@@ -163,7 +161,7 @@ public class ThirtyKFrontierExploreHandler {
                     "Answering the faulty recall, " + player.getRepresentationNoPing() + " sends 1 "
                             + type.humanReadableName() + " back to their home system (_Faulty Emergency Signal_).");
         }
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
         sendFaultySignalButtons(event, game, player, tile, home);
     }
 
@@ -202,7 +200,7 @@ public class ThirtyKFrontierExploreHandler {
         if (player.getActionCards().isEmpty()) {
             MessageHelper.sendMessageToEventChannel(
                     event, "The replication arrays find nothing to consume: you have no action cards to discard.");
-            offerReplicationPick(game, player);
+            ActionCardHelper.pickACardFromDiscardStep1(game, player);
             return;
         }
         MessageHelper.sendMessageToEventChannel(
@@ -224,7 +222,7 @@ public class ThirtyKFrontierExploreHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + ", discard an action card for _Replication Arrays_.",
-                ThirtyKExploreSupport.capped(buttons));
+                buttons);
     }
 
     @ButtonHandler(REPLICATION_DISCARD)
@@ -243,7 +241,7 @@ public class ThirtyKFrontierExploreHandler {
                 game.isFowMode() ? player.getCorrectChannel() : game.getMainGameChannel(),
                 player.getRepresentationNoPing() + " feeds _"
                         + Mapper.getActionCard(cardID).getName() + "_ into the _Replication Arrays_.");
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
         String key = REPLICATION_COUNT_KEY + player.getFaction();
         int discarded = parseCount(game.getStoredValue(key)) + 1;
         game.setStoredValue(key, String.valueOf(discarded));
@@ -252,7 +250,7 @@ public class ThirtyKFrontierExploreHandler {
             return;
         }
         game.removeStoredValue(key);
-        offerReplicationPick(game, player);
+        ActionCardHelper.pickACardFromDiscardStep1(game, player);
     }
 
     private static int parseCount(String raw) {
@@ -261,10 +259,6 @@ public class ThirtyKFrontierExploreHandler {
         } catch (NumberFormatException e) {
             return 0;
         }
-    }
-
-    private static void offerReplicationPick(Game game, Player player) {
-        ActionCardHelper.pickACardFromDiscardStep1(game, player);
     }
 
     public static void resolveInterestingContagion(
@@ -294,7 +288,7 @@ public class ThirtyKFrontierExploreHandler {
                 candidates.put(other, other.getTotalVictoryPoints());
             }
         }
-        Optional<Player> trapper = ThirtyKExploreMath.pickFewestPoints(candidates, ThreadLocalRandom.current());
+        Optional<Player> trapper = pickFewestPoints(candidates);
         if (trapper.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(
                     event,
@@ -316,7 +310,7 @@ public class ThirtyKFrontierExploreHandler {
         }
         buttons.add(ThirtyKExploreSupport.decline(chosen));
         MessageHelper.sendMessageToChannelWithButtons(
-                ThirtyKExploreSupport.channelFor(chosen),
+                chosen.getCorrectChannel(),
                 chosen.getRepresentationUnfogged() + ", you were chosen by _It's a Trap!_ in "
                         + tile.getRepresentationForButtons(game, chosen)
                         + ". You may place up to 4 destroyers there; space combat starts right away.",
@@ -334,7 +328,7 @@ public class ThirtyKFrontierExploreHandler {
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + "'s ambushers drop their cloaks: " + amount + " destroyer"
                         + (amount == 1 ? "" : "s") + " arrive (_It's a Trap!_).");
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
         StartCombatService.combatCheck(game, event, tile);
     }
 
@@ -366,9 +360,22 @@ public class ThirtyKFrontierExploreHandler {
         return cost;
     }
 
+    private static Optional<Player> pickFewestPoints(Map<Player, Integer> pointsByPlayer) {
+        int fewest = pointsByPlayer.values().stream()
+                .mapToInt(Integer::intValue)
+                .min()
+                .orElse(0);
+        List<Player> lastPlace = pointsByPlayer.entrySet().stream()
+                .filter(entry -> entry.getValue() == fewest)
+                .map(Map.Entry::getKey)
+                .toList();
+        if (lastPlace.isEmpty()) return Optional.empty();
+        return Optional.of(lastPlace.get(ThreadLocalRandom.current().nextInt(lastPlace.size())));
+    }
+
     private static void rewardSympathies(
             GenericInteractionCreateEvent event, Game game, Player explorer, Player player, double cost) {
-        if (ThirtyKExploreMath.sympathiesEarnsVictoryPoint(cost)) {
+        if (cost >= SYMPATHIES_VICTORY_POINT_COST) {
             Integer objective = game.addCustomPO(SYMPATHIES_OBJECTIVE, 1);
             game.scorePublicObjective(player.getUserID(), objective);
             FoWHelper.notifyPlayerAndAffectedInFog(
@@ -401,7 +408,7 @@ public class ThirtyKFrontierExploreHandler {
             buttons.add(Buttons.red(
                     player.factionButtonChecker() + PONDER_DISCARD + secret.getValue(), "Discard " + model.getName()));
         }
-        List<Button> choices = ThirtyKExploreSupport.capped(buttons);
+        List<Button> choices = new ArrayList<>(buttons);
         choices.add(ThirtyKExploreSupport.decline(player));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
@@ -422,7 +429,7 @@ public class ThirtyKFrontierExploreHandler {
                     event.getMessageChannel(), "That secret objective is no longer in hand.");
             return;
         }
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
         DrawSecretService.drawSO(event, game, player, 1, false);
     }
 
@@ -454,7 +461,7 @@ public class ThirtyKFrontierExploreHandler {
                 "The charts are wrong and the stars unfamiliar: the speaker chooses where the lost ships end up"
                         + " (_We're Lost, Captain_).");
         MessageHelper.sendMessageToChannelWithButtons(
-                ThirtyKExploreSupport.channelFor(speaker),
+                speaker.getCorrectChannel(),
                 speaker.getRepresentationUnfogged() + ", choose a system without planets or other players' ships; "
                         + movingShips + " move there (_We're Lost, Captain_).",
                 lostCaptainPage(game, speaker, player, tile, 0));
@@ -467,10 +474,8 @@ public class ThirtyKFrontierExploreHandler {
     }
 
     private static List<Button> lostCaptainTargets(Game game, Player speaker, Player explorer, Tile origin) {
-        Set<String> visible = game.isFowMode() ? FoWHelper.getTilePositionsToShow(game, speaker) : null;
         List<Button> buttons = new ArrayList<>();
-        for (Tile target : game.getTileMap().values()) {
-            if (visible != null && !visible.contains(target.getPosition())) continue;
+        for (Tile target : ThirtyKCards.visibleTiles(game, speaker)) {
             if (!isLostCaptainTarget(game, explorer, origin, target)) continue;
             buttons.add(Buttons.gray(
                     wereLostPrefix(speaker, explorer, origin) + target.getPosition(),
@@ -515,7 +520,7 @@ public class ThirtyKFrontierExploreHandler {
                 || !parts[1].equals(origin.getPosition())) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "_We're Lost, Captain_ has already been resolved.");
-            ThirtyKExploreSupport.deleteMessage(event);
+            ButtonHelper.deleteMessage(event);
             return;
         }
         String choice = parts[2];
@@ -525,10 +530,10 @@ public class ThirtyKFrontierExploreHandler {
             return;
         }
         Tile target = game.getTileByPosition(choice);
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
         if (target == null || !isLostCaptainTarget(game, explorer, origin, target)) {
             MessageHelper.sendMessageToChannelWithButtons(
-                    ThirtyKExploreSupport.channelFor(player),
+                    player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + ", not a valid choice, pick again.",
                     lostCaptainPage(game, player, explorer, origin, 0));
             return;
@@ -612,7 +617,7 @@ public class ThirtyKFrontierExploreHandler {
                 event,
                 player.getRepresentation() + ", the top relic is _" + relicName
                         + "_. Choose a player to gain it; they may transact with you this action phase.",
-                ThirtyKExploreSupport.capped(buttons));
+                buttons);
     }
 
     @ButtonHandler(FOREGONE_GIVE)
@@ -620,14 +625,14 @@ public class ThirtyKFrontierExploreHandler {
         String[] parts = buttonID.substring(FOREGONE_GIVE.length()).split("_", 2);
         Player chosen = game.getPlayerFromColorOrFaction(parts[0]);
         if (chosen == null || parts.length < 2) return;
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
         if (!game.getAllRelics().remove(parts[1])) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "The revealed relic is no longer in the relic deck.");
             return;
         }
-        ThirtyKRelics.gainRelic(
-                event, game, chosen, parts[1].replace("extra1", "").replace("extra2", ""));
+        RelicHelper.gainRelicAndNotify(
+                chosen, event, game, parts[1].replace("extra1", "").replace("extra2", ""), "gained");
         if (chosen != player) {
             ThirtyKTransactions.allowForThisActionPhase(game, player, chosen);
             FoWHelper.notifyPlayerAndAffectedInFog(

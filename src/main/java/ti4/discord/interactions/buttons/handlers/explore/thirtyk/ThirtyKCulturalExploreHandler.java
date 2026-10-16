@@ -14,13 +14,14 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.helpers.thirtyk.ThirtyKExploreMath;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
@@ -57,7 +58,7 @@ public class ThirtyKCulturalExploreHandler {
             String message = other.getRepresentationUnfogged() + ", "
                     + FoWHelper.actorOrAnon(game, player, "a player") + " resolved _Shared Wealth_ next to your units."
                     + " You may draw 1 action card; if you do, they gain 1 trade good.";
-            MessageHelper.sendMessageToChannelWithButtons(ThirtyKExploreSupport.channelFor(other), message, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(other.getCorrectChannel(), message, buttons);
         }
     }
 
@@ -77,7 +78,7 @@ public class ThirtyKCulturalExploreHandler {
                             + " (_Shared Wealth_).");
             ButtonHelperStats.gainTGs(event, game, explorer, 1, false);
         }
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void resolveTourismBureau(
@@ -97,6 +98,21 @@ public class ThirtyKCulturalExploreHandler {
     public static void resolveDirectImport(GenericInteractionCreateEvent event, Game game, Player player, Tile tile) {
         ButtonHelperStats.gainComms(event, game, player, 1, false);
         if (tile == null) return;
+        List<Button> buttons = directImportButtons(game, player, tile);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToEventChannel(
+                    event, "The shipment arrives unescorted: you have no ships in adjacent systems to move.");
+            return;
+        }
+        NewStuffHelper.sendPaginated(
+                event.getMessageChannel(),
+                directImportMessage(player),
+                buttons,
+                List.of(ThirtyKExploreSupport.decline(player)),
+                directImportNav(player, tile));
+    }
+
+    private static List<Button> directImportButtons(Game game, Player player, Tile tile) {
         List<Button> buttons = new ArrayList<>();
         for (Tile adjacent : ThirtyKExploreSupport.tilesInOrAdjacent(game, player, tile)) {
             if (adjacent == tile) continue;
@@ -109,23 +125,33 @@ public class ThirtyKCulturalExploreHandler {
                                 + adjacent.getRepresentationForButtons(game, player)));
             }
         }
-        if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(
-                    event, "The shipment arrives unescorted: you have no ships in adjacent systems to move.");
-            return;
-        }
-        List<Button> choices = ThirtyKExploreSupport.capped(buttons);
-        choices.add(ThirtyKExploreSupport.decline(player));
-        MessageHelper.sendMessageToEventChannelWithButtons(
-                event,
-                player.getRepresentation()
-                        + ", you may move up to 1 of your ships from an adjacent system into this system.",
-                choices);
+        return buttons;
+    }
+
+    private static String directImportMessage(Player player) {
+        return player.getRepresentation()
+                + ", you may move up to 1 of your ships from an adjacent system into this system.";
+    }
+
+    private static String directImportNav(Player player, Tile tile) {
+        return player.factionButtonChecker() + DIRECT_IMPORT_MOVE + tile.getPosition() + "_";
     }
 
     @ButtonHandler(DIRECT_IMPORT_MOVE)
     public static void directImportMove(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] parts = buttonID.substring(DIRECT_IMPORT_MOVE.length()).split("_");
+        Tile anchor = game.getTileByPosition(parts[0]);
+        if (anchor != null
+                && NewStuffHelper.turnPage(
+                        event,
+                        buttonID,
+                        directImportMessage(player),
+                        () -> directImportButtons(game, player, anchor),
+                        List.of(ThirtyKExploreSupport.decline(player)),
+                        directImportNav(player, anchor))) {
+            return;
+        }
+        if (parts.length < 3) return;
         Tile from = game.getTileByPosition(parts[0]);
         Tile to = game.getTileByPosition(parts[1]);
         UnitType type = Units.findUnitType(parts[2]);
@@ -146,7 +172,7 @@ public class ThirtyKCulturalExploreHandler {
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " escorts the import convoy in: 1 " + type.humanReadableName()
                         + " moves into " + to.getRepresentationForButtons(game, player) + " (_Direct Import_).");
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void resolveInitialInvestmentSurplus(
@@ -194,7 +220,7 @@ public class ThirtyKCulturalExploreHandler {
                 player.getRepresentationNoPing() + " reinvests 1 " + (commodity ? "commodity" : "trade good")
                         + " and " + Helper.getPlanetRepresentation(planetID, game)
                         + " is back at work (_Initial Investment Surplus_).");
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void resolveCrossSpeciesMingling(
@@ -205,7 +231,7 @@ public class ThirtyKCulturalExploreHandler {
                 if (hasForeignInfantry(player, planet)) planets++;
             }
         }
-        int infantry = ThirtyKExploreMath.crossSpeciesInfantry(planets);
+        int infantry = planets + 1;
         if (tile == null || planetID == null) return;
         AddUnitService.addUnits(event, tile, game, player.getColor(), infantry + " inf " + planetID);
         MessageHelper.sendMessageToEventChannel(
@@ -245,7 +271,7 @@ public class ThirtyKCulturalExploreHandler {
                         "Give " + model.getName()));
             }
             if (buttons.isEmpty()) continue;
-            List<Button> choices = ThirtyKExploreSupport.capped(buttons);
+            List<Button> choices = new ArrayList<>(buttons);
             choices.add(ThirtyKExploreSupport.decline(neighbor));
             MessageHelper.sendMessageToChannelWithButtons(
                     neighbor.getCardsInfoThread(),
@@ -283,7 +309,7 @@ public class ThirtyKCulturalExploreHandler {
                 player.getRepresentationNoPing()
                         + " brings a promissory note to the festival and draws 1 action card in return (_Faux"
                         + " Altruistic Festivals_).");
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
     }
 
     private static List<Player> playersWithUnitsInOrAdjacent(Game game, Player player, Tile tile) {

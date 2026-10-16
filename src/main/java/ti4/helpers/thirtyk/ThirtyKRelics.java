@@ -11,9 +11,6 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -23,9 +20,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
-import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitType;
-import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
@@ -103,12 +98,13 @@ public class ThirtyKRelics {
         String prefix = player.factionButtonChecker();
         switch (relicID) {
             case PLACEBOTRON -> offerPlacebotron(game, player, event);
-            case REDISCOVERY -> {
-                send(
-                        event,
-                        player.getRepresentationUnfogged() + ", choose the planet for _Rediscovery_.",
-                        page(rediscoveryPlanetButtons(game, player), prefix + "thirtyKRediscoverPlanet_", 0));
-            }
+            case REDISCOVERY ->
+                NewStuffHelper.sendPaginated(
+                        event.getMessageChannel(),
+                        rediscoveryMessage(player),
+                        rediscoveryPlanetButtons(game, player),
+                        cancel(),
+                        prefix + "thirtyKRediscoverPlanet_");
             case RANSOM_CANNON -> {
                 List<Button> buttons = ransomCannonTargets(game, player).stream()
                         .map(p -> FoWHelper.fogSafeTargetButton(
@@ -157,13 +153,13 @@ public class ThirtyKRelics {
                         .toList();
                 send(event, player.getRepresentationUnfogged() + ", choose the player for _Spy Reports_.", buttons);
             }
-            case DEEP_NETWORKS -> {
-                send(
-                        event,
-                        player.getRepresentationUnfogged()
-                                + ", choose the planet where _Deep Networks_ places 1 infantry.",
-                        page(deepNetworkButtons(game, player), prefix + "thirtyKDeepNet_", 0));
-            }
+            case DEEP_NETWORKS ->
+                NewStuffHelper.sendPaginated(
+                        event.getMessageChannel(),
+                        deepNetworksMessage(player),
+                        deepNetworkButtons(game, player),
+                        cancel(),
+                        prefix + "thirtyKDeepNet_");
             case SOVEREIGN_REFUGEES -> {
                 List<Button> buttons = eliminatedPlayers(game, player).stream()
                         .map(p -> FoWHelper.fogSafeTargetButton(
@@ -226,29 +222,6 @@ public class ThirtyKRelics {
         announce(game, player, event, relicID, "purged");
     }
 
-    public static void gainRelic(GenericInteractionCreateEvent event, Game game, Player player, String relicID) {
-        player.addRelic(relicID);
-        RelicModel relic = Mapper.getRelic(relicID);
-        String message =
-                player.getRepresentation() + " gained the _" + (relic == null ? relicID : relic.getName()) + "_ relic.";
-        if (game.isFowMode()) {
-            FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
-        }
-        if (relic == null) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        } else {
-            MessageHelper.sendMessageToChannelWithEmbed(
-                    player.getCorrectChannel(), message, relic.getRepresentationEmbed(false, true));
-        }
-        RelicHelper.resolveRelicEffects(event, game, player, relicID);
-        WhiteTfUnitHandler.resolveMonumentRelicDraw(event, game, player);
-        TeHelperUnits.serveIconoclastDeployAbility(game, player);
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")) {
-            OnyxxaLeaderHandler.onDrawRelic(player);
-        }
-        KairnBreakthroughHandler.offerRelicGainPrompts(game, player, relicID);
-    }
-
     public static void addActionSummary(Game game, Player player, String relicID) {
         RelicModel relic = Mapper.getRelic(relicID);
         game.setStoredValue(
@@ -293,15 +266,21 @@ public class ThirtyKRelics {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, withCancel);
     }
 
-    public static List<Button> page(List<Button> buttons, String prefix, int pageNumber) {
-        return NewStuffHelper.buttonPagination(buttons, null, prefix, 24, pageNumber, false);
+    public static List<Button> cancel() {
+        return List.of(Buttons.red("deleteButtons", "Cancel"));
+    }
+
+    public static String rediscoveryMessage(Player player) {
+        return player.getRepresentationUnfogged() + ", choose the planet for _Rediscovery_.";
+    }
+
+    public static String deepNetworksMessage(Player player) {
+        return player.getRepresentationUnfogged() + ", choose the planet where _Deep Networks_ places 1 infantry.";
     }
 
     public static List<Button> rediscoveryPlanetButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        Set<String> visible = visiblePositions(game, player);
-        for (Tile tile : game.getTileMap().values()) {
-            if (visible != null && !visible.contains(tile.getPosition())) continue;
+        for (Tile tile : ThirtyKCards.visibleTiles(game, player)) {
             for (Planet planet : tile.getPlanetUnitHolders()) {
                 if (rediscoveryOptions(game, planet).isEmpty()) continue;
                 String planetName = planet.getName();
@@ -349,25 +328,20 @@ public class ThirtyKRelics {
     }
 
     public static List<Player> chronoStasisTargets(Game game, Player player) {
-        Set<String> visible = visiblePositions(game, player);
+        List<Tile> tiles = ThirtyKCards.visibleTiles(game, player);
         return game.getRealPlayers().stream()
-                .filter(owner -> !infantryPlanets(game, owner, visible).isEmpty())
+                .filter(owner -> !infantryPlanets(tiles, owner).isEmpty())
                 .toList();
     }
 
-    public static List<Planet> infantryPlanets(Game game, Player owner, Set<String> visible) {
+    public static List<Planet> infantryPlanets(List<Tile> tiles, Player owner) {
         List<Planet> planets = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (visible != null && !visible.contains(tile.getPosition())) continue;
+        for (Tile tile : tiles) {
             for (Planet planet : tile.getPlanetUnitHolders()) {
                 if (planet.getUnitCount(UnitType.Infantry, owner) > 0) planets.add(planet);
             }
         }
         return planets;
-    }
-
-    public static Set<String> visiblePositions(Game game, Player player) {
-        return game.isFowMode() ? FoWHelper.getTilePositionsToShow(game, player) : null;
     }
 
     public static List<Player> spyReportTargets(Game game, Player player) {
@@ -380,10 +354,8 @@ public class ThirtyKRelics {
 
     public static List<Planet> deepNetworkPlanets(Game game, Player player) {
         Predicate<String> farFromHome = ThirtyKSecrets.farFromHome(game, player);
-        Set<String> visible = visiblePositions(game, player);
         List<Planet> planets = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (visible != null && !visible.contains(tile.getPosition())) continue;
+        for (Tile tile : ThirtyKCards.visibleTiles(game, player)) {
             if (tile.isHomeSystem(game) || !farFromHome.test(tile.getPosition())) continue;
             if (containsOtherPlayersUnits(game, player, tile)) continue;
             for (Planet planet : tile.getPlanetUnitHolders()) {

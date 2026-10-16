@@ -107,7 +107,7 @@ public class ThirtyKPlayAreaExploreHandler {
         if (card == null || !player.hasRelic(cardID)) return;
         purgeCard(event, player, cardID);
         ButtonHelperStats.gainTGs(event, game, player, card.purgeTradeGoods(), false);
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler(RESEARCH)
@@ -117,7 +117,7 @@ public class ThirtyKPlayAreaExploreHandler {
         if (card == null || card.researchType() == null || !player.hasRelic(cardID)) return;
         List<TechnologyModel> techs =
                 ListTechService.getAllTechOfAType(game, card.researchType().toString(), player, false, true);
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
         if (techs.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "You meet the prerequisites for no technology of that colour.");
@@ -129,7 +129,7 @@ public class ThirtyKPlayAreaExploreHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", choose the technology to research.",
-                ThirtyKExploreSupport.capped(new ArrayList<>(ListTechService.getTechButtons(techs, player, "nopay"))));
+                ListTechService.getTechButtons(techs, player, "nopay"));
     }
 
     @ButtonHandler(GAIN_TECH)
@@ -137,7 +137,7 @@ public class ThirtyKPlayAreaExploreHandler {
         String cardID = buttonID.substring(GAIN_TECH.length());
         PlayAreaCard card = START_OF_TURN_CARDS.get(cardID);
         if (card == null || card.techToGain() == null || !player.hasRelic(cardID)) return;
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
         purgeCard(event, player, cardID);
         sendResourceSpendButtons(
                 event, game, player, card.cost(), Mapper.getRelic(cardID).getName());
@@ -215,7 +215,7 @@ public class ThirtyKPlayAreaExploreHandler {
                 "The hostages go home for a handsome fee: " + player.getRepresentationNoPing()
                         + " purges _Rich Hostages_ and _" + name
                         + "_ costs 3 less (ready anything you over-spent).");
-        ThirtyKExploreSupport.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void checkMacGuffianOutpost(
