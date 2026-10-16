@@ -16,6 +16,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -24,6 +25,8 @@ import ti4.model.UnitModel;
 @UtilityClass
 class BattleMath {
 
+    private static final String XXCHA_MECH = "xxcha_mech";
+    private static final String ARTICLES_OF_WAR = "articles_war";
     private static final String ASSAULT_CANNON = "asc";
     private static final int ASSAULT_CANNON_SHIPS = 3;
 
@@ -55,6 +58,7 @@ class BattleMath {
                 for (UnitKey key : holder.getUnitKeysForPlayer(shooter)) {
                     UnitModel model = shooter.getUnitFromUnitKey(key);
                     if (model == null || (!inSystem && !model.getDeepSpaceCannon(shooter))) continue;
+                    if (XXCHA_MECH.equals(model.getId()) && ButtonHelper.isLawInPlay(game, ARTICLES_OF_WAR)) continue;
                     int dice = model.getSpaceCannonDieCount(shooter) * holder.getUnitCount(key);
                     expected += dice * hitChance(model.getSpaceCannonHitsOn(shooter));
                 }

@@ -259,6 +259,28 @@ class ProductionPlannerTest extends BaseTi4Test {
         assertThat(plan.units(UnitType.Infantry)).isGreaterThan(plan.units(UnitType.Fighter));
     }
 
+    // Indomitus has a deep space cannon, so a mech on the dock covers the neighbouring systems like a PDS. With a rival
+    // close enough to matter, one more is wanted than for a mech without cannon.
+    @Test
+    void wantsAnExtraCannonMechWhenARivalIsNearby() {
+        test.nekro.removeOwnedUnitByID("nekro_mech");
+        test.nekro.addOwnedUnitByID("xxcha_mech");
+        test.units(home, "space", test.nekro, UnitType.Carrier, 2);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
+        test.nekro.setTg(10);
+        assertThat(plan().units(UnitType.Mech)).isEqualTo(2);
+
+        test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.units(
+                test.game.getTileByPosition(AiTestGame.neighbourOf(AiTestGame.HOME)),
+                "space",
+                test.sol,
+                UnitType.Cruiser,
+                1);
+
+        assertThat(plan().units(UnitType.Mech)).isEqualTo(3);
+    }
+
     private BuildPlan plan() {
         return ProductionPlanner.plan(test.game, test.nekro, home);
     }

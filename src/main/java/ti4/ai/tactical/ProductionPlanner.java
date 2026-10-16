@@ -360,9 +360,15 @@ public class ProductionPlanner {
         builder.infantry(WANTED_SPARE_INFANTRY - spare, NEEDED_INFANTRY_VALUE);
         int wantedMechs =
                 builder.seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY) ? MECHANIZE_MECHS : WANTED_MECHS;
+        if (firesFromAdjacentSystems(builder.seat) && frontlineInterest(builder) > 0) wantedMechs++;
         while (builder.count(UnitType.Mech) < wantedMechs && builder.leavesRoomToFill(builder.cost(UnitType.Mech))) {
             if (!builder.ground(UnitType.Mech, 1, builder.fillerValue(UnitType.Mech))) return;
         }
+    }
+
+    private static boolean firesFromAdjacentSystems(Player seat) {
+        UnitModel mech = seat.getUnitByType(UnitType.Mech);
+        return mech != null && mech.getSpaceCannonDieCount(seat) > 0 && mech.getDeepSpaceCannon(seat);
     }
 
     private static void planSurplusShips(Builder builder) {

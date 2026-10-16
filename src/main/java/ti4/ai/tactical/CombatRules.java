@@ -17,6 +17,7 @@ import ti4.ai.perception.PromptButton;
 import ti4.ai.secrets.ActionSecretRules;
 import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -135,12 +136,22 @@ public class CombatRules {
                 UnitHolder planet = tile == null ? null : tile.getUnitHolders().get(parts[2]);
                 String key = "scd|" + prompt.messageId() + "|" + parts[2];
                 if (planet == null || context.memory().has(key)) continue;
-                if (BoardView.count(planet, context.seat(), UnitType.Pds) == 0) continue;
+                if (!holdsSpaceCannon(context.seat(), planet)) continue;
                 context.memory().put(key, "pressed");
                 return Optional.of(AiDecision.press(prompt, roll, "fire space cannon defense"));
             }
         }
         return Optional.empty();
+    }
+
+    private static boolean holdsSpaceCannon(Player seat, UnitHolder planet) {
+        boolean units = planet.getUnitKeysForPlayer(seat).stream()
+                .map(seat::getUnitFromUnitKey)
+                .anyMatch(model -> model != null && model.getSpaceCannonDieCount(seat) > 0);
+        return units
+                || (planet instanceof Planet held
+                        && held.getSpaceCannonDieCount() > 0
+                        && seat.getPlanets().contains(held.getName()));
     }
 
     private static Optional<AiDecision> spaceCannonOffence(AiTurnContext context, List<AiPrompt> prompts) {
