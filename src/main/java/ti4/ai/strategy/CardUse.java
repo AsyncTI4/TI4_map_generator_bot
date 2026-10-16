@@ -5,6 +5,7 @@ public enum CardUse {
     LEADERSHIP_TEMPO("win the race for the custodians"),
     DIPLOMACY_PROTECT("lock a threatened system"),
     DIPLOMACY_READY("ready planets"),
+    DIPLOMACY_PEACE_ACCORDS("claim a planet with Peace Accords"),
     POLITICS_SPEAKER("become speaker"),
     POLITICS_ACTION_CARDS("draw action cards"),
     POLITICS_AGENDA("look at the agenda deck"),

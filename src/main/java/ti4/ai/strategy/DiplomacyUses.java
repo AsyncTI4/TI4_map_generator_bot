@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.PeaceAccords;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.strategy.CardPlan.Benefit;
@@ -26,6 +27,7 @@ class DiplomacyUses {
         List<Benefit> benefits = new ArrayList<>();
         bestProtection(in).ifPresent(benefits::add);
         benefits.add(new Benefit(CardUse.DIPLOMACY_READY, readyValue(in)));
+        peaceAccordsValue(in).ifPresent(benefits::add);
         return benefits;
     }
 
@@ -66,6 +68,12 @@ class DiplomacyUses {
             value += Math.max(CardValueScale.HOME_DEFENSE, DefenseOutlook.homeCost(in.game(), seat, true));
         }
         return in.nearWin() ? value * CardValueScale.NEAR_WIN_MULTIPLIER : value;
+    }
+
+    private static Optional<Benefit> peaceAccordsValue(PlanInputs in) {
+        double claim = PeaceAccords.bestValue(in.game(), in.seat());
+        if (claim <= 0) return Optional.empty();
+        return Optional.of(new Benefit(CardUse.DIPLOMACY_PEACE_ACCORDS, CardValueScale.PEACE_ACCORDS_SHARE * claim));
     }
 
     private static double readyValue(PlanInputs in) {

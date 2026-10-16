@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.eval.PeaceAccords;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.SpendUnlock;
@@ -45,6 +46,14 @@ class DiplomacyUse {
     private record Split(List<String> forResources, List<String> forInfluence) {}
 
     static boolean worthFollowing(Game game, Player seat) {
+        return readyingWorthFollowing(game, seat) || claimsWorthFollowing(game, seat);
+    }
+
+    static boolean claimsWorthFollowing(Game game, Player seat) {
+        return PeaceAccords.bestValue(game, seat) > CardValueScale.STRATEGY_TOKEN;
+    }
+
+    static boolean readyingWorthFollowing(Game game, Player seat) {
         String key = game.getName() + "|" + seat.getUserID();
         Cached cached = CACHE.get(key);
         if (cached != null && cached.isFor(game)) return cached.worth();
