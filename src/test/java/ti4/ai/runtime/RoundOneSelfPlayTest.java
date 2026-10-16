@@ -406,7 +406,7 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
         return scored;
     }
 
-    private static Map<String, Double> ownAreaWeights(Game game, Player seat) {
+    static Map<String, Double> ownAreaWeights(Game game, Player seat) {
         Territory territory = Territory.of(game, seat);
         Map<String, Double> weights = new HashMap<>();
         for (Tile tile : game.getTileMap().values()) {
