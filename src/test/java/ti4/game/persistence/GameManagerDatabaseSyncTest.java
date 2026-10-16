@@ -71,8 +71,8 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
             gameLoadService
-                    .when(() -> GameLoadService.load(reloadedGame.getName()))
-                    .thenReturn(reloadedGame);
+                    .when(() -> GameLoadService.tryLoad(reloadedGame.getName()))
+                    .thenReturn(new GameLoadResult.Loaded(reloadedGame));
 
             assertThat(GameManager.reload(reloadedGame.getName())).isSameAs(reloadedGame);
 
@@ -89,8 +89,8 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
                 MockedStatic<GameUndoService> gameUndoService = mockStatic(GameUndoService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
             gameLoadService
-                    .when(() -> GameLoadService.load(recoveredGame.getName()))
-                    .thenReturn(null);
+                    .when(() -> GameLoadService.tryLoad(recoveredGame.getName()))
+                    .thenReturn(corruptResult());
             gameUndoService
                     .when(() -> GameUndoService.loadUndoForMissingGame(recoveredGame.getName()))
                     .thenReturn(recoveredGame);
@@ -109,7 +109,9 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameUndoService> gameUndoService = mockStatic(GameUndoService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
-            gameLoadService.when(() -> GameLoadService.load(missingGameName)).thenReturn(null);
+            gameLoadService
+                    .when(() -> GameLoadService.tryLoad(missingGameName))
+                    .thenReturn(new GameLoadResult.Missing());
             gameUndoService
                     .when(() -> GameUndoService.loadUndoForMissingGame(missingGameName))
                     .thenReturn(null);
@@ -122,18 +124,61 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
     }
 
     @Test
-    void gameThatFailsToLoadQueuesDelete() {
-        String unloadableGameName = uniqueName("db-sync-unloadable");
+    void reloadOfCorruptGameWithNoUsableUndoQueuesNoDelete() {
+        Game game = newGame("db-sync-corrupt-reload");
 
-        try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
+        try (MockedStatic<GameSaveService> gameSaveService = mockStatic(GameSaveService.class);
+                MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
+                MockedStatic<GameUndoService> gameUndoService = mockStatic(GameUndoService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
-            gameLoadService.when(() -> GameLoadService.load(unloadableGameName)).thenReturn(null);
+            gameSaveService.when(() -> GameSaveService.save(game, "test save")).thenReturn(true);
+            GameManager.save(game, "test save");
+            gameLoadService.when(() -> GameLoadService.tryLoad(game.getName())).thenReturn(corruptResult());
+            gameUndoService
+                    .when(() -> GameUndoService.loadUndoForMissingGame(game.getName()))
+                    .thenReturn(null);
 
-            assertThat(GameManager.get(unloadableGameName)).isNull();
+            assertThat(GameManager.reload(game.getName())).isNull();
 
-            pipeline.verify(() -> GameDatabaseSyncPipeline.queueDelete(unloadableGameName));
+            // The file is still on disk, so the game must stay in the bot and keep its database rows.
+            assertThat(GameManager.isValid(game.getName())).isTrue();
+            pipeline.verify(() -> GameDatabaseSyncPipeline.queueSync(game));
             pipeline.verifyNoMoreInteractions();
         }
+    }
+
+    @Test
+    void gameWithNoFileQueuesDelete() {
+        String missingGameName = uniqueName("db-sync-missing-file");
+
+        try (MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
+            assertThat(GameManager.get(missingGameName)).isNull();
+
+            pipeline.verify(() -> GameDatabaseSyncPipeline.queueDelete(missingGameName));
+            pipeline.verifyNoMoreInteractions();
+        }
+    }
+
+    @Test
+    void gameWithCorruptFileQueuesNoDeleteAndStaysValid() {
+        try (var harness = TestGameHarness.forDefaultMap();
+                MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
+            String gameName = harness.getGameName();
+            // Reloading registers the healthy game with the bot before its file gets corrupted.
+            Game game = GameManager.reload(gameName);
+            harness.corruptGameFile();
+
+            assertThat(GameManager.get(gameName)).isNull();
+
+            assertThat(GameManager.isValid(gameName)).isTrue();
+            assertThat(GameManager.getManagedGame(gameName)).isNotNull();
+            pipeline.verify(() -> GameDatabaseSyncPipeline.queueSync(game));
+            pipeline.verifyNoMoreInteractions();
+        }
+    }
+
+    private static GameLoadResult.Corrupt corruptResult() {
+        return new GameLoadResult.Corrupt(0L, new IllegalStateException("unparseable game file"));
     }
 
     private static Game newGame(String prefix) {
