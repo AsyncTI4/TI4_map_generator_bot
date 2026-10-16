@@ -52,6 +52,25 @@ class AiPerceptionTest extends BaseTi4Test {
                 .isTrue();
     }
 
+    // Production Biomes, Quantum Datahub Node, Carth of Golden Sands and Wrath of Kenara ask for their choices with
+    // unowned buttons in the main channel.
+    @Test
+    void seesTheUnownedPromptsOfTheHacanComponents() {
+        Set<String> windows = new NekroBrain().publicWindowHandlerPrefixes();
+
+        for (String handler : List.of(
+                "productionBiomes_sol",
+                "startQDN",
+                "selectBeforeSwapSCs_sol_qdn",
+                "swapSCs_sol_qdn_5_2",
+                "hacanAgentRefresh_nekro",
+                "hacanFlagshipFinish_301_2")) {
+            assertThat(AiPerception.isRelevant(PromptSource.PUBLIC, buttons(handler), "nekro", windows))
+                    .as(handler)
+                    .isTrue();
+        }
+    }
+
     // The AI must never react to its own "choose for the AI" messages.
     @Test
     void ignoresItsOwnDelegationMessages() {

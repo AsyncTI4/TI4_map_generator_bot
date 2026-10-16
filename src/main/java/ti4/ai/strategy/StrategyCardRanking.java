@@ -44,6 +44,10 @@ public class StrategyCardRanking {
         return baseValue(game, plan(game, seat, initiative));
     }
 
+    public static CardPlan pickPlan(Game game, Player seat, int initiative) {
+        return plan(game, seat, initiative);
+    }
+
     public static int initiative(PromptButton button) {
         String number = StringUtils.substringAfterLast(button.handlerId(), "_");
         return StringUtils.isNumeric(number) ? Integer.parseInt(number) : -1;
