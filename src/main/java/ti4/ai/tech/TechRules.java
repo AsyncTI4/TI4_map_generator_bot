@@ -15,13 +15,20 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.eval.BoardView;
+import ti4.ai.hacan.Beneficiary;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringReserve;
+import ti4.ai.scoring.SpendUnlock;
+import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.strategy.StrategyTokenCost;
 import ti4.ai.tactical.NullificationOutlook;
 import ti4.ai.tactical.ProductionPlanner;
 import ti4.ai.tactical.SlingRelayRules;
+import ti4.ai.tactical.Stall;
+import ti4.ai.tactical.TacticalPlan;
+import ti4.ai.tactical.TacticalPlanner;
 import ti4.ai.tactical.TacticalRules;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -82,7 +89,11 @@ public class TechRules {
     private static final String BIOMES_DONE = "done";
     private static final String COMPONENT_ACTION = "componentAction";
     private static final String BIOMES_EXHAUST = "exhaustTech_pm";
-    private static final String BIOMES_TARGET = "productionBiomes_";
+    public static final String BIOMES_TARGET = "productionBiomes_";
+    private static final int BIOMES_TRADE_GOODS = 4;
+    private static final int BIOMES_GIFT = 2;
+    private static final double RIVAL_SHARE = 0.5;
+    private static final double STRATEGY_TOKEN_VALUE = 1.0;
 
     public static Optional<AiDecision> reviveInfantry(AiTurnContext context) {
         Player seat = context.seat();
@@ -194,17 +205,54 @@ public class TechRules {
                 .or(() -> psychoarchaeology(context, thisTurn));
     }
 
+    public static Optional<AiDecision> insteadOfTacticalAction(AiTurnContext context, List<AiPrompt> thisTurn) {
+        if (!mayUseProductionBiomes(context)) return Optional.empty();
+        double value = productionBiomesValue(context.game(), context.seat())
+                + Stall.actionValue(context.game(), context.seat());
+        if (tacticalActionBeats(context, value)) return Optional.empty();
+        return openProductionBiomes(
+                context, thisTurn, "take 4 trade goods with Production Biomes instead of a weak tactical action");
+    }
+
     private static Optional<AiDecision> startProductionBiomes(AiTurnContext context, List<AiPrompt> thisTurn) {
+        if (!mayUseProductionBiomes(context)) return Optional.empty();
+        return openProductionBiomes(context, thisTurn, "take 4 trade goods with Production Biomes instead of passing");
+    }
+
+    private static boolean mayUseProductionBiomes(AiTurnContext context) {
         Player seat = context.seat();
-        String key = BIOMES_KEY + context.turnKey();
-        if (!seat.hasTechReady(PRODUCTION_BIOMES) || context.memory().has(key)) return Optional.empty();
-        int reserved = ScoringReserve.of(context.game(), seat).tokens();
-        if (seat.getStrategicCC() < 1 || seat.getStrategicCC() + seat.getTacticalCC() - 1 < reserved) {
-            return Optional.empty();
-        }
-        Optional<Match> component = Prompts.owned(thisTurn, context.faction(), COMPONENT_ACTION::equals);
-        component.ifPresent(match -> context.memory().put(key, BIOMES_MENU));
-        return component.map(match -> match.press("take 4 trade goods with Production Biomes instead of passing"));
+        if (!seat.hasTechReady(PRODUCTION_BIOMES) || context.memory().has(BIOMES_KEY + context.turnKey())) return false;
+        return spareStrategyToken(context.game(), seat);
+    }
+
+    static boolean spareStrategyToken(Game game, Player seat) {
+        int reserved = ScoringReserve.of(game, seat).tokens();
+        int follows = StrategyCardRules.strategyTokensWantedForFollows(game, seat);
+        return seat.getStrategicCC() >= 1 + follows && seat.getStrategicCC() + seat.getTacticalCC() - 1 >= reserved;
+    }
+
+    static double productionBiomesValue(Game game, Player seat) {
+        double perResource = ProductionPlanner.fillerValuePerResource(game);
+        double tradeGoods = (BIOMES_TRADE_GOODS - RIVAL_SHARE * BIOMES_GIFT) * perResource;
+        double unlocked = SpendUnlock.pointDelta(game, seat, BIOMES_TRADE_GOODS) * ObjectiveValue.VICTORY_POINT_VALUE;
+        return tradeGoods + unlocked - STRATEGY_TOKEN_VALUE;
+    }
+
+    private static boolean tacticalActionBeats(AiTurnContext context, double value) {
+        Optional<TacticalPlan> plan = TacticalRules.rememberedPlan(context).or(() -> {
+            Optional<TacticalPlan> computed = TacticalPlanner.best(context.game(), context.seat());
+            computed.ifPresent(found -> TacticalRules.remember(context, found));
+            return computed;
+        });
+        return plan.isPresent() && plan.get().score() >= value;
+    }
+
+    private static Optional<AiDecision> openProductionBiomes(
+            AiTurnContext context, List<AiPrompt> thisTurn, String reason) {
+        Optional<Match> component = Prompts.owned(thisTurn, context.faction(), COMPONENT_ACTION::equals)
+                .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
+        component.ifPresent(match -> context.memory().put(BIOMES_KEY + context.turnKey(), BIOMES_MENU));
+        return component.map(match -> match.press(reason));
     }
 
     public static Optional<AiDecision> continueProductionBiomes(AiTurnContext context) {
@@ -212,22 +260,35 @@ public class TechRules {
         String state = context.memory().get(key).orElse("");
         List<AiPrompt> visible = Prompts.newestFirst(context.prompts());
         if (BIOMES_MENU.equals(state)) {
-            Optional<Match> exhaust = Prompts.owned(visible, context.faction(), BIOMES_EXHAUST::equals);
+            Optional<Match> exhaust =
+                    Prompts.owned(Prompts.newestFirst(context.prompts()), context.faction(), BIOMES_EXHAUST::equals);
             exhaust.ifPresent(match -> context.memory().put(key, BIOMES_RECIPIENT));
             return exhaust.map(match -> match.press("exhaust Production Biomes"));
         }
         if (!BIOMES_RECIPIENT.equals(state)) return Optional.empty();
         Game game = context.game();
-        Optional<Match> recipient = visible.stream()
+        List<Match> offered = visible.stream()
                 .flatMap(prompt -> prompt.enabledButtons().stream()
                         .filter(button ->
                                 button.isUnowned() && button.handlerId().startsWith(BIOMES_TARGET))
                         .map(button -> new Match(prompt, button)))
-                .min(Comparator.comparingInt(match -> victoryPoints(
-                        game, StringUtils.removeStart(match.button().handlerId(), BIOMES_TARGET))));
+                .toList();
+        Optional<Player> chosen = Beneficiary.leastThreatening(
+                game,
+                context.seat(),
+                offered.stream().map(match -> biomesTarget(game, match)).toList());
+        Optional<Match> recipient = offered.stream()
+                .filter(match -> chosen.isPresent() && biomesTarget(game, match) == chosen.get())
+                .findFirst()
+                .or(() -> offered.stream().findFirst());
         recipient.ifPresent(match -> context.memory().put(key, BIOMES_DONE));
         return recipient.map(
-                match -> match.press("give Production Biomes' 2 trade goods to the player furthest behind"));
+                match -> match.press("give Production Biomes' 2 trade goods to the least threatening player"));
+    }
+
+    private static Player biomesTarget(Game game, Match match) {
+        return game.getPlayerFromColorOrFaction(
+                StringUtils.removeStart(match.button().handlerId(), BIOMES_TARGET));
     }
 
     public static Optional<AiDecision> nullificationField(AiTurnContext context) {
@@ -345,11 +406,6 @@ public class TechRules {
         boolean own = BoardView.hasOwnShips(seat, tile);
         boolean enemy = BoardView.hasEnemyShips(game, seat, tile);
         return own != enemy;
-    }
-
-    private static int victoryPoints(Game game, String faction) {
-        Player player = game.getPlayerFromColorOrFaction(faction);
-        return player == null ? Integer.MAX_VALUE : player.getTotalVictoryPoints();
     }
 
     private static int leaderScore(Game game, String faction) {

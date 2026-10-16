@@ -436,6 +436,18 @@ public class StrategyCardRules {
         };
     }
 
+    public static int strategyTokensWantedForFollows(Game game, Player seat) {
+        int wanted = 0;
+        for (Player other : game.getRealPlayers()) {
+            if (other == seat) continue;
+            for (int initiative : other.getSCs()) {
+                if (game.getPlayedSCs().contains(initiative)) continue;
+                if (wantsToFollow(game, seat, StrategyCard.of(game, initiative))) wanted++;
+            }
+        }
+        return wanted;
+    }
+
     private static int tokensSavedForBetterCards(AiTurnContext context, StrategyCard card) {
         Game game = context.game();
         int rank = followRank(context, card);

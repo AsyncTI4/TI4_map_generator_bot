@@ -26,6 +26,9 @@ import ti4.ai.brain.FactionBrain;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.explore.ExplorationRules;
 import ti4.ai.explore.RelicActionRules;
+import ti4.ai.hacan.CarthAgentRules;
+import ti4.ai.hacan.DatahubRules;
+import ti4.ai.hacan.WrathOfKenaraRules;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.promissory.PromissoryRules;
@@ -114,7 +117,13 @@ public class NekroBrain implements FactionBrain {
             "acquireATech",
             "generic_button_id_",
             "genericReact4",
-            FleetSupplyRules.OPEN_PREFIX);
+            FleetSupplyRules.OPEN_PREFIX,
+            TechRules.BIOMES_TARGET,
+            CarthAgentRules.TARGET_PREFIX,
+            DatahubRules.START,
+            DatahubRules.SELECT_PREFIX,
+            DatahubRules.SWAP_PREFIX,
+            WrathOfKenaraRules.FINISH_PREFIX);
     private static final Set<String> WINDOW_PREFIXES = Stream.concat(
                     PUBLIC_WINDOW_PREFIXES.stream(), ActionCardRules.targetPrefixes().stream())
             .collect(Collectors.toUnmodifiableSet());
@@ -140,6 +149,7 @@ public class NekroBrain implements FactionBrain {
             TechRules::placeSelfAssemblyMech,
             TechRules::placeMagenInfantry,
             TechRules::continueProductionBiomes,
+            DatahubRules::next,
             SlingRelayRules::next,
             TechRules::nullificationField,
             TechRules::neuralParasite,
@@ -156,6 +166,7 @@ public class NekroBrain implements FactionBrain {
             StrategyCardRules::buildWithConstruction,
             XxchaAgentRules::next,
             NekroLeaderRules::chooseAgentTarget,
+            CarthAgentRules::chooseTarget,
             NekroLeaderRules::continueHero,
             ActionCardRules::continuePlay,
             ActionCardRules::afterActivation,
@@ -174,6 +185,7 @@ public class NekroBrain implements FactionBrain {
             PromissoryRules::playCeasefire,
             PromissoryRules::playCombatNotes,
             SingularityRules::next,
+            WrathOfKenaraRules::next,
             CombatCardRules::hold,
             context -> CombatRules.next(context, CombatCardRules::atRoundStart),
             ActionSecretRules::next,
@@ -190,6 +202,7 @@ public class NekroBrain implements FactionBrain {
             TradeRules::payDebtInAgenda,
             this::pickStrategyCard,
             NekroLeaderRules::startAgent,
+            CarthAgentRules::start,
             NekroLeaderRules::startHero,
             ActionCardRules::holdOwnTurn,
             PromissoryRules::holdForCeasefire,
@@ -452,6 +465,8 @@ public class NekroBrain implements FactionBrain {
         if (planned.isPresent()) return planned;
         Optional<AiDecision> cardAction = ActionCardRules.insteadOfTacticalAction(context);
         if (cardAction.isPresent()) return cardAction;
+        Optional<AiDecision> techAction = TechRules.insteadOfTacticalAction(context, thisTurn);
+        if (techAction.isPresent()) return techAction;
         Optional<AiDecision> xxchaStall = XxchaAgentRules.insteadOfTacticalAction(context, thisTurn);
         if (xxchaStall.isPresent()) return xxchaStall;
         Optional<AiDecision> tactical = TacticalRules.start(context);
