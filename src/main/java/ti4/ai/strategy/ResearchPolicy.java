@@ -13,6 +13,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.GameHorizon;
 import ti4.ai.scoring.ObjectivePolicy;
+import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.secrets.SecretValue;
 import ti4.game.Game;
@@ -90,7 +91,8 @@ public class ResearchPolicy {
             Map.entry("parasite-obs", 1.0),
             Map.entry("subatomic", 1.0),
             Map.entry("sc", 1.0));
-    private static final double OBJECTIVE_WEIGHT = 4.0;
+    private static final double OBJECTIVE_WEIGHT =
+            ObjectiveValue.VICTORY_POINT_VALUE * WORTH_PAYING_FOR / StrategyCardRules.SECOND_TECH_COST;
     private static final double PARTIAL_PROGRESS_SHARE = 0.4;
     private static final Map<String, Double> GENERIC_VALUE = Map.ofEntries(
             Map.entry("gd", 5.0),
