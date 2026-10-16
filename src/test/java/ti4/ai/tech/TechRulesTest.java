@@ -180,6 +180,59 @@ class TechRulesTest extends BaseTi4Test {
         assertThat(nullificationAnswer(home)).isEqualTo(nullifyButton(home));
     }
 
+    // Intimidate Council wants ships in two systems next to Mecatol Rex. Sol holds one such system with a command
+    // token, so moving a dreadnought pair into the seat's lone destroyer's system would complete the objective for
+    // Sol: worth a token even though the destroyer alone is not.
+    @Test
+    void endsTheTurnOfAPlayerWhoWouldCompleteAnObjectiveByTheMove() {
+        Tile target = intimidateBoard();
+        test.units(target, "space", test.nekro, UnitType.Destroyer, 1);
+        test.sol.addPlanet("jord");
+        test.place("01", "304");
+        Tile held = test.game.getTileByPosition("102");
+        test.units(held, "space", test.sol, UnitType.Destroyer, 1);
+        held.addCC(ti4.image.Mapper.getCCID(test.sol.getColor()));
+        test.units(test.game.getTileByPosition("201"), "space", test.sol, UnitType.Dreadnought, 2);
+
+        assertThat(nullificationAnswer(target)).isEqualTo(nullifyButton(target));
+    }
+
+    // The same attack on a destroyer that holds up the seat's own Intimidate Council (a second destroyer sits in
+    // the other system next to Mecatol) breaks an objective it meets.
+    @Test
+    void endsTheTurnOfAnAttackOnTheShipsHoldingItsPresenceObjective() {
+        Tile target = intimidateBoard();
+        test.units(target, "space", test.nekro, UnitType.Destroyer, 1);
+        test.units(test.game.getTileByPosition("102"), "space", test.nekro, UnitType.Destroyer, 1);
+        test.units(test.game.getTileByPosition("201"), "space", test.sol, UnitType.Dreadnought, 2);
+
+        assertThat(nullificationAnswer(target)).isEqualTo(nullifyButton(target));
+    }
+
+    // Without the objective on the table, the very same attack on a lone destroyer stands.
+    @Test
+    void letsTheSameAttackStandWhenNoObjectiveDependsOnIt() {
+        Tile target = intimidateBoard();
+        test.game.getRevealedPublicObjectives().clear();
+        test.units(target, "space", test.nekro, UnitType.Destroyer, 1);
+        test.units(test.game.getTileByPosition("102"), "space", test.nekro, UnitType.Destroyer, 1);
+        test.units(test.game.getTileByPosition("201"), "space", test.sol, UnitType.Dreadnought, 2);
+
+        assertThat(nullificationAnswer(target)).isEqualTo(DECLINE);
+    }
+
+    private Tile intimidateBoard() {
+        test.nekro.addTech("nf");
+        test.nekro.setStrategicCC(2);
+        test.game.setPhaseOfGame("action");
+        test.place("18", "000");
+        Tile target = test.place("26", "101");
+        test.place("27", "102");
+        test.place("25", "201");
+        test.game.getRevealedPublicObjectives().put("intimidate", 1);
+        return target;
+    }
+
     private Tile nullificationTarget() {
         test.nekro.addTech("nf");
         test.nekro.setStrategicCC(2);

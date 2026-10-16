@@ -244,11 +244,7 @@ public class TechRules {
                 .split("_");
         Tile tile = game.getTileByPosition(target[0]);
         Player active = target.length > 1 ? game.getPlayerFromColorOrFaction(target[1]) : null;
-        OptionalDouble tokenCost = StrategyTokenCost.toSpend(game, seat);
-        if (tile != null
-                && active != null
-                && tokenCost.isPresent()
-                && worthSpending(game, seat, active, tile, tokenCost)) {
+        if (tile != null && active != null && worthSpending(game, seat, active, tile)) {
             return Optional.of(use.get().press("end " + active.getFaction() + "'s turn with Nullification Field"));
         }
         return use.get()
@@ -257,9 +253,11 @@ public class TechRules {
                 .map(button -> AiDecision.press(use.get().prompt(), button, "let the activation stand"));
     }
 
-    private static boolean worthSpending(Game game, Player seat, Player active, Tile tile, OptionalDouble tokenCost) {
-        double avoided = NullificationOutlook.endingTheTurnIsWorth(game, seat, active, tile);
-        return avoided >= NULLIFICATION_MARGIN * tokenCost.getAsDouble();
+    private static boolean worthSpending(Game game, Player seat, Player active, Tile tile) {
+        OptionalDouble tokenCost = StrategyTokenCost.toSpend(game, seat);
+        if (tokenCost.isEmpty()) return false;
+        NullificationOutlook.Verdict verdict = NullificationOutlook.endingTheTurn(game, seat, active, tile);
+        return verdict.scoringAtStake() || verdict.worth() >= NULLIFICATION_MARGIN * tokenCost.getAsDouble();
     }
 
     public static Optional<AiDecision> neuralParasite(AiTurnContext context) {
