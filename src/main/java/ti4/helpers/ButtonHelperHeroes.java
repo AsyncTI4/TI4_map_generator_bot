@@ -688,27 +688,34 @@ public class ButtonHelperHeroes {
                     p2.getRepresentationUnfogged() + " your planet " + planetRep + " was readied.");
             if (player.hasLeader("xxchaagent")) {
                 UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-                if (uH != null && uH.getUnitCount(UnitType.Infantry, p2) > 0) {
-                    Tile tile = game.getTileFromPlanet(planet);
-                    for (String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
-                        Tile tile2 = game.getTileByPosition(tilePos);
-                        if (FoWHelper.playerHasShipsInSystem(player, tile2)) {
-                            List<Button> buttons = new ArrayList<>();
-                            buttons.add(Buttons.red(
-                                    "xxchaAgentRemoveInfantry_" + p2.getFaction() + "_" + planet, "Remove Infantry"));
-                            buttons.add(Buttons.gray("deleteButtons", "Decline"));
-                            MessageHelper.sendMessageToChannelWithButtons(
-                                    player.getCorrectChannel(),
-                                    player.getRepresentation()
-                                            + " you have the opportunity to remove 1 of the infantry on the readied planet if you wish.",
-                                    buttons);
-
-                            return;
-                        }
-                    }
+                Tile tile = game.getTileFromPlanet(planet);
+                if (uH != null
+                        && uH.getUnitCount(UnitType.Infantry, p2) > 0
+                        && isNextToPlanetControlledBy(game, player, tile)) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.red(
+                            "xxchaAgentRemoveInfantry_" + p2.getFaction() + "_" + planet, "Remove Infantry"));
+                    buttons.add(Buttons.gray("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + " you have the opportunity to remove 1 of the infantry on the readied planet if you wish.",
+                            buttons);
                 }
             }
         }
+    }
+
+    public static boolean isNextToPlanetControlledBy(Game game, Player player, Tile tile) {
+        if (tile == null) return false;
+        for (String position : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+            Tile adjacent = game.getTileByPosition(position);
+            if (adjacent == null) continue;
+            for (UnitHolder holder : adjacent.getPlanetUnitHolders()) {
+                if (player.getPlanets().contains(holder.getName())) return true;
+            }
+        }
+        return false;
     }
 
     public static List<Button> getAttachmentSearchButtons(Game game, Player player) {
