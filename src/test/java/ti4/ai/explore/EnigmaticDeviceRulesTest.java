@@ -152,4 +152,16 @@ class EnigmaticDeviceRulesTest extends BaseTi4Test {
     private AiTurnContext context(AiPrompt... prompts) {
         return test.contextFor(sol, Set.of(), NOW, prompts);
     }
+
+    // The component-action menu is an ephemeral message, which the AI actuator re-posts into the seat's private
+    // thread, so the AI reads it as a hidden prompt.
+    @Test
+    void findsTheComponentMenuInThePrivateThread() {
+        RelicActionRules.beforePassing(context(turn), List.of(turn));
+        AiPrompt menu =
+                prompt("menu", PromptSource.AI_THREAD, NOW + 1, "FFCC_sol_componentActionRes_relic_enigmaticdevice");
+
+        assertThat(pressedId(RelicActionRules.next(context(menu)).orElseThrow()))
+                .isEqualTo("FFCC_sol_componentActionRes_relic_enigmaticdevice");
+    }
 }

@@ -154,8 +154,6 @@ class EnigmaticDeviceRules {
     }
 
     private static List<AiPrompt> visible(AiTurnContext context) {
-        return Prompts.newestFirst(context.prompts()).stream()
-                .filter(prompt -> !prompt.isHidden())
-                .toList();
+        return Prompts.newestFirst(context.prompts());
     }
 }

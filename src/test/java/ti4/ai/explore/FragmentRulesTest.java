@@ -169,4 +169,16 @@ class FragmentRulesTest extends BaseTi4Test {
     private void removeFragments(String... ids) {
         for (String id : ids) test.nekro.removeFragment(id);
     }
+
+    // The component-action menu is an ephemeral message, which the AI actuator re-posts into the seat's private
+    // thread, so the AI reads it as a hidden prompt.
+    @Test
+    void findsTheComponentMenuInThePrivateThread() {
+        fragments("crf1", "crf2", "crf3");
+        RelicActionRules.beforePassing(test.context(turn), List.of(turn));
+        AiPrompt menu = prompt("menu", PromptSource.AI_THREAD, NOW + 1, "FFCC_nekro_componentActionRes_getRelic_");
+
+        assertThat(pressedId(RelicActionRules.next(test.context(menu)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_componentActionRes_getRelic_");
+    }
 }
