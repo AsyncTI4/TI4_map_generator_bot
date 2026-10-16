@@ -67,6 +67,7 @@ class NotesForTrade {
             return own ? CeasefireValue.OWN_BACK : CeasefireValue.received(game, seat, owner);
         }
         if (alias.endsWith(POLITICAL_SECRET)) return politicalSecretValue(game);
+        if (ConvoysValue.isConvoys(alias)) return own ? ConvoysValue.OWN_BACK : ConvoysValue.received(game, seat);
         return NOTES_IT_PLAYS.getOrDefault(alias, OTHER_NOTE);
     }
 
@@ -83,6 +84,7 @@ class NotesForTrade {
         if (alias.endsWith(TRADE_AGREEMENT)) return agreementValue(seat);
         if (alias.endsWith(CEASEFIRE)) return CeasefireValue.givenCost(game, seat, receiver);
         if (alias.endsWith(POLITICAL_SECRET)) return politicalSecretValue(game);
+        if (ConvoysValue.isConvoys(alias)) return ConvoysValue.GIVE_COST;
         return OWN_FACTION_NOTE_COST;
     }
 

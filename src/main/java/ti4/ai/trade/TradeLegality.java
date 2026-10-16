@@ -22,7 +22,7 @@ class TradeLegality {
     private static final String WINDOW_KEY = "tradeWindow|";
     private static final String CENSURE = "tf-censure";
     private static final String GUILD_SHIPS = "guild_ships";
-    private static final List<String> CONVOYS = List.of("convoys", "sigma_trade_convoys", "viability_trade_convoys");
+    static final List<String> CONVOYS = List.of("convoys", "sigma_trade_convoys", "viability_trade_convoys");
     private static final String ACTION = "action";
     private static final String STRATEGY = "strategy";
     private static final String AGENDA = "agenda";
