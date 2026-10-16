@@ -113,4 +113,17 @@ class SlingRelayRulesTest extends BaseTi4Test {
         assertThat(SlingRelayRules.insteadOfTacticalAction(test.context(turn), List.of(turn)))
                 .isEmpty();
     }
+
+    // The component-action menu is an ephemeral message, which the AI actuator re-posts into the seat's private
+    // thread, so the AI reads it as a hidden prompt.
+    @Test
+    void findsTheComponentMenuInThePrivateThread() {
+        AiPrompt turn =
+                prompt("turn", PromptSource.PUBLIC, NOW, "FFCC_nekro_componentAction", "FFCC_nekro_passForRound");
+        SlingRelayRules.start(test.context(turn), List.of(turn));
+        AiPrompt menu = prompt("menu", PromptSource.AI_THREAD, NOW + 1, "FFCC_nekro_exhaustTech_sr");
+
+        assertThat(pressedId(SlingRelayRules.next(test.context(menu)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_exhaustTech_sr");
+    }
 }

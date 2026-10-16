@@ -342,4 +342,20 @@ class TechRulesTest extends BaseTi4Test {
     private Optional<AiDecision> endOfTurn(AiPrompt prompt) {
         return TechRules.endOfTurn(test.context(prompt), List.of(prompt));
     }
+
+    // The component-action menu is an ephemeral message, which the AI actuator re-posts into the seat's private
+    // thread, so the AI reads it as a hidden prompt.
+    @Test
+    void findsTheProductionBiomesMenuInThePrivateThread() {
+        test.nekro.addTech("pm");
+        test.nekro.setStrategicCC(2);
+        AiPrompt start =
+                prompt("start", PromptSource.PUBLIC, NOW, "FFCC_nekro_componentAction", "FFCC_nekro_passForRound");
+        TechRules.beforePassing(test.context(start), List.of(start));
+        AiPrompt menu = prompt("menu", PromptSource.AI_THREAD, NOW, "FFCC_nekro_exhaustTech_pm");
+
+        assertThat(pressedId(
+                        TechRules.continueProductionBiomes(test.context(menu)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_exhaustTech_pm");
+    }
 }

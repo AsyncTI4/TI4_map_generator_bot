@@ -79,15 +79,16 @@ public class ScoringReserve {
                 wallet.tradeGoods() + expected,
                 wallet.tacticTokens(),
                 wallet.strategyTokens(),
-                wallet.tradeGoodValue());
+                wallet.tradeGoodValue(),
+                wallet.pooling());
         return bestAffordableSpend(game, seat, projected)
-                .map(spend -> netOfIncome(spend, expected, readied, wallet.tradeGoodValue()))
+                .map(spend -> netOfIncome(spend, expected, readied, wallet))
                 .filter(spend -> wallet.canPay(spend.cost()));
     }
 
-    private static Reserved netOfIncome(
-            Reserved spend, int expected, List<Wallet.PlanetValue> readied, int tradeGoodValue) {
-        SpendCost afterReadying = ExpectedReadying.netOf(spend.cost(), readied);
+    private static Reserved netOfIncome(Reserved spend, int expected, List<Wallet.PlanetValue> readied, Wallet wallet) {
+        int tradeGoodValue = wallet.tradeGoodValue();
+        SpendCost afterReadying = ExpectedReadying.netOf(spend.cost(), readied, wallet.pooling());
         return new Reserved(
                 spend.objectiveId(),
                 ExpectedTradeGoods.netOf(afterReadying, expected, tradeGoodValue),

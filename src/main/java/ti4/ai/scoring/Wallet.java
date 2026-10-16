@@ -6,33 +6,51 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 
 public record Wallet(
-        List<PlanetValue> planets, int tradeGoods, int tacticTokens, int strategyTokens, int tradeGoodValue) {
+        List<PlanetValue> planets,
+        int tradeGoods,
+        int tacticTokens,
+        int strategyTokens,
+        int tradeGoodValue,
+        Pooling pooling) {
 
     public record PlanetValue(String name, int resources, int influence) {}
 
     public record Payment(List<String> forResources, List<String> forInfluence, int tradeGoods, int tokens) {
 
         public int planetCount() {
-            return forResources.size() + forInfluence.size();
+            return (int) Stream.concat(forResources.stream(), forInfluence.stream())
+                    .distinct()
+                    .count();
         }
     }
 
     private static final int SKIP = 0;
     private static final int AS_RESOURCES = 1;
     private static final int AS_INFLUENCE = 2;
+    private static final int AS_BOTH = 3;
     private static final int UNREACHABLE = Integer.MAX_VALUE;
     private static final int CHOICE_SHIFT = 1_000_000;
     private static final String MIRROR_COMPUTING = "mc";
     private static final int MIRRORED_TRADE_GOOD = 2;
 
+    public Wallet(List<PlanetValue> planets, int tradeGoods, int tacticTokens, int strategyTokens, int tradeGoodValue) {
+        this(planets, tradeGoods, tacticTokens, strategyTokens, tradeGoodValue, Pooling.SEPARATE);
+    }
+
     public static Wallet of(Game game, Player seat) {
-        Wallet empty =
-                new Wallet(List.of(), seat.getTg(), seat.getTacticalCC(), seat.getStrategicCC(), tradeGoodValue(seat));
+        Wallet empty = new Wallet(
+                List.of(),
+                seat.getTg(),
+                seat.getTacticalCC(),
+                seat.getStrategicCC(),
+                tradeGoodValue(seat),
+                Pooling.of(seat));
         return empty.withPlanets(game, seat.getReadiedPlanets());
     }
 
@@ -42,15 +60,19 @@ public record Wallet(
         for (String name : names) {
             Planet planet = info.get(name);
             if (planet == null || holds(combined, name)) continue;
-            int resources = Math.max(0, planet.getResources());
-            int influence = Math.max(0, planet.getInfluence());
+            int resources = pooling.resourcesOf(planet);
+            int influence = pooling.influenceOf(planet);
             if (resources + influence > 0) combined.add(new PlanetValue(name, resources, influence));
         }
-        return new Wallet(combined, tradeGoods, tacticTokens, strategyTokens, tradeGoodValue);
+        return withPlanetValues(combined);
+    }
+
+    public Wallet withPlanetValues(List<PlanetValue> values) {
+        return new Wallet(values, tradeGoods, tacticTokens, strategyTokens, tradeGoodValue, pooling);
     }
 
     public Wallet withTradeGoods(int amount) {
-        return new Wallet(planets, Math.max(0, amount), tacticTokens, strategyTokens, tradeGoodValue);
+        return new Wallet(planets, Math.max(0, amount), tacticTokens, strategyTokens, tradeGoodValue, pooling);
     }
 
     private static boolean holds(List<PlanetValue> planets, String name) {
@@ -81,12 +103,14 @@ public record Wallet(
                 Math.max(0, tradeGoods - payment.tradeGoods()),
                 tokensLeft - strategyLeft,
                 strategyLeft,
-                tradeGoodValue);
+                tradeGoodValue,
+                pooling);
     }
 
     public int shortfall(SpendCost cost, int limit) {
         int tokensShort = Math.max(0, cost.tokens() - tokens());
-        Wallet withTokens = new Wallet(planets, tradeGoods, tacticTokens + tokensShort, strategyTokens, tradeGoodValue);
+        Wallet withTokens =
+                new Wallet(planets, tradeGoods, tacticTokens + tokensShort, strategyTokens, tradeGoodValue, pooling);
         for (int extra = 0; extra < limit; extra++) {
             if (withTokens.withTradeGoods(tradeGoods + extra).canPay(cost)) return extra + tokensShort;
         }
@@ -123,6 +147,14 @@ public record Wallet(
                     int next = resources * width + Math.min(needInfluence, influence + planet.influence());
                     relax(best, choice, i, state, next, best[i][state] + waste(planet), AS_INFLUENCE);
                 }
+                if (pooling.paysBothKinds()
+                        && planet.resources() > 0
+                        && planet.influence() > 0
+                        && (resources < needResources || influence < needInfluence)) {
+                    int next = Math.min(needResources, resources + planet.resources()) * width
+                            + Math.min(needInfluence, influence + planet.influence());
+                    relax(best, choice, i, state, next, best[i][state] + waste(planet), AS_BOTH);
+                }
             }
         }
         int chosen = -1;
@@ -151,6 +183,10 @@ public record Wallet(
             String planet = planets.get(i - 1).name();
             if (how == AS_RESOURCES) forResources.addFirst(planet);
             if (how == AS_INFLUENCE) forInfluence.addFirst(planet);
+            if (how == AS_BOTH) {
+                forResources.addFirst(planet);
+                forInfluence.addFirst(planet);
+            }
             state = encoded % CHOICE_SHIFT;
         }
         return Optional.of(new Payment(forResources, forInfluence, chosenTradeGoods, cost.tokens()));
@@ -160,8 +196,8 @@ public record Wallet(
         return seat.hasTech(MIRROR_COMPUTING) ? MIRRORED_TRADE_GOOD : 1;
     }
 
-    private static int waste(PlanetValue planet) {
-        return planet.resources() + planet.influence();
+    private int waste(PlanetValue planet) {
+        return pooling.paysBothKinds() ? planet.resources() : planet.resources() + planet.influence();
     }
 
     private static void relax(int[][] best, int[][] choice, int i, int from, int to, int cost, int how) {

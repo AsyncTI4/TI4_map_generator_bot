@@ -96,9 +96,7 @@ public class SlingRelayRules {
         String position = state[1];
         String unit = state[2];
         String cost = state[3];
-        List<AiPrompt> visible = Prompts.newestFirst(context.prompts()).stream()
-                .filter(prompt -> !prompt.isHidden())
-                .toList();
+        List<AiPrompt> visible = Prompts.newestFirst(context.prompts());
         return switch (state[0]) {
             case MENU ->
                 advance(

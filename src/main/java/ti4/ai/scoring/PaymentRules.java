@@ -79,7 +79,9 @@ public class PaymentRules {
     private static void remember(
             AiTurnContext context, String purpose, Wallet.Payment payment, String doneHandler, boolean lastsThePhase) {
         List<String> planets = new ArrayList<>(payment.forResources());
-        planets.addAll(payment.forInfluence());
+        payment.forInfluence().stream()
+                .filter(planet -> !planets.contains(planet))
+                .forEach(planets::add);
         int tradeGoodsAfter = Math.max(0, context.seat().getTg() - payment.tradeGoods());
         PendingPayment pending =
                 new PendingPayment(purpose, planets, tradeGoodsAfter, context.now(), doneHandler, lastsThePhase);

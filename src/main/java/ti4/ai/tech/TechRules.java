@@ -210,9 +210,7 @@ public class TechRules {
     public static Optional<AiDecision> continueProductionBiomes(AiTurnContext context) {
         String key = BIOMES_KEY + context.turnKey();
         String state = context.memory().get(key).orElse("");
-        List<AiPrompt> visible = Prompts.newestFirst(context.prompts()).stream()
-                .filter(prompt -> !prompt.isHidden())
-                .toList();
+        List<AiPrompt> visible = Prompts.newestFirst(context.prompts());
         if (BIOMES_MENU.equals(state)) {
             Optional<Match> exhaust = Prompts.owned(visible, context.faction(), BIOMES_EXHAUST::equals);
             exhaust.ifPresent(match -> context.memory().put(key, BIOMES_RECIPIENT));

@@ -28,7 +28,7 @@ class SecretCards {
 
     static Optional<Plan> impersonationPlan(Game game, Player seat) {
         return InfluencePayments.payment(game, seat, IMPERSONATION_INFLUENCE)
-                .map(payment -> Plan.of(SecretDrawValue.of(game, seat) - InfluencePayments.cost(game, payment)));
+                .map(payment -> Plan.of(SecretDrawValue.of(game, seat) - InfluencePayments.cost(game, seat, payment)));
     }
 
     private static void expectPayment(AiTurnContext context) {

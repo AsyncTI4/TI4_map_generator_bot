@@ -20,6 +20,7 @@ import ti4.ai.perception.PromptButton;
 import ti4.ai.promissory.CeasefireRules;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.PaymentRules;
+import ti4.ai.scoring.Pooling;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
@@ -676,7 +677,7 @@ public class TacticalRules {
         if (owed > 0) {
             SpendCost reserve = ProductionPlanner.reserve(game, seat);
             Optional<PromptButton> planet = PaymentPlanner.keepingReserve(game, seat, payment, owed, reserve)
-                    .or(() -> PaymentPlanner.choosePlanet(game, payment, owed));
+                    .or(() -> PaymentPlanner.choosePlanet(game, seat, payment, owed));
             if (planet.isPresent()) return Optional.of(AiDecision.press(payment, planet.get(), "pay for units"));
             if (seat.getTg() > 0) {
                 Optional<PromptButton> tradeGood = payment.enabledHandler("reduceTG_1_res");
@@ -689,6 +690,7 @@ public class TacticalRules {
     }
 
     private static double spent(Game game, Player seat) {
+        Pooling pooling = Pooling.of(seat);
         double spent = 0;
         for (String thing : seat.getSpentThingsThisWindow()) {
             if (SARWEEN.equals(thing)) {
@@ -697,8 +699,9 @@ public class TacticalRules {
                 spent += ButtonHelper.getNumberOfUnitUpgrades(seat);
             } else if (thing.startsWith("tg_")) {
                 spent += parseDouble(StringUtils.substringAfter(thing, "tg_")) * Wallet.tradeGoodValue(seat);
-            } else if (seat.getPlanets().contains(thing)) {
-                spent += BoardView.planetResources(game, thing);
+            } else if (seat.getPlanets().contains(thing)
+                    && game.getPlanetsInfo().get(thing) != null) {
+                spent += pooling.resourcesOf(game.getPlanetsInfo().get(thing));
             }
         }
         return spent;

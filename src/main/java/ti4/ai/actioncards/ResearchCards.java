@@ -132,7 +132,7 @@ class ResearchCards {
     static Optional<Plan> plagiarizePlan(Game game, Player seat) {
         Optional<Wallet.Payment> payment = payment(game, seat);
         if (payment.isEmpty()) return Optional.empty();
-        double cost = InfluencePayments.cost(game, payment.get());
+        double cost = InfluencePayments.cost(game, seat, payment.get());
         return copyable(game, seat).stream()
                 .map(alias -> Plan.aimedAt(
                         ResearchPolicy.TECH_TEMPO * ResearchPolicy.value(game, seat, alias)

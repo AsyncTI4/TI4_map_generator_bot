@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.scoring.Pooling;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.SpendUnlock;
@@ -73,6 +74,17 @@ class DiplomacyUse {
         return best(game, seat, candidates, PLANETS_TO_READY);
     }
 
+    static List<Choice> eachAlone(Game game, Player seat, Collection<String> candidates) {
+        Demand demand = new Demand(game, seat, 0);
+        return candidates.stream()
+                .distinct()
+                .map(planet -> new Choice(
+                        List.of(planet),
+                        demand.use(List.of(planet)),
+                        SpendUnlock.unlocks(game, seat, List.of(planet), 0)))
+                .toList();
+    }
+
     static Choice readying(Game game, Player seat, Collection<String> planets) {
         List<String> readied = planets.stream()
                 .distinct()
@@ -117,7 +129,7 @@ class DiplomacyUse {
         return pairs;
     }
 
-    private static List<Split> splits(List<String> planets) {
+    private static List<Split> splits(List<String> planets, Pooling pooling) {
         List<Split> splits = new ArrayList<>();
         splits.add(new Split(List.of(), List.of()));
         for (String planet : planets) {
@@ -125,6 +137,9 @@ class DiplomacyUse {
             for (Split split : splits) {
                 extended.add(new Split(append(split.forResources(), planet), split.forInfluence()));
                 extended.add(new Split(split.forResources(), append(split.forInfluence(), planet)));
+                if (pooling.paysBothKinds()) {
+                    extended.add(new Split(append(split.forResources(), planet), append(split.forInfluence(), planet)));
+                }
             }
             splits = extended;
         }
@@ -196,15 +211,18 @@ class DiplomacyUse {
 
         int use(List<String> planets) {
             if (!active) return 0;
-            return splits(planets).stream().mapToInt(this::use).max().orElse(0);
+            return splits(planets, wallet.pooling()).stream()
+                    .mapToInt(this::use)
+                    .max()
+                    .orElse(0);
         }
 
         private int use(Split split) {
             int resources = split.forResources().stream()
-                    .mapToInt(planet -> Helper.getPlanetResources(planet, game))
+                    .mapToInt(planet -> wallet.pooling().resourcesOf(game, planet))
                     .sum();
             int influence = split.forInfluence().stream()
-                    .mapToInt(planet -> Helper.getPlanetInfluence(planet, game))
+                    .mapToInt(planet -> wallet.pooling().influenceOf(game, planet))
                     .sum();
             int resourceUse = Math.min(resources, productionUse(resources) + researchUse(split.forResources()));
             int influenceUse =

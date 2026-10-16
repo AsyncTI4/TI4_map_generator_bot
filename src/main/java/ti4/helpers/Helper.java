@@ -1928,9 +1928,12 @@ public final class Helper {
                     .append(res)
                     .append(" resource")
                     .append(res == 1 ? "" : "s")
-                    .append(" or ")
+                    .append(xxchaHero ? " and " : " or ")
                     .append(inf)
                     .append(" influence.");
+            if (xxchaBt && !xxchaHero) {
+                msg.append("\n-# _Archon's Gift_: each planet counts as resources or as influence, not both.");
+            }
         }
         return msg.toString();
     }

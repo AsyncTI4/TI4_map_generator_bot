@@ -60,9 +60,7 @@ class FragmentRules {
     static Optional<AiDecision> next(AiTurnContext context) {
         Optional<List<String>> state = ComponentFlow.fields(context, FLOW);
         if (state.isEmpty()) return Optional.empty();
-        List<AiPrompt> visible = Prompts.newestFirst(context.prompts()).stream()
-                .filter(prompt -> !prompt.isHidden())
-                .toList();
+        List<AiPrompt> visible = Prompts.newestFirst(context.prompts());
         return switch (state.get().get(1)) {
             case MENU -> openPurging(context, visible, state.get());
             case PURGE -> purge(context, visible, state.get());

@@ -17,7 +17,7 @@ public class ExpectedReadying {
         List<String> exhausted = seat.getExhaustedPlanets().stream()
                 .filter(seat.getPlanets()::contains)
                 .toList();
-        return new Wallet(List.of(), 0, 0, 0, 1)
+        return new Wallet(List.of(), 0, 0, 0, 1, Pooling.of(seat))
                 .withPlanets(game, exhausted).planets().stream()
                         .sorted(Comparator.comparingInt(
                                         (Wallet.PlanetValue planet) -> -(planet.resources() + planet.influence()))
@@ -37,7 +37,7 @@ public class ExpectedReadying {
         return false;
     }
 
-    public static SpendCost netOf(SpendCost cost, List<Wallet.PlanetValue> readied) {
+    public static SpendCost netOf(SpendCost cost, List<Wallet.PlanetValue> readied, Pooling pooling) {
         int resources = cost.resources();
         int influence = cost.influence();
         List<Wallet.PlanetValue> largestFirst = readied.stream()
@@ -45,6 +45,11 @@ public class ExpectedReadying {
                         (Wallet.PlanetValue planet) -> -Math.max(planet.resources(), planet.influence())))
                 .toList();
         for (Wallet.PlanetValue planet : largestFirst) {
+            if (pooling.paysBothKinds()) {
+                resources = Math.max(0, resources - planet.resources());
+                influence = Math.max(0, influence - planet.influence());
+                continue;
+            }
             boolean forResources = resources > 0 && (influence == 0 || planet.resources() >= planet.influence());
             if (forResources) {
                 resources = Math.max(0, resources - planet.resources());

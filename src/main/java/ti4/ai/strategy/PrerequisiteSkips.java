@@ -67,7 +67,7 @@ public class PrerequisiteSkips {
         return new Plan(kept, true, lost - spendValue(game, dearest) + aidaCost);
     }
 
-    private static Map<TechnologyType, Integer> missing(Player seat, TechnologyModel tech) {
+    static Map<TechnologyType, Integer> missing(Player seat, TechnologyModel tech) {
         String requirements = tech.getRequirements().orElse("");
         Map<TechnologyType, Integer> missing = new EnumMap<>(TechnologyType.class);
         for (Map.Entry<Character, TechnologyType> colour : COLOURS.entrySet()) {
