@@ -110,6 +110,50 @@ class TechRulesTest extends BaseTi4Test {
                 .isEqualTo("productionBiomes_sol");
     }
 
+    // Sol leads on points, so the 2 trade goods go to Xxcha even though Sol is offered first.
+    @Test
+    void neverGivesProductionBiomesTradeGoodsToThePointsLeader() {
+        ti4.game.Player xxcha = test.addSeat("200000000000000002", "xxcha", "green");
+        test.points(test.sol, 4);
+        test.points(xxcha, 1);
+        test.memory.put("productionBiomes|" + test.context().turnKey(), "recipient");
+        AiPrompt recipients =
+                prompt("recipients", PromptSource.PUBLIC, NOW, "productionBiomes_sol", "productionBiomes_xxcha");
+
+        assertThat(pressedId(TechRules.continueProductionBiomes(test.context(recipients))
+                        .orElseThrow()))
+                .isEqualTo("productionBiomes_xxcha");
+    }
+
+    // Sol still holds an unplayed Imperial whose secondary the seat wants (it has room for a secret), and its only
+    // strategy token is needed for that, so it passes instead of spending the token on Production Biomes.
+    @Test
+    void keepsItsStrategyTokenForASecondaryItWantsToFollow() {
+        test.nekro.addTech("pm");
+        test.nekro.setStrategicCC(1);
+        test.sol.addSC(8);
+        AiPrompt start =
+                prompt("start", PromptSource.PUBLIC, NOW, "FFCC_nekro_componentAction", "FFCC_nekro_passForRound");
+
+        assertThat(TechRules.beforePassing(test.context(start), List.of(start))).isEmpty();
+    }
+
+    // One trade good short of Negotiate Trade Routes: Production Biomes' 4 trade goods unlock a point, which beats any
+    // tactical action available, so it is used as the action rather than kept for the end of the round.
+    @Test
+    void usesProductionBiomesAsTheActionWhenItsTradeGoodsUnlockAnObjective() {
+        test.nekro.addTech("pm");
+        test.nekro.setStrategicCC(2);
+        test.nekro.setTg(1);
+        test.game.getRevealedPublicObjectives().put("trade_routes", 1);
+        AiPrompt start =
+                prompt("start", PromptSource.PUBLIC, NOW, "FFCC_nekro_tacticalAction", "FFCC_nekro_componentAction");
+
+        assertThat(pressedId(TechRules.insteadOfTacticalAction(test.context(start), List.of(start))
+                        .orElseThrow()))
+                .isEqualTo("FFCC_nekro_componentAction");
+    }
+
     // Sol activates the system with the seat's lone destroyer, with two dreadnoughts next door: Nullification Field
     // ends Sol's turn. With nothing able to move in, the seat lets the activation stand.
     @Test
