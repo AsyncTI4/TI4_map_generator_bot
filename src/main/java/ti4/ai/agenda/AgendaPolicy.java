@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
@@ -123,6 +124,12 @@ public class AgendaPolicy {
 
     public static boolean worthDiscarding(Game game, Player seat) {
         return predictedElectionScore(game, seat, null) <= -DISCARD_THRESHOLD;
+    }
+
+    public static OptionalDouble expectedLoss(Game game, Player seat) {
+        AgendaForecast forecast = AgendaVoting.forecastWithItsBallot(game, seat);
+        if (forecast.isEmpty()) return OptionalDouble.empty();
+        return OptionalDouble.of(Math.max(0, -forecast.expectedUtility(seat)));
     }
 
     public static boolean wouldElectToAPoint(Game game, Player seat) {
