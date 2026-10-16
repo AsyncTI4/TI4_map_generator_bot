@@ -93,7 +93,7 @@ class DealItemTest {
         assertThat(parsed("sendingsol_receivingnekro_Frags_supermassive_fragment")
                         .type())
                 .isEqualTo(ItemType.UNSUPPORTED);
-        assertThat(parsed("sendingsol_receivingnekro_ACs_17").type()).isEqualTo(ItemType.UNSUPPORTED);
+        assertThat(parsed("sendingsol_receivingnekro_SOs_generic1").type()).isEqualTo(ItemType.UNSUPPORTED);
         assertThat(parsed("sendingsol_receivingnekro_details_text").type()).isEqualTo(ItemType.UNSUPPORTED);
         assertThat(parsed("sendingsol_receivingnekro_TGs_lots").type()).isEqualTo(ItemType.UNSUPPORTED);
     }
@@ -121,15 +121,35 @@ class DealItemTest {
     @Test
     void knowsWhichTypesItBuilds() {
         assertThat(ItemType.of("TGs")).isEqualTo(ItemType.TRADE_GOODS);
-        assertThat(ItemType.of("ACs")).isEqualTo(ItemType.UNSUPPORTED);
+        assertThat(ItemType.of("ACs")).isEqualTo(ItemType.ACTION_CARDS);
+        assertThat(ItemType.of("Planets")).isEqualTo(ItemType.PLANETS);
         assertThat(ItemType.of("")).isEqualTo(ItemType.UNSUPPORTED);
-        assertThat(List.of(ItemType.values()).stream().filter(ItemType::buildable))
-                .containsExactly(
-                        ItemType.TRADE_GOODS,
-                        ItemType.COMMODITIES,
-                        ItemType.SEND_DEBT,
-                        ItemType.CLEAR_DEBT,
-                        ItemType.PROMISSORY);
+        assertThat(List.of(ItemType.values()).stream().filter(ItemType::countable))
+                .containsExactly(ItemType.TRADE_GOODS, ItemType.COMMODITIES, ItemType.SEND_DEBT, ItemType.CLEAR_DEBT);
+        assertThat(List.of(ItemType.values()).stream().filter(ItemType::named))
+                .containsExactly(ItemType.PROMISSORY, ItemType.ACTION_CARDS, ItemType.PLANETS);
+    }
+
+    // Arbiters and the Hacan mech: a card by its hand number or "generic<n>" (cards the sender picks later), and a
+    // planet by its id.
+    @Test
+    void readsCardsAndPlanets() {
+        DealItem card = parsed("sendingsol_receivingnekro_ACs_17");
+        assertThat(card.type()).isEqualTo(ItemType.ACTION_CARDS);
+        assertThat(card.isGenericCard()).isFalse();
+        assertThat(card.amount()).isEqualTo(1);
+
+        DealItem generic = parsed("sendingnekro_receivingsol_ACs_generic2");
+        assertThat(generic.isGenericCard()).isTrue();
+        assertThat(generic.amount()).isEqualTo(2);
+
+        DealItem planet = parsed("sendingsol_receivingnekro_Planets_arretze");
+        assertThat(planet.type()).isEqualTo(ItemType.PLANETS);
+        assertThat(planet.detail()).isEqualTo("arretze");
+
+        assertThat(parsed("sendingsol_receivingnekro_ACs_sabo").type()).isEqualTo(ItemType.UNSUPPORTED);
+        assertThat(card.unsupported().engineString()).isEqualTo("sendingsol_receivingnekro_ACs_17");
+        assertThat(card.unsupported().type()).isEqualTo(ItemType.UNSUPPORTED);
     }
 
     @Test

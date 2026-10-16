@@ -218,7 +218,10 @@ class PendingOffers {
                 && deal.notes(ours).stream()
                         .allMatch(detail -> NotesForTrade.aliasOf(seat, detail)
                                 .filter(alias -> NotesForTrade.inHand(seat, alias))
-                                .isPresent());
+                                .isPresent())
+                && deal.named(ours, ItemType.ACTION_CARDS).stream()
+                        .allMatch(
+                                detail -> TradeActionCards.aliasOf(seat, detail).isPresent());
         boolean theirsHeld = partner.getTg() >= deal.total(theirs, ItemType.TRADE_GOODS)
                 && partner.getCommodities() + partner.getTg() >= deal.total(theirs, ItemType.COMMODITIES);
         return oursHeld && theirsHeld;

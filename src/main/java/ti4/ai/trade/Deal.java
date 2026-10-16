@@ -24,9 +24,11 @@ record Deal(List<DealItem> items) {
     static Deal between(Player holder, Player other) {
         String holderFaction = holder.getFaction();
         String otherFaction = other.getFaction();
+        boolean cardsAllowed = TradeActionCards.tradable(holder, other);
         return new Deal(holder.getTransactionItemsWithPlayer(other).stream()
                 .map(raw -> DealItem.parse(raw, holderFaction, otherFaction))
                 .flatMap(Optional::stream)
+                .map(item -> cardsAllowed || item.type() != ItemType.ACTION_CARDS ? item : item.unsupported())
                 .toList());
     }
 
@@ -49,10 +51,18 @@ record Deal(List<DealItem> items) {
     }
 
     List<String> notes(String sender) {
+        return named(sender, ItemType.PROMISSORY);
+    }
+
+    List<String> named(String sender, ItemType type) {
         return items.stream()
-                .filter(item -> item.isFrom(sender) && item.type() == ItemType.PROMISSORY)
+                .filter(item -> item.isFrom(sender) && item.type() == type)
                 .map(DealItem::detail)
                 .toList();
+    }
+
+    boolean has(ItemType type) {
+        return items.stream().anyMatch(item -> item.type() == type);
     }
 
     Deal withNotesNamedAs(String sender, Deal target) {
@@ -158,13 +168,13 @@ record Deal(List<DealItem> items) {
         return switch (item.type()) {
             case TRADE_GOODS, COMMODITIES, SEND_DEBT, CLEAR_DEBT -> parties;
             case FRAGMENTS -> parties + SUMMARY_FIELDS + item.fragmentKind();
-            case PROMISSORY, UNSUPPORTED -> parties + SUMMARY_FIELDS + item.detail();
+            case PROMISSORY, ACTION_CARDS, PLANETS, UNSUPPORTED -> parties + SUMMARY_FIELDS + item.detail();
         };
     }
 
     private static int summaryAmount(DealItem item) {
         return switch (item.type()) {
-            case PROMISSORY, UNSUPPORTED -> 1;
+            case PROMISSORY, ACTION_CARDS, PLANETS, UNSUPPORTED -> 1;
             default -> item.amount();
         };
     }

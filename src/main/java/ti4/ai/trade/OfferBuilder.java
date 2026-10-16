@@ -57,7 +57,9 @@ class OfferBuilder {
             new Order(false, ItemType.COMMODITIES),
             new Order(false, ItemType.TRADE_GOODS),
             new Order(false, ItemType.PROMISSORY),
-            new Order(true, ItemType.PROMISSORY));
+            new Order(true, ItemType.PROMISSORY),
+            new Order(false, ItemType.ACTION_CARDS),
+            new Order(true, ItemType.PLANETS));
 
     private record Order(boolean fromPartner, ItemType type) {}
 
@@ -207,8 +209,10 @@ class OfferBuilder {
             return restart(build);
         }
         List<Pick> picks = BuilderPrompts.picks(picker);
-        Optional<Pick> choice = missing.type() == ItemType.PROMISSORY
-                ? picks.stream().filter(pick -> picksNote(build, missing, pick)).findFirst()
+        Optional<Pick> choice = missing.type().named()
+                ? picks.stream()
+                        .filter(pick -> picksNamed(build, missing, pick))
+                        .findFirst()
                 : picks.stream()
                         .filter(pick -> amount(pick).isPresent() && amount(pick).getAsInt() <= missing.remaining())
                         .max(Comparator.comparingInt(pick -> amount(pick).getAsInt()));
@@ -217,8 +221,10 @@ class OfferBuilder {
                 build, picker.prompt(), choice.get().button(), "trade: put " + describe(missing) + " in the offer");
     }
 
-    private static boolean picksNote(Build build, Missing missing, Pick pick) {
-        if (Standings.same(missing.sender(), build.seat())) return pick.detail().equals(missing.detail());
+    private static boolean picksNamed(Build build, Missing missing, Pick pick) {
+        if (missing.type() != ItemType.PROMISSORY || Standings.same(missing.sender(), build.seat())) {
+            return pick.detail().equals(missing.detail());
+        }
         String name = NotesForTrade.aliasOf(missing.sender(), missing.detail())
                 .map(Mapper::getPromissoryNote)
                 .map(PromissoryNoteModel::getName)
@@ -430,11 +436,12 @@ class OfferBuilder {
             Player sender = order.fromPartner() ? partner : seat;
             Player receiver = order.fromPartner() ? seat : partner;
             String faction = sender.getFaction();
-            if (order.type() == ItemType.PROMISSORY) {
-                Optional<String> note = target.notes(faction).stream()
-                        .filter(detail -> !current.notes(faction).contains(detail))
+            if (order.type().named()) {
+                List<String> present = current.named(faction, order.type());
+                Optional<String> named = target.named(faction, order.type()).stream()
+                        .filter(detail -> !present.contains(detail))
                         .findFirst();
-                if (note.isPresent()) return Optional.of(new Missing(sender, receiver, order.type(), 1, note.get()));
+                if (named.isPresent()) return Optional.of(new Missing(sender, receiver, order.type(), 1, named.get()));
                 continue;
             }
             int remaining = target.total(faction, order.type()) - current.total(faction, order.type());
@@ -448,9 +455,13 @@ class OfferBuilder {
         String theirs = partner.getFaction();
         if (!DealItem.tradable(theirs) || target.notes(ours).size() > 1) return false;
         return target.items().stream().allMatch(item -> {
-            if (item.isFrom(theirs) && item.isTo(ours)) return REQUESTABLE.contains(item.type()) || namedNote(item);
+            if (item.isFrom(theirs) && item.isTo(ours)) {
+                return REQUESTABLE.contains(item.type()) || namedNote(item) || item.type() == ItemType.PLANETS;
+            }
             if (!item.isFrom(ours) || !item.isTo(theirs)) return false;
-            if (item.type() == ItemType.PROMISSORY) return StringUtils.isNumeric(item.detail());
+            if (item.type() == ItemType.PROMISSORY || item.type() == ItemType.ACTION_CARDS) {
+                return StringUtils.isNumeric(item.detail());
+            }
             return REQUESTABLE.contains(item.type());
         });
     }
@@ -497,9 +508,13 @@ class OfferBuilder {
     }
 
     private static String describe(Missing missing) {
-        String what = missing.type() == ItemType.PROMISSORY
-                ? "a promissory note"
-                : missing.remaining() + " " + missing.type().token();
+        String what =
+                switch (missing.type()) {
+                    case PROMISSORY -> "a promissory note";
+                    case ACTION_CARDS -> "an action card";
+                    case PLANETS -> "a planet";
+                    default -> missing.remaining() + " " + missing.type().token();
+                };
         return what + " from " + missing.sender().getFaction() + " to "
                 + missing.receiver().getFaction();
     }

@@ -45,6 +45,8 @@ public class ComponentValues {
             case CLEAR_DEBT -> DEBT_LIABILITY * amount;
             case FRAGMENTS -> fragments(seat, item, seatPrivate);
             case PROMISSORY -> receivedNote(game, seat, from, item);
+            case ACTION_CARDS -> TradeActionCards.receiveValue(game, seat, from, item, seatPrivate);
+            case PLANETS -> TradePlanets.receiveValue(game, item);
             case UNSUPPORTED -> 0;
         };
     }
@@ -62,6 +64,8 @@ public class ComponentValues {
             case CLEAR_DEBT -> debtReceivable(game, seat, to, amount, trustInTo);
             case FRAGMENTS -> NotesForTrade.INFINITE;
             case PROMISSORY -> givenNote(game, seat, to, item, seatPrivate);
+            case ACTION_CARDS -> TradeActionCards.giveCost(game, seat, to, item, seatPrivate);
+            case PLANETS -> NotesForTrade.INFINITE;
             case UNSUPPORTED -> 0;
         };
     }

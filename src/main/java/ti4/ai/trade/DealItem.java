@@ -23,6 +23,8 @@ record DealItem(String sender, String receiver, ItemType type, String detail) {
     private static final Pattern FRAGMENT = Pattern.compile("(CRF|IRF|HRF|URF)\\d{1,2}");
     private static final Pattern NOTE = Pattern.compile(
             "\\d{1,6}|" + GENERIC_NOTE + "\\d|(?!" + GENERIC_NOTE + ")[A-Za-z0-9]*[A-Za-z][A-Za-z0-9]*");
+    private static final Pattern CARD = Pattern.compile("\\d{1,6}|" + GENERIC_NOTE + "\\d");
+    private static final Pattern PLANET = Pattern.compile("[A-Za-z0-9]{1,40}");
 
     static Optional<DealItem> parse(String raw, String factionA, String factionB) {
         if (raw == null || !tradable(factionA) || !tradable(factionB)) return Optional.empty();
@@ -53,6 +55,8 @@ record DealItem(String sender, String receiver, ItemType type, String detail) {
                 AMOUNT.matcher(detail).matches();
             case PROMISSORY -> NOTE.matcher(detail).matches();
             case FRAGMENTS -> FRAGMENT.matcher(detail).matches();
+            case ACTION_CARDS -> CARD.matcher(detail).matches();
+            case PLANETS -> PLANET.matcher(detail).matches();
             case UNSUPPORTED -> false;
         };
     }
@@ -60,14 +64,27 @@ record DealItem(String sender, String receiver, ItemType type, String detail) {
     int amount() {
         return switch (type) {
             case TRADE_GOODS, COMMODITIES, SEND_DEBT, CLEAR_DEBT -> Integer.parseInt(detail);
-            case PROMISSORY -> isGenericNote() ? Integer.parseInt(detail.substring(GENERIC_NOTE.length())) : SINGLE;
+            case PROMISSORY, ACTION_CARDS ->
+                isGeneric() ? Integer.parseInt(detail.substring(GENERIC_NOTE.length())) : SINGLE;
             case FRAGMENTS -> Integer.parseInt(detail.substring(FRAGMENT_KIND_LENGTH));
-            case UNSUPPORTED -> SINGLE;
+            case PLANETS, UNSUPPORTED -> SINGLE;
         };
     }
 
     boolean isGenericNote() {
-        return type == ItemType.PROMISSORY && detail.startsWith(GENERIC_NOTE);
+        return type == ItemType.PROMISSORY && isGeneric();
+    }
+
+    boolean isGenericCard() {
+        return type == ItemType.ACTION_CARDS && isGeneric();
+    }
+
+    private boolean isGeneric() {
+        return detail.startsWith(GENERIC_NOTE);
+    }
+
+    DealItem unsupported() {
+        return new DealItem(sender, receiver, ItemType.UNSUPPORTED, type.token() + SEPARATOR + detail);
     }
 
     String fragmentKind() {

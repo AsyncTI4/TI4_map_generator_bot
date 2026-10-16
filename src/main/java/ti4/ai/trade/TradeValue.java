@@ -89,7 +89,16 @@ class TradeValue {
                 && deal.total(faction, ItemType.CLEAR_DEBT) <= seat.getDebtTokenCount(partner.getColor())
                 && deal.total(faction, ItemType.SEND_DEBT) <= DebtRules.room(seat, partner)
                 && fragmentsHeld(seat, deal)
-                && notesHeld(game, seat, partner, deal);
+                && notesHeld(game, seat, partner, deal)
+                && cardsHeld(seat, deal)
+                && deal.named(faction, ItemType.PLANETS).isEmpty();
+    }
+
+    private static boolean cardsHeld(Player seat, Deal deal) {
+        String faction = seat.getFaction();
+        return deal.items().stream()
+                .filter(item -> item.isFrom(faction) && item.type() == ItemType.ACTION_CARDS)
+                .allMatch(item -> TradeActionCards.held(seat, item));
     }
 
     static boolean ourSideCovered(AiTurnContext context, Player partner, Deal deal) {

@@ -36,6 +36,22 @@ class DealTest extends BaseTi4Test {
         assertThat(Deal.between(test.sol, test.nekro).isEmpty()).isTrue();
     }
 
+    // Action cards change hands only when a party has Arbiters (or Guild Ships the technology): between Nekro and Sol
+    // the card stays an item the AI cannot judge, and once Sol is Hacan-like it reads as a card.
+    @Test
+    void readsCardsOnlyWhenArbitersAllowsThem() {
+        AiTestGame test = new AiTestGame();
+        test.sol.addTransactionItem("sendingsol_receivingnekro_ACs_17");
+
+        assertThat(Deal.between(test.sol, test.nekro).hasUnsupported()).isTrue();
+
+        test.sol.addAbility("arbiters");
+
+        Deal deal = Deal.between(test.sol, test.nekro);
+        assertThat(deal.hasUnsupported()).isFalse();
+        assertThat(deal.named("sol", ItemType.ACTION_CARDS)).containsExactly("17");
+    }
+
     // Debt is the bot's ledger: a deal that only moves debt skips Pillage and the neighbour rule.
     @Test
     void knowsDebtOnlyDeals() {
@@ -49,7 +65,7 @@ class DealTest extends BaseTi4Test {
 
     @Test
     void dropsWhatItCannotJudge() {
-        Deal deal = deal("sendingsol_receivingnekro_ACs_17", "sendingnekro_receivingsol_TGs_2");
+        Deal deal = deal("sendingsol_receivingnekro_details_text", "sendingnekro_receivingsol_TGs_2");
 
         assertThat(deal.hasUnsupported()).isTrue();
         assertThat(deal.withoutUnsupported().hasUnsupported()).isFalse();

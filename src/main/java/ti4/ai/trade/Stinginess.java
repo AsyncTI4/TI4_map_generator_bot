@@ -108,7 +108,7 @@ class Stinginess {
         int points = (net > 0 ? SpendUnlock.pointDelta(game, partner, net) : 0) + thronePoints(game, partner, deal);
         if (points > 0 && Standings.vp(partner) + points >= Standings.goal(game)) vetoes.add(Veto.WIN);
         if (points > 0 && rivalry(game, seat, partner) >= FEEDS_LEADER) vetoes.add(Veto.LEADER);
-        if (deal.hasUnsupported()) vetoes.add(Veto.UNSUPPORTED);
+        if (deal.hasUnsupported() || TradeActionCards.blocked(seat, partner, deal)) vetoes.add(Veto.UNSUPPORTED);
         if (deal.total(seat.getFaction(), ItemType.PROMISSORY) > 1
                 || deal.total(partner.getFaction(), ItemType.PROMISSORY) > 1) {
             vetoes.add(Veto.TWO_NOTES);
@@ -155,6 +155,8 @@ class Stinginess {
             case SEND_DEBT, CLEAR_DEBT -> PARTNER_DEBT * amount;
             case PROMISSORY -> noteFromSeat(game, partner, seat, item, seatPrivate);
             case FRAGMENTS -> PARTNER_FRAGMENT * amount;
+            case ACTION_CARDS -> TradeActionCards.worthToTable(seat, partner, item);
+            case PLANETS -> TradePlanets.worth(game, item.detail());
             case UNSUPPORTED -> 0;
         };
     }
@@ -170,6 +172,8 @@ class Stinginess {
                         .map(alias -> NotesForTrade.giveCost(game, partner, seat, alias))
                         .orElse(PARTNER_NOTE * amount);
             case FRAGMENTS -> PARTNER_FRAGMENT * amount;
+            case ACTION_CARDS -> TradeActionCards.worthToTable(partner, seat, item);
+            case PLANETS -> TradePlanets.worth(game, item.detail());
             case UNSUPPORTED -> 0;
         };
     }

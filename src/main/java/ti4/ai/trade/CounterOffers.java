@@ -54,6 +54,7 @@ class CounterOffers {
                 partner,
                 incoming.withoutUnsupported()
                         .without(item -> item.type() == ItemType.FRAGMENTS)
+                        .without(item -> unrequestable(item, ours))
                         .withoutNotes(theirs));
         deal = clamp(deal, ours, theirs, ItemType.COMMODITIES, TradeBudget.spareCommodities(context, partner));
         deal = clamp(
@@ -63,6 +64,14 @@ class CounterOffers {
         deal = clamp(deal, theirs, ours, ItemType.COMMODITIES, partner.getCommodities());
         deal = clamp(deal, theirs, ours, ItemType.TRADE_GOODS, partner.getTg());
         return clamp(deal, theirs, ours, ItemType.CLEAR_DEBT, partner.getDebtTokenCount(seat.getColor()));
+    }
+
+    private static boolean unrequestable(DealItem item, String ours) {
+        return switch (item.type()) {
+            case ACTION_CARDS -> !item.isFrom(ours) || item.isGenericCard();
+            case PLANETS -> item.isFrom(ours);
+            default -> false;
+        };
     }
 
     private static Optional<Scored> scored(AiTurnContext context, Player partner, Deal deal) {
