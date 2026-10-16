@@ -92,6 +92,7 @@ import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
 import ti4.model.BreakthroughModel;
+import ti4.model.ColorModel;
 import ti4.model.EmbeddableModel;
 import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
@@ -3562,10 +3563,15 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         eb.addField(name, value, inline);
     }
 
+    private Color getPrimaryColorOrWhite() {
+        ColorModel colorModel = Mapper.getColor(getColor());
+        return colorModel == null ? Color.WHITE : colorModel.getPrimaryColor();
+    }
+
     private void applyEmbedDefaults(EmbedBuilder eb) {
         eb.setAuthor(getUserName(), null, getUser().getEffectiveAvatarUrl());
         eb.setFooter("");
-        eb.setColor(Mapper.getColor(getColor()).getPrimaryColor());
+        eb.setColor(getPrimaryColorOrWhite());
     }
 
     private String getContainerTitle() {
@@ -3585,7 +3591,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public Container getRepresentationContainer() {
         List<ContainerChildComponent> components = new ArrayList<>();
-        Color accent = Mapper.getColor(getColor()).getPrimaryColor();
+        Color accent = getPrimaryColorOrWhite();
 
         // TITLE SECTION
         String title = getContainerTitle();
