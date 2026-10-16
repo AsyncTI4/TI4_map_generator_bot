@@ -28,6 +28,7 @@ import ti4.ai.explore.ExplorationRules;
 import ti4.ai.explore.RelicActionRules;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.promissory.ConvoysRules;
 import ti4.ai.promissory.PromissoryRules;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.PaymentRules;
@@ -125,6 +126,7 @@ public class NekroBrain implements FactionBrain {
             SecretCostRules::pay,
             NekroLeaderRules::payAgentCost,
             RelicActionRules::next,
+            ConvoysRules::next,
             NekroRules::propagationTokens,
             RiderPayouts::technology,
             RiderPayouts::leadership,
@@ -439,6 +441,8 @@ public class NekroBrain implements FactionBrain {
         if (sling.isPresent()) return sling;
         Optional<AiDecision> relicAction = RelicActionRules.insteadOfTacticalAction(context, thisTurn);
         if (relicAction.isPresent()) return relicAction;
+        Optional<AiDecision> convoys = ConvoysRules.insteadOfTacticalAction(context, thisTurn);
+        if (convoys.isPresent()) return convoys;
         Optional<AiDecision> planned = StrategyCardTurn.playIfDue(context, thisTurn);
         if (planned.isPresent()) return planned;
         Optional<AiDecision> cardAction = ActionCardRules.insteadOfTacticalAction(context);
@@ -459,6 +463,8 @@ public class NekroBrain implements FactionBrain {
         if (card.isPresent()) return card;
         Optional<AiDecision> relicBeforePassing = RelicActionRules.beforePassing(context, thisTurn);
         if (relicBeforePassing.isPresent()) return relicBeforePassing;
+        Optional<AiDecision> convoysBeforePassing = ConvoysRules.beforePassing(context, thisTurn);
+        if (convoysBeforePassing.isPresent()) return convoysBeforePassing;
         Optional<AiDecision> beforePassing = TechRules.beforePassing(context, thisTurn);
         if (beforePassing.isPresent()) return beforePassing;
         for (String handler : List.of("passForRound", "passingAbilities")) {

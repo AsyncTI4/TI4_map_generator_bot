@@ -72,6 +72,18 @@ class TradeFlowSelfPlayTest extends BaseTi4Test {
         assertThat(trade.holderItemsLeft).as(outcome.report()).isZero();
     }
 
+    // A non-Hacan seat holds Hacan's Trade Convoys, has no tactic token to do anything else and neighbours nobody. It
+    // plays Convoys as a component action through the bot's real buttons; the bot then offers End Turn (no second
+    // action without Fleet Logistics) and the seat ends its turn with Convoys face up in its play area.
+    @Test
+    void playsTradeConvoysAsItsActionAndEndsTheTurn() throws Exception {
+        ConvoysScenario convoys = new ConvoysScenario();
+        SelfPlayGame.Outcome outcome = play(convoys);
+
+        assertThat(outcome.ending()).as(outcome.report()).isEqualTo(SelfPlayGame.Ending.STOP_CONDITION);
+        assertThat(convoys.handlers).as(outcome.report()).containsKeys("componentAction", "turnEnd");
+    }
+
     private static SelfPlayGame.Outcome play(Scenario scenario) throws Exception {
         try (SelfPlayEnvironment env = new SelfPlayEnvironment(System.currentTimeMillis())) {
             SelfPlayGame selfPlay = new SelfPlayGame(
@@ -179,6 +191,38 @@ class TradeFlowSelfPlayTest extends BaseTi4Test {
                     && next.getTg() >= amount
                     && first.getTransactionItems().isEmpty()
                     && next.getTransactionItems().isEmpty();
+            if (finished) handlers = Map.copyOf(env.pressedHandlers);
+            return finished;
+        }
+    }
+
+    private static final class ConvoysScenario extends Scenario {
+
+        String holder;
+        Map<String, Integer> handlers = Map.of();
+
+        @Override
+        void force(Game game) {
+            Player active = game.getActivePlayer();
+            Player chosen = HACAN.equals(active.getFaction())
+                    ? game.getRealPlayers().stream()
+                            .filter(player -> !HACAN.equals(player.getFaction()))
+                            .findFirst()
+                            .orElseThrow()
+                    : active;
+            holder = chosen.getFaction();
+            Player hacan = player(game, HACAN);
+            hacan.removePromissoryNote("convoys");
+            chosen.setPromissoryNote("convoys");
+            chosen.setTacticalCC(0);
+            if (chosen != active) StartTurnService.turnStart(selfPlay.ownerEvent(), game, chosen);
+        }
+
+        @Override
+        boolean done(Game game) {
+            Player chosen = player(game, holder);
+            boolean finished =
+                    chosen.getPromissoryNotesInPlayArea().contains("convoys") && game.getActivePlayer() != chosen;
             if (finished) handlers = Map.copyOf(env.pressedHandlers);
             return finished;
         }

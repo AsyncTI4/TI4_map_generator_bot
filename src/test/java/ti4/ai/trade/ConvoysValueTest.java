@@ -35,14 +35,14 @@ class ConvoysValueTest extends BaseTi4Test {
         hacan.setPromissoryNote("red_ta", 2);
     }
 
-    // Sol could newly trade with Nekro and Letnev: 0.5 each to a human. An AI cannot play the note yet (playing it
-    // needs a component action whose turn the bot never ends), so it is worth only a plain note to one.
+    // Sol could newly trade with Nekro and Letnev, and Nekro (an AI, which plays the note as a component action) with
+    // Sol and Letnev: 0.5 each.
     @Test
-    void isWorthHalfATradeGoodPerNewPartnerToAHuman() {
+    void isWorthHalfATradeGoodPerNewPartner() {
         assertThat(ConvoysValue.newPartners(table.game, table.sol)).isEqualTo(2);
         assertThat(NotesForTrade.receiveValue(table.game, table.sol, "convoys")).isCloseTo(1.0, within(EXACT));
         assertThat(NotesForTrade.receiveValue(table.game, table.nekro, "convoys"))
-                .isCloseTo(NotesForTrade.OTHER_NOTE, within(EXACT));
+                .isCloseTo(1.0, within(EXACT));
     }
 
     // Guild Ships already let Hacan trade with everyone, so giving Convoys away costs it little: it is the note Hacan
