@@ -158,8 +158,10 @@ public class ResearchPolicy {
 
     public static double researchValue(Game game, Player seat, String alias) {
         TechnologyModel tech = Mapper.getTech(alias);
-        if (tech == null) return 0;
-        return value(game, seat, alias) - PrerequisiteSkips.of(game, seat, tech).valueLost();
+        if (tech == null || seat.hasTech(alias)) return 0;
+        return value(game, seat, alias)
+                - PrerequisiteSkips.of(game, seat, tech).valueLost()
+                + ResearchPrior.nudge(seat.getFaction(), alias);
     }
 
     public static double freeResearchWorth(Game game, Player seat) {

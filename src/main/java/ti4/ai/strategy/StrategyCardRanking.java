@@ -41,7 +41,7 @@ public class StrategyCardRanking {
     }
 
     public static double baseValue(Game game, Player seat, int initiative) {
-        return baseValue(game, plan(game, seat, initiative));
+        return baseValue(game, seat, plan(game, seat, initiative));
     }
 
     public static CardPlan pickPlan(Game game, Player seat, int initiative) {
@@ -64,13 +64,13 @@ public class StrategyCardRanking {
 
     private static double value(Game game, Player seat, CardPlan plan) {
         double denial = plan.card() == StrategyCard.IMPERIAL ? imperialDenial(game, seat) : 0;
-        return baseValue(game, plan)
+        return baseValue(game, seat, plan)
                 + denial
                 + CardValueScale.TRADE_GOOD * game.getScTradeGoods().getOrDefault(plan.initiative(), 0);
     }
 
-    private static double baseValue(Game game, CardPlan plan) {
-        return plan.value() + PickPrior.nudge(plan.card(), game.getRound());
+    private static double baseValue(Game game, Player seat, CardPlan plan) {
+        return plan.value() + PickPrior.nudge(seat.getFaction(), plan.card(), game.getRound());
     }
 
     static double imperialDenial(Game game, Player seat) {

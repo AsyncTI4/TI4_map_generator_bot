@@ -27,4 +27,15 @@ class PickPriorTest {
         assertThat(PickPrior.nudge(StrategyCard.POLITICS, 9)).isEqualTo(PickPrior.nudge(StrategyCard.POLITICS, 6));
         assertThat(PickPrior.nudge(StrategyCard.OTHER, 3)).isZero();
     }
+
+    // Xxcha players take Diplomacy most in round 1 (Peace Accords) and Hacan players Trade; factions without their
+    // own data use the Nekro rates.
+    @Test
+    void usesTheFactionsOwnPickRates() {
+        assertThat(PickPrior.nudge("xxcha", StrategyCard.DIPLOMACY, 1)).isCloseTo(1.0, within(0.01));
+        assertThat(PickPrior.nudge("hacan", StrategyCard.DIPLOMACY, 1)).isCloseTo(-0.52, within(0.01));
+        assertThat(PickPrior.nudge("hacan", StrategyCard.TRADE, 1)).isCloseTo(0.77, within(0.01));
+        assertThat(PickPrior.nudge("sardakk", StrategyCard.WARFARE, 1))
+                .isEqualTo(PickPrior.nudge(StrategyCard.WARFARE, 1));
+    }
 }
