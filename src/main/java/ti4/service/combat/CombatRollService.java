@@ -102,6 +102,7 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
@@ -1634,6 +1635,9 @@ public class CombatRollService {
             if (xytherisHeroBonus) {
                 modifierToHit += 4;
             }
+            int thirtyKBonus = ThirtyKExploreHooks.spaceCannonRollBonus(rollType, unitModel, perUnitHolder);
+            modifierToHit += thirtyKBonus;
+            resultBuilder.append(ThirtyKExploreHooks.spaceCannonBonusNote(unitModel, thirtyKBonus));
             List<NamedCombatModifierModel> availableExtraRolls = extraRolls.stream()
                     .filter(m -> !consumedBestMods.contains(m.getModifier().getAlias()))
                     .collect(Collectors.toList());

@@ -55,6 +55,8 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
@@ -1727,6 +1729,7 @@ public final class AgendaHelper {
             if (thing.contains("planet_") && !prevoting) {
                 String planet = thing.replace("planet_", "");
                 player.exhaustPlanet(planet);
+                ThirtyKExploreHooks.onPlanetExhausted(event, game, player, planet);
                 UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                 if (uH != null) {
                     if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
@@ -1784,6 +1787,7 @@ public final class AgendaHelper {
                         }
                         if (!prevoting) {
                             player.exhaustPlanet(planet);
+                            ThirtyKExploreHooks.onPlanetExhausted(event, game, player, planet);
                         }
                     }
                     if (!prevoting) {
@@ -2926,6 +2930,7 @@ public final class AgendaHelper {
         game.setStoredValue("Pass On Shenanigans", "");
         game.setStoredValue("Abstain On Agenda", "");
         game.resetCurrentAgendaVotes();
+        ThirtyKActionCardHooks.onAgendaVotesReset(game);
         game.setHasHackElectionBeenPlayed(false);
         game.removeStoredValue("hackElectionFaction");
         game.removeStoredValue("viabilityFavorXxcha");
