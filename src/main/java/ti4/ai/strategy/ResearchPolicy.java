@@ -131,6 +131,8 @@ public class ResearchPolicy {
             Map.entry("x89", 1.0));
     private static final Set<String> UNIT_UPGRADE_OBJECTIVES = Set.of("develop", "revolutionize");
     private static final Set<String> COLOUR_PAIR_OBJECTIVES = Set.of("diversify", "master_science");
+    private static final Set<String> STATUS_PHASE_INCOME = Set.of("hm", "nm");
+    private static final double OPENING_STATUS_PHASES = 5;
     private static final String GRAVITY_DRIVE = "gd";
     private static final double GRAVITY_DRIVE_RACE_SHARE = 0.5;
     private static final String PRODUCE_EN_MASSE = "pem";
@@ -181,7 +183,7 @@ public class ResearchPolicy {
     public static double value(Game game, Player seat, String alias) {
         TechnologyModel tech = Mapper.getTech(alias);
         if (tech == null || seat.hasTech(alias)) return 0;
-        return baseValue(tech)
+        return baseValue(tech) * statusPhaseShare(game, alias)
                 + OBJECTIVE_WEIGHT * objectiveGain(game, seat, tech)
                 + steppingStoneValue(game, seat, tech)
                 + custodiansRaceValue(game, seat, alias)
@@ -211,6 +213,11 @@ public class ResearchPolicy {
         double without =
                 race.raceValue(seat, race.arrivalWith(seat, CustodiansRace.Drive.OWNED), CustodiansRace.Order.UNKNOWN);
         return GRAVITY_DRIVE_RACE_SHARE * Math.max(0, withDrive - without);
+    }
+
+    private static double statusPhaseShare(Game game, String alias) {
+        if (!STATUS_PHASE_INCOME.contains(alias)) return 1;
+        return Math.min(1, (double) GameHorizon.roundsLeft(game) / OPENING_STATUS_PHASES);
     }
 
     public static double heldValue(String alias) {

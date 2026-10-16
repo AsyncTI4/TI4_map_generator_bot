@@ -17,6 +17,8 @@ import ti4.game.Tile;
 @UtilityClass
 class ImperialUses {
 
+    private static final int FIRST_IMPERIAL_ROUND = 2;
+
     private static final int CUSTODIANS_COST = 6;
 
     static List<Benefit> benefits(PlanInputs in, int initiative) {
@@ -42,6 +44,7 @@ class ImperialUses {
     private static boolean isLastToPick(PlanInputs in) {
         Game game = in.game();
         return in.moment() == PlanMoment.PICK
+                && in.round() >= FIRST_IMPERIAL_ROUND
                 && game.getRealPlayers().stream()
                         .filter(other -> other != in.seat())
                         .noneMatch(other -> other.getSCs().size() < Math.max(1, game.getStrategyCardsPerPlayer()));

@@ -87,4 +87,20 @@ class ResearchPolicyTest extends BaseTi4Test {
         test.points(test.nekro, 6);
         assertThat(ResearchPolicy.researchesLeft(test.game)).isEqualTo(1);
     }
+    // Hyper Metabolism and Neural Motivator pay once per status phase, so they lose value as the game shortens:
+    // full value with five rounds to go, three fifths with the leader on 4 (three rounds). Gravity Drive does not.
+    @Test
+    void statusPhaseIncomeTechnologiesShrinkWithTheRoundsLeft() {
+        double metabolism = ResearchPolicy.value(test.game, test.nekro, "hm");
+        double motivator = ResearchPolicy.value(test.game, test.nekro, "nm");
+        double drive = ResearchPolicy.value(test.game, test.nekro, "gd");
+        assertThat(metabolism).isPositive();
+        assertThat(motivator).isPositive();
+
+        test.points(test.nekro, 4);
+
+        assertThat(ResearchPolicy.value(test.game, test.nekro, "hm")).isCloseTo(metabolism * 0.6, Offset.offset(1e-9));
+        assertThat(ResearchPolicy.value(test.game, test.nekro, "nm")).isCloseTo(motivator * 0.6, Offset.offset(1e-9));
+        assertThat(ResearchPolicy.value(test.game, test.nekro, "gd")).isEqualTo(drive);
+    }
 }

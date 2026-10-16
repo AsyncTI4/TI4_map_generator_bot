@@ -104,6 +104,18 @@ class StrategyCardPlannerTest extends BaseTi4Test {
                 .contains(SecretDrawValue.of(test.game, test.nekro));
     }
 
+    // Human players practically never pick Imperial in round 1, so the last picker keeps the token-only secret there.
+    @Test
+    void keepsTheTokenOnlySecretForTheLastPickerInRoundOne() {
+        test.game.setRound(1);
+        test.sol.addSC(LEADERSHIP);
+        changed();
+
+        assertThat(plan(IMPERIAL).benefit(CardUse.IMPERIAL_SECRET))
+                .map(Benefit::value)
+                .contains(Math.min(SecretDrawValue.of(test.game, test.nekro), CardValueScale.STRATEGY_TOKEN));
+    }
+
     @Test
     void valuesNoSecretWhenTheHandHasNoRoomForIt() {
         test.game.setRound(3);
