@@ -53,6 +53,7 @@ import ti4.ai.tactical.TacticalPlanner;
 import ti4.ai.tactical.TacticalRules;
 import ti4.ai.tech.TechRules;
 import ti4.ai.trade.TradeRules;
+import ti4.ai.xxcha.XxchaAgentRules;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -89,6 +90,8 @@ public class NekroBrain implements FactionBrain {
             "exhaustForVotes_",
             "draw_1_AC",
             "nekroAgentRes_",
+            XxchaAgentRules.USER_PREFIX,
+            XxchaAgentRules.READY_PREFIX,
             PromissoryRules.GREYFIRE_TARGET,
             TIED_PLANETS,
             "sendTGTo_",
@@ -148,6 +151,7 @@ public class NekroBrain implements FactionBrain {
             FleetSupplyRules::removeExcessShips,
             StrategyCardRules::buildWithWarfare,
             StrategyCardRules::buildWithConstruction,
+            XxchaAgentRules::next,
             NekroLeaderRules::chooseAgentTarget,
             NekroLeaderRules::continueHero,
             ActionCardRules::continuePlay,
@@ -459,6 +463,8 @@ public class NekroBrain implements FactionBrain {
         if (card.isPresent()) return card;
         Optional<AiDecision> relicBeforePassing = RelicActionRules.beforePassing(context, thisTurn);
         if (relicBeforePassing.isPresent()) return relicBeforePassing;
+        Optional<AiDecision> xxchaAgent = XxchaAgentRules.beforePassing(context, thisTurn);
+        if (xxchaAgent.isPresent()) return xxchaAgent;
         Optional<AiDecision> beforePassing = TechRules.beforePassing(context, thisTurn);
         if (beforePassing.isPresent()) return beforePassing;
         for (String handler : List.of("passForRound", "passingAbilities")) {
