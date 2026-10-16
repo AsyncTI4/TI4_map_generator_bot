@@ -80,13 +80,35 @@ class CommandTokenPolicyTest extends BaseTi4Test {
         assertThat(CommandTokenPolicy.poolToGrow(test.game, test.nekro)).isEqualTo("increase_fleet_cc");
     }
 
+    // Scoring happens before the status phase hands out tokens, so the fifth fleet token has to be in place during the
+    // round the stack is built. One tactic token is enough to produce into the stack; the fleet comes before a second.
     @Test
-    void stillTakesTwoTacticTokensBeforeGrowingTheFleet() {
+    void growsTheFleetForRaiseAFleetOnceOneTacticTokenIsKept() {
         test.game.getRevealedPublicObjectives().put("raise_fleet", 1);
-        test.nekro.setTacticalCC(1);
+        test.nekro.setTacticalCC(0);
         test.nekro.setFleetCC(3);
         Tile home = test.nekroHome();
         test.units(home, "space", test.nekro, UnitType.Carrier, 3);
+        assertThat(CommandTokenPolicy.poolToGrow(test.game, test.nekro)).isEqualTo("increase_tactic_cc");
+
+        test.nekro.setTacticalCC(1);
+        assertThat(CommandTokenPolicy.poolToGrow(test.game, test.nekro)).isEqualTo("increase_fleet_cc");
+
+        test.nekro.setFleetCC(5);
+        assertThat(CommandTokenPolicy.poolToGrow(test.game, test.nekro)).isEqualTo("increase_tactic_cc");
+    }
+
+    // A status phase scores one public objective. With Engineer a Marvel already met, that slot is taken next round
+    // whatever happens, so Raise a Fleet would add nothing then and the second tactic token comes first again.
+    @Test
+    void keepsTheSecondTacticTokenWhenAnotherPublicAlreadyTakesTheSlot() {
+        test.game.getRevealedPublicObjectives().put("raise_fleet", 1);
+        test.game.getRevealedPublicObjectives().put("engineer_marvel", 1);
+        test.nekro.setTacticalCC(1);
+        test.nekro.setFleetCC(3);
+        Tile home = test.nekroHome();
+        test.units(home, "space", test.nekro, UnitType.Carrier, 2);
+        test.units(home, "space", test.nekro, UnitType.Flagship, 1);
 
         assertThat(CommandTokenPolicy.poolToGrow(test.game, test.nekro)).isEqualTo("increase_tactic_cc");
     }
