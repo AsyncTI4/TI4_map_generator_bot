@@ -44,4 +44,17 @@ class SecretStatisticsTest extends BaseTi4Test {
     void fallsBackToEvenOddsForAnythingElse() {
         assertThat(SecretStatistics.completion("survey")).isEqualTo(SecretStatistics.UNKNOWN_COMPLETION);
     }
+
+    // The opening table is how often the AI's own copies were scored by the round-two status phase in self-play
+    // (shrunk toward 15% for small samples). Every base and PoK secret has a measured share, and the quick ones
+    // (Threaten Enemies, Hoard Raw Materials) sit far above the combat secrets the AI almost never finishes that early.
+    @Test
+    void hasAnOpeningShareForEveryBaseAndPokSecret() {
+        for (String secret : BASE_AND_POK_SECRETS) {
+            assertThat(SecretStatistics.openingCompletion(secret)).as(secret).isBetween(0.0, 0.7);
+        }
+        assertThat(SecretStatistics.openingCompletion("survey")).isEqualTo(SecretStatistics.UNKNOWN_OPENING_COMPLETION);
+        assertThat(SecretStatistics.openingCompletion("te")).isGreaterThan(SecretStatistics.openingCompletion("dyp"));
+        assertThat(SecretStatistics.openingCompletion("hrm")).isGreaterThan(SecretStatistics.openingCompletion("btv"));
+    }
 }

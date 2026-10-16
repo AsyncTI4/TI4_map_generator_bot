@@ -28,6 +28,8 @@ public final class ObjectiveValue {
     private static final int STEPS_WITHIN_REACH = 3;
     private static final int STAGE_TWO_POINTS = 2;
     public static final int NOT_MODELLED = -1;
+    private static final Set<String> ATTACHMENT_OBJECTIVES = Set.of("lost_outposts", "ancient_monuments");
+    private static final Set<String> SPECIALTY_OBJECTIVES = Set.of("research_outposts", "brain_trust");
 
     private record Target(String id, int threshold, int points, int before) {}
 
@@ -104,6 +106,30 @@ public final class ObjectiveValue {
                 * partialShare(target, fewestStillNeeded)
                 * (then - now)
                 / stillNeeded;
+    }
+
+    public double attachmentGain(String planetName) {
+        Planet planet = game.getPlanetsInfo().get(planetName);
+        if (planet == null || planet.hasAttachment() || !countsForScoring(planet)) return 0;
+        return oneMoreGain(ATTACHMENT_OBJECTIVES);
+    }
+
+    public double specialtyGain(String planetName) {
+        Planet planet = game.getPlanetsInfo().get(planetName);
+        if (planet == null || !planet.getTechSpecialities().isEmpty()) return 0;
+        return oneMoreGain(SPECIALTY_OBJECTIVES);
+    }
+
+    private double oneMoreGain(Set<String> objectives) {
+        double total = 0;
+        for (Target target : targets) {
+            int now = target.before();
+            if (!objectives.contains(target.id()) || now >= target.threshold()) continue;
+            total += now + 1 >= target.threshold()
+                    ? VICTORY_POINT_VALUE * target.points()
+                    : partialGain(target, now, now + 1);
+        }
+        return total;
     }
 
     public Set<String> brokenReady(Footprint after) {

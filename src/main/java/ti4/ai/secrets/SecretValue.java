@@ -5,8 +5,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.ai.eval.BoardView;
 import ti4.ai.eval.GameHorizon;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.image.Mapper;
 import ti4.model.TechnologyModel;
@@ -26,6 +28,11 @@ public class SecretValue {
             "otf", 0.15,
             "mtm", 0.15);
     private static final String ADAPT_NEW_STRATEGIES = "ans";
+    private static final String SEIZE_AN_ICON = "sai";
+    private static final String DEFY_SPACE_AND_TIME = "dfat";
+    private static final String MALLICE = "mallice";
+    private static final double OFF_THE_BOARD = 0.1;
+    private static final int OPENING_ROUND = 1;
     private static final String DICTATE_POLICY = "dp";
     private static final String DRIVE_THE_DEBATE = "dtd";
     private static final Set<String> VALEFAR_ASSIMILATORS = Set.of("vax", "vay");
@@ -59,9 +66,36 @@ public class SecretValue {
         boolean ready = isReady(game, seat, secretId);
         boolean congested = isCongested(game, seat, secretId);
         if (ready && !congested) return READY_VALUE;
-        double chance = ready ? 1.0 : completionChance(game, seat, secretId);
-        double value = chance * phaseValue(secretId);
+        double chance = ready ? 1.0 : completionChance(game, seat, secretId) * boardFeasibility(game, seat, secretId);
+        double value = chance * phaseValue(secretId) + openingTempo(game, seat, secretId);
         return congested ? value * CONGESTION_FACTOR : value;
+    }
+
+    private static double openingTempo(Game game, Player seat, String secretId) {
+        if (game.getRound() > OPENING_ROUND) return 0;
+        return SecretStatistics.openingCompletion(secretId) * boardFeasibility(game, seat, secretId);
+    }
+
+    private static double boardFeasibility(Game game, Player seat, String secretId) {
+        return switch (secretId) {
+            case SEIZE_AN_ICON -> legendaryWithinGrasp(game, seat) ? 1.0 : OFF_THE_BOARD;
+            case DEFY_SPACE_AND_TIME -> nexusOnBoard(game) ? 1.0 : OFF_THE_BOARD;
+            default -> 1.0;
+        };
+    }
+
+    private static boolean legendaryWithinGrasp(Game game, Player seat) {
+        return game.getTileMap().values().stream()
+                .flatMap(tile -> tile.getPlanetUnitHolders().stream())
+                .filter(Planet::isLegendary)
+                .map(planet -> BoardView.controller(game, planet.getName()))
+                .anyMatch(controller -> controller == null || controller == seat);
+    }
+
+    private static boolean nexusOnBoard(Game game) {
+        return game.getTileMap().values().stream()
+                .flatMap(tile -> tile.getPlanetUnitHolders().stream())
+                .anyMatch(planet -> planet.getName().contains(MALLICE));
     }
 
     static boolean meetsThreshold(Game game, Player seat, String secretId) {

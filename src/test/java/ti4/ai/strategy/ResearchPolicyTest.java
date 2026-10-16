@@ -58,6 +58,23 @@ class ResearchPolicyTest extends BaseTi4Test {
                         Offset.offset(1e-9));
     }
 
+    // Research values are on the scale where a second Technology research (6 resources) is worth 4, and a victory
+    // point is worth 8 resources, so a technology that completes a public objective gains 8 * 4 / 6 = 5.33 from it.
+    // Sol with two green technologies and one blue completes Diversify Research with any second blue technology, which
+    // then outranks Hyper Metabolism, the best technology that completes nothing.
+    @Test
+    void aTechnologyThatCompletesAnObjectiveGainsAVictoryPoint() {
+        test.sol.addTech("dxa");
+        test.sol.addTech("amd");
+        double before = ResearchPolicy.value(test.game, test.sol, "gd");
+
+        test.game.getRevealedPublicObjectives().put("diversify", 1);
+        double after = ResearchPolicy.value(test.game, test.sol, "gd");
+
+        assertThat(after - before).isCloseTo(8.0 * 4 / 6, Offset.offset(1e-9));
+        assertThat(after).isGreaterThan(ResearchPolicy.value(test.game, test.sol, "hm"));
+    }
+
     // About one and a half researches fit in each of the rounds the leader still needs: seven in a fresh ten point
     // game (five rounds), four with the leader on 4 (three rounds), and always at least one.
     @Test

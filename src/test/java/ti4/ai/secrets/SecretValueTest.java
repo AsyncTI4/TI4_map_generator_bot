@@ -168,6 +168,37 @@ class SecretValueTest extends BaseTi4Test {
         assertThat(without).isGreaterThan(value("ttfd"));
     }
 
+    // At the start of the game the keep choice also counts how often a secret is scored by the second status phase
+    // (SecretStatistics.openingCompletion): Threaten Enemies is scored early about two times in three, Demonstrate
+    // Your Power almost never, so Threaten Enemies is kept even though the whole-game model alone ranks Demonstrate
+    // Your Power higher. From round two on the opening bonus is gone and the whole-game model decides alone.
+    @Test
+    void keepsASecretThatIsScoredEarlyWhenChoosingAtTheStart() {
+        test.nekro.setSecret("te");
+        test.nekro.setSecret("dyp");
+        assertThat(discarded()).isEqualTo("te");
+
+        test.game.setRound(1);
+
+        assertThat(value("te") - value("dyp")).isGreaterThan(0.4);
+        assertThat(discarded()).isEqualTo("dyp");
+    }
+
+    // Seize an Icon needs a legendary planet. With none on the board that another player does not already hold, only
+    // a lucky explore could still make one, so the secret keeps a tenth of its value.
+    @Test
+    void valuesSeizeAnIconByWhetherALegendaryPlanetIsWithinGrasp() {
+        test.nekro.setSecret("sai");
+        double without = value("sai");
+        test.place("65", neighbour);
+        double with = value("sai");
+        test.sol.addPlanet("primor");
+        double taken = value("sai");
+
+        assertThat(without).isCloseTo(with * 0.1, within(0.01));
+        assertThat(taken).isCloseTo(without, within(0.01));
+    }
+
     // Secrets the table has no statistics for (homebrew, or ids that are not cards at all) fall back to even odds
     // and never throw.
     @Test
