@@ -2,11 +2,13 @@ package ti4.ai.actioncards;
 
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.ai.scoring.Pooling;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.tactical.ProductionPlanner;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 
 @UtilityClass
@@ -23,12 +25,13 @@ class InfluencePayments {
                 .or(() -> Wallet.of(game, seat).plan(cost));
     }
 
-    static double cost(Game game, Wallet.Payment payment) {
+    static double cost(Game game, Player seat, Wallet.Payment payment) {
         double perResource = ProductionPlanner.fillerValuePerResource(game) * UNSPENT_SHARE;
+        Pooling pooling = Pooling.of(seat);
         double planets = 0;
         for (String name : payment.forInfluence()) {
-            planets += INFLUENCE_OPPORTUNITY * game.getPlanetsInfo().get(name).getInfluence()
-                    + perResource * game.getPlanetsInfo().get(name).getResources();
+            Planet planet = game.getPlanetsInfo().get(name);
+            planets += INFLUENCE_OPPORTUNITY * pooling.influenceOf(planet) + perResource * pooling.resourcesOf(planet);
         }
         return planets + payment.tradeGoods() * TRADE_GOOD;
     }

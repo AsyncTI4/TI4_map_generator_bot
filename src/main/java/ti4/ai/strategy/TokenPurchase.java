@@ -5,6 +5,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.CustodiansRace;
+import ti4.ai.scoring.Pooling;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
@@ -48,7 +49,8 @@ public class TokenPurchase {
     }
 
     static Optional<Purchase> best(Game game, Player seat, int reinforcements, Wallet wallet) {
-        Wallet influencePlanets = new Wallet(influenceLeaning(wallet), 0, 0, 0, wallet.tradeGoodValue());
+        Wallet influencePlanets =
+                new Wallet(influenceLeaning(wallet), 0, 0, 0, wallet.tradeGoodValue(), wallet.pooling());
         SpendCost keep = ScoringReserve.of(game, seat).plus(custodiansReserve(game, seat));
         for (int tokens = Math.min(MAX_TOKENS, reinforcements); tokens > 0; tokens--) {
             Optional<Wallet.Payment> payment = influencePlanets
@@ -60,6 +62,7 @@ public class TokenPurchase {
     }
 
     private static List<Wallet.PlanetValue> influenceLeaning(Wallet wallet) {
+        if (wallet.pooling() != Pooling.SEPARATE) return wallet.planets();
         return wallet.planets().stream()
                 .filter(planet -> planet.influence() > planet.resources())
                 .toList();

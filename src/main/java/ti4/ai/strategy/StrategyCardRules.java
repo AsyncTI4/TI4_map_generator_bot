@@ -656,14 +656,9 @@ public class StrategyCardRules {
     }
 
     private static Wallet withoutPlanets(Wallet wallet, List<String> planets) {
-        return new Wallet(
-                wallet.planets().stream()
-                        .filter(planet -> !planets.contains(planet.name()))
-                        .toList(),
-                wallet.tradeGoods(),
-                wallet.tacticTokens(),
-                wallet.strategyTokens(),
-                wallet.tradeGoodValue());
+        return wallet.withPlanetValues(wallet.planets().stream()
+                .filter(planet -> !planets.contains(planet.name()))
+                .toList());
     }
 
     private static Wallet.Payment withSkipPlanets(Wallet.Payment payment, PrerequisiteSkips.Plan skips) {
