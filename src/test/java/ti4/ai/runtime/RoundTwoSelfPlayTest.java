@@ -143,7 +143,7 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
             int[] cardsRecordedForRound = {0};
             int[] agendasSkipped = {0};
             AtomicReference<Game> live = new AtomicReference<>(game);
-            String[] probeState = {"", ""};
+            String[] probeState = {"", "", "", ""};
             ScoringDiagnostic diagnostic = new ScoringDiagnostic();
             env.decisionListener = diagnostic::onDecision;
             SelfPlayGame.Outcome outcome = selfPlay.run(
@@ -212,13 +212,26 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
         }
     }
 
-    // -Dai.selfplay.roundtwo.picks=true prints every seat's pick values when it picks, and each strategy card play
-    // with the player's points and scored publics just after it, all prefixed with PROBE and the game name.
+    // -Dai.selfplay.roundtwo.picks=true prints every seat's pick values when it picks; each strategy card play with
+    // the player's points, scored and scorable publics as it is played (before its primary resolves); the round the
+    // custodians are taken and by whom; and, at the start of round two's action phase, each seat's custodians arrival,
+    // whether it can land this round and its ready influence. All lines start with PROBE and the game name.
     private static final boolean PICK_PROBE = Boolean.getBoolean("ai.selfplay.roundtwo.picks");
 
     private static void pickProbe(String name, Game game, String[] state) {
         Player active = game.getActivePlayer();
         String phase = game.getPhaseOfGame();
+        boolean custodiansOpen = ti4.ai.eval.CustodiansRace.open(game);
+        if (state[2].isEmpty() && custodiansOpen) state[2] = "open";
+        if ("open".equals(state[2]) && !custodiansOpen) {
+            state[2] = "taken";
+            Player mecatol = game.getRealPlayers().stream()
+                    .filter(player -> player.controlsMecatol(true))
+                    .findFirst()
+                    .orElse(null);
+            System.out.println("PROBE CUSTODIANS " + name + " r" + game.getRound() + " " + phase + " by "
+                    + (mecatol == null ? "-" : mecatol.getFaction()));
+        }
         if ("strategy".equalsIgnoreCase(phase) && active != null) {
             String key = game.getRound() + "|" + active.getFaction() + "|" + active.getSCs();
             if (key.equals(state[0])) return;
@@ -230,6 +243,23 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
             return;
         }
         if (!inActionPhase(game)) return;
+        if (game.getRound() == LAST_ROUND && !"r2".equals(state[3]) && custodiansOpen) {
+            state[3] = "r2";
+            var race = ti4.ai.eval.CustodiansRace.of(game, game.getRealPlayers().getFirst());
+            StringBuilder outlook = new StringBuilder();
+            for (Player seat : game.getRealPlayers()) {
+                var wallet = ti4.ai.scoring.Wallet.of(game, seat);
+                outlook.append(String.format(
+                        " %s[arr %s land %b inf %d tg %d t%d]",
+                        seat.getFaction(),
+                        race.arrival(seat).isPresent() ? race.arrival(seat).getAsInt() : "-",
+                        race.canLandThisRound(seat),
+                        wallet.influence(),
+                        seat.getTg(),
+                        seat.getTacticalCC()));
+            }
+            System.out.println("PROBE CUSTODIANS-R2 " + name + outlook);
+        }
         String played = game.getRound() + "|" + game.getPlayedSCs();
         if (played.equals(state[1])) return;
         state[1] = played;
