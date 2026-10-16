@@ -20,6 +20,8 @@ import ti4.testUtils.BaseTi4Test;
 
 class TechRulesTest extends BaseTi4Test {
 
+    private static final String DECLINE = "FFCC_nekro_deleteButtons";
+
     private AiTestGame test;
 
     @BeforeEach
@@ -110,33 +112,95 @@ class TechRulesTest extends BaseTi4Test {
                 .isEqualTo("productionBiomes_sol");
     }
 
-    // Sol activates the system with the seat's lone destroyer, with two dreadnoughts next door: Nullification Field
-    // ends Sol's turn. With nothing able to move in, the seat lets the activation stand.
+    // Sol activates the system with the seat's lone destroyer, with two dreadnoughts next door. The seat would lose
+    // the destroyer, which is not worth a strategy token and a tech exhaust, so the activation stands.
     @Test
-    void endsTheTurnOfAPlayerWhoCouldOverwhelmItsShips() {
+    void letsAnAttackOnALoneDestroyerStand() {
+        Tile tile = nullificationTarget();
+        test.units(tile, "space", test.nekro, UnitType.Destroyer, 1);
+        test.units(stagingTile(tile), "space", test.sol, UnitType.Dreadnought, 2);
+
+        assertThat(nullificationAnswer(tile)).isEqualTo(DECLINE);
+    }
+
+    // Three cruisers against three dreadnoughts next door: the fleet is lost for little in return, so Nullification
+    // Field ends Sol's turn.
+    @Test
+    void endsTheTurnOfAPlayerWhoWouldDestroyItsFleet() {
+        Tile tile = nullificationTarget();
+        test.units(tile, "space", test.nekro, UnitType.Cruiser, 3);
+        test.units(stagingTile(tile), "space", test.sol, UnitType.Dreadnought, 3);
+
+        assertThat(nullificationAnswer(tile)).isEqualTo(nullifyButton(tile));
+    }
+
+    // Three dreadnoughts facing a lone cruiser win the fight, so the token is kept for a real attack.
+    @Test
+    void letsAnAttackItWouldWinStand() {
+        Tile tile = nullificationTarget();
+        test.units(tile, "space", test.nekro, UnitType.Dreadnought, 3);
+        test.units(stagingTile(tile), "space", test.sol, UnitType.Cruiser, 1);
+
+        assertThat(nullificationAnswer(tile)).isEqualTo(DECLINE);
+    }
+
+    // With nothing of Sol's within reach of the system, activating it is no threat and the token is kept.
+    @Test
+    void keepsTheTokenWhenNothingCanMoveIn() {
+        Tile tile = nullificationTarget();
+        test.units(tile, "space", test.nekro, UnitType.Cruiser, 3);
+
+        assertThat(nullificationAnswer(tile)).isEqualTo(DECLINE);
+    }
+
+    // A fleet that would be wiped out is still not worth a token the seat does not have.
+    @Test
+    void cannotNullifyWithoutAStrategyToken() {
+        Tile tile = nullificationTarget();
+        test.nekro.setStrategicCC(0);
+        test.units(tile, "space", test.nekro, UnitType.Cruiser, 3);
+        test.units(stagingTile(tile), "space", test.sol, UnitType.Dreadnought, 3);
+
+        assertThat(nullificationAnswer(tile)).isEqualTo(DECLINE);
+    }
+
+    // A single destroyer is not worth a token, but the same destroyer guarding the home system's planet against a
+    // landing is: losing the planet costs far more than the ship.
+    @Test
+    void endsTheTurnOfAnInvasionOfItsHomeSystem() {
         test.nekro.addTech("nf");
         test.nekro.setStrategicCC(2);
-        String position = AiTestGame.neighbourOf(AiTestGame.HOME);
-        Tile tile = test.game.getTileByPosition(position);
-        test.units(tile, "space", test.nekro, UnitType.Destroyer, 1);
-        String next = PositionMapper.getAdjacentTilePositions(position).stream()
+        Tile home = test.game.getTileByPosition(AiTestGame.HOME);
+        test.units(home, "space", test.nekro, UnitType.Destroyer, 1);
+        Tile staging = stagingTile(home);
+        test.units(staging, "space", test.sol, UnitType.Dreadnought, 2);
+        test.units(staging, "space", test.sol, UnitType.Carrier, 2);
+        test.units(staging, "space", test.sol, UnitType.Infantry, 6);
+
+        assertThat(nullificationAnswer(home)).isEqualTo(nullifyButton(home));
+    }
+
+    private Tile nullificationTarget() {
+        test.nekro.addTech("nf");
+        test.nekro.setStrategicCC(2);
+        return test.game.getTileByPosition(AiTestGame.neighbourOf(AiTestGame.HOME));
+    }
+
+    private Tile stagingTile(Tile tile) {
+        String next = PositionMapper.getAdjacentTilePositions(tile.getPosition()).stream()
                 .filter(candidate -> !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate))
                 .findFirst()
                 .orElseThrow();
-        Tile staging = test.place("25", next);
-        AiPrompt nullify = prompt(
-                "nullify",
-                PromptSource.PUBLIC,
-                NOW,
-                "FFCC_nekro_nullificationField_" + position + "_" + test.sol.getColor(),
-                "FFCC_nekro_deleteButtons");
-        assertThat(pressedId(TechRules.nullificationField(test.context(nullify)).orElseThrow()))
-                .isEqualTo("FFCC_nekro_deleteButtons");
+        return test.place("25", next);
+    }
 
-        test.units(staging, "space", test.sol, UnitType.Dreadnought, 2);
+    private String nullifyButton(Tile tile) {
+        return "FFCC_nekro_nullificationField_" + tile.getPosition() + "_" + test.sol.getColor();
+    }
 
-        assertThat(pressedId(TechRules.nullificationField(test.context(nullify)).orElseThrow()))
-                .isEqualTo("FFCC_nekro_nullificationField_" + position + "_" + test.sol.getColor());
+    private String nullificationAnswer(Tile tile) {
+        AiPrompt nullify = prompt("nullify", PromptSource.PUBLIC, NOW, nullifyButton(tile), DECLINE);
+        return pressedId(TechRules.nullificationField(test.context(nullify)).orElseThrow());
     }
 
     // Neural Parasite destroys an enemy infantry at the start of each turn. It starts it, picks the leader (Sol, on 3

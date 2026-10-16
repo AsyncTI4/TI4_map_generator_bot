@@ -6,6 +6,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import ti4.ai.eval.BoardView;
@@ -81,6 +82,8 @@ public final class DefenseOutlook {
     private static final String GRAVITY_DRIVE = "gd";
 
     record Chances(double space, double take, double groundMax) {}
+
+    private record SpaceFight(Force attack, Force defence) {}
 
     record Blend(DefenseOutlook excluded, double w0) {}
 
@@ -212,6 +215,10 @@ public final class DefenseOutlook {
 
     IncomingForce force(Player enemy, Tile tile, Horizon horizon) {
         return incoming.of(enemy, tile, horizon);
+    }
+
+    IncomingForce activatingForce(Player enemy, Tile tile) {
+        return incoming.activating(enemy, tile);
     }
 
     double leaveCost(Tile origin, List<UnitMove> moves) {
@@ -504,7 +511,7 @@ public final class DefenseOutlook {
         });
     }
 
-    private double shipLoss(Tile tile) {
+    double shipLoss(Tile tile) {
         return cached(ownShipLosses, tile.getPosition(), () -> {
             ObjectiveValue objectives = own();
             return Math.max(0, -objectives.gain(objectives.before().withoutShipsIn(tile.getPosition())));
@@ -573,7 +580,7 @@ public final class DefenseOutlook {
         return SPACE_STAKE_SHARE * Math.max(0, spaceGain(tile, force)) + shipLoss(tile);
     }
 
-    private double spaceGain(Tile tile, IncomingForce force) {
+    double spaceGain(Tile tile, IncomingForce force) {
         String key = force.key() + "|" + tile.getPosition();
         return cached(spaceGains, key, () -> {
             ObjectiveValue view = publicView(force.enemy());
@@ -581,7 +588,7 @@ public final class DefenseOutlook {
         });
     }
 
-    private double publicGain(Player enemy, Tile tile, IncomingForce force) {
+    double publicGain(Player enemy, Tile tile, IncomingForce force) {
         return publicGain(enemy, tile, force, seatPlanets(tile));
     }
 
@@ -781,7 +788,7 @@ public final class DefenseOutlook {
                 .orElse(0);
     }
 
-    private Chances chances(Tile tile, IncomingForce force, Defenders defenders) {
+    Chances chances(Tile tile, IncomingForce force, Defenders defenders) {
         double space = spaceChance(tile, force, defenders);
         List<Planet> planets = seatPlanets(tile);
         if (!force.carriesGround() || planets.isEmpty()) return new Chances(space, 0, 0);
@@ -798,6 +805,41 @@ public final class DefenseOutlook {
     }
 
     private double computeSpace(Tile tile, IncomingForce force, Defenders defenders) {
+        Optional<SpaceFight> fight = spaceFight(tile, force, defenders);
+        if (fight.isPresent())
+            return CombatOdds.resolve(fight.get().attack(), fight.get().defence())
+                    .attackerWins();
+        return undefendedChance(tile, force);
+    }
+
+    double expectedShipLoss(Tile tile, IncomingForce force, Defenders defenders) {
+        Optional<SpaceFight> fight = spaceFight(tile, force, defenders);
+        if (fight.isEmpty()) return undefendedChance(tile, force) * defenders.shipCost(seat);
+        return CombatOdds.resolveDetailed(fight.get().attack(), fight.get().defence())
+                .defenderCostLost();
+    }
+
+    double expectedAttackerLoss(Tile tile, IncomingForce force, Defenders defenders) {
+        Optional<SpaceFight> fight = spaceFight(tile, force, defenders);
+        if (fight.isEmpty()) return 0;
+        return CombatOdds.resolveDetailed(fight.get().attack(), fight.get().defence())
+                .attackerCostLost();
+    }
+
+    private double undefendedChance(Tile tile, IncomingForce force) {
+        Player enemy = force.enemy();
+        int ourCannon = (int) Math.round(BattleMath.cannonFire(game, tile, seat, null));
+        List<Combatant> arriving = CombatForces.combatants(
+                game,
+                tile,
+                BoardView.space(tile),
+                new Side(enemy, force.ships()),
+                new Side(seat, Map.of()),
+                force.damaged());
+        return BattleMath.afterCannonFire(arriving, ourCannon).isEmpty() ? 0 : 1;
+    }
+
+    private Optional<SpaceFight> spaceFight(Tile tile, IncomingForce force, Defenders defenders) {
         Player enemy = force.enemy();
         UnitHolder space = BoardView.space(tile);
         int ourCannon = (int) Math.round(BattleMath.cannonFire(game, tile, seat, null));
@@ -808,11 +850,7 @@ public final class DefenseOutlook {
         boolean undefended = defenders.ships().isEmpty()
                 || CombatForces.combatants(game, tile, space, defending, attacking, defendersDamaged)
                         .isEmpty();
-        if (undefended) {
-            List<Combatant> arriving =
-                    CombatForces.combatants(game, tile, space, attacking, new Side(seat, Map.of()), force.damaged());
-            return BattleMath.afterCannonFire(arriving, ourCannon).isEmpty() ? 0 : 1;
-        }
+        if (undefended) return Optional.empty();
         Side cannonedDefenders = BattleMath.afterAssaultCannon(defending, attacking);
         Side cannonedAttackers = BattleMath.afterAssaultCannon(attacking, defending);
         Side barragedDefenders = BattleMath.afterBarrage(cannonedDefenders, cannonedAttackers);
@@ -823,9 +861,8 @@ public final class DefenseOutlook {
         List<Combatant> attackers = BattleMath.afterCannonFire(
                 CombatForces.combatants(game, tile, space, barragedAttackers, barragedDefenders, force.damaged()),
                 ourCannon);
-        Force defence = CombatForces.force(seat, defenderUnits, false);
-        Force attack = CombatForces.force(enemy, attackers, false);
-        return CombatOdds.resolve(attack, defence).attackerWins();
+        return Optional.of(new SpaceFight(
+                CombatForces.force(enemy, attackers, false), CombatForces.force(seat, defenderUnits, false)));
     }
 
     private double groundChance(Tile tile, IncomingForce force, Planet planet, Defenders defenders) {

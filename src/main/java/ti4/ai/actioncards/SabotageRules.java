@@ -76,12 +76,19 @@ public class SabotageRules {
         }
         long readyAt = window.createdAtMillis() + passDelayMillis(context, window);
         if (context.now() < readyAt) return Optional.of(new AiDecision.Wait(readyAt, "sabotage window"));
-        Optional<PromptButton> cancel =
-                SabotagePolicy.cancelWith(context, window).filter(button -> !context.alreadyPressed(window, button));
+        Optional<SabotagePolicy.Choice> cancel = cancelChoice(context, window);
         if (cancel.isPresent()) {
-            return Optional.of(AiDecision.press(window, cancel.get(), "cancel the action card with a Sabotage"));
+            SabotagePolicy.Choice choice = cancel.get();
+            if (choice.instinctTraining()) InstinctTraining.remember(context, window);
+            return Optional.of(AiDecision.press(choice.prompt(), choice.button(), choice.reason()));
         }
         return Optional.of(AiDecision.press(window, pass.get(), "no sabotage"));
+    }
+
+    private static Optional<SabotagePolicy.Choice> cancelChoice(AiTurnContext context, AiPrompt window) {
+        if (InstinctTraining.spentOn(context, window)) return Optional.empty();
+        return SabotagePolicy.choose(context, window)
+                .filter(choice -> !context.alreadyPressed(choice.prompt(), choice.button()));
     }
 
     private static List<AiPrompt> windows(AiTurnContext context) {

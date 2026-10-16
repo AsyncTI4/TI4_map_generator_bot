@@ -29,14 +29,39 @@ public class SabotagePolicy {
 
     record Cancellation(PromptButton button, String title, Player cardPlayer) {}
 
+    record Choice(AiPrompt prompt, PromptButton button, String reason, boolean instinctTraining) {}
+
     public static Optional<PromptButton> cancelWith(AiTurnContext context, AiPrompt window) {
         return cancellation(context, window)
+                .filter(cancellation -> mayCancelWithCard(context))
                 .filter(cancellation -> worthCancelling(context, cancellation))
                 .map(Cancellation::button);
     }
 
+    static Optional<Choice> choose(AiTurnContext context, AiPrompt window) {
+        Optional<Cancellation> cancellation = cancellation(context, window);
+        if (cancellation.isEmpty()) return Optional.empty();
+        Cancellation cancel = cancellation.get();
+        double value = cancelValue(context, cancel.title(), cancel.cardPlayer());
+        Optional<InstinctTraining.Use> token = InstinctTraining.available(context, cancel.title(), cancel.cardPlayer())
+                .filter(use -> value >= use.cost());
+        Optional<PromptButton> card = Optional.of(cancel)
+                .filter(candidate -> mayCancelWithCard(context))
+                .filter(candidate -> worthCancelling(context, candidate))
+                .map(Cancellation::button);
+        double cardKeep = marginalKeep(context.game(), context.seat(), cancel.title());
+        if (token.isPresent() && (card.isEmpty() || token.get().cost() < cardKeep)) {
+            return Optional.of(new Choice(
+                    token.get().prompt(), token.get().button(), "cancel the action card with Instinct Training", true));
+        }
+        return card.map(button -> new Choice(window, button, "cancel the action card with a Sabotage", false));
+    }
+
     public static boolean aimedAtSeat(AiTurnContext context, AiPrompt window) {
         return cancellation(context, window)
+                .filter(cancellation -> mayCancelWithCard(context)
+                        || InstinctTraining.available(context, cancellation.title(), cancellation.cardPlayer())
+                                .isPresent())
                 .filter(cancellation ->
                         Involvement.aimedAtSeat(context, cancellation.title(), cancellation.cardPlayer()))
                 .isPresent();
@@ -116,15 +141,16 @@ public class SabotagePolicy {
         return Optional.of(new Cancellation(button.get(), title, cardPlayer));
     }
 
+    private static boolean mayCancelWithCard(AiTurnContext context) {
+        Player seat = context.seat();
+        boolean holdsSabotage = seat.getActionCards().keySet().stream().anyMatch(AiActionCards::isSabotage);
+        return holdsSabotage && ActionCardRules.mayPlay(context.game(), seat);
+    }
+
     private static boolean mayCancel(AiTurnContext context, String title, Player cardPlayer) {
         Game game = context.game();
         Player seat = context.seat();
-        boolean holdsSabotage = seat.getActionCards().keySet().stream().anyMatch(AiActionCards::isSabotage);
-        if (!holdsSabotage
-                || !ActionCardRules.mayPlay(game, seat)
-                || SabotageService.isShameixBaneCancellationBlocked(seat, cardPlayer)) {
-            return false;
-        }
+        if (SabotageService.isShameixBaneCancellationBlocked(seat, cardPlayer)) return false;
         return ActionCardPrior.aliasOfTitle(game, title)
                 .map(Mapper::getActionCard)
                 .filter(model -> !ActionCardHelper.cannotBeSabotaged(model))

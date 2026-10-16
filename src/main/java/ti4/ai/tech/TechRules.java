@@ -3,6 +3,7 @@ package ti4.ai.tech;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
@@ -14,10 +15,11 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.eval.BoardView;
-import ti4.ai.eval.Threats;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.scoring.ScoringReserve;
+import ti4.ai.strategy.StrategyTokenCost;
+import ti4.ai.tactical.NullificationOutlook;
 import ti4.ai.tactical.ProductionPlanner;
 import ti4.ai.tactical.SlingRelayRules;
 import ti4.ai.tactical.TacticalRules;
@@ -51,6 +53,7 @@ public class TechRules {
     private static final String PSYCHO_EXHAUST = "psychoExhaust_";
     private static final int TRADE_GOOD_VALUE = 1;
     private static final String NULLIFICATION_PREFIX = "nullificationField_";
+    private static final double NULLIFICATION_MARGIN = 2.0;
     private static final String DECLINE = "deleteButtons";
     private static final String NEURAL_PARASITE = "parasite-obs";
     private static final String PARASITE_KEY = "neuralParasite|";
@@ -241,9 +244,11 @@ public class TechRules {
                 .split("_");
         Tile tile = game.getTileByPosition(target[0]);
         Player active = target.length > 1 ? game.getPlayerFromColorOrFaction(target[1]) : null;
-        int reserved = ScoringReserve.of(game, seat).tokens();
-        boolean spareToken = seat.getStrategicCC() >= 1 && seat.getStrategicCC() + seat.getTacticalCC() - 1 >= reserved;
-        if (tile != null && active != null && spareToken && threatened(game, seat, active, tile)) {
+        OptionalDouble tokenCost = StrategyTokenCost.toSpend(game, seat);
+        if (tile != null
+                && active != null
+                && tokenCost.isPresent()
+                && worthSpending(game, seat, active, tile, tokenCost)) {
             return Optional.of(use.get().press("end " + active.getFaction() + "'s turn with Nullification Field"));
         }
         return use.get()
@@ -252,17 +257,9 @@ public class TechRules {
                 .map(button -> AiDecision.press(use.get().prompt(), button, "let the activation stand"));
     }
 
-    private static boolean threatened(Game game, Player seat, Player active, Tile tile) {
-        double incoming = Threats.incomingFleetCost(game, active, tile);
-        if (incoming <= 0) return false;
-        if (tile == seat.getHomeSystemTile()) return true;
-        double defending = BoardView.ships(BoardView.space(tile), seat).entrySet().stream()
-                .mapToDouble(entry -> BoardView.model(seat, entry.getKey())
-                                .map(model -> (double) model.getCost())
-                                .orElse(0.0)
-                        * entry.getValue())
-                .sum();
-        return incoming >= defending;
+    private static boolean worthSpending(Game game, Player seat, Player active, Tile tile, OptionalDouble tokenCost) {
+        double avoided = NullificationOutlook.endingTheTurnIsWorth(game, seat, active, tile);
+        return avoided >= NULLIFICATION_MARGIN * tokenCost.getAsDouble();
     }
 
     public static Optional<AiDecision> neuralParasite(AiTurnContext context) {

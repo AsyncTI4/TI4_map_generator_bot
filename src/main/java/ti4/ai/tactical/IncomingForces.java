@@ -146,8 +146,18 @@ final class IncomingForces {
                 key -> MovementGraph.reach(game, enemy, origin.getPosition(), move));
     }
 
+    IncomingForce activating(Player enemy, Tile target) {
+        return forces.computeIfAbsent(
+                enemy.getFaction() + "#" + target.getPosition() + "#activating",
+                key -> gather(enemy, target, Horizon.IMMEDIATE, ONE_MOVE));
+    }
+
     private IncomingForce scan(Player enemy, Tile target, Horizon horizon, int moves) {
         if (blocked(enemy, target, horizon)) return IncomingForce.none(enemy, horizon);
+        return gather(enemy, target, horizon, moves);
+    }
+
+    private IncomingForce gather(Player enemy, Tile target, Horizon horizon, int moves) {
         Map<Tile, Map<UnitType, Integer>> reaching = new LinkedHashMap<>();
         Slot gravityDriveShip = null;
         // TODO: PoK Warfare + Fleet Logistics can unlock one origin; exclusions do not unblock paths
