@@ -109,8 +109,10 @@ class XxchaAgentRulesTest extends BaseTi4Test {
     }
 
     @Test
-    void doesNothingWhenNoReadiedPlanetWouldBeUsed() {
+    void doesNothingWhenNoReadiedPlanetWouldBeUsedAndNobodyIsLeftToStallAgainst() {
         test.game.getRevealedPublicObjectives().clear();
+        test.sol.setPassed(true);
+        test.nekro.setPassed(true);
 
         assertThat(beforePassing()).isEmpty();
     }
@@ -140,6 +142,8 @@ class XxchaAgentRulesTest extends BaseTi4Test {
     // does the one readying complete Erect a Monument, and the agent picks Archon Ren over Archon Tau.
     @Test
     void theHeroMakesAHomePlanetWorthReadying() {
+        test.sol.setPassed(true);
+        test.nekro.setPassed(true);
         xxcha.refreshPlanet("abyz");
         xxcha.exhaustPlanet("archonren");
         xxcha.exhaustPlanet("archontau");
@@ -161,5 +165,14 @@ class XxchaAgentRulesTest extends BaseTi4Test {
                 .isEqualTo("FFCC_xxcha_componentActionRes_leader_xxchaagent");
         assertThat(pressed(XxchaAgentRules.next(context(userChoice())))).isEqualTo("exhaustAgent_xxchaagent_xxcha");
         assertThat(pressed(XxchaAgentRules.next(context(planets)))).isEqualTo("khraskHeroStep4Ready_xxcha_archonren");
+    }
+
+    // Someone is still acting, so an action that spends no token is worth something even when the planet it readies
+    // has no use: the agent is the stall.
+    @Test
+    void stallsWithTheAgentWhileOthersAreStillActing() {
+        test.game.getRevealedPublicObjectives().clear();
+
+        assertThat(pressed(beforePassing())).isEqualTo("FFCC_xxcha_componentAction");
     }
 }

@@ -447,6 +447,8 @@ public class NekroBrain implements FactionBrain {
         if (planned.isPresent()) return planned;
         Optional<AiDecision> cardAction = ActionCardRules.insteadOfTacticalAction(context);
         if (cardAction.isPresent()) return cardAction;
+        Optional<AiDecision> xxchaStall = XxchaAgentRules.insteadOfTacticalAction(context, thisTurn);
+        if (xxchaStall.isPresent()) return xxchaStall;
         Optional<AiDecision> tactical = TacticalRules.start(context);
         if (tactical.isPresent()) return tactical;
         for (AiPrompt prompt : thisTurn) {

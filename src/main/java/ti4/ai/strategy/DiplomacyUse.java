@@ -65,6 +65,17 @@ class DiplomacyUse {
         return best(game, seat, candidates, PLANETS_TO_READY);
     }
 
+    static List<Choice> eachAlone(Game game, Player seat, Collection<String> candidates) {
+        Demand demand = new Demand(game, seat, 0);
+        return candidates.stream()
+                .distinct()
+                .map(planet -> new Choice(
+                        List.of(planet),
+                        demand.use(List.of(planet)),
+                        SpendUnlock.unlocks(game, seat, List.of(planet), 0)))
+                .toList();
+    }
+
     static Choice readying(Game game, Player seat, Collection<String> planets) {
         List<String> readied = planets.stream()
                 .distinct()

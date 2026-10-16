@@ -9,7 +9,12 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.perception.AiPrompt;
+import ti4.ai.scoring.ObjectiveCatalog;
+import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.strategy.ReadyingValue;
+import ti4.ai.tactical.Stall;
+import ti4.ai.tactical.TacticalPlan;
+import ti4.ai.tactical.TacticalPlanner;
 import ti4.ai.tactical.TacticalRules;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -27,6 +32,8 @@ public class XxchaAgentRules {
     private static final long STEP_WAIT_MILLIS = 60_000L;
     private static final long CLOCK_SKEW_MILLIS = 5_000L;
     private static final double MIN_VALUE = 1.0;
+    private static final double MIN_EARLY_VALUE = 1.5;
+    private static final double MIN_EARLY_VALUE_WITH_OBJECTIVE = 3.0;
 
     enum Stage {
         MENU,
@@ -57,19 +64,64 @@ public class XxchaAgentRules {
     }
 
     public static Optional<AiDecision> beforePassing(AiTurnContext context, List<AiPrompt> thisTurn) {
-        Player seat = context.seat();
-        Game game = context.game();
         if (!canStart(context)) return Optional.empty();
-        Optional<ReadyingValue.Pick> pick = ReadyingValue.bestSingle(game, seat, exhaustedPlanets(seat));
-        if (pick.isEmpty() || pick.get().value() < MIN_VALUE) return Optional.empty();
+        Game game = context.game();
+        Optional<ReadyingValue.Pick> pick =
+                ReadyingValue.bestSingle(game, context.seat(), exhaustedPlanets(context.seat()));
+        if (pick.isEmpty() || pick.get().value() + Stall.actionValue(game, context.seat()) < MIN_VALUE) {
+            return Optional.empty();
+        }
+        return open(context, thisTurn, pick.get(), "instead of passing");
+    }
+
+    public static Optional<AiDecision> insteadOfTacticalAction(AiTurnContext context, List<AiPrompt> thisTurn) {
+        if (!canStart(context)) return Optional.empty();
+        Game game = context.game();
+        Player seat = context.seat();
+        List<ReadyingValue.Pick> picks = ReadyingValue.eachAlone(game, seat, exhaustedPlanets(seat));
+        if (picks.isEmpty()) return Optional.empty();
+        Optional<TacticalPlan> plan = tacticalPlan(context);
+        if (plan.isEmpty()) return Optional.empty();
+        double stall = Stall.actionValue(game, seat);
+        if (plan.get().score() < TacticalPlanner.MIN_SCORE) {
+            if (stall <= 0) return Optional.empty();
+            return open(context, thisTurn, picks.getFirst(), "as the stalling action");
+        }
+        Optional<ReadyingValue.Pick> beforeASpend = pickBeforeASpend(game, seat, picks);
+        if (beforeASpend.isEmpty() || plan.get().score() >= beforeASpend.get().value() + stall) {
+            return Optional.empty();
+        }
+        return open(context, thisTurn, beforeASpend.get(), "before the spend it pays for");
+    }
+
+    private static Optional<ReadyingValue.Pick> pickBeforeASpend(
+            Game game, Player seat, List<ReadyingValue.Pick> picks) {
+        boolean objectiveOn = spendObjectiveOn(game, seat);
+        if (objectiveOn && picks.stream().anyMatch(ReadyingValue.Pick::unlocksScore)) return Optional.empty();
+        double needed = objectiveOn ? MIN_EARLY_VALUE_WITH_OBJECTIVE : MIN_EARLY_VALUE;
+        return picks.stream().filter(pick -> pick.value() >= needed).findFirst();
+    }
+
+    private static boolean spendObjectiveOn(Game game, Player seat) {
+        return game.getRevealedPublicObjectives().keySet().stream()
+                .anyMatch(id -> ObjectiveCatalog.isSpend(id) && !ObjectivePolicy.hasScored(game, seat, id));
+    }
+
+    private static Optional<TacticalPlan> tacticalPlan(AiTurnContext context) {
+        return TacticalRules.rememberedPlan(context).or(() -> {
+            Optional<TacticalPlan> computed = TacticalPlanner.best(context.game(), context.seat());
+            computed.ifPresent(found -> TacticalRules.remember(context, found));
+            return computed;
+        });
+    }
+
+    private static Optional<AiDecision> open(
+            AiTurnContext context, List<AiPrompt> thisTurn, ReadyingValue.Pick pick, String when) {
         Optional<Match> menu = Prompts.owned(thisTurn, context.faction(), COMPONENT_ACTION::equals)
                 .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
         if (menu.isEmpty()) return Optional.empty();
-        remember(
-                context,
-                new Flow(
-                        Stage.MENU, context.now(), seat.getFaction(), pick.get().planet()));
-        return Optional.of(menu.get().press("ready " + pick.get().planet() + " with Ggrocuto Rinn instead of passing"));
+        remember(context, new Flow(Stage.MENU, context.now(), context.seat().getFaction(), pick.planet()));
+        return Optional.of(menu.get().press("ready " + pick.planet() + " with Ggrocuto Rinn " + when));
     }
 
     public static Optional<AiDecision> next(AiTurnContext context) {
