@@ -245,7 +245,8 @@ final class SelfPlayGame {
     // the game reveals them and a batch can study how seats play towards particular objectives.
     // -Dai.selfplay.objectiveseed=N instead stacks a stage one order drawn from N and the game slot. Two batches run
     // with the same seed reveal the same objectives in each slot (same seating, same map), so they can be compared
-    // game by game, which removes the objective draw from the noise of an A/B comparison.
+    // game by game, which removes the objective draw from the noise of an A/B comparison. With both properties the
+    // chosen objectives come first and the seeded order fills the rest, so a study of one objective is paired too.
     private static void revealChosenObjectives(Game game, int slot) {
         List<String> peekable = game.getPublicObjectives1Peekable();
         List<String> deck = game.getPublicObjectives1();
@@ -255,12 +256,15 @@ final class SelfPlayGame {
                 .filter(id -> !id.isEmpty())
                 .toList();
         Integer seed = Integer.getInteger("ai.selfplay.objectiveseed");
-        if (chosen.isEmpty() && seed != null) {
+        if (seed != null) {
             List<String> all = new ArrayList<>(peekable);
             all.addAll(deck);
+            all.removeAll(chosen);
             java.util.Collections.sort(all);
             java.util.Collections.shuffle(all, new java.util.Random(seed * 1009L + slot));
-            chosen = List.copyOf(all.subList(0, Math.min(5, all.size())));
+            List<String> stacked = new ArrayList<>(chosen);
+            stacked.addAll(all.subList(0, Math.max(0, Math.min(5 - chosen.size(), all.size()))));
+            chosen = List.copyOf(stacked);
         }
         if (chosen.isEmpty()) return;
         peekable.removeAll(chosen);

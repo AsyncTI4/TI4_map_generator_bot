@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.scoring.ObjectiveCatalog;
+import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.strategy.TokenPlan;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -158,6 +160,7 @@ public class CommandTokenPolicy {
                     new Level(Pool.FLEET, Math.min(cap, largest) - bonus),
                     new Level(Pool.TACTIC, 1),
                     new Level(Pool.FLEET, Math.min(cap, BASE_FLEET) - bonus),
+                    new Level(Pool.FLEET, Math.min(cap, fleetForAnOpenSlot(game, seat, largest, cap)) - bonus),
                     new Level(Pool.STRATEGY, plan.strategy()),
                     new Level(Pool.TACTIC, plan.tactic()),
                     new Level(Pool.FLEET, Math.min(cap, objectiveFleet(game, seat, largest, cap)) - bonus),
@@ -165,6 +168,8 @@ public class CommandTokenPolicy {
         }
         return List.of(
                 new Level(Pool.FLEET, Math.min(cap, largest) - bonus),
+                new Level(Pool.TACTIC, 1),
+                new Level(Pool.FLEET, Math.min(cap, fleetForAnOpenSlot(game, seat, largest, cap)) - bonus),
                 new Level(Pool.TACTIC, TACTIC_FIRST),
                 new Level(Pool.FLEET, Math.min(cap, objectiveFleet(game, seat, largest, cap)) - bonus),
                 new Level(Pool.FLEET, Math.min(cap, BASE_FLEET) - bonus),
@@ -172,6 +177,16 @@ public class CommandTokenPolicy {
                 new Level(Pool.FLEET, Math.min(cap, stackingFleet(game, seat, largest)) - bonus),
                 new Level(Pool.TACTIC, TACTIC_PLENTY),
                 new Level(Pool.STRATEGY, STRATEGY_MAX));
+    }
+
+    private static int fleetForAnOpenSlot(Game game, Player seat, int largest, int cap) {
+        return holdsAnotherFreePublic(game, seat) ? 0 : objectiveFleet(game, seat, largest, cap);
+    }
+
+    private static boolean holdsAnotherFreePublic(Game game, Player seat) {
+        return ObjectivePolicy.scorablePublics(game, seat).stream()
+                .filter(id -> !ObjectiveCatalog.isSpend(id))
+                .anyMatch(id -> !RAISE_A_FLEET.equals(id) && !COMMAND_AN_ARMADA.equals(id));
     }
 
     private static int objectiveFleet(Game game, Player seat, int largest, int cap) {
