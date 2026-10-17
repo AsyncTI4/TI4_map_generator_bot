@@ -27,9 +27,10 @@ import ti4.spring.service.persistence.TitleEntityRepository;
 import ti4.spring.service.persistence.UserEntity;
 import ti4.spring.service.persistence.UserEntityRepository;
 
-// Runs against a real Postgres, e.g. a throwaway database in a local container:
+// Runs against a real Postgres. CI provides one (the postgres service in .github/workflows/run-tests.yml).
+// Locally, set the variable to a throwaway database, never the dev "tibot" one, since create-drop drops its tables:
 //   TI4_TEST_POSTGRES_URL=jdbc:postgresql://localhost:5432/tibot_test
-// Skipped when the variable is unset (CI has no database).
+// Skipped when the variable is unset.
 @EnabledIfEnvironmentVariable(named = "TI4_TEST_POSTGRES_URL", matches = ".+")
 @SpringBootTest(
         classes = PlayerTitleServiceDatabaseTest.TestConfig.class,

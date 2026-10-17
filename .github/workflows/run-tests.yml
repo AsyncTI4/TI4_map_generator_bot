@@ -10,6 +10,20 @@ jobs:
       checks: write
       pull-requests: write
       security-events: write
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: tibot_test
+          POSTGRES_USER: tibot
+          POSTGRES_PASSWORD: tibot
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U tibot -d tibot_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -88,6 +102,10 @@ jobs:
         if: steps.diff.outputs.has_java == 'true' && (steps.validate-json.outcome == 'success' || steps.validate-json.outcome == 'skipped')
         id: maven
         shell: bash
+        env:
+          TI4_TEST_POSTGRES_URL: jdbc:postgresql://localhost:5432/tibot_test
+          TI4_TEST_POSTGRES_USER: tibot
+          TI4_TEST_POSTGRES_PASSWORD: tibot
         run: |
           set -o pipefail
           mvn --batch-mode \

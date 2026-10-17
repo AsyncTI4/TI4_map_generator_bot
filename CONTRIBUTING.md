@@ -12,6 +12,7 @@
 - [Adding Homebrew Content](#adding-homebrew-content)
 - [Testing your Changes](#testing-your-changes)
   - [VSCode Test](#vscode-test)
+  - [Database Tests](#database-tests)
 - [Helpful Tips for Debugging](#helpful-tips-for-debugging)
 
 # Getting the Code
@@ -268,6 +269,18 @@ To run Java tests in VSCode - make sure you add a test configuration your .vscod
     }
 ]
 ```
+
+## Database Tests
+
+Tests named `*DatabaseTest` run against a real PostgreSQL and are skipped unless `TI4_TEST_POSTGRES_URL` is set. CI provides a database, so they run in the pull request checks. To run them locally, start the local database and create a separate test database. The tests drop and recreate their tables, so never point them at `tibot`.
+
+```bash
+docker compose -f docker-compose.local.yml up -d
+docker exec tibot-postgres createdb -U tibot tibot_test
+TI4_TEST_POSTGRES_URL=jdbc:postgresql://localhost:5432/tibot_test mvn test -Dtest='*DatabaseTest'
+```
+
+`TI4_TEST_POSTGRES_USER` (default `tibot`) and `TI4_TEST_POSTGRES_PASSWORD` (default empty) are also read.
 
 # Helpful Tips for Debugging
 
