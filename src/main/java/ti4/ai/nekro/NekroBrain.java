@@ -33,7 +33,10 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.promissory.ConvoysRules;
 import ti4.ai.promissory.PromissoryRules;
+import ti4.ai.sardakk.CommanderReach;
 import ti4.ai.sardakk.NorrSupremacyRules;
+import ti4.ai.sardakk.SardakkCommanderRules;
+import ti4.ai.sardakk.SardakkHeroRules;
 import ti4.ai.sardakk.TroAgentRules;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.PaymentRules;
@@ -87,6 +90,7 @@ public class NekroBrain implements FactionBrain {
             "combatRoll_",
             "ringTile_",
             "getTilesThisFarAway_",
+            CommanderReach.BUTTON_PREFIX,
             "spend_",
             "reduceTG_",
             "deleteButtons_tacticalAction",
@@ -192,6 +196,8 @@ public class NekroBrain implements FactionBrain {
             PromissoryRules::playCombatNotes,
             SingularityRules::next,
             WrathOfKenaraRules::next,
+            SardakkHeroRules::next,
+            SardakkCommanderRules::next,
             CombatCardRules::hold,
             context -> CombatRules.next(context, CombatCardRules::atRoundStart),
             ActionSecretRules::next,

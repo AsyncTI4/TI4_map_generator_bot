@@ -14,8 +14,9 @@ class PickPrior {
     private static final Map<StrategyCard, int[]> NEKRO_PICKS_BY_ROUND = new EnumMap<>(StrategyCard.class);
     private static final Map<StrategyCard, int[]> HACAN_PICKS_BY_ROUND = new EnumMap<>(StrategyCard.class);
     private static final Map<StrategyCard, int[]> XXCHA_PICKS_BY_ROUND = new EnumMap<>(StrategyCard.class);
+    private static final Map<StrategyCard, int[]> SARDAKK_PICKS_BY_ROUND = new EnumMap<>(StrategyCard.class);
     private static final Map<String, Map<StrategyCard, int[]>> PICKS_BY_FACTION =
-            Map.of("hacan", HACAN_PICKS_BY_ROUND, "xxcha", XXCHA_PICKS_BY_ROUND);
+            Map.of("hacan", HACAN_PICKS_BY_ROUND, "xxcha", XXCHA_PICKS_BY_ROUND, "sardakk", SARDAKK_PICKS_BY_ROUND);
 
     static {
         NEKRO_PICKS_BY_ROUND.put(StrategyCard.LEADERSHIP, new int[] {121, 81, 108, 108, 119, 20});
@@ -44,6 +45,15 @@ class PickPrior {
         XXCHA_PICKS_BY_ROUND.put(StrategyCard.WARFARE, new int[] {90, 31, 36, 40, 83, 33});
         XXCHA_PICKS_BY_ROUND.put(StrategyCard.TECHNOLOGY, new int[] {90, 135, 162, 169, 116, 29});
         XXCHA_PICKS_BY_ROUND.put(StrategyCard.IMPERIAL, new int[] {1, 40, 113, 127, 118, 30});
+
+        SARDAKK_PICKS_BY_ROUND.put(StrategyCard.LEADERSHIP, new int[] {160, 169, 196, 188, 147, 44});
+        SARDAKK_PICKS_BY_ROUND.put(StrategyCard.DIPLOMACY, new int[] {105, 90, 51, 43, 99, 31});
+        SARDAKK_PICKS_BY_ROUND.put(StrategyCard.POLITICS, new int[] {172, 149, 135, 146, 136, 31});
+        SARDAKK_PICKS_BY_ROUND.put(StrategyCard.CONSTRUCTION, new int[] {40, 119, 114, 104, 104, 28});
+        SARDAKK_PICKS_BY_ROUND.put(StrategyCard.TRADE, new int[] {129, 138, 134, 113, 61, 12});
+        SARDAKK_PICKS_BY_ROUND.put(StrategyCard.WARFARE, new int[] {267, 96, 101, 128, 136, 40});
+        SARDAKK_PICKS_BY_ROUND.put(StrategyCard.TECHNOLOGY, new int[] {117, 175, 134, 96, 72, 17});
+        SARDAKK_PICKS_BY_ROUND.put(StrategyCard.IMPERIAL, new int[] {1, 53, 122, 163, 135, 35});
     }
 
     static double nudge(StrategyCard card, int round) {

@@ -29,6 +29,7 @@ import ti4.ai.explore.ExploreOutlook;
 import ti4.ai.explore.ExploreSite;
 import ti4.ai.explore.ExploreValues;
 import ti4.ai.promissory.PlayAreaNotes;
+import ti4.ai.sardakk.CommanderReach;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ObjectiveValue;
@@ -536,7 +537,8 @@ public class TacticalPlanner {
         TacticalPlan best = landInPlace(context, tile, free).orElse(null);
         for (Tile origin : context.origins()) {
             if (origin == tile) continue;
-            Optional<TacticalPlan> plan = expandFrom(context, tile, origin, free);
+            Optional<TacticalPlan> plan = expandFrom(context, tile, origin, free)
+                    .map(found -> withCommanderLandings(context, tile, found, free));
             if (plan.isPresent() && (best == null || plan.get().score() > best.score())) best = plan.get();
         }
         if (best == null || context.coveredByEnemySpaceCannon(tile)) return Optional.empty();
@@ -559,6 +561,7 @@ public class TacticalPlanner {
                 BoardView.SPACE,
                 UnitType.Mech,
                 BoardView.count(space, seat, UnitType.Mech));
+        groundForces.addAll(context.commanderMoves(tile));
         int landed = Math.min(unitCount(groundForces), free.size());
         if (landed == 0) return Optional.empty();
         List<Planet> targets = free.subList(0, landed);
@@ -647,6 +650,27 @@ public class TacticalPlanner {
                         context, origin, tile, transports.getFirst().type());
         TacticalPlan plan = new TacticalPlan(Kind.EXPAND, tile.getPosition(), legal.get(), landings, score);
         return Optional.of(withFollowers(context, tile, plan));
+    }
+
+    private static TacticalPlan withCommanderLandings(
+            Context context, Tile tile, TacticalPlan plan, List<Planet> free) {
+        List<Planet> uncovered = free.stream()
+                .filter(planet -> !plan.landings().containsKey(planet.getName()))
+                .limit(context.commanderPulls(tile).size())
+                .toList();
+        if (uncovered.isEmpty()) return plan;
+        Map<String, Integer> landings = new LinkedHashMap<>(plan.landings());
+        double value = plan.score()
+                - context.objectiveGain(tile, plan.moves(), plan.landings().keySet());
+        for (Planet planet : uncovered) {
+            landings.put(planet.getName(), 1);
+            value += BoardView.planetValue(planet)
+                    + planetTempo(context.game)
+                    + context.exploreValue(tile, planet, 1, 0)
+                    + context.expansionZoneBonus(tile);
+        }
+        value += context.objectiveGain(tile, plan.moves(), landings.keySet());
+        return new TacticalPlan(plan.kind(), plan.target(), plan.moves(), landings, value);
     }
 
     private static List<UnitMove> landedFrom(Tile tile, Map<Planet, int[]> forces) {
@@ -807,7 +831,15 @@ public class TacticalPlanner {
             if (origin != tile) pool.addAll(candidatesFrom(context, tile, origin, opponent));
         }
         pool.addAll(combinations(context, tile, opponent, pool));
+        commanderOnly(context, tile, opponent).ifPresent(pool::add);
         return pool;
+    }
+
+    private static Optional<Candidate> commanderOnly(Context context, Tile tile, Player opponent) {
+        if (context.commanderPulls(tile).isEmpty() || BoardView.hasEnemyShips(context.game, context.seat, tile)) {
+            return Optional.empty();
+        }
+        return candidate(context, tile, opponent, List.of(), false, null);
     }
 
     private static List<Candidate> combinations(Context context, Tile tile, Player opponent, List<Candidate> singles) {
@@ -1025,8 +1057,9 @@ public class TacticalPlanner {
             departing.addAll(part.departure().ships());
             departing.addAll(part.departure().cargo());
         }
-        Strike strike =
-                Strike.of(seat, tile, opponent, origins, departing, rules(context, tile, opponent, homeLandings));
+        Strike strike = Strike.of(
+                        seat, tile, opponent, origins, departing, rules(context, tile, opponent, homeLandings))
+                .withPulled(context.commanderForces(tile));
         StrikeEstimate estimate = StrikeEvaluator.estimate(game, seat, strike);
         if (estimate.spaceWin() <= 0) return Optional.empty();
         Optional<List<UnitMove>> legal = executedMoves(context, parts, tile, estimate);
@@ -1049,9 +1082,10 @@ public class TacticalPlanner {
     private static Optional<List<UnitMove>> executedMoves(
             Context context, List<Part> parts, Tile tile, StrikeEstimate estimate) {
         Player seat = context.seat;
-        int landed = estimate.groundSent().values().stream()
+        int landedTotal = estimate.groundSent().values().stream()
                 .mapToInt(Integer::intValue)
                 .sum();
+        int landed = Math.max(0, landedTotal - context.commanderPulls(tile).size());
         List<UnitMove> allCargo = new ArrayList<>();
         parts.forEach(part -> allCargo.addAll(part.departure().cargo()));
         List<UnitMove> carried = take(allCargo, landed);
@@ -1493,7 +1527,17 @@ public class TacticalPlanner {
         for (boolean homeLandings : new boolean[] {true, false}) {
             StrikeRules rules = rules(context, target, opponent, homeLandings);
             Strike strike = new Strike(
-                    target, opponent, List.of(), List.of(), ships, Map.of(), ground, extraShips, extraGround, rules);
+                    target,
+                    opponent,
+                    List.of(),
+                    List.of(),
+                    ships,
+                    Map.of(),
+                    ground,
+                    extraShips,
+                    extraGround,
+                    rules,
+                    Map.of());
             StrikeEstimate estimate = StrikeEvaluator.estimate(game, seat, strike);
             if (estimate.spaceWin() < rules.landMinWin()) return 0;
             StrikeValue value =
@@ -2153,6 +2197,17 @@ public class TacticalPlanner {
         return game.mecatols().contains(planet.getName()) ? MECATOL_GARRISON : 0;
     }
 
+    public static CommanderReach.Garrison garrison(Game game, Player seat) {
+        return garrisonOf(game, new DefenseOutlook(game, seat));
+    }
+
+    private static CommanderReach.Garrison garrisonOf(Game game, DefenseOutlook defense) {
+        return (tile, planet) -> {
+            int mecatol = game.mecatols().contains(planet.getName()) ? MECATOL_GARRISON : 0;
+            return Math.max(mecatol, defense.groundToKeep(tile, planet, List.of()));
+        };
+    }
+
     public static int groundKeptHomeWhileTransportsLeave(Game game, Player seat) {
         Tile home = seat.getHomeSystemTile();
         if (home == null) return 0;
@@ -2223,6 +2278,7 @@ public class TacticalPlanner {
         private DefenseOutlook defense;
         private OffenseOutlook offense;
         private Exposure exposure;
+        private final Map<String, List<CommanderReach.Pull>> commanderPulls = new HashMap<>();
         private final Map<String, Optional<TacticalPlan>> attacks = new HashMap<>();
         private final Map<String, Double> futureScores = new HashMap<>();
         private ExploreOutlook exploreOutlook;
@@ -2476,6 +2532,29 @@ public class TacticalPlanner {
                     .filter(planet -> BoardView.controller(game, planet.getName()) == null)
                     .filter(planet -> !BoardView.hasCustodians(planet))
                     .count();
+        }
+
+        List<CommanderReach.Pull> commanderPulls(Tile tile) {
+            return commanderPulls.computeIfAbsent(tile.getPosition(), position -> {
+                boolean custodiansToPay = tile.getPlanetUnitHolders().stream().anyMatch(BoardView::hasCustodians);
+                return custodiansToPay ? List.of() : CommanderReach.pulls(game, seat, tile, garrison());
+            });
+        }
+
+        List<UnitMove> commanderMoves(Tile tile) {
+            return commanderPulls(tile).stream()
+                    .map(pull -> new UnitMove(pull.position(), pull.planet(), pull.type(), 1))
+                    .toList();
+        }
+
+        Map<UnitType, Integer> commanderForces(Tile tile) {
+            Map<UnitType, Integer> forces = new EnumMap<>(UnitType.class);
+            commanderPulls(tile).forEach(pull -> forces.merge(pull.type(), 1, Integer::sum));
+            return forces;
+        }
+
+        CommanderReach.Garrison garrison() {
+            return garrisonOf(game, defense());
         }
 
         boolean coveredByEnemySpaceCannon(Tile tile) {

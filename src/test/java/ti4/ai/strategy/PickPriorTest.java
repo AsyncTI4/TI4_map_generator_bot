@@ -35,7 +35,19 @@ class PickPriorTest {
         assertThat(PickPrior.nudge("xxcha", StrategyCard.DIPLOMACY, 1)).isCloseTo(1.0, within(0.01));
         assertThat(PickPrior.nudge("hacan", StrategyCard.DIPLOMACY, 1)).isCloseTo(-0.52, within(0.01));
         assertThat(PickPrior.nudge("hacan", StrategyCard.TRADE, 1)).isCloseTo(0.77, within(0.01));
-        assertThat(PickPrior.nudge("sardakk", StrategyCard.WARFARE, 1))
+        assertThat(PickPrior.nudge("mahact", StrategyCard.WARFARE, 1))
                 .isEqualTo(PickPrior.nudge(StrategyCard.WARFARE, 1));
+    }
+
+    // Sardakk players take Warfare in over a quarter of first picks and almost never Imperial in round one, but
+    // take Leadership and Imperial steadily later.
+    @Test
+    void usesTheSardakkPickRates() {
+        assertThat(PickPrior.nudge("sardakk", StrategyCard.WARFARE, 1)).isCloseTo(1.0, within(0.01));
+        assertThat(PickPrior.nudge("sardakk", StrategyCard.IMPERIAL, 1)).isLessThan(-0.95);
+        assertThat(PickPrior.nudge("sardakk", StrategyCard.CONSTRUCTION, 1)).isCloseTo(-0.68, within(0.01));
+        assertThat(PickPrior.nudge("sardakk", StrategyCard.LEADERSHIP, 3)).isGreaterThan(0.5);
+        assertThat(PickPrior.nudge("sardakk", StrategyCard.IMPERIAL, 9))
+                .isEqualTo(PickPrior.nudge("sardakk", StrategyCard.IMPERIAL, 6));
     }
 }

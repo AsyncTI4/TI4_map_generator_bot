@@ -16,6 +16,17 @@ class ResearchPriorTest {
         assertThat(ResearchPrior.nudge("xxcha", "pds2")).isCloseTo(0.75, within(0.01));
     }
 
+    // Sardakk players research Carrier II in 84% of games (capped), their own Exotrireme II in 82% and PDS II in 12%.
+    @Test
+    void followsTheSardakkResearchRates() {
+        assertThat(ResearchPrior.nudge("sardakk", "cv2")).isEqualTo(ResearchPrior.WEIGHT);
+        assertThat(ResearchPrior.nudge("sardakk", "exo2")).isEqualTo(ResearchPrior.WEIGHT);
+        assertThat(ResearchPrior.nudge("sardakk", "dd2")).isCloseTo(0.35, within(0.01));
+        assertThat(ResearchPrior.nudge("sardakk", "pds2")).isCloseTo(-0.27, within(0.01));
+        assertThat(ResearchPrior.nudge("sardakk", "gls")).isCloseTo(-0.49, within(0.01));
+        assertThat(ResearchPrior.nudge("sardakk", "dn2")).isZero();
+    }
+
     @Test
     void givesNothingWithoutData() {
         assertThat(ResearchPrior.nudge("nekro", "gd")).isZero();

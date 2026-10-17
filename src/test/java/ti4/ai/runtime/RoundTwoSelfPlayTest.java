@@ -100,6 +100,9 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
         int threads = Math.clamp(Integer.getInteger("ai.selfplay.threads", 6), 1, games);
         List<GameResult> results = playAll(games, threads);
         report(results);
+        System.out.printf(
+                "ROUND2 SARDAKK LEADERS commander pulls %d, hero plays %d over %d games%n",
+                COMMANDER_PULLS.get(), HERO_PLAYS.get(), results.size());
         List<ScoringDiagnostic.SeatRound> scoring = new ArrayList<>();
         for (GameResult result : results) {
             scoring.addAll(result.scoring());
@@ -109,6 +112,26 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
                                 ScoringDiagnostic.line(seat).replaceFirst(" g ", " " + result.name() + " ")));
         }
         ScoringDiagnostic.report(scoring);
+    }
+
+    private static final AtomicInteger COMMANDER_PULLS = new AtomicInteger();
+    private static final AtomicInteger HERO_PLAYS = new AtomicInteger();
+
+    // -Dai.selfplay.roundtwo.sardakkleaders=true unlocks Sardakk's commander and hero before round 1 (neither unlocks
+    // naturally within two rounds), so the smoke run exercises their rules; the report counts how often each fired.
+    private static void unlockSardakkLeaders(Game game) {
+        for (Player seat : game.getRealPlayers()) {
+            if (!"sardakk".equals(seat.getFaction())) continue;
+            for (String leader : List.of("sardakkcommander", "sardakkhero")) {
+                seat.getLeader(leader).ifPresent(found -> found.setLocked(false));
+            }
+        }
+    }
+
+    private static void countSardakkLeaders(ti4.ai.brain.AiDecision decision) {
+        if (!(decision instanceof ti4.ai.brain.AiDecision.Press press)) return;
+        if (press.reason().contains("G'hom Sek'kus")) COMMANDER_PULLS.incrementAndGet();
+        if (press.reason().contains("Sh'val")) HERO_PLAYS.incrementAndGet();
     }
 
     private static List<GameResult> playAll(int games, int threads) throws Exception {
@@ -137,6 +160,7 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
             List<String> seating = new ArrayList<>(FACTIONS);
             Collections.rotate(seating, slot);
             Game game = selfPlay.setUp(seating);
+            if (Boolean.getBoolean("ai.selfplay.roundtwo.sardakkleaders")) unlockSardakkLeaders(game);
             if (Boolean.getBoolean("ai.selfplay.roundtwo.forceagenda"))
                 selfPlay.force(game, RoundTwoSelfPlayTest::takeCustodians);
             Map<String, Map<String, Double>> ownArea = new HashMap<>();
@@ -152,7 +176,10 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
             AtomicReference<Game> live = new AtomicReference<>(game);
             String[] probeState = {"", "", "", ""};
             ScoringDiagnostic diagnostic = new ScoringDiagnostic();
-            env.decisionListener = diagnostic::onDecision;
+            env.decisionListener = (context, decision) -> {
+                diagnostic.onDecision(context, decision);
+                countSardakkLeaders(decision);
+            };
             SelfPlayGame.Outcome outcome = selfPlay.run(
                     current -> {
                         live.set(current);

@@ -161,6 +161,19 @@ to build one by hand:
   - Nekro: Propagation's command tokens from any source, the commander's card draw, Dacxive Animators' infantry,
     and its agent and hero (below);
   - paying for a Nekro agent that names it (any AI seat);
+  - Sardakk's commander and hero (`ti4.ai.sardakk`, keyed on the leaders being unlocked, so alliances count):
+    - _G'hom Sek'kus_: the tactical planner counts 1 ground force from each planet in an adjacent system without the
+      seat's own command token as landable in the active system (unless an enemy fleet sits over it, the planet is
+      contested, or the home/guarded garrison rules need the force). That gives expansions and invasions with no
+      transport, and favours systems beside its infantry. At the Commit Ground Forces step it pulls what the plan
+      lands beyond the ground forces in orbit, and adds a force to a contested planet when that lifts the win chance
+      by 8 points or more (from between 30% and 85%). Never twice from one planet, never onto a planet with the
+      custodians token, and not while its ships still have a space combat to fight;
+    - _Sh'val, Harbinger_: after movement, instead of fighting the space combat, when the ships are not favoured
+      (60% or less to win) but the ground forces in orbit (plus the commander's) win the landing at 65% or more on a
+      planet worth a victory point or more (an objective or secret it would score, a custodians/Mecatol hold, an
+      enemy home planet, denying a rival's score), and not fighting is worth more than the fleet's replacement cost
+      beyond the expected fight losses plus half a point for the card. It then lands everything on that planet.
   - playing component action cards and _Forward Supply Base_, valued by what they score and by human play statistics,
     and answering cards that target it (below);
   - playing the promissory notes other players gave it, and respecting its own notes played against it (below);
