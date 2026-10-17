@@ -3,8 +3,10 @@ package ti4.ai.promissory;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.actioncards.ActionCardRules;
@@ -15,6 +17,8 @@ import ti4.ai.brain.Prompts.Match;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.strategy.ResearchPolicy;
+import ti4.ai.tactical.GroundDrops;
+import ti4.ai.tactical.GroundDrops.Drop;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -64,9 +68,11 @@ class NoteOffers {
             context.memory().remove(MILITARY_SUPPORT_KEY);
             return Optional.empty();
         }
+        Map<String, Double> needs = GroundDrops.drops(game, seat, Optional.empty()).stream()
+                .collect(Collectors.toMap(Drop::planet, Drop::infantry, Math::max));
         Optional<Match> best = targets(context, since.get() - CLOCK_SKEW_MILLIS).stream()
-                .max(Comparator.comparingDouble(
-                                (Match match) -> ActionCardRules.frontlineValue(game, seat, planetOf(match)))
+                .max(Comparator.comparingDouble((Match match) -> needs.getOrDefault(planetOf(match), 0.0))
+                        .thenComparingDouble(match -> ActionCardRules.frontlineValue(game, seat, planetOf(match)))
                         .thenComparing(match -> match.button().handlerId(), Comparator.reverseOrder()));
         if (best.isPresent()) {
             context.memory().remove(MILITARY_SUPPORT_KEY);

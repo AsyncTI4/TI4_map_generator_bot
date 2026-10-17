@@ -77,12 +77,19 @@ public class ActionCardResponses {
                         AiDecision.press(prompt, owed.get(), "give the promissory note it priced in a deal"));
             }
             PromptButton give = gives.stream()
-                    .min(Comparator.comparingInt(button ->
-                            NoteGiving.giveRank(game, noteFor(notes, button).orElse(""), receiverOf(button))))
+                    .min(Comparator.comparing((PromptButton button) -> withheld(context, notes, button))
+                            .thenComparingInt(button -> NoteGiving.giveRank(
+                                    game, noteFor(notes, button).orElse(""), receiverOf(button))))
                     .orElseThrow();
             return Optional.of(AiDecision.press(prompt, give, "give the least harmful promissory note"));
         }
         return Optional.empty();
+    }
+
+    private static boolean withheld(AiTurnContext context, Map<String, Integer> notes, PromptButton button) {
+        return noteFor(notes, button)
+                .filter(note -> NoteGiving.withheld(context.seat(), note))
+                .isPresent();
     }
 
     private static boolean asksForANote(AiPrompt prompt) {

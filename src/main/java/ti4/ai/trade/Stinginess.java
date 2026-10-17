@@ -183,8 +183,12 @@ class Stinginess {
         Optional<String> alias = item.isGenericNote()
                 ? NotesForTrade.leastHarmful(game, seat, partner)
                 : NotesForTrade.aliasOf(seat, item.detail());
-        return alias.map(note -> NotesForTrade.receiveValue(game, partner, note))
-                .orElse(NotesForTrade.OTHER_NOTE);
+        return alias.map(note -> valueToRival(game, partner, note)).orElse(NotesForTrade.OTHER_NOTE);
+    }
+
+    private static double valueToRival(Game game, Player partner, String note) {
+        double value = NotesForTrade.receiveValue(game, partner, note);
+        return MilitarySupport.ALIAS.equals(note) ? MilitarySupport.rivalGain(value) : value;
     }
 
     private static Optional<String> namedNoteOfPartner(DealItem item) {

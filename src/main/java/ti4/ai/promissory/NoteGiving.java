@@ -13,6 +13,7 @@ public class NoteGiving {
 
     public static final String THRONE = "_sftt";
     public static final String ALLIANCE = "_an";
+    public static final String MILITARY_SUPPORT = "ms";
     private static final String OTHER = "";
     private static final List<String> NOTE_GIVE_ORDER = List.of("_cf", "_ta", "_ps", OTHER, ALLIANCE, THRONE);
     private static final int RETURNED_TO_OWNER = -1;
@@ -30,6 +31,10 @@ public class NoteGiving {
         return NOTE_GIVE_ORDER.indexOf(OTHER);
     }
 
+    public static boolean withheld(Player giver, String note) {
+        return MILITARY_SUPPORT.equals(note) && giver.ownsPromissoryNote(note) && giver.getStrategicCC() > 0;
+    }
+
     public static boolean isThroneOrAlliance(String note) {
         return note.endsWith(THRONE) || note.endsWith(ALLIANCE);
     }
@@ -39,6 +44,7 @@ public class NoteGiving {
         List<String> inPlayArea = giver.getPromissoryNotesInPlayArea();
         return giver.getPromissoryNotes().keySet().stream()
                 .filter(note -> !inPlayArea.contains(note))
+                .filter(note -> !withheld(giver, note))
                 .filter(note -> allowThroneOrAlliance || !isThroneOrAlliance(note))
                 .min(Comparator.comparingInt((String note) -> giveRank(game, note, receiver.getFaction()))
                         .thenComparing(Comparator.naturalOrder()));

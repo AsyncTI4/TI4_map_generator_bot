@@ -253,11 +253,16 @@ class ComponentValuesTest extends BaseTi4Test {
         assertThat(giveCost("black_an")).isCloseTo(0.3, within(EXACT));
     }
 
-    // Military Support costs its owner a strategy token and hands the holder 2 infantry whenever it is played, so Sol
-    // does not give its own away for the price of an ordinary faction note.
+    // Military Support costs its owner a strategy token whenever it is played, so Sol never gives its own away while it
+    // holds one; with none it comes straight back at no cost beyond the risk of tokens arriving first.
     @Test
-    void militarySupportCostsItsOwnerAStrategyTokenAndTwoInfantry() {
-        assertThat(NotesForTrade.giveCost(table.game, sol, nekro, "ms")).isCloseTo(3.0, within(EXACT));
+    void militarySupportIsNeverGivenWhileItsOwnerHoldsAStrategyToken() {
+        sol.setStrategicCC(1);
+        assertThat(NotesForTrade.giveCost(table.game, sol, nekro, "ms")).isInfinite();
+
+        sol.setStrategicCC(0);
+        assertThat(NotesForTrade.giveCost(table.game, sol, nekro, "ms"))
+                .isCloseTo(MilitarySupport.RETURN_RISK, within(EXACT));
     }
 
     // A Trade Agreement is worth its owner's commodities less 1, given or received.
@@ -302,7 +307,6 @@ class ComponentValuesTest extends BaseTi4Test {
     // Notes the AI knows how to play are worth what playing them brings; any other note 0.3.
     @Test
     void notesItPlays() {
-        assertThat(receiveValue("ms")).isCloseTo(1.0, within(EXACT));
         assertThat(receiveValue("ra")).isCloseTo(1.5, within(EXACT));
         assertThat(receiveValue("tekklar")).isCloseTo(1.0, within(EXACT));
         assertThat(receiveValue("gift")).isCloseTo(1.0, within(EXACT));

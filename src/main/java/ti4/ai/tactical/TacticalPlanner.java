@@ -2127,7 +2127,7 @@ public class TacticalPlanner {
     }
 
     @Nullable
-    private static Player singleOpponent(Game game, Player seat, Tile tile) {
+    static Player singleOpponent(Game game, Player seat, Tile tile) {
         List<Player> others = game.getPlayers().values().stream()
                 .filter(other -> other != seat)
                 .filter(other -> other.getColor() != null)

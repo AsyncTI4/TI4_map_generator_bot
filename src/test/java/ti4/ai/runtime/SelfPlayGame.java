@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.ai.AiSettings;
+import ti4.ai.brain.AiMemory;
 import ti4.ai.secrets.SecretPhase;
 import ti4.ai.selfplay.SelfPlaySetup;
 import ti4.game.Game;
@@ -36,6 +37,8 @@ final class SelfPlayGame {
 
     static final long STEP_MILLIS = 10_000L;
     static final long STALL_MILLIS = 2 * 60 * 60 * 1000L;
+    private static final List<String> TRADE_TURN_KEYS =
+            List.of("tradeTurnDrafts|", "tradeWindow|", "tradeNoteDeals|", "tradeNoteDealWith|");
     private static final String OWNER_ID = "300000000000000001";
     private static final String AGENDA_FLIP_STAMP = "lastAgendaReactTime";
     private static final long AGENDA_FLIP_AGE_MILLIS = 10 * 60 * 1000L;
@@ -298,9 +301,24 @@ final class SelfPlayGame {
         }
     }
 
+    private AiLane lane;
+
+    // The first action phase lets the active seat start its turn's deals in the same tick that begins the phase, before
+    // a
+    // scenario can force its state; this gives every seat back its turn's deal budget and its used trading windows.
+    void forgetTradeTurn(Game game) {
+        if (lane == null) return;
+        for (Player player : game.getRealPlayers()) {
+            AiMemory memory = lane.seat(player.getUserID()).memory();
+            for (String prefix : TRADE_TURN_KEYS) {
+                memory.keysStartingWith(prefix).forEach(memory::remove);
+            }
+        }
+    }
+
     Outcome run(Predicate<Game> stopWhen, long maxVirtualMillis, int maxTicks) {
         env.markStart();
-        AiLane lane = new AiLane(name);
+        lane = new AiLane(name);
         long lastProgressAt = env.now();
         String lastProgress = "";
         int ticks = 0;

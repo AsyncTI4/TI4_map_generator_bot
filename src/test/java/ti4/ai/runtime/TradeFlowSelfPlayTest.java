@@ -11,6 +11,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import ti4.ai.brain.StrategyCard;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -134,6 +135,17 @@ class TradeFlowSelfPlayTest extends BaseTi4Test {
             }
         }
 
+        // Whoever picked Technology would otherwise be asked to hold it for payment, a deal that is not under test.
+        void settleTechnologyCard(Game game) {
+            for (Player player : game.getRealPlayers()) {
+                for (int initiative : player.getSCs()) {
+                    if (StrategyCard.of(game, initiative) == StrategyCard.TECHNOLOGY) {
+                        game.setSCPlayed(initiative, true);
+                    }
+                }
+            }
+        }
+
         static Player player(Game game, String faction) {
             return game.getPlayerFromColorOrFaction(faction);
         }
@@ -169,6 +181,8 @@ class TradeFlowSelfPlayTest extends BaseTi4Test {
             active = first.getFaction();
             neighbour = next.getFaction();
             beside(game, first, next);
+            settleTechnologyCard(game);
+            selfPlay.forgetTradeTurn(game);
             for (Player player : game.getRealPlayers()) {
                 player.setCommodities(0);
                 player.setTg(0);

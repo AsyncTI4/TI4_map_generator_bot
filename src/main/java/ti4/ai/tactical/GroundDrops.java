@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.scoring.ObjectiveValue;
@@ -37,6 +38,12 @@ public class GroundDrops {
 
     public static Optional<Drop> best(Game game, Player seat, Optional<TacticalPlan> plan) {
         return drops(game, seat, plan).stream().max(Comparator.comparingDouble(Drop::infantry));
+    }
+
+    public static OptionalDouble need(Game game, Player seat) {
+        return drops(game, seat, Optional.empty()).stream()
+                .mapToDouble(drop -> drop.infantry() - INFANTRY_FLOOR * INFANTRY)
+                .max();
     }
 
     public static Optional<String> bestPlanetIn(Game game, Player seat, Tile tile, Optional<TacticalPlan> plan) {

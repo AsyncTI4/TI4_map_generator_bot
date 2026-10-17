@@ -115,6 +115,30 @@ class PromissoryRulesTest extends BaseTi4Test {
                 .isEqualTo("FFCC_nekro_placeOneNDone_skipbuild_2gf_mordaiii");
     }
 
+    // The infantry go where they are worth most (here: a carrier at home with nobody to load it), not to the planet
+    // that
+    // merely sorts first.
+    @Test
+    void placesMilitarySupportWhereInfantryIsNeededMost() {
+        Tile home = test.nekroHome();
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.nekro.addPlanet("lodor");
+        aiHolds(test.sol, "ms");
+        test.isActive(test.sol, "action");
+        PromissoryRules.answerOffers(test.context(hidden("ms", "resolvePNPlay_ms", "deleteButtons")));
+        test.nekro.removePromissoryNote("ms");
+        AiPrompt targets = prompt(
+                "targets",
+                PromptSource.PUBLIC,
+                NOW,
+                "FFCC_nekro_placeOneNDone_skipbuild_2gf_lodor",
+                "FFCC_nekro_placeOneNDone_skipbuild_2gf_mordaiii");
+
+        assertThat(pressed(PromissoryRules.continuePlay(test.context(targets))))
+                .isEqualTo("FFCC_nekro_placeOneNDone_skipbuild_2gf_mordaiii");
+    }
+
     // The note's window is the start of Sol's turn: an offer left over from an earlier turn is not taken.
     @Test
     void ignoresAMilitarySupportOfferFromAnEarlierTurn() {

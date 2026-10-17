@@ -98,6 +98,17 @@ public final class ObjectiveValue {
         return total;
     }
 
+    public int completedPoints(Footprint after) {
+        int total = 0;
+        for (Target target : targets) {
+            int then = progress(target.id(), after);
+            if (then != NOT_MODELLED && target.before() < target.threshold() && then >= target.threshold()) {
+                total += target.points();
+            }
+        }
+        return total;
+    }
+
     private static double partialGain(Target target, int now, int then) {
         int stillNeeded = target.threshold() - Math.min(now, then);
         int fewestStillNeeded = target.threshold() - Math.max(now, then);
