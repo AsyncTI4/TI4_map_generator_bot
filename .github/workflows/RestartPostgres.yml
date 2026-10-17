@@ -4,7 +4,7 @@ concurrency:
   group: "RestartPostgres"
 jobs:
   restart:
-    name: Restart Postgres
+    name: Restart Postgres via docker
     runs-on: ubuntu-latest
     steps:
       - name: executing remote ssh commands using password
@@ -15,13 +15,13 @@ jobs:
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
           script: |
-            whoami; id
-            echo "=== passwordless sudo? ==="
-            sudo -n true 2>&1 && echo "YES" || echo "NO"
-            sudo -n -l 2>&1 | head -20 || true
-            echo "=== restarting postgres ==="
-            sudo -n systemctl restart postgresql 2>&1 && echo "restart issued" || echo "restart FAILED"
-            sleep 5
+            echo "=== BEFORE ==="
+            ss -lntp | grep 5432 || true
+            echo "=== restarting postgresql on the host ==="
+            docker run --rm --privileged --pid=host alpine:3 \
+              nsenter -t 1 -m -u -i -n -p -- systemctl restart postgresql \
+              && echo "restart issued" || echo "restart FAILED"
+            sleep 6
             echo "=== AFTER ==="
             ss -lntp | grep 5432 || echo "nothing listening"
             pg_isready -h 172.17.0.1 -p 5432 2>&1 || true
