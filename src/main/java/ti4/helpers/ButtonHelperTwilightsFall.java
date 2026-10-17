@@ -605,7 +605,11 @@ public final class ButtonHelperTwilightsFall {
             if (game.getPlayerFromColorOrFaction(faction) != null)
                 participants.add(game.getPlayerFromColorOrFaction(faction));
         }
-        if (participants.get(0) == participants.get(1)) {
+        if (participants.isEmpty()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "There is no splice in progress to reverse.");
+            return;
+        }
+        if (participants.size() > 1 && participants.get(0) == participants.get(1)) {
             Collections.rotate(participants, -2);
         }
         Collections.reverse(participants);
