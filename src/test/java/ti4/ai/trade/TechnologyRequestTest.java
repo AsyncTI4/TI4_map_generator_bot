@@ -27,12 +27,14 @@ import ti4.testUtils.BaseTi4Test;
 // says so at the table, and the holder reads the ask from that message. A seat that can follow now pays to have
 // Technology played early (for Gravity Drive); a seat that cannot follow yet, but could after another turn, pays to
 // have it held. Only a human payer, who posts no such message, has the ask inferred from what it can afford.
-// Nekro (the AI) holds Technology in round 1; Sol, its neighbour, is a second AI. Hacan, Letnev and Arborec sit at the
-// table without trade goods or commodities, so they cannot be denied the secondary; with four opponents, denying Sol
-// alone is worth less to Nekro than a trade good.
+// Nekro (the AI) holds Technology in round 1; Sol, its neighbour, is a second AI. Hacan, Letnev, Arborec and Yssaril
+// sit at the table without trade goods or commodities, so they cannot be denied the secondary; with five opponents,
+// denying Sol alone is worth less to Nekro than a trade good (Sol's own research rates make Gravity Drive worth more
+// to it than to a faction without data, so a smaller table would put its denial above a single debt).
 class TechnologyRequestTest extends BaseTi4Test {
 
     private static final int TECHNOLOGY = 7;
+    private static final String SIXTH_SEAT_ID = "200000000000000077";
     private static final String HOLD_DEBT = "sendingsol_receivingnekro_SendDebt_1";
     private static final String EARLY_TRADE_GOOD = "sendingsol_receivingnekro_TGs_1";
 
@@ -51,6 +53,7 @@ class TechnologyRequestTest extends BaseTi4Test {
         table.stock(table.secondAiSeat("letnev", "green"), 0, 0);
         arborec = table.humanSeat("arborec", "yellow");
         table.stock(arborec, 0, 0);
+        table.stock(table.test.addSeat(SIXTH_SEAT_ID, "yssaril", "purple"), 0, 0);
         nekro = table.nekro;
         sol = table.sol;
         nekro.addSC(TECHNOLOGY);

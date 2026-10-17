@@ -16,6 +16,18 @@ class ResearchPriorTest {
         assertThat(ResearchPrior.nudge("xxcha", "pds2")).isCloseTo(0.75, within(0.01));
     }
 
+    // Sol players research Advanced Carrier II and Gravity Drive in over 90% of games, Spec Ops II in 42%, PDS II in
+    // 1%.
+    @Test
+    void followsSolsResearchRates() {
+        assertThat(ResearchPrior.nudge("sol", "ac2")).isEqualTo(ResearchPrior.WEIGHT);
+        assertThat(ResearchPrior.nudge("sol", "gd")).isEqualTo(ResearchPrior.WEIGHT);
+        assertThat(ResearchPrior.nudge("sol", "so2")).isCloseTo(0.33, within(0.01));
+        assertThat(ResearchPrior.nudge("sol", "x89c4")).isCloseTo(0.16, within(0.01));
+        assertThat(ResearchPrior.nudge("sol", "pds2")).isCloseTo(-0.48, within(0.01));
+        assertThat(ResearchPrior.nudge("sol", "it")).isZero();
+    }
+
     @Test
     void givesNothingWithoutData() {
         assertThat(ResearchPrior.nudge("nekro", "gd")).isZero();

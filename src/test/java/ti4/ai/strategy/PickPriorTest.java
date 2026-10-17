@@ -28,6 +28,18 @@ class PickPriorTest {
         assertThat(PickPrior.nudge(StrategyCard.OTHER, 3)).isZero();
     }
 
+    // Sol players take Politics first (231 of 1194 games), Technology and Trade next, Imperial almost never in round 1
+    // but the most from round 3 on.
+    @Test
+    void usesSolsOwnPickRates() {
+        assertThat(PickPrior.nudge("sol", StrategyCard.POLITICS, 1)).isCloseTo(0.55, within(0.01));
+        assertThat(PickPrior.nudge("sol", StrategyCard.TRADE, 1)).isCloseTo(0.37, within(0.01));
+        assertThat(PickPrior.nudge("sol", StrategyCard.IMPERIAL, 1)).isCloseTo(-0.98, within(0.01));
+        assertThat(PickPrior.nudge("sol", StrategyCard.LEADERSHIP, 2)).isCloseTo(0.66, within(0.01));
+        assertThat(PickPrior.nudge("sol", StrategyCard.IMPERIAL, 3)).isCloseTo(0.52, within(0.01));
+        assertThat(PickPrior.nudge("sol", StrategyCard.CONSTRUCTION, 1)).isNegative();
+    }
+
     // Xxcha players take Diplomacy most in round 1 (Peace Accords) and Hacan players Trade; factions without their
     // own data use the Nekro rates.
     @Test
