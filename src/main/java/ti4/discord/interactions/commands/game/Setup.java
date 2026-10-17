@@ -9,6 +9,7 @@ import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
+import ti4.service.tigl.TiglSetupService;
 
 class Setup extends GameStateSubcommand {
 
@@ -24,7 +25,6 @@ class Setup extends GameStateSubcommand {
         addOptions(new OptionData(
                 OptionType.INTEGER, Constants.MAX_SO_COUNT, "Max Number of secret objectives per player. Default 3"));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Custom description"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.TIGL_GAME, "True to mark the game as TIGL"));
         addOptions(new OptionData(
                 OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
         addOptions(
@@ -124,11 +124,6 @@ class Setup extends GameStateSubcommand {
                             : "Whispers have been disabled for this game.");
         }
 
-        if (!setGameMode(event, game)) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "Something went wrong and the game modes could not be set, please see error above.");
-        }
         if (customGameName == null
                 && pingHours == null
                 && scCountPerPlayer == null
@@ -138,37 +133,7 @@ class Setup extends GameStateSubcommand {
                 && playerCount == null) {
             CreateGameService.presentSetupToPlayers(game);
         }
-    }
 
-    private static boolean setGameMode(SlashCommandInteractionEvent event, Game game) {
-        if (event.getOption(Constants.TIGL_GAME) == null
-                && event.getOption(Constants.ABSOL_MODE) == null
-                && event.getOption(Constants.DISCORDANT_STARS_MODE) == null
-                && event.getOption(Constants.BASE_GAME_MODE) == null
-                && event.getOption(Constants.MILTYMOD_MODE) == null) {
-            return true; // no changes were made
-        }
-        boolean isTIGLGame =
-                event.getOption(Constants.TIGL_GAME, game.isCompetitiveTIGLGame(), OptionMapping::getAsBoolean);
-        boolean absolMode = event.getOption(Constants.ABSOL_MODE, game.isAbsolMode(), OptionMapping::getAsBoolean);
-        boolean miltyModMode =
-                event.getOption(Constants.MILTYMOD_MODE, game.isMiltyModMode(), OptionMapping::getAsBoolean);
-        boolean discordantStarsMode = event.getOption(
-                Constants.DISCORDANT_STARS_MODE, game.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
-        boolean blueReverieMode =
-                event.getOption(Constants.BLUE_REVERIE_MODE, game.isBlueReverieMode(), OptionMapping::getAsBoolean);
-        boolean baseGameMode =
-                event.getOption(Constants.BASE_GAME_MODE, game.isBaseGameMode(), OptionMapping::getAsBoolean);
-        boolean votcMode = event.getOption(Constants.VOTC_MODE, game.isVotcMode(), OptionMapping::getAsBoolean);
-        return WeirdGameSetup.setGameMode(
-                event,
-                game,
-                baseGameMode,
-                absolMode,
-                miltyModMode,
-                discordantStarsMode,
-                blueReverieMode,
-                isTIGLGame,
-                votcMode);
+        TiglSetupService.recheckLadder(game);
     }
 }
