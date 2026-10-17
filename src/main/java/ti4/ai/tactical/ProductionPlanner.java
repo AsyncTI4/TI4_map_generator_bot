@@ -60,6 +60,8 @@ public class ProductionPlanner {
     private static final int INFANTRY_PER_RESOURCE = 2;
     private static final int RESEARCH_SAVINGS = 4;
     private static final double CARRIER_VALUE = 2.5;
+    private static final int HEAVY_LIFT_CAPACITY = 8;
+    private static final double SUSTAINING_CARRIER_BONUS = 0.5;
     private static final double NEEDED_INFANTRY_VALUE = 0.5;
     private static final double SCORING_VALUE_PER_RESOURCE = 0.5;
     private static final double ENABLER_VALUE = 0.3 * ObjectiveValue.VICTORY_POINT_VALUE;
@@ -221,6 +223,30 @@ public class ProductionPlanner {
         return new BuildPlan(builder.orders);
     }
 
+    public static BuildPlan bellumGloriosum(
+            Game game, Player seat, Tile tile, int limit, @Nullable String groundPlanet, DefenseOutlook defense) {
+        if (BoardView.hasEnemyShips(game, seat, tile)) return new BuildPlan(List.of());
+        Budget budget = new Budget(
+                limit, spendableResources(game, seat) + (seat.hasTech("st") ? 1 : 0) + aidaDiscount(seat), 0);
+        Builder builder = new Builder(game, seat, tile, budget, groundPlanet, defense);
+        planDefensiveUnits(builder);
+        int spare = TacticalPlanner.movableGroundForces(game, seat, tile, defense);
+        builder.infantry(WANTED_SPARE_INFANTRY - spare, NEEDED_INFANTRY_VALUE);
+        builder.fighters(builder.fillerValue(UnitType.Fighter));
+        return new BuildPlan(builder.orders);
+    }
+
+    private static int wantedCarriers(Player seat) {
+        return BoardView.capacity(seat, UnitType.Carrier) >= HEAVY_LIFT_CAPACITY ? 1 : WANTED_CARRIERS;
+    }
+
+    private static double carrierValue(Player seat) {
+        boolean sustains = BoardView.model(seat, UnitType.Carrier)
+                .map(UnitModel::getSustainDamage)
+                .orElse(false);
+        return CARRIER_VALUE + (sustains ? SUSTAINING_CARRIER_BONUS : 0);
+    }
+
     public static Optional<BuildPlan> freeBuild(Game game, Player seat, Tile tile, DefenseOutlook defense) {
         if (!seat.hasLeaderUnlocked(HACAN_HERO) || BoardView.hasEnemyShips(game, seat, tile)) return Optional.empty();
         BuildPlan free = plan(game, seat, tile, FREE_BUILD_RESOURCES, defense);
@@ -280,7 +306,7 @@ public class ProductionPlanner {
         if (resources <= 0 || BoardView.hasEnemyShips(game, seat, tile)) return List.of();
         Builder planned = oneShipBuilder(game, seat, tile, resources);
         planScoringUnits(planned);
-        planned.shipsUpTo(UnitType.Carrier, WANTED_CARRIERS, CARRIER_VALUE, false);
+        planned.shipsUpTo(UnitType.Carrier, wantedCarriers(seat), carrierValue(seat), false);
         planSurplusShips(planned);
         Builder cheapest = oneShipBuilder(game, seat, tile, resources);
         cheapest.ship(UnitType.Destroyer, cheapest.fillerValue(UnitType.Destroyer), false);
@@ -391,8 +417,8 @@ public class ProductionPlanner {
     }
 
     private static void planCoreUnits(Builder builder) {
-        builder.shipsUpTo(UnitType.Carrier, WANTED_CARRIERS, CARRIER_VALUE, false);
-        builder.overSuppliedCarriersUpTo(WANTED_CARRIERS);
+        builder.shipsUpTo(UnitType.Carrier, wantedCarriers(builder.seat), carrierValue(builder.seat), false);
+        builder.overSuppliedCarriersUpTo(wantedCarriers(builder.seat));
         int spare = TacticalPlanner.movableGroundForces(builder.game, builder.seat, builder.tile, builder.defense);
         builder.infantry(WANTED_SPARE_INFANTRY - spare, NEEDED_INFANTRY_VALUE);
         int wantedMechs =
@@ -612,7 +638,7 @@ public class ProductionPlanner {
             while (budget.overSupply > 0 && budget.fleetRoom <= 0 && count(UnitType.Carrier) < target) {
                 budget.overSupply--;
                 budget.fleetRoom++;
-                if (!ship(UnitType.Carrier, CARRIER_VALUE - scrap.getAsDouble(), false)) {
+                if (!ship(UnitType.Carrier, carrierValue(seat) - scrap.getAsDouble(), false)) {
                     budget.fleetRoom--;
                     return;
                 }

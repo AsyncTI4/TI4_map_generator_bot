@@ -22,6 +22,8 @@ class NotesForTrade {
     static final String POLITICAL_SECRET = "_ps";
     static final int LAST_AGENDA_ROUND = 5;
     private static final double OWN_THRONE_BACK = 1.0;
+    private static final String MILITARY_SUPPORT = "ms";
+    private static final double MILITARY_SUPPORT_COST = 3.0;
     private static final String POLITICAL_FAVOR = "favor";
     private static final double FAVOR_PLAY_CHANCE = 0.25;
     private static final double TRADE_GOOD_PER_AGENDA = 1.0;
@@ -88,6 +90,7 @@ class NotesForTrade {
         if (alias.endsWith(CEASEFIRE)) return CeasefireValue.givenCost(game, seat, receiver);
         if (alias.endsWith(POLITICAL_SECRET)) return politicalSecretValue(game);
         if (POLITICAL_FAVOR.equals(alias)) return politicalFavorCost(game);
+        if (MILITARY_SUPPORT.equals(alias)) return MILITARY_SUPPORT_COST;
         if (ConvoysValue.isConvoys(alias)) return ConvoysValue.GIVE_COST;
         return OWN_FACTION_NOTE_COST;
     }

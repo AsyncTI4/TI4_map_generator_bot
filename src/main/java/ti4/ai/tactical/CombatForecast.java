@@ -1,7 +1,11 @@
 package ti4.ai.tactical;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CombatModifiers.Side;
@@ -41,6 +45,10 @@ public class CombatForecast {
                 .orElse(0.0);
     }
 
+    public static double extraDieSwing(Game game, Player seat, String position, String holderName) {
+        return duel(game, seat, position, holderName).map(Duel::extraDieSwing).orElse(0.0);
+    }
+
     public static double repairSwing(Game game, Player seat, String position, String holderName) {
         return duel(game, seat, position, holderName).map(Duel::repairSwing).orElse(0.0);
     }
@@ -75,11 +83,27 @@ public class CombatForecast {
             return CombatForces.current(game, tile, holder, opponent, seat, ground);
         }
 
+        double extraDieSwing() {
+            Force own = own();
+            Optional<Integer> best = IntStream.range(0, own.units().size())
+                    .filter(index -> own.units().get(index).type() != null)
+                    .boxed()
+                    .min(Comparator.comparingInt(index -> own.units().get(index).hitsOn()));
+            if (best.isEmpty()) return 0;
+            List<Combatant> units = new ArrayList<>(own.units());
+            Combatant unit = units.get(best.get());
+            units.set(best.get(), unit.rolling(unit.hitsOn(), unit.dice() + 1));
+            return swing(own, enemy(), own.withUnits(units));
+        }
+
         double firstRoundSwing(RoundModifier modifier) {
             Force own = own();
-            Force enemy = enemy();
             Force boosted = own.withUnits(
                     own.units().stream().map(unit -> boosted(unit, modifier)).toList());
+            return swing(own, enemy(), boosted);
+        }
+
+        private double swing(Force own, Force enemy, Force boosted) {
             double before = CombatForces.win(own, enemy, attacks());
             double after = attacks()
                     ? CombatOdds.resolveFirstRound(own, enemy, boosted, enemy).attackerWins()

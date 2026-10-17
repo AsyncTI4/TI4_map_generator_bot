@@ -40,6 +40,11 @@ import ti4.ai.secrets.ActionSecretRules;
 import ti4.ai.secrets.SecretCostRules;
 import ti4.ai.secrets.SecretRules;
 import ti4.ai.secrets.SecretValue;
+import ti4.ai.sol.BellumGloriosumRules;
+import ti4.ai.sol.OrbitalDropRules;
+import ti4.ai.sol.SolAgentRules;
+import ti4.ai.sol.SolCommanderRules;
+import ti4.ai.sol.SolHeroRules;
 import ti4.ai.strategy.CardPlanMemory;
 import ti4.ai.strategy.ChecksAndBalances;
 import ti4.ai.strategy.OverruleChoice;
@@ -47,6 +52,7 @@ import ti4.ai.strategy.SecondaryQueue;
 import ti4.ai.strategy.StrategyCardRanking;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.strategy.StrategyCardTurn;
+import ti4.ai.tactical.CombatMoment;
 import ti4.ai.tactical.CombatRules;
 import ti4.ai.tactical.FleetSupplyRules;
 import ti4.ai.tactical.IntegratedEconomyRules;
@@ -124,7 +130,10 @@ public class NekroBrain implements FactionBrain {
             DatahubRules.START,
             DatahubRules.SELECT_PREFIX,
             DatahubRules.SWAP_PREFIX,
-            WrathOfKenaraRules.FINISH_PREFIX);
+            WrathOfKenaraRules.FINISH_PREFIX,
+            OrbitalDropRules.MECH_PREFIX,
+            OrbitalDropRules.FINISH,
+            BellumGloriosumRules.OFFER_PREFIX);
     private static final Set<String> WINDOW_PREFIXES = Stream.concat(
                     PUBLIC_WINDOW_PREFIXES.stream(), ActionCardRules.targetPrefixes().stream())
             .collect(Collectors.toUnmodifiableSet());
@@ -166,9 +175,13 @@ public class NekroBrain implements FactionBrain {
             FleetSupplyRules::removeExcessShips,
             StrategyCardRules::buildWithWarfare,
             StrategyCardRules::buildWithConstruction,
+            BellumGloriosumRules::next,
             XxchaAgentRules::next,
+            OrbitalDropRules::next,
+            SolHeroRules::next,
             NekroLeaderRules::chooseAgentTarget,
             CarthAgentRules::chooseTarget,
+            SolAgentRules::chooseTarget,
             NekroLeaderRules::continueHero,
             ActionCardRules::continuePlay,
             ActionCardRules::afterActivation,
@@ -189,7 +202,8 @@ public class NekroBrain implements FactionBrain {
             SingularityRules::next,
             WrathOfKenaraRules::next,
             CombatCardRules::hold,
-            context -> CombatRules.next(context, CombatCardRules::atRoundStart),
+            SolCommanderRules::next,
+            context -> CombatRules.next(context, NekroBrain::atRoundStart),
             ActionSecretRules::next,
             SecretRules::scoreAgendaSecret,
             PromissoryRules::queueAgendaNote,
@@ -237,6 +251,10 @@ public class NekroBrain implements FactionBrain {
             if (decision.isPresent()) return decision.get();
         }
         return AiDecision.idle();
+    }
+
+    private static Optional<AiDecision> atRoundStart(AiTurnContext context, CombatMoment moment) {
+        return SolAgentRules.atRoundStart(context, moment).or(() -> CombatCardRules.atRoundStart(context, moment));
     }
 
     private Optional<AiDecision> finishCommandTokenGain(AiTurnContext context) {
@@ -473,6 +491,10 @@ public class NekroBrain implements FactionBrain {
         if (techAction.isPresent()) return techAction;
         Optional<AiDecision> xxchaStall = XxchaAgentRules.insteadOfTacticalAction(context, thisTurn);
         if (xxchaStall.isPresent()) return xxchaStall;
+        Optional<AiDecision> solHero = SolHeroRules.insteadOfTacticalAction(context, thisTurn);
+        if (solHero.isPresent()) return solHero;
+        Optional<AiDecision> orbitalDrop = OrbitalDropRules.insteadOfTacticalAction(context, thisTurn);
+        if (orbitalDrop.isPresent()) return orbitalDrop;
         Optional<AiDecision> tactical = TacticalRules.start(context);
         if (tactical.isPresent()) return tactical;
         for (AiPrompt prompt : thisTurn) {
@@ -491,6 +513,10 @@ public class NekroBrain implements FactionBrain {
         if (relicBeforePassing.isPresent()) return relicBeforePassing;
         Optional<AiDecision> xxchaAgent = XxchaAgentRules.beforePassing(context, thisTurn);
         if (xxchaAgent.isPresent()) return xxchaAgent;
+        Optional<AiDecision> solHeroBeforePassing = SolHeroRules.beforePassing(context, thisTurn);
+        if (solHeroBeforePassing.isPresent()) return solHeroBeforePassing;
+        Optional<AiDecision> orbitalDropBeforePassing = OrbitalDropRules.beforePassing(context, thisTurn);
+        if (orbitalDropBeforePassing.isPresent()) return orbitalDropBeforePassing;
         Optional<AiDecision> convoysBeforePassing = ConvoysRules.beforePassing(context, thisTurn);
         if (convoysBeforePassing.isPresent()) return convoysBeforePassing;
         Optional<AiDecision> beforePassing = TechRules.beforePassing(context, thisTurn);

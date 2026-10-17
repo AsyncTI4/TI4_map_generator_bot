@@ -592,7 +592,7 @@ public class CombatRules {
         return tracker(context.game(), faction, position, holder);
     }
 
-    static int tracker(Game game, String faction, String position, String holder) {
+    public static int tracker(Game game, String faction, String position, String holder) {
         String value = game.getStoredValue("combatRoundTracker" + faction + position + holder);
         return StringUtils.isNumeric(value) ? Integer.parseInt(value) : 0;
     }
