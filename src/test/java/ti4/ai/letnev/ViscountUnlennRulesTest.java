@@ -20,8 +20,8 @@ import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
-// Viscount Unlenn gives one ship an extra die for a round and readies every status phase, so the seat uses it in its
-// own space combats when the die changes the outcome, and not at all for anybody else's.
+// Viscount Unlenn gives the ship with the best chance to hit an extra die for a round and readies every status phase,
+// so the seat uses it in its own space combats unless the fight is already decided, and never for anybody else's.
 class ViscountUnlennRulesTest extends BaseTi4Test {
 
     private static final String SPACE = "space";
@@ -124,9 +124,19 @@ class ViscountUnlennRulesTest extends BaseTi4Test {
     }
 
     @Test
-    void doesNotUseTheAgentOnASkirmish() {
+    void usesTheFreeAgentEvenInASkirmishBecauseItReadiesEveryRound() {
         fleets(UnitType.Destroyer, 1, UnitType.Destroyer, 1);
 
+        assertThat(pressed(ViscountUnlennRules.atRoundStart(context(combatStart()), moment)))
+                .isEqualTo("FFCC_letnev_getAgentSelection_letnevagent");
+    }
+
+    @Test
+    void doesNotUseTheAgentOnAFightTheDieCannotSave() {
+        fleets(UnitType.Destroyer, 1, UnitType.Dreadnought, 8);
+
+        assertThat(CombatForecast.extraDie(test.game, letnev, position, SPACE).worthSpending())
+                .isFalse();
         assertThat(ViscountUnlennRules.atRoundStart(context(combatStart()), moment))
                 .isEmpty();
     }
@@ -146,8 +156,7 @@ class ViscountUnlennRulesTest extends BaseTi4Test {
         test.units(tile, SPACE, test.sol, UnitType.Dreadnought, 3);
         test.units(tile, SPACE, test.nekro, UnitType.Dreadnought, 3);
 
-        assertThat(CombatForecast.extraDieGain(test.game, letnev, position).gain())
-                .isZero();
+        assertThat(CombatForecast.extraDie(test.game, letnev, position, SPACE)).isEqualTo(CombatForecast.ExtraDie.NONE);
     }
 
     @Test

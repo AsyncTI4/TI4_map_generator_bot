@@ -1,11 +1,11 @@
 package ti4.ai.tactical;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
 import lombok.experimental.UtilityClass;
@@ -49,10 +49,6 @@ public class CombatForecast {
         return duel(game, seat, position, holderName)
                 .map(duel -> duel.firstRoundSwing(modifier))
                 .orElse(0.0);
-    }
-
-    public static double extraDieSwing(Game game, Player seat, String position, String holderName) {
-        return duel(game, seat, position, holderName).map(Duel::extraDieSwing).orElse(0.0);
     }
 
     public static double repairSwing(Game game, Player seat, String position, String holderName) {
@@ -129,10 +125,19 @@ public class CombatForecast {
                 .orElse(FirstRoundGain.NONE);
     }
 
-    public static FirstRoundGain extraDieGain(Game game, Player seat, String position) {
-        return duel(game, seat, position, BoardView.SPACE)
-                .map(duel -> duel.firstRoundGain(Duel::withExtraDieOnBestShip))
-                .orElse(FirstRoundGain.NONE);
+    public record ExtraDie(double winWithout, double winWith) {
+
+        public static final double DECIDED_WIN = 0.95;
+        public static final double HOPELESS = 0.05;
+        public static final ExtraDie NONE = new ExtraDie(0, 0);
+
+        public boolean worthSpending() {
+            return winWithout < DECIDED_WIN && winWith >= HOPELESS;
+        }
+    }
+
+    public static ExtraDie extraDie(Game game, Player seat, String position, String holderName) {
+        return duel(game, seat, position, holderName).map(Duel::extraDie).orElse(ExtraDie.NONE);
     }
 
     private static Optional<Duel> duel(Game game, Player seat, String position, String holderName) {
@@ -165,17 +170,20 @@ public class CombatForecast {
             return CombatForces.current(game, tile, holder, opponent, seat, ground);
         }
 
-        double extraDieSwing() {
-            Force own = own();
-            Optional<Integer> best = IntStream.range(0, own.units().size())
-                    .filter(index -> own.units().get(index).type() != null)
-                    .boxed()
-                    .min(Comparator.comparingInt(index -> own.units().get(index).hitsOn()));
-            if (best.isEmpty()) return 0;
-            List<Combatant> units = new ArrayList<>(own.units());
-            Combatant unit = units.get(best.get());
-            units.set(best.get(), unit.rolling(unit.hitsOn(), unit.dice() + 1));
-            return swing(own, enemy(), own.withUnits(units));
+        ExtraDie extraDie() {
+            Force own = own().rerollingMissesInFirstRounds(0);
+            Force enemy = enemy();
+            return new ExtraDie(winOf(detailed(own, own, enemy)), winOf(detailed(own, withExtraDie(own), enemy)));
+        }
+
+        private Force withExtraDie(Force own) {
+            List<Combatant> units = own.units();
+            OptionalInt chosen = ExtraDieTarget.choose(units, ground);
+            if (chosen.isEmpty()) return own;
+            List<Combatant> boosted = new ArrayList<>(units);
+            Combatant unit = units.get(chosen.getAsInt());
+            boosted.set(chosen.getAsInt(), unit.rolling(unit.hitsOn(), unit.dice() + 1));
+            return own.withUnits(boosted);
         }
 
         double firstRoundSwing(RoundModifier modifier) {
@@ -270,27 +278,6 @@ public class CombatForecast {
             return attacks()
                     ? detailed.attackerCostLost() - detailed.defenderCostLost()
                     : detailed.defenderCostLost() - detailed.attackerCostLost();
-        }
-
-        static Force withExtraDieOnBestShip(Force own) {
-            List<Combatant> units = own.units();
-            int chosen = -1;
-            for (int i = 0; i < units.size(); i++) {
-                Combatant unit = units.get(i);
-                if (unit.type() == null || unit.dice() == 0) continue;
-                if (chosen < 0 || bestShip(unit, units.get(chosen))) chosen = i;
-            }
-            if (chosen < 0) return own;
-            List<Combatant> boosted = new ArrayList<>(units);
-            Combatant unit = units.get(chosen);
-            boosted.set(chosen, unit.rolling(unit.hitsOn(), unit.dice() + 1));
-            return own.withUnits(boosted);
-        }
-
-        private static boolean bestShip(Combatant candidate, Combatant current) {
-            if (candidate.hitsOn() != current.hitsOn()) return candidate.hitsOn() < current.hitsOn();
-            if (candidate.dice() != current.dice()) return candidate.dice() > current.dice();
-            return candidate.cost() >= current.cost();
         }
 
         private Map<UnitType, Integer> unitsOf(Player player) {

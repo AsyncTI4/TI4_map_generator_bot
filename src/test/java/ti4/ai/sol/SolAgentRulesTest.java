@@ -92,6 +92,30 @@ class SolAgentRulesTest extends BaseTi4Test {
     }
 
     @Test
+    void usesTheAgentInAnEvenSmallFightBecauseItReadiesEveryRound() {
+        fight(1, 1);
+
+        assertThat(pressed(SolAgentRules.atRoundStart(context(offer()), moment())))
+                .isEqualTo("FFCC_sol_getAgentSelection_solagent");
+    }
+
+    @Test
+    void keepsTheAgentOnAHopelessFight() {
+        fight(1, 12);
+
+        assertThat(SolAgentRules.atRoundStart(context(offer()), moment())).isEmpty();
+    }
+
+    @Test
+    void usesTheAgentWhenAMechIsAmongTheDefenders() {
+        fight(2, 3);
+        test.units(tile, PLANET, sol, UnitType.Mech, 1);
+
+        assertThat(pressed(SolAgentRules.atRoundStart(context(offer()), moment())))
+                .isEqualTo("FFCC_sol_getAgentSelection_solagent");
+    }
+
+    @Test
     void keepsTheAgentForCombatsItDoesNotFightIn() {
         test.units(tile, PLANET, test.nekro, UnitType.Infantry, 3);
 

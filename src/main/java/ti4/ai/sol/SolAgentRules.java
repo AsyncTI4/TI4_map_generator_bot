@@ -21,7 +21,6 @@ public class SolAgentRules {
 
     public static final String START = "getAgentSelection_solagent";
     public static final String TARGET_PREFIX = "exhaustAgent_solagent_";
-    static final double MIN_SWING = 0.2;
     private static final String AGENT = "solagent";
     private static final String KEY = "solAgent|";
     private static final String STARTED = "started";
@@ -38,8 +37,8 @@ public class SolAgentRules {
         Optional<String> state = context.memory().get(key);
         if (state.isPresent()) return awaitTarget(context, state.get());
         if (!fightsHere(context.game(), seat, moment)) return Optional.empty();
-        double swing = CombatForecast.extraDieSwing(context.game(), seat, moment.position(), moment.holder());
-        if (swing < MIN_SWING) {
+        if (!CombatForecast.extraDie(context.game(), seat, moment.position(), moment.holder())
+                .worthSpending()) {
             context.memory().put(key, DECLINED);
             return Optional.empty();
         }

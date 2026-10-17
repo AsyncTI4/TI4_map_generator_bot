@@ -8,10 +8,10 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
+import ti4.ai.eval.BoardView;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.tactical.CombatForecast;
-import ti4.ai.tactical.CombatForecast.FirstRoundGain;
 import ti4.ai.tactical.CombatMoment;
 import ti4.game.Player;
 
@@ -21,8 +21,6 @@ public class ViscountUnlennRules {
     public static final String AGENT = "letnevagent";
     public static final String TARGET_PREFIX = "exhaustAgent_" + AGENT + "_";
     static final String OPEN = "getAgentSelection_" + AGENT;
-    static final double MIN_GAIN = 1.5;
-    static final double HOPELESS = 0.1;
     private static final String KEY = "letnevAgent|";
     private static final String SELECTING = "selecting";
     private static final String DECIDED = "decided";
@@ -54,8 +52,8 @@ public class ViscountUnlennRules {
     }
 
     static boolean worthUsing(AiTurnContext context, CombatMoment moment) {
-        FirstRoundGain gain = CombatForecast.extraDieGain(context.game(), context.seat(), moment.position());
-        return gain.winChance() >= HOPELESS && gain.gain() >= MIN_GAIN;
+        return CombatForecast.extraDie(context.game(), context.seat(), moment.position(), BoardView.SPACE)
+                .worthSpending();
     }
 
     private static Optional<AiDecision> chooseTarget(AiTurnContext context, String key, long since) {
