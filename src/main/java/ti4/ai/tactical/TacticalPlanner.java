@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
@@ -283,6 +284,16 @@ public class TacticalPlanner {
 
     public static List<TacticalPlan> rankedFreeing(Game game, Player seat, String freedPosition) {
         Set<String> freed = Set.of(freedPosition);
+        return candidates(
+                new Context(game, seat, freed),
+                tile -> freed.contains(tile.getPosition()) || activatable(game, seat, tile));
+    }
+
+    public static List<TacticalPlan> rankedFreeingEveryToken(Game game, Player seat) {
+        Set<String> freed = game.getTileMap().values().stream()
+                .filter(tile -> tile.hasPlayerCC(seat))
+                .map(Tile::getPosition)
+                .collect(Collectors.toSet());
         return candidates(
                 new Context(game, seat, freed),
                 tile -> freed.contains(tile.getPosition()) || activatable(game, seat, tile));

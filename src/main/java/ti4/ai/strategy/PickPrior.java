@@ -16,11 +16,13 @@ class PickPrior {
     private static final Map<StrategyCard, int[]> XXCHA_PICKS_BY_ROUND = new EnumMap<>(StrategyCard.class);
     private static final Map<StrategyCard, int[]> SARDAKK_PICKS_BY_ROUND = new EnumMap<>(StrategyCard.class);
     private static final Map<StrategyCard, int[]> LETNEV_PICKS_BY_ROUND = new EnumMap<>(StrategyCard.class);
+    private static final Map<StrategyCard, int[]> SOL_PICKS_BY_ROUND = new EnumMap<>(StrategyCard.class);
     private static final Map<String, Map<StrategyCard, int[]>> PICKS_BY_FACTION = Map.of(
             "hacan", HACAN_PICKS_BY_ROUND,
             "xxcha", XXCHA_PICKS_BY_ROUND,
             "sardakk", SARDAKK_PICKS_BY_ROUND,
-            "letnev", LETNEV_PICKS_BY_ROUND);
+            "letnev", LETNEV_PICKS_BY_ROUND,
+            "sol", SOL_PICKS_BY_ROUND);
 
     static {
         NEKRO_PICKS_BY_ROUND.put(StrategyCard.LEADERSHIP, new int[] {121, 81, 108, 108, 119, 20});
@@ -66,6 +68,14 @@ class PickPrior {
         LETNEV_PICKS_BY_ROUND.put(StrategyCard.WARFARE, new int[] {97, 88, 109, 116, 148, 37});
         LETNEV_PICKS_BY_ROUND.put(StrategyCard.TECHNOLOGY, new int[] {188, 175, 152, 148, 99, 26});
         LETNEV_PICKS_BY_ROUND.put(StrategyCard.IMPERIAL, new int[] {2, 93, 164, 141, 148, 46});
+        SOL_PICKS_BY_ROUND.put(StrategyCard.LEADERSHIP, new int[] {168, 247, 168, 161, 163, 38});
+        SOL_PICKS_BY_ROUND.put(StrategyCard.DIPLOMACY, new int[] {149, 110, 89, 95, 139, 47});
+        SOL_PICKS_BY_ROUND.put(StrategyCard.POLITICS, new int[] {231, 188, 170, 182, 175, 39});
+        SOL_PICKS_BY_ROUND.put(StrategyCard.CONSTRUCTION, new int[] {69, 138, 119, 121, 81, 18});
+        SOL_PICKS_BY_ROUND.put(StrategyCard.TRADE, new int[] {204, 157, 195, 174, 92, 23});
+        SOL_PICKS_BY_ROUND.put(StrategyCard.WARFARE, new int[] {153, 54, 66, 108, 134, 42});
+        SOL_PICKS_BY_ROUND.put(StrategyCard.TECHNOLOGY, new int[] {217, 192, 150, 136, 111, 26});
+        SOL_PICKS_BY_ROUND.put(StrategyCard.IMPERIAL, new int[] {3, 105, 224, 207, 179, 53});
     }
 
     static double nudge(StrategyCard card, int round) {

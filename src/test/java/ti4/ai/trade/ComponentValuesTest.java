@@ -253,6 +253,13 @@ class ComponentValuesTest extends BaseTi4Test {
         assertThat(giveCost("black_an")).isCloseTo(0.3, within(EXACT));
     }
 
+    // Military Support costs its owner a strategy token and hands the holder 2 infantry whenever it is played, so Sol
+    // does not give its own away for the price of an ordinary faction note.
+    @Test
+    void militarySupportCostsItsOwnerAStrategyTokenAndTwoInfantry() {
+        assertThat(NotesForTrade.giveCost(table.game, sol, nekro, "ms")).isCloseTo(3.0, within(EXACT));
+    }
+
     // A Trade Agreement is worth its owner's commodities less 1, given or received.
     @Test
     void tradeAgreement() {

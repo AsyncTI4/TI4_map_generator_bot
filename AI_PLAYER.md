@@ -41,6 +41,29 @@ L1Z1X Mindnet, Naalu Collective, Federation of Sol, Universities of Jol-Nar, Xxc
 Yin Brotherhood. They all use the same rules; the Nekro-only rules (Technological Singularity,
 the tech-steal bonus when choosing attacks) switch on for Nekro only.
 
+**Federation of Sol.** The Sol rules key on the ability, leader, unit or breakthrough rather than the faction, so
+Nekro and Franken copies work too (`ti4.ai.sol`):
+- _Orbital Drop_ (`OrbitalDropRules`, `GroundDrops`) is a component action worth, per planet, the better of what 2
+  infantry cut from the expected loss of a landing there (the same defence model production uses), the carriers in
+  that system waiting for infantry (1.0 each when the best tactical plan launches from it, 0.5 otherwise), and
+  finishing _Occupy the Fringe_ (80% of a point), plus a floor of 0.3 per infantry and a quarter of the rest. It
+  costs a strategy token (2 trade goods, times 0.4 with 3 spare tokens, 0.6 with 2, 0.8 with 1, 1.0 with none, and 1.5
+  more when it would cost a follow it plans) and the action. It is played when that, plus 1.5 for stalling while
+  anyone else is still in the round, beats the best tactical plan, and in place of passing. The mech deploy pays 3
+  resources when the mech's gain beats the premium over a mech's cost (a mech that turns a landing 2 infantry cannot,
+  or advances _Mechanize the Military_).
+- Evelyn Delouis (`SolAgentRules`) is used at the start of a round of a ground combat the seat fights in, when the
+  extra die on its best ground force moves the win chance times the stake by at least 0.2; never for other
+  players' combats. Claire Gibson (`SolCommanderRules`) places her free infantry before the seat's first roll.
+- Jace X, 4th Air Legion (`SolHeroRules`) is played from round 3 on when the seat has a tactical token and freeing
+  every command token on the board makes its best tactical plan worth at least three quarters of a point and at least
+  3 more than its two best plans now.
+- _Bellum Gloriosum_ (`BellumGloriosumRules`): after its normal build is paid, the seat takes the free build for each
+  ship with capacity it produced: defending infantry, spare infantry up to four, then fighters up to its room, paid
+  from what the reserve leaves.
+- Production wants one Advanced Carrier II (capacity 8, and it sustains damage) instead of two carriers.
+- Genesis' infantry in space is landed like any other ground force in the system, or carried with the fleet.
+
 **When an AI is confused**, it posts the choice in the main game channel and **any player**
 may pick for it. Choices involving hidden information (its hand, its secret objectives) are
 never shown: the AI picks a safe option and says so. A safe option is one that declines or passes; it is never a

@@ -71,6 +71,19 @@ class AiPerceptionTest extends BaseTi4Test {
         }
     }
 
+    // The mech deploy and the finish button of Orbital Drop, and the Bellum Gloriosum offer, are unowned buttons posted
+    // in the main channel.
+    @Test
+    void seesTheUnownedPromptsOfSolsComponents() {
+        Set<String> windows = new NekroBrain().publicWindowHandlerPrefixes();
+
+        for (String handler : List.of("orbitalMechDrop_jord", "finishComponentAction_spitItOut", "solBtBuild_301_8")) {
+            assertThat(AiPerception.isRelevant(PromptSource.PUBLIC, buttons(handler), "sol", windows))
+                    .as(handler)
+                    .isTrue();
+        }
+    }
+
     // The AI must never react to its own "choose for the AI" messages.
     @Test
     void ignoresItsOwnDelegationMessages() {
