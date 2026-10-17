@@ -61,6 +61,8 @@ public class TestBedPreset {
         private List<String> scoredObjectives;
         private List<String> fragments;
         private String breakthrough;
+        private boolean teamMateYou;
+        private boolean botAccount;
 
         public boolean hasRandomFaction() {
             return faction == null || faction.isBlank() || "random".equalsIgnoreCase(faction);

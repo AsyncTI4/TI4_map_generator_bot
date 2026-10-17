@@ -276,7 +276,10 @@ Seat fields (all optional): `faction`, `color`, `home`, `speaker`, `sc`; `acs`, 
 randomly, ids give that card, e.g. `["sabo1", 2]`; an action card held by another seat or in the discard is moved
 over); `techs`, `planets`; `tg`, `commodities`, `ccs` (`tactic/fleet/strategy`); `leaders`
 (`{ "unlock": ["commander"], "exhaust": ["agent"] }`); `units` (`{ "101": "2 dn, cv", "home": "2 gf" }`); `pns`,
-`scoredObjectives`, `fragments`, `breakthrough`. Unknown fields
+`scoredObjectives`, `fragments`, `breakthrough`; `teamMateYou` (`true` adds you as a teammate on that seat and turns on community mode, as `/player add_teammate` does;
+needs a preset without `you`, one seat at most); `botAccount` (`true` seats the bot's own Discord account instead
+of a virtual seat, so a real non-developer user holds the seat; scripts cannot act as it, one seat at most).
+Unknown fields
 and ids fail with every error listed at once; problems that only show while applying come back as warnings.
 
 ### Scripts

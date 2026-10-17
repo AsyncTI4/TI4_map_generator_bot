@@ -2,6 +2,7 @@ package ti4.game.persistence;
 
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -46,6 +47,7 @@ public class ManagedGame {
     private final ThreadChannel launchPostThread;
     private final Set<ManagedPlayer> players;
     private final Map<ManagedPlayer, Boolean> playerToIsReal;
+    private final Map<String, String> teamMateToPrimaryId;
 
     public ManagedGame(Game game) {
         name = game.getName();
@@ -81,6 +83,27 @@ public class ManagedGame {
                 .collect(Collectors.toUnmodifiableMap(
                         p -> getPlayer(p.getUserID()),
                         p -> ((p.isRealPlayer() && !p.isNpc()) || (p.isEliminated() && game.isHasEnded()))));
+        teamMateToPrimaryId = collectTeamMates(game);
+    }
+
+    private static Map<String, String> collectTeamMates(Game game) {
+        if (!game.isCommunityMode()) {
+            return Collections.emptyMap();
+        }
+        return game.getPlayers().values().stream()
+                .flatMap(player -> player.getTeamMateIDs().stream()
+                        .filter(id -> !id.equals(player.getUserID()))
+                        .map(id -> Map.entry(id, player.getUserID())))
+                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (first, _) -> first));
+    }
+
+    public String getSeatUserId(String id) {
+        if (hasPlayer(id)) return id;
+        return teamMateToPrimaryId.getOrDefault(id, id);
+    }
+
+    public boolean hasPlayerOrTeamMate(String id) {
+        return hasPlayer(id) || teamMateToPrimaryId.containsKey(id);
     }
 
     private static String sanitizeToNull(String str) {
