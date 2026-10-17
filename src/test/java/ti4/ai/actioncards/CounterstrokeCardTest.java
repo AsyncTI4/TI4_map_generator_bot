@@ -118,14 +118,16 @@ class CounterstrokeCardTest extends BaseTi4Test {
         assertThat(unlocked).isGreaterThan(1.0);
     }
 
+    // A command token is worth about two trade goods (2r = 3i = 1 token = 2 trade goods), more than an average action
+    // card, so Counterstroke is worth playing just to take the token back.
     @Test
-    void counterstrokeIsHeldWhenItOnlyReturnsAToken() {
+    void counterstrokeIsPlayedEvenWhenItOnlyReturnsAToken() {
         Tile outpost = table.system("40", "302");
         outpost.addCC(ccId());
         table.game.setActiveSystem("302");
         table.nekro.setActionCard("counterstroke", HAND_INDEX);
 
-        assertThat(ActionCardRules.afterActivation(table.test.context(hand()))).isEmpty();
+        assertThat(ActionCardRules.afterActivation(table.test.context(hand()))).isPresent();
     }
 
     @Test

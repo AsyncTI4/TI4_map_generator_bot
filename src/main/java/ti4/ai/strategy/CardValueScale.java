@@ -10,7 +10,7 @@ class CardValueScale {
     static final double VICTORY_POINT = ObjectiveValue.VICTORY_POINT_VALUE;
     static final double TRADE_GOOD = 1.0;
     static final double COMMODITY = 0.5;
-    static final double TOKEN_FLOOR = 0.75;
+    static final double TOKEN_FLOOR = 1.5;
     static final double TOKEN_ACTION_SHARE = 0.6;
     static final double STRATEGY_TOKEN = 1.0;
     static final double ACTION_CARD = ActionCardPrior.AVERAGE_CARD;
