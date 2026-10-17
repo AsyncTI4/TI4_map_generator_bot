@@ -64,7 +64,9 @@ class StrikeEvaluator {
         List<Combatant> arriving =
                 CombatForces.combatants(game, target, space, attacking, new Side(opponent, Map.of()), strike.damaged());
         List<Combatant> survivingCannon = BattleMath.afterCannonFire(arriving, theirCannon);
-        if (theirCannon > 0 && survivingCannon.isEmpty()) return wipedOut(seat, strike, spaceCombat);
+        if (theirCannon > 0 && survivingCannon.isEmpty() && !arriving.isEmpty()) {
+            return wipedOut(seat, strike, spaceCombat);
+        }
         double cannonLoss = costOf(arriving) - costOf(survivingCannon);
         Space cannonOnly = new Space(1, cannonLoss, cannonLoss, 0, 0, cannonLoss > 0 ? 1 : 0);
         Space fight = spaceCombat
@@ -212,6 +214,7 @@ class StrikeEvaluator {
         Map<UnitType, Integer> remaining = new EnumMap<>(UnitType.class);
         remaining.putAll(strike.cargo());
         Map<UnitType, Integer> dropped = dropExcessCargo(seat, remaining, survivors);
+        strike.pulled().forEach((type, count) -> remaining.merge(type, count, Integer::sum));
         Map<String, Integer> landings = new LinkedHashMap<>();
         Map<String, Double> wins = new LinkedHashMap<>();
         Map<String, Integer> sentTo = new LinkedHashMap<>();

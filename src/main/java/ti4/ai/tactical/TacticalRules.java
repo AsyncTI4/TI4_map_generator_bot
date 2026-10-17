@@ -258,7 +258,7 @@ public class TacticalRules {
         return context.memory().get(PLAN_KEY + actionKey(context)).flatMap(TacticalPlan::decode);
     }
 
-    private static Optional<TacticalPlan> plan(AiTurnContext context, String target) {
+    public static Optional<TacticalPlan> plan(AiTurnContext context, String target) {
         return rememberedPlan(context)
                 .filter(plan -> plan.target().equals(target))
                 .or(() -> context.game().getTacticalActionDisplacement().isEmpty()

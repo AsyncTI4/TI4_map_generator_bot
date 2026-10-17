@@ -513,6 +513,7 @@ final class OffenseOutlook {
         }
         Map<UnitType, Integer> cargo = new java.util.EnumMap<>(UnitType.class);
         cargo.putAll(strike.cargo());
+        strike.pulled().forEach((type, count) -> cargo.merge(type, count, Integer::sum));
         for (Map.Entry<String, Integer> sent : estimate.groundSent().entrySet()) {
             int left = sent.getValue();
             for (UnitType type : BoardView.GROUND_FORCES) {

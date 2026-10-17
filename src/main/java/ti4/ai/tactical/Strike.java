@@ -19,7 +19,8 @@ record Strike(
         Map<UnitType, Integer> cargo,
         Map<UnitType, Integer> extraDefenderShips,
         Map<UnitType, Integer> extraDefenderGround,
-        StrikeRules rules) {
+        StrikeRules rules,
+        Map<UnitType, Integer> pulled) {
 
     Strike withMoves(List<UnitMove> executed) {
         return new Strike(
@@ -32,7 +33,23 @@ record Strike(
                 cargo,
                 extraDefenderShips,
                 extraDefenderGround,
-                rules);
+                rules,
+                pulled);
+    }
+
+    Strike withPulled(Map<UnitType, Integer> commanderForces) {
+        return new Strike(
+                target,
+                opponent,
+                origins,
+                moves,
+                ships,
+                damaged,
+                cargo,
+                extraDefenderShips,
+                extraDefenderGround,
+                rules,
+                commanderForces);
     }
 
     static Strike of(
@@ -54,6 +71,10 @@ record Strike(
             int hurt = Math.min(move.count(), BoardView.damaged(BoardView.space(origin), seat, move.type()));
             if (hurt > 0) damaged.merge(move.type(), hurt, Integer::sum);
         }
-        return new Strike(target, opponent, origins, moves, ships, damaged, cargo, Map.of(), Map.of(), rules);
+        return new Strike(target, opponent, origins, moves, ships, damaged, cargo, Map.of(), Map.of(), rules, Map.of());
+    }
+
+    int pulledForces() {
+        return pulled.values().stream().mapToInt(Integer::intValue).sum();
     }
 }
