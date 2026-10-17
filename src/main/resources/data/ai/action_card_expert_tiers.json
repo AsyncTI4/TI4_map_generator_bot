@@ -1,0 +1,316 @@
+{
+  "source": "Expert ranking of the TE + PoK action cards from a podcast series by experienced competitive players (pasted by the user 2026-10-11). Covers cards alphabetically from Ancient Burial Sites to Overrule; later cards are not ranked yet. rankInTier: 1 is best within the tier.",
+  "rankedThrough": "Overrule",
+  "cards": [
+    {
+      "name": "Overrule",
+      "tier": "S",
+      "rankInTier": 1
+    },
+    {
+      "name": "Focused Research",
+      "tier": "S",
+      "rankInTier": 2
+    },
+    {
+      "name": "Divert Funding",
+      "tier": "S",
+      "rankInTier": 3
+    },
+    {
+      "name": "Flank Speed",
+      "tier": "S",
+      "rankInTier": 4
+    },
+    {
+      "name": "Impersonation",
+      "tier": "S",
+      "rankInTier": 5
+    },
+    {
+      "name": "Master Plan",
+      "tier": "S",
+      "rankInTier": 6
+    },
+    {
+      "name": "Confounding Legal Text",
+      "tier": "A",
+      "rankInTier": 1
+    },
+    {
+      "name": "Imperial Rider",
+      "tier": "A",
+      "rankInTier": 2
+    },
+    {
+      "name": "Lie in Wait",
+      "tier": "A",
+      "rankInTier": 3
+    },
+    {
+      "name": "Exchange Program",
+      "tier": "A",
+      "rankInTier": 4
+    },
+    {
+      "name": "Crash Landing",
+      "tier": "A",
+      "rankInTier": 5
+    },
+    {
+      "name": "Leadership Rider",
+      "tier": "A",
+      "rankInTier": 6
+    },
+    {
+      "name": "Crisis",
+      "tier": "B",
+      "rankInTier": 1
+    },
+    {
+      "name": "Counterstroke",
+      "tier": "B",
+      "rankInTier": 2
+    },
+    {
+      "name": "Fire Team",
+      "tier": "B",
+      "rankInTier": 3
+    },
+    {
+      "name": "Black Market Dealings",
+      "tier": "B",
+      "rankInTier": 4
+    },
+    {
+      "name": "Emergency Repairs",
+      "tier": "B",
+      "rankInTier": 5
+    },
+    {
+      "name": "Coup d'Etat",
+      "tier": "B",
+      "rankInTier": 6
+    },
+    {
+      "name": "Mining Initiative",
+      "tier": "B",
+      "rankInTier": 7
+    },
+    {
+      "name": "Extreme Duress",
+      "tier": "B",
+      "rankInTier": 8
+    },
+    {
+      "name": "Deadly Plot",
+      "tier": "B",
+      "rankInTier": 9
+    },
+    {
+      "name": "Ghost Ship",
+      "tier": "B",
+      "rankInTier": 10
+    },
+    {
+      "name": "Fighter Prototype",
+      "tier": "B",
+      "rankInTier": 11
+    },
+    {
+      "name": "Exploration Probe",
+      "tier": "B",
+      "rankInTier": 12
+    },
+    {
+      "name": "Insubordination",
+      "tier": "B",
+      "rankInTier": 13
+    },
+    {
+      "name": "Archaeological Expedition",
+      "tier": "B",
+      "rankInTier": 14
+    },
+    {
+      "name": "Brilliance",
+      "tier": "B",
+      "rankInTier": 15
+    },
+    {
+      "name": "Frontline Deployment",
+      "tier": "B",
+      "rankInTier": 16
+    },
+    {
+      "name": "Economic Initiative",
+      "tier": "C",
+      "rankInTier": 1
+    },
+    {
+      "name": "Manipulate Investments",
+      "tier": "C",
+      "rankInTier": 2
+    },
+    {
+      "name": "Forward Supply Base",
+      "tier": "C",
+      "rankInTier": 3
+    },
+    {
+      "name": "Harness Energy",
+      "tier": "C",
+      "rankInTier": 4
+    },
+    {
+      "name": "In The Silence Of Space",
+      "tier": "C",
+      "rankInTier": 5
+    },
+    {
+      "name": "Diplomacy Rider",
+      "tier": "C",
+      "rankInTier": 6
+    },
+    {
+      "name": "Fighter Conscription",
+      "tier": "C",
+      "rankInTier": 7
+    },
+    {
+      "name": "Industrial Initiative",
+      "tier": "C",
+      "rankInTier": 8
+    },
+    {
+      "name": "Mercenary Contract",
+      "tier": "C",
+      "rankInTier": 9
+    },
+    {
+      "name": "Nav Suite",
+      "tier": "C",
+      "rankInTier": 10
+    },
+    {
+      "name": "Blitz",
+      "tier": "C",
+      "rankInTier": 11
+    },
+    {
+      "name": "Experimental Battlestation",
+      "tier": "C",
+      "rankInTier": 12
+    },
+    {
+      "name": "Cripple Defenses",
+      "tier": "C",
+      "rankInTier": 13
+    },
+    {
+      "name": "Bunker",
+      "tier": "C",
+      "rankInTier": 14
+    },
+    {
+      "name": "Infiltrate",
+      "tier": "D",
+      "rankInTier": 1
+    },
+    {
+      "name": "Construction Rider",
+      "tier": "D",
+      "rankInTier": 2
+    },
+    {
+      "name": "Diplomatic Pressure",
+      "tier": "D",
+      "rankInTier": 3
+    },
+    {
+      "name": "Lost Star Chart",
+      "tier": "D",
+      "rankInTier": 4
+    },
+    {
+      "name": "Direct Hit",
+      "tier": "D",
+      "rankInTier": 5
+    },
+    {
+      "name": "Decoy Operation",
+      "tier": "D",
+      "rankInTier": 6
+    },
+    {
+      "name": "Bribery",
+      "tier": "D",
+      "rankInTier": 7
+    },
+    {
+      "name": "Ghost Squad",
+      "tier": "D",
+      "rankInTier": 8
+    },
+    {
+      "name": "Morale Boost",
+      "tier": "D",
+      "rankInTier": 9
+    },
+    {
+      "name": "Courageous to the End",
+      "tier": "D",
+      "rankInTier": 10
+    },
+    {
+      "name": "Assassinate Representative",
+      "tier": "D",
+      "rankInTier": 11
+    },
+    {
+      "name": "Hack Election",
+      "tier": "D",
+      "rankInTier": 12
+    },
+    {
+      "name": "Distinguished Councilor",
+      "tier": "D",
+      "rankInTier": 13
+    },
+    {
+      "name": "Insider Information",
+      "tier": "D",
+      "rankInTier": 14
+    },
+    {
+      "name": "Disable",
+      "tier": "D",
+      "rankInTier": 15
+    },
+    {
+      "name": "Maneuvering Jets",
+      "tier": "D",
+      "rankInTier": 16
+    },
+    {
+      "name": "Intercept",
+      "tier": "D",
+      "rankInTier": 17
+    },
+    {
+      "name": "Lucky Shot",
+      "tier": "D",
+      "rankInTier": 18
+    },
+    {
+      "name": "Confusing Legal Text",
+      "tier": "D",
+      "rankInTier": 19
+    },
+    {
+      "name": "Ancient Burial Sites",
+      "tier": "D",
+      "rankInTier": 20
+    }
+  ]
+}

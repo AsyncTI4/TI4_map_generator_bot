@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -40,9 +39,10 @@ public class AgendaRiderHelper {
         String choice = buttonID.substring(buttonID.indexOf('_') + 1);
         String voteMessage = player.getFactionEmojiOrColor() + " Chose to reverse the " + choice + ".";
 
+        // TODO: removes this rider for every faction, not only the cancelled player's (matters with two copies in play)
         rewriteVotes(game, piece -> !piece.contains(choice), null);
 
-        player.getCorrectChannel().sendMessage(voteMessage).queue(Consumers.nop(), BotLogger::catchRestError);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), voteMessage);
     }
 
     @ButtonHandler("eraseMyRiders")

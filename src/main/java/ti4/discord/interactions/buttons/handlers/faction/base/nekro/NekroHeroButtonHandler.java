@@ -78,7 +78,7 @@ class NekroHeroButtonHandler {
                 .append(") from scouring ")
                 .append(planetRep)
                 .append(".");
-        MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, count);
 

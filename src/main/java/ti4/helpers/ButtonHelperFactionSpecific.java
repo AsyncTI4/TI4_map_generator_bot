@@ -1191,14 +1191,19 @@ public final class ButtonHelperFactionSpecific {
         ButtonHelper.deleteMessage(event);
     }
 
+    public static List<Button> norrSupremacyButtons() {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 Command Token"));
+        buttons.add(Buttons.blue("acquireAUnitUpgrade_deleteThisMessage", "Research a Unit Upgrade"));
+        buttons.add(Buttons.red("deleteButtons", "Neither"));
+        return buttons;
+    }
+
     @ButtonHandler("sardakkbtRes")
     public static void sardakkbtRes(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
 
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 Command Token"));
-        buttons.add(Buttons.blue("acquireATech_deleteThisMessage", "Research a Unit Upgrade"));
-        buttons.add(Buttons.red("deleteButtons", "Neither"));
+        List<Button> buttons = norrSupremacyButtons();
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
