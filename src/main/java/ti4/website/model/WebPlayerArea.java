@@ -14,6 +14,7 @@ import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
@@ -182,6 +183,8 @@ public class WebPlayerArea {
 
     // Nekro Z Assimilator targets (Thunder's Edge) - factions whose flagships have been assimilated
     private List<String> valefarZTargets;
+
+    private List<Integer> omenDice;
 
     public static WebPlayerArea fromPlayer(Player player, Game game) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
@@ -356,6 +359,9 @@ public class WebPlayerArea {
             }
         }
         webPlayerArea.valefarZTargets = valefarZTargets;
+
+        webPlayerArea.omenDice =
+                player.hasAbility("divination") ? ButtonHelperAbilities.getAllOmenDie(game) : new ArrayList<>();
 
         // Breakthrough info (Thunder's Edge)
         if (game.isThundersEdge()) {

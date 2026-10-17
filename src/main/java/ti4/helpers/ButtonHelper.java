@@ -105,6 +105,7 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperTechs;
@@ -562,7 +563,16 @@ public class ButtonHelper {
             return;
         }
 
-        Helper.fixGameChannelPermissions(gameToPing.getActionsChannel().getGuild(), gameToPing);
+        Guild gameGuild = gameToPing.getGuild();
+        if (gameGuild == null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Could not find the server for game " + gameToPing.getName()
+                            + ". Its channels may not exist yet or may have been deleted.");
+            return;
+        }
+
+        Helper.fixGameChannelPermissions(gameGuild, gameToPing);
         MessageHelper.sendMessageToChannel(
                 gameToPing.getBotMapUpdatesThread(), "Pinging game" + gameToPing.getPing() + ".");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attempted to ping the game.");
@@ -1419,7 +1429,7 @@ public class ButtonHelper {
                 } else {
                     types.add(deck);
                 }
-                ExploreService.secondHalfOfExpInfo(types, event, player, game, false);
+                ExploreService.secondHalfOfExpInfo(types, event, game, false);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
             case "tiles" -> EventHelper.showRemainingTiles(game, event);
@@ -1439,10 +1449,12 @@ public class ButtonHelper {
             types.add(Constants.INDUSTRIAL);
             types.add(Constants.HAZARDOUS);
             types.add(Constants.FRONTIER);
-            ExploreService.secondHalfOfExpInfo(types, event.getMessageChannel(), player, game, false, true);
+            ExploreService.secondHalfOfExpInfo(
+                    types, event.getMessageChannel(), event.getUser().getId(), game, false, true);
         } else {
             types.add(type);
-            ExploreService.secondHalfOfExpInfo(types, event.getMessageChannel(), player, game, false, true);
+            ExploreService.secondHalfOfExpInfo(
+                    types, event.getMessageChannel(), event.getUser().getId(), game, false, true);
         }
         deleteMessage(event);
     }
@@ -2557,6 +2569,7 @@ public class ButtonHelper {
         if (game.isDominusOrb()
                 || game.isL1Hero()
                 || player.hasTech("tf-desperados")
+                || player.hasAbility("desperados_br")
                 || player.hasTech("tf-fraactalspikedrives")
                 || !game.getStoredValue("phantomEnergy").isEmpty()) {
             return true;
@@ -5105,6 +5118,15 @@ public class ButtonHelper {
                     (("absol_pa".equals(tech) || "tf-industrialjuggernaut".equals(tech)) ? "Use" : "Exhaust") + " "
                             + model.getName()));
         }
+        if (player.hasTechReady("bio_br")) {
+            endButtons.add(BlueReverieTechHelper.getBioplasmosisEndTurnButton(player));
+        }
+        if (player.hasTechReady("l4_br")) {
+            endButtons.add(Buttons.gray(
+                    player.factionButtonChecker() + "repairUnitsL4",
+                    "Repair All Your Damaged Units",
+                    FactionEmojis.Letnev));
+        }
 
         // Agents
         if (player.hasUnexhaustedLeader("naazagent")) {
@@ -6792,6 +6814,18 @@ public class ButtonHelper {
                             event.getMessageChannel(),
                             "Reminder: SPACE CANNON cannot be used against " + target.getRepresentationNoPing()
                                     + "'s Commandos (Qhet Infantry).");
+                }
+                UnitHolder invadedPlanet = game.getUnitHolderFromPlanet(unitHolderName);
+                if (target != player
+                        && (target.hasTech("l4") || target.hasTech("l4_br"))
+                        && invadedPlanet != null
+                        && FoWHelper.playerHasUnitsOnPlanet(target, invadedPlanet)) {
+                    MessageHelper.sendMessageToChannel(
+                            game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
+                            game.isFowMode()
+                                    ? "Reminder: SPACE CANNON cannot be used against protected ground forces."
+                                    : player.getRepresentation()
+                                            + ", this is a reminder that SPACE CANNON cannot be used against units protected by _L4 Disruptors_.");
                 }
             }
         }

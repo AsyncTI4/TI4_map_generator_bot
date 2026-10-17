@@ -651,7 +651,8 @@ public final class ButtonHelperAgents {
         // Clever Clever Ssruu
         String ssruuClever = "";
         String ssruuSlash = "";
-        if ("yssarilagent".equalsIgnoreCase(playerLeader.getId())) {
+        if ("yssarilagent".equalsIgnoreCase(playerLeader.getId())
+                || "yssarilagent_br".equalsIgnoreCase(playerLeader.getId())) {
             ssruuClever = "Clever Clever ";
             ssruuSlash = "/Yssaril";
         }

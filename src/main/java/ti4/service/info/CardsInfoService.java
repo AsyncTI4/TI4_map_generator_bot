@@ -33,6 +33,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BRLightrailOrdnanceRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
@@ -222,6 +223,10 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("pharadnagent")) {
             buttons.add(Buttons.gray("exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));
+        }
+        Button lightrailOrdnanceButton = BRLightrailOrdnanceRelicHandler.getCardsInfoButton(game, player);
+        if (lightrailOrdnanceButton != null) {
+            buttons.add(lightrailOrdnanceButton);
         }
         if (player.hasReadyBreakthrough("pharadnbt")) {
             buttons.add(Buttons.gray(
@@ -557,6 +562,12 @@ public class CardsInfoService {
         buttons.addAll(KaltrimBreakthroughHandler.getEchoOperativesRepairButtons(game, player));
         if (player.hasReadyBreakthrough("sarcosabt")) {
             buttons.add(SarcosaBreakthroughHandler.getGraveholdButton(player));
+        }
+        if (player.hasTechReady("l4_br")) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "repairUnitsL4",
+                    "Repair All Your Damaged Units",
+                    FactionEmojis.Letnev));
         }
         Button doubleDragonsDeploy = ThurvialiUnitHandler.getDoubleDragonsDeployButton(game, player);
         if (doubleDragonsDeploy != null) {

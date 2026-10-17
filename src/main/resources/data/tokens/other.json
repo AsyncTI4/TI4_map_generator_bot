@@ -26,6 +26,18 @@
         "source": "other"
     },
     {
+        "id": "oceanus",
+        "imagePath": "token_oceanus.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "oceanus",
+            "token_oceanus"
+        ],
+        "tokenPlanetName": "oceanus",
+        "isPlanet": true,
+        "source": "expanded_fracture"
+    },
+    {
         "id": "consulate",
         "imagePath": "token_consulate.png",
         "spaceOrPlanet": "planet",

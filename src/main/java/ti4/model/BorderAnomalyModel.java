@@ -1,85 +1,89 @@
 package ti4.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.Data;
 import ti4.ResourceHelper;
+import ti4.model.Source.ComponentSource;
+import ti4.model.enums.AutomationStatus;
 
-public class BorderAnomalyModel {
+@Data
+public class BorderAnomalyModel implements ModelInterface {
 
-    @Getter
-    public enum BorderAnomalyType {
-        // homebrew
-        ASTEROID("Asteroid Field", "asteroid_border.png"), //
-        GRAVITY_WAVE("Gravity Wave", "gravity_wave_border.png"), //
-        NEBULA("Nebula", "nebula_border.png"), //
-        MINEFIELD("Minefield", "minefield_border.png"), //
-        ARROW("Arrow", "adjacency_arrow.png"), //
-        SPATIAL_TEAR("Spatial Tear", "spatial_tear_border.png"),
-        VOID_TETHER("Void Tether", "void_tether.png"), //
+    private static final String IMAGE_FOLDER = "borders/";
 
-        // PBD 100 two
-        CORE_BORDER("Core border", "core_border.png"), //
-        RIM_BORDER("Rim border", "rim_border.png"), //
-        YELLOW("Yellow", "yellow.png"), //
-        REDORANGE("RedOrange", "redorange.png");
+    private String id;
+    private String name;
+    private List<String> aliasList = new ArrayList<>();
+    private String imagePath;
+    private ComponentSource source;
+    private Rules rules = new Rules();
+    private AutomationStatus automation;
+    private String automationNotes;
 
-        private final String name;
-
-        private final String imageFilePath;
-
-        BorderAnomalyType(String name, String fileName) {
-            this.name = name;
-            imageFilePath = ResourceHelper.getResourceFromFolder("borders/", fileName);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString().toLowerCase();
-        }
-
-        public String toSearchString() {
-            return toString().toLowerCase().replace("_", "");
-        }
-
-        @JsonValue
-        public String toJson() {
-            return name();
-        }
-
-        @JsonCreator
-        public static BorderAnomalyType fromJson(String value) {
-            if (value == null) {
-                return null;
-            }
-
-            for (BorderAnomalyType type : values()) {
-                if (type.name().equalsIgnoreCase(value)) {
-                    return type;
-                }
-            }
-            return valueOf(value);
-        }
+    @Data
+    public static class Rules {
+        private Adjacency adjacency = new Adjacency();
     }
 
-    public static BorderAnomalyType getBorderAnomalyTypeFromString(String type) {
-        if (type == null) {
-            return null;
-        }
-        Map<String, BorderAnomalyType> allTypes = Arrays.stream(BorderAnomalyType.values())
-                .collect(Collectors.toMap(BorderAnomalyType::toSearchString, (t -> t)));
-        if (allTypes.containsKey(type.toLowerCase())) {
-            return allTypes.get(type.toLowerCase());
-        }
+    @Data
+    public static class Adjacency {
+        private boolean blocksIn;
+        private boolean blocksOut;
+    }
 
-        for (BorderAnomalyType anomalyType : BorderAnomalyType.values()) {
-            if (anomalyType.getName().equalsIgnoreCase(type)) {
-                return anomalyType;
-            }
-        }
-        return null;
+    @Override
+    public boolean isValid() {
+        return id != null && name != null && imagePath != null && source != null && automation != null;
+    }
+
+    @Override
+    public String getAlias() {
+        return id;
+    }
+
+    @JsonIgnore
+    public String getImageFilePath() {
+        return ResourceHelper.getResourceFromFolder(IMAGE_FOLDER, imagePath);
+    }
+
+    @JsonIgnore
+    public boolean blocksAdjacencyIn() {
+        return rules != null
+                && rules.getAdjacency() != null
+                && rules.getAdjacency().isBlocksIn();
+    }
+
+    @JsonIgnore
+    public boolean blocksAdjacencyOut() {
+        return rules != null
+                && rules.getAdjacency() != null
+                && rules.getAdjacency().isBlocksOut();
+    }
+
+    @JsonIgnore
+    public boolean declaresAdjacencyRules() {
+        return blocksAdjacencyIn() || blocksAdjacencyOut();
+    }
+
+    @JsonIgnore
+    public String getAutoCompleteName() {
+        if (automation == null || automation == AutomationStatus.FULL) return name;
+        return name + " (" + automation.getLabel() + ")";
+    }
+
+    @JsonIgnore
+    public String getSearchString() {
+        return id.replace("_", "");
+    }
+
+    public boolean matches(String input) {
+        if (input == null) return false;
+        String lowered = input.toLowerCase();
+        return id.equalsIgnoreCase(input)
+                || getSearchString().equals(lowered)
+                || name.equalsIgnoreCase(input)
+                || (aliasList != null && aliasList.stream().anyMatch(alias -> alias.equalsIgnoreCase(input)));
     }
 }

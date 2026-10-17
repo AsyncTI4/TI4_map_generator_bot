@@ -10,19 +10,15 @@ import ti4.game.Game;
 public record BoardPosition(char board, String local) {
 
     public static final List<Character> BOARDS = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g');
-    public static final String REGEX = "[a-g][0-8][0-9][0-9]";
-    public static final int MAX_RING = 8;
+    public static final String REGEX = "[a-g](?:1[0-6]|[0-9])[0-9][0-9]";
+    public static final int MAX_RING = 16;
     public static final char MAIN_BOARD = '0';
     private static final Pattern PATTERN = Pattern.compile(REGEX);
     private static final int HORIZONTAL_TILE_SPACING = 260;
     static final int RAW_STRIDE = (2 * MAX_RING + 2) * HORIZONTAL_TILE_SPACING;
 
     public static Optional<BoardPosition> parse(String position) {
-        if (position == null
-                || position.length() != 4
-                || position.charAt(0) < BOARDS.getFirst()
-                || position.charAt(0) > BOARDS.getLast()
-                || !PATTERN.matcher(position).matches()) {
+        if (position == null || !PATTERN.matcher(position).matches()) {
             return Optional.empty();
         }
         return Optional.of(new BoardPosition(position.charAt(0), position.substring(1)));

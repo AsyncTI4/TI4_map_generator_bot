@@ -167,6 +167,7 @@ class ActionCardButtonHandler {
             if ("Relitigate".equals(acName) && targetPlayer != null) {
                 RelitigateLLButtonHandler.onRelitigateSabotaged(game, targetPlayer);
             }
+            EscapeClauseActionCardHandler.resolveSabotagedEscapeClause(event, game, targetPlayer, acName);
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(
                         game.getActionsChannel(),

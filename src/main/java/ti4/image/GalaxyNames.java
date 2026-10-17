@@ -118,6 +118,11 @@ public final class GalaxyNames {
         save(game, RENAMED_KEY, renamed);
     }
 
+    public static void clearNames(Game game) {
+        game.removeStoredValue(ASSIGNED_KEY);
+        game.removeStoredValue(RENAMED_KEY);
+    }
+
     private static String autoName(Game game, String id, Set<String> taken) {
         if (MAIN_ID.equals(id) && !taken.contains(NAMES.getFirst())) {
             return NAMES.getFirst();

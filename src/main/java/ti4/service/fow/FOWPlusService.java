@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -296,11 +297,11 @@ public final class FOWPlusService {
     }
 
     // Hide explore and relic decks
-    public static boolean deckInfoAvailable(Player player, Game game) {
-        if (!isActive(game) && !game.getFowOption(FOWOption.HIDE_EXPLORES)
-                || game.getPlayersWithGMRole().contains(player)) return true;
+    public static boolean deckInfoAvailable(Game game, @Nullable String viewerId, MessageChannel channel) {
+        if (!isActive(game) && !game.getFowOption(FOWOption.HIDE_EXPLORES) || FoWHelper.isGameMaster(viewerId, game))
+            return true;
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Deck info not available.");
+        MessageHelper.sendMessageToChannel(channel, "Deck info not available.");
         return false;
     }
 

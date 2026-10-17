@@ -37,12 +37,18 @@ import ti4.service.unit.AddUnitService;
 @UtilityClass
 public class FractureService {
 
-    /** Is there any Fracture space on the board, whether from a tile or from a fracture token? */
+    /**
+     * Is there any Fracture space on the board, whether from a tile or from a
+     * fracture token?
+     */
     public static boolean isFractureInPlay(Game game) {
         return game.getTileMap().values().stream().anyMatch(Tile::isFracture);
     }
 
-    /** Positional check, for map rendering only - use {@link #isFractureInPlay} for rules. */
+    /**
+     * Positional check, for map rendering only - use {@link #isFractureInPlay} for
+     * rules.
+     */
     public static boolean isFractureRegionOnMap(Game game) {
         return Stream.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7")
                 .anyMatch(pos -> game.getTileByPosition(pos) != null);
@@ -85,16 +91,18 @@ public class FractureService {
         if (game.isCosmicConvergenceMode()) {
             Die die1 = new Die(0);
             Die die2 = new Die(0);
-            // For display, show both dice; success is if either is 1 or 10
-            diceDisplay = DiceEmojis.getDieEmoji("green", die1.getResult()) + " "
-                    + DiceEmojis.getDieEmoji("green", die2.getResult());
+            String die1Color = (die1.getResult() == 1 || die1.getResult() == 10) ? "green" : "gray";
+            String die2Color = (die2.getResult() == 1 || die2.getResult() == 10) ? "green" : "gray";
+            diceDisplay = DiceEmojis.getDieEmoji(die1Color, die1.getResult()) + " "
+                    + DiceEmojis.getDieEmoji(die2Color, die2.getResult());
             boolean isSuccess = (die1.getResult() == 1 || die1.getResult() == 10)
                     || (die2.getResult() == 1 || die2.getResult() == 10);
             result = isSuccess ? 1 : 2; // use 1 for success, anything else for fail
         } else {
             Die singleDie = new Die(0);
             result = singleDie.getResult();
-            diceDisplay = DiceEmojis.getDieEmoji("green", result);
+            String dieColor = (result == 1 || result == 10) ? "green" : "gray";
+            diceDisplay = DiceEmojis.getDieEmoji(dieColor, result);
         }
 
         if ("onyxxabt".equals(bt)) {
@@ -127,7 +135,8 @@ public class FractureService {
                                 getTilesWithSkipAndNoIngressAndNotAdding(game, type, new ArrayList<>());
                         if (tilesWithSkip.isEmpty()) continue;
 
-                        // The GM presses these in fog, so they must not carry the player's FFCC_ ownership prefix
+                        // The GM presses these in fog, so they must not carry the player's FFCC_
+                        // ownership prefix
                         String prefix = game.isFowMode() ? "" : player.factionButtonChecker();
                         List<Button> buttons = new ArrayList<>(tilesWithSkip.stream()
                                 .map(tile -> {
@@ -220,11 +229,15 @@ public class FractureService {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
-    /** Brings The Fracture into play for an automatic effect, saying so only if it is switched off for the game. */
+    /**
+     * Brings The Fracture into play for an automatic effect, saying so only if it
+     * is switched off for the game.
+     */
     public static boolean enterPlayOrExplain(
             GenericInteractionCreateEvent event, Game game, @NotNull Player player, String breakthrough) {
         if (!spawnFracture(event, game)) {
-            // Already in play is the normal case for a later effect, so stay quiet unless it is actually disabled
+            // Already in play is the normal case for a later effect, so stay quiet unless
+            // it is actually disabled
             if (!isFractureInPlay(game)) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), whyFractureCannotEnterPlay(game));
             }
@@ -234,7 +247,10 @@ public class FractureService {
         return true;
     }
 
-    /** Places The Fracture if it is allowed to enter play. Returns true if the tiles were actually placed. */
+    /**
+     * Places The Fracture if it is allowed to enter play. Returns true if the tiles
+     * were actually placed.
+     */
     public static boolean spawnFracture(GenericInteractionCreateEvent event, Game game) {
         if (!canFractureEnterPlay(game)) return false;
         List<String> fracture = Arrays.asList(
@@ -314,7 +330,8 @@ public class FractureService {
             if (!game.isFowMode() && tilesWithSkip.size() <= numberOfIngressPerTechType) continue;
             anyChoicesToMake = true;
 
-            // The GM presses these in fog, so they must not carry the player's FFCC_ ownership prefix
+            // The GM presses these in fog, so they must not carry the player's FFCC_
+            // ownership prefix
             String prefix = game.isFowMode() ? "" : player.factionButtonChecker();
             List<Button> buttons = new ArrayList<>(tilesWithSkip.stream()
                     .map(tile -> {

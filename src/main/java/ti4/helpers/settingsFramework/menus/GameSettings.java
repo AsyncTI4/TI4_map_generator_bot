@@ -16,10 +16,8 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.helpers.MapTemplateHelper;
-import ti4.helpers.TIGLHelper;
 import ti4.helpers.settingsFramework.menus.MiltySettings.DraftingMode;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
-import ti4.helpers.settingsFramework.settings.BooleanSettingWithCustomAction;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
@@ -48,8 +46,6 @@ public class GameSettings extends SettingsMenu {
     private final IntegerSetting stage1s;
     private final IntegerSetting stage2s;
     private final IntegerSetting secrets;
-    private final BooleanSetting tigl;
-    private final BooleanSetting tiglFractured;
     private final BooleanSetting alliance;
     private final ChoiceSetting<MapTemplateModel> mapTemplate;
 
@@ -67,15 +63,6 @@ public class GameSettings extends SettingsMenu {
         stage1s = new IntegerSetting("Stage1s", "number of Stage 1 public objectives", 5, 1, 20, 1);
         stage2s = new IntegerSetting("Stage2s", "number of Stage 2 public objectives", 5, 1, 20, 1);
         secrets = new IntegerSetting("Secrets", "Max number of secret objectives", 3, 1, 10, 1);
-        boolean defaultTigl = game.isCompetitiveTIGLGame();
-        boolean defaultTiglFractured = defaultTigl && TIGLHelper.isFracturedTIGLGame(game);
-        tigl = new BooleanSettingWithCustomAction(
-                "TIGL", "TIGL Game", defaultTigl, (value) -> ensureFracturedDisabledWhenTiglOff());
-        tiglFractured = new BooleanSettingWithCustomAction(
-                "TIGL Fractured",
-                "TIGL Fractured Game",
-                defaultTiglFractured,
-                (value) -> ensureTiglEnabledWhenFracturedOn());
         alliance = new BooleanSetting("Alliance", "Alliance Mode", false);
         mapTemplate = new ChoiceSetting<>("Template", "Map Template", "6pStandard");
 
@@ -84,8 +71,6 @@ public class GameSettings extends SettingsMenu {
         stage1s.setEmoji(CardEmojis.Public1);
         stage2s.setEmoji(CardEmojis.Public2);
         secrets.setEmoji(CardEmojis.SecretObjective);
-        tigl.setEmoji(MiscEmojis.TIGL);
-        tiglFractured.setEmoji(MiscEmojis.TIGL);
         alliance.setEmoji(SourceEmojis.StrategicAlliance);
         mapTemplate.setEmoji(MiltyDraftEmojis.sliceA);
 
@@ -113,8 +98,6 @@ public class GameSettings extends SettingsMenu {
             stage1s.initialize(json.get("stage1s"));
             stage2s.initialize(json.get("stage2s"));
             secrets.initialize(json.get("secrets"));
-            tigl.initialize(json.get("tigl"));
-            tiglFractured.initialize(json.get("tiglFractured"));
             alliance.initialize(json.get("alliance"));
             mapTemplate.initialize(json.get("mapTemplate"));
         }
@@ -133,8 +116,6 @@ public class GameSettings extends SettingsMenu {
         ls.add(stage1s);
         ls.add(stage2s);
         ls.add(secrets);
-        ls.add(tigl);
-        ls.add(tiglFractured);
         ls.add(alliance);
         ls.add(mapTemplate);
         return ls;
@@ -195,18 +176,6 @@ public class GameSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private void ensureFracturedDisabledWhenTiglOff() {
-        if (!tigl.isVal()) {
-            tiglFractured.setVal(false);
-        }
-    }
-
-    private void ensureTiglEnabledWhenFracturedOn() {
-        if (tiglFractured.isVal()) {
-            tigl.setVal(true);
-        }
-    }
-
     private String preset444() {
         pointTotal.setVal(12);
         stage1s.setVal(4);

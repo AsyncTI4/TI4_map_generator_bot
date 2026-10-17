@@ -41,6 +41,9 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
+import ti4.helpers.thirtyk.ThirtyKRelicHooks;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -208,6 +211,7 @@ class DeleteButtonsButtonHandler {
                     game.setStoredValue(
                             MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction(), buttonID + "|" + pos);
                 }
+                BlueReverieTechHelper.offerProductionBiomes(game, player);
             }
             if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)
                     && player.hasAbility("amalgamation")
@@ -249,10 +253,13 @@ class DeleteButtonsButtonHandler {
                     }
                 });
                 AutoFactoriesService.resolveAutoFactories(game, player, buttonID);
+                ThirtyKRelicHooks.afterProduction(game, player);
+                ThirtyKExploreHooks.afterProduction(event, game, player);
                 TheIconService.checkAndSendIconButton(event, game, player, buttonID);
                 EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
                 int cost = Helper.calculateCostOfProducedUnits(player, game, true, false);
                 cost = ThurvialiLeadersHandler.applyThurvialiHeroProductionDiscount(game, player, cost);
+                cost = ThirtyKRelicHooks.applyProductionDiscount(player, cost);
                 Map<String, Integer> unitsMap = new HashMap<>();
                 for (Map.Entry<String, Integer> entry :
                         player.getCurrentProducedUnits().entrySet()) {

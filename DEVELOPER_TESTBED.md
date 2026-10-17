@@ -77,10 +77,13 @@ To test a component, get it into play with the preset (or mid-script with `do: h
 | Public objective | game `revealedObjectives`, seat `scoredObjectives` | `"revealedObjectives": ["corner"]` |
 | Law in play | game `laws` (`id` or `id:elected`) | `"laws": ["arms_reduction"]` |
 | Token or attachment | game `tokens`: tile position or planet | `"tokens": { "101": ["frontier"], "mecatolrex": ["dmz"] }` |
+| Border anomaly | game `borderAnomalies`: tile position to `<n\|ne\|se\|s\|sw\|nw>:<type>` | `"borderAnomalies": { "202": ["n:spatial_tear"] }` |
 | Relic fragment | seat `fragments` | `"fragments": ["crf1"]` |
 | Tile outside the map string (maps A-G, corners, Fracture) | game `tiles`: position to tile id | `"tiles": { "a000": "39", "tl": "82" }` |
 | Fog option | game `fowOptions` (fog presets) | `"fowOptions": ["map_connections", "ghost_hexes"]` |
 | Game stored value (map sectors, feature state) | game `stored` | `"stored": { "fowMapSegments": "core=000:3" }` |
+| Card decks (homebrew sets) | game `decks`: slot (`ac`, `so`, `relic`, `explore`, `agenda`) to deck id | `"decks": { "ac": "action_cards_30k", "explore": "explores_30k" }` |
+| Next explore card | script `do: stackExplore` (value: explore id) puts the card on top of its deck | `{ "do": "stackExplore", "value": "tourismbureau30k" }` |
 | Breakthrough | seat `breakthrough`: `unlocked` or `exhausted` | `"breakthrough": "unlocked"` |
 | TG, commodities, command tokens | seat `tg`, `commodities`, `ccs` | `"ccs": "3/3/2"` |
 | State a feature keeps in stored values | script `do: setStored` | `{ "do": "setStored", "key": "x", "value": "y" }` |
@@ -183,7 +186,8 @@ specific cards for anything you check (`"acs": ["sabo1"]`), and `"start": "actio
 **3. Precondition, action, outcome.** Check the starting state first, then press, then check.
 
 **Finding buttons.** Never guess ids.
-- From a run: a `press` that finds nothing lists every visible button as ``Label (`id`)``.
+- From a run: a `press` that finds nothing lists every visible button as ``Label (`handler`, for <seat>)`` and
+  what the game is waiting on.
 - From the code: `grep -rn '"End Turn"' src/main/java` finds `Buttons.red(... "turnEnd", "End Turn")`.
 - Prefer ids over labels: labels change with state (Sol's `End Turn (+1 ability)`).
 - `factionButtonChecker()` adds `FFCC_<faction>_`; `press` lets you leave it out. Write dynamic ids with their
@@ -205,12 +209,17 @@ Then press each follow-up button as the seat that must react (`no_sabotage` in `
 
 **Choosing checks.** State first (exact and instant); messages for what a player sees, with short fragments of
 fixed text (card names often render as emoji, so `Politics` is not in the play message);
-`count` to catch duplicates; `noFactionLeak` on `main` in fog games only. Messages posted before the script
-started (everything the preset did) are invisible, so check those through state.
+`count` to catch duplicates; `buttons` / `noButtons` for what a seat is offered next; `noFactionLeak` on `main`
+in fog games only, with `"since": "start"` so it covers the whole run. A message check sees only messages posted
+since the last `press` or `do` (`"since": "start"`: since the script started). Messages posted before the
+script started (everything the preset did) are invisible, so check those through state.
 
 **Run, read, fix.** `/testbed run file:<script>.json` in a testbed game or a new game of the right kind. Read the
-❌ lines; the attached `.md` log has the full detail. `unsupported interaction calls` means the handler used
-something the stand-in click only fakes: check that step by hand once. When it passes twice, keep it in
+❌ lines; the attached `.md` log has the full detail: time per step, what each press replied or re-posted, and at
+the first failure a snapshot of the game (phase, who it waits on, every seat's state, the last messages per
+channel). A press fails when the handler threw (`the handler threw`) or the bot refused the seat (`the bot
+refused`). `unsupported interaction calls` means the handler used something the stand-in click only fakes:
+check that step by hand once. When it passes twice, keep it in
 `data/testbed/local/scripts/` or share it in `data/testbed/scripts/`; `/testbed run script:all` runs it with the
 others.
 
@@ -256,10 +265,11 @@ copy-paste templates.
 | `defaults` | Seat fields for every seat that does not set them. |
 | `start` | `setup` (default), `strategy` or `action` (seats without `sc` get the lowest free card). |
 | `combat` | Positions where a combat check runs after the start phase; needs `start: action`. |
-| `revealedObjectives`, `laws`, `tokens` | Game state; see [Set up any component](#set-up-any-component). |
+| `revealedObjectives`, `laws`, `tokens`, `borderAnomalies` | Game state; see [Set up any component](#set-up-any-component). |
 | `tiles` | Extra tiles by position, placed over the map string: maps A-G (`a000`-`g848`), corners, Fracture. |
 | `fowOptions` | Fog options switched on at apply (names as in the FoW options, e.g. `map_connections`). `fow_plus` turns on full FoW+ mode, including the options it forces. |
 | `stored` | Game stored values set at apply. Unlike script `setStored`, values may contain `:` and `,` (sector definitions do). |
+| `decks` | Deck ids switched on before seats get cards, so `acs`, `sos` and `relics` can give cards from homebrew decks. Slots: `ac`, `so`, `relic`, `explore`, `agenda`. |
 | `shortcuts` | Test buttons for the **Preset** group. |
 
 Seat fields (all optional): `faction`, `color`, `home`, `speaker`, `sc`; `acs`, `sos`, `relics` (a number draws
@@ -276,7 +286,7 @@ and ids fail with every error listed at once; problems that only show while appl
 | `name`, `description` | Shown in autocomplete and the report. JSON has no comments: explain here or in `note` steps. |
 | `preset` | Reset and applied before the steps. |
 | `stopOnFail` | Stop at the first ❌ (also per step). |
-| `settleSeconds` | Pause after each press or action (default 2; also per step). |
+| `settleSeconds` | Pause after each press or action, after its message edits have landed (default 0.5, decimals allowed; also per step). `setStored`, `removeStored` and `actAs` skip it unless the step sets it. |
 | `timeoutSeconds` | How long `press` and positive checks wait (default 20; also per step). |
 | `shortcuts` | Test buttons, like a preset's. |
 
@@ -285,7 +295,7 @@ and ids fail with every error listed at once; problems that only show while appl
 | `note` | `{ "note": "round 2 starts" }` |
 | `press` | `{ "as": "sol", "press": "strategicAction_3", "in": "main" }` |
 | `pressId` | `{ "as": "nekro", "pressId": "sc_follow_3" }` |
-| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields), `actAs` (as or `you`) |
+| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields; when it gives cards the seat's cards info is re-sent so the new hand buttons appear), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck) |
 | `wait` | `{ "wait": 5 }` (seconds) |
 | `expect` | one of the checks below |
 
@@ -293,8 +303,8 @@ Every step may also have a `label` for the report.
 
 | Check | Example | Passes when |
 | --- | --- | --- |
-| State | `{ "state": "hacan.tg", "equals": "3" }` | equals (as text, case ignored), or contains every `contains` and no `notContains` |
-| Messages | `{ "in": "hacan:cards-info", "contains": "Reminder", "count": 1 }` | among messages since the script started; also `notContains`, `noFactionLeak` |
+| State | `{ "state": "hacan.tg", "equals": "3" }` | equals (as text, case ignored), or contains every `contains` and no `notContains`; `matches` (regex) must also find a match |
+| Messages | `{ "in": "hacan:cards-info", "contains": "Reminder", "count": 1 }` | among messages since the last `press` or `do`; also `notContains`, `noFactionLeak`, `matches` (regex), `attachment` (file name contains), `buttons`, `noButtons`, `since` |
 | Reply | `{ "ephemeral": "these buttons are for someone else" }` | a reply to the previous press contains it |
 | Modal | `{ "modal": "tradeModal_" }` | the previous press opened a modal whose id starts with it |
 
@@ -303,19 +313,29 @@ Every step may also have a `label` for the report.
 - **Scopes (`in`):** `main`, `actions` (normal games only; fog games have no actions channel), `gm` (fog games
   only), `<seat>` (the seat's own channel from `getCorrectChannel()`: its private channel when it has one, in fog
   or not, otherwise the main channel), `<seat>:private`, `<seat>:cards-info`, `<seat>:combat` (its newest combat
-  thread).
-- **State paths:** `<seat>.` + `tg`, `commodities`, `ccs`, `scs`, `passed`, `followed`, `acs` (count), `acIds`,
-  `sos` (count), `soIds`, `pns`, `pnsInPlay`, `sosScored`, `posScored`, `fragments`, `breakthroughs`, `leaders`,
-  `techs`, `exhaustedTechs`, `purgedTechs`, `relics`, `exhaustedRelics`, `planets`, `exhaustedPlanets`;
-  `game.` + `phase`, `round`, `activePlayer`, `speaker`, `playedScs`, `acDiscard`, `agendaDiscard`, `laws`,
-  `revealedPos`, `purgedPns`, `exploreDiscard`; `stored:<key>`. Lists are sorted and comma-joined.
+  thread), `<seat>:comms-inbox` (its anonymous comms inbox thread, once it exists).
+- **State paths:** `<seat>.` + `tg`, `commodities`, `ccs`, `tacticalCcs`, `fleetCcs`, `strategyCcs`, `vp`,
+  `debt`, `scs`, `passed`, `followed`, `acs` (count), `acIds`, `sos` (count), `soIds`, `pns`, `pnsInPlay`,
+  `sosScored`, `posScored`, `fragments`, `breakthroughs`, `leaders`, `techs`, `exhaustedTechs`, `purgedTechs`,
+  `relics`, `exhaustedRelics`, `planets`, `exhaustedPlanets`;
+  `game.` + `activeSystem`, `phase`, `round`, `activePlayer`, `speaker`, `playedScs`, `acDiscard`, `agendaDiscard`,
+  `laws`, `revealedPos`, `purgedPns`, `exploreDiscard`, `exploreDeck`, `relicDeck`,
+  `decks` (`ac:<id>,so:<id>,relic:<id>,explore:<id>,agenda:<id>`), `borderAnomalies` (`<tile>:<direction>:<type>`);
+  `tile.<position>.` + `units` (`space:blue_dd=2`), `ccs`, `tokens`, `planets`;
+  `planet.<id>.` + `owner`, `units`, `tokens`; `stored:<key>`. Lists are sorted and comma-joined.
 - **Placeholders:** `{ac:<id>}`, `{so:<id>}`, `{pn:<id>}` (the acting seat's hand number), `{<seat>.faction}`,
   `{<seat>.color}`. Seat placeholders resolve first, so they can sit inside card ones: `{pn:{hacan.color}_sftt}`.
 - **Semantics:** `do: hand` sets `tg`, `commodities`, `ccs` and `breakthrough`, and adds cards, techs, units,
   planets, notes, fragments, scored objectives and leader changes. `press` prefers an exact id or label over an
   id prefix, and a prefix never stops inside a number, so `ac_play_from_hand_1` never presses card 12. `press`
-  skips disabled buttons (`pressId` does not). Presses wait for their button and positive checks
-  retry until `timeoutSeconds`; `notContains` and `noFactionLeak` run once after `settleSeconds`.
+  skips disabled buttons (`pressId` does not). Among matches it prefers the acting seat's own buttons, then the
+  newest message, and says when others also matched. A press passes only if the handler ran for that seat (a form
+  opening counts), or when the very next step is an `ephemeral` check, which is how wrong-seat guard tests expect
+  the refusal; it waits for the handler's message edits before settling. Presses wait for their button and
+  positive checks retry until `timeoutSeconds`, finishing as soon as the message lands. `notContains`,
+  `noFactionLeak` and `noButtons` keep watching until nothing new arrives for a second (or `timeoutSeconds`), and
+  fail on the first hit. `buttons` looks at messages posted or edited since the step began; `noButtons` at every
+  message the channel shows.
 
 ## Safety
 
@@ -346,6 +366,9 @@ Every step may also have a `label` for the report.
   applied before snapshots existed fall back to rebuilding seats, map, played strategy cards and the main decks.
 - Script presses build a stand-in click on a real message and run it through `ButtonProcessor.processNow`, the
   normal button path with the game lock. `pressId` carrier messages delete themselves afterwards.
+- A script run listens to Discord message events (`TestBedMessageLog`) instead of re-reading channel history:
+  checks and button searches wake when a message arrives, is edited or deleted. A channel's recent history is
+  read once, the first time a press searches it.
 - Presets, scripts and test button files are read once and cached; `/testbed reload` re-reads them.
 
 ### Regression guards

@@ -712,6 +712,17 @@ public class PlayHeroService {
                                 + ", use the button to do individual invasions, then delete the buttons when you have placed 3 total infantry.",
                         buttons);
             }
+            case "yinhero_br" -> {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.blue(
+                        player.factionButtonChecker() + "yinBrHeroStart", "Invade A Planet With Yin Hero"));
+                buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(),
+                        player.getRepresentation(true, showFlavourText)
+                                + ", use the button to do individual invasions, then delete the buttons when you have placed 3 total infantry.",
+                        buttons);
+            }
             case "naazhero" -> {
                 RelicHelper.drawRelicAndNotify(player, event, game);
                 List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(game);
@@ -760,7 +771,7 @@ public class PlayHeroService {
                         buttons);
             }
             case "empyreanhero" -> {
-                AddFrontierTokensService.addFrontierTokens(event, game);
+                AddFrontierTokensService.addFrontierTokensIncludingFracture(event, game);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added frontier tokens");
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),

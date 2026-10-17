@@ -1,10 +1,14 @@
 package ti4.service.testbed;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.commands.map.AddBorderAnomaly;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -12,6 +16,8 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
+import ti4.model.DeckModel;
+import ti4.model.DeckModel.DeckType;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.Seat;
 import ti4.service.fow.FOWPlusService;
@@ -47,6 +53,75 @@ public class TestBedComponentService {
                 if (problem != null) warnings.add(problem);
             }
         }
+        for (Map.Entry<String, List<String>> entry : preset.getBorderAnomalies().entrySet()) {
+            for (String border : entry.getValue()) {
+                game.addBorderAnomaly(entry.getKey(), borderDirection(border), borderType(border));
+            }
+        }
+    }
+
+    static final Map<String, DeckType> DECK_SLOTS = Map.of(
+            "ac", DeckType.ACTION_CARD,
+            "so", DeckType.SECRET_OBJECTIVE,
+            "relic", DeckType.RELIC,
+            "explore", DeckType.EXPLORE,
+            "agenda", DeckType.AGENDA);
+
+    @Nullable
+    static String deckProblem(String slot, String deckId) {
+        DeckType expected = DECK_SLOTS.get(slot);
+        if (expected == null) {
+            return "unknown `decks` slot `" + slot + "`; use one of " + new TreeSet<>(DECK_SLOTS.keySet()) + ".";
+        }
+        DeckModel deck = Mapper.getDeck(deckId);
+        if (deck == null) return "unknown deck `" + deckId + "` for `decks." + slot + "`.";
+        if (deck.getType() != expected) {
+            return "deck `" + deckId + "` is not a `" + slot + "` deck.";
+        }
+        return null;
+    }
+
+    static void applyDecks(
+            Game game, TestBedPreset preset, GenericInteractionCreateEvent event, List<String> warnings) {
+        preset.getDecks().forEach((slot, deckId) -> {
+            DeckModel deck = Mapper.getDeck(deckId);
+            if (deckProblem(slot, deckId) != null) return;
+            boolean applied =
+                    switch (DECK_SLOTS.get(slot)) {
+                        case ACTION_CARD -> game.validateAndSetActionCardDeck(event, deck);
+                        case SECRET_OBJECTIVE -> game.validateAndSetSecretObjectiveDeck(event, deck);
+                        case RELIC -> game.validateAndSetRelicDeck(deck);
+                        case EXPLORE -> game.validateAndSetExploreDeck(event, deck);
+                        case AGENDA -> game.validateAndSetAgendaDeck(event, deck);
+                        default -> false;
+                    };
+            if (!applied) warnings.add("Could not switch the `" + slot + "` deck to `" + deckId + "`.");
+        });
+    }
+
+    static boolean stackExplore(Game game, String exploreId) {
+        boolean inDeck = game.getAllExplores().contains(exploreId);
+        boolean inDiscard = game.getAllExploreDiscard().contains(exploreId);
+        if (!inDeck && !inDiscard) return false;
+        List<String> deck = new ArrayList<>(game.getAllExplores());
+        deck.remove(exploreId);
+        deck.addFirst(exploreId);
+        game.setExploreDeck(deck);
+        if (inDiscard) {
+            List<String> discard = new ArrayList<>(game.getAllExploreDiscard());
+            discard.remove(exploreId);
+            game.setExploreDiscard(discard);
+        }
+        return true;
+    }
+
+    static Integer borderDirection(String border) {
+        return AddBorderAnomaly.parseDirection(
+                StringUtils.substringBefore(border, ":").trim().toLowerCase());
+    }
+
+    static String borderType(String border) {
+        return StringUtils.substringAfter(border, ":").trim();
     }
 
     static void applySeatComponents(Game game, Player player, Seat seat, List<String> warnings) {

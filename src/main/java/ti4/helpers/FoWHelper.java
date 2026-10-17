@@ -1149,6 +1149,15 @@ public final class FoWHelper {
             wormholeIDs.add(Constants.ALPHA);
         }
 
+        boolean hasLazaxGateFoldingBr = player != null
+                && player == game.getActivePlayer()
+                && !game.getCurrentActiveSystem().isEmpty()
+                && player.hasTech("lgf_br");
+        if (hasLazaxGateFoldingBr && hasUncontrolledLegendaryPlanet(player, tile)) {
+            wormholeIDs.add(Constants.BETA);
+            wormholeIDs.add(Constants.ALPHA);
+        }
+
         if (player != null
                 && player == game.getActivePlayer()
                 && !game.getCurrentActiveSystem().isEmpty()
@@ -1194,6 +1203,12 @@ public final class FoWHelper {
                 adjacentPositions.add(position_);
                 continue;
             }
+            if (hasLazaxGateFoldingBr
+                    && hasUncontrolledLegendaryPlanet(player, tile_)
+                    && (wormholeIDs.contains(Constants.ALPHA) || wormholeIDs.contains(Constants.BETA))) {
+                adjacentPositions.add(position_);
+                continue;
+            }
             for (UnitHolder unitHolder : tile_.getUnitHolders().values()) {
                 Set<String> tokenList = unitHolder.getTokenList();
                 for (String token : tokenList) {
@@ -1218,6 +1233,11 @@ public final class FoWHelper {
             }
         }
         return adjacentPositions;
+    }
+
+    private static boolean hasUncontrolledLegendaryPlanet(Player player, Tile tile) {
+        return tile.getPlanetUnitHolders().stream()
+                .anyMatch(planet -> planet.isLegendary() && !player.getPlanets().contains(planet.getName()));
     }
 
     /**

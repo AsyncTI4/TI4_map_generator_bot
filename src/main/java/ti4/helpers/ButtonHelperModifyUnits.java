@@ -25,6 +25,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.EdynAgentHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.TnelisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantTechHandler;
@@ -47,6 +49,9 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
+import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.helpers.twilight_kart.TkHelperStarflare;
@@ -577,6 +582,7 @@ public final class ButtonHelperModifyUnits {
             }
         }
         IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "groundcombat");
+        ThirtyKSecretHooks.afterCombatHits(game, player, tile, unitHolder, "groundcombat");
         LostLegaciesRelicHandler.finishNeutralReplacementBatch(event, game);
         event.getMessage();
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -1120,6 +1126,9 @@ public final class ButtonHelperModifyUnits {
         }
         if (!justSummarizing && event instanceof ButtonInteractionEvent bevent) {
             IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "spacecombat");
+            ThirtyKSecretHooks.afterCombatHits(game, player, tile, unitHolder, "spacecombat");
+            ThirtyKExploreHooks.afterSpaceCombatHits(event, game, player, tile, "spacecombat");
+            ThirtyKActionCardHooks.afterCombatHitsAssigned(game, tile, "spacecombat");
             if (sustainedFlagbearer) {
                 VanguardUnitHandler.offerFlagbearerAfterSustain(bevent, game, player, tile);
             }
@@ -1523,7 +1532,17 @@ public final class ButtonHelperModifyUnits {
                     }
                 }
             }
-            if (player != player2 && players.contains(player)) {
+            boolean deployedDaedalonIntoCoexistence =
+                    TnelisUnitHandler.consumeDeployCoexistence(game, player, tile, unitHolder);
+            if (player != player2 && players.contains(player) && !deployedDaedalonIntoCoexistence) {
+                boolean edynAgentCanBeUsedByLandingPlayer =
+                        EdynAgentHandler.canUseToAllowCoexistence(game, player, player, unitHolder);
+                boolean anotherEdynAgentCanBeUsed = game.getRealPlayers().stream()
+                        .anyMatch(agentOwner ->
+                                EdynAgentHandler.canUseToAllowCoexistence(game, agentOwner, player, unitHolder));
+                if (anotherEdynAgentCanBeUsed) {
+                    EdynAgentHandler.offerCoexistence(game, player, unitHolder);
+                }
                 if (!TwilightsFallMonumentsButtonHandler.preventsCoexistence(game, tile)
                         && (player2.hasUnlockedBreakthrough("titansbt")
                                 || player.hasUnlockedBreakthrough("titansbt")
@@ -1565,6 +1584,9 @@ public final class ButtonHelperModifyUnits {
                     } else {
                         buttons.add(Buttons.green(player.factionButtonChecker() + "deleteButtons", "Coexistence"));
                     }
+                    if (edynAgentCanBeUsedByLandingPlayer) {
+                        buttons.add(EdynAgentHandler.getCoexistenceButton(player, player, unitHolder.getName()));
+                    }
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
                     if (player2.getPlanets().contains(unitHolder.getName())
                             && (player2.hasAbility("researchteam")
@@ -1584,6 +1606,18 @@ public final class ButtonHelperModifyUnits {
                         MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), msg, buttons);
                     }
 
+                } else if (edynAgentCanBeUsedByLandingPlayer) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(EdynAgentHandler.getCoexistenceButton(player, player, unitHolder.getName()));
+                    buttons.add(Buttons.red(
+                            player.factionButtonChecker() + "startCombatOn_" + unitHolder.getName(),
+                            "Engage in Combat"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCorrectChannel(),
+                            player.getRepresentationNoPing()
+                                    + ", you may use Allant to allow your units to enter coexistence on "
+                                    + Helper.getPlanetRepresentation(unitHolder.getName(), game) + ".",
+                            buttons);
                 } else {
                     if (game.getStoredValue("coexistFlag").isEmpty()) {
                         StartCombatService.startGroundCombat(player, player2, game, event, unitHolder, tile);

@@ -81,6 +81,7 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKRelicHooks;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -92,6 +93,7 @@ import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
 import ti4.model.BreakthroughModel;
+import ti4.model.ColorModel;
 import ti4.model.EmbeddableModel;
 import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
@@ -1646,6 +1648,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (MonumentsDSButtonHandler.hasVaylerianMonumentCommodityBonus(game, this)) {
             bonus++;
         }
+        bonus += ThirtyKRelicHooks.commodityBonus(game, this);
 
         return bonus;
     }
@@ -2022,9 +2025,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (leader.isEmpty()) {
             leader = getLeaderByType(leaderIdOrType);
         }
-        if (leader.isEmpty() && leaderIdOrType.contains("agent")) {
-            leader = getLeaderByID("yssarilagent");
-        }
         return leader;
     }
 
@@ -2060,14 +2060,14 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             return Optional.of(new Leader("keleresagent", "agent"));
         }
         if (leaderId.contains("agent")) {
-            for (Leader leader : leaders) {
-                if ("yssarilagent".equals(leader.getId())) {
-                    if (!leader.isExhausted()) {
-                        return Optional.of(leader);
-                    }
-                    if (exhaustedFallbackLeader == null) {
-                        exhaustedFallbackLeader = leader;
-                    }
+            Optional<Leader> externalAgent = getExternalAgent(leaderId);
+            if (externalAgent.isPresent()) {
+                Leader leader = externalAgent.get();
+                if (!leader.isExhausted()) {
+                    return Optional.of(leader);
+                }
+                if (exhaustedFallbackLeader == null) {
+                    exhaustedFallbackLeader = leader;
                 }
             }
         }
@@ -2089,8 +2089,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                     && game.getStoredValue("keleresAgentTarget").equalsIgnoreCase(getFaction())) {
                 return true;
             }
-            return hasExternalAccessToLeader(leaderId)
-                    && !getLeaderByID("yssarilagent").map(Leader::isExhausted).orElse(true);
+            return getExternalAgent(leaderId)
+                    .map(leader -> !leader.isExhausted())
+                    .orElse(false);
         }
     }
 
@@ -2104,19 +2105,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public Optional<Leader> getLeaderByID(String leaderID) {
-        for (Leader leader : leaders) {
-            if (leader.getId().equalsIgnoreCase(leaderID)) {
-                return Optional.of(leader);
-            }
-        }
-        if (leaderID.contains("agent")) {
-            for (Leader leader : leaders) {
-                if ("yssarilagent".equals(leader.getId())) {
-                    return Optional.of(leader);
-                }
-            }
-        }
-        return Optional.empty();
+        Optional<Leader> leader = getDirectLeaderByID(leaderID);
+        return leader.isPresent() ? leader : getExternalAgent(leaderID);
     }
 
     public List<String> getLeaderIDs() {
@@ -2129,10 +2119,31 @@ public class Player extends PlayerProperties implements StoredValueHelper {
      *         Yssaril Agent
      */
     public boolean hasExternalAccessToLeader(String leaderID) {
-        if (!hasLeader(leaderID) && leaderID.contains("agent") && getLeaderIDs().contains("yssarilagent")) {
+        if (!hasLeader(leaderID) && leaderID.contains("agent") && hasLeader("yssarilagent")) {
             return game.isLeaderInGame(leaderID);
         }
-        return false;
+        return !hasLeader(leaderID)
+                && leaderID.contains("agent")
+                && hasLeader("yssarilagent_br")
+                && game.getRealPlayersExcludingThis(this).stream()
+                        .anyMatch(player -> player.hasLeader(leaderID)
+                                && player.getDirectLeaderByID(leaderID)
+                                        .map(Leader::isExhausted)
+                                        .orElse(false));
+    }
+
+    private Optional<Leader> getDirectLeaderByID(String leaderID) {
+        return leaders.stream()
+                .filter(leader -> leader.getId().equalsIgnoreCase(leaderID))
+                .findFirst();
+    }
+
+    private Optional<Leader> getExternalAgent(String leaderID) {
+        if (!leaderID.contains("agent") || !hasExternalAccessToLeader(leaderID)) {
+            return Optional.empty();
+        }
+        Optional<Leader> yssarilAgent = getDirectLeaderByID("yssarilagent");
+        return yssarilAgent.isPresent() ? yssarilAgent : getDirectLeaderByID("yssarilagent_br");
     }
 
     public boolean hasLeader(String leaderID) {
@@ -2315,11 +2326,18 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         List<String> promissoryNotesInPlayArea = getPromissoryNotesInPlayArea();
         int vpCount = 0;
         for (String id : promissoryNotesInPlayArea) {
-            if (id.endsWith("_sftt")) {
+            if (givesSupportForTheThroneVictoryPoint(id)) {
                 vpCount++;
             }
         }
         return vpCount;
+    }
+
+    public boolean givesSupportForTheThroneVictoryPoint(String promissoryNoteId) {
+        if (promissoryNoteId == null || !promissoryNoteId.endsWith("_sftt")) {
+            return false;
+        }
+        return !promissoryNoteId.endsWith("_br_sftt") || getPromissoryNotes().containsKey(getColor() + "_br_sftt");
     }
 
     public int getTotalVictoryPoints() {
@@ -2705,7 +2723,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 "mutagenhazardous",
                 "mutagenindustrial",
                 "mutagencultural",
-                "mutagenfrontier");
+                "mutagenfrontier",
+                "ancientexcavators30k",
+                "dauntingweaponsschematics30k",
+                "enhancedmobilitycore30k");
         return getRelics().stream()
                 .filter(Mapper::isValidRelic)
                 .filter(tradableRelics::contains)
@@ -3007,6 +3028,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             getExhaustedPlanets().add(planet);
             TheodisiOutpostActionCardHandler.offerOutpostEffects(game, this, planet);
             TaBreakthroughHandler.offerSafeHavensInfantry(game, this, planet);
+            ThirtyKRelicHooks.onPlanetExhausted(game, this, planet);
         }
         Game game = this.game;
         if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null
@@ -3547,10 +3569,15 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         eb.addField(name, value, inline);
     }
 
+    private Color getPrimaryColorOrWhite() {
+        ColorModel colorModel = Mapper.getColor(getColor());
+        return colorModel == null ? Color.WHITE : colorModel.getPrimaryColor();
+    }
+
     private void applyEmbedDefaults(EmbedBuilder eb) {
         eb.setAuthor(getUserName(), null, getUser().getEffectiveAvatarUrl());
         eb.setFooter("");
-        eb.setColor(Mapper.getColor(getColor()).getPrimaryColor());
+        eb.setColor(getPrimaryColorOrWhite());
     }
 
     private String getContainerTitle() {
@@ -3570,7 +3597,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public Container getRepresentationContainer() {
         List<ContainerChildComponent> components = new ArrayList<>();
-        Color accent = Mapper.getColor(getColor()).getPrimaryColor();
+        Color accent = getPrimaryColorOrWhite();
 
         // TITLE SECTION
         String title = getContainerTitle();

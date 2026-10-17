@@ -194,9 +194,12 @@ public class WebScoreBreakdown {
         if (promissoryNotesInPlayArea != null) {
             for (String pnId : promissoryNotesInPlayArea) {
                 // SFTT promissory notes end with "_sftt" (e.g., "blue_sftt", "red_sftt")
-                if (pnId != null && pnId.endsWith("_sftt")) {
+                if (player.givesSupportForTheThroneVictoryPoint(pnId)) {
                     // Check if this is not the player's own SFTT
                     String pnColor = pnId.substring(0, pnId.length() - 5); // Remove "_sftt"
+                    if (pnColor.endsWith("_br")) {
+                        pnColor = pnColor.substring(0, pnColor.length() - 3);
+                    }
                     if (!pnColor.equals(player.getColor())) {
                         ScoreBreakdownEntry entry =
                                 createEntry(EntryType.SFTT, null, null, EntryState.SCORED, true, 1, null, null);

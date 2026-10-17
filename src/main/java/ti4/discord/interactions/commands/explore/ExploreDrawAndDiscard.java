@@ -39,4 +39,9 @@ class ExploreDrawAndDiscard extends GameStateSubcommand {
         sb.append("To choose a card to keep/use, run this command: `/explore use explore_card_id:{ID}`");
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

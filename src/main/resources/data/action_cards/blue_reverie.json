@@ -158,5 +158,15 @@
         "window": "ACTION:",
         "text": "Spend 2 trade goods to place up to 4 neutral units that have a combined cost of 5 or less in a system that contains your ships; resolve space combat in that system. During that combat, after you destroy 1 of those units, place 1 unit of that type in that system.",
         "source": "blue_reverie"
+    },
+    {
+        "alias": "overrule_br",
+        "name": "Overrule",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Spend 1 token from your strategy pool to resolve the primary ability of 1 readied or unchosen strategy card.",
+        "notes": "You must declare which strategy card you are choosing before the Sabo window, but need not declare how you will resolve the primary ability. If you choose Trade, you cannot choose other players to resolve the secondary ability.",
+        "flavorText": "Treilla absentmindedly smiled a sickly sweet smile at the newly promoted commander. With any luck, he'd be dead or demoted within a day or two.",
+        "source": "blue_reverie"
     }
 ]

@@ -20,6 +20,7 @@ import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -40,6 +41,12 @@ class TacticalActionButtonHandlers {
     @ButtonHandler("unitTacticalMove")
     @ButtonHandler("unitTacticalRemove")
     public static void newTacticalMoveUnits(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (StringUtils.isBlank(game.getActiveSystem())) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "There is no active tactical action, so these buttons are no longer usable.");
+            return;
+        }
+
         String regexSingleUnit = "unitTactical(?<type>Move|Remove)";
         regexSingleUnit += "_" + RegexHelper.posRegex(game);
         regexSingleUnit += "_" + RegexHelper.intRegex("amt");
@@ -298,6 +305,7 @@ class TacticalActionButtonHandlers {
                         // we want "landed X" to read before those, not after.
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), landingMsg);
                         AddUnitService.addUnits(event, game, toAdd);
+                        ThirtyKExploreHooks.afterLanding(game, owner, tile, planet, type, amount);
                         if (type == UnitType.Infantry) {
                             MonumentsService.recordNaaluMonumentInfantryCommit(game, owner, tile, planet);
                         }

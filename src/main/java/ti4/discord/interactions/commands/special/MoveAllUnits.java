@@ -81,4 +81,9 @@ class MoveAllUnits extends GameStateSubcommand {
             Helper.isCCCountCorrect(player);
         }
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

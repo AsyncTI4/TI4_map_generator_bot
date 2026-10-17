@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.persistence.TestGameHarness;
+import ti4.image.MapSegment;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 
@@ -76,7 +78,9 @@ class FogGameSummaryServiceTest extends BaseTi4Test {
 
         List<MessageEmbed> embeds = FogGameSummaryService.buildEmbeds(game, false);
 
-        assertThat(embeds).hasSize(5);
+        assertThat(embeds).hasSize(7);
+        // Discord's 6000-character cap is per message; MessageHelper splits embeds across messages to stay under
+        // it, so each embed on its own must fit.
         for (MessageEmbed embed : embeds) {
             assertThat(embed.getLength()).isLessThanOrEqualTo(MessageEmbed.EMBED_MAX_LENGTH_BOT);
             assertThat(embed.getFields()).hasSizeLessThanOrEqualTo(25);
@@ -116,8 +120,104 @@ class FogGameSummaryServiceTest extends BaseTi4Test {
 
         assertThat(FogGameSummaryService.galaxyCount(game)).isEqualTo(1);
         assertThat(FogGameSummaryService.usesSectors(game)).isFalse();
-        assertThat(fieldValue(galaxies, "Galaxies")).startsWith("`main` main");
+        // One galaxy: the tile count is already in the overview, so the Galaxies field is left out.
+        assertThat(galaxies.getFields()).noneMatch(field -> "Galaxies".equals(field.getName()));
         assertThat(fieldValue(galaxies, "Sectors")).isEqualTo("None");
+    }
+
+    @Test
+    void sectorLinesIncludeHowManySystemsTheyHold() {
+        game.setTile(new Tile("19", "000"));
+        game.setTile(new Tile("20", "101"));
+        MapSegment.put(game, new MapSegment("core", "000", 1));
+
+        assertThat(fieldValue(embedTitled("Galaxies & sectors"), "Sectors"))
+                .contains("core")
+                .endsWith("2 systems");
+    }
+
+    // The Separate Fracture option can be on while no Fracture tile is placed yet; the field must not contradict it.
+    @Test
+    void fractureFieldDistinguishesNotInPlayFromSeparateMap() {
+        game.setTile(new Tile("19", "000"));
+        game.setFowOption(FOWOption.FRACTURE_SEPARATE_MAP, true);
+
+        assertThat(fieldValue(embedTitled("Galaxies & sectors"), "Fracture")).isEqualTo("Not in play");
+
+        game.setTile(new Tile("19", "frac1"));
+
+        assertThat(fieldValue(embedTitled("Galaxies & sectors"), "Fracture")).isEqualTo("Separate map");
+    }
+
+    @Test
+    void missingMapTemplateShowsNoneAndStrategyCardsShowTheSetName() {
+        game.setMapTemplateID("null");
+
+        MessageEmbed overview = FogGameSummaryService.buildEmbeds(game, false).getFirst();
+
+        assertThat(fieldValue(overview, "Map template")).isEqualTo("None");
+        assertThat(fieldValue(overview, "Strategy cards"))
+                .isEqualTo(game.getStrategyCardSet().getName());
+    }
+
+    @Test
+    void playerLinesShowVictoryPointsAndTheSpeaker() {
+        Player player = game.addPlayer("player-id", "player-user");
+        player.setFaction("sol");
+        player.setColor("red");
+        game.setSpeakerUserID("player-id");
+
+        String players = fieldValue(embedTitled("People"), "Players");
+
+        assertThat(players).contains("0 VP").contains("speaker");
+    }
+
+    @Test
+    void progressEmbedListsObjectivesPerStageAndLaws() {
+        MessageEmbed progress = embedTitled("Progress");
+
+        assertThat(fieldValue(progress, "Stage 1 objectives")).endsWith("0 revealed\n0 staged");
+        assertThat(fieldValue(progress, "Stage 2 objectives")).contains("revealed");
+        assertThat(fieldValue(progress, "Laws in play")).isEqualTo("None");
+    }
+
+    // A bare Game has no decks until setup; the Decks embed must still show the deck ids instead of crashing.
+    @Test
+    void decksEmbedWithoutSetUpDecksShowsIdsOnly() {
+        MessageEmbed decks = embedTitled("Decks");
+
+        assertThat(decks.getDescription()).contains("not set up");
+        assertThat(fieldValue(decks, "Action cards")).contains("`").doesNotContain("left");
+    }
+
+    @Test
+    void setUpGameReportsCardsLeftPerDeckWithinDiscordLimits() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game loaded = harness.load();
+            loaded.setFowMode(true);
+
+            List<MessageEmbed> embeds = FogGameSummaryService.buildEmbeds(loaded, false);
+            MessageEmbed decks = embeds.stream()
+                    .filter(embed -> "Decks".equals(embed.getTitle()))
+                    .findFirst()
+                    .orElseThrow();
+
+            assertThat(fieldValue(decks, "Action cards")).contains(" left\n`" + loaded.getAcDeckID() + "`");
+            assertThat(fieldValue(decks, "Explores")).contains("Frontier **");
+            for (MessageEmbed embed : embeds) {
+                assertThat(embed.getLength()).isLessThanOrEqualTo(MessageEmbed.EMBED_MAX_LENGTH_BOT);
+                embed.getFields()
+                        .forEach(field -> assertThat(field.getValue().length())
+                                .isLessThanOrEqualTo(MessageEmbed.VALUE_MAX_LENGTH));
+            }
+        }
+    }
+
+    @Test
+    void fogOptionsEmbedCarriesGameSettingsAndLoreCount() {
+        assertThat(fieldValue(embedTitled("Fog options"), "Settings"))
+                .contains("Auto-ping")
+                .contains("Lore entries: 0");
     }
 
     @Test
@@ -146,6 +246,31 @@ class FogGameSummaryServiceTest extends BaseTi4Test {
 
         assertThat(fieldValue(people, "Game masters")).isEqualTo("gm-user");
         assertThat(people.getFields()).noneMatch(field -> "Observers".equals(field.getName()));
+    }
+
+    // The GM role is gone after game end (and the test game has no guild at all), so /fow game_info on an ended
+    // game must fall back to the GM ids remembered at end time.
+    @Test
+    void rememberedGameMastersAreShownOnceTheRoleIsGone() {
+        Player gm = game.addPlayer("gm-id", "gm-user");
+        FogGameSummaryService.rememberGameMasters(game, List.of(gm));
+        game.setHasEnded(true);
+
+        assertThat(FogGameSummaryService.gameMasters(game)).containsExactly(gm);
+        assertThat(fieldValue(embedTitled("People"), "Game masters")).isEqualTo("gm-user");
+    }
+
+    // Games ended before GMs were remembered cannot recover them; say so rather than claiming there was none.
+    @Test
+    void endedGameWithoutRememberedGameMastersExplainsTheGap() {
+        game.setHasEnded(true);
+
+        assertThat(fieldValue(embedTitled("People"), "Game masters")).startsWith("Unknown");
+    }
+
+    @Test
+    void runningGameWithoutGameMastersReportsNone() {
+        assertThat(fieldValue(embedTitled("People"), "Game masters")).isEqualTo("None");
     }
 
     private MessageEmbed embedTitled(String title) {

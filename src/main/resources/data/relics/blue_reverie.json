@@ -98,5 +98,12 @@
         "name": "Taranis Crest",
         "text": "After you gain control of a planet from another player, you may place 1 infantry from that player's reinforcements into coexistence on that planet.\nApply +1 to the resource and influence values of planets you control that contain coexisting units.",
         "source": "blue_reverie"
+    },
+    {
+        "alias": "lightrailordnance_br",
+        "name": "Lightrail Ordnance",
+        "text": "Each of your space docks also has the attributes, unit abilities, and ability text of your PDS units.\n\nAt any time, you may purge this card to research 1 non-faction unit upgrade technology, if able.",
+        "flavourText": "*A single sparkle was the only warning the Yin fleet had before a massive hole had been punched through the hull of the Van Hauge.\nThen, searing light.*",
+        "source": "blue_reverie"
     }
 ]

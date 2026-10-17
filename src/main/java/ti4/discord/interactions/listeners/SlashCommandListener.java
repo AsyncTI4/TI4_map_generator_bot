@@ -2,6 +2,7 @@ package ti4.discord.interactions.listeners;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
@@ -31,6 +32,9 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
             Constants.ADD_TILE_LIST_RANDOM,
             Constants.EDIT_TRACK_RECORD,
             Constants.IMPORT_MAP_JSON);
+
+    private static final Set<String> UNECHOED_COMMANDS =
+            Set.of("rules ask", Constants.FOW + " " + Constants.WHISPER, Constants.BOTHELPER + " impersonate");
 
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
@@ -116,9 +120,7 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
         String susPrefix = command.isSuspicious(event) ? "sus" : "notSus";
         String commandText =
                 "```" + susPrefix + "\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
-        if (!event.getCommandString().contains("/rules ask")
-                && !event.getCommandString().contains("/fow whisper")
-                && !event.getCommandString().contains("/bothelper impersonate")) {
+        if (isEchoedInChannel(event)) {
             event.getChannel()
                     .sendMessage(commandText)
                     .queue(
@@ -128,6 +130,10 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
                             },
                             BotLogger::catchRestError);
         }
+    }
+
+    static boolean isEchoedInChannel(SlashCommandInteractionEvent event) {
+        return !UNECHOED_COMMANDS.contains(event.getFullCommandName());
     }
 
     private static ExecutionLockType getLockType(Command<SlashCommandInteractionEvent> command) {
