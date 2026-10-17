@@ -12,6 +12,7 @@ import ti4.ai.eval.CombatModifiers.Side;
 import ti4.ai.eval.CombatOdds;
 import ti4.ai.eval.CombatOdds.Combatant;
 import ti4.ai.eval.CombatOdds.Force;
+import ti4.ai.letnev.LetnevSpaceCombat;
 import ti4.ai.strategy.CopiedTechPolicy;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -65,6 +66,7 @@ class CombatForces {
         if (player.hasTech(DURANIUM_ARMOR)) force = force.repairing();
         if (ground && player.hasTech(X89_DOUBLING)) force = force.doublingHits();
         if (ground && player.hasTech(PARTICLE_WEAVE)) force = force.weaving();
+        if (!ground) force = LetnevSpaceCombat.applyTo(player, force);
         return force;
     }
 

@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.strategy.CardPlan.Benefit;
 import ti4.ai.tactical.ProductionPlanner;
@@ -76,7 +77,7 @@ class WarfareUses {
         Player seat = in.seat();
         int spent = (int) Math.ceil(firstBuild.get().totalCost());
         double second = ProductionPlanner.plan(game, seat, home, -spent).value() * CardValueScale.PRODUCTION_SHARE;
-        int fleetRoom = seat.getFleetCC()
+        int fleetRoom = FleetLimit.ships(seat)
                 - BoardView.nonFighterShips(BoardView.space(home), seat)
                 - nonFighterShips(firstBuild.get());
         return fleetRoom <= 0 ? second * CardValueScale.CROWDED_DOUBLE_BUILD_SHARE : second;

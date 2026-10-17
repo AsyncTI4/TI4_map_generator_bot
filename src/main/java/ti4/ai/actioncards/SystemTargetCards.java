@@ -10,6 +10,7 @@ import ti4.ai.actioncards.CardPrompts.Offer;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.FleetLimit;
 import ti4.ai.explore.ExploreValues;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectiveValue;
@@ -69,7 +70,7 @@ class SystemTargetCards {
         boolean otherShips = game.getRealPlayersNNeutral().stream()
                 .anyMatch(other -> other != seat && FoWHelper.playerHasActualShipsInSystem(other, tile));
         int fleet = BoardView.nonFighterShips(BoardView.space(tile), seat);
-        return !otherShips && fleet + 1 <= seat.getEffectiveFleetCC();
+        return !otherShips && fleet + 1 <= FleetLimit.ships(seat);
     }
 
     private static double ghostShipValue(Game game, Player seat, Tile tile, ObjectiveValue objectives) {

@@ -50,4 +50,17 @@ class PickPriorTest {
         assertThat(PickPrior.nudge("sardakk", StrategyCard.IMPERIAL, 9))
                 .isEqualTo(PickPrior.nudge("sardakk", StrategyCard.IMPERIAL, 6));
     }
+
+    // Letnev players take Politics most in round 1 and Imperial in 2 of 1099 games, so Imperial stays blocked in round
+    // 1
+    // and becomes a common pick by round 3.
+    @Test
+    void usesLetnevsOwnPickRates() {
+        assertThat(PickPrior.nudge("letnev", StrategyCard.POLITICS, 1)).isCloseTo(0.66, within(0.01));
+        assertThat(PickPrior.nudge("letnev", StrategyCard.CONSTRUCTION, 1)).isCloseTo(-0.63, within(0.01));
+        assertThat(PickPrior.nudge("letnev", StrategyCard.IMPERIAL, 1)).isCloseTo(-0.98, within(0.02));
+        assertThat(PickPrior.nudge("letnev", StrategyCard.IMPERIAL, 3)).isPositive();
+        assertThat(PickPrior.nudge("letnev", StrategyCard.IMPERIAL, 12))
+                .isEqualTo(PickPrior.nudge("letnev", StrategyCard.IMPERIAL, 6));
+    }
 }

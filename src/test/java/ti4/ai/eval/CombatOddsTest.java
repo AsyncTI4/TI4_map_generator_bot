@@ -26,6 +26,47 @@ class CombatOddsTest {
                 .isCloseTo(1.0, within(1e-4));
     }
 
+    // Munitions Reserves rerolls the misses of a round, so a side that pays for it hits more often: each paid round
+    // helps, and a budget of zero rounds changes nothing.
+    @Test
+    void rerollingMissesInTheFirstRoundsImprovesTheOdds() {
+        Force dreadnoughts = Force.of(List.of(DREADNOUGHT, DREADNOUGHT));
+
+        double plain = CombatOdds.resolve(dreadnoughts, dreadnoughts).attackerWins();
+        double oneRound = CombatOdds.resolve(dreadnoughts.rerollingMissesInFirstRounds(1), dreadnoughts)
+                .attackerWins();
+        double threeRounds = CombatOdds.resolve(dreadnoughts.rerollingMissesInFirstRounds(3), dreadnoughts)
+                .attackerWins();
+
+        assertThat(oneRound).isGreaterThan(plain + 0.05);
+        assertThat(threeRounds).isGreaterThan(oneRound);
+        assertThat(CombatOdds.resolve(dreadnoughts.rerollingMissesInFirstRounds(0), dreadnoughts)
+                        .attackerWins())
+                .isCloseTo(plain, within(1e-9));
+    }
+
+    // A cruiser duel with the attacker rerolling its first round: it then hits with 1 - 0.6 * 0.6 = 0.64 against the
+    // defender's 0.4. It wins at once with 0.64 * 0.6, and 0.6 * 0.36 of the time goes on to a plain duel (0.375).
+    @Test
+    void aRerolledDieHitsWithTheChanceOfEitherRoll() {
+        Force cruiser = Force.of(List.of(CRUISER));
+
+        Outcome outcome = CombatOdds.resolve(cruiser.rerollingMissesInFirstRounds(1), cruiser);
+
+        assertThat(outcome.attackerWins()).isCloseTo(0.64 * 0.6 + 0.36 * 0.6 * 0.375, within(1e-4));
+    }
+
+    @Test
+    void theOtherSidesRerollsHurtTheOpponent() {
+        Force dreadnoughts = Force.of(List.of(DREADNOUGHT, DREADNOUGHT));
+
+        double plain = CombatOdds.resolve(dreadnoughts, dreadnoughts).attackerWins();
+        double facingRerolls = CombatOdds.resolve(dreadnoughts, dreadnoughts.rerollingMissesInFirstRounds(2))
+                .attackerWins();
+
+        assertThat(facingRerolls).isLessThan(plain - 0.05);
+    }
+
     @Test
     void identicalSidesAreEvenlyMatched() {
         Outcome outcome = CombatOdds.resolve(List.of(CRUISER), List.of(CRUISER));

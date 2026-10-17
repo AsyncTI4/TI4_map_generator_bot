@@ -1,8 +1,12 @@
 package ti4.ai.tactical;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
+import java.util.stream.IntStream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CombatModifiers.Side;
@@ -10,13 +14,16 @@ import ti4.ai.eval.CombatOdds;
 import ti4.ai.eval.CombatOdds.Combatant;
 import ti4.ai.eval.CombatOdds.Detailed;
 import ti4.ai.eval.CombatOdds.Force;
+import ti4.ai.eval.PlanetStake;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SystemStake;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitType;
+import ti4.model.UnitModel;
 
 @UtilityClass
 public class CombatForecast {
@@ -99,6 +106,30 @@ public class CombatForecast {
         return CombatOdds.resolve(attack, defence).attackerWins();
     }
 
+    public record FirstRoundGain(double gain, double winChance) {
+
+        public static final FirstRoundGain NONE = new FirstRoundGain(0, 0);
+    }
+
+    public static FirstRoundGain rerollGain(Game game, Player seat, String position) {
+        return duel(game, seat, position, BoardView.SPACE)
+                .map(duel -> duel.firstRoundGain(own -> own.rerollingMissesInFirstRounds(1)))
+                .orElse(FirstRoundGain.NONE);
+    }
+
+    public static FirstRoundGain mechSwapGain(Game game, Player seat, String position, String planet) {
+        return duel(game, seat, position, planet)
+                .filter(Duel::ground)
+                .map(Duel::mechSwapGain)
+                .orElse(FirstRoundGain.NONE);
+    }
+
+    public static FirstRoundGain extraDieGain(Game game, Player seat, String position) {
+        return duel(game, seat, position, BoardView.SPACE)
+                .map(duel -> duel.firstRoundGain(Duel::withExtraDieOnBestShip))
+                .orElse(FirstRoundGain.NONE);
+    }
+
     private static Optional<Duel> duel(Game game, Player seat, String position, String holderName) {
         Tile tile = game.getTileByPosition(position);
         UnitHolder holder = tile == null ? null : tile.getUnitHolders().get(holderName);
@@ -152,6 +183,93 @@ public class CombatForecast {
             double before = CombatForces.win(own, enemy, attacks());
             double after = CombatForces.win(repaired, enemy, attacks());
             return (after - before) * stake(own, enemy);
+        }
+
+        FirstRoundGain firstRoundGain(UnaryOperator<Force> firstRoundChange) {
+            Force own = own().rerollingMissesInFirstRounds(0);
+            Force enemy = enemy();
+            return compare(own, enemy, 0, detailed(own, own, enemy), detailed(own, firstRoundChange.apply(own), enemy));
+        }
+
+        FirstRoundGain mechSwapGain() {
+            Force own = own();
+            Force enemy = enemy();
+            Optional<Force> swapped = withMechInPlaceOfInfantry(own);
+            if (swapped.isEmpty()) return FirstRoundGain.NONE;
+            return compare(
+                    own,
+                    enemy,
+                    planetStake(),
+                    detailed(own, own, enemy),
+                    detailed(swapped.get(), swapped.get(), enemy));
+        }
+
+        private FirstRoundGain compare(Force own, Force enemy, double extraStake, Detailed plain, Detailed changed) {
+            double winBefore = winOf(plain);
+            double swing = (winOf(changed) - winBefore) * (stake(own, enemy) + extraStake);
+            double costs = netLoss(plain) - netLoss(changed);
+            return new FirstRoundGain(swing + costs, winBefore);
+        }
+
+        private double planetStake() {
+            return holder instanceof Planet planet ? PlanetStake.of(game, seat, planet) : 0;
+        }
+
+        private Optional<Force> withMechInPlaceOfInfantry(Force own) {
+            UnitModel mech = seat.getUnitByType(UnitType.Mech);
+            UnitModel infantry = seat.getUnitByType(UnitType.Infantry);
+            List<Combatant> units = new ArrayList<>(own.units());
+            int index = IntStream.range(0, units.size())
+                    .filter(i -> units.get(i).type() == UnitType.Infantry)
+                    .findFirst()
+                    .orElse(-1);
+            if (mech == null || infantry == null || index < 0) return Optional.empty();
+            Combatant replaced = units.get(index);
+            int hitsOn = mech.getCombatHitsOn() + replaced.hitsOn() - infantry.getCombatHitsOn();
+            units.set(
+                    index,
+                    new Combatant(
+                            hitsOn, mech.getCombatDieCount(), mech.getSustainDamage(), mech.getCost(), UnitType.Mech));
+            return Optional.of(own.withUnits(units));
+        }
+
+        private Detailed detailed(Force own, Force firstRoundOwn, Force enemy) {
+            return attacks()
+                    ? CombatOdds.resolveDetailed(own, enemy, firstRoundOwn, enemy, 0, 0)
+                    : CombatOdds.resolveDetailed(enemy, own, enemy, firstRoundOwn, 0, 0);
+        }
+
+        private double winOf(Detailed detailed) {
+            return attacks()
+                    ? detailed.outcome().attackerWins()
+                    : detailed.outcome().defenderWins();
+        }
+
+        private double netLoss(Detailed detailed) {
+            return attacks()
+                    ? detailed.attackerCostLost() - detailed.defenderCostLost()
+                    : detailed.defenderCostLost() - detailed.attackerCostLost();
+        }
+
+        static Force withExtraDieOnBestShip(Force own) {
+            List<Combatant> units = own.units();
+            int chosen = -1;
+            for (int i = 0; i < units.size(); i++) {
+                Combatant unit = units.get(i);
+                if (unit.type() == null || unit.dice() == 0) continue;
+                if (chosen < 0 || bestShip(unit, units.get(chosen))) chosen = i;
+            }
+            if (chosen < 0) return own;
+            List<Combatant> boosted = new ArrayList<>(units);
+            Combatant unit = units.get(chosen);
+            boosted.set(chosen, unit.rolling(unit.hitsOn(), unit.dice() + 1));
+            return own.withUnits(boosted);
+        }
+
+        private static boolean bestShip(Combatant candidate, Combatant current) {
+            if (candidate.hitsOn() != current.hitsOn()) return candidate.hitsOn() < current.hitsOn();
+            if (candidate.dice() != current.dice()) return candidate.dice() > current.dice();
+            return candidate.cost() >= current.cost();
         }
 
         private Map<UnitType, Integer> unitsOf(Player player) {

@@ -117,11 +117,48 @@ class ResearchPrior {
             Map.entry("da", 17),
             Map.entry("dxa", 1));
 
+    private static final int LETNEV_GAMES = 1099;
+    private static final Map<String, Integer> LETNEV_RESEARCH = Map.ofEntries(
+            Map.entry("nes", 945),
+            Map.entry("gd", 888),
+            Map.entry("da", 584),
+            Map.entry("lwd", 546),
+            Map.entry("dn2", 372),
+            Map.entry("dd2", 359),
+            Map.entry("asc", 327),
+            Map.entry("cv2", 266),
+            Map.entry("ws", 238),
+            Map.entry("sr", 186),
+            Map.entry("fl", 185),
+            Map.entry("aida", 167),
+            Map.entry("det", 153),
+            Map.entry("st", 132),
+            Map.entry("sdn", 127),
+            Map.entry("x89c4", 120),
+            Map.entry("l4", 115),
+            Map.entry("cr2", 82),
+            Map.entry("nm", 64),
+            Map.entry("md", 45),
+            Map.entry("pa", 41),
+            Map.entry("hm", 35),
+            Map.entry("sar", 34),
+            Map.entry("pi", 29),
+            Map.entry("bs", 23),
+            Map.entry("ie", 17),
+            Map.entry("ff2", 17),
+            Map.entry("pds2", 16),
+            Map.entry("td", 11),
+            Map.entry("sd2", 7),
+            Map.entry("dxa", 2),
+            Map.entry("inf2", 2),
+            Map.entry("gls", 2));
+
     static double nudge(String faction, String alias) {
         return switch (faction) {
             case "hacan" -> nudge(HACAN_RESEARCH, HACAN_GAMES, alias);
             case "xxcha" -> nudge(XXCHA_RESEARCH, XXCHA_GAMES, alias);
             case "sardakk" -> nudge(SARDAKK_RESEARCH, SARDAKK_GAMES, alias);
+            case "letnev" -> nudge(LETNEV_RESEARCH, LETNEV_GAMES, alias);
             default -> 0;
         };
     }

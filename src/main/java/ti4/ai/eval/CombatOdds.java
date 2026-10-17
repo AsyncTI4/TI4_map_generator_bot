@@ -56,30 +56,39 @@ public class CombatOdds {
             int hitMultiplier,
             boolean repairs,
             @Nullable Force afterOpponentLoss,
-            boolean weaves) {
+            boolean weaves,
+            int rerollRounds) {
+
+        public Force(List<Combatant> units, int hitMultiplier, boolean repairs, @Nullable Force afterOpponentLoss) {
+            this(units, hitMultiplier, repairs, afterOpponentLoss, false, 0);
+        }
 
         public static Force of(List<Combatant> units) {
-            return new Force(units, 1, false, null, false);
+            return new Force(units, 1, false, null, false, 0);
         }
 
         public Force doublingHits() {
-            return new Force(units, 2, repairs, afterOpponentLoss, weaves);
+            return new Force(units, 2, repairs, afterOpponentLoss, weaves, rerollRounds);
         }
 
         public Force repairing() {
-            return new Force(units, hitMultiplier, true, afterOpponentLoss, weaves);
+            return new Force(units, hitMultiplier, true, afterOpponentLoss, weaves, rerollRounds);
         }
 
         public Force weaving() {
-            return new Force(units, hitMultiplier, repairs, afterOpponentLoss, true);
+            return new Force(units, hitMultiplier, repairs, afterOpponentLoss, true, rerollRounds);
         }
 
         public Force improvingAfterOpponentLoss(Force improved) {
-            return new Force(units, hitMultiplier, repairs, improved, weaves);
+            return new Force(units, hitMultiplier, repairs, improved, weaves, rerollRounds);
         }
 
         public Force withUnits(List<Combatant> replaced) {
-            return new Force(replaced, hitMultiplier, repairs, afterOpponentLoss, weaves);
+            return new Force(replaced, hitMultiplier, repairs, afterOpponentLoss, weaves, rerollRounds);
+        }
+
+        public Force rerollingMissesInFirstRounds(int rounds) {
+            return new Force(units, hitMultiplier, repairs, afterOpponentLoss, weaves, Math.max(0, rounds));
         }
     }
 
@@ -129,8 +138,8 @@ public class CombatOdds {
                 int absorbedByD = (int) (state.getKey() & 0xffffffffL);
                 Side rollingA = round == 0 ? firstA : a;
                 Side rollingD = round == 0 ? firstD : d;
-                double[] hitsOnD = rollingA.hitDistribution(absorbedByA, d.lostAUnit(absorbedByD));
-                double[] hitsOnA = rollingD.hitDistribution(absorbedByD, a.lostAUnit(absorbedByA));
+                double[] hitsOnD = rollingA.hitDistribution(absorbedByA, d.lostAUnit(absorbedByD), round);
+                double[] hitsOnA = rollingD.hitDistribution(absorbedByD, a.lostAUnit(absorbedByA), round);
                 for (int x = 0; x < hitsOnD.length; x++) {
                     if (hitsOnD[x] == 0) continue;
                     for (int y = 0; y < hitsOnA.length; y++) {
@@ -212,6 +221,8 @@ public class CombatOdds {
         private final double[] lostCosts;
         private final Map<Integer, double[]> distributions = new HashMap<>();
         private final Map<Integer, double[]> improvedDistributions = new HashMap<>();
+        private final Map<Integer, double[]> rerolledDistributions = new HashMap<>();
+        private final Map<Integer, double[]> improvedRerolledDistributions = new HashMap<>();
 
         Side(Force force) {
             this.force = force;
@@ -263,22 +274,26 @@ public class CombatOdds {
             return after - 1;
         }
 
-        double[] hitDistribution(int absorbed, boolean opponentLostAUnit) {
+        double[] hitDistribution(int absorbed, boolean opponentLostAUnit, int round) {
             boolean improved = opponentLostAUnit && force.afterOpponentLoss() != null;
-            Map<Integer, double[]> cache = improved ? improvedDistributions : distributions;
+            boolean rerolling = round < active(opponentLostAUnit).rerollRounds();
+            Map<Integer, double[]> cache = improved
+                    ? (rerolling ? improvedRerolledDistributions : improvedDistributions)
+                    : (rerolling ? rerolledDistributions : distributions);
             List<Combatant> units = improved ? improvedOrder : lossOrder;
-            return cache.computeIfAbsent(absorbed, count -> computeDistribution(units, count));
+            return cache.computeIfAbsent(absorbed, count -> computeDistribution(units, count, rerolling));
         }
 
         private Force active(boolean opponentLostAUnit) {
             return opponentLostAUnit && force.afterOpponentLoss() != null ? force.afterOpponentLoss() : force;
         }
 
-        private double[] computeDistribution(List<Combatant> units, int absorbed) {
+        private double[] computeDistribution(List<Combatant> units, int absorbed, boolean rerollingMisses) {
             int destroyed = Math.max(0, absorbed - sustains);
             double[] distribution = {1.0};
             for (Combatant unit : units.subList(Math.min(destroyed, units.size()), units.size())) {
-                double hitChance = Math.clamp((11 - unit.hitsOn()) / 10.0, 0.0, 1.0);
+                double single = Math.clamp((11 - unit.hitsOn()) / 10.0, 0.0, 1.0);
+                double hitChance = rerollingMisses ? 1 - (1 - single) * (1 - single) : single;
                 for (int die = 0; die < unit.dice(); die++) distribution = addDie(distribution, hitChance);
             }
             return distribution;

@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.scoring.Footprint;
 import ti4.game.Game;
@@ -219,7 +220,7 @@ final class IncomingForces {
     private Map<Tile, Map<UnitType, Integer>> withinFleetSupply(
             Player enemy, Tile target, Map<Tile, Map<UnitType, Integer>> reaching) {
         int resident = isGone(enemy, target) ? 0 : BoardView.nonFighterShips(BoardView.space(target), enemy);
-        int supply = enemy.getFleetCC() - resident;
+        int supply = FleetLimit.ships(enemy) - resident;
         List<Slot> slots = new ArrayList<>();
         reaching.forEach((origin, ships) -> ships.forEach((type, count) -> {
             for (int i = 0; i < count; i++) slots.add(new Slot(origin, type, cost(enemy, type)));

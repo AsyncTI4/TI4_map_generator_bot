@@ -17,6 +17,7 @@ import ti4.ai.eval.CombatOdds.Force;
 import ti4.ai.eval.FactionAggression;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.PlanetStake;
+import ti4.ai.letnev.L4Disruptors;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.IncomingForces.Exclusion;
 import ti4.ai.tactical.IncomingForces.Horizon;
@@ -875,7 +876,7 @@ public final class DefenseOutlook {
         Player enemy = force.enemy();
         Map<UnitType, Integer> landing = new EnumMap<>(UnitType.class);
         landing.putAll(force.ground());
-        removeLandingForces(landing, expectedSpaceCannonHits(planet));
+        removeLandingForces(landing, L4Disruptors.shieldsInvaders(enemy) ? 0 : expectedSpaceCannonHits(planet));
         if (landing.values().stream().mapToInt(Integer::intValue).sum() == 0) return 0;
         Defenders.Stack ours = defenders.on(planet.getName());
         if (ours.isEmpty()) return 1;

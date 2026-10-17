@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FlagshipRating;
+import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.Threats;
 import ti4.ai.scoring.Footprint;
@@ -209,7 +210,7 @@ public class ProductionPlanner {
         Budget budget = new Budget(
                 Helper.getProductionValue(seat, game, tile, false),
                 spendableResources(game, seat) + extraResources + (seat.hasTech("st") ? 1 : 0) + aidaDiscount(seat),
-                seat.getFleetCC() - BoardView.nonFighterShips(BoardView.space(tile), seat));
+                FleetLimit.ships(seat) - BoardView.nonFighterShips(BoardView.space(tile), seat));
         budget.overSupply = Math.max(0, overSupplyCarriers);
         Builder builder = new Builder(game, seat, tile, budget, defense);
         planScoringUnits(builder);
@@ -260,7 +261,7 @@ public class ProductionPlanner {
         int spendable = spendableResources(game, seat);
         int resources = Math.min(spendable, BoardView.planetResources(game, planet));
         if (resources <= 0) return new BuildPlan(List.of());
-        int fleetRoom = seat.getFleetCC() - BoardView.nonFighterShips(BoardView.space(tile), seat);
+        int fleetRoom = FleetLimit.ships(seat) - BoardView.nonFighterShips(BoardView.space(tile), seat);
         Builder builder = new Builder(
                 game, seat, tile, new Budget(resources * INFANTRY_PER_RESOURCE, resources, fleetRoom), planet);
         planScoringUnits(builder);
@@ -292,7 +293,7 @@ public class ProductionPlanner {
     }
 
     private static Builder oneShipBuilder(Game game, Player seat, Tile tile, int resources) {
-        int fleetRoom = seat.getFleetCC() - BoardView.nonFighterShips(BoardView.space(tile), seat);
+        int fleetRoom = FleetLimit.ships(seat) - BoardView.nonFighterShips(BoardView.space(tile), seat);
         return new Builder(game, seat, tile, new Budget(1, resources, fleetRoom));
     }
 
@@ -496,7 +497,7 @@ public class ProductionPlanner {
         int wanted = 0;
         if (wantsUnscored(game, seat, COMMAND_AN_ARMADA) && largest < ARMADA_SHIPS) wanted = ARMADA_SHIPS;
         if (wantsUnscored(game, seat, RAISE_A_FLEET) && largest < RAISE_A_FLEET_SHIPS) wanted = RAISE_A_FLEET_SHIPS;
-        wanted = Math.min(wanted, seat.getFleetCC());
+        wanted = Math.min(wanted, FleetLimit.ships(seat));
         if (wanted < RAISE_A_FLEET_SHIPS || wanted <= largest) return 0;
         int here = BoardView.nonFighterShips(BoardView.space(tile), seat);
         int missing = wanted - here;

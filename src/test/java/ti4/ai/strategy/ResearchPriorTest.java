@@ -27,6 +27,16 @@ class ResearchPriorTest {
         assertThat(ResearchPrior.nudge("sardakk", "dn2")).isZero();
     }
 
+    // Letnev players take Non-Euclidean Shielding in 86% of games and L4 Disruptors in 10%.
+    @Test
+    void followsLetnevResearchRates() {
+        assertThat(ResearchPrior.nudge("letnev", "nes")).isEqualTo(ResearchPrior.WEIGHT);
+        assertThat(ResearchPrior.nudge("letnev", "da")).isCloseTo(0.56, within(0.01));
+        assertThat(ResearchPrior.nudge("letnev", "l4")).isCloseTo(-0.29, within(0.01));
+        assertThat(ResearchPrior.nudge("letnev", "sd2")).isCloseTo(-0.48, within(0.01));
+        assertThat(ResearchPrior.nudge("letnev", "it")).isZero();
+    }
+
     @Test
     void givesNothingWithoutData() {
         assertThat(ResearchPrior.nudge("nekro", "gd")).isZero();

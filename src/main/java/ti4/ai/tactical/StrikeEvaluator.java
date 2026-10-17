@@ -17,6 +17,7 @@ import ti4.ai.eval.CombatOdds.Force;
 import ti4.ai.eval.CombatOdds.Outcome;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.PlanetStake;
+import ti4.ai.letnev.L4Disruptors;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -238,7 +239,9 @@ class StrikeEvaluator {
                 extraGround.clear();
             }
             int defenders = count(defenderGround);
-            int hits = (int) Math.round(BattleMath.spaceCannonHits(opponent, planet));
+            int hits = L4Disruptors.shieldsInvaders(seat)
+                    ? 0
+                    : (int) Math.round(BattleMath.spaceCannonHits(opponent, planet));
             int sent = defenders == 0 ? Math.min(ground, hits + 1) : ground;
             Map<UnitType, Integer> landing = new EnumMap<>(UnitType.class);
             landing.putAll(remaining);

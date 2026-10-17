@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.FleetLimit;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.strategy.TokenPlan;
@@ -153,7 +154,7 @@ public class CommandTokenPolicy {
     private static List<Level> priorities(Game game, Player seat) {
         int largest = largestStack(game, seat);
         int bonus = fleetBonus(seat);
-        int cap = fleetCap(game);
+        int cap = fleetCap(game, seat);
         if (ACTION_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) {
             TokenPlan plan = TokenPlan.of(game, seat);
             return List.of(
@@ -204,12 +205,14 @@ public class CommandTokenPolicy {
         return shipsCouldJoin && largest >= BASE_FLEET ? Math.min(STACKING_FLEET_CAP, largest + 1) : 0;
     }
 
-    private static int fleetCap(Game game) {
-        return ButtonHelper.isLawInPlay(game, FLEET_REGULATIONS) ? REGULATED_FLEET : Integer.MAX_VALUE;
+    private static int fleetCap(Game game, Player seat) {
+        return ButtonHelper.isLawInPlay(game, FLEET_REGULATIONS)
+                ? REGULATED_FLEET + fleetBonus(seat)
+                : Integer.MAX_VALUE;
     }
 
     private static int fleetBonus(Player seat) {
-        return Math.max(0, seat.getEffectiveFleetCC() - seat.getFleetCC());
+        return FleetLimit.bonus(seat);
     }
 
     private static int totalTokens(Player seat) {

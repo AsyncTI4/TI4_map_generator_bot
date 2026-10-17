@@ -9,6 +9,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.AiSettings;
 import ti4.ai.actioncards.AiCard.Window;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.FleetLimit;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.scoring.ScoringStakes;
@@ -249,7 +250,7 @@ public class ActionCardValue {
         for (Tile tile : game.getTileMap().values()) {
             UnitHolder space = BoardView.space(tile);
             if (!BoardView.hasOwnShips(seat, tile)) continue;
-            if (BoardView.nonFighterShips(space, seat) + 1 <= seat.getEffectiveFleetCC()) tiles.add(tile);
+            if (BoardView.nonFighterShips(space, seat) + 1 <= FleetLimit.ships(seat)) tiles.add(tile);
         }
         return tiles;
     }

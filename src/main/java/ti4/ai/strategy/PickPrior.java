@@ -15,8 +15,12 @@ class PickPrior {
     private static final Map<StrategyCard, int[]> HACAN_PICKS_BY_ROUND = new EnumMap<>(StrategyCard.class);
     private static final Map<StrategyCard, int[]> XXCHA_PICKS_BY_ROUND = new EnumMap<>(StrategyCard.class);
     private static final Map<StrategyCard, int[]> SARDAKK_PICKS_BY_ROUND = new EnumMap<>(StrategyCard.class);
-    private static final Map<String, Map<StrategyCard, int[]>> PICKS_BY_FACTION =
-            Map.of("hacan", HACAN_PICKS_BY_ROUND, "xxcha", XXCHA_PICKS_BY_ROUND, "sardakk", SARDAKK_PICKS_BY_ROUND);
+    private static final Map<StrategyCard, int[]> LETNEV_PICKS_BY_ROUND = new EnumMap<>(StrategyCard.class);
+    private static final Map<String, Map<StrategyCard, int[]>> PICKS_BY_FACTION = Map.of(
+            "hacan", HACAN_PICKS_BY_ROUND,
+            "xxcha", XXCHA_PICKS_BY_ROUND,
+            "sardakk", SARDAKK_PICKS_BY_ROUND,
+            "letnev", LETNEV_PICKS_BY_ROUND);
 
     static {
         NEKRO_PICKS_BY_ROUND.put(StrategyCard.LEADERSHIP, new int[] {121, 81, 108, 108, 119, 20});
@@ -54,6 +58,14 @@ class PickPrior {
         SARDAKK_PICKS_BY_ROUND.put(StrategyCard.WARFARE, new int[] {267, 96, 101, 128, 136, 40});
         SARDAKK_PICKS_BY_ROUND.put(StrategyCard.TECHNOLOGY, new int[] {117, 175, 134, 96, 72, 17});
         SARDAKK_PICKS_BY_ROUND.put(StrategyCard.IMPERIAL, new int[] {1, 53, 122, 163, 135, 35});
+        LETNEV_PICKS_BY_ROUND.put(StrategyCard.LEADERSHIP, new int[] {189, 237, 205, 220, 185, 40});
+        LETNEV_PICKS_BY_ROUND.put(StrategyCard.DIPLOMACY, new int[] {175, 93, 53, 87, 118, 37});
+        LETNEV_PICKS_BY_ROUND.put(StrategyCard.POLITICS, new int[] {228, 143, 135, 164, 141, 31});
+        LETNEV_PICKS_BY_ROUND.put(StrategyCard.CONSTRUCTION, new int[] {51, 136, 141, 115, 92, 35});
+        LETNEV_PICKS_BY_ROUND.put(StrategyCard.TRADE, new int[] {169, 132, 125, 100, 44, 16});
+        LETNEV_PICKS_BY_ROUND.put(StrategyCard.WARFARE, new int[] {97, 88, 109, 116, 148, 37});
+        LETNEV_PICKS_BY_ROUND.put(StrategyCard.TECHNOLOGY, new int[] {188, 175, 152, 148, 99, 26});
+        LETNEV_PICKS_BY_ROUND.put(StrategyCard.IMPERIAL, new int[] {2, 93, 164, 141, 148, 46});
     }
 
     static double nudge(StrategyCard card, int round) {

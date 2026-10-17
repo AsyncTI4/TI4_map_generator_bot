@@ -11,6 +11,7 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.tactical.ProductionPlanner;
 import ti4.ai.tactical.RoundGoals;
@@ -331,7 +332,7 @@ class OpeningOutlook {
                     .filter(carrier -> carrier.moved && carrier.bornAt == BEFORE_ANY_ACTION)
                     .count();
             int fleetRoom =
-                    (int) (seat.getFleetCC() - BoardView.nonFighterShips(BoardView.space(home), seat) + movedOut);
+                    (int) (FleetLimit.ships(seat) - BoardView.nonFighterShips(BoardView.space(home), seat) + movedOut);
             OptionalDouble scrap = ProductionPlanner.cheapestShipToScrap(seat, home);
             int overSupply = scenario.overSupply() && scrap.isPresent() ? OVER_SUPPLY_CARRIERS : 0;
             Transport carrier = transport(seat, UnitType.Carrier);

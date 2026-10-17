@@ -29,6 +29,9 @@ import ti4.ai.explore.RelicActionRules;
 import ti4.ai.hacan.CarthAgentRules;
 import ti4.ai.hacan.DatahubRules;
 import ti4.ai.hacan.WrathOfKenaraRules;
+import ti4.ai.letnev.DarktalonTreillaRules;
+import ti4.ai.letnev.LetnevCombatRules;
+import ti4.ai.letnev.RearAdmiralFarranRules;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.promissory.ConvoysRules;
@@ -52,6 +55,7 @@ import ti4.ai.strategy.SecondaryQueue;
 import ti4.ai.strategy.StrategyCardRanking;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.strategy.StrategyCardTurn;
+import ti4.ai.tactical.CombatMoment;
 import ti4.ai.tactical.CombatRules;
 import ti4.ai.tactical.FleetSupplyRules;
 import ti4.ai.tactical.IntegratedEconomyRules;
@@ -131,7 +135,8 @@ public class NekroBrain implements FactionBrain {
             DatahubRules.START,
             DatahubRules.SELECT_PREFIX,
             DatahubRules.SWAP_PREFIX,
-            WrathOfKenaraRules.FINISH_PREFIX);
+            WrathOfKenaraRules.FINISH_PREFIX,
+            RearAdmiralFarranRules.GAIN);
     private static final Set<String> WINDOW_PREFIXES = Stream.concat(
                     PUBLIC_WINDOW_PREFIXES.stream(), ActionCardRules.targetPrefixes().stream())
             .collect(Collectors.toUnmodifiableSet());
@@ -175,6 +180,8 @@ public class NekroBrain implements FactionBrain {
             StrategyCardRules::buildWithConstruction,
             XxchaAgentRules::next,
             NorrSupremacyRules::next,
+            DarktalonTreillaRules::next,
+            RearAdmiralFarranRules::gainTradeGood,
             NekroLeaderRules::chooseAgentTarget,
             CarthAgentRules::chooseTarget,
             NekroLeaderRules::continueHero,
@@ -199,7 +206,7 @@ public class NekroBrain implements FactionBrain {
             SardakkHeroRules::next,
             SardakkCommanderRules::next,
             CombatCardRules::hold,
-            context -> CombatRules.next(context, CombatCardRules::atRoundStart),
+            context -> CombatRules.next(context, NekroBrain::atRoundStart),
             ActionSecretRules::next,
             SecretRules::scoreAgendaSecret,
             PromissoryRules::queueAgendaNote,
@@ -247,6 +254,10 @@ public class NekroBrain implements FactionBrain {
             if (decision.isPresent()) return decision.get();
         }
         return AiDecision.idle();
+    }
+
+    private static Optional<AiDecision> atRoundStart(AiTurnContext context, CombatMoment moment) {
+        return CombatCardRules.atRoundStart(context, moment).or(() -> LetnevCombatRules.atRoundStart(context, moment));
     }
 
     private Optional<AiDecision> finishCommandTokenGain(AiTurnContext context) {
@@ -483,6 +494,8 @@ public class NekroBrain implements FactionBrain {
         if (cardAction.isPresent()) return cardAction;
         Optional<AiDecision> techAction = TechRules.insteadOfTacticalAction(context, thisTurn);
         if (techAction.isPresent()) return techAction;
+        Optional<AiDecision> hero = DarktalonTreillaRules.insteadOfTacticalAction(context, thisTurn);
+        if (hero.isPresent()) return hero;
         Optional<AiDecision> xxchaStall = XxchaAgentRules.insteadOfTacticalAction(context, thisTurn);
         if (xxchaStall.isPresent()) return xxchaStall;
         Optional<AiDecision> tactical = TacticalRules.start(context);

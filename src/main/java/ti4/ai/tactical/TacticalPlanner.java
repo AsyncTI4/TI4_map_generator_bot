@@ -21,6 +21,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CombatModifiers.Side;
 import ti4.ai.eval.CustodiansRace;
+import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.Territory;
@@ -372,7 +373,7 @@ public class TacticalPlanner {
             moves.addAll(legal.get());
         }
         if (BoardView.nonFighterShips(BoardView.space(target), context.seat) + movedNonFighterShips(moves)
-                > context.seat.getFleetCC()) {
+                > FleetLimit.ships(context.seat)) {
             return plan;
         }
         return new TacticalPlan(
@@ -386,7 +387,7 @@ public class TacticalPlanner {
             candidates.addAll(idleShips(context, origin, target, base));
         }
         candidates.sort(Comparator.comparingDouble(Follower::gain).reversed());
-        int room = context.seat.getFleetCC()
+        int room = FleetLimit.ships(context.seat)
                 - BoardView.nonFighterShips(BoardView.space(target), context.seat)
                 - movedNonFighterShips(base);
         List<UnitMove> moves = new ArrayList<>();
@@ -1092,7 +1093,7 @@ public class TacticalPlanner {
         int moving = parts.stream()
                 .mapToInt(part -> movedNonFighterShips(part.departure().ships()))
                 .sum();
-        if (BoardView.nonFighterShips(BoardView.space(tile), seat) + moving > seat.getFleetCC()) {
+        if (BoardView.nonFighterShips(BoardView.space(tile), seat) + moving > FleetLimit.ships(seat)) {
             return Optional.empty();
         }
         List<UnitMove> executed = new ArrayList<>();
@@ -1433,7 +1434,7 @@ public class TacticalPlanner {
         int moving = contributions.stream()
                 .mapToInt(found -> movedNonFighterShips(found.ships()))
                 .sum();
-        return BoardView.nonFighterShips(BoardView.space(staging), seat) + moving > seat.getFleetCC();
+        return BoardView.nonFighterShips(BoardView.space(staging), seat) + moving > FleetLimit.ships(seat);
     }
 
     private static Optional<Contribution> contribution(Context context, Tile target, Tile staging, Tile origin) {
@@ -1820,7 +1821,7 @@ public class TacticalPlanner {
             Context context, Tile tile, List<UnitMove> moves, UnitMove escort) {
         List<UnitMove> merged = merge(concat(moves, List.of(escort)));
         if (BoardView.nonFighterShips(BoardView.space(tile), context.seat) + movedNonFighterShips(merged)
-                > context.seat.getFleetCC()) {
+                > FleetLimit.ships(context.seat)) {
             return Optional.empty();
         }
         Tile origin = context.game.getTileByPosition(escort.origin());
@@ -2019,7 +2020,7 @@ public class TacticalPlanner {
             Context context, Tile origin, Tile target, List<UnitMove> moves) {
         Player seat = context.seat;
         int fleetAfterMove = BoardView.nonFighterShips(BoardView.space(target), seat) + movedNonFighterShips(moves);
-        if (fleetAfterMove > seat.getFleetCC()) return Optional.empty();
+        if (fleetAfterMove > FleetLimit.ships(seat)) return Optional.empty();
         List<UnitMove> legal = new ArrayList<>(moves);
         UnitHolder space = BoardView.space(origin);
         int spare = capacityOf(seat, shipsIn(legal)) - cargoIn(legal);
