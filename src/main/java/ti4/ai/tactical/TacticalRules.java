@@ -585,7 +585,10 @@ public class TacticalRules {
                         && DONE_PRODUCING.equals(button.label()));
         if (done.isEmpty()) return Optional.empty();
         if (plan.isPresent()) {
-            Optional<AiDecision> next = nextPlacement(context, done.get().prompt(), plan.get());
+            BuildPlan placing = ProductionPlanner.BELLUM_SOURCE.equals(source)
+                    ? plan.get()
+                    : plan.get().withoutBonus();
+            Optional<AiDecision> next = nextPlacement(context, done.get().prompt(), placing);
             if (next.isPresent()) return next;
         }
         Optional<AiDecision> spinner =

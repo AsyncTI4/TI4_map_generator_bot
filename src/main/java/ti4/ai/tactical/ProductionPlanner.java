@@ -38,7 +38,10 @@ public class ProductionPlanner {
 
     static final int MIN_UNITS = 4;
     private static final int OPENING_ROUND = 1;
-    private static final int OLD_FIELD_COUNT = 7;
+    private static final int DEFENSE_FIELD = 7;
+    private static final int BONUS_FIELD = 8;
+    private static final String BELLUM_GLORIOSUM = "solbt";
+    public static final String BELLUM_SOURCE = "solBtBuild";
     private static final int WANTED_CARRIERS = 2;
     private static final int WANTED_DREADNOUGHTS = 3;
     private static final double FRONTLINE_BONUS = 0.5;
@@ -105,7 +108,20 @@ public class ProductionPlanner {
             double cost,
             double value,
             boolean scoring,
-            boolean defense) {
+            boolean defense,
+            boolean bonus) {
+        public BuildOrder(
+                String unitId,
+                String location,
+                UnitType type,
+                int units,
+                double cost,
+                double value,
+                boolean scoring,
+                boolean defense) {
+            this(unitId, location, type, units, cost, value, scoring, defense, false);
+        }
+
         public String handlerId() {
             return "place_" + unitId + "_" + location;
         }
@@ -143,6 +159,10 @@ public class ProductionPlanner {
             return orders.isEmpty();
         }
 
+        public BuildPlan withoutBonus() {
+            return new BuildPlan(orders.stream().filter(order -> !order.bonus()).toList());
+        }
+
         public int units() {
             return orders.stream().mapToInt(BuildOrder::units).sum();
         }
@@ -167,7 +187,8 @@ public class ProductionPlanner {
                                     String.valueOf(order.cost()),
                                     String.valueOf(order.value()),
                                     String.valueOf(order.scoring()),
-                                    String.valueOf(order.defense())))
+                                    String.valueOf(order.defense()),
+                                    String.valueOf(order.bonus())))
                             .toList());
         }
 
@@ -185,7 +206,8 @@ public class ProductionPlanner {
                             Double.parseDouble(fields[4]),
                             Double.parseDouble(fields[5]),
                             Boolean.parseBoolean(fields[6]),
-                            fields.length > OLD_FIELD_COUNT && Boolean.parseBoolean(fields[OLD_FIELD_COUNT])));
+                            fields.length > DEFENSE_FIELD && Boolean.parseBoolean(fields[DEFENSE_FIELD]),
+                            fields.length > BONUS_FIELD && Boolean.parseBoolean(fields[BONUS_FIELD])));
                 }
                 return Optional.of(new BuildPlan(orders));
             } catch (RuntimeException e) {
@@ -212,7 +234,8 @@ public class ProductionPlanner {
         Budget budget = new Budget(
                 Helper.getProductionValue(seat, game, tile, false),
                 spendableResources(game, seat) + extraResources + (seat.hasTech("st") ? 1 : 0) + aidaDiscount(seat),
-                FleetLimit.ships(seat) - BoardView.nonFighterShips(BoardView.space(tile), seat));
+                FleetLimit.ships(seat) - BoardView.nonFighterShips(BoardView.space(tile), seat),
+                seat.hasUnlockedBreakthrough(BELLUM_GLORIOSUM));
         budget.overSupply = Math.max(0, overSupplyCarriers);
         Builder builder = new Builder(game, seat, tile, budget, defense);
         planScoringUnits(builder);
@@ -227,8 +250,8 @@ public class ProductionPlanner {
     public static BuildPlan bellumGloriosum(
             Game game, Player seat, Tile tile, int limit, @Nullable String groundPlanet, DefenseOutlook defense) {
         if (BoardView.hasEnemyShips(game, seat, tile)) return new BuildPlan(List.of());
-        Budget budget = new Budget(
-                limit, spendableResources(game, seat) + (seat.hasTech("st") ? 1 : 0) + aidaDiscount(seat), 0);
+        Budget budget = Budget.bonusOnly(
+                limit, spendableResources(game, seat) + (seat.hasTech("st") ? 1 : 0) + aidaDiscount(seat));
         Builder builder = new Builder(game, seat, tile, budget, groundPlanet, defense);
         planDefensiveUnits(builder);
         int spare = TacticalPlanner.movableGroundForces(game, seat, tile, defense);
@@ -481,12 +504,12 @@ public class ProductionPlanner {
 
     private static void fillProduction(Builder builder) {
         if (builder.game.getRound() <= OPENING_ROUND) {
-            builder.infantry(builder.budget.units, builder.fillerValue(UnitType.Infantry));
+            builder.infantry(builder.budget.slots(), builder.fillerValue(UnitType.Infantry));
             builder.fighters(builder.fillerValue(UnitType.Fighter));
             return;
         }
         builder.fighters(builder.fillerValue(UnitType.Fighter));
-        builder.infantry(builder.budget.units, builder.fillerValue(UnitType.Infantry));
+        builder.infantry(builder.budget.slots(), builder.fillerValue(UnitType.Infantry));
     }
 
     private static boolean isUpgraded(Player seat, UnitType type) {
@@ -554,11 +577,46 @@ public class ProductionPlanner {
         private double resources;
         private int fleetRoom;
         private int overSupply;
+        private int bonus;
+        private final boolean bonusEnabled;
 
         Budget(int units, double resources, int fleetRoom) {
+            this(units, resources, fleetRoom, false);
+        }
+
+        Budget(int units, double resources, int fleetRoom, boolean bonusEnabled) {
             this.units = units;
             this.resources = resources;
             this.fleetRoom = fleetRoom;
+            this.bonusEnabled = bonusEnabled;
+        }
+
+        static Budget bonusOnly(int limit, double resources) {
+            Budget budget = new Budget(0, resources, 0, true);
+            budget.bonus = limit;
+            return budget;
+        }
+
+        int slots() {
+            return units + bonus;
+        }
+
+        void gainBonus(int capacity) {
+            if (bonusEnabled) bonus += capacity;
+        }
+
+        boolean allowsGroundOrFighters(int unitCount, double cost) {
+            return (units >= unitCount || bonus >= unitCount) && resources >= cost;
+        }
+
+        boolean spendGroundOrFighters(int unitCount, double cost) {
+            resources -= cost;
+            if (bonus >= unitCount) {
+                bonus -= unitCount;
+                return true;
+            }
+            units -= unitCount;
+            return false;
         }
 
         boolean allows(int unitCount, double cost, boolean usesFleet) {
@@ -622,6 +680,7 @@ public class ProductionPlanner {
             double cost = model.getCost();
             if (!budget.allows(1, cost, true)) return false;
             budget.spend(1, cost, true);
+            budget.gainBonus(model.getCapacityValue());
             orders.add(new BuildOrder(
                     type.name().toLowerCase(), tile.getPosition(), type, 1, cost, value, scoring, forDefense));
             return true;
@@ -701,10 +760,11 @@ public class ProductionPlanner {
             if (type == UnitType.Mech && game.isBaseGameMode()) return false;
             if (!underCap(model.getAsyncId(), planned(type) + count)) return false;
             double cost = model.getCost() * count;
-            if (!budget.allows(count, cost, false)) return false;
-            budget.spend(count, cost, false);
+            if (!budget.allowsGroundOrFighters(count, cost)) return false;
+            boolean bonus = budget.spendGroundOrFighters(count, cost);
             String unitId = count == 2 ? "2" + type.getValue() : type.name().toLowerCase();
-            orders.add(new BuildOrder(unitId, planet.get(), type, count, cost, valueEach * count, false, forDefense));
+            orders.add(new BuildOrder(
+                    unitId, planet.get(), type, count, cost, valueEach * count, false, forDefense, bonus));
             return true;
         }
 
@@ -718,11 +778,19 @@ public class ProductionPlanner {
                 return false;
             }
             double cost = model.getCost() * count;
-            if (!budget.allows(count, cost, false)) return false;
-            budget.spend(count, cost, false);
+            if (!budget.allowsGroundOrFighters(count, cost)) return false;
+            boolean bonus = budget.spendGroundOrFighters(count, cost);
             String unitId = count == 2 ? "2" + UnitType.Fighter.getValue() : "fighter";
             orders.add(new BuildOrder(
-                    unitId, tile.getPosition(), UnitType.Fighter, count, cost, valueEach * count, false, forDefense));
+                    unitId,
+                    tile.getPosition(),
+                    UnitType.Fighter,
+                    count,
+                    cost,
+                    valueEach * count,
+                    false,
+                    forDefense,
+                    bonus));
             return true;
         }
 
@@ -780,9 +848,9 @@ public class ProductionPlanner {
             double cost = model.getCost() * count;
             if (BoardView.GROUND_FORCES.contains(type)) {
                 boolean mechAllowed = type != UnitType.Mech || !game.isBaseGameMode();
-                return mechAllowed && groundTarget().isPresent() && budget.allows(count, cost, false);
+                return mechAllowed && groundTarget().isPresent() && budget.allowsGroundOrFighters(count, cost);
             }
-            if (type == UnitType.Fighter) return count <= fighterRoom() && budget.allows(count, cost, false);
+            if (type == UnitType.Fighter) return count <= fighterRoom() && budget.allowsGroundOrFighters(count, cost);
             return budget.allowsShips(count, cost);
         }
 
@@ -819,7 +887,7 @@ public class ProductionPlanner {
         }
 
         boolean leavesRoomToFill(double cost) {
-            return budget.resources - cost >= CHEAPEST_UNIT_COST * (budget.units - 1);
+            return budget.resources - cost >= CHEAPEST_UNIT_COST * (budget.slots() - 1);
         }
 
         double scoringValue(UnitType type) {

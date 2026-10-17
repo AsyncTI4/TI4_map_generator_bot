@@ -22,7 +22,7 @@ import ti4.game.Tile;
 public class BellumGloriosumRules {
 
     public static final String OFFER_PREFIX = "solBtBuild_";
-    static final String SOURCE = "solBtBuild";
+    static final String SOURCE = ProductionPlanner.BELLUM_SOURCE;
     private static final String BREAKTHROUGH = "solbt";
     private static final String DECLINE = "deleteButtons";
     private static final String DONE_PRODUCING = "Done Producing Units";
@@ -86,7 +86,9 @@ public class BellumGloriosumRules {
                 context.memory().put(PLAN_KEY, plan.encode());
                 remember(context, new Active(BUILDING, context.now(), tile.getPosition()));
                 return Optional.of(AiDecision.press(
-                        prompt, build.get(), "produce up to " + parts[2] + " free ground forces and fighters"));
+                        prompt,
+                        build.get(),
+                        "produce up to " + parts[2] + " more ground forces and fighters, paid for"));
             }
             return prompt.firstEnabled(button -> button.isUnowned() && DECLINE.equals(button.handlerId()))
                     .map(decline ->
