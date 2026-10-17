@@ -25,18 +25,27 @@ public class CombatOdds {
             int dice,
             boolean sustain,
             double cost,
-            @Nullable UnitType type) {
+            @Nullable UnitType type,
+            boolean retaliates) {
 
         public Combatant(int hitsOn, int dice, boolean sustain, double cost) {
-            this(hitsOn, dice, sustain, cost, null);
+            this(hitsOn, dice, sustain, cost, null, false);
+        }
+
+        public Combatant(int hitsOn, int dice, boolean sustain, double cost, @Nullable UnitType type) {
+            this(hitsOn, dice, sustain, cost, type, false);
+        }
+
+        public Combatant retaliatingOnSustain() {
+            return new Combatant(hitsOn, dice, sustain, cost, type, true);
         }
 
         public Combatant withoutSustain() {
-            return new Combatant(hitsOn, dice, false, cost, type);
+            return new Combatant(hitsOn, dice, false, cost, type, false);
         }
 
         public Combatant rolling(int newHitsOn, int newDice) {
-            return new Combatant(newHitsOn, newDice, sustain, cost, type);
+            return new Combatant(newHitsOn, newDice, sustain, cost, type, retaliates);
         }
     }
 
@@ -46,26 +55,31 @@ public class CombatOdds {
             List<Combatant> units,
             int hitMultiplier,
             boolean repairs,
-            @Nullable Force afterOpponentLoss) {
+            @Nullable Force afterOpponentLoss,
+            boolean weaves) {
 
         public static Force of(List<Combatant> units) {
-            return new Force(units, 1, false, null);
+            return new Force(units, 1, false, null, false);
         }
 
         public Force doublingHits() {
-            return new Force(units, 2, repairs, afterOpponentLoss);
+            return new Force(units, 2, repairs, afterOpponentLoss, weaves);
         }
 
         public Force repairing() {
-            return new Force(units, hitMultiplier, true, afterOpponentLoss);
+            return new Force(units, hitMultiplier, true, afterOpponentLoss, weaves);
+        }
+
+        public Force weaving() {
+            return new Force(units, hitMultiplier, repairs, afterOpponentLoss, true);
         }
 
         public Force improvingAfterOpponentLoss(Force improved) {
-            return new Force(units, hitMultiplier, repairs, improved);
+            return new Force(units, hitMultiplier, repairs, improved, weaves);
         }
 
         public Force withUnits(List<Combatant> replaced) {
-            return new Force(replaced, hitMultiplier, repairs, afterOpponentLoss);
+            return new Force(replaced, hitMultiplier, repairs, afterOpponentLoss, weaves);
         }
     }
 
@@ -122,8 +136,14 @@ public class CombatOdds {
                     for (int y = 0; y < hitsOnA.length; y++) {
                         double p = state.getValue() * hitsOnD[x] * hitsOnA[y];
                         if (p == 0) continue;
-                        int newA = Math.min(a.hitPoints(), absorbedByA + y * d.hitMultiplier(a.lostAUnit(absorbedByA)));
-                        int newD = Math.min(d.hitPoints(), absorbedByD + x * a.hitMultiplier(d.lostAUnit(absorbedByD)));
+                        boolean aLostAUnit = a.lostAUnit(absorbedByA);
+                        boolean dLostAUnit = d.lostAUnit(absorbedByD);
+                        int hitsByA = x + a.weavedHit(dLostAUnit, y);
+                        int hitsByD = y + d.weavedHit(aLostAUnit, x);
+                        int struckA = absorbedByA + hitsByD * d.hitMultiplier(aLostAUnit);
+                        int struckD = absorbedByD + hitsByA * a.hitMultiplier(dLostAUnit);
+                        int newA = Math.min(a.hitPoints(), struckA + d.retaliation(absorbedByD, struckD));
+                        int newD = Math.min(d.hitPoints(), struckD + a.retaliation(absorbedByA, struckA));
                         boolean aDead = newA == a.hitPoints();
                         boolean dDead = newD == d.hitPoints();
                         if (aDead && dDead) {
@@ -188,6 +208,7 @@ public class CombatOdds {
         private final List<Combatant> lossOrder;
         private final List<Combatant> improvedOrder;
         private final int sustains;
+        private final int retaliators;
         private final double[] lostCosts;
         private final Map<Integer, double[]> distributions = new HashMap<>();
         private final Map<Integer, double[]> improvedDistributions = new HashMap<>();
@@ -204,6 +225,9 @@ public class CombatOdds {
                             ? order.stream().map(improved.units()::get).toList()
                             : lossOrder;
             sustains = (int) force.units().stream().filter(Combatant::sustain).count();
+            retaliators = (int) force.units().stream()
+                    .filter(unit -> unit.sustain() && unit.retaliates())
+                    .count();
             lostCosts = new double[lossOrder.size() + 1];
             for (int i = 0; i < lossOrder.size(); i++)
                 lostCosts[i + 1] = lostCosts[i] + lossOrder.get(i).cost();
@@ -219,6 +243,14 @@ public class CombatOdds {
 
         boolean lostAUnit(int absorbed) {
             return absorbed > sustains;
+        }
+
+        int weavedHit(boolean opponentLostAUnit, int opponentHits) {
+            return active(opponentLostAUnit).weaves() && opponentHits > 0 ? 1 : 0;
+        }
+
+        int retaliation(int absorbedBefore, int absorbedAfter) {
+            return Math.max(0, Math.min(absorbedAfter, retaliators) - Math.min(absorbedBefore, retaliators));
         }
 
         int hitMultiplier(boolean opponentLostAUnit) {

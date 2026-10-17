@@ -17,6 +17,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -28,6 +29,9 @@ class CombatForces {
 
     static final String DURANIUM_ARMOR = "da";
     static final String X89_DOUBLING = "x89c4";
+    static final String PARTICLE_WEAVE = "vpw";
+    static final String VALKYRIE_MECH = "sardakk_mech";
+    private static final String ARTICLES_OF_WAR = "articles_war";
     private static final String NON_EUCLIDEAN_SHIELDING = "nes";
     private static final String SINGULARITY = "technological_singularity";
     private static final int NEVER_HITS = 11;
@@ -47,7 +51,9 @@ class CombatForces {
             int hurt = damaged.getOrDefault(type, 0);
             for (int i = 0; i < count; i++) {
                 boolean sustain = model.getSustainDamage() && i >= hurt;
-                combatants.add(new Combatant(hitsOn, profile.diceCount(), sustain, model.getCost(), type));
+                Combatant combatant = new Combatant(hitsOn, profile.diceCount(), sustain, model.getCost(), type);
+                combatants.add(
+                        sustain && retaliatesOnSustain(game, model) ? combatant.retaliatingOnSustain() : combatant);
             }
         });
         if (player.hasTech(NON_EUCLIDEAN_SHIELDING)) combatants.addAll(secondCancelledHits(combatants));
@@ -58,6 +64,7 @@ class CombatForces {
         Force force = Force.of(units);
         if (player.hasTech(DURANIUM_ARMOR)) force = force.repairing();
         if (ground && player.hasTech(X89_DOUBLING)) force = force.doublingHits();
+        if (ground && player.hasTech(PARTICLE_WEAVE)) force = force.weaving();
         return force;
     }
 
@@ -146,6 +153,7 @@ class CombatForces {
     static Optional<Force> improved(Player seat, Force force, String alias, boolean ground) {
         if (DURANIUM_ARMOR.equals(alias)) return Optional.of(force.repairing());
         if (X89_DOUBLING.equals(alias)) return ground ? Optional.of(force.doublingHits()) : Optional.empty();
+        if (PARTICLE_WEAVE.equals(alias)) return ground ? Optional.of(force.weaving()) : Optional.empty();
         boolean changed = false;
         List<Combatant> units = new ArrayList<>();
         for (Combatant unit : force.units()) {
@@ -200,6 +208,10 @@ class CombatForces {
             if (hurt > 0) damaged.put(type, hurt);
         });
         return damaged;
+    }
+
+    private static boolean retaliatesOnSustain(Game game, UnitModel model) {
+        return VALKYRIE_MECH.equals(model.getId()) && !ButtonHelper.isLawInPlay(game, ARTICLES_OF_WAR);
     }
 
     private static List<Combatant> secondCancelledHits(List<Combatant> combatants) {

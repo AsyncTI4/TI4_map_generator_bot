@@ -1300,8 +1300,7 @@ public final class ButtonHelperAgents {
                 if (!posNPlanet.isEmpty()) {
                     p2 = game.getPlayerFromColorOrFaction(posNPlanet);
                 }
-                List<Button> buttons =
-                        new ArrayList<>(Helper.getPlanetPlaceUnitButtons(p2, game, "2gf", "placeOneNDone_skipbuild"));
+                List<Button> buttons = sardakkAgentPlacementButtons(game, p2);
                 String message2 = p2.getRepresentationUnfogged() + ", use buttons to resolve " + ssruuClever
                         + "T'ro An, the N'orr" + ssruuSlash + " agent.";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message2, buttons);
@@ -2748,6 +2747,18 @@ public final class ButtonHelperAgents {
             }
         }
         return gloryTiles;
+    }
+
+    public static List<Button> sardakkAgentPlacementButtons(Game game, Player player) {
+        List<Button> everyPlanet =
+                new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
+        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+        if (activeSystem == null) return everyPlanet;
+        List<Button> inActiveSystem = everyPlanet.stream()
+                .filter(button -> activeSystem.getPlanetUnitHolders().stream()
+                        .anyMatch(planet -> button.getCustomId().endsWith("_" + planet.getName())))
+                .toList();
+        return inActiveSystem.isEmpty() ? everyPlanet : new ArrayList<>(inActiveSystem);
     }
 
     public static List<Button> getSardakkAgentButtons(Game game, Player player) {

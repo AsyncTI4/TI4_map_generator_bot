@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.ai.eval.CombatOdds.Combatant;
+import ti4.ai.eval.CombatOdds.Detailed;
 import ti4.ai.eval.CombatOdds.Force;
 import ti4.ai.eval.CombatOdds.Outcome;
 
@@ -119,5 +120,70 @@ class CombatOddsTest {
         double always = CombatOdds.resolve(Force.of(upgraded), cruisers).attackerWins();
 
         assertThat(later).isGreaterThan(never).isLessThan(always);
+    }
+
+    // One infantry each, hitting on 8 (30%). Every time the defender hits, the weave gives the attacker a hit too, so
+    // the pair die together (0.3) or the attacker scores alone (0.7 * 0.3 = 0.21) and the defender can never win.
+    // Over the rounds that nobody scores (0.49): both die 0.3 / 0.51, the attacker wins 0.21 / 0.51.
+    @Test
+    void particleWeaveAnswersEveryHitTheOpponentScores() {
+        Force weavers = Force.of(List.of(INFANTRY)).weaving();
+        Force plain = Force.of(List.of(INFANTRY));
+
+        Outcome outcome = CombatOdds.resolve(weavers, plain);
+
+        assertThat(outcome.defenderWins()).isCloseTo(0.0, within(1e-6));
+        assertThat(outcome.bothDestroyed()).isCloseTo(0.3 / 0.51, within(1e-4));
+        assertThat(outcome.attackerWins()).isCloseTo(0.21 / 0.51, within(1e-4));
+    }
+
+    @Test
+    void particleWeaveIsNothingWhenTheOpponentCannotHit() {
+        Combatant harmless = new Combatant(11, 1, false, 0.5);
+        Force weavers = Force.of(List.of(INFANTRY)).weaving();
+        Force defenders = Force.of(List.of(harmless));
+
+        double woven = CombatOdds.resolve(weavers, defenders).attackerWins();
+        double plain =
+                CombatOdds.resolve(Force.of(List.of(INFANTRY)), defenders).attackerWins();
+
+        assertThat(woven).isCloseTo(plain, within(1e-9));
+    }
+
+    @Test
+    void particleWeaveMakesTheWeaverTheFavouriteInAnEvenGroundFight() {
+        List<Combatant> infantry = Collections.nCopies(3, INFANTRY);
+
+        Outcome weaving = CombatOdds.resolve(Force.of(infantry).weaving(), Force.of(infantry));
+
+        assertThat(weaving.attackerWins()).isGreaterThan(weaving.defenderWins() + 0.2);
+    }
+
+    // The mech is the attacker's only unit and cannot hit. The defender's single infantry hits every round: the mech
+    // sustains it and, when it retaliates, kills the infantry in the same round; without the retaliation the second
+    // round destroys the mech.
+    @Test
+    void aSustainingMechThatRetaliatesKillsTheUnitThatDamagedIt() {
+        Combatant mech = new Combatant(11, 1, true, 2);
+        Combatant sureHit = new Combatant(1, 1, false, 0.5);
+        Force defenders = Force.of(List.of(sureHit));
+
+        Outcome retaliating = CombatOdds.resolve(Force.of(List.of(mech.retaliatingOnSustain())), defenders);
+        Outcome plain = CombatOdds.resolve(Force.of(List.of(mech)), defenders);
+
+        assertThat(retaliating.attackerWins()).isCloseTo(1.0, within(1e-9));
+        assertThat(plain.defenderWins()).isCloseTo(1.0, within(1e-9));
+    }
+
+    @Test
+    void aMechOnlyRetaliatesForTheHitsItsSustainAbsorbs() {
+        Combatant mech = new Combatant(11, 1, true, 2).retaliatingOnSustain();
+        Combatant sureHit = new Combatant(1, 1, false, 0.5);
+        Force defenders = Force.of(List.of(sureHit, sureHit, sureHit));
+
+        Detailed detailed = CombatOdds.resolveDetailed(Force.of(List.of(mech)), defenders);
+
+        assertThat(detailed.outcome().defenderWins()).isCloseTo(1.0, within(1e-9));
+        assertThat(detailed.defenderCostLost()).isCloseTo(0.5, within(1e-9));
     }
 }

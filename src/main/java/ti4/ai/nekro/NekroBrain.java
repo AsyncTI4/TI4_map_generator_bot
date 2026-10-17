@@ -33,6 +33,8 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.promissory.ConvoysRules;
 import ti4.ai.promissory.PromissoryRules;
+import ti4.ai.sardakk.NorrSupremacyRules;
+import ti4.ai.sardakk.TroAgentRules;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.PaymentRules;
 import ti4.ai.scoring.ScoringRules;
@@ -98,6 +100,7 @@ public class NekroBrain implements FactionBrain {
             "nekroAgentRes_",
             XxchaAgentRules.USER_PREFIX,
             XxchaAgentRules.READY_PREFIX,
+            TroAgentRules.USE_PREFIX,
             PromissoryRules.GREYFIRE_TARGET,
             TIED_PLANETS,
             "sendTGTo_",
@@ -167,6 +170,7 @@ public class NekroBrain implements FactionBrain {
             StrategyCardRules::buildWithWarfare,
             StrategyCardRules::buildWithConstruction,
             XxchaAgentRules::next,
+            NorrSupremacyRules::next,
             NekroLeaderRules::chooseAgentTarget,
             CarthAgentRules::chooseTarget,
             NekroLeaderRules::continueHero,
@@ -443,6 +447,8 @@ public class NekroBrain implements FactionBrain {
         Optional<AiDecision> primary = StrategyCardRules.resolvePrimary(context);
         if (primary.isPresent()) return primary;
         if (StrategyCardRules.awaitingSecondaries(context)) return Optional.empty();
+        Optional<AiDecision> troAgent = TroAgentRules.afterTacticalAction(context);
+        if (troAgent.isPresent()) return troAgent;
         List<AiPrompt> thisTurn = promptsThisTurn(context);
         Optional<AiDecision> masterPlan = ActionCardRules.masterPlan(context, secondActionIsWorthIt(context, thisTurn));
         if (masterPlan.isPresent()) return masterPlan;
