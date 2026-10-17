@@ -5,10 +5,10 @@ import ti4.ai.actioncards.ActionCardPrior;
 import ti4.ai.scoring.ObjectiveValue;
 
 @UtilityClass
-class CardValueScale {
+public class CardValueScale {
 
     static final double VICTORY_POINT = ObjectiveValue.VICTORY_POINT_VALUE;
-    static final double TRADE_GOOD = 1.0;
+    public static final double TRADE_GOOD = 1.0;
     static final double COMMODITY = 0.5;
     static final double TOKEN_FLOOR = 1.5;
     static final double TOKEN_ACTION_SHARE = 0.6;

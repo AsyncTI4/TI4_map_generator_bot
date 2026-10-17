@@ -13,6 +13,7 @@ import ti4.ai.scoring.PaymentRules;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
+import ti4.ai.strategy.CardValueScale;
 import ti4.ai.tactical.CombatForecast;
 import ti4.ai.tactical.CombatForecast.FirstRoundGain;
 import ti4.ai.tactical.CombatMoment;
@@ -26,7 +27,7 @@ public class DunlainReaperRules {
     static final String PREFIX = "letnevMechRes_";
     static final String SUFFIX = "_mech";
     static final int RESOURCES = 2;
-    static final double RESOURCE_VALUE = 1.0;
+    static final double RESOURCE_VALUE = CardValueScale.TRADE_GOOD;
     static final double MIN_GAIN = RESOURCES * RESOURCE_VALUE;
     private static final String KEY = "dunlainReaper|";
     private static final String DONE_PAYING = "deleteButtons";

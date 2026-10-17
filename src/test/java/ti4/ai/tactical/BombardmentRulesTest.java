@@ -84,6 +84,19 @@ class BombardmentRulesTest extends BaseTi4Test {
                 .isNotEqualTo("combatRoll_" + target + "_space_bombardment");
     }
 
+    // Arc Secundus, the Letnev flagship, takes the Planetary Shield away from the other players' units in its system.
+    @Test
+    void bombardsAShieldedPlanetWithArcSecundusInTheFleet() {
+        test.units(tile, "lodor", test.sol, UnitType.Pds, 1);
+        test.nekro.removeOwnedUnitByID("nekro_flagship");
+        test.nekro.addOwnedUnitByID("letnev_flagship");
+        test.units(tile, "space", test.nekro, UnitType.Flagship, 1);
+        AiPrompt landing = landingPrompt("combatRoll_" + target + "_space_bombardment");
+
+        assertThat(pressedId(TacticalRules.continueAction(test.context(landing)).orElseThrow()))
+                .isEqualTo("combatRoll_" + target + "_space_bombardment");
+    }
+
     // With several planets the bot first shows the assignment (auto-assigned to the defended planet), then rolls
     // on "Done Assigning".
     @Test

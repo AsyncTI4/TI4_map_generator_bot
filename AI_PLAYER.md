@@ -645,6 +645,43 @@ to build one by hand:
     attacker's roll, so it never had a start-of-round window); it still does not roll first. Without the button (fog
     of war, or it scrolled out of the thread's history) the earlier behaviour applies: a pause after the newest
     message, then the hook, then the roll.
+  - **Barony of Letnev** (`ti4.ai.letnev`; every rule keys on the ability, technology, leader or unit, so Nekro,
+    Franken and alliances get it too):
+    - _Odds._ `CombatForces.force` adds the space-side Letnev edges to every force the planner and the defence
+      outlook build, for either side. Non-Euclidean Shielding (each sustain absorbs two hits), the Arc Secundus
+      repairing every round (`Force.repairs`, the Duranium Armor model), Munitions Reserves (`Force.rerollRounds`: the
+      misses of the first N rounds are rolled again, so a die hits with `1 - (1 - p)^2`; N is the seat's trade goods
+      divided by 2, at most 3 rounds) and Gravleash Maneuvers (+X on the rolls of the ship that rolls most dice, X being
+      the number of ship types; the movement half is not modelled).
+    - _Fleet supply._ `FleetLimit.ships(seat)` is the per-system ship limit everywhere the AI plans with it (tactical
+      moves and followers, production room, opening carriers, Warfare double builds, the enemy fleet that can reach a
+      system, the systems an action card may put a ship in): the fleet pool plus Mahact tokens plus 2 for Armada, unlimited while
+      Darktalon Treilla is active. `CommandTokenPolicy` subtracts the same bonus from every fleet token target, so a
+      Letnev seat holds two fewer fleet tokens for the same stack (also under _Fleet Regulations_, where the cap is 4
+      tokens plus the bonus).
+    - _Round start_ (`LetnevCombatRules`, called through the same hook as the combat cards, cards first). Viscount
+      Unlenn: when the extra die for the ship with the best hit chance gains at least 1.5 (in the units of a trade good)
+      in a fight the seat has at least a 10% chance in, it presses "Use Letnev Agent", then the button that names its
+      own faction, waiting up to 30 seconds for the buttons so that it never rolls with the agent half-resolved. It
+      never uses the agent for another player's combat. Munitions Reserves: 2 trade goods when the first-round reroll is
+      worth at least 2.5 (the 2 trade goods and a quarter on top), with the same 10% floor, plus a victory point when
+      the 2 trade goods are reserved for a spend objective. A fight already won loses little to a miss and a hopeless
+      one is not worth the trade goods. The swing is `(win chance with - win chance without) x stake + the drop in
+      expected losses` (`CombatForecast.rerollGain`, `extraDieGain`). Dunlain Reaper: in a ground combat, 2 resources
+      (planned through the scoring reserve and paid through `PaymentRules`) to replace one infantry with a mech when the
+      whole-fight gain, with the planet's stake, reaches those 2 resources (`CombatForecast.mechSwapGain`).
+    - _Darktalon Treilla_ (`DarktalonTreillaRules`). On its own turn, before a tactical action, the seat asks the planner
+      for its best plan with the fleet limit lifted. It plays the hero (component action, then the hero button) when
+      that plan is an attack that stacks more non-fighter ships than the real limit and beats the best real plan by 4 or
+      more. The hero is not played because it is unlocked, and the lifted limit then lets the next tactical action
+      field the stack.
+    - _Rear Admiral Farran_ (`RearAdmiralFarranRules`): the commander's trade good prompt is taken when it names the
+      seat. _L4 Disruptors_ (`L4Disruptors`): the planets' space cannon is left out of the landing in invasion planning
+      (`StrikeEvaluator`) and of the invasion threat against the seat's own planets (`DefenseOutlook`); the cannon still
+      fires at the arriving ships.
+    - Not handled: _War Funding_ (the bot only prints the holder's rerolled dice and leaves the rerolled hits and the
+      opponent's reroll to its players, so there is nothing an AI can press safely), the movement half of Gravleash
+      Maneuvers, and playing the hero for a production overflow.
   - **Ground combat automation.** Pressing "Automate Combat" asks the opponent to confirm; only then do the bot's
     automated rolls run, and they move a pending one-round modifier in on each side's first automated roll
     (`CombatRollService` takes the same path as a manual roll), so a _Morale Boost_ played first applies to round 1

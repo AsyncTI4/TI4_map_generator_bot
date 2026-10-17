@@ -12,6 +12,7 @@ import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
+import ti4.ai.strategy.CardValueScale;
 import ti4.ai.tactical.CombatForecast;
 import ti4.ai.tactical.CombatForecast.FirstRoundGain;
 import ti4.ai.tactical.CombatMoment;
@@ -22,7 +23,7 @@ import ti4.game.Player;
 public class MunitionsReservesRules {
 
     public static final String BUTTON = "munitionsReserves";
-    static final double TRADE_GOOD_VALUE = 1.0;
+    static final double TRADE_GOOD_VALUE = CardValueScale.TRADE_GOOD;
     static final double MARGIN = 1.25;
     static final double HOPELESS = 0.1;
     private static final String ARMED_KEY = "munitionsReserves";
