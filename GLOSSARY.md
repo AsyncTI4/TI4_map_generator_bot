@@ -433,6 +433,13 @@ A Planet whose controller also gains a legendary planet ability card with a uniq
 The order in which Players take Turns each Round, lowest Strategy card number first.
 _Avoid_: Turn order (also used for the seating order around the table)
 
+**Speaker order**:
+The clockwise order beginning with the Speaker, used for abilities and components in phases where Players hold no Strategy cards (Strategy and Agenda phases); Voting instead begins with the Player to the Speaker's left.
+_Avoid_: Seating order
+
+**Clockwise order**:
+The order beginning with the active Player and moving clockwise, used in the Action phase for Space cannon fire and Strategy card secondary abilities; every other Action phase window uses Initiative order.
+
 **Adjacency**:
 The relationship between Systems that touch, share a wormhole type or are joined by hyperlane lines, governing movement.
 _Avoid_: Neighbors (that names Players with pieces in or next to each other's Systems)
