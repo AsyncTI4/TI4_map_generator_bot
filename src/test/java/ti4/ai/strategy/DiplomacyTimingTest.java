@@ -95,7 +95,8 @@ class DiplomacyTimingTest extends BaseTi4Test {
 
     private Tile threatenHome() {
         Tile next = test.place("27", AiTestGame.neighbourOf(AiTestGame.HOME));
-        test.units(next, "space", test.sol, UnitType.Dreadnought, 1);
+        test.units(next, "space", test.sol, UnitType.Carrier, 2);
+        test.units(next, "space", test.sol, UnitType.Infantry, 6);
         changed();
         return next;
     }

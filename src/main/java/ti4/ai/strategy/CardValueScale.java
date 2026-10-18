@@ -32,7 +32,7 @@ public class CardValueScale {
     static final double READY_SPEND_BONUS = 1.5;
     static final int READY_FORECAST_CAP = 6;
     static final double PROTECT_SHARE = 0.5;
-    static final double HOME_DEFENSE = 0.5 * VICTORY_POINT;
+    static final double MIN_LOCK_EXPOSURE = 1.0;
     static final double NEAR_WIN_MULTIPLIER = 1.5;
     static final int NEAR_WIN_GAP = 3;
     static final double SPEND_UNLOCK_SHARE = 0.8;

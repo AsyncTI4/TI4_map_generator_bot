@@ -100,7 +100,6 @@ class CardTiming {
     private static boolean protectsThreatenedSystem(PlanInputs in, CardPlan plan) {
         return plan.benefit(CardUse.DIPLOMACY_PROTECT)
                 .filter(benefit -> benefit.hasTarget() && in.isThreatened(tileAt(in.game(), benefit.target())))
-                .filter(benefit -> benefit.value() >= CardValueScale.READY_SHARE * READY_USE_WORTH_PLAYING)
                 .isPresent();
     }
 

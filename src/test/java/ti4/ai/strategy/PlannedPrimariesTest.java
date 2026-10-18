@@ -112,11 +112,12 @@ class PlannedPrimariesTest extends BaseTi4Test {
         assertThat(resolve(card, removals)).isEqualTo("FFCC_nekro_removeCCFromBoard_warfare_" + lodor.getPosition());
     }
 
-    // A fleet next to home: Diplomacy first locks the home system, then readies planets as before.
+    // A landing fleet next to home: Diplomacy first locks the home system, then readies planets as before.
     @Test
     void locksTheThreatenedSystemWithDiplomacy() {
         Tile next = test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));
-        test.units(next, "space", test.sol, UnitType.Dreadnought, 1);
+        test.units(next, "space", test.sol, UnitType.Carrier, 2);
+        test.units(next, "space", test.sol, UnitType.Infantry, 6);
         changed();
         AiPrompt card = prompt(
                 "diplomacy",

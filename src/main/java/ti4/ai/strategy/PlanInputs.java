@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.Threats;
+import ti4.ai.tactical.DefenseOutlook;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
 import ti4.game.Game;
@@ -24,6 +25,7 @@ record PlanInputs(
         int reinforcements,
         Map<String, List<TacticalPlan>> freeing,
         Map<Integer, CardPlan> plans,
+        Map<String, Double> lockExposures,
         CustodiansRace.Snapshot race) {
 
     private static final int MAX_CACHED = 32;
@@ -56,6 +58,7 @@ record PlanInputs(
                 StrategyCardRules.reinforcements(game, seat),
                 new ConcurrentHashMap<>(),
                 new ConcurrentHashMap<>(),
+                new ConcurrentHashMap<>(),
                 CustodiansRace.of(game, seat));
         synchronized (CACHE) {
             CACHE.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), inputs));
@@ -81,6 +84,11 @@ record PlanInputs(
 
     boolean isThreatened(@Nullable Tile tile) {
         return tile != null && threatened.contains(tile.getPosition());
+    }
+
+    double lockExposure(Tile tile) {
+        return lockExposures.computeIfAbsent(
+                tile.getPosition(), position -> new DefenseOutlook(game, seat).lockCost(tile));
     }
 
     double bestScore() {

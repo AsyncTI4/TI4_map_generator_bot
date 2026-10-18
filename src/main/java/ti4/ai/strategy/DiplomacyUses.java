@@ -12,7 +12,6 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.strategy.CardPlan.Benefit;
-import ti4.ai.tactical.DefenseOutlook;
 import ti4.ai.tactical.PeaceAccords;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -32,13 +31,25 @@ class DiplomacyUses {
     }
 
     static Optional<Benefit> bestProtection(PlanInputs in) {
+        return protections(in).stream().max(Comparator.comparingDouble(Benefit::value));
+    }
+
+    static List<Benefit> protections(PlanInputs in) {
         Game game = in.game();
         Player seat = in.seat();
         Tile mecatol = game.getMecatolTile();
-        return lockableTiles(game, seat).stream()
+        List<Tile> threatened = lockableTiles(game, seat).stream()
                 .filter(tile -> tile != mecatol && in.isThreatened(tile))
-                .map(tile -> new Benefit(CardUse.DIPLOMACY_PROTECT, protectionValue(in, tile), tile.getPosition()))
-                .max(Comparator.comparingDouble(Benefit::value));
+                .toList();
+        if (threatened.isEmpty()) return List.of();
+        List<Benefit> benefits = new ArrayList<>();
+        for (Tile tile : threatened) {
+            double exposure = in.lockExposure(tile);
+            if (exposure < CardValueScale.MIN_LOCK_EXPOSURE) continue;
+            benefits.add(
+                    new Benefit(CardUse.DIPLOMACY_PROTECT, protectionValue(in, tile, exposure), tile.getPosition()));
+        }
+        return benefits;
     }
 
     static boolean isLockable(Game game, Player seat, String position) {
@@ -57,16 +68,13 @@ class DiplomacyUses {
         return tiles;
     }
 
-    private static double protectionValue(PlanInputs in, Tile tile) {
+    private static double protectionValue(PlanInputs in, Tile tile, double exposure) {
         Player seat = in.seat();
         double planets = tile.getPlanetUnitHolders().stream()
                 .filter(planet -> seat.getPlanets().contains(planet.getName()))
                 .mapToDouble(BoardView::planetValue)
                 .sum();
-        double value = CardValueScale.PROTECT_SHARE * planets;
-        if (tile == seat.getHomeSystemTile()) {
-            value += Math.max(CardValueScale.HOME_DEFENSE, DefenseOutlook.homeCost(in.game(), seat, true));
-        }
+        double value = CardValueScale.PROTECT_SHARE * planets + exposure;
         return in.nearWin() ? value * CardValueScale.NEAR_WIN_MULTIPLIER : value;
     }
 

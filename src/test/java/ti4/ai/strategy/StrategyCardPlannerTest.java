@@ -203,15 +203,23 @@ class StrategyCardPlannerTest extends BaseTi4Test {
         assertThat(plan(LEADERSHIP).value()).isGreaterThan(plenty);
     }
 
+    // A lone dreadnought in reach cannot land on anything, so locking home is not worth a card. A landing party with
+    // ground forces next to the empty home is.
     @Test
-    void locksTheHomeSystemWithDiplomacyAgainstAFleetInReach() {
+    void locksTheHomeSystemWithDiplomacyOnlyAgainstALandingFleetInReach() {
         assertThat(plan(DIPLOMACY).has(CardUse.DIPLOMACY_PROTECT)).isFalse();
 
         solDreadnoughtNextTo(AiTestGame.HOME);
+        assertThat(plan(DIPLOMACY).has(CardUse.DIPLOMACY_PROTECT)).isFalse();
+
+        Tile next = test.game.getTileByPosition(AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.units(next, "space", test.sol, UnitType.Carrier, 2);
+        test.units(next, "space", test.sol, UnitType.Infantry, 6);
+        changed();
 
         Benefit protect = plan(DIPLOMACY).benefit(CardUse.DIPLOMACY_PROTECT).orElseThrow();
         assertThat(protect.target()).isEqualTo(AiTestGame.HOME);
-        assertThat(protect.value()).isGreaterThanOrEqualTo(CardValueScale.HOME_DEFENSE);
+        assertThat(protect.value()).isGreaterThanOrEqualTo(CardValueScale.MIN_LOCK_EXPOSURE);
     }
 
     // Base-game Diplomacy has no buttons for its primary, so the AI cannot use it beyond the trade goods on it.
