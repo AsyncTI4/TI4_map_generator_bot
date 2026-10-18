@@ -335,6 +335,7 @@ public final class Constants {
     public static final String SEARCH_FOR_GAME = "for_game";
     public static final String SEARCH_MY_TITLES = "my_titles";
     public static final String SEARCH_WINNING_PATH = "winning_path_games";
+    public static final String LIST_WINNING_PATHS = "winning_path_counts";
 
     public static final String FIX_THE_FRANKENS = "fix_the_frankens";
     public static final String RELOAD_GAME = "reload_game";
