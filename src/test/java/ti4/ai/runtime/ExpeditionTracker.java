@@ -19,13 +19,18 @@ import ti4.service.map.FractureService;
  */
 final class ExpeditionTracker {
 
+    private static final String PICK = "pick ";
+    private static final String EXPEDITION = "expedition";
     private static final String ROLL = "roll for The Fracture";
     private static final String INGRESS = "place an ingress token near itself";
 
     record Claim(int round, String faction, String kind) {}
 
+    record CardPick(int round, String card, boolean expeditionUse, boolean expeditionMain) {}
+
     record Summary(
             List<Claim> claims,
+            List<CardPick> picks,
             int rolls,
             int fractureRound,
             int ingressTokens,
@@ -34,7 +39,7 @@ final class ExpeditionTracker {
             String mostSlices,
             String infantryOwner) {
 
-        static final Summary NOTHING = new Summary(List.of(), 0, 0, 0, 0, 0, "", "");
+        static final Summary NOTHING = new Summary(List.of(), List.of(), 0, 0, 0, 0, 0, "", "");
 
         boolean fractureEntered() {
             return fractureRound > 0;
@@ -46,6 +51,7 @@ final class ExpeditionTracker {
     }
 
     private final List<Claim> claims = new ArrayList<>();
+    private final List<CardPick> picks = new ArrayList<>();
     private int rolls;
     private int fractureRound;
     private int ingressPresses;
@@ -69,7 +75,20 @@ final class ExpeditionTracker {
         if (decision instanceof AiDecision.Press press) {
             if (ROLL.equals(press.reason())) rolls++;
             if (INGRESS.equals(press.reason())) ingressPresses++;
+            notePick(round, press.reason());
         }
+    }
+
+    // A pick's reason is "pick Card: use (+value), use (+value)" with the uses from the largest down, so the first use
+    // is the main one.
+    private void notePick(int round, String reason) {
+        if (!reason.startsWith(PICK)) return;
+        int colon = reason.indexOf(':');
+        if (colon < 0) return;
+        String card = reason.substring(PICK.length(), colon);
+        String uses = reason.substring(colon + 1);
+        String main = uses.split(", ")[0];
+        picks.add(new CardPick(round, card, uses.contains(EXPEDITION), main.contains(EXPEDITION)));
     }
 
     synchronized Summary summary(Game game) {
@@ -80,6 +99,7 @@ final class ExpeditionTracker {
                 .count();
         return new Summary(
                 List.copyOf(claims),
+                List.copyOf(picks),
                 rolls,
                 fractureRound,
                 (int) tokens,
