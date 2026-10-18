@@ -64,7 +64,8 @@ public class ExpeditionUnlock {
                         planets,
                         worth(game, seat, holdings.withWallet(holdings.wallet().withPlanets(game, planets))) - base))
                 .filter(readying -> readying.gain() > 0)
-                .max(Comparator.comparingDouble(Readying::gain));
+                .max(Comparator.comparingDouble(Readying::gain)
+                        .thenComparingInt(readying -> totalSize(game, readying.planets())));
     }
 
     public static double refundOfFirstClaim(Game game, Player seat) {
@@ -110,14 +111,18 @@ public class ExpeditionUnlock {
                         .thenComparing(Comparator.naturalOrder()))
                 .limit(PAIR_CANDIDATES)
                 .toList();
+        if (ranked.size() <= 1) return ranked.stream().map(List::of).toList();
         List<List<String>> pairs = new ArrayList<>();
         for (int first = 0; first < ranked.size(); first++) {
-            pairs.add(List.of(ranked.get(first)));
             for (int second = first + 1; second < ranked.size(); second++) {
                 pairs.add(List.of(ranked.get(first), ranked.get(second)));
             }
         }
         return pairs;
+    }
+
+    private static int totalSize(Game game, List<String> planets) {
+        return planets.stream().mapToInt(planet -> size(game, planet)).sum();
     }
 
     private static int size(Game game, String planet) {
