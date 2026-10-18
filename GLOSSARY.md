@@ -23,52 +23,73 @@ The playable race a Player controls, which supplies its home system, starting te
 _Avoid_: Race, empire
 
 **Speaker**:
-The Player who holds the speaker token and so breaks ties and picks first in the Strategy phase.
+The Player who holds the speaker token, picks first in the Strategy phase, reveals each Agenda and decides tied outcomes.
 _Avoid_: Host
 
 **Round**:
-One full cycle of Strategy, Action, Status and Agenda phases.
+One full cycle of Strategy, Action and Status phases, plus the Agenda phase once the Custodians token has been removed.
 _Avoid_: Turn (a Turn is one Player's action within the Action phase)
 
 **Phase**:
 One of the Round's stages: Strategy, Action, Status or Agenda.
 
+**Status phase**:
+The Phase in which Players score objectives, reveal a public objective, draw an action card, reset their Command tokens, ready their cards, repair units and return their Strategy cards.
+
+**Agenda phase**:
+The Phase, added to every Round once the Custodians token is removed, in which two Agendas are revealed and voted on and then all Planets are readied.
+
+**Vote**:
+Votes cast on an Agenda outcome by exhausting Planets, one vote per influence; every vote a Player casts on an Agenda must go to the same outcome, and Trade goods cannot buy votes.
+_Avoid_: Ballot
+
 **Turn**:
 A single Player's opportunity to take one action during the Action phase, tracked as the active player.
 
 **Pass**:
-A Player's declaration that they take no further Turns in the current Action phase.
+A Player's declaration that they take no further Turns in the current Action phase, allowed only after they have performed the strategic action of their Strategy card.
 
 **Strategy card**:
 A numbered card chosen in the Strategy phase that grants its holder a primary ability and lets others follow with a secondary.
 _Avoid_: SC card, initiative card
+
+**Strategic action**:
+A Turn action that resolves the primary ability of the Player's Strategy card, after which the card is exhausted and every other Player may Follow.
 
 **Follow**:
 Using a Strategy card's secondary ability after another Player plays its primary.
 _Avoid_: Secondary-ing
 
 **Tactical action**:
-A Turn action that activates a system, moves ships into it, and resolves landing and combat.
+A Turn action that activates a system, moves ships into it, and then resolves space combat, invasion and production there.
 _Avoid_: Move
 
 **Component action**:
 A Turn action that uses a card or ability marked as an action, rather than a Strategy card or Tactical action.
 
 **Command token**:
-A Player's token pool, divided into tactic, fleet and strategy tokens, spent on actions and fleet capacity.
+A Player's token, kept in the tactic, fleet or strategy pool of their command sheet; tactic and strategy tokens are spent on actions, while the fleet pool caps how many ships a Player may have in a System.
 _Avoid_: CC, command counter
 
+**Fleet pool**:
+The Command token pool whose size is the maximum number of non-fighter ships a Player may have in any one System.
+_Avoid_: Fleet supply
+
 **Trade goods**:
-The flexible currency a Player holds and spends.
+The flexible currency a Player holds, each spendable as one resource or one influence, though never as votes.
 _Avoid_: TG coins
 
 **Commodities**:
-The portion of a Player's economy that converts to Trade goods when given to another Player. Restocking them to the maximum is to replenish, which players also call refreshing.
+A Faction-limited stock of goods that a Player cannot spend but that converts to Trade goods when given to another Player. Restocking them to the maximum is to replenish, which players also call refreshing.
 _Avoid_: Refill
 
 **Transaction**:
-A voluntary exchange of Trade goods, Commodities, cards or other items between two Players.
+A voluntary exchange between two neighboring Players of Trade goods, Commodities, relic fragments and up to one promissory note each way, agreed before anything changes hands.
 _Avoid_: Trade, deal
+
+**Deal**:
+An agreement between Players that may include a Transaction and is binding only if its terms can be carried out immediately.
+_Avoid_: Contract
 
 ### Map and pieces
 
@@ -83,6 +104,9 @@ _Avoid_: Hex, system tile
 **System**:
 A Tile as a place pieces can be activated, moved into and fought over; identified by its map position.
 
+**Active system**:
+The System a Player activated with a Command token for the current Tactical action, where movement, combat and production resolve.
+
 **Space**:
 The area of a System outside its planets, where ships sit.
 _Avoid_: Space area
@@ -95,7 +119,29 @@ Anything on a Tile that can hold units: its Space or one of its Planets.
 _Avoid_: Location
 
 **Unit**:
-A piece of a Player's force, such as a fighter, dreadnought or infantry, defined by its unit type and owner.
+A piece of a Player's force, defined by its unit type and owner, and always a ship, a ground force or a structure.
+
+**Ground forces**:
+Infantry and Mechs, the Units that land on Planets and fight ground combat.
+_Avoid_: Troops, ground units
+
+**Mech**:
+A faction-specific heavy ground force, produced for the cost on its Faction's mech card and sometimes placed through Deploy.
+
+**Structure**:
+A Unit placed on a Planet that cannot move: a Space dock or a PDS.
+_Avoid_: Building
+
+**Space dock**:
+A Structure with Production, limited to one per Planet.
+
+**PDS**:
+A Structure with Space cannon, limited to two per Planet.
+_Avoid_: Planetary defense
+
+**Unit upgrade**:
+A Technology that replaces the attributes and abilities of the Faction unit sharing its name, marked by a higher roman numeral.
+_Avoid_: Unit tech
 
 **Home system**:
 The System a Faction starts in and defends.
@@ -103,20 +149,35 @@ The System a Faction starts in and defends.
 **Wormhole**:
 A System feature that links it to other Systems bearing the same wormhole type.
 
+**Wormhole nexus**:
+The extra System where alpha, beta and gamma wormholes converge, which starts with only its gamma wormhole and becomes active when a unit enters it or Mallice is controlled.
+
 **Anomaly**:
-A System feature that alters movement or combat there, such as a nebula or gravity rift.
+A System with unique rules for movement or combat, marked by a red border: an asteroid field, nebula, supernova or gravity rift.
+
+**Asteroid field**:
+An Anomaly that ships cannot move through or into.
+
+**Nebula**:
+An Anomaly that ships can enter only as the active System, that cuts the move value of ships starting there to 1, and that gives its defender +1 on combat rolls.
+
+**Supernova**:
+An Anomaly that ships cannot move through or into.
+
+**Gravity rift**:
+An Anomaly that adds +1 to the move of ships leaving or passing through it, each of which is destroyed on a roll of 1 to 3.
 
 **Border anomaly**:
 An anomaly attached to a System's edge rather than its interior.
 
 **Hyperlane**:
-A Tile whose contents are lanes joining adjacent Systems rather than planets.
+A Tile that is not a System, whose drawn lanes make the Systems at their ends adjacent.
 
 **Frontier token**:
-A marker in an unexplored System that a ship may explore for a reward.
+A marker placed in each System without planets that can be explored for a reward.
 
 **Attachment**:
-A token placed on a Planet that modifies its properties.
+A card attached to a Planet's card, marked by a token on the Planet, that modifies it and stays with the Planet when control changes.
 _Avoid_: Upgrade
 
 **Map template**:
@@ -147,24 +208,24 @@ _Avoid_: PO
 A card voted on in the Agenda phase, resolving as either a law or a one-time directive.
 
 **Law**:
-An Agenda that remains in play after passing.
+An Agenda that permanently changes the rules once its For or Elect outcome wins, and is discarded if it loses.
 
 **Promissory note**:
-A card owned by a Faction, handed to another Player, and returned when its condition is met.
+A card of a Player's own color and Faction that another Player holds and can play, passed on through Transactions and usually returned to its owner after use.
 _Avoid_: PN
 
 **Relic**:
-A powerful card gained from exploration, usually by finding a relic fragment.
+A powerful card drawn from the relic deck, usually by spending relic fragments found through exploration; relics cannot be traded.
 
 **Exploration**:
-Drawing from a planet-type or Frontier deck to reveal an attachment, relic fragment or event.
+Drawing from a planet-trait or Frontier deck to reveal an attachment, relic fragment or other one-off effect, which a Player does on first taking control of a Planet.
 
 **Technology**:
 A researched upgrade that grants abilities or unit improvements.
 _Avoid_: Tech card
 
 **Leader**:
-An agent, commander or hero belonging to a Faction, each unlocked and used under its own conditions.
+An agent, commander or hero belonging to a Faction; the agent starts ready, while the commander and hero must first be unlocked.
 
 **Ability**:
 A standing faction or card effect that is not a card in hand.
@@ -240,11 +301,23 @@ _Avoid_: Ladder game
 **Combat**:
 A fight between two Players in a System, resolved in rounds of rolling units.
 
+**Space combat**:
+The Combat between ships in the active System, which follows Space cannon offense and runs until at most one Player has ships left.
+
+**Ground combat**:
+The Combat between ground forces on a Planet during Invasion, which runs until at most one Player has ground forces left.
+
+**Attacker / Defender**:
+The active Player is the attacker in a Combat and the other Player is the defender.
+
 **Combat modifier**:
 An effect that changes a unit's combat roll or the number of dice rolled.
 
 **Bombardment**:
-A pre-ground-combat attack by ships against planets.
+A unit ability that rolls against ground forces on a Planet at the start of Invasion.
+
+**Planetary shield**:
+A unit ability that stops Bombardment against its Planet.
 
 ### Discord surface
 
@@ -286,37 +359,59 @@ A developer-only harness for driving a Game through scripted actions on a develo
 A card or planet is exhausted once its use is spent and readied when refreshed, typically in the Status phase.
 _Avoid_: Tapped / untapped, used / refreshed
 
+**Resources**:
+A Planet's material value, spent by exhausting the Planet to pay for Production and other costs.
+_Avoid_: Res
+
+**Influence**:
+A Planet's political value, spent by exhausting the Planet to gain Command tokens, remove the Custodians token or cast votes.
+_Avoid_: Inf
+
 **Control**:
 A Player controls a Planet when they hold it, whether or not units are on it.
 _Avoid_: Own, claim
 
+**Neighbors**:
+Two Players who both have a unit on or control a Planet in the same System or in adjacent Systems, and so can make Transactions.
+_Avoid_: Adjacent players
+
 **Invasion**:
-The step of a Tactical action in which ground forces land on Planets and fight any defenders.
+The step of a Tactical action in which a Player bombards, lands ground forces on Planets, fights any defenders and establishes control.
 
 **Production**:
-Building units at a Space dock or via an ability, paid for with resources up to the unit's cost.
+A unit ability, chiefly of Space docks, to produce units by spending resources at least equal to their cost, up to the ability's value.
 _Avoid_: Build
 
+**Capacity**:
+The number of fighters and ground forces a ship can carry, which together cap what a Player may keep in a System's Space.
+
+**Transport**:
+Carrying fighters and ground forces along with a moving ship, up to its capacity.
+_Avoid_: Ferry
+
+**Deploy**:
+A unit ability that places that unit from reinforcements without producing it.
+
 **Reinforcements**:
-A Player's supply of unit pieces not currently on the Map, from which new units are drawn.
+A Player's supply of units and Command tokens not currently on the Map, from which new ones are drawn.
 _Avoid_: Supply, reserves
 
 **Blockaded**:
-A Space dock whose System contains enemy ships and none of its owner's, so it cannot produce ships.
+A Player's unit with Production in a System that holds enemy ships and none of its owner's, so it cannot produce ships but can still produce ground forces.
 
 **Space cannon**:
-A unit ability that fires at ships, in space or on approach to a Planet, before combat.
+A unit ability that rolls to hit ships in the active System after movement and ground forces committed to land on its Planet during Invasion.
 _Avoid_: PDS fire
 
 **Anti-fighter barrage**:
-A unit ability that fires at fighters at the start of space combat.
+A unit ability that destroys fighters at the start of the first round of space combat.
 _Avoid_: AFB
 
 **Sustain damage**:
 A unit ability to absorb one hit and flip to a damaged state instead of being destroyed.
 
 **Capture**:
-Removing an opposing unit from the Map to a Player's own holding area rather than destroying it.
+Taking an opposing unit out of play to the capturing Player's faction sheet instead of destroying it, so its owner cannot use it until it is returned.
 
 **Purge**:
 Permanently removing a component from the game.
@@ -326,24 +421,24 @@ The score a Player earns from objectives and other effects, with the first to th
 _Avoid_: Score, points
 
 **Custodians token**:
-The token on Mecatol Rex that is removed by spending influence and grants a Victory point.
+The token on Mecatol Rex that a Player removes by spending six influence and committing ground forces there, gaining a Victory point and starting the Agenda phase.
 
 **Mecatol Rex**:
-The center System, holding the Custodians token and the Imperial card's point for controlling it.
+The center System, holding the Custodians token; its controller gains a Victory point when resolving the Imperial card.
 
 **Legendary planet**:
-A Planet with a unique ability that its controller may use.
+A Planet whose controller also gains a legendary planet ability card with a unique ability.
 
 **Initiative order**:
-The order in which Players take Turns each Round, set by the numbers on their Strategy cards.
+The order in which Players take Turns each Round, lowest Strategy card number first.
 _Avoid_: Turn order (also used for the seating order around the table)
 
 **Adjacency**:
-The relationship between Systems that share an edge or are linked by wormholes or other effects, governing movement.
+The relationship between Systems that touch, share a wormhole type or are joined by hyperlane lines, governing movement.
 _Avoid_: Neighbors (that names Players with pieces in or next to each other's Systems)
 
 **Elimination**:
-A Player's removal from the Game when they control no Planets, have no ground forces on the Map and own no Space docks.
+A Player's removal from the Game when they control no Planets, have no ground forces on the Map and own no unit with Production.
 
 ### Table slang
 
