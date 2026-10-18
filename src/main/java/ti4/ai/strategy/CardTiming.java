@@ -34,7 +34,7 @@ class CardTiming {
         if (plan.card() == StrategyCard.IMPERIAL && yieldsToOverrule(in)) return Timing.FALLBACK;
         Optional<Benefit> main = plan.main();
         if (main.isEmpty()) return Timing.FALLBACK;
-        return dueNow(in, main.get()) ? Timing.NOW : Timing.FALLBACK;
+        return dueNow(in, plan, main.get()) ? Timing.NOW : Timing.FALLBACK;
     }
 
     private static boolean claimsWithPeaceAccords(PlanInputs in, CardPlan plan) {
@@ -71,13 +71,14 @@ class CardTiming {
                         .isPresent();
     }
 
-    private static boolean dueNow(PlanInputs in, Benefit main) {
+    private static boolean dueNow(PlanInputs in, CardPlan plan, Benefit main) {
         Player seat = in.seat();
         return switch (main.use()) {
             case LEADERSHIP_TOKENS, TECHNOLOGY_PROPAGATION ->
                 seat.getTacticalCC() == 0 && !in.ranked().isEmpty();
             case DIPLOMACY_PROTECT -> main.hasTarget() && in.isThreatened(tileAt(in.game(), main.target()));
-            case DIPLOMACY_READY -> main.value() >= CardValueScale.READY_SHARE * READY_USE_WORTH_PLAYING;
+            case DIPLOMACY_READY ->
+                main.value() >= CardValueScale.READY_SHARE * READY_USE_WORTH_PLAYING && !readiesAfterSpending(in, plan);
             case CONSTRUCTION_PRODUCE -> main.value() >= in.bestScore();
             case TECHNOLOGY_RESEARCH -> TechnologyTiming.playsNow(in);
             case CONSTRUCTION_PDS -> main.hasTarget() && in.round() >= FIRST_ROUND_FOR_EARLY_PDS;
@@ -86,6 +87,21 @@ class CardTiming {
             case IMPERIAL_SCORE -> imperialScoresNow(in);
             default -> false;
         };
+    }
+
+    private static boolean readiesAfterSpending(PlanInputs in, CardPlan plan) {
+        Game game = in.game();
+        Player seat = in.seat();
+        return DiplomacyUses.revealsSpendObjective(game, seat)
+                && !protectsThreatenedSystem(in, plan)
+                && DiplomacyUse.spendingAhead(game, seat, !in.ranked().isEmpty());
+    }
+
+    private static boolean protectsThreatenedSystem(PlanInputs in, CardPlan plan) {
+        return plan.benefit(CardUse.DIPLOMACY_PROTECT)
+                .filter(benefit -> benefit.hasTarget() && in.isThreatened(tileAt(in.game(), benefit.target())))
+                .filter(benefit -> benefit.value() >= CardValueScale.READY_SHARE * READY_USE_WORTH_PLAYING)
+                .isPresent();
     }
 
     private static boolean yieldsToOverrule(PlanInputs in) {

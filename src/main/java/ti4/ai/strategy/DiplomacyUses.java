@@ -103,7 +103,7 @@ class DiplomacyUses {
         return Math.max(planet.getResources(), planet.getInfluence());
     }
 
-    private static boolean revealsSpendObjective(Game game, Player seat) {
+    static boolean revealsSpendObjective(Game game, Player seat) {
         return game.getRevealedPublicObjectives().keySet().stream()
                 .anyMatch(id -> ObjectiveCatalog.isSpend(id) && !ObjectivePolicy.hasScored(game, seat, id));
     }

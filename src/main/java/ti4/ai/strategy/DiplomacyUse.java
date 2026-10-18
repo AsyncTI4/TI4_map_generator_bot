@@ -66,6 +66,10 @@ class DiplomacyUse {
         return worth;
     }
 
+    static boolean spendingAhead(Game game, Player seat, boolean tacticalPlanRanked) {
+        return new Demand(game, seat, 0).spendsThisRound(tacticalPlanRanked);
+    }
+
     static Optional<Choice> bestToFollow(Game game, Player seat) {
         return best(game, seat, seat.getExhaustedPlanets(), PLANETS_TO_READY, TOKENS_TO_FOLLOW);
     }
@@ -209,6 +213,32 @@ class DiplomacyUse {
                     && TokenPurchase.custodiansWithinReach(game, seat);
         }
 
+        boolean spendsThisRound(boolean tacticalPlanRanked) {
+            if (!active || !hasFundsBeyondReserve()) return false;
+            boolean tacticalSpend = seat.getTacticalCC() >= 1 && (tacticalPlanRanked || !docks.isEmpty());
+            return tacticalSpend || researchAhead() || (leadership && tokensNow > 0);
+        }
+
+        private boolean hasFundsBeyondReserve() {
+            Wallet free = wallet.plan(reserve).map(wallet::without).orElse(wallet);
+            return !free.planets().isEmpty() || free.tradeGoods() > 0;
+        }
+
+        private boolean researchAhead() {
+            if (anotherHoldsUnplayed(game, seat, StrategyCard.TECHNOLOGY) && keepsTokenToFollow(0)) {
+                return researchWanted(ResearchPolicy.WORTH_FOLLOWING_FOR);
+            }
+            return holdsUnplayed(game, seat, StrategyCard.TECHNOLOGY)
+                    && !StrategyCardRules.cannotResearch(seat)
+                    && researchWanted(ResearchPolicy.WORTH_PAYING_FOR);
+        }
+
+        private boolean researchWanted(double worth) {
+            return StrategyCardRules.cannotResearch(seat)
+                    ? StrategyCardRules.propagationWorthFollowing(game, seat)
+                    : StrategyCardRules.worthResearching(game, seat, worth);
+        }
+
         int use(List<String> planets) {
             if (!active) return 0;
             return splits(planets, wallet.pooling()).stream()
@@ -270,10 +300,7 @@ class DiplomacyUse {
 
         private int costWorthFunding(int cost, double worth) {
             if (affords(wallet, SpendCost.resources(cost))) return 0;
-            boolean wanted = StrategyCardRules.cannotResearch(seat)
-                    ? StrategyCardRules.propagationWorthFollowing(game, seat)
-                    : StrategyCardRules.worthResearching(game, seat, worth);
-            return wanted ? cost : 0;
+            return researchWanted(worth) ? cost : 0;
         }
 
         private int leadershipReinforcements() {
