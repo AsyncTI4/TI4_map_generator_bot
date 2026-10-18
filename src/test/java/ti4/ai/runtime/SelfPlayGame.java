@@ -286,9 +286,25 @@ final class SelfPlayGame {
             chosen = List.copyOf(stacked);
         }
         if (chosen.isEmpty()) return;
+        stackOnTop(peekable, deck, chosen);
+    }
+
+    // The stage one objectives still to be revealed sit in the peekable list first, then the deck. The chosen ones go
+    // to
+    // the front, and the peekable list keeps its size: anything pushed past its end goes back on top of the deck.
+    // Growing the peekable list instead made the status phases reveal stage one objectives for the whole game, so
+    // seeded
+    // batches never saw a stage two objective.
+    static void stackOnTop(List<String> peekable, List<String> deck, List<String> chosen) {
+        int peekableSize = peekable.size();
         peekable.removeAll(chosen);
         deck.removeAll(chosen);
-        (peekable.isEmpty() ? deck : peekable).addAll(0, chosen);
+        if (peekableSize == 0) {
+            deck.addAll(0, chosen);
+            return;
+        }
+        peekable.addAll(0, chosen);
+        while (peekable.size() > peekableSize) deck.addFirst(peekable.removeLast());
     }
 
     // -Dai.actioncards.ab=true plays half of the seats with the action card rules from before the statistics, rotating
