@@ -73,6 +73,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -2577,6 +2578,9 @@ public final class Helper {
         }
         if (player.hasTech("thvanguardy")
                 && tile.getPosition().equals(game.getStoredValue("vanguardReinforce" + player.getFaction()))) {
+            productionValueTotal += 3;
+        }
+        if (TheodisiLegendaryButtonHandler.hasRemoteFactoryProduction(game, player, tile, uH)) {
             productionValueTotal += 3;
         }
 

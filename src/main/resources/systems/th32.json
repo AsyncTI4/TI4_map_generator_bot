@@ -1,0 +1,22 @@
+{
+    "id": "th32",
+    "name": "Jass/Idejett/Moruun",
+    "aliases": [
+        "th32",
+        "jass",
+        "idejett",
+        "moruun"
+    ],
+    "imagePath": "th32.png",
+    "planets": [
+        "jass",
+        "idejett",
+        "moruun"
+    ],
+    "shipPositionsType": "TYPE06",
+    "wormholes": [
+        "ALPHA"
+    ],
+    "tileBack": "blue",
+    "source": "theodisi"
+}

@@ -606,6 +606,7 @@ class GameLoadService {
                 case Constants.DISCORDANT_STARS_MODE -> game.setDiscordantStarsMode(parseBooleanOrDefault(info, false));
                 case Constants.BLUE_REVERIE_MODE -> game.setBlueReverieMode(parseBooleanOrDefault(info, false));
                 case Constants.UNCHARTED_SPACE_STUFF -> game.setUnchartedSpaceStuff(parseBooleanOrDefault(info, false));
+                case Constants.LOST_LEGACIES_TILES -> game.setLostLegaciesTiles(parseBooleanOrDefault(info, false));
                 case Constants.VERBOSITY -> game.setOutputVerbosity(info);
                 case Constants.BETA_TEST_MODE -> game.setTestBetaFeaturesMode(parseBooleanOrDefault(info, false));
                 case Constants.AGE_OF_EXPLORATION_MODE ->

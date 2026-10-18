@@ -9,6 +9,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.planet.AlfheimLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.VanaheimLegendaryButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -256,6 +257,26 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.addAll(ButtonHelper.getDomnaStepOneTiles(player, game));
             }
             case "eko" -> output = "blank";
+            case "avarin" -> {
+                TheodisiLegendaryButtonHandler.offerAvarinUnitUpgradeResearch(game, player);
+                output = "blank";
+            }
+            case "celyon" -> {
+                TheodisiLegendaryButtonHandler.offerCelyonPlanetSelection(game, player);
+                output = "blank";
+            }
+            case "illyra" -> {
+                TheodisiLegendaryButtonHandler.offerIllyraPlanetSelection(game, player);
+                output = "blank";
+            }
+            case "thren" -> {
+                TheodisiLegendaryButtonHandler.offerThrenPlanetSelection(game, player);
+                output = "blank";
+            }
+            case "vespix" -> {
+                TheodisiLegendaryButtonHandler.offerVespixPlanetSelection(game, player);
+                output = "blank";
+            }
             default -> {
                 if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null
                         && game.isAbsolMode()

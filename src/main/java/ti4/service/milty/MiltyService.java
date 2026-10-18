@@ -92,6 +92,9 @@ public class MiltyService {
         if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
+        if (game.isLostLegaciesTiles()) {
+            sources.add(ComponentSource.theodisi);
+        }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             sources.add(ComponentSource.thunders_edge);
         }

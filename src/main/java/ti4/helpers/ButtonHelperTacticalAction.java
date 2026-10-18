@@ -65,6 +65,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
@@ -136,6 +137,7 @@ public final class ButtonHelperTacticalAction {
         RetrofittingLLButtonHandler.returnRetrofittedTechs(game);
         XytherisAbilityHandler.clearStingOfTheHiveRollState(game);
         OblivionAbilityHandler.offerReflectionExplore(event, game);
+        TheodisiLegendaryButtonHandler.offerEndOfTacticalActionAbilities(game, player);
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
             if (player.hasUnit("lunarium_carrier2")) {
                 LunariumAbilityHandler.resolveCrypticHaulerIIFighters(
@@ -339,6 +341,7 @@ public final class ButtonHelperTacticalAction {
         RevenantLeadersHandler.clearRedLeaderTacticalState(game);
         ThronesTechHandler.clearRiftTouchedBastion(game);
         game.removeStoredValue("vanguardReinforce" + player.getFaction());
+        TheodisiLegendaryButtonHandler.clearRemoteFactory(game, player);
         game.removeStoredValue("safeHarborUsed");
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
         SarcosaHeroHandler.completeNeutralTacticalAction(game, player);
@@ -851,6 +854,7 @@ public final class ButtonHelperTacticalAction {
         }
         game.setActiveSystem(pos);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        TheodisiLegendaryButtonHandler.offerActivationAbility(game, player);
         BlueReverieHelper.offerShameixBanePrompts(game, player, tile);
         BlueReverieRelicHandler.offerAendsTorch(game, player, tile);
         SarcosaCommanderHandler.offerAdjacencySelection(game, player);
