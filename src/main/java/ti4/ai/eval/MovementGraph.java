@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
@@ -17,6 +18,11 @@ public class MovementGraph {
     private static final int NEBULA_MOVE = 1;
 
     public static Map<String, Integer> reach(Game game, Player player, String origin, int moveValue) {
+        return reach(game, player, origin, moveValue, Set.of());
+    }
+
+    public static Map<String, Integer> reach(
+            Game game, Player player, String origin, int moveValue, Set<String> screened) {
         Map<String, Integer> distances = new HashMap<>();
         Tile start = game.getTileByPosition(origin);
         if (start == null || moveValue <= 0 || start.isGravityRift(game, player)) return distances;
@@ -29,7 +35,8 @@ public class MovementGraph {
             int distance = distances.get(position);
             if (distance >= budget) continue;
             Tile tile = game.getTileByPosition(position);
-            if (!position.equals(origin) && blocksPassage(game, player, tile)) continue;
+            if (!position.equals(origin) && (screened.contains(position) || blocksPassage(game, player, tile)))
+                continue;
             for (String next : FoWHelper.getAdjacentTiles(game, position, player, false, false, true)) {
                 if (distances.containsKey(next) || !canEnter(game, player, game.getTileByPosition(next))) continue;
                 distances.put(next, distance + 1);

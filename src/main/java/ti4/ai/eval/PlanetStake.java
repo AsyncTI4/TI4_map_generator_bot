@@ -26,7 +26,9 @@ public class PlanetStake {
         if (!seat.getExhaustedPlanets().contains(name)) {
             stake += Math.max(BoardView.planetResources(game, name), BoardView.planetInfluence(game, name));
         }
-        return stake + Math.max(0, -objectives.gain(objectives.before().withoutPlanet(name)));
+        return stake
+                + FracturePrize.point(planet)
+                + Math.max(0, -objectives.gain(objectives.before().withoutPlanet(name)));
     }
 
     public static double structures(Planet planet, Player seat) {
