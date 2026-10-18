@@ -802,6 +802,13 @@ class AutoCompleteProvider {
                 if (Constants.ADD_FOG_TILE.equals(subcommandName) && Constants.TILE_NAME.equals(optionName)) {
                     var options = searchModels(event, TileHelper.getAllTileModels(), null);
                     event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                } else if (Constants.MOVE_ALL_UNITS.equals(subcommandName) && Constants.TILE_NAME.equals(optionName)) {
+                    List<Command.Choice> options = new ArrayList<>();
+                    options.add(new Command.Choice(Constants.ALL, Constants.ALL));
+                    options.addAll(mapTo25ChoicesThatContain(game.getTileMap().keySet(), enteredValue).stream()
+                            .limit(24)
+                            .toList());
+                    event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
                 } else if (game.isFowMode()) {
                     var options = mapTo25ChoicesThatContain(game.getTileMap().keySet(), enteredValue);
                     event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
