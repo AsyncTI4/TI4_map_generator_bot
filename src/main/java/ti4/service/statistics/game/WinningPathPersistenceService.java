@@ -46,7 +46,7 @@ public class WinningPathPersistenceService {
         });
     }
 
-    static synchronized Map<String, Integer> getWinningPathCounts(int playerCount, int victoryPoints) {
+    public static synchronized Map<String, Integer> getWinningPathCounts(int playerCount, int victoryPoints) {
         Map<String, Map<String, Integer>> data = readData();
         Map<String, Integer> map = data.get(key(playerCount, victoryPoints));
         return map == null ? Collections.emptyMap() : map;
