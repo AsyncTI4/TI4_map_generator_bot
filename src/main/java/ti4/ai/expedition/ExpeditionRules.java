@@ -3,6 +3,7 @@ package ti4.ai.expedition;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
@@ -69,11 +70,24 @@ public class ExpeditionRules {
     }
 
     public static Optional<AiDecision> endOfTurn(AiTurnContext context, List<AiPrompt> thisTurn) {
-        return open(context, thisTurn, END_OF_TURN, "open its end-of-turn abilities to do an expedition");
+        return open(
+                context,
+                thisTurn,
+                END_OF_TURN,
+                "open its end-of-turn abilities to do an expedition",
+                () -> ExpeditionOutlook.claimNow(context.game(), context.seat()));
     }
 
     public static Optional<AiDecision> beforePassing(AiTurnContext context, List<AiPrompt> thisTurn) {
-        return open(context, thisTurn, PASSING, "open its passing abilities to do an expedition");
+        return open(
+                context,
+                thisTurn,
+                PASSING,
+                "open its passing abilities to do an expedition",
+                () -> ExpeditionOutlook.best(
+                        context.game(),
+                        context.seat(),
+                        Holdings.of(context.game(), context.seat()).atPassing()));
     }
 
     public static Optional<AiDecision> next(AiTurnContext context) {
@@ -84,14 +98,18 @@ public class ExpeditionRules {
     }
 
     private static Optional<AiDecision> open(
-            AiTurnContext context, List<AiPrompt> thisTurn, String opener, String reason) {
+            AiTurnContext context,
+            List<AiPrompt> thisTurn,
+            String opener,
+            String reason,
+            Supplier<Optional<ExpeditionOutlook.Choice>> claim) {
         if (context.memory().has(key(context))) return Optional.empty();
         Optional<Match> info = Prompts.owned(thisTurn, context.faction(), INFO::equals)
                 .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
         Optional<Match> menu = info.or(() -> Prompts.owned(thisTurn, context.faction(), opener::equals)
                 .filter(match -> !context.alreadyPressed(match.prompt(), match.button())));
         if (menu.isEmpty()) return Optional.empty();
-        Optional<ExpeditionOutlook.Choice> choice = ExpeditionOutlook.best(context.game(), context.seat());
+        Optional<ExpeditionOutlook.Choice> choice = claim.get();
         if (choice.isEmpty()) return Optional.empty();
         if (info.isPresent()) {
             remember(context, new Flow(choice.get().kind(), Stage.CLAIM, context.now(), 0));

@@ -77,6 +77,7 @@ class TechRulesTest extends BaseTi4Test {
     // seat passes: planets ready again in the status phase anyway.
     @Test
     void tradesTechSkipPlanetsForTradeGoodsWithPsychoarchaeologyBeforePassing() {
+        everySliceClaimedBySol();
         test.nekro.addTech("pa");
         AiPrompt start = prompt("start", PromptSource.PUBLIC, NOW, "FFCC_nekro_getPsychoButtons");
         AiPrompt planets = prompt("planets", PromptSource.PUBLIC, NOW, "psychoExhaust_meharxull", "deleteButtons");

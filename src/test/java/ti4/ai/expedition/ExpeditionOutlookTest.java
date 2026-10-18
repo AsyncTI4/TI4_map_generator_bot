@@ -1,10 +1,13 @@
 package ti4.ai.expedition;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
+import ti4.ai.scoring.Wallet;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
@@ -62,26 +65,36 @@ class ExpeditionOutlookTest extends BaseTi4Test {
                 .hasValueSatisfying(choice -> assertThat(choice.kind()).isEqualTo(ExpeditionKind.TRADE_GOODS));
     }
 
-    // Early on five resources cost 1.0 in trade goods, which even a faction that loses win rate with its breakthrough
-    // pays: it is cheap and nothing is being saved for.
+    // As the seat passes, unspent planets are wasted: a resource is worth 0.1, so even a faction that loses win rate
+    // with its breakthrough pays five of them.
     @Test
-    void aLowLiftFactionTakesTheBreakthroughWhenItIsCheap() {
+    void aLowLiftFactionTakesTheBreakthroughWhenSpendingIsNearlyFree() {
         sevenResources(test.nekro);
 
-        assertThat(ExpeditionOutlook.best(test.game, test.nekro))
-                .hasValueSatisfying(choice -> assertThat(choice.kind()).isEqualTo(ExpeditionKind.FIVE_RES));
+        assertThat(ExpeditionOutlook.best(test.game, test.nekro, passing(test.nekro)))
+                .hasValueSatisfying(choice -> {
+                    assertThat(choice.kind()).isEqualTo(ExpeditionKind.FIVE_RES);
+                    assertThat(choice.cost()).isEqualTo(0.1 * 7);
+                });
     }
 
-    // Late in the game the same five resources cost 3.5 in planets spent: the strong breakthrough pays for it and the
-    // weak one does not.
+    // With turns still to spend them on, a resource is a trade good and the two planets that pay for five exhaust all
+    // seven: more than even a strong breakthrough is worth. Waiting for the pass makes it cheap for both.
     @Test
-    void aLowLiftFactionDoesNotSpendSevenResourcesButAHighLiftFactionDoes() {
-        lateGame();
+    void noFactionSpendsSevenResourcesWhileTurnsRemainButBothDoAsTheyPass() {
         sevenResources(test.nekro);
         sevenResources(mahact);
 
+        assertThat(option(test.nekro, ExpeditionKind.FIVE_RES).cost()).isEqualTo(7.0);
         assertThat(ExpeditionOutlook.best(test.game, test.nekro)).isEmpty();
-        assertThat(ExpeditionOutlook.best(test.game, mahact)).isPresent();
+        assertThat(ExpeditionOutlook.best(test.game, mahact)).isEmpty();
+        assertThat(ExpeditionOutlook.best(test.game, test.nekro, passing(test.nekro)))
+                .isPresent();
+        assertThat(ExpeditionOutlook.best(test.game, mahact, passing(mahact))).isPresent();
+    }
+
+    private Holdings passing(Player seat) {
+        return Holdings.of(test.game, seat).atPassing();
     }
 
     // The scoring reserve comes first: five trade goods are the Trade Routes objective, so 3 of them cannot go.
@@ -232,5 +245,51 @@ class ExpeditionOutlookTest extends BaseTi4Test {
 
         assertThat(ExpeditionOutlook.isOpen(test.game, mahact)).isFalse();
         assertThat(ExpeditionOutlook.best(test.game, mahact)).isEmpty();
+    }
+
+    @Test
+    void aSeatWithNothingToSpendOnPaysAMiddleRate() {
+        sevenResources(test.nekro);
+        test.nekro.setTacticalCC(0);
+
+        assertThat(option(test.nekro, ExpeditionKind.FIVE_RES).cost()).isCloseTo(0.4 * 7, within(1e-9));
+    }
+
+    @Test
+    void anInfluencePlanetCostsTwoThirdsOfAResourceWhileTurnsRemain() {
+        test.place("38", "201");
+        test.nekro.addPlanet("abyz");
+        test.nekro.exhaustPlanet("mordaiii");
+        Holdings holdings = Holdings.of(test.game, test.nekro);
+
+        assertThat(KindPricing.paymentCost(
+                        holdings.wallet(), new Wallet.Payment(List.of(), List.of("abyz"), 0, 0), SpendHorizon.AHEAD))
+                .isCloseTo(2.0 / 3.0 * holdings.wallet().influence(), within(1e-9));
+    }
+
+    // A strong breakthrough, 3 trade goods and 7 resources: five resources are nearly free at the pass, so the seat
+    // waits for it unless a rival could claim that slice first.
+    @Test
+    void theSeatWaitsForTheCheapPassWhenNoRivalCouldTakeTheSlice() {
+        sevenResources(mahact);
+        mahact.setTg(3);
+
+        assertThat(ExpeditionOutlook.best(test.game, mahact)).isPresent();
+        assertThat(ExpeditionOutlook.claimNow(test.game, mahact)).isEmpty();
+    }
+
+    @Test
+    void theSeatClaimsAtOnceWhenRivalsCouldTakeTheCheapSlice() {
+        sevenResources(mahact);
+        mahact.setTg(3);
+        Player mentak = test.addSeat("200000000000000010", "mentak", "red");
+        for (Player rival : List.of(test.sol, mentak)) {
+            rival.addBreakthrough(rival.getFaction() + "bt");
+            rival.addPlanet("abyz");
+            rival.addPlanet("mordaiii");
+        }
+
+        assertThat(ExpeditionOutlook.claimNow(test.game, mahact))
+                .hasValueSatisfying(choice -> assertThat(choice.kind()).isEqualTo(ExpeditionKind.TRADE_GOODS));
     }
 }

@@ -27,15 +27,17 @@ class TradeUses {
                         CardUse.TRADE_SPEND_OBJECTIVE,
                         Math.max(0, unlockedPoints) * CardValueScale.SPEND_UNLOCK_SHARE * CardValueScale.VICTORY_POINT),
                 new Benefit(CardUse.TRADE_LEVERAGE, hasTradePartner(game, seat) ? CardValueScale.TRADE_LEVERAGE : 0),
-                new Benefit(CardUse.TRADE_EXPEDITION, expeditionValue(game, seat, unlockedPoints)),
+                new Benefit(
+                        CardUse.TRADE_EXPEDITION,
+                        expeditionValue(game, seat, unlockedPoints, in.moment() == PlanMoment.PICK)),
                 new Benefit(
                         CardUse.OPENING_EXPANSION,
                         OpeningOutlook.gravityDriveGainFromTrade(game, seat, in.moment() == PlanMoment.PICK)));
     }
 
-    private static double expeditionValue(Game game, Player seat, int unlockedPoints) {
+    private static double expeditionValue(Game game, Player seat, int unlockedPoints, boolean racing) {
         if (unlockedPoints > 0) return 0;
-        return ExpeditionUnlock.afterTradeGoods(game, seat, TRADE_GOODS_GAINED);
+        return ExpeditionUnlock.afterTradeGoods(game, seat, TRADE_GOODS_GAINED, racing);
     }
 
     static int spendPointsUnlocked(Game game, Player seat) {

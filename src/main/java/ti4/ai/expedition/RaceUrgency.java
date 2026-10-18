@@ -22,6 +22,15 @@ class RaceUrgency {
         return Math.min(CAP, PER_RIVAL * rivals);
     }
 
+    static double stillOpen(Game game, Player seat, ExpeditionKind kind) {
+        long rivals = game.getRealPlayers().stream()
+                .filter(rival -> rival != seat)
+                .filter(BreakthroughValue::isLocked)
+                .filter(rival -> couldClaim(game, rival, kind))
+                .count();
+        return Math.pow(1 - PER_RIVAL, rivals);
+    }
+
     static boolean couldClaim(Game game, Player rival, ExpeditionKind kind) {
         return switch (kind) {
             case TECH_SKIP ->

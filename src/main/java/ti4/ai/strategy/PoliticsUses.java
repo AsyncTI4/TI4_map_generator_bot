@@ -92,7 +92,7 @@ class PoliticsUses {
     }
 
     private static double expeditionValue(PlanInputs in) {
-        return ExpeditionUnlock.afterDrawing(in.game(), in.seat(), cardsDrawn(in));
+        return ExpeditionUnlock.afterDrawing(in.game(), in.seat(), cardsDrawn(in), in.moment() == PlanMoment.PICK);
     }
 
     private static double actionCardValue(PlanInputs in) {

@@ -95,14 +95,36 @@ class ExpeditionCardUsesTest extends BaseTi4Test {
         assertThat(value).isEqualTo(netWith(now.withWallet(now.wallet().withTradeGoods(3))));
     }
 
-    // Seven ready resources pay for five at a fifth of a trade good each: three trade goods would only be a dearer way
-    // to the same slice.
+    // Seven ready resources pay for five nearly for free as the seat passes, and no rival can take that slice: the
+    // three trade goods would only be a dearer way to the same slice.
     @Test
-    void tradeAddsNothingWhenCheaperPlanetsAlreadyPayForASlice() {
+    void tradeAddsNothingWhenWaitingForThePassPaysForASliceAnyway() {
         readySevenResources();
 
-        assertThat(ExpeditionOutlook.best(test.game, seat)).isPresent();
+        assertThat(ExpeditionOutlook.best(
+                        test.game, seat, Holdings.of(test.game, seat).atPassing()))
+                .isPresent();
         assertThat(value(TRADE, CardUse.TRADE_EXPEDITION, PlanMoment.PICK)).isZero();
+    }
+
+    // Two rivals could also pay for five resources, so waiting for the pass may lose the slice and the trade goods'
+    // slice is worth having now.
+    @Test
+    void tradeIsWorthTheTradeGoodsSliceWhenRivalsCouldTakeTheCheaperOne() {
+        readySevenResources();
+        twoRivalsWithSevenResources();
+
+        assertThat(value(TRADE, CardUse.TRADE_EXPEDITION, PlanMoment.PICK)).isPositive();
+    }
+
+    private void twoRivalsWithSevenResources() {
+        Player mentak = test.addSeat("200000000000000010", "mentak", "red");
+        for (Player rival : java.util.List.of(test.sol, mentak)) {
+            rival.addBreakthrough(rival.getFaction() + "bt");
+            rival.addPlanet("abyz");
+            rival.addPlanet("mordaiii");
+        }
+        changed();
     }
 
     @Test
@@ -161,11 +183,16 @@ class ExpeditionCardUsesTest extends BaseTi4Test {
     }
 
     // At pick time the seat expects to exhaust the cheapest planets on its first turn and have Diplomacy return them.
+    // With no tactic token left the planets are worth a middle rate, and two rivals make waiting for the pass risky.
     @Test
     void diplomacyExpectsToRefundThePlanetsTheFirstClaimExhausts() {
         readySevenResources();
+        twoRivalsWithSevenResources();
+        seat.setTacticalCC(0);
+        changed();
 
-        ExpeditionOutlook.Choice first = ExpeditionOutlook.best(test.game, seat).orElseThrow();
+        ExpeditionOutlook.Choice first =
+                ExpeditionOutlook.claimNow(test.game, seat).orElseThrow();
 
         assertThat(first.kind()).isEqualTo(ExpeditionKind.FIVE_RES);
         assertThat(ExpeditionUnlock.refundOfFirstClaim(test.game, seat)).isPositive();

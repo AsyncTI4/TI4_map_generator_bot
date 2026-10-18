@@ -14,7 +14,6 @@ import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.SpendUnlock;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.secrets.SecretValue;
-import ti4.ai.tactical.ProductionPlanner;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -32,19 +31,20 @@ class KindPricing {
     private static final String BIO_STIMS = "bs";
     private static final Wallet.Payment NO_PAYMENT = new Wallet.Payment(List.of(), List.of(), 0, 0);
 
-    static Optional<Price> of(Game game, Player seat, ExpeditionKind kind, Holdings holdings) {
+    static Optional<Price> of(Game game, Player seat, ExpeditionKind kind, Holdings holdings, SpendHorizon horizon) {
         SpendCost reserve = ScoringReserve.of(game, seat);
         return switch (kind) {
-            case TECH_SKIP -> techSkip(game, seat, holdings.wallet(), reserve);
+            case TECH_SKIP -> techSkip(game, seat, holdings.wallet(), reserve, horizon);
             case TRADE_GOODS -> tradeGoods(holdings.wallet(), reserve);
-            case FIVE_RES -> planetsFor(game, holdings.wallet(), reserve, SpendCost.resources(RESOURCES_COST));
-            case FIVE_INF -> planetsFor(game, holdings.wallet(), reserve, SpendCost.influence(INFLUENCE_COST));
+            case FIVE_RES -> planetsFor(game, holdings.wallet(), reserve, SpendCost.resources(RESOURCES_COST), horizon);
+            case FIVE_INF -> planetsFor(game, holdings.wallet(), reserve, SpendCost.influence(INFLUENCE_COST), horizon);
             case SECRET -> secret(game, seat);
             case ACTION_CARDS -> actionCards(game, seat, holdings);
         };
     }
 
-    private static Optional<Price> techSkip(Game game, Player seat, Wallet wallet, SpendCost reserve) {
+    private static Optional<Price> techSkip(
+            Game game, Player seat, Wallet wallet, SpendCost reserve, SpendHorizon horizon) {
         boolean bioStims = seat.hasTechReady(BIO_STIMS);
         boolean nothingExhausted = bioStims && exhaustedSkipPlanets(game, seat).isEmpty();
         return wallet.planets().stream()
@@ -52,15 +52,16 @@ class KindPricing {
                 .filter(planet -> bioStims || keepsReserve(wallet, reserve, planet))
                 .map(planet -> new Price(
                         new Wallet.Payment(List.of(planet.name()), List.of(), 0, 0),
-                        nothingExhausted ? 0 : techSkipCost(game, seat, planet, bioStims)))
+                        nothingExhausted ? 0 : techSkipCost(game, seat, planet, bioStims, horizon)))
                 .min(Comparator.comparingDouble(Price::cost));
     }
 
-    private static double techSkipCost(Game game, Player seat, Wallet.PlanetValue planet, boolean bioStims) {
-        double cost = exhaustCost(game, planet) + exhaustedPoints(game, seat, planet);
+    private static double techSkipCost(
+            Game game, Player seat, Wallet.PlanetValue planet, boolean bioStims, SpendHorizon horizon) {
+        double cost = exhaustCost(planet, horizon) + exhaustedPoints(game, seat, planet);
         if (!bioStims) return cost;
         double readiedInstead = exhaustedSkipPlanets(game, seat).stream()
-                .mapToDouble(name -> exhaustCost(game, name))
+                .mapToDouble(name -> exhaustCost(game, name, horizon))
                 .max()
                 .orElse(cost);
         return Math.min(cost, readiedInstead);
@@ -88,20 +89,19 @@ class KindPricing {
         return Optional.of(new Price(payment, TRADE_GOODS_COST));
     }
 
-    private static Optional<Price> planetsFor(Game game, Wallet wallet, SpendCost reserve, SpendCost cost) {
+    private static Optional<Price> planetsFor(
+            Game game, Wallet wallet, SpendCost reserve, SpendCost cost, SpendHorizon horizon) {
         return ScoringReserve.planAfterReserve(wallet, reserve, cost)
-                .map(payment -> new Price(payment, paymentCost(game, wallet, payment)));
+                .map(payment -> new Price(payment, paymentCost(wallet, payment, horizon)));
     }
 
-    static double paymentCost(Game game, Wallet wallet, Wallet.Payment payment) {
-        double perResource = ProductionPlanner.fillerValuePerResource(game);
+    static double paymentCost(Wallet wallet, Wallet.Payment payment, SpendHorizon horizon) {
         double planets = Stream.concat(
                         payment.forResources().stream()
-                                .map(name ->
-                                        perResource * planetOf(wallet, name).resources()),
+                                .map(name -> horizon.perResource()
+                                        * planetOf(wallet, name).resources()),
                         payment.forInfluence().stream()
-                                .map(name -> perResource
-                                        * BoardView.INFLUENCE_WEIGHT
+                                .map(name -> horizon.perInfluence()
                                         * planetOf(wallet, name).influence()))
                 .mapToDouble(Double::doubleValue)
                 .sum();
@@ -115,16 +115,15 @@ class KindPricing {
                 .orElse(new Wallet.PlanetValue(name, 0, 0));
     }
 
-    private static double exhaustCost(Game game, Wallet.PlanetValue planet) {
-        double perResource = ProductionPlanner.fillerValuePerResource(game);
-        return perResource * (planet.resources() + BoardView.INFLUENCE_WEIGHT * planet.influence());
+    private static double exhaustCost(Wallet.PlanetValue planet, SpendHorizon horizon) {
+        return Math.max(horizon.perResource() * planet.resources(), horizon.perInfluence() * planet.influence());
     }
 
-    private static double exhaustCost(Game game, String planet) {
+    private static double exhaustCost(Game game, String planet, SpendHorizon horizon) {
         return exhaustCost(
-                game,
                 new Wallet.PlanetValue(
-                        planet, BoardView.planetResources(game, planet), BoardView.planetInfluence(game, planet)));
+                        planet, BoardView.planetResources(game, planet), BoardView.planetInfluence(game, planet)),
+                horizon);
     }
 
     private static Optional<Price> secret(Game game, Player seat) {

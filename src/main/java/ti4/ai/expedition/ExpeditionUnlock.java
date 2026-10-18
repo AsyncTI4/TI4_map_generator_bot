@@ -16,37 +16,31 @@ public class ExpeditionUnlock {
 
     public static final int TRADE_GOODS_FROM_TRADE = 3;
     public static final int PLANETS_READIED = 2;
-    static final double FIRST_CLAIM_PER_CONTENDER = 0.25;
-    static final double FIRST_CLAIM_CAP = 0.75;
     static final double LOW_SECRET_COST = 1.0;
     private static final int PAIR_CANDIDATES = 6;
 
     public record Readying(List<String> planets, double gain) {}
 
-    public static double worth(Game game, Player seat) {
-        return worth(game, seat, Holdings.of(game, seat));
-    }
-
     public static double worth(Game game, Player seat, Holdings holdings) {
-        return ExpeditionOutlook.best(game, seat, holdings)
-                .map(ExpeditionOutlook.Choice::net)
-                .orElse(0.0);
+        return ExpeditionOutlook.value(game, seat, holdings);
     }
 
     public static double gain(Game game, Player seat, Holdings after) {
-        return Math.max(0, worth(game, seat, after) - worth(game, seat));
+        Holdings before = Holdings.of(game, seat).racingForTheSlice(after.racing());
+        return Math.max(0, worth(game, seat, after) - worth(game, seat, before));
     }
 
-    public static double afterTradeGoods(Game game, Player seat, int tradeGoodsGained) {
+    public static double afterTradeGoods(Game game, Player seat, int tradeGoodsGained, boolean racing) {
         if (!ExpeditionOutlook.isOpen(game, seat) || tradeGoodsGained <= 0) return 0;
-        Holdings holdings = Holdings.of(game, seat);
+        Holdings holdings = Holdings.of(game, seat).racingForTheSlice(racing);
         Wallet richer = holdings.wallet().withTradeGoods(seat.getTg() + tradeGoodsGained);
         return gain(game, seat, holdings.withWallet(richer));
     }
 
-    public static double afterDrawing(Game game, Player seat, int cardsDrawn) {
+    public static double afterDrawing(Game game, Player seat, int cardsDrawn, boolean racing) {
         if (!ExpeditionOutlook.isOpen(game, seat) || cardsDrawn <= 0) return 0;
-        return gain(game, seat, Holdings.of(game, seat).withActionCards(seat.getAcCount() + cardsDrawn));
+        Holdings holdings = Holdings.of(game, seat).racingForTheSlice(racing);
+        return gain(game, seat, holdings.withActionCards(seat.getAcCount() + cardsDrawn));
     }
 
     public static double gainFromReadying(Game game, Player seat, Collection<String> planets) {
@@ -69,7 +63,7 @@ public class ExpeditionUnlock {
     }
 
     public static double refundOfFirstClaim(Game game, Player seat) {
-        Optional<ExpeditionOutlook.Choice> choice = ExpeditionOutlook.best(game, seat);
+        Optional<ExpeditionOutlook.Choice> choice = ExpeditionOutlook.claimNow(game, seat);
         if (choice.isEmpty()) return 0;
         int planets = choice.get().payment().planetCount();
         if (planets == 0) return 0;
@@ -77,31 +71,22 @@ public class ExpeditionUnlock {
     }
 
     public static double claimingFirst(Game game, Player seat) {
-        List<ExpeditionOutlook.Choice> options = ExpeditionOutlook.options(game, seat, Holdings.of(game, seat)).stream()
+        Holdings first = Holdings.of(game, seat);
+        List<ExpeditionOutlook.Choice> options = ExpeditionOutlook.options(game, seat, first).stream()
                 .filter(choice -> choice.net() > 0)
                 .toList();
         if (options.isEmpty()) return 0;
         ExpeditionOutlook.Choice best = options.getFirst();
         if (best.kind() == ExpeditionKind.SECRET && best.cost() > LOW_SECRET_COST) return 0;
-        double lostChance = Math.min(FIRST_CLAIM_CAP, FIRST_CLAIM_PER_CONTENDER * contenders(game, seat, best.kind()));
-        double fallback = options.size() > 1 ? options.get(1).net() : 0;
-        return lostChance * (best.net() - fallback);
+        return Math.max(0, worth(game, seat, first) - worth(game, seat, first.racingForTheSlice(true)));
     }
 
     public static List<String> plannedPlanets(Game game, Player seat) {
-        return ExpeditionOutlook.best(game, seat).stream()
+        return ExpeditionOutlook.best(game, seat, Holdings.of(game, seat).atPassing()).stream()
                 .flatMap(choice -> java.util.stream.Stream.concat(
                         choice.payment().forResources().stream(), choice.payment().forInfluence().stream()))
                 .distinct()
                 .toList();
-    }
-
-    private static long contenders(Game game, Player seat, ExpeditionKind kind) {
-        return game.getRealPlayers().stream()
-                .filter(rival -> rival != seat)
-                .filter(BreakthroughValue::isLocked)
-                .filter(rival -> RaceUrgency.couldClaim(game, rival, kind))
-                .count();
     }
 
     private static List<List<String>> pairs(Game game, Collection<String> exhausted) {
