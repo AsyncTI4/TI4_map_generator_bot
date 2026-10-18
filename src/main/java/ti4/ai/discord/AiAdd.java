@@ -21,7 +21,9 @@ class AiAdd extends GameStateSubcommand {
                 .setRequired(true)
                 .setAutoComplete(true));
         OptionData faction = new OptionData(
-                OptionType.STRING, Constants.FACTION, "Faction the AI plays (default: the first free one)");
+                OptionType.STRING,
+                Constants.FACTION,
+                "Faction the AI plays (default: the first free one of the six fully implemented)");
         AiSettings.FACTION_NAMES.forEach((alias, name) -> faction.addChoice(name, alias));
         addOptions(faction);
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of the AI's units").setAutoComplete(true));

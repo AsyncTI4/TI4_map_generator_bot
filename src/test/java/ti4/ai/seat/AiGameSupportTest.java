@@ -110,11 +110,20 @@ class AiGameSupportTest extends BaseTi4Test {
         assertThat(AiGameSupport.firstFreeFaction(test.game)).isEqualTo("hacan");
     }
 
+    // L1Z1X, Naalu, Jol-Nar and Yin stay selectable by name but are never picked by default.
+    @Test
+    void theDefaultFactionIsOneOfTheSixImplementedOnes() {
+        assertThat(AiSettings.DEFAULT_FACTIONS).containsExactly("nekro", "sardakk", "hacan", "letnev", "sol", "xxcha");
+        assertThat(AiSettings.SUPPORTED_FACTIONS).containsAll(AiSettings.DEFAULT_FACTIONS);
+        assertThat(AiSettings.DEFAULT_FACTIONS).doesNotContain("l1z1x", "naalu", "jolnar", "yin");
+        assertThat(AiSettings.DEFAULT_FACTIONS).contains(AiGameSupport.firstFreeFaction(test.game));
+    }
+
     @Test
     void noFreeFactionOnceEverySupportedFactionIsTaken() {
         String[] colors = {"red", "yellow", "green", "purple", "orange", "pink", "gray", "brown"};
         int seat = 0;
-        for (String faction : AiSettings.SUPPORTED_FACTIONS) {
+        for (String faction : AiSettings.DEFAULT_FACTIONS) {
             if (AiGameSupport.isTaken(test.game, faction)) continue;
             test.addSeat("71000005555555" + (10 + seat), faction, colors[seat]);
             seat++;

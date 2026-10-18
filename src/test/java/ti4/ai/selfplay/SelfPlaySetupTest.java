@@ -48,11 +48,11 @@ class SelfPlaySetupTest extends BaseTi4Test {
     }
 
     @Test
-    void picksDistinctSupportedFactions() {
+    void picksDistinctDefaultFactions() {
         List<String> factions = SelfPlaySetup.pickFactions(6, new Random(7));
 
         assertThat(factions).hasSize(6).doesNotHaveDuplicates();
-        assertThat(AiSettings.SUPPORTED_FACTIONS).containsAll(factions);
+        assertThat(AiSettings.DEFAULT_FACTIONS).containsAll(factions);
     }
 
     // Names follow the bot's game-name rules and stay clear of the numbered pbd and fow series.

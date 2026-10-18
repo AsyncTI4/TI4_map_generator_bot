@@ -48,7 +48,7 @@ public class AiGameSupport {
 
     @Nullable
     public static String firstFreeFaction(Game game) {
-        return AiSettings.SUPPORTED_FACTIONS.stream()
+        return AiSettings.DEFAULT_FACTIONS.stream()
                 .filter(faction -> !isTaken(game, faction))
                 .findFirst()
                 .orElse(null);

@@ -18,6 +18,7 @@ public class AiSettings {
     public static final String NEKRO = "nekro";
     public static final SequencedMap<String, String> FACTION_NAMES = factionNames();
     public static final List<String> SUPPORTED_FACTIONS = List.copyOf(FACTION_NAMES.keySet());
+    public static final List<String> DEFAULT_FACTIONS = List.of(NEKRO, "sardakk", "hacan", "letnev", "sol", "xxcha");
     public static final int MAX_SEATS = 8;
     public static final Duration POLL_PERIOD = Duration.ofSeconds(3);
     public static final Duration DEBOUNCE = Duration.ofMillis(2500);

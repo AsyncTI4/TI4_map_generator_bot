@@ -67,7 +67,7 @@ public class SelfPlaySetup {
     }
 
     public static List<String> pickFactions(int seats, RandomGenerator random) {
-        List<String> factions = new ArrayList<>(AiSettings.SUPPORTED_FACTIONS);
+        List<String> factions = new ArrayList<>(AiSettings.DEFAULT_FACTIONS);
         Collections.shuffle(factions, random);
         return List.copyOf(factions.subList(0, seats));
     }
