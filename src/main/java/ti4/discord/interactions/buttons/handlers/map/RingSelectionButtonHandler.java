@@ -9,6 +9,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
+import ti4.service.map.SystemPickerService;
 
 @UtilityClass
 class RingSelectionButtonHandler {
@@ -16,9 +17,12 @@ class RingSelectionButtonHandler {
     @ButtonHandler("ring_")
     public static void ring(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         List<Button> ringButtons = ButtonHelper.getTileInARing(player, game, buttonID);
+        SystemPickerService.dropUnknownSystems(ringButtons, player, game);
         String num = buttonID.replace("ring_", "");
         String message;
         if (!"corners".equalsIgnoreCase(num)) {
+            // TODO: reads only the first digit, so rings 10+ skip the left/right message (SystemPickerService fixes
+            // this for fog)
             int ring = Integer.parseInt(num.charAt(0) + "");
             if (ring > 4 && !num.contains("left") && !num.contains("right")) {
                 message =

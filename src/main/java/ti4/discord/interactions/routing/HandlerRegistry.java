@@ -1,6 +1,5 @@
 package ti4.discord.interactions.routing;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -9,46 +8,47 @@ import ti4.logging.RollbarManager;
 
 public class HandlerRegistry<C extends ListenerContext> {
 
-    private final Map<String, Handler<C>> handlers = new HashMap<>();
+    private final Map<String, Route<C>> routes = new HashMap<>();
+    private int longestKeyLength;
 
     public void register(String key, Consumer<C> consumer, boolean shouldSave) {
-        handlers.put(key, new Handler<>(consumer, shouldSave));
+        routes.put(key, new Route<>(key, consumer, shouldSave));
+        longestKeyLength = Math.max(longestKeyLength, key.length());
     }
 
-    public boolean isSave(String componentId) {
-        Handler<C> handler = findHandler(componentId);
-        return handler == null || handler.shouldSave();
+    public Route<C> resolve(String rawComponentId) {
+        String key = findMatchedKey(ComponentIdEnvelope.decode(rawComponentId).handlerId());
+        return key == null ? Route.unmatched() : routes.get(key);
     }
 
-    public boolean handle(String componentId, C context) {
-        if (componentId == null) return false;
-
-        String matchedKey = findMatchedKey(componentId);
-        if (matchedKey == null) return false;
-
-        RollbarManager.put("handler_id", matchedKey);
-        handlers.get(matchedKey).consumer().accept(context);
-        return true;
-    }
-
-    private Handler<C> findHandler(String componentId) {
+    String findMatchedKey(String componentId) {
         if (componentId == null) return null;
-        String key = findMatchedKey(componentId);
-        return key == null ? null : handlers.get(key);
-    }
-
-    private String findMatchedKey(String componentId) {
-        if (handlers.containsKey(componentId)) return componentId;
-
-        return handlers.keySet().stream()
-                .filter(componentId::startsWith)
-                .max(Comparator.comparingInt(String::length))
-                .orElse(null);
+        for (int length = Math.min(componentId.length(), longestKeyLength); length >= 0; length--) {
+            String candidate = componentId.substring(0, length);
+            if (routes.containsKey(candidate)) return candidate;
+        }
+        return null;
     }
 
     public int getSize() {
-        return handlers.size();
+        return routes.size();
     }
 
-    private record Handler<C extends ListenerContext>(Consumer<C> consumer, boolean shouldSave) {}
+    public record Route<C extends ListenerContext>(String key, Consumer<C> consumer, boolean shouldSave) {
+
+        private static <C extends ListenerContext> Route<C> unmatched() {
+            return new Route<>(null, null, true);
+        }
+
+        public boolean isMatched() {
+            return key != null;
+        }
+
+        public boolean dispatch(C context) {
+            if (!isMatched()) return false;
+            RollbarManager.put("handler_id", key);
+            consumer.accept(context);
+            return true;
+        }
+    }
 }

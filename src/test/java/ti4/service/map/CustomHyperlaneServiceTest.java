@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -13,6 +14,8 @@ import org.junit.jupiter.api.Test;
  * so it needs direct coverage.
  */
 class CustomHyperlaneServiceTest {
+
+    private static final Pattern PATTERN = Pattern.compile("1");
 
     private static String matrixWithOneConnection(int row, int col) {
         StringBuilder sb = new StringBuilder();
@@ -65,7 +68,7 @@ class CustomHyperlaneServiceTest {
         assertFalse(CustomHyperlaneService.isValidConnectionMatrix("0,0,0;0,0,0"), "wrong dimensions");
         assertFalse(
                 CustomHyperlaneService.isValidConnectionMatrix(
-                        matrixWithOneConnection(0, 0).replaceFirst("1", "2")),
+                        PATTERN.matcher(matrixWithOneConnection(0, 0)).replaceFirst("2")),
                 "cells must be 0 or 1");
     }
 }

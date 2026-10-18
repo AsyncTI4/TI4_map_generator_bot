@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -76,6 +77,76 @@ public final class NewStuffHelper {
             return buttonsToUse;
         }
         return allButtons;
+    }
+
+    public static List<Button> paginateWithPinnedButtons(
+            List<Button> allButtons, List<Button> pinnedButtons, String prefixID, int allottedSpace, int pageNum) {
+        int capacityPerPage = allottedSpace - pinnedButtons.size();
+        if (capacityPerPage < 3) {
+            return Collections.emptyList();
+        }
+        if (allButtons.size() <= capacityPerPage) {
+            List<Button> onlyPage = new ArrayList<>(allButtons);
+            onlyPage.addAll(pinnedButtons);
+            return onlyPage;
+        }
+
+        List<List<Button>> pages = splitIntoPagesLeavingRoomForNavButtons(allButtons, capacityPerPage);
+        int maxPage = pages.size() - 1;
+        if (pageNum < 0) pageNum = 0;
+        if (pageNum > maxPage) pageNum = maxPage;
+
+        List<Button> buttonsToUse = new ArrayList<>();
+        if (pageNum > 0) {
+            String prev = "Previous Page (" + pageNum + "/" + (maxPage + 1) + ")";
+            buttonsToUse.add(Buttons.blue(prefixID + "page" + (pageNum - 1), prev, "⏪"));
+        }
+        buttonsToUse.addAll(pages.get(pageNum));
+        if (pageNum < maxPage) {
+            String next = "Next Page (" + (pageNum + 2) + "/" + (maxPage + 1) + ")";
+            buttonsToUse.add(Buttons.blue(prefixID + "page" + (pageNum + 1), next, "⏩"));
+        }
+        buttonsToUse.addAll(pinnedButtons);
+        return buttonsToUse;
+    }
+
+    public static void sendPaginated(
+            MessageChannel channel, String message, List<Button> buttons, List<Button> pinned, String navPrefix) {
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
+                channel, message, paginateWithPinnedButtons(buttons, pinned, navPrefix, 25, 0));
+    }
+
+    public static boolean turnPage(
+            ButtonInteractionEvent event,
+            String buttonID,
+            String message,
+            Supplier<List<Button>> buttons,
+            List<Button> pinned,
+            String navPrefix) {
+        Matcher pageMatch = Pattern.compile(RegexHelper.pageRegex()).matcher(buttonID);
+        if (!pageMatch.find()) return false;
+        int page = Integer.parseInt(pageMatch.group("page"));
+        sendOrEditButtons(
+                event,
+                event.getChannel(),
+                message,
+                paginateWithPinnedButtons(buttons.get(), pinned, navPrefix, 25, page));
+        return true;
+    }
+
+    private static List<List<Button>> splitIntoPagesLeavingRoomForNavButtons(List<Button> allButtons, int capacity) {
+        int total = allButtons.size();
+        int pageCount = Math.ceilDiv(total - 2, capacity - 2);
+        List<List<Button>> pages = new ArrayList<>();
+        int index = 0;
+        for (int page = 0; page < pageCount; page++) {
+            boolean hasOnlyOneNavButton = page == 0 || page == pageCount - 1;
+            int contentRoom = capacity - (hasOnlyOneNavButton ? 1 : 2);
+            int end = page == pageCount - 1 ? total : Math.min(total, index + contentRoom);
+            pages.add(new ArrayList<>(allButtons.subList(index, end)));
+            index = end;
+        }
+        return pages;
     }
 
     public static boolean checkAndHandlePaginationChange(

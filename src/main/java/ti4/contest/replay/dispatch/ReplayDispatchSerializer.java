@@ -10,13 +10,10 @@ import ti4.contest.replay.entities.CombatCandidateEventEntity;
 import ti4.json.JsonMapperManager;
 
 @Component
-/**
- * Serializes replay dispatch payloads to JSON and converts persisted embed data to and from JDA embeds.
- */
 public class ReplayDispatchSerializer {
 
     @SneakyThrows
-    public String write(ReplayDispatchPayload payload) {
+    public static String write(ReplayDispatchPayload payload) {
         if (payload == null) return null;
         return JsonMapperManager.basic().writeValueAsString(payload);
     }

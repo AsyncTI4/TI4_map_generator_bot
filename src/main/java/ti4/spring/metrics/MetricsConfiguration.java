@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
 public class MetricsConfiguration {
 
     @Bean
-    CommandLineRunner initSREStats(MeterRegistry meterRegistry) {
+    static CommandLineRunner initSREStats(MeterRegistry meterRegistry) {
         return args -> {
             // Initialize the static metrics utility with the Actuator-managed registry.
             ti4.service.statistics.SREStats.init(meterRegistry);

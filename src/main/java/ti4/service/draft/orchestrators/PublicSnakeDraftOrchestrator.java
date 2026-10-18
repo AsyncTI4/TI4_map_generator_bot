@@ -72,7 +72,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         isReversing = false;
     }
 
-    public void setDraftOrder(DraftPlayerManager draftManager, List<String> playerOrder) {
+    public static void setDraftOrder(DraftPlayerManager draftManager, List<String> playerOrder) {
         if (playerOrder.size() != draftManager.getPlayerStates().size()) {
             throw new IllegalArgumentException("Player order size "
                     + playerOrder.size()
@@ -98,7 +98,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         }
     }
 
-    public void setPlayerPosition(DraftPlayerManager draftManager, String playerUserId, int position) {
+    public static void setPlayerPosition(DraftPlayerManager draftManager, String playerUserId, int position) {
         if (position < 1 || position > draftManager.getPlayerStates().size()) {
             throw new IllegalArgumentException("Position " + position + " is out of bounds for draft with "
                     + draftManager.getPlayerStates().size()
@@ -385,7 +385,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         return null;
     }
 
-    public List<String> getDraftOrder(DraftManager draftManager) {
+    public static List<String> getDraftOrder(DraftManager draftManager) {
         List<String> playerOrder = new ArrayList<>();
         int numPlayers = draftManager.getPlayerStates().size();
         for (int i = 0; i < numPlayers; i++) {

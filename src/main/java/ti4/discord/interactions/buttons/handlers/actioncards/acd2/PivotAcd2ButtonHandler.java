@@ -23,7 +23,7 @@ class PivotAcd2ButtonHandler {
     @ButtonHandler("resolvePivot")
     public static void resolvePivot(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
-        sendPivotAcButtons(player, 3);
+        sendPivotAcButtons(player, 3, 0);
     }
 
     @ButtonHandler("pivotDiscardAc_")
@@ -36,35 +36,41 @@ class PivotAcd2ButtonHandler {
         }
         int remaining;
         int numericalID;
+        int discarded;
         try {
             remaining = Integer.parseInt(payload.substring(0, separator));
-            numericalID = Integer.parseInt(payload.substring(separator + 1));
+            String[] discardPayload = payload.substring(separator + 1).split("_", 2);
+            numericalID = Integer.parseInt(discardPayload[0]);
+            discarded = Integer.parseInt(discardPayload[1]);
         } catch (NumberFormatException e) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
         ActionCardHelper.discardAC(event, game, player, numericalID);
-        ActionCardHelper.drawActionCards(player, 1);
         ButtonHelper.deleteMessage(event);
 
         if (remaining > 1) {
-            sendPivotAcButtons(player, remaining - 1);
+            sendPivotAcButtons(player, remaining - 1, discarded + 1);
         } else {
-            sendPivotSecretStep(player);
+            completePivotActionCardStep(player, discarded + 1);
         }
     }
 
     @ButtonHandler("pivotToSecret")
-    public static void resolvePivotToSecret(Player player, Game game, ButtonInteractionEvent event) {
+    public static void resolvePivotToSecret(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteMessage(event);
-        sendPivotSecretStep(player);
+        try {
+            completePivotActionCardStep(player, Integer.parseInt(buttonID.replace("pivotToSecret_", "")));
+        } catch (NumberFormatException e) {
+            sendPivotSecretStep(player);
+        }
     }
 
-    private static void sendPivotAcButtons(Player player, int remaining) {
+    private static void sendPivotAcButtons(Player player, int remaining, int discarded) {
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards == null || actionCards.isEmpty()) {
-            sendPivotSecretStep(player);
+            completePivotActionCardStep(player, discarded);
             return;
         }
         List<Button> buttons = new ArrayList<>();
@@ -72,19 +78,26 @@ class PivotAcd2ButtonHandler {
             int numericalID = ac.getValue();
             String acName = Mapper.getActionCard(ac.getKey()).getName();
             buttons.add(Buttons.blue(
-                    player.factionButtonChecker() + "pivotDiscardAc_" + remaining + "_" + numericalID,
+                    player.factionButtonChecker() + "pivotDiscardAc_" + remaining + "_" + numericalID + "_" + discarded,
                     "(" + numericalID + ") " + acName,
                     CardEmojis.getACEmoji(player)));
         }
-        buttons.add(
-                Buttons.green(player.factionButtonChecker() + "pivotToSecret", "Continue to Secret Objective step"));
+        buttons.add(Buttons.green(
+                player.factionButtonChecker() + "pivotToSecret_" + discarded, "Continue to Secret Objective step"));
         buttons.add(Buttons.red("deleteButtons", "Done"));
         String remainingText = remaining == 1 ? "1 discard remaining" : remaining + " discards remaining";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + ", discard up to 3 action cards for _Pivot_; each discard draws a"
-                        + " replacement (" + remainingText + ").",
+                player.getRepresentationUnfogged() + ", discard up to 3 action cards for _Pivot_, then draw that many"
+                        + " replacements (" + remainingText + ").",
                 buttons);
+    }
+
+    private static void completePivotActionCardStep(Player player, int discarded) {
+        if (discarded > 0) {
+            ActionCardHelper.drawActionCards(player, discarded);
+        }
+        sendPivotSecretStep(player);
     }
 
     private static void sendPivotSecretStep(Player player) {

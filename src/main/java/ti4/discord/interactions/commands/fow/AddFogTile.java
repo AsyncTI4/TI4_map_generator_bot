@@ -41,7 +41,7 @@ class AddFogTile extends GameStateSubcommand {
         String planetTileName = AliasHandler.resolveTile(
                 event.getOption(Constants.TILE_NAME).getAsString().toLowerCase());
         String tileName = Mapper.getTileID(planetTileName);
-        String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+        String tilePath = ResourceHelper.getTileFile(tileName);
         if (tilePath == null) {
             MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
             return;

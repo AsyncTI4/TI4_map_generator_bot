@@ -42,7 +42,7 @@ public abstract class BagDraft {
         this.owner = owner;
     }
 
-    protected Game getOwner() {
+    Game getOwner() {
         return owner;
     }
 

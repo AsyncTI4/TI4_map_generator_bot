@@ -49,7 +49,7 @@ class CombatReplayEventAppender {
         event.setRoundNumber(roundNumber);
         event.setActorFaction(actorFaction);
         event.setSummaryText(summaryText);
-        event.setPayloadJson(payloadSerializer.write(payload));
+        event.setPayloadJson(ReplayDispatchSerializer.write(payload));
         candidateEventRepository.save(event);
 
         freshCandidate.setNextEventSequence(sequenceNumber + 1);

@@ -1,0 +1,18 @@
+{
+  "name": "30k-explore-fog-2p",
+  "description": "Fog game with the 30k decks: Letnev holds Quann (201) with infantry, Nekro has a destroyer next door at 202. For Shared Wealth leak checks.",
+  "fog": true,
+  "decks": { "ac": "action_cards_30k", "so": "secret_objectives_30k", "relic": "relics_30k", "explore": "explores_30k" },
+  "you": {
+    "faction": "letnev",
+    "color": "red",
+    "home": "301",
+    "speaker": true,
+    "sc": 1,
+    "planets": ["quann"],
+    "units": { "201": "1 inf quann" }
+  },
+  "seats": [ { "faction": "nekro", "color": "blue", "home": "307", "sc": 3, "units": { "202": "dd" } } ],
+  "defaults": { "tg": 3, "commodities": 2, "ccs": "3/3/2" },
+  "start": "action"
+}

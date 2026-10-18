@@ -6,8 +6,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -20,6 +20,7 @@ import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -40,6 +41,12 @@ class TacticalActionButtonHandlers {
     @ButtonHandler("unitTacticalMove")
     @ButtonHandler("unitTacticalRemove")
     public static void newTacticalMoveUnits(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (StringUtils.isBlank(game.getActiveSystem())) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "There is no active tactical action, so these buttons are no longer usable.");
+            return;
+        }
+
         String regexSingleUnit = "unitTactical(?<type>Move|Remove)";
         regexSingleUnit += "_" + RegexHelper.posRegex(game);
         regexSingleUnit += "_" + RegexHelper.intRegex("amt");
@@ -142,7 +149,8 @@ class TacticalActionButtonHandlers {
         Tile activeTile = game.getTileByPosition(game.getActiveSystem());
         if (activeTile != null
                 && CommandCounterHelper.hasCC(event, player.getColor(), activeTile)
-                && !TacticalActionService.shouldSkipPlacingAbilities(game, player)) {
+                && !TacticalActionService.shouldSkipPlacingAbilities(game, player)
+                && !event.getButton().getLabel().toLowerCase().contains("ring")) {
             RemoveCommandCounterService.fromTile(player.getColor(), activeTile, game);
             player.setTacticalCC(player.getTacticalCC() + 1);
         }
@@ -297,6 +305,7 @@ class TacticalActionButtonHandlers {
                         // we want "landed X" to read before those, not after.
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), landingMsg);
                         AddUnitService.addUnits(event, game, toAdd);
+                        ThirtyKExploreHooks.afterLanding(game, owner, tile, planet, type, amount);
                         if (type == UnitType.Infantry) {
                             MonumentsService.recordNaaluMonumentInfantryCommit(game, owner, tile, planet);
                         }

@@ -138,15 +138,15 @@ public class ShipPositionModel {
         }
     }
 
-    public Point getOffset() {
+    public static Point getOffset() {
         return ShipPosition.offset;
     }
 
-    public Point getAllianceOffset() {
+    public static Point getAllianceOffset() {
         return ShipPosition.allianceOffset;
     }
 
-    public ShipPosition getTypeFromString(String type) {
+    public static ShipPosition getTypeFromString(String type) {
         type = type.substring(0, 6);
         Map<String, ShipPosition> allTypes = Arrays.stream(ShipPosition.values())
                 .collect(Collectors.toMap(ShipPosition::toString, (shipPositionModel -> shipPositionModel)));

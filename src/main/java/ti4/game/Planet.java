@@ -113,7 +113,7 @@ public class Planet extends UnitHolder {
     }
 
     @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
-    private boolean isRealAttachmentToken(String token) {
+    private static boolean isRealAttachmentToken(String token) {
         AttachmentModel attach = Mapper.getAttachmentInfo(token);
         if (attach != null && attach.isFakeAttachment()) return false;
         if (token.contains("superweapon")) return false;
@@ -136,7 +136,7 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
     public boolean hasAttachment() {
-        return tokenList.stream().anyMatch(this::isRealAttachmentToken);
+        return tokenList.stream().anyMatch(Planet::isRealAttachmentToken);
     }
 
     public void updateTriadStats(Player player) {
@@ -161,7 +161,7 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
     public List<String> getAttachments() {
-        return tokenList.stream().filter(this::isRealAttachmentToken).toList();
+        return tokenList.stream().filter(Planet::isRealAttachmentToken).toList();
     }
 
     public String getRepresentation(Game game) {
@@ -284,6 +284,10 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public int getResources() {
         return resourcesOriginal + resourcesModifier;
+    }
+
+    public void addResourcesModifier(int modifier) {
+        resourcesModifier += modifier;
     }
 
     @JsonIgnore

@@ -120,7 +120,7 @@ class FactionModelTest extends BaseTi4Test {
         return false;
     }
 
-    private boolean validateHomebrewReplacesID(FactionModel faction) {
+    private static boolean validateHomebrewReplacesID(FactionModel faction) {
         if (faction.getHomebrewReplacesID().isEmpty()) return true;
         if (Mapper.isValidFaction(faction.getHomebrewReplacesID().get())) return true;
         System.out.println(

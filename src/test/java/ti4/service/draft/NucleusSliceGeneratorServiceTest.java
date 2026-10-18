@@ -137,7 +137,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
         testSuccessfulNucleusForMiltySettings(game, settings);
     }
 
-    private void testSuccessfulNucleusForGame(Game game) {
+    private static void testSuccessfulNucleusForGame(Game game) {
         MiltySettings settings = game.initializeMiltySettings();
         settings.getDraftMode().setChosenKey("nucleus");
         game.getDraftTileManager().reset(game);

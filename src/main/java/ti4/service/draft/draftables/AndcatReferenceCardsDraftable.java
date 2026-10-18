@@ -210,7 +210,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         return choices;
     }
 
-    private String makePackageText(
+    private static String makePackageText(
             List<FactionModel> factionsInPackage, boolean includePriority, boolean includeEmojis) {
         StringBuilder formattedNameBuilder = new StringBuilder();
         for (int i = 0; i < 3; ++i) {
@@ -269,8 +269,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             if (informPackages.isEmpty()) {
                 return DraftButtonService.USER_MISTAKE_PREFIX + "No packages remain to show info for.";
             } else {
-                new AndcatReferenceCardsMessageHelper(this)
-                        .sendPackageInfos(draftManager, playerUserId, informPackages);
+                AndcatReferenceCardsMessageHelper.sendPackageInfos(draftManager, playerUserId, informPackages);
             }
         } else if ("pickedinfo".equals(commandKey)) {
             informPackages = new ArrayList<>();
@@ -288,17 +287,16 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             if (informPackages.isEmpty()) {
                 return DraftButtonService.USER_MISTAKE_PREFIX + "No packages have been picked yet to show info for.";
             } else {
-                new AndcatReferenceCardsMessageHelper(this)
-                        .sendPackageInfos(draftManager, playerUserId, informPackages);
+                AndcatReferenceCardsMessageHelper.sendPackageInfos(draftManager, playerUserId, informPackages);
             }
         } else if ("allinfo".equals(commandKey)) {
             informPackages = new ArrayList<>(referenceCardPackages.values());
-            new AndcatReferenceCardsMessageHelper(this).sendPackageInfos(draftManager, playerUserId, informPackages);
+            AndcatReferenceCardsMessageHelper.sendPackageInfos(draftManager, playerUserId, informPackages);
         } else if (commandKey.startsWith("info_")) {
             String[] tokens = commandKey.substring("info_".length()).split("_");
             informPackages =
                     Arrays.stream(tokens).map(this::getPackageByChoiceKey).toList();
-            new AndcatReferenceCardsMessageHelper(this).sendPackageInfos(draftManager, playerUserId, informPackages);
+            AndcatReferenceCardsMessageHelper.sendPackageInfos(draftManager, playerUserId, informPackages);
         } else if (commandKey.startsWith("assign_")) {
             return new AndcatReferenceCardsMessageHelper(this)
                     .handleAssignButton(event, draftManager, playerUserId, commandKey);
@@ -674,7 +672,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         return playerStates.stream().map(Entry::getKey).toList();
     }
 
-    private boolean isSourceOfSeat(DraftManager draftManager) {
+    private static boolean isSourceOfSeat(DraftManager draftManager) {
         return draftManager.getDraftables().stream().noneMatch(d -> d instanceof SeatDraftable);
     }
 

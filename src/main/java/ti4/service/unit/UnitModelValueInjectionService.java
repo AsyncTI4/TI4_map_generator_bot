@@ -2,11 +2,15 @@ package ti4.service.unit;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
@@ -92,7 +96,7 @@ public class UnitModelValueInjectionService {
                         copiedMonuments.stream()
                                 .map(UnitModel::getCost)
                                 .max(Float::compare)
-                                .orElse(0F)));
+                                .orElse(0.0F)));
                 injectedUnit.setCombatDieCount(Math.max(
                         unit.getCombatDieCount(),
                         copiedMonuments.stream()
@@ -137,24 +141,18 @@ public class UnitModelValueInjectionService {
                         .mapToInt(UnitModel::getSpaceCannonHitsOn)
                         .min()
                         .orElse(unit.getSpaceCannonHitsOn()));
-                injectedUnit.setDeepSpaceCannon(Boolean.TRUE.equals(unit.getDeepSpaceCannon())
-                        || copiedMonuments.stream()
-                                .anyMatch(monument -> Boolean.TRUE.equals(monument.getDeepSpaceCannon())));
-                injectedUnit.setPlanetaryShield(Boolean.TRUE.equals(unit.getPlanetaryShield())
-                        || copiedMonuments.stream()
-                                .anyMatch(monument -> Boolean.TRUE.equals(monument.getPlanetaryShield())));
-                injectedUnit.setSustainDamage(Boolean.TRUE.equals(unit.getSustainDamage())
-                        || copiedMonuments.stream()
-                                .anyMatch(monument -> Boolean.TRUE.equals(monument.getSustainDamage())));
-                injectedUnit.setDisablesPlanetaryShield(Boolean.TRUE.equals(unit.getDisablesPlanetaryShield())
-                        || copiedMonuments.stream()
-                                .anyMatch(monument -> Boolean.TRUE.equals(monument.getDisablesPlanetaryShield())));
-                injectedUnit.setCanBeDirectHit(Boolean.TRUE.equals(unit.getCanBeDirectHit())
-                        || copiedMonuments.stream()
-                                .anyMatch(monument -> Boolean.TRUE.equals(monument.getCanBeDirectHit())));
-                injectedUnit.setIsGroundForce(Boolean.TRUE.equals(unit.getIsGroundForce())
-                        || copiedMonuments.stream()
-                                .anyMatch(monument -> Boolean.TRUE.equals(monument.getIsGroundForce())));
+                injectedUnit.setDeepSpaceCannon(
+                        unit.getDeepSpaceCannon() || copiedMonuments.stream().anyMatch(UnitModel::getDeepSpaceCannon));
+                injectedUnit.setPlanetaryShield(
+                        unit.getPlanetaryShield() || copiedMonuments.stream().anyMatch(UnitModel::getPlanetaryShield));
+                injectedUnit.setSustainDamage(
+                        unit.getSustainDamage() || copiedMonuments.stream().anyMatch(UnitModel::getSustainDamage));
+                injectedUnit.setDisablesPlanetaryShield(unit.getDisablesPlanetaryShield()
+                        || copiedMonuments.stream().anyMatch(UnitModel::getDisablesPlanetaryShield));
+                injectedUnit.setCanBeDirectHit(
+                        unit.getCanBeDirectHit() || copiedMonuments.stream().anyMatch(UnitModel::getCanBeDirectHit));
+                injectedUnit.setIsGroundForce(
+                        unit.getIsGroundForce() || copiedMonuments.stream().anyMatch(UnitModel::getIsGroundForce));
                 String copiedAbilityText = copiedMonuments.stream()
                         .map(monument -> "**" + monument.getName() + "**: "
                                 + monument.getAbility().orElse(""))
@@ -168,7 +166,88 @@ public class UnitModelValueInjectionService {
                 injectedUnit.setAbility(baseAbility);
             }
         }
+        if ("thurviali_mech".equals(unit.getId())) {
+            if (injectedUnit == unit) {
+                injectedUnit = copyUnit(unit);
+            }
+            String baseAbility = unit.getAbility().orElse("");
+            int copiedAbilityStart = baseAbility.indexOf("\n\n**");
+            if (copiedAbilityStart >= 0) {
+                baseAbility = baseAbility.substring(0, copiedAbilityStart);
+            }
+            String copiedAbilityText = ThurvialiUnitHandler.getCoexistingMechOwners(player.getGame(), player).stream()
+                    .flatMap(owner -> owner.getUnitsOwned().stream())
+                    .map(Mapper::getUnit)
+                    .filter(Objects::nonNull)
+                    .filter(other -> other.getUnitType() == UnitType.Mech)
+                    .filter(other -> other.getAbility().isPresent())
+                    .map(other ->
+                            "**" + other.getName() + "**: " + other.getAbility().orElse(""))
+                    .distinct()
+                    .collect(java.util.stream.Collectors.joining("\n"));
+            String ability = copiedAbilityText.isBlank() ? baseAbility : baseAbility + "\n\n" + copiedAbilityText;
+            injectedUnit.setAbility(ability.length() <= 1024 ? ability : ability.substring(0, 1021) + "...");
+        }
+        if (player.hasRelic("lightrailordnance_br") && unit.getUnitType() == UnitType.Spacedock) {
+            UnitModel pds = player.getUnitFromAsyncID(UnitType.Pds.getValue());
+            if (pds != null) {
+                injectedUnit = addLightrailOrdnanceAttributes(injectedUnit, pds);
+            }
+        }
         return injectedUnit;
+    }
+
+    private UnitModel addLightrailOrdnanceAttributes(UnitModel spaceDock, UnitModel pds) {
+        UnitModel enhancedSpaceDock = copyUnit(spaceDock);
+        enhancedSpaceDock.setMoveValue(Math.max(spaceDock.getMoveValue(), pds.getMoveValue()));
+        enhancedSpaceDock.setProductionValue(Math.max(spaceDock.getProductionValue(), pds.getProductionValue()));
+        enhancedSpaceDock.setCapacityValue(Math.max(spaceDock.getCapacityValue(), pds.getCapacityValue()));
+        enhancedSpaceDock.setFleetSupplyBonus(Math.max(spaceDock.getFleetSupplyBonus(), pds.getFleetSupplyBonus()));
+        enhancedSpaceDock.setCapacityUsed(Math.max(spaceDock.getCapacityUsed(), pds.getCapacityUsed()));
+        enhancedSpaceDock.setCost(Math.max(spaceDock.getCost(), pds.getCost()));
+        enhancedSpaceDock.setCombatDieCount(Math.max(spaceDock.getCombatDieCount(), pds.getCombatDieCount()));
+        enhancedSpaceDock.setCombatHitsOn(getBestHitsOn(
+                List.of(spaceDock, pds),
+                UnitModel::getCombatDieCount,
+                UnitModel::getCombatHitsOn,
+                spaceDock.getCombatHitsOn()));
+        enhancedSpaceDock.setAfbDieCount(Math.max(spaceDock.getAfbDieCount(), pds.getAfbDieCount()));
+        enhancedSpaceDock.setAfbHitsOn(getBestHitsOn(
+                List.of(spaceDock, pds), UnitModel::getAfbDieCount, UnitModel::getAfbHitsOn, spaceDock.getAfbHitsOn()));
+        enhancedSpaceDock.setBombardDieCount(Math.max(spaceDock.getBombardDieCount(), pds.getBombardDieCount()));
+        enhancedSpaceDock.setBombardHitsOn(getBestHitsOn(
+                List.of(spaceDock, pds),
+                UnitModel::getBombardDieCount,
+                UnitModel::getBombardHitsOn,
+                spaceDock.getBombardHitsOn()));
+        enhancedSpaceDock.setSpaceCannonDieCount(
+                Math.max(spaceDock.getSpaceCannonDieCount(), pds.getSpaceCannonDieCount()));
+        enhancedSpaceDock.setSpaceCannonHitsOn(getBestHitsOn(
+                List.of(spaceDock, pds),
+                UnitModel::getSpaceCannonDieCount,
+                UnitModel::getSpaceCannonHitsOn,
+                spaceDock.getSpaceCannonHitsOn()));
+        enhancedSpaceDock.setDeepSpaceCannon(spaceDock.getDeepSpaceCannon() || pds.getDeepSpaceCannon());
+        enhancedSpaceDock.setPlanetaryShield(spaceDock.getPlanetaryShield() || pds.getPlanetaryShield());
+        enhancedSpaceDock.setSustainDamage(spaceDock.getSustainDamage() || pds.getSustainDamage());
+        enhancedSpaceDock.setDisablesPlanetaryShield(
+                spaceDock.getDisablesPlanetaryShield() || pds.getDisablesPlanetaryShield());
+        enhancedSpaceDock.setCanBeDirectHit(spaceDock.getCanBeDirectHit() || pds.getCanBeDirectHit());
+        enhancedSpaceDock.setIsStructure(spaceDock.getIsStructure() || pds.getIsStructure());
+        enhancedSpaceDock.setIsMonument(spaceDock.getIsMonument() || pds.getIsMonument());
+        enhancedSpaceDock.setIsGroundForce(spaceDock.getIsGroundForce() || pds.getIsGroundForce());
+        enhancedSpaceDock.setIsShip(spaceDock.getIsShip() || pds.getIsShip());
+        enhancedSpaceDock.setIsSpaceOnly(spaceDock.getIsSpaceOnly() || pds.getIsSpaceOnly());
+        enhancedSpaceDock.setIsPlanetOnly(spaceDock.getIsPlanetOnly() || pds.getIsPlanetOnly());
+        String pdsAbility = pds.getAbility().orElse("");
+        if (!pdsAbility.isBlank()) {
+            String spaceDockAbility = spaceDock.getAbility().orElse("");
+            String ability = spaceDockAbility.isBlank()
+                    ? "**" + pds.getName() + "**: " + pdsAbility
+                    : spaceDockAbility + "\n\n**" + pds.getName() + "**: " + pdsAbility;
+            enhancedSpaceDock.setAbility(ability.length() <= 1024 ? ability : ability.substring(0, 1021) + "...");
+        }
+        return enhancedSpaceDock;
     }
 
     private UnitModel combineDuplicateUnits(UnitModel representative, List<UnitModel> units) {
@@ -295,7 +374,10 @@ public class UnitModelValueInjectionService {
         if (player.hasUnlockedBreakthrough("xytherisbt")
                 && player.hasUpgradedUnit("pds2")
                 && unit.getUnitType() == UnitType.Pds) {
-            integers.combatDieCount(1).combatHitsOn(7).capacityUsed(1);
+            integers.combatDieCount(1)
+                    .combatHitsOn(5)
+                    .spaceCannonHitsOn(5, true)
+                    .capacityUsed(1);
             booleans.isGroundForce(true)
                     .isShip(true)
                     .isPlanetOnly(false)
@@ -316,6 +398,94 @@ public class UnitModelValueInjectionService {
             if (player.getHonorCounter() == 8) {
                 integers.spaceCannonDieCount(3).spaceCannonHitsOn(4);
             }
+        }
+
+        if (player.hasAbility("destroyer_customrig") && "destroyer".equalsIgnoreCase(unit.getBaseType())) {
+            integers.combatHitsOn(-2);
+        }
+
+        if (player.hasAbility("cruiser_customrig") && "cruiser".equalsIgnoreCase(unit.getBaseType())) {
+            floats.cost(-1);
+        }
+
+        if (player.hasAbility("carrier_customrig") && "carrier".equalsIgnoreCase(unit.getBaseType())) {
+            booleans.sustainDamage(true).canBeDirectHit(true);
+        }
+
+        if (player.hasAbility("dreadnought_customrig") && "dreadnought".equalsIgnoreCase(unit.getBaseType())) {
+            integers.capacityValue(1);
+        }
+
+        if (ScrapyardAbilitiesHandler.isRigActive(player, "destroyer_customrig")
+                && "destroyer".equalsIgnoreCase(unit.getBaseType())) {
+            integers.capacityValue(0, true);
+        }
+
+        if (ScrapyardAbilitiesHandler.isRigActive(player, "cruiser_customrig")
+                && "cruiser".equalsIgnoreCase(unit.getBaseType())) {
+            booleans.isGroundForce(true).isSpaceOnly(false);
+        }
+
+        if (ScrapyardAbilitiesHandler.isRigActive(player, "dreadnought_customrig")
+                && "dreadnought".equalsIgnoreCase(unit.getBaseType())) {
+            integers.bombardDieCount(3);
+            booleans.sustainDamage(false).disablesPlanetaryShield(true);
+        }
+
+        if (player.hasAbility("shielded_transports") && unit.getSustainDamage() && unit.isNonFighterShip()) {
+            integers.capacityValue(1);
+        }
+
+        if (player.hasAbility("radiant_grafting_flight") && unit.getIsStructure()) {
+            if (unit.getMoveValue() < 1) {
+                integers.moveValue(1, true);
+            }
+            booleans.isShip(true).isPlanetOnly(false).isSpaceOnly(false);
+            if (player.hasAbility("radiant_grafting_scales")) {
+                booleans.canBeDirectHit(true);
+            }
+        }
+
+        if (player.hasAbility("radiant_grafting_claws") && unit.getIsStructure()) {
+            if (unit.getCombatDieCount() < 1) {
+                integers.combatDieCount(1, true);
+            }
+            if (unit.getCombatHitsOn() == 0 || unit.getCombatHitsOn() > 6) {
+                integers.combatHitsOn(6, true);
+            }
+            booleans.isGroundForce(true);
+        }
+
+        if (player.hasAbility("radiant_grafting_parturition")
+                && (unit.getUnitType() == UnitType.Spacedock || unit.getUnitType() == UnitType.Pds)) {
+            floats.cost(4, true);
+        }
+
+        if (player.hasAbility("radiant_grafting_scales") && unit.getIsStructure()) {
+            booleans.sustainDamage(true);
+        }
+
+        if (player.hasAbility("radiant_grafting_phalanges") && unit.getUnitType() == UnitType.Mech) {
+            if (unit.getProductionValue() < 1) {
+                integers.productionValue(1, true);
+            }
+            if (unit.getSpaceCannonDieCount() < 1) {
+                integers.spaceCannonDieCount(1, true);
+            }
+            if (unit.getSpaceCannonHitsOn() == 0 || unit.getSpaceCannonHitsOn() > 9) {
+                integers.spaceCannonHitsOn(9, true);
+            }
+            booleans.isStructure(true);
+        }
+
+        if (player.hasUnlockedBreakthrough("atokerabt") && unit.getIsStructure()) {
+            integers.combatHitsOn(7, true);
+            integers.combatDieCount(1, true);
+            booleans.isGroundForce(true).sustainDamage(true);
+        }
+
+        if (player.getPlanets().contains("muspelheim") && unit.getUnitType() == UnitType.Pds) {
+            integers.productionValue(1);
         }
 
         return UnitValueInjection.of(integers, floats, booleans);
@@ -369,26 +539,62 @@ public class UnitModelValueInjectionService {
     }
 
     private void applyIntegerValues(UnitModel unit, IntegerValueInjection values) {
-        if (values.moveValue != null) unit.setMoveValue(unit.getMoveValue() + values.moveValue);
-        if (values.productionValue != null) unit.setProductionValue(unit.getProductionValue() + values.productionValue);
-        if (values.capacityValue != null) unit.setCapacityValue(unit.getCapacityValue() + values.capacityValue);
+        if (values.moveValue != null)
+            unit.setMoveValue(
+                    inject(unit.getMoveValue(), values.moveValue, values.overrides.contains(Value.MOVE_VALUE)));
+        if (values.productionValue != null)
+            unit.setProductionValue(inject(
+                    unit.getProductionValue(),
+                    values.productionValue,
+                    values.overrides.contains(Value.PRODUCTION_VALUE)));
+        if (values.capacityValue != null)
+            unit.setCapacityValue(inject(
+                    unit.getCapacityValue(), values.capacityValue, values.overrides.contains(Value.CAPACITY_VALUE)));
         if (values.fleetSupplyBonus != null)
-            unit.setFleetSupplyBonus(unit.getFleetSupplyBonus() + values.fleetSupplyBonus);
-        if (values.capacityUsed != null) unit.setCapacityUsed(unit.getCapacityUsed() + values.capacityUsed);
-        if (values.combatHitsOn != null) unit.setCombatHitsOn(unit.getCombatHitsOn() + values.combatHitsOn);
-        if (values.combatDieCount != null) unit.setCombatDieCount(unit.getCombatDieCount() + values.combatDieCount);
-        if (values.afbHitsOn != null) unit.setAfbHitsOn(unit.getAfbHitsOn() + values.afbHitsOn);
-        if (values.afbDieCount != null) unit.setAfbDieCount(unit.getAfbDieCount() + values.afbDieCount);
-        if (values.bombardHitsOn != null) unit.setBombardHitsOn(unit.getBombardHitsOn() + values.bombardHitsOn);
-        if (values.bombardDieCount != null) unit.setBombardDieCount(unit.getBombardDieCount() + values.bombardDieCount);
+            unit.setFleetSupplyBonus(inject(
+                    unit.getFleetSupplyBonus(),
+                    values.fleetSupplyBonus,
+                    values.overrides.contains(Value.FLEET_SUPPLY_BONUS)));
+        if (values.capacityUsed != null)
+            unit.setCapacityUsed(inject(
+                    unit.getCapacityUsed(), values.capacityUsed, values.overrides.contains(Value.CAPACITY_USED)));
+        if (values.combatHitsOn != null)
+            unit.setCombatHitsOn(inject(
+                    unit.getCombatHitsOn(), values.combatHitsOn, values.overrides.contains(Value.COMBAT_HITS_ON)));
+        if (values.combatDieCount != null)
+            unit.setCombatDieCount(inject(
+                    unit.getCombatDieCount(),
+                    values.combatDieCount,
+                    values.overrides.contains(Value.COMBAT_DIE_COUNT)));
+        if (values.afbHitsOn != null)
+            unit.setAfbHitsOn(
+                    inject(unit.getAfbHitsOn(), values.afbHitsOn, values.overrides.contains(Value.AFB_HITS_ON)));
+        if (values.afbDieCount != null)
+            unit.setAfbDieCount(
+                    inject(unit.getAfbDieCount(), values.afbDieCount, values.overrides.contains(Value.AFB_DIE_COUNT)));
+        if (values.bombardHitsOn != null)
+            unit.setBombardHitsOn(inject(
+                    unit.getBombardHitsOn(), values.bombardHitsOn, values.overrides.contains(Value.BOMBARD_HITS_ON)));
+        if (values.bombardDieCount != null)
+            unit.setBombardDieCount(inject(
+                    unit.getBombardDieCount(),
+                    values.bombardDieCount,
+                    values.overrides.contains(Value.BOMBARD_DIE_COUNT)));
         if (values.spaceCannonHitsOn != null)
-            unit.setSpaceCannonHitsOn(unit.getSpaceCannonHitsOn() + values.spaceCannonHitsOn);
+            unit.setSpaceCannonHitsOn(inject(
+                    unit.getSpaceCannonHitsOn(),
+                    values.spaceCannonHitsOn,
+                    values.overrides.contains(Value.SPACE_CANNON_HITS_ON)));
         if (values.spaceCannonDieCount != null)
-            unit.setSpaceCannonDieCount(unit.getSpaceCannonDieCount() + values.spaceCannonDieCount);
+            unit.setSpaceCannonDieCount(inject(
+                    unit.getSpaceCannonDieCount(),
+                    values.spaceCannonDieCount,
+                    values.overrides.contains(Value.SPACE_CANNON_DIE_COUNT)));
     }
 
     private void applyFloatValues(UnitModel unit, FloatValueInjection values) {
-        if (values.cost != null) unit.setCost(unit.getCost() + values.cost);
+        if (values.cost != null)
+            unit.setCost(inject(unit.getCost(), values.cost, values.overrides.contains(Value.COST)));
     }
 
     private void applyBooleanValues(UnitModel unit, BooleanValueInjection values) {
@@ -421,6 +627,31 @@ public class UnitModelValueInjectionService {
             }
         }
         return copy;
+    }
+
+    private int inject(int currentValue, int injectedValue, boolean override) {
+        return override ? injectedValue : currentValue + injectedValue;
+    }
+
+    private float inject(float currentValue, float injectedValue, boolean override) {
+        return override ? injectedValue : currentValue + injectedValue;
+    }
+
+    private enum Value {
+        MOVE_VALUE,
+        PRODUCTION_VALUE,
+        CAPACITY_VALUE,
+        FLEET_SUPPLY_BONUS,
+        CAPACITY_USED,
+        COMBAT_HITS_ON,
+        COMBAT_DIE_COUNT,
+        AFB_HITS_ON,
+        AFB_DIE_COUNT,
+        BOMBARD_HITS_ON,
+        BOMBARD_DIE_COUNT,
+        SPACE_CANNON_HITS_ON,
+        SPACE_CANNON_DIE_COUNT,
+        COST
     }
 
     public record UnitValueInjection(
@@ -461,6 +692,7 @@ public class UnitModelValueInjectionService {
     }
 
     public static final class IntegerValueInjection {
+        private final Set<Value> overrides = EnumSet.noneOf(Value.class);
         private Integer moveValue;
         private Integer productionValue;
         private Integer capacityValue;
@@ -490,9 +722,17 @@ public class UnitModelValueInjectionService {
             return this;
         }
 
+        public IntegerValueInjection moveValue(int moveValue, boolean override) {
+            return moveValue(moveValue).override(Value.MOVE_VALUE, override);
+        }
+
         public IntegerValueInjection productionValue(int productionValue) {
             this.productionValue = productionValue;
             return this;
+        }
+
+        public IntegerValueInjection productionValue(int productionValue, boolean override) {
+            return productionValue(productionValue).override(Value.PRODUCTION_VALUE, override);
         }
 
         public IntegerValueInjection capacityValue(int capacityValue) {
@@ -500,9 +740,17 @@ public class UnitModelValueInjectionService {
             return this;
         }
 
+        public IntegerValueInjection capacityValue(int capacityValue, boolean override) {
+            return capacityValue(capacityValue).override(Value.CAPACITY_VALUE, override);
+        }
+
         public IntegerValueInjection fleetSupplyBonus(int fleetSupplyBonus) {
             this.fleetSupplyBonus = fleetSupplyBonus;
             return this;
+        }
+
+        public IntegerValueInjection fleetSupplyBonus(int fleetSupplyBonus, boolean override) {
+            return fleetSupplyBonus(fleetSupplyBonus).override(Value.FLEET_SUPPLY_BONUS, override);
         }
 
         public IntegerValueInjection capacityUsed(int capacityUsed) {
@@ -510,9 +758,17 @@ public class UnitModelValueInjectionService {
             return this;
         }
 
+        public IntegerValueInjection capacityUsed(int capacityUsed, boolean override) {
+            return capacityUsed(capacityUsed).override(Value.CAPACITY_USED, override);
+        }
+
         public IntegerValueInjection combatHitsOn(int combatHitsOn) {
             this.combatHitsOn = combatHitsOn;
             return this;
+        }
+
+        public IntegerValueInjection combatHitsOn(int combatHitsOn, boolean override) {
+            return combatHitsOn(combatHitsOn).override(Value.COMBAT_HITS_ON, override);
         }
 
         public IntegerValueInjection combatDieCount(int combatDieCount) {
@@ -520,9 +776,17 @@ public class UnitModelValueInjectionService {
             return this;
         }
 
+        public IntegerValueInjection combatDieCount(int combatDieCount, boolean override) {
+            return combatDieCount(combatDieCount).override(Value.COMBAT_DIE_COUNT, override);
+        }
+
         public IntegerValueInjection afbHitsOn(int afbHitsOn) {
             this.afbHitsOn = afbHitsOn;
             return this;
+        }
+
+        public IntegerValueInjection afbHitsOn(int afbHitsOn, boolean override) {
+            return afbHitsOn(afbHitsOn).override(Value.AFB_HITS_ON, override);
         }
 
         public IntegerValueInjection afbDieCount(int afbDieCount) {
@@ -530,9 +794,17 @@ public class UnitModelValueInjectionService {
             return this;
         }
 
+        public IntegerValueInjection afbDieCount(int afbDieCount, boolean override) {
+            return afbDieCount(afbDieCount).override(Value.AFB_DIE_COUNT, override);
+        }
+
         public IntegerValueInjection bombardHitsOn(int bombardHitsOn) {
             this.bombardHitsOn = bombardHitsOn;
             return this;
+        }
+
+        public IntegerValueInjection bombardHitsOn(int bombardHitsOn, boolean override) {
+            return bombardHitsOn(bombardHitsOn).override(Value.BOMBARD_HITS_ON, override);
         }
 
         public IntegerValueInjection bombardDieCount(int bombardDieCount) {
@@ -540,13 +812,34 @@ public class UnitModelValueInjectionService {
             return this;
         }
 
+        public IntegerValueInjection bombardDieCount(int bombardDieCount, boolean override) {
+            return bombardDieCount(bombardDieCount).override(Value.BOMBARD_DIE_COUNT, override);
+        }
+
         public IntegerValueInjection spaceCannonHitsOn(int spaceCannonHitsOn) {
             this.spaceCannonHitsOn = spaceCannonHitsOn;
             return this;
         }
 
+        public IntegerValueInjection spaceCannonHitsOn(int spaceCannonHitsOn, boolean override) {
+            return spaceCannonHitsOn(spaceCannonHitsOn).override(Value.SPACE_CANNON_HITS_ON, override);
+        }
+
         public IntegerValueInjection spaceCannonDieCount(int spaceCannonDieCount) {
             this.spaceCannonDieCount = spaceCannonDieCount;
+            return this;
+        }
+
+        public IntegerValueInjection spaceCannonDieCount(int spaceCannonDieCount, boolean override) {
+            return spaceCannonDieCount(spaceCannonDieCount).override(Value.SPACE_CANNON_DIE_COUNT, override);
+        }
+
+        private IntegerValueInjection override(Value value, boolean override) {
+            if (override) {
+                overrides.add(value);
+            } else {
+                overrides.remove(value);
+            }
             return this;
         }
 
@@ -568,6 +861,7 @@ public class UnitModelValueInjectionService {
     }
 
     public static final class FloatValueInjection {
+        private final Set<Value> overrides = EnumSet.noneOf(Value.class);
         private Float cost;
 
         private FloatValueInjection() {}
@@ -582,6 +876,16 @@ public class UnitModelValueInjectionService {
 
         public FloatValueInjection cost(float cost) {
             this.cost = cost;
+            return this;
+        }
+
+        public FloatValueInjection cost(float cost, boolean override) {
+            this.cost = cost;
+            if (override) {
+                overrides.add(Value.COST);
+            } else {
+                overrides.remove(Value.COST);
+            }
             return this;
         }
 

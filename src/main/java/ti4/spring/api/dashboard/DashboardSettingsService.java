@@ -42,11 +42,11 @@ class DashboardSettingsService {
             Set.of("Dislike Space Risk More", "Dislike Boat Float More", "No Strong Feelings", "No Preference");
     private static final Set<String> ALLOWED_SANDBAG_PREFS = Set.of("bot", "manual", "No Preference");
 
-    DashboardSettingsResponse getSettings(String userId) {
+    static DashboardSettingsResponse getSettings(String userId) {
         return DashboardSettingsResponse.from(UserSettingsManager.get(userId));
     }
 
-    DashboardSettingsResponse updateSettings(String userId, DashboardSettingsUpdateRequest request) {
+    static DashboardSettingsResponse updateSettings(String userId, DashboardSettingsUpdateRequest request) {
         UserSettings settings = UserSettingsManager.get(userId);
 
         if (request.preferredColors() != null) {

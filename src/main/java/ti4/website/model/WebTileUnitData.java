@@ -325,7 +325,9 @@ public final class WebTileUnitData {
                 "aurelionstation",
                 "innersanctum",
                 "fabricatestation",
-                "seraphdatacenter");
+                "seraphdatacenter",
+                "mobilemountain",
+                "gedustation");
 
         Map<String, Planet> planetsInfo = game.getPlanetsInfo();
 

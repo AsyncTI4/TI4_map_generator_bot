@@ -115,11 +115,11 @@ class PrivateersAcd2ButtonHandler {
             int count = space.getUnitCount(type, player);
             if (count > 0) {
                 RemoveUnitService.removeUnit(event, tile, game, player, space, type, count);
-                if (neutralUnits.length() > 0) neutralUnits.append(", ");
+                if (!neutralUnits.isEmpty()) neutralUnits.append(", ");
                 neutralUnits.append(count).append(" ").append(type.value);
             }
         }
-        if (neutralUnits.length() > 0) {
+        if (!neutralUnits.isEmpty()) {
             AddUnitService.addUnits(event, tile, game, game.getNeutralColor(), neutralUnits.toString());
         }
 

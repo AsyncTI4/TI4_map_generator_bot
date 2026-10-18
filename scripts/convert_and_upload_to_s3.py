@@ -70,7 +70,7 @@ def compute_local_md5(file_path):
         return None
 
 
-def get_all_s3_keys(s3_client, bucket_name, prefix="", with_etags=False):
+def get_all_s3_keys(s3_client, bucket_name, prefix="", with_etags=False, with_sizes=False):
     """Fetch all S3 keys from the bucket.
 
     Args:
@@ -78,12 +78,13 @@ def get_all_s3_keys(s3_client, bucket_name, prefix="", with_etags=False):
         bucket_name: S3 bucket name
         prefix: Optional key prefix to filter results
         with_etags: If True, return dict with ETags; if False, return set of keys only
+        with_sizes: If True, return dict with object sizes
 
     Returns:
         dict or set: If with_etags=True, returns dict mapping S3 key to ETag (MD5 hash without quotes).
                      If with_etags=False, returns set of S3 keys only.
     """
-    all_keys = {} if with_etags else set()
+    all_keys = {} if with_etags or with_sizes else set()
     continuation_token = None
 
     try:
@@ -100,7 +101,9 @@ def get_all_s3_keys(s3_client, bucket_name, prefix="", with_etags=False):
 
             if "Contents" in response:
                 for obj in response["Contents"]:
-                    if with_etags:
+                    if with_sizes:
+                        all_keys[obj["Key"]] = obj["Size"]
+                    elif with_etags:
                         # Store key with its ETag (strip quotes from ETag)
                         etag = obj.get("ETag", "").strip('"')
                         all_keys[obj["Key"]] = etag
@@ -177,7 +180,7 @@ def convert_image_to_webp(source_file, dest_file):
 
 
 def _process_single_image(
-    source_file, dest_root, relative_path, s3_key, existing_s3_keys, check_hash=False
+    source_file, dest_root, relative_path, s3_key, existing_s3_keys, check_hash=False, check_size=False
 ):
     """Process a single image file: convert/copy and check if upload is needed.
 
@@ -197,7 +200,7 @@ def _process_single_image(
             "error" - processing failed
     """
     # Default mode: just check if file exists in S3 by key
-    if not check_hash:
+    if not check_hash and not check_size:
         if s3_key in existing_s3_keys:
             logger.info(f"[SKIP CONVERT] Already in S3: {s3_key}")
             return "skipped", None, True
@@ -220,6 +223,14 @@ def _process_single_image(
         if not convert_image_to_webp(source_file, dest_file):
             return "error", None, False
         action = "converted"
+
+    if check_size and s3_key in existing_s3_keys:
+        if dest_file.stat().st_size == existing_s3_keys[s3_key]:
+            logger.info(f"[SKIP] Size matches S3: {s3_key}")
+            return "skipped", None, True
+        logger.info(f"[UPDATE] Size differs, will re-upload: {s3_key}")
+        logger.info(f"  {action.upper()} {source_file.name} -> {dest_filename}")
+        return action, dest_file, True
 
     # Hash checking mode: compare file contents
     if check_hash and s3_key in existing_s3_keys:
@@ -306,7 +317,7 @@ def _concurrent_upload_batch(
     return uploaded_count, error_count
 
 
-def scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, prefix="", check_hash=False):
+def scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, prefix="", check_hash=False, check_size=False):
     _log_header("STAGE 1: SCANNING AND CONVERTING IMAGES")
 
     files_to_upload = []
@@ -326,7 +337,7 @@ def scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, prefix="", c
 
         # Process the image
         action, dest_file, success = _process_single_image(
-            source_file, dest_root, relative_path, s3_key, existing_s3_keys, check_hash
+            source_file, dest_root, relative_path, s3_key, existing_s3_keys, check_hash, check_size
         )
 
         # Update statistics and upload list
@@ -336,7 +347,7 @@ def scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, prefix="", c
         else:
             stats["skipped" if action == "skipped" else "errors"] += 1
 
-    skip_reason = "hash matches S3" if check_hash else "already in S3"
+    skip_reason = "size matches S3" if check_size else "hash matches S3" if check_hash else "already in S3"
     _log_summary(
         "CONVERSION SUMMARY:",
         {
@@ -366,7 +377,7 @@ def upload_images(s3_client, files_to_upload, bucket_name):
 
 
 def scan_and_upload_directory(
-    s3_client, source_dir, bucket_name, existing_s3_keys, prefix="", check_hash=False, force_upload=False
+    s3_client, source_dir, bucket_name, existing_s3_keys, prefix="", check_hash=False, check_size=False, force_upload=False
 ):
     """Scan directory and upload files.
 
@@ -408,6 +419,15 @@ def scan_and_upload_directory(
 
         # Default mode: skip only if exists
         if not check_hash:
+            if check_size:
+                if s3_key in existing_s3_keys and local_file.stat().st_size == existing_s3_keys[s3_key]:
+                    logger.info(f"[SKIP] Size matches S3: {s3_key}")
+                    skipped_count += 1
+                    continue
+                if s3_key in existing_s3_keys:
+                    logger.info(f"[UPDATE] Size differs, will re-upload: {s3_key}")
+                files_to_upload.append((local_file, s3_key))
+                continue
             if s3_key in existing_s3_keys:
                 logger.info(f"[SKIP] Already in S3: {s3_key}")
                 skipped_count += 1
@@ -464,10 +484,16 @@ def main():
         "--dest-dir",
         help="Destination directory for WebP conversion/copying (default: src/main/webp)",
     )
-    parser.add_argument(
+    change_check_group = parser.add_mutually_exclusive_group()
+    change_check_group.add_argument(
         "--check-hash",
         action="store_true",
         help="Enable hash checking to detect file changes (default: only check filename existence)",
+    )
+    change_check_group.add_argument(
+        "--check-size",
+        action="store_true",
+        help="Re-upload files when their size differs from the existing S3 object",
     )
 
     args = parser.parse_args()
@@ -488,7 +514,7 @@ def main():
     logger.info(f"S3 bucket: {args.bucket}")
     if args.prefix:
         logger.info(f"S3 prefix: {args.prefix}")
-    logger.info(f"Hash checking: {'enabled' if args.check_hash else 'disabled (filename only)'}")
+    logger.info(f"Change checking: {'size' if args.check_size else 'hash' if args.check_hash else 'disabled (filename only)'}")
 
     try:
         # Initialize S3 client
@@ -503,12 +529,16 @@ def main():
 
         # Fetch existing S3 keys (with or without ETags based on check_hash flag)
         logger.info("Fetching existing S3 objects...")
-        existing_s3_keys = get_all_s3_keys(s3_client, args.bucket, args.prefix, args.check_hash)
+        existing_s3_keys = get_all_s3_keys(
+            s3_client, args.bucket, args.prefix, args.check_hash, args.check_size
+        )
         logger.info(f"Found {len(existing_s3_keys)} existing objects in S3")
 
         # Scan local images and convert only new ones
         files_to_upload, converted, copied, skipped_conv, conv_errors = (
-            scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, args.prefix, args.check_hash)
+            scan_and_convert_images(
+                source_dir, dest_dir, existing_s3_keys, args.prefix, args.check_hash, args.check_size
+            )
         )
 
         if conv_errors > 0:

@@ -29,6 +29,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnos
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionTargetingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
+import ti4.discord.interactions.buttons.handlers.faction.base.yin.YinImpulseCoreButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
@@ -36,31 +37,45 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaPnHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.ToldarTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiFlagshipHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
+import ti4.discord.utility.DiscordThreadUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -94,6 +109,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.planet.JotunheimLegendaryService;
 import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -212,6 +228,8 @@ public class StartCombatService {
             Tile tile,
             GenericInteractionCreateEvent event,
             String specialCombatTitle) {
+        ScrapyardLeaderHandler.clearCommanderModifiers(game);
+        XinCommanderHandler.beginCombat(game, tile, Constants.SPACE);
         if (CombatContestSettings.isEnabledStatic()) {
             SpringContext.getBean(CombatReplayService.class).onSpaceCombatStarted(game, player, player2, tile);
         }
@@ -261,6 +279,9 @@ public class StartCombatService {
             GenericInteractionCreateEvent event,
             UnitHolder unitHolder,
             Tile tile) {
+        XinTechHandler.offerAstromanticCloakStarButtons(game, player, unitHolder, unitHolder.getName());
+        ScrapyardLeaderHandler.clearCommanderModifiers(game);
+        XinCommanderHandler.beginCombat(game, tile, unitHolder.getName());
         String threadName = combatThreadName(game, player, player2, tile, null);
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
@@ -364,6 +385,7 @@ public class StartCombatService {
         PonthousUnitHandler.clearOldGlorySustain(game);
         PonthousPromissoryHandler.clearThunderbirdPrototype(game);
         PonthousTechHandler.clearThunderbirdProtocol(game);
+        VanguardLeadersHandler.clearCommanderState(game);
         game.setStoredValue("factionsInCombat", player1.getFaction() + "_" + player2.getFaction());
 
         sendStartOfCombatSecretMessages(game, player1, player2, tile, spaceOrGround, unitHolderName);
@@ -387,6 +409,12 @@ public class StartCombatService {
                         player2.getRepresentation()
                                 + ", the bot thinks you have started a combat. If you lose this combat, press the button below to unlock _Vorun Kael_:",
                         AeternaLeadersHandler.offerAeternaCommanderUnlockButton(player2));
+            }
+            if ("ground".equalsIgnoreCase(spaceOrGround)) {
+                offerVanguardCommanderUnlock(player1);
+                offerVanguardCommanderUnlock(player2);
+                VanguardBreakthroughHandler.offerTrainingDummiesGroundCombatReward(player1);
+                VanguardBreakthroughHandler.offerTrainingDummiesGroundCombatReward(player2);
             }
         }
 
@@ -452,6 +480,18 @@ public class StartCombatService {
         CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
     }
 
+    private static void offerVanguardCommanderUnlock(Player player) {
+        Button unlockButton = VanguardLeadersHandler.getCommanderUnlockButton(player);
+        if (unlockButton == null) {
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButton(
+                player.getCardsInfoThread(),
+                player.getRepresentation()
+                        + ", if you win this ground combat, press the button below to unlock _Shieldbrother Michael_:",
+                unlockButton);
+    }
+
     private static void initializeCombatThread(
             ThreadChannel threadChannel,
             Game game,
@@ -491,7 +531,7 @@ public class StartCombatService {
                 amount++;
             }
         }
-        if (CombatContestSettings.isEnabledStatic() && (amount > 2 || tile.getNumberOfUnitsInSystem() > 2)) {
+        if (amount > 2 || tile.getNumberOfUnitsInSystem() > 2) {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
                     ButtonHelper.getCombatTileSummaryMessage(
@@ -643,6 +683,26 @@ public class StartCombatService {
             }
         }
 
+        if (isGroundCombat) {
+            UnitHolder combatPlanet = tile.getUnitHolders().get(unitHolderName);
+            sendDaxciveAnimatorsStartGroundCombatButton(event, player1, unitHolderName, game);
+            sendDaxciveAnimatorsStartGroundCombatButton(event, player2, unitHolderName, game);
+            if (player1.hasUnit("ponthous_mech")
+                    && combatPlanet != null
+                    && combatPlanet.getUnitKeysForPlayer(player1).stream()
+                            .map(player1::getUnitFromUnitKey)
+                            .anyMatch(unit -> unit != null && "ponthous_mech".equals(unit.getId()))) {
+                PonthousUnitHandler.offerDragoonsReminder(threadChannel, player1);
+            }
+            if (player2.hasUnit("ponthous_mech")
+                    && combatPlanet != null
+                    && combatPlanet.getUnitKeysForPlayer(player2).stream()
+                            .map(player2::getUnitFromUnitKey)
+                            .anyMatch(unit -> unit != null && "ponthous_mech".equals(unit.getId()))) {
+                PonthousUnitHandler.offerDragoonsReminder(threadChannel, player2);
+            }
+        }
+
         if (isGroundCombat && !game.isFowMode()) {
             List<Button> autoButtons = new ArrayList<>();
             boolean thalnos = false;
@@ -771,6 +831,20 @@ public class StartCombatService {
                     threadChannel,
                     player1.getRepresentation()
                             + ", you are affected by the Quietus (the Rebellion flagship), and your units will have lost all unit abilities.");
+        }
+        if (player1.hasUnlockedBreakthrough("qhetbt") && isGroundCombat) {
+            MessageHelper.sendMessageToChannel(
+                    threadChannel,
+                    player1.getRepresentation()
+                            + ", a reminder that you have _Duranium Outfitting_, and as such, one of your plastic-piece infantry may use sustain damage during this combat."
+                            + "\n-# This is not automated, just cancel 1 hit and keep track of if it has been used or not.");
+        }
+        if (player2.hasUnlockedBreakthrough("qhetbt") && isGroundCombat) {
+            MessageHelper.sendMessageToChannel(
+                    threadChannel,
+                    player2.getRepresentation()
+                            + ", a reminder that you have _Duranium Outfitting_, and as such, one of your plastic-piece infantry may use sustain damage during this combat."
+                            + "\n-# This is not automated, just cancel 1 hit and keep track of if it has been used or not.");
         }
 
         if (tile.isHomeSystem(game)
@@ -906,6 +980,13 @@ public class StartCombatService {
                                     + " due to the ability of the Quetzecoatl (the Argent flagship).");
                 }
             }
+            if (JotunheimLegendaryService.isActive(game, activePlayer)) {
+                MessageHelper.sendMessageToChannel(
+                        threadChannel,
+                        "Reminder that you cannot use SPACE CANNON against the ships of "
+                                + activePlayer.getFactionEmojiOrColor()
+                                + " due to _Hrungnir's Husk_ (Jotunheim).");
+            }
             if (game.isOrdinianC1Mode()
                     && (tile.getSpaceUnitHolder().getTokenList().contains("token_custc1.png")
                             || tile.getSpaceUnitHolder().getTokenList().contains("token_custvpc1.png"))) {
@@ -924,6 +1005,20 @@ public class StartCombatService {
             MessageHelper.sendMessageToChannelWithButtons(
                     threadChannel, "Buttons for start of space combat abilities.", startOfSpaceCombatButtons);
         }
+    }
+
+    private static void sendDaxciveAnimatorsStartGroundCombatButton(
+            GenericInteractionCreateEvent event, Player player, String planet, Game game) {
+        if (!player.hasTech("dxa_br") || !player.hasTechReady("dxa_br")) {
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButton(
+                game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
+                player.getRepresentation()
+                        + ", you may exhaust _Daxcive Animators_ to place 1 infantry at the start of combat.",
+                Buttons.green(
+                        player.factionButtonChecker() + "dxaBrStartGroundCombat_" + planet,
+                        Helper.getPlanetRepresentation(planet, game)));
     }
 
     private static void sendStartOfCombatSecretMessages(
@@ -1011,6 +1106,24 @@ public class StartCombatService {
 
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
+            if (player.hasTech("thvanguardy")
+                    && game.getStoredValue("vanguardReinforce" + player.getFaction())
+                            .isEmpty()
+                    && !game.getActiveSystem().isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentation()
+                                + ", if you win this combat, you must use _Reinforce_ to give the active system PRODUCTION 3 until the end of this action.",
+                        List.of(
+                                Buttons.green(
+                                        player.factionButtonChecker() + "useVanguardReinforce",
+                                        "Use Reinforce (On Win)",
+                                        FactionEmojis.vanguard),
+                                Buttons.red("deleteButtons", "Decline")));
+            }
+            if (!"space".equalsIgnoreCase(type) && player.hasAbility("enhanced_fundamentals") && player.getTg() >= 2) {
+                VanguardAbilitiesHandler.sendFundamentalsButton(player);
+            }
             int capitalShips = ButtonHelper.checkFleetAndCapacity(player, game, tile, true, true)[0];
             if ("space".equalsIgnoreCase(type) && player.getSecretsUnscored().containsKey("dyp") && capitalShips >= 3) {
                 MessageHelper.sendMessageToChannel(
@@ -1028,7 +1141,13 @@ public class StartCombatService {
             if (!"mentak".equalsIgnoreCase(player.getFaction())) {
                 mentakOpponent = player;
             }
-
+            if (player.getPromissoryNotesInPlayArea().contains("dspnsarc")) {
+                MessageHelper.sendMessageToChannelWithButton(
+                        player.getCardsInfoThread(),
+                        player.getRepresentation()
+                                + ", a reminder that if you win this combat, you may give _Plunderers_ to your opponent to take up to 2 trade goods or commodities from them.",
+                        SarcosaPnHandler.offerPlunderersButton(player, otherPlayer));
+            }
             if ((player.hasAbility("primacy")
                             || player.hasAbility("edict")
                             || player.hasAbility("edict_y")
@@ -1065,10 +1184,11 @@ public class StartCombatService {
             if ("space".equalsIgnoreCase(type) && player.hasUnexhaustedLeader("kaloraagent")) {
                 KaloraLeaderHandler.offerKaloraAgentButtons(player, msg);
             }
-            if ("space".equalsIgnoreCase(type) && ButtonHelper.doesPlayerHaveFSHere("onyxxa_flagship", player, tile)) {
+            if ("space".equalsIgnoreCase(type) && OnyxxaUnitHandler.isFlagshipInOrAdjacentSystem(game, player, tile)) {
                 OnyxxaUnitHandler.offerFlagshipWinButton(player, msg);
             }
-            if ("space".equalsIgnoreCase(type) && game.playerHasLeaderUnlockedOrAlliance(player, "arvaxicommander")) {
+            if (player.hasLeader("arvaxicommander")
+                    || game.playerHasLeaderUnlockedOrAlliance(player, "arvaxicommander")) {
                 ArvaxiLeaderHandler.sendCombatButtons(player, otherPlayer, game, msg);
             }
             if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {
@@ -1288,6 +1408,33 @@ public class StartCombatService {
                         msg + ", a reminder that if you lose this combat, you ready Mobius Spike, Belkosea Hero.",
                         buttons);
             }
+            if ("space".equalsIgnoreCase(type)
+                    && player.ownsUnit("sarcosa_destroyer")
+                    && ButtonHelper.doesPlayerHaveUnitHere("sarcosa_destroyer", player, tile)
+                    && (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dd", true) < player.getUnitCap("dd"))) {
+                buttons = new ArrayList<>();
+                buttons.add(SarcosaUnitHandler.offerRavagerDeploy(player, tile));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        msg
+                                + ", a reminder that if you win this combat, you may deploy one of your _Ravagers_ in the active system.",
+                        buttons);
+            }
+            if ("space".equalsIgnoreCase(type)
+                    && player.hasTech("dssarcdd")
+                    && ButtonHelper.doesPlayerHaveUnitHere("sarcosa_destroyer2", player, tile)
+                    && otherPlayer.getTg() > 0) {
+                int ravagerIIs = SarcosaUnitHandler.getRavagerIICount(player, tile);
+                buttons = new ArrayList<>();
+                buttons.add(SarcosaUnitHandler.sendRavagerTGSteal(player, otherPlayer, tile));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        msg
+                                + ", a reminder that if you win this combat, take up to 1 trade good from them for each of your "
+                                + ravagerIIs
+                                + " _Ravager II_ units in this system.",
+                        buttons);
+            }
             if (player.getLeaderIDs().contains("kortalicommander") && !player.hasLeaderUnlocked("kortalicommander")) {
                 buttons = new ArrayList<>();
                 buttons.add(
@@ -1297,6 +1444,18 @@ public class StartCombatService {
                         msg
                                 + ", a reminder that if you destroy all of the opponent's units in this system, you may use the button to unlock Queen Lorena, "
                                 + "the Kortali commander.",
+                        buttons);
+            }
+            if (!"space".equalsIgnoreCase(type) && player.hasTech("dxa_br") && !player.hasTechReady("dxa_br")) {
+                buttons = new ArrayList<>();
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + "biostimsReady_tech_dxa_br",
+                        "Ready Daxcive Animators",
+                        TechEmojis.BioticTech));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentation()
+                                + ", a reminder that you have _Daxcive Animators_ exhausted, and may ready it if you win this ground combat.",
                         buttons);
             }
         }
@@ -1499,6 +1658,11 @@ public class StartCombatService {
         Button thunderbirdProtocolP2 = PonthousTechHandler.getThunderbirdProtocolButton(game, p2, tile);
         if (thunderbirdProtocolP2 != null) buttons.add(thunderbirdProtocolP2);
 
+        Button impulseCoreP1 = YinImpulseCoreButtonHandler.getImpulseCoreButton(p1, tile);
+        if (impulseCoreP1 != null) buttons.add(impulseCoreP1);
+        Button impulseCoreP2 = YinImpulseCoreButtonHandler.getImpulseCoreButton(p2, tile);
+        if (impulseCoreP2 != null) buttons.add(impulseCoreP2);
+
         // Aeterna Hero
         if (!tile.isHomeSystem() && p1.hasLeaderUnlocked("aeternahero")) {
             buttons.add(AeternaLeadersHandler.getGravecallButton(game, p1, tile));
@@ -1556,6 +1720,12 @@ public class StartCombatService {
             String unitHolderName,
             GenericInteractionCreateEvent event) {
         List<Button> buttons = getGeneralCombatButtons(game, tile.getPosition(), player1, player2, spaceOrGround);
+        ScrapyardLeaderHandler.addCommanderButton(buttons, game, player1, tile, unitHolderName);
+        ScrapyardLeaderHandler.addCommanderButton(buttons, game, player2, tile, unitHolderName);
+        ScrapyardUnitHandler.addDregCombatButton(buttons, game, player1, player2, tile, "space".equals(spaceOrGround));
+        ScrapyardUnitHandler.addDregCombatButton(buttons, game, player2, player1, tile, "space".equals(spaceOrGround));
+        RevenantLeadersHandler.addRevThronesHeroButton(buttons, game, player1, player2, tile, unitHolderName);
+        RevenantLeadersHandler.addRevThronesHeroButton(buttons, game, player2, player1, tile, unitHolderName);
         if ("ground".equalsIgnoreCase(spaceOrGround)) {
             TwilightsFallMonumentsButtonHandler.addGreenTfMonumentButtons(buttons, game, tile, unitHolderName);
             TwilightsFallMonumentsButtonHandler.addRedTfMonumentButtons(buttons, game, tile, unitHolderName);
@@ -1571,7 +1741,27 @@ public class StartCombatService {
         List<Button> buttons = new ArrayList<>();
         UnitHolder space = tile.getUnitHolders().get("space");
         boolean isSpaceCombat = "space".equalsIgnoreCase(groundOrSpace);
+        CurrentCombat currentCombat = getCurrentCombat(game);
+        UnitHolder combatHolder = isSpaceCombat
+                ? space
+                : currentCombat != null
+                                && pos.equals(currentCombat.tilePosition())
+                                && currentCombat.unitHolderName() != null
+                        ? tile.getUnitHolders().get(currentCombat.unitHolderName())
+                        : null;
+        UydaiFlagshipHandler.addCombatButton(buttons, game, tile, combatHolder, p1, p2, 0);
         boolean isGroundCombat = "ground".equalsIgnoreCase(groundOrSpace);
+
+        String commanderUnitHolder = isSpaceCombat ? Constants.SPACE : null;
+        if (commanderUnitHolder == null && currentCombat != null && pos.equals(currentCombat.tilePosition())) {
+            commanderUnitHolder = currentCombat.unitHolderName();
+        }
+        if (commanderUnitHolder != null && tile.getUnitHolders().containsKey(commanderUnitHolder)) {
+            ScrapyardLeaderHandler.addCommanderButton(buttons, game, p1, tile, commanderUnitHolder);
+            ScrapyardLeaderHandler.addCommanderButton(buttons, game, p2, tile, commanderUnitHolder);
+            XinCommanderHandler.addCommanderButton(buttons, game, p1, tile, commanderUnitHolder);
+            XinCommanderHandler.addCommanderButton(buttons, game, p2, tile, commanderUnitHolder);
+        }
 
         if (isSpaceCombat) {
             WhiteTfUnitHandler.addFlagshipButton(buttons, game, p1, p2, tile);
@@ -1581,8 +1771,13 @@ public class StartCombatService {
         if (isGroundCombat) {
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p1, tile);
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p2, tile);
+            XinUnitHandler.addSentinelRepairButton(buttons, p1, tile, combatHolder);
+            XinUnitHandler.addSentinelRepairButton(buttons, p2, tile, combatHolder);
         }
-
+        if (isGroundCombat) {
+            ThurvialiBreakthroughHandler.addNeurograftingReadyButtons(buttons, p1);
+            ThurvialiBreakthroughHandler.addNeurograftingReadyButtons(buttons, p2);
+        }
         if ("justPicture".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Buttons.blue(
                     "refreshViewOfSystem_" + pos + "_" + p1.getFaction() + "_" + p2.getFaction() + "_" + groundOrSpace,
@@ -2039,14 +2234,14 @@ public class StartCombatService {
             }
         }
 
-        if (p2.hasRelicReady("superweaponcaled") && !game.isFowMode()) {
+        if (p2.hasRelicReady("superweaponcaled") && ButtonHelperAbilities.canUseCaled(game, p2) && !game.isFowMode()) {
             String factionChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(
                     factionChecker + "exhaustSuperweapon_caled_" + tile.getPosition(),
                     "Destroy 1 Ship With Caled",
                     FactionEmojis.belkosea));
         }
-        if (p1.hasRelicReady("superweaponcaled")) {
+        if (p1.hasRelicReady("superweaponcaled") && ButtonHelperAbilities.canUseCaled(game, p1)) {
             String factionChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(
                     factionChecker + "exhaustSuperweapon_caled_" + tile.getPosition(),
@@ -2105,14 +2300,10 @@ public class StartCombatService {
                     Buttons.gray(factionChecker + "munitionsReserves", "Use Munitions Reserves", FactionEmojis.Letnev));
         }
 
-        if (p2.hasTech("dstoldr") && !game.isFowMode()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Buttons.gray(factionChecker + "virTraining", "Use V.I.R. Training", FactionEmojis.toldar));
+        if (!game.isFowMode()) {
+            ToldarTechHandler.addVirTrainingButton(buttons, p2);
         }
-        if (p1.hasTech("dstoldr")) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Buttons.gray(factionChecker + "virTraining", "Use V.I.R. Training", FactionEmojis.toldar));
-        }
+        ToldarTechHandler.addVirTrainingButton(buttons, p1);
         if (p2.hasTech("dsvadey") && !game.isFowMode()) {
             String factionChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(
@@ -2327,6 +2518,12 @@ public class StartCombatService {
                     factionChecker + "purgeRedCreussHero_" + tile.getPosition(),
                     "Purge Rebellion Hero",
                     FactionEmojis.Crimson));
+        }
+        if (p1.hasLeaderUnlocked("arvaxihero") && isSpaceCombat) {
+            buttons.add(ArvaxiLeaderHandler.getPurgeHeroButton(p1, tile.getPosition()));
+        }
+        if (p2.hasLeaderUnlocked("arvaxihero") && !game.isFowMode() && isSpaceCombat) {
+            buttons.add(ArvaxiLeaderHandler.getPurgeHeroButton(p2, tile.getPosition()));
         }
         if (p1.hasLeaderUnlocked("bastionhero")) {
             String factionChecker = "FFCC_" + p1.getFaction() + "_";
@@ -2793,6 +2990,6 @@ public class StartCombatService {
             }
             sb.append(specialCombatTitle != null ? specialCombatTitle : "");
         }
-        return sb.toString();
+        return DiscordThreadUtility.fitThreadName(sb.toString());
     }
 }

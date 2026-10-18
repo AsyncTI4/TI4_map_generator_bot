@@ -175,7 +175,7 @@ public class CombatReplayPromotionService {
         return snapshot == null ? null : snapshot.replaySummaryText();
     }
 
-    private Comparator<CombatCandidateEntity> candidateComparator(Map<Long, Double> jointScoresByObservationId) {
+    private static Comparator<CombatCandidateEntity> candidateComparator(Map<Long, Double> jointScoresByObservationId) {
         return Comparator.comparing(CombatReplayPromotionService::getPromotionScore)
                 .thenComparing(candidate -> jointScoresByObservationId.getOrDefault(candidate.getObservationId(), 0.0))
                 .thenComparing(CombatCandidateEntity::getResolvedAt, Comparator.reverseOrder())

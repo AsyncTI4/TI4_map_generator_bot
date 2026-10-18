@@ -28,6 +28,7 @@ import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.FogStandardService;
 import ti4.service.fow.GMService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.map.AddTileListService;
@@ -436,7 +437,6 @@ public final class FowSetupWizardService {
                 *opens to* next time (back to Game Type) - it does not undo or clear any answers you've \
                 already given (factions, map, dice rolls, toggles, etc.), those all stay exactly as set.
                 """;
-            default -> null;
         };
     }
 
@@ -600,7 +600,9 @@ public final class FowSetupWizardService {
 
     private static void renderFogType(Game game, FowSetupWizardState state, StringBuilder sb, List<Button> buttons) {
         sb.append("Pick a fog preset, then fine-tune individual options if you want.\n\n")
-                .append("- **Normal**: defaults, no extra visibility relaxations.\n")
+                .append("- **Standard**: what new fog games start with - FoW+ plus managed comms, new transactions, ")
+                .append("Fog QoL 01, GM turn map, hidden AC discard, map connections and ghost hexes.\n")
+                .append("- **Normal**: FoW+ off, no extra visibility relaxations.\n")
                 .append("- **Fog Lite**: easier for new GMs/players - novas always visible, unexplored map, ")
                 .append("explore decks and stats-from-HS-only restrictions relaxed.\n")
                 .append("- **")
@@ -610,7 +612,8 @@ public final class FowSetupWizardService {
                 .append(FOWPlusService.isActive(game))
                 .append("\n");
 
-        buttons.add(Buttons.green("fowSetupFogType_normal", "Normal"));
+        buttons.add(Buttons.green("fowSetupFogType_standard", "Standard"));
+        buttons.add(Buttons.gray("fowSetupFogType_normal", "Normal"));
         buttons.add(Buttons.blue("fowSetupFogType_lite", "Fog Lite"));
         buttons.add(Buttons.blue("fowSetupFogType_plus", "Fog+"));
         buttons.add(Buttons.gray("fowSetupFogOptions", "Fine-tune Options"));
@@ -621,6 +624,9 @@ public final class FowSetupWizardService {
         if (!requireGM(event, game)) return;
         String type = buttonID.replace("fowSetupFogType_", "");
         switch (type) {
+            case "standard" -> {
+                FogStandardService.reapply(game, GMService.getGMChannel(game), game.getMainGameChannel());
+            }
             case "normal" -> {
                 FOWPlusService.setActive(game, false);
                 game.setFowOption(FOWOption.BRIGHT_NOVAS, false);

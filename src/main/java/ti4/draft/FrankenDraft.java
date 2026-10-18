@@ -32,6 +32,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
+import ti4.service.milty.EchoesOfYggdrasilService;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 
@@ -105,7 +106,17 @@ public class FrankenDraft extends BagDraft {
     }
 
     private static final String[] excludedFactions = {
-        "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "obsidian"
+        "lazax",
+        "admins",
+        "franken",
+        "keleresm",
+        "keleresx",
+        "miltymod",
+        "qulane",
+        "neutral",
+        "obsidian",
+        "stoneborn",
+        "morpha"
     };
 
     public static List<FactionModel> getDraftableFactionsForGame(Game game) {
@@ -264,7 +275,7 @@ public class FrankenDraft extends BagDraft {
         return bags;
     }
 
-    protected void initFrankenDraftTiles(MiltyDraftManager draftManager, Game game) {
+    protected static void initFrankenDraftTiles(MiltyDraftManager draftManager, Game game) {
         List<ComponentSource> sources = new ArrayList<>(List.of(
                 ComponentSource.base,
                 ComponentSource.codex1,
@@ -278,6 +289,9 @@ public class FrankenDraft extends BagDraft {
         if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
+        if (game.isLostLegaciesTiles()) {
+            sources.add(ComponentSource.theodisi);
+        }
         if (Boolean.parseBoolean(game.getStoredValue(Constants.INCLUDE_ERONOUS_TILES))) {
             sources.add(ComponentSource.eronous);
         }
@@ -285,6 +299,7 @@ public class FrankenDraft extends BagDraft {
             sources.add(ComponentSource.thunders_edge);
         }
         MiltyDraftHelper.initDraftTiles(draftManager, sources);
+        EchoesOfYggdrasilService.addTiles(game, draftManager);
     }
 
     @Override

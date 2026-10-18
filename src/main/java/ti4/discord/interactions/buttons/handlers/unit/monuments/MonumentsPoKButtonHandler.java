@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.unit.monuments;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -243,7 +244,7 @@ public class MonumentsPoKButtonHandler {
                     continue;
                 }
                 List<Button> buttons = game.getRealPlayers().stream()
-                        .filter(tokenOwner -> monumentTile.hasPlayerCC(tokenOwner))
+                        .filter(monumentTile::hasPlayerCC)
                         .filter(tokenOwner ->
                                 tokenOwner == player || !player.getMahactCC().contains(tokenOwner.getColor()))
                         .map(tokenOwner -> Buttons.green(
@@ -281,7 +282,7 @@ public class MonumentsPoKButtonHandler {
             }
             for (Tile monumentTile : monumentTiles) {
                 List<Button> buttons = game.getRealPlayers().stream()
-                        .filter(tokenOwner -> monumentTile.hasPlayerCC(tokenOwner))
+                        .filter(monumentTile::hasPlayerCC)
                         .filter(tokenOwner ->
                                 tokenOwner == player || !player.getMahactCC().contains(tokenOwner.getColor()))
                         .map(tokenOwner -> Buttons.green(
@@ -353,7 +354,7 @@ public class MonumentsPoKButtonHandler {
         if (game == null || player == null || otherPlayer == null || !game.isMonumentsMode()) {
             return false;
         }
-        return List.of(player, otherPlayer).stream()
+        return Stream.of(player, otherPlayer)
                 .filter(monumentOwner -> MonumentsService.isMonumentOnBoard(game, monumentOwner, "naaz-rokha_monument"))
                 .anyMatch(monumentOwner ->
                         MonumentsService.getTilesInOrAdjacentToPlayerMonument(game, monumentOwner).stream()

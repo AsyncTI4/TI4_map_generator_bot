@@ -124,7 +124,7 @@ public class LeaderInfoService {
 
                 Leader commander = game.getRevenantLichCommander(lichPoolOwner, otherPlayer);
                 if (commander != null) {
-                    lichEmbeds.add(game.getUnlockedLeaderCopy(commander).getLeaderEmbed(game));
+                    lichEmbeds.add(Game.getUnlockedLeaderCopy(commander).getLeaderEmbed(game));
                 }
             }
         }

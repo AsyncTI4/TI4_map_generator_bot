@@ -27,9 +27,6 @@ import ti4.contest.replay.core.CombatCandidateStatus;
                     columnList = "status, pending_resolution_started_at"),
             @Index(name = "idx_combat_candidate_promoted_at", columnList = "promoted_at")
         })
-/**
- * Represents a replay-worthy combat that is being tracked, resolved, promoted, or expired.
- */
 public class CombatCandidateEntity {
 
     @Id

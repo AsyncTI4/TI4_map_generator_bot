@@ -41,7 +41,7 @@ public class AbilityDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
-    public String getLongDescriptionImpl() {
+    protected String getLongDescriptionImpl() {
         AbilityModel abilityModel = getAbilityModel();
         StringBuilder sb = new StringBuilder();
         if (abilityModel.getPermanentEffect().isPresent()) {

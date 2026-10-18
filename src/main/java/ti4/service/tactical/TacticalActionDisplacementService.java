@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
@@ -20,6 +21,7 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.model.UnitModel;
 import ti4.service.regex.RegexService;
 import ti4.spring.service.gameevent.GameEventDraft;
 
@@ -132,9 +134,22 @@ public class TacticalActionDisplacementService {
 
         List<Integer> statesMoved = uh.removeUnit(unitKey, amt, state);
         fakeUh.addUnitsWithStates(unitKey, statesMoved);
-        displaced.put(unitKey, fakeUh.getUnitsByState().get(unitKey));
-        game.getTacticalActionDisplacement().put(uhKey, displaced);
+        List<Integer> newStates = fakeUh.getUnitsByState().get(unitKey);
+        if (newStates != null) {
+            displaced.put(unitKey, newStates);
+        }
+        if (!displaced.isEmpty()) {
+            game.getTacticalActionDisplacement().put(uhKey, displaced);
+        }
+        removeEmptyDisplacement(game.getTacticalActionDisplacement());
         return game.getTacticalActionDisplacement();
+    }
+
+    public void removeEmptyDisplacement(Map<String, Map<UnitKey, List<Integer>>> displacement) {
+        if (displacement == null) return;
+        displacement.values().removeIf(Objects::isNull);
+        displacement.values().forEach(units -> units.values().removeIf(Objects::isNull));
+        displacement.values().removeIf(Map::isEmpty);
     }
 
     public Map<String, Map<UnitKey, List<Integer>>> reverseSingleUnit(
@@ -178,6 +193,7 @@ public class TacticalActionDisplacementService {
     public boolean applyDisplacementToActiveSystem(Game game, Tile tile) {
         boolean moved = false;
         UnitHolder activeSystemSpace = tile.getSpaceUnitHolder();
+        removeEmptyDisplacement(game.getTacticalActionDisplacement());
         GameEventDraft.stageMovement(game, tile.getPosition(), game.getTacticalActionDisplacement());
         for (Entry<String, Map<UnitKey, List<Integer>>> e :
                 game.getTacticalActionDisplacement().entrySet()) {
@@ -245,7 +261,11 @@ public class TacticalActionDisplacementService {
 
         for (UnitKey unitKey : new HashSet<>(unitHolder.getUnitsByState().keySet())) {
             if (!canMoveUnit(player, allowedAllies, unitKey)) continue;
-            if (unitHolder instanceof Planet && !movableFromPlanets.contains(unitKey.unitType())) continue;
+            UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+            boolean isFlightStructure =
+                    player.hasAbility("radiant_grafting_flight") && unitModel != null && unitModel.getIsStructure();
+            if (unitHolder instanceof Planet && !movableFromPlanets.contains(unitKey.unitType()) && !isFlightStructure)
+                continue;
 
             List<Integer> existing = movement.getOrDefault(unitKey, UnitState.emptyList());
             List<Integer> states = unitHolder.removeUnit(unitKey, unitHolder.getUnitCount(unitKey));

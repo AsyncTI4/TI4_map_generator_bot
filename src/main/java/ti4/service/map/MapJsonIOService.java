@@ -71,6 +71,8 @@ public class MapJsonIOService {
                 t.setTileID(tile.getTileID());
 
                 // tokens
+                // NOTE: a fog-vision token's recipient grant (Space#getFowVisionGrant) is not exported, so a
+                // restricted vision token round-trips as "visible to everyone". Export/import is GM-only in FoW.
                 if (includeTokens
                         && tile.getSpaceUnitHolder() != null
                         && !tile.getSpaceUnitHolder().getTokenList().isEmpty()) {
@@ -89,7 +91,7 @@ public class MapJsonIOService {
                     if (bah.getTile().equals(tile.getPosition())) {
                         BorderAnomalyIO bi = new BorderAnomalyIO();
                         bi.setDirection(bah.getDirection());
-                        bi.setType(bah.getType().toString());
+                        bi.setType(bah.getType());
                         baList.add(bi);
                     }
                 }
@@ -112,7 +114,7 @@ public class MapJsonIOService {
                     if (includeLore) {
                         List<LoreEntry> planetLore = LoreService.getEntriesForBase(game, planet.getName());
                         if (!planetLore.isEmpty()) {
-                            pi.setPlanetLore(buildLoreIO(planetLore.get(0)));
+                            pi.setPlanetLore(buildLoreIO(planetLore.getFirst()));
                             pi.setPlanetLoreEntries(buildLoreIOList(planetLore));
                             planetHasExportedData = true;
                         }
@@ -129,7 +131,7 @@ public class MapJsonIOService {
                 if (includeLore) {
                     List<LoreEntry> systemLore = LoreService.getEntriesForBase(game, tile.getPosition());
                     if (!systemLore.isEmpty()) {
-                        t.setSystemLore(buildLoreIO(systemLore.get(0)));
+                        t.setSystemLore(buildLoreIO(systemLore.getFirst()));
                         t.setSystemLoreEntries(buildLoreIOList(systemLore));
                     }
                 }
@@ -157,6 +159,7 @@ public class MapJsonIOService {
             }
 
             mapData.setMapInfo(tiles);
+            MapSectorJsonService.exportSectors(game, mapData);
 
             if (includeLore) {
                 Map<String, List<LoreIO>> phaseLore = new HashMap<>();
@@ -192,18 +195,18 @@ public class MapJsonIOService {
             game.getCustomHyperlaneData().clear();
             LoreService.clearLore(game);
 
+            List<TileIO> placedTiles = new ArrayList<>();
             for (TileIO tileIO : mapData.getMapInfo()) {
                 // Isolated per tile: an unexpected failure processing one tile must not abort the
                 // rest of the map (or phase lore, handled after this loop) — it's reported and
                 // skipped instead, same as every other per-item failure in this importer.
                 try {
                     if (handleTile(tileIO, game, errorSb)) {
+                        placedTiles.add(tileIO);
                         handleTokens(tileIO, game, errorSb);
                         handleCustomHyperlane(tileIO, game, errorSb);
                         handleBorderAnomalies(tileIO, game, errorSb);
-                        handleSystemLore(tileIO, game, errorSb);
                         handlePlanetAttachments(tileIO, game, errorSb);
-                        handlePlanetLore(tileIO, game, errorSb);
                         handleAdjacencyOverrides(tileIO, game, errorSb);
                         handleCustomAdjacencies(tileIO, game, errorSb);
                     }
@@ -211,10 +214,29 @@ public class MapJsonIOService {
                     appendError(errorSb, tileIO, "unexpected error, tile skipped: " + e.getMessage());
                 }
             }
+            for (TileIO tileIO : placedTiles) {
+                try {
+                    handleSystemLore(tileIO, game, errorSb);
+                } catch (Exception e) {
+                    appendError(errorSb, tileIO, "unexpected error, system lore skipped: " + e.getMessage());
+                }
+                try {
+                    handlePlanetLore(tileIO, game, errorSb);
+                } catch (Exception e) {
+                    appendError(errorSb, tileIO, "unexpected error, planet lore skipped: " + e.getMessage());
+                }
+            }
             try {
                 handlePhaseLore(mapData, game, errorSb);
             } catch (Exception e) {
                 errorSb.append("- phase lore: unexpected error, skipped: ")
+                        .append(e.getMessage())
+                        .append('\n');
+            }
+            try {
+                MapSectorJsonService.importSectors(game, mapData, errorSb);
+            } catch (Exception e) {
+                errorSb.append("- sectors and galaxies: unexpected error, skipped: ")
                         .append(e.getMessage())
                         .append('\n');
             }
@@ -232,12 +254,13 @@ public class MapJsonIOService {
         }
 
         if (!errorSb.isEmpty()) {
-            MessageHelper.sendMessageToChannel(feedbackChannel, "Some tiles failed to import:\n" + errorSb);
+            MessageHelper.sendMessageToChannel(
+                    feedbackChannel, "Some parts of the map did not import cleanly:\n" + errorSb);
         }
     }
 
     private static boolean handleTile(TileIO tileIO, Game game, StringBuilder sb) {
-        if (!PositionMapper.isTilePositionValid(tileIO.getPosition())) {
+        if (!PositionMapper.isTilePositionValid(game, tileIO.getPosition())) {
             appendError(sb, tileIO, "Invalid tile position: " + tileIO.getPosition());
             return false;
         }
@@ -249,7 +272,7 @@ public class MapJsonIOService {
             appendError(sb, tileIO, "Could not find tile: " + tileID);
             return false;
         }
-        String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+        String tilePath = ResourceHelper.getTileFile(tileName);
         if (tilePath == null) {
             appendError(sb, tileIO, "Could not find tile: " + tileID);
             return false;
@@ -267,15 +290,17 @@ public class MapJsonIOService {
         for (String token : tileIO.getTokens()) {
             Tile tile = game.getTileByPosition(tileIO.getPosition());
             String tokenFileName = token;
-            String tokenPath = tile.getTokenPath(tokenFileName);
+            String tokenPath = Tile.getTokenPath(tokenFileName);
             if (tokenPath == null) {
                 tokenFileName = Mapper.getTokenID(token);
-                tokenPath = tile.getTokenPath(tokenFileName);
+                tokenPath = Tile.getTokenPath(tokenFileName);
                 if (tokenPath == null) {
                     appendError(sb, tileIO, "Token not found: " + token);
                     continue;
                 }
             }
+            // NOTE: no fog-vision grant is imported (see export), so an imported fog-vision token reveals the
+            // system to everyone. To re-restrict: /fow remove_vision_token, then /fow add_vision_token with targets.
             tile.getSpaceUnitHolder().addToken(tokenFileName);
         }
     }
@@ -297,13 +322,7 @@ public class MapJsonIOService {
         if (tileIO.getBorderAnomalies() == null) return;
 
         for (BorderAnomalyIO anomalyIO : tileIO.getBorderAnomalies()) {
-            BorderAnomalyModel.BorderAnomalyType anomalyType;
-            try {
-                anomalyType = BorderAnomalyModel.BorderAnomalyType.valueOf(
-                        anomalyIO.getType().toUpperCase());
-            } catch (Exception e) {
-                anomalyType = new BorderAnomalyModel().getBorderAnomalyTypeFromString(anomalyIO.getType());
-            }
+            BorderAnomalyModel anomalyType = Mapper.resolveBorderAnomaly(anomalyIO.getType());
 
             if (anomalyType == null) {
                 appendError(
@@ -313,7 +332,7 @@ public class MapJsonIOService {
                                 + anomalyIO.getDirection());
                 continue;
             }
-            game.addBorderAnomaly(tileIO.getPosition(), anomalyIO.getDirection(), anomalyType);
+            game.addBorderAnomaly(tileIO.getPosition(), anomalyIO.getDirection(), anomalyType.getId());
         }
     }
 
@@ -331,10 +350,10 @@ public class MapJsonIOService {
             for (String attachment : planetIO.getAttachments()) {
                 String attachmentFileName = attachment;
                 Tile tile = game.getTileByPosition(tileIO.getPosition());
-                String attachmentPath = tile.getAttachmentPath(attachmentFileName);
+                String attachmentPath = Tile.getAttachmentPath(attachmentFileName);
                 if (attachmentPath == null) {
                     attachmentFileName = Mapper.getAttachmentImagePath(attachment);
-                    attachmentPath = tile.getAttachmentPath(attachmentFileName);
+                    attachmentPath = Tile.getAttachmentPath(attachmentFileName);
                     if (attachmentPath == null) {
                         appendError(sb, tileIO, "Attachment not found: " + attachment);
                         continue;
@@ -500,6 +519,16 @@ public class MapJsonIOService {
         // LoreService.getPhaseTargetNames. Phase lore has no tile of its own, so it can't live in
         // any TileIO entry.
         private Map<String, List<LoreIO>> phaseLore;
+        private Map<String, String> galaxies;
+        private Integer sectorGap;
+    }
+
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class SectorIO {
+        private String type;
+        private Integer distance;
+        private String name;
     }
 
     @Data
@@ -518,6 +547,7 @@ public class MapJsonIOService {
         private List<LoreIO> systemLoreEntries;
         private List<String> customAdjacencies;
         private List<AdjacencyOverrideIO> adjacencyOverrides;
+        private SectorIO sector;
     }
 
     @Data

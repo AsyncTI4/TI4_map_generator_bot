@@ -84,7 +84,7 @@ class SetupGameChannels extends GameStateSubcommand {
         }
     }
 
-    private void setRoleAndChannel(
+    private static void setRoleAndChannel(
             SlashCommandInteractionEvent event,
             Game game,
             String playerConstant,

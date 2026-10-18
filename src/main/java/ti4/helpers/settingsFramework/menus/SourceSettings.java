@@ -33,6 +33,7 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting discoStars;
     private final BooleanSetting betaTestMode;
     private final BooleanSetting unchartedSpace;
+    private final BooleanSetting lostLegaciesTiles;
     private final BooleanSetting blueReverie;
     private final BooleanSetting absol;
     private final BooleanSetting ignis;
@@ -43,6 +44,7 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting deepreaches;
     private final BooleanSetting lostLegacies;
     private final BooleanSetting monuments;
+    private final BooleanSetting echoesOfYggdrasil;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -62,6 +64,7 @@ public class SourceSettings extends SettingsMenu {
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
         teDemo = new BooleanSetting("ThundersEdge", "Thunders Edge", game.isThundersEdge());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
+        lostLegaciesTiles = new BooleanSetting("LostLegaciesTiles", "Lost Legacies Tiles", game.isLostLegaciesTiles());
         blueReverie = new BooleanSetting("BlueReverie", "Blue Reverie", game.isBlueReverieMode());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());
         ignis = new BooleanSetting(
@@ -73,6 +76,7 @@ public class SourceSettings extends SettingsMenu {
         deepreaches = new BooleanSetting("DeepReaches", "Deep Reaches", false);
         lostLegacies = new BooleanSetting("LostLegacies", "Lost Legacies", false);
         monuments = new BooleanSetting("Monuments", "Monuments+", game.isMonumentsMode());
+        echoesOfYggdrasil = new BooleanSetting("EchoesOfYggdrasil", "Echoes of Yggdrasil", false);
         actionCardDeck2 = new BooleanSetting("ActionCardDeck2", "Action Card Deck 2", game.isAcd2());
         // Emojis
         base.setEmoji(SourceEmojis.TI4BaseGame);
@@ -80,6 +84,8 @@ public class SourceSettings extends SettingsMenu {
         codexes.setEmoji(FactionEmojis.Keleres);
         discoStars.setEmoji(SourceEmojis.DiscordantStars);
         unchartedSpace.setEmoji(SourceEmojis.DiscordantStars);
+        lostLegaciesTiles.setEmoji(SourceEmojis.Theodisi);
+        blueReverie.setEmoji(SourceEmojis.BlueReverie);
         absol.setEmoji(SourceEmojis.Absol);
         eronous.setEmoji(SourceEmojis.Eronous);
         actionCardDeck2.setEmoji(SourceEmojis.ActionDeck2);
@@ -91,9 +97,11 @@ public class SourceSettings extends SettingsMenu {
         discoStars.setExtraInfo("Adds Discordant Stars factions only.");
         blueReverie.setExtraInfo("Adds Blue Reverie factions only.");
         unchartedSpace.setExtraInfo("Adds Uncharted Space content.");
+        lostLegaciesTiles.setExtraInfo("Adds Lost Legacies tiles to the draft tile pool.");
         lostLegacies.setExtraInfo("Adds Lost Legacies factions only.");
         monuments.setExtraInfo(
                 "Adds faction monuments plus Monuments action cards, agendas, secrets, and strategy cards.");
+        echoesOfYggdrasil.setExtraInfo("Adds the nine Echoes of Yggdrasil tiles to the draft tile pool.");
         // miltymod.setExtraInfo("NOTE: this is NOT \"milty draft\", this is a homebrew mod that replaces components in
         // the game");
 
@@ -112,6 +120,7 @@ public class SourceSettings extends SettingsMenu {
             discoStars.initialize(json.get("discoStars"));
             teDemo.initialize(json.get("teDemo"));
             unchartedSpace.initialize(json.get("unchartedSpace"));
+            lostLegaciesTiles.initialize(json.get("lostLegaciesTiles"));
             blueReverie.initialize(json.get("blueReverie"));
             absol.initialize(json.get("absol"));
             ignis.initialize(json.get("ignis"));
@@ -120,6 +129,7 @@ public class SourceSettings extends SettingsMenu {
             deepreaches.initialize(json.get("deepreaches"));
             lostLegacies.initialize(json.get("lostLegacies"));
             monuments.initialize(json.get("monuments"));
+            echoesOfYggdrasil.initialize(json.get("echoesOfYggdrasil"));
             actionCardDeck2.initialize(json.get("actionCardDeck2"));
         }
         base.setEditable(false);
@@ -139,6 +149,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(discoStars);
         ls.add(blueReverie);
         ls.add(unchartedSpace);
+        ls.add(lostLegaciesTiles);
         ls.add(absol);
         ls.add(ignis);
         ls.add(eronous);
@@ -146,6 +157,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(deepreaches);
         ls.add(lostLegacies);
         ls.add(monuments);
+        ls.add(echoesOfYggdrasil);
         ls.add(actionCardDeck2);
         return ls;
     }
@@ -173,6 +185,7 @@ public class SourceSettings extends SettingsMenu {
                     ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
         if (discoStars.isVal()) sources.add(ComponentSource.ds);
         if (unchartedSpace.isVal()) sources.add(ComponentSource.uncharted_space);
+        if (lostLegaciesTiles.isVal()) sources.add(ComponentSource.theodisi);
         if (absol.isVal()) sources.add(ComponentSource.absol);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         return sources;
@@ -192,7 +205,7 @@ public class SourceSettings extends SettingsMenu {
         if (teDemo.isVal()) sources.add(ComponentSource.thunders_edge);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         if (ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
-        if (whispers.isVal()) sources.add(ComponentSource.balacasi);
+        if (whispers.isVal()) sources.add(ComponentSource.wftv);
         if (deepreaches.isVal()) sources.add(ComponentSource.beans);
         if (lostLegacies.isVal()) sources.add(ComponentSource.theodisi);
         return sources;
@@ -297,10 +310,14 @@ public class SourceSettings extends SettingsMenu {
             }
             case "Eronous" -> {}
             case "Monuments" -> game.setMonumentsMode(monuments.isVal());
+            case "EchoesOfYggdrasil" ->
+                game.setStoredValue(
+                        ti4.helpers.Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,
+                        Boolean.toString(echoesOfYggdrasil.isVal()));
         }
     }
 
-    private String getAcd2Version(BooleanSetting pok, BooleanSetting teDemo) {
+    private static String getAcd2Version(BooleanSetting pok, BooleanSetting teDemo) {
         // when TE is fully implemented, this needs to check for _pok, _pok_te, or _te.
         String suffix = pok.isVal() ? "_pok" : teDemo.isVal() ? "_te" : "";
         return "action_deck_2" + suffix;

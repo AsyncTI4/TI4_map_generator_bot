@@ -107,7 +107,7 @@ class SearchSources extends Subcommand {
      * @param compSource
      * @return
      */
-    private Map<String, Integer> getOccurrencesByCompType(ComponentSource compSource) {
+    private static Map<String, Integer> getOccurrencesByCompType(ComponentSource compSource) {
         HashMap<String, Integer> occurrences = new HashMap<>();
         occurrences.put("Abilities", Mapper.getAbilitiesSources(compSource).size());
         occurrences.put("Action Cards", Mapper.getActionCardsSources(compSource).size());
@@ -155,7 +155,7 @@ class SearchSources extends Subcommand {
      * 3. List sources from sources.json that have no match in the first list (missing entries in \resources\ .json files (except sources.json), or wrong entry in sources.json)
      * @param event
      */
-    private void checkSources(SlashCommandInteractionEvent event) {
+    private static void checkSources(SlashCommandInteractionEvent event) {
 
         // Sources from \resources\ .json files (excluding sources.json)
         List<String> abilitySources = Mapper.getAbilitiesSources(null);

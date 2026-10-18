@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -966,6 +967,14 @@ public class ButtonHelperCommanders {
         String enemyFaction = buttonID.split("_")[1];
         Player enemy = game.getPlayerFromColorOrFaction(enemyFaction);
         if (enemy == null) return;
+        if (XinTechHandler.hasAstromanticCloakSteel(enemy)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", you cannot look at this player's Action Cards, Promissory Notes, or Secret Objectives"
+                            + " because they have _Astromantic Cloak (Steel)_!");
+            return;
+        }
         String message = player.getFactionEmoji() + " used So Ata, the Yssaril commander, to look at the ";
         String type = buttonID.split("_")[0];
         if ("ac".equalsIgnoreCase(type)) {
@@ -1009,13 +1018,16 @@ public class ButtonHelperCommanders {
 
         String message = player.getFactionEmojiOrColor() + " moved 1 " + mechorInf + " from " + planetRepresentation2
                 + " to " + planetRepresentation + " using G'hom Sek'kus, the Sardakk Commander.";
-        RemoveUnitService.removeUnits(
-                event, game.getTileFromPlanet(planet2), game, player.getColor(), "1 " + mechorInf + " " + planet2);
-
-        FlipTileService.flipTileIfNeeded(event, game.getTileFromPlanet(planet1), game);
-        planet1 = planet1.replace("lockedm", "m");
-        AddUnitService.addUnits(
-                event, game.getTileFromPlanet(planet1), game, player.getColor(), "1 " + mechorInf + " " + planet1);
+        Tile origin = game.getTileFromPlanet(planet2);
+        planet1 = FlipTileService.unlockMalliceIfNeeded(event, planet1, game);
+        Tile destination = game.getTileFromPlanet(planet1);
+        if (origin == null || destination == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "Could not find " + planetRepresentation2 + " or " + planetRepresentation + " on the map.");
+            return;
+        }
+        RemoveUnitService.removeUnits(event, origin, game, player.getColor(), "1 " + mechorInf + " " + planet2);
+        AddUnitService.addUnits(event, destination, game, player.getColor(), "1 " + mechorInf + " " + planet1);
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         CommanderUnlockCheckService.checkPlayer(player, "naaz");

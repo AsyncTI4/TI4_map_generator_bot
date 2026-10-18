@@ -1,0 +1,5 @@
+{
+  "group": "Shared",
+  "description": "Test buttons shared with every developer. Personal ones go in data/testbed/local/shortcuts/.",
+  "shortcuts": []
+}

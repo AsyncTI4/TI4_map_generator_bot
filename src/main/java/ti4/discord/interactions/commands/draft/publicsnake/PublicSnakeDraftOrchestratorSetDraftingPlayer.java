@@ -25,7 +25,8 @@ class PublicSnakeDraftOrchestratorSetDraftingPlayer extends GameStateSubcommand 
         }
 
         String userId = event.getOption(Constants.PLAYER).getAsUser().getId();
-        List<String> playerOrder = orchestrator.getDraftOrder(getGame().getDraftManager());
+        List<String> playerOrder =
+                PublicSnakeDraftOrchestrator.getDraftOrder(getGame().getDraftManager());
         if (!playerOrder.contains(userId)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player " + userId + " is not in the draft.");
             return;

@@ -20,14 +20,14 @@ public class DashboardSettingsController {
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     public DashboardSettingsResponse get() {
-        return dashboardSettingsService.getSettings(RequestContext.getUserId());
+        return DashboardSettingsService.getSettings(RequestContext.getUserId());
     }
 
     @PutMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DashboardSettingsResponse> update(@RequestBody DashboardSettingsUpdateRequest request) {
         try {
-            return ResponseEntity.ok(dashboardSettingsService.updateSettings(RequestContext.getUserId(), request));
+            return ResponseEntity.ok(DashboardSettingsService.updateSettings(RequestContext.getUserId(), request));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }

@@ -22,7 +22,7 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.explore.ExploreService;
 
 @UtilityClass
-public class ArchaeologistCoopLLButtonHandler {
+class ArchaeologistCoopLLButtonHandler {
     private static final String RESOLVE = "resolveArchaeologistCoop";
     private static final String SOURCE = "resolveArchaeologistCoopSource_";
     private static final String EXPLORE = "resolveArchaeologistCoopExplore_";

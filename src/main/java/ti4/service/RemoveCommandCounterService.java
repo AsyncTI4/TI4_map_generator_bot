@@ -27,7 +27,7 @@ public class RemoveCommandCounterService {
 
     public static void fromTile(String color, Tile tile, Game game) {
         String ccID = Mapper.getCCID(color);
-        String ccPath = tile.getCCPath(ccID);
+        String ccPath = Tile.getCCPath(ccID);
         if (ccPath == null) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "Command Counter: " + color + " is not valid and not supported.");

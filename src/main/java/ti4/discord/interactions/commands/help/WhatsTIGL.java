@@ -15,7 +15,7 @@ class WhatsTIGL extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String path = ResourceHelper.getInstance().getHelpFile("WhatsTIGL.txt");
+        String path = ResourceHelper.getHelpFile("WhatsTIGL.txt");
         try {
             String message = Files.readString(Paths.get(path));
             MessageHelper.sendMessageToEventChannel(event, message);

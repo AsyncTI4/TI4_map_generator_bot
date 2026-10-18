@@ -23,6 +23,8 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.leader.PurgeHeroService;
+import ti4.service.leader.UydaiHeroService;
+import ti4.service.tactical.postmovement.AtokeraHeroButton;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.RemoveUnitService;
@@ -46,12 +48,7 @@ class OtherHeroButtonHandler {
 
     @ButtonHandler("purgeAtokeraHero")
     public static void purgeAtokeraHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
-        PurgeHeroService.purgeHeroPreamble(event, player, game, "atokerahero", "Kapoko Vui, the Atokera hero");
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", unfortunately at this time the addition of ships to the ground is not automated."
-                        + " `/move units` can place them on the planet however, and they will roll dice as normal once there.");
+        AtokeraHeroButton.useHero(event, game, player);
     }
 
     @ButtonHandler("utilizePharadnHero_")
@@ -140,8 +137,8 @@ class OtherHeroButtonHandler {
     }
 
     @ButtonHandler("purgeUydaiHero")
-    public static void purgeUydaiHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
-        PurgeHeroService.purgeHeroPreamble(event, player, game, "uydaihero", "Londor II, the Uydai hero");
+    public static void purgeUydaiHero(ButtonInteractionEvent event, Player player, Game game) {
+        UydaiHeroService.purgeHero(event, player, game);
     }
 
     @ButtonHandler("purgeKortaliHero_")

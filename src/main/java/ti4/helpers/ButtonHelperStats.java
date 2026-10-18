@@ -4,7 +4,6 @@ import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -48,9 +47,9 @@ public final class ButtonHelperStats {
         convertComms(event, game, player, amt, deleteMsg, null);
     }
 
-    public static void convertComms(
+    private static void convertComms(
             ButtonInteractionEvent event, Game game, Player player, int amt, boolean deleteMsg, Tile tile) {
-        String message, ident = player.getRepresentation();
+        String message, ident = player.getRepresentationNoPing();
         if (player.getCommodities() >= amt) {
             player.setCommodities(player.getCommodities() - amt);
             player.setTg(player.getTg() + amt);
@@ -92,7 +91,7 @@ public final class ButtonHelperStats {
         gainComms(event, game, player, amt, deleteMsg, skipOutput, null);
     }
 
-    public static void gainComms(
+    private static void gainComms(
             GenericInteractionCreateEvent event,
             Game game,
             Player player,
@@ -146,6 +145,7 @@ public final class ButtonHelperStats {
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
         offerBountyBrokerageAfterReplenish(game, player);
+        ButtonHelperFactionSpecific.offerThwart(game, player);
     }
 
     public static void offerBountyBrokerageAfterReplenish(Game game, Player player) {
@@ -189,15 +189,6 @@ public final class ButtonHelperStats {
             String axis = player.getRepresentationUnfogged() + " you have the opportunity to buy _Axis Orders_.";
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), axis, ButtonHelperAbilities.getBuyableAxisOrders(player, game));
-        }
-        if (realGain > 0
-                && player.hasAbility("expeditionary_cache")
-                && KairnAbilityHandler.getAvailableExpeditionTokens(game) > 0) {
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(),
-                    player.getRepresentationUnfogged()
-                            + ", you may place expedition tokens using **Expeditionary Cache**.",
-                    KairnAbilityHandler.getExpeditionaryCacheButtons(player, game));
         }
         CommanderUnlockCheckService.checkPlayer(player, "mykomentori");
         Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");

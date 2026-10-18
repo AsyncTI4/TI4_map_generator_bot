@@ -14,12 +14,14 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.EmergencyA
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRequisitionLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.planet.SvartalfheimLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -39,6 +41,9 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
+import ti4.helpers.thirtyk.ThirtyKRelicHooks;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -206,6 +211,7 @@ class DeleteButtonsButtonHandler {
                     game.setStoredValue(
                             MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction(), buttonID + "|" + pos);
                 }
+                BlueReverieTechHelper.offerProductionBiomes(game, player);
             }
             if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)
                     && player.hasAbility("amalgamation")
@@ -216,7 +222,16 @@ class DeleteButtonsButtonHandler {
             if ("skarnathBuild".equalsIgnoreCase(buttonID)) {
                 ThronesThroneHandler.clearSkarnathDiscount(game, player);
             }
+            if ("Done Producing Units".equalsIgnoreCase(buttonLabel)
+                    && buttonID.startsWith("thurvialiHeroPlacement_")) {
+                ThurvialiLeadersHandler.finishThurvialiHeroPlacement(event, game, player);
+                ButtonHelper.deleteMessage(event);
+                return;
+            }
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
+                CommanderUnlockCheckService.checkPlayer(player, "revenantponthous");
+                RevenantLeadersHandler.offerRevPonthousCommander(game, player, tile);
+                SvartalfheimLegendaryButtonHandler.offerAndvarisArtificing(event, game, player);
                 if (game.isMonumentsMode()) {
                     if (MonumentsService.isMonumentOnBoard(game, player, "sol_monument")) {
                         MonumentsButtonHandler.offerCenotaphAfterProduction(game, player);
@@ -238,9 +253,13 @@ class DeleteButtonsButtonHandler {
                     }
                 });
                 AutoFactoriesService.resolveAutoFactories(game, player, buttonID);
+                ThirtyKRelicHooks.afterProduction(game, player);
+                ThirtyKExploreHooks.afterProduction(event, game, player);
                 TheIconService.checkAndSendIconButton(event, game, player, buttonID);
                 EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
-                int cost = Helper.calculateCostOfProducedUnits(player, game, true);
+                int cost = Helper.calculateCostOfProducedUnits(player, game, true, false);
+                cost = ThurvialiLeadersHandler.applyThurvialiHeroProductionDiscount(game, player, cost);
+                cost = ThirtyKRelicHooks.applyProductionDiscount(player, cost);
                 Map<String, Integer> unitsMap = new HashMap<>();
                 for (Map.Entry<String, Integer> entry :
                         player.getCurrentProducedUnits().entrySet()) {
@@ -264,8 +283,7 @@ class DeleteButtonsButtonHandler {
                     }
                 }
                 game.setStoredValue("producedUnitCostFor" + player.getFaction(), "" + cost);
-                player.setTotalExpenses(
-                        player.getTotalExpenses() + Helper.calculateCostOfProducedUnits(player, game, true));
+                player.setTotalExpenses(player.getTotalExpenses() + cost);
                 String message2 = player.getRepresentationUnfogged()
                         + ", please choose the planets you wish to exhaust to pay a cost of " + cost + ".";
                 boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
@@ -438,10 +456,6 @@ class DeleteButtonsButtonHandler {
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
                 }
-                CommanderUnlockCheckService.checkPlayer(player, "revenantmyrr");
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "revenantmyrrcommander")) {
-                    RevenantLeadersHandler.offerRevMyrrCommander(game, player, tile);
-                }
             }
         }
         if ("Done Producing Units".equalsIgnoreCase(buttonLabel) && "myrrBt".equalsIgnoreCase(buttonID)) {
@@ -494,15 +508,6 @@ class DeleteButtonsButtonHandler {
                     && game.getStoredValue("ASN" + player.getFaction()).isEmpty()) {
                 ButtonHelperTacticalAction.endOfTacticalActionThings(player, game, event);
                 List<Button> systemButtons2;
-                if (player.hasUnexhaustedLeader("sardakkagent")) {
-                    String message = player.getRepresentationUnfogged() + ", you may use "
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                            + "T'ro, the N'orr" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                            + " agent.";
-                    systemButtons2 = new ArrayList<>(ButtonHelperAgents.getSardakkAgentButtons(game));
-                    systemButtons2.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
-                }
                 systemButtons2 = new ArrayList<>();
                 if (player.hasUnexhaustedLeader("nomadagentmercer")) {
                     String message = player.getRepresentationUnfogged() + ", you may use "

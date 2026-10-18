@@ -1,0 +1,121 @@
+{
+    "id": "vespix",
+    "tileId": "th20",
+    "name": "Vespix",
+    "aliases": [
+        "vespix"
+    ],
+    "resources": 3,
+    "influence": 3,
+    "planetTypes": [
+        "HAZARDOUS",
+        "CULTURAL",
+        "INDUSTRIAL"
+    ],
+    "legendaryAbilityName": "Paradise Lost",
+    "legendaryAbilityText": "At the end of a tactical action you may exhaust this card to explore 1 planet you control in the active system.",
+    "planetLayout": {
+        "unitHolderName": "vespix",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 169,
+            "y": 142
+        },
+        "planetRadius": 98
+    },
+    "positionInTile": {
+        "x": 169,
+        "y": 142
+    },
+    "unitPositions": {
+        "unitHolderName": "vespix",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 150,
+                    "y": 126
+                }
+            ],
+            "sd": [
+                {
+                    "x": 254,
+                    "y": 90
+                }
+            ],
+            "pd": [
+                {
+                    "x": 116,
+                    "y": 149
+                },
+                {
+                    "x": 143,
+                    "y": 171
+                },
+                {
+                    "x": 189,
+                    "y": 187
+                },
+                {
+                    "x": 110,
+                    "y": 176
+                },
+                {
+                    "x": 156,
+                    "y": 192
+                }
+            ],
+            "mf": [
+                {
+                    "x": 146,
+                    "y": 74
+                },
+                {
+                    "x": 177,
+                    "y": 74
+                },
+                {
+                    "x": 128,
+                    "y": 53
+                },
+                {
+                    "x": 159,
+                    "y": 51
+                },
+                {
+                    "x": 190,
+                    "y": 52
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 222,
+                    "y": 110
+                },
+                {
+                    "x": 222,
+                    "y": 148
+                }
+            ],
+            "att": [
+                {
+                    "x": 53,
+                    "y": 72
+                },
+                {
+                    "x": 39,
+                    "y": 101
+                },
+                {
+                    "x": 33,
+                    "y": 134
+                },
+                {
+                    "x": 33,
+                    "y": 166
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "source": "theodisi"
+}

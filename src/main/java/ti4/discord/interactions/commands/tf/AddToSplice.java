@@ -33,6 +33,15 @@ class AddToSplice extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         String spliceType = event.getOption(Constants.SPLICE_TYPE, OptionMapping::getAsString);
+        String currentSpliceType = game.getStoredValue("spliceType");
+        if (!currentSpliceType.isEmpty() && !currentSpliceType.equalsIgnoreCase(spliceType)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "The current splice is a " + currentSpliceType + " splice, so a " + spliceType
+                            + " card can't be added to it. Use `/tf start_new_splice` to start a " + spliceType
+                            + " splice instead.");
+            return;
+        }
 
         String card = ButtonHelperTwilightsFall.addSpliceCardToSplice(game, spliceType);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Added " + card + " to the splice!");

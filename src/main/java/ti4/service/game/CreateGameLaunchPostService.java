@@ -18,9 +18,9 @@ import ti4.logging.BotLogger;
 public class CreateGameLaunchPostService {
 
     public static final String MAKING_NEW_GAMES_CHANNEL = "making-new-games";
-    public static final String MAKING_PRIVATE_GAMES_CHANNEL = "making-private-games";
+    private static final String MAKING_PRIVATE_GAMES_CHANNEL = "making-private-games";
     public static final String MAKING_TIGL_GAMES_CHANNEL = "making-tigl-games";
-    public static final String MAKING_SUPERFAST_GAMES_CHANNEL = "making-superfast-games";
+    private static final String MAKING_SUPERFAST_GAMES_CHANNEL = "making-superfast-games";
 
     private static final String CREATE_GAME_FLOW_MESSAGE = """
         To launch a new game, please use the buttons. Players can add themselves or you can add them manually. Once all players are added, press the launch button.

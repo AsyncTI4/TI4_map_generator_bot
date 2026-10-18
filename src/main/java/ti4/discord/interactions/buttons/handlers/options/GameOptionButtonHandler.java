@@ -79,6 +79,18 @@ final class GameOptionButtonHandler {
         event.editButton(GameOptionService.showOwnedPNs_OFF).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
+    @ButtonHandler("injectRulesLinks_turnON")
+    public static void injectRulesLinks_turnON(ButtonInteractionEvent event, Game game) {
+        game.setInjectRulesLinks(true);
+        event.editButton(GameOptionService.rulesLinks_ON).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("injectRulesLinks_turnOFF")
+    public static void injectRulesLinks_turnOFF(ButtonInteractionEvent event, Game game) {
+        game.setInjectRulesLinks(false);
+        event.editButton(GameOptionService.rulesLinks_OFF).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
     @ButtonHandler("anonDeclare_")
     public static void handleEnvironmentChoice(
             ButtonInteractionEvent event, String buttonId, Game game, Player player) {

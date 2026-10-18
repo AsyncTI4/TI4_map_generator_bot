@@ -28,7 +28,7 @@ class LeaderModelTest extends ModelTest<LeaderModel> {
         }
     }
 
-    private boolean validateFaction(LeaderModel model) {
+    private static boolean validateFaction(LeaderModel model) {
         if (model.getFaction().isEmpty()) return true;
         if (Mapper.isValidFaction(model.getFaction())
                 || "keleres".equals(model.getFaction())
@@ -39,7 +39,7 @@ class LeaderModelTest extends ModelTest<LeaderModel> {
         return false;
     }
 
-    private boolean validateHomebrewReplacesID(LeaderModel model) {
+    private static boolean validateHomebrewReplacesID(LeaderModel model) {
         if (model.getHomebrewReplacesID().isEmpty()) return true;
         if (Mapper.isValidLeader(model.getHomebrewReplacesID().get())) return true;
         System.out.println("Tech **" + model.getAlias() + "** failed validation due to invalid HomebrewReplacesID ID: `"
@@ -47,7 +47,7 @@ class LeaderModelTest extends ModelTest<LeaderModel> {
         return false;
     }
 
-    private boolean validateLeaderEmoji(LeaderModel model) {
+    private static boolean validateLeaderEmoji(LeaderModel model) {
         // supported sources
         List<ComponentSource> srcs = List.of(
                 ComponentSource.ds,

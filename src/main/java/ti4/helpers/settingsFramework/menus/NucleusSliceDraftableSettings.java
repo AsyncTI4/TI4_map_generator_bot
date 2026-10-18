@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -30,6 +31,7 @@ import tools.jackson.databind.JsonNode;
 @JsonIgnoreProperties("messageId")
 public class NucleusSliceDraftableSettings extends SettingsMenu {
 
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
     // Setting
     private final IntegerRangeSetting nucleusWormholes;
     private final IntegerRangeSetting totalWormholes;
@@ -233,10 +235,9 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         }
 
         // Normalize the map string (replace newlines and commas with spaces)
-        String normalizedMapString = mapString
-                .replace("\n", " ")
-                .replace(",", " ")
-                .replaceAll("\\s+", " ")
+        String normalizedMapString = WHITESPACE_PATTERN
+                .matcher(mapString.replace("\n", " ").replace(",", " "))
+                .replaceAll(" ")
                 .trim();
         presetMapString = normalizedMapString;
 

@@ -201,7 +201,7 @@ class TurnOrderHelperTest extends BaseTi4Test {
         return game;
     }
 
-    private Player createPlayer(
+    private static Player createPlayer(
             String userId,
             String faction,
             String color,

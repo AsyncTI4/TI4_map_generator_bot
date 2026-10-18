@@ -89,8 +89,7 @@ class SampleDecals extends Subcommand {
         int n = 0;
 
         BufferedImage coloursImage = new BufferedImage(PAGEWIDTH, PAGEHIGHT, BufferedImage.TYPE_INT_ARGB);
-        BufferedImage backgroundImage =
-                ImageHelper.read(ResourceHelper.getInstance().getExtraFile("starfield.png"));
+        BufferedImage backgroundImage = ImageHelper.read(ResourceHelper.getExtraFile("starfield.png"));
         Graphics2D graphic = coloursImage.createGraphics();
         graphic.drawImage(backgroundImage, 0, 0, null);
         BasicStroke stroke = new BasicStroke(3.0f);

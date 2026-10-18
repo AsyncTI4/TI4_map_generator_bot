@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -17,6 +17,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
@@ -25,6 +26,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.spring.context.SpringContext;
 
@@ -75,6 +77,7 @@ class RetreatButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, retreatButtons);
 
         if (game.getTileByPosition(pos).isGravityRift()
+                && !AsgardLegendaryService.isBifrostBridgeActive(game, player)
                 && !player.hasRelic("circletofthevoid")
                 && !player.hasTech("tf-crucible")) {
             Button rift = Buttons.green(
@@ -95,6 +98,7 @@ class RetreatButtonHandler {
         if (player.hasUnlockedBreakthrough("kalorabt")) {
             KaloraBreakthroughHandler.bypassOperationsRetreat(player, game, game.getTileByPosition(pos1), event);
         }
+        ThirtyKExploreHooks.beforeRetreatInto(game, player, game.getTileByPosition(pos2));
         ButtonHelperModifyUnits.retreatSpaceUnits(buttonID, event, game, player);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),

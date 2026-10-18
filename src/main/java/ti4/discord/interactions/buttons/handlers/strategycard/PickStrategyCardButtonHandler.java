@@ -94,7 +94,7 @@ public class PickStrategyCardButtonHandler {
                                 + " yourself.");
                 game.setStoredValue("Public Disgrace", "");
             } else if (pdOnly.isEmpty()
-                    || (pdOnly.equalsIgnoreCase(player.getFaction()) || pdOnly.equalsIgnoreCase(player.getColor()))) {
+                    || (pdOnly.contains("_" + player.getFaction()) || pdOnly.contains("_" + player.getColor()))) {
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2 == player) continue;
                     if (pdValue.contains(p2.getFaction())

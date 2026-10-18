@@ -5,7 +5,7 @@ import jakarta.persistence.Converter;
 import ti4.contest.replay.core.CombatContestReplayStatus;
 
 @Converter(autoApply = true)
-public class CombatContestReplayStatusConverter implements AttributeConverter<CombatContestReplayStatus, String> {
+class CombatContestReplayStatusConverter implements AttributeConverter<CombatContestReplayStatus, String> {
 
     @Override
     public String convertToDatabaseColumn(CombatContestReplayStatus attribute) {

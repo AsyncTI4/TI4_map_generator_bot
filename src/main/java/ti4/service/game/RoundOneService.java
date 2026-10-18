@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -26,11 +26,13 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.image.FileUploadService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.tigl.TiglSetupService;
 
 @UtilityClass
 public class RoundOneService {
 
     public static void roundOne(GenericInteractionCreateEvent event, Game game) {
+        TiglSetupService.enforceLadderRules(game, game.getActionsChannel());
         if (game.isAcd2()) {
             BotLogger.info(
                     Constants.privateStaticVoidPing() + " Action Card Deck 2 game has begun: " + game.gameJumpLinks());
@@ -178,7 +180,7 @@ public class RoundOneService {
                     }
                     if (!buttons.isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(
-                                target.getCorrectChannel(),
+                                target.getCardsInfoThread(),
                                 target.getRepresentation() + ", please choose a planet on which to place a Shrine.",
                                 buttons);
                     }

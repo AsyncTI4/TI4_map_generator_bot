@@ -23,25 +23,24 @@ class ReplayDispatchPayloadTest extends BaseTi4Test {
 
     @Test
     void writesGenericMessagePayloadsForNewLiteralMessages() {
-        String json = serializer.write(ReplayDispatchPayload.genericMessage("new"));
+        String json = ReplayDispatchSerializer.write(ReplayDispatchPayload.genericMessage("new"));
 
         assertTrue(json.contains("\"kind\":\"GENERIC_MESSAGE\""));
     }
 
     @Test
     void writesStructuredInteractionPayloads() {
-        assertTrue(serializer
-                .write(ReplayDispatchPayload.leaderPlayed("yssarilagent"))
+        assertTrue(ReplayDispatchSerializer.write(ReplayDispatchPayload.leaderPlayed("yssarilagent"))
                 .contains("\"kind\":\"LEADER_PLAYED\""));
-        assertTrue(serializer
-                .write(ReplayDispatchPayload.actionCardPlayed("mb1"))
+        assertTrue(ReplayDispatchSerializer.write(ReplayDispatchPayload.actionCardPlayed("mb1"))
                 .contains("\"kind\":\"ACTION_CARD_PLAYED\""));
-        assertTrue(serializer.write(ReplayDispatchPayload.techPlayed("asc")).contains("\"kind\":\"TECH_PLAYED\""));
-        assertTrue(
-                serializer.write(ReplayDispatchPayload.techExhausted("gls")).contains("\"kind\":\"TECH_EXHAUSTED\""));
-        assertTrue(serializer.write(ReplayDispatchPayload.retreatDeclared()).contains("\"kind\":\"RETREAT_DECLARED\""));
-        assertTrue(serializer
-                .write(ReplayDispatchPayload.retreatResolved("A1"))
+        assertTrue(ReplayDispatchSerializer.write(ReplayDispatchPayload.techPlayed("asc"))
+                .contains("\"kind\":\"TECH_PLAYED\""));
+        assertTrue(ReplayDispatchSerializer.write(ReplayDispatchPayload.techExhausted("gls"))
+                .contains("\"kind\":\"TECH_EXHAUSTED\""));
+        assertTrue(ReplayDispatchSerializer.write(ReplayDispatchPayload.retreatDeclared())
+                .contains("\"kind\":\"RETREAT_DECLARED\""));
+        assertTrue(ReplayDispatchSerializer.write(ReplayDispatchPayload.retreatResolved("A1"))
                 .contains("\"kind\":\"RETREAT_RESOLVED\""));
     }
 }

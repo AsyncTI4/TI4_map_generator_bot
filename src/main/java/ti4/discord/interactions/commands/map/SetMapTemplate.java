@@ -28,7 +28,8 @@ public class SetMapTemplate extends GameStateSubcommand {
         setMapTemplate(event, mapTemplate, transform, getGame());
     }
 
-    private void setMapTemplate(GenericInteractionCreateEvent event, String mapTemplate, boolean transform, Game game) {
+    private static void setMapTemplate(
+            GenericInteractionCreateEvent event, String mapTemplate, boolean transform, Game game) {
         if (!Mapper.isValidMapTemplate(mapTemplate)) {
             MessageHelper.sendMessageToEventChannel(event, "Invalid map template: " + mapTemplate);
         }

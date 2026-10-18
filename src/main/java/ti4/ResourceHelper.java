@@ -13,7 +13,7 @@ import ti4.helpers.Units.UnitKey;
 
 public final class ResourceHelper {
 
-    private static final Pattern PATTERN = Pattern.compile(Constants.UNIT_DD);
+    private static final Pattern UNIT_DD_PATTERN = Pattern.compile(Constants.UNIT_DD);
     private static ResourceHelper resourceHelper;
     private final Map<String, String> unitCache = new HashMap<>();
     private final Map<String, String> decalCache = new HashMap<>();
@@ -34,12 +34,12 @@ public final class ResourceHelper {
     }
 
     @Nullable
-    public String getPositionFile(String name) {
+    public static String getPositionFile(String name) {
         return getResourceFromFolder("positions/", name);
     }
 
     @Nullable
-    public String getTileFile(String name) {
+    public static String getTileFile(String name) {
         return getResourceFromFolder("tiles/", name);
     }
 
@@ -57,7 +57,7 @@ public final class ResourceHelper {
     @Nullable
     public String getUnitFile(String name) {
         if (name.endsWith(Constants.UNIT_DD) && RandomHelper.isOneInX(Constants.EYE_CHANCE)) {
-            name = PATTERN.matcher(name).replaceFirst(Constants.UNIT_DD_EYE);
+            name = UNIT_DD_PATTERN.matcher(name).replaceFirst(Constants.UNIT_DD_EYE);
         }
         return getCachedResource(unitCache, "units/", name);
     }
@@ -112,7 +112,7 @@ public final class ResourceHelper {
     }
 
     @Nullable
-    public String getPAResource(String name) {
+    public static String getPAResource(String name) {
         return getResourceFromFolder("player_area/", name);
     }
 
@@ -122,11 +122,11 @@ public final class ResourceHelper {
     }
 
     @Nullable
-    public String getExtraFile(String name) {
+    public static String getExtraFile(String name) {
         return getResourceFromFolder("extra/", name);
     }
 
-    private String getCachedResource(Map<String, String> cache, String folder, String name) {
+    private static String getCachedResource(Map<String, String> cache, String folder, String name) {
         if (cache.containsKey(name)) {
             return cache.get(name);
         }
@@ -150,26 +150,26 @@ public final class ResourceHelper {
     }
 
     @Nullable
-    public String getDataFile(String name) {
+    public static String getDataFile(String name) {
         return getResourceFromFolder("data/", name);
     }
 
-    public String getDataFolder(String name) {
+    public static String getDataFolder(String name) {
         return Storage.getResourcePath() + File.separator + "data" + File.separator + name;
     }
 
     @Nullable
-    public String getWebFile(String name) {
+    public static String getWebFile(String name) {
         return getResourceFromFolder("web/", name);
     }
 
     @Nullable
-    public String getAliasFile(String name) {
+    public static String getAliasFile(String name) {
         return getResourceFromFolder("alias/", name);
     }
 
     @Nullable
-    public String getHelpFile(String name) {
+    public static String getHelpFile(String name) {
         return getResourceFromFolder("help/", name);
     }
 }

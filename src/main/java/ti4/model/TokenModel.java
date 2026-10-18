@@ -24,6 +24,7 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
     private Boolean isNova;
 
     private Boolean isScar;
+    private Boolean isFowVision;
     private List<String> aliasList;
     private List<Wormhole> wormholes;
     private ComponentSource source;
@@ -93,8 +94,10 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
         if (aliasList != null) sb.append("\nAlias list: ").append(aliasList);
         eb.setFooter(sb.toString());
 
-        eb.setThumbnail("https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/"
-                + imagePath + "?raw=true");
+        eb.setThumbnail(
+                "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/" + imagePath
+                        + "?raw=true",
+                id);
 
         return eb.build();
     }

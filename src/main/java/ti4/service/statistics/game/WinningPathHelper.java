@@ -12,7 +12,7 @@ import ti4.image.Mapper;
 @UtilityClass
 public class WinningPathHelper {
 
-    private static final Pattern PATTERN = Pattern.compile("[^a-z]");
+    private static final Pattern NON_LOWERCASE_LETTER_PATTERN = Pattern.compile("[^a-z]");
 
     public static String buildWinningPath(Game game, Player winner) {
         return describe(breakDownWinningPath(game, winner));
@@ -76,7 +76,8 @@ public class WinningPathHelper {
     }
 
     private static String normalizeVictoryPointKey(String poID) {
-        String normalized = PATTERN.matcher(poID.toLowerCase()).replaceAll("");
+        String normalized =
+                NON_LOWERCASE_LETTER_PATTERN.matcher(poID.toLowerCase()).replaceAll("");
         if (normalized.contains("seed")) return WinningPathBreakdown.SEED;
         if (normalized.contains("mutiny")) return WinningPathBreakdown.MUTINY;
         if (normalized.contains("shard")) return WinningPathBreakdown.SHARD;

@@ -213,7 +213,7 @@ class ArbitrationAcd2ButtonHandler {
                 && hasCoexistencePartner(game, planet, infantryPlayer);
     }
 
-    static boolean hasCoexistencePartner(Game game, Planet planet, Player infantryPlayer) {
+    private static boolean hasCoexistencePartner(Game game, Planet planet, Player infantryPlayer) {
         return neutralHasGroundForces(game, planet)
                 || game.getRealPlayers().stream()
                         .anyMatch(other -> other != infantryPlayer && planet.hasGroundForces(other));

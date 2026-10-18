@@ -37,7 +37,7 @@ class SleeperToken extends GameStateSubcommand {
         sleeperForPlanet(event, game, Constants.PLANET6, player);
     }
 
-    private void sleeperForPlanet(SlashCommandInteractionEvent event, Game game, String planet, Player player) {
+    private static void sleeperForPlanet(SlashCommandInteractionEvent event, Game game, String planet, Player player) {
         OptionMapping planetOption = event.getOption(planet);
         if (planetOption == null) {
             return;

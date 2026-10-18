@@ -113,6 +113,10 @@ public class CombatModifierModel implements ModelInterface {
             if ("_ship_no_ff".equals(scope)) {
                 isInScope = unit.getIsShip() && !"fighter".equalsIgnoreCase(unit.getBaseType());
             }
+            if ("_upgraded_ship_".equals(scope)) {
+                isInScope = unit.getIsShip()
+                        && unit.getRequiredTechId().map(player::hasTech).orElse(false);
+            }
             if ("_groundforce_".equals(scope)) {
                 isInScope = unit.getIsGroundForce();
             }

@@ -1,0 +1,38 @@
+{
+    "id":  "ao6",
+    "name":  "Muspelheim",
+    "aliases":  [
+        "ao6",
+        "muspelheim"
+    ],
+    "imagePath":  "ao6_muspelheim.png",
+    "planets":  [
+        "muspelheim"
+    ],
+    "shipPositionsType":  "TYPE01",
+    "spaceTokenLocations":  [
+        {
+            "x":  245,
+            "y":  100
+        },
+        {
+            "x":  200,
+            "y":  185
+        },
+        {
+            "x":  110,
+            "y":  215
+        },
+        {
+            "x":  120,
+            "y":  40
+        }
+    ],
+    "wormholes":  null,
+    "isAsteroidField":  false,
+    "isSupernova":  false,
+    "isNebula":  false,
+    "isGravityRift":  false,
+    "source":  "goose",
+    "tileBack":  "blue"
+}

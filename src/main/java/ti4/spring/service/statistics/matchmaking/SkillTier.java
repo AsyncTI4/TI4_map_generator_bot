@@ -17,8 +17,6 @@ public enum SkillTier {
         private static final long LOWER_MEDIUM = 1900;
 
         private static final long MEDIUM_HIGHER = 2150;
-
-        private Bounds() {}
     }
 
     /** A parsed filter value: a tier, optionally inverted by the {@value #EXCLUSION_PREFIX} prefix. */

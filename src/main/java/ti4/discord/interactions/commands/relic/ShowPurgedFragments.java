@@ -23,13 +23,14 @@ class ShowPurgedFragments extends GameStateSubcommand {
                         fragmentId -> Mapper.getExplore(fragmentId).getName()))
                 .toList()) {
             message.append('`')
-                    .append(index++)
+                    .append(index)
                     .append(".` - ")
                     .append(Mapper.getExplore(fragmentId).getNameRepresentation())
                     .append(" (`")
                     .append(fragmentId)
                     .append("`)")
                     .append('\n');
+            index++;
         }
         if (index == 1) {
             message.append("No relic fragments have been purged.");

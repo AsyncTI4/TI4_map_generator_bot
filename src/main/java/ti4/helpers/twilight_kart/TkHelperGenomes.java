@@ -67,7 +67,7 @@ public class TkHelperGenomes {
             }
             String name = id.replace(PREFIX, "").replace(SUFFIX, "").toUpperCase();
             try {
-                return Optional.of(TkGenome.valueOf(name));
+                return Optional.of(valueOf(name));
             } catch (IllegalArgumentException e) {
                 return Optional.empty();
             }
@@ -125,9 +125,9 @@ public class TkHelperGenomes {
                 String.format("%s has exhausted the %s_%s_.", player.getRepresentation(), ssruuClever, name);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), exhaustText);
         switch (tkGenome) {
-            case TkGenome.DEPLOYMENT -> ButtonHelper.resolveTransitDiodesStep1(game, player);
+            case DEPLOYMENT -> ButtonHelper.resolveTransitDiodesStep1(game, player);
 
-            case TkGenome.SWARM -> {
+            case SWARM -> {
                 String text = player.getRepresentation() + ", use buttons to drop 2 infantry on a planet.";
                 List<Button> buttons = new ArrayList<>(
                         Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
@@ -137,7 +137,7 @@ public class TkHelperGenomes {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), text, buttons);
             }
 
-            case TkGenome.SPLITTING -> {
+            case SPLITTING -> {
                 String[] args = rest.split("_");
                 if (args.length < 2) {
                     return;

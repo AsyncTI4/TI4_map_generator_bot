@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
@@ -18,15 +19,20 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.game.GameSummaryService;
+import ti4.service.game.ModernGameInfoService;
 import ti4.service.option.FOWOptionService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.settings.users.UserSettingsManager;
 
 class Info extends GameStateSubcommand {
 
+    private static final String MODERN = "modern";
+
     public Info() {
         super(Constants.INFO, "Game information:", false, false);
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game Name").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.BOOLEAN, MODERN, "Readable embed layout (default false: classic text)"));
     }
 
     @Override
@@ -35,12 +41,26 @@ class Info extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "This command cannot be used in private channel.");
             return;
         }
+        if (event.getOption(MODERN, false, OptionMapping::getAsBoolean)) {
+            sendModernGameInfo(getGame(), event);
+            return;
+        }
         StringBuilder sb = getGameInfo(getGame(), event);
         MessageHelper.replyToMessage(event, sb.toString());
     }
 
+    private static void sendModernGameInfo(Game game, SlashCommandInteractionEvent event) {
+        boolean privateGame = FoWHelper.isPrivateGame(game, event);
+        boolean showPlayersAndMap = !privateGame && FoWHelper.canSeeWholeMap(game, event);
+        MessageHelper.sendMessageToChannelWithEmbeds(
+                event.getChannel(),
+                "## Game Info: " + GameSummaryService.displayName(game),
+                ModernGameInfoService.buildEmbeds(game, privateGame, showPlayersAndMap));
+    }
+
     private static StringBuilder getGameInfo(Game game, SlashCommandInteractionEvent event) {
         boolean privateGame = FoWHelper.isPrivateGame(game, event);
+        boolean hidesMap = !FoWHelper.canSeeWholeMap(game, event);
 
         StringBuilder sb = new StringBuilder();
         sb.append("## Game Info:").append('\n');
@@ -98,7 +118,7 @@ class Info extends GameStateSubcommand {
             }
         }
         sb.append("Map Template: `").append(game.getMapTemplateID()).append('`').append('\n');
-        if (!privateGame || game.isHasEnded()) {
+        if (!hidesMap) {
             sb.append("Map String: `").append(game.getMapString()).append('`').append('\n');
             sb.append("Hex Summary: ` ")
                     .append(game.getHexSummary())
@@ -272,7 +292,7 @@ class Info extends GameStateSubcommand {
             sb.append('\n');
         }
 
-        if (!privateGame) {
+        if (!privateGame && !hidesMap) {
             sb.append("### Players: ").append('\n');
             int index = 1;
             for (Player player : game.getRealPlayers()) {

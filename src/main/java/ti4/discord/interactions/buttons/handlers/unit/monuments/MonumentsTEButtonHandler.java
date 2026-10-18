@@ -172,7 +172,7 @@ public class MonumentsTEButtonHandler {
                         KELERES_MONUMENT_COMMAND_TOKENS + player.getFaction(), Integer.toString(remainingTokens));
             }
         }
-        CommandCounterHelper.addCC(event, player, tile, ping, useMonumentToken ? false : useTactic, true);
+        CommandCounterHelper.addCC(event, player, tile, ping, !useMonumentToken && useTactic, true);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -185,17 +185,7 @@ public class MonumentsTEButtonHandler {
         if (!game.isMonumentsMode() || !hasKeleresMonument(game, player)) {
             return false;
         }
-        int commandTokenLimit = 16;
-        if (!game.getStoredValue("ccLimit").isBlank()) {
-            commandTokenLimit = Integer.parseInt(game.getStoredValue("ccLimit"));
-        }
-        if (!game.getStoredValue("ccLimit" + player.getColor()).isBlank()) {
-            commandTokenLimit = Integer.parseInt(game.getStoredValue("ccLimit" + player.getColor()));
-        }
-        if (player.hasRelic("endurance_steroids")) {
-            commandTokenLimit += 2;
-        }
-        return Helper.getCCCount(game, player.getColor()) < commandTokenLimit;
+        return Helper.getCCCount(game, player.getColor()) < player.getCommandTokenLimit();
     }
 
     // Epiphany Hollow
@@ -384,10 +374,7 @@ public class MonumentsTEButtonHandler {
     }
 
     public static void offerEpiphanyResearchButtons(Game game, Player player, TechnologyModel technology) {
-        if (game == null
-                || player == null
-                || technology == null
-                || !MonumentsService.hasMonument(game, player, "firmament_monument")) {
+        if (player == null || technology == null || !MonumentsService.hasMonument(game, player, "firmament_monument")) {
             return;
         }
         List<String> controlTokens = getEpiphanyControlTokens(game, player);
@@ -413,7 +400,7 @@ public class MonumentsTEButtonHandler {
                         FactionEmojis.Firmament)));
         buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
+                player.getCardsInfoThread(),
                 player.getRepresentationNoPing() + ", after researching " + technology.getNameRepresentation()
                         + ", you may remove a control token from _Epiphany_ to skip 1 prerequisite or move a non-Firmament player's control token to a plot card.",
                 buttons);
@@ -464,7 +451,7 @@ public class MonumentsTEButtonHandler {
             return;
         }
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
+                player.getCardsInfoThread(),
                 player.getRepresentationNoPing() + ", choose the plot card to receive "
                         + game.getPlayerFromColorOrFaction(parts[1]).getFactionEmojiOrColor() + "'s control token.",
                 buttons);
@@ -491,11 +478,10 @@ public class MonumentsTEButtonHandler {
         player.setPlotCardFaction(parts[1], parts[0]);
         Player tokenOwner = game.getPlayerFromColorOrFaction(parts[0]);
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
+                player.getCardsInfoThread(),
                 player.getRepresentationNoPing() + " moved "
                         + (tokenOwner == null ? parts[0] : tokenOwner.getFactionEmojiOrColor())
-                        + "'s control token from _Epiphany_ to "
-                        + ti4.image.Mapper.getPlot(parts[1]).getNameRepresentation() + ".");
+                        + "'s control token from _Epiphany_ to a plot card.");
         ButtonHelper.deleteMessage(event);
     }
 

@@ -30,8 +30,8 @@ public class EgressClientManager {
 
     static {
         webProperties = new Properties();
-        try (InputStream input = new FileInputStream(
-                Objects.requireNonNull(ResourceHelper.getInstance().getWebFile("web.properties")))) {
+        try (InputStream input =
+                new FileInputStream(Objects.requireNonNull(ResourceHelper.getWebFile("web.properties")))) {
             webProperties.load(input);
         } catch (IOException e) {
             BotLogger.error("Could not load web properties.", e);

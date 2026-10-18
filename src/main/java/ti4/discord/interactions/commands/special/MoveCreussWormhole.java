@@ -75,7 +75,7 @@ class MoveCreussWormhole extends GameStateSubcommand {
         CommanderUnlockCheckService.checkPlayer(player, "ghost");
     }
 
-    private boolean isValidCreussWormhole(String tokenName) {
+    private static boolean isValidCreussWormhole(String tokenName) {
         if (tokenName == null) return false;
         List<String> validNames = List.of("creussalpha", "creussbeta", "creussgamma");
         return validNames.contains(tokenName);

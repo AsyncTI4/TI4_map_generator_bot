@@ -59,6 +59,7 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.tactical.TacticalActionDisplacementService;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
@@ -73,7 +74,7 @@ class GameLoadService {
                     .addKeySerializer(Units.UnitKey.class, new UnitKeyMapKeySerializer())
                     .addKeyDeserializer(Units.UnitKey.class, new UnitKeyMapKeyDeserializer()))
             .build();
-    private static final Pattern PATTERN = Pattern.compile("—");
+    private static final Pattern EM_DASH_PATTERN = Pattern.compile("—");
     private static final String GAME_FILE_EXTENSION = Constants.TXT;
 
     static List<String> loadGameNames() {
@@ -248,6 +249,9 @@ class GameLoadService {
                 }
                 if (ENDTOKENS.equals(data)) {
                     break;
+                }
+                if (tile != null && data.startsWith(FOW_VISION_GRANT + " ")) {
+                    tile.setFowVisionGrant(Helper.getListFromCSV(data.substring(FOW_VISION_GRANT.length() + 1)));
                 }
             }
         }
@@ -507,6 +511,7 @@ class GameLoadService {
                 case Constants.DISPLACED_UNITS_ACTIVATION_NEW -> {
                     Map<String, Map<UnitKey, List<Integer>>> displacedUnits =
                             mapper.readValue(info, new TypeReference<>() {});
+                    TacticalActionDisplacementService.removeEmptyDisplacement(displacedUnits);
                     game.setTacticalActionDisplacement(displacedUnits);
                 }
                 case Constants.FOW_OPTIONS -> {
@@ -549,6 +554,7 @@ class GameLoadService {
                 case Constants.FAST_SC_FOLLOW -> game.setFastSCFollowMode(parseBooleanOrDefault(info, false));
                 case Constants.QUEUE_SO -> game.setQueueSO(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_BUBBLES -> game.setShowBubbles(parseBooleanOrDefault(info, false));
+                // TODO: default false here vs true in GameProperties; a missing token reverts to legacy flow.
                 case Constants.TRANSACTION_METHOD -> game.setNewTransactionMethod(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_GEARS -> game.setShowGears(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_BANNERS -> game.setShowBanners(parseBooleanOrDefault(info, false));
@@ -600,6 +606,7 @@ class GameLoadService {
                 case Constants.DISCORDANT_STARS_MODE -> game.setDiscordantStarsMode(parseBooleanOrDefault(info, false));
                 case Constants.BLUE_REVERIE_MODE -> game.setBlueReverieMode(parseBooleanOrDefault(info, false));
                 case Constants.UNCHARTED_SPACE_STUFF -> game.setUnchartedSpaceStuff(parseBooleanOrDefault(info, false));
+                case Constants.LOST_LEGACIES_TILES -> game.setLostLegaciesTiles(parseBooleanOrDefault(info, false));
                 case Constants.VERBOSITY -> game.setOutputVerbosity(info);
                 case Constants.BETA_TEST_MODE -> game.setTestBetaFeaturesMode(parseBooleanOrDefault(info, false));
                 case Constants.AGE_OF_EXPLORATION_MODE ->
@@ -769,7 +776,7 @@ class GameLoadService {
         while (mapdata.hasMoreTokens()) {
             StringTokenizer entry = new StringTokenizer(mapdata.nextToken(), ",");
             String id = entry.nextToken();
-            String val = entry.nextToken();
+            String val = entry.hasMoreTokens() ? entry.nextToken() : "";
             data.put(id, val);
         }
         return data;
@@ -1078,7 +1085,7 @@ class GameLoadService {
                         String tileID = system[1];
                         String label = system[2];
                         if (label != null)
-                            label = PATTERN.matcher(label).replaceAll(" "); // replace em dash with spaces
+                            label = EM_DASH_PATTERN.matcher(label).replaceAll(" "); // replace em dash with spaces
                         player.addFogTile(tileID, position, label);
                     }
                 }
@@ -1132,9 +1139,12 @@ class GameLoadService {
                     String filter = tokenizer.nextToken();
                     player.setFogFilter(filter);
                 }
+                case Constants.FOG_GHOST_HEXES -> player.setFogGhostHexes(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.READY_TO_PASS_BAG ->
                     player.setReadyToPassBag(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.OPLUSPLUS_COUNCIL_CONFIRMED ->
+                    player.setOplusplusCouncilConfirmed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.AUTO_PASS_WHENS_N_AFTERS ->
                     player.setAutoPassOnWhensAfters(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));

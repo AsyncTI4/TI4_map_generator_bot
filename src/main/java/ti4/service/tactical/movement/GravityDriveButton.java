@@ -4,15 +4,19 @@ import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.service.emoji.SourceEmojis;
+import ti4.service.emoji.TechEmojis;
 import ti4.service.tactical.MoveAbilityButton;
 import ti4.service.tactical.MoveContext;
 
 public final class GravityDriveButton implements MoveAbilityButton {
     public boolean enabled(MoveContext ctx) {
-        return ctx.player.hasTech("baldrick_gd");
+        return ctx.player.hasTech("baldrick_gd") || ctx.player.hasTechReady("gd_br");
     }
 
     public List<Button> build(MoveContext ctx) {
-        return List.of(Buttons.gray("exhaustTech_baldrick_gd", "Exhaust Gravity Drive", SourceEmojis.IgnisAurora));
+        if (ctx.player.hasTech("baldrick_gd")) {
+            return List.of(Buttons.gray("exhaustTech_baldrick_gd", "Exhaust Gravity Drive", SourceEmojis.IgnisAurora));
+        }
+        return List.of(Buttons.gray("exhaustTech_gd_br", "Exhaust Gravity Drive", TechEmojis.PropulsionTech));
     }
 }

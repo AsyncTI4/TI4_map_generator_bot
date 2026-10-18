@@ -35,11 +35,6 @@ public interface TwilightFallDeckFuncs {
         List<String> allCards = Mapper.getDeck(deckID).getNewShuffledDeck();
         Game game = getSelf();
         List<String> bannedCards = new ArrayList<>();
-        for (String card : allCards) {
-            if (game.getStoredValue("bannedTechs").contains(card)) {
-                bannedCards.add(card);
-            }
-        }
 
         if (game != null && game.isTwilightDS()) {
             for (TechnologyModel tech : Mapper.getTechs().values()) {
@@ -48,6 +43,11 @@ public interface TwilightFallDeckFuncs {
                 }
             }
             Collections.shuffle(allCards);
+        }
+        for (String card : allCards) {
+            if (game.getStoredValue("bannedTechs").contains(card)) {
+                bannedCards.add(card);
+            }
         }
         for (String card : bannedCards) {
             allCards.remove(card);

@@ -3,6 +3,7 @@ package ti4.helpers.settingsFramework.menus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,18 @@ import tools.jackson.databind.JsonNode;
 @JsonIgnoreProperties("messageId")
 class FrankenDrazFactionPrioritySettings extends SettingsMenu {
     private static final String MENU_ID = "drazFactionPriorities";
+    private static final Set<String> EXCLUDED_FACTIONS = Set.of(
+            "lazax",
+            "admins",
+            "franken",
+            "keleresm",
+            "keleresx",
+            "miltymod",
+            "qulane",
+            "neutral",
+            "obsidian",
+            "stoneborn",
+            "morpha");
 
     private final ListSetting<FactionModel> prioritizedFactions;
     private final IntegerRangeSetting discordantStarsFactionLimits;
@@ -88,13 +101,13 @@ class FrankenDrazFactionPrioritySettings extends SettingsMenu {
         String prefix = menuAction + "_" + navId() + "_";
         List<Button> buttons = new ArrayList<>();
         if (settings.isEffectiveDiscordantStarsEnabled()) {
-            buttons.add(Buttons.blue(prefix + "prioritizeDiscordantStars", "Prioritize Discordant Stars"));
+            buttons.add(Buttons.blue(prefix + "prioritizeAllDS", "Prioritize Discordant Stars"));
         }
         if (settings.isEffectiveBlueReverieEnabled()) {
-            buttons.add(Buttons.blue(prefix + "prioritizeBlueReverie", "Prioritize Blue Reverie"));
+            buttons.add(Buttons.blue(prefix + "prioritizeAllBR", "Prioritize Blue Reverie"));
         }
         if (settings.isLostLegaciesEnabled()) {
-            buttons.add(Buttons.blue(prefix + "prioritizeLostLegacies", "Prioritize Lost Legacies"));
+            buttons.add(Buttons.blue(prefix + "prioritizeAllLL", "Prioritize Lost Legacies"));
         }
         return buttons;
     }
@@ -103,9 +116,9 @@ class FrankenDrazFactionPrioritySettings extends SettingsMenu {
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
         ComponentSource source =
                 switch (action) {
-                    case "prioritizeDiscordantStars" -> ComponentSource.ds;
-                    case "prioritizeBlueReverie" -> ComponentSource.blue_reverie;
-                    case "prioritizeLostLegacies" -> ComponentSource.theodisi;
+                    case "prioritizeAllDS" -> ComponentSource.ds;
+                    case "prioritizeAllBR" -> ComponentSource.blue_reverie;
+                    case "prioritizeAllLL" -> ComponentSource.theodisi;
                     default -> null;
                 };
         if (source == null) return null;
@@ -131,13 +144,16 @@ class FrankenDrazFactionPrioritySettings extends SettingsMenu {
     @Override
     protected void updateTransientSettings() {
         if (parent instanceof FrankenSettings settings) {
-            prioritizedFactions.setAllValues(settings.getLegalFactionOptions());
+            Map<String, FactionModel> legalFactions = new LinkedHashMap<>(settings.getLegalFactionOptions());
+            legalFactions.keySet().removeAll(EXCLUDED_FACTIONS);
+            prioritizedFactions.setAllValues(legalFactions);
         }
     }
 
     private static IntegerRangeSetting sourceRange(String id, String name, ComponentSource source) {
         int factionCount = (int) Mapper.getFactionsValues().stream()
                 .filter(faction -> faction.getSource() == source)
+                .filter(faction -> !EXCLUDED_FACTIONS.contains(faction.getAlias()))
                 .count();
         return new IntegerRangeSetting(id, name, 0, 0, factionCount, factionCount, 0, factionCount, 1);
     }

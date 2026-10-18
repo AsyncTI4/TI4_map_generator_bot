@@ -2,6 +2,8 @@ package ti4.discord.interactions.buttons.handlers.actioncards.theodisi;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -110,9 +112,9 @@ public class PrecisionTargetingLLButtonHandler {
         } catch (NumberFormatException e) {
             return "";
         }
-        return List.of(state[2].split(",")).stream()
+        return Stream.of(state[2].split(","))
                 .map(asyncId -> defender.getPriorityUnitByAsyncID(asyncId, tile.getSpaceUnitHolder()))
-                .filter(unit -> unit != null)
+                .filter(Objects::nonNull)
                 .map(UnitModel::getName)
                 .distinct()
                 .reduce((left, right) -> left + ", " + right)
@@ -133,11 +135,11 @@ public class PrecisionTargetingLLButtonHandler {
         } catch (NumberFormatException e) {
             return List.of();
         }
-        return List.of(state[2].split(",")).stream()
+        return Stream.of(state[2].split(","))
                 .map(asyncId -> tile.getSpaceUnitHolder().getUnitKeysForPlayer(defender).stream()
                         .filter(key -> key.asyncID().equals(asyncId))
                         .findFirst()
-                        .map(key -> key.unitName())
+                        .map(UnitKey::unitName)
                         .orElse(null))
                 .filter(java.util.Objects::nonNull)
                 .distinct()

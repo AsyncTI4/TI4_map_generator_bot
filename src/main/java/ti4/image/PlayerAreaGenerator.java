@@ -44,10 +44,10 @@ import ti4.ResourceHelper;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
@@ -68,7 +68,6 @@ import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Storage;
-import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.MapGenerator.HorizontalAlign;
@@ -158,7 +157,7 @@ public class PlayerAreaGenerator {
         }
     }
 
-    private void drawString(Graphics2D g2, String text, int x, int y, float maxWidth) {
+    private static void drawString(Graphics2D g2, String text, int x, int y, float maxWidth) {
         var attributedString = new AttributedString(text);
         attributedString.addAttribute(TextAttribute.FONT, g2.getFont());
         AttributedCharacterIterator characterIterator = attributedString.getIterator();
@@ -459,7 +458,7 @@ public class PlayerAreaGenerator {
         return r;
     }
 
-    private String factionDisplayName(Player player) {
+    private static String factionDisplayName(Player player) {
         StringBuilder text = new StringBuilder();
         if (player.getDisplayName() != null && !"null".equalsIgnoreCase(player.getDisplayName())) {
             text.append("[").append(player.getDisplayName()).append("]");
@@ -486,7 +485,7 @@ public class PlayerAreaGenerator {
 
             if (member != null) return member.getEffectiveName() + afk;
             return user.getEffectiveName() + afk;
-        } catch (Exception e) {
+        } catch (Exception _) {
         }
         return player.getUserName() + afk;
     }
@@ -692,7 +691,7 @@ public class PlayerAreaGenerator {
         return xDelta;
     }
 
-    private int getPlotCardColumnCount(List<Entry<String, Integer>> plots) {
+    private static int getPlotCardColumnCount(List<Entry<String, Integer>> plots) {
         return Math.max(1, (plots.size() + 4) / 5);
     }
 
@@ -827,14 +826,6 @@ public class PlayerAreaGenerator {
     }
 
     private int theodisiTokenSupplies(Player player, int xDeltaFromRightSide, int yDelta) {
-        if (player.hasAbility("expeditionary_cache")) {
-            xDeltaFromRightSide = displayTheodisiTokenSupply(
-                    "token_theodisi_kairnexpedition.png",
-                    5,
-                    KairnAbilityHandler.getAvailableExpeditionTokens(game),
-                    xDeltaFromRightSide,
-                    yDelta);
-        }
         if (player.hasAbility("sting_of_the_hive")) {
             xDeltaFromRightSide = displayTheodisiTokenSupply(
                     "token_theodisi_mine.png",
@@ -1345,7 +1336,7 @@ public class PlayerAreaGenerator {
             String relicStatus = isExhausted ? "_exh" : "_rdy";
 
             String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
-            String resourcePath = ResourceHelper.getInstance().getPAResource(relicFileName);
+            String resourcePath = ResourceHelper.getPAResource(relicFileName);
             BufferedImage resourceBufferedImage;
             try {
                 resourceBufferedImage = ImageHelper.read(resourcePath);
@@ -1361,6 +1352,14 @@ public class PlayerAreaGenerator {
             }
             if (MonumentsBRButtonHandler.hasArmageddonProjectSuperweapon(game, player, relicID)) {
                 DrawingUtil.getAndDrawControlToken(graphics, player, x + deltaX + 10, y + 60, false, 0.5f);
+            }
+            if (List.of("economicboon", "naturesboon", "diplomaticboon", "cosmicboon")
+                    .contains(relicID)) {
+                int tokenCount = LostLegaciesRelicHandler.getBoonTokens(game, player, relicID);
+                for (int token = 0; token < tokenCount; token++) {
+                    DrawingUtil.getAndDrawControlToken(
+                            graphics, player, x + deltaX + 2 + token % 3 * 14, y + 52 + token / 3 * 13, false, 0.25f);
+                }
             }
 
             deltaX += 48;
@@ -1414,9 +1413,11 @@ public class PlayerAreaGenerator {
                         default -> -1;
                     };
             if (leaderRank1 == leaderRank2) {
-                return Mapper.getLeader(leader1.getId())
-                        .getName()
-                        .compareToIgnoreCase(Mapper.getLeader(leader2.getId()).getName());
+                LeaderModel leaderModel1 = Mapper.getLeader(leader1.getId());
+                LeaderModel leaderModel2 = Mapper.getLeader(leader2.getId());
+                String leaderName1 = leaderModel1 == null ? leader1.getId() : leaderModel1.getName();
+                String leaderName2 = leaderModel2 == null ? leader2.getId() : leaderModel2.getName();
+                return leaderName1.compareToIgnoreCase(leaderName2);
             }
             return leaderRank1 - leaderRank2;
         };
@@ -1481,6 +1482,12 @@ public class PlayerAreaGenerator {
             }
 
             LeaderModel leaderModel = Mapper.getLeader(leader.getId());
+            if (leaderModel == null) {
+                g2.setFont(Storage.getFont14());
+                DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, leader.getId(), x + deltaX + 7, y + 30, 120, true);
+                deltaX += 48;
+                continue;
+            }
             boolean shrink = game.isTwilightsFallMode() ? leaderModel.getTFShrinkName() : leaderModel.getShrinkName();
             String name = game.isTwilightsFallMode() ? leaderModel.getTFShortName() : leaderModel.getShortName();
 
@@ -1732,7 +1739,7 @@ public class PlayerAreaGenerator {
                 if (abilityFileName != null) {
                     String status = isExhaustedLocked ? "_exh" : "_rdy";
                     abilityFileName += status + ".png";
-                    String resourcePath = ResourceHelper.getInstance().getPAResource(abilityFileName);
+                    String resourcePath = ResourceHelper.getPAResource(abilityFileName);
 
                     BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
                     graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
@@ -1946,18 +1953,7 @@ public class PlayerAreaGenerator {
         String CC_TAG = "cc";
         UnitTokenPosition reinforcementsPosition = PositionMapper.getReinforcementsPosition(CC_TAG);
         if (reinforcementsPosition != null && playerColor != null) {
-            int positionCount = reinforcementsPosition.getPositionCount(CC_TAG);
-            if (!game.getStoredValue("ccLimit").isEmpty()) {
-                positionCount = Integer.parseInt(game.getStoredValue("ccLimit"));
-            }
-            if (!game.getStoredValue("ccLimit" + playerColor).isEmpty()) {
-                positionCount = Integer.parseInt(game.getStoredValue("ccLimit" + playerColor));
-            }
-            if (game.getPlayerFromColorOrFaction(playerColor) != null
-                    && game.getPlayerFromColorOrFaction(playerColor).hasRelic("endurance_steroids")) {
-                positionCount += 2;
-            }
-            int remainingReinforcements = positionCount - ccCount;
+            int remainingReinforcements = player.getCommandTokenLimit() - ccCount;
             if (remainingReinforcements > 0) {
                 for (int i = 0; i < remainingReinforcements && i < 16; i++) {
                     try {
@@ -1984,15 +1980,15 @@ public class PlayerAreaGenerator {
 
         int x = mapWidth - 120 - xDeltaFromRightSide;
         boolean onBoard = MonumentsService.hasMonumentOnBoard(game, player);
-        String monumentFile = "outline_monument.png";
+        BufferedImage image = null;
         if (!onBoard) {
-            UnitKey monumentKey = Units.getUnitKey(monument.getUnitType(), player.getColor());
-            monumentFile = monumentKey.getFileName();
+            String monumentKey =
+                    getUnitPath(Mapper.getUnitKey(monument.getUnitType().toString(), player.getColor()));
+            image = ImageHelper.read(monumentKey);
+        } else {
+            image = ImageHelper.read(ResourceHelper.getResourceFromFolder("units/", "outline_monument.png"));
         }
-        BufferedImage image = ImageHelper.read(ResourceHelper.getResourceFromFolder("units/", monumentFile));
-        if (image == null) {
-            image = ImageHelper.read(ResourceHelper.getResourceFromFolder("units/", "black_monument.png"));
-        }
+
         graphics.drawImage(image, x + 20, y + 40, null);
         if (NekroMonumentService.hasAssimilatorOnMonument(game, player)) {
             drawFactionIconImageBorder(graphics, "nekro", x + 52, y + 78, 36, 36);
@@ -2412,7 +2408,7 @@ public class PlayerAreaGenerator {
             Set<PlanetType> types = EnumSet.noneOf(PlanetType.class);
             if (model != null && model.getPlanetTypes() != null) types.addAll(model.getPlanetTypes());
 
-            if (types.contains(PlanetType.FAKE)) {
+            if (types.contains(PlanetType.FAKE) || types.contains(PlanetType.SPACESTATION)) {
                 fakePlanets.add(planet);
             } else if (game.getTileFromPlanet(planet) == null) {
                 nonTile.add(planet);
@@ -3263,7 +3259,7 @@ public class PlayerAreaGenerator {
         return xDeltaFromRightSide;
     }
 
-    private String hasInfantryII(List<String> techs) {
+    private static String hasInfantryII(List<String> techs) {
         if (techs == null) {
             return null;
         }
@@ -3363,7 +3359,7 @@ public class PlayerAreaGenerator {
                 if (zealotsHeroActive && zealotsTechs.contains(tech)) {
                     String path = "pa_tech_unitsnew_zealots_" + tech + ".png";
                     try {
-                        path = ResourceHelper.getInstance().getPAResource(path);
+                        path = ResourceHelper.getPAResource(path);
                         BufferedImage img = ImageHelper.read(path);
                         graphics.drawImage(img, deltaX + x + unitOffset.x, y + unitOffset.y, null);
                     } catch (Exception e) {
@@ -3428,7 +3424,7 @@ public class PlayerAreaGenerator {
                 Point unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
                 String path = "pa_tech_unitsnew_zealotspurged_" + tech + ".png";
                 try {
-                    path = ResourceHelper.getInstance().getPAResource(path);
+                    path = ResourceHelper.getPAResource(path);
                     BufferedImage img = ImageHelper.read(path);
                     graphics.drawImage(img, deltaX + x + unitOffset.x, y + unitOffset.y, null);
                 } catch (Exception e) {
@@ -3563,15 +3559,16 @@ public class PlayerAreaGenerator {
         return deltaX;
     }
 
-    private void drawFactionIconImage(Graphics graphics, String faction, int x, int y, int width, int height) {
+    private static void drawFactionIconImage(Graphics graphics, String faction, int x, int y, int width, int height) {
         drawFactionIconImageOpaque(graphics, faction, x, y, width, height, null, false);
     }
 
-    private void drawFactionIconImageBorder(Graphics graphics, String faction, int x, int y, int width, int height) {
+    private static void drawFactionIconImageBorder(
+            Graphics graphics, String faction, int x, int y, int width, int height) {
         drawFactionIconImageOpaque(graphics, faction, x, y, width, height, null, true);
     }
 
-    private void drawFactionIconImageBorder(
+    private static void drawFactionIconImageBorder(
             Graphics graphics, String faction, int x, int y, int width, int height, boolean border) {
         drawFactionIconImageOpaque(graphics, faction, x, y, width, height, null, border);
     }
@@ -3657,7 +3654,7 @@ public class PlayerAreaGenerator {
 
     public static Rectangle drawPAImage(Graphics g, int x, int y, String resourceName) {
         try {
-            String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
+            String resourcePath = ResourceHelper.getPAResource(resourceName);
             BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
             g.drawImage(resourceBufferedImage, x, y, null);
             if (resourceBufferedImage != null)
@@ -3697,7 +3694,7 @@ public class PlayerAreaGenerator {
 
     public static void drawPAImageScaled(Graphics graphics, int x, int y, String resourceName, int width, int height) {
         try {
-            String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
+            String resourcePath = ResourceHelper.getPAResource(resourceName);
             BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, width, height);
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
@@ -3707,7 +3704,7 @@ public class PlayerAreaGenerator {
 
     private void drawPAImageOpaque(int x, int y, String resourceName, float opacity) {
         try {
-            String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
+            String resourcePath = ResourceHelper.getPAResource(resourceName);
             BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
             Graphics2D g2 = (Graphics2D) graphics;
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));

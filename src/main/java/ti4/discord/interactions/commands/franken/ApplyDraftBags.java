@@ -41,7 +41,7 @@ class ApplyDraftBags extends GameStateSubcommand {
                 player.resetDraftQueue();
                 player.setReadyToPassBag(true);
             }
-            frankenDrazDraft.expandFactionPackages(game);
+            FrankenDrazDraft.expandFactionPackages(game);
         }
 
         FrankenDraftBagService.applyDraftBags(event, game);

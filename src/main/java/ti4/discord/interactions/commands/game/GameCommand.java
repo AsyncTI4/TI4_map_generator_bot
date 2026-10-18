@@ -33,7 +33,8 @@ public class GameCommand implements ParentCommand {
                     new Tags(),
                     new GalacticEventsSetup(),
                     new GameOptions(),
-                    new StartScenario())
+                    new StartScenario(),
+                    new PlaceDrawableCard())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

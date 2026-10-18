@@ -6,7 +6,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
-import ti4.helpers.TIGLHelper;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
@@ -16,6 +15,7 @@ import ti4.service.draft.draftables.FactionDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
 import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
+import ti4.service.milty.EchoesOfYggdrasilService;
 import ti4.service.rules.ThundersEdgeRulesService;
 
 @UtilityClass
@@ -26,10 +26,6 @@ public class DraftSetupService {
         // Load the general game settings
         boolean success = game.loadGameSettingsFromSettings(event, settings);
         if (!success) return "Fix the game settings before continuing";
-        if (game.isCompetitiveTIGLGame()) {
-            TIGLHelper.sendTIGLSetupText(game);
-        }
-
         DraftSpec specs = DraftSpec.createFromMiltySettings(settings);
 
         if (specs.getTemplate().isNucleusTemplate()) {
@@ -56,12 +52,16 @@ public class DraftSetupService {
         if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
+        if (game.isLostLegaciesTiles()) {
+            sources.add(ComponentSource.theodisi);
+        }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             sources.add(ComponentSource.thunders_edge);
         }
         // Setup managers and game state
         DraftTileManager tileManager = game.getDraftTileManager();
         tileManager.addAllDraftTiles(sources);
+        EchoesOfYggdrasilService.addTiles(game, tileManager);
         DraftManager draftManager = game.getDraftManager();
         draftManager.resetForNewDraft();
         draftManager.setPlayers(specs.playerIDs);
@@ -150,10 +150,6 @@ public class DraftSetupService {
         // Game object setup and validation
         boolean success = game.loadGameSettingsFromSettings(event, settings);
         if (!success) return "Fix the game settings before continuing";
-        if (game.isCompetitiveTIGLGame()) {
-            TIGLHelper.sendTIGLSetupText(game);
-        }
-
         // Setup managers and game state
         DraftManager draftManager = game.getDraftManager();
         draftManager.resetForNewDraft();
@@ -163,6 +159,9 @@ public class DraftSetupService {
         if (sourceSettings == null) {
             return "Error: Could not find source settings.";
         }
+        game.setStoredValue(
+                ti4.helpers.Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,
+                Boolean.toString(sourceSettings.getEchoesOfYggdrasil().isVal()));
 
         List<ComponentSource> tileSources = new ArrayList<>(sourceSettings.getTileSources());
         if (game.isDiscordantStarsMode()) {
@@ -171,12 +170,16 @@ public class DraftSetupService {
         if (game.isUnchartedSpaceStuff()) {
             tileSources.add(ComponentSource.uncharted_space);
         }
+        if (game.isLostLegaciesTiles()) {
+            tileSources.add(ComponentSource.theodisi);
+        }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             tileSources.add(ComponentSource.thunders_edge);
         }
         DraftTileManager tileManager = game.getDraftTileManager();
         tileManager.clear();
         tileManager.addAllDraftTiles(tileSources);
+        EchoesOfYggdrasilService.addTiles(game, tileManager);
 
         for (String draftableKey : settings.getDraftablesList().getKeys()) {
             Draftable draftable = DraftComponentFactory.createDraftable(draftableKey);

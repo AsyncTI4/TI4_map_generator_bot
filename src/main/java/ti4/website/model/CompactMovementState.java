@@ -1,6 +1,7 @@
 package ti4.website.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class CompactMovementState {
         state.add("space");
         state.add(displacement.entrySet().stream()
                 .map(entry -> serializeSource(game, entry))
-                .filter(source -> !((List<?>) source.get(2)).isEmpty())
+                .filter(source -> !((Collection<?>) source.get(2)).isEmpty())
                 .sorted(Comparator.comparing(source -> JsonMapperManager.basic().writeValueAsString(source)))
                 .map(source -> (Object) source)
                 .toList());
@@ -50,7 +51,7 @@ public class CompactMovementState {
                                 .mapToInt(value -> (Integer) value)
                                 .sum()
                         > 0)
-                .sorted(Comparator.<List<Object>, String>comparing(unit -> (String) unit.get(0))
+                .sorted(Comparator.<List<Object>, String>comparing(unit -> (String) unit.getFirst())
                         .thenComparing(unit -> (String) unit.get(1)))
                 .map(unit -> (Object) unit)
                 .toList();

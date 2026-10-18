@@ -6,6 +6,7 @@ import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Storage;
 import ti4.json.PersistenceManager;
@@ -26,6 +27,23 @@ public class UserSettingsManager {
 
     public static void save(UserSettings userSettings) {
         persistFile(userSettings);
+    }
+
+    static void addActiveHourCheckins(String userId, int[] checkinsByUtcHour) {
+        try {
+            UserSettingsFileLockManager.wrapWithWriteLock(userId, () -> {
+                try {
+                    UserSettings userSettings =
+                            Objects.requireNonNullElseGet(readFileWithoutLock(userId), () -> new UserSettings(userId));
+                    userSettings.addActiveHourCheckins(checkinsByUtcHour);
+                    writeFileWithoutLock(userSettings);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
+        } catch (RuntimeException e) {
+            BotLogger.error("Failed to record active hours for user " + userId + ".", e);
+        }
     }
 
     private static UserSettings readFile(String userId) {

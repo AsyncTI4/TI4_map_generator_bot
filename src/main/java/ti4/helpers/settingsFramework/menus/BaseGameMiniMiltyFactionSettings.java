@@ -76,7 +76,7 @@ public class BaseGameMiniMiltyFactionSettings extends SettingsMenu {
     }
 
     @Override
-    protected void updateTransientSettings() {
+    void updateTransientSettings() {
         Map<String, FactionModel> allFactions = getAvailableBaseFactions();
         banFactions.setAllValues(allFactions);
         priFactions.setAllValues(allFactions);

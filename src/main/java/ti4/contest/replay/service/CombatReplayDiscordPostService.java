@@ -1,6 +1,7 @@
 package ti4.contest.replay.service;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.entities.Message;
@@ -26,6 +27,7 @@ import ti4.message.MessageHelper;
 @RequiredArgsConstructor
 public class CombatReplayDiscordPostService {
 
+    private static final Pattern EDGE_HYPHEN_PATTERN = Pattern.compile("(^-+|-+$)");
     private final ti4.contest.replay.core.CombatContestSettings settings;
     private final ReplayPayloadRenderer replayPayloadRenderer;
 
@@ -64,7 +66,7 @@ public class CombatReplayDiscordPostService {
     }
 
     @SneakyThrows
-    public Message sendTileRenderMessage(
+    public static Message sendTileRenderMessage(
             MessageChannel channel, String message, List<MessageEmbed> embeds, Game snapshotGame, String tilePosition) {
         if (snapshotGame == null) {
             return sendDiscordMessage(channel, message, embeds);
@@ -127,11 +129,12 @@ public class CombatReplayDiscordPostService {
     }
 
     private static String normalizeThreadNamePart(String value) {
-        String normalized = StringUtils.defaultIfBlank(value, "unknown")
-                .trim()
-                .toLowerCase()
-                .replaceAll("[^a-z0-9]+", "-")
-                .replaceAll("(^-+|-+$)", "");
+        String normalized = EDGE_HYPHEN_PATTERN
+                .matcher(StringUtils.defaultIfBlank(value, "unknown")
+                        .trim()
+                        .toLowerCase()
+                        .replaceAll("[^a-z0-9]+", "-"))
+                .replaceAll("");
         if (normalized.isBlank()) return "unknown";
         return StringUtils.abbreviate(normalized, 18);
     }

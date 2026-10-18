@@ -2,6 +2,7 @@ package ti4.service.draft;
 
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -10,6 +11,8 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
 
 public abstract class Draftable extends DraftLifecycleHooks {
+    private static final Pattern NON_LOWERCASE_LETTER_PATTERN = Pattern.compile("[^a-z]");
+
     /**
      * Get the type of draftable, e.g. "Speaker", "Slice", "Faction".
      * @return An object representing the type of draftable. It's a glorified string.
@@ -54,7 +57,9 @@ public abstract class Draftable extends DraftLifecycleHooks {
      * @return A lowercase alphabetical string.
      */
     public String getDraftableCommandKey() {
-        return getType().toString().toLowerCase().replaceAll("[^a-z]", "");
+        return NON_LOWERCASE_LETTER_PATTERN
+                .matcher(getType().toString().toLowerCase())
+                .replaceAll("");
     }
     /**
      * Make a button ID which the draft service will return to the draftable.

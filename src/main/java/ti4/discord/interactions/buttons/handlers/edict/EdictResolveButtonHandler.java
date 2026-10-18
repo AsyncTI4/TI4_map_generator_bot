@@ -28,6 +28,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
@@ -81,8 +82,8 @@ public class EdictResolveButtonHandler {
         AgendaModel model = Mapper.getAgenda(edict);
 
         boolean isOrangeBonusResolution = buttonID.contains("orangetf");
-        String resolverRep =
-                (isOrangeBonusResolution && game.isFowMode()) ? "Someone" : player.getRepresentationNoPing();
+        String fogPhrase = !isOrangeBonusResolution && player.isTyrant() ? "The tyrant" : "Someone";
+        String resolverRep = FoWHelper.actorOrAnon(game, player, fogPhrase);
         String message = resolverRep + " is resolving the _" + model.getName() + "_ edict.";
         MessageHelper.sendMessageToChannelWithEmbed(game.getMainGameChannel(), message, model.getRepresentationEmbed());
 

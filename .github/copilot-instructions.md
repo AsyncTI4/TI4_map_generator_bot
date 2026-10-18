@@ -148,7 +148,8 @@ public void handleMyButton(ButtonInteractionEvent event, Game game, Player playe
 ### 8. Statistics & Persistence
 
 - `PlayerEntity` (Spring Data / Hibernate entity) tracks per-player statistics. Has an `is_replaced` boolean column set when `statsTrackedUserID != userID`.
-- `PersistAllEntitiesService` persists all game entities to SQLite on a cron schedule.
+- `GameDatabaseSyncPipeline` queues a database write (via `GameEntityPersistenceService`) every time a game file is saved, undone, reloaded, or deleted.
+- `GameDatabaseReconciliationCron` runs nightly on the same pipeline, diffs every ManagedGame against its database rows (game files are the source of truth), logs an error listing any discrepancies, and repairs them. It also deletes `discord_user` rows no player, title or standalone title references.
 - `ExpeditionWinRateStatisticsService` merges `obsidian` and `firmament` factions into a combined key `"obsidian & firmament"`.
 
 ### 9. Cron Jobs

@@ -76,11 +76,20 @@ public class DraftTileManager {
         for (TileModel tileModel : allTiles) {
             if (isNotDraftable(tileModel)) continue;
             if (!sources.contains(tileModel.getSource())) continue;
+            if (tileModel.getSource() == ComponentSource.theodisi && !TileHelper.isLostLegaciesTile(tileModel)) {
+                continue;
+            }
             if (tileModel.getTileBack() == TileBack.GREEN || tileModel.isHyperlane()) continue;
 
             MiltyDraftTile draftTile = getDraftTileFromModel(tileModel);
             addDraftTile(draftTile);
         }
+    }
+
+    public void addDraftTile(String tileId) {
+        TileModel tileModel = TileHelper.getTileById(tileId);
+        if (tileModel == null || isNotDraftable(tileModel) || tileModel.isHyperlane()) return;
+        addDraftTile(getDraftTileFromModel(tileModel));
     }
 
     /**
@@ -190,6 +199,9 @@ public class DraftTileManager {
         }
         if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
+        }
+        if (game.isLostLegaciesTiles()) {
+            sources.add(ComponentSource.theodisi);
         }
         return sources;
     }

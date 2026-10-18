@@ -2,6 +2,7 @@ package ti4.service.relic;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Helper;
@@ -38,6 +39,8 @@ public class SendRelicService {
         RelicHelper.resolveRelicLossEffects(game, player1, relicID);
         if (resolveGainEffects) {
             RelicHelper.resolveRelicEffects(event, game, player2, relicID);
+        } else {
+            KairnBreakthroughHandler.offerRelicGainPrompts(game, player2, relicID);
         }
 
         // Additionally exhaust the relic after gaining, if applicable
