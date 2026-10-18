@@ -83,12 +83,16 @@ class SecretCardTest extends BaseTi4Test {
                 .isEqualTo("ac_play_from_hand_" + HAND_INDEX);
     }
 
+    // Two secrets scored and the third already scorable: a draw would only replace a secret worth keeping.
     @Test
-    void impersonationIsHeldWhenTheHandIsFull() {
+    void impersonationIsHeldWhenTheHandIsFullOfSecretsWorthKeeping() {
         holdsInfluence();
-        table.nekro.setSecret("dhw");
-        table.nekro.setSecret("gamf");
-        table.nekro.setSecret("mtm");
+        table.nekro.setSecretScored("dhw");
+        table.nekro.setSecretScored("gamf");
+        table.game.addLaw("conventions", null);
+        table.game.addLaw("minister_war", "sol");
+        table.game.addLaw("shard_of_the_throne", "sol");
+        table.nekro.setSecret("dp");
         table.nekro.setActionCard("impersonation", HAND_INDEX);
 
         assertThat(ActionCardRules.playBeforePassing(table.test.context(

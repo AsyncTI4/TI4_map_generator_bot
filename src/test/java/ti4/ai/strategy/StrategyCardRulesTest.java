@@ -100,18 +100,34 @@ class StrategyCardRulesTest extends BaseTi4Test {
         assertThat(decision.map(AiTestGame::pressedId)).contains("sc_draw_so");
     }
 
-    // A full hand would only trade one secret for another, which costs a strategy token without bringing a point
-    // closer.
+    // Two secrets scored and the third already scorable: the strategy token would only replace a secret worth keeping.
     @Test
-    void doesNotFollowImperialToSwapSecretsWithAFullHand() {
+    void doesNotFollowImperialWhenTheFullHandIsWorthKeeping() {
         test.sol.addSC(IMPERIAL);
         test.game.setSCPlayed(IMPERIAL, true);
         test.nekro.setStrategicCC(2);
-        test.nekro.setSecret("survey");
-        test.nekro.setSecret("prove_endurance");
-        test.nekro.setSecret("dhw");
+        test.nekro.setSecretScored("dhw");
+        test.nekro.setSecretScored("gamf");
+        test.game.addLaw("conventions", null);
+        test.game.addLaw("minister_war", "sol");
+        test.game.addLaw("shard_of_the_throne", "sol");
+        test.nekro.setSecret("dp");
 
         assertThat(StrategyCardRules.follow(test.context(imperialCard()))).isEmpty();
+    }
+
+    // Human players follow Imperial with a full hand to draw a better secret and discard their worst one.
+    @Test
+    void followsImperialWithAFullHandToReplaceAHopelessSecret() {
+        test.sol.addSC(IMPERIAL);
+        test.game.setSCPlayed(IMPERIAL, true);
+        test.nekro.setStrategicCC(2);
+        test.nekro.setSecretScored("dhw");
+        test.nekro.setSecretScored("gamf");
+        test.nekro.setSecret("mrm");
+
+        assertThat(StrategyCardRules.follow(test.context(imperialCard())).map(AiTestGame::pressedId))
+                .contains("sc_draw_so");
     }
 
     @Test

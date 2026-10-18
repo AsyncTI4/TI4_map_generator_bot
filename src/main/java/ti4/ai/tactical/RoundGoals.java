@@ -99,12 +99,12 @@ public final class RoundGoals {
 
     private static double mecatolValue(Game game, Player seat, Tile tile) {
         if (!tile.isMecatol(game) || seat.controlsMecatol(true)) return 0;
-        return MecatolStake.holdValue(game, seat);
+        return MecatolStake.ownHoldValue(game, seat);
     }
 
     private static double frontierValue(Player seat, Tile tile) {
         if (!seat.hasTech(DARK_ENERGY_TAP) || BoardView.hasOwnShips(seat, tile)) return 0;
         boolean frontier = BoardView.space(tile).getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER));
-        return frontier ? TacticalPlanner.frontierCardValue() : 0;
+        return frontier ? TacticalPlanner.frontierCardValue(seat) : 0;
     }
 }

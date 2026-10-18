@@ -88,7 +88,6 @@ public class TacticalPlanner {
     private static final double SLICE_PLANET_BONUS = 1.0;
     private static final double BORDER_PLANET_BONUS = 0.3;
     private static final double FOREIGN_PLANET_PENALTY = 1.0;
-    private static final double FRONTIER_CARD_VALUE = ExploreValues.FRONTIER_CARD;
     private static final double FRONTIER_POSITION_VALUE = 1.0;
     private static final String DARK_ENERGY_TAP = "det";
     private static final String HAZARDOUS = "hazardous";
@@ -356,8 +355,8 @@ public class TacticalPlanner {
         };
     }
 
-    static double frontierCardValue() {
-        return FRONTIER_CARD_VALUE;
+    static double frontierCardValue(Player seat) {
+        return ExploreValues.frontierCard(seat.getGame(), seat);
     }
 
     private record Follower(Tile origin, UnitType type, int idle, double gain) {}
@@ -590,7 +589,7 @@ public class TacticalPlanner {
                     + context.exploreValue(tile, planet, split[INFANTRY], split[MECH]);
             if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
             if (isMecatol(context.game, planet)) {
-                value += MecatolStake.holdValue(context.game, seat) + context.mecatolCash();
+                value += MecatolStake.ownHoldValue(context.game, seat) + context.mecatolCash();
             }
             value += context.expansionZoneBonus(tile);
         }
@@ -640,7 +639,7 @@ public class TacticalPlanner {
                     + planetTempo(context.game)
                     + context.exploreValue(tile, planet, landing[INFANTRY], landing[MECH]);
             if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
-            if (isMecatol(context.game, planet)) value += MecatolStake.holdValue(context.game, seat);
+            if (isMecatol(context.game, planet)) value += MecatolStake.ownHoldValue(context.game, seat);
             value += context.expansionZoneBonus(tile);
         }
         int spareForces = unitCount(cargo) - landed;
@@ -1882,7 +1881,7 @@ public class TacticalPlanner {
     private static double frontierExplore(Player seat, Tile tile) {
         if (!seat.hasTech(DARK_ENERGY_TAP) || BoardView.hasOwnShips(seat, tile)) return 0;
         boolean frontier = BoardView.space(tile).getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER));
-        return frontier ? FRONTIER_CARD_VALUE + FRONTIER_POSITION_VALUE : 0;
+        return frontier ? frontierCardValue(seat) + FRONTIER_POSITION_VALUE : 0;
     }
 
     private static Optional<TacticalPlan> groupPosition(Context context, Tile tile, Tile origin) {

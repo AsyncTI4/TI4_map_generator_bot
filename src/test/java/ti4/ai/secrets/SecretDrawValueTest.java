@@ -71,11 +71,15 @@ class SecretDrawValueTest extends BaseTi4Test {
         assertThat(SecretDrawValue.of(test.game, test.nekro)).isZero();
     }
 
+    // Two secrets scored and the third already scorable: a draw would only replace a secret worth keeping.
     @Test
-    void aFullHandMakesADrawWorthTheSwapAtMost() {
-        test.nekro.setSecret("dhw");
-        test.nekro.setSecret("gamf");
-        test.nekro.setSecret("mtm");
+    void aFullHandWorthKeepingMakesADrawWorthTheSwapAtMost() {
+        test.nekro.setSecretScored("dhw");
+        test.nekro.setSecretScored("gamf");
+        test.game.addLaw("conventions", null);
+        test.game.addLaw("minister_war", "sol");
+        test.game.addLaw("shard_of_the_throne", "sol");
+        test.nekro.setSecret("dp");
         assertThat(SecretDrawValue.hasRoom(test.nekro)).isFalse();
 
         assertThat(SecretDrawValue.of(test.game, test.nekro)).isLessThanOrEqualTo(SecretDrawValue.SWAP_VALUE);

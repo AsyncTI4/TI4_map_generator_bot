@@ -1,7 +1,10 @@
 package ti4.ai.explore;
 
+import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.secrets.SecretDrawValue;
+import ti4.ai.secrets.SecretDraws;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.trade.ComponentValues;
 import ti4.game.Game;
@@ -29,6 +32,25 @@ public class ExploreValues {
     public static final double FRONTIER_CARD = 1.5;
     public static final double DEMILITARIZED_ZONE = -1.5;
     private static final int ACTION_CARDS_DRAWN_BY_LOST_CREW = 2;
+    private static final String DERELICT_VESSEL = "dv";
+    private static final String FRONTIER_DECK = "frontier";
+
+    public static double frontierCard(Game game, Player seat) {
+        return FRONTIER_CARD + derelictVesselShare(game) * secretDraw(game, seat);
+    }
+
+    private static double derelictVesselShare(Game game) {
+        List<String> deck = game.getExploreDeck(FRONTIER_DECK);
+        if (deck.isEmpty()) return 0;
+        long vessels = deck.stream()
+                .filter(card -> DERELICT_VESSEL.equals(CardValue.kind(card)))
+                .count();
+        return (double) vessels / deck.size();
+    }
+
+    private static double secretDraw(Game game, Player seat) {
+        return SecretDraws.worthDrawing(game, seat) ? SecretDrawValue.of(game, seat) : 0;
+    }
 
     public static double tokenValue(Game game, Player seat) {
         return StrategyCardRules.reinforcements(game, seat) > 0 ? COMMAND_TOKEN : 0;

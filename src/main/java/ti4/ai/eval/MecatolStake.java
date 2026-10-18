@@ -1,18 +1,32 @@
 package ti4.ai.eval;
 
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.scoring.ObjectiveValue;
+import ti4.ai.secrets.SecretDraws;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 
 @UtilityClass
 public class MecatolStake {
 
     static final double IMPERIAL_ROUND_SHARE = 0.25;
     private static final int MAX_IMPERIAL_ROUNDS = 2;
+    private static final Set<String> SECRET_REDRAW_MECATOLS = Set.of("mrte", "mc");
 
     public static double holdValue(Game game, Player player) {
         return ObjectiveValue.VICTORY_POINT_VALUE * IMPERIAL_ROUND_SHARE * imperialRoundsAhead(game);
+    }
+
+    public static double ownHoldValue(Game game, Player seat) {
+        double redraw = redrawsSecrets(game) ? SecretDraws.redrawValue(game, seat) : 0;
+        return holdValue(game, seat) + redraw;
+    }
+
+    private static boolean redrawsSecrets(Game game) {
+        Tile mecatol = game.getMecatolTile();
+        return mecatol != null && mecatol.getUnitHolders().keySet().stream().anyMatch(SECRET_REDRAW_MECATOLS::contains);
     }
 
     private static int imperialRoundsAhead(Game game) {

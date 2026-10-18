@@ -129,11 +129,15 @@ class StrategizeCardTest extends BaseTi4Test {
         assertThat(plan()).isEmpty();
     }
 
+    // Two secrets scored and the third already scorable: a draw would only replace a secret worth keeping.
     @Test
-    void strategizeValuesNoSecretWhenTheHandHasNoRoomForOne() {
-        table.nekro.setSecret("dhw");
-        table.nekro.setSecret("gamf");
-        table.nekro.setSecret("mtm");
+    void strategizeValuesNoSecretWhenTheFullHandIsWorthKeeping() {
+        table.nekro.setSecretScored("dhw");
+        table.nekro.setSecretScored("gamf");
+        table.game.addLaw("conventions", null);
+        table.game.addLaw("minister_war", "sol");
+        table.game.addLaw("shard_of_the_throne", "sol");
+        table.nekro.setSecret("dp");
         onlyThese(StrategyCard.IMPERIAL);
 
         assertThat(plan()).isEmpty();

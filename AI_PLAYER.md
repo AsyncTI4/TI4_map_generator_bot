@@ -255,6 +255,14 @@ to build one by hand:
       0.6 when it can make the condition happen next turn. A secret it can score right now is worth a flat 2.0, and a
       status secret is halved when other scorable ones already fill the rounds left. It uses Imperial to replace the
       rest; it never pursues _Mechanize the Military_, _Occupy the Fringe_ or _Strengthen Bonds_ yet.
+    - **Drawing and trading secrets** (`SecretDraws`). Like human players it draws a secret whenever it can (Imperial,
+      an exploration, _Impersonation_, _Strategize_), and with a full hand draws anyway and discards its weakest, unless
+      every secret it still holds is worth keeping (a keep value of 0.75 or more: one it can score, one close to done or
+      a good action secret); it never draws once all its secrets are scored. A full hand values the draw at what the new
+      secret could add over the weakest one. When its secrets are weak it plays its outs: at the end of its turn it
+      exhausts Mecatol Rex (Thunder's Edge) to trade the weakest for a new one, holding Mecatol Rex is worth that trade
+      on top of the Imperial points, and with Dark Energy Tap a frontier token is worth the chance of a _Derelict Vessel_
+      still in the frontier deck. When a draw leaves it over the limit with no discard buttons showing, it opens them.
 - **Command tokens** (`CommandTokenPolicy`). Every gain (status phase, Leadership, Propagation) goes to the first
   unmet level of one priority list, and status-phase redistribution moves a token out of any pool above its share
   (fleet first, then strategy, then tactic) and gains it back where the list needs it, so each move brings the pools
@@ -304,7 +312,7 @@ to build one by hand:
   primary before ending its turn, paying every cost the bot leaves to the player:
   | Card | Primary | Follows when |
   | --- | --- | --- |
-  | Imperial | scores the best public objective it qualifies for, then the Imperial point (Mecatol Rex) or a secret | it has a spare strategy token and room in hand for a secret (it never swaps one secret for another) |
+  | Imperial | scores the best public objective it qualifies for, then the Imperial point (Mecatol Rex) or a secret | it has a spare strategy token, and room in hand for a secret or a weakest secret worth replacing (see Drawing and trading secrets) |
   | Technology | one free technology, a second for 6 resources if one is worth it (`ResearchPolicy`: generic value, informed by the technologies Nekro players most often end games with, plus progress on tech objectives it can still finish in the rounds left, about 1.5 researches a round until the leader is 2 points a round from winning, and Space Dock II for _Produce en Masse_; minus 0.7 per resource or influence lost exhausting a technology specialty planet for a prerequisite, which it then exhausts when paying, free with Psychoarchaeology, or AI Development Algorithm when that costs less); Nekro takes Propagation's 3 command tokens instead | a technology worth at least 3 (most technologies other than the weakest) is affordable after the scoring reserve; as Nekro, Propagation's 3 command tokens for the strategy token and 4 resources |
   | Leadership | 3 command tokens, plus up to 3 more bought with spare influence, within its reinforcements | spare influence buys up to 3 command tokens (3 influence each, no strategy token) |
   | Politics | makes itself speaker (or the player furthest behind), draws 2 action cards, and once the custodians are taken looks at the top 2 agendas, burying _Public Execution_ while it leads on points, agendas that punish the planet owner while it holds the most planets, and elections it would lose on influence (a work in progress that needs a redesign: votes are unknown in the action phase) | with a spare strategy token when _Form a Spy Network_ needs cards (right after Imperial when 2 cards complete it), or with 2 or more spare strategy tokens and room for 2 cards; never with no strategy token, a full hand or _Hold No Action Cards_ |
@@ -428,7 +436,8 @@ to build one by hand:
     pool of `SecretOdds`, judged against the seat's own public board) raised towards 1 by a quarter for each round the
     game is expected to last (the leader's points to go over 2), times what a point is worth to the seat. Only one
     secret scores in each status phase, so secrets already in the hand take rounds away, and a full hand makes a draw
-    worth the swap, 0.3, at most. Following _Imperial_, an exploration's secret, _Impersonation_ and _Strategize_ use it. Picking _Imperial_ only for its secret still counts just the strategy token it saves over following, unless the seat is the last to pick and nobody else could play Imperial for it to follow.
+    worth what the new secret could add over the weakest one (at least the swap, 0.3), or 0.3 at most when every
+    held secret is worth keeping. Following _Imperial_, an exploration's secret, _Impersonation_ and _Strategize_ use it. Picking _Imperial_ only for its secret still counts just the strategy token it saves over following, unless the seat is the last to pick and nobody else could play Imperial for it to follow.
   - **Expert tiers** (`ExpertTiers`, `data/ai/action_card_expert_tiers.json`). A podcast tier list by three experienced players
     ranks every card from _Ancient Burial Sites_ to _Overrule_ (S, A, B, C, D, best first within a tier). The Impact
     Score misjudges some cards (_Impersonation_ and _Leadership Rider_ rate lower than the experts put them, _Morale
