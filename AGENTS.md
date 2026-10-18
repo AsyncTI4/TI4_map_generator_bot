@@ -126,6 +126,9 @@ A single action row can hold **either** up to 5 buttons **or** one select menu â
   `Player.fogSafeEmoji()` / `getFactionEmojiOrColor()`. If none of them fits, suggest a cheap best-effort
   fix (e.g. `game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel()`). If even that
   isn't feasible, leave a compact TODO in the method saying what leaks, so it can be made fog safe later.
+- **Domain vocabulary lives in [GLOSSARY.md](GLOSSARY.md).** Use its terms in code, messages and
+  PR text, and check it for TI4 rules, table slang (wash, plastic, guac, X-1) and Discord surface
+  names. Add new terms there when you introduce a domain concept.
 - **Component-specific rules live in [COMPONENT_RULES.md](COMPONENT_RULES.md).** Open it only
   when your change touches a component listed below; otherwise skip it.
   - Border anomalies: any file or class named `BorderAnomaly*` or `border_anomal*`.
