@@ -63,7 +63,8 @@ The flexible currency a Player holds and spends.
 _Avoid_: TG coins
 
 **Commodities**:
-The portion of a Player's economy that converts to Trade goods when given to another Player.
+The portion of a Player's economy that converts to Trade goods when given to another Player. Restocking them to the maximum is to replenish, which players also call refreshing.
+_Avoid_: Refill
 
 **Transaction**:
 A voluntary exchange of Trade goods, Commodities, cards or other items between two Players.
