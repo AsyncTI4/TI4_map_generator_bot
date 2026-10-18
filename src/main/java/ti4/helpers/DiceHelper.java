@@ -28,9 +28,17 @@ public final class DiceHelper {
         private final int result;
 
         public Die(int threshold) {
+            this(threshold, nextResult());
+        }
+
+        private Die(int threshold, int result) {
             this.threshold = threshold;
+            this.result = result;
+        }
+
+        private static int nextResult() {
             Integer forced = FORCED_RESULTS.get().poll();
-            result = forced != null ? forced : ThreadLocalRandom.current().nextInt(1, 11);
+            return forced != null ? forced : ThreadLocalRandom.current().nextInt(1, 11);
         }
 
         public String getGreenDieIfSuccessOrRedDieIfFailure() {
@@ -75,9 +83,7 @@ public final class DiceHelper {
     }
 
     public static Die spoof(int threshold, int result) {
-        Die d = new Die(threshold);
-        while (d.getResult() != result) d = new Die(threshold);
-        return d;
+        return new Die(threshold, result);
     }
 
     public static List<Die> rollDice(int threshold, int numDice) {

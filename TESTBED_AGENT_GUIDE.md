@@ -63,22 +63,27 @@ format reference. This file covers how you work with it.
   script" in `DEVELOPER_TESTBED.md` lists each component type.
 - **`press` by default.** It proves the bot offered the button to that seat. Use `pressId` only for buttons not on
   screen at that point, ability buttons, or deliberate wrong-seat guard checks.
-- **State checks first.** Use the paths in `TestBedStateResolver` (`SEAT_FIELDS`, `GAME_FIELDS`, `stored:<key>`).
+- **State checks first.** Use the paths in `TestBedStateResolver` (`SEAT_FIELDS`, `GAME_FIELDS`,
+  `tile.<position>.<field>`, `planet.<id>.<field>`, `stored:<key>`).
   If you need a value that has no path, add it to the list and the matching `switch`; `TestBedGameTest` fails if a
   listed path is not implemented. Many features keep their state in game stored values, which `stored:<key>` can
   read: find the key in the code.
 - **Message checks second,** with short stable fragments taken from the code's message strings, never whole
   sentences, emoji or mentions. Names often render as emoji (strategy cards do), so match the fixed text
-  around them. Use `count` for "exactly once". In fog scripts add
-  `{ "expect": { "in": "main", "noFactionLeak": true } }` after anything that could announce publicly.
+  around them. Use `count` for "exactly once", `matches` for a regex, `buttons` / `noButtons` for what a seat is
+  offered next. A message check only sees messages since the last `press` or `do`; add `"since": "start"` to see
+  the whole run. In fog scripts add
+  `{ "expect": { "in": "main", "noFactionLeak": true, "since": "start" } }` after anything that could announce
+  publicly.
 - **One behaviour, small and deterministic.** A precondition check first; `stopOnFail: true` when later steps
   depend on earlier ones; no checks that depend on dice rolls or random draws.
 - **Know what a script cannot see:** messages from before it started (including everything the preset did),
-  modal contents, select menus, combat threads, reactions and slash commands. Check those through state, or list
-  them for the developer to verify by hand.
+  modal contents, select menus, reactions and slash commands. Combat threads are visible through the
+  `<seat>:combat` scope. Check the rest through state, or list it for the developer to verify by hand.
 - **Timing:** `press` waits for its button and positive checks retry, both for up to `timeoutSeconds`
-  (default 20). Absence checks (`notContains`, `noFactionLeak`) run once after `settleSeconds` (default 2): raise
-  that on the step before them when the action posts a lot. Crons and timers need a `wait`.
+  (default 20), and finish as soon as the message lands. Absence checks (`notContains`, `noFactionLeak`,
+  `noButtons`) keep watching until nothing new arrives for a second. A press fails if the handler threw or the
+  bot refused the seat. Crons and timers need a `wait`.
 - **Use ids, not labels, for buttons whose label carries state** (`End Turn (+1 ability)`, `Tactical Action (3)`).
 - JSON cannot hold comments: put intent in `description` and `note` steps.
 

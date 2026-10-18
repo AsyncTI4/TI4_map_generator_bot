@@ -26,11 +26,13 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.image.FileUploadService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.tigl.TiglSetupService;
 
 @UtilityClass
 public class RoundOneService {
 
     public static void roundOne(GenericInteractionCreateEvent event, Game game) {
+        TiglSetupService.enforceLadderRules(game, game.getActionsChannel());
         if (game.isAcd2()) {
             BotLogger.info(
                     Constants.privateStaticVoidPing() + " Action Card Deck 2 game has begun: " + game.gameJumpLinks());

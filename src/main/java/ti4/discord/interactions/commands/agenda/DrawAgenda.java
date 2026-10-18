@@ -22,4 +22,9 @@ class DrawAgenda extends GameStateSubcommand {
         var fromBottom = event.getOption("from_bottom", Boolean.FALSE, OptionMapping::getAsBoolean);
         AgendaHelper.drawAgenda(count, fromBottom, getGame(), getPlayer());
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

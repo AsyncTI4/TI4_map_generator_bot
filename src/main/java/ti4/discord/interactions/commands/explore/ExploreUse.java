@@ -82,4 +82,9 @@ class ExploreUse extends GameStateSubcommand {
                     "\nThis card was drawn __forcefully__ (if the card wasn't in the deck, it was created from thin air).";
         ExploreService.resolveExplore(event, id, tile, planetName, messageText, player, game);
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

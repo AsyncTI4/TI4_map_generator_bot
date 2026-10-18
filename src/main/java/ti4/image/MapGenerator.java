@@ -3268,7 +3268,7 @@ public class MapGenerator implements AutoCloseable {
                 .mapToInt(BoardPosition.BOARDS::indexOf)
                 .max()
                 .orElse(-1);
-        return (highestBoard + 1) * BoardPosition.boardWidth(getRingCount(game));
+        return (highestBoard + 1) * BoardPosition.boardWidth(PositionMapper.boardLayoutRingCount(game));
     }
 
     static int getMaxObjectiveWidth(Game game) {

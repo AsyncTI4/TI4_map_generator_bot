@@ -114,7 +114,10 @@ class GameUndoService {
             sendAnyChangedCardsInfo(gameToUndo, loadedGame);
             GameMessageManager.removeAfter(gameName, loadedGame.getLastModifiedDate());
 
-            sendUndoConfirmationMessage(gameToUndo, undoIndex, latestUndoIndex);
+            List<String> undoCommands = removeUndoneSaves(gameToUndo, undoIndex, latestUndoIndex);
+            if (!gameToUndo.isFowMode()) {
+                sendUndoConfirmationMessage(gameToUndo, undoIndex, latestUndoIndex, undoCommands);
+            }
             return loadedGame;
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(gameToUndo), "Error trying to undo: " + gameName, e);
@@ -155,10 +158,7 @@ class GameUndoService {
         return gameName + "_" + undoIndex + Constants.TXT;
     }
 
-    private static void sendUndoConfirmationMessage(Game gameToUndo, int undoIndex, int latestUndoIndex) {
-        if (gameToUndo.isFowMode()) {
-            return;
-        }
+    private static List<String> removeUndoneSaves(Game gameToUndo, int undoIndex, int latestUndoIndex) {
         Map<String, String> undoNamesToCommandText =
                 GameUndoNameService.getUndoNamesToCommandText(gameToUndo, latestUndoIndex - undoIndex);
         List<String> undoCommands = new ArrayList<>();
@@ -170,8 +170,7 @@ class GameUndoService {
                 BotLogger.error(new LogOrigin(gameToUndo), "Failed to delete undo file: " + currentUndo);
             }
         }
-
-        sendUndoConfirmationMessage(gameToUndo, undoIndex, latestUndoIndex, undoCommands);
+        return undoCommands;
     }
 
     private static void sendUndoConfirmationMessage(

@@ -44,7 +44,6 @@ import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.AbilityModel;
-import ti4.model.BorderAnomalyModel;
 import ti4.model.BreakthroughModel;
 import ti4.model.ColorableModelInterface;
 import ti4.model.DeckModel;
@@ -599,15 +598,9 @@ class AutoCompleteProvider {
             }
             case Constants.BORDER_TYPE -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, String> anomalies = Arrays.stream(
-                                BorderAnomalyModel.BorderAnomalyType.values()) // Search string:name
-                        .filter(anomalyType -> anomalyType != BorderAnomalyModel.BorderAnomalyType.ARROW)
-                        .collect(Collectors.toMap(
-                                BorderAnomalyModel.BorderAnomalyType::toSearchString,
-                                BorderAnomalyModel.BorderAnomalyType::getName));
-                List<Command.Choice> options = anomalies.entrySet().stream()
-                        .filter(anomaly -> anomaly.getValue().toLowerCase().contains(enteredValue))
-                        .map(anomaly -> new Command.Choice(anomaly.getValue(), anomaly.getKey()))
+                List<Command.Choice> options = Mapper.getBorderAnomalies().stream()
+                        .filter(anomaly -> anomaly.getName().toLowerCase().contains(enteredValue))
+                        .map(anomaly -> new Command.Choice(anomaly.getAutoCompleteName(), anomaly.getId()))
                         .limit(25)
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);

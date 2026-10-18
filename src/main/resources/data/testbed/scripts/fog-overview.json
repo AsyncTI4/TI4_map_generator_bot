@@ -24,7 +24,7 @@
     { "label": "The GM map offers the GM Overview", "as": "you", "in": "gm", "press": "compactMapOverview" },
 
     { "label": "Galaxy names back to automatic", "do": "removeStored", "key": "fowGalaxyRenames" },
-    { "expect": { "in": "main", "noFactionLeak": true } },
+    { "expect": { "in": "main", "noFactionLeak": true, "since": "start" } },
     { "note": "By hand: Sol's overview shows only Sol's known systems (incl. hyperlane 306 and custom lane 204); the GM overview shows every panel with hyperlanes 306/207/a105 and custom lanes 204/a206; Hacan's overview shows nothing of Sol's area." }
   ]
 }

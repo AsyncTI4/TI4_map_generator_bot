@@ -9,6 +9,7 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyModel;
 
@@ -36,8 +37,7 @@ class RemoveBorderAnomaly extends GameStateSubcommand {
         Game game = getGame();
         String tilesString = event.getOption(Constants.PRIMARY_TILE).getAsString();
         String anomalyTypeString = event.getOption(Constants.BORDER_TYPE, null, OptionMapping::getAsString);
-        BorderAnomalyModel.BorderAnomalyType anomalyType =
-                BorderAnomalyModel.getBorderAnomalyTypeFromString(anomalyTypeString);
+        BorderAnomalyModel anomalyType = Mapper.resolveBorderAnomaly(anomalyTypeString);
         if (anomalyTypeString != null && anomalyType == null) {
             AddBorderAnomaly.sendUnknownTypeMessage(event, anomalyTypeString);
             return;
@@ -67,7 +67,7 @@ class RemoveBorderAnomaly extends GameStateSubcommand {
                 if (game.getBorderAnomalies().stream()
                         .anyMatch(anom -> anom.getTile().equals(tile)
                                 && anom.getDirection() == d
-                                && (anomalyType == null || anom.getType() == anomalyType))) {
+                                && (anomalyType == null || anom.isType(anomalyType.getId())))) {
                     game.removeBorderAnomaly(tile, d);
                     amountRemoved++;
                 }

@@ -685,6 +685,8 @@ public class StartCombatService {
 
         if (isGroundCombat) {
             UnitHolder combatPlanet = tile.getUnitHolders().get(unitHolderName);
+            sendDaxciveAnimatorsStartGroundCombatButton(event, player1, unitHolderName, game);
+            sendDaxciveAnimatorsStartGroundCombatButton(event, player2, unitHolderName, game);
             if (player1.hasUnit("ponthous_mech")
                     && combatPlanet != null
                     && combatPlanet.getUnitKeysForPlayer(player1).stream()
@@ -1003,6 +1005,20 @@ public class StartCombatService {
             MessageHelper.sendMessageToChannelWithButtons(
                     threadChannel, "Buttons for start of space combat abilities.", startOfSpaceCombatButtons);
         }
+    }
+
+    private static void sendDaxciveAnimatorsStartGroundCombatButton(
+            GenericInteractionCreateEvent event, Player player, String planet, Game game) {
+        if (!player.hasTech("dxa_br") || !player.hasTechReady("dxa_br")) {
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButton(
+                game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
+                player.getRepresentation()
+                        + ", you may exhaust _Daxcive Animators_ to place 1 infantry at the start of combat.",
+                Buttons.green(
+                        player.factionButtonChecker() + "dxaBrStartGroundCombat_" + planet,
+                        Helper.getPlanetRepresentation(planet, game)));
     }
 
     private static void sendStartOfCombatSecretMessages(
@@ -1428,6 +1444,18 @@ public class StartCombatService {
                         msg
                                 + ", a reminder that if you destroy all of the opponent's units in this system, you may use the button to unlock Queen Lorena, "
                                 + "the Kortali commander.",
+                        buttons);
+            }
+            if (!"space".equalsIgnoreCase(type) && player.hasTech("dxa_br") && !player.hasTechReady("dxa_br")) {
+                buttons = new ArrayList<>();
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + "biostimsReady_tech_dxa_br",
+                        "Ready Daxcive Animators",
+                        TechEmojis.BioticTech));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentation()
+                                + ", a reminder that you have _Daxcive Animators_ exhausted, and may ready it if you win this ground combat.",
                         buttons);
             }
         }

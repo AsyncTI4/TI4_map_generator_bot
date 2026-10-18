@@ -1,0 +1,12 @@
+{
+  "name": "30k-explore-precision-laser",
+  "description": "Precision Laser Defenses attaches to Mehar Xull and is purged from the explore cards.",
+  "preset": "30k-explore-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "do": "stackExplore", "value": "precisionlaserdefenses30k" },
+    { "as": "sol", "pressId": "FFCC_{sol.faction}_movedNExplored_filler_meharxull_hazardous" },
+    { "expect": { "state": "planet.meharxull.tokens", "contains": "attachment_precisionlaserdefenses30k.png" } },
+    { "expect": { "state": "game.exploreDiscard", "notContains": "precisionlaserdefenses30k" } }
+  ]
+}

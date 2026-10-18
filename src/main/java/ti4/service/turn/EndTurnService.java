@@ -18,6 +18,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.acd2.FracturedReali
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.TnelisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
@@ -38,6 +39,8 @@ import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
+import ti4.helpers.thirtyk.ThirtyKTurnState;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
@@ -85,7 +88,7 @@ public class EndTurnService {
     }
 
     public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
-        if (UydaiUnitHandler.offerDeathCommandosPlacement(event, game, player)) return;
+        UydaiUnitHandler.offerDeathCommandosPlacement(event, game, player);
         if (NetrunnersBreakthroughHandler.offerDataBreachTechnology(game, player)) return;
         if (StringUtils.isNotEmpty(game.getCurrentActiveSystem())
                 && game.getStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED)
@@ -124,6 +127,8 @@ public class EndTurnService {
         RevenantLeadersHandler.clearPurpleLeaderActionState(game);
         MonumentsDSButtonHandler.clearForbiddenLibraryActionState(game, player);
         MonumentsDSButtonHandler.clearMirrorforgeActionState(game, player);
+        BlueReverieTechHelper.clearProductionBiomes(game, player);
+        TnelisUnitHandler.clearDeployState(game, player);
         if (player.hasAbility("phantom_energy")) {
             TyrisAbilityHandler.cleanupPhantomEnergy(game, player);
         }
@@ -141,6 +146,7 @@ public class EndTurnService {
         game.removeStoredValue("safeHarborUsed");
         game.removeStoredValue("heartWarnedThisTurn");
         FracturedRealityAcd2ButtonHandler.clearPendingRolls(game);
+        ThirtyKTurnState.clearEndOfTurn(game);
         game.removeStoredValue(LostLegciesExploreHandler.IMMEDIATE_ASSEMBLY_PRODUCTION + player.getFaction());
         String fieldTestTech = game.getStoredValue("fieldTestTech" + player.getFaction());
         if (!fieldTestTech.isEmpty()) {
@@ -272,7 +278,8 @@ public class EndTurnService {
             }
         }
 
-        if (game.getRealPlayers().stream().allMatch(Player::isPassed)) {
+        Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
+        if (nextPlayer == null) {
             if (mainPlayer.getSecretsUnscored().containsKey("pe")) {
                 MessageHelper.sendMessageToChannel(
                         mainPlayer.getCardsInfoThread(),
@@ -287,7 +294,6 @@ public class EndTurnService {
 
             return;
         }
-        Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
         if (!game.isFowMode()) {
             GameMessageManager.remove(game.getName(), GameMessageType.TURN)
                     .ifPresent(messageId -> game.getMainGameChannel()

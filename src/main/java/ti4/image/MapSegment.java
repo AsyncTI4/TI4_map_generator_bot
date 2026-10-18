@@ -264,7 +264,10 @@ public record MapSegment(
     }
 
     private static String autoSectorName(Game game, Set<String> cluster, Set<String> takenNames) {
-        String anchor = cluster.stream().min(MapFrame.POSITION_ORDER).orElse("");
+        return freeSectorName(game, anchorOf(cluster), takenNames);
+    }
+
+    public static String freeSectorName(Game game, String anchor, Set<String> takenNames) {
         List<String> words = SectorNames.NAMES;
         int start = Math.floorMod((game.getName() + ":" + anchor).hashCode(), words.size());
         for (int offset = 0; offset < words.size(); offset++) {
@@ -279,6 +282,75 @@ public record MapSegment(
             suffix++;
         }
         return base + "-" + suffix;
+    }
+
+    private static String anchorOf(Set<String> positions) {
+        return positions.stream().min(MapFrame.POSITION_ORDER).orElse("");
+    }
+
+    public String anchor() {
+        return kind == Kind.CIRCLE || kind == Kind.CLUSTER ? centre : anchorOf(positions());
+    }
+
+    public static boolean canJoinSector(String position) {
+        return !isFracturePosition(position)
+                && !CORNER_POSITIONS.contains(position.toLowerCase())
+                && PositionMapper.getTilePosition(position) != null;
+    }
+
+    public static boolean isPinned(Game game, String name) {
+        return pins(game).stream().anyMatch(pin -> pin.name().equals(name));
+    }
+
+    @Nullable
+    public static String putPin(Game game, String name, Set<String> positions) {
+        if (!isValidName(name) || isReservedName(name)) {
+            return "`" + name + "` is not a usable sector name.";
+        }
+        List<Pin> pins = new ArrayList<>(pins(game));
+        boolean replacing = pins.removeIf(pin -> pin.name().equals(name));
+        if (!replacing && pins.size() >= MAX_SEGMENTS) {
+            return "This game already has the maximum of " + MAX_SEGMENTS + " named automatic sectors.";
+        }
+        pins.add(new Pin(name, Set.copyOf(positions)));
+        savePins(game, pins);
+        return null;
+    }
+
+    public static void clearAll(Game game) {
+        game.removeStoredValue(STORAGE_KEY);
+        game.removeStoredValue(DEFAULT_KEY);
+        game.removeStoredValue(AUTO_KEY);
+        game.removeStoredValue(GAP_KEY);
+        game.removeStoredValue(PIN_KEY);
+    }
+
+    @Nullable
+    public static String validate(Game game, String name, String centre, @Nullable Integer radius, boolean cluster) {
+        if (!isValidName(name)) {
+            return "Segment names use lowercase letters, digits and `-`, up to 20 characters.";
+        }
+        if (isReservedName(name)) {
+            return "`" + MAIN + "`, `" + FRACTURE + "` and `board-a` to `board-g` are reserved segment names.";
+        }
+        if (radius == null && !cluster) {
+            return "Give a `radius`, or set `cluster` to true.";
+        }
+        if (radius != null && (radius < 0 || radius > MAX_RADIUS)) {
+            return "Radius must be between 0 and " + MAX_RADIUS + ".";
+        }
+        if (!PositionMapper.isTilePositionValid(centre)) {
+            return "Tile position `" + centre + "` is invalid.";
+        }
+        if (cluster && game.getTileByPosition(centre) == null) {
+            return "There is no tile at `" + centre + "` to grow a cluster from.";
+        }
+        boolean isNew =
+                stored(game).stream().noneMatch(segment -> segment.name().equals(name));
+        if (isNew && stored(game).size() >= MAX_SEGMENTS) {
+            return "This game already has the maximum of " + MAX_SEGMENTS + " segments.";
+        }
+        return null;
     }
 
     private static Set<String> placedGridPositions(Game game) {

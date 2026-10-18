@@ -55,6 +55,8 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
@@ -1606,6 +1608,14 @@ public final class AgendaHelper {
             orderList.remove(edynPlayer.orElse(null));
             orderList.add(edynPlayer.get());
         }
+
+        Player blueReverieExecutiveOrderPlayer =
+                game.getPlayerFromColorOrFaction(game.getStoredValue("executiveOrderBr"));
+        if (blueReverieExecutiveOrderPlayer != null) {
+            orderList.remove(blueReverieExecutiveOrderPlayer);
+            orderList.addFirst(blueReverieExecutiveOrderPlayer);
+        }
+
         return orderList;
     }
 
@@ -1719,6 +1729,7 @@ public final class AgendaHelper {
             if (thing.contains("planet_") && !prevoting) {
                 String planet = thing.replace("planet_", "");
                 player.exhaustPlanet(planet);
+                ThirtyKExploreHooks.onPlanetExhausted(event, game, player, planet);
                 UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                 if (uH != null) {
                     if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
@@ -1776,6 +1787,7 @@ public final class AgendaHelper {
                         }
                         if (!prevoting) {
                             player.exhaustPlanet(planet);
+                            ThirtyKExploreHooks.onPlanetExhausted(event, game, player, planet);
                         }
                     }
                     if (!prevoting) {
@@ -1845,7 +1857,8 @@ public final class AgendaHelper {
             voteAmount = 1;
         }
 
-        boolean executive = player.getFaction().equals(game.getStoredValue("executiveOrder"));
+        boolean executive = player.getFaction().equals(game.getStoredValue("executiveOrder"))
+                && game.getStoredValue("executiveOrderBr").isEmpty();
         if (player.hasUnlockedBreakthrough("xxchabt") || executive) {
             voteAmount = Math.max(p.getResources(), p.getInfluence());
         }
@@ -1930,7 +1943,9 @@ public final class AgendaHelper {
                 planetButtons.add(Buttons.gray(
                         "exhaustForVotes_hacanCommanderTg", "Spend Trade Goods for 2 Votes Each", FactionEmojis.Hacan));
             }
-            if (player.isSpeaker() && !game.getStoredValue("executiveOrder").isEmpty()) {
+            if (player.isSpeaker()
+                    && !game.getStoredValue("executiveOrder").isEmpty()
+                    && game.getStoredValue("executiveOrderBr").isEmpty()) {
                 planetButtons.add(Buttons.gray(
                         "exhaustForVotes_hacanCommanderTg",
                         "Spend Trade Goods for 1 Vote Each",
@@ -2915,6 +2930,7 @@ public final class AgendaHelper {
         game.setStoredValue("Pass On Shenanigans", "");
         game.setStoredValue("Abstain On Agenda", "");
         game.resetCurrentAgendaVotes();
+        ThirtyKActionCardHooks.onAgendaVotesReset(game);
         game.setHasHackElectionBeenPlayed(false);
         game.removeStoredValue("hackElectionFaction");
         game.removeStoredValue("viabilityFavorXxcha");
@@ -3220,10 +3236,10 @@ public final class AgendaHelper {
     }
 
     public static void showDiscards(Game game, GenericInteractionCreateEvent event) {
-        if (!RiftSetModeService.deckInfoAvailable(
-                TestBedService.resolveActingPlayer(
-                        game, event, game.getPlayer(event.getUser().getId())),
-                game)) {
+        Player actingPlayer = TestBedService.resolveActingPlayer(
+                game, event, game.getPlayer(event.getUser().getId()));
+        String viewerId = actingPlayer == null ? event.getUser().getId() : actingPlayer.getUserID();
+        if (!RiftSetModeService.deckInfoAvailable(game, viewerId, event.getMessageChannel())) {
             return;
         }
         StringBuilder sb2 = new StringBuilder();

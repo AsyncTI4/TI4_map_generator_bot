@@ -90,6 +90,7 @@ import ti4.game.persistence.ManagedGame;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.ImageHelper;
 import ti4.image.Mapper;
@@ -2276,6 +2277,9 @@ public final class Helper {
                         && player.hasAbility("synthesis")) {
                     productionValue++;
                 }
+                if (productionValue > 0 && player.hasTech("pm_br")) {
+                    productionValue += 2;
+                }
                 productionValueTotal += productionValue * uH.getUnits().get(unit);
                 productionValueTotal += XytherisLeadersHandler.getMyrixAgentBonus(game, player, tile, uH, unit);
             } else {
@@ -2337,6 +2341,7 @@ public final class Helper {
         if (unitsOnly) {
             return productionValueTotal;
         }
+        productionValueTotal += ThirtyKExploreHooks.extraPlanetProduction(uH, productionValueTotal);
         if (uH instanceof Planet planet) {
             if (TaPromissoryHandler.planetHasAdvancedStructuralEngineering(planet)
                     && player.getPlanets().contains(planet.getName())) {
@@ -2679,6 +2684,9 @@ public final class Helper {
                         if (cosmicSuper) {
                             productionValue++;
                         }
+                        if (productionValue > 0 && player.hasTech("pm_br")) {
+                            productionValue += 2;
+                        }
                         if (productionValue > highestProd) {
                             highestProd = productionValue;
                         }
@@ -2727,6 +2735,9 @@ public final class Helper {
                             }
                             if (cosmicSuper) {
                                 productionValue++;
+                            }
+                            if (productionValue > 0 && player.hasTech("pm_br")) {
+                                productionValue += 2;
                             }
                             if (productionValue > highestProd) {
                                 highestProd = productionValue;
@@ -2854,6 +2865,7 @@ public final class Helper {
             if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
                 cost = Math.max(0, cost - 1);
             }
+            cost = Math.max(0, cost - ThirtyKExploreHooks.productionDiscount(game, producedUnits));
             if (game.isMonumentsMode()) {
                 if (MonumentsService.isMonumentOnBoard(game, player, "rohdhna_monument")) {
                     Tile monumentTile = MonumentsService.getMonumentTile(game, player, "rohdhna_monument");
@@ -3106,7 +3118,8 @@ public final class Helper {
         }
         boolean greenMechd = false;
         boolean ironMechSpaceAdded = false;
-        if (player.hasTech("tf-desperados") && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)) {
+        if ((player.hasTech("tf-desperados") || player.hasAbility("desperados_br"))
+                && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)) {
             unitButtons.add(Buttons.blue(
                     player.factionButtonChecker() + "desperadoDestroyer_" + tile.getPosition(),
                     "Place Desperado Destroyer",
@@ -3132,6 +3145,12 @@ public final class Helper {
                 unitButtons.add(Buttons.blue(
                         "sarMechStep1_" + tile.getPosition() + "_" + warfareNOtherstuff,
                         "Use Self-Assembly Routines",
+                        TechEmojis.WarfareTech));
+            }
+            if (player.hasTech("sar_br")) {
+                unitButtons.add(Buttons.blue(
+                        player.factionButtonChecker() + "sarBR_" + tile.getPosition() + "_" + warfareNOtherstuff,
+                        "Use Self Assembly Routines",
                         TechEmojis.WarfareTech));
             }
 

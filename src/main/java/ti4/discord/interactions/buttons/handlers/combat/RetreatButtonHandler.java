@@ -17,6 +17,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
@@ -97,6 +98,7 @@ class RetreatButtonHandler {
         if (player.hasUnlockedBreakthrough("kalorabt")) {
             KaloraBreakthroughHandler.bypassOperationsRetreat(player, game, game.getTileByPosition(pos1), event);
         }
+        ThirtyKExploreHooks.beforeRetreatInto(game, player, game.getTileByPosition(pos2));
         ButtonHelperModifyUnits.retreatSpaceUnits(buttonID, event, game, player);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),

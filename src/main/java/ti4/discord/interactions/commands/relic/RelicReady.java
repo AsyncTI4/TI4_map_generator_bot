@@ -32,4 +32,9 @@ class RelicReady extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, "Invalid relic or player does not have specified relic.");
         }
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

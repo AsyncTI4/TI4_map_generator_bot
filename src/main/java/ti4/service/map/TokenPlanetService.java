@@ -20,6 +20,7 @@ public final class TokenPlanetService {
         cradle,
         oasis,
         avernus,
+        oceanus,
         thundersedge,
         illusion,
         phantasm,

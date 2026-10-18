@@ -1,0 +1,16 @@
+{
+  "name": "30k-ac-conflagration-after-turn",
+  "description": "Hacan takes Mecatol Rex from Sol with 3 infantry; Sol only answers with Conflagration after the turn has ended, and 2 of the 3 infantry still burn.",
+  "preset": "30k-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "do": "hand", "as": "sol", "hand": { "acs": ["conflagration30k1"], "planets": ["mr"] } },
+    { "do": "hand", "as": "hacan", "hand": { "units": { "000": "3 inf mr" }, "planets": ["mr"] } },
+    { "expect": { "state": "planet.mr.owner", "equals": "hacan" } },
+    { "as": "sol", "pressId": "FFCC_sol_turnEnd" },
+    { "expect": { "state": "game.activePlayer", "equals": "hacan" } },
+    { "label": "Sol answers in Hacan's turn", "as": "sol", "press": "ac_play_from_hand_{ac:conflagration30k1}", "in": "sol:cards-info" },
+    { "as": "sol", "press": "thkAcConflagration", "in": "sol" },
+    { "expect": { "state": "planet.mr.units", "contains": "gf=1", "notContains": "gf=3" } }
+  ]
+}

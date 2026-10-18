@@ -1,7 +1,6 @@
 package ti4.helpers;
 
-import static java.util.Map.entry;
-import static java.util.Map.ofEntries;
+import static java.util.Map.*;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -24,6 +23,8 @@ public final class Constants {
     public static final String solaxId = "380689512621277185";
     public static final String andcatId = "238933125072158720";
     public static final String privateStaticVoidId = "148195684644814848";
+    public static final String lazikId = "206450549371961346";
+    public static final String niuId = "339399043740467200";
 
     // Server IDs
     public static final String ASYNCTI4_HUB_SERVER_ID = "943410040369479690";
@@ -48,6 +49,14 @@ public final class Constants {
             entry("1220415693837832212", "Emoji Farm 17"),
             entry("1243245147551170582", "Emoji Farm 18"),
             entry("1303437221361352715", "Emoji Farm 19"));
+
+    public static String lazikPing() {
+        return "<@" + lazikId + ">";
+    }
+
+    public static String niuPing() {
+        return "<@" + niuId + ">";
+    }
 
     public static String jazzPing() {
         return "<@" + jazzId + ">";
@@ -104,6 +113,7 @@ public final class Constants {
 
     // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
+    public static final String OPLUSPLUS_COUNCIL_CONFIRMED = "oplusplus_council_confirmed";
     public static final String TEN_MIN_REMINDER = "ten_min_reminder";
     public static final String PREFERS_DISTANCE = "prefers_distance";
     public static final String AUTO_PASS_WHENS_N_AFTERS = "auto_pass_whens_n_afters";
@@ -153,6 +163,7 @@ public final class Constants {
     public static final String GAME_CUSTOM_NAME = "game_custom_name";
     public static final String LAST_IMAGE_FILE_NAME = "last_image_file_name";
     public static final String AVERNUS = "avernus";
+    public static final String OCEANUS = "oceanus";
     public static final String BROKENPLANET1 = "brokenplanet1";
     public static final String BROKENPLANET2 = "brokenplanet2";
     public static final String BROKENPLANET3 = "brokenplanet3";
@@ -487,6 +498,7 @@ public final class Constants {
             LOST_STATION,
             ILLUSTRION,
             AVERNUS,
+            OCEANUS,
             THUNDERSEDGE,
             BROKENPLANET1,
             BROKENPLANET2,
@@ -671,6 +683,7 @@ public final class Constants {
     public static final String GAME = "game";
     public static final String MAP = "map";
     public static final String INFO = "info";
+    public static final String GAME_INFO = "game_info";
     public static final String SHUFFLE_EXPLORES = "shuffle_explores";
     public static final String CHANGE_TYPE = "change_type";
     public static final String START_FRANKEN_DRAFT = "start_franken_draft";
@@ -1534,6 +1547,7 @@ public final class Constants {
     public static final String CRON_NAME = "cron_name";
     public static final String RUN_CRON = "run_cron";
     public static final String MMR_HISTORY = "mmr_history";
+    public static final String GAME_MMR = "game_mmr";
     public static final String UPLOAD_RECENT_GAME_STATS = "upload_recent_game_stats";
 
     public static final String HELIOS_ATTACHMENT_1 = "attachment_helios1.png";
@@ -1679,6 +1693,11 @@ public final class Constants {
     public static final String TIGL = "tigl";
     public static final String TIGL_CHANGE_NICKNAME = "change_nickname";
     public static final String TIGL_REPORT_MANUALLY = "report_manually";
+    public static final String TIGL_USER_RANKS = "user_ranks";
+    public static final String TIGL_ENABLE = "enable";
+    public static final String TIGL_MODE = "mode";
+    public static final String TIGL_INIT_RANKS = "init_ranks";
+    public static final String TIGL_INCLUDE_HISTORY = "include_history";
     public static final String TIGL_NICKNAME = "nickname";
     public static final String TIGL_FRACTURED_TAG = "TIGL Fractured";
     public static final String LAZAX = "lazax";
@@ -1686,7 +1705,6 @@ public final class Constants {
     public static final String LAZAX_TOP_100 = "top_100";
     public static final String LAZAX_DELEGATION_LEADERBOARD = "delegation_leaderboard";
     public static final String PUBLIC = "public";
-    public static final String IS_FRACTURED = "is_fractured";
     public static final String SHOW_GAME_IDS = "show_game_ids";
     public static final String SEARCH_NAMES = "search_names";
     public static final String SEARCH_TAGS = "search_tags";

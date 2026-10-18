@@ -107,6 +107,9 @@ public final class ButtonHelperFactionSpecific {
     private static final String REFLECT_DECLINE = "reflectDecline";
     private static final String REFLECT_PENDING = "reflectPending_";
     private static final String REFLECT_DRAWING = "reflectDrawing_";
+    private static final String PAY_RADIANCE_BR = "payRadianceBr_";
+    private static final String DECLINE_RADIANCE_BR = "declineRadianceBr_";
+    private static final String FINISH_RADIANCE_BR_PAYMENT = "finishRadianceBrPayment_";
 
     public static List<Button> getc4RedTechButtons(Player player) {
         // ACTION: Exhaust this card to place 1 PDS on a planet you control.
@@ -1390,6 +1393,80 @@ public final class ButtonHelperFactionSpecific {
                 buttons);
     }
 
+    public static void offerTargetInfluencePayment(Game game, Player player, Player target, Tile tile) {
+        String payload = player.getFaction() + "|" + tile.getPosition();
+        List<Button> buttons = List.of(
+                Buttons.green(
+                        target.factionButtonChecker() + PAY_RADIANCE_BR + payload,
+                        "Spend 2 Influence",
+                        FactionEmojis.edyn),
+                Buttons.red(
+                        target.factionButtonChecker() + DECLINE_RADIANCE_BR + payload,
+                        "Decline (Place Command Token)"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                target.getCorrectChannel(),
+                target.getRepresentationNoPing() + ", spend 2 influence to prevent "
+                        + player.getRepresentationNoPing() + " from placing one of your command tokens in "
+                        + tile.getRepresentationForButtons(game, target) + " using **Radiance**.",
+                buttons);
+    }
+
+    @ButtonHandler(PAY_RADIANCE_BR)
+    public static void payRadianceBr(ButtonInteractionEvent event, Game game, Player target, String buttonID) {
+        String[] values = buttonID.substring(PAY_RADIANCE_BR.length()).split("\\|", 2);
+        Player player = values.length == 2 ? game.getPlayerFromColorOrFaction(values[0]) : null;
+        Tile tile = values.length == 2 ? game.getTileByPosition(values[1]) : null;
+        if (player == null || tile == null || player == target || !player.hasAbility("radiance_br")) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        List<Button> buttons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, target, "inf"));
+        buttons.add(Buttons.green(
+                target.factionButtonChecker() + FINISH_RADIANCE_BR_PAYMENT + player.getFaction() + "|"
+                        + tile.getPosition(),
+                "Done Paying Influence",
+                FactionEmojis.edyn));
+        MessageHelper.sendMessageToChannelWithButtons(
+                target.getCorrectChannel(),
+                target.getRepresentationNoPing() + ", spend 2 influence to prevent "
+                        + player.getRepresentationNoPing() + " from placing one of your command tokens in "
+                        + tile.getRepresentationForButtons(game, target) + " using **Radiance**.\n"
+                        + Helper.buildSpentThingsMessage(target, game, "inf"),
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(FINISH_RADIANCE_BR_PAYMENT)
+    public static void finishRadianceBrPayment(
+            ButtonInteractionEvent event, Game game, Player target, String buttonID) {
+        String[] values =
+                buttonID.substring(FINISH_RADIANCE_BR_PAYMENT.length()).split("\\|", 2);
+        Player player = values.length == 2 ? game.getPlayerFromColorOrFaction(values[0]) : null;
+        Tile tile = values.length == 2 ? game.getTileByPosition(values[1]) : null;
+        if (player == null || tile == null || player == target || !player.hasAbility("radiance_br")) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                target.getRepresentationNoPing()
+                        + " spent 2 influence to prevent their command token from being placed in "
+                        + tile.getRepresentationForButtons(game, player) + " by **Radiance**.");
+        target.resetSpentThings();
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(DECLINE_RADIANCE_BR)
+    public static void declineRadianceBr(ButtonInteractionEvent event, Game game, Player target, String buttonID) {
+        String[] values = buttonID.substring(DECLINE_RADIANCE_BR.length()).split("\\|", 2);
+        Player player = values.length == 2 ? game.getPlayerFromColorOrFaction(values[0]) : null;
+        Tile tile = values.length == 2 ? game.getTileByPosition(values[1]) : null;
+        if (player != null && tile != null && player != target && player.hasAbility("radiance_br")) {
+            placeRadianceCommandToken(event, game, player, target, tile);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("edynAgendaStuffStep2_")
     public static void resolveEdynAgendaStuffStep2(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
@@ -1416,16 +1493,28 @@ public final class ButtonHelperFactionSpecific {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String pos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);
-        CommandCounterHelper.addCC(event, p2, tile);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        if (p2 == null || tile == null || p2 == player) {
+            return;
+        }
+        if (player.hasAbility("radiance_br")) {
+            offerTargetInfluencePayment(game, player, p2, tile);
+            return;
+        }
+        placeRadianceCommandToken(event, game, player, p2, tile);
+    }
+
+    private static void placeRadianceCommandToken(
+            ButtonInteractionEvent event, Game game, Player player, Player target, Tile tile) {
+        CommandCounterHelper.addCC(event, target, tile);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " you placed " + p2.getFactionEmojiOrColor()
+                player.getRepresentationUnfogged() + " you placed " + target.getFactionEmojiOrColor()
                         + " command token in tile " + tile.getRepresentationForButtons(game, player) + ".");
         MessageHelper.sendMessageToChannel(
-                p2.getCorrectChannel(),
-                p2.getRepresentationUnfogged() + " you were jammed in " + tile.getRepresentationForButtons(game, p2)
-                        + " via the **Radiance** ability.");
+                target.getCorrectChannel(),
+                target.getRepresentationUnfogged() + " you were jammed in "
+                        + tile.getRepresentationForButtons(game, target) + " via the **Radiance** ability.");
     }
 
     public static void resolveCavStep1(Game game, Player player) {

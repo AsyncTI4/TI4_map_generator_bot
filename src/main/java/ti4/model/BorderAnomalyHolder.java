@@ -1,8 +1,10 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ti4.image.Mapper;
 
 @Data
 @NoArgsConstructor
@@ -10,20 +12,24 @@ import lombok.NoArgsConstructor;
 public class BorderAnomalyHolder {
     private String tile;
     private int direction;
-    private BorderAnomalyModel.BorderAnomalyType type;
+    private String type;
+
+    @JsonIgnore
+    public BorderAnomalyModel getModel() {
+        return Mapper.getBorderAnomaly(type);
+    }
+
+    public boolean isType(String typeId) {
+        return type != null && type.equals(typeId);
+    }
 
     public boolean blocksAdjacencyIn() {
-        return switch (type) {
-            case SPATIAL_TEAR, GRAVITY_WAVE -> true;
-            case null, default -> false;
-        };
+        BorderAnomalyModel model = getModel();
+        return model != null && model.blocksAdjacencyIn();
     }
 
     public boolean blocksAdjacencyOut() {
-        return switch (type) {
-            case SPATIAL_TEAR -> true;
-            case GRAVITY_WAVE -> false;
-            case null, default -> false;
-        };
+        BorderAnomalyModel model = getModel();
+        return model != null && model.blocksAdjacencyOut();
     }
 }

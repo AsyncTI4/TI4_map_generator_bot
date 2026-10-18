@@ -25,4 +25,9 @@ class BreakthroughSetTg extends GameStateSubcommand {
                 .orElse(null);
         BreakthroughCommandHelper.updateBreakthroughTradeGoods(getPlayer(), optionTG.getAsString(), id);
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }
