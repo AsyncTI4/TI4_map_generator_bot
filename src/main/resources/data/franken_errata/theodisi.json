@@ -206,6 +206,7 @@
 		"itemId": "scrapyard",
 		"alternateText": "During setup, gain 3 random technologies with 0 prerequisites.",
 		"source": "theodisi"
+	},
     {
         "itemCategory": "ABILITY",
         "itemId": "custom_rigs",
