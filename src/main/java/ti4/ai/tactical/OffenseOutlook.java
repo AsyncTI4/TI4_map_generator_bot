@@ -104,7 +104,9 @@ final class OffenseOutlook {
             }
             if (BoardView.controller(game, planet.getName()) == opponent) {
                 heldPlanetValue += w * g * base;
-                fractureDenial += w * g * standings.denialWeight(opponent) * FracturePrize.point(planet);
+                if (FracturePrize.isStyx(planet)) {
+                    fractureDenial += w * g * standings.denialWeight(opponent) * FracturePrize.point(planet);
+                }
             }
         }
         double hurt = standings.hurtWeight(opponent);
