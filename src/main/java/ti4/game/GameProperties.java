@@ -172,6 +172,7 @@ public class GameProperties {
     private @ExportableField boolean discordantStarsMode;
     private @ExportableField boolean blueReverieMode;
     private @ExportableField boolean unchartedSpaceStuff;
+    private @ExportableField boolean lostLegaciesTiles;
     private @ExportableField boolean miltyModMode;
     private @ExportableField boolean promisesPromisesMode;
     private @ExportableField boolean flagshippingMode;

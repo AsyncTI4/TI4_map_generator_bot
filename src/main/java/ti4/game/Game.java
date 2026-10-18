@@ -3534,6 +3534,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         SourceSettings sources = miltySettings.getSourceSettings();
         if (sources.getAbsol().isVal()) setAbsolMode(true);
         setMonumentsMode(sources.getMonuments().isVal());
+        setLostLegaciesTiles(sources.getLostLegaciesTiles().isVal());
 
         GameSettings settings = miltySettings.getGameSettings();
         setVp(settings.getPointTotal().getVal());
@@ -3561,6 +3562,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         SourceSettings sources = draftSettings.getSourceSettings();
         if (sources.getAbsol().isVal()) setAbsolMode(true);
         setMonumentsMode(sources.getMonuments().isVal());
+        setLostLegaciesTiles(sources.getLostLegaciesTiles().isVal());
 
         setVp(gameSetupSettings.getPointTotal().getVal());
 
@@ -5018,6 +5020,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isDiscordantStarsMode()
                 || isBlueReverieMode()
                 || isUnchartedSpaceStuff()
+                || isLostLegaciesTiles()
                 || isFrankenGame()
                 || isMiltyModMode()
                 || isThundersEdgeDemo()

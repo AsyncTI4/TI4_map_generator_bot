@@ -1,0 +1,17 @@
+{
+    "id": "th37",
+    "name": "Ilun/Saresh",
+    "aliases": [
+        "th37",
+        "ilun",
+        "saresh"
+    ],
+    "imagePath": "th37.png",
+    "planets": [
+        "ilun",
+        "saresh"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "blue",
+    "source": "theodisi"
+}
