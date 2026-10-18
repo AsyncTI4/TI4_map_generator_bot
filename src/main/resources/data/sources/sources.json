@@ -382,8 +382,9 @@
         "canal": "community",
         "subcanal": "personal projs",
         "credits": "Mr.Merford",
-        "description": "New Layouts for Fracture"
-    } 
+        "description": "New Layouts for Fracture" 
+    },
+    { 
         "source": "goose",
         "name": "Goose",
         "canal": "community",
