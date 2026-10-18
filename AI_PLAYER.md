@@ -1156,6 +1156,11 @@ Seven small generic changes don't reference `ti4.ai`:
     the cards drawn most that no rule plays. `-Dai.actioncards.ab=true` plays half of the seats, a different half in
     each game, with the action card rules from before the statistics, and the summary compares the two groups: average
     final victory points, action cards played per seat per game and top finishes, with their seat counts.
+  - The batch summary breaks scoring down (`ObjectiveTracker`): the leader's points by source (the same breakdown as
+    the bot's "Winners Path to Victory" statistic, to read next to human games), the share of seats scoring a public
+    objective and a secret in each status phase, and for every public objective by stage the share of seats that
+    scored it and how far short the others were just before each status phase (taken once every seat has passed, as
+    queued scores land when the status phase starts). It ends with every secret scored over the batch.
   - `-Dai.secrets.hold=false` plays without patience with action secrets. The batch prints the secrets scored per seat
     by phase and the average round in which the action secrets were scored.
 - In a dev guild:

@@ -108,6 +108,7 @@ class AiSelfPlayTest extends BaseTi4Test {
         printPromissoryNotes(outcomes);
         printActionCards(outcomes);
         printSecrets(outcomes);
+        printObjectives(outcomes);
         printPlanKinds(outcomes);
         printMecatol(outcomes);
         printExpansionZones(outcomes);
@@ -189,6 +190,181 @@ class AiSelfPlayTest extends BaseTi4Test {
                         .mapToInt(SelfPlayGame.Outcome::totalVictoryPoints)
                         .average()
                         .orElse(0));
+    }
+
+    // Where the points come from and where they are missed: the leader's points by source, how many seats score in each
+    // status phase, and for every public objective how many seats scored it and how far short the others were.
+    private static void printObjectives(List<SelfPlayGame.Outcome> outcomes) {
+        List<ObjectiveTracker.Summary> summaries =
+                outcomes.stream().map(SelfPlayGame.Outcome::objectives).toList();
+        printLeaderPath(summaries);
+        System.out.println("Seats scoring a public objective in each status phase: "
+                + perRoundDecimal(
+                        summaries.stream()
+                                .map(summary -> summary.scoringShareByRound(true))
+                                .toList(),
+                        1));
+        System.out.println("Seats scoring a secret objective in each status phase: "
+                + perRoundDecimal(
+                        summaries.stream()
+                                .map(summary -> summary.scoringShareByRound(false))
+                                .toList(),
+                        1));
+        printObjectiveRates(summaries);
+        printSecretMix(summaries);
+    }
+
+    // Every secret scored over the batch, most scored first, with its share of all scored secrets: the mix to hold
+    // against how often human players complete each secret.
+    private static void printSecretMix(List<ObjectiveTracker.Summary> summaries) {
+        Map<String, Long> counts = summaries.stream()
+                .flatMap(summary -> summary.secretsScored().stream())
+                .collect(java.util.stream.Collectors.groupingBy(id -> id, java.util.stream.Collectors.counting()));
+        long total = counts.values().stream().mapToLong(Long::longValue).sum();
+        String mix = counts.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry::getKey))
+                .map(entry -> String.format(
+                        "%s %d (%.0f%%)",
+                        secretName(entry.getKey()), entry.getValue(), 100.0 * entry.getValue() / total))
+                .collect(java.util.stream.Collectors.joining(", "));
+        System.out.println("Secrets scored over the batch (" + total + "): " + mix);
+    }
+
+    private static String secretName(String id) {
+        ti4.model.SecretObjectiveModel model = ti4.image.Mapper.getSecretObjective(id);
+        return model == null ? id : model.getName();
+    }
+
+    // The breakdown of the bot's "Winners Path to Victory" statistic for the seat that led at the end, averaged per
+    // game,
+    // so it can be read next to the same statistic over human games.
+    private static void printLeaderPath(List<ObjectiveTracker.Summary> summaries) {
+        double games = Math.max(1, summaries.size());
+        int stageOne = 0;
+        int stageTwo = 0;
+        int secrets = 0;
+        int supports = 0;
+        Map<String, Integer> others = new java.util.TreeMap<>();
+        for (ObjectiveTracker.Summary summary : summaries) {
+            ti4.service.statistics.game.WinningPathBreakdown path = summary.leaderPath();
+            stageOne += path.stage1s();
+            stageTwo += path.stage2s();
+            secrets += path.secrets();
+            supports += path.supports();
+            path.otherPoints().forEach((source, points) -> others.merge(source, points, Integer::sum));
+        }
+        String otherSources = others.entrySet().stream()
+                .map(entry -> String.format("%s %.2f", entry.getKey(), entry.getValue() / games))
+                .collect(java.util.stream.Collectors.joining(", "));
+        System.out.printf(
+                "Leader's points by source per game (as in Winners Path to Victory): stage I %.2f, stage II %.2f"
+                        + " (%.2f points), secrets %.2f, Support for the Throne %.2f, other %.2f (%s) over %d games%n",
+                stageOne / games,
+                stageTwo / games,
+                2 * stageTwo / games,
+                secrets / games,
+                supports / games,
+                others.values().stream().mapToInt(Integer::intValue).sum() / games,
+                otherSources,
+                summaries.size());
+    }
+
+    // Per public objective, by stage and from the least scored up: the share of seats that scored it out of the seats
+    // it
+    // was revealed to, and, for the seats that had not scored it when a status phase came, how far short they were
+    // ("met" counts seats that qualified, with how many of them scored it there).
+    private static void printObjectiveRates(List<ObjectiveTracker.Summary> summaries) {
+        Map<String, ObjectiveTally> tallies = new java.util.HashMap<>();
+        for (ObjectiveTracker.Summary summary : summaries) {
+            for (ObjectiveTracker.Reveal reveal : summary.reveals()) {
+                ObjectiveTally tally = tallies.computeIfAbsent(reveal.objective(), _ -> new ObjectiveTally());
+                tally.points = reveal.points();
+                tally.games++;
+                tally.seatReveals += summary.seats();
+                tally.scorers += reveal.scorers();
+            }
+            for (ObjectiveTracker.Chance chance : summary.chances()) {
+                ObjectiveTally tally = tallies.get(chance.objective());
+                if (tally != null) tally.add(chance);
+            }
+        }
+        for (int stage = 1; stage <= 2; stage++) {
+            int points = stage;
+            List<Map.Entry<String, ObjectiveTally>> rows = tallies.entrySet().stream()
+                    .filter(entry -> entry.getValue().points == points)
+                    .sorted(Comparator.comparingDouble((Map.Entry<String, ObjectiveTally> entry) ->
+                                    entry.getValue().scoredShare())
+                            .thenComparing(Map.Entry::getKey))
+                    .toList();
+            int scorers =
+                    rows.stream().mapToInt(entry -> entry.getValue().scorers).sum();
+            int seatReveals = rows.stream()
+                    .mapToInt(entry -> entry.getValue().seatReveals)
+                    .sum();
+            System.out.printf(
+                    "Stage %s public objectives: scored by %.0f%% of the seats they were revealed to (%d of %d)%n",
+                    stage == 1 ? "I" : "II",
+                    seatReveals == 0 ? 0 : 100.0 * scorers / seatReveals,
+                    scorers,
+                    seatReveals);
+            for (Map.Entry<String, ObjectiveTally> row : rows) {
+                System.out.println("  " + objectiveName(row.getKey()) + ": " + row.getValue());
+            }
+        }
+    }
+
+    private static String objectiveName(String id) {
+        ti4.model.PublicObjectiveModel model = ti4.image.Mapper.getPublicObjective(id);
+        return model == null ? id : model.getName();
+    }
+
+    private static final class ObjectiveTally {
+        int points;
+        int games;
+        int seatReveals;
+        int scorers;
+        int unscoredAtStatus;
+        int met;
+        int metAndScored;
+        int shortByOne;
+        int shortByTwo;
+        int shortByMore;
+        int unmodelled;
+
+        void add(ObjectiveTracker.Chance chance) {
+            unscoredAtStatus++;
+            switch (chance.shortBy()) {
+                case ObjectiveTracker.UNMODELLED -> unmodelled++;
+                case 0 -> {
+                    met++;
+                    if (chance.scored()) metAndScored++;
+                }
+                case 1 -> shortByOne++;
+                case 2 -> shortByTwo++;
+                default -> shortByMore++;
+            }
+        }
+
+        double scoredShare() {
+            return seatReveals == 0 ? 0 : (double) scorers / seatReveals;
+        }
+
+        @Override
+        public String toString() {
+            String shortfall = unmodelled == unscoredAtStatus && unscoredAtStatus > 0
+                    ? "not measured"
+                    : String.format(
+                            "met %d (scored %d), short by 1: %d, 2: %d, 3+: %d%s",
+                            met,
+                            metAndScored,
+                            shortByOne,
+                            shortByTwo,
+                            shortByMore,
+                            unmodelled == 0 ? "" : ", not measured " + unmodelled);
+            return String.format(
+                    "%.0f%% of seats (%d of %d, %d games); unscored before a status phase %d: %s",
+                    100 * scoredShare(), scorers, seatReveals, games, unscoredAtStatus, shortfall);
+        }
     }
 
     // Tactical actions by the kind of plan behind them, per game over the batch: attacks, attacks on another player's

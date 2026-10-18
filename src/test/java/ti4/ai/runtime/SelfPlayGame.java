@@ -69,6 +69,7 @@ final class SelfPlayGame {
             SecretSummary secrets,
             MecatolTracker.Summary mecatol,
             PromissoryTracker.Summary promissory,
+            ObjectiveTracker.Summary objectives,
             String report,
             long wallSeconds) {
 
@@ -191,6 +192,7 @@ final class SelfPlayGame {
     private final java.util.Set<String> legacySeats = new java.util.LinkedHashSet<>();
     private final java.util.Set<String> heldCards = new java.util.LinkedHashSet<>();
     private final List<Integer> playRounds = new ArrayList<>();
+    private final ObjectiveTracker objectives = new ObjectiveTracker();
 
     SelfPlayGame(SelfPlayEnvironment env, String name) {
         this(env, name, 0);
@@ -330,6 +332,7 @@ final class SelfPlayGame {
             recordVictoryPoints(game);
             recordPlayRounds(game);
             env.promissory.observe(game);
+            objectives.observe(game);
             closeOverrulePicks(game, false);
             if (stopWhen.test(game)) return outcome(Ending.STOP_CONDITION, game, ticks);
             if (AiTickRunner.reachedVictoryPoints(game)) return outcome(Ending.VICTORY_POINTS, game, ticks);
@@ -549,6 +552,7 @@ final class SelfPlayGame {
                 secretSummary(game),
                 env.mecatol.summary(),
                 env.promissory.summary(game),
+                objectives.summary(game),
                 report(ending, game, ticks),
                 (System.nanoTime() - wallStart) / 1_000_000_000L);
     }
