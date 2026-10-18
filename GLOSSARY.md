@@ -279,6 +279,71 @@ _Avoid_: Mod, admin
 **Testbed**:
 A developer-only harness for driving a Game through scripted actions on a development bot.
 
+### Rules concepts
+
+**Exhausted / Readied**:
+A card or planet is exhausted once its use is spent and readied when refreshed, typically in the Status phase.
+_Avoid_: Tapped / untapped, used / refreshed
+
+**Control**:
+A Player controls a Planet when they hold it, whether or not units are on it.
+_Avoid_: Own, claim
+
+**Invasion**:
+The step of a Tactical action in which ground forces land on Planets and fight any defenders.
+
+**Production**:
+Building units at a Space dock or via an ability, paid for with resources up to the unit's cost.
+_Avoid_: Build
+
+**Reinforcements**:
+A Player's supply of unit pieces not currently on the Map, from which new units are drawn.
+_Avoid_: Supply, reserves
+
+**Blockaded**:
+A Space dock whose System contains enemy ships and none of its owner's, so it cannot produce ships.
+
+**Space cannon**:
+A unit ability that fires at ships, in space or on approach to a Planet, before combat.
+_Avoid_: PDS fire
+
+**Anti-fighter barrage**:
+A unit ability that fires at fighters at the start of space combat.
+_Avoid_: AFB
+
+**Sustain damage**:
+A unit ability to absorb one hit and flip to a damaged state instead of being destroyed.
+
+**Capture**:
+Removing an opposing unit from the Map to a Player's own holding area rather than destroying it.
+
+**Purge**:
+Permanently removing a component from the game.
+
+**Victory points**:
+The score a Player earns from objectives and other effects, with the first to the Game's threshold winning.
+_Avoid_: Score, points
+
+**Custodians token**:
+The token on Mecatol Rex that is removed by spending influence and grants a Victory point.
+
+**Mecatol Rex**:
+The center System, holding the Custodians token and the Imperial card's point for controlling it.
+
+**Legendary planet**:
+A Planet with a unique ability that its controller may use.
+
+**Initiative order**:
+The order in which Players take Turns each Round, set by the numbers on their Strategy cards.
+_Avoid_: Turn order (also used for the seating order around the table)
+
+**Adjacency**:
+The relationship between Systems that share an edge or are linked by wormholes or other effects, governing movement.
+_Avoid_: Neighbors (that names Players with pieces in or next to each other's Systems)
+
+**Elimination**:
+A Player's removal from the Game when they control no Planets, have no ground forces on the Map and own no Space docks.
+
 ### Table slang
 
 **Pop**:
