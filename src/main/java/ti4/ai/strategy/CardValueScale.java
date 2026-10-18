@@ -54,4 +54,6 @@ public class CardValueScale {
     static final double SECOND_RESEARCH_SHARE = 0.5;
     static final double CROWDED_DOUBLE_BUILD_SHARE = 0.5;
     static final double TE_FIRST_BUILD_SHARE = 0.5;
+    static final double EXPEDITION_FIRST_SHARE = 0.5;
+    static final double EXPEDITION_PLAY_MIN = 0.5;
 }

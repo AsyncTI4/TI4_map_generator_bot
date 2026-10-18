@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.expedition.ExpeditionUnlock;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -27,7 +28,8 @@ public class ReadyingValue {
     public static double of(Game game, Player seat, Collection<String> planets) {
         if (planets.isEmpty()) return 0;
         return CardValueScale.READY_SHARE
-                * DiplomacyUse.readying(game, seat, planets).use();
+                        * DiplomacyUse.readying(game, seat, planets).use()
+                + ExpeditionUnlock.gainFromReadying(game, seat, planets);
     }
 
     public static Optional<Pick> bestSingle(Game game, Player seat, Collection<String> candidates) {
@@ -47,7 +49,8 @@ public class ReadyingValue {
                 ? CardValueScale.SPEND_UNLOCK_SHARE * CardValueScale.VICTORY_POINT
                 : CardValueScale.READY_SHARE * choice.use();
         double skip = techSkipValue(game, seat, planet);
-        return new Pick(planet, spend + skip, choice.unlocksScore(), skip);
+        double expedition = ExpeditionUnlock.gainFromReadying(game, seat, choice.planets());
+        return new Pick(planet, spend + skip + expedition, choice.unlocksScore(), skip);
     }
 
     static double techSkipValue(Game game, Player seat, String planet) {

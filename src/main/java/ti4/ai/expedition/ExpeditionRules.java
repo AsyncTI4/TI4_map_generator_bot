@@ -2,6 +2,9 @@ package ti4.ai.expedition;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.actioncards.ActionCardValue;
@@ -12,6 +15,7 @@ import ti4.ai.brain.Prompts.Match;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.scoring.PaymentRules;
+import ti4.ai.scoring.Wallet;
 import ti4.ai.secrets.SecretValue;
 import ti4.game.Player;
 
@@ -22,6 +26,7 @@ public class ExpeditionRules {
     static final long STEP_TIMEOUT_MILLIS = 60_000L;
     static final long POLL_MILLIS = 3_000L;
     private static final String KEY = "expedition|";
+    private static final String PAID_KEY = "expeditionPaid|";
     private static final String FIELD = "~";
     private static final String INFO = "expeditionInfoAndButtons";
     private static final String END_OF_TURN = "endOfTurnAbilities";
@@ -125,8 +130,21 @@ public class ExpeditionRules {
         remember(context, new Flow(kind, next, context.now(), holding));
         if (next == Stage.PAY) {
             PaymentRules.expect(context, "an expedition", choice.get().payment(), PAYMENT_DONE);
+            rememberPaid(context, choice.get().payment());
         }
         return button.map(match -> match.press("claim the " + kind.id() + " expedition"));
+    }
+
+    public static Set<String> paidThisTurn(AiTurnContext context) {
+        String paid = context.memory().get(PAID_KEY + context.turnKey()).orElse("");
+        return Set.of(StringUtils.split(paid, FIELD));
+    }
+
+    private static void rememberPaid(AiTurnContext context, Wallet.Payment payment) {
+        String planets = Stream.concat(payment.forResources().stream(), payment.forInfluence().stream())
+                .distinct()
+                .collect(Collectors.joining(FIELD));
+        context.memory().put(PAID_KEY + context.turnKey(), planets);
     }
 
     private static Stage nextStage(ExpeditionKind kind) {

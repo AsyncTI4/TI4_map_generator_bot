@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.OptionalInt;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.CustodiansRace.Snapshot;
+import ti4.ai.expedition.ExpeditionUnlock;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.secrets.SpyNetwork;
 import ti4.ai.strategy.CardPlan.Benefit;
@@ -23,6 +24,7 @@ class PoliticsUses {
         return List.of(
                 new Benefit(CardUse.POLITICS_SPEAKER, speakerValue(in)),
                 new Benefit(CardUse.POLITICS_ACTION_CARDS, actionCardValue(in)),
+                new Benefit(CardUse.POLITICS_EXPEDITION, expeditionValue(in)),
                 new Benefit(CardUse.POLITICS_AGENDA, in.agendaPhaseActive() ? CardValueScale.AGENDA_PEEK : 0));
     }
 
@@ -82,11 +84,22 @@ class PoliticsUses {
                 && ListPlayerInfoService.getPlayerProgressOnObjective(objective, game, seat) >= threshold - 1;
     }
 
+    private static int cardsDrawn(PlanInputs in) {
+        Game game = in.game();
+        Player seat = in.seat();
+        if (StrategyCardRules.holdsNoActionCards(seat)) return 0;
+        return Math.clamp(ButtonHelper.getACLimit(game, seat) - seat.getAcCount(), 0, CARDS_DRAWN);
+    }
+
+    private static double expeditionValue(PlanInputs in) {
+        return ExpeditionUnlock.afterDrawing(in.game(), in.seat(), cardsDrawn(in));
+    }
+
     private static double actionCardValue(PlanInputs in) {
         Game game = in.game();
         Player seat = in.seat();
         if (StrategyCardRules.holdsNoActionCards(seat)) return 0;
-        int drawn = Math.clamp(ButtonHelper.getACLimit(game, seat) - seat.getAcCount(), 0, CARDS_DRAWN);
+        int drawn = cardsDrawn(in);
         double value = drawn * CardValueScale.ACTION_CARD;
         if (SpyNetwork.withinReach(game, seat, CARDS_DRAWN)) {
             value += CardValueScale.SPEND_UNLOCK_SHARE * CardValueScale.VICTORY_POINT;
