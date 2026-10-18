@@ -52,6 +52,9 @@ public class DraftSetupService {
         if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
+        if (game.isLostLegaciesTiles()) {
+            sources.add(ComponentSource.theodisi);
+        }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             sources.add(ComponentSource.thunders_edge);
         }
@@ -166,6 +169,9 @@ public class DraftSetupService {
         }
         if (game.isUnchartedSpaceStuff()) {
             tileSources.add(ComponentSource.uncharted_space);
+        }
+        if (game.isLostLegaciesTiles()) {
+            tileSources.add(ComponentSource.theodisi);
         }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             tileSources.add(ComponentSource.thunders_edge);

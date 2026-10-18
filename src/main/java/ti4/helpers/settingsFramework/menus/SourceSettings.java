@@ -33,6 +33,7 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting discoStars;
     private final BooleanSetting betaTestMode;
     private final BooleanSetting unchartedSpace;
+    private final BooleanSetting lostLegaciesTiles;
     private final BooleanSetting blueReverie;
     private final BooleanSetting absol;
     private final BooleanSetting ignis;
@@ -63,6 +64,7 @@ public class SourceSettings extends SettingsMenu {
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
         teDemo = new BooleanSetting("ThundersEdge", "Thunders Edge", game.isThundersEdge());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
+        lostLegaciesTiles = new BooleanSetting("LostLegaciesTiles", "Lost Legacies Tiles", game.isLostLegaciesTiles());
         blueReverie = new BooleanSetting("BlueReverie", "Blue Reverie", game.isBlueReverieMode());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());
         ignis = new BooleanSetting(
@@ -82,6 +84,7 @@ public class SourceSettings extends SettingsMenu {
         codexes.setEmoji(FactionEmojis.Keleres);
         discoStars.setEmoji(SourceEmojis.DiscordantStars);
         unchartedSpace.setEmoji(SourceEmojis.DiscordantStars);
+        lostLegaciesTiles.setEmoji(SourceEmojis.Theodisi);
         blueReverie.setEmoji(SourceEmojis.BlueReverie);
         absol.setEmoji(SourceEmojis.Absol);
         eronous.setEmoji(SourceEmojis.Eronous);
@@ -94,6 +97,7 @@ public class SourceSettings extends SettingsMenu {
         discoStars.setExtraInfo("Adds Discordant Stars factions only.");
         blueReverie.setExtraInfo("Adds Blue Reverie factions only.");
         unchartedSpace.setExtraInfo("Adds Uncharted Space content.");
+        lostLegaciesTiles.setExtraInfo("Adds Lost Legacies tiles to the draft tile pool.");
         lostLegacies.setExtraInfo("Adds Lost Legacies factions only.");
         monuments.setExtraInfo(
                 "Adds faction monuments plus Monuments action cards, agendas, secrets, and strategy cards.");
@@ -116,6 +120,7 @@ public class SourceSettings extends SettingsMenu {
             discoStars.initialize(json.get("discoStars"));
             teDemo.initialize(json.get("teDemo"));
             unchartedSpace.initialize(json.get("unchartedSpace"));
+            lostLegaciesTiles.initialize(json.get("lostLegaciesTiles"));
             blueReverie.initialize(json.get("blueReverie"));
             absol.initialize(json.get("absol"));
             ignis.initialize(json.get("ignis"));
@@ -144,6 +149,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(discoStars);
         ls.add(blueReverie);
         ls.add(unchartedSpace);
+        ls.add(lostLegaciesTiles);
         ls.add(absol);
         ls.add(ignis);
         ls.add(eronous);
@@ -179,6 +185,7 @@ public class SourceSettings extends SettingsMenu {
                     ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
         if (discoStars.isVal()) sources.add(ComponentSource.ds);
         if (unchartedSpace.isVal()) sources.add(ComponentSource.uncharted_space);
+        if (lostLegaciesTiles.isVal()) sources.add(ComponentSource.theodisi);
         if (absol.isVal()) sources.add(ComponentSource.absol);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         return sources;

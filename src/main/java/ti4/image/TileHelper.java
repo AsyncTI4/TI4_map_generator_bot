@@ -22,6 +22,7 @@ import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
+import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 
 public final class TileHelper {
@@ -156,6 +157,18 @@ public final class TileHelper {
 
     public static boolean isValidTile(String tileID) {
         return tileIdsToTileModels.containsKey(tileID);
+    }
+
+    public static boolean isLostLegaciesTile(TileModel tileModel) {
+        if (tileModel == null || tileModel.getSource() != ComponentSource.theodisi) return false;
+        String tileId = tileModel.getId();
+        if (tileId == null || !tileId.startsWith("th")) return false;
+        try {
+            int tileNumber = Integer.parseInt(tileId.substring(2));
+            return tileNumber >= 19 && tileNumber <= 48;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     public static boolean isValidPlanet(String planetID) {

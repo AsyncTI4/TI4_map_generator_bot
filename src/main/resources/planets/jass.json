@@ -1,0 +1,28 @@
+{
+    "id": "jass",
+    "tileId": "th32",
+    "name": "Jass",
+    "aliases": [
+        "jass"
+    ],
+    "resources": 2,
+    "influence": 0,
+    "planetTypes": [
+        "CULTURAL",
+        "HAZARDOUS"
+    ],
+    "planetLayout": {
+        "unitHolderName": "jass",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 82,
+            "y": 134
+        },
+        "planetRadius": 62
+    },
+    "positionInTile": {
+        "x": 82,
+        "y": 134
+    },
+    "source": "theodisi"
+}

@@ -301,6 +301,9 @@ public class MiltyDraftHelper {
         if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
+        if (game.isLostLegaciesTiles()) {
+            sources.add(ComponentSource.theodisi);
+        }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             sources.add(ComponentSource.thunders_edge);
         }
@@ -358,6 +361,9 @@ public class MiltyDraftHelper {
             if (isInvalid(tileModel)) continue;
 
             if (!sources.contains(tileModel.getSource())) continue;
+            if (tileModel.getSource() == ComponentSource.theodisi && !TileHelper.isLostLegaciesTile(tileModel)) {
+                continue;
+            }
             if (tileModel.getTileBack() == TileBack.GREEN || tileModel.isHyperlane()) continue;
 
             MiltyDraftTile draftTile = getDraftTileFromModel(tileModel);

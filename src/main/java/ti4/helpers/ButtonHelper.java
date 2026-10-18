@@ -82,6 +82,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
@@ -4953,6 +4954,10 @@ public class ButtonHelper {
         if (player.hasRelicReady("waning_moonphase")) {
             passButtons.add(AeternaAbilityHandler.getWaningMoonButton(player));
         }
+        Button avarinButton = TheodisiLegendaryButtonHandler.getAvarinPassButton(player);
+        if (avarinButton != null) {
+            passButtons.add(avarinButton);
+        }
 
         if (player.hasReadyBreakthrough("veldyrbt") || player.hasTech("tf-harnessedaurora")) {
             passButtons.add(Buttons.green(
@@ -5030,6 +5035,10 @@ public class ButtonHelper {
         }
         Button cosmicBoonButton = LostLegaciesRelicHandler.getCosmicBoonTokenButton(game, player);
         if (cosmicBoonButton != null) endButtons.add(cosmicBoonButton);
+        Button celyonButton = TheodisiLegendaryButtonHandler.getCelyonEndTurnButton(player);
+        if (celyonButton != null) {
+            endButtons.add(celyonButton);
+        }
 
         // Legendary Planets
         List<String> implementedLegendaryPlanets = List.of(

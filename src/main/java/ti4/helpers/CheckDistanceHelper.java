@@ -13,6 +13,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.Dr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -120,7 +121,8 @@ public class CheckDistanceHelper {
                                     && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     && !player.hasAbility("voidborn")
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
-                                    && !ButtonHelper.isLawInPlay(game, "shared_research"))
+                                    && !ButtonHelper.isLawInPlay(game, "shared_research")
+                                    && !TheodisiLegendaryButtonHandler.ignoresAvarinAnomaly(game, player, tile))
                             || (tile.isSupernova()
                                     && !RealityFieldImpactorService.nullifies(game, tile)
                                     && player != null
@@ -131,7 +133,8 @@ public class CheckDistanceHelper {
                                     && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !player.hasAbility("gashlai_physiology")
-                                    && !player.hasTech("tf-mr"))
+                                    && !player.hasTech("tf-mr")
+                                    && !TheodisiLegendaryButtonHandler.ignoresAvarinAnomaly(game, player, tile))
                             || (player != null
                                     && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
                                     && !BelkoseaAgentService.ignoresOtherShips(game, player, tile)
@@ -160,7 +163,8 @@ public class CheckDistanceHelper {
                                     && !AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile2)
                                     && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     && !player.hasTech("absol_amd")
-                                    && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2))) {
+                                    && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
+                                    && !TheodisiLegendaryButtonHandler.ignoresAvarinAnomaly(game, player, tile))) {
                         continue;
                     }
                 }
@@ -170,7 +174,8 @@ public class CheckDistanceHelper {
                             && !RealityFieldImpactorService.nullifies(game, tile)
                             && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                             && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
-                            && !AsgardLegendaryService.isBifrostBridgeActive(game, player)) {
+                            && !AsgardLegendaryService.isBifrostBridgeActive(game, player)
+                            && !TheodisiLegendaryButtonHandler.ignoresAvarinAnomaly(game, player, tile)) {
                         num = -1;
                         if (game.isCosmicPhenomenaeMode()) {
                             num = -2;
