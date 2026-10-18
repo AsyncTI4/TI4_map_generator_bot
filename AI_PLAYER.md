@@ -256,7 +256,11 @@ to build one by hand:
       secret the chance per round of meeting its condition (`ActionSecretOdds`), higher with a ship placed for it and
       0.6 when it can make the condition happen next turn. A secret it can score right now is worth a flat 2.0, and a
       status secret is halved when other scorable ones already fill the rounds left. It uses Imperial to replace the
-      rest; it never pursues _Mechanize the Military_, _Occupy the Fringe_ or _Strengthen Bonds_ yet.
+      rest. It pursues _Mechanize the Military_ and _Occupy the Fringe_ like the other board secrets: the tactical
+      planner counts the planets holding one of its mechs and the most ground forces on a planet without its space dock,
+      lands a mech first on a planet that has none while it holds _Mechanize the Military_, and with _Occupy the Fringe_
+      in hand plans garrison moves that carry ground forces onto a planet it holds without a dock. It does not pursue
+      _Strengthen Bonds_ yet (it is met by the promissory notes it receives).
     - **Drawing and trading secrets** (`SecretDraws`). Like human players it draws a secret whenever it can (Imperial,
       an exploration, _Impersonation_, _Strategize_), and with a full hand draws anyway and discards its weakest, unless
       every secret it still holds is worth keeping (a keep value of 0.75 or more: one it can score, one close to done or

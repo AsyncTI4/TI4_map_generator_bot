@@ -379,6 +379,7 @@ class AiSelfPlayTest extends BaseTi4Test {
                 "position",
                 "defend",
                 "stage",
+                "garrison",
                 "attack on another home",
                 "attack landing on a home",
                 "attack on Mecatol",

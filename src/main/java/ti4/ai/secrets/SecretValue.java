@@ -24,9 +24,7 @@ public class SecretValue {
             "csl", 0.3,
             "dfat", 0.3,
             "fc", 0.6,
-            "pem", 0.6,
-            "otf", 0.15,
-            "mtm", 0.15);
+            "pem", 0.6);
     private static final String ADAPT_NEW_STRATEGIES = "ans";
     private static final String SEIZE_AN_ICON = "sai";
     private static final String DEFY_SPACE_AND_TIME = "dfat";

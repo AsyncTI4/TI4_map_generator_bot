@@ -236,12 +236,23 @@ public final class ObjectiveValue {
             case "gamf" -> footprint.dreadnoughtCount();
             case "conquer" -> countPlanets(footprint, this::inAnotherHomeSystem);
             case "supremacy" -> overlap(footprint.heavyShipSystems(), "supremacy");
+            case "mtm" -> countPlanets(footprint.mechPlanets(), planet -> true);
+            case "otf" -> footprint.mostGroundForcesWithoutADock();
             default -> NOT_MODELLED;
         };
     }
 
     private int countPlanets(Footprint footprint, Predicate<Planet> wanted) {
         return countAllPlanets(footprint, planet -> countsForScoring(planet) && wanted.test(planet));
+    }
+
+    private int countPlanets(Set<String> names, Predicate<Planet> wanted) {
+        int count = 0;
+        for (String name : names) {
+            Planet planet = game.getPlanetsInfo().get(name);
+            if (planet != null && countsForScoring(planet) && wanted.test(planet)) count++;
+        }
+        return count;
     }
 
     private int countAllPlanets(Footprint footprint, Predicate<Planet> wanted) {

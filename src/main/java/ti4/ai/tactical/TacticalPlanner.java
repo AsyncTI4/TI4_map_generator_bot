@@ -99,6 +99,7 @@ public class TacticalPlanner {
     private static final double MECATOL_CASH_SHARE = 0.75;
     private static final String DARKEN_THE_SKIES = "dts";
     private static final String CONQUER_THE_WEAK = "conquer";
+    private static final String OCCUPY_THE_FRINGE = "otf";
     private static final String MAKE_AN_EXAMPLE = "mew";
     private static final int DEMONSTRATION_SHIPS = 3;
     private static final double PATIENT_SHARE = 0.25;
@@ -538,11 +539,54 @@ public class TacticalPlanner {
         advance(context, tile).ifPresent(plans::add);
         pickup(context, tile).ifPresent(plans::add);
         defend(context, tile).ifPresent(plans::add);
+        garrison(context, tile).ifPresent(plans::add);
         return plans.stream()
                 .map(plan -> plan.withScore(PlayAreaNotes.adjustedScore(context.game, context.seat, tile, plan)
                         + SetupHint.bonusFor(context.hints, plan)))
                 .max(Comparator.comparingDouble(TacticalPlan::score))
                 .map(plan -> withFighters(context, tile, plan));
+    }
+
+    private static Optional<TacticalPlan> garrison(Context context, Tile tile) {
+        Game game = context.game;
+        Player seat = context.seat;
+        if (!seat.getSecretsUnscored().containsKey(OCCUPY_THE_FRINGE) || BoardView.hasEnemyUnits(game, seat, tile)) {
+            return Optional.empty();
+        }
+        Optional<Planet> fringe = tile.getPlanetUnitHolders().stream()
+                .filter(planet -> seat.getPlanets().contains(planet.getName()))
+                .filter(planet -> BoardView.count(planet, seat, UnitType.Spacedock) == 0)
+                .max(Comparator.comparingInt(planet -> BoardView.groundForces(planet, seat)));
+        if (fringe.isEmpty()) return Optional.empty();
+        TacticalPlan best = null;
+        for (Tile origin : context.origins()) {
+            if (origin == tile) continue;
+            Optional<TacticalPlan> plan = garrisonFrom(context, tile, origin, fringe.get());
+            if (plan.isPresent() && (best == null || plan.get().score() > best.score())) best = plan.get();
+        }
+        return Optional.ofNullable(best);
+    }
+
+    private static Optional<TacticalPlan> garrisonFrom(Context context, Tile tile, Tile origin, Planet planet) {
+        Player seat = context.seat;
+        List<UnitMove> groundForces = availableGroundForces(context.game, seat, origin, context.defense(), List.of());
+        int available = unitCount(groundForces);
+        if (available == 0) return Optional.empty();
+        List<UnitMove> transports = transports(context, origin, tile, available);
+        if (transports.isEmpty()) return Optional.empty();
+        List<UnitMove> cargo = take(groundForces, Math.min(available, capacityOf(seat, transports)));
+        Optional<List<UnitMove>> legal = loadedMoves(context, origin, tile, transports, cargo);
+        if (legal.isEmpty()) return Optional.empty();
+        double gain = context.objectiveGain(tile, legal.get(), List.of(planet.getName()));
+        if (gain <= 0) return Optional.empty();
+        int wanted = BoardView.groundForces(planet, seat) + unitCount(cargo);
+        double score = gain
+                - DISTANCE_COST
+                        * context.distance(origin, tile, transports.getFirst().type())
+                - GROUP_MOVE_COST * (movedNonFighterShips(transports) - 1)
+                - context.defense().leaveCost(origin, legal.get());
+        return Optional.of(new TacticalPlan(
+                Kind.GARRISON, tile.getPosition(), legal.get(), Map.of(planet.getName(), wanted), score));
     }
 
     private static Optional<TacticalPlan> expand(Context context, Tile tile) {
@@ -2689,7 +2733,7 @@ public class TacticalPlanner {
 
         double objectiveGain(Tile target, List<UnitMove> moves, Collection<String> gainedPlanets) {
             List<Footprint.Move> footprintMoves = moves.stream()
-                    .map(move -> new Footprint.Move(move.origin(), move.type(), move.count()))
+                    .map(move -> new Footprint.Move(move.origin(), move.holder(), move.type(), move.count()))
                     .toList();
             ObjectiveValue value = objectives();
             return value.gain(value.before().after(target.getPosition(), footprintMoves, gainedPlanets));
