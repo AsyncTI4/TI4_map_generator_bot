@@ -28,8 +28,7 @@ public class ReadyingValue {
     public static double of(Game game, Player seat, Collection<String> planets) {
         if (planets.isEmpty()) return 0;
         return CardValueScale.READY_SHARE
-                        * DiplomacyUse.readying(game, seat, planets).use()
-                + ExpeditionUnlock.gainFromReadying(game, seat, planets);
+                * DiplomacyUse.readying(game, seat, planets).use();
     }
 
     public static Optional<Pick> bestSingle(Game game, Player seat, Collection<String> candidates) {

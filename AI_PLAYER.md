@@ -289,13 +289,13 @@ to build one by hand:
   | Technology | the best technology it can research (and a second worth 6 resources; Gravity Drive is worth more while the custodians are still to be taken and it saves the seat a round); for Nekro, Propagation's tokens |
   | Imperial | an extra public objective this round, the Mecatol Rex point (less while an enemy fleet can reach it, half when it can take Mecatol this round), or a secret (only the strategy token a follow would cost, since following Imperial draws the same secret, except for the last seat to pick: nobody else is left to play Imperial, so the whole secret counts); plus denying the card to a Mecatol Rex holder still to pick |
 
-  **Expedition uses** (`ExpeditionUnlock`, Thunder's Edge games only, while the seat's breakthrough is locked or the Thunder's Edge race still pays, and while a slice is open). Each is `ExpeditionOutlook` valued for the holdings after the card minus the same without it, so only a slice the seat could not otherwise pay for, or would pay for with something dearer, counts:
+  **Expedition uses** (`ExpeditionUnlock`, Thunder's Edge games only, while the seat's breakthrough is locked or the Thunder's Edge race still pays, and while a slice is open). Each is `ExpeditionOutlook.value` for the holdings after the card minus the same without it. The value is the best slice to claim now or the best to claim at the pass (see Cost below), and at pick time the seat's turn is still to come, so a slice is worth its net times the chance that no rival that could pay for it (0.25 each) takes it first. Only a slice the seat could not otherwise pay for, or would pay for with something dearer or riskier, counts:
   | Card | Expedition use |
   | --- | --- |
   | Trade | the 3 trade goods it gives (not the commodities: they arrive in later turns), unless a spend objective they make payable already claims them |
   | Politics | the 2 cards it draws, for the action card slice |
-  | Diplomacy | at pick time, the cost of the planets the first claim will exhaust, for the 2 it can ready; in the action phase, the best 2 exhausted planets whose readying makes a slice payable. Either way only what exceeds the card's ordinary readying value counts (the two overlap), and the primary readies the pair the expedition needs when that beats its ordinary choice. The Xxcha agent and the readying action cards value a planet with the same expedition gain |
-  | Leadership | acting first: for the best slice only, each rival that lacks a breakthrough and could pay for it takes it first with chance 0.25 (at most 0.75), times the net lead over the next best slice, halved (0.5, kept modest); never for the secret slice unless its worst secret costs at most 1 (a keep value of 0.25), since that slice wins the least |
+  | Diplomacy | at pick time, the cost of the planets the first claim will exhaust, for the 2 it can ready; in the action phase, the best 2 exhausted planets whose readying makes a slice payable. Either way only what exceeds the card's ordinary readying value counts (the two overlap), and the primary readies the pair the expedition needs when that beats its ordinary choice. The Xxcha agent and Bio-Stims value a planet with the same expedition gain (the readying action cards do not: valuing a card would recurse through the action card slice cost) |
+  | Leadership | acting first: the value of the expedition when the claim is certain minus the value when rivals may take the slice first, halved (0.5, kept modest); never when the best slice is the secret one unless its worst secret costs at most 1 (a keep value of 0.25), since that slice wins the least |
 
   A Trade, Politics or Diplomacy plan with an expedition use of at least 0.5 plays the card at once, so the end-of-turn claim happens with what the card gave before a rival's turn (Leadership needs no play: the claim is the seat's first turn's end whatever it does).
 
@@ -1057,7 +1057,7 @@ to build one by hand:
 - **Expeditions** (`ti4.ai.expedition`). A Thunder's Edge expedition slice is claimed at the end of a turn, from the
   end-of-turn abilities menu (or the passing menu), not as a component action, so it replaces no action and is decided
   after the action, with the money the action brought (Trade, Diplomacy and Politics before it count). The AI claims
-  the kind with the best net value when that is above 0, one slice a turn, and the first slice unlocks its
+  the kind with the best net value when that is above 0 and not worse than waiting for the pass, one slice a turn, and the first slice unlocks its
   breakthrough. It runs before Bio-Stims: a paid technology specialty planet is then readied by Bio-Stims. Bio-Stims' choice ranks the spent technology specialty planets by their readying value (`ReadyingValue`, expedition gain included), then prefers the one the expedition exhausted this turn (remembered in `expeditionPaid|`), then the larger. Psychoarchaeology never trades a planet the planned expedition would pay with.
   `ExpeditionOutlook.best(game, seat)` returns the choice; `best(game, seat, holdings)` and `options` value it for an
   adjusted `Holdings` (a wallet with the trade goods or planets a card is about to give, and a card count), for the
@@ -1088,13 +1088,23 @@ to build one by hand:
     0.2 per point and at most 1.0 (an eighth of a point).
   - **Race urgency.** The kinds go to whoever claims them first. Each other seat that still lacks a breakthrough and
     could pay for the kind adds 0.25 (at most 1.0), but only when the claim is already worth it.
-  - **Cost** (a resource is worth 0.2 up to round 4, fading to 0.5 from round 8; an influence 0.6 of that, as for the
-    other spends; a trade good 1):
+  - **Cost** (the user's exchange rate, 2 resources = 3 influence = 1 command token = 2 trade goods: a resource is
+    worth 1 trade good and an influence 2/3, scaled by how much of the round is left to use the planets, `SpendHorizon`):
+    | Spending | Resource | Influence |
+    | --- | --- | --- |
+    | turns ahead where it would spend them (`SpendOutlook`: a tactic token and funds beyond the reserve, a research follow, Leadership tokens) | 1.0 | 0.67 |
+    | no tactic token left and no planned spend | 0.4 | 0.27 |
+    | the claim is made as the seat passes (planets are wasted then) | 0.1 | 0.1 |
+
+    A trade good is always 1. **Claim now or at the pass.** `claimNow` claims the best kind (without its race urgency)
+    only when it is worth at least the best kind priced for the pass times the chance that kind is still open then
+    (0.75 per rival that lacks a breakthrough and could pay for it); otherwise the seat waits and `beforePassing`
+    claims at the pass rates. A seat that has passed is not offered an expedition.
     | Kind | Cost |
     | --- | --- |
-    | 5 resources, 5 influence | the cheapest payment after the scoring reserve (`Wallet`), priced at the planets it exhausts |
+    | 5 resources, 5 influence | the cheapest payment after the scoring reserve (`Wallet`), priced at the planets it exhausts (all of each planet's resources or influence, so two planets for 7 resources cost 7) |
     | 3 trade goods | 3, only with 3 in hand (the bot takes them itself) and when the reserve keeps the rest |
-    | Technology specialty planet | the planet's value and the points it would cost a spend objective; 0 with Bio-Stims ready and no skip planet already exhausted, never more than the planet Bio-Stims would have readied instead |
+    | Technology specialty planet | the planet's resources or its influence, whichever is worth more (a planet pays one or the other), and the points it would cost a spend objective; 0 with Bio-Stims ready and no skip planet already exhausted, never more than the planet Bio-Stims would have readied instead |
     | Secret objective | 0 for a secret over the limit, otherwise the keep value of the least promising one (at most 1) x 8 x 0.5 |
     | 2 action cards | the keep values of the two worst cards (an expected card counts 1.2 each for cards still to be drawn) |
   - **Flow.** It opens `endOfTurnAbilities` (or `passingAbilities`), presses "Do an Expedition", then the slice, and
@@ -1325,9 +1335,9 @@ Seven small generic changes don't reference `ti4.ai`:
 - **Action cards, legacy switch.** `-Dai.actioncards.ab=true` and the stored value `aiLegacyActionCards` keep the
   rules from before the statistics for comparison, until the large A/B batch at the end of the project.
 - **Expeditions, race and strategy cards.** The Thunder's Edge chance is a closed-form estimate from the slices
-  claimed so far; it does not model who will claim the rest. `ExpeditionOutlook.best(game, seat, holdings)` takes an
-  adjusted wallet and hand, but the strategy-card values (Trade, Diplomacy, Politics) do not ask it yet, so the
-  expedition after such a card is only found once the card has been played.
+  claimed so far; it does not model who will claim the rest. The chance that a rival takes a slice first is 0.25 per
+  rival that could pay for it, whatever the turn order, and waiting for the pass is not charged for the breakthrough
+  coming later in the round.
 - **Expeditions, correlation.** The breakthrough lift and the kind nudge are read off human games, where who completes
   an expedition early is entangled with who was already winning; the 0.5 factor on the lift is a guess, not a
   measurement. Holding Thunder's Edge is worth a point on the same evidence.
