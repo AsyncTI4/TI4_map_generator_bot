@@ -896,7 +896,16 @@ to build one by hand:
     presence objective (_Intimidate Council_, _Explore Deep Space_, _Populate the Outer Rim_, _Make History_,
     _Raise a Fleet_, _Achieve Supremacy_ with its flagship or a war sun, and secrets such as _Control the Region_,
     _Cut Supply Lines_ beside an unguarded space dock, and _Foster Cohesion_). It may enter a system where another
-    player has planets or structures but no ships.
+    player has planets or structures but no ships. A carrier-type ship (capacity 3 or more and no sustain damage:
+    a hauler) that would arrive with nothing aboard pays half a point per slot it leaves empty, so a destroyer or
+    cruiser makes the presence move and a carrier only does when it completes something worth the slots. The same
+    charge applies to a staging group's empty haulers, to an idle hauler following from a different system, and to a
+    hauler that attacks on its own with no ground forces or fighters.
+  - **Pickup**: carriers go where units wait. When the units in a system with the seat's space dock (the infantry and
+    mechs on its planets that the garrison does not keep, those in its space area) and the fighters beyond the dock
+    allowance outnumber the capacity of the ships already there, a hauler from a system with nothing for it to carry
+    moves in, worth 0.5 per unit it can take less distance, leaving and exposure. It is a low-scoring plan: it runs
+    only when the seat has tokens to spare.
   - **Defense** (`DefenseOutlook`). Its home system, a system with its space dock, a Mecatol Rex it holds, a system whose
     ships or planets carry at least 4 points of objective progress, and a system where an invasion would complete a
     revealed public objective for the invader are _guarded_. For each guarded system and each other player it works out
@@ -920,7 +929,9 @@ to build one by hand:
     system only while the cost stays within half a point (`holdBack`, `groundToKeep`, with a second pass that keeps
     more infantry once the ships that leave are known); expansions, attacks and moves are scored net of the cost of
     leaving; a _defend_ plan brings ships to an exposed system when that lowers the cost by more than the move costs
-    (their spare ground forces land on the weakest planet); retaking a planet in its own home is worth the points
+    (their spare ground forces land on the weakest planet, and the ships take along the ground forces their capacity
+    holds from the system they leave; a hauler that defends with nothing aboard pays the empty-slot charge, but one that
+    ferries ground forces which lower the cost by enough is sent on those alone); retaking a planet in its own home is worth the points
     that home holds; and production buys infantry, mechs, fighters or ships at the dock (ground forces on the dock
     planet) until the cost is gone or a unit no longer lowers it by half a point per resource, so a one-planet home is
     defended on the ground and a home with several planets in space, and a hopeless defence buys nothing. Not yet:
