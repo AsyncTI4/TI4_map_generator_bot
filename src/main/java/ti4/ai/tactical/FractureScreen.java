@@ -137,6 +137,7 @@ final class FractureScreen {
         return game.getNeutral();
     }
 
+    // TODO: ingress systems on a rival's path are not screened, and a screen is planned one ship, one system per action
     private List<Tile> screenTiles(Tile styx) {
         return game.getTileMap().values().stream()
                 .filter(Tile::isFracture)

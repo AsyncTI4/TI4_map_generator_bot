@@ -40,7 +40,7 @@ class FractureActivationTest extends BaseTi4Test {
     @Test
     void theRealCornersRingOffersTheFractureSystems() {
         List<String> offered =
-                ButtonHelper.getTileInARing(fracture.board.test.game, fracture.nekro(), "ring_corners").stream()
+                ButtonHelper.getTileInARing(fracture.nekro(), fracture.board.test.game, "ring_corners").stream()
                         .map(button -> button.getCustomId())
                         .toList();
 

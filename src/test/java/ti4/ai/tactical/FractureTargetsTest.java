@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.eval.PlanetStake;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.TacticalPlan.Kind;
+import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -207,6 +208,11 @@ class FractureTargetsTest extends BaseTi4Test {
         assertThat(completing).isGreaterThan(first);
     }
 
+    private void scoreMarrow(Player player) {
+        Game game = fracture.board.test.game;
+        game.scorePublicObjective(player.getUserID(), game.addCustomPO("A Song Like Marrow", 1));
+    }
+
     private void rivalFleetAtAnotherIngress() {
         Player sardakk = fracture.board.sardakk;
         sardakk.addTech("cr2");
@@ -220,6 +226,37 @@ class FractureTargetsTest extends BaseTi4Test {
         fracture.board.test.units(far, "space", sardakk, UnitType.Infantry, 4);
         fracture.board.test.game.setRound(5);
         fracture.board.test.points(sardakk, 8);
+    }
+
+    @Test
+    void aRivalsStyxIsAttackedForItsPointAndDeniesTheRival() {
+        Player sardakk = fracture.board.sardakk;
+        Tile styx = fracture.fracture(FractureScenario.STYX);
+        Planet planet = styx.getPlanetUnitHolders().getFirst();
+        styx.removeAllUnits(fracture.board.test.game.getNeutral().getColor());
+        fracture.board.test.game.getNeutral().removePlanet(planet.getName());
+        sardakk.addPlanet(planet.getName());
+        fracture.board.test.units(styx, planet.getName(), sardakk, UnitType.Infantry, 2);
+        scoreMarrow(sardakk);
+        bigFleetBesideStyx();
+
+        StrikeValue value = TacticalPlanner.explainAttack(
+                        fracture.board.test.game, fracture.nekro(), FractureScenario.STYX)
+                .orElseThrow();
+
+        assertThat(value.fractureDenial()).isPositive();
+        assertThat(value.planets()).isGreaterThan(ObjectiveValue.VICTORY_POINT_VALUE / 2);
+    }
+
+    @Test
+    void theSongLikeMarrowCountsAsAScoredPointAndNotAsAnUnknownObjective() {
+        Player sardakk = fracture.board.sardakk;
+        scoreMarrow(sardakk);
+        Standings standings = new DefenseOutlook(fracture.board.test.game, fracture.nekro()).standings();
+
+        assertThat(standings.vp(sardakk)).isEqualTo(1);
+        assertThat(standings.projected(sardakk)).isGreaterThanOrEqualTo(1.0);
+        assertThat(standings.ready(sardakk)).isEmpty();
     }
 
     @Test
