@@ -12,7 +12,6 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.strategy.CardPlan.Benefit;
-import ti4.ai.tactical.DefenseOutlook;
 import ti4.ai.tactical.PeaceAccords;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -43,10 +42,9 @@ class DiplomacyUses {
                 .filter(tile -> tile != mecatol && in.isThreatened(tile))
                 .toList();
         if (threatened.isEmpty()) return List.of();
-        DefenseOutlook outlook = new DefenseOutlook(game, seat);
         List<Benefit> benefits = new ArrayList<>();
         for (Tile tile : threatened) {
-            double exposure = outlook.lockCost(tile);
+            double exposure = in.lockExposure(tile);
             if (exposure < CardValueScale.MIN_LOCK_EXPOSURE) continue;
             benefits.add(
                     new Benefit(CardUse.DIPLOMACY_PROTECT, protectionValue(in, tile, exposure), tile.getPosition()));
