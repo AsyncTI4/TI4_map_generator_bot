@@ -21,6 +21,7 @@ class PaymentPlanner {
     private static final String SPEND_PREFIX = "spend_";
     private static final String RESOURCE_SUFFIX = "_res";
     private static final String ONE_TRADE_GOOD = "reduceTG_1_res";
+    private static final double RESOURCES_PER_INFLUENCE = 2.0 / 3;
 
     static Optional<PromptButton> choosePlanet(Game game, AiPrompt payment, double owed) {
         return choosePlanet(game, Pooling.SEPARATE, payment, owed);
@@ -81,11 +82,29 @@ class PaymentPlanner {
     }
 
     private static Optional<PromptButton> choose(Game game, Pooling pooling, List<PromptButton> planets, double owed) {
-        Optional<PromptButton> smallestCovering = planets.stream()
+        Optional<PromptButton> leastWastefulCovering = planets.stream()
                 .filter(button -> resources(game, pooling, button) >= owed)
-                .min(Comparator.comparingInt(button -> resources(game, pooling, button)));
-        if (smallestCovering.isPresent()) return smallestCovering;
-        return planets.stream().max(Comparator.comparingInt(button -> resources(game, pooling, button)));
+                .min(Comparator.comparingDouble(button -> wasted(game, pooling, button, owed)));
+        if (leastWastefulCovering.isPresent()) return leastWastefulCovering;
+        return planets.stream()
+                .max(Comparator.comparingInt((PromptButton button) -> resources(game, pooling, button))
+                        .thenComparing(Comparator.comparingDouble(
+                                        (PromptButton button) -> forgoneInfluence(game, pooling, button))
+                                .reversed()));
+    }
+
+    private static double wasted(Game game, Pooling pooling, PromptButton button, double owed) {
+        return resources(game, pooling, button) - owed + forgoneInfluence(game, pooling, button);
+    }
+
+    private static double forgoneInfluence(Game game, Pooling pooling, PromptButton button) {
+        if (pooling != Pooling.SEPARATE) return 0;
+        Planet planet = game.getPlanetsInfo().get(planetOf(button));
+        return planet == null ? 0 : RESOURCES_PER_INFLUENCE * Math.max(0, planet.getInfluence());
+    }
+
+    static String describe(PromptButton button) {
+        return button.handlerId().startsWith(SPEND_PREFIX) ? planetOf(button) : "a trade good";
     }
 
     static String planetOf(PromptButton button) {

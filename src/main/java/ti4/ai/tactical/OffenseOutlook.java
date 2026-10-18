@@ -95,7 +95,7 @@ final class OffenseOutlook {
             planets += w * g * (base + explore + custodians);
             territory += w * g * terms.territoryValues().getOrDefault(planet.getName(), 0.0);
             if (isMecatol(planet)) {
-                mecatolHold += w * g * MecatolStake.holdValue(game, seat);
+                mecatolHold += w * g * MecatolStake.ownHoldValue(game, seat);
                 if (BoardView.controller(game, planet.getName()) == opponent) {
                     mecatolDenial += w * g * standings.denialWeight(opponent) * MecatolStake.holdValue(game, opponent);
                 }
@@ -483,7 +483,7 @@ final class OffenseOutlook {
         double shipStake = 0.5 * after.shipCost(seat);
         double planetStake = landed.stream()
                 .mapToDouble(planet ->
-                        BoardView.planetValue(planet) + (isMecatol(planet) ? MecatolStake.holdValue(game, seat) : 0))
+                        BoardView.planetValue(planet) + (isMecatol(planet) ? MecatolStake.ownHoldValue(game, seat) : 0))
                 .sum();
         return world(strike, estimate)
                 .counterstrike(strike.target(), after, planetsAfter, shipStake, planetStake, strike.opponent());

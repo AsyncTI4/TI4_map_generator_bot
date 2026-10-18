@@ -26,6 +26,7 @@ import ti4.ai.scoring.ScoringRules;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.secrets.SecretDrawValue;
+import ti4.ai.secrets.SecretDraws;
 import ti4.ai.secrets.SpyNetwork;
 import ti4.ai.tactical.PeaceAccords;
 import ti4.ai.tactical.ProductionPlanner;
@@ -416,7 +417,7 @@ public class StrategyCardRules {
 
     static boolean wantsToFollow(Game game, Player seat, StrategyCard card) {
         return switch (card) {
-            case IMPERIAL -> hasRoomForSecret(seat);
+            case IMPERIAL -> SecretDraws.worthDrawing(game, seat);
             case TECHNOLOGY ->
                 cannotResearch(seat)
                         ? propagationWorthFollowing(game, seat)
@@ -1028,7 +1029,8 @@ public class StrategyCardRules {
     }
 
     private static Optional<AiDecision> followImperial(AiTurnContext context, AiPrompt card) {
-        if (!hasSpareStrategyToken(context, StrategyCard.IMPERIAL) || !hasRoomForSecret(context.seat())) {
+        if (!hasSpareStrategyToken(context, StrategyCard.IMPERIAL)
+                || !SecretDraws.worthDrawing(context.game(), context.seat())) {
             return Optional.empty();
         }
         return CardMessages.pressOnce(context, card, "sc_draw_so", "follow Imperial to draw a secret objective");
@@ -1100,10 +1102,6 @@ public class StrategyCardRules {
         return propagationGain(game, seat) >= MIN_PROPAGATION_FOLLOW_GAIN;
     }
 
-    private static boolean hasRoomForSecret(Player seat) {
-        return seat.getSoScored() + seat.getSecretsUnscored().size() < seat.getMaxSOCount();
-    }
-
     public static boolean hasSpareStrategyToken(Game game, Player seat, StrategyCard card) {
         int rank = followRank(game, seat, card);
         int saved = 0;
@@ -1122,7 +1120,8 @@ public class StrategyCardRules {
 
     public static Optional<Double> secondaryValue(Game game, Player seat, StrategyCard card) {
         return switch (card) {
-            case IMPERIAL -> hasRoomForSecret(seat) ? Optional.of(SecretDrawValue.of(game, seat)) : Optional.empty();
+            case IMPERIAL ->
+                SecretDraws.worthDrawing(game, seat) ? Optional.of(SecretDrawValue.of(game, seat)) : Optional.empty();
             case DIPLOMACY -> diplomacyFollowValue(game, seat);
             case CONSTRUCTION ->
                 StructurePolicy.nearsStructureObjective(game, seat)
@@ -1163,7 +1162,7 @@ public class StrategyCardRules {
         String reason = "perform the secondary of " + card.name().toLowerCase() + " with Strategize";
         return switch (card) {
             case IMPERIAL ->
-                hasRoomForSecret(seat)
+                SecretDraws.worthDrawing(game, seat)
                         ? CardMessages.pressOnce(context, prompt, STRATEGIZE_SECRET_BUTTON, reason)
                         : Optional.empty();
             case DIPLOMACY -> {

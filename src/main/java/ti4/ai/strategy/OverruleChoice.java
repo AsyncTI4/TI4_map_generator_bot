@@ -9,6 +9,7 @@ import ti4.ai.brain.StrategyCard;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.ScoringStakes.OverrulePlay;
 import ti4.ai.secrets.SecretDrawValue;
+import ti4.ai.secrets.SecretDraws;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -63,7 +64,7 @@ public class OverruleChoice {
     }
 
     private static double secret(Game game, Player seat) {
-        boolean drawsSecret = !seat.controlsMecatol(true) && SecretDrawValue.hasRoom(seat);
+        boolean drawsSecret = !seat.controlsMecatol(true) && SecretDraws.worthDrawing(game, seat);
         return drawsSecret ? SecretDrawValue.of(game, seat) : 0;
     }
 }

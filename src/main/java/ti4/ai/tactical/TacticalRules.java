@@ -695,7 +695,10 @@ public class TacticalRules {
             SpendCost reserve = ProductionPlanner.reserve(game, seat);
             Optional<PromptButton> planet = PaymentPlanner.keepingReserve(game, seat, payment, owed, reserve)
                     .or(() -> PaymentPlanner.choosePlanet(game, seat, payment, owed));
-            if (planet.isPresent()) return Optional.of(AiDecision.press(payment, planet.get(), "pay for units"));
+            if (planet.isPresent()) {
+                return Optional.of(AiDecision.press(
+                        payment, planet.get(), "pay for units with " + PaymentPlanner.describe(planet.get())));
+            }
             if (seat.getTg() > 0) {
                 Optional<PromptButton> tradeGood = payment.enabledHandler("reduceTG_1_res");
                 if (tradeGood.isPresent()) {

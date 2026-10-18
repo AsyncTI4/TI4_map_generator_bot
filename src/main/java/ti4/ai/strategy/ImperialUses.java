@@ -7,6 +7,7 @@ import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.secrets.SecretDrawValue;
+import ti4.ai.secrets.SecretDraws;
 import ti4.ai.strategy.CardPlan.Benefit;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
@@ -30,7 +31,7 @@ class ImperialUses {
                 new Benefit(CardUse.IMPERIAL_MECATOL, mecatolValue(in), mecatolPosition(game)),
                 new Benefit(
                         CardUse.IMPERIAL_SECRET,
-                        !holdsMecatol && hasRoomForSecret(seat) ? secretOverFollowing(in) : 0));
+                        !holdsMecatol && SecretDraws.worthDrawing(game, seat) ? secretOverFollowing(in) : 0));
     }
 
     private static double secretOverFollowing(PlanInputs in) {
@@ -103,9 +104,5 @@ class ImperialUses {
     private static boolean takesCustodiansThisRound(Game game, Player seat) {
         return TokenPurchase.custodiansWithinReach(game, seat)
                 && Wallet.of(game, seat).canPay(SpendCost.influence(CUSTODIANS_COST));
-    }
-
-    private static boolean hasRoomForSecret(Player seat) {
-        return seat.getSoScored() + seat.getSecretsUnscored().size() < seat.getMaxSOCount();
     }
 }

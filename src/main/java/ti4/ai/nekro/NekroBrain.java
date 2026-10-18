@@ -46,6 +46,7 @@ import ti4.ai.scoring.PaymentRules;
 import ti4.ai.scoring.ScoringRules;
 import ti4.ai.secrets.ActionSecretRules;
 import ti4.ai.secrets.SecretCostRules;
+import ti4.ai.secrets.SecretRedrawRules;
 import ti4.ai.secrets.SecretRules;
 import ti4.ai.secrets.SecretValue;
 import ti4.ai.sol.BellumGloriosumRules;
@@ -81,6 +82,7 @@ import ti4.helpers.Constants;
 
 public class NekroBrain implements FactionBrain {
 
+    private static final String OPEN_SECRET_DISCARDS = "get_so_discard_buttons";
     private static final String TIED_PLANETS = "tiedPlanets_";
     private static final String FLEET_LOGISTICS = "fl";
     private static final String CHECKS_AND_BALANCES = ChecksAndBalances.GIVE_PREFIX;
@@ -202,6 +204,7 @@ public class NekroBrain implements FactionBrain {
             ActionCardRules::presetSummit,
             PromissoryRules::continuePlay,
             this::queueProveEndurance,
+            SecretRedrawRules::discardForRedraw,
             this::discardExcessSecret,
             this::discardExcessActionCards,
             TradeRules::rescindStale,
@@ -323,6 +326,18 @@ public class NekroBrain implements FactionBrain {
             Optional<PromptButton> button = prompt.enabledHandler(handler);
             if (button.isPresent()) {
                 return Optional.of(AiDecision.press(prompt, button.get(), "discard the least promising secret"));
+            }
+        }
+        return openSecretDiscards(context);
+    }
+
+    private static Optional<AiDecision> openSecretDiscards(AiTurnContext context) {
+        for (AiPrompt prompt : newestFirst(context.prompts())) {
+            if (!prompt.isHidden()) continue;
+            Optional<PromptButton> button = prompt.enabledHandler(OPEN_SECRET_DISCARDS);
+            if (button.isPresent() && !context.alreadyPressed(prompt, button.get())) {
+                return Optional.of(AiDecision.press(
+                        prompt, button.get(), "open the secret discard buttons to get back to the limit"));
             }
         }
         return Optional.empty();
@@ -489,6 +504,8 @@ public class NekroBrain implements FactionBrain {
         if (secondAction.isPresent()) return secondAction;
         Optional<AiDecision> endOfTurnTech = TechRules.endOfTurn(context, thisTurn);
         if (endOfTurnTech.isPresent()) return endOfTurnTech;
+        Optional<AiDecision> secretRedraw = SecretRedrawRules.endOfTurn(context, thisTurn);
+        if (secretRedraw.isPresent()) return secretRedraw;
         for (String handler : List.of("turnEnd", "endOfTurnAbilities")) {
             Optional<AiDecision> end = ownedHandler(context, thisTurn, handler, "end the turn");
             if (end.isPresent()) return end;
@@ -543,6 +560,8 @@ public class NekroBrain implements FactionBrain {
         if (convoysBeforePassing.isPresent()) return convoysBeforePassing;
         Optional<AiDecision> beforePassing = TechRules.beforePassing(context, thisTurn);
         if (beforePassing.isPresent()) return beforePassing;
+        Optional<AiDecision> redrawBeforePassing = SecretRedrawRules.endOfTurn(context, thisTurn);
+        if (redrawBeforePassing.isPresent()) return redrawBeforePassing;
         for (String handler : List.of("passForRound", "passingAbilities")) {
             Optional<AiDecision> pass = ownedHandler(context, thisTurn, handler, "pass for the round");
             if (pass.isPresent()) return pass;

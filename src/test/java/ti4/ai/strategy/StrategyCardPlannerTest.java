@@ -116,12 +116,16 @@ class StrategyCardPlannerTest extends BaseTi4Test {
                 .contains(Math.min(SecretDrawValue.of(test.game, test.nekro), CardValueScale.STRATEGY_TOKEN));
     }
 
+    // Two secrets scored and the third already scorable: a draw would only replace a secret worth keeping.
     @Test
-    void valuesNoSecretWhenTheHandHasNoRoomForIt() {
+    void valuesNoSecretWhenTheFullHandIsWorthKeeping() {
         test.game.setRound(3);
-        test.nekro.setSecret("dhw");
-        test.nekro.setSecret("gamf");
-        test.nekro.setSecret("mtm");
+        test.nekro.setSecretScored("dhw");
+        test.nekro.setSecretScored("gamf");
+        test.game.addLaw("conventions", null);
+        test.game.addLaw("minister_war", "sol");
+        test.game.addLaw("shard_of_the_throne", "sol");
+        test.nekro.setSecret("dp");
         changed();
 
         assertThat(plan(IMPERIAL).benefits()).extracting(Benefit::use).doesNotContain(CardUse.IMPERIAL_SECRET);

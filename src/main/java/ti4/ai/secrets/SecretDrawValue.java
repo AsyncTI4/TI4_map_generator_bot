@@ -20,16 +20,30 @@ public class SecretDrawValue {
     }
 
     public static double of(Game game, Player seat) {
-        double points = expectedPoints(game, seat);
-        double value = points * ScoringStakes.scoreValue(game, seat, 1);
-        return hasRoom(seat) ? value : Math.min(value, SWAP_VALUE);
+        if (hasRoom(seat)) return pointValue(game, seat, expectedPoints(game, seat));
+        if (!SecretDraws.weakHand(game, seat)) {
+            return Math.min(pointValue(game, seat, expectedPoints(game, seat)), SWAP_VALUE);
+        }
+        double gain = Math.max(0, swapPoints(game, seat) - SecretDraws.weakestKeep(game, seat));
+        return Math.max(SWAP_VALUE, pointValue(game, seat, gain));
+    }
+
+    static double pointValue(Game game, Player seat, double points) {
+        return points * ScoringStakes.scoreValue(game, seat, 1);
     }
 
     static double expectedPoints(Game game, Player seat) {
+        return expectedPoints(game, seat, seat.getSecretsUnscored().size());
+    }
+
+    static double swapPoints(Game game, Player seat) {
+        return expectedPoints(game, seat, Math.max(0, seat.getSecretsUnscored().size() - 1));
+    }
+
+    private static double expectedPoints(Game game, Player seat, int competing) {
         int roundsLeft = roundsLeft(game);
         double readiness = unseenReadiness(game, seat);
         double eventually = readiness + (1 - readiness) * Math.min(1.0, roundsLeft * ROUND_SHARE);
-        int competing = seat.getSecretsUnscored().size();
         double scoringTurns = Math.min(1.0, Math.max(0, roundsLeft - competing));
         return eventually * scoringTurns;
     }
