@@ -641,17 +641,11 @@ public class TacticalPlanner {
         Map<Planet, int[]> forces =
                 distribute(targets, countOf(cargo, UnitType.Infantry), countOf(cargo, UnitType.Mech));
         Map<String, Integer> landings = new LinkedHashMap<>();
-        double value = 0;
         for (Planet planet : targets) {
             int[] landing = forces.get(planet);
             landings.put(planet.getName(), landing[INFANTRY] + landing[MECH]);
-            value += BoardView.planetValue(planet)
-                    + planetTempo(context.game)
-                    + context.exploreValue(tile, planet, landing[INFANTRY], landing[MECH]);
-            if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
-            if (isMecatol(context.game, planet)) value += MecatolStake.holdValue(context.game, seat);
-            value += context.expansionZoneBonus(tile);
         }
+        double value = landingValue(context, tile, targets, forces);
         int spareForces = unitCount(cargo) - landed;
         double approach = approaching && spareForces > 0 ? APPROACH_SHARE * context.approachGain(tile) : 0;
         if (approach > 0) spareForces--;
@@ -671,6 +665,104 @@ public class TacticalPlanner {
                         context, origin, tile, transports.getFirst().type());
         TacticalPlan plan = new TacticalPlan(Kind.EXPAND, tile.getPosition(), legal.get(), landings, score);
         return Optional.of(withFollowers(context, tile, plan));
+    }
+
+    private static double landingValue(Context context, Tile tile, List<Planet> targets, Map<Planet, int[]> forces) {
+        double value = 0;
+        for (Planet planet : targets) {
+            int[] landing = forces.get(planet);
+            value += BoardView.planetValue(planet)
+                    + planetTempo(context.game)
+                    + context.exploreValue(tile, planet, landing[INFANTRY], landing[MECH]);
+            if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
+            if (isMecatol(context.game, planet)) value += MecatolStake.holdValue(context.game, context.seat);
+            value += context.expansionZoneBonus(tile);
+        }
+        return value;
+    }
+
+    private static List<Planet> landingTargets(Context context, Tile tile) {
+        return freePlanetsIn(context, tile).stream()
+                .filter(planet -> !BoardView.enemyGroundForcesOn(context.game, context.seat, planet))
+                .filter(planet -> !BoardView.enemyStructuresOn(context.game, context.seat, planet))
+                .sorted(Comparator.comparingDouble(BoardView::planetValue).reversed())
+                .toList();
+    }
+
+    private static TacticalPlan withLandings(Context context, Tile tile, TacticalPlan plan) {
+        if (!plan.landings().isEmpty() || !movesAHauler(context, plan.moves())) return plan;
+        List<Planet> free = landingTargets(context, tile);
+        if (free.isEmpty() || BoardView.hasEnemyShips(context.game, context.seat, tile)) return plan;
+        TacticalPlan best = plan;
+        for (Tile origin : originsOf(context, plan.moves())) {
+            TacticalPlan loaded = loadedFrom(context, tile, origin, free, plan);
+            if (loaded.score() > best.score()) best = loaded;
+        }
+        return best;
+    }
+
+    private static boolean movesAHauler(Context context, List<UnitMove> moves) {
+        return shipsIn(moves).stream().anyMatch(move -> BoardView.capacity(context.seat, move.type()) > 0);
+    }
+
+    private static TacticalPlan loadedFrom(
+            Context context, Tile tile, Tile origin, List<Planet> free, TacticalPlan plan) {
+        Player seat = context.seat;
+        List<UnitMove> leaving = movesFrom(origin, plan.moves());
+        int spare = capacityOf(seat, shipsIn(leaving)) - cargoIn(leaving);
+        int aboard = unitCount(groundIn(leaving));
+        List<UnitMove> onPlanets =
+                availableGroundForces(context.game, seat, origin, context.defense(), shipsIn(leaving)).stream()
+                        .filter(move -> !BoardView.SPACE.equals(move.holder()))
+                        .toList();
+        onPlanets = mechsFirstForHazardousPlanets(onPlanets, free);
+        int room = Math.min(Math.min(spare, unitCount(onPlanets)), free.size() - aboard);
+        if (room <= 0 && aboard == 0) return plan;
+        TacticalPlan best = plan;
+        for (int added = Math.max(room, 0); added >= (aboard == 0 ? 1 : 0); added--) {
+            Optional<TacticalPlan> loaded = loadedPlan(context, tile, origin, free, plan, take(onPlanets, added));
+            if (loaded.isPresent() && loaded.get().score() > best.score()) best = loaded.get();
+        }
+        return best;
+    }
+
+    private static Optional<TacticalPlan> loadedPlan(
+            Context context, Tile tile, Tile origin, List<Planet> free, TacticalPlan plan, List<UnitMove> cargo) {
+        List<UnitMove> fromOrigin = concat(movesFrom(origin, plan.moves()), cargo);
+        Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, fromOrigin);
+        if (legal.isEmpty()) return Optional.empty();
+        List<UnitMove> moves = new ArrayList<>(plan.moves());
+        moves.removeIf(move -> move.origin().equals(origin.getPosition()));
+        moves.addAll(legal.get());
+        moves = merge(moves);
+        List<UnitMove> ground = groundIn(legal.get());
+        int landed = Math.min(unitCount(ground), free.size());
+        List<Planet> targets = free.subList(0, landed);
+        List<UnitMove> ordered = take(mechsFirstForHazardousPlanets(ground, targets), landed);
+        Map<Planet, int[]> forces =
+                distribute(targets, countOf(ordered, UnitType.Infantry), countOf(ordered, UnitType.Mech));
+        Map<String, Integer> landings = new LinkedHashMap<>();
+        forces.forEach((planet, landing) -> landings.put(planet.getName(), landing[INFANTRY] + landing[MECH]));
+        double score = plan.score()
+                + landingValue(context, tile, targets, forces)
+                + context.objectiveGain(tile, moves, landings.keySet())
+                - context.objectiveGain(tile, plan.moves(), List.of())
+                - leaveCosts(context, moves)
+                + leaveCosts(context, plan.moves())
+                + CapacityUse.emptyHaulerPenalty(context.seat, plan.moves())
+                - CapacityUse.emptyHaulerPenalty(context.seat, moves)
+                - EXPAND_EXPOSURE_SHARE
+                        * Math.max(
+                                0,
+                                context.exposure(tile, moves, landedFrom(tile, forces))
+                                        - context.exposure(tile, plan.moves(), List.of()));
+        return Optional.of(new TacticalPlan(Kind.EXPAND, tile.getPosition(), moves, landings, score));
+    }
+
+    private static double leaveCosts(Context context, List<UnitMove> moves) {
+        return originsOf(context, moves).stream()
+                .mapToDouble(origin -> context.defense().leaveCost(origin, moves))
+                .sum();
     }
 
     private static TacticalPlan withCommanderLandings(
@@ -1942,9 +2034,11 @@ public class TacticalPlanner {
                         - SHIP_COST_WEIGHT * fleetCost(seat, legal.get())
                         - context.defense().leaveCost(origin, legal.get())
                         - CapacityUse.emptyHaulerPenalty(seat, legal.get());
-                if (best == null || score > best.score()) {
-                    best = new TacticalPlan(Kind.POSITION, tile.getPosition(), legal.get(), Map.of(), score);
-                }
+                TacticalPlan plan = withLandings(
+                        context,
+                        tile,
+                        new TacticalPlan(Kind.POSITION, tile.getPosition(), legal.get(), Map.of(), score));
+                if (best == null || plan.score() > best.score()) best = plan;
             }
             Optional<TacticalPlan> group = groupPosition(context, tile, origin);
             if (group.isPresent() && (best == null || group.get().score() > best.score())) best = group.get();
@@ -1992,7 +2086,8 @@ public class TacticalPlanner {
                 - GROUP_MOVE_COST * movedNonFighterShips(legal.get())
                 - context.defense().leaveCost(origin, legal.get())
                 - CapacityUse.emptyHaulerPenalty(seat, legal.get());
-        return Optional.of(new TacticalPlan(Kind.POSITION, tile.getPosition(), legal.get(), Map.of(), score));
+        return Optional.of(withLandings(
+                context, tile, new TacticalPlan(Kind.POSITION, tile.getPosition(), legal.get(), Map.of(), score)));
     }
 
     private record Reinforcement(
