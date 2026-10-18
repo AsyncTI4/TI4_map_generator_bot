@@ -208,7 +208,9 @@ to build one by hand:
     exhausts exactly that. It prefers the objective worth more points, then one that costs nothing.
   - **Reserve.** During the action phase it keeps back what the cheapest affordable spend objective needs at the
     status phase (unexhausted planets, trade goods, tokens), unless it already qualifies for enough free
-    objectives. Production, research and following respect the reserve. Production also leaves the custodians' 6
+    objectives. Production, research and following respect the reserve. Production pays with the planet that wastes
+    least: the resources it overpays plus its influence at 2 resources to 3 influence, so a 2/3 planet such as Lirta IV
+    is kept for Leadership or the custodians when a resource planet covers the same bill. Production also leaves the custodians' 6
     influence while its ships can reach Mecatol Rex, and the influence-leaning planets a Leadership secondary (or its
     own primary) would spend on command tokens while that card is still to come this round.
   - **Mecatol Rex.** It lands on Mecatol Rex when it can pay the custodians' 6 influence (on top of the reserve),
