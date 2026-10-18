@@ -163,6 +163,10 @@ public final class DefenseOutlook {
         return home == null ? 0 : outlook.cost(home, outlook.defendersAt(home), immediateOnly);
     }
 
+    public double lockCost(Tile tile) {
+        return cost(tile, defendersAt(tile), false);
+    }
+
     Standings standings() {
         if (root != null) return root.standings();
         if (standings == null) standings = new Standings(game, incoming);

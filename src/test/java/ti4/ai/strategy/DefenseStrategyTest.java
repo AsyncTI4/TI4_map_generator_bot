@@ -63,20 +63,18 @@ class DefenseStrategyTest extends BaseTi4Test {
         changed();
     }
 
-    // A lone cruiser in reach is a threat to the ships, not to the planet, so locking home is worth only the flat
-    // amount. A landing party that wins Mordai II and has a reason to take it makes the lock worth what home is at
-    // risk.
+    // A lone cruiser in reach cannot take the planet, so locking home is not worth the card. A landing party that wins
+    // Mordai II and has a reason to take it makes the lock worth what home is at risk.
     @Test
-    void diplomacyValuesLockingHomeByWhatItWouldCostToLoseIt() {
+    void diplomacyLocksHomeOnlyAgainstAThreatWorthWhatItWouldCostToLoseIt() {
         loneCruiser();
-        double flat =
-                plan(DIPLOMACY).benefit(CardUse.DIPLOMACY_PROTECT).orElseThrow().value();
+        assertThat(plan(DIPLOMACY).benefit(CardUse.DIPLOMACY_PROTECT)).isEmpty();
 
         landingFleetWithAReasonToLand();
         Benefit lock = plan(DIPLOMACY).benefit(CardUse.DIPLOMACY_PROTECT).orElseThrow();
 
         assertThat(lock.target()).isEqualTo(AiTestGame.HOME);
-        assertThat(lock.value()).isGreaterThan(flat);
+        assertThat(lock.value()).isGreaterThanOrEqualTo(CardValueScale.MIN_LOCK_EXPOSURE);
     }
 
     // Construction (the Prophecy of Kings card, whose primary only builds structures) hurries a PDS to a threatened

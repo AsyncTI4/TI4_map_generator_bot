@@ -32,7 +32,6 @@ class StrategyCardTurnTest extends BaseTi4Test {
     private static final int WARFARE = 6;
     private static final int IMPERIAL = 8;
     private static final String MECATOL = "000";
-    private static final String FAR_SIDE = "310";
 
     private AiTestGame test;
     private Tile home;
@@ -61,6 +60,14 @@ class StrategyCardTurnTest extends BaseTi4Test {
     private Tile solDreadnoughtNextTo(String position) {
         Tile next = test.place("26", AiTestGame.neighbourOf(position));
         test.units(next, "space", test.sol, UnitType.Dreadnought, 1);
+        changed();
+        return next;
+    }
+
+    private Tile solLandingPartyNextTo(String position) {
+        Tile next = test.place("26", AiTestGame.neighbourOf(position));
+        test.units(next, "space", test.sol, UnitType.Carrier, 2);
+        test.units(next, "space", test.sol, UnitType.Infantry, 6);
         changed();
         return next;
     }
@@ -99,13 +106,12 @@ class StrategyCardTurnTest extends BaseTi4Test {
         assertThat(StrategyCardTurn.dueNow(context, IMPERIAL)).isFalse();
     }
 
-    // The fleet that threatened home moves off towards another Nekro system: Diplomacy now locks that one.
+    // The landing party that threatened home moves out of reach: the lock is no longer worth the card. A minor colony
+    // it moves on to is not worth locking either.
     @Test
-    void retargetsDiplomacyWhenTheThreatMoves() {
-        Tile mehar = test.place("24", FAR_SIDE);
-        test.nekro.addPlanet("meharxull");
+    void dropsTheDiplomacyLockWhenTheThreatMovesAway() {
         test.nekro.addSC(DIPLOMACY);
-        Tile nearHome = solDreadnoughtNextTo(AiTestGame.HOME);
+        Tile nearHome = solLandingPartyNextTo(AiTestGame.HOME);
         AiTurnContext context = test.context(turnStart(DIPLOMACY));
 
         StrategyCardReplanner.refresh(context);
@@ -114,12 +120,11 @@ class StrategyCardTurnTest extends BaseTi4Test {
                 .contains(AiTestGame.HOME);
 
         test.game.removeTile(nearHome.getPosition());
-        solDreadnoughtNextTo(mehar.getPosition());
+        changed();
         StrategyCardReplanner.refresh(context);
 
         assertThat(stored(context, DIPLOMACY).flatMap(plan -> plan.benefit(CardUse.DIPLOMACY_PROTECT)))
-                .map(Benefit::target)
-                .contains(FAR_SIDE);
+                .isEmpty();
     }
 
     // A Mecatol Rex point an enemy fleet can reach is cashed before that fleet moves.

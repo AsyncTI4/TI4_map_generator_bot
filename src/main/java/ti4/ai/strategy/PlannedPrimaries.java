@@ -117,7 +117,8 @@ class PlannedPrimaries {
                 .flatMap(plan -> plan.benefit(CardUse.DIPLOMACY_PROTECT))
                 .map(Benefit::target)
                 .filter(position -> DiplomacyUses.isLockable(game, seat, position))
-                .filter(position -> in.isThreatened(game.getTileByPosition(position)));
+                .filter(position -> DiplomacyUses.protections(in).stream()
+                        .anyMatch(protection -> protection.target().equals(position)));
         return planned.or(() -> DiplomacyUses.bestProtection(in).map(Benefit::target));
     }
 
