@@ -33,6 +33,9 @@ class ThroneValue {
             double maxStrengthRatio,
             double maxPeace) {}
 
+    private static final double EARLY_COST = 6.0;
+    private static final double FIT_WEIGHT = 1.5;
+
     static final Weights DEFAULT =
             new Weights(0.02, 0.03, 0.02, 0.2, 0.4, 0.3, 0.5, 4.0, 0.5, 4, 0.75, 1.0, 0.3, 0.5, 2.0, 2.5);
 
@@ -45,7 +48,10 @@ class ThroneValue {
         int shared = sharedSystems(game, seat, owner);
         boolean neighbours = TradeLegality.neighbours(game, seat, owner);
         double points = Desperation.scoreValue(game, seat, 1) * keepChance(game, neighbours, shared, weights);
-        return points - restriction(game, seat, owner, neighbours, shared, weights);
+        return points
+                - restriction(game, seat, owner, neighbours, shared, weights)
+                - earlyCost(game, seat, owner)
+                + fit(game, seat, owner);
     }
 
     static double givenCost(Game game, Player seat, Player receiver) {
@@ -53,7 +59,30 @@ class ThroneValue {
     }
 
     static double givenCost(Game game, Player seat, Player receiver, Weights weights) {
-        return Math.max(0, retained(game, seat, weights) - peace(game, seat, receiver, weights));
+        return Math.max(
+                        0,
+                        retained(game, seat, weights)
+                                - peace(game, seat, receiver, weights)
+                                - fit(game, seat, receiver))
+                + earlyCost(game, seat, receiver);
+    }
+
+    static double earlyCost(Game game, Player seat, Player partner) {
+        return ThroneTiming.open(game, seat, partner) ? 0 : EARLY_COST;
+    }
+
+    static double fit(Game game, Player seat, Player partner) {
+        if (FactionAggression.of(seat) == FactionAggression.AGGRESSIVE) {
+            return FIT_WEIGHT * fleetCost(game, partner) / Math.max(1.0, strongestFleet(game));
+        }
+        return TradeLegality.neighbours(game, seat, partner) ? FIT_WEIGHT : 0;
+    }
+
+    private static double strongestFleet(Game game) {
+        return game.getRealPlayers().stream()
+                .mapToDouble(player -> fleetCost(game, player))
+                .max()
+                .orElse(0);
     }
 
     static double keepChance(Game game, boolean neighbours, int sharedSystems, Weights weights) {

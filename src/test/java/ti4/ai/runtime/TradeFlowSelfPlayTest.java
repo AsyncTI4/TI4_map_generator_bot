@@ -263,6 +263,8 @@ class TradeFlowSelfPlayTest extends BaseTi4Test {
                 tradeOwner.removeSC(TRADE);
                 tradeOwner.addSC(previous);
             }
+            settleTechnologyCard(game);
+            selfPlay.forgetTradeTurn(game);
             chosen.clearSCs();
             chosen.addSC(TRADE);
             chosen.setTacticalCC(0);

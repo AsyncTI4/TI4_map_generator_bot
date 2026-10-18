@@ -201,7 +201,9 @@ class ComponentValuesTest extends BaseTi4Test {
     // over the 5 rounds the game has left; the AI's own back is worth what it denies the holder.
     @Test
     void supportForTheThrone() {
-        assertThat(receiveValue("blue_sftt")).isCloseTo(6 * Math.pow(0.98, 5), within(EXACT));
+        table.game.setRound(4);
+        double fit = ThroneValue.fit(table.game, nekro, sol);
+        assertThat(receiveValue("blue_sftt")).isCloseTo(6 * Math.pow(0.98, 5) + fit, within(EXACT));
         assertThat(receiveValue("black_sftt")).isCloseTo(1.0, within(EXACT));
 
         // Sol holds it face up, which is one of its 4 points; the two are level, so Sol is a peer (rivalry 0.1).
@@ -226,7 +228,9 @@ class ComponentValuesTest extends BaseTi4Test {
     // rivalry term, not here.
     @Test
     void ownThroneCostsTheOptionOfKeepingIt() {
-        assertThat(giveCost("black_sftt")).isCloseTo(0.5 * 5 / 4 * 6, within(EXACT));
+        table.game.setRound(4);
+        double fit = ThroneValue.fit(table.game, nekro, sol);
+        assertThat(giveCost("black_sftt")).isCloseTo(0.5 * 5 / 4 * 6 - fit, within(EXACT));
 
         table.nekroAndSolNeighbour();
         assertThat(giveCost("black_sftt")).isLessThan(0.5 * 5 / 4 * 6);

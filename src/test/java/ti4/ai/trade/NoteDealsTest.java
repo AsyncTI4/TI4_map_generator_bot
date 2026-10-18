@@ -26,6 +26,7 @@ class NoteDealsTest extends BaseTi4Test {
         table = TradeTable.withAiSol();
         nekro = table.nekro;
         sol = table.sol;
+        table.game.setRound(4);
         table.nekroAndSolNeighbour();
         for (int index = 0; index < SUFFIXES.length; index++) {
             nekro.addOwnedPromissoryNoteByID("black" + SUFFIXES[index]);
