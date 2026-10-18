@@ -430,15 +430,12 @@ The center System, holding the Custodians token; its controller gains a Victory 
 A Planet whose controller also gains a legendary planet ability card with a unique ability.
 
 **Initiative order**:
-The order in which Players take Turns each Round, lowest Strategy card number first.
-_Avoid_: Turn order (also used for the seating order around the table)
+The order in which Players take Turns each Round, lowest Strategy card number first, and the default order for Action phase windows; Space cannon fire and Strategy card secondaries instead go clockwise from the active Player.
+_Avoid_: Turn order (also used for the seating order around the table), Clockwise order
 
 **Speaker order**:
 The clockwise order beginning with the Speaker, used for abilities and components in phases where Players hold no Strategy cards (Strategy and Agenda phases); Voting instead begins with the Player to the Speaker's left.
 _Avoid_: Seating order
-
-**Clockwise order**:
-The order beginning with the active Player and moving clockwise, used in the Action phase for Space cannon fire and Strategy card secondary abilities; every other Action phase window uses Initiative order.
 
 **Adjacency**:
 The relationship between Systems that touch, share a wormhole type or are joined by hyperlane lines, governing movement.
