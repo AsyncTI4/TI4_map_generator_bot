@@ -379,10 +379,7 @@ public class TheodisiLegendaryButtonHandler {
             return;
         }
         StartCombatService.CurrentCombat combat = StartCombatService.getCurrentCombat(game);
-        if (tile == null
-                || holder == null
-                || opponent == null
-                || combat == null) {
+        if (tile == null || holder == null || opponent == null || combat == null) {
             ButtonHelper.deleteTheOneButton(event);
             return;
         }
