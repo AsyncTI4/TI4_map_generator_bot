@@ -280,14 +280,24 @@ to build one by hand:
   score and no Mecatol Rex is worth only the secret it draws (no more than the strategy token a follow costs).
   | Card | Uses it plans for |
   | --- | --- |
-  | Leadership | the tactical actions its 3 tokens unlock (the plans it could not otherwise afford), and acting first in a race for the custodians |
-  | Diplomacy | locking a system with its planets that an enemy fleet can reach (home most, by what an attack on it before the seat's next turn would cost it; more when close to winning), and readying its best 2 planets (more with a spend objective revealed). For the Xxcha's _Peace Accords_ it is also worth the best empty planet next to one it controls (`PeaceAccords`: the planet's value, the expansion bonus a landing there would get, the objective progress and, for a planet a rival holds, half its value again), and the card is played at once when that beats its best tactical action. Base-game Diplomacy has no buttons to resolve, so it is worth only its trade goods |
-  | Politics | becoming speaker (more when it will want Imperial next round or is racing a rival for the custodians next round; a loss when it is already speaker, since the card hands the token away), 2 action cards (a point when they complete _Form a Spy Network_), and looking at the agenda deck once the custodians are taken |
+  | Leadership | the tactical actions its 3 tokens unlock (the plans it could not otherwise afford), acting first in a race for the custodians, and claiming a contested expedition slice before a rival (see below) |
+  | Diplomacy | locking a system with its planets that an enemy fleet can reach (home most, by what an attack on it before the seat's next turn would cost it; more when close to winning), readying its best 2 planets (more with a spend objective revealed), and the planets an expedition exhausts or would need (see below). For the Xxcha's _Peace Accords_ it is also worth the best empty planet next to one it controls (`PeaceAccords`: the planet's value, the expansion bonus a landing there would get, the objective progress and, for a planet a rival holds, half its value again), and the card is played at once when that beats its best tactical action. Base-game Diplomacy has no buttons to resolve, so it is worth only its trade goods |
+  | Politics | becoming speaker (more when it will want Imperial next round or is racing a rival for the custodians next round; a loss when it is already speaker, since the card hands the token away), 2 action cards (a point when they complete _Form a Spy Network_), looking at the agenda deck once the custodians are taken, and the expedition the 2 cards make payable (the action card slice) |
   | Construction | a space dock early, PDS (more under threat), a structure objective it would complete; for the Thunder's Edge card also production at a dock without placing a token, so the units can move out this round |
-  | Trade | 3 trade goods, its commodities, a spend objective they make payable, and leverage for deals |
+  | Trade | 3 trade goods, its commodities, a spend objective they make payable, leverage for deals, and the expedition the 3 trade goods make payable (the trade goods slice) |
   | Warfare | PoK: a command token plus one reactivation; Thunder's Edge: a free tactical action. Reactivations are a second build at home, building at home and then moving out, moving twice to reach a far system, or activating a system that holds its token |
   | Technology | the best technology it can research (and a second worth 6 resources; Gravity Drive is worth more while the custodians are still to be taken and it saves the seat a round); for Nekro, Propagation's tokens |
   | Imperial | an extra public objective this round, the Mecatol Rex point (less while an enemy fleet can reach it, half when it can take Mecatol this round), or a secret (only the strategy token a follow would cost, since following Imperial draws the same secret, except for the last seat to pick: nobody else is left to play Imperial, so the whole secret counts); plus denying the card to a Mecatol Rex holder still to pick |
+
+  **Expedition uses** (`ExpeditionUnlock`, Thunder's Edge games only, while the seat's breakthrough is locked or the Thunder's Edge race still pays, and while a slice is open). Each is `ExpeditionOutlook` valued for the holdings after the card minus the same without it, so only a slice the seat could not otherwise pay for, or would pay for with something dearer, counts:
+  | Card | Expedition use |
+  | --- | --- |
+  | Trade | the 3 trade goods it gives (not the commodities: they arrive in later turns), unless a spend objective they make payable already claims them |
+  | Politics | the 2 cards it draws, for the action card slice |
+  | Diplomacy | at pick time, the cost of the planets the first claim will exhaust, for the 2 it can ready; in the action phase, the best 2 exhausted planets whose readying makes a slice payable. Either way only what exceeds the card's ordinary readying value counts (the two overlap), and the primary readies the pair the expedition needs when that beats its ordinary choice. The Xxcha agent and the readying action cards value a planet with the same expedition gain |
+  | Leadership | acting first: for the best slice only, each rival that lacks a breakthrough and could pay for it takes it first with chance 0.25 (at most 0.75), times the net lead over the next best slice, halved (0.5, kept modest); never for the secret slice unless its worst secret costs at most 1 (a keep value of 0.25), since that slice wins the least |
+
+  A Trade, Politics or Diplomacy plan with an expedition use of at least 0.5 plays the card at once, so the end-of-turn claim happens with what the card gave before a rival's turn (Leadership needs no play: the claim is the seat's first turn's end whatever it does).
 
   The pick adds the trade goods on a card and a small nudge (at most an eighth of a point) from how often human Nekro
   players take that card in that round (`PickPrior`), and remembers the plan. During the action phase it re-plans
@@ -1048,7 +1058,7 @@ to build one by hand:
   end-of-turn abilities menu (or the passing menu), not as a component action, so it replaces no action and is decided
   after the action, with the money the action brought (Trade, Diplomacy and Politics before it count). The AI claims
   the kind with the best net value when that is above 0, one slice a turn, and the first slice unlocks its
-  breakthrough. It runs before Bio-Stims: a paid technology specialty planet is then readied by Bio-Stims.
+  breakthrough. It runs before Bio-Stims: a paid technology specialty planet is then readied by Bio-Stims. Bio-Stims' choice ranks the spent technology specialty planets by their readying value (`ReadyingValue`, expedition gain included), then prefers the one the expedition exhausted this turn (remembered in `expeditionPaid|`), then the larger. Psychoarchaeology never trades a planet the planned expedition would pay with.
   `ExpeditionOutlook.best(game, seat)` returns the choice; `best(game, seat, holdings)` and `options` value it for an
   adjusted `Holdings` (a wallet with the trade goods or planets a card is about to give, and a card count), for the
   strategy-card values to ask what the expedition would be worth after the card.
