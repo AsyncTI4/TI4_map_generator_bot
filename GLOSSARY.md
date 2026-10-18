@@ -278,3 +278,40 @@ _Avoid_: Mod, admin
 
 **Testbed**:
 A developer-only harness for driving a Game through scripted actions on a development bot.
+
+### Table slang
+
+**Pop**:
+To play a Strategy card's primary ability, as in "popping Trade".
+_Avoid_: Cast, fire
+
+**Wash**:
+To convert another Player's refreshed Commodities into Trade goods, usually as a favor requested of the Trade card's holder.
+_Avoid_: Launder, flip
+
+**X-1**:
+The outcome of the standard Trade deal: the Trade holder washes a Player's Commodities and keeps one Trade good as payment, leaving that Player one short of their maximum.
+_Avoid_: Wash tax
+
+**Plastic**:
+Military strength measured in physical unit pieces; fighters and infantry may be stood in for by tokens, but every such stand-in needs at least one plastic piece, and each color has only so many.
+_Avoid_: Fleet size, army size
+
+**Guac**:
+Victory points gained outside public and secret objectives, such as Support for the Throne.
+_Avoid_: Bonus points, extra VP
+
+**Sabo**:
+Shorthand for the Sabotage action card, which cancels another action card.
+_Avoid_: Cancel card
+
+**Gum**:
+To park a fighter or other small ship in a System to block opponents from moving through it.
+_Avoid_: Clog, blocker
+
+**Saar ball**:
+The Saar faction's style of keeping its forces moving and reinforcing as it travels.
+
+**Space risk**:
+Prioritizing Combat and fleet fights over objectives, usually to the detriment of actually winning.
+_Avoid_: Warmongering
