@@ -109,6 +109,46 @@ class CarrierCargoTest extends BaseTi4Test {
         assertThat(loaded).isGreaterThan(empty);
     }
 
+    // Fighters in the departure system ride free: a carrier positioning with nothing else to carry takes them along.
+    @Test
+    void aPositioningCarrierTakesTheFightersAlongToo() {
+        enemyHolds(twoPlanetSystem(), "starpoint", 4, 1);
+        test.units(departure, "space", test.nekro, UnitType.Fighter, 2);
+
+        TacticalPlan plan = plan().orElseThrow();
+
+        assertThat(moved(plan, UnitType.Carrier)).isEqualTo(1);
+        assertThat(moved(plan, UnitType.Fighter)).isEqualTo(2);
+        assertThat(plan.landings()).isEmpty();
+    }
+
+    // A space dock lets 3 fighters stay without capacity, so they were never stranded and never travelled; with nothing
+    // threatening the dock they now ride along.
+    @Test
+    void fightersThatCouldStayAtADockRideAlongWhenNothingThreatensIt() {
+        enemyHolds(twoPlanetSystem(), "starpoint", 4, 1);
+        test.units(departure, "quann", test.nekro, UnitType.Spacedock, 1);
+        test.units(departure, "space", test.nekro, UnitType.Fighter, 2);
+
+        TacticalPlan plan = plan().orElseThrow();
+
+        assertThat(moved(plan, UnitType.Fighter)).as(plan.toString()).isEqualTo(2);
+    }
+
+    // Ground forces come first and the fighters fill what is left of the capacity.
+    @Test
+    void fightersFillTheCapacityTheGroundForcesLeave() {
+        enemyHolds(twoPlanetSystem(), "starpoint", 4, 1);
+        test.units(departure, "quann", test.nekro, UnitType.Infantry, 1);
+        test.units(departure, "space", test.nekro, UnitType.Fighter, 3);
+
+        TacticalPlan plan = plan().orElseThrow();
+
+        assertThat(moved(plan, UnitType.Infantry)).isEqualTo(1);
+        assertThat(moved(plan, UnitType.Fighter)).isEqualTo(3);
+        assertThat(plan.landings()).containsOnlyKeys("newalbion");
+    }
+
     // Nothing to carry: the carrier still goes for the objective, and no landing is invented.
     @Test
     void movesTheCarrierAloneWhenThereIsNothingToCarry() {

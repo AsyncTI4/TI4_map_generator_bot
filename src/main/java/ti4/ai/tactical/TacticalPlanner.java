@@ -542,7 +542,8 @@ public class TacticalPlanner {
         return plans.stream()
                 .map(plan -> plan.withScore(PlayAreaNotes.adjustedScore(context.game, context.seat, tile, plan)
                         + SetupHint.bonusFor(context.hints, plan)))
-                .max(Comparator.comparingDouble(TacticalPlan::score));
+                .max(Comparator.comparingDouble(TacticalPlan::score))
+                .map(plan -> withFighters(context, tile, plan));
     }
 
     private static Optional<TacticalPlan> expand(Context context, Tile tile) {
@@ -690,6 +691,39 @@ public class TacticalPlanner {
     }
 
     private static TacticalPlan withLandings(Context context, Tile tile, TacticalPlan plan) {
+        return withFighters(context, tile, withGroundLandings(context, tile, plan));
+    }
+
+    private static TacticalPlan withFighters(Context context, Tile tile, TacticalPlan plan) {
+        TacticalPlan best = plan;
+        for (Tile origin : originsOf(context, plan.moves())) {
+            best = withFightersFrom(context, tile, origin, best);
+        }
+        return best;
+    }
+
+    private static TacticalPlan withFightersFrom(Context context, Tile tile, Tile origin, TacticalPlan plan) {
+        List<UnitMove> leaving = movesFrom(origin, plan.moves());
+        int spare = capacityOf(context.seat, shipsIn(leaving)) - cargoIn(leaving);
+        int fighters = Math.min(spare, escortFighters(context, origin, leaving) - countOf(leaving, UnitType.Fighter));
+        if (fighters <= 0) return plan;
+        UnitMove escort = new UnitMove(origin.getPosition(), BoardView.SPACE, UnitType.Fighter, fighters);
+        Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, concat(leaving, List.of(escort)));
+        if (legal.isEmpty()) return plan;
+        List<UnitMove> moves = new ArrayList<>(plan.moves());
+        moves.removeIf(move -> move.origin().equals(origin.getPosition()));
+        moves.addAll(legal.get());
+        moves = merge(moves);
+        double carried = countOf(moves, UnitType.Fighter) - countOf(plan.moves(), UnitType.Fighter);
+        double score = plan.score()
+                + FIGHTER_ESCORT_VALUE * carried
+                - leaveCosts(context, moves)
+                + leaveCosts(context, plan.moves());
+        if (score <= plan.score()) return plan;
+        return new TacticalPlan(plan.kind(), plan.target(), moves, plan.landings(), score);
+    }
+
+    private static TacticalPlan withGroundLandings(Context context, Tile tile, TacticalPlan plan) {
         if (!plan.landings().isEmpty() || !movesAHauler(context, plan.moves())) return plan;
         List<Planet> free = landingTargets(context, tile);
         if (free.isEmpty() || BoardView.hasEnemyShips(context.game, context.seat, tile)) return plan;
