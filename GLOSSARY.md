@@ -354,8 +354,8 @@ _Avoid_: Cast, fire
 To convert another Player's refreshed Commodities into Trade goods, usually as a favor requested of the Trade card's holder.
 _Avoid_: Launder, flip
 
-**X-1**:
-The outcome of the standard Trade deal: the Trade holder washes a Player's Commodities and keeps one Trade good as payment, leaving that Player one short of their maximum.
+**X-1 / X-2**:
+The outcome of the standard Trade deal: the Trade holder washes a Player's Commodities and keeps one Trade good as payment, leaving that Player one short of their maximum. X-2 is the same deal with a charge of two.
 _Avoid_: Wash tax
 
 **Plastic**:
