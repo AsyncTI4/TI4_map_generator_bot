@@ -929,7 +929,9 @@ to build one by hand:
     system only while the cost stays within half a point (`holdBack`, `groundToKeep`, with a second pass that keeps
     more infantry once the ships that leave are known); expansions, attacks and moves are scored net of the cost of
     leaving; a _defend_ plan brings ships to an exposed system when that lowers the cost by more than the move costs
-    (their spare ground forces land on the weakest planet); retaking a planet in its own home is worth the points
+    (their spare ground forces land on the weakest planet, and the ships take along the ground forces their capacity
+    holds from the system they leave; a hauler that defends with nothing aboard pays the empty-slot charge, but one that
+    ferries ground forces which lower the cost by enough is sent on those alone); retaking a planet in its own home is worth the points
     that home holds; and production buys infantry, mechs, fighters or ships at the dock (ground forces on the dock
     planet) until the cost is gone or a unit no longer lowers it by half a point per resource, so a one-planet home is
     defended on the ground and a home with several planets in space, and a hopeless defence buys nothing. Not yet:

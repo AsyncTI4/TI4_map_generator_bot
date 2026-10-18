@@ -2044,12 +2044,73 @@ public class TacticalPlanner {
             after = next.after();
             costAfter = next.costAfter();
         }
-        if (chosen.isEmpty()) return Optional.empty();
-        Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, merge(chosen));
+        if (chosen.isEmpty()) {
+            return ferriedDefence(context, tile, origin, candidates, now, costNow, buildBonus);
+        }
+        List<UnitMove> ships = merge(chosen);
+        Optional<TacticalPlan> unloaded =
+                defensePlan(context, tile, origin, ships, List.of(), after, costNow, buildBonus);
+        if (defense.mostExposedPlanet(tile, after) == null) return unloaded;
+        List<UnitMove> cargo =
+                take(availableGroundForces(context.game, seat, origin, defense, ships), capacityOf(seat, ships));
+        if (cargo.isEmpty()) return unloaded;
+        return better(unloaded, defensePlan(context, tile, origin, ships, cargo, after, costNow, buildBonus));
+    }
+
+    private static Optional<TacticalPlan> ferriedDefence(
+            Context context,
+            Tile tile,
+            Tile origin,
+            List<UnitMove> candidates,
+            Defenders now,
+            double costNow,
+            double buildBonus) {
+        Player seat = context.seat;
+        DefenseOutlook defense = context.defense();
+        List<UnitMove> ferry = ferry(context, origin, candidates);
+        if (ferry.isEmpty() || defense.mostExposedPlanet(tile, now) == null) return Optional.empty();
+        Defenders reinforced = now;
+        for (UnitMove ship : ferry) reinforced = reinforced.plusShips(ship.type(), ship.count(), 0);
+        List<UnitMove> cargo =
+                take(availableGroundForces(context.game, seat, origin, defense, ferry), capacityOf(seat, ferry));
+        if (cargo.isEmpty()) return Optional.empty();
+        return defensePlan(context, tile, origin, ferry, cargo, reinforced, costNow, buildBonus)
+                .filter(plan -> plan.score() - buildBonus >= DefenseOutlook.HOLD_MIN_GAIN);
+    }
+
+    private static List<UnitMove> ferry(Context context, Tile origin, List<UnitMove> candidates) {
+        Player seat = context.seat;
+        int waiting = movableGroundForces(context.game, seat, origin, context.defense());
+        List<UnitMove> ferry = new ArrayList<>();
+        int capacity = 0;
+        for (UnitMove candidate : candidates) {
+            if (!CapacityUse.hauler(seat, candidate.type())) continue;
+            int taken = 0;
+            while (taken < candidate.count() && capacity < waiting) {
+                taken++;
+                capacity += BoardView.capacity(seat, candidate.type());
+            }
+            if (taken > 0) ferry.add(new UnitMove(origin.getPosition(), BoardView.SPACE, candidate.type(), taken));
+        }
+        return ferry;
+    }
+
+    private static Optional<TacticalPlan> defensePlan(
+            Context context,
+            Tile tile,
+            Tile origin,
+            List<UnitMove> ships,
+            List<UnitMove> cargo,
+            Defenders reinforced,
+            double costNow,
+            double buildBonus) {
+        DefenseOutlook defense = context.defense();
+        Defenders after = reinforced;
+        Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, concat(ships, cargo));
         if (legal.isEmpty()) return Optional.empty();
         Map<String, Integer> landed = new LinkedHashMap<>();
         for (UnitMove move : legal.get()) {
-            if (!BoardView.SPACE.equals(move.holder()) || !BoardView.GROUND_FORCES.contains(move.type())) continue;
+            if (!BoardView.GROUND_FORCES.contains(move.type())) continue;
             for (int unit = 0; unit < move.count(); unit++) {
                 Planet planet = defense.mostExposedPlanet(tile, after);
                 if (planet == null) break;
@@ -2067,6 +2128,7 @@ public class TacticalPlanner {
                 - defense.leaveCost(origin, legal.get())
                 - DISTANCE_COST * farthest
                 - GROUP_MOVE_COST * (movedNonFighterShips(legal.get()) - 1)
+                - CapacityUse.loneHaulerPenalty(context.seat, legal.get())
                 + buildBonus;
         return Optional.of(new TacticalPlan(Kind.DEFEND, tile.getPosition(), legal.get(), landed, score));
     }

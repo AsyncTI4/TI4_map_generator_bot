@@ -182,6 +182,32 @@ class CapacityUseTest extends BaseTi4Test {
         assertThat(plan.moves()).isEqualTo(carrierFrom(away.getPosition()));
     }
 
+    // Home is exposed (one infantry against a raiding fleet) and a carrier one system away sits beside three infantry
+    // on a planet of ours. Reinforcing home with the carrier alone would leave its capacity unused; the defence takes
+    // the infantry along and lands them on the home planet.
+    @Test
+    void aCarrierDefendingHomeBringsGroundForcesAlong() {
+        board.raidingFleet(1, 2, 4);
+        board.reveal("conquer");
+        board.test.units(board.home, HOME_PLANET, nekro(), UnitType.Infantry, 1);
+        String awayPosition = board.otherNeighbourOfHome();
+        Tile away = board.test.place("26", awayPosition);
+        nekro().addPlanet("lodor");
+        nekro().exhaustPlanet("lodor");
+        board.test.units(away, "lodor", nekro(), UnitType.Infantry, 3);
+        board.test.units(away, "space", nekro(), UnitType.Carrier, 1);
+        nekro().exhaustPlanet(HOME_PLANET);
+        nekro().setTg(0);
+
+        TacticalPlan plan = best().orElseThrow();
+
+        assertThat(plan.kind()).isEqualTo(Kind.DEFEND);
+        assertThat(plan.target()).isEqualTo(AiTestGame.HOME);
+        assertThat(plan.moves()).contains(new UnitMove(awayPosition, "space", UnitType.Carrier, 1));
+        assertThat(plan.moves()).anyMatch(move -> "lodor".equals(move.holder()) && move.type() == UnitType.Infantry);
+        assertThat(plan.landings()).containsKey(HOME_PLANET);
+    }
+
     // Nothing waits at the dock: no reason to bring the carrier back.
     @Test
     void doesNotRecallACarrierWhenNothingIsWaiting() {
