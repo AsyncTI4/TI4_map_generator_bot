@@ -148,8 +148,9 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     public String getAutoCompleteName(Game game) {
         StringBuilder sb = new StringBuilder(name);
         if (getFaction().isPresent()) sb.append(" (").append(getFaction().get()).append(")");
-        game.getPlayersFromBreakthrough(alias).stream().findFirst().ifPresent(p -> sb.append(' ')
-                .append(p.isBreakthroughUnlocked(alias) ? "🔓" : "🔒"));
+        game.getPlayersFromBreakthrough(alias).stream()
+                .findFirst()
+                .ifPresent(p -> sb.append(' ').append(p.isBreakthroughUnlocked(alias) ? "🔓" : "🔒"));
         return sb.toString();
     }
 

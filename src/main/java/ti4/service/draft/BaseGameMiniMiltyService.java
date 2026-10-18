@@ -63,7 +63,7 @@ public class BaseGameMiniMiltyService {
         FactionDraftable factionDraftable = new FactionDraftable();
         factionDraftable.initialize(
                 settings.getFactionSettings().getNumFactions().getVal(),
-                settings.getFactionSources(),
+                BaseGameMiniMiltySettings.getFactionSources(),
                 prioritizedFactions,
                 new ArrayList<>(bannedFactions));
         draftManager.addDraftable(factionDraftable);

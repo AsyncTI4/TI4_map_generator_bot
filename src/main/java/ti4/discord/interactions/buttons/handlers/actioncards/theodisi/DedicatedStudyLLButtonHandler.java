@@ -17,7 +17,7 @@ import ti4.model.TechnologyModel;
 import ti4.service.tech.PlayerTechService;
 
 @UtilityClass
-public class DedicatedStudyLLButtonHandler {
+class DedicatedStudyLLButtonHandler {
     private static final String RESOLVE = "resolveDedicatedStudy";
     private static final String PURGE = "purgeDedicatedStudy_";
     private static final String RESEARCH = "researchDedicatedStudy_";
@@ -138,7 +138,7 @@ public class DedicatedStudyLLButtonHandler {
         int spent = Integer.parseInt(state[3]);
         int techRequirements = tech.getRequirements().orElse("").length();
         if (chosen >= 2
-                || !buttons.stream().anyMatch(button -> button.getCustomId().endsWith(RESEARCH + techId))) {
+                || buttons.stream().noneMatch(button -> button.getCustomId().endsWith(RESEARCH + techId))) {
             MessageHelper.sendEphemeralMessageToEventChannel(
                     event, "That technology is no longer eligible for _Dedicated Study_.");
             return;
@@ -237,10 +237,13 @@ public class DedicatedStudyLLButtonHandler {
                         && !tech.isUnitUpgrade()
                         && tech.getFirstType().toString().equals(type))
                 .toList();
-        return candidates.stream().anyMatch(first -> candidates.stream()
-                .anyMatch(second -> first != second
-                        && first.getRequirements().orElse("").length()
-                                        + second.getRequirements().orElse("").length()
-                                == totalRequirements));
+        return candidates.stream()
+                .anyMatch(first -> candidates.stream()
+                        .anyMatch(second -> first != second
+                                && first.getRequirements().orElse("").length()
+                                                + second.getRequirements()
+                                                        .orElse("")
+                                                        .length()
+                                        == totalRequirements));
     }
 }

@@ -13,6 +13,8 @@ class GamePersistenceKeys {
     static final String ENDTILE = "-endtile-";
     static final String TOKENS = "-tokens-";
     static final String ENDTOKENS = "-endtokens-";
+    // tile-level line inside TOKENS/ENDTOKENS: "fowvisiongrant red,blue"
+    static final String FOW_VISION_GRANT = "fowvisiongrant";
     static final String PLANET_TOKENS = "-planettokens-";
     static final String PLANET_ENDTOKENS = "-planetendtokens-";
     static final String MAPINFO = "-mapinfo-";

@@ -47,7 +47,7 @@ class JazzCommand extends Subcommand {
         return false;
     }
 
-    public String json(MiltySettings object) {
+    public static String json(MiltySettings object) {
         try {
             return JsonMapperManager.basic().writeValueAsString(object);
         } catch (Exception e) {

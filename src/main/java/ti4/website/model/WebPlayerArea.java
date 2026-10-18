@@ -14,6 +14,7 @@ import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
@@ -183,6 +184,8 @@ public class WebPlayerArea {
     // Nekro Z Assimilator targets (Thunder's Edge) - factions whose flagships have been assimilated
     private List<String> valefarZTargets;
 
+    private List<Integer> omenDice;
+
     public static WebPlayerArea fromPlayer(Player player, Game game) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
 
@@ -313,7 +316,7 @@ public class WebPlayerArea {
         webPlayerArea.scs = player.getSCs();
         webPlayerArea.isSpeaker = player.isSpeaker();
         webPlayerArea.isTyrant = player.isTyrant();
-        webPlayerArea.neighbors = player.getNeighbouringPlayers(false).stream()
+        webPlayerArea.neighbors = player.getNeighbouringPlayers(true).stream()
                 .map(Player::getColor)
                 .toList();
 
@@ -356,6 +359,9 @@ public class WebPlayerArea {
             }
         }
         webPlayerArea.valefarZTargets = valefarZTargets;
+
+        webPlayerArea.omenDice =
+                player.hasAbility("divination") ? ButtonHelperAbilities.getAllOmenDie(game) : new ArrayList<>();
 
         // Breakthrough info (Thunder's Edge)
         if (game.isThundersEdge()) {
@@ -564,16 +570,8 @@ public class WebPlayerArea {
         if (playerColor == null) {
             return 0;
         }
-        // Default CC limit is 16 in TI4
-        int ccLimit = 16;
-        if (!game.getStoredValue("ccLimit").isEmpty()) {
-            ccLimit = Integer.parseInt(game.getStoredValue("ccLimit"));
-        }
-        if (!game.getStoredValue("ccLimit" + playerColor).isEmpty()) {
-            ccLimit = Integer.parseInt(game.getStoredValue("ccLimit" + playerColor));
-        }
         int ccCount = Helper.getCCCount(game, playerColor);
-        int remainingReinforcements = ccLimit - ccCount;
+        int remainingReinforcements = player.getCommandTokenLimit() - ccCount;
         return Math.max(0, remainingReinforcements);
     }
 

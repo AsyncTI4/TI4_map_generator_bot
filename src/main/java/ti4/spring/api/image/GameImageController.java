@@ -87,7 +87,7 @@ public class GameImageController {
     /**
      * Get the user ID if authenticated, null otherwise.
      */
-    private String getOptionalUserId() {
+    private static String getOptionalUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
             return auth.getName();
@@ -189,16 +189,16 @@ public class GameImageController {
         return gameAttachmentUrlRefreshService
                 .refreshAttachmentUrl(gameName)
                 .map(ResponseEntity::ok)
-                .orElseGet(this::notFound);
+                .orElseGet(GameImageController::notFound);
     }
 
-    private ResponseEntity<String> notFound() {
+    private static ResponseEntity<String> notFound() {
         return ResponseEntity.notFound().build();
     }
 
     @SetupRequestContext(save = false)
     @PostMapping("/refresh")
-    public ResponseEntity<String> refresh(@PathVariable String gameName) {
+    public static ResponseEntity<String> refresh(@PathVariable String gameName) {
         Game game = RequestContext.getGame();
         MapRenderPipeline.queue(game, null, DisplayType.all, null);
         return ResponseEntity.ok("Queued");

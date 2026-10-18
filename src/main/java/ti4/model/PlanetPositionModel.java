@@ -174,15 +174,15 @@ public class PlanetPositionModel {
         }
     }
 
-    public Point getOffset() {
+    public static Point getOffset() {
         return PlanetPosition.offset;
     }
 
-    public Point getAllianceOffset() {
+    public static Point getAllianceOffset() {
         return PlanetPosition.allianceOffset;
     }
 
-    public PlanetPosition getTypeFromString(String type) {
+    public static PlanetPosition getTypeFromString(String type) {
         type = type.substring(0, 6);
         Map<String, PlanetPosition> allTypes = Arrays.stream(PlanetPosition.values())
                 .collect(Collectors.toMap(PlanetPosition::toString, (shipPositionModel -> shipPositionModel)));

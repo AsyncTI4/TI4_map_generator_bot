@@ -1,0 +1,175 @@
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia;
+
+import java.util.ArrayList;
+import java.util.List;
+import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAgents;
+import ti4.image.Mapper;
+import ti4.message.MessageHelper;
+
+@UtilityClass
+public class ArdentiaLeadersHandler {
+    private static final String AGENT_PAYMENT_DONE = "ardentiaAgentPaymentDone_";
+    private static final String ARDENTIA_HERO_TARGET = "ardentiaHeroTarget_";
+    private static final String ARDENTIA_HERO_REMOVE = "ardentiaHeroRemoveCC_";
+
+    // Agent
+    public static void startArdentiaAgentStep1(Game game, Player targetPlayer) {
+        if (game == null || targetPlayer == null) {
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, targetPlayer));
+        buttons.add(Buttons.red(targetPlayer.factionButtonChecker() + AGENT_PAYMENT_DONE, "Done"));
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                game.getActionsChannel(),
+                targetPlayer.getRepresentation() + ", please choose how to spend 1 influence.",
+                buttons);
+    }
+
+    @ButtonHandler(AGENT_PAYMENT_DONE)
+    public static void startArdentiaAgentStep3(
+            ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        if (event == null || player == null || game == null) {
+            return;
+        }
+        ButtonHelper.deleteMessage(event);
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                game.getActionsChannel(),
+                "Please choose where to gain 1 command token.",
+                ButtonHelper.getGainCCButtons(player));
+
+        if (player.hasAbility("seize_command")) {
+            MessageHelper.sendMessageToChannelWithButton(
+                    game.getActionsChannel(),
+                    "You may use **Seize Command**.",
+                    ArdentiaAbilityHandler.getSeizeCommandButton(player));
+        }
+    }
+
+    // Hero
+    public static void startArdentiaHero(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (event == null || game == null || player == null) {
+            return;
+        }
+
+        List<Button> targets = new ArrayList<>();
+        for (Player otherPlayer : game.getRealPlayers()) {
+            if (!ButtonHelper.getTilesWithYourCC(otherPlayer, game, event).isEmpty()) {
+                targets.add(Buttons.gray(
+                        player.factionButtonChecker() + ARDENTIA_HERO_TARGET + otherPlayer.getFaction(),
+                        otherPlayer.getFactionNameOrColor(),
+                        otherPlayer.getFactionEmojiOrColor()));
+            }
+        }
+        targets.add(Buttons.red("deleteButtons", "Done"));
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentation()
+                        + ", you may remove another player's command token from a system to gain 1 command token and 1 trade good for each other player's command token removed.",
+                targets);
+    }
+
+    @ButtonHandler(ARDENTIA_HERO_TARGET)
+    public static void selectArdentiaHeroTarget(
+            ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        if (event == null || player == null || game == null) {
+            return;
+        }
+
+        String faction = buttonID.replace(ARDENTIA_HERO_TARGET, "");
+        Player target = game.getPlayerFromColorOrFaction(faction);
+
+        if (target == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that player.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> tileButtons = new ArrayList<>();
+        for (Tile tile : ButtonHelper.getTilesWithYourCC(target, game, event)) {
+            tileButtons.add(Buttons.green(
+                    player.factionButtonChecker()
+                            + ARDENTIA_HERO_REMOVE
+                            + target.getFaction() + "|"
+                            + tile.getPosition(),
+                    tile.getRepresentationForButtons(game, player)));
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentation()
+                        + ", please choose which of " + target.getRepresentationNoPing()
+                        + "'s command tokens to return to reinforcements.",
+                tileButtons);
+
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    @ButtonHandler(ARDENTIA_HERO_REMOVE)
+    public static void resolveRemoveArdentiaHeroTargetCC(
+            ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        if (event == null || player == null || game == null) {
+            return;
+        }
+
+        String payload = buttonID.substring(ARDENTIA_HERO_REMOVE.length());
+        String[] parts = payload.split("\\|", 2);
+
+        String faction = parts[0];
+        String tile = parts[1];
+
+        Player target = game.getPlayerFromColorOrFaction(faction);
+        Tile tilePos = game.getTileByPosition(tile);
+
+        if (target == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not fint that player.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (tilePos == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not fint that tile.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (!tilePos.hasPlayerCC(target)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "The selected player does not have a command token in that system.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String ccId = Mapper.getCCID(target.getColor());
+        tilePos.removeCC(ccId);
+        MessageHelper.sendMessageToChannel(
+                target.getCorrectChannel(),
+                target.getRepresentationUnfogged() + ", your command token in "
+                        + tilePos.getRepresentationForButtons(game, target)
+                        + " was returned to your reinforcements by _Echo of Subjugation_.");
+        String tgGain = player.gainTG(1, true);
+        ButtonHelperAgents.resolveArtunoCheck(player, 1);
+
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), player.getRepresentation() + " gained 1 trade good " + tgGain + ".");
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                "Please choose where to gain 1 command token for removing " + target.getRepresentationNoPing()
+                        + "'s command token from the chosen system.",
+                ButtonHelper.getGainCCButtons(player));
+
+        ButtonHelper.deleteMessage(event);
+    }
+}

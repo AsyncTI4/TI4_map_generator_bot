@@ -36,14 +36,14 @@ public abstract class GameStateSubcommand extends Subcommand implements GameStat
 
     @Override
     public void onException(SlashCommandInteractionEvent event, Throwable throwable) {
-        commandGameState.clear();
+        CommandGameState.clear();
         super.onException(event, throwable);
     }
 
     @NotNull
     @Override
     public Game getGame() {
-        return commandGameState.getGame();
+        return CommandGameState.getGame();
     }
 
     @NotNull

@@ -15,6 +15,7 @@ import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Helper;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
+import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
 
 @UtilityClass
@@ -58,6 +59,13 @@ class ActionCardButtonHandler {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentation() + ", you cannot cancel your own action card _" + acName + "_.");
+            return;
+        }
+        if (SabotageService.isShameixBaneCancellationBlocked(player, targetPlayer)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentation() + ", you cannot cancel " + targetPlayer.getRepresentationNoPing()
+                            + "'s action card due to _Shameix's Bane_.");
             return;
         }
 
@@ -144,6 +152,7 @@ class ActionCardButtonHandler {
             if ("Relitigate".equals(acName) && targetPlayer != null) {
                 RelitigateLLButtonHandler.onRelitigateSabotaged(game, targetPlayer);
             }
+            EscapeClauseActionCardHandler.resolveSabotagedEscapeClause(event, game, targetPlayer, acName);
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(
                         game.getActionsChannel(),

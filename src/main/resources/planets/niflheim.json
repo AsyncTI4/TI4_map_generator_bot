@@ -1,0 +1,27 @@
+{
+    "planetLayout":  {
+        "unitHolderName":  "niflheim",
+        "resourcesLocation":  "BottomLeft",
+        "centerPosition":  {
+            "x":  172,
+            "y":  153
+        },
+        "planetRadius":  83
+    },
+    "id":  "niflheim",
+    "tileId":  "ao9",
+    "name":  "Niflheim",
+    "aliases":  [
+        "niflheim"
+    ],
+    "resources":  1,
+    "influence":  3,
+    "planetTypes":  [
+        "HAZARDOUS"
+    ],
+    "legendaryAbilityName":  "Hvergelmir's Haze",
+    "legendaryAbilityText":  "You may exhaust this card when you pass to choose another player; that player must discard 1 action card, then you and that player draw an action card.",
+    "legendaryAbilityFlavourText":  "\"The mist... it's speaking to the crew.\" - NavVoice-Log 20332",
+    "flavourText":  "A world surrounded by a dense and chaotic nebula with unusually strong electromagnectic fields, visitors often experience strong mental distress while near this planet.",
+    "source":  "goose"
+}

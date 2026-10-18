@@ -44,7 +44,6 @@ import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.AbilityModel;
-import ti4.model.BorderAnomalyModel;
 import ti4.model.BreakthroughModel;
 import ti4.model.ColorableModelInterface;
 import ti4.model.DeckModel;
@@ -78,6 +77,7 @@ import ti4.service.draft.draftables.FactionDraftable;
 import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
+import ti4.service.fow.MapSegmentService;
 import ti4.service.franken.FrankenDraftMode;
 import ti4.service.game.GameNameService;
 import ti4.service.game.GameUndoNameService;
@@ -86,6 +86,8 @@ import ti4.service.map.MapPresetService;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.statistics.PlayerStatTypes;
 import ti4.service.statistics.game.GameStatTypes;
+import ti4.service.testbed.TestBedAutoComplete;
+import ti4.service.testbed.TestBedService;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass
@@ -117,6 +119,7 @@ class AutoCompleteProvider {
                 case Constants.SEARCH, "search2" -> resolveSearchCommandAutoComplete(event, subCommandName, optionName);
                 case Constants.FRANKEN -> resolveFrankenAutoComplete(event, subCommandName, optionName);
                 case Constants.FRANKEN2 -> resolvePlotAutoComplete(event, optionName);
+                case "testbed" -> resolveTestBedAutoComplete(event, optionName);
             }
             if (event.isAcknowledged()) return;
         }
@@ -259,6 +262,18 @@ class AutoCompleteProvider {
                         .toList();
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokenNames, enteredValue);
+                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+            }
+            case Constants.MAP_SEGMENT -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<String> names = List.of();
+                if (GameManager.isValid(gameName)) {
+                    Game game = GameManager.getManagedGame(gameName).getGame();
+                    boolean foggedView = MapSegmentService.isFoggedView(game, event.getChannel());
+                    names = MapSegmentService.viewableNames(
+                            game, event.getUser().getId(), foggedView);
+                }
+                List<Command.Choice> options = mapTo25ChoicesThatContain(names, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.DISPLAY_TYPE -> {
@@ -583,15 +598,9 @@ class AutoCompleteProvider {
             }
             case Constants.BORDER_TYPE -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, String> anomalies = Arrays.stream(
-                                BorderAnomalyModel.BorderAnomalyType.values()) // Search string:name
-                        .filter(anomalyType -> anomalyType != BorderAnomalyModel.BorderAnomalyType.ARROW)
-                        .collect(Collectors.toMap(
-                                BorderAnomalyModel.BorderAnomalyType::toSearchString,
-                                BorderAnomalyModel.BorderAnomalyType::getName));
-                List<Command.Choice> options = anomalies.entrySet().stream()
-                        .filter(anomaly -> anomaly.getValue().contains(enteredValue))
-                        .map(anomaly -> new Command.Choice(anomaly.getValue(), anomaly.getKey()))
+                List<Command.Choice> options = Mapper.getBorderAnomalies().stream()
+                        .filter(anomaly -> anomaly.getName().toLowerCase().contains(enteredValue))
+                        .map(anomaly -> new Command.Choice(anomaly.getAutoCompleteName(), anomaly.getId()))
                         .limit(25)
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
@@ -792,6 +801,13 @@ class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 if (Constants.ADD_FOG_TILE.equals(subcommandName) && Constants.TILE_NAME.equals(optionName)) {
                     var options = searchModels(event, TileHelper.getAllTileModels(), null);
+                    event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                } else if (Constants.MOVE_ALL_UNITS.equals(subcommandName) && Constants.TILE_NAME.equals(optionName)) {
+                    List<Command.Choice> options = new ArrayList<>();
+                    options.add(new Command.Choice(Constants.ALL, Constants.ALL));
+                    options.addAll(mapTo25ChoicesThatContain(game.getTileMap().keySet(), enteredValue).stream()
+                            .limit(24)
+                            .toList());
                     event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
                 } else if (game.isFowMode()) {
                     var options = mapTo25ChoicesThatContain(game.getTileMap().keySet(), enteredValue);
@@ -1362,7 +1378,8 @@ class AutoCompleteProvider {
             case Constants.PICK_AC_FROM_DISCARD, Constants.SHUFFLE_AC_BACK_INTO_DECK -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Game game = GameManager.getManagedGame(gameName).getGame();
-                Player viewer = game.getPlayer(event.getUser().getId());
+                Player viewer = TestBedService.resolveActingPlayer(
+                        game, event, game.getPlayer(event.getUser().getId()));
                 boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, viewer);
                 Map<String, Integer> discardActionCardIDs = game.getDiscardActionCards();
                 List<Command.Choice> options = discardActionCardIDs.entrySet().stream()
@@ -1482,6 +1499,22 @@ class AutoCompleteProvider {
                     default -> Collections.emptyList();
                 };
         event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static void resolveTestBedAutoComplete(
+            @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String optionName) {
+        if (!TestBedService.isEnabled() || !TestBedService.isDeveloper(event.getMember())) {
+            event.replyChoices(List.of()).queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+        String gameName = GameNameService.getGameNameFromChannel(event);
+        Game game = GameManager.isValid(gameName)
+                ? GameManager.getManagedGame(gameName).getGame()
+                : null;
+        List<Command.Choice> choices = TestBedAutoComplete.choices(
+                optionName, game, event.getFocusedOption().getValue());
+        if (choices == null) return;
+        event.replyChoices(choices).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static void resolveFrankenAutoComplete(

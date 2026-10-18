@@ -1,0 +1,49 @@
+{
+  "name": "selftest-core",
+  "description": "Self-test of the test bed: every step verb, check forms, do actions, a wrong-seat guard and a turn end.",
+  "preset": "action-3p",
+  "steps": [
+    { "note": "Starting state from the preset" },
+    { "expect": { "state": "game.phase", "equals": "action" } },
+    { "expect": { "state": "game.round", "equals": "1" } },
+    { "expect": { "state": "game.activePlayer", "equals": "sol" } },
+    { "expect": { "state": "sol.scs", "equals": "3" } },
+    { "expect": { "state": "you.acIds", "contains": "sabo1" } },
+
+    { "note": "do actions: hands for everyone and one seat, stored values" },
+    { "do": "hand", "as": "all", "hand": { "tg": 5 } },
+    { "expect": { "state": "hacan.tg", "equals": "5" } },
+    { "do": "hand", "as": "seat2", "hand": { "acs": ["sabo2"] } },
+    { "expect": { "state": "jolnar.acIds", "contains": "sabo2" } },
+    { "do": "setStored", "key": "testbedSelftest", "value": "on" },
+    { "expect": { "state": "stored:testbedSelftest", "equals": "on" } },
+    { "do": "removeStored", "key": "testbedSelftest" },
+    { "expect": { "state": "stored:testbedSelftest", "equals": "" } },
+
+    { "note": "Strategy card play and follows: press, pressId, message check" },
+    { "as": "sol", "press": "strategicAction_3" },
+    { "expect": { "state": "game.playedScs", "contains": "3" } },
+    { "expect": { "in": "main", "contains": "indicate your choice with these buttons" } },
+    { "as": "hacan", "press": "sc_follow_3" },
+    { "expect": { "state": "hacan.followed", "contains": "3" } },
+    { "expect": { "state": "hacan.ccs", "equals": "3/3/1" } },
+    { "as": "seat2", "pressId": "sc_no_follow_3" },
+    { "expect": { "state": "jolnar.followed", "contains": "3" } },
+    { "expect": { "state": "jolnar.ccs", "equals": "3/3/2" } },
+
+    { "note": "Guard: Jol-Nar cannot end Sol's turn" },
+    { "as": "jolnar", "pressId": "FFCC_{sol.faction}_turnEnd" },
+    { "expect": { "ephemeral": "these buttons are for someone else" } },
+    { "expect": { "state": "game.activePlayer", "equals": "sol" } },
+
+    { "note": "Act-as and turn flow" },
+    { "do": "actAs", "as": "hacan" },
+    { "do": "actAs", "as": "you" },
+    { "as": "sol", "pressId": "FFCC_sol_turnEnd" },
+    { "expect": { "state": "game.activePlayer", "equals": "hacan" } },
+    { "do": "setActivePlayer", "as": "jolnar" },
+    { "expect": { "state": "game.activePlayer", "equals": "jolnar" } },
+    { "wait": 1 },
+    { "expect": { "state": "sol.passed", "equals": "false" } }
+  ]
+}

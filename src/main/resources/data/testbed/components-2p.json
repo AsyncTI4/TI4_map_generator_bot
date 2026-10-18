@@ -1,0 +1,20 @@
+{
+  "name": "components-2p",
+  "description": "Sol and Hacan in the action phase with an objective scored, a law, a fragment, Hacan's Support for the Throne and known action cards.",
+  "fog": false,
+  "you": {
+    "faction": "sol",
+    "sc": 1,
+    "acs": ["economic_initiative"],
+    "pns": ["sftt:hacan"],
+    "scoredObjectives": ["corner"],
+    "fragments": ["crf1"],
+    "breakthrough": "unlocked"
+  },
+  "seats": [ { "faction": "hacan", "sc": 5, "acs": ["sabo1"] } ],
+  "defaults": { "tg": 3, "ccs": "3/3/2" },
+  "revealedObjectives": ["corner"],
+  "laws": ["arms_reduction"],
+  "tokens": { "101": ["frontier"] },
+  "start": "action"
+}

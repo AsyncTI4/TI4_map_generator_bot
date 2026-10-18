@@ -7,21 +7,31 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.planet.NiflheimLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperCommanders;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.DiscordantStarsHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StatusHelper;
+import ti4.helpers.Units.UnitType;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
+import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.message.MessageHelper;
 import ti4.service.game.MonumentsService;
+import ti4.service.unit.AddUnitService;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
 
@@ -36,10 +46,16 @@ public class PassService {
                     "You are not the active player. If you need to, you can force pass with `/player stats passed:y`.");
             return;
         }
+        UydaiUnitHandler.offerDeathCommandosPlacement(event, game, player);
 
         player.setPassed(true);
+        ThirtyKSecretHooks.onPassed(game, player);
         GameEventService.commit(game, GameEventType.TURN, player, Map.of("passed", true));
+        ButtonHelperFactionSpecific.offerDeathBinding(game, player);
+        SarcosaHeroHandler.offerPassAbility(game, player);
+        NiflheimLegendaryButtonHandler.offerHvergelmirsHaze(event, game, player);
         VerydithAbilitiesHandler.getMandateButtons(event, player, game);
+        RevenantLeadersHandler.offerRevArcanumAgentButtons(game, player);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
             ButtonHelperCommanders.olradinCommanderStep1(player, game);
         }
@@ -87,6 +103,47 @@ public class PassService {
             String message2 = player.getRepresentationUnfogged() + "! Your current command tokens are "
                     + player.getCCRepresentation() + ". Use buttons to gain a command token.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+        }
+        if (player.hasTech("lgf_br")) {
+            String mecatol = game.mecatols().stream()
+                    .filter(planet -> "mr".equals(planet) || "mrte".equals(planet))
+                    .findFirst()
+                    .orElse(null);
+            UnitHolder planetHolder = mecatol == null ? null : game.getUnitHolderFromPlanet(mecatol);
+            boolean canCoexist = planetHolder != null
+                    && game.getRealPlayers().stream()
+                            .filter(otherPlayer -> !otherPlayer.equals(player))
+                            .anyMatch(otherPlayer -> FoWHelper.playerHasUnitsOnPlanet(otherPlayer, planetHolder));
+            if (canCoexist && mecatol != null) {
+                String priorCoexistenceFlag = game.getStoredValue("coexistFlag");
+                game.setStoredValue("coexistFlag", "yes");
+                try {
+                    int infantryBefore = planetHolder.getUnitCount(UnitType.Infantry, player.getColor());
+                    AddUnitService.addUnits(
+                            event, game.getTileFromPlanet(mecatol), game, player.getColor(), "2 infantry " + mecatol);
+                    if (planetHolder.getUnitCount(UnitType.Infantry, player.getColor()) == infantryBefore + 2) {
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentation()
+                                        + " placed 2 infantry into coexistence on Mecatol Rex using _Lazax Gate Folding_.");
+                    } else {
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentation() + " could not place infantry using _Lazax Gate Folding_.");
+                    }
+                } finally {
+                    if (priorCoexistenceFlag.isEmpty()) {
+                        game.removeStoredValue("coexistFlag");
+                    } else {
+                        game.setStoredValue("coexistFlag", priorCoexistenceFlag);
+                    }
+                }
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + " could not place infantry using _Lazax Gate Folding_ because no other player's units are on Mecatol Rex.");
+            }
         }
         // if (player.hasAbility("bestow")) {
         //     String msg = player.getRepresentation() + ", since you have the _Bestow_ Honor card,"

@@ -16,8 +16,9 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.EscapeClauseActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -43,6 +44,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.BlindSelectionService;
+import ti4.service.fow.FogTokenRemovalService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.fow.PlanetTargetService.UnitHolderTargetSpec;
@@ -351,6 +353,7 @@ public final class ButtonHelperActionCards {
         checkForPlayingManipulateInvestments(game, player);
         checkForPlayingSummit(game, player);
         checkForPlayingBountyContracts(game, player);
+        EscapeClauseActionCardHandler.offerPreset(game, player);
         checkForPlayingSpliceCards(game, player);
         checkForPreassigningRelitigate(game, player);
         if (player.getPlayableActionCards().contains("puppetsonastring")) {
@@ -946,6 +949,11 @@ public final class ButtonHelperActionCards {
     public static void unexpectedSomeoneElseStep2(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (game.isFowMode() && p2 != null) {
+            FogTokenRemovalService.startFlux(event, game, player, p2);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "unexpectedOtherPerson", p2);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
@@ -1604,6 +1612,12 @@ public final class ButtonHelperActionCards {
     @ButtonHandler("spyStep3_")
     public static void resolveSpyStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (p2 == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(), "Could not find the player to send the action card to.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         ActionCardHelper.sendRandomACPart2(event, game, player, p2);
         ButtonHelper.deleteMessage(event);
     }
@@ -1848,7 +1862,7 @@ public final class ButtonHelperActionCards {
      * the target names the holder rather than just the system. VISIBLE_NOW because a dock is a unit: a
      * remembered system tells you nothing about whether it is still there.
      */
-    public static UnitHolderTargetSpec meltdownSpec(Game game) {
+    private static UnitHolderTargetSpec meltdownSpec(Game game) {
         return UnitHolderTargetSpec.of("reactorMeltdownStep3_" + BlindSelectionService.TBD_FACTION, UnitType.Spacedock)
                 .excludingSelf()
                 .where((tile, uh) -> Constants.SPACE.equals(uh.getName())
@@ -2807,9 +2821,12 @@ public final class ButtonHelperActionCards {
     public static void resolveReparationsStep3(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, reparationsSpec())) return;
-        var target = PlanetTargetService.resolve(game, player, buttonID, reparationsSpec(), t -> t.owner()
-                .getReadiedPlanets()
-                .contains(t.planetId()));
+        var target = PlanetTargetService.resolve(
+                game,
+                player,
+                buttonID,
+                reparationsSpec(),
+                t -> t.owner().getReadiedPlanets().contains(t.planetId()));
         if (target == null) {
             PlanetTargetService.fizzle(event, player);
             return;
@@ -3291,7 +3308,7 @@ public final class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
-    public static List<Button> getExplorationRiderButtons(
+    private static List<Button> getExplorationRiderButtons(
             Player player, Game game, int remainingExplores, Set<String> selectedPlanets) {
         List<Button> buttons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
@@ -3355,7 +3372,7 @@ public final class ButtonHelperActionCards {
         return "industrial".equalsIgnoreCase(originalPlanetType) || "hazardous".equalsIgnoreCase(originalPlanetType);
     }
 
-    public static String encodeExplorationRiderPlanets(Set<String> selectedPlanets) {
+    private static String encodeExplorationRiderPlanets(Set<String> selectedPlanets) {
         if (selectedPlanets.isEmpty()) {
             return "";
         }

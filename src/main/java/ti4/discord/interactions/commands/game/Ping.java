@@ -22,7 +22,7 @@ class Ping extends GameStateSubcommand {
         pingGame(event, game);
     }
 
-    private void pingGame(GenericInteractionCreateEvent event, Game game) {
+    private static void pingGame(GenericInteractionCreateEvent event, Game game) {
         MessageChannel channel = event.getMessageChannel();
         if (channel instanceof ThreadChannel threadChannel) {
             if (threadChannel.getName().toLowerCase().contains("cards info")) {

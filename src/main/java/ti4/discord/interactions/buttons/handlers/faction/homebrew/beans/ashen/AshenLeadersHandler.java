@@ -407,8 +407,9 @@ public class AshenLeadersHandler {
                 assignments.add(new BombardmentAssignment(
                         unit.getLeft().getAsyncId(),
                         targetPlanet,
-                        galvanizedCount-- > 0,
+                        galvanizedCount > 0,
                         BombardmentAssignmentType.UNIT));
+                galvanizedCount--;
             }
         }
         if (player.hasTech("ps") || player.hasTech("absol_ps")) {

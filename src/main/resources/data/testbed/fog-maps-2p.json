@@ -1,0 +1,20 @@
+{
+  "name": "fog-maps-2p",
+  "description": "Fog game with an extra map A (a sector `outpost` plus an unsectored rest) linked to the main map by alpha wormholes; map connections and ghost hexes on.",
+  "fog": true,
+  "you": { "faction": "sol", "home": "301", "units": { "305": "cv" } },
+  "seats": [
+    { "faction": "hacan", "home": "310", "units": { "a301": "dd" } }
+  ],
+  "defaults": { "tg": 2 },
+  "tiles": {
+    "a000": "39",
+    "a101": "19",
+    "a102": "20",
+    "a103": "21",
+    "a201": "22",
+    "a301": "23"
+  },
+  "fowOptions": ["map_connections", "ghost_hexes"],
+  "stored": { "fowMapSegments": "core=000:3;outpost=a000:1" }
+}

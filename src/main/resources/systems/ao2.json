@@ -1,0 +1,38 @@
+{
+    "id":  "ao2",
+    "name":  "Asgard",
+    "aliases":  [
+        "ao2",
+        "asgard"
+    ],
+    "imagePath":  "ao2_asgard.png",
+    "planets":  [
+        "asgard"
+    ],
+    "shipPositionsType":  "TYPE01",
+    "spaceTokenLocations":  [
+        {
+            "x":  245,
+            "y":  100
+        },
+        {
+            "x":  200,
+            "y":  185
+        },
+        {
+            "x":  110,
+            "y":  215
+        },
+        {
+            "x":  120,
+            "y":  40
+        }
+    ],
+    "wormholes":  null,
+    "isAsteroidField":  false,
+    "isSupernova":  false,
+    "isNebula":  false,
+    "isGravityRift":  true,
+    "source":  "goose",
+    "tileBack":  "red"
+}

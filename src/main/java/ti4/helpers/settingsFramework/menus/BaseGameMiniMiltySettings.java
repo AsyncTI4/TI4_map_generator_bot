@@ -79,7 +79,7 @@ public class BaseGameMiniMiltySettings extends SettingsMenu {
     }
 
     @Override
-    protected void updateTransientSettings() {
+    void updateTransientSettings() {
         MapTemplateModel template = getResolvedMapTemplate();
         mapTemplateStatus.setDisplay(template == null ? "No standard template available" : template.getAlias());
     }
@@ -93,7 +93,7 @@ public class BaseGameMiniMiltySettings extends SettingsMenu {
         return new ArrayList<>(game.getPlayerIDs());
     }
 
-    public List<ComponentSource> getFactionSources() {
+    public static List<ComponentSource> getFactionSources() {
         return List.of(ComponentSource.base);
     }
 

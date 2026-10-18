@@ -112,7 +112,7 @@ public class DataSkimmerService {
     }
 
     @ButtonHandler("discardDataSkimmer")
-    public static void discardCardsOnDataSkimmer(Game game, Player ralnel) {
+    private static void discardCardsOnDataSkimmer(Game game, Player ralnel) {
         if (!ralnel.hasUnlockedBreakthrough("ralnelbt")) return;
 
         List<String> discarded = new ArrayList<>();

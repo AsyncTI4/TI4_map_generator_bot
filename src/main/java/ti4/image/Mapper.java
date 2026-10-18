@@ -41,6 +41,7 @@ import ti4.model.AbilityModel;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.AttachmentModel;
+import ti4.model.BorderAnomalyModel;
 import ti4.model.BreakthroughModel;
 import ti4.model.ColorModel;
 import ti4.model.ColorableModelInterface;
@@ -97,6 +98,7 @@ public class Mapper {
     private static final Map<String, ActionCardModel> actionCards = new HashMap<>();
     private static final Map<String, AgendaModel> agendas = new HashMap<>();
     private static final Map<String, AttachmentModel> attachments = new HashMap<>();
+    private static final Map<String, BorderAnomalyModel> borderAnomalies = new HashMap<>();
     private static final Map<String, ColorModel> colors = new HashMap<>();
     private static final Map<String, CombatModifierModel> combatModifiers = new HashMap<>();
     private static final Map<String, DeckModel> decks = new HashMap<>();
@@ -123,6 +125,8 @@ public class Mapper {
     private static final Map<String, StrategyCardModel> strategyCards = new HashMap<>();
     private static final Map<String, TechnologyModel> technologies = new HashMap<>();
     private static final Map<String, TokenModel> tokens = new HashMap<>();
+    // ids + image paths of tokens flagged isFowVision; precomputed so per-tile fog checks avoid getTokenKey's scan
+    private static final Set<String> fowVisionTokenIds = new HashSet<>();
     private static final Map<String, GalacticEventModel> galacticevents = new HashMap<>();
 
     @Getter
@@ -155,6 +159,7 @@ public class Mapper {
         importJsonObjectsFromFolder("action_cards", actionCards, ActionCardModel.class);
         importJsonObjectsFromFolder("agendas", agendas, AgendaModel.class);
         importJsonObjectsFromFolder("attachments", attachments, AttachmentModel.class);
+        importJsonObjectsFromFolder("border_anomalies", borderAnomalies, BorderAnomalyModel.class);
         importJsonObjectsFromFolder("breakthroughs", breakthroughs, BreakthroughModel.class);
         importJsonObjectsFromFolder("colors", colors, ColorModel.class);
         importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class);
@@ -176,6 +181,7 @@ public class Mapper {
         importJsonObjectsFromFolder("galactic_events", galacticevents, GalacticEventModel.class);
 
         importJsonObjectsFromFolder("tokens", tokens, TokenModel.class);
+        indexFowVisionTokens();
         importJsonObjectsFromFolder("tokens", spaceTokens, SpaceTokenModel.class);
         importJsonObjectsFromFolder("units", units, UnitModel.class);
         importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
@@ -191,7 +197,7 @@ public class Mapper {
 
     private static void readData(String propertyFileName, Properties properties) throws IOException {
         properties.clear();
-        String propFile = ResourceHelper.getInstance().getDataFile(propertyFileName);
+        String propFile = ResourceHelper.getDataFile(propertyFileName);
         if (propFile != null) {
             try (InputStream input = new FileInputStream(propFile)) {
                 properties.load(input);
@@ -204,7 +210,7 @@ public class Mapper {
 
     private static <T extends ModelInterface> void importJsonObjectsFromFolder(
             String jsonFolderName, Map<String, T> objectMap, Class<T> target) {
-        String folderPath = ResourceHelper.getInstance().getDataFolder(jsonFolderName);
+        String folderPath = ResourceHelper.getDataFolder(jsonFolderName);
         // Added to prevent duplicates when running Mapper.init() over and over with ModelTest classes
         objectMap.clear();
 
@@ -254,7 +260,7 @@ public class Mapper {
     private static <T extends ModelInterface> void importJsonObjects(
             String jsonFileName, Map<String, T> objectMap, Class<T> target) throws Exception {
         List<T> allObjects = new ArrayList<>();
-        String filePath = ResourceHelper.getInstance().getDataFile(jsonFileName);
+        String filePath = ResourceHelper.getDataFile(jsonFileName);
         JavaType type = jsonMapper.getTypeFactory().constructCollectionType(ArrayList.class, target);
 
         if (filePath != null) {
@@ -1230,6 +1236,27 @@ public class Mapper {
         return getGenericHomebrewReplaceMap(models, TechnologyModel::getHomebrewReplacesID);
     }
 
+    public static BorderAnomalyModel getBorderAnomaly(String id) {
+        if (id == null) return null;
+        return borderAnomalies.get(id);
+    }
+
+    public static BorderAnomalyModel resolveBorderAnomaly(String input) {
+        if (input == null) return null;
+        BorderAnomalyModel exact = borderAnomalies.get(input);
+        if (exact != null) return exact;
+        return borderAnomalies.values().stream()
+                .filter(model -> model.matches(input))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static List<BorderAnomalyModel> getBorderAnomalies() {
+        return borderAnomalies.values().stream()
+                .sorted(Comparator.comparing(BorderAnomalyModel::getName))
+                .toList();
+    }
+
     // ####################
     // Tokens & Tokens from .properties
 
@@ -1254,6 +1281,20 @@ public class Mapper {
 
     public static TokenModel getToken(String id) {
         return tokens.get(getTokenKey(id));
+    }
+
+    private static void indexFowVisionTokens() {
+        fowVisionTokenIds.clear();
+        for (TokenModel token : tokens.values()) {
+            if (!Boolean.TRUE.equals(token.getIsFowVision())) continue;
+            fowVisionTokenIds.add(token.getId());
+            if (token.getImagePath() != null) fowVisionTokenIds.add(token.getImagePath());
+        }
+    }
+
+    /** True if the id or image path belongs to a token flagged {@code isFowVision}. */
+    public static boolean isFowVisionToken(String tokenId) {
+        return tokenId != null && fowVisionTokenIds.contains(tokenId);
     }
 
     public static boolean isValidToken(String id) {
@@ -1525,8 +1566,7 @@ public class Mapper {
     }
 
     public static Set<String> getWormholesTiles(String wormholeID) {
-        WormholeModel wormholeModel = new WormholeModel();
-        WormholeModel.Wormhole wormhole = wormholeModel.getWormholeFromString(wormholeID);
+        WormholeModel.Wormhole wormhole = WormholeModel.getWormholeFromString(wormholeID);
         if (wormhole == null) {
             return new HashSet<>();
         }

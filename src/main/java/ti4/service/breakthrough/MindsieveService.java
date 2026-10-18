@@ -12,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.RegexHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -32,7 +33,7 @@ public class MindsieveService {
     }
 
     public boolean canUseMindsieve(Player naalu, Player primary, StrategyCardModel scModel) {
-        if (scModel == null || scModel.usesAutomationForSCID("pok1leadership")) return false;
+        if (primary == null || scModel == null || scModel.usesAutomationForSCID("pok1leadership")) return false;
         if (!naalu.hasUnlockedBreakthrough(id)) return false;
         for (String pn : naalu.getPromissoryNotes().keySet()) {
             PromissoryNoteModel model = Mapper.getPromissoryNote(pn);
@@ -68,8 +69,10 @@ public class MindsieveService {
                 continue;
             }
             Player owner = game.getPNOwner(pn);
-            buttons.add(
-                    Buttons.green("mindsieveFollow_" + sc + "_" + pn, "Send " + model.getName(), owner.fogSafeEmoji()));
+            buttons.add(Buttons.green(
+                    "mindsieveFollow_" + sc + "_" + pn,
+                    "Send " + model.getName(),
+                    PromissoryNoteHelper.ownerEmoji(game, owner, pn)));
         }
         buttons.add(
                 Buttons.DONE_DELETE_BUTTONS.withLabel("Decline Mindsieve").withEmoji(FactionEmojis.Naalu.asEmoji()));
@@ -89,6 +92,13 @@ public class MindsieveService {
                     Player primary = game.getPlayerFromSC(sc);
                     StrategyCardModel scModel =
                             game.getStrategyCardModelByInitiative(sc).orElse(null);
+                    if (primary == null || scModel == null) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getMessageChannel(),
+                                "No player currently holds that strategy card, so _Mindsieve_ cannot be used to follow it.");
+                        ButtonHelper.deleteMessage(event);
+                        return;
+                    }
                     SendPromissoryService.sendPromissoryToPlayer(event, game, naalu, primary, pn);
 
                     if (!naalu.getFollowedSCs().contains(sc))

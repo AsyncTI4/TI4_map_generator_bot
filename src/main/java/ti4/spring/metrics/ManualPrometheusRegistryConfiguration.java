@@ -73,19 +73,19 @@ is restored; then Boot will supply its managed (Composite) registry. */
 public class ManualPrometheusRegistryConfiguration {
     @Bean
     @ConditionalOnMissingBean
-    public PrometheusConfig prometheusConfig() {
+    public static PrometheusConfig prometheusConfig() {
         return PrometheusConfig.DEFAULT;
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public Clock micrometerClock() {
+    public static Clock micrometerClock() {
         return Clock.SYSTEM;
     }
 
     @Bean
     @ConditionalOnMissingBean(MeterRegistry.class)
-    public MeterRegistry meterRegistry(PrometheusConfig config) {
+    public static MeterRegistry meterRegistry(PrometheusConfig config) {
         // Use the default Prometheus CollectorRegistry to ensure Actuator (if present) sees the same registry.
         return new PrometheusMeterRegistry(config);
     }

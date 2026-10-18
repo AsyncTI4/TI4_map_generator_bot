@@ -35,7 +35,7 @@ class CombatReplayTileRendererTest extends BaseTi4Test {
         harness.add(mecatol, sol, UnitType.Carrier, 1);
         harness.add(mecatol, sol, UnitType.Dreadnought, 1);
         harness.add(mecatol, mentak, UnitType.Cruiser, 1);
-        harness.add(mecatol, "mrte", mentak, UnitType.Infantry, 2);
+        Harness.add(mecatol, "mrte", mentak, UnitType.Infantry, 2);
 
         String initialSnapshot = CombatReplayTileRenderer.captureInitialSnapshot(harness.game, mecatol.getPosition());
 
@@ -172,7 +172,7 @@ class CombatReplayTileRendererTest extends BaseTi4Test {
             add(tile, Constants.SPACE, player, unitType, count);
         }
 
-        private void add(Tile tile, String holderName, Player player, UnitType unitType, int count) {
+        private static void add(Tile tile, String holderName, Player player, UnitType unitType, int count) {
             tile.addUnit(holderName, Units.getUnitKey(unitType, player.getColorID()), count);
         }
 

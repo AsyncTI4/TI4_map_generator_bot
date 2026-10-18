@@ -33,7 +33,7 @@ class AddTile extends GameStateSubcommand {
         Set<String> positions = Helper.getSetFromCSV(positionOption);
 
         for (String position : positions) {
-            if (!PositionMapper.isTilePositionValid(position)) {
+            if (!PositionMapper.isTilePositionValid(getGame(), position)) {
                 MessageHelper.replyToMessage(event, "Position `" + position + "` not allowed");
                 return;
             }
@@ -44,7 +44,7 @@ class AddTile extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
             return;
         }
-        String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+        String tilePath = ResourceHelper.getTileFile(tileName);
         if (tilePath == null) {
             MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
             return;

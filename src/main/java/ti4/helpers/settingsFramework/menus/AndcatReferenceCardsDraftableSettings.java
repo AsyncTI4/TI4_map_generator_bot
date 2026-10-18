@@ -267,7 +267,7 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
         return null;
     }
 
-    private String parseFactionToAlias(String inputFaction) {
+    private static String parseFactionToAlias(String inputFaction) {
         FactionModel faction = Mapper.getFaction(inputFaction);
         if (faction != null) {
             return faction.getAlias();

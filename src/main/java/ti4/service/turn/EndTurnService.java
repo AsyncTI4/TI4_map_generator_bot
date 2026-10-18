@@ -14,14 +14,17 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.acd2.FracturedRealityAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.TnelisUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
@@ -36,15 +39,22 @@ import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
+import ti4.helpers.thirtyk.ThirtyKTurnState;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.service.fow.FowCommunicationThreadService;
+import ti4.service.fow.GMService;
 import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.planet.AsgardLegendaryService;
+import ti4.service.planet.JotunheimLegendaryService;
+import ti4.service.tactical.postmovement.AtokeraHeroButton;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
@@ -68,7 +78,17 @@ public class EndTurnService {
         return null;
     }
 
+    private static void sendFogTurnSummary(Game game, Player player) {
+        String summary = game.getStoredValue("currentActionSummary" + player.getFaction());
+        if (summary.isEmpty()) return;
+        String turn = "(Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + ") ";
+        GMService.postToActivityThread(game, turn + player.getRepresentationNoPing() + summary);
+        MessageHelper.sendPrivateMessageToPlayer(player, game, "Your turn summary " + turn + summary);
+        game.removeStoredValue("currentActionSummary" + player.getFaction());
+    }
+
     public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
+        UydaiUnitHandler.offerDeathCommandosPlacement(event, game, player);
         if (NetrunnersBreakthroughHandler.offerDataBreachTechnology(game, player)) return;
         if (StringUtils.isNotEmpty(game.getCurrentActiveSystem())
                 && game.getStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED)
@@ -89,6 +109,8 @@ public class EndTurnService {
                     event,
                     "End of Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for "
                             + player.getRepresentationNoPing() + ".");
+        } else if (game.getFowOption(FOWOption.GM_TURN_MAP)) {
+            GMService.refreshMapInActivityThread(game);
         }
     }
 
@@ -96,7 +118,8 @@ public class EndTurnService {
         pingNextPlayer(event, game, mainPlayer, false);
     }
 
-    private static void resetStoredValuesEndOfTurn(Game game, Player player) {
+    private static void resetStoredValuesEndOfTurn(GenericInteractionCreateEvent event, Game game, Player player) {
+        AtokeraHeroButton.returnCommittedShips(event, game, player);
         AeternaAbilityHandler.clearCycleOfReclamationActionCaptures(game);
         AeternaLeadersHandler.clearAeternaCommanderActionState(game);
         AeternaUnitsHandler.clearCryptActionState(game);
@@ -104,6 +127,8 @@ public class EndTurnService {
         RevenantLeadersHandler.clearPurpleLeaderActionState(game);
         MonumentsDSButtonHandler.clearForbiddenLibraryActionState(game, player);
         MonumentsDSButtonHandler.clearMirrorforgeActionState(game, player);
+        BlueReverieTechHelper.clearProductionBiomes(game, player);
+        TnelisUnitHandler.clearDeployState(game, player);
         if (player.hasAbility("phantom_energy")) {
             TyrisAbilityHandler.cleanupPhantomEnergy(game, player);
         }
@@ -116,8 +141,12 @@ public class EndTurnService {
         TeHelperGeneral.checkCoexistTransfer(game);
         game.removeStoredValue("mahactHeroTarget");
         game.removeStoredValue("possiblyUsedRift");
+        AsgardLegendaryService.clearBifrostBridge(game, player);
+        JotunheimLegendaryService.clear(game, player);
         game.removeStoredValue("safeHarborUsed");
         game.removeStoredValue("heartWarnedThisTurn");
+        FracturedRealityAcd2ButtonHandler.clearPendingRolls(game);
+        ThirtyKTurnState.clearEndOfTurn(game);
         game.removeStoredValue(LostLegciesExploreHandler.IMMEDIATE_ASSEMBLY_PRODUCTION + player.getFaction());
         String fieldTestTech = game.getStoredValue("fieldTestTech" + player.getFaction());
         if (!fieldTestTech.isEmpty()) {
@@ -142,7 +171,7 @@ public class EndTurnService {
     public static void pingNextPlayer(
             GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
         MonumentsButtonHandler.offerFireflyReplacement(game, mainPlayer);
-        resetStoredValuesEndOfTurn(game, mainPlayer);
+        resetStoredValuesEndOfTurn(event, game, mainPlayer);
 
         var userSettings = UserSettingsManager.get(mainPlayer.getUserID());
 
@@ -249,7 +278,8 @@ public class EndTurnService {
             }
         }
 
-        if (game.getRealPlayers().stream().allMatch(Player::isPassed)) {
+        Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
+        if (nextPlayer == null) {
             if (mainPlayer.getSecretsUnscored().containsKey("pe")) {
                 MessageHelper.sendMessageToChannel(
                         mainPlayer.getCardsInfoThread(),
@@ -264,7 +294,6 @@ public class EndTurnService {
 
             return;
         }
-        Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
         if (!game.isFowMode()) {
             GameMessageManager.remove(game.getName(), GameMessageType.TURN)
                     .ifPresent(messageId -> game.getMainGameChannel()
@@ -293,6 +322,9 @@ public class EndTurnService {
                     game.removeStoredValue("currentActionSummary" + mainPlayer.getFaction());
                 }
             }
+        }
+        if (FoWHelper.isFogQol01(game)) {
+            sendFogTurnSummary(game, mainPlayer);
         }
         if (justPassed) {
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {

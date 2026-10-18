@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 class SCRemoveFromGame extends GameStateSubcommand {
 
     public SCRemoveFromGame() {
-        super(Constants.REMOVE_SC_FROM_GAME, "Remove a Stategy Card # from the game", true, false);
+        super(Constants.REMOVE_SC_FROM_GAME, "Remove a Strategy Card # from the game", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card to remove")
                 .setRequired(true));
     }

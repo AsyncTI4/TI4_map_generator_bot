@@ -51,14 +51,19 @@ import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TheodisiOutpostActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
+import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.discord.utility.DiscordErrorUtility;
+import ti4.discord.utility.DiscordThreadUtility;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.game.helper.StoredValueHelper;
@@ -66,6 +71,7 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
@@ -75,6 +81,7 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKRelicHooks;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -86,6 +93,7 @@ import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
 import ti4.model.BreakthroughModel;
+import ti4.model.ColorModel;
 import ti4.model.EmbeddableModel;
 import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
@@ -126,6 +134,7 @@ import ti4.settings.users.UserSettingsManager;
 public class Player extends PlayerProperties implements StoredValueHelper {
 
     private static final int EMBED_FIELD_VALUE_LIMIT = 1024;
+    private static final int DEFAULT_COMMAND_TOKEN_LIMIT = 16;
 
     @Getter
     private final Game game;
@@ -403,6 +412,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return transactionItemsWithPlayer;
     }
 
+    // TODO: loose match - "ing"+faction hits sending and receiving, and faction ids that end another id.
     public void clearTransactionItemsWithPlayer(Player player) {
         List<String> newTransactionItems = new ArrayList<>();
         for (String item : getTransactionItems()) {
@@ -610,7 +620,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public Role getRoleForCommunity() {
         try {
             return JdaService.jda.getRoleById(getRoleIDForCommunity());
-        } catch (Exception e) {
+        } catch (Exception _) {
         }
         return null;
     }
@@ -632,11 +642,11 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (isNpc() || isDummy()) {
             return dummyPlayerSpoof();
         }
-        return "FFCC_" + getFaction() + "_";
+        return ComponentIdEnvelope.ownedBy(getFaction());
     }
 
     public String dummyPlayerSpoof() {
-        return "dummyPlayerSpoof" + getFaction() + "_";
+        return ComponentIdEnvelope.spoofedAs(getFaction());
     }
 
     /** AKA: Has Infantry Revival Ability */
@@ -689,21 +699,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     private ThreadChannel getCardsInfoThread(boolean createIfMissing) {
         if (isNpc() || isDummy()) return null;
 
-        TextChannel parentChannel = getCorrectChannel();
-        if (parentChannel == null) {
-            if (!game.isHasEnded()) {
-                BotLogger.warning(
-                        new LogOrigin(this),
-                        "`Player.getCardsInfoThread`: parent channel is null for game: " + game.getName());
-            }
-            return null;
-        }
+        TextChannel parentChannel = getCardsInfoThreadParentChannel();
+        if (parentChannel == null) return null;
 
-        String userName = getUserName().replace("/", "");
-        String threadName = game.isFowMode()
-                ? String.format("%s-cards-info-%s-private", game.getName(), userName)
-                : String.format("%s%s-%s", Constants.CARDS_INFO_THREAD_PREFIX, game.getName(), userName);
-
+        String threadName = getCardsInfoThreadName();
         ThreadChannel foundThread = findCardsInfoThreadByIdOrName(parentChannel, threadName);
 
         if (foundThread != null) {
@@ -711,7 +710,40 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             return foundThread;
         }
 
-        return createIfMissing ? createNewThread(parentChannel, threadName) : null;
+        return createIfMissing ? createAndGreetCardsInfoThread(parentChannel, threadName) : null;
+    }
+
+    @Nullable
+    public ThreadChannel createCardsInfoThread() {
+        if (isNpc() || isDummy()) return null;
+
+        TextChannel parentChannel = getCardsInfoThreadParentChannel();
+        if (parentChannel == null) return null;
+
+        return createCardsInfoThread(parentChannel, getCardsInfoThreadName());
+    }
+
+    public void sendCardsInfoThreadGreeting(ThreadChannel thread) {
+        MessageHelper.sendMessageToChannel(thread, "Hello " + getPing() + "! This is your private channel.");
+    }
+
+    @Nullable
+    private TextChannel getCardsInfoThreadParentChannel() {
+        TextChannel parentChannel = getCorrectChannel();
+        if (parentChannel == null && !game.isHasEnded()) {
+            BotLogger.warning(
+                    new LogOrigin(this),
+                    "`Player.getCardsInfoThreadParentChannel`: parent channel is null for game: " + game.getName());
+        }
+        return parentChannel;
+    }
+
+    private String getCardsInfoThreadName() {
+        String userName = getUserName().replace("/", "");
+        return DiscordThreadUtility.fitThreadName(
+                game.isFowMode()
+                        ? String.format("%s-cards-info-%s-private", game.getName(), userName)
+                        : String.format("%s%s-%s", Constants.CARDS_INFO_THREAD_PREFIX, game.getName(), userName));
     }
 
     @Nullable
@@ -736,7 +768,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     @Nullable
-    private ThreadChannel retrieveCardsInfoThreadById(TextChannel parentChannel, Long id) {
+    private static ThreadChannel retrieveCardsInfoThreadById(TextChannel parentChannel, Long id) {
         try {
             return DiscordChannelUtility.retrieveThreadChannelById(parentChannel.getGuild(), id)
                     .complete();
@@ -750,16 +782,21 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
     }
 
-    private ThreadChannel createNewThread(TextChannel actionsChannel, String threadName) {
+    private ThreadChannel createAndGreetCardsInfoThread(TextChannel parentChannel, String threadName) {
+        ThreadChannel thread = createCardsInfoThread(parentChannel, threadName);
+        sendCardsInfoThreadGreeting(thread);
+        return thread;
+    }
+
+    private ThreadChannel createCardsInfoThread(TextChannel parentChannel, String threadName) {
         boolean isPrivate = !game.isFowMode();
-        ThreadChannelAction action = actionsChannel
+        ThreadChannelAction action = parentChannel
                 .createThreadChannel(threadName, isPrivate)
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK);
 
         if (isPrivate) action = action.setInvitable(false);
 
         ThreadChannel thread = action.complete();
-        MessageHelper.sendMessageToChannel(thread, "Hello " + getPing() + "! This is your private channel.");
         setCardsInfoThreadID(thread.getId());
         return thread;
     }
@@ -833,11 +870,28 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public int getUnitCap(String unit) {
         if (unitCaps.get(unit) == null) {
+            if ("monument".equals(unit)) return 1;
             if (PositionMapper.getReinforcementsPosition(unit) == null) return 0;
             return PositionMapper.getReinforcementsPosition(unit).getPositionCount(unit);
             // return 0;
         }
         return unitCaps.get(unit);
+    }
+
+    public int getCommandTokenLimit() {
+        int limit = DEFAULT_COMMAND_TOKEN_LIMIT;
+        String globalOverride = game.getStoredValue("ccLimit");
+        if (!globalOverride.isBlank()) {
+            limit = Integer.parseInt(globalOverride.trim());
+        }
+        String colorOverride = game.getStoredValue("ccLimit" + getColor());
+        if (!colorOverride.isBlank()) {
+            limit = Integer.parseInt(colorOverride.trim());
+        }
+        if (hasRelic("endurance_steroids")) {
+            limit += 2;
+        }
+        return limit;
     }
 
     public void setUnitCap(String unit, int cap) {
@@ -969,11 +1023,17 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (unitID.contains("flagship") && hasUnlockedBreakthrough("nekrobt")) {
             return ValefarZService.hasFlagshipAbility(game, this, unitID);
         }
-        return getUnitsOwned().contains(unitID);
+        return ownsUnit(unitID);
     }
 
     public boolean ownsUnit(String unitID) {
-        return getUnitsOwned().contains(unitID);
+        if (getUnitsOwned().contains(unitID)) {
+            return true;
+        }
+        UnitModel unit = Mapper.getUnit(unitID);
+        return unit != null
+                && unit.getUnitType() == UnitType.Mech
+                && ThurvialiUnitHandler.hasCopiedMechAbility(game, this, unitID);
     }
 
     public boolean removeOwnedUnitByID(String unitID) {
@@ -1070,7 +1130,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return injectPlayerUnitValues(allUnits.getFirst());
     }
 
-    private Integer getUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
+    private static Integer getUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
         int score = 0;
 
         if ("naaz_voltron".equals(unit.getAlias())) score += 99; // ALWAYS use voltron, if available
@@ -1105,7 +1165,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return score;
     }
 
-    public UnitModel getUnitByID(String unitID) {
+    public static UnitModel getUnitByID(String unitID) {
         return Mapper.getUnit(unitID);
     }
 
@@ -1141,6 +1201,15 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             identifier = ThreadLocalRandom.current().nextInt(1000);
         }
         actionCards.put(id, identifier);
+        if ("tf-stasis".equals(id)) {
+            ButtonHelperActionCards.checkForAssigningStasis(game, this);
+        }
+        if ("crisis".equals(id)) {
+            ButtonHelperActionCards.checkForAssigningCrisis(game, this);
+        }
+        if ("extremeduress".equals(id)) {
+            ButtonHelperActionCards.checkForAssigningExtremeDuress(game, this);
+        }
     }
 
     public void setEvent(String id) {
@@ -1579,6 +1648,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (MonumentsDSButtonHandler.hasVaylerianMonumentCommodityBonus(game, this)) {
             bonus++;
         }
+        bonus += ThirtyKRelicHooks.commodityBonus(game, this);
 
         return bonus;
     }
@@ -1622,7 +1692,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return getUser(getUserID());
     }
 
-    private User getUser(String userId) {
+    private static User getUser(String userId) {
         // TODO: This is to handle JDA being null during tests. We should think of a cleaner solution.
         return JdaService.jda == null ? null : JdaService.jda.getUserById(userId);
     }
@@ -1955,9 +2025,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (leader.isEmpty()) {
             leader = getLeaderByType(leaderIdOrType);
         }
-        if (leader.isEmpty() && leaderIdOrType.contains("agent")) {
-            leader = getLeaderByID("yssarilagent");
-        }
         return leader;
     }
 
@@ -1993,14 +2060,14 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             return Optional.of(new Leader("keleresagent", "agent"));
         }
         if (leaderId.contains("agent")) {
-            for (Leader leader : leaders) {
-                if ("yssarilagent".equals(leader.getId())) {
-                    if (!leader.isExhausted()) {
-                        return Optional.of(leader);
-                    }
-                    if (exhaustedFallbackLeader == null) {
-                        exhaustedFallbackLeader = leader;
-                    }
+            Optional<Leader> externalAgent = getExternalAgent(leaderId);
+            if (externalAgent.isPresent()) {
+                Leader leader = externalAgent.get();
+                if (!leader.isExhausted()) {
+                    return Optional.of(leader);
+                }
+                if (exhaustedFallbackLeader == null) {
+                    exhaustedFallbackLeader = leader;
                 }
             }
         }
@@ -2022,8 +2089,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                     && game.getStoredValue("keleresAgentTarget").equalsIgnoreCase(getFaction())) {
                 return true;
             }
-            return hasExternalAccessToLeader(leaderId)
-                    && !getLeaderByID("yssarilagent").map(Leader::isExhausted).orElse(true);
+            return getExternalAgent(leaderId)
+                    .map(leader -> !leader.isExhausted())
+                    .orElse(false);
         }
     }
 
@@ -2037,19 +2105,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public Optional<Leader> getLeaderByID(String leaderID) {
-        for (Leader leader : leaders) {
-            if (leader.getId().equalsIgnoreCase(leaderID)) {
-                return Optional.of(leader);
-            }
-        }
-        if (leaderID.contains("agent")) {
-            for (Leader leader : leaders) {
-                if ("yssarilagent".equals(leader.getId())) {
-                    return Optional.of(leader);
-                }
-            }
-        }
-        return Optional.empty();
+        Optional<Leader> leader = getDirectLeaderByID(leaderID);
+        return leader.isPresent() ? leader : getExternalAgent(leaderID);
     }
 
     public List<String> getLeaderIDs() {
@@ -2062,10 +2119,31 @@ public class Player extends PlayerProperties implements StoredValueHelper {
      *         Yssaril Agent
      */
     public boolean hasExternalAccessToLeader(String leaderID) {
-        if (!hasLeader(leaderID) && leaderID.contains("agent") && getLeaderIDs().contains("yssarilagent")) {
+        if (!hasLeader(leaderID) && leaderID.contains("agent") && hasLeader("yssarilagent")) {
             return game.isLeaderInGame(leaderID);
         }
-        return false;
+        return !hasLeader(leaderID)
+                && leaderID.contains("agent")
+                && hasLeader("yssarilagent_br")
+                && game.getRealPlayersExcludingThis(this).stream()
+                        .anyMatch(player -> player.hasLeader(leaderID)
+                                && player.getDirectLeaderByID(leaderID)
+                                        .map(Leader::isExhausted)
+                                        .orElse(false));
+    }
+
+    private Optional<Leader> getDirectLeaderByID(String leaderID) {
+        return leaders.stream()
+                .filter(leader -> leader.getId().equalsIgnoreCase(leaderID))
+                .findFirst();
+    }
+
+    private Optional<Leader> getExternalAgent(String leaderID) {
+        if (!leaderID.contains("agent") || !hasExternalAccessToLeader(leaderID)) {
+            return Optional.empty();
+        }
+        Optional<Leader> yssarilAgent = getDirectLeaderByID("yssarilagent");
+        return yssarilAgent.isPresent() ? yssarilAgent : getDirectLeaderByID("yssarilagent_br");
     }
 
     public boolean hasLeader(String leaderID) {
@@ -2248,11 +2326,18 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         List<String> promissoryNotesInPlayArea = getPromissoryNotesInPlayArea();
         int vpCount = 0;
         for (String id : promissoryNotesInPlayArea) {
-            if (id.endsWith("_sftt")) {
+            if (givesSupportForTheThroneVictoryPoint(id)) {
                 vpCount++;
             }
         }
         return vpCount;
+    }
+
+    public boolean givesSupportForTheThroneVictoryPoint(String promissoryNoteId) {
+        if (promissoryNoteId == null || !promissoryNoteId.endsWith("_sftt")) {
+            return false;
+        }
+        return !promissoryNoteId.endsWith("_br_sftt") || getPromissoryNotes().containsKey(getColor() + "_br_sftt");
     }
 
     public int getTotalVictoryPoints() {
@@ -2290,6 +2375,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         Game game = this.game;
 
         getFollowedSCs().add(sc);
+        if (game != null) {
+            ThurvialiAbilityHandler.offerCelestialEnvoys(game, this, sc);
+        }
         if (editSCFollow) {
             game.setStoredValue(
                     "followedSC" + sc + "_" + game.getRound(),
@@ -2635,7 +2723,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 "mutagenhazardous",
                 "mutagenindustrial",
                 "mutagencultural",
-                "mutagenfrontier");
+                "mutagenfrontier",
+                "ancientexcavators30k",
+                "dauntingweaponsschematics30k",
+                "enhancedmobilitycore30k");
         return getRelics().stream()
                 .filter(Mapper::isValidRelic)
                 .filter(tradableRelics::contains)
@@ -2878,9 +2969,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             getExhaustedTechs().add(tech);
 
             if (game != null) {
-                if (game.playerHasLeaderUnlockedOrAlliance(this, "arcanumcommander")) {
-                    ArcanumLeadersHandler.offerArcanumTechExhaustCommanderButtons(this);
-                }
                 if (hasUnexhaustedLeader("revenantagent")) {
                     RevenantLeadersHandler.offerRevenantAgentButtons(this, tech);
                 }
@@ -2940,6 +3028,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             getExhaustedPlanets().add(planet);
             TheodisiOutpostActionCardHandler.offerOutpostEffects(game, this, planet);
             TaBreakthroughHandler.offerSafeHavensInfantry(game, this, planet);
+            ThirtyKRelicHooks.onPlanetExhausted(game, this, planet);
         }
         Game game = this.game;
         if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null
@@ -2959,14 +3048,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
         if ("ponthous".equalsIgnoreCase(planet)
                 && !getExhaustedPlanetsAbilities().contains(planet)) {
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("planetAbilityExhaust_" + planet, "Use Ponthous Ability"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(
                     getCorrectChannel(),
-                    getRepresentation()
-                            + ", you may exhaust the Ponthous ability and \"exhaust\" the Ponthous + or - card to ready Ponthous.",
-                    buttons);
+                    getRepresentation() + ", you may exhaust _Fractured Souls_ to ready Ponthous.",
+                    PonthousAbilityHandler.getFracturedSoulsButtons(this));
         }
     }
 
@@ -3257,10 +3342,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public UnitModel getUnitFromUnitKey(UnitKey unit) {
+        if (isSarcosaNeutralControl() && unit != null) {
+            Player neutral = game.getPlayerFromColorOrFaction("neutral");
+            if (neutral != null && neutral.unitBelongsToPlayer(unit)) {
+                return neutral.getUnitFromAsyncID(unit.asyncID());
+            }
+        }
         return getUnitFromAsyncID(unit.asyncID());
     }
 
     public UnitModel getUnitFromAsyncID(String asyncID) {
+        if (isSarcosaNeutralControl()) {
+            Player neutral = game.getPlayerFromColorOrFaction("neutral");
+            if (neutral != null) {
+                return neutral.getUnitFromAsyncID(asyncID);
+            }
+        }
         // TODO: Maybe this sort can be better, idk
         return getUnitsByAsyncID(asyncID).stream()
                 .min(UnitModel::sortFactionUnitsFirst)
@@ -3271,7 +3368,15 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (unit == null) {
             return false;
         }
+        if (isSarcosaNeutralControl()) {
+            Player neutral = game.getPlayerFromColorOrFaction("neutral");
+            return neutral != null && neutral.unitBelongsToPlayer(unit);
+        }
         return getColor().equals(AliasHandler.resolveColor(unit.colorID()));
+    }
+
+    private boolean isSarcosaNeutralControl() {
+        return SarcosaHeroHandler.isControllingNeutralUnits(game, this);
     }
 
     public boolean removeTempMod(TemporaryCombatModifierModel tempMod) {
@@ -3457,17 +3562,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return eb.build();
     }
 
-    private void addFieldSafely(EmbedBuilder eb, String name, String value, boolean inline) {
+    private static void addFieldSafely(EmbedBuilder eb, String name, String value, boolean inline) {
         if (value.length() > EMBED_FIELD_VALUE_LIMIT) {
             value = value.substring(0, EMBED_FIELD_VALUE_LIMIT - 3) + "...";
         }
         eb.addField(name, value, inline);
     }
 
+    private Color getPrimaryColorOrWhite() {
+        ColorModel colorModel = Mapper.getColor(getColor());
+        return colorModel == null ? Color.WHITE : colorModel.getPrimaryColor();
+    }
+
     private void applyEmbedDefaults(EmbedBuilder eb) {
         eb.setAuthor(getUserName(), null, getUser().getEffectiveAvatarUrl());
         eb.setFooter("");
-        eb.setColor(Mapper.getColor(getColor()).getPrimaryColor());
+        eb.setColor(getPrimaryColorOrWhite());
     }
 
     private String getContainerTitle() {
@@ -3487,7 +3597,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public Container getRepresentationContainer() {
         List<ContainerChildComponent> components = new ArrayList<>();
-        Color accent = Mapper.getColor(getColor()).getPrimaryColor();
+        Color accent = getPrimaryColorOrWhite();
 
         // TITLE SECTION
         String title = getContainerTitle();
@@ -3528,7 +3638,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return Container.of(components).withAccentColor(accent);
     }
 
-    private List<String> getModelNames(Collection<String> ids, Function<String, EmbeddableModel> mapper) {
+    private static List<String> getModelNames(Collection<String> ids, Function<String, EmbeddableModel> mapper) {
         return ids.stream()
                 .map(mapper)
                 .map(EmbeddableModel::getNameRepresentation)
@@ -3613,6 +3723,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @JsonIgnore
     public void setStoredValue(String key, String val) {
+        if (StringUtils.isBlank(val)) {
+            removeStoredValue(key);
+            return;
+        }
         String safeKey = StringHelper.escape(key);
         getStoredValueMap().put(safeKey, StringHelper.escape(val));
     }
@@ -3640,19 +3754,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         String safeKey = StringHelper.escape(key);
         List<String> vs = getStoredList(key);
         Collections.addAll(vs, vals);
-        String ls = String.join("|", vs.stream().map(StringHelper::escape).toList());
-        getStoredValueMap().put(safeKey, ls);
+        putStoredList(safeKey, vs);
     }
 
     public void removeFromStoredList(String key, String... vals) {
         String safeKey = StringHelper.escape(key);
         List<String> vs = getStoredList(key);
         for (String v : vals) vs.remove(v);
-        if (vs.isEmpty()) {
+        putStoredList(safeKey, vs);
+    }
+
+    private void putStoredList(String safeKey, List<String> values) {
+        String ls = String.join("|", values.stream().map(StringHelper::escape).toList());
+        if (ls.isEmpty()) {
             getStoredValueMap().remove(safeKey);
             return;
         }
-        String ls = String.join("|", vs.stream().map(StringHelper::escape).toList());
         getStoredValueMap().put(safeKey, ls);
     }
 

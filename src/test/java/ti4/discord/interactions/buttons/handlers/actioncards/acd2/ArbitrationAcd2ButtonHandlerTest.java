@@ -207,7 +207,7 @@ class ArbitrationAcd2ButtonHandlerTest extends BaseTi4Test {
         return game.getUnitHolderFromPlanet(planetName);
     }
 
-    private List<String> customIds(List<Button> buttons) {
+    private static List<String> customIds(List<Button> buttons) {
         return buttons.stream()
                 .map(Button::getCustomId)
                 .filter(java.util.Objects::nonNull)

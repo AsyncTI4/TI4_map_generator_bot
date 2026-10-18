@@ -39,7 +39,8 @@ public class AndcatReferenceCardsMessageHelper {
         this.draftable = draftable;
     }
 
-    public void sendPackageInfos(DraftManager draftManager, String playerUserId, List<ReferenceCardPackage> packages) {
+    public static void sendPackageInfos(
+            DraftManager draftManager, String playerUserId, List<ReferenceCardPackage> packages) {
         if (packages == null || packages.isEmpty()) {
             return;
         }

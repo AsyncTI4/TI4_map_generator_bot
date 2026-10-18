@@ -12,7 +12,6 @@ import ti4.image.ImageHelper;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.MapGenerator.VerticalAlign;
 import ti4.image.Mapper;
-import ti4.model.BorderAnomalyModel.BorderAnomalyType;
 import ti4.model.TileModel;
 import ti4.service.image.FileUploadService;
 
@@ -29,10 +28,6 @@ final class JimboImageHelper {
             return (name != null) ? name : tok;
         };
         return generateImage(tokens, Mapper::getTokenPath, getTokenName);
-    }
-
-    public static FileUpload borderAnomalyImage(List<BorderAnomalyType> anomalies) {
-        return generateImage(anomalies, BorderAnomalyType::getImageFilePath, BorderAnomalyType::getName);
     }
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------

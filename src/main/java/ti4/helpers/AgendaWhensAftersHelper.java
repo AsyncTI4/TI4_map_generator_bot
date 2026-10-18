@@ -13,6 +13,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.cron.AutoPingCron;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
+import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -22,6 +23,7 @@ import ti4.logging.BotLogger;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.PromissoryNoteModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionCheckService;
 import ti4.service.button.ReactionService;
@@ -71,8 +73,8 @@ public final class AgendaWhensAftersHelper {
             game.removeStoredValue("queuedWhensFor" + player.getFaction());
             game.removeStoredValue("queuedAftersFor" + player.getFaction());
             game.removeStoredValue("queuedAftersLockedFor" + player.getFaction());
-            List<String> whens = AgendaWhensAftersHelper.getPossibleWhenNames(player);
-            List<String> afters = AgendaWhensAftersHelper.getPossibleAfterNames(player);
+            List<String> whens = getPossibleWhenNames(player);
+            List<String> afters = getPossibleAfterNames(player);
             if (!game.getStoredValue("executiveOrder").isEmpty() && whens.isEmpty() && afters.isEmpty()) {
                 game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "Yes");
             }
@@ -203,14 +205,22 @@ public final class AgendaWhensAftersHelper {
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId)
                     && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || "favor".equals(pnId))) {
-                names.add(StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")
-                        + Mapper.getPromissoryNote(pnId).getName());
+                names.add(whenPromissoryNoteLabel(pnId));
             }
         }
         return names;
     }
 
-    private static List<Button> getPossibleWhenButtons(Player player) {
+    private static String whenPromissoryNoteLabel(String pnId) {
+        PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnId);
+        String colorPrefix = promissoryNote
+                .getColor()
+                .map(color -> StringUtils.capitalize(color) + " ")
+                .orElse("");
+        return colorPrefix + promissoryNote.getName();
+    }
+
+    static List<Button> getPossibleWhenButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
         if (player.hasAbility("quash") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
             buttons.add(Buttons.red("queueWhen_ability_quash", "Quash"));
@@ -225,10 +235,7 @@ public final class AgendaWhensAftersHelper {
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId)
                     && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || "favor".equals(pnId))) {
-                buttons.add(Buttons.red(
-                        "queueWhen_pn_" + pnId,
-                        StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")
-                                + Mapper.getPromissoryNote(pnId).getName()));
+                buttons.add(Buttons.red("queueWhen_pn_" + pnId, whenPromissoryNoteLabel(pnId)));
             }
         }
         return buttons;
@@ -306,7 +313,8 @@ public final class AgendaWhensAftersHelper {
 
     public static List<String> getPossibleAfterNames(Player player) {
         List<String> names = new ArrayList<>();
-        List<String> abilities = new ArrayList<>(Arrays.asList("radiance", "galactic_threat", "conspirators"));
+        List<String> abilities =
+                new ArrayList<>(Arrays.asList("radiance", "galactic_threat", "conspirators", "radiance_br"));
         for (String ability : abilities) {
             if (player.hasAbility(ability)) {
                 if ("galactic_threat".equalsIgnoreCase(ability)
@@ -367,7 +375,8 @@ public final class AgendaWhensAftersHelper {
 
     private static List<Button> getPossibleAferButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
-        List<String> abilities = new ArrayList<>(Arrays.asList("radiance", "galactic_threat", "conspirators"));
+        List<String> abilities =
+                new ArrayList<>(Arrays.asList("radiance", "galactic_threat", "conspirators", "radiance_br"));
         for (String ability : abilities) {
             if (player.hasAbility(ability)) {
                 if ("galactic_threat".equalsIgnoreCase(ability)
@@ -1085,6 +1094,15 @@ public final class AgendaWhensAftersHelper {
                     FactionEmojis.edyn));
         }
 
+        if (Helper.getPlayerFromAbility(game, "radiance_br") != null) {
+            Player edyn = Helper.getPlayerFromAbility(game, "radiance_br");
+            String factionChecker = "FFCC_" + edyn.getFaction() + "_";
+            afterButtons.add(Buttons.gray(
+                    factionChecker + "play_after_Edyn Radiance Ability",
+                    "Use Edyn Radiance Ability",
+                    FactionEmojis.edyn));
+        }
+
         for (Player p1 : game.getRealPlayers()) {
             String factionChecker = "FFCC_" + p1.getFaction() + "_";
             if (p1.hasTechReady("dsedyng")) {
@@ -1233,7 +1251,12 @@ public final class AgendaWhensAftersHelper {
         ReactionService.addReaction(event, game, player, message);
     }
 
-    public static void playWhen(
+    @ButtonHandler("play_when")
+    public static void playWhen(ButtonContext context) {
+        playWhen(context.getEvent(), context.getGame(), context.getPlayer(), context.getMainGameChannel());
+    }
+
+    private static void playWhen(
             ButtonInteractionEvent event, Game game, Player player, MessageChannel mainGameChannel) {
         ReactionCheckService.clearAllReactions(event);
         ReactionService.addReaction(event, game, player, true, true, "is playing a \"when\".");

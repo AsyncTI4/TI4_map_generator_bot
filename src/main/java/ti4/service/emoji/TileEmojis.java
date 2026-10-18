@@ -111,7 +111,7 @@ public enum TileEmojis implements TI4Emoji {
     Ordinian_92,
     Lizard_93,
     Sorrow_94,
-    Katena_95,
+    Ikatena_95,
     Chronos_96a,
     Hollow_96b,
     Faunus_97,
@@ -315,7 +315,7 @@ public enum TileEmojis implements TI4Emoji {
             case "92" -> Ordinian_92;
             case "93" -> Lizard_93;
             case "94" -> Sorrow_94;
-            case "95" -> Katena_95;
+            case "95" -> Ikatena_95;
             case "96a" -> Chronos_96a;
             case "96b" -> Hollow_96b;
             case "97" -> Faunus_97;

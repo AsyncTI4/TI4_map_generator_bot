@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -25,12 +26,13 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
@@ -57,6 +59,7 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKExplores;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
@@ -549,7 +552,7 @@ public class ExploreService {
         String planetName = info[1];
         Tile tile = game.getTileFromPlanet(planetName);
         String tileName = tile == null ? "no tile" : tile.getPosition();
-        String messageText = player.getRepresentation() + " explored the planet "
+        String messageText = player.getRepresentationNoPing() + " explored the planet "
                 + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " in tile "
                 + tileName + ":";
         if (buttonID.contains("_distantSuns")) {
@@ -1350,6 +1353,10 @@ public class ExploreService {
                     "mutagenfrontier" -> {
                 game.purgeExplore(ogID);
                 player.addRelic(cardID);
+                if (List.of("economicboon", "naturesboon", "diplomaticboon", "cosmicboon")
+                        .contains(cardID)) {
+                    LostLegaciesRelicHandler.initializeBoon(game, player, cardID, tile, planetID);
+                }
                 message =
                         new StringBuilder("Card has been added to play area.\nAdded as a relic (not actually a relic)");
                 MessageHelper.sendMessageToEventChannel(event, message.toString());
@@ -1414,22 +1421,20 @@ public class ExploreService {
                 buttons.add(decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
             }
-            case "objectivedeliberations" -> {
+            case "objectivedeliberations" ->
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation()
                                 + ", please resolve _Objective Deliberations_.\n-# You have " + player.getTg() + " "
                                 + (player.getTg() > 1 ? "trade goods." : "trade good."),
                         LostLegciesExploreHandler.offerObjectiveDeliberationButtons(event, game, player));
-            }
-            case "explorationenclave" -> {
+            case "explorationenclave" ->
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation()
                                 + ", please resolve _Exploration Enclave_.\n-# You have " + player.getTg() + " "
                                 + (player.getTg() > 1 ? "trade goods." : "trade good."),
                         LostLegciesExploreHandler.getExplorationEnclaveButtons(event, game, player));
-            }
             case "synergisticresearch" -> {
                 var breakthrough = player.getBreakthroughModel();
                 if (!player.hasUnlockedBreakthrough(player.getBreakthroughID())) {
@@ -1492,6 +1497,7 @@ public class ExploreService {
         }
         RiftSetModeService.resolveExplore(ogID, player, game);
         FOWPlusService.resolveExplore(event, ogID, tile, planetID, player, game);
+        ThirtyKExplores.resolveExplore(event, cardID, tile, planetID, player, game);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
 
         if (player.hasAbility("fortune_seekers")
@@ -1526,6 +1532,22 @@ public class ExploreService {
             List<Button> buttons = List.of(placeSleeper, declineSleeper);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
         }
+        if (planetID != null
+                && player.hasUnlockedBreakthrough("pharadnbt")
+                && player.getNomboxTile().getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "hiddenVaultsProduce_" + planetID,
+                    "Produce 1 Infantry on " + Helper.getPlanetRepresentation(planetID, game),
+                    UnitEmojis.infantry));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", you may produce 1 infantry on "
+                            + Helper.getPlanetRepresentation(planetID, game) + " with _Hidden Vaults_.",
+                    buttons);
+        }
     }
 
     public static void expFront(GenericInteractionCreateEvent event, Tile tile, Game game, Player player) {
@@ -1550,7 +1572,7 @@ public class ExploreService {
             }
             cardID = cardID == null ? game.drawExplore(Constants.FRONTIER) : cardID;
             boolean isSlashForce = force && event instanceof SlashCommandInteractionEvent;
-            String messageText = player.getRepresentation() + (isSlashForce ? " force" : "") + " explored the "
+            String messageText = player.getRepresentationNoPing() + (isSlashForce ? " force" : "") + " explored the "
                     + ExploreEmojis.Frontier + "frontier token in tile " + tile.getPosition() + ":";
             resolveExplore(event, cardID, tile, null, messageText, player, game);
 
@@ -1558,7 +1580,7 @@ public class ExploreService {
                 player.setAtsCount(player.getAtsCount() + 1);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                        player.getRepresentationNoPing() + " put 1 commodity on _ATS Armaments_.");
             }
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "No frontier token in given system.");
@@ -1576,14 +1598,15 @@ public class ExploreService {
             if (hasFrontierToken) {
                 space.removeToken(frontierFilename);
             }
-            String messageText = player.getRepresentation() + " explored the " + ExploreEmojis.Frontier
+            String messageText = player.getRepresentationNoPing() + " explored the " + ExploreEmojis.Frontier
                     + "frontier token in tile " + tile.getPosition() + ":";
             resolveExplore(event, cardID, tile, null, messageText, player, game);
 
             if (player.hasTech("dslaner")) {
                 player.setAtsCount(player.getAtsCount() + 1);
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                        event.getMessageChannel(),
+                        player.getRepresentationNoPing() + " put 1 commodity on _ATS Armaments_.");
             }
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No frontier token in given system.");
@@ -1591,16 +1614,31 @@ public class ExploreService {
     }
 
     public static void secondHalfOfExpInfo(
-            List<String> types, GenericInteractionCreateEvent event, Player player, Game game, boolean overRide) {
-        secondHalfOfExpInfo(types, event.getMessageChannel(), player, game, overRide, false);
+            List<String> types, GenericInteractionCreateEvent event, Game game, boolean overRide) {
+        secondHalfOfExpInfo(types, event.getMessageChannel(), event.getUser().getId(), game, overRide, false);
     }
 
     public static void secondHalfOfExpInfo(
-            List<String> types, MessageChannel channel, Player player, Game game, boolean overRide, boolean fullText) {
-        if (!FOWPlusService.deckInfoAvailable(player, game) || !RiftSetModeService.deckInfoAvailable(player, game)) {
+            List<String> types,
+            MessageChannel channel,
+            @Nullable String viewerId,
+            Game game,
+            boolean overRide,
+            boolean fullText) {
+        if (!FOWPlusService.deckInfoAvailable(game, viewerId, channel)
+                || !RiftSetModeService.deckInfoAvailable(game, viewerId, channel)) {
             return;
         }
-        boolean isGM = player != null && game.getPlayersWithGMRole().contains(player);
+        boolean hiddenByFog = game.isFowMode()
+                && "action".equalsIgnoreCase(game.getPhaseOfGame())
+                && !overRide
+                && !FoWHelper.isGameMaster(viewerId, game);
+        if (hiddenByFog) {
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
+            return;
+        }
         for (String currentType : types) {
             StringBuilder info = new StringBuilder();
             List<String> deck = game.getExploreDeck(currentType);
@@ -1638,18 +1676,7 @@ public class ExploreService {
                 info.append("​"); // add a zero width space at the end to cement newlines between sets of explores
             }
 
-            if (player == null || player.getSCs().isEmpty() || overRide || !game.isFowMode() || isGM) {
-                MessageHelper.sendMessageToChannel(channel, info.toString());
-            }
-        }
-        if (player != null
-                && "action".equalsIgnoreCase(game.getPhaseOfGame())
-                && game.isFowMode()
-                && !overRide
-                && !isGM) {
-            MessageHelper.sendMessageToChannel(
-                    channel,
-                    "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
+            MessageHelper.sendMessageToChannel(channel, info.toString());
         }
     }
 

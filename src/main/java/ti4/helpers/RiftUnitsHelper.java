@@ -11,8 +11,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -27,7 +27,9 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.relic.AlluringThroneService;
+import ti4.service.tactical.movement.RealityFieldImpactorService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
@@ -456,15 +458,27 @@ public final class RiftUnitsHelper {
 
     @ButtonHandler("getRiftButtons_")
     public static void offerRiftButtons(Player player, String buttonID, Game game) {
-        if (ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)) {
+        if (ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
+                || AsgardLegendaryService.isBifrostBridgeActive(game, player)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationNoPing()
-                            + " ignores gravity-rift effects during this tactical action due to _Power Word: Plane Shift_.");
+                            + " ignores gravity-rift effects during this turn due to _"
+                            + (AsgardLegendaryService.isBifrostBridgeActive(game, player)
+                                    ? "Bifrost Bridge"
+                                    : "Power Word: Plane Shift")
+                            + "_.");
             return;
         }
         String tilePosition = buttonID.replace("getRiftButtons_", "");
         Tile tile = game.getTileByPosition(tilePosition);
+        if (RealityFieldImpactorService.nullifies(game, tile)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + " ignores the gravity-rift effects in "
+                            + tile.getRepresentation() + " due to _Reality-Field Impactor_.");
+            return;
+        }
         MessageChannel channel = player.getCorrectChannel();
         if (player.hasAbility("celestial_guides")) {
             MessageHelper.sendMessageToChannel(

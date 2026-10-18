@@ -12,10 +12,9 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -29,9 +28,12 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
+import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
+import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -66,6 +68,7 @@ public class AddPlanetService {
             Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setup) {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
+        DiscordantStarsHelper.checkBRTaranisCrest(game);
         EronousPlanetService.resolveCantrisPO(game, planet, player);
         if (setup && "ponthous".equalsIgnoreCase(planet)) {
             // Setup exhausts Ponthous without opening its optional ready-planet window.
@@ -73,7 +76,10 @@ public class AddPlanetService {
         } else {
             player.exhaustPlanet(planet);
         }
-        if ("mirage".equals(planet) || "avernus".equals(planet) || "thundersedge".equals(planet)) {
+        if ("mirage".equals(planet)
+                || "avernus".equals(planet)
+                || "thundersedge".equals(planet)
+                || "oceanus".equals(planet)) {
             game.clearPlanetsCache();
         }
         Tile tile = game.getTileFromPlanet(planet);
@@ -95,9 +101,6 @@ public class AddPlanetService {
                     event != null ? new LogOrigin(event) : null,
                     "Unitholder found null in addPlanet for planet " + planet);
             unitHolder = game.getUnitHolderFromPlanet(planet);
-        }
-        if ("ponthous".equalsIgnoreCase(planet)) {
-            PonthousAbilityHandler.resetFracturedSouls(game, player);
         }
         if (player.isRealPlayer() && unitHolder.getTokenList().contains("token_freepeople.png")) {
             unitHolder.removeToken("token_freepeople.png");
@@ -205,7 +208,7 @@ public class AddPlanetService {
                             && !player_.getExhaustedPlanets().contains(planet)
                             && "action".equalsIgnoreCase(game.getPhaseOfGame())
                             && ButtonHelper.checkForTechSkips(game, planet)
-                            && !ButtonHelperAbilities.canBePillaged(player_, game, player.getTg() + 1)) {
+                            && !ButtonHelperAbilities.canBePillaged(player_, game, player_.getTg() + 1)) {
                         player_.exhaustPlanet(planet);
                         MessageHelper.sendMessageToChannel(
                                 player_.getCorrectChannel(),
@@ -215,6 +218,7 @@ public class AddPlanetService {
                         ButtonHelperAgents.resolveArtunoCheck(player_, 1);
                     }
                     player_.removePlanet(planet);
+                    ThirtyKSecretHooks.onPlanetLost(game, player_, unitHolder);
                     CommanderUnlockCheckService.checkPlayer(player_, "uydai");
                     List<String> relics = new ArrayList<>(player_.getRelics());
                     if ("mr".equalsIgnoreCase(planet)) {
@@ -322,6 +326,7 @@ public class AddPlanetService {
                 }
             }
         }
+        ThirtyKActionCardHooks.onPlanetControlChanged(game, player, previousOwner, planet);
         if ((!alreadyOwned && player.hasAbility("contagion_blex") || player.hasAbility("plague_reservoir"))
                 && player.hasTech("dxa")
                 && !doubleCheck

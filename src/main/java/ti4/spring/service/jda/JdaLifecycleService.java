@@ -8,7 +8,7 @@ import ti4.discord.JdaService;
 public class JdaLifecycleService {
 
     @PreDestroy
-    private void shutdown() {
+    private static void shutdown() {
         JdaService.shutdown();
     }
 }

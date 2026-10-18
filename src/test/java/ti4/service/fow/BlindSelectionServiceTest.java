@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.game.persistence.TestGameHarness;
 import ti4.testUtils.BaseTi4Test;
 
@@ -26,10 +27,27 @@ class BlindSelectionServiceTest extends BaseTi4Test {
     private static String anyOnMapPlanet(Game game) {
         return game.getTileMap().values().stream()
                 .flatMap(t -> t.getUnitHolders().values().stream())
-                .map(uh -> uh.getName())
+                .map(UnitHolder::getName)
                 .filter(name -> game.getTileFromPlanet(name) != null)
                 .findFirst()
                 .orElse(null);
+    }
+
+    /**
+     * Discord rejects a modal label over 45 characters with an IllegalArgumentException thrown synchronously,
+     * which killed the whole Blind Target flow for unit-holder targets ("Planet name, or a system position for
+     * the one in space" was 54). The detail belongs in the placeholder, which allows 100.
+     */
+    @Test
+    void everyBlindPromptLabelFitsDiscordsModalLimit() {
+        for (String type : new String[] {POSITION, PLANET, UNIT_HOLDER}) {
+            assertThat(BlindSelectionService.blindPromptLabel(type))
+                    .as("label for type %s", type)
+                    .hasSizeLessThanOrEqualTo(45);
+            assertThat(BlindSelectionService.blindPromptPlaceholder(type))
+                    .as("placeholder for type %s", type)
+                    .hasSizeLessThanOrEqualTo(100);
+        }
     }
 
     @Test

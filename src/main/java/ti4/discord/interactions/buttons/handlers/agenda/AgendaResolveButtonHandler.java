@@ -57,8 +57,8 @@ import ti4.discord.interactions.buttons.handlers.agenda.resolver.VoiceOfTheCounc
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WarrantAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WormholeReconAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WormholeResearchAgendaResolver;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -67,6 +67,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
+import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
@@ -176,6 +178,7 @@ class AgendaResolveButtonHandler {
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "edyn");
         }
         List<Player> riders = AgendaHelper.getWinningRiders(winner, game, event);
+        ThirtyKActionCardHooks.resolveAgendaPredictions(game, winner, event);
         List<Player> voters = AgendaHelper.getWinningVoters(winner, game);
         VeylorLeadersHandler.resolveVeylorHeroLosingVote(game, winner);
         VeylorAbilitiesHandler.resolveLobbyistDues(event, game, winner);
@@ -183,6 +186,7 @@ class AgendaResolveButtonHandler {
         notifyIndoctrinationTeam(game, voters);
         checkFlorzenUnlock(voters, riders);
         processRiders(game, riders);
+        ThirtyKSecretHooks.onAgendaResolved(game);
         String resMes = buildResolutionMessage(game, winner);
         int aCount = computeNextAgendaCount(game);
         List<Button> buttons = buildNextButtons(game, aCount);
@@ -508,11 +512,14 @@ class AgendaResolveButtonHandler {
                     + ", please use this buttons to proceed after fully resolving the agenda.";
             buttons = StartTurnService.getStartOfTurnButtons(executiveOrderPlayer, game, true, event);
             game.removeStoredValue("executiveOrder");
+            game.removeStoredValue("executiveOrderBr");
             game.updateActivePlayer(executiveOrderPlayer);
             Player oldSpeaker = game.getPlayer(game.getStoredValue("oldSpeakerExecutiveOrder"));
             game.setSpeaker(oldSpeaker);
             game.setPhaseOfGame("action");
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);
+            MessageChannel turnChannel =
+                    game.isFowMode() ? executiveOrderPlayer.getCorrectChannel() : event.getChannel();
+            MessageHelper.sendMessageToChannelWithButtons(turnChannel, voteMessage, buttons);
         }
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);

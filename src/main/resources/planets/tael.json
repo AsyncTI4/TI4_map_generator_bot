@@ -1,0 +1,27 @@
+{
+    "id": "tael",
+    "tileId": "th31",
+    "name": "Tael",
+    "aliases": [
+        "tael"
+    ],
+    "resources": 2,
+    "influence": 0,
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "planetLayout": {
+        "unitHolderName": "tael",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 81,
+            "y": 136
+        },
+        "planetRadius": 62
+    },
+    "positionInTile": {
+        "x": 81,
+        "y": 136
+    },
+    "source": "theodisi"
+}

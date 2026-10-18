@@ -1,0 +1,31 @@
+{
+    "planetLayout":  
+    {
+        "unitHolderName":  "asgard",
+        "resourcesLocation":  "BottomLeft",
+        "centerPosition":  
+        {
+            "x":  150,
+            "y":  148
+        },
+        "planetRadius":  60
+    },
+    "id":  "asgard",
+    "tileId":  "ao2",
+    "name":  "Asgard",
+    "aliases":  
+    [
+        "asgard"
+    ],
+    "resources":  2,
+    "influence":  3,
+    "planetTypes":  
+    [
+        "CULTURAL"
+    ],
+    "legendaryAbilityName":  "Bifrost Bridge",
+    "legendaryAbilityText":  "You may exhaust this card at the start of your turn. If you do, systems containing printed gravity rifts are adjacent and your ships ignore the effects of gravity rifts until the end of this turn.",
+    "legendaryAbilityFlavourText":  "Matter distorts and fades, light dances a rainbow cascade.",
+    "flavourText":  "This planet anchors a network of cosmic rifts, letting fleets fold space to bridge vast distances in an instant.",
+    "source":  "goose"
+}

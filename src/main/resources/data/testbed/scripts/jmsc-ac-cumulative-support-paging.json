@@ -1,0 +1,15 @@
+{
+  "name": "jmsc-ac-cumulative-support-paging",
+  "description": "Cumulative Support lists every planet on the map, more than 25: the list is one paged message whose Next and Previous buttons edit it in place.",
+  "preset": "jmsc-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "do": "hand", "as": "sol", "hand": { "acs": ["cumulativesupportjmsc"] } },
+    { "as": "sol", "press": "ac_play_from_hand_{ac:cumulativesupportjmsc}", "in": "sol:cards-info" },
+    { "as": "sol", "press": "thkAcCumulativeStart", "in": "sol" },
+    { "label": "First page offers Next", "expect": { "in": "sol", "buttons": ["thkAcCumulativePlace_page1"] } },
+    { "as": "sol", "press": "thkAcCumulativePlace_page1", "in": "sol" },
+    { "label": "Second page offers Previous", "expect": { "in": "sol", "buttons": ["thkAcCumulativePlace_page0"] } },
+    { "label": "Still a single target message", "expect": { "in": "sol", "contains": "choose a planet. You place infantry", "count": 1, "since": "start" } }
+  ]
+}

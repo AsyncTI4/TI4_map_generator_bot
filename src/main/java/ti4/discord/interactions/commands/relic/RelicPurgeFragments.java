@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -85,17 +86,25 @@ class RelicPurgeFragments extends GameStateSubcommand {
             game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
             switch (fragid) {
                 case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9", "supermassivecultural" ->
-                    message.append(" a " + (fragid.contains("supermassive") ? "supermassive " : "")
-                            + ExploreEmojis.CFrag + "cultural");
+                    message.append(" a ")
+                            .append(fragid.contains("supermassive") ? "supermassive " : "")
+                            .append(ExploreEmojis.CFrag)
+                            .append("cultural");
                 case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7", "supermassivehazardous" ->
-                    message.append(" a " + (fragid.contains("supermassive") ? "supermassive " : "")
-                            + ExploreEmojis.HFrag + "hazardous");
+                    message.append(" a ")
+                            .append(fragid.contains("supermassive") ? "supermassive " : "")
+                            .append(ExploreEmojis.HFrag)
+                            .append("hazardous");
                 case "irf1", "irf2", "irf3", "irf4", "irf5", "supermassiveindustrial" ->
-                    message.append(" an " + (fragid.contains("supermassive") ? "supermassive " : "")
-                            + ExploreEmojis.IFrag + "industrial");
+                    message.append(" an ")
+                            .append(fragid.contains("supermassive") ? "supermassive " : "")
+                            .append(ExploreEmojis.IFrag)
+                            .append("industrial");
                 case "urf1", "urf2", "urf3", "supermassiveunknown" ->
-                    message.append(" an " + (fragid.contains("supermassive") ? "supermassive " : "")
-                            + ExploreEmojis.UFrag + "unknown");
+                    message.append(" an ")
+                            .append(fragid.contains("supermassive") ? "supermassive " : "")
+                            .append(ExploreEmojis.UFrag)
+                            .append("unknown");
                 default -> message.append(' ').append(fragid);
             }
             message.append(" relic fragment.");
@@ -126,6 +135,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
         }
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
         MessageHelper.sendMessageToEventChannel(event, message.toString());
+        ArcanumLeadersHandler.offerArcanumCommanderTechPurge(game, activePlayer, event, fragmentsToPurge.size());
 
         if (activePlayer.hasTech("dslaner") && !game.isTwilightsFallMode()) {
             activePlayer.setAtsCount(activePlayer.getAtsCount() + 1);

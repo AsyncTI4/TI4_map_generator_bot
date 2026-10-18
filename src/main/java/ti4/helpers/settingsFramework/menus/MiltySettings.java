@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.jetbrains.annotations.NotNull;
@@ -43,6 +44,7 @@ public class MiltySettings extends SettingsMenu {
     @JsonIgnore
     private final Game game;
 
+    @Setter
     private boolean randomSetup;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -144,10 +146,6 @@ public class MiltySettings extends SettingsMenu {
                     default -> null;
                 };
         return (error == null ? "success" : error);
-    }
-
-    public void setRandomSetup(boolean randomSetup) {
-        this.randomSetup = randomSetup;
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------

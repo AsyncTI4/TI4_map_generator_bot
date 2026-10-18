@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
+import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
 
 class ShowMapString extends GameStateSubcommand {
@@ -15,8 +16,9 @@ class ShowMapString extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        if (game.isFowMode() && event.getChannel().getName().endsWith("private")) {
-            MessageHelper.replyToMessage(event, "Command not available in private channel.");
+        if (!FoWHelper.canSeeWholeMap(game, event)) {
+            MessageHelper.replyToMessage(
+                    event, "In an active Fog of War game only the GM can see the map string, in the GM room.");
             return;
         }
         showMapString(event, game);

@@ -40,7 +40,8 @@ class RevealSpecificStage1 extends GameStateSubcommand {
 
         MessageHelper.sendMessageToChannel(
                 event.getChannel(), "### " + game.getPing() + " **Stage 1 Public Objective Revealed**");
-        event.getChannel().sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin()
-                .queue(Consumers.nop(), BotLogger::catchRestError));
+        event.getChannel()
+                .sendMessageEmbeds(po.getRepresentationEmbed())
+                .queue(m -> m.pin().queue(Consumers.nop(), BotLogger::catchRestError));
     }
 }

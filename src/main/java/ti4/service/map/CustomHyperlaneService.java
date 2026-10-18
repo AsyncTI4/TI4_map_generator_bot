@@ -161,7 +161,7 @@ public class CustomHyperlaneService {
             }
 
             String position = data[0];
-            if (!PositionMapper.isTilePositionValid(position)) {
+            if (!PositionMapper.isTilePositionValid(game, position)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid position: `" + position + "`");
                 return;
             }

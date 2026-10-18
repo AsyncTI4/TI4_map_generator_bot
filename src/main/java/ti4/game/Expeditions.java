@@ -124,7 +124,7 @@ public class Expeditions {
         }
     }
 
-    private String playerInfo(Game game, Player viewingPlayer, String faction) {
+    private static String playerInfo(Game game, Player viewingPlayer, String faction) {
         Player player = game.getPlayerFromColorOrFaction(faction);
         return player != null
                 ? (game.isFowMode() && !FoWHelper.canSeeStatsOfPlayer(game, player, viewingPlayer)
@@ -133,7 +133,7 @@ public class Expeditions {
                 : "-";
     }
 
-    private TI4Emoji getExpeditionEmoji(String expeditionID, Game game) {
+    private static TI4Emoji getExpeditionEmoji(String expeditionID, Game game) {
         return switch (expeditionID) {
             case "techSkip" -> TechEmojis.PropulsionTech;
             case "tradeGoods" -> MiscEmojis.tg;
@@ -145,7 +145,7 @@ public class Expeditions {
         };
     }
 
-    private String getExpeditionMessage(String expeditionID) {
+    private static String getExpeditionMessage(String expeditionID) {
         return switch (expeditionID) {
             case "techSkip" -> "Exhaust 1 technology specialty planet";
             case "tradeGoods" -> "Spend 3 trade goods";

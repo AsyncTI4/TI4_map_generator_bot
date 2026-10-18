@@ -105,7 +105,7 @@ class Observer extends Subcommand {
         }
     }
 
-    private void addObserver(
+    private static void addObserver(
             SlashCommandInteractionEvent event, String userID, GuildChannel channel, boolean skipMessage) {
         if (channel == null) return;
         Guild guild = channel.getGuild();
@@ -122,7 +122,7 @@ class Observer extends Subcommand {
         }
     }
 
-    private void removeObserver(
+    private static void removeObserver(
             SlashCommandInteractionEvent event, String userID, GuildChannel channel, boolean skipMessage) {
         if (channel == null) return;
         // clear permissions instead of revoking permissions.

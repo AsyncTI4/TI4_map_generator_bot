@@ -202,11 +202,14 @@ public class MonumentsBRButtonHandler {
                 && !MonumentsService.isMonumentOnBoard(game, player, "sarcosa_monument")
                 && tile != null
                 && planet != null
+                && FoWHelper.knowsTile(game, player, tile.getPosition())
                 && !tile.isHomeSystem(game)
                 && !tile.isFracture()
                 && game.getTileMap().values().stream()
                         .filter(system -> FoWHelper.playerHasUnitsInSystem(player, system)
-                                || (neutral != null && FoWHelper.playerHasUnitsInSystem(neutral, system)))
+                                || (neutral != null
+                                        && FoWHelper.knowsTile(game, player, system.getPosition())
+                                        && FoWHelper.playerHasUnitsInSystem(neutral, system)))
                         .flatMap(system ->
                                 FoWHelper.getAdjacentTilesAndNotThisTile(game, system.getPosition(), player, false)
                                         .stream())
@@ -539,9 +542,13 @@ public class MonumentsBRButtonHandler {
                                 && tile == MonumentsService.getMonumentTile(game, player, "belkosea_monument"));
     }
 
-    public static boolean ignoresFighterCapacity(Game game, Player player, Tile tile) {
-        return hasArmageddonProjectSuperweapon(game, player, "superweaponglatison")
-                && tile == MonumentsService.getMonumentTile(game, player, "belkosea_monument");
+    public static boolean removesSustainDamage(Game game, Player player, Tile tile) {
+        return !player.hasTech("dsxinystar")
+                && game != null
+                && game.getRealPlayersNNeutral().stream()
+                        .anyMatch(other -> other != player
+                                && hasArmageddonProjectSuperweapon(game, other, "superweaponglatison")
+                                && tile == MonumentsService.getMonumentTile(game, other, "belkosea_monument"));
     }
 
     public static void addArmageddonProjectCardsInfoButtons(List<Button> buttons, Game game, Player player) {
@@ -621,74 +628,84 @@ public class MonumentsBRButtonHandler {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
         }
-        if ("availyn".equals(superweapon)) {
-            List<Button> buttons = game.getTileMap().values().stream()
-                    .filter(tile -> FoWHelper.playerHasActualShipsInSystem(player, tile))
-                    .map(tile -> Buttons.green(
-                            player.factionButtonChecker() + ARMAGEDDON_PROJECT_AVAILYN_TARGET + tile.getPosition(),
-                            tile.getRepresentationForButtons(game, player)))
-                    .toList();
-            if (buttons.isEmpty() || !MonumentsService.exhaustMonument(game, player, "belkosea_monument")) {
-                return;
-            }
-            MessageHelper.sendMessageToChannelWithButtons(
-                    event.getMessageChannel(),
-                    player.getRepresentationNoPing()
-                            + ", choose a system in which to produce up to 3 fighters with _Armageddon Project_.",
-                    buttons);
-        } else if ("grom".equals(superweapon)) {
-            List<Button> buttons = new ArrayList<>();
-            for (String position : FoWHelper.getAdjacentTiles(game, monumentTile.getPosition(), player, true)) {
-                Tile tile = game.getTileByPosition(position);
-                if (tile != null
-                        && (tile.getTileModel() == null || !tile.getTileModel().isHyperlane())) {
-                    buttons.add(Buttons.green(
-                            player.factionButtonChecker() + ARMAGEDDON_PROJECT_GROM_TARGET + position,
-                            tile.getRepresentationForButtons(game, player)));
+        switch (superweapon) {
+            case "availyn" -> {
+                List<Button> buttons = game.getTileMap().values().stream()
+                        .filter(tile -> FoWHelper.playerHasActualShipsInSystem(player, tile))
+                        .map(tile -> Buttons.green(
+                                player.factionButtonChecker() + ARMAGEDDON_PROJECT_AVAILYN_TARGET + tile.getPosition(),
+                                tile.getRepresentationForButtons(game, player)))
+                        .toList();
+                if (buttons.isEmpty() || !MonumentsService.exhaustMonument(game, player, "belkosea_monument")) {
+                    return;
                 }
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(),
+                        player.getRepresentationNoPing()
+                                + ", choose a system in which to produce up to 3 fighters with _Armageddon Project_.",
+                        buttons);
             }
-            if (buttons.isEmpty() || !MonumentsService.exhaustMonument(game, player, "belkosea_monument")) {
-                return;
-            }
-            MessageHelper.sendMessageToChannelWithButtons(
-                    event.getMessageChannel(),
-                    player.getRepresentationNoPing()
-                            + ", choose a system in which to resolve Grom's copied text ability.",
-                    buttons);
-        } else if ("mors".equals(superweapon)) {
-            List<Button> buttons = new ArrayList<>();
-            Set<String> adjacent =
-                    FoWHelper.getAdjacentTilesAndNotThisTile(game, monumentTile.getPosition(), player, true);
-            for (Tile tile : game.getTileMap().values()) {
-                if (!tile.getPosition().equals(monumentTile.getPosition())
-                        && !adjacent.contains(tile.getPosition())
-                        && (tile.getTileModel() == null || !tile.getTileModel().isHyperlane())) {
-                    buttons.add(Buttons.green(
-                            player.factionButtonChecker() + ARMAGEDDON_PROJECT_MORS_TARGET + tile.getPosition(),
-                            tile.getRepresentationForButtons(game, player)));
+            case "grom" -> {
+                List<Button> buttons = new ArrayList<>();
+                for (String position : FoWHelper.getAdjacentTiles(game, monumentTile.getPosition(), player, true)) {
+                    Tile tile = game.getTileByPosition(position);
+                    if (tile != null
+                            && FoWHelper.knowsTile(game, player, tile.getPosition())
+                            && (tile.getTileModel() == null
+                                    || !tile.getTileModel().isHyperlane())) {
+                        buttons.add(Buttons.green(
+                                player.factionButtonChecker() + ARMAGEDDON_PROJECT_GROM_TARGET + position,
+                                tile.getRepresentationForButtons(game, player)));
+                    }
                 }
+                if (buttons.isEmpty() || !MonumentsService.exhaustMonument(game, player, "belkosea_monument")) {
+                    return;
+                }
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(),
+                        player.getRepresentationNoPing()
+                                + ", choose a system in which to resolve Grom's copied text ability.",
+                        buttons);
             }
-            if (buttons.isEmpty() || !MonumentsService.exhaustMonument(game, player, "belkosea_monument")) {
+            case "mors" -> {
+                List<Button> buttons = new ArrayList<>();
+                Set<String> adjacent =
+                        FoWHelper.getAdjacentTilesAndNotThisTile(game, monumentTile.getPosition(), player, true);
+                for (Tile tile : game.getTileMap().values()) {
+                    if (!tile.getPosition().equals(monumentTile.getPosition())
+                            && !adjacent.contains(tile.getPosition())
+                            && FoWHelper.knowsTile(game, player, tile.getPosition())
+                            && (tile.getTileModel() == null
+                                    || !tile.getTileModel().isHyperlane())) {
+                        buttons.add(Buttons.green(
+                                player.factionButtonChecker() + ARMAGEDDON_PROJECT_MORS_TARGET + tile.getPosition(),
+                                tile.getRepresentationForButtons(game, player)));
+                    }
+                }
+                if (buttons.isEmpty() || !MonumentsService.exhaustMonument(game, player, "belkosea_monument")) {
+                    return;
+                }
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(),
+                        player.getRepresentationNoPing()
+                                + ", choose a non-adjacent system in which to resolve Mors's copied text ability.",
+                        buttons);
+            }
+            case "glatison" -> {
+                if (!MonumentsService.exhaustMonument(game, player, "belkosea_monument")) {
+                    return;
+                }
+                for (Tile tile : game.getTileMap().values()) {
+                    tile.removeAllUnitDamage(player.getColor());
+                }
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentationNoPing()
+                                + " repaired all damaged units with Glatison's copied text ability.");
+            }
+            case null, default -> {
                 return;
             }
-            MessageHelper.sendMessageToChannelWithButtons(
-                    event.getMessageChannel(),
-                    player.getRepresentationNoPing()
-                            + ", choose a non-adjacent system in which to resolve Mors's copied text ability.",
-                    buttons);
-        } else if ("glatison".equals(superweapon)) {
-            if (!MonumentsService.exhaustMonument(game, player, "belkosea_monument")) {
-                return;
-            }
-            for (Tile tile : game.getTileMap().values()) {
-                tile.removeAllUnitDamage(player.getColor());
-            }
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    player.getRepresentationNoPing()
-                            + " repaired all damaged units with Glatison's copied text ability.");
-        } else {
-            return;
         }
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
@@ -726,11 +743,15 @@ public class MonumentsBRButtonHandler {
         ButtonHelperAbilities.morsPart2(player, game, "morsPart2_" + position, event);
     }
 
-    private static Set<String> getArmageddonProjectSuperweapons(Game game, Player player) {
+    public static Set<String> getArmageddonProjectSuperweapons(Game game, Player player) {
         String stored = game.getStoredValue(ARMAGEDDON_PROJECT_SUPERWEAPONS + player.getFaction());
         if (stored.isEmpty()) {
             return new LinkedHashSet<>();
         }
         return new LinkedHashSet<>(Arrays.asList(stored.split(",")));
+    }
+
+    public static void setArmageddonProjectSuperweapons(Game game, Player player, Set<String> superweapons) {
+        game.setStoredValue(ARMAGEDDON_PROJECT_SUPERWEAPONS + player.getFaction(), String.join(",", superweapons));
     }
 }

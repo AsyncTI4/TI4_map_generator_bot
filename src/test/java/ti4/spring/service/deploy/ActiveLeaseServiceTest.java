@@ -70,7 +70,7 @@ class ActiveLeaseServiceTest {
         return leaseProperties;
     }
 
-    private void setField(Object target, String fieldName, Object value) throws Exception {
+    private static void setField(Object target, String fieldName, Object value) throws Exception {
         Field field = target.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
         field.set(target, value);

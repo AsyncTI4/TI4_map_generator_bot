@@ -58,7 +58,7 @@ class PublicSnakeDraftOrchestratorSetOrder extends GameStateSubcommand {
             userIds.add(event.getOption(Constants.PLAYER8).getAsUser().getId());
         }
         try {
-            orchestrator.setDraftOrder(getGame().getDraftManager(), userIds);
+            PublicSnakeDraftOrchestrator.setDraftOrder(getGame().getDraftManager(), userIds);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Draft order was set.");
             orchestrator.validateState(getGame().getDraftManager());
         } catch (IllegalArgumentException e) {

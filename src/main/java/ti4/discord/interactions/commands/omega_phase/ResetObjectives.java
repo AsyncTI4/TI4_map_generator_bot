@@ -46,7 +46,7 @@ class ResetObjectives extends GameStateSubcommand {
         setPublicObjectivesStage2Deck(game);
     }
 
-    private void setPublicObjectivesStage1Deck(Game game) {
+    private static void setPublicObjectivesStage1Deck(Game game) {
         DeckModel deck = Mapper.getDeck("public_stage_1_objectives_omegaphase");
         if (!game.getStage1PublicDeckID().equals(deck.getAlias())) {
             game.setStage1PublicDeckID(deck.getAlias());
@@ -74,7 +74,7 @@ class ResetObjectives extends GameStateSubcommand {
         }
     }
 
-    private void setPublicObjectivesStage2Deck(Game game) {
+    private static void setPublicObjectivesStage2Deck(Game game) {
         // No stage 2s in this mode
         game.setUpPeekableObjectives(0, 2);
 

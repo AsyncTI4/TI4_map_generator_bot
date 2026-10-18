@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -164,17 +163,6 @@ public class AverageTurnTimeService {
         int minimumTurns = 0;
         int maximumResults = userIds.size();
         return getAverageTurnTimes(players, minimumTurns, maximumResults);
-    }
-
-    @Transactional(readOnly = true)
-    public Map<String, Long> getUserIdsToAverageTurnTimes(List<String> userIds) {
-        List<UserAverageTurnTimeAccumulator> averageTurnTimes = getAverageTurnTimes(userIds);
-
-        return averageTurnTimes.stream()
-                .collect(Collectors.toMap(
-                        acc -> acc.userId,
-                        UserAverageTurnTimeAccumulator::getAverage,
-                        (existing, replacement) -> existing));
     }
 
     public static AverageTurnTimeService getBean() {

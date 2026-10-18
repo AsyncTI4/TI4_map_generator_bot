@@ -13,9 +13,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionBountyHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -38,11 +40,15 @@ import ti4.service.breakthrough.ValefarZService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.game.MonumentsService;
+import ti4.service.tactical.movement.RealityFieldImpactorService;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class CombatModHelper {
+
+    private static final Set<String> CODE_CARD_ABILITIES =
+            Set.of("bestow", "reflect", "ascend", "thwart", "deceive", "scourge");
 
     private static Boolean IsModInScopeForUnits(
             List<UnitModel> units, CombatModifierModel modifier, CombatRollType rollType, Game game, Player player) {
@@ -161,8 +167,8 @@ public class CombatModHelper {
                             tile,
                             player,
                             opponent,
-                            opponentUnitsByQuantity,
                             unitsByQuantity,
+                            opponentUnitsByQuantity,
                             game)) {
                 RelicModel relicModel = Mapper.getRelic(relic);
                 String relicName = "specialized_augmentations".equals(relic)
@@ -462,6 +468,7 @@ public class CombatModHelper {
                 Player activePlayer = game.getActivePlayer();
                 if (onTile != null
                         && (onTile.isNebula() || tile.isNebula(game))
+                        && !RealityFieldImpactorService.nullifies(game, tile)
                         && activePlayer != null
                         && !activePlayer.getUserID().equals(player.getUserID())
                         && !activePlayer.getAllianceMembers().contains(player.getFaction())
@@ -484,6 +491,7 @@ public class CombatModHelper {
                 if (game.isCosmicPhenomenaeMode()
                         && onTile != null
                         && (onTile.isNebula() || tile.isNebula(game))
+                        && !RealityFieldImpactorService.nullifies(game, tile)
                         && activePlayer != null
                         && !activePlayer.getUserID().equals(player.getUserID())
                         && !activePlayer.getAllianceMembers().contains(player.getFaction())
@@ -517,6 +525,10 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "arvaxihero" -> meetsCondition = ArvaxiLeaderHandler.isHeroActiveForCombat(game, player, tile);
+            case "zephyrion_flagship_bounty" ->
+                meetsCondition = opponentUnitsByQuantity != null
+                        && ZephyrionBountyHandler.hasBountyOnAnyUnit(game, opponent, opponentUnitsByQuantity.keySet());
             case "tnelisopponentfs" -> {
                 if (ButtonHelper.doesPlayerHaveFSHere("tnelis_flagship", opponent, tile)
                         && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
@@ -614,6 +626,7 @@ public class CombatModHelper {
                     meetsCondition = ownUnits < opponentUnits;
                 }
             }
+            case "toldar_mech_owner" -> meetsCondition = player.ownsUnit("toldar_mech");
             case "lizho_commander_particular" -> {
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "lizhocommander")) {
                     int nonFighter = 0;
@@ -719,6 +732,7 @@ public class CombatModHelper {
                 }
             }
             case "active_player" -> meetsCondition = game.getActivePlayer() == player;
+            case "opponent_not_neutral" -> meetsCondition = opponent != null && !opponent.isNeutral();
             case "rhodun_monument_combat" -> {
                 boolean opponentHasUnitUpgrade = opponent != null
                         && opponent.getTechs().stream()
@@ -792,25 +806,10 @@ public class CombatModHelper {
                         scalingCount += 1;
                     }
                 }
-                case "code" -> {
-                    if (player.getHonorCounter() > 1) {
-                        scalingCount += 1;
-                        if (player.getHonorCounter() > 4) {
-                            scalingCount += 1;
-                            if (player.getHonorCounter() > 7) {
-                                scalingCount += 1;
-                            }
-                        }
-                    }
-
-                    if (player.getDishonorCounter() > 1) {
-                        scalingCount += 1;
-                        if (player.getDishonorCounter() < 4) {
-                            scalingCount += 1;
-                            scalingCount += 1;
-                        }
-                    }
-                }
+                case "code" ->
+                    scalingCount = player.getAbilities().stream()
+                            .filter(CODE_CARD_ABILITIES::contains)
+                            .count();
                 case Constants.LAW -> scalingCount = game.getLaws().size();
                 case Constants.MOD_OPPONENT_PO_EXCLUSIVE_SCORED -> {
                     if (opponent != null) {
@@ -847,7 +846,7 @@ public class CombatModHelper {
                     if (game.getStoredValue(combatName).isEmpty()) {
                         round = 0;
                     } else {
-                        round = Integer.parseInt(game.getStoredValue(combatName)) - 1;
+                        round = Integer.parseInt(game.getStoredValue(combatName));
                     }
                     scalingCount += round;
                 }
@@ -1058,8 +1057,7 @@ public class CombatModHelper {
             String bombardmentTarget = game.getStoredValue("bombardmentTarget" + player.getFaction());
             List<BombardmentAssignment> bombardmentAssignments = new ObjectMapper()
                     .readValue(
-                            game.getStoredValue("assignedBombardment" + player.getFaction()),
-                            new TypeReference<List<BombardmentAssignment>>() {});
+                            game.getStoredValue("assignedBombardment" + player.getFaction()), new TypeReference<>() {});
             return bombardmentAssignments.stream()
                     .filter(a -> a.planet().equals(bombardmentTarget)
                             && a.galvanized()

@@ -22,6 +22,12 @@ class EndGameButtonHandler {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler(EndGameService.MOST_POINTS_END_GAME_BUTTON_ID)
+    public static void gameEndWithMostPointsWinner(ButtonInteractionEvent event, Game game) {
+        EndGameService.recordMostPointsWinner(game, event.getMessageChannel());
+        gameEnd(event, game);
+    }
+
     @ButtonHandler("gameEndConfirmation")
     public static void gameEndConfirmation(ButtonInteractionEvent event, Game game) {
         List<Button> buttons = new ArrayList<>();
@@ -32,7 +38,7 @@ class EndGameButtonHandler {
 
     @ButtonHandler(EndedGameScoringGuardService.CONTINUE_PLAYING_BUTTON_ID)
     public static void continuePlayingAfterEnd(ButtonInteractionEvent event, Game game) {
-        game.setHasEnded(false);
+        game.reopen();
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), "This game's ended flag has been cleared. You may continue playing.");
         ButtonHelper.deleteMessage(event);

@@ -17,27 +17,32 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
+import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.relic.AlluringThroneService;
+import ti4.service.tactical.movement.RealityFieldImpactorService;
 
 @UtilityClass
 public class TacticalActionOutputService {
@@ -147,6 +152,13 @@ public class TacticalActionOutputService {
 
         Tile activeTile = game.getTileByPosition(game.getActiveSystem());
         if (player.hasTech("scc") && tile.containsPlayersUnits(player) && activeTile.containsPlayersUnits(player)) {
+            distance = riftDistance = 1;
+        }
+        if (player.hasTech("scc_br")
+                && tile.containsPlayersUnits(player)
+                && activeTile.containsPlayersUnits(player)
+                && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)
+                && !FoWHelper.otherPlayersHaveUnitsInSystem(player, activeTile, game)) {
             distance = riftDistance = 1;
         }
 
@@ -277,6 +289,7 @@ public class TacticalActionOutputService {
         StringBuilder output = new StringBuilder();
         int maxBonus = 0;
         boolean ignoresAnomalies = ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
+                || AsgardLegendaryService.isBifrostBridgeActive(game, player)
                 || (unit.unitType() == UnitType.Flagship
                         && AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile));
         if (distance > moveValue && distance < 90 && !game.isL1Hero()) {
@@ -289,10 +302,11 @@ public class TacticalActionOutputService {
             if (player.hasTech("gd")) {
                 maxBonus++;
                 output.append(", may have used _Gravity Drive_)");
-            } else {
-                if (!game.isTwilightsFallMode()) {
-                    output.append(", __does not have _Gravity Drive___)");
-                }
+            } else if (BlueReverieTechHelper.consumeGravityDriveBonus(game, player)) {
+                maxBonus++;
+                output.append(", used _Gravity Drive_)");
+            } else if (!player.hasTech("gd_br") && !game.isTwilightsFallMode()) {
+                output.append(", __does not have _Gravity Drive___)");
             }
             String cyclotronTilePosition = game.getStoredValue("dihmohnCyclotron_" + player.getFaction());
             if (!cyclotronTilePosition.isEmpty()) {
@@ -331,7 +345,9 @@ public class TacticalActionOutputService {
                     output.append(
                             ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     ? " (ignores gravity-rift effects due to _Power Word: Plane Shift_)"
-                                    : " (this flagship ignores gravity-rift effects due to _Alluring Throne_)");
+                                    : AsgardLegendaryService.isBifrostBridgeActive(game, player)
+                                            ? " (ignores gravity-rift effects due to _Bifrost Bridge_)"
+                                            : " (this flagship ignores gravity-rift effects due to _Alluring Throne_)");
                 } else {
                     // Don't automatically count rifts, allowing the player to verify the chosen path.
                     output.append(" (gravity rifts along a path could add +")
@@ -350,18 +366,22 @@ public class TacticalActionOutputService {
             if (player.hasTech("bedreamneg") && DreamFactionTechHandler.getsNonEuclideanMoveBonus(game, player, tile)) {
                 output.append(" (+1 move from a nexus token source with _Non-Euclidean Geometries_)");
             }
-            if (unit.unitType() == UnitType.Destroyer) {
-                if (player.ownsUnit("ponthous_destroyer2")) {
-                    output.append("**REMINDER**: Renegade II can only transport ground forces.");
-                } else if (player.ownsUnit("ponthous_destroyer")) {
-                    output.append("**REMINDER**: Renegade I can only transport infantry.");
-                }
-            }
             if (player.hasPlanet("gyraxis")
                     && player.getExhaustedPlanetsAbilities().contains("gyraxis")
                     && "yes".contains(game.getStoredValue("gyraxisActive"))) {
                 output.append("May add +1 move to up to 1 ship being moved from each system containing their ships.");
             }
+        }
+        if (player.hasUnit("scrapyard_flagship")) {
+            output.append(" (May apply +1 to the MOVE value of units in this system if _Jumpstarter_ does not move.)");
+        }
+        UnitModel unitModel = player.getUnitFromUnitKey(unit);
+        if (unitModel != null && "qhet_cruiser2".equals(unitModel.getId())) {
+            int battlecruiserDistance = CheckDistanceHelper.getDistanceBetweenTwoTiles(
+                    game, null, tile.getPosition(), game.getActiveSystem(), true);
+            output.append(" (May move through systems that contain different other players' ships, distance is ")
+                    .append(battlecruiserDistance)
+                    .append(")");
         }
         if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
             GMService.logPlayerActivity(game, player, output.toString());
@@ -395,6 +415,7 @@ public class TacticalActionOutputService {
         int baseMoveValue = model.getMoveValue();
         if (baseMoveValue == 0) return 0;
         if (tile.isNebula(game)
+                && !RealityFieldImpactorService.nullifies(game, tile)
                 && !DreamAbilitiesHandler.ignoresNebula(player, game, tile)
                 && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                 && !player.hasAbility("voidborn")
@@ -479,6 +500,17 @@ public class TacticalActionOutputService {
                     break;
                 }
             }
+        }
+        if (player.hasUnit("scrapyard_flagship")
+                && ButtonHelper.doesPlayerHaveFSHere("scrapyard_flagship", player, tile)) {
+            bonusMoveValue += 1;
+        }
+        Player nokarPlayer = Helper.getPlayerFromAbility(game, "desperados_br");
+        if (nokarPlayer != null
+                && nokarPlayer.hasAbility("desperados_br")
+                && nokarPlayer != player
+                && model.getUnitType() == UnitType.Destroyer) {
+            baseMoveValue++;
         }
 
         return baseMoveValue + bonusMoveValue;

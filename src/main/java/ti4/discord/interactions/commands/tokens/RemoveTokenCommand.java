@@ -43,13 +43,13 @@ public class RemoveTokenCommand extends AddRemoveTokenCommand {
             tokenName = AliasHandler.resolveAttachment(tokenName);
 
             String tokenID = Mapper.getAttachmentImagePath(tokenName);
-            String tokenPath = tile.getAttachmentPath(tokenID);
+            String tokenPath = Tile.getAttachmentPath(tokenID);
             if (tokenPath != null) {
                 removeToken(event, tile, tokenID, true);
                 game.clearPlanetsCache();
             } else {
                 tokenID = Mapper.getTokenID(tokenName);
-                tokenPath = tile.getTokenPath(tokenID);
+                tokenPath = Tile.getTokenPath(tokenID);
 
                 if (tokenPath == null) {
                     MessageHelper.replyToMessage(event, "Token: " + tokenName + " is not valid");
@@ -71,7 +71,8 @@ public class RemoveTokenCommand extends AddRemoveTokenCommand {
         }
     }
 
-    private void removeToken(SlashCommandInteractionEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet) {
+    private static void removeToken(
+            SlashCommandInteractionEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet) {
         String unitHolder = Constants.SPACE;
         if (needSpecifyPlanet) {
             OptionMapping option = event.getOption(Constants.PLANET);

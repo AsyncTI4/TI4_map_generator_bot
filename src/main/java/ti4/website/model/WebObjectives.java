@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.Data;
 import ti4.game.Game;
@@ -84,6 +85,15 @@ public class WebObjectives {
         webObjectives.allObjectives.addAll(webObjectives.customObjectives);
 
         return webObjectives;
+    }
+
+    public Optional<Integer> findFactionProgress(String objectiveKey, String faction) {
+        return allObjectives.stream()
+                .filter(objective ->
+                        objective.isRevealed() && objective.getKey().equals(objectiveKey))
+                .map(objective -> objective.getFactionProgress().get(faction))
+                .filter(Objects::nonNull)
+                .findFirst();
     }
 
     private static void processStage1Objectives(Game game, WebObjectives webObjectives) {

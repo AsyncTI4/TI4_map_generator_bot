@@ -45,7 +45,7 @@ public class HelpCommand implements ParentCommand {
     }
 
     static void showHelpText(GenericInteractionCreateEvent event, String helpFileName) {
-        String path = ResourceHelper.getInstance().getHelpFile(helpFileName);
+        String path = ResourceHelper.getHelpFile(helpFileName);
         try {
             String message = Files.readString(Paths.get(path));
             MessageHelper.sendMessageToEventChannel(event, message);

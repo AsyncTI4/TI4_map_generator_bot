@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -436,9 +437,17 @@ class ExploreButtonHandler {
     @ButtonHandler("movedNExplored_")
     static void movedNExplored(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String bID = buttonID.replace("movedNExplored_", "");
+        boolean skipKairnAgentInterrupt = bID.startsWith("skipKairnAgent_");
+        if (skipKairnAgentInterrupt) {
+            bID = bID.substring("skipKairnAgent_".length());
+        }
+        String[] info = bID.split("_");
+        if (!skipKairnAgentInterrupt
+                && KairnLeadershandler.offerKairnAgentExploreInterrupt(event, game, player, buttonID, info)) {
+            return;
+        }
         boolean dsdihmy = bID.startsWith("dsdihmy_");
         boolean scanlink = bID.startsWith("scanlink_");
-        String[] info = bID.split("_");
         Tile tile = game.getTileFromPlanet(info[1]);
         if (buttonID.contains("frontier")) {
             player.setBreakthroughExhausted("bentorbt", true);

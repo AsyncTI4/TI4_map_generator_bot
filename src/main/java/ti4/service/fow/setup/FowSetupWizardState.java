@@ -18,7 +18,7 @@ public class FowSetupWizardState {
     private FowSetupStep step = FowSetupStep.GAME_TYPE;
     private Long panelMessageId;
     private Set<FowSetupStep> infoThreadsPosted = EnumSet.noneOf(FowSetupStep.class);
-    private boolean introShown = false;
+    private boolean introShown;
 
     private String gameType;
     private String scenarioNote;
@@ -27,7 +27,7 @@ public class FowSetupWizardState {
     // excluded from FACTIONS/TABLE_ORDER candidate lists. Seeded once (see playerRolesInitialized) from
     // Player.isGM(), then left entirely to the GM to toggle.
     private Set<String> nonPlayingUserIds = new LinkedHashSet<>();
-    private boolean playerRolesInitialized = false;
+    private boolean playerRolesInitialized;
 
     // FACTIONS step: factions chosen by the GM but not yet finalized with a home position
     private Map<String, String> pendingFactionByUserId = new LinkedHashMap<>();

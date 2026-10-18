@@ -1,0 +1,31 @@
+{
+    "id": "soryn",
+    "tileId": "th31",
+    "name": "Soryn",
+    "aliases": [
+        "soryn"
+    ],
+    "resources": 0,
+    "influence": 1,
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "techSpecialties": [
+        "PROPULSION",
+        "CYBERNETIC"
+    ],
+    "planetLayout": {
+        "unitHolderName": "soryn",
+        "resourcesLocation": "TopRight",
+        "centerPosition": {
+            "x": 214,
+            "y": 86
+        },
+        "planetRadius": 62
+    },
+    "positionInTile": {
+        "x": 214,
+        "y": 86
+    },
+    "source": "theodisi"
+}

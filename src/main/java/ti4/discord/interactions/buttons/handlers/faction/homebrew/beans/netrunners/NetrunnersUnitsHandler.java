@@ -25,7 +25,6 @@ public class NetrunnersUnitsHandler {
     public static void offerTrojan(Game game, Player player, Tile tile) {
         if (game == null
                 || player == null
-                || tile == null
                 || !player.hasUnit("netrunners_flagship")
                 || !ButtonHelper.doesPlayerHaveFSHere("netrunners_flagship", player, tile)) {
             return;
@@ -63,8 +62,7 @@ public class NetrunnersUnitsHandler {
             return;
         }
         Tile tile = game.getTileByPosition(parts[0]);
-        if (tile == null
-                || !player.hasUnit("netrunners_flagship")
+        if (!player.hasUnit("netrunners_flagship")
                 || !ButtonHelper.doesPlayerHaveFSHere("netrunners_flagship", player, tile)) {
             return;
         }

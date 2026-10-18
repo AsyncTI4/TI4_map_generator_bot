@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+import ti4.settings.users.RefreshMapStyle;
 import ti4.settings.users.UserSettingsManager;
 
 class SetPreferredSettings extends Subcommand {
@@ -44,6 +45,12 @@ class SetPreferredSettings extends Subcommand {
                 OptionType.BOOLEAN,
                 "ephemeral_wrong_button_warning",
                 "True to keep the \"wrong button\" warning ephemeral"));
+        OptionData refreshMapStyle =
+                new OptionData(OptionType.STRING, "refresh_map_style", "What the Refresh Map button shows you");
+        for (RefreshMapStyle style : RefreshMapStyle.values()) {
+            refreshMapStyle.addChoice(style.getLabel(), style.getValue());
+        }
+        addOptions(refreshMapStyle);
     }
 
     @Override
@@ -89,6 +96,11 @@ class SetPreferredSettings extends Subcommand {
                 event.getOption("ephemeral_wrong_button_warning", null, OptionMapping::getAsBoolean);
         if (wrongButtonWarning != null) {
             userSettings.setPrefersWrongButtonEphemeral(wrongButtonWarning);
+        }
+
+        String refreshMapStyle = event.getOption("refresh_map_style", null, OptionMapping::getAsString);
+        if (refreshMapStyle != null) {
+            RefreshMapStyle.fromValue(refreshMapStyle).ifPresent(userSettings::setRefreshMapStyle);
         }
 
         Integer sabo = event.getOption("sabo_decline_median", null, OptionMapping::getAsInt);

@@ -103,9 +103,10 @@ class SearchWinningPath extends Subcommand {
         StringBuilder listedGames = new StringBuilder();
 
         ConsumeGameUtility.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilterForWonGame(event).and(game -> game.getWinner()
-                        .map(winner -> hasWinningPath(game, winner, searchedPath))
-                        .orElse(false)),
+                GameStatisticsFilterer.getGamesFilterForWonGame(event)
+                        .and(game -> game.getWinner()
+                                .map(winner -> hasWinningPath(game, winner, searchedPath))
+                                .orElse(false)),
                 game -> {
                     if (foundGames.add(game.getName()) && foundGames.size() <= MAX_GAMES_LISTED) {
                         listedGames.append(formatGame(game)).append('\n');

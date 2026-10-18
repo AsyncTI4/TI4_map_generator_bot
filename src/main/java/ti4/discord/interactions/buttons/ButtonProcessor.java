@@ -1,49 +1,27 @@
 package ti4.discord.interactions.buttons;
 
-import java.text.DecimalFormat;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.List;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.AsyncTI4DiscordBot;
 import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
 import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.HandlerRegistry;
+import ti4.executors.ExecutionLockManager;
 import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
-import ti4.game.Game;
-import ti4.game.Player;
-import ti4.game.Tile;
-import ti4.helpers.AgendaWhensAftersHelper;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperAgents;
-import ti4.helpers.ButtonHelperModifyUnits;
-import ti4.helpers.ButtonHelperStats;
-import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
-import ti4.helpers.DisplayType;
-import ti4.helpers.SearchGameHelper;
-import ti4.helpers.StatusHelper;
-import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
 import ti4.message.MessageHelper;
-import ti4.service.button.ReactionService;
 import ti4.service.game.GameNameService;
-import ti4.service.strategycard.PlayStrategyCardService;
-import ti4.settings.users.UserSettings;
-import ti4.settings.users.UserSettingsManager;
+import ti4.settings.users.UserActiveHourRecorder;
 import ti4.spring.context.SpringContext;
 
 @UtilityClass
@@ -51,7 +29,9 @@ public class ButtonProcessor {
 
     private static final HandlerRegistry<ButtonContext> registry =
             AnnotationHandler.buildHandlerRegistry(ButtonContext.class, ButtonHandler.class);
-    private static final ButtonRuntimeWarningService runtimeWarningService = new ButtonRuntimeWarningService();
+    private static final ButtonRuntimeMonitor runtimeMonitor = new ButtonRuntimeMonitor();
+    private static final String DISABLED_HANDLER_ID = "(combat replay disabled)";
+    private static final String UNROUTED_HANDLER_ID = "(unrouted)";
 
     public static void checkButtonHandlersSetup() {
         if (registry.getSize() == 0) {
@@ -60,11 +40,38 @@ public class ButtonProcessor {
     }
 
     public static void queue(ButtonInteractionEvent event) {
+        ButtonPressTimeline timeline = ButtonPressTimeline.received(event);
+        runtimeMonitor.recordQueued();
         String gameName = GameNameService.getGameNameFromChannel(event);
-        String componentId = event.getButton().getCustomId();
-        ExecutionLockType lockType = registry.isSave(componentId) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
+        HandlerRegistry.Route<ButtonContext> route =
+                registry.resolve(event.getButton().getCustomId());
+        ExecutionLockType lockType = route.shouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutorServiceManager.runAsyncWithLock(
-                eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event), lockType);
+                eventToString(event, gameName),
+                gameName,
+                event.getMessageChannel(),
+                () -> process(event, route, timeline),
+                lockType);
+    }
+
+    public static void processNow(ButtonInteractionEvent event) {
+        long now = System.currentTimeMillis();
+        ButtonPressTimeline timeline = ButtonPressTimeline.received(now, now);
+        runtimeMonitor.recordQueued();
+        String gameName = GameNameService.getGameNameFromChannel(event);
+        HandlerRegistry.Route<ButtonContext> route =
+                registry.resolve(event.getButton().getCustomId());
+        if (gameName == null) {
+            process(event, route, timeline);
+            return;
+        }
+        ExecutionLockType lockType = route.shouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ;
+        ExecutionLockManager.lock(gameName, lockType);
+        try {
+            process(event, route, timeline);
+        } finally {
+            ExecutionLockManager.unlock(gameName, lockType);
+        }
     }
 
     private static String eventToString(ButtonInteractionEvent event, String gameName) {
@@ -74,41 +81,44 @@ public class ButtonProcessor {
                 + ButtonHelper.getButtonRepresentation(event.getButton());
     }
 
-    private static void process(ButtonInteractionEvent event) {
-        long processStartTime = System.currentTimeMillis();
+    private static void process(
+            ButtonInteractionEvent event, HandlerRegistry.Route<ButtonContext> route, ButtonPressTimeline timeline) {
+        timeline.markStarted();
+        runtimeMonitor.recordStarted();
 
         ButtonContext context = new ButtonContext(event);
-        if (!context.isValid()) return;
+        timeline.markCompleted(ButtonPressStage.CONTEXT);
+        if (!context.isValid()) {
+            runtimeMonitor.recordInvalid();
+            return;
+        }
 
-        long beforeTime = System.currentTimeMillis();
         log(event);
-        long logRuntime = System.currentTimeMillis() - beforeTime;
+        timeline.markCompleted(ButtonPressStage.LOG);
 
-        long resolveRuntime = 0;
-        long saveRuntime = 0;
         try {
             CombatReplayService combatReplayService =
                     CombatContestSettings.isEnabledStatic() ? SpringContext.getBean(CombatReplayService.class) : null;
             if (combatReplayService != null) {
                 CombatReplayService.PreInteractionSnapshot preInteractionSnapshot =
                         combatReplayService.capturePreInteractionSnapshot(context.getGame());
-                combatReplayService.setPreInteractionSnapshot(preInteractionSnapshot);
+                CombatReplayService.setPreInteractionSnapshot(preInteractionSnapshot);
+                timeline.markCompleted(ButtonPressStage.REPLAY_SNAPSHOT);
             }
             try {
-                beforeTime = System.currentTimeMillis();
-                resolveButtonInteractionEvent(context);
-                resolveRuntime = System.currentTimeMillis() - beforeTime;
+                String handlerId = resolveButtonInteractionEvent(context, route);
+                timeline.markResolved(handlerId);
 
-                beforeTime = System.currentTimeMillis();
                 context.save();
-                saveRuntime = System.currentTimeMillis() - beforeTime;
+                timeline.markCompleted(ButtonPressStage.SAVE);
 
                 if (combatReplayService != null && context.getGame() != null) {
                     combatReplayService.onButtonInteractionSettled(context.getGame(), context.getPlayer(), event);
+                    timeline.markCompleted(ButtonPressStage.REPLAY_SETTLE);
                 }
             } finally {
                 if (combatReplayService != null) {
-                    combatReplayService.clearPreInteractionSnapshot();
+                    CombatReplayService.clearPreInteractionSnapshot();
                 }
             }
         } catch (Exception e) {
@@ -117,38 +127,20 @@ public class ButtonProcessor {
             RollbarManager.clear();
         }
 
-        long contextCreationRuntime = context.getCreationEndTime() - context.getCreationStartTime();
-        runtimeWarningService.submitNewRuntime(
-                event,
-                processStartTime,
-                System.currentTimeMillis(),
-                contextCreationRuntime,
-                logRuntime,
-                resolveRuntime,
-                saveRuntime);
+        timeline.markFinished();
+        if (!AsyncTI4DiscordBot.isUnstable()) {
+            runtimeMonitor.submit(event, timeline);
+        }
     }
 
     private static void log(ButtonInteractionEvent event) {
-        // TODO: These timings are temporary to track down any spikes...
-        int warningThresholdSeconds = 1;
-        new TimedRunnable("ButtonProcessor BotLogger log", warningThresholdSeconds, () -> BotLogger.logButton(event))
-                .run();
+        BotLogger.logButton(event);
+        // TODO: Check whether Rollbar is still configured and read; if not, drop this per-press metadata.
+        RollbarManager.putInteractionMetadata("button", event);
+        RollbarManager.put("button_id", event.getButton().getCustomId());
+        RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
 
-        new TimedRunnable("ButtonProcessor Rollbar setup", warningThresholdSeconds, () -> {
-                    RollbarManager.putInteractionMetadata("button", event);
-                    RollbarManager.put("button_id", event.getButton().getCustomId());
-                    RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
-                })
-                .run();
-
-        new TimedRunnable("ButtonProcessor user settings save", warningThresholdSeconds, () -> {
-                    User user = event.getUser();
-                    UserSettings userSettings = UserSettingsManager.get(user.getId());
-                    int currentHourUTC = ZonedDateTime.now(ZoneId.of("UTC")).getHour();
-                    userSettings.addActiveHour(currentHourUTC);
-                    UserSettingsManager.save(userSettings);
-                })
-                .run();
+        UserActiveHourRecorder.record(event.getUser().getId());
     }
 
     private static boolean isCombatReplayButton(String buttonID) {
@@ -158,297 +150,24 @@ public class ButtonProcessor {
                         || buttonID.startsWith("combatReplayDebug_"));
     }
 
-    private static void resolveButtonInteractionEvent(ButtonContext context) {
-        // pull values from context for easier access
+    private static String resolveButtonInteractionEvent(
+            ButtonContext context, HandlerRegistry.Route<ButtonContext> route) {
         ButtonInteractionEvent event = context.getEvent();
-        Player player = context.getPlayer();
-        String buttonID = context.getButtonID();
-        Game game = context.getGame();
-        MessageChannel privateChannel = context.getPrivateChannel();
-        MessageChannel mainGameChannel = context.getMainGameChannel();
 
         // Skip combat replay buttons when the feature is disabled
-        if (!CombatContestSettings.isEnabledStatic() && isCombatReplayButton(buttonID)) return;
+        if (!CombatContestSettings.isEnabledStatic() && isCombatReplayButton(context.getButtonID()))
+            return DISABLED_HANDLER_ID;
+        if (route.dispatch(context)) return route.key();
 
-        // Check the list of ButtonHandlers first
-        if (registry.handle(buttonID, context)) return;
-
-        // TODO Convert all else..if..startsWith to use @ButtonHandler
-        if (false) {
-            // Don't add anymore if/else startWith statements - use @ButtonHandler
-        } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
-            trackButtonHandler(Constants.SO_SCORE_FROM_HAND);
-            StatusHelper.soScoreFromHand(
-                    event, buttonID, game, player, privateChannel, mainGameChannel, mainGameChannel);
-        } else if (buttonID.startsWith(Constants.PO_SCORING)) {
-            trackButtonHandler(Constants.PO_SCORING);
-            StatusHelper.poScoring(event, player, buttonID, game, privateChannel);
-        } else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
-            trackButtonHandler(Constants.GENERIC_BUTTON_ID_PREFIX);
-            ReactionService.addReaction(event, game, player);
-        } else if (buttonID.startsWith("autoAssignGroundHits_")) {
-            trackButtonHandler("autoAssignGroundHits_");
-            Tile tile = game.getTileFromPlanet(buttonID.split("_")[1]);
-            if (PonthousAbilityHandler.requiresManualLastStandAssignment(
-                    game,
-                    player,
-                    tile,
-                    tile == null ? null : tile.getUnitHolderFromPlanet(buttonID.split("_")[1]),
-                    event)) {
-                MessageHelper.sendMessageToChannelWithButton(
-                        event.getMessageChannel(),
-                        player.getRepresentationNoPing() + ", assign this hit manually to use _Last Stand_ if needed.",
-                        Buttons.red(
-                                player.factionButtonChecker() + "getDamageButtons_" + tile.getPosition()
-                                        + "_groundcombat",
-                                "Assign Hits"));
-                return;
-            }
-            ButtonHelperModifyUnits.autoAssignGroundCombatHits(
-                    player, game, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
-        } else if (buttonID.startsWith("strategicAction_")) {
-            trackButtonHandler("strategicAction_");
-            strategicAction(event, player, buttonID, game, mainGameChannel);
-        } else if (buttonID.startsWith("getSwapButtons_")) {
-            trackButtonHandler("getSwapButtons_");
-            MessageHelper.sendMessageToChannelWithButtons(
-                    event.getMessageChannel(),
-                    "Swap",
-                    ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, game, true));
-            // Don't add anymore if/else startWith statements - use @ButtonHandler
-        } else {
-            switch (buttonID) { // TODO Convert all switch case to use @ButtonHandler
-                // Don't add anymore cases - use @ButtonHandler
-                case "refreshInfoButtons" -> {
-                    trackButtonHandler("refreshInfoButtons");
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            event.getChannel(), null, getRefreshInfoButtons(game));
-                }
-                case "gain_1_comms" -> {
-                    trackButtonHandler("gain_1_comms");
-                    ButtonHelperStats.gainComms(event, game, player, 1, true);
-                }
-                case "gain_2_comms" -> {
-                    trackButtonHandler("gain_2_comms");
-                    ButtonHelperStats.gainComms(event, game, player, 2, true);
-                }
-                case "gain_3_comms" -> {
-                    trackButtonHandler("gain_3_comms");
-                    ButtonHelperStats.gainComms(event, game, player, 3, true);
-                }
-                case "gain_4_comms" -> {
-                    trackButtonHandler("gain_4_comms");
-                    ButtonHelperStats.gainComms(event, game, player, 4, true);
-                }
-                case "gain_1_comms_stay" -> {
-                    trackButtonHandler("gain_1_comms_stay");
-                    ButtonHelperStats.gainComms(event, game, player, 1, false);
-                }
-                case "gain_2_comms_stay" -> {
-                    trackButtonHandler("gain_2_comms_stay");
-                    ButtonHelperStats.gainComms(event, game, player, 2, false);
-                }
-                case "gain_3_comms_stay" -> {
-                    trackButtonHandler("gain_3_comms_stay");
-                    ButtonHelperStats.gainComms(event, game, player, 3, false);
-                }
-                case "gain_4_comms_stay" -> {
-                    trackButtonHandler("gain_4_comms_stay");
-                    ButtonHelperStats.gainComms(event, game, player, 4, false);
-                }
-                case "convert_1_comms" -> {
-                    trackButtonHandler("convert_1_comms");
-                    ButtonHelperStats.convertComms(event, game, player, 1);
-                }
-                case "convert_2_comms" -> {
-                    trackButtonHandler("convert_2_comms");
-                    ButtonHelperStats.convertComms(event, game, player, 2, true);
-                }
-                case "convert_3_comms" -> {
-                    trackButtonHandler("convert_3_comms");
-                    ButtonHelperStats.convertComms(event, game, player, 3);
-                }
-                case "convert_4_comms" -> {
-                    trackButtonHandler("convert_4_comms");
-                    ButtonHelperStats.convertComms(event, game, player, 4);
-                }
-                case "convert_2_comms_stay" -> {
-                    trackButtonHandler("convert_2_comms_stay");
-                    ButtonHelperStats.convertComms(event, game, player, 2, false);
-                }
-                // Don't add anymore cases - use @ButtonHandler
-                case "play_when" -> {
-                    trackButtonHandler("play_when");
-                    AgendaWhensAftersHelper.playWhen(event, game, player, mainGameChannel);
-                }
-                case "gain_1_tg" -> {
-                    trackButtonHandler("gain_1_tg");
-                    gain1TG(event, player, game, mainGameChannel);
-                }
-                case "gain1tgFromLetnevCommander" -> {
-                    trackButtonHandler("gain1tgFromLetnevCommander");
-                    gain1tgFromLetnevCommander(event, player, game);
-                }
-                case "gain1tgFromMuaatCommander" -> {
-                    trackButtonHandler("gain1tgFromMuaatCommander");
-                    gain1tgFromMuaatCommander(event, player, game);
-                }
-                case "gain1tgFromCommander" -> {
-                    trackButtonHandler("gain1tgFromCommander");
-                    gain1tgFromCommander(event, player, game, mainGameChannel); // should be deprecated
-                }
-                case "resolveHarness" -> {
-                    trackButtonHandler("resolveHarness");
-                    ButtonHelperStats.replenishComms(event, game, player, false);
-                }
-                case "pass_on_abilities" -> {
-                    trackButtonHandler("pass_on_abilities");
-                    ReactionService.addReaction(
-                            event,
-                            game,
-                            player,
-                            " is " + event.getButton().getLabel().toLowerCase() + ".");
-                }
-                case "searchMyGames" -> {
-                    trackButtonHandler("searchMyGames");
-                    SearchGameHelper.searchGames(
-                            event.getUser(), event, false, false, false, true, false, true, false, false);
-                }
-                case "checkWHView" -> {
-                    trackButtonHandler("checkWHView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.wormholes);
-                }
-                case "checkAnomView" -> {
-                    trackButtonHandler("checkAnomView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.anomalies);
-                }
-                case "checkLegendView" -> {
-                    trackButtonHandler("checkLegendView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.legendaries);
-                }
-                case "checkEmptyView" -> {
-                    trackButtonHandler("checkEmptyView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.empties);
-                }
-                case "checkAetherView" -> {
-                    trackButtonHandler("checkAetherView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.aetherstream);
-                }
-                case "checkCannonView" -> {
-                    trackButtonHandler("checkCannonView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.spacecannon);
-                }
-                case "checkTraitView" -> {
-                    trackButtonHandler("checkTraitView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.traits);
-                }
-                case "checkTechSkipView" -> {
-                    trackButtonHandler("checkTechSkipView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.techskips);
-                }
-                case "checkAttachmView" -> {
-                    trackButtonHandler("checkAttachmView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.attachments);
-                }
-                case "checkShiplessView" -> {
-                    trackButtonHandler("checkShiplessView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.shipless);
-                }
-                case "checkUnlocked" -> {
-                    trackButtonHandler("checkUnlocked");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.unlocked);
-                }
-                // Don't add anymore cases - use @ButtonHandler
-                default ->
-                    MessageHelper.sendMessageToEventChannel(
-                            event,
-                            "Button " + ButtonHelper.getButtonRepresentation(event.getButton())
-                                    + " pressed. This button does not do anything.");
-            }
-        }
-    }
-
-    @Deprecated
-    private static void gain1tgFromCommander(
-            ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
-        String message =
-                player.getRepresentation() + " gained 1 trade good " + player.gainTG(1) + " from their commander.";
-        ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, 1);
-        MessageHelper.sendMessageToChannel(mainGameChannel, message);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    private static void gain1tgFromMuaatCommander(ButtonInteractionEvent event, Player player, Game game) {
-        String message = player.getRepresentation() + " gained 1 trade good " + player.gainTG(1)
-                + " from Magmus, the Muaat commander.";
-        ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, 1);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    private static void gain1tgFromLetnevCommander(ButtonInteractionEvent event, Player player, Game game) {
-        String message = player.getRepresentation() + " gained 1 trade good " + player.gainTG(1)
-                + " from Rear Admiral Farran, the Letnev commander.";
-        ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, 1);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    private static void gain1TG(
-            ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
-
-        String label = event.getButton().getLabel();
-
-        if (label.contains("inf") && label.contains("mech")) {
-            String message = "Please resolve removing infantry manually, if applicable.";
-            ReactionService.addReaction(event, game, player, message);
-            return;
-        }
-
-        String message = "Gained 1 trade good " + player.gainTG(1, true) + ".";
-        ButtonHelperAgents.resolveArtunoCheck(player, 1);
-        ReactionService.addReaction(event, game, player, message);
-
-        ButtonHelper.deleteMessage(event);
-
-        if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
-            MessageHelper.sendMessageToChannel(mainGameChannel, player.getFactionEmoji() + " " + message);
-        }
-    }
-
-    private static List<Button> getRefreshInfoButtons(Game game) {
-        if (game == null) return Buttons.REFRESH_INFO_BUTTONS;
-        if (game.isTwilightsFallMode()) return Buttons.REFRESH_INFO_BUTTONS_TF;
-        if (game.isThundersEdge()) return Buttons.REFRESH_INFO_BUTTONS_TE;
-        return Buttons.REFRESH_INFO_BUTTONS;
-    }
-
-    private static void strategicAction(
-            ButtonInteractionEvent event, Player player, String buttonID, Game game, MessageChannel mainGameChannel) {
-        int scNum = Integer.parseInt(buttonID.replace("strategicAction_", ""));
-        PlayStrategyCardService.playSC(event, scNum, game, mainGameChannel, player);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    private static void trackButtonHandler(String handlerId) {
-        RollbarManager.put("button_handler_id", handlerId);
+        context.setShouldSave(false);
+        BotLogger.error(
+                new LogOrigin(event, context),
+                "Unrouted button: `" + context.getButtonID() + "`. This could just be a stale button.");
+        MessageHelper.sendMessageToEventChannel(event, "We couldn't resolve what to do with this button.");
+        return UNROUTED_HANDLER_ID;
     }
 
     public static String getButtonProcessingStatistics() {
-        var decimalFormatter = new DecimalFormat("#.##");
-        double thresholdMissPercent = runtimeWarningService.getThresholdMissPercent();
-        return "Button Processor Statistics: " + DateTimeHelper.getCurrentTimestamp()
-                + "\n> Total button presses: "
-                + runtimeWarningService.getRuntimeSubmissionCount()
-                + "\n> Threshold misses: "
-                + decimalFormatter.format(thresholdMissPercent) + "% ("
-                + runtimeWarningService.getRuntimeThresholdMissCount() + ")"
-                + "\n> Average preprocessing time: "
-                + decimalFormatter.format(runtimeWarningService.getAveragePreprocessingTime()) + "ms"
-                + "\n> Average processing time: "
-                + decimalFormatter.format(runtimeWarningService.getAverageProcessingTime()) + "ms";
+        return runtimeMonitor.formatStatistics(DateTimeHelper.getCurrentTimestamp());
     }
 }

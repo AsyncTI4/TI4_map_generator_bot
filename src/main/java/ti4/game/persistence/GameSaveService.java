@@ -523,6 +523,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.UNCHARTED_SPACE_STUFF + " " + game.isUnchartedSpaceStuff());
         writer.write(System.lineSeparator());
+        writer.write(Constants.LOST_LEGACIES_TILES + " " + game.isLostLegaciesTiles());
+        writer.write(System.lineSeparator());
         writer.write(Constants.VERBOSITY + " " + game.getOutputVerbosity());
         writer.write(System.lineSeparator());
         writer.write(Constants.BETA_TEST_MODE + " " + game.isTestBetaFeaturesMode());
@@ -817,10 +819,18 @@ class GameSaveService {
             writer.write(Constants.FOG_FILTER + " " + fogColor);
             writer.write(System.lineSeparator());
 
+            if (!player.isFogGhostHexes()) {
+                writer.write(Constants.FOG_GHOST_HEXES + " false");
+                writer.write(System.lineSeparator());
+            }
+
             writer.write(Constants.PASSED + " " + player.isPassed());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.READY_TO_PASS_BAG + " " + player.isReadyToPassBag());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.OPLUSPLUS_COUNCIL_CONFIRMED + " " + player.isOplusplusCouncilConfirmed());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.AUTO_PASS_WHENS_N_AFTERS + " " + player.isAutoPassOnWhensAfters());
@@ -1270,6 +1280,10 @@ class GameSaveService {
 
         writer.write(TOKENS);
         writer.write(System.lineSeparator());
+        if (!tile.getFowVisionGrant().isEmpty()) {
+            writer.write(FOW_VISION_GRANT + " " + String.join(",", tile.getFowVisionGrant()));
+            writer.write(System.lineSeparator());
+        }
 
         writer.write(ENDTOKENS);
         writer.write(System.lineSeparator());

@@ -17,7 +17,7 @@ public class MyGamesController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public List<MyGameSummary> get() {
+    public static List<MyGameSummary> get() {
         String userId = RequestContext.getUserId();
         return MyGamesService.getMyGames(userId);
     }

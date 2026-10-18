@@ -14,8 +14,8 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRe
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -28,6 +28,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -99,6 +100,7 @@ class SpendingButtonHandler {
         }
         PlanetExhaust.doAction(player, planetName, game);
         player.addSpentThing(planetName);
+        ThirtyKExploreHooks.onPlanetExhausted(event, game, player, planetName);
 
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
         if (uH != null) {

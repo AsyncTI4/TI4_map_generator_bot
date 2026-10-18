@@ -201,7 +201,7 @@
         "phase": "Action",
         "window": "After you destroy 1 or more of another player's infantry on a planet:",
         "text": "Destroy half of that player's infantry on that planet, rounded up.",
-        "flavorText": "The Soladity's Blight has many strains, some more virulent than others.",
+        "flavorText": "The Sodality's Blight has many strains, some more virulent than others.",
         "source": "ds",
         "actualSource": "uncharted_space"
     },

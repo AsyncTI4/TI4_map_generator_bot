@@ -5,7 +5,7 @@ import jakarta.persistence.Converter;
 import ti4.contest.replay.core.CombatCandidateEventType;
 
 @Converter(autoApply = true)
-public class CombatCandidateEventTypeConverter implements AttributeConverter<CombatCandidateEventType, String> {
+class CombatCandidateEventTypeConverter implements AttributeConverter<CombatCandidateEventType, String> {
 
     @Override
     public String convertToDatabaseColumn(CombatCandidateEventType attribute) {

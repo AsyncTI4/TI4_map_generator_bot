@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.actioncards.acd2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -202,7 +203,7 @@ class SeizedResearchAcd2ButtonHandler {
     private static String getBreakthroughLabel(Player player) {
         BreakthroughModel breakthrough = player.getBreakthroughIDs().stream()
                 .map(player::getBreakthroughModel)
-                .filter(model -> model != null)
+                .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null);
         if (breakthrough == null) {

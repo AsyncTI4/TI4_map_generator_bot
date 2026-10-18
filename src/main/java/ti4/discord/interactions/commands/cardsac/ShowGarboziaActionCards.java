@@ -12,6 +12,7 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.service.decks.ShowActionCardsService;
+import ti4.service.testbed.TestBedService;
 
 class ShowGarboziaActionCards extends GameStateSubcommand {
 
@@ -23,7 +24,8 @@ class ShowGarboziaActionCards extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        Player viewer = game.getPlayer(event.getUser().getId());
+        Player viewer = TestBedService.resolveActingPlayer(
+                game, event, game.getPlayer(event.getUser().getId()));
         if (ActionCardHelper.hidesUnplayedDiscards(game, viewer) && (viewer == null || !viewer.hasPlanet("garbozia"))) {
             MessageHelper.replyToMessage(event, "You are not authorized to use this command.");
             return;

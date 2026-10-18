@@ -22,9 +22,6 @@ import lombok.NoArgsConstructor;
                     name = "idx_combat_observation_game_tile_started_at",
                     columnList = "game_name, tile_position, started_at")
         })
-/**
- * Stores the initial snapshot and scoring inputs for a combat observed by the replay selector.
- */
 public class CombatObservationEntity {
 
     @Id

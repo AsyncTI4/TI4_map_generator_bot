@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -37,8 +38,8 @@ public class MapRenderPipeline {
         String gameName = renderEvent.game.getName();
         var timedRunnable =
                 new TimedRunnable("Render event task for " + gameName, EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
-                    try (var mapGenerator =
-                            new MapGenerator(renderEvent.game, renderEvent.displayType, renderEvent.event)) {
+                    try (var mapGenerator = new MapGenerator(
+                            renderEvent.game, renderEvent.displayType, renderEvent.event, renderEvent.segment)) {
                         mapGenerator.draw();
                         if (renderEvent.uploadToDiscord) {
                             uploadToDiscord(mapGenerator, renderEvent.callback());
@@ -51,6 +52,21 @@ public class MapRenderPipeline {
                     }
                 });
 
+        ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
+    }
+
+    public static void queueImage(Game game, String label, Supplier<FileUpload> image, Consumer<FileUpload> callback) {
+        if (CircuitBreaker.isOpen()) {
+            return;
+        }
+        var timedRunnable =
+                new TimedRunnable(label + " for " + game.getName(), EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
+                    try (FileUpload fileUpload = image.get()) {
+                        callback.accept(fileUpload);
+                    } catch (Exception e) {
+                        BotLogger.error(new LogOrigin(game), "Failed to render " + label + ".", e);
+                    }
+                });
         ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }
 
@@ -86,6 +102,20 @@ public class MapRenderPipeline {
         queue(game, event, displayType, callback, true, true);
     }
 
+    public static void queue(
+            Game game,
+            @Nullable GenericInteractionCreateEvent event,
+            @Nullable DisplayType displayType,
+            @Nullable String segment,
+            @Nullable Consumer<FileUpload> callback) {
+        queue(game, event, displayType, segment, callback, true, true);
+    }
+
+    public static void queueUnfoggedWithoutWebsiteUpload(
+            Game game, @Nullable DisplayType displayType, Consumer<FileUpload> callback) {
+        queue(game, null, displayType, null, callback, true, false);
+    }
+
     private static void queue(
             Game game,
             @Nullable GenericInteractionCreateEvent event,
@@ -93,10 +123,21 @@ public class MapRenderPipeline {
             @Nullable Consumer<FileUpload> callback,
             boolean uploadToDiscord,
             boolean uploadToWebsite) {
+        queue(game, event, displayType, null, callback, uploadToDiscord, uploadToWebsite);
+    }
+
+    private static void queue(
+            Game game,
+            @Nullable GenericInteractionCreateEvent event,
+            @Nullable DisplayType displayType,
+            @Nullable String segment,
+            @Nullable Consumer<FileUpload> callback,
+            boolean uploadToDiscord,
+            boolean uploadToWebsite) {
         if (game == null) {
             throw new IllegalArgumentException("game cannot be null in render pipeline");
         }
-        render(new RenderEvent(game, event, displayType, callback, uploadToDiscord, uploadToWebsite));
+        render(new RenderEvent(game, event, displayType, segment, callback, uploadToDiscord, uploadToWebsite));
     }
 
     public static ShutdownResult shutdown() {
@@ -108,6 +149,7 @@ public class MapRenderPipeline {
             Game game,
             GenericInteractionCreateEvent event,
             DisplayType displayType,
+            String segment,
             Consumer<FileUpload> callback,
             boolean uploadToDiscord,
             boolean uploadToWebsite) {}

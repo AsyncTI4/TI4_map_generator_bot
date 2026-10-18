@@ -1,8 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.faction.base.naalu;
 
-import java.util.List;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -34,15 +32,10 @@ class NaaluButtonHandler {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "The Oracle, the Naalu hero, was not purged - something went wrong");
         }
-        for (Player p1 : game.getRealPlayers()) {
-            if (p1 == player) {
-                continue;
-            }
-            List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p1);
-            String message = p1.getRepresentationUnfogged()
-                    + ", The Oracle, the Naalu hero, has been played and you must send a promissory note. Please choose the promissory note you wish to send.";
-            MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
-        }
+        ButtonHelper.sendForcedPNSendButtonsToOtherPlayers(
+                game,
+                player,
+                "The Oracle, the Naalu hero, has been played and you must send a promissory note. Please choose the promissory note you wish to send.");
         ButtonHelper.deleteMessage(event);
     }
 

@@ -17,10 +17,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesUnitHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -29,6 +30,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.BreakthroughHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -197,6 +199,9 @@ public final class BreakthroughCommandHelper {
             if ("yinbt".equalsIgnoreCase(bt.getID())) {
                 BreakthroughHelper.resolveYinBreakthroughAbility(player.getGame(), player);
             }
+            if ("kairnbt".equalsIgnoreCase(bt.getID())) {
+                KairnBreakthroughHandler.refreshRelics(game, player);
+            }
             if ("khraskbt".equalsIgnoreCase(bt.getID())) {
                 player.addPlanet("grove");
                 Planet grove = game.getPlanetsInfo().get("grove");
@@ -272,18 +277,20 @@ public final class BreakthroughCommandHelper {
                     }
                 }
             }
+            if ("onyxxabt".equalsIgnoreCase(bt.getID()) && btIDs.size() == 1) {
+                if (FractureService.enterPlayOrExplain(null, game, player, bt.getID())) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation(false, false)
+                                    + " has gained _Styx and Stones_, and so The Fracture enters play automatically!"
+                                    + " Ingress tokens will be placed in their position on the map, if there were no choices to be made.");
+                }
+            }
             if ("firmamentbt".equalsIgnoreCase(bt.getID())) {
                 SowingReapingService.sendTheSowingButtons(game);
             }
             if ("revenantbt".equalsIgnoreCase(bt.getID())) {
                 RevenantBreakthroughHandler.gainAttachedAgent(game, player);
-            }
-            if ("xytherisbt".equalsIgnoreCase(bt.getID())) {
-                player.setUnitCap("pd", player.getUnitCap("pd") + 4);
-                MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(),
-                        player.getRepresentation() + ", your PDS unit cap has been increased to "
-                                + player.getUnitCap("pd"));
             }
             if (player.hasBreakthrough("arcanumbt")) {
                 ArcanumBreakthroughHandler.offerArcanumBTFlipOnGain(game, player);
@@ -297,6 +304,15 @@ public final class BreakthroughCommandHelper {
             }
             if ("netrunnersbt".equalsIgnoreCase(bt.getID())) {
                 NetrunnersBreakthroughHandler.offerDataBreachPlacement(game, player);
+            }
+            if ("toldarbt".equalsIgnoreCase(bt.getID())
+                    || "toldarbthonor".equalsIgnoreCase(bt.getID())
+                    || "toldarbtdishonor".equalsIgnoreCase(bt.getID())) {
+                if (player.getHonorCounter() == player.getDishonorCounter()) {
+                    ButtonHelperFactionSpecific.offerToldarBtSideChoice(player);
+                } else {
+                    ButtonHelperFactionSpecific.correctHonorAbilities(player, game);
+                }
             }
             if (FractureService.canFractureEnterPlay(game)) serveRollFractureButtons(player, btID);
             if ("muaatbt".equals(bt.getAlias())) StellarGenesisService.serveAvernusButtons(game, player);
@@ -318,6 +334,10 @@ public final class BreakthroughCommandHelper {
             rollFracture = rollFracture.withLabel("Spawn Fracture").withEmoji(FactionEmojis.Cabal.asEmoji());
             message =
                     "You can roll for other breakthroughs first and then spawn The Fracture with _Al'Raith Ix Ianovar_.";
+        }
+        if ("onyxxabt".equals(btID)) {
+            rollFracture = rollFracture.withLabel("Spawn Fracture").withEmoji(FactionEmojis.onyxxa.asEmoji());
+            message = "You can roll for other breakthroughs first and then spawn The Fracture with _Styx and Stones_.";
         }
         MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, rollFracture);
     }

@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -28,6 +29,7 @@ public class DreamLeadersHandler {
     private static final String AGENT_DECLINE = "dream_agent_decline";
     private static final String HERO_NEXUS_USES_KEY = "dreamHeroNexusUses";
     private static final int HERO_BUTTON_LIMIT = 25;
+    private static final Pattern TO_ = Pattern.compile("_to_");
 
     public static int getDreamCommanderVoteCount(Game game, Player player) {
         return game.getTileMap().values().stream()
@@ -304,7 +306,7 @@ public class DreamLeadersHandler {
             fromPosition = fromPosition.substring(0, fromPosition.lastIndexOf("_page"));
         }
         Tile fromTile = game.getTileByPosition(fromPosition);
-        if (fromTile == null || !DreamAbilitiesHandler.hasNexusToken(fromTile)) {
+        if (!DreamAbilitiesHandler.hasNexusToken(fromTile)) {
             MessageHelper.sendMessageToEventChannel(event, "That system does not contain a nexus token.");
             return;
         }
@@ -337,15 +339,14 @@ public class DreamLeadersHandler {
             return;
         }
         ButtonHelper.deleteMessage(event);
-        String[] parts = buttonID.replace("dream_hero_move_nexus_", "").split("_to_");
+        String[] parts = TO_.split(buttonID.replace("dream_hero_move_nexus_", ""));
         if (parts.length != 2) {
             MessageHelper.sendMessageToEventChannel(event, "Could not parse that nexus token move.");
             return;
         }
         Tile fromTile = game.getTileByPosition(parts[0]);
         Tile toTile = game.getTileByPosition(parts[1]);
-        if (fromTile == null
-                || !DreamAbilitiesHandler.hasNexusToken(fromTile)
+        if (!DreamAbilitiesHandler.hasNexusToken(fromTile)
                 || !isDreamHeroNexusDestination(game, toTile)
                 || DreamAbilitiesHandler.hasNexusToken(toTile)) {
             MessageHelper.sendMessageToEventChannel(event, "That is not a valid nexus token move.");

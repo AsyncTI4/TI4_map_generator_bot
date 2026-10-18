@@ -130,7 +130,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
      * @param occurrences HashMap with Key is Component Type and Value is occurrences for specific Source in Component Type json files
      * @return StringBuilder
      */
-    private String compTypeOccurrences(Map<String, Integer> occurrences) {
+    private static String compTypeOccurrences(Map<String, Integer> occurrences) {
         StringBuilder implementation = new StringBuilder();
         for (Map.Entry<String, Integer> entry : occurrences.entrySet()) {
             if (entry.getValue() != 0) {

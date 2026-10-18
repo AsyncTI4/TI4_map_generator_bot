@@ -4,7 +4,7 @@
         "name": "An Eventful Galaxy",
         "text": "Before the game begins, shuffle the following event cards and place them in the common play area\nAge of Commerce\nCall to the void\nZealous Orthodoxy\nAge of Exploration\nCosmic Phenomenae\nHidden agenda\nTotal War\nConventions of war abandoned\nWeird Wormholes\nWild wild Galaxy\nThis is the event deck.\nDuring Setup, draw one card from the event deck, it is now an active event.\nAt the start of the status phase, purge the active event drawn from this card and replace it with a new one.",
         "complexity": 3,
-        "flavorText": "Even the most intuitive leaders don't know what will happen from age to age. The most successful leaders know that they have to adapt to hidden plots or a war breaking out .",
+        "flavorText": "Even the most intuitive leaders don't know what will happen from age to age. The most successful leaders know that they have to adapt to hidden plots or a war breaking out.",
         "source": "addiction"
     },
     {
@@ -23,6 +23,14 @@
         "complexity": 2,
         "flavorText": "Center of the universe, last remnants of a lost empire, greatest city in the galaxy, blasted wasteland. All of these describe Mecatol Rex, former seat of the Lazax Emperors",
         "source": "other"
+    },
+    {
+        "alias": "oplusplus_council",
+        "name": "Objective Council",
+        "text": "At the start of setup, replace the objective decks with the O++ objective decks.\nAt the start of setup, deal each player 5 stage I, 5 stage II, and 8 secret objectives. Purge each undealt card. Each player purges 3 objectives of each type from their hand; If playing with 3 players, players may only purge 2 cards of each type. Players put all drawn unpurged objectives from their hands into a deck of each type. These are the objective decks for this game.",
+        "complexity": 1,
+        "flavorText": "The council believes it is important for the stability of the galaxy that all have a say in this body's priorities. We will now open the floor to the councilor from Archon Ren.",
+        "source": "oplusplus"
     },
     {
         "alias": "new_dawn",

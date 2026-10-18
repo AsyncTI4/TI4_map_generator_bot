@@ -14,6 +14,6 @@ public final class UydaiHeroButton implements MoveAbilityButton {
 
     public List<Button> build(MoveContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player.factionButtonChecker() + "purgeUydaiHero", "Use Uydai Hero", FactionEmojis.vaylerian));
+                ctx.player.factionButtonChecker() + "purgeUydaiHero", "Use Uydai Hero", FactionEmojis.uydai));
     }
 }

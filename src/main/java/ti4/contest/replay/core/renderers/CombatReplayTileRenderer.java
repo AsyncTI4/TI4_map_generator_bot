@@ -7,6 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
@@ -38,6 +39,7 @@ public class CombatReplayTileRenderer {
                     .addKeySerializer(UnitKey.class, new UnitKeyMapKeySerializer())
                     .addKeyDeserializer(UnitKey.class, new UnitKeyMapKeyDeserializer()))
             .build();
+    private static final Pattern INVALID_FACTION_ID_CHARACTER_PATTERN = Pattern.compile("[^a-z0-9_-]");
 
     public String captureInitialSnapshot(Game game, String tilePosition) {
         Tile tile = game.getTileByPosition(tilePosition);
@@ -244,7 +246,9 @@ public class CombatReplayTileRenderer {
 
     private String normalizeFactionLabel(String faction) {
         if (StringUtils.isBlank(faction)) return null;
-        String normalized = faction.trim().toLowerCase().replaceAll("[^a-z0-9_-]", "");
+        String normalized = INVALID_FACTION_ID_CHARACTER_PATTERN
+                .matcher(faction.trim().toLowerCase())
+                .replaceAll("");
         return normalized.isEmpty() ? null : normalized;
     }
 

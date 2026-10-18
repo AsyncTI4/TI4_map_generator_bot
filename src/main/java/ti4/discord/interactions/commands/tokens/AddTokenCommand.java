@@ -13,8 +13,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -52,13 +52,13 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
     public static void addToken(GenericInteractionCreateEvent event, Tile tile, String tokenName, Game game) {
         MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();
         String tokenFileName = Mapper.getAttachmentImagePath(tokenName);
-        String tokenPath = tile.getAttachmentPath(tokenFileName);
+        String tokenPath = Tile.getAttachmentPath(tokenFileName);
         if (tokenFileName != null && tokenPath != null) {
             addToken(event, tile, tokenFileName, true, game);
         } else {
             tokenName = AliasHandler.resolveToken(tokenName);
             tokenFileName = Mapper.getTokenID(tokenName);
-            tokenPath = tile.getTokenPath(tokenFileName);
+            tokenPath = Tile.getTokenPath(tokenFileName);
 
             if (tokenPath == null) {
                 MessageHelper.sendMessageToChannel(channel, "Token: " + tokenName + " is not valid");

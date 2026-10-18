@@ -8,9 +8,9 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
@@ -274,7 +274,18 @@ public class AddUnitService {
             MonumentsButtonHandler.offerCenotaph(game, player, tile, unitKey, location, amount);
         }
         CommanderUnlockCheckService.checkPlayer(
-                player, "dream", "myrr", "natau", "oblivion", "revenantponthous", "thrones", "crystellum");
+                player,
+                "dream",
+                "myrr",
+                "natau",
+                "oblivion",
+                "revenantxytheris",
+                "thrones",
+                "crystellum",
+                "scrapyard",
+                "thurviali",
+                "sarcosa",
+                "xin");
     }
 
     private static void checkFleetCapacity(Tile tile, String color, Game game) {

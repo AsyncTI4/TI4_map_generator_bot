@@ -59,7 +59,7 @@ public class NetrunnersBreakthroughHandler {
         }
         StringBuilder colors = new StringBuilder();
         for (TechnologyType synergy : synergies) {
-            if (colors.length() > 0) {
+            if (!colors.isEmpty()) {
                 colors.append('/');
             }
             switch (synergy) {

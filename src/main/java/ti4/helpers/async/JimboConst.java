@@ -47,7 +47,7 @@ final class JimboConst {
     public static final String metaAction = "jimbo_metaAction";
     public static final String metaSymmetryAdd = "jimbo_metaSymmetryAdd";
     public static final String metaSymmetryRemove = "jimbo_metaSymmetryRemove";
-    private static final Pattern PATTERN = Pattern.compile("(blank|\\d+)$");
+    private static final Pattern COLOR_SUFFIX_PATTERN = Pattern.compile("(blank|\\d+)$");
 
     // Tile separation
     public static List<TileModel> blueTiles;
@@ -250,7 +250,7 @@ final class JimboConst {
         Set<String> baseStringOrder = new LinkedHashSet<>();
         Map<Integer, Map<String, TileModel>> tilesByNum = new HashMap<>();
         for (TileModel tile : draftTiles) {
-            String color = PATTERN.matcher(tile.getId()).replaceAll("");
+            String color = COLOR_SUFFIX_PATTERN.matcher(tile.getId()).replaceAll("");
             String indexStr = tile.getId().replace(color, "");
             int index;
             switch (indexStr) {

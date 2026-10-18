@@ -12,7 +12,6 @@ import ti4.game.Game;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.spring.api.webdata.GameWebDataService;
-import ti4.spring.context.SpringContext;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
@@ -50,18 +49,9 @@ public class WebSocketNotifier {
         messagingTemplate.convertAndSend(destination, "refresh");
     }
 
-    /** Static entry point for non-Spring callers (GameManager, GameUndoService). Never throws. */
-    public static void notifyGameStateChange(Game game) {
+    void notifyGameStateChanged(Game game) {
         try {
-            SpringContext.getBean(WebSocketNotifier.class).notifyGameStateChanged(game);
-        } catch (Exception ignored) {
-            // Spring context may not be up during warmup; state streams on the next save.
-        }
-    }
-
-    public void notifyGameStateChanged(Game game) {
-        try {
-            if (game == null || System.getenv("TESTING") != null) return;
+            if (game == null || game.isFowMode()) return;
 
             String gameId = game.getName();
             // Build the snapshot outside the lock (pure computation, no shared state).
@@ -70,10 +60,6 @@ public class WebSocketNotifier {
             synchronized (perGameLocks.computeIfAbsent(gameId, k -> new Object())) {
                 // Sole writer of the web-data cache: if anything else wrote it, the diff
                 // baseline would drift from what clients last received.
-                if (game.isFowMode()) {
-                    gameWebDataService.put(gameId, MAPPER.writeValueAsString(current));
-                    return; // cache refreshed for REST, but FoW games never stream
-                }
                 String previousJson = gameWebDataService.getIfCached(gameId);
                 JsonNode previous = previousJson == null ? null : MAPPER.readTree(previousJson);
 
@@ -107,8 +93,8 @@ public class WebSocketNotifier {
 
         ObjectNode patch = MAPPER.createObjectNode();
         Set<String> fieldNames = new HashSet<>();
-        before.propertyNames().forEach(fieldNames::add);
-        after.propertyNames().forEach(fieldNames::add);
+        fieldNames.addAll(before.propertyNames());
+        fieldNames.addAll(after.propertyNames());
         for (String field : fieldNames) {
             JsonNode beforeValue = before.path(field);
             JsonNode afterValue = after.path(field);

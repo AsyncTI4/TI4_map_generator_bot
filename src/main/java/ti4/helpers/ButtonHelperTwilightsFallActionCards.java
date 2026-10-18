@@ -279,10 +279,7 @@ public final class ButtonHelperTwilightsFallActionCards {
                 }
             }
         } else {
-            Player activeP = game.getActivePlayer();
-            if (activeP == null) {
-                activeP = player;
-            }
+            Player activeP = ButtonHelperTwilightsFall.spliceInitiator(game, player);
             if (game.isVeiledHeartMode()) {
                 MessageHelper.sendMessageToChannel(
                         activeP.getCorrectChannel(), activeP.getRepresentation() + ", the splice is complete.");
@@ -297,12 +294,13 @@ public final class ButtonHelperTwilightsFallActionCards {
             }
             if (!game.getStoredValue("endTurnWhenSpliceEnds").isEmpty()) {
                 Player p3 = game.getActivePlayer();
-                if (game.getStoredValue("endTurnWhenSpliceEnds").contains(p3.getFaction())) {
+                if (p3 != null && game.getStoredValue("endTurnWhenSpliceEnds").contains(p3.getFaction())) {
                     EndTurnService.endTurnAndUpdateMap(event, game, p3);
                 }
                 game.setStoredValue("endTurnWhenSpliceEnds", "");
             }
             game.removeStoredValue("willParticipateInSplice");
+            game.removeStoredValue("spliceInitiator");
         }
         ButtonHelper.deleteMessage(event);
     }

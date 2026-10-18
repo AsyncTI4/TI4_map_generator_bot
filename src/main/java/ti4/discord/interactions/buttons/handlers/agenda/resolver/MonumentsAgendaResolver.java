@@ -6,17 +6,7 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelperStats;
 import ti4.service.agenda.MonumentsAgendaService;
 
-public class MonumentsAgendaResolver implements AgendaResolver {
-    private final String agendaId;
-
-    public MonumentsAgendaResolver(String agendaId) {
-        this.agendaId = agendaId;
-    }
-
-    @Override
-    public String agendaId() {
-        return agendaId;
-    }
+public record MonumentsAgendaResolver(String agendaId) implements AgendaResolver {
 
     @Override
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {

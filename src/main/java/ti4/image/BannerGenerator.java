@@ -24,13 +24,11 @@ public class BannerGenerator {
 
     public static void drawFactionBanner(Player player) {
         BufferedImage bannerImage = new BufferedImage(325, 50, BufferedImage.TYPE_INT_ARGB);
-        BufferedImage backgroundImage = ImageHelper.readScaled(
-                ResourceHelper.getInstance().getExtraFile("factionbanner_background.png"), 325, 50);
+        BufferedImage backgroundImage =
+                ImageHelper.readScaled(ResourceHelper.getExtraFile("factionbanner_background.png"), 325, 50);
         String pnColorFile = "pa_pn_color_" + Mapper.getColorID(player.getColor()) + ".png";
-        BufferedImage colorImage =
-                ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pnColorFile), 1.5f);
-        BufferedImage gradientImage =
-                ImageHelper.read(ResourceHelper.getInstance().getExtraFile("factionbanner_gradient.png"));
+        BufferedImage colorImage = ImageHelper.readScaled(ResourceHelper.getPAResource(pnColorFile), 1.5f);
+        BufferedImage gradientImage = ImageHelper.read(ResourceHelper.getExtraFile("factionbanner_gradient.png"));
         BufferedImage smallFactionImage = DrawingUtil.getPlayerFactionIconImageScaled(player, 0.26f);
         BufferedImage largeFactionImage = DrawingUtil.getPlayerFactionIconImageScaled(player, 1.4f);
         Graphics bannerG = bannerImage.getGraphics();
@@ -83,15 +81,12 @@ public class BannerGenerator {
     public static void drawAgendaBanner(int num, Game game) {
         Graphics bannerG;
         BufferedImage bannerImage = new BufferedImage(225, 50, BufferedImage.TYPE_INT_ARGB);
-        BufferedImage backgroundImage = ImageHelper.readScaled(
-                ResourceHelper.getInstance().getExtraFile("factionbanner_background.png"), 325, 50);
-        BufferedImage agendaImage =
-                ImageHelper.readScaled(ResourceHelper.getInstance().getExtraFile("agenda.png"), 50, 50);
+        BufferedImage backgroundImage =
+                ImageHelper.readScaled(ResourceHelper.getExtraFile("factionbanner_background.png"), 325, 50);
+        BufferedImage agendaImage = ImageHelper.readScaled(ResourceHelper.getExtraFile("agenda.png"), 50, 50);
         String pnColorFile = "pa_pn_color_" + Mapper.getColorID("blue") + ".png";
-        BufferedImage colorImage =
-                ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pnColorFile), 1.5f);
-        BufferedImage gradientImage =
-                ImageHelper.read(ResourceHelper.getInstance().getExtraFile("factionbanner_gradient.png"));
+        BufferedImage colorImage = ImageHelper.readScaled(ResourceHelper.getPAResource(pnColorFile), 1.5f);
+        BufferedImage gradientImage = ImageHelper.read(ResourceHelper.getExtraFile("factionbanner_gradient.png"));
         bannerG = bannerImage.getGraphics();
 
         bannerG.drawImage(backgroundImage, 0, 0, null);
@@ -130,7 +125,7 @@ public class BannerGenerator {
         }
         BufferedImage bannerImage = new BufferedImage(511, 331, BufferedImage.TYPE_INT_ARGB);
         BufferedImage backgroundImage =
-                ImageHelper.readScaled(ResourceHelper.getInstance().getExtraFile(phase + "banner.png"), 511, 331);
+                ImageHelper.readScaled(ResourceHelper.getExtraFile(phase + "banner.png"), 511, 331);
 
         Graphics bannerG = bannerImage.getGraphics();
         bannerG.drawImage(backgroundImage, 0, 0, null);

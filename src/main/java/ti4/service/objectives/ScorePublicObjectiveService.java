@@ -10,10 +10,9 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.ActionCardHelper;
 import ti4.helpers.BreakthroughHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -22,9 +21,11 @@ import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StatusHelper;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.fow.FowScoringStatusService;
 import ti4.service.game.EndedGameScoringGuardService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.leader.HeroUnlockCheckService;
@@ -63,6 +64,7 @@ public class ScorePublicObjectiveService {
         boolean scored = game.scorePublicObjective(player.getUserID(), poID);
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", poName);
+            FowScoringStatusService.refresh(game, player);
         }
         if (!scored) {
             MessageHelper.sendMessageToChannel(
@@ -71,6 +73,7 @@ public class ScorePublicObjectiveService {
         } else {
             StatusHelper.recordObjectiveScored(game, player, id, "PUBLIC");
             informAboutScoring(event, channel, game, player, poID);
+            ThirtyKExploreHooks.afterPublicObjectiveScored(game, player, id);
             if (player.hasAbility("primordial")) {
                 KaloraAbilityHandler.primordial(player, game);
             }
@@ -187,18 +190,6 @@ public class ScorePublicObjectiveService {
                         p2.getCorrectChannel(),
                         p2.getRepresentation() + " draws 1 secret objective due to their Toldar hero ability.");
                 DrawSecretService.drawSO(event, game, p2);
-            }
-        }
-        if (player.hasAbility("reflect")) {
-
-            List<String> scoredPlayerList =
-                    game.getScoredPublicObjectives().computeIfAbsent(idC, key -> new ArrayList<>());
-            if (scoredPlayerList.size() > 1 && Mapper.getPublicObjective(idC) != null) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + " is drawing 1 action card due to scoring an objective someone else already scored while having the _Reflect_ Honor card.");
-                ActionCardHelper.drawActionCardsSilent(player, 1);
             }
         }
         if (game.isOmegaPhaseMode()) {

@@ -32,7 +32,7 @@ public class TechSpecialtyModel {
         }
     }
 
-    public TechSpecialty getTechSpecialtyFromString(String specialty) {
+    public static TechSpecialty getTechSpecialtyFromString(String specialty) {
         Map<String, TechSpecialty> allTypes = Arrays.stream(TechSpecialty.values())
                 .collect(Collectors.toMap(TechSpecialty::toString, (techSpecialty -> techSpecialty)));
         if (allTypes.containsKey(specialty.toLowerCase())) return allTypes.get(specialty.toLowerCase());

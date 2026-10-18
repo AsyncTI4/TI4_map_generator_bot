@@ -28,9 +28,9 @@ import ti4.service.unit.RemoveUnitService;
 public class TkSpoilResolver implements EdictResolver {
 
     @Getter
-    public final String edict = "tk-spoil";
+    private final String edict = "tk-spoil";
 
-    private List<Button> buttons() {
+    private static List<Button> buttons() {
         return List.of(Buttons.red("beginSpoil", "Remove 1 Ship"));
     }
 
@@ -57,7 +57,7 @@ public class TkSpoilResolver implements EdictResolver {
             for (Player p2 : game.getRealPlayersExcludingThis(tyrant)) {
                 try {
                     total += Integer.parseInt(p2.getStoredValue("tk-spoil"));
-                } catch (Exception e) {
+                } catch (Exception _) {
                 }
             }
             String gain = tyrant.gainTG(total);

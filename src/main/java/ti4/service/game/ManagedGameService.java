@@ -11,7 +11,10 @@ import ti4.game.persistence.ManagedGame;
 public class ManagedGameService {
 
     public String getGameNameForSorting(ManagedGame game) {
-        String gameName = game.getName();
+        return getGameNameForSorting(game.getName());
+    }
+
+    public String getGameNameForSorting(String gameName) {
         if (gameName.startsWith("pbd")) {
             return StringUtils.leftPad(gameName, 10, "0");
         }

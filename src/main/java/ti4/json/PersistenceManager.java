@@ -41,7 +41,7 @@ public class PersistenceManager {
         return readObjectFromJsonFile(PERSISTENCE_MANAGER_JSON_PATH, fileName, clazz);
     }
 
-    public static <T> T readObjectFromJsonFile(String directory, String fileName, Class<T> clazz) throws IOException {
+    public static <T> T readObjectFromJsonFile(String directory, String fileName, Class<T> clazz) {
         JavaType ref = jsonMapper.getTypeFactory().constructType(clazz);
         return readObjectFromJsonFile(directory, fileName, ref);
     }
@@ -62,8 +62,7 @@ public class PersistenceManager {
         return jsonMapper.readValue(file, clazz);
     }
 
-    public static <T> T readObjectFromJsonFile(String directory, String fileName, TypeReference<T> typeReference)
-            throws IOException {
+    public static <T> T readObjectFromJsonFile(String directory, String fileName, TypeReference<T> typeReference) {
         JavaType ref = jsonMapper.getTypeFactory().constructType(typeReference);
         return readObjectFromJsonFile(directory, fileName, ref);
     }

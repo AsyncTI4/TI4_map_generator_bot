@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -30,9 +31,9 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -68,6 +69,8 @@ public class TileGenerator {
 
     private static final int TILE_PADDING = 100;
     private static final Point TILE_POSITION_POINT = new Point(255, 295);
+    // top-left of the fog-vision token, tucked inside the hex's bottom-left edge
+    private static final Point FOW_VISION_TOKEN_POINT = new Point(75, 236);
     private static final Point LABEL_POSITION_POINT = new Point(90, 295);
     private static final BasicStroke stroke4 = new BasicStroke(4.0f);
     private static final BasicStroke stroke6 = new BasicStroke(6.0f);
@@ -79,6 +82,7 @@ public class TileGenerator {
 
     static final int TILE_WIDTH = 345;
     static final int TILE_HEIGHT = 300;
+    private static final Pattern DIGIT_PATTERN = Pattern.compile("[0-9]");
 
     private final Game game;
     private final GenericInteractionCreateEvent event;
@@ -303,9 +307,9 @@ public class TileGenerator {
                 if (CustomHyperlaneService.isCustomHyperlaneTile(tile)) {
                     image = HyperlaneTileGenerator.generateHyperlaneTile(tile, game);
                 } else if (game.isLiberationC4Mode() && "51".equals(tile.getTileID())) {
-                    image = ImageHelper.read(ResourceHelper.getInstance().getTileFile("51r_Creuss.png"));
+                    image = ImageHelper.read(ResourceHelper.getTileFile("51r_Creuss.png"));
                 } else if (game.isLiberationC4Mode() && "17".equals(tile.getTileID())) {
-                    image = ImageHelper.read(ResourceHelper.getInstance().getTileFile("17r_DeltaWH.png"));
+                    image = ImageHelper.read(ResourceHelper.getTileFile("17r_DeltaWH.png"));
                 } else {
                     image = ImageHelper.read(tile.getTilePath());
                 }
@@ -313,8 +317,7 @@ public class TileGenerator {
 
                 // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
                 if (tile.isAnomaly(game, null) && tileShipPositions != null) {
-                    BufferedImage anomalyImage =
-                            ImageHelper.read(ResourceHelper.getInstance().getTileFile("tile_anomaly.png"));
+                    BufferedImage anomalyImage = ImageHelper.read(ResourceHelper.getTileFile("tile_anomaly.png"));
                     switch (tileShipPositions.toString().toUpperCase()) {
                         case "TYPE09":
                         case "TYPE12":
@@ -398,14 +401,14 @@ public class TileGenerator {
                             .matcher(tileID)
                             .replaceAll("");
                     String draftColor = PatternHelper.BLANK_WORD_PATTERN
-                            .matcher(tileID.replaceAll("[0-9]", ""))
+                            .matcher(DIGIT_PATTERN.matcher(tileID).replaceAll(""))
                             .replaceAll("")
                             .toUpperCase();
                     Point draftNumPosition = new Point(85, 140);
 
                     if (tileID.endsWith("blank")) {
                         // tiny tile
-                        String greenPath = ResourceHelper.getInstance().getTileFile("00_green.png");
+                        String greenPath = ResourceHelper.getTileFile("00_green.png");
                         BufferedImage green = ImageHelper.readScaled(greenPath, 73, 63);
                         tileGraphics.drawImage(green, TILE_PADDING + 49, TILE_PADDING + 119, null);
                     } else {
@@ -506,8 +509,7 @@ public class TileGenerator {
                     int direction = 0;
                     for (String secondaryTile : adj) {
                         if (secondaryTile != null) {
-                            addBorderDecoration(
-                                    direction, secondaryTile, tileGraphics, BorderAnomalyModel.BorderAnomalyType.ARROW);
+                            addBorderDecoration(direction, secondaryTile, tileGraphics, getAdjacencyArrowImagePath());
                         }
                         direction++;
                     }
@@ -516,7 +518,9 @@ public class TileGenerator {
                 if (!game.getBorderAnomalies().isEmpty()) {
                     List<String> orderedAdjacentPositions = PositionMapper.getAdjacentTilePositions(tile.getPosition());
                     game.getBorderAnomalies().forEach(borderAnomalyHolder -> {
-                        if (borderAnomalyHolder.getTile().equals(tile.getPosition())
+                        BorderAnomalyModel anomalyModel = borderAnomalyHolder.getModel();
+                        if (anomalyModel != null
+                                && borderAnomalyHolder.getTile().equals(tile.getPosition())
                                 && (!isFoWPrivate
                                         || !tile.hasFog(fowPlayer)
                                         || FoWHelper.getTilePositionsToShow(game, fowPlayer)
@@ -526,7 +530,7 @@ public class TileGenerator {
                                     borderAnomalyHolder.getDirection(),
                                     null,
                                     tileGraphics,
-                                    borderAnomalyHolder.getType());
+                                    anomalyModel.getImageFilePath());
                         }
                     });
                 }
@@ -576,7 +580,7 @@ public class TileGenerator {
                         }
                         var problematicTiles = List.of("25", "26", "64"); // quann, lodor, atlas
                         BufferedImage gearImage = ImageHelper.readScaled(
-                                ResourceHelper.getInstance().getTileFile("production_representation.png"), 64, 64);
+                                ResourceHelper.getTileFile("production_representation.png"), 64, 64);
                         int xMod;
                         int yMod = -290;
                         if (tile.getUnitHolders().size() != 4 || problematicTiles.contains(tile.getTileID())) {
@@ -598,7 +602,7 @@ public class TileGenerator {
 
                     if (capacityUsed > 0 || capacity > 0 || ignoredFs > 0) {
                         BufferedImage carrierImage = ImageHelper.readScaled(
-                                ResourceHelper.getInstance().getTileFile("capacity_representation.png"), 64, 21);
+                                ResourceHelper.getTileFile("capacity_representation.png"), 64, 21);
 
                         int xMod = -155;
                         int yMod = -290;
@@ -704,8 +708,8 @@ public class TileGenerator {
                 int x = TILE_PADDING + (isSpiral ? 36 : 0);
                 int y = TILE_PADDING + (isSpiral ? 43 : 0);
                 if (distance > 0) {
-                    BufferedImage distanceColor = ImageHelper.read(
-                            ResourceHelper.getInstance().getTileFile(getColorFilterForDistance(distance)));
+                    BufferedImage distanceColor =
+                            ImageHelper.read(ResourceHelper.getTileFile(getColorFilterForDistance(distance)));
                     tileGraphics.drawImage(distanceColor, x, y, null);
                 }
                 if (distance < 11) {
@@ -785,7 +789,7 @@ public class TileGenerator {
                     y += (isSpiral ? 43 : 0);
                     x += 33;
                     y += 101;
-                    String chevronFile = ResourceHelper.getInstance().getTileFile("tile_anomaly_chevron.png");
+                    String chevronFile = ResourceHelper.getTileFile("tile_anomaly_chevron.png");
                     BufferedImage bufferedImage = ImageHelper.read(chevronFile);
                     tileGraphics.drawImage(bufferedImage, x, y, null);
                 }
@@ -1471,9 +1475,9 @@ public class TileGenerator {
                 if (CustomHyperlaneService.isCustomHyperlaneTile(tile)) {
                     image = HyperlaneTileGenerator.generateHyperlaneTile(tile, game);
                 } else if (game.isLiberationC4Mode() && "51".equals(tile.getTileID())) {
-                    image = ImageHelper.read(ResourceHelper.getInstance().getTileFile("51r_Creuss.png"));
+                    image = ImageHelper.read(ResourceHelper.getTileFile("51r_Creuss.png"));
                 } else if (game.isLiberationC4Mode() && "17".equals(tile.getTileID())) {
-                    image = ImageHelper.read(ResourceHelper.getInstance().getTileFile("17r_DeltaWH.png"));
+                    image = ImageHelper.read(ResourceHelper.getTileFile("17r_DeltaWH.png"));
                 } else {
                     image = ImageHelper.read(tile.getTilePath());
                 }
@@ -1481,8 +1485,7 @@ public class TileGenerator {
 
                 // COPY BASE TILE GEN - ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
                 if (tile.isAnomaly(game, null) && tileShipPositions != null) {
-                    BufferedImage anomalyImage =
-                            ImageHelper.read(ResourceHelper.getInstance().getTileFile("tile_anomaly.png"));
+                    BufferedImage anomalyImage = ImageHelper.read(ResourceHelper.getTileFile("tile_anomaly.png"));
                     switch (tileShipPositions.toString().toUpperCase()) {
                         case "TYPE09":
                         case "TYPE12":
@@ -1557,23 +1560,25 @@ public class TileGenerator {
         return "Distance" + distance + ".png";
     }
 
+    private static String getAdjacencyArrowImagePath() {
+        return ResourceHelper.getResourceFromFolder("borders/", "adjacency_arrow.png");
+    }
+
     private static void addBorderDecoration(
-            int direction,
-            String secondaryTile,
-            Graphics tileGraphics,
-            BorderAnomalyModel.BorderAnomalyType decorationType) {
+            int direction, String secondaryTile, Graphics tileGraphics, String decorationImagePath) {
         Graphics2D tileGraphics2d = (Graphics2D) tileGraphics;
 
-        if (decorationType == null) {
+        if (decorationImagePath == null) {
             return;
         }
+        boolean isAdjacencyArrow = secondaryTile != null;
         BufferedImage borderDecorationImage;
         try {
-            BufferedImage cached = ImageHelper.read(decorationType.getImageFilePath());
+            BufferedImage cached = ImageHelper.read(decorationImagePath);
             borderDecorationImage = new BufferedImage(
                     cached.getColorModel(), cached.copyData(null), cached.isAlphaPremultiplied(), null);
         } catch (Exception e) {
-            BotLogger.error("Could not find border decoration image! Decoration was " + decorationType, e);
+            BotLogger.error("Could not find border decoration image! Decoration was " + decorationImagePath, e);
             return;
         }
 
@@ -1587,7 +1592,7 @@ public class TileGenerator {
         int centerX = 173;
         int centerY = 150;
 
-        if (decorationType == BorderAnomalyModel.BorderAnomalyType.ARROW) {
+        if (isAdjacencyArrow) {
             int textOffsetX = 12;
             int textOffsetY = 40;
             Graphics2D arrow = borderDecorationImage.createGraphics();
@@ -1605,7 +1610,7 @@ public class TileGenerator {
         }
 
         tileGraphics2d.rotate(Math.toRadians((direction) * 60), centerX, centerY);
-        if (decorationType == BorderAnomalyModel.BorderAnomalyType.ARROW) centerX -= 20;
+        if (isAdjacencyArrow) centerX -= 20;
         tileGraphics2d.drawImage(borderDecorationImage, null, centerX - imageCenterX, -imageCenterY);
         tileGraphics2d.setTransform(originalTileTransform);
     }
@@ -1614,7 +1619,7 @@ public class TileGenerator {
         int deltaX = 0;
         int deltaY = 0;
         for (String ccID : unitHolder.getCcList()) {
-            String ccPath = tile.getCCPath(ccID);
+            String ccPath = Tile.getCCPath(ccID);
             if (ccPath == null) {
                 continue;
             }
@@ -1773,7 +1778,7 @@ public class TileGenerator {
         boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
         for (String tokenID : tokenList) {
             if (isValid.apply(tokenID)) {
-                String tokenPath = tile.getTokenPath(tokenID);
+                String tokenPath = Tile.getTokenPath(tokenID);
                 if (tokenPath == null) {
                     BotLogger.warning(new LogOrigin(game), "Could not find token file for: " + tokenID);
                     continue;
@@ -1789,7 +1794,7 @@ public class TileGenerator {
                         scale = planetHolder.getRadius() / 65.0f;
                     }
                     if (tile.isFracture()) {
-                        tokenPath = tile.getTokenPath("token_worlddestroyed_frac.png");
+                        tokenPath = Tile.getTokenPath("token_worlddestroyed_frac.png");
                     }
                     scale *= 1.55f;
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
@@ -1836,7 +1841,7 @@ public class TileGenerator {
                 if (isValidToken(tokenID) || isValidCustodianToken(tokenID)) {
                     continue;
                 }
-                String tokenPath = tile.getTokenPath(tokenID);
+                String tokenPath = Tile.getTokenPath(tokenID);
                 if (tokenPath == null) {
                     BotLogger.warning(
                             "Could not parse token file for: " + tokenID + " on tile: " + tile.getAutoCompleteName());
@@ -1971,7 +1976,7 @@ public class TileGenerator {
         int x = centerPosition.x;
         int y = centerPosition.y - (tokenList.size() > 1 ? 35 : 0);
         for (String tokenID : tokenList) {
-            String tokenPath = tile.getTokenPath(tokenID);
+            String tokenPath = Tile.getTokenPath(tokenID);
             if (tokenPath == null) {
                 BotLogger.warning("Could not parse token file for: " + tokenID);
                 continue;
@@ -2041,7 +2046,7 @@ public class TileGenerator {
         }
         int index = 0;
         for (String tokenID : tokenList) {
-            String tokenPath = tile.getTokenPath(tokenID);
+            String tokenPath = Tile.getTokenPath(tokenID);
             if (game.isLiberationC4Mode()) {
                 tokenPath = tokenPath.replace("token_creuss", "token_crimsoncreuss");
                 tokenPath = tokenPath.replace("token_crimsoncreussepsilon", "token_creussepsilon");
@@ -2069,6 +2074,13 @@ public class TileGenerator {
                 int sleeperX = TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2);
                 int sleeperY = TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2);
                 tileGraphics.drawImage(tokenImage, sleeperX, sleeperY, null);
+            } else if (Mapper.isFowVisionToken(tokenID)) {
+                // fixed marker: doesn't take a space-token slot, so other tokens keep their positions
+                tileGraphics.drawImage(
+                        tokenImage,
+                        TILE_PADDING + FOW_VISION_TOKEN_POINT.x,
+                        TILE_PADDING + FOW_VISION_TOKEN_POINT.y,
+                        null);
             } else {
 
                 int drawX = TILE_PADDING + x;

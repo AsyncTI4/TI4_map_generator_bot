@@ -1,0 +1,30 @@
+{
+    "id": "ilex",
+    "tileId": "th30",
+    "name": "Ilex",
+    "aliases": [
+        "ilex"
+    ],
+    "resources": 4,
+    "influence": 0,
+    "planetTypes": [
+        "CULTURAL"
+    ],
+    "techSpecialties": [
+        "BIOTIC"
+    ],
+    "planetLayout": {
+        "unitHolderName": "ilex",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 131,
+            "y": 85
+        },
+        "planetRadius": 63
+    },
+    "positionInTile": {
+        "x": 131,
+        "y": 85
+    },
+    "source": "theodisi"
+}

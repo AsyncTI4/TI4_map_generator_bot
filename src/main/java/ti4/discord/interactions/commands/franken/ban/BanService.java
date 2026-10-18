@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
@@ -15,6 +16,7 @@ import ti4.service.franken.FrankenBanList;
 public class BanService implements IBanService {
 
     private static final Map<String, BiFunction<Game, String, String>> BAN_APPLIERS = new HashMap<>();
+    private static final Pattern FIN_SEPARATOR_PATTERN = Pattern.compile(Constants.FIN_SEPARATOR);
 
     static {
         BAN_APPLIERS.put(Constants.ABILITY, (game, id) -> {
@@ -144,7 +146,7 @@ public class BanService implements IBanService {
     public static void appendStoredValue(Game game, String key, String value) {
         String prev = game.getStoredValue(key);
         Set<String> values = new LinkedHashSet<>();
-        if (!prev.isEmpty()) values.addAll(List.of(prev.split(Constants.FIN_SEPARATOR)));
+        if (!prev.isEmpty()) values.addAll(List.of(FIN_SEPARATOR_PATTERN.split(prev)));
         if (!values.add(value)) return;
         game.setStoredValue(key, String.join(Constants.FIN_SEPARATOR, values));
     }

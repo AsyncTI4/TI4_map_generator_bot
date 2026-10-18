@@ -17,7 +17,7 @@ public class TkEndorseResolver implements EdictResolver {
     @Getter
     public String edict = "tk-endorse";
 
-    private List<Button> buttons(Game game, Player player) {
+    private static List<Button> buttons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         String id = player.factionButtonChecker() + "electEndorse_";
         for (Player p2 : game.getRealPlayers()) {

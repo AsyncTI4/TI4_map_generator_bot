@@ -13,19 +13,19 @@ import ti4.testUtils.BaseTi4Test;
 class ButtonHelperCapacityTest extends BaseTi4Test {
     private static final String PLAYER_COLOR = "red";
 
-    private Tile createFlagshipTile() {
+    private static Tile createFlagshipTile() {
         Tile tile = new Tile("flagship_tile", "000", null, null, null);
         tile.getSpaceUnitHolder().addUnit(new UnitKey(UnitType.Flagship, PLAYER_COLOR), 1);
         return tile;
     }
 
-    private Game createTfGame() {
+    private static Game createTfGame() {
         Game game = new Game();
         game.setTwilightsFallMode(true);
         return game;
     }
 
-    private Player createPlayer(Game game) {
+    private static Player createPlayer(Game game) {
         Player player = new Player("101", "testUser", game);
         player.setColor(PLAYER_COLOR);
         return player;

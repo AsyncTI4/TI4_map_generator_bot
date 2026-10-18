@@ -1,0 +1,28 @@
+{
+  "name": "fog-galaxies-2p",
+  "description": "Two galaxies (main + map A) with sectors, hyperlanes (306, 207, a105) and custom hyperlanes (204, a206); map connections and ghost hexes on; action phase.",
+  "fog": true,
+  "you": { "faction": "sol", "home": "301", "units": { "305": "cv, 2 ff" } },
+  "seats": [
+    { "faction": "hacan", "home": "310", "units": { "a301": "dd" } }
+  ],
+  "defaults": { "tg": 2, "ccs": "3/3/2" },
+  "start": "action",
+  "tiles": {
+    "306": "83a",
+    "207": "85a",
+    "a000": "39",
+    "a101": "19",
+    "a102": "20",
+    "a103": "21",
+    "a105": "84a",
+    "a201": "22",
+    "a301": "23"
+  },
+  "customHyperlanes": {
+    "204": "0,0,0,0,0,0;0,0,0,0,1,0;0,0,0,0,0,0;0,0,0,0,0,0;0,1,0,0,0,0;0,0,0,0,0,0",
+    "a206": "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0"
+  },
+  "fowOptions": ["map_connections", "ghost_hexes"],
+  "stored": { "fowMapSegments": "core=000:3;outpost=a000:1" }
+}
