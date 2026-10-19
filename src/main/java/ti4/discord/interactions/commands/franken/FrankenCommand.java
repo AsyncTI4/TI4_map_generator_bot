@@ -31,6 +31,7 @@ public class FrankenCommand implements ParentCommand {
                     new FrankenEdit(),
                     new ShowFrankenBag(),
                     new ShowFrankenHand(),
+                    new FrankenViewCard(),
                     new Ban(),
                     new DraftLimits(),
                     new BanFaction(),
