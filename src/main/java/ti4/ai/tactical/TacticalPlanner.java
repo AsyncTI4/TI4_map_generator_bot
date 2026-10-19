@@ -102,6 +102,9 @@ public class TacticalPlanner {
     private static final String CONQUER_THE_WEAK = "conquer";
     private static final String OCCUPY_THE_FRINGE = "otf";
     private static final String MECHANIZE_THE_MILITARY = "mtm";
+    private static final int MECHANIZED_PLANETS = 4;
+    private static final int FRINGE_GROUND_FORCES = 9;
+    private static final double SECRET_CARGO_SHARE = 0.3;
     private static final String MAKE_AN_EXAMPLE = "mew";
     private static final int DEMONSTRATION_SHIPS = 3;
     private static final double PATIENT_SHARE = 0.25;
@@ -2070,12 +2073,40 @@ public class TacticalPlanner {
         if (legal.isEmpty()) return Optional.empty();
         int pickedUp = Math.min(unserved, capacityOf(seat, haulers));
         double score = FORWARD_GROUND_FORCE_VALUE * pickedUp
+                + secretCargoValue(context, tile, pickedUp)
                 - DISTANCE_COST
                         * context.distance(origin, tile, haulers.getFirst().type())
                 - GROUP_MOVE_COST * (movedNonFighterShips(legal.get()) - 1)
                 - context.defense().leaveCost(origin, legal.get())
                 - context.exposure(tile, legal.get(), List.of());
         return Optional.of(new TacticalPlan(Kind.PICKUP, tile.getPosition(), legal.get(), Map.of(), score));
+    }
+
+    private static double secretCargoValue(Context context, Tile tile, int pickedUp) {
+        Player seat = context.seat;
+        double total = 0;
+        if (seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY)) {
+            total += cargoShare(
+                    context,
+                    MECHANIZE_THE_MILITARY,
+                    MECHANIZED_PLANETS,
+                    unitCount(spareMechs(context, tile)),
+                    pickedUp);
+        }
+        if (seat.getSecretsUnscored().containsKey(OCCUPY_THE_FRINGE)) {
+            int ground = unitCount(availableGroundForces(context.game, seat, tile, context.defense(), List.of()));
+            total += cargoShare(context, OCCUPY_THE_FRINGE, FRINGE_GROUND_FORCES, ground, pickedUp);
+        }
+        return total;
+    }
+
+    private static double cargoShare(Context context, String secret, int threshold, int cargo, int pickedUp) {
+        ObjectiveValue value = context.objectives();
+        int progress = value.progress(secret, value.before());
+        int toGo = threshold - progress;
+        if (progress == ObjectiveValue.NOT_MODELLED || toGo <= 0) return 0;
+        int carried = Math.min(toGo, Math.min(cargo, pickedUp));
+        return ObjectiveValue.VICTORY_POINT_VALUE * SECRET_CARGO_SHARE * carried / toGo;
     }
 
     private static double advanceScore(Context context, Tile tile, double base, List<UnitMove> moves) {

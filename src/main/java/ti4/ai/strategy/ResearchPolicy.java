@@ -143,6 +143,9 @@ public class ResearchPolicy {
     private static final String SPACE_DOCK_UPGRADE = "sd2";
     private static final int DOCK_UPGRADE_PRODUCTION = 2;
     private static final double STEPPING_STONE_SHARE = 0.3;
+    private static final Set<String> TRANSIT_DIODES = Set.of("td", "absol_td");
+    private static final List<String> GROUND_SECRETS = List.of("mtm", "otf");
+    private static final double GROUND_SECRET_SHARE = 0.4;
     private static final Map<Character, TechnologyType> PREREQUISITE_COLOURS = Map.of(
             'B', TechnologyType.PROPULSION,
             'G', TechnologyType.BIOTIC,
@@ -189,7 +192,16 @@ public class ResearchPolicy {
                 + OBJECTIVE_WEIGHT * objectiveGain(game, seat, tech)
                 + steppingStoneValue(game, seat, tech)
                 + custodiansRaceValue(game, seat, alias)
-                + openingReachValue(game, seat, alias);
+                + openingReachValue(game, seat, alias)
+                + groundSecretValue(game, seat, tech);
+    }
+
+    private static double groundSecretValue(Game game, Player seat, TechnologyModel tech) {
+        if (!TRANSIT_DIODES.contains(tech.getAlias()) || !ListTechService.isTechResearchable(tech, seat)) return 0;
+        long held = GROUND_SECRETS.stream()
+                .filter(seat.getSecretsUnscored()::containsKey)
+                .count();
+        return held * GROUND_SECRET_SHARE * ScoringStakes.scoreValue(game, seat, 1);
     }
 
     static double bestValueAsTechnologyHolder(Game game, Player seat) {

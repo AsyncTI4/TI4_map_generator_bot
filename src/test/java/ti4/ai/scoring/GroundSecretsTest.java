@@ -113,4 +113,28 @@ class GroundSecretsTest extends BaseTi4Test {
         assertThat(plan.landings()).containsEntry("tarmann", 2);
         assertThat(plan.moves()).allMatch(move -> move.type() != UnitType.Infantry);
     }
+
+    // A carrier one system away is worth more coming home for spare mechs while Mechanize the Military is in hand. The
+    // home planets are exhausted, so building there is not on offer.
+    @Test
+    void aCarrierComesHomeForSpareMechsWhileMechanizeIsHeld() {
+        test.nekro.setTacticalCC(3);
+        Tile tarmann = test.place("22", neighbour);
+        test.nekro.addPlanet("tarmann");
+        test.units(home, "mordaiii", test.nekro, UnitType.Mech, 3);
+        test.units(tarmann, "space", test.nekro, UnitType.Carrier, 1);
+        new java.util.ArrayList<>(test.nekro.getPlanets()).forEach(test.nekro::exhaustPlanet);
+        test.nekro.setTg(0);
+        double without = TacticalPlanner.forTarget(test.game, test.nekro, AiTestGame.HOME)
+                .filter(plan -> plan.kind() == Kind.PICKUP)
+                .map(TacticalPlan::score)
+                .orElse(0.0);
+
+        test.nekro.setSecret(MECHANIZE);
+        TacticalPlan plan = TacticalPlanner.forTarget(test.game, test.nekro, AiTestGame.HOME)
+                .orElseThrow();
+
+        assertThat(plan.kind()).isEqualTo(Kind.PICKUP);
+        assertThat(plan.score()).isGreaterThan(without + 1);
+    }
 }

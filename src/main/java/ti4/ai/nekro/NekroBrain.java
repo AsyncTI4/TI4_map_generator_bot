@@ -70,6 +70,7 @@ import ti4.ai.tactical.SlingRelayRules;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
 import ti4.ai.tactical.TacticalRules;
+import ti4.ai.tactical.TransitDiodesRules;
 import ti4.ai.tech.TechRules;
 import ti4.ai.trade.TradeRules;
 import ti4.ai.xxcha.PeaceAccordsRules;
@@ -175,6 +176,7 @@ public class NekroBrain implements FactionBrain {
             TechRules::continueProductionBiomes,
             DatahubRules::next,
             SlingRelayRules::next,
+            TransitDiodesRules::next,
             TechRules::nullificationField,
             TechRules::neuralParasite,
             TechRules::salvageOperations,
@@ -513,6 +515,8 @@ public class NekroBrain implements FactionBrain {
         }
         if (TacticalRules.pickingSystem(context)) return TacticalRules.start(context);
         if (TacticalRules.actionTaken(context)) return Optional.empty();
+        Optional<AiDecision> diodes = TransitDiodesRules.start(context, thisTurn);
+        if (diodes.isPresent()) return diodes;
         Optional<AiDecision> warfareFirst = warfareBeforeFollowUp(context, thisTurn);
         if (warfareFirst.isPresent()) return warfareFirst;
         Optional<AiDecision> sling = SlingRelayRules.insteadOfTacticalAction(context, thisTurn);

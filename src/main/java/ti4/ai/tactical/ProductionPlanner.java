@@ -395,7 +395,11 @@ public class ProductionPlanner {
         if (seat.getSecretsUnscored().containsKey(OCCUPY_THE_FRINGE)) {
             int stacked = new ObjectiveValue(builder.game, seat).before().mostGroundForcesWithoutADock();
             int spare = TacticalPlanner.movableGroundForces(builder.game, seat, builder.tile, builder.defense);
-            builder.infantry(FRINGE_GROUND_FORCES - stacked - spare, builder.scoringValue(UnitType.Infantry));
+            int movable = GroundDrops.roomNear(builder.game, seat, builder.tile)
+                    + (TransitDiodesRules.readyDiodes(seat).isPresent() ? TransitDiodesRules.MOVED_UNITS : 0)
+                    - spare;
+            int wanted = Math.min(FRINGE_GROUND_FORCES - stacked - spare, movable);
+            builder.infantry(wanted, builder.scoringValue(UnitType.Infantry));
         }
         if (fleetShips == 0 && new ObjectiveValue(builder.game, seat).caresAboutPresence()) {
             int pawns = Math.min(WANTED_PAWNS, builder.count(UnitType.Destroyer) + PAWNS_PER_BUILD);

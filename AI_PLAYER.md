@@ -261,7 +261,12 @@ to build one by hand:
       lands a mech first on a planet that has none while it holds _Mechanize the Military_, and with _Occupy the Fringe_
       in hand plans garrison moves that carry ground forces onto a planet it holds without a dock. With _Mechanize the
       Military_ in hand, garrison moves carry spare mechs (never a planet's last one) to held planets that have none,
-      one each, and with _Occupy the Fringe_ in hand production buys the infantry its biggest dockless stack still lacks. With _Strengthen Bonds_ (another player's note in its play area) or
+      one each, and with _Occupy the Fringe_ in hand production buys the infantry its biggest dockless stack still lacks,
+      up to what its carriers in or next to the system can move (plus 4 with Transit Diodes ready). A carrier pickup at a
+      system holding that cargo is worth more while either secret is held. With Transit Diodes ready
+      (`TransitDiodesRules`) it moves up to 4 ground forces at the start of its turn: spare mechs to bare planets, or
+      infantry onto the dockless stack. Research values Transit Diodes for these secrets only when its prerequisites are
+      already met. With _Strengthen Bonds_ (another player's note in its play area) or
       _Betray a Friend_ (beat a player whose note is in its play area; only a neighbour's note counts, one per owner) it
       buys the notes that land in a play area (`NoteSecrets`): such a note is worth 0.9 of a point more for _Strengthen
       Bonds_ and 0.4 for _Betray a Friend_, while the secret is unmet. Its first ask is the owner's fair price for the
