@@ -46,6 +46,7 @@ final class ObjectiveTracker {
             WinningPathBreakdown leaderPath,
             List<String> secretsScored,
             List<String> secretsHeld,
+            Map<String, List<Integer>> groundProgress,
             int seats) {
 
         static final Summary NOTHING = new Summary(
@@ -55,6 +56,7 @@ final class ObjectiveTracker {
                 new WinningPathBreakdown(0, 0, 0, 0, Map.of()),
                 List.of(),
                 List.of(),
+                Map.of(),
                 0);
 
         // For each status phase the game reached, from round 1: the share of seats that scored at least one public
@@ -90,6 +92,9 @@ final class ObjectiveTracker {
     private final List<StatusScoring> statusScoring = new ArrayList<>();
     private final List<Chance> chances = new ArrayList<>();
     private final Set<String> held = new java.util.LinkedHashSet<>();
+    // Mechanize the Military and Occupy the Fringe: the most progress each holder had at any status phase.
+    private static final List<String> GROUND_SECRETS = List.of("mtm", "otf");
+    private final Map<String, Integer> groundProgress = new java.util.LinkedHashMap<>();
 
     // The snapshot opens once every seat has passed, before the status phase starts: scores a seat queued during the
     // action phase are applied the moment the status phase begins, so a snapshot taken then would already hold them.
@@ -114,6 +119,7 @@ final class ObjectiveTracker {
                 held.stream()
                         .map(entry -> entry.substring(entry.indexOf('|') + 1))
                         .toList(),
+                groundProgressByHolder(),
                 game.getRealPlayers().size());
     }
 
@@ -129,6 +135,30 @@ final class ObjectiveTracker {
         }
     }
 
+    private void recordGroundProgress(Game game) {
+        for (Player seat : game.getRealPlayers()) {
+            ti4.ai.scoring.ObjectiveValue value = null;
+            for (String secret : GROUND_SECRETS) {
+                if (!seat.getSecretsUnscored().containsKey(secret)) continue;
+                if (value == null) value = new ti4.ai.scoring.ObjectiveValue(game, seat);
+                int progress = value.progress(secret, value.before());
+                groundProgress.merge(seat.getFaction() + "|" + secret, progress, Math::max);
+            }
+            for (String secret : GROUND_SECRETS) {
+                if (seat.getSecretsScored().containsKey(secret))
+                    groundProgress.put(seat.getFaction() + "|" + secret, 99);
+            }
+        }
+    }
+
+    private Map<String, List<Integer>> groundProgressByHolder() {
+        Map<String, List<Integer>> bySecret = new java.util.TreeMap<>();
+        groundProgress.forEach((key, progress) -> bySecret.computeIfAbsent(
+                        key.substring(key.indexOf('|') + 1), secret -> new ArrayList<>())
+                .add(progress));
+        return bySecret;
+    }
+
     private static boolean actionPhaseOver(Game game) {
         return ACTION_PHASE.equals(game.getPhaseOfGame())
                 && !game.getRealPlayers().isEmpty()
@@ -141,6 +171,7 @@ final class ObjectiveTracker {
     }
 
     private void open(Game game) {
+        recordGroundProgress(game);
         Map<String, Set<String>> publics = new HashMap<>();
         Map<String, Integer> secrets = new HashMap<>();
         List<Pending> pending = new ArrayList<>();

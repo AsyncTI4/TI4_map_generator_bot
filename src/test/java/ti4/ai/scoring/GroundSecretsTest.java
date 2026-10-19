@@ -93,4 +93,24 @@ class GroundSecretsTest extends BaseTi4Test {
         assertThat(plan.kind()).isEqualTo(Kind.GARRISON);
         assertThat(plan.landings()).containsEntry("tarmann", 9);
     }
+
+    // With Mechanize the Military in hand and mechs on Mordai II and Abyz, a carrier at home takes a spare mech to
+    // Tarmann, a held planet without one.
+    @Test
+    void thePlannerSpreadsMechsForMechanizeTheMilitary() {
+        test.nekro.setSecret(MECHANIZE);
+        test.nekro.setTacticalCC(3);
+        Tile tarmann = test.place("22", neighbour);
+        test.nekro.addPlanet("tarmann");
+        test.units(tarmann, "tarmann", test.nekro, UnitType.Infantry, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Mech, 2);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+
+        TacticalPlan plan =
+                TacticalPlanner.forTarget(test.game, test.nekro, neighbour).orElseThrow();
+
+        assertThat(plan.kind()).isEqualTo(Kind.GARRISON);
+        assertThat(plan.landings()).containsEntry("tarmann", 2);
+        assertThat(plan.moves()).allMatch(move -> move.type() != UnitType.Infantry);
+    }
 }

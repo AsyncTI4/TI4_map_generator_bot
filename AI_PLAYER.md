@@ -259,7 +259,9 @@ to build one by hand:
       rest. It pursues _Mechanize the Military_ and _Occupy the Fringe_ like the other board secrets: the tactical
       planner counts the planets holding one of its mechs and the most ground forces on a planet without its space dock,
       lands a mech first on a planet that has none while it holds _Mechanize the Military_, and with _Occupy the Fringe_
-      in hand plans garrison moves that carry ground forces onto a planet it holds without a dock. With _Strengthen Bonds_ (another player's note in its play area) or
+      in hand plans garrison moves that carry ground forces onto a planet it holds without a dock. With _Mechanize the
+      Military_ in hand, garrison moves carry spare mechs (never a planet's last one) to held planets that have none,
+      one each, and with _Occupy the Fringe_ in hand production buys the infantry its biggest dockless stack still lacks. With _Strengthen Bonds_ (another player's note in its play area) or
       _Betray a Friend_ (beat a player whose note is in its play area; only a neighbour's note counts, one per owner) it
       buys the notes that land in a play area (`NoteSecrets`): such a note is worth 0.9 of a point more for _Strengthen
       Bonds_ and 0.4 for _Betray a Friend_, while the secret is unmet. Its first ask is the owner's fair price for the

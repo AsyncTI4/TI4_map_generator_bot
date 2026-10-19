@@ -246,6 +246,21 @@ class AiSelfPlayTest extends BaseTi4Test {
                         secretName(entry.getKey()), scored.getOrDefault(entry.getKey(), 0L), entry.getValue()))
                 .collect(java.util.stream.Collectors.joining(", "));
         System.out.println("Secrets scored/held (seats that held each one at some point): " + rows);
+        printGroundProgress(summaries);
+    }
+
+    // For each holder of Mechanize the Military (4 mech planets) or Occupy the Fringe (9 ground forces on a planet
+    // without a dock): the most progress it had at a status phase, as a count of holders per step; 99 is scored.
+    private static void printGroundProgress(List<ObjectiveTracker.Summary> summaries) {
+        Map<String, java.util.TreeMap<Integer, Integer>> steps = new java.util.TreeMap<>();
+        for (ObjectiveTracker.Summary summary : summaries) {
+            summary.groundProgress()
+                    .forEach((secret, progress) ->
+                            progress.forEach(best -> steps.computeIfAbsent(secret, id -> new java.util.TreeMap<>())
+                                    .merge(best, 1, Integer::sum)));
+        }
+        steps.forEach((secret, counts) -> System.out.println(
+                "Best progress per holder at a status phase, " + secretName(secret) + ": " + counts));
     }
 
     private static String secretName(String id) {

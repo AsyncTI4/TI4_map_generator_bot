@@ -77,6 +77,8 @@ public class ProductionPlanner {
     private static final String COMMAND_AN_ARMADA = "command_armada";
     private static final String SUPREMACY = "supremacy";
     private static final String MIGHTY_FLEET = "gamf";
+    private static final String OCCUPY_THE_FRINGE = "otf";
+    private static final int FRINGE_GROUND_FORCES = 9;
     private static final String UNVEIL_FLAGSHIP = "uf";
     private static final String MAKE_AN_EXAMPLE = "mew";
     private static final String FIGHT_WITH_PRECISION = "fwp";
@@ -389,6 +391,11 @@ public class ProductionPlanner {
         }
         if (seat.getSecretsUnscored().containsKey(FIGHT_WITH_PRECISION)) {
             builder.enablingShips(model -> model.getAfbDieCount(seat) > 0);
+        }
+        if (seat.getSecretsUnscored().containsKey(OCCUPY_THE_FRINGE)) {
+            int stacked = new ObjectiveValue(builder.game, seat).before().mostGroundForcesWithoutADock();
+            int spare = TacticalPlanner.movableGroundForces(builder.game, seat, builder.tile, builder.defense);
+            builder.infantry(FRINGE_GROUND_FORCES - stacked - spare, builder.scoringValue(UnitType.Infantry));
         }
         if (fleetShips == 0 && new ObjectiveValue(builder.game, seat).caresAboutPresence()) {
             int pawns = Math.min(WANTED_PAWNS, builder.count(UnitType.Destroyer) + PAWNS_PER_BUILD);
