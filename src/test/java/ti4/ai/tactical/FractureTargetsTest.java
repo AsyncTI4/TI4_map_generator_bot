@@ -144,7 +144,7 @@ class FractureTargetsTest extends BaseTi4Test {
     void aFleetThatCanWinStyxStagesWithinReachOfIt() {
         fracture.ships(fracture.ingress, UnitType.Dreadnought, 5);
         fracture.ships(fracture.ingress, UnitType.Carrier, 2);
-        fracture.ships(fracture.ingress, UnitType.Infantry, 4);
+        fracture.ships(fracture.ingress, UnitType.Infantry, 8);
 
         List<TacticalPlan> stages = TacticalPlanner.ranked(fracture.board.test.game, fracture.nekro()).stream()
                 .filter(plan -> plan.kind() == Kind.STAGE)
