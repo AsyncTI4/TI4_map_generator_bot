@@ -2383,10 +2383,8 @@ public final class ButtonHelperAbilities {
                     event.getMessageChannel(), "No eligible opponent found for combat on " + planetName + ".");
             return;
         }
-        if (SarcosaUnitHandler.handleEvasiveCoexistence(game, player, enemyPlayer.get(), tile, unitHolder)) {
-            return;
-        }
         StartCombatService.startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
+        SarcosaUnitHandler.offerEvasiveCoexistenceReminder(game, player, enemyPlayer.get(), unitHolder);
     }
 
     @ButtonHandler("replaceSleeperWith_")

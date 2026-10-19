@@ -39,59 +39,30 @@ public class SarcosaUnitHandler {
     private static final String EXPLORE_NAUCLIS = "explorePlanetWithNauclis_";
     private static final String DEPLOY_RAVAGER = "deployRavager";
     private static final String RAVAGER_STEAL = "stealTgRavager_";
-    private static final String FINISH_EVASIVE_PAYMENT = "finishEvasivePayment_";
 
-    public static boolean handleEvasiveCoexistence(
-            Game game, Player endingPlayer, Player defendingPlayer, Tile tile, UnitHolder planet) {
-        List<Player> evasiveOwners = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, planet).stream()
-                .filter(owner -> owner.hasAbility("evasive"))
-                .filter(owner -> game.getPlanetsPlayerIsCoexistingOn(owner).contains(planet.getName()))
-                .toList();
-        if (evasiveOwners.contains(endingPlayer)) {
+    public static void offerEvasiveCoexistenceReminder(
+            Game game, Player endingPlayer, Player defendingPlayer, UnitHolder planet) {
+        if (endingPlayer.hasAbility("evasive")
+                && game.getPlanetsPlayerIsCoexistingOn(endingPlayer).contains(planet.getName())) {
             MessageHelper.sendMessageToChannel(
                     endingPlayer.getCorrectChannel(),
                     endingPlayer.getRepresentationNoPing()
-                            + " cannot end coexistence with their own units due to _Evasive_.");
-            return true;
+                            + " cannot end coexistence with their own units due to **Evasive**.");
+            return;
         }
-        if (evasiveOwners.isEmpty()) {
-            return false;
+        if (!defendingPlayer.hasAbility("evasive")
+                || !game.getPlanetsPlayerIsCoexistingOn(defendingPlayer).contains(planet.getName())) {
+            return;
         }
-
-        Player evasiveOwner = evasiveOwners.getFirst();
         List<Button> buttons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, endingPlayer, "inf"));
-        buttons.add(Buttons.green(
-                endingPlayer.factionButtonChecker() + FINISH_EVASIVE_PAYMENT + tile.getPosition() + "|"
-                        + planet.getName() + "|" + defendingPlayer.getFaction(),
-                "Pay 2 Influence and Start Combat",
-                FactionEmojis.sarcosa));
-        buttons.add(Buttons.red(endingPlayer.factionButtonChecker() + "deleteButtons", "Decline"));
+        buttons.add(Buttons.red(endingPlayer.factionButtonChecker() + "deleteButtons", "Done Spending 2 Influence"));
         MessageHelper.sendMessageToChannelWithButtons(
                 endingPlayer.getCorrectChannel(),
                 endingPlayer.getRepresentationNoPing() + ", spend 2 influence to end coexistence with "
-                        + evasiveOwner.getRepresentationNoPing() + "'s units on "
-                        + Helper.getPlanetRepresentation(planet.getName(), game) + " due to _Evasive_.\n"
-                        + "Only decline if Engage in Combat was pressed in error, or if you are engaging a player other than "
-                        + evasiveOwner.getRepresentationNoPing() + ".\n"
+                        + defendingPlayer.getRepresentationNoPing() + "'s units on "
+                        + Helper.getPlanetRepresentation(planet.getName(), game) + " due to **Evasive**.\n"
                         + Helper.buildSpentThingsMessage(endingPlayer, game, "inf"),
                 buttons);
-        return true;
-    }
-
-    @ButtonHandler(FINISH_EVASIVE_PAYMENT)
-    public static void finishEvasivePayment(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] values = buttonID.substring(FINISH_EVASIVE_PAYMENT.length()).split("\\|", 3);
-        Tile tile = values.length == 3 ? game.getTileByPosition(values[0]) : null;
-        UnitHolder planet = tile == null || values.length != 3
-                ? null
-                : tile.getUnitHolders().get(values[1]);
-        Player defender = values.length == 3 ? game.getPlayerFromColorOrFaction(values[2]) : null;
-        if (tile == null || planet == null || defender == null || player == defender) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        StartCombatService.startGroundCombat(player, defender, game, event, planet, tile);
-        ButtonHelper.deleteMessage(event);
     }
 
     public static void offerColossusInfantryDestruction(
