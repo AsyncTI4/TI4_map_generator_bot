@@ -1,4 +1,4 @@
-package ti4.discord.interactions.commands.omega_phase;
+package ti4.discord.interactions.commands.homebrew.omega_phase;
 
 import java.util.ArrayList;
 import java.util.List;

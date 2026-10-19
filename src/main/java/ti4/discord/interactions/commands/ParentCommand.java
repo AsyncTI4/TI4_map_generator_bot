@@ -44,12 +44,15 @@ public interface ParentCommand extends Command<SlashCommandInteractionEvent> {
     }
 
     default Command<SlashCommandInteractionEvent> getSubcommand(SlashCommandInteractionEvent event) {
-        String subcommandGroupName = event.getInteraction().getSubcommandGroup();
-        if (subcommandGroupName != null) {
-            return getSubcommandGroups().get(subcommandGroupName);
-        }
         String subcommandName = event.getInteraction().getSubcommandName();
-        return getSubcommands().get(subcommandName);
+        String subcommandGroupName = event.getInteraction().getSubcommandGroup();
+        if (subcommandGroupName == null) {
+            return getSubcommands().get(subcommandName);
+        }
+        SubcommandGroup subcommandGroup = getSubcommandGroups().get(subcommandGroupName);
+        return subcommandGroup == null
+                ? null
+                : subcommandGroup.getGroupSubcommands().get(subcommandName);
     }
 
     @Override

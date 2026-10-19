@@ -1,4 +1,4 @@
-package ti4.discord.interactions.commands.special;
+package ti4.discord.interactions.commands.bothelper;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;

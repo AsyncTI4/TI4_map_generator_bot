@@ -1,14 +1,14 @@
-package ti4.discord.interactions.commands.monuments;
+package ti4.discord.interactions.commands.homebrew.monuments;
 
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import ti4.discord.interactions.commands.ParentCommand;
 import ti4.discord.interactions.commands.Subcommand;
+import ti4.discord.interactions.commands.SubcommandGroup;
 
-public class MonumentsCommand implements ParentCommand {
+public class MonumentsGroup extends SubcommandGroup {
 
-    private final Map<String, Subcommand> subcommands = Stream.of(
+    private static final Map<String, Subcommand> subcommands = Stream.of(
                     new MonumentReady(),
                     new MonumentExhaust(),
                     new BelkoseaToken(BelkoseaToken.Action.ADD),
@@ -16,18 +16,12 @@ public class MonumentsCommand implements ParentCommand {
                     new BelkoseaToken(BelkoseaToken.Action.MOVE))
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
-    @Override
-    public String getName() {
-        return "monument";
+    public MonumentsGroup() {
+        super("monument", "Monuments commands");
     }
 
     @Override
-    public String getDescription() {
-        return "Monument";
-    }
-
-    @Override
-    public Map<String, Subcommand> getSubcommands() {
+    public Map<String, Subcommand> getGroupSubcommands() {
         return subcommands;
     }
 }

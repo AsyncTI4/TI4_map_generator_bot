@@ -1,4 +1,4 @@
-package ti4.discord.interactions.commands.monuments;
+package ti4.discord.interactions.commands.homebrew.monuments;
 
 import java.util.Set;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

@@ -3601,7 +3601,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             if (isOmegaPhaseMode()) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        "This game is using Omega Phase, so the objective setup was ignored. If there's a problem with it, use `/omegaphase "
+                        "This game is using Omega Phase, so the objective setup was ignored. If there's a problem with it, use `/homebrew omegaphase "
                                 + Constants.RESET_OMEGA_PHASE_OBJECTIVES + "`");
             } else {
                 setUpPeekableObjectives(stage1Count, 1);

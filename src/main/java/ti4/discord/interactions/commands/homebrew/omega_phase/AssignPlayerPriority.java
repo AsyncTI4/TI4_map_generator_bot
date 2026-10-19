@@ -1,4 +1,4 @@
-package ti4.discord.interactions.commands.omega_phase;
+package ti4.discord.interactions.commands.homebrew.omega_phase;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
