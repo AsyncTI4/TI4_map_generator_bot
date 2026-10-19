@@ -105,6 +105,7 @@ public class TacticalPlanner {
     private static final int MECHANIZED_PLANETS = 4;
     private static final int FRINGE_GROUND_FORCES = 9;
     private static final double SECRET_CARGO_SHARE = 0.3;
+    private static final double COMPLETING_CARGO_SHARE = 0.5;
     private static final String MAKE_AN_EXAMPLE = "mew";
     private static final int DEMONSTRATION_SHIPS = 3;
     private static final double PATIENT_SHARE = 0.25;
@@ -694,9 +695,9 @@ public class TacticalPlanner {
         int landed = Math.min(unitCount(groundForces), free.size());
         if (landed == 0) return Optional.empty();
         List<Planet> targets = free.subList(0, landed);
-        List<UnitMove> landing = take(mechsFirstForHazardousPlanets(groundForces, targets), landed);
+        List<UnitMove> landing = take(mechsFirstForHazardousPlanets(context.seat, groundForces, targets), landed);
         Map<Planet, int[]> forces =
-                distribute(targets, countOf(landing, UnitType.Infantry), countOf(landing, UnitType.Mech));
+                distribute(context.seat, targets, countOf(landing, UnitType.Infantry), countOf(landing, UnitType.Mech));
         Map<String, Integer> landings = new LinkedHashMap<>();
         double value = 0;
         for (Planet planet : targets) {
@@ -738,7 +739,7 @@ public class TacticalPlanner {
         boolean approaching = context.approaches(tile);
         if (approaching) loadable = Math.max(loadable, Math.min(landed + 1, Math.min(capacity, available - reserved)));
         List<Planet> targets = free.subList(0, landed);
-        List<UnitMove> ordered = mechsFirstForHazardousPlanets(groundForces, targets);
+        List<UnitMove> ordered = mechsFirstForHazardousPlanets(context.seat, groundForces, targets);
         List<UnitMove> cargo = take(ordered, loadable);
         Optional<List<UnitMove>> legal = loadedMoves(context, origin, tile, transports, cargo);
         if (legal.isEmpty()) {
@@ -747,7 +748,7 @@ public class TacticalPlanner {
         }
         if (legal.isEmpty()) return Optional.empty();
         Map<Planet, int[]> forces =
-                distribute(targets, countOf(cargo, UnitType.Infantry), countOf(cargo, UnitType.Mech));
+                distribute(context.seat, targets, countOf(cargo, UnitType.Infantry), countOf(cargo, UnitType.Mech));
         Map<String, Integer> landings = new LinkedHashMap<>();
         for (Planet planet : targets) {
             int[] landing = forces.get(planet);
@@ -856,7 +857,7 @@ public class TacticalPlanner {
                 availableGroundForces(context.game, seat, origin, context.defense(), shipsIn(leaving)).stream()
                         .filter(move -> !BoardView.SPACE.equals(move.holder()))
                         .toList();
-        onPlanets = mechsFirstForHazardousPlanets(onPlanets, free);
+        onPlanets = mechsFirstForHazardousPlanets(context.seat, onPlanets, free);
         int room = Math.min(Math.min(spare, unitCount(onPlanets)), free.size() - aboard);
         if (room <= 0 && aboard == 0) return plan;
         TacticalPlan best = plan;
@@ -879,9 +880,9 @@ public class TacticalPlanner {
         List<UnitMove> ground = groundIn(legal.get());
         int landed = Math.min(unitCount(ground), free.size());
         List<Planet> targets = free.subList(0, landed);
-        List<UnitMove> ordered = take(mechsFirstForHazardousPlanets(ground, targets), landed);
+        List<UnitMove> ordered = take(mechsFirstForHazardousPlanets(context.seat, ground, targets), landed);
         Map<Planet, int[]> forces =
-                distribute(targets, countOf(ordered, UnitType.Infantry), countOf(ordered, UnitType.Mech));
+                distribute(context.seat, targets, countOf(ordered, UnitType.Infantry), countOf(ordered, UnitType.Mech));
         Map<String, Integer> landings = new LinkedHashMap<>();
         forces.forEach((planet, landing) -> landings.put(planet.getName(), landing[INFANTRY] + landing[MECH]));
         double score = plan.score()
@@ -966,8 +967,11 @@ public class TacticalPlanner {
         return transports;
     }
 
-    private static List<UnitMove> mechsFirstForHazardousPlanets(List<UnitMove> forces, List<Planet> targets) {
-        long hazardous = targets.stream().filter(TacticalPlanner::isHazardous).count();
+    private static List<UnitMove> mechsFirstForHazardousPlanets(
+            Player seat, List<UnitMove> forces, List<Planet> targets) {
+        long hazardous = mechanizes(seat)
+                ? targets.size()
+                : targets.stream().filter(TacticalPlanner::isHazardous).count();
         List<UnitMove> mechs = ofType(forces, UnitType.Mech);
         int forHazardous = (int) Math.min(hazardous, unitCount(mechs));
         List<UnitMove> ordered = new ArrayList<>(take(mechs, forHazardous));
@@ -988,12 +992,13 @@ public class TacticalPlanner {
         return planet.getPlanetTypes().contains(HAZARDOUS);
     }
 
-    private static Map<Planet, int[]> distribute(List<Planet> targets, int infantry, int mechs) {
+    private static Map<Planet, int[]> distribute(Player seat, List<Planet> targets, int infantry, int mechs) {
         Map<Planet, int[]> forces = new LinkedHashMap<>();
         targets.forEach(planet -> forces.put(planet, new int[2]));
         int[] left = {infantry, mechs};
+        boolean mechanize = mechanizes(seat);
         for (Planet planet : targets) {
-            if (isHazardous(planet)) give(forces.get(planet), left, MECH);
+            if (mechanize || isHazardous(planet)) give(forces.get(planet), left, MECH);
         }
         for (Planet planet : targets) {
             if (total(forces.get(planet)) == 0) giveEither(forces.get(planet), left);
@@ -2106,6 +2111,7 @@ public class TacticalPlanner {
         int toGo = threshold - progress;
         if (progress == ObjectiveValue.NOT_MODELLED || toGo <= 0) return 0;
         int carried = Math.min(toGo, Math.min(cargo, pickedUp));
+        if (carried == toGo) return ObjectiveValue.VICTORY_POINT_VALUE * COMPLETING_CARGO_SHARE;
         return ObjectiveValue.VICTORY_POINT_VALUE * SECRET_CARGO_SHARE * carried / toGo;
     }
 
@@ -2582,15 +2588,24 @@ public class TacticalPlanner {
         for (Planet planet : origin.getPlanetUnitHolders()) {
             if (!seat.getPlanets().contains(planet.getName())) continue;
             int planetMechs = BoardView.count(planet, seat, UnitType.Mech);
-            int garrison = garrison(game, seat, origin, planet, defense, shipsLeaving, blend);
-            int mechsStaying = Math.min(planetMechs, garrison);
-            int infantryStaying = garrison - mechsStaying;
             int planetInfantry = BoardView.count(planet, seat, UnitType.Infantry);
+            int garrison = garrison(game, seat, origin, planet, defense, shipsLeaving, blend);
+            int infantryFirst = mechanizes(seat) ? Math.min(planetInfantry, garrison) : 0;
+            int mechsStaying = Math.min(planetMechs, garrison - infantryFirst);
+            int infantryStaying = garrison - mechsStaying;
             addMove(infantry, position, planet.getName(), UnitType.Infantry, planetInfantry - infantryStaying);
             addMove(mechs, position, planet.getName(), UnitType.Mech, planetMechs - mechsStaying);
         }
+        if (mechanizes(seat)) {
+            mechs.addAll(infantry);
+            return mechs;
+        }
         infantry.addAll(mechs);
         return infantry;
+    }
+
+    private static boolean mechanizes(Player seat) {
+        return seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY);
     }
 
     private static void addMove(List<UnitMove> moves, String origin, String holder, UnitType type, int count) {

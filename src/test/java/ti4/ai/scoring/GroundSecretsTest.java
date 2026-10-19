@@ -137,4 +137,28 @@ class GroundSecretsTest extends BaseTi4Test {
         assertThat(plan.kind()).isEqualTo(Kind.PICKUP);
         assertThat(plan.score()).isGreaterThan(without + 1);
     }
+
+    // Expanding to Qucen'n and Rarron (neither hazardous) from home with two mechs and four infantry: the carrier
+    // holds four, and while Mechanize the Military is held it takes the mechs, one for each planet.
+    @Test
+    void anExpansionCarriesMechsWhileMechanizeIsHeld() {
+        test.nekro.setTacticalCC(3);
+        test.place("29", neighbour);
+        test.units(home, "mordaiii", test.nekro, UnitType.Mech, 2);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 4);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        TacticalPlan without =
+                TacticalPlanner.forTarget(test.game, test.nekro, neighbour).orElseThrow();
+
+        test.nekro.setSecret(MECHANIZE);
+        TacticalPlan plan =
+                TacticalPlanner.forTarget(test.game, test.nekro, neighbour).orElseThrow();
+
+        assertThat(without.moves()).noneMatch(move -> move.type() == UnitType.Mech);
+        assertThat(plan.kind()).isEqualTo(Kind.EXPAND);
+        assertThat(plan.moves())
+                .filteredOn(move -> move.type() == UnitType.Mech)
+                .extracting(TacticalPlan.UnitMove::count)
+                .containsExactly(2);
+    }
 }
