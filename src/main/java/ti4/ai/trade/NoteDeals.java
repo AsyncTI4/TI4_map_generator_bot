@@ -37,6 +37,7 @@ class NoteDeals {
         List<Player> eligible = partners.stream()
                 .filter(partner -> OwnTurnDeals.mayApproach(context, partner))
                 .filter(partner -> !context.memory().has(partnerKey(game, partner)))
+                .filter(partner -> !OfferRejections.dropped(context, partner))
                 .toList();
         for (Option option : best(context, eligible)) {
             Optional<AiDecision> start =
@@ -44,6 +45,8 @@ class NoteDeals {
             if (start.isEmpty()) continue;
             TradeMemory.increment(context.memory(), roundKey);
             if (asksForAChasedNote(game, context.seat(), option)) NoteSecrets.asked(context.memory(), option.partner());
+            askedNote(game, context.seat(), option)
+                    .ifPresent(alias -> OfferRejections.noteAsked(context.memory(), option.partner(), alias));
             context.memory().put(partnerKey(game, option.partner()), String.valueOf(context.now()));
             return start;
         }
@@ -118,12 +121,18 @@ class NoteDeals {
     }
 
     private static boolean asksForAChasedNote(Game game, Player seat, Option option) {
+        return askedNote(game, seat, option)
+                .filter(alias -> NoteSecrets.chases(game, seat, alias))
+                .isPresent();
+    }
+
+    private static Optional<String> askedNote(Game game, Player seat, Option option) {
         return option.deal().items().stream()
                 .filter(item ->
                         item.type() == ItemType.PROMISSORY && item.receiver().equals(seat.getFaction()))
                 .map(item -> NotesForTrade.aliasOf(game, item))
                 .flatMap(Optional::stream)
-                .anyMatch(alias -> NoteSecrets.chases(game, seat, alias));
+                .findFirst();
     }
 
     private static List<String> ownNotes(Player seat, Player partner) {

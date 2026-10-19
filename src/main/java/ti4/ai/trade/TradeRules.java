@@ -13,6 +13,7 @@ public class TradeRules {
         if (!AiSettings.isTradingEnabled()) return Optional.empty();
         Trust.refresh(context);
         TradeEntry.observe(context);
+        OfferRejections.observe(context);
         PendingOffers.observe(context);
         TradeCardRules.observe(context);
         return Optional.empty();
@@ -25,6 +26,11 @@ public class TradeRules {
 
     public static Optional<AiDecision> answerOffers(AiTurnContext context) {
         return OfferResponder.answer(context);
+    }
+
+    public static Optional<AiDecision> askWhatTheyWant(AiTurnContext context) {
+        if (!AiSettings.isTradingEnabled()) return Optional.empty();
+        return OfferRejections.askWhatTheyWant(context);
     }
 
     public static Optional<AiDecision> payDebtInAgenda(AiTurnContext context) {

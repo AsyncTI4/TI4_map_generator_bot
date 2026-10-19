@@ -209,6 +209,7 @@ public class NekroBrain implements FactionBrain {
             this::discardExcessActionCards,
             TradeRules::rescindStale,
             TradeRules::answerOffers,
+            TradeRules::askWhatTheyWant,
             ActionCardResponses::respond,
             SabotageRules::answerWindowsAimedAtSeat,
             SabotageRules::followUp,

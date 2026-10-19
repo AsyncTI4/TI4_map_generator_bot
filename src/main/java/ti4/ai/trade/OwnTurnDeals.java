@@ -294,6 +294,7 @@ class OwnTurnDeals {
     }
 
     static boolean mayApproach(AiTurnContext context, Player partner) {
+        if (OfferRejections.coolingDown(context, partner)) return false;
         if (AiSeats.isAiSeat(partner)) return true;
         return Trust.of(context, partner) >= Trust.UNSOLICITED
                 && TradeMemory.count(context.memory(), unsolicitedKey(context, partner)) < MAX_UNSOLICITED;

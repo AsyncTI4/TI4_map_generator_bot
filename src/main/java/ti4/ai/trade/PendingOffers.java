@@ -33,7 +33,8 @@ class PendingOffers {
         CROSSED("their offer crossed ours"),
         EXPIRED("no answer in time"),
         WINDOW_CLOSED("the trading window closed"),
-        UNCOVERABLE("it can no longer be covered");
+        UNCOVERABLE("it can no longer be covered"),
+        REJECTED("it was rejected");
 
         private final String reason;
 
@@ -189,6 +190,8 @@ class PendingOffers {
         Game game = context.game();
         Player seat = context.seat();
         Deal deal = Deal.between(seat, partner);
+        if (OfferRejections.rejectedSince(context.memory(), partner, pending.sentAt()))
+            return Optional.of(Stale.REJECTED);
         if (crossed(context, partner, pending)) return Optional.of(Stale.CROSSED);
         if (context.now() > pending.expiresAt()) return Optional.of(Stale.EXPIRED);
         if (!pending.openKey().equals(TradeLegality.openKey(game, pending.purpose(), deal))) {

@@ -812,6 +812,12 @@ to build one by hand:
   - **Builder.** An offer is built with the bot's transaction buttons, one press per tick: `transaction`, the
     partner, what it asks for, what it gives (so an old Accept pressed during the build can only make the partner
     pay), then "Send the Offer". A counter-offer starts from "Reject and CounterOffer" on the offer it received.
+  - **Rejections** (`OfferRejections`). It reads the bot's "your offer ... has been rejected" notice in its private
+    thread, rescinds the rejected offer and makes no new unsolicited offer to that player for the rest of the round.
+    When the rejected offer asked a human for a promissory note it asks in table talk what they would want for it; their
+    next offer is the answer, taken if it clears the usual margin and otherwise rejected (no counter-offer), and the
+    note deal with that player then waits until the next round. A rejection from an AI seat drops the note deal the
+    same way.
   - **Recovery.** An offer counts as accepted once its items with the partner are gone. It rescinds an offer that
     gets no answer in time (5 minutes for an AI; for a human, until the phase ends, at most 12 hours or 24 for a Trade
     bill or a debt collection), whose window has closed, that it can no longer cover, or that crossed the partner's
