@@ -83,6 +83,7 @@ public class ProductionPlanner {
     private static final String MAKE_AN_EXAMPLE = "mew";
     private static final String FIGHT_WITH_PRECISION = "fwp";
     private static final String MECHANIZE_THE_MILITARY = "mtm";
+    private static final int STUCK_SPARE_MECHS = 2;
     private static final int MAX_DEFENSE_BUNDLES = 6;
     private static final int MAX_DEFENSE_BUNDLE_SIZE = 3;
     private static final int MAX_DEFENSE_MECHS = 2;
@@ -372,6 +373,9 @@ public class ProductionPlanner {
 
     private static void planScoringUnits(Builder builder) {
         Player seat = builder.seat;
+        if (mechsStuckAtHome(builder)) {
+            builder.ship(UnitType.Carrier, builder.scoringValue(UnitType.Carrier) + ENABLER_VALUE, true);
+        }
         for (UnitType type : heavyShipsWanted(builder)) {
             double enabler = type == UnitType.Flagship && wantsFlagshipForSecret(builder) ? ENABLER_VALUE : 0;
             if (builder.ship(type, builder.scoringValue(type) + enabler, true)) break;
@@ -405,6 +409,20 @@ public class ProductionPlanner {
             int pawns = Math.min(WANTED_PAWNS, builder.count(UnitType.Destroyer) + PAWNS_PER_BUILD);
             builder.shipsUpTo(UnitType.Destroyer, pawns, builder.scoringValue(UnitType.Destroyer), true);
         }
+    }
+
+    private static boolean mechsStuckAtHome(Builder builder) {
+        Player seat = builder.seat;
+        Tile home = seat.getHomeSystemTile();
+        if (!seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY) || home != builder.tile) return false;
+        boolean haulerAtHome = BoardView.MOVING_SHIPS.stream()
+                .anyMatch(type ->
+                        BoardView.capacity(seat, type) > 0 && BoardView.count(BoardView.space(home), seat, type) > 0);
+        if (haulerAtHome) return false;
+        int mechs = home.getUnitHolders().values().stream()
+                .mapToInt(holder -> BoardView.count(holder, seat, UnitType.Mech))
+                .sum();
+        return mechs - 1 >= STUCK_SPARE_MECHS;
     }
 
     private record DefenseBundle(UnitType type, int count) {

@@ -281,6 +281,23 @@ class ProductionPlannerTest extends BaseTi4Test {
         assertThat(plan().units(UnitType.Mech)).isEqualTo(3);
     }
 
+    // Four mechs sit on Mordai II and both carriers are away: while Mechanize the Military is held, a carrier is built
+    // at
+    // home to take the spare mechs out.
+    @Test
+    void buildsACarrierAtHomeForMechsStuckThereWhileMechanizeIsHeld() {
+        Tile away = test.place("22", AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.units(away, "space", test.nekro, UnitType.Carrier, 2);
+        test.units(home, "mordaiii", test.nekro, UnitType.Mech, 4);
+        test.nekro.setTg(10);
+        int without = plan().units(UnitType.Carrier);
+
+        test.nekro.setSecret("mtm");
+
+        assertThat(without).isZero();
+        assertThat(plan().units(UnitType.Carrier)).isEqualTo(1);
+    }
+
     private BuildPlan plan() {
         return ProductionPlanner.plan(test.game, test.nekro, home);
     }
