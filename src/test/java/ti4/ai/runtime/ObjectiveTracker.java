@@ -47,6 +47,7 @@ final class ObjectiveTracker {
             List<String> secretsScored,
             List<String> secretsHeld,
             Map<String, List<Integer>> groundProgress,
+            List<MechanizeHolder> mechanize,
             int seats) {
 
         static final Summary NOTHING = new Summary(
@@ -57,6 +58,7 @@ final class ObjectiveTracker {
                 List.of(),
                 List.of(),
                 Map.of(),
+                List.of(),
                 0);
 
         // For each status phase the game reached, from round 1: the share of seats that scored at least one public
@@ -87,6 +89,27 @@ final class ObjectiveTracker {
 
     private record Pending(String userId, String objective, int shortBy) {}
 
+    // A Mechanize the Military holder at the start of one status phase: mechs on the board, planets with a mech, mechs
+    // in the home system, own carriers (and those in the home system), mechs built so far and how often a mech first
+    // arrived on a planet outside the home system while the secret was held.
+    record MechanizeHolder(
+            String faction,
+            int round,
+            int mechs,
+            int mechPlanets,
+            int mechsHome,
+            int carriers,
+            int carriersHome,
+            int built,
+            int arrivedAway,
+            boolean scored) {}
+
+    private final List<MechanizeHolder> mechanize = new ArrayList<>();
+    private final Map<String, Integer> mechTotals = new HashMap<>();
+    private final Map<String, Integer> mechsBuilt = new HashMap<>();
+    private final Map<String, Integer> arrivals = new HashMap<>();
+    private final Map<String, Set<String>> awayMechPlanets = new HashMap<>();
+
     private Snapshot open;
     private int lastOpenedRound;
     private final List<StatusScoring> statusScoring = new ArrayList<>();
@@ -100,6 +123,7 @@ final class ObjectiveTracker {
     // action phase are applied the moment the status phase begins, so a snapshot taken then would already hold them.
     synchronized void observe(Game game) {
         if (pastTheOpeningDiscard(game)) recordHeld(game);
+        trackMechs(game);
         boolean scoringWindow = actionPhaseOver(game) || inStatusPhase(game);
         if (open != null && (!scoringWindow || game.getRound() != open.round())) close(game);
         if (scoringWindow && open == null && game.getRound() != lastOpenedRound) open(game);
@@ -120,6 +144,7 @@ final class ObjectiveTracker {
                         .map(entry -> entry.substring(entry.indexOf('|') + 1))
                         .toList(),
                 groundProgressByHolder(),
+                List.copyOf(mechanize),
                 game.getRealPlayers().size());
     }
 
@@ -132,6 +157,72 @@ final class ObjectiveTracker {
         for (Player seat : game.getRealPlayers()) {
             for (String secret : seat.getSecretsUnscored().keySet()) held.add(seat.getFaction() + "|" + secret);
             for (String secret : seat.getSecretsScored().keySet()) held.add(seat.getFaction() + "|" + secret);
+        }
+    }
+
+    private static boolean holdsMechanize(Player seat) {
+        return seat.getSecretsUnscored().containsKey("mtm")
+                || seat.getSecretsScored().containsKey("mtm");
+    }
+
+    private void trackMechs(Game game) {
+        for (Player seat : game.getRealPlayers()) {
+            if (!holdsMechanize(seat)) continue;
+            String faction = seat.getFaction();
+            int total = 0;
+            Set<String> away = new HashSet<>();
+            ti4.game.Tile home = seat.getHomeSystemTile();
+            for (ti4.game.Tile tile : game.getTileMap().values()) {
+                for (ti4.game.UnitHolder holder : tile.getUnitHolders().values()) {
+                    int here = ti4.ai.eval.BoardView.count(holder, seat, ti4.helpers.Units.UnitType.Mech);
+                    total += here;
+                    if (here > 0 && holder instanceof ti4.game.Planet && tile != home) away.add(holder.getName());
+                }
+            }
+            Integer before = mechTotals.put(faction, total);
+            if (before != null && total > before) mechsBuilt.merge(faction, total - before, Integer::sum);
+            Set<String> previous = awayMechPlanets.put(faction, away);
+            if (previous != null) {
+                long arrived = away.stream()
+                        .filter(planet -> !previous.contains(planet))
+                        .count();
+                if (arrived > 0) arrivals.merge(faction, (int) arrived, Integer::sum);
+            }
+        }
+    }
+
+    private void recordMechanize(Game game) {
+        for (Player seat : game.getRealPlayers()) {
+            if (!holdsMechanize(seat)) continue;
+            ti4.game.Tile home = seat.getHomeSystemTile();
+            int mechs = 0;
+            int planets = 0;
+            int mechsHome = 0;
+            int carriers = 0;
+            int carriersHome = 0;
+            for (ti4.game.Tile tile : game.getTileMap().values()) {
+                for (ti4.game.UnitHolder holder : tile.getUnitHolders().values()) {
+                    int here = ti4.ai.eval.BoardView.count(holder, seat, ti4.helpers.Units.UnitType.Mech);
+                    mechs += here;
+                    if (here > 0 && holder instanceof ti4.game.Planet) planets++;
+                    if (tile == home) mechsHome += here;
+                    int carriersHere = ti4.ai.eval.BoardView.count(holder, seat, ti4.helpers.Units.UnitType.Carrier);
+                    carriers += carriersHere;
+                    if (tile == home) carriersHome += carriersHere;
+                }
+            }
+            String faction = seat.getFaction();
+            mechanize.add(new MechanizeHolder(
+                    faction,
+                    game.getRound(),
+                    mechs,
+                    planets,
+                    mechsHome,
+                    carriers,
+                    carriersHome,
+                    mechsBuilt.getOrDefault(faction, 0),
+                    arrivals.getOrDefault(faction, 0),
+                    seat.getSecretsScored().containsKey("mtm")));
         }
     }
 
@@ -172,6 +263,7 @@ final class ObjectiveTracker {
 
     private void open(Game game) {
         recordGroundProgress(game);
+        recordMechanize(game);
         Map<String, Set<String>> publics = new HashMap<>();
         Map<String, Integer> secrets = new HashMap<>();
         List<Pending> pending = new ArrayList<>();

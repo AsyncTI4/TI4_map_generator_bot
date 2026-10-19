@@ -261,6 +261,31 @@ class AiSelfPlayTest extends BaseTi4Test {
         }
         steps.forEach((secret, counts) -> System.out.println(
                 "Best progress per holder at a status phase, " + secretName(secret) + ": " + counts));
+        printMechanizeHolders(summaries);
+    }
+
+    // Each Mechanize the Military holder at each status phase: mechs on the board / planets with a mech / mechs at
+    // home, carriers (at home), mechs built so far and mechs that first reached a planet away from home.
+    private static void printMechanizeHolders(List<ObjectiveTracker.Summary> summaries) {
+        int game = 0;
+        for (ObjectiveTracker.Summary summary : summaries) {
+            game++;
+            for (ObjectiveTracker.MechanizeHolder holder : summary.mechanize()) {
+                System.out.printf(
+                        "Mechanize holder g%d %s r%d: mechs %d on %d planets (%d at home), carriers %d (%d at home), built %d, arrived away %d%s%n",
+                        game,
+                        holder.faction(),
+                        holder.round(),
+                        holder.mechs(),
+                        holder.mechPlanets(),
+                        holder.mechsHome(),
+                        holder.carriers(),
+                        holder.carriersHome(),
+                        holder.built(),
+                        holder.arrivedAway(),
+                        holder.scored() ? ", scored" : "");
+            }
+        }
     }
 
     private static String secretName(String id) {
