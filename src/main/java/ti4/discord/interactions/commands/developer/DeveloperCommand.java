@@ -32,7 +32,8 @@ public class DeveloperCommand implements ParentCommand {
                     new ModifyMatchmakingQueue(),
                     new ShowMatchmakingRatingHistory(),
                     new ShowGameMatchmakingRatings(),
-                    new RunSql())
+                    new RunSql(),
+                    new ExportFinishedGame())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

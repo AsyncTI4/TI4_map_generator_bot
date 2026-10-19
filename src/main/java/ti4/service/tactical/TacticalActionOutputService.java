@@ -400,7 +400,9 @@ public class TacticalActionOutputService {
 
     private int getUnitMoveValue(
             Game game, Player player, Tile tile, UnitKey unit, Set<UnitKey> allMovingUnits, boolean skipBonus) {
-        UnitModel model = player.getUnitFromUnitKey(unit);
+
+        UnitModel model = player.getPriorityUnitByAsyncID(unit.asyncID(), null);
+        // player.getUnitFromUnitKey(unit);
         if (model == null) {
             return 0;
         }

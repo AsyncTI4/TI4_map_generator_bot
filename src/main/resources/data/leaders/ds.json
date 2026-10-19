@@ -345,7 +345,7 @@
         "type": "agent",
         "name": "Rond Bri'ay",
         "title": "Master of Operations",
-        "abilityWindow": "When 1 or more of a player's units use PRODUCTION:",
+        "abilityWindow": "After 1 or more of a player's units use PRODUCTION:",
         "abilityText": "You may exhaust this card to allow that player to gain 1 command token.",
         "unlockCondition": "Always Unlocked",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/ds/rohdhnaagent.webp?raw=true",

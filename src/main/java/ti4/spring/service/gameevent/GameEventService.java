@@ -1,5 +1,6 @@
 package ti4.spring.service.gameevent;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -21,6 +22,10 @@ public class GameEventService {
 
     private final GameEventRepository gameEventRepository;
 
+    public static GameEventService getBean() {
+        return SpringContext.getBean(GameEventService.class);
+    }
+
     public static void commit(Game game, String archetype, @Nullable Player player, Map<String, Object> payload) {
         commit(game, archetype, player, payload, null);
     }
@@ -33,7 +38,7 @@ public class GameEventService {
             @Nullable String movementState) {
         try {
             if (DatabasePersistenceGate.isDisabled()) return;
-            SpringContext.getBean(GameEventService.class).commitEvent(game, archetype, player, payload, movementState);
+            getBean().commitEvent(game, archetype, player, payload, movementState);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to commit game event.", e);
         }
@@ -95,5 +100,33 @@ public class GameEventService {
     List<GameEventEntity> getEventsForGame(Game game) {
         return gameEventRepository.findByGameNameAndSeqLessThanEqualOrderBySeqAsc(
                 game.getName(), game.getEventSequenceCounter());
+    }
+
+    public String formatEventsAsText(Game game, boolean includeMapState) {
+        StringBuilder text = new StringBuilder();
+        for (GameEventEntity event : getEventsForGame(game)) {
+            text.append("#")
+                    .append(event.getSeq())
+                    .append(" | ")
+                    .append(Instant.ofEpochMilli(event.getTimestampEpochMillis()))
+                    .append(" | round ")
+                    .append(event.getRound())
+                    .append(" | ")
+                    .append(event.getPhase())
+                    .append(" | ")
+                    .append(event.getFaction() == null ? "-" : event.getFaction())
+                    .append(" | ")
+                    .append(event.getArchetype())
+                    .append("\n  payload: ")
+                    .append(event.getPayload());
+            if (event.getMovementState() != null) {
+                text.append("\n  movementState: ").append(event.getMovementState());
+            }
+            if (includeMapState && event.getMapState() != null) {
+                text.append("\n  mapState: ").append(event.getMapState());
+            }
+            text.append("\n");
+        }
+        return text.toString();
     }
 }
