@@ -44,7 +44,7 @@ public class GameCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "Game";
+        return "Create, set up, join and manage a game and its players";
     }
 
     @Override

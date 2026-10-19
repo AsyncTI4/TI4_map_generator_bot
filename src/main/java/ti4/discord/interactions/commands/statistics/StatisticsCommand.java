@@ -38,7 +38,7 @@ public class StatisticsCommand implements ParentCommand {
     }
 
     public String getDescription() {
-        return "Statistics";
+        return "Player and community statistics: games, turn times, dice luck, ratings, titles";
     }
 
     @Override

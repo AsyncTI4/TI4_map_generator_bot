@@ -19,7 +19,7 @@ import ti4.message.MessageHelper;
 class ShowPN extends GameStateSubcommand {
 
     public ShowPN() {
-        super(Constants.SHOW_PN, "Show Promissory Note to player", true, true);
+        super(Constants.SHOW_PN, "Show one of your Promissory Notes to a player", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER,
                         Constants.PROMISSORY_NOTE_ID,

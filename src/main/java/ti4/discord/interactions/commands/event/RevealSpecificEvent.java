@@ -18,7 +18,7 @@ import ti4.model.EventModel;
 class RevealSpecificEvent extends GameStateSubcommand {
 
     public RevealSpecificEvent() {
-        super(Constants.REVEAL_SPECIFIC, "Reveal top Event from deck", true, false);
+        super(Constants.REVEAL_SPECIFIC, "Reveal a specific Event by ID", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.EVENT_ID, "Event ID (text ID found in /search events)")
                 .setRequired(true)
                 .setAutoComplete(true));

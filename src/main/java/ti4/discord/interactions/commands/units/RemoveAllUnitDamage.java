@@ -23,7 +23,7 @@ public class RemoveAllUnitDamage extends GameStateCommand {
 
     @Override
     public String getDescription() {
-        return "Removal all unit damages from the map";
+        return "Remove all unit damage from the map";
     }
 
     @Override

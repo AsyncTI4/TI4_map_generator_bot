@@ -35,7 +35,7 @@ public class AdminCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "Admin";
+        return "Admin-only tools: delete games, disable the bot, fix channels and threads";
     }
 
     @Override

@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 class BreakthroughRemove extends GameStateSubcommand {
 
     public BreakthroughRemove() {
-        super(Constants.BREAKTHROUGH_REMOVE, "Set the breakthrough you are using", true, true);
+        super(Constants.BREAKTHROUGH_REMOVE, "Remove a breakthrough from your faction", true, true);
         addOption(OptionType.STRING, Constants.BREAKTHROUGH, "Which breakthrough to remove", true, true);
         addOption(OptionType.STRING, Constants.FACTION_COLOR, "Faction to remove the breakthrough", false, true);
     }

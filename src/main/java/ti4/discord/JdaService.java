@@ -295,12 +295,6 @@ public class JdaService {
 
         if (isProduction()) leaveNonWhitelistedGuilds();
 
-        // Attempt to start a "Search Only" version of the bot on eligible servers
-        for (Guild searchGuild : jda.getGuilds()) {
-            if (guilds.stream().anyMatch(g -> g.getId().equals(searchGuild.getId()))) continue;
-            startBotSearchOnly(searchGuild);
-        }
-
         // Check for and report a missing bot-log webhook
         if (!GlobalSettings.settingExists(GlobalSettings.ImplementedSettings.BOT_LOG_WEBHOOK_URL)) {
             BotLogger.warning(
@@ -417,29 +411,6 @@ public class JdaService {
         } catch (Exception e) {
             BotLogger.error("\n# FAILED TO START BOT ", e);
             return false;
-        }
-        return true;
-    }
-
-    private static boolean startBotSearchOnly(Guild guild) {
-        // Do not set up search commands for test bots, and definitely never for the hub server, which several test bots
-        // are still in
-        if (guild == null) return false;
-        if (System.getenv("TESTING") != null) return false;
-        if (Constants.ASYNCTI4_HUB_SERVER_ID.equals(guild.getId())) return false;
-
-        // Disable this for now
-        boolean x = true;
-        if (x) return false;
-
-        try {
-            CommandListUpdateAction commands = guild.updateCommands();
-            SlashCommandManager.getCommands().forEach(command -> command.registerSearchCommands(commands));
-            commands.queue(Consumers.nop(), BotLogger::catchRestError);
-            BotLogger.info("SEARCH-ONLY BOT STARTED UP: " + guild.getName());
-            guilds.add(guild);
-        } catch (Exception e) {
-            BotLogger.error("\n# SEARCH-ONLY BOT FAILED TO START: " + guild.getName(), e);
         }
         return true;
     }
