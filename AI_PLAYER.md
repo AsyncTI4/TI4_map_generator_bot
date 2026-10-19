@@ -262,7 +262,9 @@ to build one by hand:
       in hand plans garrison moves that carry ground forces onto a planet it holds without a dock. With _Mechanize the
       Military_ in hand, home keeps infantry back before mechs, expansions load mechs first and land one on each
       planet, a pickup that would complete the secret is worth half a point, production adds a carrier at home when two or
-      more spare mechs sit there with none to take them, and garrison moves carry spare mechs (never a planet's last one) to held planets that have none,
+      more spare mechs sit there with none to take them, a forward dock goes to a planet that shares its system with
+      another held planet, building at a dock first lifts a spare mech onto a held planet in that system without one
+      (using a ship already there, or one from next door), and garrison moves carry spare mechs (never a planet's last one) to held planets that have none,
       one each, and with _Occupy the Fringe_ in hand production buys the infantry its biggest dockless stack still lacks,
       up to what its carriers in or next to the system can move (plus 4 with Transit Diodes ready). A carrier pickup at a
       system holding that cargo is worth more while either secret is held. With Transit Diodes ready

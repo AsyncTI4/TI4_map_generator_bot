@@ -141,7 +141,7 @@ public final class Footprint {
                 take(forces, move.holder(), move.count());
                 if (move.type() == UnitType.Mech) take(mechs, move.holder(), move.count());
             }
-            if (move.origin().equals(target)) continue;
+            if (move.origin().equals(target) && BoardView.SPACE.equals(move.holder())) continue;
             if (move.type() == UnitType.Mech) {
                 arrivingMechs += move.count();
             } else {

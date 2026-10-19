@@ -1973,9 +1973,62 @@ public class TacticalPlanner {
         if (build.isEmpty()) return Optional.empty();
         double objectiveGain = context.builtGain(tile, build);
         boolean forScoring = build.scoring() || objectiveGain > 0;
-        if (build.units() < ProductionPlanner.MIN_UNITS && !forScoring && !build.defense()) return Optional.empty();
+        Optional<MechShift> shift = mechShift(context, tile);
+        boolean worthBuilding = build.units() >= ProductionPlanner.MIN_UNITS || forScoring || build.defense();
+        if (!worthBuilding && shift.isEmpty()) return Optional.empty();
+        TacticalPlan plan =
+                new TacticalPlan(Kind.PRODUCE, tile.getPosition(), List.of(), Map.of(), build.value() + objectiveGain);
+        return Optional.of(shift.map(found -> found.before(plan)).orElse(plan));
+    }
+
+    private record MechShift(List<UnitMove> moves, String planet, int wanted, double value) {
+        TacticalPlan before(TacticalPlan produce) {
+            return new TacticalPlan(
+                    produce.kind(), produce.target(), moves, Map.of(planet, wanted), produce.score() + value);
+        }
+    }
+
+    private static Optional<MechShift> mechShift(Context context, Tile tile) {
+        Player seat = context.seat;
+        if (!mechanizes(seat) || BoardView.hasEnemyUnits(context.game, seat, tile)) return Optional.empty();
+        Optional<Planet> bare = ownedPlanets(seat, tile)
+                .filter(planet -> BoardView.count(planet, seat, UnitType.Mech) == 0)
+                .findFirst();
+        Optional<Planet> spare = ownedPlanets(seat, tile)
+                .filter(planet -> BoardView.count(planet, seat, UnitType.Mech) >= 2)
+                .findFirst();
+        if (bare.isEmpty() || spare.isEmpty()) return Optional.empty();
+        List<UnitMove> moves = new ArrayList<>(
+                List.of(new UnitMove(tile.getPosition(), spare.get().getName(), UnitType.Mech, 1)));
+        double cost = 0;
+        if (capacityOf(seat, shipsAt(seat, tile)) <= BoardView.groundForces(BoardView.space(tile), seat)) {
+            Optional<Map.Entry<List<UnitMove>, Double>> hauler = nearestHauler(context, tile);
+            if (hauler.isEmpty()) return Optional.empty();
+            moves.addAll(0, hauler.get().getKey());
+            cost = hauler.get().getValue();
+        }
+        double gain = context.objectiveGain(tile, moves, List.of(bare.get().getName()));
+        if (gain - cost <= 0) return Optional.empty();
         return Optional.of(
-                new TacticalPlan(Kind.PRODUCE, tile.getPosition(), List.of(), Map.of(), build.value() + objectiveGain));
+                new MechShift(moves, bare.get().getName(), BoardView.groundForces(bare.get(), seat) + 1, gain - cost));
+    }
+
+    private static Optional<Map.Entry<List<UnitMove>, Double>> nearestHauler(Context context, Tile tile) {
+        Map.Entry<List<UnitMove>, Double> best = null;
+        for (Tile origin : context.origins()) {
+            if (origin == tile) continue;
+            List<UnitMove> haulers = transports(context, origin, tile, 1).stream()
+                    .filter(move -> CapacityUse.hauler(context.seat, move.type()))
+                    .toList();
+            if (haulers.isEmpty()) continue;
+            Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, haulers);
+            if (legal.isEmpty()) continue;
+            double cost = DISTANCE_COST
+                            * context.distance(origin, tile, haulers.getFirst().type())
+                    + context.defense().leaveCost(origin, legal.get());
+            if (best == null || cost < best.getValue()) best = Map.entry(legal.get(), cost);
+        }
+        return Optional.ofNullable(best);
     }
 
     private static double planetTempo(Game game) {

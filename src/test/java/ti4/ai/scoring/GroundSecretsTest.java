@@ -161,4 +161,50 @@ class GroundSecretsTest extends BaseTi4Test {
                 .extracting(TacticalPlan.UnitMove::count)
                 .containsExactly(2);
     }
+
+    // A forward dock on Qucen'n with two mechs and a carrier beside it: building there first lifts a spare mech onto
+    // Rarron, the other planet of the system, then produces.
+    @Test
+    void aForwardDockShiftsAMechToItsOtherPlanetBeforeBuilding() {
+        test.nekro.setSecret(MECHANIZE);
+        test.nekro.setTacticalCC(3);
+        test.nekro.setTg(6);
+        Tile dock = test.place("29", neighbour);
+        test.nekro.addPlanet("qucenn");
+        test.nekro.addPlanet("rarron");
+        test.units(dock, "qucenn", test.nekro, UnitType.Spacedock, 1);
+        test.units(dock, "qucenn", test.nekro, UnitType.Mech, 2);
+        test.units(dock, "space", test.nekro, UnitType.Carrier, 1);
+
+        TacticalPlan plan =
+                TacticalPlanner.forTarget(test.game, test.nekro, neighbour).orElseThrow();
+
+        assertThat(plan.kind()).isEqualTo(Kind.PRODUCE);
+        assertThat(plan.moves()).containsExactly(new TacticalPlan.UnitMove(neighbour, "qucenn", UnitType.Mech, 1));
+        assertThat(plan.landings()).containsEntry("rarron", 1);
+    }
+
+    // No ship with capacity sits at the dock, so the carrier at home comes along to do the lifting.
+    @Test
+    void aCarrierFromNextDoorDoesTheLiftingWhenNoneIsAtTheDock() {
+        test.nekro.setSecret(MECHANIZE);
+        test.nekro.setTacticalCC(3);
+        test.nekro.setTg(6);
+        Tile dock = test.place("29", neighbour);
+        test.nekro.addPlanet("qucenn");
+        test.nekro.addPlanet("rarron");
+        test.units(dock, "qucenn", test.nekro, UnitType.Spacedock, 1);
+        test.units(dock, "qucenn", test.nekro, UnitType.Mech, 2);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+
+        TacticalPlan plan =
+                TacticalPlanner.forTarget(test.game, test.nekro, neighbour).orElseThrow();
+
+        assertThat(plan.kind()).isEqualTo(Kind.PRODUCE);
+        assertThat(plan.moves())
+                .contains(
+                        new TacticalPlan.UnitMove(AiTestGame.HOME, "space", UnitType.Carrier, 1),
+                        new TacticalPlan.UnitMove(neighbour, "qucenn", UnitType.Mech, 1));
+        assertThat(plan.landings()).containsEntry("rarron", 1);
+    }
 }

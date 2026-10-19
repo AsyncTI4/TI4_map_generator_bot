@@ -28,6 +28,8 @@ class StructurePolicy {
     static final String PDS = "pds";
     static final String SPACE_DOCK = "spacedock";
     private static final String FUEL_THE_WAR_MACHINE = "fwm";
+    private static final String MECHANIZE_THE_MILITARY = "mtm";
+    private static final int MECH_SPREADING_PREFERENCE = 2;
     private static final int MAX_PDS_PER_PLANET = 2;
     private static final int MIN_FORWARD_DOCK_RESOURCES = 2;
     private static final int RICH_DOCK_RESOURCES = 3;
@@ -120,7 +122,16 @@ class StructurePolicy {
         if (isHome(game, planet)) return 1;
         int rich = planet.getResources() >= RICH_DOCK_RESOURCES ? 1 : 0;
         int nearby = STYX.equals(planet.getName()) || inSlice(game, seat, planet) ? 1 : 0;
-        return rich + nearby;
+        return rich + nearby + mechSpreadingSite(game, seat, planet);
+    }
+
+    private static int mechSpreadingSite(Game game, Player seat, Planet planet) {
+        if (!seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY)) return 0;
+        Tile tile = game.getTileFromPlanet(planet.getName());
+        if (tile == null) return 0;
+        boolean anotherHeldPlanet = tile.getPlanetUnitHolders().stream()
+                .anyMatch(other -> other != planet && seat.getPlanets().contains(other.getName()));
+        return anotherHeldPlanet ? MECH_SPREADING_PREFERENCE : 0;
     }
 
     // TODO: could use ti4.ai.eval.Territory instead of its own slice search
