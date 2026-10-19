@@ -35,6 +35,7 @@ public class UserSettings {
     private String activeHours;
     private boolean hasAnsweredSurvey;
     private boolean prefersSarweenMsg = true;
+    private boolean prefersStrategyThreadJoining = true;
     private boolean prefersPillageMsg = true;
     private String voltronStyle = "eyes";
     private boolean prefersAutoDebtClearance = true;

@@ -706,6 +706,7 @@ public class StartCombatService {
         if (isGroundCombat && !game.isFowMode()) {
             List<Button> autoButtons = new ArrayList<>();
             boolean thalnos = false;
+            List<Player> playersWithX89 = new ArrayList<>();
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                 if (!uH.getName().equalsIgnoreCase(unitHolderName)) {
                     continue;
@@ -747,6 +748,9 @@ public class StartCombatService {
                     if (player.hasRelic("thalnos")) {
                         thalnos = true;
                     }
+                    if (!playersWithX89.contains(player) && player.hasTech("x89c4")) {
+                        playersWithX89.add(player);
+                    }
 
                     String magenFmt = "%s, a reminder to use _%s_. The button should be above, ";
                     magenFmt += "but it (and SPACE CANNON) are not part of automated ground combat.";
@@ -776,6 +780,12 @@ public class StartCombatService {
                             " One of you may have __The Crown of Thalnos__, and thus not wish to automate the combat.";
                 }
                 MessageHelper.sendMessageToChannelWithButtons(threadChannel, automMessage, autoButtons);
+                for (Player p : playersWithX89) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            "This is a reminder that " + p.getRepresentationNoPing()
+                                    + " has X89 and thus their ground forces' hits will be doubled.");
+                }
             }
         }
         // DS Lanefir ATS Armaments

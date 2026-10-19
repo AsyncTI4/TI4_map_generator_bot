@@ -275,8 +275,10 @@ public final class Helper {
         List<Player> players = PlayStrategyCardService.getPlayersInFollowOrder(game, imperialHolder);
         for (Player player : players) {
             String message =
-                    player.getRepresentationUnfogged() + " drew their queued secret objective from **Imperial**. ";
+                    player.getRepresentationNoPing() + " drew their queued secret objective from **Imperial**. ";
             if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCardsInfoThread(), player.getRepresentation() + " you drew your queued secret.");
                 game.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());

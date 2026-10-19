@@ -602,7 +602,6 @@ public class PlayerTechService {
                             "reparationsStep3_" + player.getFaction() + "_" + planet,
                             Helper.getPlanetRepresentation(planet, game)));
                 }
-                ButtonHelper.deleteMessage(event);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged() + ", please choose the planet you wish to exhaust.",
