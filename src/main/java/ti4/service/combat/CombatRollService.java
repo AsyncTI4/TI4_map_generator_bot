@@ -2273,6 +2273,7 @@ public class CombatRollService {
                         }
                     }
                 }
+                KaloraUnitHandler.offerDreadnoughtTradeGoods(player, unitModel, rollType, resultRolls, numOfUnit);
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "kaltrimcommander")) {
                     int num1s = 0;
                     for (DiceHelper.Die die : resultRolls) {
