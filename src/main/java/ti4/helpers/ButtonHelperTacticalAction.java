@@ -976,6 +976,7 @@ public final class ButtonHelperTacticalAction {
                 KaltrimUnitHandler.offerButtonsToCaptureConsulateInf(game, consulateOwner, player, tile);
             }
         }
+        KaltrimUnitHandler.offerShrineInfantryRemoval(game, player, tile);
         KaltrimTechHandler.offerKaldurArrestField(player, game, tile);
         Player agentOwner = game.getPlayerFromLeader("scrapyardagent");
         if (agentOwner != null && agentOwner.hasUnexhaustedLeader("scrapyardagent")) {
