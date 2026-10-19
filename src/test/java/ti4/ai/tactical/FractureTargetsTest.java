@@ -164,6 +164,140 @@ class FractureTargetsTest extends BaseTi4Test {
                 .isEmpty();
     }
 
+    private Optional<TacticalPlan> stageTo(String position) {
+        return TacticalPlanner.ranked(fracture.board.test.game, fracture.nekro()).stream()
+                .filter(plan -> plan.kind() == Kind.STAGE && plan.target().equals(position))
+                .findFirst();
+    }
+
+    private void styxFleet(Tile tile) {
+        fracture.ships(tile, UnitType.Dreadnought, 3);
+        fracture.ships(tile, UnitType.Carrier, 2);
+        fracture.ships(tile, UnitType.Infantry, 6);
+    }
+
+    // Styx is three moves from every ingress and a moved fleet waits under its token until the next round, so a fleet
+    // of
+    // dreadnoughts one move from the ingress starts its march by moving onto the ingress.
+    @Test
+    void aFleetOneMoveFromTheIngressMarchesOntoIt() {
+        styxFleet(fracture.board.home);
+
+        assertThat(stageTo(fracture.ingress.getPosition())).isPresent();
+    }
+
+    // The neutral units never move, so each step closer to Styx is worth a larger share of the strike it prepares.
+    @Test
+    void eachStepTowardStyxIsWorthMoreThanTheOneBefore() {
+        styxFleet(fracture.board.home);
+        double fromHome = stageTo(fracture.ingress.getPosition()).orElseThrow().score();
+
+        fracture = new FractureScenario();
+        styxFleet(fracture.ingress);
+        double fromIngress = stageTo("frac2").orElseThrow().score();
+
+        fracture = new FractureScenario();
+        styxFleet(fracture.fracture("frac2"));
+        double fromEgress = stageTo("frac3").orElseThrow().score();
+
+        assertThat(fromIngress).isGreaterThan(fromHome);
+        assertThat(fromEgress).isGreaterThan(fromIngress);
+    }
+
+    @Test
+    void aFleetOnTheEgressMarchesOnTowardStyxRatherThanBack() {
+        styxFleet(fracture.fracture("frac2"));
+
+        double onward = stageTo("frac3").orElseThrow().score();
+
+        double back =
+                stageTo(fracture.ingress.getPosition()).map(TacticalPlan::score).orElse(Double.NEGATIVE_INFINITY);
+
+        assertThat(back).isLessThan(onward);
+    }
+
+    // A fleet on its way to Styx gives up the steps it has made when it leaves the Fracture for another target, so an
+    // attack on Cocytus from the egress is charged the march it abandons.
+    @Test
+    void anAttackThatPullsAMarchingFleetOffTheRouteIsChargedTheMarch() {
+        styxFleet(fracture.fracture("frac2"));
+        double raw = TacticalPlanner.explainAttack(fracture.board.test.game, fracture.nekro(), FractureScenario.COCYTUS)
+                .orElseThrow()
+                .score();
+
+        Optional<TacticalPlan> charged = TacticalPlanner.ranked(fracture.board.test.game, fracture.nekro()).stream()
+                .filter(plan -> plan.kind() == Kind.ATTACK && FractureScenario.COCYTUS.equals(plan.target()))
+                .findFirst();
+
+        assertThat(charged.map(TacticalPlan::score).orElse(Double.NEGATIVE_INFINITY))
+                .isLessThan(raw);
+    }
+
+    // Without an ingress in its own slice a seat reaches the Fracture only through Mecatol Rex or a neighbour's slice,
+    // so
+    // the march is worth half as much and the seat keeps its usual fleet pool.
+    @Test
+    void aSeatWithoutAnIngressInItsSliceValuesTheMarchLess() {
+        Game game = fracture.board.test.game;
+        styxFleet(fracture.ingress);
+        double own = stageTo("frac2").orElseThrow().score();
+        assertThat(ti4.ai.eval.FractureCampaign.routeShare(game, fracture.nekro()))
+                .isEqualTo(1.0);
+
+        Tile foreign =
+                fracture.board.test.place("27", ti4.ai.AiTestGame.neighbourOf(DefenseScenario.SARDAKK_HOME_POSITION));
+        foreign.addToken(Constants.TOKEN_INGRESS, "space");
+        fracture.ingress.getSpaceUnitHolder().removeToken(Constants.TOKEN_INGRESS);
+
+        assertThat(ti4.ai.eval.FractureCampaign.routeShare(game, fracture.nekro()))
+                .isLessThan(1.0);
+        assertThat(stageTo("frac2").map(TacticalPlan::score).orElse(Double.NEGATIVE_INFINITY))
+                .isLessThan(own);
+    }
+
+    @Test
+    void aFleetTooSmallForStyxDoesNotMarchTowardIt() {
+        fracture.ships(fracture.board.home, UnitType.Dreadnought, 1);
+        fracture.ships(fracture.board.home, UnitType.Carrier, 1);
+        fracture.ships(fracture.board.home, UnitType.Infantry, 4);
+
+        assertThat(stageTo(fracture.ingress.getPosition())).isEmpty();
+    }
+
+    // The dock nearest an ingress builds the smallest fleet that beats the guard of Styx (three dreadnoughts and a
+    // carrier) ahead of surplus ships, and only while Styx is not the seat's.
+    @Test
+    void theDockNearAnIngressBuildsAFleetForStyx() {
+        fracture.ships(fracture.board.home, UnitType.Carrier, 2);
+        fracture.board.test.units(fracture.board.home, "mordaiii", fracture.nekro(), UnitType.Infantry, 4);
+        fracture.nekro().setTg(10);
+        ProductionPlanner.BuildPlan near =
+                ProductionPlanner.plan(fracture.board.test.game, fracture.nekro(), fracture.board.home);
+
+        fracture.ingress.getSpaceUnitHolder().removeToken(Constants.TOKEN_INGRESS);
+        ProductionPlanner.BuildPlan far =
+                ProductionPlanner.plan(fracture.board.test.game, fracture.nekro(), fracture.board.home);
+
+        assertThat(near.units(UnitType.Dreadnought)).isGreaterThan(far.units(UnitType.Dreadnought));
+    }
+
+    // Three dreadnoughts and a carrier are four ships in one system, one more than the starting fleet pool allows.
+    // The token comes ahead of strategy tokens once the stack at the dock is close to the pool.
+    @Test
+    void aDockNearAnIngressWantsAFourthFleetToken() {
+        fracture.ships(fracture.board.home, UnitType.Dreadnought, 2);
+        fracture.nekro().setTacticalCC(3);
+        fracture.nekro().setFleetCC(3);
+        fracture.nekro().setStrategicCC(0);
+        String near = ti4.ai.nekro.CommandTokenPolicy.poolToGrow(fracture.board.test.game, fracture.nekro());
+
+        fracture.ingress.getSpaceUnitHolder().removeToken(Constants.TOKEN_INGRESS);
+        String far = ti4.ai.nekro.CommandTokenPolicy.poolToGrow(fracture.board.test.game, fracture.nekro());
+
+        assertThat(near).isEqualTo("increase_fleet_cc");
+        assertThat(far).isNotEqualTo("increase_fleet_cc");
+    }
+
     @Test
     void aDockNearAnIngressBuildsDreadnoughtsPastTheUsualThree() {
         fracture.ships(fracture.board.home, UnitType.Dreadnought, 3);

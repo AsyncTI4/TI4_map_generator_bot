@@ -40,9 +40,11 @@ class FractureSelfPlayTest extends BaseTi4Test {
         assertThat(scenario.relicsGained).as(outcome.report()).isEqualTo(1);
     }
 
+    // A fleet that could beat the guard of Styx marches on toward its point instead, so this one is only big enough for
+    // Cocytus.
     @Test
     void aSeatTakesCocytusAndDrawsItsRelic() throws Exception {
-        Attack scenario = new Attack("frac2", COCYTUS, 3, 2, 8);
+        Attack scenario = new Attack("frac2", COCYTUS, 2, 1, 4);
         SelfPlayGame.Outcome outcome = play(scenario);
 
         assertThat(outcome.ending()).as(outcome.report()).isEqualTo(SelfPlayGame.Ending.STOP_CONDITION);

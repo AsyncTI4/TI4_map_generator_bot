@@ -274,12 +274,14 @@ to build one by hand:
   3. fleet up to what a revealed _Raise a Fleet_ or _Command an Armada_ needs, once a stack can grow into it this
      round;
   4. fleet up to 3;
-  5. strategy up to 2;
-  6. fleet up to its largest stack plus one (at most 5), only when that stack has at least 3 ships and other ships
+  5. fleet up to 4 while a dock is within two moves of an ingress, one ingress is in the seat's own slice, Styx is
+     not the seat's and a stack has at least 2 ships (`FractureCampaign`: three dreadnoughts and a carrier for Styx);
+  6. strategy up to 2;
+  7. fleet up to its largest stack plus one (at most 5), only when that stack has at least 3 ships and other ships
      could join it;
-  7. tactic up to 5;
-  8. strategy up to 3, never more;
-  9. the rest to tactic.
+  8. tactic up to 5;
+  9. strategy up to 3, never more;
+  10. the rest to tactic.
 
   Every fleet level stays within _Fleet Regulations_' 4, and _Raise a Fleet_ is ignored under it. A normal round
   ends near 2 tactic, 2 strategy and 3 fleet. When it must lose a token (for example for a Nekro agent), it takes it
@@ -910,7 +912,10 @@ to build one by hand:
        Precision_. A few destroyers to move around for presence objectives.
     2. **Core.** Carriers up to two, the infantry the dock is short of a carrier load, and two mechs (four for
        _Mechanize the Military_).
-    3. **Surplus.** Its flagship, a war sun when it has the technology, dreadnoughts up to three, upgraded cruisers
+    3. **Fracture fleet.** At the dock nearest an ingress (within two moves) while Styx is not the seat's, a carrier,
+       three dreadnoughts and six infantry counted in that system, the smallest fleet that beats the guard of Styx,
+       at 0.75 a resource.
+    4. **Surplus.** Its flagship, a war sun when it has the technology, dreadnoughts up to three, upgraded cruisers
        and destroyers up to four, then plain cruisers up to two. Each only while the resources left could still fill
        the rest of the production with cheap units. Every flagship is worth building with money to spare, ahead of
        dreadnoughts, and its tier in `FlagshipRating` sets how much more it needs on top: nothing for S (Nekro,
@@ -918,7 +923,7 @@ to build one by hand:
        Empyrean, Keleres, Naaz-Rokha, Mahact), 3 for B (Jol-Nar, Winnu, Letnev, Mentak, Cabal), 4.5 for C (Muaat,
        Saar, Titans), 6 for D (Argent, Arborec, Ral Nel, Sardakk, Hacan), and 3.75 for a flagship not on the list.
        Plain destroyers are only built for objectives.
-    4. **Fill.** The rest of the dock's production: fighters into the dock's 3 free fighter slots and the spare
+    5. **Fill.** The rest of the dock's production: fighters into the dock's 3 free fighter slots and the spare
        capacity of its ships (each carrier keeps room for two infantry, so fighters never block an expansion), then
        infantry.
 
@@ -1032,11 +1037,25 @@ to build one by hand:
     influence, a relic when its relic token is still on it (4, three fragments at 1, 1 and 2) and, for Styx, the point of _A Song
     Like Marrow_ (8): the point is charged back by the counterstrike term when a rival can reach Styx, and a rival's Styx
     counts as a point to deny (its denial weight times 8) next to the usual standings terms. Fleets stage for the Fracture
-    planets with a lead of two moves instead of one (a staging system from which the target is two of the ships' moves
-    away, so a fleet works its way along the egress and the empty Fracture systems, one tactical action per step), only
-    while the fleet that would be there can win the fight (the same score of 4 as for any attack). A dock within two
-    moves of an ingress system, while a Fracture planet is not yet the seat's, values its warships the same half as much
-    again, and builds dreadnoughts up to five instead of three.
+    planets with a lead of three moves instead of one (a staging system from which the target is up to three of the
+    ships' moves away): Styx is three moves from every ingress, and a fleet that moved waits under its token until the
+    next round, so a fleet of dreadnoughts marches one step a round, from beside the ingress onto it, then the egress,
+    then the void beside Styx. Each step must bring every ship closer to the target, so a fleet never stages backward,
+    and only while the fleet that would be there can win the fight (the same score of 4 as for any attack). A step is
+    worth 0.8 of that strike when one move is left and 0.85 times less per further move (0.68, then 0.58), against 0.35
+    for a player's system: the neutral units never move or reinforce, so the strike a step prepares is near certain.
+    A fleet on that route keeps what it has marched: any other plan that moves its ships out of an empty Fracture system
+    without bringing them closer to Styx (an attack on Cocytus or on Mecatol Rex from the egress, a stage toward another
+    planet) is charged the value of the step it stands on, in proportion to the share of the fleet that leaves, while
+    the strike from there still scores 4.
+    All of this is worth half as much (`FractureCampaign.routeShare`) for a seat with no ingress in its own home, lane or
+    slice: it can only go in through Mecatol Rex or a neighbour's slice, so it values the march, the march it would
+    give up and the fleet it builds for Styx at half, and does not take the fourth fleet token for it.
+    A dock within two moves of an ingress system, while a Fracture planet is not yet the seat's, values its warships
+    the same half as much again, and builds dreadnoughts up to five instead of three. The dock nearest an ingress
+    (`FractureCampaign`, while Styx is not the seat's) also builds the smallest fleet that beats the guard of Styx,
+    three dreadnoughts, a carrier and six infantry counted in that system, at 0.75 a resource, after the core units and
+    before the surplus ships, and the fleet pool grows to 4 for it (three dreadnoughts and a carrier).
     Not yet: locking a captured system with the seat's own Diplomacy; parking ships on Mecatol Rex
     without landing; Magen Defense Grid, Mentak Ambush, L4 Disruptors and Titans' planetary PDS in the odds; retreats in
     the kill estimates; building space docks forward; more than three origins; Prophecy of Kings Warfare with Fleet
@@ -1326,6 +1345,13 @@ Seven small generic changes don't reference `ti4.ai`:
     game is unchanged. `FractureSelfPlayTest` puts a fleet beside Styx and beside Cocytus and checks that the active seat
     takes the planet through the whole combat against the neutral units (another AI seat rolls for them), with the point
     of Styx and the relic.
+  - `-Dai.selfplay.styxprobe=true` prints a `STYXPROBE` line for the active seat at the start of each of its action-phase
+    turns (`StyxProbe`): the fleet cost that could reach Styx within one to four tactical actions, what defence holds
+    back, the distance from its nearest dock to an ingress, its best strike on Styx with the gate that rejects it
+    (`spaceWin` or `score`), and the staging toward Styx with the gate that rejects it (`notWorth`, `feas` for
+    feasibility, `attackExists`, `noGathering`, `future` for a future strike under 4, or `ok` with the plan's score,
+    the biggest gathering and the future strike, counterstrike and leave cost of the best one), next to the seat's
+    top-ranked plan.
   - Every action card play carries the round it was first seen in, and the batch summary prints the plays by round
     for the whole batch and each card's average round. `Overrule` gets its own block: its plays by round, the strategy
     cards its picks chose, how many of those picks raised the seat's points before its turn ended, and how many seats
@@ -1448,9 +1474,12 @@ Seven small generic changes don't reference `ti4.ai`:
 - **Expeditions, correlation.** The breakthrough lift and the kind nudge are read off human games, where who completes
   an expedition early is entangled with who was already winning; the 0.5 factor on the lift is a guess, not a
   measurement. Holding Thunder's Edge is worth a point on the same evidence.
-- **Expeditions, the Fracture.** The roll and the ingress tokens are placed, but the tactical planner does not attack
-  the Fracture's neutral units (its ingress systems are placed for distance and safety, not for a route in), and the
-  Fracture roll is only worth 0.4.
+- **Expeditions, the Fracture.** The ingress tokens are placed for distance and safety, not for a route in, and the
+  Fracture roll is only worth 0.4. Styx is still rarely taken in self-play: a fleet that can beat its guard comes
+  together around round 5, a dreadnought fleet needs three more rounds from the ingress, and games end around round 6.
+  Not yet: researching carrier II or other move upgrades for the march, Warfare or _Flank Speed_ to cover two steps in
+  a round (_Unexpected Action_ already frees a staged fleet when that ranks best), and remembering a march across
+  rounds rather than re-deriving it each turn.
 - **Expeditions, fog of war.** In fog the GM places the ingress tokens (their buttons carry no owner), and the AI
   neither places them nor knows which rival holds how many slices.
 - **Expeditions, tile choice.** Thunder's Edge is placed by distance and the rivals' home and fleet pressure, not by

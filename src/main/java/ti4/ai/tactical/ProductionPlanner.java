@@ -12,6 +12,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FlagshipRating;
 import ti4.ai.eval.FleetLimit;
+import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.Threats;
@@ -49,6 +50,7 @@ public class ProductionPlanner {
     private static final int FRONTLINE_RANGE = 2;
     private static final int FRACTURE_RANGE = 2;
     private static final int FRACTURE_DREADNOUGHTS = 5;
+    private static final double FRACTURE_FLEET_VALUE_PER_RESOURCE = 0.75;
     private static final double MAX_HURT_WEIGHT = 1.5;
     private static final double OUTLYING_SHARE = 0.5;
     private static final int WANTED_UPGRADED_LIGHT_SHIPS = 4;
@@ -244,6 +246,7 @@ public class ProductionPlanner {
         planScoringUnits(builder);
         planDefensiveUnits(builder);
         planCoreUnits(builder);
+        planFractureFleet(builder);
         planSurplusShips(builder);
         planAutoFactories(builder);
         fillProduction(builder);
@@ -459,6 +462,27 @@ public class ProductionPlanner {
     private static boolean firesFromAdjacentSystems(Player seat) {
         UnitModel mech = seat.getUnitByType(UnitType.Mech);
         return mech != null && mech.getSpaceCannonDieCount(seat) > 0 && mech.getDeepSpaceCannon(seat);
+    }
+
+    private static void planFractureFleet(Builder builder) {
+        if (!FractureCampaign.isDock(builder.game, builder.seat, builder.tile)) return;
+        fractureShipsUpTo(builder, UnitType.Carrier, FractureCampaign.CARRIERS);
+        fractureShipsUpTo(builder, UnitType.Dreadnought, FractureCampaign.DREADNOUGHTS);
+        int spare = TacticalPlanner.movableGroundForces(builder.game, builder.seat, builder.tile, builder.defense)
+                + builder.planned(UnitType.Infantry);
+        builder.infantry(
+                FractureCampaign.INFANTRY - spare, fractureValuePerResource(builder) * builder.cost(UnitType.Infantry));
+    }
+
+    private static double fractureValuePerResource(Builder builder) {
+        return FRACTURE_FLEET_VALUE_PER_RESOURCE * FractureCampaign.routeShare(builder.game, builder.seat);
+    }
+
+    private static void fractureShipsUpTo(Builder builder, UnitType type, int wanted) {
+        double value = fractureValuePerResource(builder) * builder.cost(type);
+        while (BoardView.count(BoardView.space(builder.tile), builder.seat, type) + builder.planned(type) < wanted) {
+            if (!builder.ship(type, value, false)) return;
+        }
     }
 
     private static void planSurplusShips(Builder builder) {

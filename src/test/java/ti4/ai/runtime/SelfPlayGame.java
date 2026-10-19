@@ -197,6 +197,7 @@ final class SelfPlayGame {
     private final List<Integer> playRounds = new ArrayList<>();
     private final ObjectiveTracker objectives = new ObjectiveTracker();
     private final FractureTracker fracture;
+    private String probedTurn = "";
 
     SelfPlayGame(SelfPlayEnvironment env, String name) {
         this(env, name, 0);
@@ -339,6 +340,22 @@ final class SelfPlayGame {
         }
     }
 
+    // -Dai.selfplay.styxprobe=true: one diagnostic line for the active seat at the start of each of its action-phase
+    // turns.
+    private void probeStyx(Game game) {
+        if (!ti4.ai.tactical.StyxProbe.enabled() || !"action".equalsIgnoreCase(game.getPhaseOfGame())) return;
+        Player active = game.getActivePlayer();
+        if (active == null) return;
+        String turn = game.getRound() + "|" + active.getFaction();
+        if (probedTurn.equals(turn)) return;
+        probedTurn = turn;
+        try {
+            ti4.ai.tactical.StyxProbe.report(game, active).ifPresent(System.out::println);
+        } catch (RuntimeException e) {
+            System.out.println("STYXPROBE error " + e);
+        }
+    }
+
     Outcome run(Predicate<Game> stopWhen, long maxVirtualMillis, int maxTicks) {
         env.markStart();
         lane = new AiLane(name);
@@ -356,6 +373,7 @@ final class SelfPlayGame {
             objectives.observe(game);
             if (fracture.due(game)) force(game, fracture::enter);
             fracture.observe(game);
+            probeStyx(game);
             closeOverrulePicks(game, false);
             if (stopWhen.test(game)) return outcome(Ending.STOP_CONDITION, game, ticks);
             if (AiTickRunner.reachedVictoryPoints(game)) return outcome(Ending.VICTORY_POINTS, game, ticks);

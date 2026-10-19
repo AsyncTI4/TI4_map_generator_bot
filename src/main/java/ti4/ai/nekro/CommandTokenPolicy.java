@@ -9,6 +9,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FleetLimit;
+import ti4.ai.eval.FractureCampaign;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.strategy.TokenPlan;
@@ -161,6 +162,7 @@ public class CommandTokenPolicy {
                     new Level(Pool.FLEET, Math.min(cap, largest) - bonus),
                     new Level(Pool.TACTIC, 1),
                     new Level(Pool.FLEET, Math.min(cap, BASE_FLEET) - bonus),
+                    new Level(Pool.FLEET, Math.min(cap, fractureFleet(game, seat, largest)) - bonus),
                     new Level(Pool.FLEET, Math.min(cap, fleetForAnOpenSlot(game, seat, largest, cap)) - bonus),
                     new Level(Pool.STRATEGY, plan.strategy()),
                     new Level(Pool.TACTIC, plan.tactic()),
@@ -174,6 +176,7 @@ public class CommandTokenPolicy {
                 new Level(Pool.TACTIC, TACTIC_FIRST),
                 new Level(Pool.FLEET, Math.min(cap, objectiveFleet(game, seat, largest, cap)) - bonus),
                 new Level(Pool.FLEET, Math.min(cap, BASE_FLEET) - bonus),
+                new Level(Pool.FLEET, Math.min(cap, fractureFleet(game, seat, largest)) - bonus),
                 new Level(Pool.STRATEGY, STRATEGY_TARGET),
                 new Level(Pool.FLEET, Math.min(cap, stackingFleet(game, seat, largest)) - bonus),
                 new Level(Pool.TACTIC, TACTIC_PLENTY),
@@ -198,6 +201,16 @@ public class CommandTokenPolicy {
             target = Math.max(target, Math.min(ARMADA_SHIPS, Math.max(RAISE_A_FLEET_SHIPS, fieldable)));
         }
         return Math.min(target, largest + SHIPS_BUILT_PER_ROUND);
+    }
+
+    private static int fractureFleet(Game game, Player seat, int largest) {
+        boolean stackNearTheLimit = largest >= BASE_FLEET - 1;
+        boolean ownRoute = FractureCampaign.routeShare(game, seat) >= 1;
+        return stackNearTheLimit
+                        && ownRoute
+                        && FractureCampaign.dock(game, seat).isPresent()
+                ? FractureCampaign.FLEET_SHIPS
+                : 0;
     }
 
     private static int stackingFleet(Game game, Player seat, int largest) {

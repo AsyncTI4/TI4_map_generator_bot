@@ -23,6 +23,7 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CombatModifiers.Side;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.FleetLimit;
+import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.MovementGraph;
@@ -78,7 +79,9 @@ public class TacticalPlanner {
     private static final double DIPLOMACY_DISCOUNT = 0.5;
     private static final double STAGE_SHIP_STAKE = 0.5;
     private static final int STAGE_TARGETS = 3;
-    private static final int FRACTURE_STAGE_LEAD = 2;
+    private static final int FRACTURE_STAGE_LEAD = 3;
+    private static final double FRACTURE_STAGE_SHARE = 0.8;
+    private static final double FRACTURE_STEP_SHARE = 0.85;
     private static final int STAGING_CANDIDATES = 4;
     private static final int STAGING_TILES_PER_TARGET = 2;
     static final double ATTACK_MIN_SCORE = 4.0;
@@ -305,11 +308,11 @@ public class TacticalPlanner {
         return plans.isEmpty() ? 0 : plans.getFirst().score();
     }
 
-    private static boolean activatable(Game game, Player seat, Tile tile) {
+    static boolean activatable(Game game, Player seat, Tile tile) {
         return !tile.hasPlayerCC(seat) && ButtonHelper.canActivateTile(game, seat, tile);
     }
 
-    private static List<TacticalPlan> candidates(Context context, Predicate<Tile> activatable) {
+    static List<TacticalPlan> candidates(Context context, Predicate<Tile> activatable) {
         return candidates(context, activatable, MIN_SCORE);
     }
 
@@ -321,6 +324,7 @@ public class TacticalPlanner {
                 .toList());
         plans.addAll(stage(context, activatable));
         return plans.stream()
+                .map(plan -> plan.withScore(plan.score() - marchForfeit(context, plan)))
                 .filter(plan -> plan.score() >= minScore)
                 .sorted(Comparator.comparingDouble(TacticalPlan::score).reversed())
                 .toList();
@@ -975,7 +979,7 @@ public class TacticalPlanner {
         return finalPlan(context, tile, candidatePool(context, tile, opponent));
     }
 
-    private static List<Candidate> candidatePool(Context context, Tile tile, Player opponent) {
+    static List<Candidate> candidatePool(Context context, Tile tile, Player opponent) {
         List<Candidate> pool = new ArrayList<>();
         for (Tile origin : context.origins()) {
             if (origin != tile) pool.addAll(candidatesFrom(context, tile, origin, opponent));
@@ -1034,11 +1038,11 @@ public class TacticalPlanner {
                 .map(found -> context.offense().evaluate(found.strike(), found.estimate(), found.terms(), true));
     }
 
-    private record Departure(List<UnitMove> ships, List<UnitMove> cargo, boolean heldBack) {}
+    record Departure(List<UnitMove> ships, List<UnitMove> cargo, boolean heldBack) {}
 
-    private record Part(Tile origin, Departure departure) {}
+    record Part(Tile origin, Departure departure) {}
 
-    private record Candidate(
+    record Candidate(
             List<Part> parts,
             Strike strike,
             StrikeEstimate estimate,
@@ -1321,7 +1325,7 @@ public class TacticalPlanner {
         if (finalists.stream().noneMatch(found -> found == candidate)) finalists.add(candidate);
     }
 
-    private static Optional<TacticalPlan> fullPlan(Context context, Tile tile, Candidate candidate) {
+    static Optional<TacticalPlan> fullPlan(Context context, Tile tile, Candidate candidate) {
         if (candidate.estimate().spaceWin() < candidate.strike().rules().landMinWin()) return Optional.empty();
         StrikeValue value = context.offense()
                 .evaluate(candidate.strike(), candidate.estimate(), candidate.terms(), true, ATTACK_MIN_SCORE);
@@ -1452,7 +1456,7 @@ public class TacticalPlanner {
         return ranked.stream().limit(STAGE_TARGETS).map(RankedTarget::tile).toList();
     }
 
-    private static boolean worthStagingFor(Context context, Tile tile, Player opponent) {
+    static boolean worthStagingFor(Context context, Tile tile, Player opponent) {
         if (opponent.isNeutral()) return tile.getPlanetUnitHolders().stream().anyMatch(FracturePrize::isFracturePlanet);
         if (FracturePrize.holdsStyx(tile, opponent)) return true;
         if (context.defense().standings().denialWeight(opponent) >= STAGE_MIN_DENIAL) return true;
@@ -1462,7 +1466,7 @@ public class TacticalPlanner {
                 .anyMatch(planet -> context.offense().deniesObjectives(opponent, planet));
     }
 
-    private static double stagePrize(Context context, Tile tile, Player opponent) {
+    static double stagePrize(Context context, Tile tile, Player opponent) {
         Game game = context.game;
         Player seat = context.seat;
         double prize = tile.getPlanetUnitHolders().stream()
@@ -1483,7 +1487,7 @@ public class TacticalPlanner {
         return prize;
     }
 
-    private static double stageFeasibility(Context context, Tile target, Player opponent) {
+    static double stageFeasibility(Context context, Tile target, Player opponent) {
         Player seat = context.seat;
         double ours = 0;
         for (Tile origin : context.origins()) {
@@ -1514,14 +1518,14 @@ public class TacticalPlanner {
                 .anyMatch(planet -> game.mecatols().contains(planet.getName()));
     }
 
-    private record Contribution(Tile origin, List<UnitMove> ships, List<UnitMove> cargo, List<UnitMove> moves) {
+    record Contribution(Tile origin, List<UnitMove> ships, List<UnitMove> cargo, List<UnitMove> moves) {
 
         double shipCost(Player seat) {
             return fleetCost(seat, ships);
         }
     }
 
-    private record Gathering(Tile staging, List<Contribution> contributions, double cost, double counter) {
+    record Gathering(Tile staging, List<Contribution> contributions, double cost, double counter) {
 
         List<UnitMove> ships() {
             return contributions.stream()
@@ -1565,11 +1569,90 @@ public class TacticalPlanner {
         return plans;
     }
 
-    private static int stageLead(Player opponent) {
+    static int stageLead(Player opponent) {
         return opponent.isNeutral() ? FRACTURE_STAGE_LEAD : 1;
     }
 
-    private static Optional<Gathering> gather(Context context, Tile target, Tile staging, int lead) {
+    private static double stageShare(Context context, Tile target, Player opponent, Gathering gathering) {
+        if (!opponent.isNeutral()) return STAGE_SHARE;
+        int steps = gathering.ships().stream()
+                .mapToInt(move -> stepsToTarget(context, gathering.staging(), target, move.type(), FRACTURE_STAGE_LEAD))
+                .max()
+                .orElse(FRACTURE_STAGE_LEAD);
+        return routeShare(context) * FRACTURE_STAGE_SHARE * Math.pow(FRACTURE_STEP_SHARE, steps - 1);
+    }
+
+    private static double routeShare(Context context) {
+        return FractureCampaign.routeShare(context.game, context.territory());
+    }
+
+    private static double marchForfeit(Context context, TacticalPlan plan) {
+        Optional<Tile> styx = styxToTake(context);
+        if (styx.isEmpty() || plan.target().equals(styx.get().getPosition())) return 0;
+        Tile target = context.game.getTileByPosition(plan.target());
+        double forfeit = 0;
+        for (String position : departingShips(plan.moves()).stream()
+                .map(UnitMove::origin)
+                .distinct()
+                .toList()) {
+            Tile origin = context.game.getTileByPosition(position);
+            if (origin == null || !origin.isFracture() || origin == styx.get()) continue;
+            if (plan.kind() == Kind.STAGE && target != null && closerTo(context, styx.get(), target, origin)) continue;
+            double stationed = fleetCost(context.seat, context.stageGroup(origin));
+            if (stationed <= 0) continue;
+            double leaving = fleetCost(
+                    context.seat,
+                    departingShips(plan.moves()).stream()
+                            .filter(move -> move.origin().equals(position))
+                            .toList());
+            forfeit += marchValue(context, origin, styx.get()) * Math.min(1, leaving / stationed);
+        }
+        return forfeit;
+    }
+
+    private static Optional<Tile> styxToTake(Context context) {
+        return FracturePrize.tiles(context.game).stream()
+                .filter(tile -> tile.getPlanetUnitHolders().stream()
+                        .anyMatch(planet -> FracturePrize.isStyx(planet)
+                                && !context.seat.getPlanets().contains(planet.getName())))
+                .findFirst();
+    }
+
+    private static boolean closerTo(Context context, Tile goal, Tile next, Tile origin) {
+        int far = FRACTURE_STAGE_LEAD + 1;
+        return context.reach(next, far).getOrDefault(goal.getPosition(), far + 1)
+                < context.reach(origin, far).getOrDefault(goal.getPosition(), far + 1);
+    }
+
+    private static double marchValue(Context context, Tile origin, Tile styx) {
+        return context.marchValues.computeIfAbsent(origin.getPosition(), position -> {
+            Player opponent = singleOpponent(context.game, context.seat, styx);
+            if (opponent == null) return 0.0;
+            UnitHolder space = BoardView.space(origin);
+            List<UnitMove> cargo = BoardView.GROUND_FORCES.stream()
+                    .filter(type -> BoardView.count(space, context.seat, type) > 0)
+                    .map(type ->
+                            new UnitMove(position, BoardView.SPACE, type, BoardView.count(space, context.seat, type)))
+                    .toList();
+            double future = futureScore(context, styx, opponent, origin, List.of(), cargo);
+            if (future < ATTACK_MIN_SCORE) return 0.0;
+            int steps = context.stageGroup(origin).stream()
+                    .mapToInt(move -> stepsToTarget(context, origin, styx, move.type(), FRACTURE_STAGE_LEAD))
+                    .max()
+                    .orElse(FRACTURE_STAGE_LEAD);
+            return routeShare(context) * FRACTURE_STAGE_SHARE * Math.pow(FRACTURE_STEP_SHARE, steps - 1) * future;
+        });
+    }
+
+    private static int stepsToTarget(Context context, Tile from, Tile target, UnitType type, int maxSteps) {
+        int move = BoardView.moveValue(context.seat, type);
+        for (int steps = 1; steps <= maxSteps; steps++) {
+            if (context.reach(from, steps * move).containsKey(target.getPosition())) return steps;
+        }
+        return maxSteps + 1;
+    }
+
+    static Optional<Gathering> gather(Context context, Tile target, Tile staging, int lead) {
         Player seat = context.seat;
         List<Contribution> contributions = new ArrayList<>();
         for (Tile origin : context.origins()) {
@@ -1602,6 +1685,9 @@ public class TacticalPlanner {
                 .filter(move -> context.reach(staging, lead * BoardView.moveValue(seat, move.type()))
                         .containsKey(target.getPosition()))
                 .filter(move -> !context.reaches(origin, target, move.type()))
+                .filter(move -> lead == 1
+                        || stepsToTarget(context, staging, target, move.type(), lead)
+                                < stepsToTarget(context, origin, target, move.type(), lead + 1))
                 .toList();
         if (ships.isEmpty()) return Optional.empty();
         boolean planetsToTake = !enemyPlanets(game, seat, target).isEmpty()
@@ -1615,15 +1701,14 @@ public class TacticalPlanner {
                 .map(moves -> new Contribution(origin, ships, cargo, moves));
     }
 
-    private static double counterAt(Context context, Gathering gathering, Player opponent) {
+    static double counterAt(Context context, Gathering gathering, Player opponent) {
         Defenders after = context.defense().defendersAt(gathering.staging());
         for (UnitMove move : gathering.ships()) after = after.plusShips(move.type(), move.count(), 0);
         return context.defense()
                 .counterstrike(gathering.staging(), after, List.of(), STAGE_SHIP_STAKE * gathering.cost(), 0, opponent);
     }
 
-    private static Optional<TacticalPlan> stagePlan(
-            Context context, Tile target, Player opponent, Gathering gathering) {
+    static Optional<TacticalPlan> stagePlan(Context context, Tile target, Player opponent, Gathering gathering) {
         Player seat = context.seat;
         Tile staging = gathering.staging();
         double future = futureScore(context, target, opponent, staging, gathering.ships(), gathering.cargo());
@@ -1644,7 +1729,7 @@ public class TacticalPlanner {
         double leaving = gathering.contributions().stream()
                 .mapToDouble(found -> context.defense().leaveCost(found.origin(), found.moves()))
                 .sum();
-        double score = STAGE_SHARE * future * (diplomacy ? DIPLOMACY_DISCOUNT : 1)
+        double score = stageShare(context, target, opponent, gathering) * future * (diplomacy ? DIPLOMACY_DISCOUNT : 1)
                 - gathering.counter()
                 - leaving
                 - DISTANCE_COST * farthest
@@ -1661,7 +1746,7 @@ public class TacticalPlanner {
                 .sum();
     }
 
-    private static double futureScore(
+    static double futureScore(
             Context context, Tile target, Player opponent, Tile staging, List<UnitMove> group, List<UnitMove> cargo) {
         String key = target.getPosition() + "#" + BoardView.ships(BoardView.space(staging), context.seat) + "#" + group
                 + "#" + cargo;
@@ -1749,7 +1834,7 @@ public class TacticalPlanner {
                 .map(type -> new UnitMove(origin.getPosition(), BoardView.SPACE, type, 1));
     }
 
-    private static double cost(Player seat, UnitType type) {
+    static double cost(Player seat, UnitType type) {
         return BoardView.model(seat, type).map(UnitModel::getCost).orElse(0f);
     }
 
@@ -2571,7 +2656,7 @@ public class TacticalPlanner {
         return rest;
     }
 
-    private static double fleetCost(Player seat, List<UnitMove> moves) {
+    static double fleetCost(Player seat, List<UnitMove> moves) {
         return moves.stream()
                 .mapToDouble(move -> BoardView.model(seat, move.type())
                                 .map(UnitModel::getCost)
@@ -2580,7 +2665,7 @@ public class TacticalPlanner {
                 .sum();
     }
 
-    private static final class Context {
+    static final class Context {
         private final Game game;
         private final Player seat;
         private final Set<String> freed;
@@ -2599,6 +2684,7 @@ public class TacticalPlanner {
         private final Map<String, List<CommanderReach.Pull>> commanderPulls = new HashMap<>();
         private final Map<String, Optional<TacticalPlan>> attacks = new HashMap<>();
         private final Map<String, Double> futureScores = new HashMap<>();
+        private final Map<String, Double> marchValues = new HashMap<>();
         private ExploreOutlook exploreOutlook;
         private final Map<String, Double> exploreValues = new HashMap<>();
         private Territory territory;
