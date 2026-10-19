@@ -24,6 +24,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.FactionBrain;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.expedition.ExpeditionRules;
 import ti4.ai.explore.ExplorationRules;
 import ti4.ai.explore.RelicActionRules;
 import ti4.ai.hacan.CarthAgentRules;
@@ -146,7 +147,8 @@ public class NekroBrain implements FactionBrain {
             RearAdmiralFarranRules.GAIN,
             OrbitalDropRules.MECH_PREFIX,
             OrbitalDropRules.FINISH,
-            BellumGloriosumRules.OFFER_PREFIX);
+            BellumGloriosumRules.OFFER_PREFIX,
+            ExpeditionRules.TILE_PREFIX);
     private static final Set<String> WINDOW_PREFIXES = Stream.concat(
                     PUBLIC_WINDOW_PREFIXES.stream(), ActionCardRules.targetPrefixes().stream())
             .collect(Collectors.toUnmodifiableSet());
@@ -162,6 +164,7 @@ public class NekroBrain implements FactionBrain {
             SecretCostRules::pay,
             NekroLeaderRules::payAgentCost,
             RelicActionRules::next,
+            ExpeditionRules::next,
             ConvoysRules::next,
             NekroRules::propagationTokens,
             RiderPayouts::technology,
@@ -502,6 +505,8 @@ public class NekroBrain implements FactionBrain {
         Optional<AiDecision> secondAction =
                 TacticalRules.secondAction(context, thisTurn).or(() -> secondStrategicAction(context, thisTurn));
         if (secondAction.isPresent()) return secondAction;
+        Optional<AiDecision> expedition = ExpeditionRules.endOfTurn(context, thisTurn);
+        if (expedition.isPresent()) return expedition;
         Optional<AiDecision> endOfTurnTech = TechRules.endOfTurn(context, thisTurn);
         if (endOfTurnTech.isPresent()) return endOfTurnTech;
         Optional<AiDecision> secretRedraw = SecretRedrawRules.endOfTurn(context, thisTurn);
@@ -550,6 +555,8 @@ public class NekroBrain implements FactionBrain {
         if (card.isPresent()) return card;
         Optional<AiDecision> relicBeforePassing = RelicActionRules.beforePassing(context, thisTurn);
         if (relicBeforePassing.isPresent()) return relicBeforePassing;
+        Optional<AiDecision> expeditionBeforePassing = ExpeditionRules.beforePassing(context, thisTurn);
+        if (expeditionBeforePassing.isPresent()) return expeditionBeforePassing;
         Optional<AiDecision> xxchaAgent = XxchaAgentRules.beforePassing(context, thisTurn);
         if (xxchaAgent.isPresent()) return xxchaAgent;
         Optional<AiDecision> solHeroBeforePassing = SolHeroRules.beforePassing(context, thisTurn);

@@ -977,8 +977,7 @@ public class StrategyCardRules {
         if (seat.getExhaustedPlanets().isEmpty() && !claims) return Optional.empty();
         String reason = claims ? "ready planets and claim one with Peace Accords" : "ready planets with Diplomacy";
         Optional<AiDecision> press = CardMessages.pressOnce(context, card.get(), DIPLOMACY_READY_BUTTON, reason);
-        press.ifPresent(decision ->
-                requestReadying(context, DiplomacyUse.best(context.game(), seat, seat.getExhaustedPlanets())));
+        press.ifPresent(decision -> requestReadying(context, DiplomacyUses.readyingChoice(context.game(), seat)));
         return press;
     }
 

@@ -1,5 +1,6 @@
 package ti4.ai.strategy;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
@@ -20,6 +21,8 @@ class CardTiming {
     private static final double TE_WARFARE_REACTIVATION_MIN = 2 * TacticalPlanner.MIN_SCORE;
     private static final int LAST_ADVANCE_ROUND = 1;
     private static final String GRAVITY_DRIVE = "gd";
+    private static final List<CardUse> EXPEDITION_USES =
+            List.of(CardUse.TRADE_EXPEDITION, CardUse.POLITICS_EXPEDITION, CardUse.DIPLOMACY_EXPEDITION);
 
     enum Timing {
         NOW,
@@ -34,7 +37,14 @@ class CardTiming {
         if (plan.card() == StrategyCard.IMPERIAL && yieldsToOverrule(in)) return Timing.FALLBACK;
         Optional<Benefit> main = plan.main();
         if (main.isEmpty()) return Timing.FALLBACK;
-        return dueNow(in, plan, main.get()) ? Timing.NOW : Timing.FALLBACK;
+        return dueNow(in, plan, main.get()) || claimsExpedition(plan) ? Timing.NOW : Timing.FALLBACK;
+    }
+
+    private static boolean claimsExpedition(CardPlan plan) {
+        return EXPEDITION_USES.stream()
+                .anyMatch(use -> plan.benefit(use)
+                        .filter(benefit -> benefit.value() >= CardValueScale.EXPEDITION_PLAY_MIN)
+                        .isPresent());
     }
 
     private static boolean claimsWithPeaceAccords(PlanInputs in, CardPlan plan) {

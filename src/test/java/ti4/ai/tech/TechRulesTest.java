@@ -11,6 +11,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
+import ti4.ai.eval.BoardView;
+import ti4.ai.expedition.ExpeditionKind;
+import ti4.ai.expedition.ExpeditionUnlock;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Tile;
@@ -74,6 +77,7 @@ class TechRulesTest extends BaseTi4Test {
     // seat passes: planets ready again in the status phase anyway.
     @Test
     void tradesTechSkipPlanetsForTradeGoodsWithPsychoarchaeologyBeforePassing() {
+        everySliceClaimedBySol();
         test.nekro.addTech("pa");
         AiPrompt start = prompt("start", PromptSource.PUBLIC, NOW, "FFCC_nekro_getPsychoButtons");
         AiPrompt planets = prompt("planets", PromptSource.PUBLIC, NOW, "psychoExhaust_meharxull", "deleteButtons");
@@ -382,6 +386,68 @@ class TechRulesTest extends BaseTi4Test {
         assertThat(pressedId(
                         TechRules.placeSelfAssemblyMech(test.context(planets)).orElseThrow()))
                 .isEqualTo("sarMechStep2_mordaiii_tacticalAction");
+    }
+
+    private void everySliceClaimedBySol() {
+        for (ExpeditionKind kind : ExpeditionKind.values()) {
+            test.game.getExpeditions().getExpeditionFactions().put(kind.id(), test.sol.getFaction());
+        }
+    }
+
+    private void twoSpentTechSkipPlanets() {
+        test.place("22", "202");
+        test.nekro.addPlanet("tarmann");
+        test.nekro.addTech("bs");
+        test.nekro.setTacticalCC(0);
+        test.nekro.exhaustPlanet("meharxull");
+        test.nekro.exhaustPlanet("tarmann");
+        everySliceClaimedBySol();
+        test.memory.put("bioStims|" + test.context().turnKey(), "exhausted");
+    }
+
+    private String readiedWithBioStims() {
+        AiPrompt ready = prompt(
+                "ready", PromptSource.PUBLIC, NOW, "biostimsReady_planet_meharxull", "biostimsReady_planet_tarmann");
+        String pressed = pressedId(endOfTurn(ready).orElseThrow());
+        return pressed.substring(pressed.lastIndexOf('_') + 1);
+    }
+
+    // Both spent planets are equally idle, so Bio-Stims readies the larger one.
+    @Test
+    void readiesTheLargerSpentTechSkipPlanetWhenNeitherWasPaidForAnExpedition() {
+        twoSpentTechSkipPlanets();
+
+        assertThat(readiedWithBioStims()).isEqualTo(larger("meharxull", "tarmann"));
+    }
+
+    // The expedition exhausted the smaller planet this turn; neither has another use, so it is the one that comes back.
+    @Test
+    void readiesTheTechSkipPlanetTheExpeditionJustExhaustedWhenNothingElseNeedsReadying() {
+        twoSpentTechSkipPlanets();
+        String smaller = "meharxull".equals(larger("meharxull", "tarmann")) ? "tarmann" : "meharxull";
+        test.memory.put("expeditionPaid|" + test.context().turnKey(), smaller);
+
+        assertThat(readiedWithBioStims()).isEqualTo(smaller);
+    }
+
+    private String larger(String first, String second) {
+        return size(first) >= size(second) ? first : second;
+    }
+
+    private int size(String planet) {
+        return BoardView.planetResources(test.game, planet) + BoardView.planetInfluence(test.game, planet);
+    }
+
+    // Mehar Xull is the only planet the seat could pay the technology specialty expedition with, so Psychoarchaeology
+    // keeps it rather than trading it for a trade good when the seat passes.
+    @Test
+    void keepsTheTechSkipPlanetAPlannedExpeditionNeedsOutOfPsychoarchaeology() {
+        test.nekro.addTech("pa");
+        test.nekro.addBreakthrough("nekrobt");
+        assertThat(ExpeditionUnlock.plannedPlanets(test.game, test.nekro)).contains("meharxull");
+        AiPrompt start = prompt("start", PromptSource.PUBLIC, NOW, "FFCC_nekro_getPsychoButtons");
+
+        assertThat(TechRules.beforePassing(test.context(start), List.of(start))).isEmpty();
     }
 
     private Optional<AiDecision> endOfTurn(AiPrompt prompt) {
