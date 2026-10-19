@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 class RevealSpecificAgenda extends GameStateSubcommand {
 
     RevealSpecificAgenda() {
-        super(Constants.REVEAL_SPECIFIC, "Reveal top Agenda from deck", true, false);
+        super(Constants.REVEAL_SPECIFIC, "Reveal a specific Agenda by ID", true, false);
         addOptions(new OptionData(
                         OptionType.STRING, Constants.AGENDA_ID, "Agenda Card ID (text ID found in /search agendas)")
                 .setRequired(true)

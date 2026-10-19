@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -36,6 +37,9 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
+import ti4.helpers.thirtyk.ThirtyKRelicHooks;
+import ti4.helpers.thirtyk.ThirtyKTransactions;
 import ti4.image.Mapper;
 import ti4.image.TransactionGenerator;
 import ti4.logging.BotLogger;
@@ -279,6 +283,8 @@ public class TransactionHelper {
                 GameEventType.TRANSACTION,
                 p1,
                 Map.of("from", p1.getFaction(), "to", p2.getFaction(), "items", transactionItems));
+        ThirtyKRelicHooks.onTransactionAccepted(game, p1, p2);
+        ThirtyKActionCardHooks.onTransactionAccepted(game, p1, p2);
         List<Player> players = new ArrayList<>();
         players.add(p1);
         players.add(p2);
@@ -2297,7 +2303,8 @@ public class TransactionHelper {
                 || player.getPromissoryNotesInPlayArea().contains("viability_trade_convoys")
                 || player2.getPromissoryNotesInPlayArea().contains("viability_trade_convoys")
                 || player2.getNeighbouringPlayers(false).contains(player)
-                || player.getNeighbouringPlayers(false).contains(player2);
+                || player.getNeighbouringPlayers(false).contains(player2)
+                || ThirtyKTransactions.mayTransact(game, player, player2);
     }
 
     public static void checkTransactionLegality(Game game, Player player, Player player2) {
@@ -2353,8 +2360,10 @@ public class TransactionHelper {
                             button = Buttons.gray(factionChecker + "transactWith_" + faction, label);
                         }
 
-                        String factionEmojiString = player.getFactionEmoji();
-                        button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                        Emoji factionEmoji = buttonSafeEmoji(player.getFactionEmoji());
+                        if (factionEmoji != null) {
+                            button = button.withEmoji(factionEmoji);
+                        }
                     } else {
                         button = Buttons.gray(factionChecker + "transactWith_" + player.getColor(), player.getColor());
                     }
@@ -2363,6 +2372,18 @@ public class TransactionHelper {
             }
         }
         return playerButtons;
+    }
+
+    private static Emoji buttonSafeEmoji(String formatted) {
+        if (formatted == null || formatted.isBlank()) return null;
+        try {
+            Emoji emoji = Emoji.fromFormatted(formatted);
+            boolean isCustom = emoji instanceof CustomEmoji;
+            boolean isRealUnicode = emoji.getName().codePoints().anyMatch(codepoint -> codepoint > 0x7F);
+            return isCustom || isRealUnicode ? emoji : null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     static List<Button> getStuffToTransButtonsNew(Game game, Player player, Player p1, Player p2) {

@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 class RevealEvent extends GameStateSubcommand {
 
     public RevealEvent() {
-        super(Constants.REVEAL, "Reveal top Agenda from deck", true, false);
+        super(Constants.REVEAL, "Reveal top Event from deck", true, false);
         addOption(OptionType.INTEGER, Constants.COUNT, "Number of cards to reveal (Default = 1, Min 1, Max 2)");
         addOption(
                 OptionType.BOOLEAN,

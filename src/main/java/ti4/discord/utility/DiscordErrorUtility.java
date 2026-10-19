@@ -12,6 +12,8 @@ public class DiscordErrorUtility {
     private static final int DISCORD_UNKNOWN_MESSAGE_ERROR_CODE = 10_008;
     private static final int DISCORD_UNKNOWN_EMOJI_ERROR_CODE = 10_014;
     private static final int DISCORD_UNKNOWN_WEBHOOK_ERROR_CODE = 10_015;
+    private static final int DISCORD_INVALID_FORM_BODY_ERROR_CODE = 50_035;
+    private static final String COMPONENT_INVALID_EMOJI = "COMPONENT_INVALID_EMOJI";
 
     public static boolean isDiscordServerError(Throwable error) {
         if (error instanceof ErrorResponseException restError) {
@@ -31,6 +33,14 @@ public class DiscordErrorUtility {
 
     public static boolean isUnknownEmojiError(Throwable error) {
         return hasDiscordErrorCode(error, DISCORD_UNKNOWN_EMOJI_ERROR_CODE);
+    }
+
+    public static boolean isInvalidComponentEmojiError(Throwable error) {
+        ErrorResponseException restError = ExceptionUtils.throwableOfType(error, ErrorResponseException.class);
+        return restError != null
+                && restError.getErrorCode() == DISCORD_INVALID_FORM_BODY_ERROR_CODE
+                && restError.getMessage() != null
+                && restError.getMessage().contains(COMPONENT_INVALID_EMOJI);
     }
 
     public static boolean isUnknownChannelError(Throwable error) {

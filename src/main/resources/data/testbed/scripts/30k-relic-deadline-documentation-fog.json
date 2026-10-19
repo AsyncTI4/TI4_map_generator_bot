@@ -1,0 +1,15 @@
+{
+  "name": "30k-relic-deadline-documentation-fog",
+  "description": "Fog: Deadline Documentation on another seat moves their token and never names factions in the main channel or to the target.",
+  "preset": "30k-fog-4p",
+  "stopOnFail": true,
+  "steps": [
+    { "do": "hand", "as": "letnev", "hand": { "relics": ["deadlinedocumentation30k"] } },
+    { "as": "letnev", "pressId": "FFCC_letnev_componentActionRes_relic_deadlinedocumentation30k" },
+    { "as": "letnev", "press": "thirtyKDeadlineTarget_nekro" },
+    { "expect": { "in": "nekro:cards-info", "contains": "Deadline Documentation", "notContains": "Letnev" } },
+    { "as": "nekro", "press": "thirtyKDeadlineMove_strategy", "in": "nekro:cards-info" },
+    { "expect": { "state": "nekro.ccs", "equals": "2/3/3" } },
+    { "expect": { "in": "main", "noFactionLeak": true, "since": "start" } }
+  ]
+}

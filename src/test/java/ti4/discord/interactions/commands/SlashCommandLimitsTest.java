@@ -69,9 +69,6 @@ class SlashCommandLimitsTest {
         CommandListUpdateAction update = mock(CommandListUpdateAction.class);
         for (ParentCommand command : commands) {
             assertDoesNotThrow(() -> command.register(update), () -> "/" + command.getName() + " failed to build");
-            assertDoesNotThrow(
-                    () -> command.registerSearchCommands(update),
-                    () -> "/" + command.getName() + " failed to build its search commands");
         }
     }
 

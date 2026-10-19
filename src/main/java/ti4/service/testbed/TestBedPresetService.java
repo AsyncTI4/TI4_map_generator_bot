@@ -320,6 +320,10 @@ public class TestBedPresetService {
                 errors.add("preset: unknown tile `" + tileId + "` at `" + position + "` in `tiles`.");
             }
         });
+        preset.getDecks().forEach((slot, deckId) -> {
+            String problem = TestBedComponentService.deckProblem(slot, deckId);
+            if (problem != null) errors.add("preset: " + problem);
+        });
         for (String option : preset.getFowOptions()) {
             if (Arrays.stream(FOWOption.values())
                     .noneMatch(known -> known.name().equalsIgnoreCase(option))) {

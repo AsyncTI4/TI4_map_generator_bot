@@ -1,0 +1,26 @@
+{
+    "id": "veilwatch",
+    "tileId": "th41",
+    "name": "Veilwatch",
+    "aliases": [
+        "veilwatch"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": [
+        "SPACESTATION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "veilwatch",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 193,
+            "y": 229
+        }
+    },
+    "positionInTile": {
+            "x": 193,
+            "y": 229
+    },
+    "source": "theodisi"
+}

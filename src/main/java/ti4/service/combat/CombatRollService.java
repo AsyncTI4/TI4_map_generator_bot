@@ -72,6 +72,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.Ka
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixUnitHandler;
+import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
@@ -102,6 +103,7 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
@@ -638,6 +640,7 @@ public class CombatRollService {
                 rollType,
                 combatOnHolder,
                 Constants.COMBAT_MODIFIERS);
+        TheodisiLegendaryButtonHandler.addAvarinCombatModifier(modifiers, game, player, tile, rollType);
 
         List<NamedCombatModifierModel> extraRolls = CombatModHelper.getModifiers(
                 player,
@@ -741,6 +744,10 @@ public class CombatRollService {
         RiggedExplosivesLLButtonHandler.destroyFailedRiggedExplosives(event, game, player, tile, rollType, payload);
         FOWCombatThreadMirroring.mirrorCombatMessage(event, player, game, message);
         int h = rollResult.totalHits();
+        if (rollType == CombatRollType.combatround) {
+            TheodisiLegendaryButtonHandler.offerPelorHit(
+                    game, player, opponent, tile, combatOnHolder, rollType, h, event);
+        }
         int massHypnosisHits =
                 MassHypnosisLLButtonHandler.getRedirectedHits(game, player, tile, combatOnHolder, rollType, payload);
 
@@ -1344,7 +1351,8 @@ public class CombatRollService {
             msg2 += "\nReminder: You have the _" + relicModel.getName() + "_ relic,";
             msg2 += " you may SUSTAIN DAMAGE on one of your non-fighter ships instead of taking a hit.";
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                game.isFowMode() ? opponent.getCorrectChannel() : event.getMessageChannel(), msg2, buttons);
     }
 
     private static void offerDuraniumRepairWithoutHits(
@@ -1634,6 +1642,9 @@ public class CombatRollService {
             if (xytherisHeroBonus) {
                 modifierToHit += 4;
             }
+            int thirtyKBonus = ThirtyKExploreHooks.spaceCannonRollBonus(rollType, unitModel, perUnitHolder);
+            modifierToHit += thirtyKBonus;
+            resultBuilder.append(ThirtyKExploreHooks.spaceCannonBonusNote(unitModel, thirtyKBonus));
             List<NamedCombatModifierModel> availableExtraRolls = extraRolls.stream()
                     .filter(m -> !consumedBestMods.contains(m.getModifier().getAlias()))
                     .collect(Collectors.toList());

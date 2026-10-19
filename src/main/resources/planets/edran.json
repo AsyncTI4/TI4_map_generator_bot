@@ -1,0 +1,28 @@
+{
+    "id": "edran",
+    "tileId": "th21",
+    "name": "Edran",
+    "aliases": [
+        "edran"
+    ],
+    "resources": 3,
+    "influence": 3,
+    "planetTypes": [
+        "CULTURAL",
+        "INDUSTRIAL"
+    ],
+    "planetLayout": {
+        "unitHolderName": "edran",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 125,
+            "y": 90
+        },
+        "planetRadius": 70
+    },
+    "positionInTile": {
+        "x": 125,
+        "y": 90
+    },
+    "source": "theodisi"
+}

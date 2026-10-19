@@ -316,7 +316,7 @@
         "alias": "weaveway",
         "factionName": "The Weaveway",
         "homeSystem": "56",
-        "startingFleet": "2 cr, 1 cv, 4 inf d, sd",
+        "startingFleet": "1 dn, 1 cv, 2 fighters, 3 inf thedark, sd thedark",
         "commodities": 2,
         "factionTech": [
             "ggweasd",
@@ -364,7 +364,7 @@
         "alias": "initiative",
         "factionName": "The Keleres Initiative",
         "homeSystem": "94new",
-        "startingFleet": "2 cr, 1 cv, 2 ff, 3 inf d, sd d, pds z",
+        "startingFleet": "2 cr, 1 cv, 2 ff, 3 inf mollprimusk, sd mollprimusk, pds mollprimusk",
         "commodities": 4,
         "factionTech": [
             "gginitr",
@@ -409,7 +409,7 @@
         "alias": "company",
         "factionName": "The Gray Company",
         "homeSystem": "10",
-        "startingFleet": "1 dr, 1 cr, 1 cv, 3 ff, 3 inf d, sd d",
+        "startingFleet": "1 dr, 1 cr, 1 cv, 3 ff, 3 inf arcprime, sd arcprime",
         "commodities": 3,
         "factionTech": [
             "ggcompanyy",
@@ -456,7 +456,7 @@
         "alias": "industries",
         "factionName": "Jord Industries",
         "homeSystem": "01",
-        "startingFleet": "2 cr, 1 dd, 3 ff, 2 inf d, 1 mf d, sd d",
+        "startingFleet": "2 cv, 1 dd, 2 ff, 2 inf jord, 1 mf jord, sd jord",
         "commodities": 3,
         "factionTech": [
             "ggindustg",
@@ -497,6 +497,99 @@
             "spacedock"
         ],
         "complexity": "Low",
+        "source": "gamma"
+    },
+    {
+        "alias": "ironhull",
+        "factionName": "The Ironhull Fiefdom",
+        "homeSystem": "02",
+        "startingFleet": "1 cv, 1 dn, 1 dd, 2 fighters, 5 inf mollprimus, sd mollprimus, 1 pds mollprimus",
+        "commodities": 2,
+        "factionTech": [
+            "ggihfb",
+            "ggihfy"
+       ],
+        "startingTechAmount": 2,
+        "startingTechOptions": [
+            "md",
+            "sar",
+            "sdn",
+            "st"
+        ],
+        "homePlanets": [
+            "mollprimus"
+        ],
+        "abilities": [
+          "thralldom",
+          "breakout"
+        ],
+        "leaders": [
+            "ironhullagent",
+            "ironhullcommander",
+            "ironhullhero"
+        ],
+        "promissoryNotes": [
+            "ggpnihf"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "ironhull_flagship",
+            "infantry",
+            "ironhull_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Moderate",
+        "source": "gamma"
+    },
+    {
+        "alias": "project",
+        "factionName": "The Elysium Project",
+        "homeSystem": "55",
+        "startingFleet": "1 cv, 1 dn, 1 dd, 5 inf , sd elysium",
+        "commodities": 2,
+        "factionTech": [
+            "ggpey",
+            "ggpeg"
+        ],
+       
+        "startingTech": [
+            "pa",
+            "st"
+        ],
+        "homePlanets": [
+            "elysiumy"
+        ],
+        "abilities": [
+          "titanic",
+          "elysium",
+          "prudent"
+        ],
+        "leaders": [
+            "projectagent",
+            "projectcommander",
+            "projecthero"
+        ],
+        "promissoryNotes": [
+            "ggpnpe"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "project_flagship",
+            "infantry",
+            "project_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Moderate",
         "source": "gamma"
     }
 ]

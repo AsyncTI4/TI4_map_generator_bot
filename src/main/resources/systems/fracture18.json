@@ -1,0 +1,18 @@
+{
+    "id": "fracture18",
+    "name": "Fenrir",
+    "aliases": [
+        "fracture18",
+        "fenrir",
+        "fen",
+        "frac18"
+    ],
+    "imagePath": "fracture18.png",
+    "planets": [
+        "fenrir"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

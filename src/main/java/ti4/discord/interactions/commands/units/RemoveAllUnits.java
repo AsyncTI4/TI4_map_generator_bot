@@ -25,7 +25,7 @@ public class RemoveAllUnits extends GameStateCommand {
 
     @Override
     public String getDescription() {
-        return "Removal all units from the map";
+        return "Remove all units from the map";
     }
 
     @Override

@@ -23,6 +23,7 @@ import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieReli
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
+import ti4.helpers.thirtyk.ThirtyKRelics;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
@@ -140,29 +141,38 @@ public class RelicHelper {
         }
         relicID = relicID.replace("extra1", "");
         relicID = relicID.replace("extra2", "");
+        gainRelicAndNotify(player, event, game, relicID, "drew");
+        if (checked) game.shuffleRelics();
+    }
+
+    public static void gainRelicAndNotify(
+            Player player, GenericInteractionCreateEvent event, Game game, String relicID, String verb) {
         player.addRelic(relicID);
         RelicModel relicModel = Mapper.getRelic(relicID);
-
-        String message = player.getRepresentation() + " drew the _" + relicModel.getName() + "_ relic.";
+        String relicName = relicModel == null ? relicID : relicModel.getName();
+        String message = player.getRepresentation() + " " + verb + " the _" + relicName + "_ relic.";
         if (game.isFowMode()) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
         }
-        MessageHelper.sendMessageToChannelWithEmbed(
-                player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
+        if (relicModel == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        } else {
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
+        }
         resolveRelicEffects(event, game, player, relicID);
         WhiteTfUnitHandler.resolveMonumentRelicDraw(event, game, player);
         TeHelperUnits.serveIconoclastDeployAbility(game, player);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")) {
             OnyxxaLeaderHandler.onDrawRelic(player);
         }
-        KairnBreakthroughHandler.offerRelicGainPrompts(game, player, relicID);
-        if (checked) game.shuffleRelics();
     }
 
     public static void resolveRelicEffects(
             GenericInteractionCreateEvent event, Game game, Player player, String relicID) {
         StringBuilder helpMessage = new StringBuilder();
         // Append helpful commands after relic draws and resolve effects:
+        ThirtyKRelics.resolveRelicGained(event, game, player, relicID);
         switch (relicID) {
             case "obsidian", "absol_obsidian" -> {
                 game.drawSecretObjective(player.getUserID());
@@ -285,6 +295,7 @@ public class RelicHelper {
         CommanderUnlockCheckService.checkPlayer(player, "argent");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), helpMessage.toString());
         Helper.checkEndGame(game, player);
+        KairnBreakthroughHandler.offerRelicGainPrompts(game, player, relicID);
     }
 
     /** Meant to be called AFTER removing the relic from the player */

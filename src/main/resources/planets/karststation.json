@@ -1,0 +1,26 @@
+{
+    "id": "karststation",
+    "tileId": "th22",
+    "name": "Karst Station",
+    "aliases": [
+        "karststation"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": [
+        "SPACESTATION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "karststation",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 198,
+            "y": 206
+        }
+    },
+    "positionInTile": {
+        "x": 198,
+        "y": 206
+    },
+    "source": "theodisi"
+}

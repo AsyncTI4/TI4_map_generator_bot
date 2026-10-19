@@ -1,0 +1,17 @@
+{
+    "id": "th43",
+    "name": "Alpha/Beta Wormhole",
+    "aliases": [
+        "th43",
+        "alphabetawormhole"
+    ],
+    "imagePath": "th43.png",
+    "planets": [],
+    "shipPositionsType": "TYPE08",
+    "wormholes": [
+        "ALPHA",
+        "BETA"
+    ],
+    "tileBack": "blue",
+    "source": "theodisi"
+}

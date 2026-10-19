@@ -1,0 +1,17 @@
+{
+    "id": "fracture33",
+    "name": "Fracture Astroid Egress",
+    "aliases": [
+        "fracture33",
+        "astroidegress",
+        "frac33",
+        "astroidfrac"
+    ],
+    "hasEgress": true,
+    "isAstroid": true,
+    "imagePath": "fracture33.png",
+    "shipPositionsType": "TYPE08",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

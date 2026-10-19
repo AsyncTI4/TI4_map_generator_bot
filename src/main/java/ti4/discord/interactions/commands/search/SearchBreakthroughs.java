@@ -13,7 +13,7 @@ import ti4.model.Source.ComponentSource;
 class SearchBreakthroughs extends SearchComponentModelSubcommand {
 
     SearchBreakthroughs() {
-        super(Constants.SEARCH_BREAKTHROUGHS, "List all breakthorughs the bot can use");
+        super(Constants.SEARCH_BREAKTHROUGHS, "List all breakthroughs the bot can use");
     }
 
     @Override

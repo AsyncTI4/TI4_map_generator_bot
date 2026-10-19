@@ -63,6 +63,7 @@ import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
+import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
 
@@ -635,6 +636,10 @@ public class PlayStrategyCardService {
         }
         for (Player p : Helper.getSpeakerOrFullPriorityOrderFromPlayer(scHolder, game)) {
             String representation = ping ? p.getRepresentation() : p.getRepresentationNoPing();
+            var userSettings = UserSettingsManager.get(p.getUserID());
+            if (!userSettings.isPrefersStrategyThreadJoining()) {
+                representation = p.getRepresentationNoPing();
+            }
             if (p.hasFollowedSC(scID)) {
                 if (p.getSCs().contains(scID)) {
                     followSummary.append(representation).append(" played the SC");

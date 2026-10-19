@@ -1,0 +1,18 @@
+{
+    "id": "fracture34",
+    "name": "Pollux",
+    "aliases": [
+        "fracture34",
+        "pollux",
+        "pol",
+        "frac34"
+    ],
+    "imagePath": "fracture34.png",
+    "planets": [
+        "pollux"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

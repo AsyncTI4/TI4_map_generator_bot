@@ -1,0 +1,20 @@
+{
+    "id": "th28",
+    "name": "Kher/Veyra",
+    "aliases": [
+        "th28",
+        "kher",
+        "veyra"
+    ],
+    "imagePath": "th28.png",
+    "planets": [
+        "kher",
+        "veyra"
+    ],
+    "shipPositionsType": "TYPE05",
+    "wormholes": [
+        "BETA"
+    ],
+    "tileBack": "blue",
+    "source": "theodisi"
+}

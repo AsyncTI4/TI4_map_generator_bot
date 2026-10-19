@@ -37,6 +37,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.thirtyk.ThirtyKActionCards;
 import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.helpers.twilight_kart.TkHelperActionCards;
 import ti4.image.Mapper;
@@ -2226,6 +2227,7 @@ public class ActionCardHelper {
 
             TeHelperActionCards.resolveTeActionCard(actionCard, player, introMsg);
             TkHelperActionCards.resolveTkActionCard(actionCard, player, introMsg);
+            ThirtyKActionCards.resolveActionCard(actionCard, player, introMsg);
 
             TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(
                     Constants.AC, actionCard.getAlias(), player.getNumberOfTurns());

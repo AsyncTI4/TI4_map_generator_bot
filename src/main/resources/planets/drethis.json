@@ -1,0 +1,27 @@
+{
+    "id": "drethis",
+    "tileId": "th41",
+    "name": "Drethis",
+    "aliases": [
+        "drethis"
+    ],
+    "resources": 0,
+    "influence": 1,
+    "planetTypes": [
+        "HAZARDOUS"
+    ],
+    "planetLayout": {
+        "unitHolderName": "drethis",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 128,
+            "y": 78
+        },
+        "planetRadius": 53
+    },
+    "positionInTile": {
+            "x": 128,
+            "y": 78
+    },
+    "source": "theodisi"
+}

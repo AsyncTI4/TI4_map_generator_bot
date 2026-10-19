@@ -24,7 +24,7 @@ import ti4.service.leader.RefreshLeaderService;
 class PersonalCleanup extends GameStateSubcommand {
 
     public PersonalCleanup() {
-        super(Constants.PERSONAL_CLEANUP, "Status Phase cleanup", true, true);
+        super(Constants.PERSONAL_CLEANUP, "Run Status Phase cleanup for only your faction", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm command with YES").setRequired(true));
     }
 

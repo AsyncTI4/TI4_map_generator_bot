@@ -19,6 +19,8 @@ class SetPreferredSettings extends Subcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, "pillage_msg", "True to get the Pillage flavor text"));
         addOptions(new OptionData(OptionType.BOOLEAN, "sarween_msg", "True to get the Sarween Tools flavor text"));
         addOptions(new OptionData(
+                OptionType.BOOLEAN, "join_strat_threads", "True to join strategy threads automatically"));
+        addOptions(new OptionData(
                         OptionType.STRING, Constants.VOLTRON_STYLE, "Choose what your Eidolon Maximum looks like")
                 .setAutoComplete(true));
         addOptions(new OptionData(
@@ -76,6 +78,9 @@ class SetPreferredSettings extends Subcommand {
 
         Boolean sarween = event.getOption("sarween_msg", null, OptionMapping::getAsBoolean);
         if (sarween != null) userSettings.setPrefersSarweenMsg(sarween);
+
+        Boolean strat = event.getOption("join_strat_threads", null, OptionMapping::getAsBoolean);
+        if (strat != null) userSettings.setPrefersStrategyThreadJoining(strat);
 
         String voltron = event.getOption(Constants.VOLTRON_STYLE, null, OptionMapping::getAsString);
         if (voltron != null) userSettings.setVoltronStyle(voltron);

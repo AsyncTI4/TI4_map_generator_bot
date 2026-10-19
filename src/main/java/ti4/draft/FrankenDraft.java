@@ -289,6 +289,9 @@ public class FrankenDraft extends BagDraft {
         if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
+        if (game.isLostLegaciesTiles()) {
+            sources.add(ComponentSource.theodisi);
+        }
         if (Boolean.parseBoolean(game.getStoredValue(Constants.INCLUDE_ERONOUS_TILES))) {
             sources.add(ComponentSource.eronous);
         }

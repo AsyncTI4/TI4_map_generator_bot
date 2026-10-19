@@ -56,7 +56,7 @@
       "WARFARE",
       "BIOTIC"
     ],
-    "text": "When you gain this breakthrough and at the start of each strategy phase, shuffle each relic on this card back into the deck. Then, draw 3 relics and place each relic on this card face down. You may look at the relics on this card at any time. After a player gains a relic, you may exhaust this card to purge that relic and give them 1 on this card or ready this card.",
+    "text": "When you gain this breakthrough and at the start of each strategy phase, shuffle each relic on this card back into the deck. Then, draw 3 relics and place each relic on this card face up. After a player gains a relic, you may exhaust this card to purge that relic and give them 1 on this card or ready this card.",
     "source": "theodisi"
   },
   {
@@ -188,7 +188,7 @@
       "BIOTIC",
       "WARFARE"
     ],
-    "text": "When 1 or more of your units are destroyed, you may capture them.\nACTION: Return any number of your captured units to your reinforcements. Gain trade goods equal to half their combined cost (rounded down).",
+    "text": "When 1 or more of your units are destroyed, you may capture them.\nACTION: Exhaust this card to return any number of your captured units to your reinforcements. Gain trade goods equal to half their combined cost (rounded down).",
     "source": "theodisi"
   },
   {

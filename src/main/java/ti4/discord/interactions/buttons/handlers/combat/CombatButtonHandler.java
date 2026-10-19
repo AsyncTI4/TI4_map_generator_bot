@@ -12,6 +12,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShie
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardUnitHandler;
+import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -31,7 +32,7 @@ import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.spring.context.SpringContext;
 
 @UtilityClass
-class CombatButtonHandler {
+public class CombatButtonHandler {
 
     @ButtonHandler("automateGroundCombat_")
     public static void automateGroundCombat(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
@@ -222,6 +223,8 @@ class CombatButtonHandler {
         buttons.add(Buttons.red(
                 "getDamageButtons_" + tile.getPosition() + "_afb", "Manually Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.gray("cancelAFBHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+        TheodisiLegendaryButtonHandler.addVoskaCancelButton(
+                buttons, game, player, "cancelAFBHits_" + tile.getPosition() + "_" + h);
         VanguardAbilitiesHandler.addInterlockingShieldsButton(buttons, game, player, tile, "cancelAFBHits", h);
         TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(buttons, game, player, tile, "afb", h);
         String msg2 = "You may automatically assign " + h + " ANTI-FIGHTER BARRAGE hit" + (h == 1 ? "" : "s") + ".";
@@ -250,6 +253,8 @@ class CombatButtonHandler {
         buttons.add(Buttons.red(
                 "getDamageButtons_" + tile.getPosition() + "_pds", "Manually Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.gray("cancelPdsOffenseHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+        TheodisiLegendaryButtonHandler.addVoskaCancelButton(
+                buttons, game, player, "cancelPdsOffenseHits_" + tile.getPosition() + "_" + h);
         VanguardAbilitiesHandler.addInterlockingShieldsButton(buttons, game, player, tile, "cancelPdsOffenseHits", h);
         TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(buttons, game, player, tile, "pds", h);
         String msg2 = player.getRepresentationNoPing() + ", you may automatically assign "
@@ -288,6 +293,8 @@ class CombatButtonHandler {
                 "getDamageButtons_" + tile.getPosition() + "_groundcombat",
                 "Manually Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.gray(CancelGroundHitsButtonId.of(tile.getPosition(), h, planet), "Cancel a Hit"));
+        TheodisiLegendaryButtonHandler.addVoskaCancelButton(
+                buttons, game, player, CancelGroundHitsButtonId.of(tile.getPosition(), h, planet));
         VanguardAbilitiesHandler.addInterlockingShieldsButton(buttons, game, player, tile, "cancelGroundHits", h);
         TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
                 buttons, game, player, tile, "ground", h);
@@ -323,6 +330,8 @@ class CombatButtonHandler {
                 "getDamageButtons_" + tile.getPosition() + "_spacecombat",
                 "Manually Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.gray("cancelSpaceHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+        TheodisiLegendaryButtonHandler.addVoskaCancelButton(
+                buttons, game, player, "cancelSpaceHits_" + tile.getPosition() + "_" + h);
         VanguardAbilitiesHandler.addInterlockingShieldsButton(buttons, game, player, tile, "cancelSpaceHits", h);
         TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(buttons, game, player, tile, "space", h);
         VanguardUnitHandler.addSpaceCombatHitButtons(buttons, game, player, tile, h);

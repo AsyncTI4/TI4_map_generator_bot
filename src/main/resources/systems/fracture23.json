@@ -1,0 +1,19 @@
+{
+    "id": "fracture23",
+    "name": "Nidhogg",
+    "aliases": [
+        "fracture23",
+        "nidhogg",
+        "nid",
+        "frac23"
+
+    ],
+    "imagePath": "fracture23.png",
+    "planets": [
+        "nidhogg"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

@@ -37,7 +37,8 @@ public class BothelperCommand implements ParentCommand {
                     new ReserveGame(),
                     new DeleteFOWCommThreads(),
                     new KeepThreadAlive(),
-                    new ManageRoles())
+                    new ManageRoles(),
+                    new CloneGame())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
@@ -52,7 +53,7 @@ public class BothelperCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "BotHelper";
+        return "Bothelper tools: create game channels, manage stats, titles, roles and server limits";
     }
 
     @Override

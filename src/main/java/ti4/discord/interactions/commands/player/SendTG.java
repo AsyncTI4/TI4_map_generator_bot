@@ -20,7 +20,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 class SendTG extends GameStateSubcommand {
 
     public SendTG() {
-        super(Constants.SEND_TG, "Sent trade goods to player/faction", true, true);
+        super(Constants.SEND_TG, "Send trade goods to player/faction", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade goods count").setRequired(true));
         addOptions(new OptionData(
                         OptionType.STRING,

@@ -268,7 +268,7 @@ public class KairnAbilityHandler {
         }
         List<Button> buttons = new ArrayList<>();
         for (Planet planet : activeSystem.getPlanetUnitHolders()) {
-            if (!player.getPlanets().contains(planet.getName())) {
+            if (!player.getPlanets().contains(planet.getName()) || planet.isLegendary()) {
                 continue;
             }
             for (String trait : List.of("cultural", "hazardous", "industrial")) {

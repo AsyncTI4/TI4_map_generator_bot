@@ -116,7 +116,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
             case "censure" ->
                 "Use this command to add the objective: `/status po_add_custom public_name:Political Censure public_vp_worth:1`\n";
             case Constants.VOICE_OF_THE_COUNCIL_ID ->
-                "Use this command to change the electee: `/omegaphase elect_voice_of_the_council`\n";
+                "Use this command to change the electee: `/homebrew omegaphase elect_voice_of_the_council`\n";
             default -> null;
         };
     }

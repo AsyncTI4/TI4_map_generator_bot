@@ -11,6 +11,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -37,10 +38,16 @@ public class KairnBreakthroughHandler {
             relics.add(relic);
         }
         setStoredRelics(game, player, relics);
-        MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(),
-                player.getRepresentationNoPing() + " placed " + relics.size() + " relic"
-                        + (relics.size() == 1 ? "" : "s") + " on **Relic Trading Hub**.");
+        List<MessageEmbed> embeds = relics.stream()
+                .map(KairnBreakthroughHandler::getRelicModel)
+                .filter(java.util.Objects::nonNull)
+                .map(relic -> relic.getRepresentationEmbed(false, true))
+                .toList();
+        MessageHelper.sendMessageToChannelWithEmbeds(
+                player.getCorrectChannel(),
+                FoWHelper.actorOrAnon(game, player, "A player") + " placed " + relics.size() + " relic"
+                        + (relics.size() == 1 ? "" : "s") + " on **Relic Trading Hub**.",
+                embeds);
     }
 
     public static Button getRelicsCardsInfoButton(Player player) {

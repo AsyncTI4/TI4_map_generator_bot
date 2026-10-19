@@ -37,6 +37,7 @@ public class HomebrewService {
                 "US Explores/Relics/ACs",
                 "Uncharted Space Explores, Relics and Action Cards",
                 SourceEmojis.UnchartedSpace),
+        HBLOSTLEGACIESTILES("Lost Legacies Tiles", "Adds Lost Legacies tiles", SourceEmojis.Theodisi),
         HBACDECK2("AC2 Deck", "Action Cards Deck 2", SourceEmojis.ActionDeck2),
         HBREDTAPE("Red Tape", "Red Tape mode", null),
         HBIGNISAURORA("Ignis Aurora", "Ignis Aurora decks for SC/agendas/techs/events/relics", null),
@@ -100,6 +101,7 @@ public class HomebrewService {
         game.setDiscordantStarsMode(false);
         game.setBlueReverieMode(false);
         game.setUnchartedSpaceStuff(false);
+        game.setLostLegaciesTiles(false);
         game.setAbsolMode(false);
         game.setOmegaPhaseMode(false);
         game.setVotcMode(false);
@@ -206,6 +208,10 @@ public class HomebrewService {
                 }
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), "Set the explores/action cards/relics to Uncharted Space stuff.");
+            }
+            case HBLOSTLEGACIESTILES -> {
+                game.setLostLegaciesTiles(true);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added Lost Legacies tiles.");
             }
             case HBACDECK2 -> {
                 String acd2 = "action_deck_2";
