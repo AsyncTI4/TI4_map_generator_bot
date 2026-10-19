@@ -102,7 +102,11 @@ final class ObjectiveTracker {
             int carriersHome,
             int built,
             int arrivedAway,
-            boolean scored) {}
+            boolean scored,
+            int homeInfantry,
+            int keptHome,
+            int movableHomeMechs,
+            int bareHeldPlanets) {}
 
     private final List<MechanizeHolder> mechanize = new ArrayList<>();
     private final Map<String, Integer> mechTotals = new HashMap<>();
@@ -222,8 +226,38 @@ final class ObjectiveTracker {
                     carriersHome,
                     mechsBuilt.getOrDefault(faction, 0),
                     arrivals.getOrDefault(faction, 0),
-                    seat.getSecretsScored().containsKey("mtm")));
+                    seat.getSecretsScored().containsKey("mtm"),
+                    homeInfantry(seat, home),
+                    kept(game, seat),
+                    Math.max(0, mechsHome - Math.max(0, kept(game, seat) - homeInfantry(seat, home))),
+                    bareHeldPlanets(game, seat, home)));
         }
+    }
+
+    // Ground forces the planner keeps at home when the ships there leave; while Mechanize is held infantry stay first.
+    private static int kept(Game game, Player seat) {
+        return ti4.ai.tactical.TacticalPlanner.groundKeptHomeWhileTransportsLeave(game, seat);
+    }
+
+    private static int homeInfantry(Player seat, ti4.game.Tile home) {
+        if (home == null) return 0;
+        return home.getUnitHolders().values().stream()
+                .mapToInt(holder -> ti4.ai.eval.BoardView.count(holder, seat, ti4.helpers.Units.UnitType.Infantry))
+                .sum();
+    }
+
+    private static int bareHeldPlanets(Game game, Player seat, ti4.game.Tile home) {
+        int bare = 0;
+        for (String name : seat.getPlanets()) {
+            ti4.game.Tile tile = game.getTileFromPlanet(name);
+            if (tile == null || tile == home) continue;
+            if (game.getUnitHolderFromPlanet(name) instanceof ti4.game.Planet planet
+                    && !planet.isSpaceStation(game)
+                    && ti4.ai.eval.BoardView.count(planet, seat, ti4.helpers.Units.UnitType.Mech) == 0) {
+                bare++;
+            }
+        }
+        return bare;
     }
 
     private void recordGroundProgress(Game game) {

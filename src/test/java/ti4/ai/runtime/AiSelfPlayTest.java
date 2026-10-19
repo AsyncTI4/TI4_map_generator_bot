@@ -272,7 +272,7 @@ class AiSelfPlayTest extends BaseTi4Test {
             game++;
             for (ObjectiveTracker.MechanizeHolder holder : summary.mechanize()) {
                 System.out.printf(
-                        "Mechanize holder g%d %s r%d: mechs %d on %d planets (%d at home), carriers %d (%d at home), built %d, arrived away %d%s%n",
+                        "Mechanize holder g%d %s r%d: mechs %d on %d planets (%d at home), carriers %d (%d at home), built %d, arrived away %d, home infantry %d, kept home %d, movable home mechs %d, bare held planets %d%s%n",
                         game,
                         holder.faction(),
                         holder.round(),
@@ -283,6 +283,10 @@ class AiSelfPlayTest extends BaseTi4Test {
                         holder.carriersHome(),
                         holder.built(),
                         holder.arrivedAway(),
+                        holder.homeInfantry(),
+                        holder.keptHome(),
+                        holder.movableHomeMechs(),
+                        holder.bareHeldPlanets(),
                         holder.scored() ? ", scored" : "");
             }
         }
