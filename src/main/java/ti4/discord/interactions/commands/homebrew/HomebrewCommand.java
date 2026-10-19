@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import ti4.discord.interactions.commands.ParentCommand;
 import ti4.discord.interactions.commands.SubcommandGroup;
-import ti4.discord.interactions.commands.homebrew.ll.LostLegaciesGroup;
+import ti4.discord.interactions.commands.homebrew.lost_legacies.LostLegaciesGroup;
 import ti4.discord.interactions.commands.homebrew.monuments.MonumentsGroup;
 import ti4.discord.interactions.commands.homebrew.omega_phase.OmegaPhaseGroup;
 
@@ -22,7 +22,7 @@ public class HomebrewCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "Homebrew game mode commands: Lost Legacies, Monuments and Omega Phase";
+        return "Homebrew game mode commands";
     }
 
     @Override

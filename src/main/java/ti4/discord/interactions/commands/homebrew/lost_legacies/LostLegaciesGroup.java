@@ -1,4 +1,4 @@
-package ti4.discord.interactions.commands.homebrew.ll;
+package ti4.discord.interactions.commands.homebrew.lost_legacies;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,7 +12,7 @@ public class LostLegaciesGroup extends SubcommandGroup {
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     public LostLegaciesGroup() {
-        super("ll", "Lost Legacies commands");
+        super("lost_legacies", "Lost Legacies commands");
     }
 
     @Override

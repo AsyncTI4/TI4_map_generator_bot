@@ -1,4 +1,4 @@
-package ti4.discord.interactions.commands.homebrew.ll;
+package ti4.discord.interactions.commands.homebrew.lost_legacies;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantAbilityHandler;

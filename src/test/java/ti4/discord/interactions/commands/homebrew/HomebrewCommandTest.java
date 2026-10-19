@@ -29,8 +29,8 @@ class HomebrewCommandTest {
 
     @Test
     void everyOldTopLevelCommandIsNowAGroup() {
-        assertThat(command.getSubcommandGroups()).containsOnlyKeys("ll", "monument", "omegaphase");
-        assertThat(command.getSubcommandGroups().get("ll").getGroupSubcommands())
+        assertThat(command.getSubcommandGroups()).containsOnlyKeys("lost_legacies", "monument", "omegaphase");
+        assertThat(command.getSubcommandGroups().get("lost_legacies").getGroupSubcommands())
                 .containsOnlyKeys("relic_trading_hub", "rev_leader_fix");
         assertThat(command.getSubcommandGroups().get("monument").getGroupSubcommands())
                 .containsOnlyKeys(

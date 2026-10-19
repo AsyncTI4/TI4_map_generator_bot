@@ -564,6 +564,9 @@ public final class Constants {
     public static final String FOG_GHOST_HEXES = "fog_ghost_hexes";
     public static final String CHECK_CHANNELS = "check_channels";
     public static final String PING_SYSTEM = "ping_system";
+    public static final String TARGET_PLANET_PING = "target_planet";
+    public static final String TARGET_SYSTEM_PING = "target_system";
+    public static final String TARGET_PLAYER_PING = "target_player_ping";
     public static final String LABEL = "label";
     public static final String MESSAGE = "message";
     public static final String LAST_TIME_GAMES_CHECKED = "last_time_games_checked";
