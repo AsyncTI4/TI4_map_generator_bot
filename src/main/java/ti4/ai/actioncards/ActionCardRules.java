@@ -13,6 +13,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
+import ti4.ai.eval.MoveBoost;
 import ti4.ai.nekro.CommandTokenPolicy;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
@@ -31,6 +32,7 @@ import ti4.service.agenda.IsPlayerElectedService;
 public class ActionCardRules {
 
     private static final String REF_KEY = "acResolveRef|";
+    private static final String FLANK_SPEED_BOOST = "flankspeedBoost";
     private static final String FIELD = "~";
     private static final String COMPONENT_ACTION = "componentAction";
     private static final String SUMMIT_PRESET = "resolvePreassignment_Summit";
@@ -95,6 +97,28 @@ public class ActionCardRules {
         Optional<ActionCardValue.Candidate> best =
                 ActionCardValue.bestReactionPlay(game, seat, Window.AFTER_ACTIVATION);
         return best.flatMap(card -> startPlay(context, key, card.alias(), PlayMoment.IN_TURN));
+    }
+
+    public static Optional<AiDecision> flankSpeed(AiTurnContext context) {
+        Game game = context.game();
+        Player seat = context.seat();
+        if (!context.isActivePlayer() || AiSettings.usesLegacyActionCards(seat)) return Optional.empty();
+        if (!"action".equalsIgnoreCase(game.getPhaseOfGame())
+                || game.getActiveSystem().isBlank()) {
+            return Optional.empty();
+        }
+        if (!game.getStoredValue(FLANK_SPEED_BOOST).isEmpty() || !TacticalRules.activatedThisTurn(context)) {
+            return Optional.empty();
+        }
+        String key = PlayMemory.turnKey(context);
+        if (context.memory().has(key) || !mayPlay(game, seat)) return Optional.empty();
+        Optional<String> alias = MoveBoost.flankSpeedCard(seat);
+        boolean needed = TacticalRules.rememberedPlan(context)
+                .filter(plan -> plan.target().equals(game.getActiveSystem()))
+                .filter(plan -> TacticalPlanner.needsFlankSpeed(game, seat, plan))
+                .isPresent();
+        if (alias.isEmpty() || !needed) return Optional.empty();
+        return startPlay(context, key, alias.get(), PlayMoment.IN_TURN);
     }
 
     public static Optional<AiDecision> masterPlan(AiTurnContext context, boolean secondActionIsWorthIt) {

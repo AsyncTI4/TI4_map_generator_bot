@@ -504,6 +504,7 @@ to build one by hand:
     | Overrule | on Imperial, the points its primary scores beyond what the status phase would (one more public objective than the seat has scoring chances for, 2 for a stage II objective, and 1 for Mecatol Rex), valued as points, or 30 when they reach the goal, plus a fresh secret when it holds no Mecatol Rex; on Technology, what the strategy card plan values the primary at; plus a little for how often human players overrule that card (Imperial 0.5, Technology 0.16). It is held for a *points play* (Imperial with at least a point to score) or a use worth the reserve, see below | an unplayed Imperial or Technology, among the uses the reserve lets through; the card stays unplayed for its holder |
     | Strategize (4 copies) | the best secondary it could perform (Imperial: a fresh secret; Diplomacy: its ready; Construction: a structure when it nears a structure objective; Warfare: a build at home; Politics: two cards; Trade: its missing commodities), less the strategy token the bot takes at once, when no better follow needs that token | the card of that secondary among the unchosen ones and its own unplayed cards (a card another player will play this round can simply be followed), never Technology (the bot's button grants the technology without collecting its 4 resources) or Leadership |
     | Unexpected Action | the best a freed system buys (the Warfare "take back a token" test), else a pure stall; the token goes back to reinforcements | the token whose system unlocks the best tactical action |
+    | Flank Speed (4 copies) | played only for a move into the Fracture its plan needs one more move for, worth that plan less 1.5 for the card | none: played right after it activates the system |
     | Pirate Contract (4 copies) | the rivals' approaches it blocks (half a point of standing per rival nearby, at most 3), else a pure stall | a legal system that is not next to its own planets or units |
     | Pirate Fleet | 2 × a contender's standing for blocking its approach, less the 3 resources, paid honestly | a legal system next to a contender and away from its own ships |
     | Mercenary Contract | the points a contender loses with the planet (and a third of the planet's value) less the 2 trade goods | an empty non-home planet a contender controls, among the first 22 the bot lists |
@@ -1051,6 +1052,13 @@ to build one by hand:
     All of this is worth half as much (`FractureCampaign.routeShare`) for a seat with no ingress in its own home, lane or
     slice: it can only go in through Mecatol Rex or a neighbour's slice, so it values the march, the march it would
     give up and the fleet it builds for Styx at half, and does not take the fourth fleet token for it.
+    Three things cover two steps of the march in one round. A seat holding _Flank Speed_ also plans its moves into
+    the Fracture with one more move for every ship (`MoveBoost`), keeps such a plan only when it needs the extra move,
+    at 1.5 less for the card, and plays the card right after activating the system, before it moves
+    (`ActionCardRules.flankSpeed`). Thunder's Edge Warfare (`bestForWarfare`) may take a step of the march, which
+    places no command token and leaves the fleet free to move again; Prophecy of Kings Warfare and _Unexpected
+    Action_ take back the token of a staged fleet when that unlocks the best tactical action. A seat with a dock near
+    an ingress and three or more rounds left values carrier II 1.5 more (at its route share), for a faster march.
     A dock within two moves of an ingress system, while a Fracture planet is not yet the seat's, values its warships
     the same half as much again, and builds dreadnoughts up to five instead of three. The dock nearest an ingress
     (`FractureCampaign`, while Styx is not the seat's) also builds the smallest fleet that beats the guard of Styx,
@@ -1477,9 +1485,8 @@ Seven small generic changes don't reference `ti4.ai`:
 - **Expeditions, the Fracture.** The ingress tokens are placed for distance and safety, not for a route in, and the
   Fracture roll is only worth 0.4. Styx is still rarely taken in self-play: a fleet that can beat its guard comes
   together around round 5, a dreadnought fleet needs three more rounds from the ingress, and games end around round 6.
-  Not yet: researching carrier II or other move upgrades for the march, Warfare or _Flank Speed_ to cover two steps in
-  a round (_Unexpected Action_ already frees a staged fleet when that ranks best), and remembering a march across
-  rounds rather than re-deriving it each turn.
+  Not yet: remembering a march across rounds rather than re-deriving it each turn, production inside the Fracture
+  (Saar's floating docks), and _Flank Speed_ under Wild Wild Galaxy (+2).
 - **Expeditions, fog of war.** In fog the GM places the ingress tokens (their buttons carry no owner), and the AI
   neither places them nor knows which rival holds how many slices.
 - **Expeditions, tile choice.** Thunder's Edge is placed by distance and the rivals' home and fleet pressure, not by

@@ -40,6 +40,17 @@ class FractureSelfPlayTest extends BaseTi4Test {
         assertThat(scenario.relicsGained).as(outcome.report()).isEqualTo(1);
     }
 
+    // From the egress Styx is two moves away, so a dreadnought fleet needs Flank Speed to strike this action.
+    @Test
+    void aSeatPlaysFlankSpeedToStrikeStyxFromTheEgress() throws Exception {
+        Attack scenario = new Attack("frac2", STYX, 8, 4, 16).withFlankSpeed();
+        SelfPlayGame.Outcome outcome = play(scenario);
+
+        assertThat(outcome.ending()).as(outcome.report()).isEqualTo(SelfPlayGame.Ending.STOP_CONDITION);
+        assertThat(scenario.taken).as(outcome.report()).isTrue();
+        assertThat(scenario.round).as(outcome.report()).isEqualTo(scenario.arrangedRound);
+    }
+
     // A fleet that could beat the guard of Styx marches on toward its point instead, so this one is only big enough for
     // Cocytus.
     @Test
@@ -77,6 +88,9 @@ class FractureSelfPlayTest extends BaseTi4Test {
         private final int dreadnoughts;
         private final int carriers;
         private final int infantry;
+        private boolean flankSpeed;
+        int arrangedRound;
+        int round;
         private SelfPlayGame selfPlay;
         private String attacker;
         private int pointsBefore;
@@ -93,6 +107,11 @@ class FractureSelfPlayTest extends BaseTi4Test {
             this.dreadnoughts = dreadnoughts;
             this.carriers = carriers;
             this.infantry = infantry;
+        }
+
+        Attack withFlankSpeed() {
+            flankSpeed = true;
+            return this;
         }
 
         void attach(SelfPlayGame selfPlay) {
@@ -114,6 +133,7 @@ class FractureSelfPlayTest extends BaseTi4Test {
                     + (seat.getRelics().size() - relicsBefore) + ", round " + game.getRound();
             if (holder != seat || neutralUnitsRemain(game)) return false;
             taken = true;
+            round = game.getRound();
             pointsGained = seat.getTotalVictoryPoints() - pointsBefore;
             relicsGained = seat.getRelics().size() - relicsBefore;
             return relicsGained > 0 || ++waitingForRelic > RELIC_PATIENCE_TICKS;
@@ -136,6 +156,8 @@ class FractureSelfPlayTest extends BaseTi4Test {
             beside.addUnit("space", Units.getUnitKey(UnitType.Infantry, seat.getColor()), infantry);
             pointsBefore = seat.getTotalVictoryPoints();
             relicsBefore = seat.getRelics().size();
+            arrangedRound = game.getRound();
+            if (flankSpeed) seat.setActionCard("fs1", 401);
         }
     }
 }

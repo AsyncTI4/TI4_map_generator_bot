@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.CustodiansRace;
+import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.GameHorizon;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ObjectiveValue;
@@ -134,6 +135,9 @@ public class ResearchPolicy {
     private static final Set<String> STATUS_PHASE_INCOME = Set.of("hm", "nm");
     private static final double OPENING_STATUS_PHASES = 5;
     private static final String GRAVITY_DRIVE = "gd";
+    private static final String CARRIER_II = "cv2";
+    private static final double FRACTURE_MARCH_VALUE = 1.5;
+    private static final int FRACTURE_MARCH_ROUNDS = 3;
     private static final double GRAVITY_DRIVE_RACE_SHARE = 0.5;
     private static final String PRODUCE_EN_MASSE = "pem";
     private static final String LAWS_OF_PHYSICS = "mlp";
@@ -189,7 +193,14 @@ public class ResearchPolicy {
                 + OBJECTIVE_WEIGHT * objectiveGain(game, seat, tech)
                 + steppingStoneValue(game, seat, tech)
                 + custodiansRaceValue(game, seat, alias)
-                + openingReachValue(game, seat, alias);
+                + openingReachValue(game, seat, alias)
+                + fractureMarchValue(game, seat, alias);
+    }
+
+    private static double fractureMarchValue(Game game, Player seat, String alias) {
+        if (!CARRIER_II.equals(alias) || GameHorizon.roundsLeft(game) < FRACTURE_MARCH_ROUNDS) return 0;
+        if (FractureCampaign.dock(game, seat).isEmpty()) return 0;
+        return FRACTURE_MARCH_VALUE * FractureCampaign.routeShare(game, seat);
     }
 
     static double bestValueAsTechnologyHolder(Game game, Player seat) {

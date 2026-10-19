@@ -95,7 +95,8 @@ public class BoardView {
     }
 
     public static int moveValue(Player player, UnitType type) {
-        return model(player, type).map(UnitModel::getMoveValue).orElse(0);
+        int move = model(player, type).map(UnitModel::getMoveValue).orElse(0);
+        return move > 0 ? move + MoveBoost.extra(player) : move;
     }
 
     public static int moveValueWithGravityDrive(Player player, UnitType type) {

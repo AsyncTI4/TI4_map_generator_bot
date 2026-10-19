@@ -255,6 +255,55 @@ class FractureTargetsTest extends BaseTi4Test {
                 .isLessThan(own);
     }
 
+    // Flank Speed gives every ship one more move, so a dreadnought fleet on the ingress covers two steps of the march.
+    @Test
+    void flankSpeedLetsAFleetOnTheIngressSkipAStep() {
+        styxFleet(fracture.ingress);
+        assertThat(stageTo("frac3")).isEmpty();
+
+        fracture.nekro().setActionCard("fs1", 401);
+        Optional<TacticalPlan> faster = stageTo("frac3").or(() -> stageTo("frac5"));
+
+        assertThat(faster).isPresent();
+        assertThat(TacticalPlanner.needsFlankSpeed(fracture.board.test.game, fracture.nekro(), faster.get()))
+                .isTrue();
+    }
+
+    @Test
+    void flankSpeedLetsAFleetOnTheEgressAttackStyx() {
+        styxFleet(fracture.fracture("frac2"));
+        fracture.nekro().setActionCard("fs1", 401);
+
+        Optional<TacticalPlan> attack = TacticalPlanner.ranked(fracture.board.test.game, fracture.nekro()).stream()
+                .filter(plan -> plan.kind() == Kind.ATTACK && FractureScenario.STYX.equals(plan.target()))
+                .findFirst();
+
+        assertThat(attack).isPresent();
+        assertThat(attack.get().landings()).containsKey("styx");
+    }
+
+    // Thunder's Edge Warfare places no command token, so a march step taken with it leaves the fleet free to move
+    // again.
+    @Test
+    void warfareCanTakeAStepOfTheMarch() {
+        styxFleet(fracture.ingress);
+
+        Optional<TacticalPlan> warfare = TacticalPlanner.bestForWarfare(fracture.board.test.game, fracture.nekro());
+
+        assertThat(warfare.map(TacticalPlan::target))
+                .hasValueSatisfying(target -> assertThat(target).isIn("frac2", "frac6"));
+    }
+
+    @Test
+    void aSeatMarchingOnStyxValuesCarrierTwoMore() {
+        double near = ti4.ai.strategy.ResearchPolicy.value(fracture.board.test.game, fracture.nekro(), "cv2");
+
+        fracture.ingress.getSpaceUnitHolder().removeToken(Constants.TOKEN_INGRESS);
+        double far = ti4.ai.strategy.ResearchPolicy.value(fracture.board.test.game, fracture.nekro(), "cv2");
+
+        assertThat(near).isGreaterThan(far);
+    }
+
     @Test
     void aFleetTooSmallForStyxDoesNotMarchTowardIt() {
         fracture.ships(fracture.board.home, UnitType.Dreadnought, 1);

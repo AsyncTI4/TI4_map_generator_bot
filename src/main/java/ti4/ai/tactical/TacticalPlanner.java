@@ -17,6 +17,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
@@ -26,6 +27,7 @@ import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.MecatolStake;
+import ti4.ai.eval.MoveBoost;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.Territory;
 import ti4.ai.explore.ExploreDeck;
@@ -82,6 +84,7 @@ public class TacticalPlanner {
     private static final int FRACTURE_STAGE_LEAD = 3;
     private static final double FRACTURE_STAGE_SHARE = 0.8;
     private static final double FRACTURE_STEP_SHARE = 0.85;
+    private static final double FLANK_SPEED_COST = 1.5;
     private static final int STAGING_CANDIDATES = 4;
     private static final int STAGING_TILES_PER_TARGET = 2;
     static final double ATTACK_MIN_SCORE = 4.0;
@@ -323,6 +326,7 @@ public class TacticalPlanner {
                 .flatMap(Optional::stream)
                 .toList());
         plans.addAll(stage(context, activatable));
+        plans.addAll(flankSpeedPlans(context, activatable));
         return plans.stream()
                 .map(plan -> plan.withScore(plan.score() - marchForfeit(context, plan)))
                 .filter(plan -> plan.score() >= minScore)
@@ -332,10 +336,15 @@ public class TacticalPlanner {
 
     public static Optional<TacticalPlan> bestForWarfare(Game game, Player seat) {
         Context context = Context.tokenFree(game, seat);
-        return game.getTileMap().values().stream()
-                .filter(tile -> tile.hasPlayerCC(seat) || ButtonHelper.canActivateTile(game, seat, tile))
-                .map(tile -> bestFor(context, tile))
-                .flatMap(Optional::stream)
+        Predicate<Tile> activatable = tile -> tile.hasPlayerCC(seat) || ButtonHelper.canActivateTile(game, seat, tile);
+        Stream<TacticalPlan> marches =
+                stage(context, activatable).stream().filter(plan -> isFractureTile(game, plan.target()));
+        return Stream.concat(
+                        game.getTileMap().values().stream()
+                                .filter(activatable)
+                                .map(tile -> bestFor(context, tile))
+                                .flatMap(Optional::stream),
+                        marches)
                 .filter(plan -> plan.score() >= 0)
                 .max(Comparator.comparingDouble(TacticalPlan::score))
                 .or(() -> freeStep(context));
@@ -1584,6 +1593,40 @@ public class TacticalPlanner {
 
     private static double routeShare(Context context) {
         return FractureCampaign.routeShare(context.game, context.territory());
+    }
+
+    private static List<TacticalPlan> flankSpeedPlans(Context context, Predicate<Tile> activatable) {
+        if (MoveBoost.flankSpeedCard(context.seat).isEmpty()
+                || styxToTake(context).isEmpty()) return List.of();
+        List<TacticalPlan> boosted = MoveBoost.withOneMore(context.seat, () -> {
+            Context faster = new Context(context.game, context.seat, context.freed, context.hints);
+            List<TacticalPlan> plans = new ArrayList<>();
+            context.game.getTileMap().values().stream()
+                    .filter(Tile::isFracture)
+                    .filter(activatable)
+                    .forEach(tile -> bestFor(faster, tile).ifPresent(plans::add));
+            stage(faster, activatable).stream()
+                    .filter(plan -> isFractureTile(context.game, plan.target()))
+                    .forEach(plans::add);
+            return plans;
+        });
+        return boosted.stream()
+                .filter(plan -> needsFlankSpeed(context.game, context.seat, plan))
+                .map(plan -> plan.withScore(plan.score() - FLANK_SPEED_COST))
+                .toList();
+    }
+
+    private static boolean isFractureTile(Game game, String position) {
+        Tile tile = game.getTileByPosition(position);
+        return tile != null && tile.isFracture();
+    }
+
+    public static boolean needsFlankSpeed(Game game, Player seat, TacticalPlan plan) {
+        return departingShips(plan.moves()).stream()
+                .filter(move -> move.type() != UnitType.Fighter)
+                .anyMatch(move -> !MovementGraph.reach(
+                                game, seat, move.origin(), BoardView.moveValueWithGravityDrive(seat, move.type()))
+                        .containsKey(plan.target()));
     }
 
     private static double marchForfeit(Context context, TacticalPlan plan) {

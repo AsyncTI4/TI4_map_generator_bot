@@ -13,6 +13,7 @@ import ti4.ai.actioncards.AiCard.KeepFloor;
 import ti4.ai.actioncards.AiCard.Window;
 import ti4.ai.agenda.RiderPayoff;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.eval.MoveBoost;
 import ti4.ai.nekro.CommandTokenPolicy;
 import ti4.ai.tactical.Stall;
 import ti4.game.Game;
@@ -85,6 +86,15 @@ public class AiActionCards {
                             AgendaCards.rider(RiderPayoff.LEADERSHIP),
                             ExtraActionCard.masterPlan(),
                             ExtraActionCard.counterstroke(),
+                            new AiCard(
+                                    MoveBoost.FLANK_SPEED,
+                                    MoveBoost::isFlankSpeed,
+                                    Window.AFTER_ACTIVATION,
+                                    NEVER,
+                                    PRIOR,
+                                    null,
+                                    List.of(),
+                                    null),
                             new AiCard(
                                     SABOTAGE,
                                     ActionCardHelper::isSabotageOrShatter,

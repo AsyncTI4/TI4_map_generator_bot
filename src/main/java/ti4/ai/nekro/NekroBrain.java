@@ -211,6 +211,7 @@ public class NekroBrain implements FactionBrain {
             NekroLeaderRules::continueHero,
             ActionCardRules::continuePlay,
             ActionCardRules::afterActivation,
+            ActionCardRules::flankSpeed,
             ActionCardRules::presetSummit,
             PromissoryRules::continuePlay,
             this::queueProveEndurance,
