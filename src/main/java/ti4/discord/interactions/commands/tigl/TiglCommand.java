@@ -15,11 +15,7 @@ public class TiglCommand implements ParentCommand {
                     new Games(),
                     new InitRanks(),
                     new ReportManually(),
-                    new UserRanks(),
-                    new ShowHeroes(),
-                    new ShowTourneyWinners(),
-                    new LazaxMyPoints(),
-                    new LazaxTop100())
+                    new UserRanks())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

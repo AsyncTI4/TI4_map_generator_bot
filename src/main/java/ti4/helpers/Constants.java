@@ -1689,8 +1689,9 @@ public final class Constants {
     public static final String TIGL_INCLUDE_HISTORY = "include_history";
     public static final String TIGL_NICKNAME = "nickname";
     public static final String TIGL_FRACTURED_TAG = "TIGL Fractured";
-    public static final String LAZAX_MY_POINTS = "lazax_my_points";
-    public static final String LAZAX_TOP_100 = "lazax_top_100";
+    public static final String LAZAX = "lazax";
+    public static final String LAZAX_MY_POINTS = "my_points";
+    public static final String LAZAX_TOP_100 = "top_100";
     public static final String LAZAX_DELEGATION_LEADERBOARD = "delegation_leaderboard";
     public static final String PUBLIC = "public";
     public static final String SHOW_GAME_IDS = "show_game_ids";

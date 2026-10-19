@@ -1,4 +1,4 @@
-package ti4.discord.interactions.commands.tigl;
+package ti4.discord.interactions.commands.lazax;
 
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

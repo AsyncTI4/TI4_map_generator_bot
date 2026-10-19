@@ -1,4 +1,4 @@
-package ti4.discord.interactions.commands.tigl;
+package ti4.discord.interactions.commands.async;
 
 import java.util.List;
 import net.dv8tion.jda.api.entities.Member;
