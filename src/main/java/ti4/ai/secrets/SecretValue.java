@@ -1,6 +1,7 @@
 package ti4.ai.secrets;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -32,6 +33,7 @@ public class SecretValue {
     private static final String DEFY_SPACE_AND_TIME = "dfat";
     private static final String MALLICE = "mallice";
     private static final double OFF_THE_BOARD = 0.1;
+    private static final double RIVAL_HELD_LEGENDARY = 0.4;
     private static final int OPENING_ROUND = 1;
     private static final String DICTATE_POLICY = "dp";
     private static final String DRIVE_THE_DEBATE = "dtd";
@@ -78,18 +80,21 @@ public class SecretValue {
 
     private static double boardFeasibility(Game game, Player seat, String secretId) {
         return switch (secretId) {
-            case SEIZE_AN_ICON -> legendaryWithinGrasp(game, seat) ? 1.0 : OFF_THE_BOARD;
+            case SEIZE_AN_ICON -> legendaryReach(game, seat);
             case DEFY_SPACE_AND_TIME -> nexusOnBoard(game) ? 1.0 : OFF_THE_BOARD;
             default -> 1.0;
         };
     }
 
-    private static boolean legendaryWithinGrasp(Game game, Player seat) {
-        return game.getTileMap().values().stream()
+    private static double legendaryReach(Game game, Player seat) {
+        List<Player> holders = game.getTileMap().values().stream()
                 .flatMap(tile -> tile.getPlanetUnitHolders().stream())
                 .filter(Planet::isLegendary)
                 .map(planet -> BoardView.controller(game, planet.getName()))
-                .anyMatch(controller -> controller == null || controller == seat);
+                .toList();
+        if (holders.isEmpty()) return OFF_THE_BOARD;
+        boolean free = holders.stream().anyMatch(controller -> controller == null || controller == seat);
+        return free ? 1.0 : RIVAL_HELD_LEGENDARY;
     }
 
     private static boolean nexusOnBoard(Game game) {

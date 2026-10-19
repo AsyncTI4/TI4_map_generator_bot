@@ -14,6 +14,7 @@ import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.eval.BoardView;
 import ti4.ai.explore.ExplorationRules;
+import ti4.ai.legendary.TempestaRules;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.perception.PromptButton;
@@ -350,6 +351,8 @@ public class TacticalRules {
         if (prompt.isEmpty()) return Optional.empty();
         AiPrompt movementPrompt = prompt.get();
         if (CeasefireRules.blocksMovement(context)) return holdPosition(context, turn, movementPrompt, target);
+        Optional<AiDecision> boost = TempestaRules.boost(context, movementPrompt, plan);
+        if (boost.isPresent()) return boost;
         if (movementPrompt.hasHandlerPrefix("unitTacticalMove_")) {
             return unitView(context, movementPrompt, plan);
         }

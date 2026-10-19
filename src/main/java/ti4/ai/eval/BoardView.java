@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.ai.legendary.LegendaryPlanets;
 import ti4.ai.scoring.Wallet;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -101,6 +102,11 @@ public class BoardView {
         return moveValue(player, type) + (player.hasTech(GRAVITY_DRIVE) ? 1 : 0);
     }
 
+    public static int moveValueWithBoosts(Player player, UnitType type) {
+        boolean tempesta = LegendaryPlanets.abilityReady(player, LegendaryPlanets.TEMPESTA);
+        return moveValueWithGravityDrive(player, type) + (tempesta ? 1 : 0);
+    }
+
     public static int capacity(Player player, UnitType type) {
         return model(player, type).map(UnitModel::getCapacityValue).orElse(0);
     }
@@ -149,7 +155,7 @@ public class BoardView {
 
     public static double planetValue(Planet planet) {
         double value = planet.getResources() + INFLUENCE_WEIGHT * planet.getInfluence();
-        if (planet.isLegendary()) value += LEGENDARY_VALUE;
+        if (planet.isLegendary()) value += LegendaryPlanets.holdingValue(planet.getName());
         if (!planet.getTechSpecialities().isEmpty()) value += TECH_SPECIALTY_VALUE;
         return value;
     }

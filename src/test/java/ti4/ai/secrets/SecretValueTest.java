@@ -184,8 +184,8 @@ class SecretValueTest extends BaseTi4Test {
         assertThat(discarded()).isEqualTo("dyp");
     }
 
-    // Seize an Icon needs a legendary planet. With none on the board that another player does not already hold, only
-    // a lucky explore could still make one, so the secret keeps a tenth of its value.
+    // Seize an Icon needs a legendary planet. With none on the board, only a lucky explore could still make one, so the
+    // secret keeps a tenth of its value. One that another player holds can be taken by force, which keeps four tenths.
     @Test
     void valuesSeizeAnIconByWhetherALegendaryPlanetIsWithinGrasp() {
         test.nekro.setSecret("sai");
@@ -196,7 +196,7 @@ class SecretValueTest extends BaseTi4Test {
         double taken = value("sai");
 
         assertThat(without).isCloseTo(with * 0.1, within(0.01));
-        assertThat(taken).isCloseTo(without, within(0.01));
+        assertThat(taken).isCloseTo(with * 0.4, within(0.01));
     }
 
     // Secrets the table has no statistics for (homebrew, or ids that are not cards at all) fall back to even odds

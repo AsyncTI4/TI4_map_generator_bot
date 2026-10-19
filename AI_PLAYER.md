@@ -1184,6 +1184,40 @@ to build one by hand:
     the best `1.5 x closeness - 1.5 x pressure + 0.5 x (nearest rival home distance - own distance)` (near itself, away
     from aggressive rivals' fleets and homes) and, among the tied seats, picks itself; if it is not tied it gives the
     infantry to the least threatening seat that is not the points leader.
+- **Legendary planets** (`ti4.ai.legendary`). The official ones (every legendary planet whose source is the base game,
+  Prophecy of Kings, a Codex or Thunder's Edge) are read from the planet data, the homebrew ones are not played.
+  - **Holding value.** `BoardView.planetValue` adds what the ability is worth over the rest of a game instead of a flat 2:
+    Thunder's Edge 6, the Ordinian planets 5.5, Mallice, Hope's End, Industrex and Emelpar 4.5, Faunus and Custodia
+    Vigilia 4, Primor and Mecatol Rex 3.5, Tempesta 3, the flight academies (Mirage, Illusion, Phantasm) 2.5. Styx keeps
+    2 here because its point is priced separately (`FracturePrize`). So the tactical planner, defense and trades chase
+    and guard these planets for the ability as well as for the Seize an Icon / Make History / Become a Legend points.
+  - **Abilities.** The end-of-turn menu (`endOfTurnAbilities`) and the passing menu (`passingAbilities`) are opened by the
+    brain as before; `LegendaryRules` then presses the ready ability worth most (each card at most once a turn), and
+    `LegendaryRules.next` answers the buttons that follow with the same figures. Nothing is spent, so an ability is used
+    when it is worth 0.1 or more.
+    | Planet | When | Worth | Choice |
+    | --- | --- | --- | --- |
+    | Mallice | end of turn | 2 trade goods, or what converting the commodities gains (`ExploreValues`); plus the points a spend objective would score with the trade goods (`SpendUnlock`) | converts when that beats 2 trade goods |
+    | Hope's End | end of turn | a mech (2, plus what `GroundDrops` adds for guarding the planet and _Mechanize the Military_) or an action card (1, 0 with a full hand) | the better one, on the planet with the best mech drop |
+    | Primor | end of turn | the best infantry drop of `GroundDrops`, which prices defense, staging for the next invasion and _Occupy the Fringe_ | the planet with the best drop |
+    | Mirage, Illusion, Phantasm | end of turn | the 1 resource of 2 fighters at the filler price, only with room for them on the ships | the system with the costliest fleet that has room |
+    | Thunder's Edge | end of turn | the score of the tactical plan a second action would take, when that plan is urgent (an attack, or three quarters of a point) and an action was already taken | opens the card, then allows another action |
+    | Emelpar | end of turn | the readying value of the best exhausted planet (`ReadyingValue`: spending it this round, a spend objective it unlocks, a tech skip) | readies that planet |
+    | Ordinian, Ordinian Rex | passing | an action card plus a command token | always, then gains the token as any token gain |
+    | Faunus | passing | 0.7 of the best free planet's value (no units, no attachments, not home or legendary, no custodians token) plus 0.3 if it is taken from someone, plus the objective points the planet would complete (`ObjectiveValue`, so Seize an Icon too) | the best planet |
+    | Industrex | passing | the cost of the costliest upgraded ship with fleet room and a reinforcement, plus the objective points the ship's system would complete | that ship in the system with the best objective gain, then the most ships |
+    | Tempesta | movement | the planner counts +1 movement (`BoardView.moveValueWithBoosts`, next to Gravity Drive); when a planned move needs it, the AI exhausts the card once in the movement step | |
+    | Avernus | before passing | a free destroyer (or 2 fighters) in the system of its war sun, as a component action | |
+    | Mecatol Rex (Thunder's Edge) | end of turn | the secret redraw (see Drawing and trading secrets) | |
+  - **Not played.** Garbozia (the stored action cards would need a play step), and Custodia Vigilia and Styx, which have no
+    button: they count in the holding value and, for Styx, in `FracturePrize`.
+  - **Objectives.** Systems with a legendary planet count for _Make History_ and _Become a Legend_ and a controlled
+    legendary planet for _Seize an Icon_ (`ObjectiveValue`), so taking one raises the planner's score by those points.
+    _Seize an Icon_ in hand is worth most while a legendary planet is free or its own (`SecretValue`), 0.4 of that while
+    only rivals hold one (they can be attacked), 0.1 with none on the board. The abilities feed the same objectives: Primor's
+    infantry and Hope's End's mechs through _Occupy the Fringe_ and _Mechanize the Military_, Mallice's trade goods and
+    Emelpar's readied planet through the spend objectives, Faunus's planet and Industrex's ship through the objective gain of
+    their footprint.
 - **Actuation.** The AI presses the bot's **real** buttons through the test bed's stand-in
   event (`TestBedPress.standInEvent`), so every rule and side effect runs exactly as for a
   human. The stand-in user carries the seat's id, so the normal owner checks apply. Handler
@@ -1308,6 +1342,8 @@ Seven small generic changes don't reference `ti4.ai`:
     objective and a secret in each status phase, and for every public objective by stage the share of seats that
     scored it and how far short the others were just before each status phase (taken once every seat has passed, as
     queued scores land when the status phase starts). It ends with every secret scored over the batch.
+  - `LegendarySelfPlayTest` hands five seats a legendary planet each (Mallice, Hope's End, Primor, Ordinian, Emelpar) when
+    the first action phase begins and checks that the seats exhaust them through the bot's real buttons.
   - `-Dai.secrets.hold=false` plays without patience with action secrets. The batch prints the secrets scored per seat
     by phase and the average round in which the action secrets were scored.
 - In a dev guild:
@@ -1329,6 +1365,10 @@ Seven small generic changes don't reference `ti4.ai`:
 
 ### Known limitations
 
+- **Legendary planets, Garbozia.** The AI never uses _Dok 'N Pic's Salvage Yard_: stashing action cards on it only pays when
+  they are played from there, and the action card rules only play from the hand.
+- **Legendary planets, Thunder's Edge.** A second action is only opened for a tactical action; a strategic action that would be
+  worth it is not considered, because the menu that offers the card no longer shows the strategy cards.
 - **Secondary ordering, human holder.** A human holder's primary cannot be detected, so AI followers only wait for
   the players ahead of them, not for the primary to finish.
 - **Secondary ordering, human followers.** A human who is partway through their secondary counts as done once they

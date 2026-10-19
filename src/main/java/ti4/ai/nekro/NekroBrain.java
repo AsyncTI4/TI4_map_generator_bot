@@ -30,6 +30,8 @@ import ti4.ai.explore.RelicActionRules;
 import ti4.ai.hacan.CarthAgentRules;
 import ti4.ai.hacan.DatahubRules;
 import ti4.ai.hacan.WrathOfKenaraRules;
+import ti4.ai.legendary.AvernusRules;
+import ti4.ai.legendary.LegendaryRules;
 import ti4.ai.letnev.DarktalonTreillaRules;
 import ti4.ai.letnev.LetnevCombatRules;
 import ti4.ai.letnev.RearAdmiralFarranRules;
@@ -148,7 +150,10 @@ public class NekroBrain implements FactionBrain {
             OrbitalDropRules.MECH_PREFIX,
             OrbitalDropRules.FINISH,
             BellumGloriosumRules.OFFER_PREFIX,
-            ExpeditionRules.TILE_PREFIX);
+            ExpeditionRules.TILE_PREFIX,
+            LegendaryRules.MALLICE_PREFIX,
+            LegendaryRules.EMELPAR_PREFIX,
+            AvernusRules.TILE_PREFIX);
     private static final Set<String> WINDOW_PREFIXES = Stream.concat(
                     PUBLIC_WINDOW_PREFIXES.stream(), ActionCardRules.targetPrefixes().stream())
             .collect(Collectors.toUnmodifiableSet());
@@ -164,6 +169,8 @@ public class NekroBrain implements FactionBrain {
             SecretCostRules::pay,
             NekroLeaderRules::payAgentCost,
             RelicActionRules::next,
+            LegendaryRules::next,
+            AvernusRules::next,
             ExpeditionRules::next,
             ConvoysRules::next,
             NekroRules::propagationTokens,
@@ -511,6 +518,8 @@ public class NekroBrain implements FactionBrain {
         if (endOfTurnTech.isPresent()) return endOfTurnTech;
         Optional<AiDecision> secretRedraw = SecretRedrawRules.endOfTurn(context, thisTurn);
         if (secretRedraw.isPresent()) return secretRedraw;
+        Optional<AiDecision> legendary = LegendaryRules.endOfTurn(context, thisTurn);
+        if (legendary.isPresent()) return legendary;
         for (String handler : List.of("turnEnd", "endOfTurnAbilities")) {
             Optional<AiDecision> end = ownedHandler(context, thisTurn, handler, "end the turn");
             if (end.isPresent()) return end;
@@ -569,6 +578,10 @@ public class NekroBrain implements FactionBrain {
         if (beforePassing.isPresent()) return beforePassing;
         Optional<AiDecision> redrawBeforePassing = SecretRedrawRules.endOfTurn(context, thisTurn);
         if (redrawBeforePassing.isPresent()) return redrawBeforePassing;
+        Optional<AiDecision> legendaryBeforePassing = LegendaryRules.beforePassing(context, thisTurn);
+        if (legendaryBeforePassing.isPresent()) return legendaryBeforePassing;
+        Optional<AiDecision> nucleus = AvernusRules.beforePassing(context, thisTurn);
+        if (nucleus.isPresent()) return nucleus;
         for (String handler : List.of("passForRound", "passingAbilities")) {
             Optional<AiDecision> pass = ownedHandler(context, thisTurn, handler, "pass for the round");
             if (pass.isPresent()) return pass;

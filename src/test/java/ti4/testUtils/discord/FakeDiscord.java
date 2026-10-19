@@ -244,6 +244,14 @@ public final class FakeDiscord {
         };
     }
 
+    // Planet legendary-ability embeds show the planet sticker, so the lookup needs an icon URL.
+    private static net.dv8tion.jda.api.entities.sticker.StickerUnion sticker() {
+        net.dv8tion.jda.api.entities.sticker.StickerUnion sticker =
+                mock(net.dv8tion.jda.api.entities.sticker.StickerUnion.class);
+        when(sticker.getIconUrl()).thenReturn("https://cdn.discordapp.com/stickers/0.png");
+        return sticker;
+    }
+
     private JDA createJda() {
         when(presence.getStatus()).thenReturn(net.dv8tion.jda.api.OnlineStatus.ONLINE);
         return ProxySupport.proxy(
@@ -257,6 +265,9 @@ public final class FakeDiscord {
                         case "getUserById", "getUserByTag" -> null;
                         case "retrieveUserById" ->
                             FakeRestAction.of(this, method.getReturnType(), "retrieveUserById", state -> null, null);
+                        case "retrieveSticker" ->
+                            FakeRestAction.of(
+                                    this, method.getReturnType(), "retrieveSticker", state -> sticker(), null);
                         case "getGuildById" -> ProxySupport.idOf(args[0]) == GUILD_ID ? guild : null;
                         case "getGuilds" -> List.of(guild);
                         case "getEmojiById", "getRoleById" -> null;

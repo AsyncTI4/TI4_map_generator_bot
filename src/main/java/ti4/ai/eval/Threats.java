@@ -21,7 +21,7 @@ public class Threats {
             for (Map.Entry<UnitType, Integer> ship :
                     BoardView.ships(BoardView.space(origin), mover).entrySet()) {
                 if (ship.getKey() == UnitType.Fighter) continue;
-                int move = BoardView.moveValueWithGravityDrive(mover, ship.getKey());
+                int move = BoardView.moveValueWithBoosts(mover, ship.getKey());
                 if (!MovementGraph.reach(game, mover, origin.getPosition(), move)
                         .containsKey(target.getPosition())) continue;
                 total += BoardView.model(mover, ship.getKey())
@@ -42,7 +42,7 @@ public class Threats {
                 if (BoardView.nonFighterShips(space, other) <= 0) continue;
                 int move = BoardView.ships(space, other).keySet().stream()
                         .filter(type -> type != UnitType.Fighter)
-                        .mapToInt(type -> BoardView.moveValueWithGravityDrive(other, type))
+                        .mapToInt(type -> BoardView.moveValueWithBoosts(other, type))
                         .max()
                         .orElse(0);
                 reachable.addAll(MovementGraph.reach(game, other, origin.getPosition(), move)

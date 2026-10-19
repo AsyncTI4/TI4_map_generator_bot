@@ -1488,7 +1488,7 @@ public class TacticalPlanner {
         double ours = 0;
         for (Tile origin : context.origins()) {
             for (UnitMove ships : context.stageGroup(origin)) {
-                int move = BoardView.moveValueWithGravityDrive(seat, ships.type());
+                int move = BoardView.moveValueWithBoosts(seat, ships.type());
                 if (context.reach(origin, (stageLead(opponent) + 1) * move).containsKey(target.getPosition())) {
                     ours += ships.count() * cost(seat, ships.type());
                 }
@@ -2795,7 +2795,7 @@ public class TacticalPlanner {
         }
 
         boolean reachesWithGravityDrive(Tile origin, Tile target, UnitType type) {
-            return distance(origin, target, type) <= BoardView.moveValueWithGravityDrive(seat, type);
+            return distance(origin, target, type) <= BoardView.moveValueWithBoosts(seat, type);
         }
 
         Map<String, Integer> reach(Tile from, int move) {
@@ -2804,7 +2804,7 @@ public class TacticalPlanner {
         }
 
         int distance(Tile origin, Tile target, UnitType type) {
-            int move = BoardView.moveValueWithGravityDrive(seat, type);
+            int move = BoardView.moveValueWithBoosts(seat, type);
             Map<String, Integer> reach = reachCache.computeIfAbsent(
                     origin.getPosition() + "#" + move,
                     key -> MovementGraph.reach(game, seat, origin.getPosition(), move));
@@ -2813,7 +2813,7 @@ public class TacticalPlanner {
 
         int forwardNeed(Tile tile, UnitType transport) {
             return forwardNeeds.computeIfAbsent(tile.getPosition() + "#" + transport, key -> {
-                int move = BoardView.moveValueWithGravityDrive(seat, transport);
+                int move = BoardView.moveValueWithBoosts(seat, transport);
                 return reachCache
                         .computeIfAbsent(
                                 tile.getPosition() + "#" + move,

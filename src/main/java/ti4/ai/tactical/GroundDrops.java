@@ -158,7 +158,7 @@ public class GroundDrops {
         return cap <= 0 || ButtonHelper.getNumberOfUnitsOnTheBoard(game, seat, infantry.getAsyncId()) + INFANTRY <= cap;
     }
 
-    private static boolean mechAvailable(Game game, Player seat) {
+    public static boolean mechAvailable(Game game, Player seat) {
         UnitModel mech = seat.getUnitByType(UnitType.Mech);
         if (mech == null || game.isBaseGameMode()) return false;
         int cap = seat.getUnitCap(mech.getAsyncId());
