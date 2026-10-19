@@ -15,6 +15,7 @@ import ti4.ai.eval.CombatOdds;
 import ti4.ai.eval.CombatOdds.Combatant;
 import ti4.ai.eval.CombatOdds.Force;
 import ti4.ai.eval.FactionAggression;
+import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.PlanetStake;
 import ti4.ai.letnev.L4Disruptors;
@@ -527,6 +528,7 @@ public final class DefenseOutlook {
         return isHome(tile)
                 || hasSeatDock(tile)
                 || controlsMecatol(tile)
+                || FracturePrize.holdsStyx(tile, seat)
                 || scoringLoss(tile) >= SCORING_CRITICAL
                 || contested(tile);
     }

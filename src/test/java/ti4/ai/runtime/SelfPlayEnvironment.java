@@ -94,6 +94,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
     // The round in which each action secret was first sent to be scored, by "faction|secret".
     final Map<String, Integer> actionSecretRounds = new java.util.concurrent.ConcurrentHashMap<>();
     final MecatolTracker mecatol = new MecatolTracker();
+    final ExpeditionTracker expeditions = new ExpeditionTracker();
     final PromissoryTracker promissory = new PromissoryTracker();
     // Trading: every accepted offer (read from the offerer's items just before the Accept press), the presses each seat
     // made by handler family, and the Trade settlements each holder sent and had accepted.
@@ -424,6 +425,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
                 countRoundAction(decision, context.game().getRound());
                 noteActionSecretScored(context, decision);
                 mecatol.observe(context.game());
+                expeditions.observe(context.game(), decision);
                 countTacticalAction(context, decision);
                 countPlanKind(context, decision);
                 timeRanked(context, decision);

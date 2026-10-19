@@ -5,6 +5,7 @@ import java.util.OptionalInt;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.CustodiansRace.Order;
 import ti4.ai.eval.CustodiansRace.Snapshot;
+import ti4.ai.expedition.ExpeditionUnlock;
 import ti4.ai.strategy.CardPlan.Benefit;
 import ti4.game.Player;
 
@@ -15,7 +16,10 @@ class LeadershipUses {
         return List.of(
                 new Benefit(
                         CardUse.LEADERSHIP_TOKENS, TokenValue.tacticTokens(in, StrategyCardRules.LEADERSHIP_TOKENS)),
-                new Benefit(CardUse.LEADERSHIP_TEMPO, firstInTheRace(in)));
+                new Benefit(CardUse.LEADERSHIP_TEMPO, firstInTheRace(in)),
+                new Benefit(
+                        CardUse.LEADERSHIP_EXPEDITION,
+                        CardValueScale.EXPEDITION_FIRST_SHARE * ExpeditionUnlock.claimingFirst(in.game(), in.seat())));
     }
 
     private static double firstInTheRace(PlanInputs in) {

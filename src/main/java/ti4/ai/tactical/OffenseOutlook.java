@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FactionAggression;
+import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectiveValue;
@@ -86,13 +87,14 @@ final class OffenseOutlook {
         double territory = 0;
         double mecatolHold = 0;
         double mecatolDenial = 0;
+        double fractureDenial = 0;
         double heldPlanetValue = 0;
         for (Planet planet : landed) {
             double g = estimate.groundWins().get(planet.getName());
             double base = BoardView.planetValue(planet);
             double explore = terms.exploreValues().getOrDefault(planet.getName(), 0.0);
             double custodians = BoardView.hasCustodians(planet) ? VP : 0;
-            planets += w * g * (base + explore + custodians);
+            planets += w * g * (base + explore + custodians + FracturePrize.gain(planet));
             territory += w * g * terms.territoryValues().getOrDefault(planet.getName(), 0.0);
             if (isMecatol(planet)) {
                 mecatolHold += w * g * MecatolStake.ownHoldValue(game, seat);
@@ -100,7 +102,12 @@ final class OffenseOutlook {
                     mecatolDenial += w * g * standings.denialWeight(opponent) * MecatolStake.holdValue(game, opponent);
                 }
             }
-            if (BoardView.controller(game, planet.getName()) == opponent) heldPlanetValue += w * g * base;
+            if (BoardView.controller(game, planet.getName()) == opponent) {
+                heldPlanetValue += w * g * base;
+                if (FracturePrize.isStyx(planet)) {
+                    fractureDenial += w * g * standings.denialWeight(opponent) * FracturePrize.point(planet);
+                }
+            }
         }
         double hurt = standings.hurtWeight(opponent);
         double economyDenial = hurt * ECONOMY_DENIAL_SHARE * heldPlanetValue;
@@ -119,7 +126,8 @@ final class OffenseOutlook {
                 + denial.homeBlock()
                 + kills
                 + blockade
-                + mecatolDenial;
+                + mecatolDenial
+                + fractureDenial;
         double cappedHarm = Math.min(harmTerms, harmCap);
         double imperial = imperial(strike, estimate, landed, after, planetsAfter);
         double value = ownObjective
@@ -159,6 +167,7 @@ final class OffenseOutlook {
                 imperial,
                 mecatolHold,
                 mecatolDenial,
+                fractureDenial,
                 kills,
                 blockade,
                 nekroGain,
@@ -260,6 +269,7 @@ final class OffenseOutlook {
             List<Planet> planetsAfter,
             ContextTerms terms) {
         Player opponent = strike.opponent();
+        if (opponent.isNeutral()) return new Denial(0, 0, 0);
         Tile target = strike.target();
         double w = estimate.spaceWin();
         double denialWeight = standings.denialWeight(opponent);
@@ -329,7 +339,7 @@ final class OffenseOutlook {
     }
 
     private DefenseOutlook world(Strike strike, StrikeEstimate estimate) {
-        if (estimate.escaped()) return defense;
+        if (estimate.escaped() || strike.opponent().isNeutral()) return defense;
         return defense.excluding(new Exclusion(strike.opponent(), strike.target()));
     }
 
@@ -400,7 +410,7 @@ final class OffenseOutlook {
     }
 
     private double nekroGain(Strike strike, StrikeEstimate estimate) {
-        if (!seat.hasAbility(SINGULARITY)) return 0;
+        if (!seat.hasAbility(SINGULARITY) || strike.opponent().isNeutral()) return 0;
         List<Double> values = new ArrayList<>(copyableValues(seat, strike.opponent()));
         values.sort(java.util.Comparator.reverseOrder());
         double best = values.isEmpty() ? 0 : values.get(0);
@@ -448,6 +458,7 @@ final class OffenseOutlook {
 
     private double anger(Strike strike, double harm) {
         Player opponent = strike.opponent();
+        if (opponent.isNeutral()) return 0;
         double ratio =
                 Math.clamp(defense.fleetCostTotal(opponent) / Math.max(1, defense.fleetCostTotal(seat)), 0.0, 1.0);
         double reach = threatensGuardedSystems(opponent) ? 1 : LIMITED_REACH_RETALIATION;
@@ -482,8 +493,9 @@ final class OffenseOutlook {
             Strike strike, StrikeEstimate estimate, Defenders after, List<Planet> planetsAfter, List<Planet> landed) {
         double shipStake = 0.5 * after.shipCost(seat);
         double planetStake = landed.stream()
-                .mapToDouble(planet ->
-                        BoardView.planetValue(planet) + (isMecatol(planet) ? MecatolStake.ownHoldValue(game, seat) : 0))
+                .mapToDouble(planet -> BoardView.planetValue(planet)
+                        + FracturePrize.point(planet)
+                        + (isMecatol(planet) ? MecatolStake.ownHoldValue(game, seat) : 0))
                 .sum();
         return world(strike, estimate)
                 .counterstrike(strike.target(), after, planetsAfter, shipStake, planetStake, strike.opponent());

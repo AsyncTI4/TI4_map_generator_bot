@@ -12,6 +12,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FlagshipRating;
 import ti4.ai.eval.FleetLimit;
+import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.Threats;
 import ti4.ai.scoring.Footprint;
@@ -46,6 +47,8 @@ public class ProductionPlanner {
     private static final int WANTED_DREADNOUGHTS = 3;
     private static final double FRONTLINE_BONUS = 0.5;
     private static final int FRONTLINE_RANGE = 2;
+    private static final int FRACTURE_RANGE = 2;
+    private static final int FRACTURE_DREADNOUGHTS = 5;
     private static final double MAX_HURT_WEIGHT = 1.5;
     private static final double OUTLYING_SHARE = 0.5;
     private static final int WANTED_UPGRADED_LIGHT_SHIPS = 4;
@@ -460,16 +463,29 @@ public class ProductionPlanner {
 
     private static void planSurplusShips(Builder builder) {
         Player seat = builder.seat;
-        double frontline = 1 + FRONTLINE_BONUS * frontlineInterest(builder);
+        double fracture = fractureInterest(builder);
+        double frontline = 1 + FRONTLINE_BONUS * Math.max(frontlineInterest(builder), fracture);
+        int dreadnoughts = fracture > 0 ? FRACTURE_DREADNOUGHTS : WANTED_DREADNOUGHTS;
         builder.surplusShipsUpTo(UnitType.Flagship, 1, frontline, FlagshipRating.spareResourcesNeeded(seat));
         builder.surplusShipsUpTo(UnitType.Warsun, 1, frontline);
-        builder.surplusShipsUpTo(UnitType.Dreadnought, WANTED_DREADNOUGHTS, frontline);
+        builder.surplusShipsUpTo(UnitType.Dreadnought, dreadnoughts, frontline);
         for (UnitType light : List.of(UnitType.Cruiser, UnitType.Destroyer)) {
             if (isUpgraded(seat, light)) builder.surplusShipsUpTo(light, WANTED_UPGRADED_LIGHT_SHIPS, frontline);
         }
         if (!isUpgraded(seat, UnitType.Cruiser)) {
             builder.surplusShipsUpTo(UnitType.Cruiser, WANTED_CRUISERS, UNUPGRADED_LIGHT_SHIP_SHARE * frontline);
         }
+    }
+
+    private static double fractureInterest(Builder builder) {
+        Game game = builder.game;
+        double interest = FracturePrize.interest(game, builder.seat);
+        if (interest == 0) return 0;
+        boolean nearAnIngress =
+                MovementGraph.reach(game, builder.seat, builder.tile.getPosition(), FRACTURE_RANGE).keySet().stream()
+                        .map(game::getTileByPosition)
+                        .anyMatch(tile -> tile != null && FracturePrize.hasIngress(tile));
+        return nearAnIngress ? interest : 0;
     }
 
     private static double frontlineInterest(Builder builder) {

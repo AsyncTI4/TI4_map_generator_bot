@@ -290,14 +290,24 @@ to build one by hand:
   score and no Mecatol Rex is worth only the secret it draws (no more than the strategy token a follow costs).
   | Card | Uses it plans for |
   | --- | --- |
-  | Leadership | the tactical actions its 3 tokens unlock (the plans it could not otherwise afford), and acting first in a race for the custodians |
-  | Diplomacy | locking a system with its planets that an enemy fleet can reach (home most, by what an attack on it before the seat's next turn would cost it; more when close to winning), and readying its best 2 planets (more with a spend objective revealed). For the Xxcha's _Peace Accords_ it is also worth the best empty planet next to one it controls (`PeaceAccords`: the planet's value, the expansion bonus a landing there would get, the objective progress and, for a planet a rival holds, half its value again), and the card is played at once when that beats its best tactical action. Base-game Diplomacy has no buttons to resolve, so it is worth only its trade goods |
-  | Politics | becoming speaker (more when it will want Imperial next round or is racing a rival for the custodians next round; a loss when it is already speaker, since the card hands the token away), 2 action cards (a point when they complete _Form a Spy Network_), and looking at the agenda deck once the custodians are taken |
+  | Leadership | the tactical actions its 3 tokens unlock (the plans it could not otherwise afford), acting first in a race for the custodians, and claiming a contested expedition slice before a rival (see below) |
+  | Diplomacy | locking a system with its planets that an enemy fleet can reach (home most, by what an attack on it before the seat's next turn would cost it; more when close to winning), readying its best 2 planets (more with a spend objective revealed), and the planets an expedition exhausts or would need (see below). For the Xxcha's _Peace Accords_ it is also worth the best empty planet next to one it controls (`PeaceAccords`: the planet's value, the expansion bonus a landing there would get, the objective progress and, for a planet a rival holds, half its value again), and the card is played at once when that beats its best tactical action. Base-game Diplomacy has no buttons to resolve, so it is worth only its trade goods |
+  | Politics | becoming speaker (more when it will want Imperial next round or is racing a rival for the custodians next round; a loss when it is already speaker, since the card hands the token away), 2 action cards (a point when they complete _Form a Spy Network_), looking at the agenda deck once the custodians are taken, and the expedition the 2 cards make payable (the action card slice) |
   | Construction | a space dock early, PDS (more under threat), a structure objective it would complete; for the Thunder's Edge card also production at a dock without placing a token, so the units can move out this round |
-  | Trade | 3 trade goods, its commodities, a spend objective they make payable, and leverage for deals |
+  | Trade | 3 trade goods, its commodities, a spend objective they make payable, leverage for deals, and the expedition the 3 trade goods make payable (the trade goods slice) |
   | Warfare | PoK: a command token plus one reactivation; Thunder's Edge: a free tactical action. Reactivations are a second build at home, building at home and then moving out, moving twice to reach a far system, or activating a system that holds its token |
   | Technology | the best technology it can research (and a second worth 6 resources; Gravity Drive is worth more while the custodians are still to be taken and it saves the seat a round); for Nekro, Propagation's tokens |
   | Imperial | an extra public objective this round, the Mecatol Rex point (less while an enemy fleet can reach it, half when it can take Mecatol this round), or a secret (only the strategy token a follow would cost, since following Imperial draws the same secret, except for the last seat to pick: nobody else is left to play Imperial, so the whole secret counts); plus denying the card to a Mecatol Rex holder still to pick |
+
+  **Expedition uses** (`ExpeditionUnlock`, Thunder's Edge games only, while the seat's breakthrough is locked or the Thunder's Edge race still pays, and while a slice is open). Each is `ExpeditionOutlook.value` for the holdings after the card minus the same without it. The value is the best slice to claim now or the best to claim at the pass (see Cost below), and at pick time the seat's turn is still to come, so a slice is worth its net times the chance that no rival that could pay for it (0.25 each) takes it first. Only a slice the seat could not otherwise pay for, or would pay for with something dearer or riskier, counts:
+  | Card | Expedition use |
+  | --- | --- |
+  | Trade | the 3 trade goods it gives (not the commodities: they arrive in later turns), unless a spend objective they make payable already claims them |
+  | Politics | the 2 cards it draws, for the action card slice |
+  | Diplomacy | at pick time, the cost of the planets the first claim will exhaust, for the 2 it can ready; in the action phase, the best 2 exhausted planets whose readying makes a slice payable. Either way only what exceeds the card's ordinary readying value counts (the two overlap), and the primary readies the pair the expedition needs when that beats its ordinary choice. The Xxcha agent and Bio-Stims value a planet with the same expedition gain (the readying action cards do not: valuing a card would recurse through the action card slice cost) |
+  | Leadership | acting first: the value of the expedition when the claim is certain minus the value when rivals may take the slice first, halved (0.5, kept modest); never when the best slice is the secret one unless its worst secret costs at most 1 (a keep value of 0.25), since that slice wins the least |
+
+  A Trade, Politics or Diplomacy plan with an expedition use of at least 0.5 plays the card at once, so the end-of-turn claim happens with what the card gave before a rival's turn (Leadership needs no play: the claim is the seat's first turn's end whatever it does).
 
   The pick adds the trade goods on a card and a small nudge (at most an eighth of a point) from how often human Nekro
   players take that card in that round (`PickPrior`), and remembers the plan. During the action phase it re-plans
@@ -679,6 +689,20 @@ to build one by hand:
     attacker's roll, so it never had a start-of-round window); it still does not roll first. Without the button (fog
     of war, or it scrolled out of the thread's history) the earlier behaviour applies: a pause after the newest
     message, then the hook, then the roll.
+  - **Neutral units** (`NeutralCombat`, `CombatRules`). The neutral units of the Fracture have no seat, so nobody presses their
+    dice for them unless a seat does: the rules say any player other than the active player rolls for them. In a
+    combat where the active AI seat fights only neutral units, the next AI seat after it (in seating order) is
+    shown the combat thread and presses the buttons the bot spoofs for the neutral player: its anti-fighter barrage
+    (when it has the dice and the attacker has fighters), its round roll once the attacker has rolled the round (a
+    round is rolled once, by comparing the round counters), and its auto-assigned hits (after the neutral roll of the
+    round, in the order of the reference card with sustain damage first, which is the bot's own order). The attacker rolls
+    at once (no pause, no combat card window) except for one pause when a barrage is due, and falls back on the
+    neutral buttons itself only when no other AI seat exists after 10 seconds, or the other seat has not pressed them
+    after 120 seconds.
+    That seat keeps watching the thread for the rest of the round while neutral units are in the system, so the last
+    hits of a combat the attacker lost are still assigned. Neutral ground forces and structures count as enemy ground
+    forces and structures (`BoardView`), so the tactical action waits for a ground combat on a Fracture planet to end
+    before it draws the relic and ends the turn.
   - **Barony of Letnev** (`ti4.ai.letnev`; every rule keys on the ability, technology, leader or unit, so Nekro,
     Franken and alliances get it too):
     - _Odds._ `CombatForces.force` adds the space-side Letnev edges to every force the planner and the defence
@@ -917,7 +941,18 @@ to build one by hand:
     allowance outnumber the capacity of the ships already there, a hauler from a system with nothing for it to carry
     moves in, worth 0.5 per unit it can take less distance, leaving and exposure. It is a low-scoring plan: it runs
     only when the seat has tokens to spare.
-  - **Defense** (`DefenseOutlook`). Its home system, a system with its space dock, a Mecatol Rex it holds, a system whose
+  - **Screen** (the Fracture, `FractureScreen`). Enemy ships stop movement, so a ship in an empty Fracture system (the two
+    egress systems and the systems between them and Styx) cuts the paths of a rival that is not yet beside Styx. The
+    Fracture has two routes from every ingress system (through the left egress system and the right one), so one
+    screen alone cuts only a rival already committed to one side, and a pair seals it. When a rival could take Styx next
+    round (the force that reaches Styx, with the seat's screens in place, wins the fight and the planet with at least
+    0.3), a cheap ship (a destroyer or a cruiser) that can reach an empty Fracture system is worth half of the drop in that
+    chance times the rival's denial weight times a victory point (8), plus half of what it would add together with the
+    best second screen that is needed to make the cut (neither alone makes it), less the usual costs of leaving and the
+    exposure of the ship. It is never planned when the seat holds Styx itself, and the ship it parks is also the start of
+    the seat's own strike on Styx.
+  - **Defense** (`DefenseOutlook`). Its home system, a system with its space dock, a Mecatol Rex it holds, a Styx it holds
+    (its point is in what the planet is worth losing), a system whose
     ships or planets carry at least 4 points of objective progress, and a system where an invasion would complete a
     revealed public objective for the invader are _guarded_. For each guarded system and each other player it works out
     the biggest force that player could bring there in one tactical action (`IncomingForces`): the ships that reach it
@@ -946,7 +981,7 @@ to build one by hand:
     that home holds; and production buys infantry, mechs, fighters or ships at the dock (ground forces on the dock
     planet) until the cost is gone or a unit no longer lowers it by half a point per resource, so a one-planet home is
     defended on the ground and a home with several planets in space, and a hopeless defence buys nothing. Not yet:
-    screening (a ship parked on a chokepoint), defending with ships from more than one system in one action, planets
+    defending with ships from more than one system in one action, planets
     an enemy needs in systems the seat does not guard, and Prophecy of Kings Warfare with Fleet Logistics unlocking a
     second fleet.
   - **Offense** (`StrikeEvaluator`, `OffenseOutlook`, `Standings`). Every attack is a _strike_ whose physics and
@@ -989,7 +1024,20 @@ to build one by hand:
     worth staging for), and a staging system gathers the ships of up to three origins that reach it this action and the
     target next round, within fleet supply; the two safest staging systems per target get the future strike checked. Docks within two moves of a player worth hurting value their
     dreadnoughts, cruisers, upgraded destroyers, War Suns and flagships half as much again.
-    Not yet: screening chokepoints; locking a captured system with the seat's own Diplomacy; parking ships on Mecatol Rex
+    **The Fracture.** The neutral units of the Fracture are a legal opponent (`singleOpponent` accepts the neutral player), with
+    nothing the other players have: no hurt, denial, anger, retaliation, counterstrike, Nekro copy or standings, no
+    Nullification or trade terms, and no reinforcements (neutral units never move). The odds read the neutral player's own
+    unit models, which match the neutral unit reference card (dreadnought 5 with sustain, carrier 9, cruiser 6, destroyer 8
+    with anti-fighter barrage 6 x3, fighter 8, infantry 8, mech 6). A planet of the Fracture is worth its resources and
+    influence, a relic when its relic token is still on it (4, three fragments at 1, 1 and 2) and, for Styx, the point of _A Song
+    Like Marrow_ (8): the point is charged back by the counterstrike term when a rival can reach Styx, and a rival's Styx
+    counts as a point to deny (its denial weight times 8) next to the usual standings terms. Fleets stage for the Fracture
+    planets with a lead of two moves instead of one (a staging system from which the target is two of the ships' moves
+    away, so a fleet works its way along the egress and the empty Fracture systems, one tactical action per step), only
+    while the fleet that would be there can win the fight (the same score of 4 as for any attack). A dock within two
+    moves of an ingress system, while a Fracture planet is not yet the seat's, values its warships the same half as much
+    again, and builds dreadnoughts up to five instead of three.
+    Not yet: locking a captured system with the seat's own Diplomacy; parking ships on Mecatol Rex
     without landing; Magen Defense Grid, Mentak Ambush, L4 Disruptors and Titans' planetary PDS in the odds; retreats in
     the kill estimates; building space docks forward; more than three origins; Prophecy of Kings Warfare with Fleet
     Logistics for a double move; pre-emptive strikes against a fleet that threatens only the system the strike leaves
@@ -1066,6 +1114,76 @@ to build one by hand:
     reinforcements and the scoring reserve leaves 6 resources. The bot gives it the tokens without charging anything, so
     it first presses the message's "Exhaust Planets" button (before the tokens, which close the message) and pays
     exactly 6 through the research payment, then takes the tokens as for any Propagation.
+- **Expeditions** (`ti4.ai.expedition`). A Thunder's Edge expedition slice is claimed at the end of a turn, from the
+  end-of-turn abilities menu (or the passing menu), not as a component action, so it replaces no action and is decided
+  after the action, with the money the action brought (Trade, Diplomacy and Politics before it count). The AI claims
+  the kind with the best net value when that is above 0 and not worse than waiting for the pass, one slice a turn, and the first slice unlocks its
+  breakthrough. It runs before Bio-Stims: a paid technology specialty planet is then readied by Bio-Stims. Bio-Stims' choice ranks the spent technology specialty planets by their readying value (`ReadyingValue`, expedition gain included), then prefers the one the expedition exhausted this turn (remembered in `expeditionPaid|`), then the larger. Psychoarchaeology never trades a planet the planned expedition would pay with.
+  `ExpeditionOutlook.best(game, seat)` returns the choice; `best(game, seat, holdings)` and `options` value it for an
+  adjusted `Holdings` (a wallet with the trade goods or planets a card is about to give, and a card count), for the
+  strategy-card values to ask what the expedition would be worth after the card.
+  - **Net value** (the planner's currency: a victory point 8, a trade good 1) = breakthrough + Fracture roll +
+    Thunder's Edge race + kind nudge + race urgency - cost. A kind the scoring reserve cannot afford is unavailable.
+  - **Breakthrough** (only while the seat still has a locked one): `2.0 + 0.5 x lift`, at least 0.75, scaled down when
+    fewer than 4 rounds are left. 2.0 is what a free faction ability is worth (about a quarter of a point, like a
+    cheap technology); the lift is the faction's win rate with a breakthrough minus without, in percentage points,
+    from `expedition_stats.json` (human games), and 0.5 per point is 0.8 (a point is about 10 win-rate points) halved
+    because most of the lift is who gets an expedition early, not what the breakthrough does. The "without" rate
+    is shrunk toward the faction's own "with" rate minus 1 point by 200 pseudo-games (the global rate is 16% without
+    and 17% with), so a faction with 40 games without one does not swing it. Shrinking both rates toward the global
+    ones instead would flatten L1Z1X and Xxcha to 0. Lifts (points): Mahact 5.2, Mentak 4.4, Letnev and Yin 3.1,
+    Arborec 2.9, L1Z1X 2.3, Deepwrought, Muaat and Xxcha 2.0-2.1; Saar 0.5 and Argent 0.9; Yssaril -0.7, Jol-Nar -0.9,
+    Crimson -1.1, Naalu and Nekro -1.5. The strong breakthroughs are therefore worth 3-4.6 (they pay for 5 resources
+    at any time), the weak ones 1.25-1.65 (they only pay for a cheap kind, such as 5 resources in the first four rounds
+    at 1.0 or 3 trade goods when nothing else is wanted). Obsidian's record serves Firmament.
+  - **The Fracture roll** (only while it can enter play): 20% x 2.0 = 0.4.
+  - **The Thunder's Edge race.** The holder is the seat with the most slices, and the seat that claims the last slice
+    breaks a tie. Holding it is worth 8 (a point: human players with the most expeditions and Thunder's Edge win 54%
+    against 16-19%, but that is mostly correlation). The chance of holding is 1/players plus `0.6 / (slices left + 2)`
+    per slice of lead, between 0.03 and 0.9, 0.95 when the lead cannot be caught, and exact for the last slice (it
+    holds if it has the most slices or ties). A claim is worth 8 x (chance after - chance before), so the last slice is
+    rushed when it makes the seat the holder (about +6.9 when tied) and left alone when it gives the infantry to a
+    rival (the chance lost plus 4, half of the point, since the seat still chooses where the planet goes).
+  - **Kind nudge.** The faction's win rate after each kind against its average over kinds (shrunk by 100 pseudo-games),
+    0.2 per point and at most 1.0 (an eighth of a point).
+  - **Race urgency.** The kinds go to whoever claims them first. Each other seat that still lacks a breakthrough and
+    could pay for the kind adds 0.25 (at most 1.0), but only when the claim is already worth it.
+  - **Cost** (the user's exchange rate, 2 resources = 3 influence = 1 command token = 2 trade goods: a resource is
+    worth 1 trade good and an influence 2/3, scaled by how much of the round is left to use the planets, `SpendHorizon`):
+    | Spending | Resource | Influence |
+    | --- | --- | --- |
+    | turns ahead where it would spend them (`SpendOutlook`: a tactic token and funds beyond the reserve, a research follow, Leadership tokens) | 1.0 | 0.67 |
+    | no tactic token left and no planned spend | 0.4 | 0.27 |
+    | the claim is made as the seat passes (planets are wasted then) | 0.1 | 0.1 |
+
+    A trade good is always 1. **Claim now or at the pass.** `claimNow` claims the best kind (without its race urgency)
+    only when it is worth at least the best kind priced for the pass times the chance that kind is still open then
+    (0.75 per rival that lacks a breakthrough and could pay for it); otherwise the seat waits and `beforePassing`
+    claims at the pass rates. A seat that has passed is not offered an expedition.
+    | Kind | Cost |
+    | --- | --- |
+    | 5 resources, 5 influence | the cheapest payment after the scoring reserve (`Wallet`), priced at the planets it exhausts (all of each planet's resources or influence, so two planets for 7 resources cost 7) |
+    | 3 trade goods | 3, only with 3 in hand (the bot takes them itself) and when the reserve keeps the rest |
+    | Technology specialty planet | the planet's resources or its influence, whichever is worth more (a planet pays one or the other), and the points it would cost a spend objective; 0 with Bio-Stims ready and no skip planet already exhausted, never more than the planet Bio-Stims would have readied instead |
+    | Secret objective | 0 for a secret over the limit, otherwise the keep value of the least promising one (at most 1) x 8 x 0.5 |
+    | 2 action cards | the keep values of the two worst cards (an expected card counts 1.2 each for cards still to be drawn) |
+  - **Flow.** It opens `endOfTurnAbilities` (or `passingAbilities`), presses "Do an Expedition", then the slice, and
+    walks the payment through `PaymentRules` with exactly the planned planets (5 resources, 5 influence and the
+    technology specialty planet; it holds the turn with a `Wait` until the payment prompt shows or a minute passes).
+    A secret is discarded from the buttons the bot posts as an ephemeral message, which the actuator re-posts into the
+    seat's private thread. Action cards are discarded one at a time: the bot deletes the discard message after the first,
+    so the second comes from the "Discard an Action Card" button of the hand message. A slice another seat claimed in
+    the meantime is dropped, because the bot would let the stale button overwrite it.
+  - **Fracture.** It presses its own "Roll For The Fracture" at once. When the Fracture enters it presses the ingress
+    buttons itself, at most the number the message allows (3 a synergy colour, otherwise 1), then "Done Resolving". A
+    system scores `3 x (1 - distance / 4)` for its distance from its home, planets and fleets (`MovementGraph`), plus 1
+    for a planet or ship of its own, minus the rivals' pressure: for each rival its aggression factor
+    (`FactionAggression`) x (the share of 12 resources of that rival's fleet that can reach the system, plus 1 if the
+    rival's home is within 2 systems). A system that already holds an ingress token is skipped.
+  - **Thunder's Edge.** The seat that claims the last slice presses "Place Thunder's Edge", picks the empty system with
+    the best `1.5 x closeness - 1.5 x pressure + 0.5 x (nearest rival home distance - own distance)` (near itself, away
+    from aggressive rivals' fleets and homes) and, among the tied seats, picks itself; if it is not tied it gives the
+    infantry to the least threatening seat that is not the points leader.
 - **Actuation.** The AI presses the bot's **real** buttons through the test bed's stand-in
   event (`TestBedPress.standInEvent`), so every rule and side effect runs exactly as for a
   human. The stand-in user carries the seat's id, so the normal owner checks apply. Handler
@@ -1167,6 +1285,13 @@ Seven small generic changes don't reference `ti4.ai`:
   - `-Dai.trading=false` plays without trading, for an A/B comparison of the batch summary.
   - `SabotageSelfPlayTest` plays a contender's _Overrule_ in a six-seat game and checks that an AI seat cancels it with the bot's real buttons.
   - `-Dai.selfplay.give=<alias,...>` deals those action cards to every seat, to watch a card's flow end to end.
+  - `-Dai.selfplay.fracture=true` brings the Fracture into play at the start of round 2 of every game (`FractureTracker`): the
+    seven tiles with their neutral units, and an ingress token on a random system of each technology specialty and on
+    Mecatol Rex (`-Dai.selfplay.fractureseed=N` picks the systems, default 7). The batch prints, for each Fracture planet,
+    the games in which it was taken, with the round and the seat, and how often Styx changed hands. Without the flag a
+    game is unchanged. `FractureSelfPlayTest` puts a fleet beside Styx and beside Cocytus and checks that the active seat
+    takes the planet through the whole combat against the neutral units (another AI seat rolls for them), with the point
+    of Styx and the relic.
   - Every action card play carries the round it was first seen in, and the batch summary prints the plays by round
     for the whole batch and each card's average round. `Overrule` gets its own block: its plays by round, the strategy
     cards its picks chose, how many of those picks raised the seat's points before its turn ended, and how many seats
@@ -1276,3 +1401,17 @@ Seven small generic changes don't reference `ti4.ai`:
   among them) are valued from the human statistics alone.
 - **Action cards, legacy switch.** `-Dai.actioncards.ab=true` and the stored value `aiLegacyActionCards` keep the
   rules from before the statistics for comparison, until the large A/B batch at the end of the project.
+- **Expeditions, race and strategy cards.** The Thunder's Edge chance is a closed-form estimate from the slices
+  claimed so far; it does not model who will claim the rest. The chance that a rival takes a slice first is 0.25 per
+  rival that could pay for it, whatever the turn order, and waiting for the pass is not charged for the breakthrough
+  coming later in the round.
+- **Expeditions, correlation.** The breakthrough lift and the kind nudge are read off human games, where who completes
+  an expedition early is entangled with who was already winning; the 0.5 factor on the lift is a guess, not a
+  measurement. Holding Thunder's Edge is worth a point on the same evidence.
+- **Expeditions, the Fracture.** The roll and the ingress tokens are placed, but the tactical planner does not attack
+  the Fracture's neutral units (its ingress systems are placed for distance and safety, not for a route in), and the
+  Fracture roll is only worth 0.4.
+- **Expeditions, fog of war.** In fog the GM places the ingress tokens (their buttons carry no owner), and the AI
+  neither places them nor knows which rival holds how many slices.
+- **Expeditions, tile choice.** Thunder's Edge is placed by distance and the rivals' home and fleet pressure, not by
+  what the system offers a fleet moving there.

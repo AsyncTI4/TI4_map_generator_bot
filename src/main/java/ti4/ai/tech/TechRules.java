@@ -2,6 +2,7 @@ package ti4.ai.tech;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.Set;
@@ -15,12 +16,15 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.eval.BoardView;
+import ti4.ai.expedition.ExpeditionRules;
+import ti4.ai.expedition.ExpeditionUnlock;
 import ti4.ai.hacan.Beneficiary;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendUnlock;
+import ti4.ai.strategy.ReadyingValue;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.strategy.StrategyTokenCost;
 import ti4.ai.tactical.NullificationOutlook;
@@ -172,7 +176,7 @@ public class TechRules {
         String state = context.memory().get(key).orElse("");
         if (BIO_STIMS_EXHAUSTED.equals(state)) return readyWithBioStims(context, thisTurn, key);
         if (!state.isEmpty() || !context.seat().hasTechReady(BIO_STIMS)) return Optional.empty();
-        if (bestTechSkipPlanet(context.game(), context.seat()).isEmpty()) return Optional.empty();
+        if (bestTechSkipPlanet(context).isEmpty()) return Optional.empty();
         Optional<Match> exhaust = Prompts.owned(thisTurn, context.faction(), BIO_STIMS_EXHAUST::equals);
         if (exhaust.isPresent()) {
             context.memory().put(key, BIO_STIMS_EXHAUSTED);
@@ -183,7 +187,7 @@ public class TechRules {
     }
 
     private static Optional<AiDecision> readyWithBioStims(AiTurnContext context, List<AiPrompt> thisTurn, String key) {
-        Optional<String> planet = bestTechSkipPlanet(context.game(), context.seat());
+        Optional<String> planet = bestTechSkipPlanet(context);
         Optional<Match> ready = planet.flatMap(
                         name -> Prompts.unowned(thisTurn, (BIO_STIMS_READY_PLANET + name)::equals))
                 .or(() -> Prompts.unowned(thisTurn, id -> id.startsWith(BIO_STIMS_READY)));
@@ -192,11 +196,20 @@ public class TechRules {
         return Optional.of(ready.get().press("ready a planet with Bio-Stims"));
     }
 
-    private static Optional<String> bestTechSkipPlanet(Game game, Player seat) {
-        return seat.getExhaustedPlanets().stream()
+    private static Optional<String> bestTechSkipPlanet(AiTurnContext context) {
+        Game game = context.game();
+        Player seat = context.seat();
+        List<String> spent = seat.getExhaustedPlanets().stream()
                 .filter(name -> ButtonHelper.checkForTechSkips(game, name))
-                .max(Comparator.comparingDouble(
-                        name -> BoardView.planetResources(game, name) + BoardView.planetInfluence(game, name)));
+                .toList();
+        Map<String, Long> readyingValue = ReadyingValue.eachAlone(game, seat, spent).stream()
+                .collect(Collectors.toMap(ReadyingValue.Pick::planet, pick -> Math.round(pick.value() * 100)));
+        Set<String> paidForExpedition = ExpeditionRules.paidThisTurn(context);
+        return spent.stream()
+                .max(Comparator.comparingLong((String name) -> readyingValue.getOrDefault(name, 0L))
+                        .thenComparing(paidForExpedition::contains)
+                        .thenComparingInt(
+                                name -> BoardView.planetResources(game, name) + BoardView.planetInfluence(game, name)));
     }
 
     public static Optional<AiDecision> beforePassing(AiTurnContext context, List<AiPrompt> thisTurn) {
@@ -418,8 +431,10 @@ public class TechRules {
         Player seat = context.seat();
         if (!seat.hasTech(PSYCHOARCHAEOLOGY)) return Optional.empty();
         boolean nothingToSave = ProductionPlanner.reserve(game, seat).isNone();
+        List<String> neededForExpedition = ExpeditionUnlock.plannedPlanets(game, seat);
         Set<String> spare = seat.getReadiedPlanets().stream()
                 .filter(name -> ButtonHelper.checkForTechSkips(game, name))
+                .filter(name -> !neededForExpedition.contains(name))
                 .filter(name -> nothingToSave
                         || Math.max(BoardView.planetResources(game, name), BoardView.planetInfluence(game, name))
                                 <= TRADE_GOOD_VALUE)

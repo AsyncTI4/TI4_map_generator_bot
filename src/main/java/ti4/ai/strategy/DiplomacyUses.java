@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.expedition.ExpeditionUnlock;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.strategy.CardPlan.Benefit;
@@ -25,7 +26,9 @@ class DiplomacyUses {
         if (CardVariant.of(in.game(), initiative) == CardVariant.BASE_GAME) return List.of();
         List<Benefit> benefits = new ArrayList<>();
         bestProtection(in).ifPresent(benefits::add);
-        benefits.add(new Benefit(CardUse.DIPLOMACY_READY, readyValue(in)));
+        double ready = readyValue(in);
+        benefits.add(new Benefit(CardUse.DIPLOMACY_READY, ready));
+        benefits.add(new Benefit(CardUse.DIPLOMACY_EXPEDITION, expeditionValue(in, ready)));
         peaceAccordsValue(in).ifPresent(benefits::add);
         return benefits;
     }
@@ -84,14 +87,38 @@ class DiplomacyUses {
         return Optional.of(new Benefit(CardUse.DIPLOMACY_PEACE_ACCORDS, CardValueScale.PEACE_ACCORDS_SHARE * claim));
     }
 
+    static Optional<DiplomacyUse.Choice> readyingChoice(Game game, Player seat) {
+        Optional<DiplomacyUse.Choice> generic = DiplomacyUse.best(game, seat, seat.getExhaustedPlanets());
+        double genericValue = generic.map(DiplomacyUses::value).orElse(0.0);
+        return ExpeditionUnlock.afterReadying(game, seat, seat.getExhaustedPlanets())
+                .filter(readying -> readying.gain() > genericValue)
+                .map(readying -> DiplomacyUse.readying(game, seat, readying.planets()))
+                .or(() -> generic);
+    }
+
+    private static double value(DiplomacyUse.Choice choice) {
+        return choice.unlocksScore()
+                ? CardValueScale.SPEND_UNLOCK_SHARE * CardValueScale.VICTORY_POINT
+                : CardValueScale.READY_SHARE * choice.use();
+    }
+
+    private static double expeditionValue(PlanInputs in, double readyValue) {
+        Game game = in.game();
+        Player seat = in.seat();
+        double unlocked = in.moment() == PlanMoment.ACTION
+                ? ExpeditionUnlock.afterReadying(game, seat, seat.getExhaustedPlanets())
+                        .map(ExpeditionUnlock.Readying::gain)
+                        .orElse(0.0)
+                : ExpeditionUnlock.refundOfFirstClaim(game, seat);
+        return Math.max(0, unlocked - readyValue);
+    }
+
     private static double readyValue(PlanInputs in) {
         Game game = in.game();
         Player seat = in.seat();
         if (in.moment() == PlanMoment.ACTION) {
             return DiplomacyUse.best(game, seat, seat.getExhaustedPlanets())
-                    .map(choice -> choice.unlocksScore()
-                            ? CardValueScale.SPEND_UNLOCK_SHARE * CardValueScale.VICTORY_POINT
-                            : CardValueScale.READY_SHARE * choice.use())
+                    .map(DiplomacyUses::value)
                     .orElse(0.0);
         }
         int bestTwo = seat.getPlanets().stream()

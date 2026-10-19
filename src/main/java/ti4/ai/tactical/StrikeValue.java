@@ -10,6 +10,7 @@ record StrikeValue(
         double imperial,
         double mecatolHold,
         double mecatolDenial,
+        double fractureDenial,
         double kills,
         double blockade,
         double nekroGain,

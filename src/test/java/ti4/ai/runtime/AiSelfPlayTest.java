@@ -111,6 +111,8 @@ class AiSelfPlayTest extends BaseTi4Test {
         printObjectives(outcomes);
         printPlanKinds(outcomes);
         printMecatol(outcomes);
+        printExpeditions(outcomes);
+        printFracture(outcomes);
         printExpansionZones(outcomes);
         System.out.println("Tactical actions per seat each round: "
                 + perRoundDecimal(
@@ -435,6 +437,154 @@ class AiSelfPlayTest extends BaseTi4Test {
             }
             System.out.println("Expansion targets " + band + ": " + String.join(", ", parts));
         }
+    }
+
+    // The Thunder's Edge expedition over the batch: slices claimed per seat by round and by kind, the Fracture rolls
+    // and
+    // entries, the ingress tokens placed, and who ended up with Thunder's Edge.
+    private static void printExpeditions(List<SelfPlayGame.Outcome> outcomes) {
+        int games = Math.max(1, outcomes.size());
+        int seats = Math.max(
+                1, outcomes.stream().mapToInt(SelfPlayGame.Outcome::seats).sum());
+        List<ExpeditionTracker.Claim> claims = outcomes.stream()
+                .flatMap(outcome -> outcome.expeditions().claims().stream())
+                .toList();
+        Map<Integer, Long> byRound = claims.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        ExpeditionTracker.Claim::round,
+                        java.util.TreeMap::new,
+                        java.util.stream.Collectors.counting()));
+        Map<String, Long> byKind = claims.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        ExpeditionTracker.Claim::kind, java.util.TreeMap::new, java.util.stream.Collectors.counting()));
+        Map<String, Long> byFaction = claims.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        ExpeditionTracker.Claim::faction,
+                        java.util.TreeMap::new,
+                        java.util.stream.Collectors.counting()));
+        long seatsWithAClaim = outcomes.stream()
+                .mapToLong(outcome -> outcome.expeditions().claims().stream()
+                        .map(ExpeditionTracker.Claim::faction)
+                        .distinct()
+                        .count())
+                .sum();
+        System.out.printf(
+                "Expeditions: %.2f slices claimed per game, %.0f%% of seats claimed at least one; by round %s; by kind %s; by faction %s%n",
+                (double) claims.size() / games, 100.0 * seatsWithAClaim / seats, byRound, byKind, byFaction);
+        printCardPicks(outcomes);
+        System.out.printf(
+                "Fracture: %.2f rolls per game, entered in %d of %d games (rounds %s), %.2f ingress tokens on the board per game, %.2f ingress presses per game%n",
+                (double) outcomes.stream()
+                                .mapToInt(outcome -> outcome.expeditions().rolls())
+                                .sum()
+                        / games,
+                outcomes.stream()
+                        .filter(outcome -> outcome.expeditions().fractureEntered())
+                        .count(),
+                games,
+                outcomes.stream()
+                        .filter(outcome -> outcome.expeditions().fractureEntered())
+                        .map(outcome -> outcome.expeditions().fractureRound())
+                        .toList(),
+                (double) outcomes.stream()
+                                .mapToInt(outcome -> outcome.expeditions().ingressTokens())
+                                .sum()
+                        / games,
+                (double) outcomes.stream()
+                                .mapToInt(outcome -> outcome.expeditions().ingressPresses())
+                                .sum()
+                        / games);
+        System.out.println("Thunder's Edge: placed in "
+                + outcomes.stream()
+                        .filter(outcome -> outcome.expeditions().thundersEdgePlaced())
+                        .count() + " of "
+                + games + " games; round, most slices, infantry owner: "
+                + outcomes.stream()
+                        .filter(outcome -> outcome.expeditions().thundersEdgePlaced())
+                        .map(outcome -> "r" + outcome.expeditions().thundersEdgeRound() + " "
+                                + outcome.expeditions().mostSlices() + " -> "
+                                + outcome.expeditions().infantryOwner())
+                        .toList());
+    }
+
+    // The strategy cards picked in round one, and how often a pick's plan had an expedition use (any, and as its main
+    // use), over the whole game as well.
+    private static void printCardPicks(List<SelfPlayGame.Outcome> outcomes) {
+        List<ExpeditionTracker.CardPick> picks = outcomes.stream()
+                .flatMap(outcome -> outcome.expeditions().picks().stream())
+                .toList();
+        List<ExpeditionTracker.CardPick> roundOne =
+                picks.stream().filter(pick -> pick.round() == 1).toList();
+        Map<String, Long> byCard = roundOne.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        ExpeditionTracker.CardPick::card,
+                        java.util.TreeMap::new,
+                        java.util.stream.Collectors.counting()));
+        System.out.printf(
+                "Round one strategy card picks (%d): %s; with an expedition use %d (main use %d); all rounds %d picks,"
+                        + " expedition use %d (main use %d); expedition use by card %s%n",
+                roundOne.size(),
+                byCard,
+                roundOne.stream()
+                        .filter(ExpeditionTracker.CardPick::expeditionUse)
+                        .count(),
+                roundOne.stream()
+                        .filter(ExpeditionTracker.CardPick::expeditionMain)
+                        .count(),
+                picks.size(),
+                picks.stream().filter(ExpeditionTracker.CardPick::expeditionUse).count(),
+                picks.stream()
+                        .filter(ExpeditionTracker.CardPick::expeditionMain)
+                        .count(),
+                picks.stream()
+                        .filter(ExpeditionTracker.CardPick::expeditionUse)
+                        .collect(java.util.stream.Collectors.groupingBy(
+                                ExpeditionTracker.CardPick::card,
+                                java.util.TreeMap::new,
+                                java.util.stream.Collectors.counting())));
+        List<ExpeditionTracker.Claim> claims = outcomes.stream()
+                .flatMap(outcome -> outcome.expeditions().claims().stream())
+                .toList();
+        Map<String, Map<Integer, Long>> byKindAndRound = claims.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        ExpeditionTracker.Claim::kind,
+                        java.util.TreeMap::new,
+                        java.util.stream.Collectors.groupingBy(
+                                ExpeditionTracker.Claim::round,
+                                java.util.TreeMap::new,
+                                java.util.stream.Collectors.counting())));
+        System.out.println("Expedition claims by kind and round: " + byKindAndRound);
+    }
+
+    // The Fracture over the batch (-Dai.selfplay.fracture=true): for each planet, in how many games it was taken and
+    // the rounds and seats that took it, and how often Styx changed hands.
+    private static void printFracture(List<SelfPlayGame.Outcome> outcomes) {
+        if (!FractureTracker.enabled()) return;
+        int games = outcomes.size();
+        for (String planet : FractureTracker.PLANETS) {
+            List<String> takes = new ArrayList<>();
+            for (int index = 0; index < games; index++) {
+                String label = "g" + (index + 1);
+                outcomes.get(index).fracture().changes().stream()
+                        .filter(change ->
+                                change.planet().equals(planet) && !change.to().isEmpty())
+                        .forEach(change -> takes.add(label + " r" + change.round() + " " + change.to()
+                                + (change.from().isEmpty() ? "" : " (from " + change.from() + ")")));
+            }
+            long gamesTaken = outcomes.stream()
+                    .filter(outcome -> outcome.fracture().tookEvery(planet))
+                    .count();
+            long gamesAttacked = outcomes.stream()
+                    .filter(outcome -> outcome.fracture().attacked(planet))
+                    .count();
+            System.out.println("Fracture " + planet + ": attacked in " + gamesAttacked + "/" + games
+                    + " games, taken in " + gamesTaken + "/" + games + " games"
+                    + (takes.isEmpty() ? "" : "; " + String.join(", ", takes)));
+        }
+        System.out.println("Styx changes of hands per game: "
+                + outcomes.stream()
+                        .map(outcome -> outcome.fracture().styxChanges())
+                        .toList());
     }
 
     // The custodians race over the batch: the round the token went, who took it and whether they went first, the

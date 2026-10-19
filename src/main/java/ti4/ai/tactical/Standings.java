@@ -50,6 +50,7 @@ final class Standings {
     // TODO: ready (engine progress) and ObjectiveValue.brokenReady (footprint model) can disagree; two spend objectives
     // under Imperial may not both be affordable
     List<String> ready(Player player) {
+        if (player.isNeutral()) return List.of();
         return ready.computeIfAbsent(player.getFaction(), faction -> ObjectivePolicy.scorablePublics(game, player));
     }
 
@@ -106,6 +107,7 @@ final class Standings {
     }
 
     double projected(Player player) {
+        if (player.isNeutral()) return 0;
         Double known = projections.get(player.getFaction());
         if (known != null) return known;
         double projected = vp(player)
@@ -122,6 +124,7 @@ final class Standings {
     }
 
     double hurtWeight(Player target) {
+        if (target.isNeutral()) return 0;
         List<Player> others = game.getRealPlayers().stream()
                 .filter(player -> player != target)
                 .toList();
