@@ -259,8 +259,12 @@ to build one by hand:
       rest. It pursues _Mechanize the Military_ and _Occupy the Fringe_ like the other board secrets: the tactical
       planner counts the planets holding one of its mechs and the most ground forces on a planet without its space dock,
       lands a mech first on a planet that has none while it holds _Mechanize the Military_, and with _Occupy the Fringe_
-      in hand plans garrison moves that carry ground forces onto a planet it holds without a dock. It does not pursue
-      _Strengthen Bonds_ yet (it is met by the promissory notes it receives).
+      in hand plans garrison moves that carry ground forces onto a planet it holds without a dock. With _Strengthen Bonds_ (another player's note in its play area) or
+      _Betray a Friend_ (beat a player whose note is in its play area; only a neighbour's note counts, one per owner) it
+      buys the notes that land in a play area (`NoteSecrets`): such a note is worth 0.9 of a point more for _Strengthen
+      Bonds_ and 0.4 for _Betray a Friend_, while the secret is unmet. Its first ask is the owner's fair price for the
+      note; each ask that did not land raises the next by 1 trade good in rounds 1 and 2, 2 in the middle rounds and 3
+      once the end is in sight, up to 9.
     - **Drawing and trading secrets** (`SecretDraws`). Like human players it draws a secret whenever it can (Imperial,
       an exploration, _Impersonation_, _Strategize_), and with a full hand draws anyway and discards its weakest, unless
       every secret it still holds is worth keeping (a keep value of 0.75 or more: one it can score, one close to done or
