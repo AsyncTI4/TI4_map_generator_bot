@@ -22,7 +22,6 @@ public class SpecialCommand implements ParentCommand {
                     new SystemInfo(),
                     new StellarConverter(),
                     new Rematch(),
-                    new CloneGame(),
                     // new SwordsToPlowsharesTGGain(),
                     // new WormholeResearchFor(),
                     new SwapSC(),
