@@ -474,6 +474,29 @@ _Avoid_: Cancel card
 To park a fighter or other small ship in a System to block opponents from moving through it.
 _Avoid_: Clog, blocker
 
+**Locked down**:
+Describes a System containing a Player's Command token, whose units cannot move out of it. Players saying "that System is locked down" mean either that the units in it cannot be moved out, or that other units can be moved in.
+_Avoid_: Frozen, pinned
+
+**Point blocked**:
+Stopped from scoring, as when a Player is kept from meeting an objective's requirement.
+_Avoid_: Score blocked
+
+**Stall**:
+To take minor actions so as not to reveal major actions and plans to other Players.
+
+**Out stall**:
+To stall long enough that another Player has to Pass first.
+
+**Leadership stall**:
+Stalling while holding the Leadership Strategy card until other Players have to Pass before Leadership is used, so they never gain the tactic and strategy tokens needed for an effective Round.
+
+**Winmaking**:
+Helping another Player win, sometimes deliberately and sometimes unknowingly. Also called kingmaking, winemaking or stooging.
+
+**Winslaying**:
+Stopping a Player from being able to win. Also called kingslaying or slaying.
+
 **Saar ball**:
 The Saar faction's style of keeping its forces moving and reinforcing as it travels.
 
