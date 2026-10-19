@@ -52,7 +52,7 @@ public class BothelperCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "BotHelper";
+        return "Bothelper tools: create game channels, manage stats, titles, roles and server limits";
     }
 
     @Override

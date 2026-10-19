@@ -62,7 +62,6 @@ import ti4.discord.interactions.commands.tokens.RemoveTokenCommand;
 import ti4.discord.interactions.commands.transaction.TransactionCommand;
 import ti4.discord.interactions.commands.uncategorized.AllInfoCommand;
 import ti4.discord.interactions.commands.uncategorized.CardsInfoCommand;
-import ti4.discord.interactions.commands.uncategorized.SelectionBoxDemoCommand;
 import ti4.discord.interactions.commands.uncategorized.ShowDistancesCommand;
 import ti4.discord.interactions.commands.uncategorized.ShowGameCommand;
 import ti4.discord.interactions.commands.units.AddUnitDamage;
@@ -143,7 +142,6 @@ public class SlashCommandManager {
                     new BreakthroughCommand(),
                     new FrankenCommand2(),
                     new PlanetCommand(),
-                    new SelectionBoxDemoCommand(),
                     new UserCommand(),
                     new LazaxCommand(),
                     new TiglCommand(),

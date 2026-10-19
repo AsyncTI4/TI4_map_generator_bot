@@ -43,7 +43,7 @@ public class CustomCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "Custom";
+        return "Customize decks and objectives: add/remove cards, peek, swap and reveal specific ones";
     }
 
     @Override
