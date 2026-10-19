@@ -26,9 +26,18 @@ final class FractureTracker {
 
     record Change(int round, String planet, String from, String to) {}
 
-    record Summary(boolean enabled, int enteredRound, List<String> ingress, List<Change> changes) {
+    record Summary(
+            boolean enabled,
+            int enteredRound,
+            List<String> ingress,
+            List<Change> changes,
+            Map<String, Integer> firstAttackRound) {
 
-        static final Summary OFF = new Summary(false, 0, List.of(), List.of());
+        static final Summary OFF = new Summary(false, 0, List.of(), List.of(), Map.of());
+
+        boolean attacked(String planet) {
+            return firstAttackRound.containsKey(planet);
+        }
 
         boolean tookEvery(String planet) {
             return changes.stream().anyMatch(change -> change.planet().equals(planet));
@@ -50,6 +59,8 @@ final class FractureTracker {
     private final List<String> ingress = new ArrayList<>();
     private final Map<String, String> holders = new LinkedHashMap<>();
     private final List<Change> changes = new ArrayList<>();
+    private final Map<String, Integer> neutralUnits = new LinkedHashMap<>();
+    private final Map<String, Integer> firstAttackRound = new LinkedHashMap<>();
 
     FractureTracker(long seed) {
         this.seed = seed;
@@ -80,6 +91,7 @@ final class FractureTracker {
             ingress.add(tile.getPosition());
         }
         Collections.sort(ingress);
+        PLANETS.forEach(planet -> neutralUnits.put(planet, neutralUnitsOn(game, planet)));
     }
 
     void observe(Game game) {
@@ -87,6 +99,9 @@ final class FractureTracker {
         for (String planet : PLANETS) {
             Player holder = game.getPlayerThatControlsPlanet(planet);
             String now = holder == null ? "" : holder.getFaction();
+            if (neutralUnitsOn(game, planet) < neutralUnits.getOrDefault(planet, 0)) {
+                firstAttackRound.putIfAbsent(planet, game.getRound());
+            }
             String before = holders.getOrDefault(planet, "");
             if (!now.equals(before)) {
                 changes.add(new Change(game.getRound(), planet, before, now));
@@ -95,7 +110,19 @@ final class FractureTracker {
         }
     }
 
+    private static int neutralUnitsOn(Game game, String planet) {
+        Player neutral = game.getPlayerFromColorOrFaction("neutral");
+        Tile tile = game.getTileFromPlanet(planet);
+        if (neutral == null || tile == null) return 0;
+        return tile.getUnitHolders().values().stream()
+                .mapToInt(holder -> holder.getUnitKeysForPlayer(neutral).stream()
+                        .mapToInt(holder::getUnitCount)
+                        .sum())
+                .sum();
+    }
+
     Summary summary() {
-        return new Summary(enabled(), enteredRound, List.copyOf(ingress), List.copyOf(changes));
+        return new Summary(
+                enabled(), enteredRound, List.copyOf(ingress), List.copyOf(changes), Map.copyOf(firstAttackRound));
     }
 }

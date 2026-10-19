@@ -456,7 +456,11 @@ class AiSelfPlayTest extends BaseTi4Test {
             long gamesTaken = outcomes.stream()
                     .filter(outcome -> outcome.fracture().tookEvery(planet))
                     .count();
-            System.out.println("Fracture " + planet + ": taken in " + gamesTaken + "/" + games + " games"
+            long gamesAttacked = outcomes.stream()
+                    .filter(outcome -> outcome.fracture().attacked(planet))
+                    .count();
+            System.out.println("Fracture " + planet + ": attacked in " + gamesAttacked + "/" + games
+                    + " games, taken in " + gamesTaken + "/" + games + " games"
                     + (takes.isEmpty() ? "" : "; " + String.join(", ", takes)));
         }
         System.out.println("Styx changes of hands per game: "
