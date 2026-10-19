@@ -1,8 +1,11 @@
 package ti4.ai.expedition;
 
+import java.lang.ref.WeakReference;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.ActionCardPrior;
@@ -28,6 +31,8 @@ class KindPricing {
     static final int INFLUENCE_COST = 5;
     static final int ACTION_CARDS_COST = 2;
     static final double SECRET_CARD_SHARE = 0.5;
+    private static final int MAX_CACHED = 64;
+    private static final Map<String, CachedKeeps> KEEPS = new ConcurrentHashMap<>();
     private static final String BIO_STIMS = "bs";
     private static final Wallet.Payment NO_PAYMENT = new Wallet.Payment(List.of(), List.of(), 0, 0);
 
@@ -138,11 +143,28 @@ class KindPricing {
         return seat.getSecretsUnscored().size() > Math.max(0, seat.getMaxSOCount() - seat.getSoScored());
     }
 
-    private static Optional<Price> actionCards(Game game, Player seat, Holdings holdings) {
-        if (holdings.actionCards() < ACTION_CARDS_COST) return Optional.empty();
+    private record CachedKeeps(WeakReference<Game> game, long modified, List<Double> keeps) {
+
+        boolean isFor(Game current) {
+            return game.get() == current && modified == current.getLastModifiedDate();
+        }
+    }
+
+    private static List<Double> keepValues(Game game, Player seat) {
+        String key = game.getName() + "|" + seat.getUserID();
+        CachedKeeps cached = KEEPS.get(key);
+        if (cached != null && cached.isFor(game)) return cached.keeps();
         List<Double> keeps = ActionCardValue.discardOrder(game, seat).stream()
                 .map(alias -> ActionCardValue.keepValue(game, seat, alias))
                 .toList();
+        if (KEEPS.size() > MAX_CACHED) KEEPS.clear();
+        KEEPS.put(key, new CachedKeeps(new WeakReference<>(game), game.getLastModifiedDate(), keeps));
+        return keeps;
+    }
+
+    private static Optional<Price> actionCards(Game game, Player seat, Holdings holdings) {
+        if (holdings.actionCards() < ACTION_CARDS_COST) return Optional.empty();
+        List<Double> keeps = keepValues(game, seat);
         int extra = Math.max(0, holdings.actionCards() - keeps.size());
         double cost = Stream.concat(
                         keeps.stream(),
