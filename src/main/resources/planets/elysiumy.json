@@ -1,0 +1,28 @@
+{
+    "id": "elysiumy",
+    "tileId": 55,
+    "name": "Elysium Project",
+    "shortName": "Elysium",
+    "shrinkNamePNAttach": true,
+    "aliases": [
+        "elysium",
+        "project",
+        "ep",
+        "titans"
+    ],
+    "positionInTile": {
+        "x": 170.0,
+        "y": 128.0
+    },
+    "radius": 95.0,
+    "resources": 4,
+    "influence": 1,
+    "factionHomeworld": "project",
+    "planetType": "FACTION",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": "The Breath of Elysium",
+    "legendaryAbilityText": "After you move ships into a non-home system that is adjacent to the Elysium Planet token, you may exhaust this card and move the Elysium Planet token into that system.",
+    "flavourText": "**",
+    "source": "gamma"
+}

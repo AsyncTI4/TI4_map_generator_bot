@@ -506,12 +506,12 @@
         "startingFleet": "1 cv, 1 dn, 1 dd, 2 fighters, 5 inf mollprimus, sd mollprimus, 1 pds mollprimus",
         "commodities": 2,
         "factionTech": [
-            "ggihfy",
-            "ggihfb"
-        ],
+            "ggihfb",
+            "ggihfy"
+       ],
         "startingTechAmount": 2,
         "startingTechOptions": [
-            "mgd",
+            "md",
             "sar",
             "sdn",
             "st"
@@ -540,6 +540,52 @@
             "ironhull_flagship",
             "infantry",
             "ironhull_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Moderate",
+        "source": "gamma"
+    },
+    {
+        "alias": "project",
+        "factionName": "The Elysium Project",
+        "homeSystem": "55",
+        "startingFleet": "1 cv, 1 dn, 1 dd, 5 inf , sd elysium",
+        "commodities": 2,
+        "factionTech": [
+            "ggpey",
+            "ggpeg"
+        ],
+       
+        "startingTech": [
+            "pa",
+            "st"
+        ],
+        "homePlanets": [
+            "elysiumy"
+        ],
+        "abilities": [
+          "titanic",
+          "elysium",
+          "prudent"
+        ],
+        "leaders": [
+            "projectagent",
+            "projectcommander",
+            "projecthero"
+        ],
+        "promissoryNotes": [
+            "ggpnep"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "project_flagship",
+            "infantry",
+            "project_mech",
             "pds",
             "spacedock"
         ],

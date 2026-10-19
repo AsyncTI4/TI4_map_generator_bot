@@ -142,5 +142,17 @@
         ],
         "text": "ACTION: Exhaust this card to place a thrall token on a non-home planet. Planets you do not control that contain Thrall tokens are also treated as stations except for the purposes of control; units can be committed to, produced on, and placed on these planets.\nWhen a player places infantry on a planet you do not control with your BREAKOUT  faction ability, that player places 2 additional infantry.",
         "source": "gamma"
+    },
+    {
+        "alias": "projectbt",
+        "name": "Globus Cassus",
+        "shortName": "Globus\nCassus",
+        "faction": "project",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "Elysium is also treated as a station except for the purposes of control; units can be committed to, produced on, and placed on Elysium. At the end of your turn, you may exhaust Elysium to explore the frontier deck in Elysium's system. If your home system contains more than 1 planet, flip this card.\nYou can use technology specialties on planets you do not control in your home system without exhausting them, even if those planets are exhausted. You treat planets in systems that contain The Elysium Planet token as if you controlled them for the purpose of scoring. If your home system only contains 1 planet, flip this card.",
+        "source": "gamma"
     }
 ]

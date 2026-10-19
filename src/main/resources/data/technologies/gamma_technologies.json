@@ -270,5 +270,27 @@
         "faction": "ironhull",
         "source": "gamma",
         "text": "When you are negotiating a transaction, you may exhaust this card; during this transaction each player may allow the other to place up to 2 infantry from their reinforcements into coexistence on a planet that contains their units."
+    },    
+    {
+        "alias": "ggpey",
+        "name": "Megastructures",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "faction": "project",
+        "source": "gamma",
+        "text": "You can have any number of structures on planets you control. At the end of your turn, you may exhaust this card to place 1 structure on a planet you control."
+    },
+    {
+        "alias": "ggpeg",
+        "name": "Planetary Engineering",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "project",
+        "source": "gamma",
+        "text": "After you move 1 or more ships into a system; you may exhaust this card to ready or exhaust a planet in that system."
     }
 ]

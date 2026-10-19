@@ -669,5 +669,38 @@
         "sustainDamage": true,
         "isGroundForce": true,
         "ability": "This unit rolls 1 additional die during combat if you have less participating ground forces than your opponent."
+    },
+    {
+        "id": "project_flagship",
+        "baseType": "flagship",
+        "asyncId": "fs",
+        "name": "Herald of Elysium",
+        "source": "gamma",
+        "faction": "ironhull",
+        "moveValue": 1,
+        "capacityValue": 3,
+        "capacityUsed": 1,
+        "cost": 8,
+        "combatHitsOn": 7,
+        "combatDieCount": 2,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isShip": true,
+        "ability": "At the end of a tactical action, if there are no other player's ships in your home system, you may cause this unit to become damaged to move it to your home system."
+    },
+    {
+        "id": "project_mech",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Project Ouranos",
+        "source": "gamma",
+        "faction": "ironhull",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "isGroundForce": true,
+        "ability": "DEPLOY: When another player activates your home system, you may place 1 mech from your reinforcements onto a planet you control in that system."
     }
 ]
