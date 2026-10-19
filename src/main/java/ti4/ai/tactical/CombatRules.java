@@ -91,6 +91,8 @@ public class CombatRules {
         if (afb.isPresent()) return afb;
         Optional<AiDecision> retreat = RetreatRules.next(context, prompts);
         if (retreat.isPresent()) return retreat;
+        Optional<AiDecision> neutral = NeutralCombat.next(context, prompts);
+        if (neutral.isPresent()) return neutral;
         return combatRound(context, prompts, hook);
     }
 
@@ -507,6 +509,7 @@ public class CombatRules {
         if (mine < theirs) return RollTiming.NOW;
         if (mine > theirs || hitsPending(prompts, roll)) return RollTiming.NOT_NOW;
         List<Player> opponents = combat.get().opponents();
+        if (opponents.stream().allMatch(Player::isNeutral)) return neutralTiming(game, seat, roll, mine);
         if (opponents.stream().allMatch(AiSeats::isAiSeat)
                 && mine == 0
                 && game.getActivePlayer() != seat
@@ -514,6 +517,11 @@ public class CombatRules {
             return RollTiming.NOT_NOW;
         }
         return RollTiming.AFTER_GRACE;
+    }
+
+    private static RollTiming neutralTiming(Game game, Player seat, PromptButton roll, int mine) {
+        boolean barraged = mine == 0 && NeutralCombat.barrages(game, seat, positionOf(roll));
+        return barraged ? RollTiming.AFTER_GRACE : RollTiming.NOW;
     }
 
     record Combat(List<Player> opponents, int mine, int theirs) {}
@@ -544,7 +552,8 @@ public class CombatRules {
 
     private static boolean onlyAiOpponents(Game game, Player seat, PromptButton roll) {
         return combatOf(game, seat, roll)
-                .map(combat -> combat.opponents().stream().allMatch(AiSeats::isAiSeat))
+                .map(combat -> combat.opponents().stream()
+                        .allMatch(opponent -> AiSeats.isAiSeat(opponent) || opponent.isNeutral()))
                 .orElse(false);
     }
 

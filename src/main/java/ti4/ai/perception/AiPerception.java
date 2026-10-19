@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiSettings;
 import ti4.ai.perception.AiPrompt.PromptSource;
+import ti4.ai.tactical.NeutralCombat;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -180,8 +181,9 @@ public class AiPerception {
     }
 
     private static boolean involves(Game game, Player seat, String threadName) {
-        return (threadName.contains(seat.getFaction()) || threadName.contains(seat.getColor()))
-                && isOngoing(game, seat, threadName);
+        return ((threadName.contains(seat.getFaction()) || threadName.contains(seat.getColor()))
+                        && isOngoing(game, seat, threadName))
+                || NeutralCombat.watches(game, seat, threadName);
     }
 
     static boolean isOngoing(Game game, Player seat, String threadName) {

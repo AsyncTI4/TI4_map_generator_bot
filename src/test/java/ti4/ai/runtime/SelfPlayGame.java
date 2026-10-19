@@ -39,6 +39,7 @@ final class SelfPlayGame {
     static final long STALL_MILLIS = 2 * 60 * 60 * 1000L;
     private static final List<String> TRADE_TURN_KEYS =
             List.of("tradeTurnDrafts|", "tradeWindow|", "tradeNoteDeals|", "tradeNoteDealWith|");
+    private static final long FRACTURE_SEED = Long.getLong("ai.selfplay.fractureseed", 7L);
     private static final String OWNER_ID = "300000000000000001";
     private static final String AGENDA_FLIP_STAMP = "lastAgendaReactTime";
     private static final long AGENDA_FLIP_AGE_MILLIS = 10 * 60 * 1000L;
@@ -71,6 +72,7 @@ final class SelfPlayGame {
             ExpeditionTracker.Summary expeditions,
             PromissoryTracker.Summary promissory,
             ObjectiveTracker.Summary objectives,
+            FractureTracker.Summary fracture,
             String report,
             long wallSeconds) {
 
@@ -194,6 +196,7 @@ final class SelfPlayGame {
     private final java.util.Set<String> heldCards = new java.util.LinkedHashSet<>();
     private final List<Integer> playRounds = new ArrayList<>();
     private final ObjectiveTracker objectives = new ObjectiveTracker();
+    private final FractureTracker fracture;
 
     SelfPlayGame(SelfPlayEnvironment env, String name) {
         this(env, name, 0);
@@ -203,6 +206,7 @@ final class SelfPlayGame {
         this.env = env;
         this.name = name;
         this.slot = slot;
+        this.fracture = new FractureTracker(FRACTURE_SEED * 1009L + slot);
     }
 
     Game setUp(List<String> factions) throws Exception {
@@ -350,6 +354,8 @@ final class SelfPlayGame {
             recordPlayRounds(game);
             env.promissory.observe(game);
             objectives.observe(game);
+            if (fracture.due(game)) force(game, fracture::enter);
+            fracture.observe(game);
             closeOverrulePicks(game, false);
             if (stopWhen.test(game)) return outcome(Ending.STOP_CONDITION, game, ticks);
             if (AiTickRunner.reachedVictoryPoints(game)) return outcome(Ending.VICTORY_POINTS, game, ticks);
@@ -571,6 +577,7 @@ final class SelfPlayGame {
                 env.expeditions.summary(game),
                 env.promissory.summary(game),
                 objectives.summary(game),
+                fracture.summary(),
                 report(ending, game, ticks),
                 (System.nanoTime() - wallStart) / 1_000_000_000L);
     }
@@ -711,6 +718,18 @@ final class SelfPlayGame {
 
     // Per seat: commodities, debt both ways, offers by button family, what moved through accepted offers and the Trade
     // settlements it sent as holder; then the latest accepted offers.
+    private List<String> fractureLines() {
+        FractureTracker.Summary summary = fracture.summary();
+        if (!summary.enabled()) return List.of();
+        List<String> lines = new ArrayList<>();
+        lines.add("entered in round " + summary.enteredRound() + ", ingress on " + summary.ingress());
+        summary.changes()
+                .forEach(change -> lines.add("round " + change.round() + ": " + change.planet() + " "
+                        + (change.from().isEmpty() ? "unheld" : change.from()) + " -> "
+                        + (change.to().isEmpty() ? "unheld" : change.to())));
+        return lines;
+    }
+
     private List<String> tradeLines(Game game) {
         List<SelfPlayEnvironment.TradeRecord> ledger = ledger();
         List<String> lines = new ArrayList<>();
@@ -851,6 +870,7 @@ final class SelfPlayGame {
         }
         appendTail(report, "Victory points by round", victoryPointsByRound, 20);
         appendTail(report, "Scoreboard", scoreboard(game), 40);
+        appendTail(report, "Fracture", fractureLines(), 30);
         appendTail(report, "Trading", tradeLines(game), 30);
         appendTail(report, "Trade invariants", invariantLines(ending, game), 20);
         appendTail(report, "Promissory note moves", promissoryLines(game), 30);

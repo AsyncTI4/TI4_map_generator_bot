@@ -112,6 +112,7 @@ class AiSelfPlayTest extends BaseTi4Test {
         printPlanKinds(outcomes);
         printMecatol(outcomes);
         printExpeditions(outcomes);
+        printFracture(outcomes);
         printExpansionZones(outcomes);
         System.out.println("Tactical actions per seat each round: "
                 + perRoundDecimal(
@@ -553,6 +554,37 @@ class AiSelfPlayTest extends BaseTi4Test {
                                 java.util.TreeMap::new,
                                 java.util.stream.Collectors.counting())));
         System.out.println("Expedition claims by kind and round: " + byKindAndRound);
+    }
+
+    // The Fracture over the batch (-Dai.selfplay.fracture=true): for each planet, in how many games it was taken and
+    // the rounds and seats that took it, and how often Styx changed hands.
+    private static void printFracture(List<SelfPlayGame.Outcome> outcomes) {
+        if (!FractureTracker.enabled()) return;
+        int games = outcomes.size();
+        for (String planet : FractureTracker.PLANETS) {
+            List<String> takes = new ArrayList<>();
+            for (int index = 0; index < games; index++) {
+                String label = "g" + (index + 1);
+                outcomes.get(index).fracture().changes().stream()
+                        .filter(change ->
+                                change.planet().equals(planet) && !change.to().isEmpty())
+                        .forEach(change -> takes.add(label + " r" + change.round() + " " + change.to()
+                                + (change.from().isEmpty() ? "" : " (from " + change.from() + ")")));
+            }
+            long gamesTaken = outcomes.stream()
+                    .filter(outcome -> outcome.fracture().tookEvery(planet))
+                    .count();
+            long gamesAttacked = outcomes.stream()
+                    .filter(outcome -> outcome.fracture().attacked(planet))
+                    .count();
+            System.out.println("Fracture " + planet + ": attacked in " + gamesAttacked + "/" + games
+                    + " games, taken in " + gamesTaken + "/" + games + " games"
+                    + (takes.isEmpty() ? "" : "; " + String.join(", ", takes)));
+        }
+        System.out.println("Styx changes of hands per game: "
+                + outcomes.stream()
+                        .map(outcome -> outcome.fracture().styxChanges())
+                        .toList());
     }
 
     // The custodians race over the batch: the round the token went, who took it and whether they went first, the

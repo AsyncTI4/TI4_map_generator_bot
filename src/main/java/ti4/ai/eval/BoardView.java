@@ -118,13 +118,13 @@ public class BoardView {
     }
 
     public static boolean enemyGroundForcesOn(Game game, Player player, UnitHolder planet) {
-        return game.getRealPlayers().stream()
+        return game.getRealPlayersNNeutral().stream()
                 .filter(other -> other != player)
                 .anyMatch(other -> GROUND_FORCES.stream().anyMatch(type -> count(planet, other, type) > 0));
     }
 
     public static boolean enemyStructuresOn(Game game, Player player, UnitHolder planet) {
-        return game.getRealPlayers().stream()
+        return game.getRealPlayersNNeutral().stream()
                 .filter(other -> other != player)
                 .anyMatch(other ->
                         count(planet, other, UnitType.Pds) > 0 || count(planet, other, UnitType.Spacedock) > 0);

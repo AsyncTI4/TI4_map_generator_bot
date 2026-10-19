@@ -689,6 +689,20 @@ to build one by hand:
     attacker's roll, so it never had a start-of-round window); it still does not roll first. Without the button (fog
     of war, or it scrolled out of the thread's history) the earlier behaviour applies: a pause after the newest
     message, then the hook, then the roll.
+  - **Neutral units** (`NeutralCombat`, `CombatRules`). The neutral units of the Fracture have no seat, so nobody presses their
+    dice for them unless a seat does: the rules say any player other than the active player rolls for them. In a
+    combat where the active AI seat fights only neutral units, the next AI seat after it (in seating order) is
+    shown the combat thread and presses the buttons the bot spoofs for the neutral player: its anti-fighter barrage
+    (when it has the dice and the attacker has fighters), its round roll once the attacker has rolled the round (a
+    round is rolled once, by comparing the round counters), and its auto-assigned hits (after the neutral roll of the
+    round, in the order of the reference card with sustain damage first, which is the bot's own order). The attacker rolls
+    at once (no pause, no combat card window) except for one pause when a barrage is due, and falls back on the
+    neutral buttons itself only when no other AI seat exists after 10 seconds, or the other seat has not pressed them
+    after 120 seconds.
+    That seat keeps watching the thread for the rest of the round while neutral units are in the system, so the last
+    hits of a combat the attacker lost are still assigned. Neutral ground forces and structures count as enemy ground
+    forces and structures (`BoardView`), so the tactical action waits for a ground combat on a Fracture planet to end
+    before it draws the relic and ends the turn.
   - **Barony of Letnev** (`ti4.ai.letnev`; every rule keys on the ability, technology, leader or unit, so Nekro,
     Franken and alliances get it too):
     - _Odds._ `CombatForces.force` adds the space-side Letnev edges to every force the planner and the defence
@@ -927,7 +941,18 @@ to build one by hand:
     allowance outnumber the capacity of the ships already there, a hauler from a system with nothing for it to carry
     moves in, worth 0.5 per unit it can take less distance, leaving and exposure. It is a low-scoring plan: it runs
     only when the seat has tokens to spare.
-  - **Defense** (`DefenseOutlook`). Its home system, a system with its space dock, a Mecatol Rex it holds, a system whose
+  - **Screen** (the Fracture, `FractureScreen`). Enemy ships stop movement, so a ship in an empty Fracture system (the two
+    egress systems and the systems between them and Styx) cuts the paths of a rival that is not yet beside Styx. The
+    Fracture has two routes from every ingress system (through the left egress system and the right one), so one
+    screen alone cuts only a rival already committed to one side, and a pair seals it. When a rival could take Styx next
+    round (the force that reaches Styx, with the seat's screens in place, wins the fight and the planet with at least
+    0.3), a cheap ship (a destroyer or a cruiser) that can reach an empty Fracture system is worth half of the drop in that
+    chance times the rival's denial weight times a victory point (8), plus half of what it would add together with the
+    best second screen that is needed to make the cut (neither alone makes it), less the usual costs of leaving and the
+    exposure of the ship. It is never planned when the seat holds Styx itself, and the ship it parks is also the start of
+    the seat's own strike on Styx.
+  - **Defense** (`DefenseOutlook`). Its home system, a system with its space dock, a Mecatol Rex it holds, a Styx it holds
+    (its point is in what the planet is worth losing), a system whose
     ships or planets carry at least 4 points of objective progress, and a system where an invasion would complete a
     revealed public objective for the invader are _guarded_. For each guarded system and each other player it works out
     the biggest force that player could bring there in one tactical action (`IncomingForces`): the ships that reach it
@@ -956,7 +981,7 @@ to build one by hand:
     that home holds; and production buys infantry, mechs, fighters or ships at the dock (ground forces on the dock
     planet) until the cost is gone or a unit no longer lowers it by half a point per resource, so a one-planet home is
     defended on the ground and a home with several planets in space, and a hopeless defence buys nothing. Not yet:
-    screening (a ship parked on a chokepoint), defending with ships from more than one system in one action, planets
+    defending with ships from more than one system in one action, planets
     an enemy needs in systems the seat does not guard, and Prophecy of Kings Warfare with Fleet Logistics unlocking a
     second fleet.
   - **Offense** (`StrikeEvaluator`, `OffenseOutlook`, `Standings`). Every attack is a _strike_ whose physics and
@@ -999,7 +1024,20 @@ to build one by hand:
     worth staging for), and a staging system gathers the ships of up to three origins that reach it this action and the
     target next round, within fleet supply; the two safest staging systems per target get the future strike checked. Docks within two moves of a player worth hurting value their
     dreadnoughts, cruisers, upgraded destroyers, War Suns and flagships half as much again.
-    Not yet: screening chokepoints; locking a captured system with the seat's own Diplomacy; parking ships on Mecatol Rex
+    **The Fracture.** The neutral units of the Fracture are a legal opponent (`singleOpponent` accepts the neutral player), with
+    nothing the other players have: no hurt, denial, anger, retaliation, counterstrike, Nekro copy or standings, no
+    Nullification or trade terms, and no reinforcements (neutral units never move). The odds read the neutral player's own
+    unit models, which match the neutral unit reference card (dreadnought 5 with sustain, carrier 9, cruiser 6, destroyer 8
+    with anti-fighter barrage 6 x3, fighter 8, infantry 8, mech 6). A planet of the Fracture is worth its resources and
+    influence, a relic when its relic token is still on it (4, three fragments at 1, 1 and 2) and, for Styx, the point of _A Song
+    Like Marrow_ (8): the point is charged back by the counterstrike term when a rival can reach Styx, and a rival's Styx
+    counts as a point to deny (its denial weight times 8) next to the usual standings terms. Fleets stage for the Fracture
+    planets with a lead of two moves instead of one (a staging system from which the target is two of the ships' moves
+    away, so a fleet works its way along the egress and the empty Fracture systems, one tactical action per step), only
+    while the fleet that would be there can win the fight (the same score of 4 as for any attack). A dock within two
+    moves of an ingress system, while a Fracture planet is not yet the seat's, values its warships the same half as much
+    again, and builds dreadnoughts up to five instead of three.
+    Not yet: locking a captured system with the seat's own Diplomacy; parking ships on Mecatol Rex
     without landing; Magen Defense Grid, Mentak Ambush, L4 Disruptors and Titans' planetary PDS in the odds; retreats in
     the kill estimates; building space docks forward; more than three origins; Prophecy of Kings Warfare with Fleet
     Logistics for a double move; pre-emptive strikes against a fleet that threatens only the system the strike leaves
@@ -1247,6 +1285,13 @@ Seven small generic changes don't reference `ti4.ai`:
   - `-Dai.trading=false` plays without trading, for an A/B comparison of the batch summary.
   - `SabotageSelfPlayTest` plays a contender's _Overrule_ in a six-seat game and checks that an AI seat cancels it with the bot's real buttons.
   - `-Dai.selfplay.give=<alias,...>` deals those action cards to every seat, to watch a card's flow end to end.
+  - `-Dai.selfplay.fracture=true` brings the Fracture into play at the start of round 2 of every game (`FractureTracker`): the
+    seven tiles with their neutral units, and an ingress token on a random system of each technology specialty and on
+    Mecatol Rex (`-Dai.selfplay.fractureseed=N` picks the systems, default 7). The batch prints, for each Fracture planet,
+    the games in which it was taken, with the round and the seat, and how often Styx changed hands. Without the flag a
+    game is unchanged. `FractureSelfPlayTest` puts a fleet beside Styx and beside Cocytus and checks that the active seat
+    takes the planet through the whole combat against the neutral units (another AI seat rolls for them), with the point
+    of Styx and the relic.
   - Every action card play carries the round it was first seen in, and the batch summary prints the plays by round
     for the whole batch and each card's average round. `Overrule` gets its own block: its plays by round, the strategy
     cards its picks chose, how many of those picks raised the seat's points before its turn ended, and how many seats

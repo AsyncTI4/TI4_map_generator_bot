@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -78,6 +79,7 @@ final class IncomingForces {
     private record Slot(Tile origin, UnitType type, double cost) {}
 
     private final Game game;
+    private final Set<String> screened;
     private final Exclusion exclusion;
     private final IncomingForces base;
     private final Map<String, Map<String, Integer>> reaches;
@@ -92,9 +94,19 @@ final class IncomingForces {
     }
 
     IncomingForces(Game game, @Nullable Exclusion exclusion, @Nullable IncomingForces base) {
+        this(game, exclusion, base, Set.of());
+    }
+
+    static IncomingForces screened(Game game, Set<String> screened) {
+        return new IncomingForces(game, null, null, screened);
+    }
+
+    private IncomingForces(
+            Game game, @Nullable Exclusion exclusion, @Nullable IncomingForces base, Set<String> screened) {
         this.game = game;
         this.exclusion = exclusion;
         this.base = base;
+        this.screened = screened;
         this.reaches = base == null ? new HashMap<>() : base.reaches;
     }
 
@@ -144,7 +156,7 @@ final class IncomingForces {
     Map<String, Integer> reach(Player enemy, Tile origin, int move) {
         return reaches.computeIfAbsent(
                 enemy.getFaction() + "#" + origin.getPosition() + "#" + move,
-                key -> MovementGraph.reach(game, enemy, origin.getPosition(), move));
+                key -> MovementGraph.reach(game, enemy, origin.getPosition(), move, screened));
     }
 
     IncomingForce activating(Player enemy, Tile target) {
@@ -159,6 +171,7 @@ final class IncomingForces {
     }
 
     private IncomingForce gather(Player enemy, Tile target, Horizon horizon, int moves) {
+        if (enemy.isNeutral()) return assemble(enemy, target, horizon, Map.of());
         Map<Tile, Map<UnitType, Integer>> reaching = new LinkedHashMap<>();
         Slot gravityDriveShip = null;
         // TODO: PoK Warfare + Fleet Logistics can unlock one origin; exclusions do not unblock paths
