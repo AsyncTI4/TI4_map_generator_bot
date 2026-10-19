@@ -35,9 +35,9 @@ import ti4.service.fow.PlanetTargetService;
 import ti4.testUtils.BaseTi4Test;
 
 /**
- * {@code pingPlanetTarget}/{@code pingSystemTarget}/{@code pingPlayerTarget} are also the shared
- * implementation behind the {@code /fow} slash commands (TargetPlanetPing/TargetSystemPing/TargetPlayerPing),
- * so most tests here call them directly rather than driving the button flow end to end.
+ * {@code pingPlanetTarget}/{@code pingSystemTarget}/{@code pingPlayerTarget} are the public entry points
+ * behind the route-choice buttons, so most tests here call them directly rather than driving the button
+ * flow end to end.
  *
  * <p>Two real bugs were fixed in this handler shortly before these tests were written: the route-choice
  * button id used to embed the card title as a middle split field, which an underscore in the title would

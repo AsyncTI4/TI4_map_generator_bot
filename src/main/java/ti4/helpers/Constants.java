@@ -131,7 +131,6 @@ public final class Constants {
     public static final String REMOVE_ALLIANCE_MEMBER = "remove_alliance_member";
     public static final String ADD_TEAMMATE = "add_teammate";
     public static final String REMOVE_TEAMMATE = "remove_teammate";
-    public static final String SPIN_TILES_IN_RINGS = "spin_tiles_in_rings";
     public static final String SPIN = "spin";
     public static final String SPIN_LIST = "list";
     public static final String SPIN_ADD = "add";
@@ -368,7 +367,6 @@ public final class Constants {
     public static final String UNIT_CAP = "unit_cap";
     public static final String EVERYONE = "everyone";
     public static final String TOKEN = "token";
-    public static final String TILE_LIST = "tile_list";
     public static final String UNIT_NAMES = "unit_names";
     public static final String UNIT_NAME = "unit_name";
     public static final String CHANGE_TO_BASE_GAME = "change_to_base_game";
@@ -411,14 +409,9 @@ public final class Constants {
     public static final String INCLUDE_ECHOES_OF_YGGDRASIL_TILES = "echoes_of_yggdrasil_tiles";
     public static final String DRAW_ONLY = "draw_only";
     public static final String ADD_TILE_LIST_RANDOM = "add_tile_list_random";
-    public static final String GENERATE_PAINBOX_MAP = "generate_painbox_map";
     public static final String IMPORT_MAP_JSON = "import_json";
     public static final String EXPORT_MAP_JSON = "export_json";
     public static final String IMPORT_DECK_CONFIG = "import_deck_config";
-    public static final String BLUE_TILES = "blue_tiles";
-    public static final String RED_TILES = "red_tiles";
-    public static final String HOME_SYSTEMS = "home_systems";
-    public static final String SUPERNOVAS = "supernovas";
     public static final String INTERACTIVE_BUILDER = "interactive_builder";
     public static final String ADD_CC = "add_cc";
     public static final String ADD_CC_FROM_TACTICS = "add_cc_from_tactics";
@@ -525,10 +518,8 @@ public final class Constants {
 
     public static final String NOVA_SEED = "nova_seed";
     public static final String DESTROY_OTHER_UNITS = "destroy_other_units";
-    public static final String RISE_OF_A_MESSIAH = "rise_of_a_messiah";
     public static final String REMATCH = "rematch";
     public static final String CLONE_GAME = "clone_game";
-    public static final String FIGHTER_CONSCRIPTION = "fighter_conscription";
     public static final String SLEEPER_TOKEN = "sleeper_token";
     public static final String LIZHO_TRAP = "lizho_trap";
     public static final String LIZHO_TRAP_CARDS = "lizho_trap_cards";
@@ -573,9 +564,6 @@ public final class Constants {
     public static final String FOG_GHOST_HEXES = "fog_ghost_hexes";
     public static final String CHECK_CHANNELS = "check_channels";
     public static final String PING_SYSTEM = "ping_system";
-    public static final String TARGET_PLANET_PING = "target_planet";
-    public static final String TARGET_SYSTEM_PING = "target_system";
-    public static final String TARGET_PLAYER_PING = "target_player_ping";
     public static final String LABEL = "label";
     public static final String MESSAGE = "message";
     public static final String LAST_TIME_GAMES_CHECKED = "last_time_games_checked";
@@ -1340,9 +1328,6 @@ public final class Constants {
     public static final String FOLLOWED_SC = "followed_sc";
 
     // Installation constants
-    public static final String INSTALLATION = "installation";
-    public static final String ADD_SWEEP_TOKEN = "add_sweep_token";
-    public static final String REMOVE_SWEEP_TOKEN = "remove_sweep_token";
 
     public static final String STATS_USERNAME = "userName";
     public static final String STATS_FACTION = "faction";
@@ -1452,7 +1437,6 @@ public final class Constants {
     public static final String GLEDGE_CORE_PNG = "token_ds_gledgecore.png";
     public static final String DS_COMMAND = "ds";
     public static final String TF_COMMAND = "tf";
-    public static final String ZELIAN_HERO = "zelian_hero";
     public static final String NAALU_COMMANDER = "naalu_commander";
     public static final String MOVE_CREUSS_WORMHOLE = "move_creuss_wormhole";
     public static final String MOVE_COATL = "move_coatl";
@@ -1702,9 +1686,8 @@ public final class Constants {
     public static final String TIGL_INCLUDE_HISTORY = "include_history";
     public static final String TIGL_NICKNAME = "nickname";
     public static final String TIGL_FRACTURED_TAG = "TIGL Fractured";
-    public static final String LAZAX = "lazax";
-    public static final String LAZAX_MY_POINTS = "my_points";
-    public static final String LAZAX_TOP_100 = "top_100";
+    public static final String LAZAX_MY_POINTS = "lazax_my_points";
+    public static final String LAZAX_TOP_100 = "lazax_top_100";
     public static final String LAZAX_DELEGATION_LEADERBOARD = "delegation_leaderboard";
     public static final String PUBLIC = "public";
     public static final String SHOW_GAME_IDS = "show_game_ids";
