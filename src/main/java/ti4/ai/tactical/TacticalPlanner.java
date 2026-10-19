@@ -1553,7 +1553,7 @@ public class TacticalPlanner {
         }
     }
 
-    // TODO: staged groups leave fighters behind and assume their ships are undamaged
+    // TODO: staging toward a player leaves fighters behind, and staged ships are assumed undamaged
     private static List<TacticalPlan> stageAgainst(
             Context context, Predicate<Tile> activatable, Tile target, Player opponent) {
         Game game = context.game;
@@ -1585,6 +1585,7 @@ public class TacticalPlanner {
     private static double stageShare(Context context, Tile target, Player opponent, Gathering gathering) {
         if (!opponent.isNeutral()) return STAGE_SHARE;
         int steps = gathering.ships().stream()
+                .filter(move -> move.type() != UnitType.Fighter)
                 .mapToInt(move -> stepsToTarget(context, gathering.staging(), target, move.type(), FRACTURE_STAGE_LEAD))
                 .max()
                 .orElse(FRACTURE_STAGE_LEAD);
@@ -1639,7 +1640,8 @@ public class TacticalPlanner {
                 .distinct()
                 .toList()) {
             Tile origin = context.game.getTileByPosition(position);
-            if (origin == null || !origin.isFracture() || origin == styx.get()) continue;
+            if (origin == null || origin == styx.get()) continue;
+            if (!origin.isFracture() && !context.marchesFrom(position)) continue;
             if (plan.kind() == Kind.STAGE && target != null && closerTo(context, styx.get(), target, origin)) continue;
             double stationed = fleetCost(context.seat, context.stageGroup(origin));
             if (stationed <= 0) continue;
@@ -1651,6 +1653,23 @@ public class TacticalPlanner {
             forfeit += marchValue(context, origin, styx.get()) * Math.min(1, leaving / stationed);
         }
         return forfeit;
+    }
+
+    public static boolean isMarchStep(Game game, Player seat, TacticalPlan plan) {
+        if (plan.kind() != Kind.STAGE) return false;
+        Context context = new Context(game, seat);
+        Optional<Tile> styx = styxToTake(context);
+        Tile target = game.getTileByPosition(plan.target());
+        if (styx.isEmpty() || target == null) return false;
+        if (!context.reach(target, FRACTURE_STAGE_LEAD).containsKey(styx.get().getPosition())) return false;
+        List<String> origins = departingShips(plan.moves()).stream()
+                .map(UnitMove::origin)
+                .distinct()
+                .toList();
+        return !origins.isEmpty()
+                && origins.stream()
+                        .map(game::getTileByPosition)
+                        .allMatch(origin -> origin != null && closerTo(context, styx.get(), target, origin));
     }
 
     private static Optional<Tile> styxToTake(Context context) {
@@ -1735,13 +1754,27 @@ public class TacticalPlanner {
         if (ships.isEmpty()) return Optional.empty();
         boolean planetsToTake = !enemyPlanets(game, seat, target).isEmpty()
                 || !freePlanetsIn(context, target).isEmpty();
+        int capacity = capacityOf(seat, ships);
+        int groundRoom = lead > 1 ? Math.min(capacity, FractureCampaign.INFANTRY) : capacity;
         List<UnitMove> cargo = planetsToTake
-                ? take(availableGroundForces(game, seat, origin, context.defense(), ships), capacityOf(seat, ships))
+                ? take(availableGroundForces(game, seat, origin, context.defense(), ships), groundRoom)
                 : List.of();
-        List<UnitMove> departing = new ArrayList<>(ships);
+        List<UnitMove> group = new ArrayList<>(ships);
+        if (lead > 1) group.addAll(fightersAboard(context, origin, capacity - count(cargo)));
+        List<UnitMove> departing = new ArrayList<>(group);
         departing.addAll(cargo);
         return legalMoves(context, origin, staging, departing)
-                .map(moves -> new Contribution(origin, ships, cargo, moves));
+                .map(moves -> new Contribution(origin, group, cargo, moves));
+    }
+
+    private static List<UnitMove> fightersAboard(Context context, Tile origin, int room) {
+        int fighters = Math.min(room, BoardView.count(BoardView.space(origin), context.seat, UnitType.Fighter));
+        if (fighters <= 0) return List.of();
+        return List.of(new UnitMove(origin.getPosition(), BoardView.SPACE, UnitType.Fighter, fighters));
+    }
+
+    private static int count(List<UnitMove> moves) {
+        return moves.stream().mapToInt(UnitMove::count).sum();
     }
 
     static double counterAt(Context context, Gathering gathering, Player opponent) {
@@ -1764,8 +1797,9 @@ public class TacticalPlanner {
                 .flatMap(found -> found.moves().stream())
                 .toList());
         int farthest = gathering.contributions().stream()
-                .flatMap(found ->
-                        found.ships().stream().map(move -> context.distance(found.origin(), staging, move.type())))
+                .flatMap(found -> found.ships().stream()
+                        .filter(move -> move.type() != UnitType.Fighter)
+                        .map(move -> context.distance(found.origin(), staging, move.type())))
                 .mapToInt(Integer::intValue)
                 .max()
                 .orElse(0);
@@ -2728,6 +2762,7 @@ public class TacticalPlanner {
         private final Map<String, Optional<TacticalPlan>> attacks = new HashMap<>();
         private final Map<String, Double> futureScores = new HashMap<>();
         private final Map<String, Double> marchValues = new HashMap<>();
+        private Optional<FractureMarch> march;
         private ExploreOutlook exploreOutlook;
         private final Map<String, Double> exploreValues = new HashMap<>();
         private Territory territory;
@@ -2819,6 +2854,11 @@ public class TacticalPlanner {
             Optional<TacticalPlan> computed = expand(this, tile);
             expansions.put(tile.getPosition(), computed);
             return computed;
+        }
+
+        boolean marchesFrom(String position) {
+            if (march == null) march = FractureMarch.of(game, seat);
+            return march.filter(found -> found.position().equals(position)).isPresent();
         }
 
         FractureScreen screen() {

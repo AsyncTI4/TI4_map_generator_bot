@@ -37,6 +37,24 @@ class StructurePolicyTest extends BaseTi4Test {
                 .contains("lodor");
     }
 
+    // With the Fracture in play, a dock on an ingress in the seat's own slice builds the fleet for Styx where the march
+    // starts (the human Ral Nel docked on its ingress in round 1), even on a planet worth a single resource.
+    @Test
+    void prefersADockOnItsOwnIngressWhileStyxIsOpen() {
+        ti4.service.map.FractureService.spawnFracture(null, test.game);
+        Tile ingress = test.place("19", AiTestGame.neighbourOf(AiTestGame.HOME));
+        ingress.addToken(ti4.helpers.Constants.TOKEN_INGRESS, "space");
+        test.nekro.addPlanet("wellon");
+        assertThat(StructurePolicy.next(test.game, test.nekro)).contains(StructurePolicy.SPACE_DOCK);
+
+        test.place("26", "102");
+        test.nekro.addPlanet("lodor");
+
+        assertThat(StructurePolicy.planetFor(
+                        test.game, test.nekro, StructurePolicy.SPACE_DOCK, List.of("lodor", "wellon")))
+                .contains("wellon");
+    }
+
     // A planet worth a single resource gets a PDS rather than a dock that could never build 4 units.
     @Test
     void placesNoForwardDockOnAPoorPlanet() {

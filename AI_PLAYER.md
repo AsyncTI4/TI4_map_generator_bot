@@ -330,7 +330,7 @@ to build one by hand:
   | Technology | one free technology, a second for 6 resources if one is worth it (`ResearchPolicy`: generic value, informed by the technologies Nekro players most often end games with, plus progress on tech objectives it can still finish in the rounds left, about 1.5 researches a round until the leader is 2 points a round from winning, and Space Dock II for _Produce en Masse_; minus 0.7 per resource or influence lost exhausting a technology specialty planet for a prerequisite, which it then exhausts when paying, free with Psychoarchaeology, or AI Development Algorithm when that costs less); Nekro takes Propagation's 3 command tokens instead | a technology worth at least 3 (most technologies other than the weakest) is affordable after the scoring reserve; as Nekro, Propagation's 3 command tokens for the strategy token and 4 resources |
   | Leadership | 3 command tokens, plus up to 3 more bought with spare influence, within its reinforcements | spare influence buys up to 3 command tokens (3 influence each, no strategy token) |
   | Politics | makes itself speaker (or the player furthest behind), draws 2 action cards, and once the custodians are taken looks at the top 2 agendas, burying _Public Execution_ while it leads on points, agendas that punish the planet owner while it holds the most planets, and elections it would lose on influence (a work in progress that needs a redesign: votes are unknown in the action phase) | with a spare strategy token when _Form a Spy Network_ needs cards (right after Imperial when 2 cards complete it), or with 2 or more spare strategy tokens and room for 2 cards; never with no strategy token, a full hand or _Hold No Action Cards_ |
-  | Construction | the Thunder's Edge card produces at the dock its plan chose (no token placed) and then places one structure; otherwise two structures: a space dock while it has a site, otherwise PDS on planets without structures. A dock site is another planet in a home system with more than one planet, or a planet worth 2 or more resources elsewhere, preferring planets worth 3 or more and those in its own slice (next to home or on the way to Mecatol Rex; Styx counts too); any planet for _Fuel the War Machine_ | a revealed or held structure objective is 1 or 2 structures short |
+  | Construction | the Thunder's Edge card produces at the dock its plan chose (no token placed) and then places one structure; otherwise two structures: a space dock while it has a site, otherwise PDS on planets without structures. A dock site is another planet in a home system with more than one planet, or a planet worth 2 or more resources elsewhere, preferring planets worth 3 or more and those in its own slice (next to home or on the way to Mecatol Rex; Styx counts too); while Styx is open, a planet in an ingress system of its own slice is a dock site whatever it is worth and comes first (the human Ral Nel docked on its ingress in round 1); any planet for _Fuel the War Machine_ | a revealed or held structure objective is 1 or 2 structures short |
   | Diplomacy | first locks the threatened system its plan chose (PoK card only), then readies the 2 exhausted planets it can use best (the same test as a follow), otherwise its 2 most valuable | with _Peace Accords_, a planet worth more than the strategy token can be claimed (the ready button is pressed even with nothing exhausted, and `PeaceAccordsRules` then claims the best planet the prompt offers, or declines); otherwise its best 2 exhausted planets make a spend objective payable at the status phase (even after passing), or, while it still has actions, pay at least 3 towards production it would actually build or the custodians (both need a tactic token), research (a Technology follow it still has a strategy token for, or the 6-resource second technology of its own primary; never Nekro's free Propagation) or Leadership tokens (within its reinforcements). It readies those planets. |
   | Warfare | Thunder's Edge: a tactical action without a command token, which may reactivate a system that already holds its token (for example a second production at home), at the target its plan chose while that is still close to the best; PoK: takes back the token whose removal unlocks the best tactical action | producing at home is worth as much as a tactical action's production would need to be (carriers, infantry for free planets, ships for objectives, or enough filler) |
   | Trade | the bot resolves the primary; an AI holder then announces X−k terms per player (k = 2 for 4 or more commodities or a player ahead of it, otherwise 1; none for a player close to winning, the leader, a bad payer or one the commodities would let score) and sends each follower the deal: their commodities for that many minus k trade goods (k debt when they are not neighbours, k trade goods after Replenish and Wash), an even wash for Hacan and for players who spent a strategy token | for free when an AI holder's terms are worth it (it holds its own _Trade Agreement_, gains commodities, and the deal or the debt is worth more than what it gives up), always as Hacan, and with a strategy token for a human holder only for 4 or more new commodities and somewhere to wash them |
@@ -915,7 +915,8 @@ to build one by hand:
        _Mechanize the Military_).
     3. **Fracture fleet.** At the dock nearest an ingress (within two moves) while Styx is not the seat's, a carrier,
        three dreadnoughts and six infantry counted in that system, the smallest fleet that beats the guard of Styx,
-       at 0.75 a resource.
+       at 0.75 a resource. After the surplus ships, that dock also fills the free capacity with fighters at the same
+       value.
     4. **Surplus.** Its flagship, a war sun when it has the technology, dreadnoughts up to three, upgraded cruisers
        and destroyers up to four, then plain cruisers up to two. Each only while the resources left could still fill
        the rest of the production with cheap units. Every flagship is worth building with money to spare, ahead of
@@ -1059,6 +1060,11 @@ to build one by hand:
     places no command token and leaves the fleet free to move again; Prophecy of Kings Warfare and _Unexpected
     Action_ take back the token of a staged fleet when that unlocks the best tactical action. A seat with a dock near
     an ingress and three or more rounds left values carrier II 1.5 more (at its route share), for a faster march.
+    The march is remembered across rounds (`FractureMarch`, in memory per game and seat): a step toward Styx records
+    where the fleet stands, and while it still has ships there (and stepped within the last two rounds) a plan that
+    takes them elsewhere is charged the march, wherever it stands, an ingress on the board included; a plan that moves
+    it away without a step forgets it. A march carries six infantry at most and fills the rest of its capacity with
+    the fighters at its origin, which count in the strike it prepares (Saar took Styx with nine fighters).
     A dock within two moves of an ingress system, while a Fracture planet is not yet the seat's, values its warships
     the same half as much again, and builds dreadnoughts up to five instead of three. The dock nearest an ingress
     (`FractureCampaign`, while Styx is not the seat's) also builds the smallest fleet that beats the guard of Styx,
@@ -1353,6 +1359,10 @@ Seven small generic changes don't reference `ti4.ai`:
     game is unchanged. `FractureSelfPlayTest` puts a fleet beside Styx and beside Cocytus and checks that the active seat
     takes the planet through the whole combat against the neutral units (another AI seat rolls for them), with the point
     of Styx and the relic.
+  - `-Dai.selfplay.fleetlog=true` prints a `FLEETLOG` line per seat at the start of each round (`FleetLog`): its units on the
+    board by type, its fleet pool, its docks with each one's distance to the nearest ingress, its PDS, its ships on an
+    ingress and inside the Fracture, its movement technologies and its remembered march, to compare the AI's building
+    and movement with a human game.
   - `-Dai.selfplay.styxprobe=true` prints a `STYXPROBE` line for the active seat at the start of each of its action-phase
     turns (`StyxProbe`): the fleet cost that could reach Styx within one to four tactical actions, what defence holds
     back, the distance from its nearest dock to an ingress, its best strike on Styx with the gate that rejects it
@@ -1483,10 +1493,12 @@ Seven small generic changes don't reference `ti4.ai`:
   an expedition early is entangled with who was already winning; the 0.5 factor on the lift is a guess, not a
   measurement. Holding Thunder's Edge is worth a point on the same evidence.
 - **Expeditions, the Fracture.** The ingress tokens are placed for distance and safety, not for a route in, and the
-  Fracture roll is only worth 0.4. Styx is still rarely taken in self-play: a fleet that can beat its guard comes
-  together around round 5, a dreadnought fleet needs three more rounds from the ingress, and games end around round 6.
-  Not yet: remembering a march across rounds rather than re-deriving it each turn, production inside the Fracture
-  (Saar's floating docks), and _Flank Speed_ under Wild Wild Galaxy (+2).
+  Fracture roll is only worth 0.4. Styx is taken in about one self-play game in five (3 of 16, rounds 6 to 8): a fleet
+  that can beat its guard comes together around round 5, and games end around round 6. Against the human example game
+  (pbd28695) the AI builds fewer fighters (5 per seat at the start of round 5 against about 8), fewer destroyers, and
+  its flagship later.
+  Not yet: production inside the Fracture (Saar's floating docks), building a flagship early (every human seat had
+  one by round 3 in the example game), and _Flank Speed_ under Wild Wild Galaxy (+2).
 - **Expeditions, fog of war.** In fog the GM places the ingress tokens (their buttons carry no owner), and the AI
   neither places them nor knows which rival holds how many slices.
 - **Expeditions, tile choice.** Thunder's Edge is placed by distance and the rivals' home and fleet pressure, not by

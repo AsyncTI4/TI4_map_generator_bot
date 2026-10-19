@@ -248,6 +248,7 @@ public class ProductionPlanner {
         planCoreUnits(builder);
         planFractureFleet(builder);
         planSurplusShips(builder);
+        planFractureFighters(builder);
         planAutoFactories(builder);
         fillProduction(builder);
         return new BuildPlan(builder.orders);
@@ -472,6 +473,11 @@ public class ProductionPlanner {
                 + builder.planned(UnitType.Infantry);
         builder.infantry(
                 FractureCampaign.INFANTRY - spare, fractureValuePerResource(builder) * builder.cost(UnitType.Infantry));
+    }
+
+    private static void planFractureFighters(Builder builder) {
+        if (!FractureCampaign.isDock(builder.game, builder.seat, builder.tile)) return;
+        builder.fighters(fractureValuePerResource(builder) * builder.cost(UnitType.Fighter));
     }
 
     private static double fractureValuePerResource(Builder builder) {

@@ -51,7 +51,7 @@ public class FractureCampaign {
         return dock(game, seat).filter(found -> found == tile).isPresent();
     }
 
-    private static boolean styxToTake(Game game, Player seat) {
+    public static boolean styxToTake(Game game, Player seat) {
         return FracturePrize.tiles(game).stream()
                 .flatMap(tile -> tile.getPlanetUnitHolders().stream())
                 .filter(FracturePrize::isStyx)

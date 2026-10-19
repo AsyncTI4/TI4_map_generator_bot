@@ -197,7 +197,7 @@ public class TacticalRules {
         List<SetupHint> hints = setupHints(context);
         Optional<TacticalPlan> plan = rememberedPlan(context).or(() -> {
             Optional<TacticalPlan> computed = TacticalPlanner.best(context.game(), context.seat(), hints);
-            computed.ifPresent(found -> context.memory().put(PLAN_KEY + actionKey(context), found.encode()));
+            computed.ifPresent(found -> remember(context, found));
             return computed;
         });
         if (plan.isEmpty()) {
@@ -217,6 +217,7 @@ public class TacticalRules {
 
     public static void remember(AiTurnContext context, TacticalPlan plan) {
         context.memory().put(PLAN_KEY + actionKey(context), plan.encode());
+        FractureMarch.record(context.game(), context.seat(), plan);
     }
 
     public static boolean activatedThisTurn(AiTurnContext context) {

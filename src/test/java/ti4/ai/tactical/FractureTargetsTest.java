@@ -304,6 +304,79 @@ class FractureTargetsTest extends BaseTi4Test {
         assertThat(near).isGreaterThan(far);
     }
 
+    private Tile planetBesideTheIngress() {
+        Game game = fracture.board.test.game;
+        String side = ti4.image.PositionMapper.getAdjacentTilePositions(fracture.ingress.getPosition()).stream()
+                .filter(position -> !"x".equals(position) && game.getTileByPosition(position) == null)
+                .findFirst()
+                .orElseThrow();
+        return fracture.board.test.place("25", side);
+    }
+
+    private double expansionTo(Tile tile) {
+        return TacticalPlanner.ranked(fracture.board.test.game, fracture.nekro()).stream()
+                .filter(plan -> plan.kind() == Kind.EXPAND && plan.target().equals(tile.getPosition()))
+                .findFirst()
+                .orElseThrow()
+                .score();
+    }
+
+    // A march toward Styx is remembered across rounds, so a fleet that stepped onto a board ingress is charged the
+    // march it would give up when another plan takes its ships away, as it is inside the Fracture.
+    @Test
+    void aRememberedMarchChargesPlansThatTakeItsFleetElsewhere() {
+        styxFleet(fracture.ingress);
+        Tile side = planetBesideTheIngress();
+        double free = expansionTo(side);
+
+        TacticalPlan step = new TacticalPlan(
+                Kind.STAGE,
+                fracture.ingress.getPosition(),
+                List.of(new TacticalPlan.UnitMove(fracture.board.home.getPosition(), "space", UnitType.Dreadnought, 3)),
+                java.util.Map.of(),
+                5);
+        FractureMarch.record(fracture.board.test.game, fracture.nekro(), step);
+
+        assertThat(FractureMarch.of(fracture.board.test.game, fracture.nekro()))
+                .hasValueSatisfying(march -> assertThat(march.position()).isEqualTo(fracture.ingress.getPosition()));
+        assertThat(expansionTo(side)).isLessThan(free);
+    }
+
+    @Test
+    void aMarchIsForgottenOnceItsFleetGoesElsewhere() {
+        styxFleet(fracture.ingress);
+        Game game = fracture.board.test.game;
+        FractureMarch.remember(game, fracture.nekro(), fracture.ingress.getPosition());
+        TacticalPlan away = new TacticalPlan(
+                Kind.EXPAND,
+                fracture.board.home.getPosition(),
+                List.of(new TacticalPlan.UnitMove(fracture.ingress.getPosition(), "space", UnitType.Carrier, 1)),
+                java.util.Map.of(),
+                5);
+
+        FractureMarch.record(game, fracture.nekro(), away);
+
+        assertThat(FractureMarch.of(game, fracture.nekro())).isEmpty();
+    }
+
+    // Humans take Styx with carriers full of fighters; a march carries the fighters its ships have room for after six
+    // infantry, and they count in the strike it prepares.
+    @Test
+    void aMarchCarriesFightersThatMakeTheFleetStronger() {
+        fracture.ships(fracture.ingress, UnitType.Dreadnought, 2);
+        fracture.ships(fracture.ingress, UnitType.Carrier, 2);
+        fracture.ships(fracture.ingress, UnitType.Infantry, 4);
+        double without = stageTo("frac2").map(TacticalPlan::score).orElse(Double.NEGATIVE_INFINITY);
+
+        fracture.nekro().addTech("cv2");
+        fracture.ships(fracture.ingress, UnitType.Fighter, 8);
+        Optional<TacticalPlan> step = stageTo("frac2");
+
+        assertThat(step).isPresent();
+        assertThat(step.get().score()).isGreaterThan(without);
+        assertThat(step.get().moves()).anyMatch(move -> move.type() == UnitType.Fighter);
+    }
+
     @Test
     void aFleetTooSmallForStyxDoesNotMarchTowardIt() {
         fracture.ships(fracture.board.home, UnitType.Dreadnought, 1);
@@ -332,6 +405,20 @@ class FractureTargetsTest extends BaseTi4Test {
 
     // Three dreadnoughts and a carrier are four ships in one system, one more than the starting fleet pool allows.
     // The token comes ahead of strategy tokens once the stack at the dock is close to the pool.
+    // The humans who took Fracture planets filled their carriers with fighters (Saar struck Styx with nine).
+    @Test
+    void theDockNearAnIngressFillsItsCarriersWithFighters() {
+        fracture.ships(fracture.board.home, UnitType.Carrier, 2);
+        fracture.ships(fracture.board.home, UnitType.Dreadnought, 3);
+        fracture.board.test.units(fracture.board.home, "mordaiii", fracture.nekro(), UnitType.Infantry, 6);
+        fracture.nekro().setTg(3);
+
+        ProductionPlanner.BuildPlan plan =
+                ProductionPlanner.plan(fracture.board.test.game, fracture.nekro(), fracture.board.home);
+
+        assertThat(plan.units(UnitType.Fighter)).isPositive();
+    }
+
     @Test
     void aDockNearAnIngressWantsAFourthFleetToken() {
         fracture.ships(fracture.board.home, UnitType.Dreadnought, 2);

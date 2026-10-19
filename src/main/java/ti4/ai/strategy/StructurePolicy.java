@@ -12,6 +12,8 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.FractureCampaign;
+import ti4.ai.eval.FracturePrize;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -107,7 +109,9 @@ class StructurePolicy {
 
     private static boolean isDockSite(Game game, Player seat, Planet planet) {
         if (BoardView.count(planet, seat, UnitType.Spacedock) > 0 || planet.isSpaceStation(game)) return false;
-        if (!isHome(game, planet)) return planet.getResources() >= MIN_FORWARD_DOCK_RESOURCES;
+        if (!isHome(game, planet)) {
+            return planet.getResources() >= MIN_FORWARD_DOCK_RESOURCES || onOwnIngress(game, seat, planet);
+        }
         Tile tile = game.getTileFromPlanet(planet.getName());
         return tile != null
                 && tile.getPlanetUnitHolders().stream()
@@ -120,7 +124,17 @@ class StructurePolicy {
         if (isHome(game, planet)) return 1;
         int rich = planet.getResources() >= RICH_DOCK_RESOURCES ? 1 : 0;
         int nearby = STYX.equals(planet.getName()) || inSlice(game, seat, planet) ? 1 : 0;
-        return rich + nearby;
+        int ingress = onOwnIngress(game, seat, planet) ? 2 : 0;
+        return rich + nearby + ingress;
+    }
+
+    private static boolean onOwnIngress(Game game, Player seat, Planet planet) {
+        Tile tile = game.getTileFromPlanet(planet.getName());
+        return tile != null
+                && FracturePrize.hasIngress(tile)
+                && !tile.isMecatol(game)
+                && FractureCampaign.styxToTake(game, seat)
+                && inSlice(game, seat, planet);
     }
 
     // TODO: could use ti4.ai.eval.Territory instead of its own slice search

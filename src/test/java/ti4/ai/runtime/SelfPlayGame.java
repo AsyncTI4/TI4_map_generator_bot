@@ -198,6 +198,7 @@ final class SelfPlayGame {
     private final ObjectiveTracker objectives = new ObjectiveTracker();
     private final FractureTracker fracture;
     private String probedTurn = "";
+    private int fleetLogRound;
 
     SelfPlayGame(SelfPlayEnvironment env, String name) {
         this(env, name, 0);
@@ -340,6 +341,15 @@ final class SelfPlayGame {
         }
     }
 
+    // -Dai.selfplay.fleetlog=true: one fleet line per seat at the start of each round.
+    private void logFleets(Game game) {
+        if (!ti4.ai.tactical.FleetLog.enabled() || game.getRound() == fleetLogRound) return;
+        fleetLogRound = game.getRound();
+        for (Player player : game.getRealPlayers()) {
+            System.out.println(ti4.ai.tactical.FleetLog.line(game, player));
+        }
+    }
+
     // -Dai.selfplay.styxprobe=true: one diagnostic line for the active seat at the start of each of its action-phase
     // turns.
     private void probeStyx(Game game) {
@@ -374,6 +384,7 @@ final class SelfPlayGame {
             if (fracture.due(game)) force(game, fracture::enter);
             fracture.observe(game);
             probeStyx(game);
+            logFleets(game);
             closeOverrulePicks(game, false);
             if (stopWhen.test(game)) return outcome(Ending.STOP_CONDITION, game, ticks);
             if (AiTickRunner.reachedVictoryPoints(game)) return outcome(Ending.VICTORY_POINTS, game, ticks);
