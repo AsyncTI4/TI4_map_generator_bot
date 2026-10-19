@@ -102,7 +102,7 @@ public class GameEventService {
                 game.getName(), game.getEventSequenceCounter());
     }
 
-    public String formatEventsAsText(Game game) {
+    public String formatEventsAsText(Game game, boolean includeMapState) {
         StringBuilder text = new StringBuilder();
         for (GameEventEntity event : getEventsForGame(game)) {
             text.append("#")
@@ -122,7 +122,7 @@ public class GameEventService {
             if (event.getMovementState() != null) {
                 text.append("\n  movementState: ").append(event.getMovementState());
             }
-            if (event.getMapState() != null) {
+            if (includeMapState && event.getMapState() != null) {
                 text.append("\n  mapState: ").append(event.getMapState());
             }
             text.append("\n");

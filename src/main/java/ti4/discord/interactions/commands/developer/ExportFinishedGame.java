@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.developer;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -19,11 +20,15 @@ import ti4.spring.service.gameevent.GameEventService;
 
 class ExportFinishedGame extends Subcommand {
 
+    private static final String INCLUDE_MAP_STATE = "include_map_state";
+
     ExportFinishedGame() {
         super("export_finished_game", "Download a finished game's latest save and its game events.");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "The finished game to export.")
                 .setRequired(true)
                 .setAutoComplete(true));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, INCLUDE_MAP_STATE, "Include map snapshots in the events file (default false)."));
     }
 
     @Override
@@ -53,7 +58,8 @@ class ExportFinishedGame extends Subcommand {
             return;
         }
 
-        String events = GameEventService.getBean().formatEventsAsText(game);
+        String events = GameEventService.getBean()
+                .formatEventsAsText(game, event.getOption(INCLUDE_MAP_STATE, false, OptionMapping::getAsBoolean));
         FileUpload eventsFile = FileUpload.fromData(events.getBytes(StandardCharsets.UTF_8), gameName + "_events.txt");
 
         event.getMessageChannel()
