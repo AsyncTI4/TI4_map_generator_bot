@@ -1,0 +1,15 @@
+{
+    "id": "fracture24",
+    "name": "Fracture Set3 Right",
+    "aliases": [
+        "fracture24",
+        "rightpath",
+        "frac24",
+        "fracrightpath"
+    ],
+    "imagePath": "fracture24.png",
+    "shipPositionsType": "TYPE08",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

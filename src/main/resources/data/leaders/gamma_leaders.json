@@ -271,7 +271,6 @@
         "unlockCondition": "Have 3 scored objectives.",
         "source": "gamma"
     },
-
     {
         "id": "initiativeagent",
         "faction": "initiative",
@@ -371,6 +370,74 @@
         "abilityName": "Strategic Roadmap",
         "abilityWindow": "ACTION: Players each ready up to 1 planet they control, and immediately vote on this card as if it were an agenda and you were the speaker.",
         "abilityText": "For: The Jord player gains 2 technologies. Each other player researches 1 technology.\nAgainst: The Jord player places 1 infantry from their reinforcements on each planet they control that contains a structure. Then, each player readies each planet they control that contains a structure. \nWhen this agenda would be discarded, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "gamma"
+    },
+    {
+        "id": "ironhullagent",
+        "faction": "ironhull",
+        "type": "agent",
+        "name": "Lorroth Calamex",
+        "title": "Deputy Investigator",
+        "abilityWindow": "Action",
+        "abilityText": "Exhaust this card and choose a planet another player controls. That player may allow you to capture up to 2 infantry from that planet; they gain 1 trade good for each infantry captured.",
+        "unlockCondition": "Always Unlocked",
+        "source": "gamma"
+    },
+    {
+        "id": "ironhullcommander",
+        "faction": "ironhull",
+        "type": "commander",
+        "name": "Warchief Moonshriek",
+        "title": "Space Training Lieutenant",
+        "abilityWindow": "At the beginning of a combat:",
+        "abilityText": "Each of your Carriers and Destroyers without BOMBARDMENT gains BOMBARDMENT 8.",
+        "unlockCondition": "Have 2 Thrall tokens on the game board.",
+        "source": "gamma"
+    },
+    {
+        "id": "ironhullhero",
+        "faction": "ironhull",
+        "type": "hero",
+        "name": "Groth Slagheart",
+        "title": "Chief Colonel",
+        "abilityName": "The Stars Weep",
+        "abilityWindow": "ACTION:",
+        "abilityText": "When you commit ground forces to another player's planet, you may gain control of that planet and force your opponent's units to enter coexistence. Then, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "gamma"
+    },
+    {
+        "id": "projectagent",
+        "faction": "project",
+        "type": "agent",
+        "name": "Terraphus",
+        "title": "Biomechanical Conversion",
+        "abilityWindow": "After a player activates a system that contains 1 or more structures:",
+        "abilityText": "You may exhaust this card to allow a player to place 2 infantry from their reinforcements on each planet in that system that contains 1 or more of their structures.",
+        "unlockCondition": "Always Unlocked",
+        "source": "gamma"
+    },
+    {
+        "id": "projectcommander",
+        "faction": "project",
+        "type": "commander",
+        "name": "Protactus",
+        "title": "Reinforced Atmospherics",
+        "abilityWindow": "After you win a space combat in a system, OR After you win a ground combat on a planet",
+        "abilityText": "Eyou may remove 1 of your fighters from the game board and place it in that system or remove 1 of your ground forces from the game board and place it on that planet, respectively.",
+        "unlockCondition": "Move the Elysium planet token adjacent to Mecatol Rex, or another player's home system.",
+        "source": "gamma"
+    },
+    {
+        "id": "projecthero",
+        "faction": "project",
+        "type": "hero",
+        "name": "Logistus",
+        "title": "Grand Engineer",
+        "abilityName": "The Planet Breathes",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Ready all planets in your home system. You may perform a tactical action in that system. Then, purge this card. ",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "gamma"
     }

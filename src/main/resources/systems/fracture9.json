@@ -1,0 +1,15 @@
+{
+    "id": "fracture9",
+    "name": "Fracture Set2 Left",
+    "aliases": [
+        "fracture9",
+        "midwayleft",
+        "frac9",
+        "fracleftmid"
+    ],
+    "imagePath": "fracture9.png",
+    "shipPositionsType": "TYPE08",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

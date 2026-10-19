@@ -1,0 +1,25 @@
+{
+    "id": "sekhmet",
+    "tileId": "fracture10",
+    "name": "Sekhmet",
+    "aliases": [
+        "sekhmet",
+        "sekh",
+        "met"
+    ],
+    "resources": 1,
+    "influence": 0,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "planetLayout": {
+        "unitHolderName": "sekhmet",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+        "x": 224.0,
+        "y": 224.0
+        }
+    },
+    "flavorText": "*Sekhmet is a copper-hued crucible of iron sands and glassed craters, scorched by relentless solar flares.*",
+    "source": "merford"
+}

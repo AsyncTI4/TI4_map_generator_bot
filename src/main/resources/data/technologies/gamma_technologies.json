@@ -225,7 +225,7 @@
         "faction": "company",
         "baseUpgrade": "dn2",
         "source": "gamma",
-        "text": "This unit cannot be destroyed by 'Direct Hit' action cards.\nDEPLOY: After you win a space combat, you may produce 1 dreadnought in the active system."
+        "text": "This unit cannot be destroyed by 'Direct Hit' action cards.\nAfter you win a space combat, you may produce 1 dreadnought in the active system."
     },    
     {
         "alias": "ggindustg",
@@ -248,5 +248,49 @@
         "faction": "industries",
         "source": "gamma",
         "text": "At the end of your turn exhaust this card to choose any number of planets that contain your structures. You may remove any number of your ground forces on those planets, and place them on 1 or more of those planets."
+    },    
+    {
+        "alias": "ggihfb",
+        "name": "Agamemnon Protocol",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "faction": "ironhull",
+        "source": "gamma",
+        "text": "After you win a combat in which you destroy one of your opponents warsuns or flagship, you may exhaust this card to move any number of your ships in the active system to a system that contains a planet you control that does not contain another player's ships."
+    },
+    {
+        "alias": "ggihfy",
+        "name": "Confinement Complex",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "ironhull",
+        "source": "gamma",
+        "text": "When you are negotiating a transaction, you may exhaust this card; during this transaction each player may allow the other to place up to 2 infantry from their reinforcements into coexistence on a planet that contains their units."
+    },    
+    {
+        "alias": "ggpey",
+        "name": "Megastructures",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "faction": "project",
+        "source": "gamma",
+        "text": "You can have any number of structures on planets you control. At the end of your turn, you may exhaust this card to place 1 structure on a planet you control."
+    },
+    {
+        "alias": "ggpeg",
+        "name": "Planetary Engineering",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "project",
+        "source": "gamma",
+        "text": "After you move 1 or more ships into a system; you may exhaust this card to ready or exhaust a planet in that system."
     }
 ]

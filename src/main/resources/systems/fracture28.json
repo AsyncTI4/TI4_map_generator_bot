@@ -1,0 +1,16 @@
+{
+    "id": "fracture28",
+    "name": "Fracture Rift",
+    "aliases": [
+        "fracture28",
+        "rift",
+        "frac28",
+        "fracrift"
+    ],
+    "isRift": true,
+    "imagePath": "fracture28.png",
+    "shipPositionsType": "TYPE08",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

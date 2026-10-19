@@ -1,0 +1,16 @@
+{
+    "id": "fracture19",
+    "name": "Fracture Nebulae",
+    "aliases": [
+        "fracture19",
+        "fracturenebulae",
+        "frac19",
+        "nebfrac"
+    ],
+    "imagePath": "fracture19.png",
+    "isNebulae": true,
+    "shipPositionsType": "TYPE08",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

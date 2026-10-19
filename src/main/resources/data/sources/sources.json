@@ -377,6 +377,14 @@
         "description": "Optional alternate unit-upgrade technologies for 13 existing factions, swapped in during setup by purging a faction technology"
     },
     {
+        "source": "merford",
+        "name": "Refracture",
+        "canal": "community",
+        "subcanal": "personal projs",
+        "credits": "Mr.Merford",
+        "description": "New Layouts for Fracture" 
+    },
+    { 
         "source": "goose",
         "name": "Goose",
         "canal": "community",
