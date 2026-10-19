@@ -1,7 +1,10 @@
 package ti4.message;
 
+import static ti4.discord.utility.ButtonEmojiStripper.hasButtonEmoji;
+import static ti4.discord.utility.ButtonEmojiStripper.withoutButtonEmoji;
 import static ti4.discord.utility.DiscordErrorUtility.isDiscordServerError;
 import static ti4.discord.utility.DiscordErrorUtility.isIgnorableError;
+import static ti4.discord.utility.DiscordErrorUtility.isInvalidComponentEmojiError;
 import static ti4.discord.utility.DiscordErrorUtility.isUnknownEmojiError;
 import static ti4.discord.utility.DiscordErrorUtility.isUnknownMessageError;
 
@@ -852,6 +855,23 @@ public class MessageHelper {
                             if (isDiscordServerError(error)) {
                                 CircuitBreaker.incrementThresholdCount(
                                         "Discord server error while sending message in channel " + channel.getId());
+                            }
+                            if (isInvalidComponentEmojiError(error) && hasButtonEmoji(messageCreateData)) {
+                                BotLogger.warning(
+                                        getRestActionFailureMessage(
+                                                channel,
+                                                errorHeader + " (retrying without button emoji)",
+                                                messageCreateData,
+                                                error),
+                                        error);
+                                sendMessageWithRetry(
+                                        channel,
+                                        withoutButtonEmoji(messageCreateData),
+                                        successAction,
+                                        errorHeader,
+                                        remainingAttempts,
+                                        queuePosition);
+                                return;
                             }
                             boolean shouldRetry = error instanceof ErrorResponseException
                                     && error.getCause() instanceof SocketTimeoutException

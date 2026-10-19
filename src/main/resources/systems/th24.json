@@ -1,0 +1,18 @@
+{
+    "id": "th24",
+    "name": "Aureole Station/Silex",
+    "aliases": [
+        "th24",
+        "aureole",
+        "aureolestation",
+        "silex"
+    ],
+    "imagePath": "th24.png",
+    "planets": [
+        "aureolestation",
+        "silex"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "blue",
+    "source": "theodisi"
+}

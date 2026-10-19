@@ -1,0 +1,30 @@
+{
+    "id": "avarin",
+    "tileId": "th40",
+    "name": "Avarin",
+    "aliases": [
+        "avarin"
+    ],
+    "resources": 3,
+    "influence": 0,
+    "planetTypes": [
+        "INDUSTRIAL",
+        "HAZARDOUS"
+    ],
+    "legendaryAbilityName": "Forbidden Research Facility",
+    "legendaryAbilityText": "While a player controls Avarin, other players may ignore the effects of this system's anomaly and apply +1 to their units' combat rolls in this system.\n\nWhen you pass, if you control Avarin, you may exhaust this card to research 1 unit upgrade technology.",
+    "planetLayout": {
+        "unitHolderName": "avarin",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 138,
+            "y": 90
+        },
+        "planetRadius": 68
+    },
+    "positionInTile": {
+            "x": 138,
+            "y": 90
+    },
+    "source": "theodisi"
+}

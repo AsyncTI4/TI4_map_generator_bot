@@ -1,0 +1,30 @@
+{
+    "id": "kher",
+    "tileId": "th28",
+    "name": "Kher",
+    "aliases": [
+        "kher"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": [
+        "HAZARDOUS"
+    ],
+    "techSpecialties": [
+        "WARFARE"
+    ],
+    "planetLayout": {
+        "unitHolderName": "kher",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 128,
+            "y": 83
+        },
+        "planetRadius": 60
+    },
+    "positionInTile": {
+        "x": 128,
+        "y": 83
+    },
+    "source": "theodisi"
+}

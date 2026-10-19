@@ -1,0 +1,30 @@
+{
+    "id": "voska",
+    "tileId": "th29",
+    "name": "Voska",
+    "aliases": [
+        "voska"
+    ],
+    "resources": 2,
+    "influence": 1,
+    "planetTypes": [
+        "INDUSTRIAL",
+        "HAZARDOUS"
+    ],
+    "legendaryAbilityName": "Emperor's Aegis",
+    "legendaryAbilityText": "When you cancel 1 or more hits, you may exhaust this card to cancel an additional hit.",
+    "planetLayout": {
+        "unitHolderName": "voska",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 130,
+            "y": 86
+        },
+        "planetRadius": 66
+    },
+    "positionInTile": {
+        "x": 130,
+        "y": 86
+    },
+    "source": "theodisi"
+}

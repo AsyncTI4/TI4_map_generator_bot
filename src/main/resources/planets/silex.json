@@ -1,0 +1,32 @@
+{
+    "id": "silex",
+    "tileId": "th24",
+    "name": "Silex",
+    "aliases": [
+        "silex"
+    ],
+    "resources": 0,
+    "influence": 1,
+    "planetTypes": [
+        "INDUSTRIAL",
+        "CULTURAL"
+    ],
+    "techSpecialties": [
+        "CYBERNETIC",
+        "WARFARE"
+    ],
+    "planetLayout": {
+        "unitHolderName": "silex",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 201,
+            "y": 210
+        },
+        "planetRadius": 63
+    },
+    "positionInTile": {
+        "x": 201,
+        "y": 210
+    },
+    "source": "theodisi"
+}

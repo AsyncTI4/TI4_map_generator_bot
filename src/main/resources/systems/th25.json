@@ -1,0 +1,15 @@
+{
+    "id": "th25",
+    "name": "Cadris",
+    "aliases": [
+        "th25",
+        "cadris"
+    ],
+    "imagePath": "th25.png",
+    "planets": [
+        "cadris"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "blue",
+    "source": "theodisi"
+}

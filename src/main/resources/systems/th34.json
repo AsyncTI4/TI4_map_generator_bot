@@ -1,0 +1,15 @@
+{
+    "id": "th34",
+    "name": "Thren",
+    "aliases": [
+        "th34",
+        "thren"
+    ],
+    "imagePath": "th34.png",
+    "planets": [
+        "thren"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "blue",
+    "source": "theodisi"
+}

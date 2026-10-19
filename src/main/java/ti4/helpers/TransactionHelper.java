@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -2359,8 +2360,10 @@ public class TransactionHelper {
                             button = Buttons.gray(factionChecker + "transactWith_" + faction, label);
                         }
 
-                        String factionEmojiString = player.getFactionEmoji();
-                        button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                        Emoji factionEmoji = buttonSafeEmoji(player.getFactionEmoji());
+                        if (factionEmoji != null) {
+                            button = button.withEmoji(factionEmoji);
+                        }
                     } else {
                         button = Buttons.gray(factionChecker + "transactWith_" + player.getColor(), player.getColor());
                     }
@@ -2369,6 +2372,18 @@ public class TransactionHelper {
             }
         }
         return playerButtons;
+    }
+
+    private static Emoji buttonSafeEmoji(String formatted) {
+        if (formatted == null || formatted.isBlank()) return null;
+        try {
+            Emoji emoji = Emoji.fromFormatted(formatted);
+            boolean isCustom = emoji instanceof CustomEmoji;
+            boolean isRealUnicode = emoji.getName().codePoints().anyMatch(codepoint -> codepoint > 0x7F);
+            return isCustom || isRealUnicode ? emoji : null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     static List<Button> getStuffToTransButtonsNew(Game game, Player player, Player p1, Player p2) {

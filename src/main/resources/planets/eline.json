@@ -1,0 +1,27 @@
+{
+    "id": "eline",
+    "tileId": "th31",
+    "name": "Eline",
+    "aliases": [
+        "eline"
+    ],
+    "resources": 1,
+    "influence": 0,
+    "planetTypes": [
+        "CULTURAL"
+    ],
+    "planetLayout": {
+        "unitHolderName": "eline",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 220,
+            "y": 228
+        },
+        "planetRadius": 62
+    },
+    "positionInTile": {
+        "x": 220,
+        "y": 228
+    },
+    "source": "theodisi"
+}

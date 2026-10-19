@@ -166,7 +166,6 @@ public class RelicHelper {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")) {
             OnyxxaLeaderHandler.onDrawRelic(player);
         }
-        KairnBreakthroughHandler.offerRelicGainPrompts(game, player, relicID);
     }
 
     public static void resolveRelicEffects(
@@ -296,6 +295,7 @@ public class RelicHelper {
         CommanderUnlockCheckService.checkPlayer(player, "argent");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), helpMessage.toString());
         Helper.checkEndGame(game, player);
+        KairnBreakthroughHandler.offerRelicGainPrompts(game, player, relicID);
     }
 
     /** Meant to be called AFTER removing the relic from the player */

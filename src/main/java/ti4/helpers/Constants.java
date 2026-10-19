@@ -105,6 +105,7 @@ public final class Constants {
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
     public static final String BLUE_REVERIE_MODE = "blue_reverie_mode";
     public static final String UNCHARTED_SPACE_STUFF = "uncharted_space_stuff";
+    public static final String LOST_LEGACIES_TILES = "lost_legacies_tiles";
     public static final String TWILIGHT_DS = "twilight_ds";
     public static final String TWILIGHT_KART = "twilight_kart";
     public static final String TK_DESTROYER_CUP = "tk_destroyer_cup";
@@ -334,6 +335,7 @@ public final class Constants {
     public static final String SEARCH_FOR_GAME = "for_game";
     public static final String SEARCH_MY_TITLES = "my_titles";
     public static final String SEARCH_WINNING_PATH = "winning_path_games";
+    public static final String LIST_WINNING_PATHS = "winning_path_counts";
 
     public static final String FIX_THE_FRANKENS = "fix_the_frankens";
     public static final String RELOAD_GAME = "reload_game";
