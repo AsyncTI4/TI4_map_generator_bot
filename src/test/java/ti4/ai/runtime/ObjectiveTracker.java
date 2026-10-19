@@ -45,10 +45,17 @@ final class ObjectiveTracker {
             List<Chance> chances,
             WinningPathBreakdown leaderPath,
             List<String> secretsScored,
+            List<String> secretsHeld,
             int seats) {
 
         static final Summary NOTHING = new Summary(
-                List.of(), List.of(), List.of(), new WinningPathBreakdown(0, 0, 0, 0, Map.of()), List.of(), 0);
+                List.of(),
+                List.of(),
+                List.of(),
+                new WinningPathBreakdown(0, 0, 0, 0, Map.of()),
+                List.of(),
+                List.of(),
+                0);
 
         // For each status phase the game reached, from round 1: the share of seats that scored at least one public
         // objective (or secret) in it.
@@ -82,10 +89,12 @@ final class ObjectiveTracker {
     private int lastOpenedRound;
     private final List<StatusScoring> statusScoring = new ArrayList<>();
     private final List<Chance> chances = new ArrayList<>();
+    private final Set<String> held = new java.util.LinkedHashSet<>();
 
     // The snapshot opens once every seat has passed, before the status phase starts: scores a seat queued during the
     // action phase are applied the moment the status phase begins, so a snapshot taken then would already hold them.
     synchronized void observe(Game game) {
+        if (pastTheOpeningDiscard(game)) recordHeld(game);
         boolean scoringWindow = actionPhaseOver(game) || inStatusPhase(game);
         if (open != null && (!scoringWindow || game.getRound() != open.round())) close(game);
         if (scoringWindow && open == null && game.getRound() != lastOpenedRound) open(game);
@@ -102,7 +111,22 @@ final class ObjectiveTracker {
                 game.getRealPlayers().stream()
                         .flatMap(seat -> seat.getSecretsScored().keySet().stream())
                         .toList(),
+                held.stream()
+                        .map(entry -> entry.substring(entry.indexOf('|') + 1))
+                        .toList(),
                 game.getRealPlayers().size());
+    }
+
+    // Seats are dealt two secrets and discard one before round 1; the one discarded there was never really held.
+    private static boolean pastTheOpeningDiscard(Game game) {
+        return game.getRound() > 1 || ACTION_PHASE.equals(game.getPhaseOfGame());
+    }
+
+    private void recordHeld(Game game) {
+        for (Player seat : game.getRealPlayers()) {
+            for (String secret : seat.getSecretsUnscored().keySet()) held.add(seat.getFaction() + "|" + secret);
+            for (String secret : seat.getSecretsScored().keySet()) held.add(seat.getFaction() + "|" + secret);
+        }
     }
 
     private static boolean actionPhaseOver(Game game) {

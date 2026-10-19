@@ -228,6 +228,24 @@ class AiSelfPlayTest extends BaseTi4Test {
                         secretName(entry.getKey()), entry.getValue(), 100.0 * entry.getValue() / total))
                 .collect(java.util.stream.Collectors.joining(", "));
         System.out.println("Secrets scored over the batch (" + total + "): " + mix);
+        printSecretConversion(summaries);
+    }
+
+    // How often a seat that held each secret at some point of the game went on to score it, most held first.
+    private static void printSecretConversion(List<ObjectiveTracker.Summary> summaries) {
+        Map<String, Long> held = summaries.stream()
+                .flatMap(summary -> summary.secretsHeld().stream())
+                .collect(java.util.stream.Collectors.groupingBy(id -> id, java.util.stream.Collectors.counting()));
+        Map<String, Long> scored = summaries.stream()
+                .flatMap(summary -> summary.secretsScored().stream())
+                .collect(java.util.stream.Collectors.groupingBy(id -> id, java.util.stream.Collectors.counting()));
+        String rows = held.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry::getKey))
+                .map(entry -> String.format(
+                        "%s %d/%d",
+                        secretName(entry.getKey()), scored.getOrDefault(entry.getKey(), 0L), entry.getValue()))
+                .collect(java.util.stream.Collectors.joining(", "));
+        System.out.println("Secrets scored/held (seats that held each one at some point): " + rows);
     }
 
     private static String secretName(String id) {
