@@ -64,6 +64,7 @@ public class Source {
         erwans_gambit,
         goose,
         thirtyk,
+        merford,
 
         // async homebrew
         draft,
@@ -241,6 +242,7 @@ public class Source {
                 case omega_phase -> "Omega Phase [Homebrew]";
                 case voices_of_the_council -> "Voices of the Council [Homebrew]";
                 case theodisi -> "Lost Legacies [Homebrew]";
+                case merford -> "Refracture Project";
                 case gamma -> "Gamma Galaxies [Homebrew]";
                 case black_spectrum -> "Black Spectrum [Homebrew]";
                 case addiction -> "TI Addiction [Homebrew]";
