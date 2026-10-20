@@ -122,6 +122,7 @@ final class ObjectiveTracker {
     private final ProduceTracker produce = new ProduceTracker();
     private final HomeRaidTracker homeRaids = new HomeRaidTracker();
     private final TraitTracker traits = new TraitTracker();
+    private final SeatTracker seatOfTheEmpire = new SeatTracker();
 
     private Snapshot open;
     private int lastOpenedRound;
@@ -150,6 +151,7 @@ final class ObjectiveTracker {
         if (game == null) return Summary.NOTHING;
         homeRaids.lines(game).forEach(System.out::println);
         traits.lines(game).forEach(System.out::println);
+        seatOfTheEmpire.lines(game).forEach(System.out::println);
         if (open != null) close(game);
         NexusWatch.print(game);
         produce.finish(game);
@@ -352,6 +354,7 @@ final class ObjectiveTracker {
         NexusWatch.record(game);
         recordMechanize(game);
         produce.record(game);
+        seatOfTheEmpire.record(game);
         recordIconAndStrategies(game);
         Map<String, Set<String>> publics = new HashMap<>();
         Map<String, Integer> secrets = new HashMap<>();
