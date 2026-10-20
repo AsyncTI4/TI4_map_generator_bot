@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class CreateFoWGameServiceTest {
 
-    // A bothelper can type a reserved name into /bothelper create_fow_game_channels; only real fog numbers pass,
+    // A bothelper can type a reserved name into /bothelper2 create_fow_game_channels; only real fog numbers pass,
     // so a typo can't create a game outside the fog numbering (the command lower-cases the input first).
     @Test
     void onlyFowFollowedByANumberIsAFogGameName() {

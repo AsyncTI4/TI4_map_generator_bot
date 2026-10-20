@@ -10,6 +10,7 @@ import ti4.discord.interactions.commands.admin.AdminCommand;
 import ti4.discord.interactions.commands.agenda.AgendaCommand;
 import ti4.discord.interactions.commands.async.AsyncCommand;
 import ti4.discord.interactions.commands.bothelper.BothelperCommand;
+import ti4.discord.interactions.commands.bothelper.BothelperCommand2;
 import ti4.discord.interactions.commands.breakthrough.BreakthroughCommand;
 import ti4.discord.interactions.commands.button.GenericButtonCommand;
 import ti4.discord.interactions.commands.cardsac.ACCardsCommand;
@@ -109,6 +110,7 @@ public class SlashCommandManager {
                     new DeveloperCommand(),
                     new TestBedCommand(),
                     new BothelperCommand(),
+                    new BothelperCommand2(),
                     new PlayerCommand(),
                     new GameCommand(),
                     new ACCardsCommand(),
