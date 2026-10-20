@@ -118,6 +118,8 @@ final class ObjectiveTracker {
     private final Map<String, Integer> arrivals = new HashMap<>();
     private final Map<String, Set<String>> awayMechPlanets = new HashMap<>();
 
+    private final ProduceTracker produce = new ProduceTracker();
+
     private Snapshot open;
     private int lastOpenedRound;
     private final List<StatusScoring> statusScoring = new ArrayList<>();
@@ -132,6 +134,7 @@ final class ObjectiveTracker {
     synchronized void observe(Game game) {
         if (pastTheOpeningDiscard(game)) recordHeld(game);
         trackMechs(game);
+        produce.observe(game);
         boolean scoringWindow = actionPhaseOver(game) || inStatusPhase(game);
         if (open != null && (!scoringWindow || game.getRound() != open.round())) close(game);
         if (scoringWindow && open == null && game.getRound() != lastOpenedRound) open(game);
@@ -141,6 +144,7 @@ final class ObjectiveTracker {
         if (game == null) return Summary.NOTHING;
         if (open != null) close(game);
         NexusWatch.print(game);
+        produce.finish(game);
         return new Summary(
                 reveals(game),
                 List.copyOf(statusScoring),
@@ -337,6 +341,7 @@ final class ObjectiveTracker {
         recordGroundProgress(game);
         NexusWatch.record(game);
         recordMechanize(game);
+        produce.record(game);
         recordIconAndStrategies(game);
         Map<String, Set<String>> publics = new HashMap<>();
         Map<String, Integer> secrets = new HashMap<>();
