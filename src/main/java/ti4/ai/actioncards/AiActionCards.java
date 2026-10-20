@@ -172,6 +172,12 @@ public class AiActionCards {
         return new AiCard(key, key::equals, Window.COMBAT_ROUND, NEVER, PRIOR, resolveHandler, List.of(), null);
     }
 
+    static AiCard combatRound(
+            String key, KeepFloor keepFloor, String resolveHandler, List<String> targetPrefixes, TargetStep target) {
+        return new AiCard(
+                key, key::equals, Window.COMBAT_ROUND, NEVER, keepFloor, resolveHandler, targetPrefixes, target);
+    }
+
     static AiCard afterAction(String key, Predicate<String> matches, TargetStep target) {
         return new AiCard(key, matches, Window.AFTER_ACTION, NEVER, PRIOR, null, List.of(), target);
     }

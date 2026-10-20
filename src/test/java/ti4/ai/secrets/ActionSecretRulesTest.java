@@ -386,4 +386,68 @@ class ActionSecretRulesTest extends BaseTi4Test {
 
         assertThat(watching()).isFalse();
     }
+
+    // A flagship killed by Direct Hit outside a fight still counts, and the holder may have no ship there to watch it:
+    // the cannon fire itself opens the watch.
+    @Test
+    void scoresDestroyTheirGreatestShipWhenAFlagshipDiesToSpaceCannonWhereTheSeatHasNoShips() {
+        test.nekro.setSecret("dtgs");
+        test.units(battlefield, "space", test.sol, UnitType.Flagship, 1);
+        fireSpaceCannon();
+
+        destroy(test.sol, UnitType.Flagship, 1);
+
+        assertThat(tick(scoreButtons("dtgs")).map(AiTestGame::pressedId)).contains(scoreId("dtgs"));
+    }
+
+    @Test
+    void scoresNothingWhenTheFlagshipSurvivesTheSpaceCannon() {
+        test.nekro.setSecret("dtgs");
+        test.units(battlefield, "space", test.sol, UnitType.Flagship, 1);
+        fireSpaceCannon();
+        battlefield.addUnitDamage("space", Units.getUnitKey(UnitType.Flagship, test.sol.getColor()), 1);
+
+        assertThat(tick(scoreButtons("dtgs"))).isEmpty();
+    }
+
+    @Test
+    void scoresNothingForAFlagshipThatLeftTheSystemAfterTheSpaceCannon() {
+        test.nekro.setSecret("dtgs");
+        test.units(battlefield, "space", test.sol, UnitType.Flagship, 1);
+        fireSpaceCannon();
+        destroy(test.sol, UnitType.Flagship, 1);
+        test.units(test.game.getTileByPosition(AiTestGame.HOME), "space", test.sol, UnitType.Flagship, 1);
+
+        assertThat(tick(scoreButtons("dtgs"))).isEmpty();
+    }
+
+    @Test
+    void doesNotWatchSpaceCannonFireWithoutTheSecret() {
+        test.units(battlefield, "space", test.sol, UnitType.Flagship, 1);
+        fireSpaceCannon();
+
+        assertThat(test.memory.has("heavyCannonWatch|" + test.game.getRound())).isFalse();
+    }
+
+    // The watch starts at the first tick that sees both sides in the system, so a flagship killed afterwards is queued
+    // for scoring even when the seat only looks again after the fight.
+    @Test
+    void queuesDestroyTheirGreatestShipOnceTheFlagshipDiesAfterTheWatchStarted() {
+        test.nekro.setSecret("dtgs");
+        test.units(battlefield, "space", test.nekro, UnitType.Dreadnought, 2);
+        test.units(battlefield, "space", test.sol, UnitType.Flagship, 1);
+        ActionSecretRules.observe(
+                test.contextAt(test.game.getLastActivePlayerChange().getTime() + 1000));
+        roundsRolled(test.nekro, 1);
+        roundsRolled(test.sol, 1);
+        destroy(test.sol, UnitType.Flagship, 1);
+
+        ActionSecretRules.observe(
+                test.contextAt(test.game.getLastActivePlayerChange().getTime() + 2000));
+
+        assertThat(test.memory
+                        .get("actionSecretPending|" + test.game.getRound())
+                        .orElse(""))
+                .startsWith("dtgs|");
+    }
 }

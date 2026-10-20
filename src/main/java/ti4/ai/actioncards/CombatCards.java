@@ -21,10 +21,12 @@ class CombatCards {
     private static final int FIGHTER_PROTOTYPE_BONUS = 2;
 
     static List<AiCard> all() {
-        return Stream.concat(
+        return Stream.of(
                         Stream.of(AiActionCards.combatRound(EMERGENCY_REPAIRS, REPAIRS_HANDLER)),
                         Stream.concat(MORALE_BOOSTS.stream(), Stream.of(FIGHTER_PROTOTYPE))
-                                .map(alias -> AiActionCards.combatRound(alias, MODIFIER_HANDLER + alias)))
+                                .map(alias -> AiActionCards.combatRound(alias, MODIFIER_HANDLER + alias)),
+                        DirectHitCards.all().stream())
+                .flatMap(cards -> cards)
                 .toList();
     }
 

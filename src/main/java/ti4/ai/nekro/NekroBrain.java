@@ -247,6 +247,7 @@ public class NekroBrain implements FactionBrain {
             SardakkHeroRules::next,
             SardakkCommanderRules::next,
             CombatCardRules::hold,
+            CombatCardRules::afterSpaceCannon,
             SolCommanderRules::next,
             context -> CombatRules.next(context, NekroBrain::atRoundStart),
             ActionSecretRules::next,

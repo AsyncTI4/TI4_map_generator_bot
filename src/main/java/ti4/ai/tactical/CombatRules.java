@@ -6,6 +6,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiSeats;
+import ti4.ai.actioncards.CombatCardRules;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
@@ -178,6 +179,7 @@ public class CombatRules {
                 }
                 context.memory().put(key, "pressed");
                 ActionSecretRules.watchSpaceCannon(context, position);
+                CombatCardRules.watchSpaceCannon(context, position);
                 String reason = attacking ? "fire space cannon at the defenders" : "fire space cannon";
                 return Optional.of(AiDecision.press(prompt, roll, reason));
             }

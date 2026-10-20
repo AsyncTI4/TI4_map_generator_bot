@@ -38,6 +38,8 @@ public class ActionSecretRules {
     private static final String MARTYR = "bam";
     private static final String DUST = "ttfd";
     private static final String CANNON_KEY = "cannonWatch|";
+    private static final String HEAVY_CANNON_KEY = "heavyCannonWatch|";
+    private static final String DESTROY_THEIR_GREATEST_SHIP = "dtgs";
     private static final String MAKE_AN_EXAMPLE = "mew";
     private static final String BOMBARD_KEY = "bombardWatch|";
     private static final String FIELD = "~";
@@ -136,9 +138,9 @@ public class ActionSecretRules {
         Player target = game.getActivePlayer() == context.seat() && tile != null
                 ? shipOwnerIn(game, context.seat(), tile)
                 : game.getActivePlayer();
-        if (target == null
-                || tile == null
-                || !context.seat().getSecretsUnscored().containsKey(DUST)) return;
+        if (target == null || tile == null) return;
+        watchHeavyShipsUnderCannon(context, tile, target);
+        if (!context.seat().getSecretsUnscored().containsKey(DUST)) return;
         int ships = BoardView.nonFighterShips(BoardView.space(tile), target);
         boolean othersFire = game.getActivePlayer() != context.seat()
                 && ButtonHelper.getPlayersWithPds2Cover(target, game, position).stream()
@@ -147,6 +149,44 @@ public class ActionSecretRules {
             context.memory()
                     .put(CANNON_KEY + game.getRound(), context.turnKey() + "|" + position + "|" + target.getFaction());
         }
+    }
+
+    private static void watchHeavyShipsUnderCannon(AiTurnContext context, Tile tile, Player target) {
+        Game game = context.game();
+        if (!context.seat().getSecretsUnscored().containsKey(DESTROY_THEIR_GREATEST_SHIP)
+                || heavyShips(BoardView.space(tile), target) == 0) {
+            return;
+        }
+        context.memory()
+                .put(
+                        HEAVY_CANNON_KEY + game.getRound(),
+                        String.join(
+                                "|",
+                                context.turnKey(),
+                                tile.getPosition(),
+                                target.getFaction(),
+                                String.valueOf(heavyShipsOnBoard(game, target))));
+    }
+
+    private static void watchHeavyCannonResult(AiTurnContext context, Set<String> held) {
+        if (!held.contains(DESTROY_THEIR_GREATEST_SHIP)) return;
+        Game game = context.game();
+        String heavyKey = HEAVY_CANNON_KEY + game.getRound();
+        Optional<String> watch = context.memory().get(heavyKey);
+        if (watch.isEmpty()) return;
+        String[] parts = watch.get().split("\\|");
+        boolean readable = parts.length >= 4 && StringUtils.isNumeric(parts[parts.length - 1]);
+        Player target = readable ? game.getPlayerFromColorOrFaction(parts[parts.length - 2]) : null;
+        if (target == null || !watch.get().startsWith(context.turnKey())) {
+            context.memory().remove(heavyKey);
+            return;
+        }
+        if (heavyShipsOnBoard(game, target) >= Integer.parseInt(parts[parts.length - 1])) return;
+        context.memory().remove(heavyKey);
+        queue(
+                context,
+                List.of(DESTROY_THEIR_GREATEST_SHIP),
+                "heavyCannon|" + context.turnKey() + "|" + parts[parts.length - 3]);
     }
 
     public static void watchBombardment(AiTurnContext context, String position, String planet, Player defender) {
@@ -213,6 +253,7 @@ public class ActionSecretRules {
         watchCombats(context, held);
         watchHomePlanets(context, held);
         watchCannonResult(context, held);
+        watchHeavyCannonResult(context, held);
         watchBombardmentResult(context, held);
         return Optional.empty();
     }

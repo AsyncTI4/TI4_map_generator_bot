@@ -124,6 +124,7 @@ final class ObjectiveTracker {
     private final TraitTracker traits = new TraitTracker();
     private final SeatTracker seatOfTheEmpire = new SeatTracker();
     private final DebateTracker debate = new DebateTracker();
+    private final DirectHitTracker directHits = new DirectHitTracker();
 
     private Snapshot open;
     private int lastOpenedRound;
@@ -140,6 +141,7 @@ final class ObjectiveTracker {
         homeRaids.observe(game);
         traits.observe(game);
         debate.observe(game);
+        directHits.observe(game);
         if (pastTheOpeningDiscard(game)) recordHeld(game);
         trackMechs(game);
         produce.observe(game);
@@ -155,6 +157,7 @@ final class ObjectiveTracker {
         traits.lines(game).forEach(System.out::println);
         seatOfTheEmpire.lines(game).forEach(System.out::println);
         debate.lines(game).forEach(System.out::println);
+        directHits.lines(game).forEach(System.out::println);
         if (open != null) close(game);
         NexusWatch.print(game);
         produce.finish(game);

@@ -747,6 +747,16 @@ to build one by hand:
     AI seats pass after 10 to 40 minutes, a human can hold the window to the 24 hour ceiling, and the opponent AI waits
     too since the card is aimed at it, so a combat card can freeze a combat for that long. The combat cards used to be
     worth nothing in the hand and the first to be discarded at the hand limit; they are now kept at their prior.
+  - **Direct Hit** (`DirectHitCards`, `DirectHitRules`, every copy `dh1..dh4`). The bot's resolve button
+    (`resolveDirectHit`, then `directHitOn_<position>_<unit>_<color>`) lists the damaged ships of other players in the
+    active system that `UnitModel.getCanBeDirectHit` allows (never _Dreadnought II_ or a mech) and destroys the chosen
+    one through `DestroyUnitService`. The seat looks for a fresh sustain at the same round-start hook as the other
+    combat cards: it remembers the damaged ships it saw at the previous round start (`directHitSeen|<position>`) and a
+    ship with more damage now has just sustained. After its own space cannon fire it takes the same snapshot
+    (`directHitCannon|<position>`) and compares once the opponent's hit assignment is gone. It plays on a flagship or
+    war sun always, and on another ship that costs a _Dreadnought_ or more unless the fight is already won at 95%, or
+    whose loss lifts its win chance by 10 points (`CombatForecast.enemyShipLoss`). The card's keep floor is 2 TG, and 3
+    while it holds _Destroy Their Greatest Ship_; the target value adds that secret's point to a heavy ship. Not in fog.
   - **Ready for dice** (`ReadyForDice`, `CombatRules`). Human players press "Declare Ready To Throw Dice" in the combat
     thread when they have no more cards or abilities to play, so the AI does the same. At the start of every round
     (both sides level, no hits pending, the combat in the active system, the button still in the thread's history) each
