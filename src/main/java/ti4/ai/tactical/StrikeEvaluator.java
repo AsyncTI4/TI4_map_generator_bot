@@ -15,6 +15,7 @@ import ti4.ai.eval.CombatOdds.Combatant;
 import ti4.ai.eval.CombatOdds.Detailed;
 import ti4.ai.eval.CombatOdds.Force;
 import ti4.ai.eval.CombatOdds.Outcome;
+import ti4.ai.eval.IconStake;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.PlanetStake;
 import ti4.ai.letnev.L4Disruptors;
@@ -284,7 +285,7 @@ class StrikeEvaluator {
                 .filter(planet -> !seat.getPlanets().contains(planet.getName()))
                 .filter(planet -> BoardView.controller(game, planet.getName()) == null)
                 .filter(planet -> !BoardView.hasCustodians(planet) || rules.canPayCustodians())
-                .sorted(Comparator.comparingDouble(BoardView::planetValue).reversed())
+                .sorted(IconStake.claimOrder(game, seat))
                 .toList();
     }
 

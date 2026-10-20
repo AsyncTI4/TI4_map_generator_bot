@@ -265,6 +265,19 @@ to build one by hand:
       are pursued at once. `-Dai.secrets.hold=false` turns patience off.
     - **Agenda phase:** no limit: _Dictate Policy_ (3 laws in play) and _Drive the Debate_ (it or its planet is
       elected by the agenda just resolved, never one from an earlier round), for which it also votes for itself.
+    - **Seize an Icon** (`IconStake`). While it holds the secret and controls no legendary planet it chases one.
+      The planner already credits a landing or an attack that takes a legendary planet with the secret's full point;
+      on top of that it claims the legendary planet of a system first when the landing forces cannot cover every
+      planet, takes a rival's legendary planet through the structures on it (outside a home system structures
+      otherwise forbid the landing), stages for one a rival holds, and `marchPlans` moves a transport with up to two
+      ground forces one system closer to the nearest free legendary planet it cannot reach this action (worth 0.6 of a
+      point times the share of the distance closed, less the counterstrike, the cost of leaving and the distance). A
+      free legendary planet is also a round goal for the advance plans, in any territory zone. For a legendary Mecatol
+      Rex (Thunder's Edge) the secret's point joins the custodians race prize, and the custodians are paid out of the
+      scoring reserve, since the point of the custodians plus the icon outweighs a spend objective. A held legendary
+      planet needs no extra rule to be kept until the status phase: losing it loses the secret, which already makes its
+      system guarded. The standard self-play map (tiles 18-48) has no legendary planet, so only a map with one (Primor,
+      Hope's End, Mallice, a Thunder's Edge Mecatol Rex) exercises this.
     - **Keeping secrets.** When it holds too many it discards the one with the lowest keep value: the chance the
       secret gets scored times what a point from its phase is worth (action 1.2). The chance blends how often real
       players finished the secret (`SecretStatistics`) with the board: progress for a status secret, and for an action
