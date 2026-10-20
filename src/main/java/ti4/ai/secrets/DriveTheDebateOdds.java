@@ -19,10 +19,14 @@ class DriveTheDebateOdds {
     private static final double CEILING = 0.5;
 
     static double chance(Game game, Player seat) {
-        if (!game.isCustodiansScored()) return 0;
         double perAgenda = electionShare(game) * winChance(game, seat);
-        double agendasLeft = AGENDAS_PER_ROUND * GameHorizon.roundsLeft(game);
+        double agendasLeft = AGENDAS_PER_ROUND * agendaRoundsLeft(game);
         return Math.min(CEILING, 1 - Math.pow(1 - perAgenda, agendasLeft));
+    }
+
+    private static int agendaRoundsLeft(Game game) {
+        int roundsLeft = GameHorizon.roundsLeft(game);
+        return game.isCustodiansScored() ? roundsLeft : Math.max(0, roundsLeft - 1);
     }
 
     static double electionShare(Game game) {

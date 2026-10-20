@@ -162,13 +162,12 @@ class SecretValueTest extends BaseTi4Test {
         test.game.scorePublicObjective(test.nekro.getUserID(), 0);
     }
 
-    // A seat that can vote has Drive the Debate only once the agenda phase exists: before the Custodians are taken no
-    // agenda is ever revealed, so only the 0.47 prior is left, 0.5 * 0.47 = 0.235, far below Establish a Perimeter
-    // (0.45). Once they are taken, Sol holds all the influence at the table, so each of the roughly ten agendas left is
-    // an election about a third of the time that it wins: 1 - 0.9^10 = 0.65 is capped at 0.5, and 0.5 * 0.47 + 0.5 *
-    // 0.5 = 0.485 outranks Establish a Perimeter and Mine Rare Metals with no progress.
+    // Custodians are taken in round 2 in nearly every game, so before they go Drive the Debate only loses the round
+    // that has no agenda phase yet. Sol holds all the influence at the table, so each of the roughly eight agendas left
+    // is an election about a third of the time that it wins: 1 - 0.9^8 = 0.57 is capped at 0.5, and 0.5 * 0.47 + 0.5 *
+    // 0.5 = 0.485 outranks Establish a Perimeter and Mine Rare Metals with no progress, before and after.
     @Test
-    void keepsDriveTheDebateOnlyWhileAgendaPhasesRemain() {
+    void keepsDriveTheDebateWhileAgendaPhasesRemain() {
         test.solHomeBeside(neighbour);
         test.sol.setSecret("dtd");
         test.sol.setSecret("eap");
@@ -179,8 +178,8 @@ class SecretValueTest extends BaseTi4Test {
 
         custodiansTaken();
 
-        assertThat(beforeCustodians).isCloseTo(0.235, within(0.01));
-        assertThat(discardedBefore).isEqualTo("dtd");
+        assertThat(beforeCustodians).isCloseTo(0.485, within(0.01));
+        assertThat(discardedBefore).isNotEqualTo("dtd");
         assertThat(solValue("dtd")).isCloseTo(0.485, within(0.01));
         assertThat(solValue("dtd")).isGreaterThan(solValue("eap")).isGreaterThan(solValue("mrm"));
         assertThat(SecretValue.lowestValueSecret(test.game, test.sol).orElseThrow())
