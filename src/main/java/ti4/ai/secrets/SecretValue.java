@@ -12,8 +12,11 @@ import ti4.ai.strategy.TechPath;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.image.Mapper;
 import ti4.model.TechnologyModel;
+import ti4.model.TokenModel;
+import ti4.model.WormholeModel.Wormhole;
 import ti4.service.info.ListPlayerInfoService;
 
 @UtilityClass
@@ -31,6 +34,10 @@ public class SecretValue {
     private static final String SEIZE_AN_ICON = "sai";
     private static final String DEFY_SPACE_AND_TIME = "dfat";
     private static final String MALLICE = "mallice";
+    private static final String LOCKED_MALLICE = "lockedmallice";
+    private static final String GHOST_SHIP = "ghost_ship";
+    private static final String CREUSS = "ghost";
+    private static final double LOCKED_NEXUS = 0.12;
     private static final double OFF_THE_BOARD = 0.1;
     private static final double RIVAL_HELD_LEGENDARY = 0.4;
     private static final int OPENING_ROUND = 1;
@@ -80,7 +87,7 @@ public class SecretValue {
     private static double boardFeasibility(Game game, Player seat, String secretId) {
         return switch (secretId) {
             case SEIZE_AN_ICON -> legendaryReach(game, seat);
-            case DEFY_SPACE_AND_TIME -> nexusOnBoard(game) ? 1.0 : OFF_THE_BOARD;
+            case DEFY_SPACE_AND_TIME -> nexusReach(game, seat);
             default -> 1.0;
         };
     }
@@ -96,10 +103,45 @@ public class SecretValue {
         return free ? 1.0 : RIVAL_HELD_LEGENDARY;
     }
 
-    private static boolean nexusOnBoard(Game game) {
+    private static double nexusReach(Game game, Player seat) {
+        Optional<Tile> nexus = nexusTile(game);
+        if (nexus.isEmpty()) return OFF_THE_BOARD;
+        if (!isLocked(nexus.get()) || canOpenNexus(game, seat, nexus.get())) return 1.0;
+        return LOCKED_NEXUS;
+    }
+
+    private static Optional<Tile> nexusTile(Game game) {
         return game.getTileMap().values().stream()
-                .flatMap(tile -> tile.getPlanetUnitHolders().stream())
-                .anyMatch(planet -> planet.getName().contains(MALLICE));
+                .filter(tile -> tile.getPlanetUnitHolders().stream()
+                        .anyMatch(planet -> planet.getName().contains(MALLICE)))
+                .findFirst();
+    }
+
+    private static boolean isLocked(Tile nexus) {
+        return nexus.getPlanetUnitHolders().stream()
+                .anyMatch(planet -> planet.getName().contains(LOCKED_MALLICE));
+    }
+
+    private static boolean canOpenNexus(Game game, Player seat, Tile nexus) {
+        return seat.getActionCards().containsKey(GHOST_SHIP)
+                || game.getRealPlayers().stream().anyMatch(player -> CREUSS.equals(player.getFaction()))
+                || gammaTokenOnBoard(game, nexus);
+    }
+
+    private static boolean gammaTokenOnBoard(Game game, Tile nexus) {
+        return game.getTileMap().values().stream()
+                .filter(tile -> tile != nexus)
+                .flatMap(tile -> tile.getSpaceUnitHolder().getTokenList().stream())
+                .map(Mapper::getToken)
+                .anyMatch(SecretValue::isOfficialGammaWormhole);
+    }
+
+    private static boolean isOfficialGammaWormhole(TokenModel token) {
+        return token != null
+                && token.getSource() != null
+                && token.getSource().isOfficial()
+                && token.getWormholes() != null
+                && token.getWormholes().contains(Wormhole.GAMMA);
     }
 
     static boolean meetsThreshold(Game game, Player seat, String secretId) {

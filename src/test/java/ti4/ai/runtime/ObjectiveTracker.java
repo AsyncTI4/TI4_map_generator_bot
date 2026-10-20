@@ -140,6 +140,7 @@ final class ObjectiveTracker {
     synchronized Summary summary(Game game) {
         if (game == null) return Summary.NOTHING;
         if (open != null) close(game);
+        NexusWatch.print(game);
         return new Summary(
                 reveals(game),
                 List.copyOf(statusScoring),
@@ -334,6 +335,7 @@ final class ObjectiveTracker {
 
     private void open(Game game) {
         recordGroundProgress(game);
+        NexusWatch.record(game);
         recordMechanize(game);
         recordIconAndStrategies(game);
         Map<String, Set<String>> publics = new HashMap<>();

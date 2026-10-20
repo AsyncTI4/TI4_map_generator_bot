@@ -307,6 +307,20 @@ class ComponentCardPlansTest extends BaseTi4Test {
         assertThat(plan("ghost_ship").orElseThrow().value()).isCloseTo(withoutNexus, within(1e-9));
     }
 
+    // The locked nexus (82a) has a gamma wormhole, so the Ghost Ship can land there and flip it. Holding Defy Space and
+    // Time makes that destroyer the one that scores, which outweighs the Mallice access of an alpha system.
+    @Test
+    void ghostShipPicksTheNexusOverAnOrdinaryTargetWhileDefySpaceAndTimeIsHeld() {
+        table.system("39", "202");
+        table.system("82a", "310");
+        String without = plan("ghost_ship").orElseThrow().target();
+
+        table.nekro.setSecret("dfat");
+
+        assertThat(without).isEqualTo("202");
+        assertThat(plan("ghost_ship").orElseThrow().target()).isEqualTo("310");
+    }
+
     // ---- Exploration Probe -------------------------------------------------------------------
 
     private Tile frontier(String position) {

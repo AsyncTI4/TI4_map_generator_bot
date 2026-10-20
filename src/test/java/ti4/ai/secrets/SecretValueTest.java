@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.testUtils.BaseTi4Test;
@@ -197,6 +198,70 @@ class SecretValueTest extends BaseTi4Test {
 
         assertThat(without).isCloseTo(with * 0.1, within(0.01));
         assertThat(taken).isCloseTo(with * 0.4, within(0.01));
+    }
+
+    private double dfatValue(String nexusTile, Runnable setup) {
+        setUp();
+        test.place(nexusTile, neighbour);
+        test.nekro.setSecret("dfat");
+        setup.run();
+        return value("dfat");
+    }
+
+    private void gammaTokenAt(String token) {
+        Tile far = test.place("41", otherNeighbourOf(neighbour));
+        far.addToken(Mapper.getTokenID(token), "space");
+    }
+
+    // Defy Space and Time needs units in the nexus, and the locked nexus (82a) only has a gamma wormhole: with nothing
+    // to open it the secret keeps 0.12 of what it is worth once the nexus is active (82b).
+    @Test
+    void scalesDefySpaceAndTimeDownWhileTheNexusIsLockedWithNoWayIn() {
+        double open = dfatValue("82b", () -> {});
+        double locked = dfatValue("82a", () -> {});
+
+        assertThat(open).isGreaterThan(0);
+        assertThat(locked).isCloseTo(open * 0.12, within(0.005));
+    }
+
+    @Test
+    void keepsDefySpaceAndTimeWhileAGhostShipCouldOpenTheNexus() {
+        double open = dfatValue("82b", () -> {});
+
+        assertThat(dfatValue("82a", () -> test.nekro.setActionCard("ghost_ship", 101)))
+                .isCloseTo(open, within(0.005));
+    }
+
+    @Test
+    void keepsDefySpaceAndTimeWhileACreussSeatCouldOpenTheNexus() {
+        double open = dfatValue("82b", () -> {});
+
+        assertThat(dfatValue("82a", () -> test.addSeat("200000000000000003", "ghost", "purple")))
+                .isCloseTo(open, within(0.005));
+    }
+
+    @Test
+    void keepsDefySpaceAndTimeWhileAGammaWormholeTokenIsOnTheBoard() {
+        double open = dfatValue("82b", () -> {});
+
+        assertThat(dfatValue("82a", () -> gammaTokenAt("gamma"))).isCloseTo(open, within(0.005));
+    }
+
+    // The gamma_* data set is homebrew: its wormhole tokens are not a way to open the nexus.
+    @Test
+    void ignoresAHomebrewGammaWormholeTokenWhenOpeningTheNexus() {
+        double open = dfatValue("82b", () -> {});
+
+        assertThat(dfatValue("82a", () -> gammaTokenAt("whgamma"))).isCloseTo(open * 0.12, within(0.005));
+    }
+
+    @Test
+    void discardsLockedDefySpaceAndTimeForAnOrdinarySecret() {
+        test.place("82a", neighbour);
+        test.nekro.setSecret("dfat");
+        test.nekro.setSecret("eap");
+
+        assertThat(discarded()).isEqualTo("dfat");
     }
 
     // Secrets the table has no statistics for (homebrew, or ids that are not cards at all) fall back to even odds
