@@ -10,7 +10,7 @@
     "resources": 1,
     "influence": 2,
     "planetTypes": [
-        "STATION"
+        "SPACESTATION"
     ],
     "planetLayout": {
         "unitHolderName": "qilinstation",

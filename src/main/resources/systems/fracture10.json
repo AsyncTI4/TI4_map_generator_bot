@@ -3,14 +3,14 @@
     "name": "Anibus/Sekhmet/Nile",
     "aliases": [
         "fracture10",
-        "anibus",
+        "anubius",
         "sekhmet",
         "nile",
         "frac10"
     ],
     "imagePath": "fracture10.png",
     "planets": [
-        "anibus",
+        "anubius",
         "sekhmet",
         "nile"
     ],
