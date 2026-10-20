@@ -58,6 +58,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -1121,7 +1122,9 @@ public class TacticalPlanner {
     private static Optional<TacticalPlan> cannonRaid(Context context, Tile tile) {
         Game game = context.game;
         Player seat = context.seat;
-        if (BoardView.hasOwnShips(seat, tile) || !CannonWipeRules.coversALoneShip(game, seat, tile)) {
+        if (BoardView.hasOwnShips(seat, tile)
+                || !CannonWipeRules.coversALoneShip(game, seat, tile)
+                || !context.offers(tile)) {
             return Optional.empty();
         }
         double chance = CannonWipeRules.chanceToWipe(game, seat, tile, singleOpponent(game, seat, tile), Map.of());
@@ -3178,6 +3181,7 @@ public class TacticalPlanner {
         private final Map<String, Boolean> spaceCannonCache = new HashMap<>();
         private final Map<String, Integer> forwardNeeds = new HashMap<>();
         private List<Tile> origins;
+        private Set<String> offered;
         private ObjectiveValue objectives;
         private Boolean canPayCustodians;
         private Boolean expectsGravityDrive;
@@ -3395,6 +3399,15 @@ public class TacticalPlanner {
                 mecatolCash = MECATOL_CASH_SHARE * ScoringStakes.scoreValue(game, seat, MecatolCash.points(game, seat));
             }
             return mecatolCash;
+        }
+
+        boolean offers(Tile tile) {
+            if (tokenFree || !freed.isEmpty()) return true;
+            if (offered == null) {
+                offered = CheckDistanceHelper.getTileDistancesRelativeToAllYourUnlockedTiles(game, seat)
+                        .keySet();
+            }
+            return offered.contains(tile.getPosition());
         }
 
         List<Tile> origins() {

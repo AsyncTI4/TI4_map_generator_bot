@@ -12,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.CheckDistanceHelper;
 
 @UtilityClass
 public class StallPlans {
@@ -23,8 +24,10 @@ public class StallPlans {
     public static Optional<TacticalPlan> enduranceStall(Game game, Player seat) {
         double bonus = Endurance.stallBonus(game, seat);
         if (bonus <= 0 || !TacticalPlanner.hasTokensForAnAction(game, seat)) return Optional.empty();
+        Map<String, Integer> offered = CheckDistanceHelper.getTileDistancesRelativeToAllYourUnlockedTiles(game, seat);
         return game.getTileMap().values().stream()
                 .filter(tile -> activatable(game, seat, tile))
+                .filter(tile -> offered.containsKey(tile.getPosition()))
                 .filter(tile -> !BoardView.hasEnemyUnits(game, seat, tile))
                 .filter(tile -> rank(seat, tile) >= HELD_RANK)
                 .max(Comparator.comparingInt((Tile tile) -> rank(seat, tile))

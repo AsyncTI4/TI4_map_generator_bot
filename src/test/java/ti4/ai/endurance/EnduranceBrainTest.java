@@ -100,6 +100,23 @@ class EnduranceBrainTest extends BaseTi4Test {
                         .isTrue());
     }
 
+    // An owned planet with no unit on it is not a unit tile, so the system picker can only reach it from another unit
+    // tile.
+    // With the home locked and nothing else holding units there is no way to pick it, and stalling there would stick.
+    @Test
+    void neverStallsOnAnEmptyPlanetWhenNoUnlockedSystemHoldsUnits() {
+        String neighbour = AiTestGame.neighbourOf(AiTestGame.HOME);
+        test.place("01", neighbour);
+        test.nekro.addPlanet("jord");
+
+        assertThat(StallPlans.enduranceStall(test.game, test.nekro).map(TacticalPlan::target))
+                .isEqualTo(Optional.of(AiTestGame.HOME));
+
+        test.game.getTileByPosition(AiTestGame.HOME).addCC(Mapper.getCCID(test.nekro.getColor()));
+
+        assertThat(StallPlans.enduranceStall(test.game, test.nekro)).isEmpty();
+    }
+
     @Test
     void hasNoStallWithoutATokenToSpendOrAWinnableRace() {
         test.nekro.setTacticalCC(0);

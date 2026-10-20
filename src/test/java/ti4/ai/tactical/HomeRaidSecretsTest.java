@@ -13,6 +13,7 @@ import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
@@ -185,6 +186,20 @@ class HomeRaidSecretsTest extends BaseTi4Test {
         assertThat(plan.kind()).isEqualTo(Kind.ATTACK);
         assertThat(plan.moves()).isEmpty();
         assertThat(plan.score()).isCloseTo(VP * 0.6, within(EXACT));
+    }
+
+    // The system picker lists systems from the seat's unlocked unit systems. With every one of them holding the seat's
+    // own token the covered system cannot be picked, so the seat must not plan the activation.
+    @Test
+    void doesNotActivateForADustKillWhenNoUnlockedSystemHoldsUnits() {
+        loneSolDestroyerNextDoor();
+        test.nekro.setSecret("ttfd");
+        spaceCannonCoversTheNeighbour();
+        assertThat(TacticalPlanner.forTarget(test.game, test.nekro, neighbour)).isPresent();
+
+        home.addCC(Mapper.getCCID(test.nekro.getColor()));
+
+        assertThat(TacticalPlanner.forTarget(test.game, test.nekro, neighbour)).isEmpty();
     }
 
     @Test
