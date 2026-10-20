@@ -45,6 +45,7 @@ import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.secrets.ActionSecretTiming;
+import ti4.ai.strategy.CardValueScale;
 import ti4.ai.strategy.MecatolCash;
 import ti4.ai.strategy.OpeningHold;
 import ti4.ai.strategy.TechPath;
@@ -1134,14 +1135,18 @@ public class TacticalPlanner {
         Game game = context.game;
         Player seat = context.seat;
         if (BoardView.hasOwnShips(seat, tile)
-                || !CannonWipeRules.coversALoneShip(game, seat, tile)
+                || !CannonWipeRules.coversAShip(game, seat, tile)
                 || !context.offers(tile)) {
             return Optional.empty();
         }
-        double chance = CannonWipeRules.chanceToWipe(game, seat, tile, singleOpponent(game, seat, tile), Map.of());
-        double score = ObjectiveValue.VICTORY_POINT_VALUE * chance;
-        if (score < ATTACK_MIN_SCORE) return Optional.empty();
-        return Optional.of(new TacticalPlan(Kind.ATTACK, tile.getPosition(), List.of(), Map.of(), score));
+        Player target = CannonWipeRules.shipOwner(game, seat, tile);
+        double chance = CannonWipeRules.chanceToWipe(game, seat, tile, target, Map.of());
+        double score = secretShare(game, seat, CannonWipeRules.TURN_THEIR_FLEETS_TO_DUST)
+                        * ObjectiveValue.VICTORY_POINT_VALUE
+                        * chance
+                + chance * (target.isNeutral() ? 0 : BoardView.shipCost(BoardView.space(tile), target));
+        if (score < Math.max(MIN_SCORE, CardValueScale.TOKEN_FLOOR)) return Optional.empty();
+        return Optional.of(new TacticalPlan(Kind.RAID, tile.getPosition(), List.of(), Map.of(), score));
     }
 
     private static Optional<TacticalPlan> bestAttack(Context context, Tile tile) {

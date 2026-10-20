@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.GameHorizon;
 import ti4.ai.eval.MovementGraph;
+import ti4.ai.tactical.CannonWipeRules;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -45,6 +46,7 @@ public class ActionSecretOdds {
     private static final double MARTYR_UNPRESSED = 0.03;
     private static final double MARTYR_HOME_THREATENED = 0.20;
     private static final double MARTYR_RAID_HELD = 0.30;
+    private static final double DUST_TARGET_IN_RANGE = 0.30;
 
     public static double perRound(Game game, Player seat, String secretId) {
         return switch (secretId) {
@@ -58,7 +60,7 @@ public class ActionSecretOdds {
             case BETRAY_A_FRIEND -> holdsAnotherPlayersNote(game, seat) ? 0.125 : 0.05;
             case DARKEN_THE_SKIES -> hasShipsBesideAnotherHome(game, seat) ? 0.11 : 0.05;
             case DESTROY_THEIR_GREATEST_SHIP -> enemyHeavyShipsExist(game, seat) ? 0.10 : 0.03;
-            case TURN_THEIR_FLEETS_TO_DUST -> hasOnBoard(game, seat, "pds") ? 0.085 : 0.03;
+            case TURN_THEIR_FLEETS_TO_DUST -> turnTheirFleetsToDust(game, seat);
             case BECOME_A_MARTYR -> becomeAMartyr(game, seat);
             default -> OTHER_SECRET;
         };
@@ -98,6 +100,11 @@ public class ActionSecretOdds {
             return ENGINEERABLE;
         }
         return fleets.stream().anyMatch(fleet -> inOrBesideAnomaly(game, seat, fleet)) ? VOID_EVIDENCED : 0.09;
+    }
+
+    private static double turnTheirFleetsToDust(Game game, Player seat) {
+        if (CannonWipeRules.hasCoveredTarget(game, seat)) return DUST_TARGET_IN_RANGE;
+        return hasOnBoard(game, seat, "pds") ? 0.085 : 0.03;
     }
 
     private static double becomeAMartyr(Game game, Player seat) {

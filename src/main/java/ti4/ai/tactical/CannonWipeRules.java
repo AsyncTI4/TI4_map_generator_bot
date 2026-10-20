@@ -3,6 +3,7 @@ package ti4.ai.tactical;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.game.Game;
@@ -21,13 +22,34 @@ public class CannonWipeRules {
     private static final String ABSOL_ANTIMASS_DEFLECTORS = "absol_amd";
     private static final String ARGENT_FLAGSHIP = "argent_flagship";
 
+    public static final boolean NEUTRAL_SHIPS_COUNT = true;
+
     public static boolean held(Player seat) {
         return seat.getSecretsUnscored().containsKey(TURN_THEIR_FLEETS_TO_DUST);
     }
 
+    public static boolean mayBeTarget(Player player) {
+        return player.isRealPlayer() || (NEUTRAL_SHIPS_COUNT && player.isNeutral());
+    }
+
+    public static List<Player> possibleTargets(Game game) {
+        return game.getPlayers().values().stream()
+                .filter(CannonWipeRules::mayBeTarget)
+                .toList();
+    }
+
+    @Nullable
+    public static Player shipOwner(Game game, Player seat, Tile tile) {
+        List<Player> owners = possibleTargets(game).stream()
+                .filter(other -> other != seat)
+                .filter(other -> BoardView.nonFighterShips(BoardView.space(tile), other) > 0)
+                .toList();
+        return owners.size() == 1 ? owners.getFirst() : null;
+    }
+
     static double chanceToWipe(Game game, Player seat, Tile tile, Player opponent, Map<UnitType, Integer> arriving) {
         if (!held(seat)
-                || !opponent.isRealPlayer()
+                || !mayBeTarget(opponent)
                 || ButtonHelper.doesPlayerHaveFSHere(ARGENT_FLAGSHIP, opponent, tile)) {
             return 0;
         }
@@ -37,14 +59,27 @@ public class CannonWipeRules {
         return chances.isEmpty() ? 0 : DiceOdds.atLeast(chances, hitsNeeded);
     }
 
-    public static boolean coversALoneShip(Game game, Player seat, Tile tile) {
-        Player opponent = TacticalPlanner.singleOpponent(game, seat, tile);
+    public static boolean coversAShip(Game game, Player seat, Tile tile) {
+        Player opponent = shipOwner(game, seat, tile);
         return held(seat)
                 && opponent != null
-                && opponent.isRealPlayer()
-                && BoardView.nonFighterShips(BoardView.space(tile), opponent) == 1
                 && ButtonHelper.getPlayersWithPds2Cover(seat, game, tile.getPosition())
                         .contains(seat);
+    }
+
+    public static boolean hasCoveredTarget(Game game, Player seat) {
+        return held(seat)
+                && game.getTileMap().values().stream()
+                        .anyMatch(tile -> shipOwner(game, seat, tile) != null && coversAShip(game, seat, tile));
+    }
+
+    public static double chanceToKillOneShip(Game game, Player seat, Tile tile) {
+        if (tile.isScar(game)) return 0;
+        List<Double> chances = new ArrayList<>();
+        for (BattleMath.CannonDice stack : BattleMath.cannonDice(game, tile, seat, List.of())) {
+            addDice(chances, stack.dice(), stack.hitsOn());
+        }
+        return chances.isEmpty() ? 0 : DiceOdds.atLeast(chances, 1);
     }
 
     private static int hitsToWipe(UnitHolder space, Player opponent) {

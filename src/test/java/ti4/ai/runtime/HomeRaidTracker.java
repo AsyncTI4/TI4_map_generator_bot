@@ -135,7 +135,7 @@ final class HomeRaidTracker {
             if (!CannonWipeRules.held(seat)) continue;
             dustHolders.add(seat.getFaction());
             for (Tile tile : game.getTileMap().values()) {
-                if (CannonWipeRules.coversALoneShip(game, seat, tile)) {
+                if (CannonWipeRules.coversAShip(game, seat, tile)) {
                     String key = game.getRound() + "|" + seat.getFaction() + "|" + tile.getPosition();
                     opportunities.add(key);
                     if (seat == game.getActivePlayer() && tile.getPosition().equals(game.getActiveSystem())) {
@@ -157,10 +157,7 @@ final class HomeRaidTracker {
     }
 
     private static String loneOwner(Game game, Player seat, Tile tile) {
-        return game.getRealPlayers().stream()
-                .filter(other -> other != seat && BoardView.nonFighterShips(BoardView.space(tile), other) == 1)
-                .map(Player::getFaction)
-                .findFirst()
-                .orElse("");
+        Player owner = CannonWipeRules.shipOwner(game, seat, tile);
+        return owner == null ? "" : owner.getFaction();
     }
 }

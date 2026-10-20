@@ -363,6 +363,31 @@ class ActionSecretRulesTest extends BaseTi4Test {
         assertThat(tick(scoreButtons("ttfd")).map(AiTestGame::pressedId)).contains(scoreId("ttfd"));
     }
 
+    // A neutral destroyer is another player's ship for the secret's purposes, and the neutral player is not a real
+    // seat, so the watch must look past the real players to find it.
+    @Test
+    void scoresDustWhenTheActiveHolderKillsALoneNeutralDestroyer() {
+        test.nekro.setSecret("ttfd");
+        Player neutral = test.game.getNeutral();
+        test.units(battlefield, "space", neutral, UnitType.Destroyer, 1);
+        fireSpaceCannon();
+
+        assertThat(watching()).isTrue();
+        destroy(neutral, UnitType.Destroyer, 1);
+
+        assertThat(tick(scoreButtons("ttfd")).map(AiTestGame::pressedId)).contains(scoreId("ttfd"));
+    }
+
+    @Test
+    void scoresNothingWhileTheNeutralDestroyerSurvivesTheCannon() {
+        test.nekro.setSecret("ttfd");
+        Player neutral = test.game.getNeutral();
+        test.units(battlefield, "space", neutral, UnitType.Destroyer, 1);
+        fireSpaceCannon();
+
+        assertThat(tick(scoreButtons("ttfd"))).isEmpty();
+    }
+
     // Once a combat round was rolled the ship did not die to the cannon.
     @Test
     void scoresNothingForDustOnceACombatRoundWasRolled() {

@@ -141,12 +141,13 @@ class NeutralUnitCards {
 
     private static double contractValue(Game game, Player seat, String position) {
         Tile tile = game.getTileByPosition(position);
-        if (tile == null
-                || !TeHelperActionCards.legalPirateTarget(game, tile, CONTRACT)
-                || onOwnRoutes(game, seat, tile)) {
+        if (tile == null || !TeHelperActionCards.legalPirateTarget(game, tile, CONTRACT)) {
             return Double.NEGATIVE_INFINITY;
         }
-        return Math.min(BLOCK_CAP, blockedRivals(game, seat, tile, false));
+        double blocking = onOwnRoutes(game, seat, tile)
+                ? Double.NEGATIVE_INFINITY
+                : Math.min(BLOCK_CAP, blockedRivals(game, seat, tile, false));
+        return Math.max(blocking, DustTarget.value(game, seat, tile));
     }
 
     private static double fleetValue(Game game, Player seat, String position) {

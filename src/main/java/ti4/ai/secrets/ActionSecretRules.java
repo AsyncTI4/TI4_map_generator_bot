@@ -12,6 +12,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.eval.BoardView;
 import ti4.ai.promissory.PlayAreaNotes;
+import ti4.ai.tactical.CannonWipeRules;
 import ti4.ai.tactical.PrecisionRules;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -507,7 +508,7 @@ public class ActionSecretRules {
 
     @Nullable
     private static Player shipOwnerIn(Game game, Player seat, Tile tile) {
-        for (Player other : game.getRealPlayers()) {
+        for (Player other : CannonWipeRules.possibleTargets(game)) {
             if (other != seat && FoWHelper.playerHasActualShipsInSystem(other, tile)) return other;
         }
         return null;

@@ -3,6 +3,7 @@ package ti4.ai.secrets;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiSettings;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.tactical.CannonWipeRules;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -15,7 +16,13 @@ public class ActionSecretTiming {
     public static boolean pursueNow(Game game, Player seat, String secretId) {
         return !AiSettings.isSecretHoldEnabled()
                 || GameHorizon.endInSight(game)
+                || holdsAStandingDustTarget(game, seat, secretId)
                 || worriedAboutTheBoard(game, seat, secretId);
+    }
+
+    private static boolean holdsAStandingDustTarget(Game game, Player seat, String secretId) {
+        return CannonWipeRules.TURN_THEIR_FLEETS_TO_DUST.equals(secretId)
+                && CannonWipeRules.hasCoveredTarget(game, seat);
     }
 
     private static boolean worriedAboutTheBoard(Game game, Player seat, String secretId) {

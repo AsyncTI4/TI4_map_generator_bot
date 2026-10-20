@@ -186,7 +186,9 @@ class HomeRaidSecretsTest extends BaseTi4Test {
     }
 
     // With no ship to send, activating the covered system still fires the cannon (LRR 77.4), and a lone destroyer
-    // dies 60% of the time: worth 4.8 for the token.
+    // dies 60% of the time: worth 4.8 for the token plus the destroyer's 1 resource at that chance. It is a RAID, not
+    // an
+    // ATTACK, so that a long shot like this never counts as urgent (see DustRaidTest).
     @Test
     void activatesACoveredSystemWithNothingToMoveForADustKill() {
         loneSolDestroyerNextDoor();
@@ -196,9 +198,9 @@ class HomeRaidSecretsTest extends BaseTi4Test {
         TacticalPlan plan =
                 TacticalPlanner.forTarget(test.game, test.nekro, neighbour).orElseThrow();
 
-        assertThat(plan.kind()).isEqualTo(Kind.ATTACK);
+        assertThat(plan.kind()).isEqualTo(Kind.RAID);
         assertThat(plan.moves()).isEmpty();
-        assertThat(plan.score()).isCloseTo(VP * 0.6, within(EXACT));
+        assertThat(plan.score()).isCloseTo(VP * 0.6 + 0.6, within(EXACT));
     }
 
     // The system picker lists systems from the seat's unlocked unit systems. With every one of them holding the seat's

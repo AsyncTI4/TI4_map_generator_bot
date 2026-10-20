@@ -86,6 +86,22 @@ class ActionSecretOddsTest extends BaseTi4Test {
         assertThat(perRound("sar")).isEqualTo(0.21);
     }
 
+    // A ship our space cannon covers (a neutral one, say, posted by Pirate Contract) is a standing chance each round.
+    @Test
+    void dustGainsFromAShipUnderOurSpaceCannon() {
+        test.nekro.setSecret("ttfd");
+        test.units(home, "mordaiii", test.nekro, UnitType.Pds, 1);
+        assertThat(perRound("ttfd")).isEqualTo(0.085);
+
+        Tile next = test.place("46", neighbour);
+        test.units(next, "space", test.game.getNeutral(), UnitType.Destroyer, 1);
+        assertThat(perRound("ttfd")).isEqualTo(0.085);
+
+        test.nekro.removeOwnedUnitByID("pds");
+        test.nekro.addOwnedUnitByID("pds2");
+        assertThat(perRound("ttfd")).isEqualTo(0.30);
+    }
+
     @Test
     void ordinaryActionSecretsGainFromTheirOneBoardCondition() {
         assertThat(perRound("fwp")).isEqualTo(0.06);

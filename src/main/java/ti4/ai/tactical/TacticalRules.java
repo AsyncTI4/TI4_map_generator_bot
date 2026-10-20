@@ -152,7 +152,7 @@ public class TacticalRules {
         return Optional.of(again.get().press("take a second tactical action: " + describe(plan.get())));
     }
 
-    private static boolean urgent(TacticalPlan plan) {
+    static boolean urgent(TacticalPlan plan) {
         return plan.kind() == Kind.ATTACK || plan.score() >= URGENT_SCORE;
     }
 

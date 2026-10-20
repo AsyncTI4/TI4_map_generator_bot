@@ -14,6 +14,7 @@ public record TacticalPlan(
     public enum Kind {
         EXPAND,
         ATTACK,
+        RAID,
         PRODUCE,
         POSITION,
         DEFEND,
