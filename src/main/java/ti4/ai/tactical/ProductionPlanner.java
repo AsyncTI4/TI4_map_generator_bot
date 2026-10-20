@@ -2,9 +2,12 @@ package ti4.ai.tactical;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
+import java.util.Set;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
@@ -32,6 +35,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
@@ -380,7 +384,7 @@ public class ProductionPlanner {
 
     private static void planScoringUnits(Builder builder) {
         Player seat = builder.seat;
-        if (mechsStuckAtHome(builder)) {
+        if (mechsStuckAtHome(builder) || fringeHaulerMissing(builder)) {
             builder.ship(UnitType.Carrier, builder.scoringValue(UnitType.Carrier) + ENABLER_VALUE, true);
         }
         for (UnitType type : heavyShipsWanted(builder)) {
@@ -401,19 +405,47 @@ public class ProductionPlanner {
             builder.enablingShips(model -> model.getBombardDieCount(seat) > 0);
         }
         if (PrecisionRules.held(seat)) builder.barrageShips();
-        if (seat.getSecretsUnscored().containsKey(OCCUPY_THE_FRINGE)) {
-            int stacked = new ObjectiveValue(builder.game, seat).before().mostGroundForcesWithoutADock();
-            int spare = TacticalPlanner.movableGroundForces(builder.game, seat, builder.tile, builder.defense);
-            int movable = GroundDrops.roomNear(builder.game, seat, builder.tile)
-                    + (TransitDiodesRules.readyDiodes(seat).isPresent() ? TransitDiodesRules.MOVED_UNITS : 0)
-                    - spare;
-            int wanted = Math.min(FRINGE_GROUND_FORCES - stacked - spare, movable);
-            builder.infantry(wanted, builder.scoringValue(UnitType.Infantry));
-        }
+        if (seat.getSecretsUnscored().containsKey(OCCUPY_THE_FRINGE)) planFringeInfantry(builder);
         if (fleetShips == 0 && new ObjectiveValue(builder.game, seat).caresAboutPresence()) {
             int pawns = Math.min(WANTED_PAWNS, builder.count(UnitType.Destroyer) + PAWNS_PER_BUILD);
             builder.shipsUpTo(UnitType.Destroyer, pawns, builder.scoringValue(UnitType.Destroyer), true);
         }
+    }
+
+    private static void planFringeInfantry(Builder builder) {
+        Game game = builder.game;
+        Player seat = builder.seat;
+        Optional<Planet> anchor = FringeStack.best(game, seat);
+        int stacked = anchor.map(planet -> BoardView.groundForces(planet, seat))
+                .orElseGet(() -> new ObjectiveValue(game, seat).before().mostGroundForcesWithoutADock());
+        int spare = TacticalPlanner.movableGroundForces(game, seat, builder.tile, builder.defense);
+        int missing = FRINGE_GROUND_FORCES - stacked - spare;
+        boolean anchoredHere = anchor.filter(planet -> game.getTileFromPlanet(planet.getName()) == builder.tile)
+                .isPresent();
+        int movable = GroundDrops.roomNear(game, seat, builder.tile)
+                + (TransitDiodesRules.readyDiodes(seat).isPresent() ? TransitDiodesRules.MOVED_UNITS : 0)
+                - spare;
+        builder.infantry(anchoredHere ? missing : Math.min(missing, movable), builder.scoringValue(UnitType.Infantry));
+    }
+
+    private static boolean fringeHaulerMissing(Builder builder) {
+        Game game = builder.game;
+        Player seat = builder.seat;
+        Optional<Planet> anchor = FringeStack.best(game, seat);
+        if (anchor.isEmpty() || !FringeStack.inOrNextTo(game, seat, builder.tile, anchor.get())) return false;
+        if (BoardView.groundForces(anchor.get(), seat) >= FRINGE_GROUND_FORCES) return false;
+        Set<String> nearby = new HashSet<>(FoWHelper.getAdjacentTiles(game, builder.tile.getPosition(), seat, false));
+        nearby.add(builder.tile.getPosition());
+        return nearby.stream()
+                .map(game::getTileByPosition)
+                .filter(Objects::nonNull)
+                .noneMatch(tile -> hasCapacityShip(seat, tile));
+    }
+
+    private static boolean hasCapacityShip(Player seat, Tile tile) {
+        return BoardView.MOVING_SHIPS.stream()
+                .anyMatch(type ->
+                        BoardView.capacity(seat, type) > 0 && BoardView.count(BoardView.space(tile), seat, type) > 0);
     }
 
     private static boolean mechsStuckAtHome(Builder builder) {

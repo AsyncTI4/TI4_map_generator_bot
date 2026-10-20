@@ -145,15 +145,15 @@ public class GroundDrops {
         if (BoardView.count(planet, seat, UnitType.Spacedock) > 0) return 0;
         int stacked = BoardView.groundForces(planet, seat);
         if (stacked + INFANTRY >= FRINGE_GROUND_FORCES) return COMPLETION_SHARE * ObjectiveValue.VICTORY_POINT_VALUE;
-        if (!buildsTheBestStack(game, seat, planet, stacked)) return 0;
+        if (!buildsTheBestStack(game, seat, planet)) return 0;
         double nearness = FringeStack.nearHome(game, seat, planet.getName()) ? 1.0 : FAR_STACK_SHARE;
         double perForce = FRINGE_PROGRESS_SHARE * ObjectiveValue.VICTORY_POINT_VALUE / (FRINGE_GROUND_FORCES - stacked);
         return nearness * perForce * INFANTRY;
     }
 
-    private static boolean buildsTheBestStack(Game game, Player seat, Planet planet, int stacked) {
+    private static boolean buildsTheBestStack(Game game, Player seat, Planet planet) {
         return FringeStack.best(game, seat)
-                .map(best -> best.getName().equals(planet.getName()) || BoardView.groundForces(best, seat) <= stacked)
+                .map(best -> best.getName().equals(planet.getName()))
                 .orElse(true);
     }
 
