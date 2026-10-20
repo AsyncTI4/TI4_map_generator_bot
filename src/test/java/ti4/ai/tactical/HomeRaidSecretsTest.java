@@ -69,6 +69,19 @@ class HomeRaidSecretsTest extends BaseTi4Test {
         assertThat(landingOnJord()).isPresent();
     }
 
+    // Become a Martyr scores when the seat loses a planet in a home system, so a raid that lands troops on Sol's
+    // home is worth making for it: the ground combat is what puts a planet in play that can be lost.
+    @Test
+    void landsOnAnEnemyHomeWhileHoldingBecomeAMartyr() {
+        solHomeNextDoorHeldByTwoInfantry();
+
+        assertThat(landingOnJord()).isEmpty();
+
+        test.nekro.setSecret("bam");
+
+        assertThat(landingOnJord()).isPresent();
+    }
+
     // The secret is only worth something at another player's home, and there it is worth the whole point: the bonus
     // already depends on the odds of winning, so it is not discounted as a patient secret any more.
     @Test

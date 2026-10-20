@@ -42,6 +42,9 @@ public class ActionSecretOdds {
             BRAVE_THE_VOID, VOID_EVIDENCED,
             UNVEIL_FLAGSHIP, FLAGSHIP_EVIDENCED);
     private static final double OTHER_SECRET = 0.05;
+    private static final double MARTYR_UNPRESSED = 0.03;
+    private static final double MARTYR_HOME_THREATENED = 0.20;
+    private static final double MARTYR_RAID_HELD = 0.30;
 
     public static double perRound(Game game, Player seat, String secretId) {
         return switch (secretId) {
@@ -56,7 +59,7 @@ public class ActionSecretOdds {
             case DARKEN_THE_SKIES -> hasShipsBesideAnotherHome(game, seat) ? 0.11 : 0.05;
             case DESTROY_THEIR_GREATEST_SHIP -> enemyHeavyShipsExist(game, seat) ? 0.10 : 0.03;
             case TURN_THEIR_FLEETS_TO_DUST -> hasOnBoard(game, seat, "pds") ? 0.085 : 0.03;
-            case BECOME_A_MARTYR -> 0.056;
+            case BECOME_A_MARTYR -> becomeAMartyr(game, seat);
             default -> OTHER_SECRET;
         };
     }
@@ -95,6 +98,33 @@ public class ActionSecretOdds {
             return ENGINEERABLE;
         }
         return fleets.stream().anyMatch(fleet -> inOrBesideAnomaly(game, seat, fleet)) ? VOID_EVIDENCED : 0.09;
+    }
+
+    private static double becomeAMartyr(Game game, Player seat) {
+        if (holdsPlanetInAnotherHome(game, seat)) return MARTYR_RAID_HELD;
+        return ownHomeOutmatchedNextDoor(game, seat) ? MARTYR_HOME_THREATENED : MARTYR_UNPRESSED;
+    }
+
+    private static boolean holdsPlanetInAnotherHome(Game game, Player seat) {
+        return seat.getPlanets().stream()
+                .map(game::getTileFromPlanet)
+                .anyMatch(tile -> tile != null && tile.isHomeSystem(game) && tile != seat.getHomeSystemTile());
+    }
+
+    private static boolean ownHomeOutmatchedNextDoor(Game game, Player seat) {
+        Tile home = seat.getHomeSystemTile();
+        if (home == null
+                || home.getPlanetUnitHolders().stream()
+                        .noneMatch(planet -> seat.getPlanets().contains(planet.getName()))) {
+            return false;
+        }
+        double defence = BoardView.shipCost(BoardView.space(home), seat);
+        return FoWHelper.getAdjacentTiles(game, home.getPosition(), seat, false).stream()
+                .map(game::getTileByPosition)
+                .filter(near -> near != null)
+                .anyMatch(near -> game.getRealPlayers().stream()
+                        .filter(other -> other != seat)
+                        .anyMatch(other -> BoardView.shipCost(BoardView.space(near), other) > defence));
     }
 
     private static double unveilFlagship(Game game, Player seat) {
