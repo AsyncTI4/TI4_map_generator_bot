@@ -64,7 +64,6 @@ public class Source {
         erwans_gambit,
         goose,
         thirtyk,
-        merford,
 
         // async homebrew
         draft,
