@@ -56,7 +56,7 @@
       "WARFARE",
       "BIOTIC"
     ],
-    "text": "When you gain this breakthrough and at the start of each strategy phase, shuffle each relic on this card back into the deck. Then, draw 3 relics and place each relic on this card face up. After a player gains a relic, you may exhaust this card to purge that relic and give them 1 on this card or ready this card.",
+    "text": "When you gain this breakthrough and at the start of each strategy phase, shuffle each relic on this card back into the deck. Then, draw 3 relics and place each relic on this card. After a player gains a relic, you may exhaust this card to purge that relic and give them 1 on this card.",
     "source": "theodisi"
   },
   {
@@ -176,7 +176,7 @@
       "BIOTIC",
       "WARFARE"
     ],
-    "text": "When you spend a command token to perform the secondary effect of a strategy card, you may place 1 neutral infantry into coexistence on a non-fracture planet that contains your ground forces.\nOnce per action, when you win a ground combat, gain 2 trade goods.",
+    "text": "When you spend a command token to perform the secondary effect of a strategy card, you may place 1 neutral infantry into coexistence on a non-fracture non-legendary planet that contains your ground forces. Resolve combat on that planet.\nOnce per action, when you win a ground combat, gain 2 trade goods.",
     "source": "theodisi"
   },
   {

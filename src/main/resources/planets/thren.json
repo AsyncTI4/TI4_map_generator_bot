@@ -12,7 +12,7 @@
         "INDUSTRIAL"
     ],
     "legendaryAbilityName": "Remote Factory",
-    "legendaryAbilityText": "When you activate a non-home system you may exhaust this card: A planet in that system gains PRODUCTION 3 as if it were a unit you control until the end of that tactical action.",
+    "legendaryAbilityText": "When you activate a non-home system you may exhaust this card: That system gains PRODUCTION 3 as if it were a unit you control until the end of that tactical action.",
     "planetLayout": {
         "unitHolderName": "thren",
         "resourcesLocation": "BottomRight",

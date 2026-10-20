@@ -678,7 +678,7 @@
     "name": "Rikka \"Razor Fang\" Corvin",
     "title": "Wasteland Scrapper",
     "abilityWindow": "When a player activates a system:",
-    "abilityText": "You may exhaust this card. That player may select 2 units on the game board; swap the movement and combat values of those units until the end of that tactical action.",
+    "abilityText": "You may exhaust this card. That player may select 2 units they control on the game board; swap the movement and combat values of those units until the end of that tactical action.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -779,8 +779,8 @@
     "type": "agent",
     "name": "Golgi",
     "title": "Morpha's Fist",
-    "abilityWindow": "When a player discards 1 or more action cards:",
-    "abilityText": "You may exhaust this card and select a player other than yourself. That player takes 1 of those discarded action cards and then gives you 1 action card from their hand.",
+    "abilityWindow": "When a player other than the Morpha player discards an action card:",
+    "abilityText": "You may exhaust this card and select 1 player other than yourself. That player takes that action card and gives you 1 action card from their hand.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },

@@ -56,7 +56,7 @@ public class ScrapyardLeaderHandler {
                 target == agentOwner ? target.getCorrectChannel() : agentOwner.getCardsInfoThread(),
                 agentOwner.getRepresentation()
                         + ", you may exhaust _Rikka \"Razor Fang\" Corvin_ to let the active player swap the movement and combat values "
-                        + "of 2 of your units until the end of this tactical action.",
+                        + "of 2 of their units until the end of this tactical action.",
                 buttons);
     }
 
