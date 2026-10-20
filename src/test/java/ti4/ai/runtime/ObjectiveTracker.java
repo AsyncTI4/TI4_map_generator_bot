@@ -113,6 +113,7 @@ final class ObjectiveTracker {
     private final List<MechanizeHolder> mechanize = new ArrayList<>();
     // One line per Seize an Icon or Adapt New Strategies holder at each status phase.
     private final List<String> secretHolders = new ArrayList<>();
+    private final FringeTracker fringe = new FringeTracker();
     private final Map<String, Integer> mechTotals = new HashMap<>();
     private final Map<String, Integer> mechsBuilt = new HashMap<>();
     private final Map<String, Integer> arrivals = new HashMap<>();
@@ -132,6 +133,7 @@ final class ObjectiveTracker {
     synchronized void observe(Game game) {
         if (pastTheOpeningDiscard(game)) recordHeld(game);
         trackMechs(game);
+        fringe.observe(game, secretHolders);
         boolean scoringWindow = actionPhaseOver(game) || inStatusPhase(game);
         if (open != null && (!scoringWindow || game.getRound() != open.round())) close(game);
         if (scoringWindow && open == null && game.getRound() != lastOpenedRound) open(game);
@@ -140,6 +142,7 @@ final class ObjectiveTracker {
     synchronized Summary summary(Game game) {
         if (game == null) return Summary.NOTHING;
         if (open != null) close(game);
+        fringe.gameEnd(game, secretHolders);
         return new Summary(
                 reveals(game),
                 List.copyOf(statusScoring),

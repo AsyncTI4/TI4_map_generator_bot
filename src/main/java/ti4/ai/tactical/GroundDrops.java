@@ -34,6 +34,8 @@ public class GroundDrops {
     private static final int MECHANIZED_PLANETS = 4;
     private static final double COMPLETION_SHARE = 0.8;
     private static final double MECH_PROGRESS_SHARE = 0.1;
+    private static final double FRINGE_PROGRESS_SHARE = 0.6;
+    private static final double FAR_STACK_SHARE = 0.8;
 
     public record Drop(String planet, double infantry, double mech) {}
 
@@ -80,7 +82,7 @@ public class GroundDrops {
             boolean mechAvailable) {
         double holding = holding(defense, tile, planet.getName(), 0, UnitType.Infantry, INFANTRY);
         double staging = staging(game, seat, tile, defense, plan);
-        double objective = fringe(seat, planet);
+        double objective = fringe(game, seat, planet);
         double best = Math.max(holding, Math.max(staging, objective));
         double rest = holding + staging + objective - best;
         double infantry = best + SECONDARY_SHARE * rest + INFANTRY_FLOOR * INFANTRY;
@@ -138,11 +140,21 @@ public class GroundDrops {
         return capacity - carried;
     }
 
-    private static double fringe(Player seat, Planet planet) {
+    private static double fringe(Game game, Player seat, Planet planet) {
         if (!seat.getSecretsUnscored().containsKey(OCCUPY_THE_FRINGE)) return 0;
         if (BoardView.count(planet, seat, UnitType.Spacedock) > 0) return 0;
-        boolean completes = BoardView.groundForces(planet, seat) + INFANTRY >= FRINGE_GROUND_FORCES;
-        return completes ? COMPLETION_SHARE * ObjectiveValue.VICTORY_POINT_VALUE : 0;
+        int stacked = BoardView.groundForces(planet, seat);
+        if (stacked + INFANTRY >= FRINGE_GROUND_FORCES) return COMPLETION_SHARE * ObjectiveValue.VICTORY_POINT_VALUE;
+        if (!buildsTheBestStack(game, seat, planet, stacked)) return 0;
+        double nearness = FringeStack.nearHome(game, seat, planet.getName()) ? 1.0 : FAR_STACK_SHARE;
+        double perForce = FRINGE_PROGRESS_SHARE * ObjectiveValue.VICTORY_POINT_VALUE / (FRINGE_GROUND_FORCES - stacked);
+        return nearness * perForce * INFANTRY;
+    }
+
+    private static boolean buildsTheBestStack(Game game, Player seat, Planet planet, int stacked) {
+        return FringeStack.best(game, seat)
+                .map(best -> best.getName().equals(planet.getName()) || BoardView.groundForces(best, seat) <= stacked)
+                .orElse(true);
     }
 
     private static double mechanize(Game game, Player seat, Planet planet) {
