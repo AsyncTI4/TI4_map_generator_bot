@@ -447,7 +447,9 @@ public class StrategyCardRules {
                                 || OpeningHold.awaitsGravityDrive(game, seat);
             case DIPLOMACY -> DiplomacyUse.worthFollowing(game, seat);
             case WARFARE -> homeBuild(game, seat).isPresent();
-            case CONSTRUCTION -> StructurePolicy.nearsStructureObjective(game, seat);
+            case CONSTRUCTION ->
+                StructurePolicy.nearsStructureObjective(game, seat)
+                        || StructurePolicy.cheapDockWorthFollowing(game, seat);
             case POLITICS -> chasesSpyNetwork(game, seat);
             default -> false;
         };
@@ -1011,11 +1013,20 @@ public class StrategyCardRules {
             Optional<String> unit = CONSTRUCTION_FIRST.equals(step)
                     ? StructurePolicy.primaryFirst(
                             context.game(), context.seat(), context.game().getRound())
-                    : StructurePolicy.pds(context.game(), context.seat());
+                    : secondStructure(context, initiative);
             if (unit.isEmpty()) return Optional.empty();
             return requestStructure(context, card.get(), unit.get(), "place a structure with Construction");
         }
         return Optional.empty();
+    }
+
+    private static Optional<String> secondStructure(AiTurnContext context, int initiative) {
+        Game game = context.game();
+        Player seat = context.seat();
+        if (CardVariant.of(game, initiative) != CardVariant.THUNDERS_EDGE) return StructurePolicy.pds(game, seat);
+        return StructurePolicy.bestSecondary(game, seat)
+                .map(StructurePolicy.Placement::unit)
+                .or(() -> StructurePolicy.pds(game, seat));
     }
 
     private static Optional<AiDecision> diplomacy(AiTurnContext context, Optional<AiPrompt> card, int initiative) {
@@ -1036,15 +1047,16 @@ public class StrategyCardRules {
     private static Optional<AiDecision> followConstruction(AiTurnContext context, AiPrompt card) {
         Game game = context.game();
         Player seat = context.seat();
-        if (!hasSpareStrategyToken(context, StrategyCard.CONSTRUCTION)
-                || !StructurePolicy.nearsStructureObjective(game, seat)) {
+        if (!hasSpareStrategyToken(context, StrategyCard.CONSTRUCTION)) return Optional.empty();
+        Optional<StructurePolicy.Placement> best = StructurePolicy.bestSecondary(game, seat);
+        double tokenCost = StrategyTokenCost.toSpend(game, seat).orElse(0);
+        if (best.isEmpty() || best.get().value() - tokenCost < CardValueScale.CONSTRUCTION_FOLLOW_MARGIN) {
             return Optional.empty();
         }
-        Optional<PromptButton> button = card.enabledHandler("construction_" + StructurePolicy.PDS);
+        Optional<PromptButton> button =
+                card.enabledHandler("construction_" + best.get().unit());
         if (button.isEmpty() || context.alreadyPressed(card, button.get())) return Optional.empty();
-        Optional<String> unit = StructurePolicy.secondary(game, seat);
-        if (unit.isEmpty()) return Optional.empty();
-        return requestStructure(context, card, unit.get(), "follow Construction to place a structure");
+        return requestStructure(context, card, best.get().unit(), "follow Construction to place a structure");
     }
 
     private static Optional<AiDecision> requestStructure(
@@ -1175,10 +1187,7 @@ public class StrategyCardRules {
             case IMPERIAL ->
                 SecretDraws.worthDrawing(game, seat) ? Optional.of(SecretDrawValue.of(game, seat)) : Optional.empty();
             case DIPLOMACY -> diplomacyFollowValue(game, seat);
-            case CONSTRUCTION ->
-                StructurePolicy.nearsStructureObjective(game, seat)
-                        ? Optional.of(CardValueScale.STRUCTURE_OBJECTIVE_SHARE * CardValueScale.VICTORY_POINT)
-                        : Optional.empty();
+            case CONSTRUCTION -> StructurePolicy.bestSecondary(game, seat).map(StructurePolicy.Placement::value);
             case WARFARE -> homeBuild(game, seat).map(plan -> CardValueScale.PRODUCTION_SHARE * plan.value());
             case POLITICS -> politicsValue(game, seat);
             case TRADE ->
@@ -1223,7 +1232,8 @@ public class StrategyCardRules {
                 yield press;
             }
             case CONSTRUCTION ->
-                StructurePolicy.secondary(game, seat).flatMap(unit -> requestStructure(context, prompt, unit, reason));
+                StructurePolicy.bestSecondary(game, seat)
+                        .flatMap(best -> requestStructure(context, prompt, best.unit(), reason));
             case WARFARE -> startWarfareBuild(context, prompt, reason);
             case POLITICS -> CardMessages.pressOnce(context, prompt, STRATEGIZE_POLITICS_BUTTON, reason);
             case TRADE -> CardMessages.pressOnce(context, prompt, TRADE_REFRESH_BUTTON, reason);

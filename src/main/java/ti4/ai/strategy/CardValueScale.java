@@ -22,6 +22,8 @@ public class CardValueScale {
     static final int LAST_EARLY_DOCK_ROUND = 3;
     static final double PDS = 1.0;
     static final double THREATENED_PDS = 1.0;
+    static final double FRONTIER_PDS = 0.2;
+    static final double CONSTRUCTION_FOLLOW_MARGIN = 0.5;
     static final double STRUCTURE_OBJECTIVE_SHARE = 0.8;
     static final double PRODUCTION_SHARE = 0.8;
     static final double BUILD_THEN_MOVE_SHARE = 0.5;

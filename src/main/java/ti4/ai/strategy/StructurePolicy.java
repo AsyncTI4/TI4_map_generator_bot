@@ -6,14 +6,18 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.FracturePrize;
+import ti4.ai.explore.ExploreSite;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -21,6 +25,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.service.info.ListPlayerInfoService;
 
@@ -32,11 +37,13 @@ class StructurePolicy {
     private static final String FUEL_THE_WAR_MACHINE = "fwm";
     private static final String MECHANIZE_THE_MILITARY = "mtm";
     private static final int MECH_SPREADING_PREFERENCE = 2;
-    private static final int MAX_PDS_PER_PLANET = 2;
     private static final int MIN_FORWARD_DOCK_RESOURCES = 2;
     private static final int RICH_DOCK_RESOURCES = 3;
     private static final int SLICE_SEARCH_DEPTH = 6;
     private static final String STYX = "styx";
+    private static final String SAAR_DOCK = "saar_spacedock";
+    private static final String SAAR_DOCK_II = "saar_spacedock2";
+    private static final Set<String> SPREAD_OBJECTIVES = Set.of("infrastructure", "protect_border");
     private static final int STRUCTURES_SHORT = 2;
     private static final String ESTABLISH_A_PERIMETER = "eap";
     private static final int PERIMETER_NEAR = 3;
@@ -76,18 +83,8 @@ class StructurePolicy {
     }
 
     static int structureShortfall(Game game, Player seat) {
-        List<String> objectives = new ArrayList<>();
-        for (String id : game.getRevealedPublicObjectives().keySet()) {
-            if (STRUCTURE_OBJECTIVES.contains(id) && !ObjectivePolicy.hasScored(game, seat, id)) objectives.add(id);
-        }
-        seat.getSecretsUnscored().keySet().stream()
-                .filter(STRUCTURE_OBJECTIVES::contains)
-                .forEach(objectives::add);
-        int shortfall = NO_SHORTFALL;
-        for (String id : objectives) {
-            int missing = shortfallOf(game, seat, id);
-            if (missing > 0) shortfall = Math.min(shortfall, missing);
-        }
+        int shortfall =
+                shortfalls(game, seat).values().stream().min(Integer::compare).orElse(NO_SHORTFALL);
         if (MassProduction.oneDockFromScoring(game, seat)) shortfall = Math.min(shortfall, 1);
         return shortfall;
     }
@@ -143,31 +140,69 @@ class StructurePolicy {
         return underCap(game, seat, "pds") ? Optional.of(PDS) : Optional.empty();
     }
 
+    record Placement(String unit, String planet, double value) {}
+
+    private record DockRank(
+            boolean canHost,
+            int mass,
+            boolean site,
+            boolean fresh,
+            int preference,
+            int resources,
+            int outside,
+            int systemResources,
+            int influence) {}
+
+    private static final Comparator<DockRank> USUAL_DOCK = Comparator.comparing(DockRank::site)
+            .thenComparing(DockRank::fresh)
+            .thenComparingInt(DockRank::preference)
+            .thenComparingInt(DockRank::resources)
+            .thenComparingInt(DockRank::outside)
+            .thenComparingInt(DockRank::systemResources)
+            .thenComparingInt(DockRank::influence);
+
+    private static final Comparator<DockRank> MASS_PRODUCTION_DOCK = Comparator.comparing(DockRank::canHost)
+            .thenComparingInt(DockRank::mass)
+            .thenComparing(USUAL_DOCK);
+
     static Optional<String> planetFor(Game game, Player seat, String unit, Collection<String> candidates) {
-        Comparator<Planet> preference = SPACE_DOCK.equals(unit)
-                ? dockPreference(game, seat)
-                : Comparator.comparingInt((Planet planet) -> isHome(game, planet) ? 0 : 1)
-                        .thenComparingInt(planet -> -structures(seat, planet))
-                        .thenComparingInt(planet -> planet.getResources() + planet.getInfluence());
-        return candidates.stream()
+        List<Planet> planets = candidates.stream()
                 .map(name -> game.getPlanetsInfo().get(name))
                 .filter(planet -> planet != null && seat.getPlanets().contains(planet.getName()))
-                .filter(planet -> !PDS.equals(unit) || BoardView.count(planet, seat, UnitType.Pds) < MAX_PDS_PER_PLANET)
-                .max(preference)
-                .map(Planet::getName);
+                .toList();
+        return bestPlanet(game, seat, unit, planets).map(Planet::getName);
     }
 
-    private static Comparator<Planet> dockPreference(Game game, Player seat) {
-        Comparator<Planet> usual = Comparator.comparing((Planet planet) -> isDockSite(game, seat, planet))
-                .thenComparingInt(planet -> dockPreference(game, seat, planet))
-                .thenComparingInt(Planet::getResources)
-                .thenComparingInt(planet -> isHome(game, planet) ? 0 : 1)
-                .thenComparingInt(planet -> systemResources(game, seat, planet))
-                .thenComparingInt(Planet::getInfluence);
-        if (!MassProduction.drives(game, seat)) return usual;
-        return Comparator.comparing((Planet planet) -> MassProduction.canHostDock(game, seat, planet))
-                .thenComparingInt(planet -> MassProduction.productionWithDockOn(game, seat, planet))
-                .thenComparing(usual);
+    private static Optional<Planet> bestPlanet(Game game, Player seat, String unit, List<Planet> planets) {
+        if (PDS.equals(unit)) return PdsSites.of(game, seat, planets).best();
+        boolean mass = MassProduction.drives(game, seat);
+        Map<Planet, DockRank> ranks = new IdentityHashMap<>();
+        List<Planet> legal =
+                planets.stream().filter(planet -> dockLegal(game, seat, planet)).toList();
+        boolean spread = spreadsObjectives(game, seat);
+        for (Planet planet : legal) ranks.put(planet, dockRank(game, seat, planet, mass, spread));
+        Comparator<DockRank> order = mass ? MASS_PRODUCTION_DOCK : USUAL_DOCK;
+        return legal.stream().max(Comparator.comparing(ranks::get, order));
+    }
+
+    private static boolean dockLegal(Game game, Player seat, Planet planet) {
+        return BoardView.count(planet, seat, UnitType.Spacedock) == 0
+                && !planet.isSpaceStation(game)
+                && !ExploreSite.isDemilitarized(planet);
+    }
+
+    private static DockRank dockRank(Game game, Player seat, Planet planet, boolean mass, boolean spread) {
+        boolean canHost = mass && MassProduction.canHostDock(game, seat, planet);
+        return new DockRank(
+                canHost,
+                mass ? MassProduction.productionWithDockOn(game, seat, planet) : 0,
+                isDockSite(game, seat, planet),
+                spread && freshOutsideHome(game, seat, planet),
+                dockPreference(game, seat, planet),
+                planet.getResources(),
+                isHome(game, seat, planet) ? 0 : 1,
+                systemResources(game, seat, planet),
+                planet.getInfluence());
     }
 
     private static Optional<Planet> dockSite(Game game, Player seat, boolean anyPlanet) {
@@ -178,21 +213,49 @@ class StructurePolicy {
                 .findAny();
     }
 
-    private static boolean isDockSite(Game game, Player seat, Planet planet) {
-        if (BoardView.count(planet, seat, UnitType.Spacedock) > 0 || planet.isSpaceStation(game)) return false;
-        if (!isHome(game, planet)) {
-            return planet.getResources() >= MIN_FORWARD_DOCK_RESOURCES || onOwnIngress(game, seat, planet);
-        }
+    static boolean isDockSite(Game game, Player seat, Planet planet) {
+        if (!dockLegal(game, seat, planet)) return false;
+        if (!isHome(game, seat, planet)) return isForwardDockSite(game, seat, planet);
+        return secondHomeDockWanted(game, seat, planet);
+    }
+
+    private static boolean isForwardDockSite(Game game, Player seat, Planet planet) {
+        return planet.getResources() >= MIN_FORWARD_DOCK_RESOURCES || onOwnIngress(game, seat, planet);
+    }
+
+    private static boolean secondHomeDockWanted(Game game, Player seat, Planet planet) {
         Tile tile = game.getTileFromPlanet(planet.getName());
-        return tile != null
-                && tile.getPlanetUnitHolders().stream()
-                                .filter(other -> seat.getPlanets().contains(other.getName()))
-                                .count()
-                        > 1;
+        if (tile == null) return false;
+        long held = tile.getPlanetUnitHolders().stream()
+                .filter(other -> seat.getPlanets().contains(other.getName()))
+                .count();
+        if (held < 2) return false;
+        return MassProduction.drives(game, seat) || homeProductionLimited(game, seat, tile, planet);
+    }
+
+    private static boolean homeProductionLimited(Game game, Player seat, Tile home, Planet planet) {
+        int spendable = seat.getPlanets().stream()
+                .map(name -> game.getPlanetsInfo().get(name))
+                .filter(Objects::nonNull)
+                .mapToInt(Planet::getResources)
+                .sum();
+        if (spendable <= Helper.getProductionValue(seat, game, home, false)) return false;
+        return planet.getResources() >= bestForwardDockResources(game, seat);
+    }
+
+    private static int bestForwardDockResources(Game game, Player seat) {
+        return seat.getPlanets().stream()
+                .map(name -> game.getPlanetsInfo().get(name))
+                .filter(Objects::nonNull)
+                .filter(planet -> !isHome(game, seat, planet) && dockLegal(game, seat, planet))
+                .filter(planet -> isForwardDockSite(game, seat, planet))
+                .mapToInt(Planet::getResources)
+                .max()
+                .orElse(0);
     }
 
     private static int dockPreference(Game game, Player seat, Planet planet) {
-        if (isHome(game, planet)) return 1;
+        if (isHome(game, seat, planet)) return 1;
         int rich = planet.getResources() >= RICH_DOCK_RESOURCES ? 1 : 0;
         int nearby = STYX.equals(planet.getName()) || inSlice(game, seat, planet) ? 1 : 0;
         int ingress = onOwnIngress(game, seat, planet) ? 2 : 0;
@@ -257,13 +320,123 @@ class StructurePolicy {
                 .sum();
     }
 
-    private static int structures(Player seat, Planet planet) {
+    static int structures(Player seat, Planet planet) {
         return BoardView.count(planet, seat, UnitType.Pds) + BoardView.count(planet, seat, UnitType.Spacedock);
     }
 
-    private static boolean isHome(Game game, Planet planet) {
+    static boolean isHome(Game game, Player seat, Planet planet) {
         Tile tile = game.getTileFromPlanet(planet.getName());
-        return tile == null || tile.isHomeSystem(game);
+        if (tile == null) return true;
+        Tile home = seat.getHomeSystemTile();
+        return home != null && home.getPosition().equals(tile.getPosition());
+    }
+
+    static boolean freshOutsideHome(Game game, Player seat, Planet planet) {
+        return !isHome(game, seat, planet) && structures(seat, planet) == 0;
+    }
+
+    static boolean spreadsObjectives(Game game, Player seat) {
+        Map<String, Integer> shortfalls = shortfalls(game, seat);
+        return SPREAD_OBJECTIVES.stream().anyMatch(shortfalls::containsKey);
+    }
+
+    static Optional<Placement> bestSecondary(Game game, Player seat) {
+        List<Placement> options = new ArrayList<>();
+        if (!buildsPerimeter(game, seat)) dockPlacement(game, seat).ifPresent(options::add);
+        pdsPlacement(game, seat).ifPresent(options::add);
+        return options.stream().max(Comparator.comparingDouble(Placement::value));
+    }
+
+    static boolean cheapDockWorthFollowing(Game game, Player seat) {
+        if (!canBuildDock(game, seat) || dockSite(game, seat, false).isEmpty()) return false;
+        return dockBaseValue(game, seat) - CardValueScale.STRATEGY_TOKEN >= CardValueScale.CONSTRUCTION_FOLLOW_MARGIN;
+    }
+
+    private static Optional<Placement> dockPlacement(Game game, Player seat) {
+        if (!canBuildDock(game, seat)) return Optional.empty();
+        Optional<Planet> planet = bestPlanet(game, seat, SPACE_DOCK, ownedPlanets(game, seat));
+        if (planet.isEmpty()) return Optional.empty();
+        double base = isDockSite(game, seat, planet.get()) ? dockBaseValue(game, seat) : 0;
+        double value = base + objectiveGain(game, seat, SPACE_DOCK, planet.get());
+        return value > 0 ? Optional.of(new Placement(SPACE_DOCK, planet.get().getName(), value)) : Optional.empty();
+    }
+
+    private static Optional<Placement> pdsPlacement(Game game, Player seat) {
+        if (pds(game, seat).isEmpty()) return Optional.empty();
+        PdsSites sites = PdsSites.of(game, seat, ownedPlanets(game, seat));
+        Optional<Planet> planet = sites.best();
+        if (planet.isEmpty()) return Optional.empty();
+        double value = CardValueScale.PDS
+                + (sites.threatened(planet.get()) ? CardValueScale.THREATENED_PDS : 0)
+                + (sites.frontier(planet.get()) ? CardValueScale.FRONTIER_PDS : 0)
+                + objectiveGain(game, seat, PDS, planet.get());
+        return Optional.of(new Placement(PDS, planet.get().getName(), value));
+    }
+
+    private static boolean canBuildDock(Game game, Player seat) {
+        boolean floatingFactory = seat.hasUnit(SAAR_DOCK) || seat.hasUnit(SAAR_DOCK_II);
+        return !floatingFactory && underCap(game, seat, "sd");
+    }
+
+    private static double dockBaseValue(Game game, Player seat) {
+        double base = game.getRound() <= CardValueScale.LAST_EARLY_DOCK_ROUND
+                ? CardValueScale.DOCK_EARLY
+                : CardValueScale.DOCK_LATE;
+        int extraDocks = Math.max(0, ButtonHelper.getNumberOfUnitsOnTheBoard(game, seat, "sd") - 1);
+        return base / (1 + extraDocks);
+    }
+
+    private static List<Planet> ownedPlanets(Game game, Player seat) {
+        return seat.getPlanets().stream()
+                .map(name -> game.getPlanetsInfo().get(name))
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    private static double objectiveGain(Game game, Player seat, String unit, Planet planet) {
+        double closeness = 0;
+        for (Map.Entry<String, Integer> shortfall : shortfalls(game, seat).entrySet()) {
+            if (advances(game, seat, shortfall.getKey(), unit, planet)) {
+                closeness = Math.max(closeness, closeness(shortfall.getKey(), shortfall.getValue()));
+            }
+        }
+        if (SPACE_DOCK.equals(unit) && MassProduction.oneDockFromScoring(game, seat)) closeness = 1;
+        return closeness * CardValueScale.STRUCTURE_OBJECTIVE_SHARE * CardValueScale.VICTORY_POINT;
+    }
+
+    private static boolean advances(Game game, Player seat, String objective, String unit, Planet planet) {
+        return switch (objective) {
+            case ESTABLISH_A_PERIMETER -> PDS.equals(unit);
+            case FUEL_THE_WAR_MACHINE -> SPACE_DOCK.equals(unit);
+            case "infrastructure", "protect_border" -> freshOutsideHome(game, seat, planet);
+            default -> true;
+        };
+    }
+
+    private static double closeness(String objective, int missing) {
+        if (missing <= STRUCTURES_SHORT) return 1;
+        boolean perimeterNear = ESTABLISH_A_PERIMETER.equals(objective) && missing <= PERIMETER_NEAR;
+        return perimeterNear ? (double) STRUCTURES_SHORT / missing : 0;
+    }
+
+    private static Map<String, Integer> shortfalls(Game game, Player seat) {
+        Map<String, Integer> shortfalls = new LinkedHashMap<>();
+        for (String id : heldObjectives(game, seat)) {
+            int missing = shortfallOf(game, seat, id);
+            if (missing > 0) shortfalls.merge(id, missing, Math::min);
+        }
+        return shortfalls;
+    }
+
+    private static List<String> heldObjectives(Game game, Player seat) {
+        List<String> objectives = new ArrayList<>();
+        for (String id : game.getRevealedPublicObjectives().keySet()) {
+            if (STRUCTURE_OBJECTIVES.contains(id) && !ObjectivePolicy.hasScored(game, seat, id)) objectives.add(id);
+        }
+        seat.getSecretsUnscored().keySet().stream()
+                .filter(STRUCTURE_OBJECTIVES::contains)
+                .forEach(objectives::add);
+        return objectives;
     }
 
     private static boolean underCap(Game game, Player seat, String asyncId) {

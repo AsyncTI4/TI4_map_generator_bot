@@ -78,11 +78,29 @@ class StructurePolicyTest extends BaseTi4Test {
                 .contains("lodor");
     }
 
-    // A home system with a second planet takes a second dock: Jol-Nar's dock on Nar plus one on Jol makes every
-    // activation of home produce far more.
+    // A second home dock is only wanted once home production is the limit: Jol-Nar's dock on Nar alone already covers
+    // the 3 resources of its home, so a dock on Jol adds nothing and the next structure is a PDS.
     @Test
-    void placesASecondDockOnAnotherHomePlanet() {
+    void wantsNoSecondHomeDockWhileHomeProductionCoversTheResources() {
         Player jolnar = jolNarAtHome();
+
+        assertThat(StructurePolicy.isDockSite(
+                        test.game, jolnar, test.game.getPlanetsInfo().get("jol")))
+                .isFalse();
+        assertThat(StructurePolicy.next(test.game, jolnar)).contains(StructurePolicy.PDS);
+    }
+
+    // With resources beyond what Nar's dock produces and no forward planet worth a dock, Jol-Nar's second home dock
+    // makes every activation of home produce more, and next() agrees with planetFor().
+    @Test
+    void placesASecondDockOnAnotherHomePlanetWhenHomeProductionIsTheLimit() {
+        Player jolnar = jolNarAtHome();
+        test.place("19", "101");
+        jolnar.addPlanet("wellon");
+        test.place("22", "102");
+        jolnar.addPlanet("tarmann");
+        test.place("21", "103");
+        jolnar.addPlanet("thibah");
 
         assertThat(StructurePolicy.next(test.game, jolnar)).contains(StructurePolicy.SPACE_DOCK);
         assertThat(StructurePolicy.planetFor(test.game, jolnar, StructurePolicy.SPACE_DOCK, List.of("jol")))
@@ -175,6 +193,156 @@ class StructurePolicyTest extends BaseTi4Test {
         assertThat(StructurePolicy.nearsStructureObjective(test.game, jolnar)).isTrue();
         assertThat(StructurePolicy.planetFor(test.game, jolnar, StructurePolicy.SPACE_DOCK, List.of("jol", "lodor")))
                 .contains("jol");
+    }
+
+    // The 3 resources of Lodor beat the 1 of Jol for the dock, and a second home dock is no site at all while a forward
+    // planet is worth more.
+    @Test
+    void ranksAForwardSiteAboveASecondHomeDock() {
+        Player jolnar = jolNarAtHome();
+        test.place("26", "101");
+        jolnar.addPlanet("lodor");
+
+        assertThat(StructurePolicy.isDockSite(
+                        test.game, jolnar, test.game.getPlanetsInfo().get("jol")))
+                .isFalse();
+        assertThat(StructurePolicy.planetFor(test.game, jolnar, StructurePolicy.SPACE_DOCK, List.of("jol", "lodor")))
+                .contains("lodor");
+    }
+
+    @Test
+    void placesAPdsOutsideHomeWhenAnotherPlanetIsLegal() {
+        test.place("26", "101");
+        test.nekro.addPlanet("lodor");
+
+        assertThat(StructurePolicy.planetFor(test.game, test.nekro, StructurePolicy.PDS, List.of("mordaiii", "lodor")))
+                .contains("lodor");
+    }
+
+    @Test
+    void placesAPdsAtHomeWhenNoOtherPlanetIsLegal() {
+        assertThat(StructurePolicy.planetFor(test.game, test.nekro, StructurePolicy.PDS, List.of("mordaiii")))
+                .contains("mordaiii");
+    }
+
+    @Test
+    void placesAPdsOnAPlanetWithoutOurStructuresBeforeOneWithAPds() {
+        Tile lodor = test.place("26", "101");
+        test.nekro.addPlanet("lodor");
+        test.place("25", "102");
+        test.nekro.addPlanet("quann");
+        test.units(lodor, "lodor", test.nekro, UnitType.Pds, 1);
+
+        assertThat(StructurePolicy.planetFor(test.game, test.nekro, StructurePolicy.PDS, List.of("lodor", "quann")))
+                .contains("quann");
+    }
+
+    // Quann sits between the two homes while Lodor is on the home side of the board: with neither holding a structure,
+    // the PDS goes to the border planet even though Lodor is worth more.
+    @Test
+    void placesAPdsOnTheFrontierBeforeTheBackline() {
+        test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.nekro.addPlanet("lodor");
+        String border = AiTestGame.neighbourOf(AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.place("25", border);
+        test.nekro.addPlanet("quann");
+        test.solHomeBeside(border);
+
+        assertThat(StructurePolicy.planetFor(test.game, test.nekro, StructurePolicy.PDS, List.of("lodor", "quann")))
+                .contains("quann");
+    }
+
+    @Test
+    void placesAPdsNextToEnemyShipsBeforeTheBackline() {
+        String near = AiTestGame.neighbourOf(AiTestGame.HOME);
+        test.place("26", near);
+        test.nekro.addPlanet("lodor");
+        String far = ti4.image.PositionMapper.getAdjacentTilePositions(near).stream()
+                .filter(p -> !"x".equals(p) && !AiTestGame.HOME.equals(p) && test.game.getTileByPosition(p) == null)
+                .findFirst()
+                .orElseThrow();
+        test.place("25", far);
+        test.nekro.addPlanet("quann");
+        String watcher = ti4.image.PositionMapper.getAdjacentTilePositions(far).stream()
+                .filter(p -> !"x".equals(p)
+                        && !near.equals(p)
+                        && !AiTestGame.HOME.equals(p)
+                        && test.game.getTileByPosition(p) == null)
+                .findFirst()
+                .orElseThrow();
+        Tile enemy = test.place("47", watcher);
+        test.units(enemy, "space", test.sol, UnitType.Carrier, 1);
+
+        assertThat(StructurePolicy.planetFor(test.game, test.nekro, StructurePolicy.PDS, List.of("lodor", "quann")))
+                .contains("quann");
+    }
+
+    // A raiding fleet beside home makes the home PDS the one that matters; with the fleet gone the PDS goes to the
+    // empty planet outside home again.
+    @Test
+    void placesAPdsAtHomeWhileAFleetThreatensIt() {
+        test.game.setRound(4);
+        test.nekro.setTacticalCC(3);
+        test.nekro.setFleetCC(5);
+        test.place("26", "101");
+        test.nekro.addPlanet("lodor");
+        Player sardakk = test.addSeat("200000000000000002", "sardakk", "red");
+        sardakk.setFleetCC(5);
+        test.place("13", "310");
+        Tile staging = test.place("46", AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.units(staging, "space", sardakk, UnitType.Carrier, 1);
+        test.units(staging, "space", sardakk, UnitType.Cruiser, 2);
+        test.units(staging, "space", sardakk, UnitType.Infantry, 4);
+
+        assertThat(StructurePolicy.planetFor(test.game, test.nekro, StructurePolicy.PDS, List.of("mordaiii", "lodor")))
+                .contains("mordaiii");
+
+        staging.removeAllUnits(sardakk.getColor());
+
+        assertThat(StructurePolicy.planetFor(test.game, test.nekro, StructurePolicy.PDS, List.of("mordaiii", "lodor")))
+                .contains("lodor");
+    }
+
+    // LRR 63.4: a PDS on a planet that holds another player's units and none of the owner's is destroyed.
+    @Test
+    void placesNoPdsOnAPlanetHeldByEnemyForcesWithoutOurGroundForces() {
+        Tile lodor = test.place("26", "101");
+        test.nekro.addPlanet("lodor");
+        Tile quann = test.place("25", "102");
+        test.nekro.addPlanet("quann");
+        test.units(lodor, "lodor", test.sol, UnitType.Infantry, 1);
+
+        assertThat(StructurePolicy.planetFor(test.game, test.nekro, StructurePolicy.PDS, List.of("lodor", "quann")))
+                .contains("quann");
+
+        test.units(lodor, "lodor", test.nekro, UnitType.Infantry, 1);
+        test.units(quann, "quann", test.nekro, UnitType.Pds, 1);
+
+        assertThat(StructurePolicy.planetFor(test.game, test.nekro, StructurePolicy.PDS, List.of("lodor", "quann")))
+                .contains("lodor");
+    }
+
+    // Infrastructure counts planets outside the home system that hold a structure, so while it is short the dock
+    // goes to a planet without one even though Lodor is richer.
+    @Test
+    void spreadsDocksToAFreshPlanetWhileInfrastructureIsShort() {
+        Tile lodor = test.place("26", "101");
+        test.nekro.addPlanet("lodor");
+        test.place("25", "102");
+        test.nekro.addPlanet("quann");
+        test.units(lodor, "lodor", test.nekro, UnitType.Pds, 1);
+
+        assertThat(StructurePolicy.planetFor(
+                        test.game, test.nekro, StructurePolicy.SPACE_DOCK, List.of("lodor", "quann")))
+                .contains("lodor");
+
+        test.game
+                .getRevealedPublicObjectives()
+                .put("infrastructure", test.game.getRevealedPublicObjectives().size() + 1);
+
+        assertThat(StructurePolicy.planetFor(
+                        test.game, test.nekro, StructurePolicy.SPACE_DOCK, List.of("lodor", "quann")))
+                .contains("quann");
     }
 
     private Player jolNarAtHome() {
