@@ -291,6 +291,13 @@ to build one by hand:
       Bonds_ and 0.4 for _Betray a Friend_, while the secret is unmet. Its first ask is the owner's fair price for the
       note; each ask that did not land raises the next by 1 trade good in rounds 1 and 2, 2 in the middle rounds and 3
       once the end is in sight, up to 9.
+      With an unscored _Destroy Heretical Works_ and fewer than 2 relic fragments it hoards and buys them
+      (`FragmentSecrets`, `FragmentSecretDeals`): it never purges fragments for a relic unless 2 are left, and it
+      offers trade goods to other players for the fragments it is short of (1 or 2 of a kind, never more than it needs).
+      Each missing fragment is worth half the secret point (3 at the base, more as points get dearer), and the one that
+      completes the pair 0.9 of the point; the first ask is 2 trade goods and each ask that did not land raises the next
+      by 1 early, 2 in the middle rounds and 3 late, up to 9 a fragment. After a rejection it asks a human what they
+      would want for the fragment, as it does for notes. It never sells a fragment itself, so only humans are asked.
     - **Drawing and trading secrets** (`SecretDraws`). Like human players it draws a secret whenever it can (Imperial,
       an exploration, _Impersonation_, _Strategize_), and with a full hand draws anyway and discards its weakest, unless
       every secret it still holds is worth keeping (a keep value of 0.75 or more: one it can score, one close to done or
@@ -840,8 +847,8 @@ to build one by hand:
     pay), then "Send the Offer". A counter-offer starts from "Reject and CounterOffer" on the offer it received.
   - **Rejections** (`OfferRejections`). It reads the bot's "your offer ... has been rejected" notice in its private
     thread, rescinds the rejected offer and makes no new unsolicited offer to that player for the rest of the round.
-    When the rejected offer asked a human for a promissory note it asks in table talk what they would want for it; their
-    next offer is the answer, taken if it clears the usual margin and otherwise rejected (no counter-offer), and the
+    When the rejected offer asked a human for a promissory note (or a relic fragment) it asks in table talk what they would want for it;
+    their next offer is the answer, taken if it clears the usual margin and otherwise rejected (no counter-offer), and the
     note deal with that player then waits until the next round. A rejection from an AI seat drops the note deal the
     same way.
   - **Recovery.** An offer counts as accepted once its items with the partner are gone. It rescinds an offer that

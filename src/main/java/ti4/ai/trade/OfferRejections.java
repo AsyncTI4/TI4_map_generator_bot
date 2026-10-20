@@ -18,6 +18,7 @@ import ti4.model.PromissoryNoteModel;
 class OfferRejections {
 
     static final String NOTICE = AiPerception.OFFER_REJECTED;
+    static final String FRAGMENTS_ASKED = "fragments";
     private static final String SEEN_KEY = "offerRejectionsSeenUpTo";
     private static final String REJECTED_ROUND_KEY = "offerRejectedRound|";
     private static final String REJECTED_AT_KEY = "offerRejectedAt|";
@@ -81,10 +82,14 @@ class OfferRejections {
     }
 
     static String question(Player seat, Player partner, String alias) {
-        PromissoryNoteModel model = Mapper.getPromissoryNote(alias);
-        String note = model == null ? "promissory note" : "_" + model.getName() + "_";
+        String note = FRAGMENTS_ASKED.equals(alias) ? "relic fragment" : noteName(alias);
         return AiPrompt.TABLE_TALK + seat.getRepresentationNoPing() + " to " + partner.getRepresentationNoPing()
                 + ": what would you want for your " + note + "? Send me an offer.";
+    }
+
+    private static String noteName(String alias) {
+        PromissoryNoteModel model = Mapper.getPromissoryNote(alias);
+        return model == null ? "promissory note" : "_" + model.getName() + "_";
     }
 
     static void noteAsked(AiMemory memory, Player partner, String alias) {

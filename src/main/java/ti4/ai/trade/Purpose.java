@@ -12,6 +12,7 @@ enum Purpose {
     WASH("wash"),
     SELL("sale"),
     NOTE_DEAL("promissory note deal"),
+    FRAGMENT_DEAL("relic fragment deal"),
     DESPERATION("purchase"),
     TECHNOLOGY_REQUEST("payment to play Technology soon"),
     TECHNOLOGY_HOLD("payment to hold Technology until later"),
@@ -23,7 +24,7 @@ enum Purpose {
 
     private static final Set<Purpose> SETTLEMENTS = EnumSet.of(SETTLEMENT, SETTLEMENT_FEE, EVEN_WASH);
     private static final Set<Purpose> PROPOSALS =
-            EnumSet.of(WASH, SELL, NOTE_DEAL, DESPERATION, TECHNOLOGY_REQUEST, TECHNOLOGY_HOLD);
+            EnumSet.of(WASH, SELL, NOTE_DEAL, FRAGMENT_DEAL, DESPERATION, TECHNOLOGY_REQUEST, TECHNOLOGY_HOLD);
     private static final Set<Purpose> FAVORS = EnumSet.of(TECHNOLOGY_REQUEST, TECHNOLOGY_HOLD);
     private static final Set<Purpose> LONG_HUMAN_REPLY = EnumSet.of(SETTLEMENT, SETTLEMENT_FEE, DEBT_COLLECTION);
 

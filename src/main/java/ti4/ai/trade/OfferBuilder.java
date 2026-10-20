@@ -42,6 +42,7 @@ class OfferBuilder {
             Purpose.WASH,
             Purpose.SELL,
             Purpose.NOTE_DEAL,
+            Purpose.FRAGMENT_DEAL,
             Purpose.DESPERATION,
             Purpose.TECHNOLOGY_REQUEST,
             Purpose.TECHNOLOGY_HOLD,
@@ -52,10 +53,12 @@ class OfferBuilder {
             new Order(true, ItemType.TRADE_GOODS),
             new Order(true, ItemType.SEND_DEBT),
             new Order(true, ItemType.CLEAR_DEBT),
+            new Order(true, ItemType.FRAGMENTS),
             new Order(false, ItemType.CLEAR_DEBT),
             new Order(false, ItemType.SEND_DEBT),
             new Order(false, ItemType.COMMODITIES),
             new Order(false, ItemType.TRADE_GOODS),
+            new Order(false, ItemType.FRAGMENTS),
             new Order(false, ItemType.PROMISSORY),
             new Order(true, ItemType.PROMISSORY),
             new Order(false, ItemType.ACTION_CARDS),
@@ -214,8 +217,10 @@ class OfferBuilder {
                         .filter(pick -> picksNamed(build, missing, pick))
                         .findFirst()
                 : picks.stream()
-                        .filter(pick -> amount(pick).isPresent() && amount(pick).getAsInt() <= missing.remaining())
-                        .max(Comparator.comparingInt(pick -> amount(pick).getAsInt()));
+                        .filter(pick -> amount(pick, missing).isPresent()
+                                && amount(pick, missing).getAsInt() <= missing.remaining())
+                        .max(Comparator.comparingInt(
+                                pick -> amount(pick, missing).getAsInt()));
         if (choice.isEmpty()) return abort(build);
         return press(
                 build, picker.prompt(), choice.get().button(), "trade: put " + describe(missing) + " in the offer");
@@ -232,8 +237,10 @@ class OfferBuilder {
         return !name.isEmpty() && name.equals(pick.button().label());
     }
 
-    private static OptionalInt amount(Pick pick) {
-        return TradeMemory.parseInt(pick.detail());
+    private static OptionalInt amount(Pick pick, Missing missing) {
+        if (missing.type() != ItemType.FRAGMENTS) return TradeMemory.parseInt(pick.detail());
+        if (!pick.detail().startsWith(missing.detail())) return OptionalInt.empty();
+        return TradeMemory.parseInt(pick.detail().substring(missing.detail().length()));
     }
 
     private static Optional<AiDecision> addOrSwitch(Build build, Step builder, Missing missing) {
@@ -436,6 +443,11 @@ class OfferBuilder {
             Player sender = order.fromPartner() ? partner : seat;
             Player receiver = order.fromPartner() ? seat : partner;
             String faction = sender.getFaction();
+            if (order.type() == ItemType.FRAGMENTS) {
+                Optional<Missing> fragments = missingFragments(sender, receiver, target, current);
+                if (fragments.isPresent()) return fragments;
+                continue;
+            }
             if (order.type().named()) {
                 List<String> present = current.named(faction, order.type());
                 Optional<String> named = target.named(faction, order.type()).stream()
@@ -450,19 +462,35 @@ class OfferBuilder {
         return Optional.empty();
     }
 
+    private static Optional<Missing> missingFragments(Player sender, Player receiver, Deal target, Deal current) {
+        String faction = sender.getFaction();
+        return ComponentValues.FRAGMENT_KINDS.stream()
+                .filter(kind -> target.fragments(faction, kind) > current.fragments(faction, kind))
+                .findFirst()
+                .map(kind -> new Missing(
+                        sender,
+                        receiver,
+                        ItemType.FRAGMENTS,
+                        target.fragments(faction, kind) - current.fragments(faction, kind),
+                        kind));
+    }
+
     private static boolean buildable(Player seat, Player partner, Deal target) {
         String ours = seat.getFaction();
         String theirs = partner.getFaction();
         if (!DealItem.tradable(theirs) || target.notes(ours).size() > 1) return false;
         return target.items().stream().allMatch(item -> {
             if (item.isFrom(theirs) && item.isTo(ours)) {
-                return REQUESTABLE.contains(item.type()) || namedNote(item) || item.type() == ItemType.PLANETS;
+                return REQUESTABLE.contains(item.type())
+                        || namedNote(item)
+                        || item.type() == ItemType.PLANETS
+                        || item.type() == ItemType.FRAGMENTS;
             }
             if (!item.isFrom(ours) || !item.isTo(theirs)) return false;
             if (item.type() == ItemType.PROMISSORY || item.type() == ItemType.ACTION_CARDS) {
                 return StringUtils.isNumeric(item.detail());
             }
-            return REQUESTABLE.contains(item.type());
+            return REQUESTABLE.contains(item.type()) || item.type() == ItemType.FRAGMENTS;
         });
     }
 
@@ -513,6 +541,7 @@ class OfferBuilder {
                     case PROMISSORY -> "a promissory note";
                     case ACTION_CARDS -> "an action card";
                     case PLANETS -> "a planet";
+                    case FRAGMENTS -> missing.remaining() + " " + missing.detail() + " relic fragments";
                     default -> missing.remaining() + " " + missing.type().token();
                 };
         return what + " from " + missing.sender().getFaction() + " to "

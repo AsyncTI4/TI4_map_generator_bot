@@ -182,6 +182,28 @@ class OfferBuilderTest extends BaseTi4Test {
                 .isEqualTo("offerToTransact_SendDebt_black_blue_2");
     }
 
+    // Relic fragments are picked by kind and amount: the picker lists 1..n of every kind the sender holds, and the
+    // builder presses the kind it needs at the amount still missing.
+    @Test
+    void swapsRelicFragmentsByKindAndAmount() {
+        nekro.setIrf(1);
+        sol.setCrf(2);
+        start(deal("sendingsol_receivingnekro_Frags_CRF2", "sendingnekro_receivingsol_Frags_IRF1"), Purpose.SETTLEMENT);
+        tick(playerPicker());
+        tick(offering());
+
+        assertThat(pressed(tick(asking()))).isEqualTo("newTransact_Frags_blue_black");
+        assertThat(pressed(tick(picker("Frags", sol, nekro, "CRF1", "CRF2"))))
+                .isEqualTo("offerToTransact_Frags_blue_black_CRF2");
+        nekro.addTransactionItem("sendingsol_receivingnekro_Frags_CRF2");
+        assertThat(pressed(tick(asking()))).isEqualTo("getNewTransaction_black_blue");
+        assertThat(pressed(tick(offering()))).isEqualTo("newTransact_Frags_black_blue");
+        assertThat(pressed(tick(picker("Frags", nekro, sol, "IRF1"))))
+                .isEqualTo("offerToTransact_Frags_black_blue_IRF1");
+        nekro.addTransactionItem("sendingnekro_receivingsol_Frags_IRF1");
+        assertThat(pressed(tick(offering()))).isEqualTo("sendOffer_blue");
+    }
+
     // A promissory note is picked by its number in the AI's hand, never by its name.
     @Test
     void picksTheNoteByItsHandNumber() {
