@@ -468,6 +468,7 @@ public final class GroundCampaign {
 
     private Haul haulNear(Tile dock, boolean carrierTwo) {
         Set<String> around = new HashSet<>(FoWHelper.getAdjacentTiles(game, dock.getPosition(), seat, false));
+        around.add(dock.getPosition());
         int near = 0;
         int move = 0;
         for (String position : around) {
@@ -476,10 +477,7 @@ public final class GroundCampaign {
             near += capacityIn(tile, carrierTwo);
             move = Math.max(move, moveIn(tile, carrierTwo));
         }
-        int here = capacityIn(dock, carrierTwo);
-        near += here;
-        move = Math.max(move, moveIn(dock, carrierTwo));
-        return new Haul(here, near, move);
+        return new Haul(capacityIn(dock, carrierTwo), near, move);
     }
 
     private int capacityIn(Tile tile, boolean carrierTwo) {

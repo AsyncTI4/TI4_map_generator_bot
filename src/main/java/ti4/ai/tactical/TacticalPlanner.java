@@ -3045,7 +3045,7 @@ public class TacticalPlanner {
                 .toList();
     }
 
-    static int movableGroundForces(Game game, Player seat, Tile origin) {
+    public static int movableGroundForces(Game game, Player seat, Tile origin) {
         return movableGroundForces(game, seat, origin, new DefenseOutlook(game, seat));
     }
 
