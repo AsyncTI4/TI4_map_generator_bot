@@ -22,10 +22,7 @@ public class ComponentValues {
     private static final double NOT_ENDGAME = 1.0;
     private static final double FRAGMENT = 1.0;
     private static final double FRAGMENT_COMPLETING_SET = 2.0;
-    private static final double FRAGMENT_FOR_HERETICAL_WORKS = 3.0;
     private static final int FRAGMENTS_PER_RELIC = 3;
-    private static final int HERETICAL_WORKS_FRAGMENTS = 2;
-    private static final String HERETICAL_WORKS = "dhw";
     private static final String CULTURAL = "CRF";
     private static final String INDUSTRIAL = "IRF";
     private static final String HAZARDOUS = "HRF";
@@ -43,7 +40,7 @@ public class ComponentValues {
             case COMMODITIES -> COMMODITY_RECEIVED * amount;
             case SEND_DEBT -> debtReceivable(game, seat, from, amount, trustInFrom);
             case CLEAR_DEBT -> DEBT_LIABILITY * amount;
-            case FRAGMENTS -> fragments(seat, item, seatPrivate);
+            case FRAGMENTS -> fragments(game, seat, item, seatPrivate);
             case PROMISSORY -> receivedNote(game, seat, from, item);
             case ACTION_CARDS -> TradeActionCards.receiveValue(game, seat, from, item, seatPrivate);
             case PLANETS -> TradePlanets.receiveValue(game, item);
@@ -128,23 +125,16 @@ public class ComponentValues {
     }
 
     public static double gainedFragment(Player seat, String kind) {
-        int held = FRAGMENT_KINDS.stream()
-                .mapToInt(known -> fragmentsOfKind(seat, known))
-                .sum();
-        boolean hereticalWorks =
-                seat.getSecretsUnscored().containsKey(HERETICAL_WORKS) && held < HERETICAL_WORKS_FRAGMENTS;
-        return fragmentValue(hereticalWorks, fragmentsToward(seat, kind));
+        return fragmentValue(
+                FragmentSecrets.chases(seat) ? FragmentSecrets.BASE_VALUE : 0, fragmentsToward(seat, kind));
     }
 
-    private static double fragments(Player seat, DealItem item, boolean seatPrivate) {
+    private static double fragments(Game game, Player seat, DealItem item, boolean seatPrivate) {
         int towardSet = fragmentsToward(seat, item.fragmentKind());
-        int held = FRAGMENT_KINDS.stream()
-                .mapToInt(kind -> fragmentsOfKind(seat, kind))
-                .sum();
-        boolean hereticalWorks = !seatPrivate && seat.getSecretsUnscored().containsKey(HERETICAL_WORKS);
+        int missing = seatPrivate ? 0 : FragmentSecrets.missing(seat);
+        double forSecret = missing > 0 ? FragmentSecrets.perFragment(game, seat) : 0;
         return IntStream.range(0, item.amount())
-                .mapToDouble(index ->
-                        fragmentValue(hereticalWorks && held + index < HERETICAL_WORKS_FRAGMENTS, towardSet + index))
+                .mapToDouble(index -> fragmentValue(index < missing ? forSecret : 0, towardSet + index))
                 .sum();
     }
 
@@ -160,8 +150,8 @@ public class ComponentValues {
                 .orElse(0);
     }
 
-    private static double fragmentValue(boolean forHereticalWorks, int towardSet) {
-        if (forHereticalWorks) return FRAGMENT_FOR_HERETICAL_WORKS;
+    private static double fragmentValue(double forSecret, int towardSet) {
+        if (forSecret > 0) return forSecret;
         return towardSet == FRAGMENTS_PER_RELIC - 1 ? FRAGMENT_COMPLETING_SET : FRAGMENT;
     }
 }

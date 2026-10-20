@@ -43,6 +43,14 @@ record Deal(List<DealItem> items) {
                 .sum();
     }
 
+    int fragments(String sender, String kind) {
+        return items.stream()
+                .filter(item -> item.isFrom(sender) && item.type() == ItemType.FRAGMENTS)
+                .filter(item -> item.fragmentKind().equals(kind))
+                .mapToInt(DealItem::amount)
+                .sum();
+    }
+
     int received(String receiver, ItemType type) {
         return items.stream()
                 .filter(item -> item.isTo(receiver) && item.type() == type)
