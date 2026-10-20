@@ -2,6 +2,7 @@ package ti4.service.storage;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -39,6 +40,17 @@ class ChannelExportRequestTest {
                 new ChannelExportRequest("111", List.of("111"), "id", ChannelExportFormat.JSON, null, null, false);
 
         assertThat(request.toDispatchPayload()).hasSizeLessThan(10);
+    }
+
+    @Test
+    void resumePayloadOnlyNamesTheExportBecauseTheHostKeepsTheSettings() {
+        var location = new ChannelExportLocation(Path.of("exported_channels"), "111", "20261019-120000");
+
+        assertThat(ChannelExportRequest.resumeDispatchPayload(location))
+                .containsExactly(
+                        Map.entry("channel", "111"),
+                        Map.entry("export_id", "20261019-120000"),
+                        Map.entry("resume", "true"));
     }
 
     @Test

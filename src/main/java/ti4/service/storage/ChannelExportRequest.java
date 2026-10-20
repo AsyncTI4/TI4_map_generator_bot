@@ -27,6 +27,14 @@ public record ChannelExportRequest(
         return EXPORT_ID_FORMAT.format(now);
     }
 
+    public static Map<String, String> resumeDispatchPayload(ChannelExportLocation location) {
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put("channel", location.channelId());
+        payload.put("export_id", location.exportId());
+        payload.put("resume", "true");
+        return payload;
+    }
+
     public Map<String, String> toDispatchPayload() {
         Map<String, String> payload = new LinkedHashMap<>();
         payload.put("channel", channelId);

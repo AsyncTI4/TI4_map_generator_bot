@@ -28,13 +28,12 @@ import ti4.service.storage.ChannelExportLocation;
 import ti4.service.storage.ChannelExportRequest;
 import ti4.service.storage.ChannelExportWatcher;
 
-class GetChannelHtml extends Subcommand {
+class StartChannelExport extends Subcommand {
 
     private static final int MAX_CHANNELS_PER_EXPORT = 1000;
-    private static final long DEFAULT_MAX_UPLOAD_BYTES = 10L * 1024 * 1024;
 
-    GetChannelHtml() {
-        super(Constants.GET_CHANNEL_HTML, "Export a channel's history to exported_channels on the bot server");
+    StartChannelExport() {
+        super(Constants.START_CHANNEL_EXPORT, "Export a channel's history to exported_channels on the bot server");
         addOptions(
                 new OptionData(OptionType.CHANNEL, Constants.CHANNEL, "Channel to export (defaults to current channel)")
                         .setRequired(false),
@@ -115,7 +114,7 @@ class GetChannelHtml extends Subcommand {
         ChannelExportLocation location =
                 new ChannelExportLocation(Storage.getChannelExportsDirectory(), channel.getId(), request.exportId());
         MessageHelper.sendMessageToEventChannel(event, startedMessage(request, location, truncated));
-        ChannelExportWatcher.watch(location, event.getChannel(), maxUploadBytes(event));
+        ChannelExportWatcher.watch(location, event.getChannel(), ChannelExportLookup.maxUploadBytes(event));
     }
 
     @Nullable
@@ -160,16 +159,13 @@ class GetChannelHtml extends Subcommand {
                 .hasPermission(threadContainer, Permission.MANAGE_THREADS, Permission.MESSAGE_HISTORY);
     }
 
-    private static long maxUploadBytes(SlashCommandInteractionEvent event) {
-        return event.getGuild() != null ? event.getGuild().getMaxFileSize() : DEFAULT_MAX_UPLOAD_BYTES;
-    }
-
     private static String startedMessage(
             ChannelExportRequest request, ChannelExportLocation location, boolean truncated) {
         int threadCount = request.channelIds().size() - (request.channelIds().contains(request.channelId()) ? 1 : 0);
         String message = "Started export `" + request.exportId() + "` of <#" + request.channelId() + "> with "
                 + StringHelper.pluralize(threadCount, "thread") + ". It will be saved as `"
-                + location.displayPath(location.archive()) + "`, and I'll post here when it finishes.";
+                + location.displayPath(location.archive()) + "`, and I'll post here when it finishes. Stop it with `"
+                + ChannelExportWatcher.CANCEL_COMMAND + " export_id:" + request.exportId() + "`.";
         if (truncated) {
             message += "\nOnly the first " + MAX_CHANNELS_PER_EXPORT
                     + " channels and threads are included; export the remaining threads one at a time.";

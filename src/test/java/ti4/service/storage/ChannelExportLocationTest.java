@@ -14,11 +14,12 @@ class ChannelExportLocationTest {
     @TempDir
     Path tempDir;
 
+    private Path exportsRoot;
     private ChannelExportLocation location;
 
     @BeforeEach
     void setUp() throws IOException {
-        Path exportsRoot = tempDir.resolve("exported_channels");
+        exportsRoot = tempDir.resolve("exported_channels");
         location = new ChannelExportLocation(exportsRoot, "123", "20261019-120000");
         Files.createDirectories(location.directory());
     }
@@ -29,18 +30,18 @@ class ChannelExportLocationTest {
     }
 
     @Test
-    void reportsRunningOnceTheWorkDirectoryOrLogExists() throws IOException {
+    void reportsRunningOnlyWhileTheRunningMarkerExists() throws IOException {
+        // A leftover work directory from a cancelled run must not look like a live export.
         Files.createDirectories(location.workDirectory());
-        assertThat(location.status()).isEqualTo(ChannelExportStatus.RUNNING);
-
-        Files.delete(location.workDirectory());
         Files.writeString(location.log(), "exporting");
+        assertThat(location.status()).isEqualTo(ChannelExportStatus.NOT_STARTED);
+
+        Files.createFile(location.runningMarker());
         assertThat(location.status()).isEqualTo(ChannelExportStatus.RUNNING);
     }
 
     @Test
     void reportsDoneWhenTheDoneMarkerIsWritten() throws IOException {
-        Files.writeString(location.log(), "exporting");
         Files.writeString(location.archive(), "archive");
         Files.createFile(location.doneMarker());
 
@@ -49,11 +50,76 @@ class ChannelExportLocationTest {
 
     @Test
     void failedMarkerWinsOverEverythingElse() throws IOException {
-        Files.createDirectories(location.workDirectory());
+        Files.createFile(location.runningMarker());
         Files.writeString(location.failedMarker(), "Invalid format: Csv\n");
 
         assertThat(location.status()).isEqualTo(ChannelExportStatus.FAILED);
-        assertThat(location.failureReason()).isEqualTo("Invalid format: Csv");
+        assertThat(location.stopReason(location.failedMarker())).isEqualTo("Invalid format: Csv");
+    }
+
+    @Test
+    void cancelRequestIsWrittenForTheExporterToPickUp() throws IOException {
+        Files.createFile(location.runningMarker());
+
+        location.requestCancel();
+
+        assertThat(location.isCancelRequested()).isTrue();
+        assertThat(location.status()).isEqualTo(ChannelExportStatus.RUNNING);
+    }
+
+    @Test
+    void cancelledExportWithSavedSettingsCanBeResumed() throws IOException {
+        Files.writeString(location.savedRequest(), "CHANNEL_IDS=123\n");
+        Files.writeString(location.cancelledMarker(), "Stopped after 3 of 10 parts\n");
+        Files.writeString(location.partCount(), "10\n");
+        Files.writeString(location.progress(), "channel:0\nchannel:1\nchannel:2\n");
+
+        assertThat(location.status()).isEqualTo(ChannelExportStatus.CANCELLED);
+        assertThat(location.canResume()).isTrue();
+        assertThat(location.progressSummary()).contains("3 of 10 parts");
+    }
+
+    @Test
+    void exportThatFailedBeforeSavingSettingsCannotBeResumed() throws IOException {
+        Files.writeString(location.failedMarker(), "Invalid format: Csv\n");
+
+        assertThat(location.canResume()).isFalse();
+    }
+
+    @Test
+    void clearingStopMarkersLeavesProgressInPlace() throws IOException {
+        Files.writeString(location.savedRequest(), "CHANNEL_IDS=123\n");
+        Files.writeString(location.progress(), "channel:0\n");
+        Files.writeString(location.cancelledMarker(), "Stopped after 1 of 2 parts\n");
+        location.requestCancel();
+
+        location.clearStopMarkers();
+
+        assertThat(location.status()).isEqualTo(ChannelExportStatus.NOT_STARTED);
+        assertThat(location.isCancelRequested()).isFalse();
+        assertThat(location.progress()).exists();
+        assertThat(location.savedRequest()).exists();
+    }
+
+    @Test
+    void progressSummaryIsEmptyBeforeThePartsAreCounted() throws IOException {
+        assertThat(location.progressSummary()).isEmpty();
+    }
+
+    @Test
+    void findsAnExportByIdAcrossChannelDirectories() throws IOException {
+        Files.writeString(location.log(), "exporting");
+        Files.createDirectories(exportsRoot.resolve("456"));
+
+        assertThat(ChannelExportLocation.find(exportsRoot, "20261019-120000")).containsExactly(location);
+        assertThat(ChannelExportLocation.find(exportsRoot, "20261019-999999")).isEmpty();
+    }
+
+    @Test
+    void rejectsExportIdsThatCouldEscapeTheExportsFolder() throws IOException {
+        assertThat(ChannelExportLocation.isValidExportId("../maps")).isFalse();
+        assertThat(ChannelExportLocation.isValidExportId("")).isFalse();
+        assertThat(ChannelExportLocation.find(exportsRoot, "../123")).isEmpty();
     }
 
     @Test

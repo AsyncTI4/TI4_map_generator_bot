@@ -1639,7 +1639,11 @@ public final class Constants {
     public static final String PLAYER_TEMP_MODS = "PLAYER_TEMP_MODS";
     public static final String PLAYER_NEW_TEMP_MODS = "PLAYER_NEW_TEMP_MODS";
     public static final String ARCHIVE_CHANNELS = "archive_channels";
-    public static final String GET_CHANNEL_HTML = "get_channel_html";
+    public static final String CHANNEL_EXPORT = "channel_export";
+    public static final String START_CHANNEL_EXPORT = "start";
+    public static final String CANCEL_CHANNEL_EXPORT = "cancel";
+    public static final String RESUME_CHANNEL_EXPORT = "resume";
+    public static final String EXPORT_ID = "export_id";
     public static final String CHANNEL = "channel";
     public static final String INCLUDE_THREADS = "include_threads";
     public static final String INCLUDE_MEDIA = "include_media";
