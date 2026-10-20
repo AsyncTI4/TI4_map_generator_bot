@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.actioncards;
+package ti4.discord.interactions.buttons.handlers.actioncards.bluereverie;
 
 import java.util.List;
 import lombok.experimental.UtilityClass;

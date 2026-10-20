@@ -418,6 +418,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         neutral.addTech("dd2");
         neutral.addTech("cv2");
         neutral.addTech("cr2");
+        neutral.addTech("dn2");
         neutral.addTech("ws");
         return neutral;
     }
@@ -430,8 +431,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     @NotNull
     public Player getNeutral() {
-        if (getPlayerFromColorOrFaction("neutral") == null) return setupNeutralPlayer();
-        return getPlayerFromColorOrFaction("neutral");
+        Player neutral = getPlayerFromColorOrFaction("neutral");
+        if (neutral == null) return setupNeutralPlayer();
+        neutral.addTech("dn2");
+        return neutral;
     }
 
     @NotNull

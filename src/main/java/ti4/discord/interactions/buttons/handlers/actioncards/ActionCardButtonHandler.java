@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.actioncards;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EscapeClauseActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -140,7 +141,7 @@ class ActionCardButtonHandler {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         player.getRepresentation()
-                                + ", you clicked the _Sabotage_ action card button but did not have a _Sabotage_ in hand.");
+                                + ", you clicked the _Sabotage_ action card button but did not have one in hand.");
             }
         }
 
