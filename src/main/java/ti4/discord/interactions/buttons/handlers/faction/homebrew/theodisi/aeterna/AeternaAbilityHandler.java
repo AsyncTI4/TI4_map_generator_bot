@@ -294,9 +294,7 @@ public class AeternaAbilityHandler {
             GenericInteractionCreateEvent event, Game game, List<RemovedUnit> destroyedUnits, boolean combat) {
         if (destroyedUnits.isEmpty()) return;
         for (Player aeterna : game.getRealPlayers()) {
-            boolean duringAeternasTacticalAction = aeterna == game.getActivePlayer()
-                    && !game.getCurrentActiveSystem().isEmpty();
-            if (!aeterna.hasAbility("cycle_of_reclamation") || duringAeternasTacticalAction) continue;
+            if (!aeterna.hasAbility("cycle_of_reclamation")) continue;
             String actionCaptureKey = CYCLE_ACTION_CAPTURE + aeterna.getFaction();
             if (!game.getPhaseOfGame().startsWith("agenda")
                     && !game.getStoredValue(actionCaptureKey).isEmpty()) {

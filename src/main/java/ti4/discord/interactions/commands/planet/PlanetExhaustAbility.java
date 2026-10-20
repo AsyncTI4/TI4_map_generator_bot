@@ -270,7 +270,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = "blank";
             }
             case "thren" -> {
-                TheodisiLegendaryButtonHandler.offerThrenPlanetSelection(game, player);
+                TheodisiLegendaryButtonHandler.resolveThrenRemoteFactory(game, player);
                 output = "blank";
             }
             case "vespix" -> {

@@ -2583,10 +2583,6 @@ public final class Helper {
                 && tile.getPosition().equals(game.getStoredValue("vanguardReinforce" + player.getFaction()))) {
             productionValueTotal += 3;
         }
-        if (TheodisiLegendaryButtonHandler.hasRemoteFactoryProduction(game, player, tile, uH)) {
-            productionValueTotal += 3;
-        }
-
         return productionValueTotal;
     }
 
@@ -2634,6 +2630,9 @@ public final class Helper {
         if (!singleDock) {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
                 productionValueTotal += getProductionValueOfUnitHolder(player, game, tile, uH);
+            }
+            if (TheodisiLegendaryButtonHandler.hasRemoteFactoryProduction(game, player, tile)) {
+                productionValueTotal += 3;
             }
             if (tile.getUnitHolders().size() == 1
                     && player.hasTech("dsmorty")
