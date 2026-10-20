@@ -1,7 +1,6 @@
 package ti4.ai.tactical;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -12,6 +11,7 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.eval.BoardView;
 import ti4.ai.perception.AiPrompt;
+import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -130,52 +130,58 @@ public class TransitDiodesRules {
     }
 
     static List<Transfer> plan(Game game, Player seat) {
-        List<Transfer> mechanize = mechanize(game, seat);
-        List<Transfer> occupy = occupy(game, seat);
+        DefenseOutlook defense = new DefenseOutlook(game, seat);
+        List<Transfer> mechanize = mechanize(game, seat, defense);
+        List<Transfer> occupy = occupy(game, seat, defense);
         if (completesMechanize(game, seat, mechanize)) return mechanize;
         if (completesOccupy(game, seat, occupy)) return occupy;
         return mechanize.isEmpty() ? occupy : mechanize;
     }
 
-    private static List<Transfer> mechanize(Game game, Player seat) {
-        if (!seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY)) return List.of();
-        List<Planet> bare = placeable(game, seat).stream()
-                .filter(planet -> BoardView.count(planet, seat, UnitType.Mech) == 0)
+    private static List<Transfer> mechanize(Game game, Player seat, DefenseOutlook defense) {
+        GroundCampaign campaign = defense.campaign();
+        if (!campaign.holdsMechanize()) return List.of();
+        Set<String> placeable = placeableNames(game, seat);
+        List<Planet> bare = campaign.bareTargets().stream()
+                .filter(planet -> placeable.contains(planet.getName()))
                 .toList();
         List<Transfer> transfers = new ArrayList<>();
+        int wanted = Math.min(MOVED_UNITS, bare.size());
         for (Tile tile : game.getTileMap().values()) {
-            for (UnitHolder holder : tile.getUnitHolders().values()) {
-                int spare = BoardView.count(holder, seat, UnitType.Mech) - (holder instanceof Planet ? 1 : 0);
-                for (int i = 0; i < spare && transfers.size() < Math.min(MOVED_UNITS, bare.size()); i++) {
+            for (UnitMove spare : TacticalPlanner.spareMechs(game, seat, tile, defense)) {
+                for (int i = 0; i < spare.count() && transfers.size() < wanted; i++) {
                     Planet target = bare.get(transfers.size());
-                    transfers.add(new Transfer(tile.getPosition(), holder.getName(), MECH, target.getName()));
+                    transfers.add(new Transfer(tile.getPosition(), spare.holder(), MECH, target.getName()));
                 }
             }
         }
         return transfers;
     }
 
-    private static List<Transfer> occupy(Game game, Player seat) {
-        if (!seat.getSecretsUnscored().containsKey(OCCUPY_THE_FRINGE)) return List.of();
-        Optional<Planet> fringe = placeable(game, seat).stream()
-                .filter(planet -> BoardView.count(planet, seat, UnitType.Spacedock) == 0)
-                .max(Comparator.comparingInt(planet -> BoardView.groundForces(planet, seat)));
-        if (fringe.isEmpty()) return List.of();
+    private static List<Transfer> occupy(Game game, Player seat, DefenseOutlook defense) {
+        GroundCampaign campaign = defense.campaign();
+        Set<String> placeable = placeableNames(game, seat);
+        Optional<Planet> fringe = campaign.anchor().filter(planet -> placeable.contains(planet.getName()));
+        if (!campaign.holdsFringe() || fringe.isEmpty()) return List.of();
         Planet target = fringe.get();
-        int wanted = Math.min(MOVED_UNITS, FRINGE_GROUND_FORCES - BoardView.groundForces(target, seat));
+        int wanted = Math.min(MOVED_UNITS, campaign.fringeDemand());
         List<Transfer> transfers = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            for (UnitHolder holder : tile.getUnitHolders().values()) {
-                if (holder.getName().equals(target.getName())) continue;
-                boolean planet = holder instanceof Planet;
-                int infantry = BoardView.count(holder, seat, UnitType.Infantry);
-                int spare = planet ? Math.min(infantry, BoardView.groundForces(holder, seat) - 1) : infantry;
-                for (int i = 0; i < spare && transfers.size() < wanted; i++) {
-                    transfers.add(new Transfer(tile.getPosition(), holder.getName(), INFANTRY, target.getName()));
+            for (UnitMove spare : TacticalPlanner.spareGround(game, seat, tile, defense)) {
+                if (spare.type() != UnitType.Infantry || spare.holder().equals(target.getName())) continue;
+                int movable = leavesOneBehind(tile, spare, seat);
+                for (int i = 0; i < movable && transfers.size() < wanted; i++) {
+                    transfers.add(new Transfer(tile.getPosition(), spare.holder(), INFANTRY, target.getName()));
                 }
             }
         }
         return transfers;
+    }
+
+    private static int leavesOneBehind(Tile tile, UnitMove spare, Player seat) {
+        UnitHolder holder = tile.getUnitHolders().get(spare.holder());
+        if (!(holder instanceof Planet)) return spare.count();
+        return Math.min(spare.count(), BoardView.groundForces(holder, seat) - 1);
     }
 
     private static boolean completesMechanize(Game game, Player seat, List<Transfer> transfers) {
@@ -193,6 +199,10 @@ public class TransitDiodesRules {
                 .flatMap(tile -> tile.getPlanetUnitHolders().stream())
                 .filter(planet -> BoardView.count(planet, seat, UnitType.Mech) > 0)
                 .count();
+    }
+
+    private static Set<String> placeableNames(Game game, Player seat) {
+        return placeable(game, seat).stream().map(Planet::getName).collect(java.util.stream.Collectors.toSet());
     }
 
     private static List<Planet> placeable(Game game, Player seat) {

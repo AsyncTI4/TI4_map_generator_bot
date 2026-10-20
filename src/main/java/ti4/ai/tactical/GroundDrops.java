@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
-import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -28,14 +27,6 @@ public class GroundDrops {
     private static final double NEEDED_INFANTRY_VALUE = 0.5;
     private static final double INVASION_INFANTRY_VALUE = 1.0;
     private static final double SECONDARY_SHARE = 0.25;
-    private static final String MECHANIZE_THE_MILITARY = "mtm";
-    private static final String OCCUPY_THE_FRINGE = "otf";
-    private static final int FRINGE_GROUND_FORCES = 9;
-    private static final int MECHANIZED_PLANETS = 4;
-    private static final double COMPLETION_SHARE = 0.8;
-    private static final double MECH_PROGRESS_SHARE = 0.1;
-    private static final double FRINGE_PROGRESS_SHARE = 0.6;
-    private static final double FAR_STACK_SHARE = 0.8;
 
     public record Drop(String planet, double infantry, double mech) {}
 
@@ -82,17 +73,17 @@ public class GroundDrops {
             boolean mechAvailable) {
         double holding = holding(defense, tile, planet.getName(), 0, UnitType.Infantry, INFANTRY);
         double staging = staging(game, seat, tile, defense, plan);
-        double objective = fringe(game, seat, planet);
+        double objective = defense.campaign().fringeDropValue(planet, INFANTRY);
         double best = Math.max(holding, Math.max(staging, objective));
         double rest = holding + staging + objective - best;
         double infantry = best + SECONDARY_SHARE * rest + INFANTRY_FLOOR * INFANTRY;
-        double mech = mechAvailable ? mechValue(game, seat, defense, tile, planet) : 0;
+        double mech = mechAvailable ? mechValue(defense, tile, planet) : 0;
         return new Drop(planet.getName(), infantry, mech);
     }
 
-    private static double mechValue(Game game, Player seat, DefenseOutlook defense, Tile tile, Planet planet) {
+    private static double mechValue(DefenseOutlook defense, Tile tile, Planet planet) {
         double holding = holding(defense, tile, planet.getName(), INFANTRY, UnitType.Mech, 1);
-        return holding + mechanize(game, seat, planet);
+        return holding + defense.campaign().mechDropValue(planet);
     }
 
     private static double holding(
@@ -138,34 +129,6 @@ public class GroundDrops {
         }
         int carried = BoardView.count(space, seat, UnitType.Fighter) + BoardView.groundForces(space, seat);
         return capacity - carried;
-    }
-
-    private static double fringe(Game game, Player seat, Planet planet) {
-        if (!seat.getSecretsUnscored().containsKey(OCCUPY_THE_FRINGE)) return 0;
-        if (BoardView.count(planet, seat, UnitType.Spacedock) > 0) return 0;
-        int stacked = BoardView.groundForces(planet, seat);
-        if (stacked + INFANTRY >= FRINGE_GROUND_FORCES) return COMPLETION_SHARE * ObjectiveValue.VICTORY_POINT_VALUE;
-        if (!buildsTheBestStack(game, seat, planet)) return 0;
-        double nearness = FringeStack.nearHome(game, seat, planet.getName()) ? 1.0 : FAR_STACK_SHARE;
-        double perForce = FRINGE_PROGRESS_SHARE * ObjectiveValue.VICTORY_POINT_VALUE / (FRINGE_GROUND_FORCES - stacked);
-        return nearness * perForce * INFANTRY;
-    }
-
-    private static boolean buildsTheBestStack(Game game, Player seat, Planet planet) {
-        return FringeStack.best(game, seat)
-                .map(best -> best.getName().equals(planet.getName()))
-                .orElse(true);
-    }
-
-    private static double mechanize(Game game, Player seat, Planet planet) {
-        if (!seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY)) return 0;
-        if (BoardView.count(planet, seat, UnitType.Mech) > 0) return 0;
-        long mechanized = game.getTileMap().values().stream()
-                .flatMap(tile -> tile.getPlanetUnitHolders().stream())
-                .filter(held -> BoardView.count(held, seat, UnitType.Mech) > 0)
-                .count();
-        double share = mechanized + 1 >= MECHANIZED_PLANETS ? COMPLETION_SHARE : MECH_PROGRESS_SHARE;
-        return share * ObjectiveValue.VICTORY_POINT_VALUE;
     }
 
     private static boolean placeable(Game game, Planet planet) {

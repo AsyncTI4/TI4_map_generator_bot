@@ -17,6 +17,7 @@ import ti4.ai.eval.GameHorizon;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringStakes;
+import ti4.ai.tactical.GroundCampaign;
 import ti4.ai.tactical.PrecisionRules;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -148,6 +149,7 @@ public class ResearchPolicy {
     private static final Set<String> TRANSIT_DIODES = Set.of("td", "absol_td");
     private static final List<String> GROUND_SECRETS = List.of("mtm", "otf");
     private static final double GROUND_SECRET_SHARE = 0.4;
+    private static final double GROUND_SPEED_UP_SHARE = 0.75;
     private static final Set<String> DESTROYER_UPGRADES = Set.of("dd2", "absol_dd2");
     private static final double BARRAGE_SECRET_SHARE = 0.3;
 
@@ -214,11 +216,21 @@ public class ResearchPolicy {
     }
 
     private static double groundSecretValue(Game game, Player seat, TechnologyModel tech) {
-        if (!TRANSIT_DIODES.contains(tech.getAlias()) || !ListTechService.isTechResearchable(tech, seat)) return 0;
-        long held = GROUND_SECRETS.stream()
+        boolean diodes = TRANSIT_DIODES.contains(tech.getAlias());
+        if (!diodes && !CARRIER_II.equals(tech.getAlias()) || !ListTechService.isTechResearchable(tech, seat)) return 0;
+        GroundCampaign campaign = GroundCampaign.of(game, seat);
+        double speedUp = GROUND_SECRETS.stream()
                 .filter(seat.getSecretsUnscored()::containsKey)
-                .count();
-        return held * GROUND_SECRET_SHARE * ScoringStakes.scoreValue(game, seat, 1);
+                .mapToDouble(secret -> groundSpeedUp(campaign, secret, diodes))
+                .sum();
+        return speedUp * GROUND_SECRET_SHARE * ScoringStakes.scoreValue(game, seat, 1);
+    }
+
+    private static double groundSpeedUp(GroundCampaign campaign, String secret, boolean diodes) {
+        GroundCampaign.Eta now = campaign.eta(secret);
+        GroundCampaign.Eta upgraded = campaign.eta(secret, !diodes, diodes);
+        if (!now.feasible() && upgraded.feasible()) return 1.0;
+        return now.rounds() - upgraded.rounds() >= 1 ? GROUND_SPEED_UP_SHARE : 0;
     }
 
     static double bestValueAsTechnologyHolder(Game game, Player seat) {

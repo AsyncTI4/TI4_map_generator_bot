@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
-import ti4.ai.eval.GameHorizon;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -21,7 +20,6 @@ public class FringeStack {
     public static final String OCCUPY_THE_FRINGE = "otf";
     public static final int GROUND_FORCES = 9;
     public static final int PROTECTED_FROM = 3;
-    private static final int GIVEN_UP_AT = 4;
     private static final int ANCHOR_SLACK = 2;
     private static final int IN_DOCK_SYSTEM = 0;
     private static final int NEXT_TO_DOCK_SYSTEM = 1;
@@ -33,11 +31,7 @@ public class FringeStack {
 
     public static Optional<Planet> best(Game game, Player seat) {
         if (!held(seat)) return Optional.empty();
-        List<Planet> candidates = seat.getPlanets().stream()
-                .map(game::getUnitHolderFromPlanet)
-                .filter(Objects::nonNull)
-                .filter(planet -> BoardView.count(planet, seat, UnitType.Spacedock) == 0)
-                .toList();
+        List<Planet> candidates = docklessPlanets(game, seat);
         int largest = candidates.stream()
                 .mapToInt(planet -> BoardView.groundForces(planet, seat))
                 .max()
@@ -52,6 +46,22 @@ public class FringeStack {
                         .thenComparing(planet -> !nearHome(game, seat, planet.getName())));
     }
 
+    static Optional<Planet> fallback(Game game, Player seat) {
+        if (!held(seat)) return Optional.empty();
+        List<Tile> dockSystems = dockSystems(game, seat);
+        return docklessPlanets(game, seat).stream()
+                .min(Comparator.comparingInt((Planet planet) -> distanceToDocks(game, seat, dockSystems, planet))
+                        .thenComparing(planet -> !nearHome(game, seat, planet.getName())));
+    }
+
+    private static List<Planet> docklessPlanets(Game game, Player seat) {
+        return seat.getPlanets().stream()
+                .map(game::getUnitHolderFromPlanet)
+                .filter(Objects::nonNull)
+                .filter(planet -> BoardView.count(planet, seat, UnitType.Spacedock) == 0)
+                .toList();
+    }
+
     public static boolean inOrNextTo(Game game, Player seat, Tile dockSystem, Planet anchor) {
         Tile tile = game.getTileFromPlanet(anchor.getName());
         if (tile == null) return false;
@@ -61,11 +71,7 @@ public class FringeStack {
     }
 
     public static boolean isProtected(Game game, Player seat, Planet planet) {
-        return best(game, seat)
-                .filter(stack -> stack.getName().equals(planet.getName()))
-                .filter(stack -> BoardView.groundForces(stack, seat) >= PROTECTED_FROM)
-                .filter(stack -> !givenUp(game, BoardView.groundForces(stack, seat)))
-                .isPresent();
+        return GroundCampaign.of(game, seat).protects(planet);
     }
 
     public static int kept(Game game, Player seat, Planet planet) {
@@ -81,7 +87,7 @@ public class FringeStack {
         return adjacent.contains(tile.getPosition());
     }
 
-    private static List<Tile> dockSystems(Game game, Player seat) {
+    static List<Tile> dockSystems(Game game, Player seat) {
         return seat.getPlanets().stream()
                 .map(game::getUnitHolderFromPlanet)
                 .filter(Objects::nonNull)
@@ -98,9 +104,5 @@ public class FringeStack {
         }
         boolean adjacent = dockSystems.stream().anyMatch(dock -> inOrNextTo(game, seat, dock, planet));
         return adjacent ? NEXT_TO_DOCK_SYSTEM : ELSEWHERE;
-    }
-
-    private static boolean givenUp(Game game, int stacked) {
-        return GameHorizon.roundsLeft(game) <= 1 && stacked <= GIVEN_UP_AT;
     }
 }
