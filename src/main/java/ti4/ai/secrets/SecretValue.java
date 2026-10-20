@@ -7,6 +7,7 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.strategy.TechPath;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -170,6 +171,7 @@ public class SecretValue {
         int threshold = ListPlayerInfoService.getObjectiveThreshold(secretId, game);
         if (threshold <= 0) return achievableCompletion(secretId);
         double share = Math.min(1.0, (double) progress(game, seat, secretId) / threshold);
+        if (TechPath.follows(secretId) && !TechPath.reachable(game, seat, secretId)) return share >= 1.0 ? 1.0 : 0.0;
         double runway = Math.min(1.0, GameHorizon.roundsLeft(game) / STATUS_RUNWAY_ROUNDS);
         return share + (1 - share) * achievableCompletion(secretId) * runway;
     }

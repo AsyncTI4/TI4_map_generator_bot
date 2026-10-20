@@ -71,6 +71,7 @@ import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
 import ti4.ai.tactical.TacticalRules;
 import ti4.ai.tactical.TransitDiodesRules;
+import ti4.ai.tech.EntropicScarRules;
 import ti4.ai.tech.TechRules;
 import ti4.ai.trade.TradeRules;
 import ti4.ai.xxcha.PeaceAccordsRules;
@@ -170,6 +171,7 @@ public class NekroBrain implements FactionBrain {
             NekroRules::commanderDraw,
             NekroRules::dacxiveAnimators,
             TechRules::reviveInfantry,
+            EntropicScarRules::next,
             TechRules::placeSpinnerInfantry,
             TechRules::placeSelfAssemblyMech,
             TechRules::placeMagenInfantry,

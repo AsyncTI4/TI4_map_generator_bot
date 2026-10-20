@@ -2,7 +2,6 @@ package ti4.ai.strategy;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
@@ -11,7 +10,6 @@ import ti4.ai.tactical.ProductionPlanner;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
-import ti4.helpers.ButtonHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 
@@ -21,11 +19,6 @@ public class PrerequisiteSkips {
     static final double VALUE_PER_RESOURCE = 0.7;
     private static final String PSYCHOARCHAEOLOGY = "pa";
     private static final String AI_DEVELOPMENT = "aida";
-    private static final Map<Character, TechnologyType> COLOURS = Map.of(
-            'B', TechnologyType.PROPULSION,
-            'G', TechnologyType.BIOTIC,
-            'R', TechnologyType.WARFARE,
-            'Y', TechnologyType.CYBERNETIC);
 
     public record Plan(List<String> planets, boolean aiDevelopment, double resourcesLost) {
 
@@ -44,7 +37,7 @@ public class PrerequisiteSkips {
         int shortfall = 0;
         for (Map.Entry<TechnologyType, Integer> colour : missing.entrySet()) {
             List<String> candidates = seat.getReadiedPlanets().stream()
-                    .filter(planet -> !planets.contains(planet) && hasSpecialty(game, planet, colour.getKey()))
+                    .filter(planet -> !planets.contains(planet) && hasSpecialty(game, seat, planet, colour.getKey()))
                     .sorted(Comparator.comparingInt(planet -> spendValue(game, planet)))
                     .limit(colour.getValue())
                     .toList();
@@ -68,24 +61,19 @@ public class PrerequisiteSkips {
     }
 
     static Map<TechnologyType, Integer> missing(Player seat, TechnologyModel tech) {
-        String requirements = tech.getRequirements().orElse("");
-        Map<TechnologyType, Integer> missing = new EnumMap<>(TechnologyType.class);
-        for (Map.Entry<Character, TechnologyType> colour : COLOURS.entrySet()) {
-            long needed = requirements
-                    .chars()
-                    .filter(letter -> letter == colour.getKey())
-                    .count();
-            int owned = ButtonHelper.getNumberOfCertainTypeOfTech(seat, colour.getValue());
-            int gap = (int) Math.max(0, needed - owned);
-            if (gap > 0) missing.put(colour.getValue(), gap);
-        }
-        return missing;
+        return TechColours.missing(seat, tech.getRequirements().orElse(""), TechColours.owned(seat, null), Map.of());
     }
 
-    private static boolean hasSpecialty(Game game, String planet, TechnologyType colour) {
+    private static boolean hasSpecialty(Game game, Player seat, String planet, TechnologyType colour) {
         Planet info = game.getPlanetsInfo().get(planet);
-        return info != null
-                && info.getTechSpecialities().stream().anyMatch(specialty -> specialty.equalsIgnoreCase(colour.name()));
+        if (info == null) return false;
+        return info.getTechSpecialities().stream()
+                .anyMatch(specialty -> specialty.equalsIgnoreCase(colour.name())
+                        || (TechColours.pooled(seat, colour) && pooledSpecialty(seat, specialty)));
+    }
+
+    private static boolean pooledSpecialty(Player seat, String specialty) {
+        return TechColours.pool(seat).stream().anyMatch(colour -> colour.name().equalsIgnoreCase(specialty));
     }
 
     private static int spendValue(Game game, String planet) {

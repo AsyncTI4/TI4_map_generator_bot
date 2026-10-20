@@ -15,7 +15,6 @@ import ti4.ai.eval.GameHorizon;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringStakes;
-import ti4.ai.secrets.SecretValue;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -91,7 +90,7 @@ public class ResearchPolicy {
             Map.entry("parasite-obs", 1.0),
             Map.entry("subatomic", 1.0),
             Map.entry("sc", 1.0));
-    private static final double OBJECTIVE_WEIGHT =
+    static final double OBJECTIVE_WEIGHT =
             ObjectiveValue.VICTORY_POINT_VALUE * WORTH_PAYING_FOR / StrategyCardRules.SECOND_TECH_COST;
     private static final double PARTIAL_PROGRESS_SHARE = 0.4;
     private static final Map<String, Double> GENERIC_VALUE = Map.ofEntries(
@@ -136,8 +135,6 @@ public class ResearchPolicy {
     private static final String GRAVITY_DRIVE = "gd";
     private static final double GRAVITY_DRIVE_RACE_SHARE = 0.5;
     private static final String PRODUCE_EN_MASSE = "pem";
-    private static final String LAWS_OF_PHYSICS = "mlp";
-    private static final String ADAPT_NEW_STRATEGIES = "ans";
     private static final int PAIR = 2;
     private static final double RESEARCHES_PER_ROUND = 1.5;
     private static final String SPACE_DOCK_UPGRADE = "sd2";
@@ -146,11 +143,6 @@ public class ResearchPolicy {
     private static final Set<String> TRANSIT_DIODES = Set.of("td", "absol_td");
     private static final List<String> GROUND_SECRETS = List.of("mtm", "otf");
     private static final double GROUND_SECRET_SHARE = 0.4;
-    private static final Map<Character, TechnologyType> PREREQUISITE_COLOURS = Map.of(
-            'B', TechnologyType.PROPULSION,
-            'G', TechnologyType.BIOTIC,
-            'R', TechnologyType.WARFARE,
-            'Y', TechnologyType.CYBERNETIC);
 
     public static Optional<String> best(Game game, Player seat, Collection<String> candidates) {
         return candidates.stream()
@@ -293,16 +285,11 @@ public class ResearchPolicy {
     }
 
     static int missingPrerequisites(Player seat, TechnologyModel next, TechnologyModel adding) {
-        String requirements = next.getRequirements().orElse("");
-        int missing = 0;
-        for (Map.Entry<Character, TechnologyType> colour : PREREQUISITE_COLOURS.entrySet()) {
-            long needed = requirements
-                    .chars()
-                    .filter(letter -> letter == colour.getKey())
-                    .count();
-            missing += (int) Math.max(0, needed - colourCount(seat, colour.getValue(), adding));
-        }
-        return missing;
+        return TechColours.missing(seat, next.getRequirements().orElse(""), TechColours.owned(seat, adding), Map.of())
+                .values()
+                .stream()
+                .mapToInt(Integer::intValue)
+                .sum();
     }
 
     private static boolean isFactionTech(TechnologyModel tech) {
@@ -313,6 +300,11 @@ public class ResearchPolicy {
         double gain = 0;
         int laterResearches = researchesLeft(game) - 1;
         for (String objective : objectivesInPlay(game, seat)) {
+            if (TechPath.follows(objective)) {
+                gain += TechPath.gain(game, seat, objective, tech)
+                        * Math.max(1, ObjectivePolicy.victoryPoints(objective));
+                continue;
+            }
             int threshold = ListPlayerInfoService.getObjectiveThreshold(objective, game);
             if (threshold <= 0) continue;
             int before = progress(game, objective, seat, null);
@@ -352,12 +344,6 @@ public class ResearchPolicy {
                     .mapToInt(count -> Math.max(0, PAIR - count))
                     .sum();
         }
-        if (LAWS_OF_PHYSICS.equals(objective)) return threshold - colours.getFirst();
-        if (ADAPT_NEW_STRATEGIES.equals(objective)) {
-            boolean ownFactionTech = adding != null
-                    && adding.getFaction().filter(seat.getFaction()::equals).isPresent();
-            return threshold - SecretValue.ownFactionTechnologies(seat) - (ownFactionTech ? 1 : 0);
-        }
         return 0;
     }
 
@@ -386,16 +372,6 @@ public class ResearchPolicy {
                 if (colourCount(seat, type, adding) >= 2) pairs++;
             }
             return pairs;
-        }
-        if (LAWS_OF_PHYSICS.equals(objective)) {
-            int best = 0;
-            for (TechnologyType type : TechnologyType.mainFour) best = Math.max(best, colourCount(seat, type, adding));
-            return best;
-        }
-        if (ADAPT_NEW_STRATEGIES.equals(objective)) {
-            boolean addsOwnFactionTech = adding != null
-                    && adding.getFaction().filter(seat.getFaction()::equals).isPresent();
-            return SecretValue.ownFactionTechnologies(seat) + (addsOwnFactionTech ? 1 : 0);
         }
         return 0;
     }

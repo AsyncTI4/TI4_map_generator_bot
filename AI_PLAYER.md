@@ -168,6 +168,11 @@ to build one by hand:
     for fleet objectives), otherwise infantry and fighters (for spare capacity) only when an enemy fleet can reach
     the system or the money is spare beyond its best dock's production and a research; Mirror Computing counts each
     trade good as 2 in every payment plan;
+  - **Entropic Scars** (`EntropicScarRules`): while it has ships in a scar (an anomaly, Thunder's Edge) at the start of the
+    status phase it presses the faction technology it values most (`ResearchPolicy.value`, which includes the secret
+    objectives below) for a strategy token, prerequisites ignored, as long as the technology is worth more than the
+    token at the tech tempo, otherwise it presses "No Thanks". Each offer message is answered once, and only while
+    the ships are still there. It does not yet move ships into a scar for it;
   - technologies it does not use: Transit Diodes, Chaos Mapping, Instinct Training, Quantum Datahub Node, Wormhole
     Generator and the remaining faction technologies with an action or a choice it has no rule for. They are worth
     the least when it researches or copies a technology;
@@ -227,6 +232,14 @@ to build one by hand:
       _Form a Spy Network_, 2 relic fragments for _Destroy Heretical Works_. A cost (like a spend public objective's
       planets) stays owed until it is paid, even when the bot queues the score behind slower players.
       _Adapt New Strategies_ counts only the seat's own faction technologies, so Nekro's copies never score it.
+      Research walks the route to _Adapt New Strategies_ and _Master the Laws of Physics_ (`TechPath`): the researches
+      still needed are the seat's cheapest two faction technologies (each one research, plus one per prerequisite it
+      lacks after its technology specialty planets and breakthrough synergy, where a synergy colour counts as either
+      of its two) or the colour closest to four (synergy colours pooled, as the bot's own progress check does). If
+      that fits in the researches left (one per round the leader still needs) a technology that shortens the route
+      carries 1.1 times its even share of the point and the one that finishes it the whole point; otherwise the
+      route is worth nothing, and the secret's keep value falls to what it has already completed. Nekro (no
+      research, Valefar Assimilators never count) never has a route.
     - **Action phase:** at most one per combat (a space combat and each ground combat are separate). Before anything
       else on every tick it records each combat it is in (opponent, whether that opponent leads on points, its
       flagship, the system), and it also picks up a combat it only saw after the fact from the bot's combat round
