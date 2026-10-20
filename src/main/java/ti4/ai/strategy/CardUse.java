@@ -3,6 +3,7 @@ package ti4.ai.strategy;
 public enum CardUse {
     LEADERSHIP_TOKENS("command tokens for more actions"),
     LEADERSHIP_TEMPO("win the race for the custodians"),
+    LEADERSHIP_ENDURANCE("stall to be the last to pass"),
     DIPLOMACY_PROTECT("lock a threatened system"),
     DIPLOMACY_READY("ready planets"),
     DIPLOMACY_PEACE_ACCORDS("claim a planet with Peace Accords"),

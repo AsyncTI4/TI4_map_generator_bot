@@ -35,7 +35,8 @@ class FragmentRules {
 
     static Optional<AiDecision> insteadOfTacticalAction(AiTurnContext context, List<AiPrompt> thisTurn) {
         if (!canMakeRelic(context.seat())) return Optional.empty();
-        if (ComponentFlow.tacticalActionBeats(context, EARLY_RELIC_VALUE + Stall.ACTION_VALUE)) {
+        if (ComponentFlow.tacticalActionBeats(
+                context, EARLY_RELIC_VALUE + Stall.value(context.game(), context.seat()))) {
             return Optional.empty();
         }
         return open(context, thisTurn, "purge relic fragments instead of a weak tactical action");

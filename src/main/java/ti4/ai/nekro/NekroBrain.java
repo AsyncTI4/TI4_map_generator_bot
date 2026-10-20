@@ -565,6 +565,8 @@ public class NekroBrain implements FactionBrain {
         if (convoysBeforePassing.isPresent()) return convoysBeforePassing;
         Optional<AiDecision> beforePassing = TechRules.beforePassing(context, thisTurn);
         if (beforePassing.isPresent()) return beforePassing;
+        Optional<AiDecision> enduranceStall = TacticalRules.stall(context);
+        if (enduranceStall.isPresent()) return enduranceStall;
         Optional<AiDecision> redrawBeforePassing = SecretRedrawRules.endOfTurn(context, thisTurn);
         if (redrawBeforePassing.isPresent()) return redrawBeforePassing;
         for (String handler : List.of("passForRound", "passingAbilities")) {

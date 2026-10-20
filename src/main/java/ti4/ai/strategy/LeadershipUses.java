@@ -3,6 +3,7 @@ package ti4.ai.strategy;
 import java.util.List;
 import java.util.OptionalInt;
 import lombok.experimental.UtilityClass;
+import ti4.ai.endurance.Endurance;
 import ti4.ai.eval.CustodiansRace.Order;
 import ti4.ai.eval.CustodiansRace.Snapshot;
 import ti4.ai.strategy.CardPlan.Benefit;
@@ -15,7 +16,11 @@ class LeadershipUses {
         return List.of(
                 new Benefit(
                         CardUse.LEADERSHIP_TOKENS, TokenValue.tacticTokens(in, StrategyCardRules.LEADERSHIP_TOKENS)),
-                new Benefit(CardUse.LEADERSHIP_TEMPO, firstInTheRace(in)));
+                new Benefit(CardUse.LEADERSHIP_TEMPO, firstInTheRace(in)),
+                new Benefit(
+                        CardUse.LEADERSHIP_ENDURANCE,
+                        Endurance.leadershipValue(
+                                in.seat(), Math.min(StrategyCardRules.LEADERSHIP_TOKENS, in.reinforcements()))));
     }
 
     private static double firstInTheRace(PlanInputs in) {

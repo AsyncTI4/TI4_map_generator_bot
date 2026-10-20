@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.ai.endurance.Endurance;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.GameHorizon;
 import ti4.ai.scoring.ObjectivePolicy;
@@ -193,7 +194,8 @@ public class ResearchPolicy {
                 + steppingStoneValue(game, seat, tech)
                 + custodiansRaceValue(game, seat, alias)
                 + openingReachValue(game, seat, alias)
-                + groundSecretValue(game, seat, tech);
+                + groundSecretValue(game, seat, tech)
+                + Endurance.researchValue(seat, alias);
     }
 
     private static double groundSecretValue(Game game, Player seat, TechnologyModel tech) {
