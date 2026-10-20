@@ -14,7 +14,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
 
@@ -110,15 +109,6 @@ public class GroundDrops {
     private static boolean launchesFrom(TacticalPlan plan, Tile tile) {
         boolean invades = plan.kind() == Kind.EXPAND || plan.kind() == Kind.ATTACK;
         return invades && plan.moves().stream().anyMatch(move -> move.origin().equals(tile.getPosition()));
-    }
-
-    static int roomNear(Game game, Player seat, Tile tile) {
-        int room = Math.max(0, transportRoom(seat, tile));
-        for (String position : FoWHelper.getAdjacentTiles(game, tile.getPosition(), seat, false)) {
-            Tile nearby = game.getTileByPosition(position);
-            if (nearby != null && nearby != tile) room += Math.max(0, transportRoom(seat, nearby));
-        }
-        return room;
     }
 
     private static int transportRoom(Player seat, Tile tile) {

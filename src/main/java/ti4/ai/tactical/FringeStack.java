@@ -74,10 +74,6 @@ public class FringeStack {
         return GroundCampaign.of(game, seat).protects(planet);
     }
 
-    public static int kept(Game game, Player seat, Planet planet) {
-        return isProtected(game, seat, planet) ? GROUND_FORCES : 0;
-    }
-
     public static boolean nearHome(Game game, Player seat, String planetName) {
         Tile tile = game.getTileFromPlanet(planetName);
         Tile home = seat.getHomeSystemTile();
