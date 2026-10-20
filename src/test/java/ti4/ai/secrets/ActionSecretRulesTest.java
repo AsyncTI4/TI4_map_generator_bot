@@ -76,6 +76,43 @@ class ActionSecretRulesTest extends BaseTi4Test {
         assertThat(tick(scoreButtons("dyp")).map(AiTestGame::pressedId)).contains(scoreId("dyp"));
     }
 
+    private void neutralBattlefield(String tileId) {
+        battlefield = test.place(tileId, battlefield.getPosition());
+    }
+
+    // Combat against neutral units is a combat (neutral-units.md II, VIII), so a win over them scores Brave the Void.
+    @Test
+    void scoresBraveTheVoidAfterBeatingNeutralUnitsInAnAnomaly() {
+        neutralBattlefield("42");
+        Player neutral = test.game.getNeutral();
+        test.nekro.setSecret("btv");
+        test.units(battlefield, "space", test.nekro, UnitType.Dreadnought, 2);
+        test.units(battlefield, "space", neutral, UnitType.Destroyer, 1);
+        assertThat(tick()).isEmpty();
+
+        roundsRolled(test.nekro, 1);
+        roundsRolled(neutral, 1);
+        destroy(neutral, UnitType.Destroyer, 1);
+
+        assertThat(tick(scoreButtons("btv")).map(AiTestGame::pressedId)).contains(scoreId("btv"));
+    }
+
+    // Neutral units are not a player, and with every score at zero they would otherwise look like the leader.
+    @Test
+    void doesNotScoreSparkARebellionAgainstNeutralUnits() {
+        Player neutral = test.game.getNeutral();
+        test.nekro.setSecret("sar");
+        test.units(battlefield, "space", test.nekro, UnitType.Dreadnought, 2);
+        test.units(battlefield, "space", neutral, UnitType.Destroyer, 1);
+        assertThat(tick()).isEmpty();
+
+        roundsRolled(test.nekro, 1);
+        roundsRolled(neutral, 1);
+        destroy(neutral, UnitType.Destroyer, 1);
+
+        assertThat(tick(scoreButtons("sar"))).isEmpty();
+    }
+
     // Spark a Rebellion needs a win against the player with the most points; a lost combat scores nothing.
     @Test
     void scoresNothingAfterLosingTheCombat() {
