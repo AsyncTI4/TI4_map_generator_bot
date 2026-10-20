@@ -40,6 +40,7 @@ import ti4.cron.CardsInfoPinCleanupCron;
 import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
 import ti4.cron.CronManager;
+import ti4.cron.DiskUsageCron;
 import ti4.cron.EndOldGamesCron;
 import ti4.cron.FastScFollowCron;
 import ti4.cron.FlushUserActiveHoursCron;
@@ -333,6 +334,7 @@ public class JdaService {
         UploadStatsCron.register();
         UploadRecentStatsCron.register();
         OldUndoFileCleanupCron.register();
+        DiskUsageCron.register();
         EndOldGamesCron.register();
         GameMessageCleanupCron.register();
         CardsInfoPinCleanupCron.register();

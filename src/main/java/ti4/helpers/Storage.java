@@ -19,6 +19,7 @@ public final class Storage {
     private static final String GAMES_PATH = "/maps/";
     private static final String DELETED_GAMES_PATH = "/deletedmaps/";
     private static final String TTPG_EXPORTS = "/ttpg_exports/";
+    private static final String CHANNEL_EXPORTS = "/exported_channels/";
 
     private static String resourcePath;
 
@@ -328,6 +329,11 @@ public final class Storage {
     @NotNull
     public static File getTTPGExportStorage(String fileName) {
         return new File(getStoragePath() + TTPG_EXPORTS + fileName);
+    }
+
+    @NotNull
+    public static Path getChannelExportsDirectory() {
+        return Path.of(getStoragePath() + CHANNEL_EXPORTS);
     }
 
     public static void init() {
