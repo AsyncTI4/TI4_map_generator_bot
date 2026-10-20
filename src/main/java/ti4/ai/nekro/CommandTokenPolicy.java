@@ -11,6 +11,7 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FleetLimit;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectivePolicy;
+import ti4.ai.strategy.TechPath;
 import ti4.ai.strategy.TokenPlan;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -174,10 +175,19 @@ public class CommandTokenPolicy {
                 new Level(Pool.TACTIC, TACTIC_FIRST),
                 new Level(Pool.FLEET, Math.min(cap, objectiveFleet(game, seat, largest, cap)) - bonus),
                 new Level(Pool.FLEET, Math.min(cap, BASE_FLEET) - bonus),
-                new Level(Pool.STRATEGY, STRATEGY_TARGET),
+                new Level(Pool.STRATEGY, strategyTarget(game, seat)),
                 new Level(Pool.FLEET, Math.min(cap, stackingFleet(game, seat, largest)) - bonus),
                 new Level(Pool.TACTIC, TACTIC_PLENTY),
                 new Level(Pool.STRATEGY, STRATEGY_MAX));
+    }
+
+    private static int strategyTarget(Game game, Player seat) {
+        boolean onARoute = seat.getSecretsUnscored().containsKey(TechPath.ADAPT_NEW_STRATEGIES)
+                && TechPath.researchesNeeded(game, seat, TechPath.ADAPT_NEW_STRATEGIES)
+                                .orElse(0)
+                        > 0
+                && TechPath.reachable(game, seat, TechPath.ADAPT_NEW_STRATEGIES);
+        return onARoute ? STRATEGY_TARGET + 1 : STRATEGY_TARGET;
     }
 
     private static int fleetForAnOpenSlot(Game game, Player seat, int largest, int cap) {

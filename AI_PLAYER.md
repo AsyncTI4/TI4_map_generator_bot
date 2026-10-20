@@ -173,7 +173,9 @@ to build one by hand:
     objectives below) for a strategy token, prerequisites ignored, as long as the technology is worth more than the
     token at the tech tempo, otherwise it presses "No Thanks". Each offer message is answered once, and only while
     the ships are still there. While it holds _Adapt New Strategies_ and has no ships in a scar, a position move into a
-    reachable scar is worth 0.6 of a point divided by the faction technologies still missing;
+    reachable scar is worth 0.6 of a point divided by the faction technologies still missing. While it holds the secret
+    with ships in or beside a scar it keeps one strategy token for the purchase (`ScarToken`), and while a reachable
+    research route still needs work it takes a third strategy token at the status phase so it can follow Technology;
   - technologies it does not use: Transit Diodes, Chaos Mapping, Instinct Training, Quantum Datahub Node, Wormhole
     Generator and the remaining faction technologies with an action or a choice it has no rule for. They are worth
     the least when it researches or copies a technology;

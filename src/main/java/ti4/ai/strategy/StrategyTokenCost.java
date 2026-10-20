@@ -20,7 +20,8 @@ public class StrategyTokenCost {
 
     public static boolean canSpare(Game game, Player seat) {
         int reserved = ScoringReserve.of(game, seat).tokens();
-        return seat.getStrategicCC() >= 1 && seat.getStrategicCC() + seat.getTacticalCC() - 1 >= reserved;
+        int scar = ScarToken.kept(game, seat);
+        return seat.getStrategicCC() - scar >= 1 && seat.getStrategicCC() + seat.getTacticalCC() - 1 - scar >= reserved;
     }
 
     private static double scarcity(int strategyTokens) {
