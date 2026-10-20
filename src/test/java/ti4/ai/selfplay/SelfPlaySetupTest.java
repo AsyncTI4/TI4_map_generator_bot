@@ -32,11 +32,35 @@ class SelfPlaySetupTest extends BaseTi4Test {
     void leavesNoPlaceholderHomeSystemForAnEmptySeat() {
         Map<String, String> tiles = SelfPlaySetup.tiles(4, new Game());
 
-        assertThat(tiles.get("000")).isEqualTo("18");
+        assertThat(tiles.get("000")).isEqualTo("112");
         assertThat(List.of("301", "304", "310", "313"))
                 .allSatisfy(home -> assertThat(tiles.get(home)).isEqualTo("0g"));
         assertThat(tiles.get("307")).isEqualTo("-1");
         assertThat(tiles.get("316")).isEqualTo("-1");
+    }
+
+    // "Thunder Dreaming", the six-player map in the Thunder's Edge rulebook. Neighbours read off the rulebook picture
+    // must be neighbours on the bot's board: Gral (43) touches 107, 109, 26, 28, 35 and 101; 30 touches 37 and 47.
+    @Test
+    void laysOutTheThunderDreamingMapFromTheRulebook() {
+        Map<String, String> tiles = SelfPlaySetup.tiles(6, new Game());
+        Map<String, String> positionOf = new java.util.HashMap<>();
+        tiles.forEach((position, tile) -> positionOf.putIfAbsent(tile, position));
+
+        assertThat(tiles.get("000")).isEqualTo("112");
+        assertThat(tiles.values().stream().filter("0g"::equals)).hasSize(6);
+        assertThat(neighbours(positionOf, "43")).contains("107", "109", "26", "28", "35", "101");
+        assertThat(neighbours(positionOf, "30")).contains("37", "47", "112", "98", "44", "35");
+        assertThat(neighbours(positionOf, "115")).contains("29", "28", "46");
+    }
+
+    private static List<String> neighbours(Map<String, String> positionOf, String tile) {
+        Map<String, String> tileAt = new java.util.HashMap<>();
+        positionOf.forEach((t, position) -> tileAt.put(position, t));
+        return ti4.image.PositionMapper.getAdjacentTilePositions(positionOf.get(tile)).stream()
+                .map(tileAt::get)
+                .filter(java.util.Objects::nonNull)
+                .toList();
     }
 
     @Test

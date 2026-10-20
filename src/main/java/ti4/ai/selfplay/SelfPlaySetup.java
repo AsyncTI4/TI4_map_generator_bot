@@ -32,6 +32,9 @@ public class SelfPlaySetup {
     private static final String CUSTOM_NAME = "AI self-play";
     private static final String UNUSED_POSITION = "-1";
     private static final int FEW_SEATS = 4;
+    public static final String THUNDER_DREAMING_MAP_STRING =
+            "{112} 35 30 98 34 113 101 109 47 37 44 110 49 27 48 38 46 28 43"
+                    + " 0 42 100 0 40 105 0 39 111 0 114 99 0 29 115 0 26 107";
 
     public record Channels(TextChannel actions, TextChannel tableTalk, ThreadChannel mapUpdates) {}
 
@@ -54,7 +57,7 @@ public class SelfPlaySetup {
 
     public static Map<String, String> tiles(int seats, Game game) {
         Map<String, String> tiles =
-                new HashMap<>(MapStringMapper.getMappedTilesToPosition(TestBedPresetService.DEFAULT_MAP_STRING, game));
+                new HashMap<>(MapStringMapper.getMappedTilesToPosition(THUNDER_DREAMING_MAP_STRING, game));
         List<String> used = homePositions(seats);
         for (String home : TestBedPresetService.DEFAULT_HOME_POSITIONS) {
             if (!used.contains(home)) tiles.put(home, UNUSED_POSITION);
