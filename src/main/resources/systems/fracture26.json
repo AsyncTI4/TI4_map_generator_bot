@@ -3,13 +3,13 @@
     "name": "Ptoma Station",
     "aliases": [
         "fracture26",
-        "ptoma",
+        "ptomastation",
         "ptomastation",
         "frac26"
     ],
     "imagePath": "fracture26.png",
     "planets": [
-        "ptoma"
+        "ptomastation"
     ],
     "shipPositionsType": "TYPE04",
     "tileBack": "fracture",

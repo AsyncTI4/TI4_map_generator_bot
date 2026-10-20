@@ -703,7 +703,7 @@ public class MiltyDraftManager {
             MiltyDraftHelper.addDraftTile(this, tileId);
             TileModel tileRequested = TileHelper.getTileById(tileId);
             if (tileRequested == null) {
-                throw new Exception("Could not find tile for tile ID [" + id + "]");
+                throw unknownTile(id);
             }
             Set<ComponentSource> currentsources = all.stream()
                     .map(t -> t.getTile().getTileModel().getSource())
@@ -718,9 +718,15 @@ public class MiltyDraftManager {
                     .findFirst()
                     .orElse(null);
             if (result == null) {
-                throw new Exception("Could not find tile for tile ID [" + id + "]");
+                throw unknownTile(id);
             }
         }
         return result;
+    }
+
+    private static Exception unknownTile(String id) {
+        String shown = id.length() > 40 ? id.substring(0, 40) + "..." : id;
+        return new Exception("Could not find tile `" + shown
+                + "`. Separate tiles within a slice with commas and slices with `;` or `|`.");
     }
 }
