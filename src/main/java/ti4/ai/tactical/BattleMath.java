@@ -31,11 +31,15 @@ class BattleMath {
     private static final int ASSAULT_CANNON_SHIPS = 3;
 
     static int expectedCannonHits(Game game, Player seat, Tile tile) {
+        return (int) Math.round(expectedCannonFire(game, seat, tile));
+    }
+
+    static double expectedCannonFire(Game game, Player seat, Tile tile) {
         double expected = 0;
         for (Player other : game.getRealPlayers()) {
             if (other != seat) expected += cannonFire(game, tile, other, null);
         }
-        return (int) Math.round(expected);
+        return expected;
     }
 
     static int ownCannonHits(Game game, Player seat, Tile tile, Collection<Tile> origins) {

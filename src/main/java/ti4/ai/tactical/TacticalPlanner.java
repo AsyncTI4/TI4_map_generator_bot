@@ -864,12 +864,19 @@ public class TacticalPlanner {
         moves.addAll(legal.get());
         moves = merge(moves);
         double carried = countOf(moves, UnitType.Fighter) - countOf(plan.moves(), UnitType.Fighter);
+        double objectiveDelta = context.objectiveGain(
+                        tile, moves, plan.landings().keySet())
+                - context.objectiveGain(tile, plan.moves(), plan.landings().keySet());
         double score = plan.score()
-                + FIGHTER_ESCORT_VALUE * carried
+                + escortValue(FIGHTER_ESCORT_VALUE * carried, objectiveDelta)
                 - leaveCosts(context, moves)
                 + leaveCosts(context, plan.moves());
         if (score <= plan.score()) return plan;
         return new TacticalPlan(plan.kind(), plan.target(), moves, plan.landings(), score);
+    }
+
+    private static double escortValue(double escort, double objectiveDelta) {
+        return objectiveDelta < 0 ? escort + objectiveDelta : Math.max(escort, objectiveDelta);
     }
 
     private static TacticalPlan withGroundLandings(Context context, Tile tile, TacticalPlan plan) {
@@ -2600,9 +2607,9 @@ public class TacticalPlanner {
         if (!context.objectives().caresAboutPresence() && frontier == 0 && !barrage && scar == 0) {
             return Optional.empty();
         }
-        if (BoardView.hasEnemyShips(game, seat, tile) || context.coveredByEnemySpaceCannon(tile)) {
-            return Optional.empty();
-        }
+        if (BoardView.hasEnemyShips(game, seat, tile)) return Optional.empty();
+        boolean covered = context.coveredByEnemySpaceCannon(tile);
+        if (covered && !SeatCover.chases(game, seat, tile, context.objectives())) return Optional.empty();
         TacticalPlan best = null;
         for (Tile origin : context.origins()) {
             if (origin == tile) continue;
@@ -2627,12 +2634,27 @@ public class TacticalPlanner {
                         context,
                         tile,
                         new TacticalPlan(Kind.POSITION, tile.getPosition(), legal.get(), Map.of(), score));
-                if (best == null || plan.score() > best.score()) best = plan;
+                Optional<TacticalPlan> allowed = covered ? underCannon(context, tile, plan) : Optional.of(plan);
+                if (allowed.isPresent() && (best == null || allowed.get().score() > best.score())) {
+                    best = allowed.get();
+                }
             }
             Optional<TacticalPlan> group = groupPosition(context, tile, origin);
+            if (covered) group = group.flatMap(plan -> underCannon(context, tile, plan));
             if (group.isPresent() && (best == null || group.get().score() > best.score())) best = group.get();
         }
         return Optional.ofNullable(best);
+    }
+
+    private static Optional<TacticalPlan> underCannon(Context context, Tile tile, TacticalPlan plan) {
+        double fire = BattleMath.expectedCannonFire(context.game, context.seat, tile);
+        Footprint after =
+                context.footprintAfter(tile, plan.moves(), plan.landings().keySet());
+        if (!SeatCover.completesThroughCannon(context.game, context.objectives(), after, fire)) {
+            return Optional.empty();
+        }
+        double score = plan.score() - SeatCover.exposure(context.seat, tile, plan.moves(), fire);
+        return Optional.of(new TacticalPlan(plan.kind(), plan.target(), plan.moves(), plan.landings(), score));
     }
 
     private static Optional<TacticalPlan> screen(Context context, Tile tile) {
@@ -3338,12 +3360,15 @@ public class TacticalPlanner {
             return objectives;
         }
 
-        double objectiveGain(Tile target, List<UnitMove> moves, Collection<String> gainedPlanets) {
+        Footprint footprintAfter(Tile target, List<UnitMove> moves, Collection<String> gainedPlanets) {
             List<Footprint.Move> footprintMoves = moves.stream()
                     .map(move -> new Footprint.Move(move.origin(), move.holder(), move.type(), move.count()))
                     .toList();
-            ObjectiveValue value = objectives();
-            return value.gain(value.before().after(target.getPosition(), footprintMoves, gainedPlanets));
+            return objectives().before().after(target.getPosition(), footprintMoves, gainedPlanets);
+        }
+
+        double objectiveGain(Tile target, List<UnitMove> moves, Collection<String> gainedPlanets) {
+            return objectives().gain(footprintAfter(target, moves, gainedPlanets));
         }
 
         double builtGain(Tile tile, ProductionPlanner.BuildPlan build) {
