@@ -80,6 +80,21 @@ class ChannelExportLocationTest {
     }
 
     @Test
+    void exportPausedAtItsSizeCapCanBeResumed() throws IOException {
+        Files.writeString(location.savedRequest(), "MAX_SIZE_MB=100\n");
+        Files.writeString(
+                location.pausedMarker(), "Reached the 100 MB size cap with 104 MB exported, after 4 of 9 parts\n");
+
+        assertThat(location.status()).isEqualTo(ChannelExportStatus.PAUSED);
+        assertThat(location.canResume()).isTrue();
+        assertThat(location.stopReason(location.pausedMarker())).startsWith("Reached the 100 MB size cap");
+
+        location.clearStopMarkers();
+
+        assertThat(location.status()).isEqualTo(ChannelExportStatus.NOT_STARTED);
+    }
+
+    @Test
     void exportThatFailedBeforeSavingSettingsCannotBeResumed() throws IOException {
         Files.writeString(location.failedMarker(), "Invalid format: Csv\n");
 

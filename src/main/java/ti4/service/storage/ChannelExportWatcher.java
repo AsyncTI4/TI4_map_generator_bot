@@ -56,6 +56,7 @@ public final class ChannelExportWatcher implements Runnable {
                 case DONE -> stopAfter(this::reportDone);
                 case FAILED -> stopAfter(this::reportFailed);
                 case CANCELLED -> stopAfter(this::reportCancelled);
+                case PAUSED -> stopAfter(this::reportPaused);
                 case RUNNING -> stopIfOlderThan(FINISH_TIMEOUT, "is still running after 24 hours. Check the host.");
                 case NOT_STARTED ->
                     stopIfOlderThan(
@@ -106,6 +107,14 @@ public final class ChannelExportWatcher implements Runnable {
                 responseChannel,
                 exportName() + " was cancelled: " + location.stopReason(location.cancelledMarker())
                         + ". The finished parts are kept; " + resumeHint());
+    }
+
+    private void reportPaused() throws IOException {
+        MessageHelper.sendMessageToChannel(
+                responseChannel,
+                exportName() + " paused: " + location.stopReason(location.pausedMarker())
+                        + ". To continue, run `" + RESUME_COMMAND + " export_id:" + location.exportId()
+                        + " max_size_mb:` with a higher cap, or 0 for no cap.");
     }
 
     private void reportFailed() throws IOException {

@@ -52,6 +52,7 @@ class CancelChannelExport extends Subcommand {
     private static String describe(ChannelExportStatus status) {
         return switch (status) {
             case CANCELLED -> "already cancelled";
+            case PAUSED -> "it is paused at its size cap";
             case FAILED -> "it failed";
             case DONE -> "it already finished";
             case RUNNING, NOT_STARTED -> "running";

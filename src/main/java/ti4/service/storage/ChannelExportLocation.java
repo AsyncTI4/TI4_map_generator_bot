@@ -57,6 +57,10 @@ public record ChannelExportLocation(Path exportsRoot, String channelId, String e
         return sibling(".cancelled");
     }
 
+    public Path pausedMarker() {
+        return sibling(".paused");
+    }
+
     public Path cancelRequest() {
         return sibling(".cancel");
     }
@@ -93,6 +97,7 @@ public record ChannelExportLocation(Path exportsRoot, String channelId, String e
     public ChannelExportStatus status() {
         if (Files.exists(failedMarker())) return ChannelExportStatus.FAILED;
         if (Files.exists(cancelledMarker())) return ChannelExportStatus.CANCELLED;
+        if (Files.exists(pausedMarker())) return ChannelExportStatus.PAUSED;
         if (Files.exists(doneMarker())) return ChannelExportStatus.DONE;
         if (Files.exists(runningMarker())) return ChannelExportStatus.RUNNING;
         return ChannelExportStatus.NOT_STARTED;
@@ -113,6 +118,7 @@ public record ChannelExportLocation(Path exportsRoot, String channelId, String e
     public void clearStopMarkers() throws IOException {
         Files.deleteIfExists(failedMarker());
         Files.deleteIfExists(cancelledMarker());
+        Files.deleteIfExists(pausedMarker());
         Files.deleteIfExists(cancelRequest());
     }
 

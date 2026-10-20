@@ -16,7 +16,8 @@ public record ChannelExportRequest(
         ChannelExportFormat format,
         @Nullable LocalDate after,
         @Nullable LocalDate before,
-        boolean includeMedia) {
+        boolean includeMedia,
+        @Nullable Integer maxSizeMb) {
 
     public static final String DISPATCH_EVENT_TYPE = "archive_game_channel";
 
@@ -27,11 +28,15 @@ public record ChannelExportRequest(
         return EXPORT_ID_FORMAT.format(now);
     }
 
-    public static Map<String, String> resumeDispatchPayload(ChannelExportLocation location) {
+    public static Map<String, String> resumeDispatchPayload(
+            ChannelExportLocation location, @Nullable Integer newMaxSizeMb) {
         Map<String, String> payload = new LinkedHashMap<>();
         payload.put("channel", location.channelId());
         payload.put("export_id", location.exportId());
         payload.put("resume", "true");
+        if (newMaxSizeMb != null) {
+            payload.put("max_size_mb", newMaxSizeMb.toString());
+        }
         return payload;
     }
 
@@ -44,6 +49,7 @@ public record ChannelExportRequest(
         payload.put("after", dateOrBlank(after));
         payload.put("before", dateOrBlank(before));
         payload.put("media", String.valueOf(includeMedia));
+        payload.put("max_size_mb", maxSizeMb == null ? "" : maxSizeMb.toString());
         return payload;
     }
 

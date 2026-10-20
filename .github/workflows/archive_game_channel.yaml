@@ -21,16 +21,18 @@ jobs:
         EXPORT_BEFORE: ${{ github.event.client_payload.before }}
         EXPORT_MEDIA: ${{ github.event.client_payload.media }}
         EXPORT_RESUME: ${{ github.event.client_payload.resume }}
+        EXPORT_MAX_SIZE_MB: ${{ github.event.client_payload.max_size_mb }}
         EXPORT_ROOT: ${{ vars.HOST_TI4_SAVES_DIR }}/exported_channels
       with:
         host: ${{ secrets.HOSTINGER_SSH_HOST }}
         username: ${{ secrets.HOSTINGER_SSH_USER }}
         password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
         port: ${{ secrets.HOSTINGER_SSH_PORT }}
-        envs: DISCORD_BOT_KEY,CHANNEL_ID,CHANNEL_IDS,EXPORT_ID,EXPORT_FORMAT,EXPORT_AFTER,EXPORT_BEFORE,EXPORT_MEDIA,EXPORT_RESUME,EXPORT_ROOT
+        envs: DISCORD_BOT_KEY,CHANNEL_ID,CHANNEL_IDS,EXPORT_ID,EXPORT_FORMAT,EXPORT_AFTER,EXPORT_BEFORE,EXPORT_MEDIA,EXPORT_RESUME,EXPORT_MAX_SIZE_MB,EXPORT_ROOT
         # The export runs detached on the host, one part at a time: the main channel in 30-day
-        # windows and its threads in batches. Between parts it checks for a cancel request, so it
-        # can stop cleanly and be resumed later from the first unfinished part.
+        # windows and its threads in batches. Between parts it checks for a cancel request and for
+        # the optional size cap, so it can stop cleanly and be resumed later from the first
+        # unfinished part. A resume may pass a new max_size_mb (0 removes the cap).
         # Layout under exported_channels/<channel id>/:
         #   <export id>/            exported files while the export runs
         #   <export id>.request     settings saved on first start, reused on resume
@@ -39,12 +41,14 @@ jobs:
         #   <export id>.running     present while the exporter runs
         #   <export id>.cancel      written by the bot to ask the exporter to stop
         #   <export id>.cancelled   written when the exporter stopped on request
+        #   <export id>.paused      written when the export reached its size cap
         #   <export id>.failed      written on any failure (with the reason)
         #   <export id>.tar.gz      finished export, followed by <export id>.done
         #   <export id>.log         exporter output
         script: |
           set -eu
           is_digits() { case "$1" in ''|*[!0-9]*) return 1 ;; esac; return 0; }
+          is_optional_digits() { [ -z "$1" ] || is_digits "$1"; }
           is_optional_date() { case "$1" in ''|[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) return 0 ;; esac; return 1; }
 
           is_digits "$CHANNEL_ID" || { echo "Invalid channel id: $CHANNEL_ID"; exit 1; }
@@ -68,7 +72,12 @@ jobs:
             EXPORT_AFTER="$(saved_setting EXPORT_AFTER)"
             EXPORT_BEFORE="$(saved_setting EXPORT_BEFORE)"
             EXPORT_MEDIA="$(saved_setting EXPORT_MEDIA)"
-            rm -f "$EXPORT_BASE.failed" "$EXPORT_BASE.cancelled" "$EXPORT_BASE.cancel"
+            rm -f "$EXPORT_BASE.failed" "$EXPORT_BASE.cancelled" "$EXPORT_BASE.paused" "$EXPORT_BASE.cancel"
+            if [ -n "${EXPORT_MAX_SIZE_MB:-}" ]; then
+              is_digits "$EXPORT_MAX_SIZE_MB" || fail "Invalid size cap: $EXPORT_MAX_SIZE_MB"
+              sed -i '/^MAX_SIZE_MB=/d' "$EXPORT_BASE.request"
+              echo "MAX_SIZE_MB=$EXPORT_MAX_SIZE_MB" >> "$EXPORT_BASE.request"
+            fi
           fi
 
           CHANNEL_IDS="${CHANNEL_IDS:-$CHANNEL_ID}"
@@ -79,6 +88,7 @@ jobs:
           is_optional_date "${EXPORT_AFTER:-}" || fail "Invalid after date: $EXPORT_AFTER"
           is_optional_date "${EXPORT_BEFORE:-}" || fail "Invalid before date: $EXPORT_BEFORE"
           case "${EXPORT_MEDIA:-false}" in true|false) ;; *) fail "Invalid media flag: $EXPORT_MEDIA" ;; esac
+          is_optional_digits "${EXPORT_MAX_SIZE_MB:-}" || fail "Invalid size cap: $EXPORT_MAX_SIZE_MB"
 
           if [ ! -f "$EXPORT_BASE.request" ]; then
             {
@@ -87,11 +97,15 @@ jobs:
               echo "EXPORT_AFTER=${EXPORT_AFTER:-}"
               echo "EXPORT_BEFORE=${EXPORT_BEFORE:-}"
               echo "EXPORT_MEDIA=${EXPORT_MEDIA:-false}"
+              echo "MAX_SIZE_MB=${EXPORT_MAX_SIZE_MB:-0}"
               echo "END_MS=$(( $(date -u +%s) * 1000 ))"
             } > "$EXPORT_BASE.request"
           fi
           END_MS="$(saved_setting END_MS)"
           is_digits "$END_MS" || fail "Invalid saved end time: $END_MS"
+          MAX_SIZE_MB="$(saved_setting MAX_SIZE_MB)"
+          MAX_SIZE_MB="${MAX_SIZE_MB:-0}"
+          is_digits "$MAX_SIZE_MB" || fail "Invalid saved size cap: $MAX_SIZE_MB"
 
           docker version > /dev/null || fail "Docker is not available on the host"
 
@@ -121,6 +135,11 @@ jobs:
             echo "Cancelled on request"
             exit 0
           }
+          stop_paused() {
+            echo "Reached the $MAX_SIZE_MB MB size cap with $(( $1 / 1024 )) MB exported, after $(wc -l < "$PROGRESS" | tr -d ' ') of $PART_COUNT parts" > "$EXPORT_BASE.paused"
+            echo "Paused at the size cap"
+            exit 0
+          }
           stop_failed() { echo "$1" > "$EXPORT_BASE.failed"; echo "$1"; exit 1; }
 
           run_part() {
@@ -128,6 +147,10 @@ jobs:
             shift
             if grep -qx "$key" "$PROGRESS"; then return 0; fi
             if [ -f "$EXPORT_BASE.cancel" ]; then stop_cancelled; fi
+            if [ "$MAX_SIZE_MB" -gt 0 ]; then
+              exported_kb=$(du -sk "$EXPORT_BASE" | cut -f1)
+              if [ "$exported_kb" -ge $(( MAX_SIZE_MB * 1024 )) ]; then stop_paused "$exported_kb"; fi
+            fi
             echo "Exporting part $key"
             docker run --rm --name "$CONTAINER" --cpus 1 --memory 1g --user "$(id -u):$(id -g)" \
               -e DISCORD_TOKEN -v "$EXPORT_BASE":/out \
@@ -203,7 +226,7 @@ jobs:
 
           mkdir -p "$EXPORT_BASE"
           touch "$EXPORT_BASE.running"
-          export CHANNEL_ID CHANNEL_IDS EXPORT_ID EXPORT_BASE EXPORT_FORMAT END_MS
+          export CHANNEL_ID CHANNEL_IDS EXPORT_ID EXPORT_BASE EXPORT_FORMAT END_MS MAX_SIZE_MB
           export EXPORT_AFTER="${EXPORT_AFTER:-}" EXPORT_BEFORE="${EXPORT_BEFORE:-}" EXPORT_MEDIA="${EXPORT_MEDIA:-false}"
           export DISCORD_TOKEN="$DISCORD_BOT_KEY"
           nohup sh "$EXPORT_BASE.sh" >> "$EXPORT_BASE.log" 2>&1 < /dev/null &

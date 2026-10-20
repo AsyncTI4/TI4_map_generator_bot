@@ -57,7 +57,13 @@ class StartChannelExport extends Subcommand {
                                 OptionType.BOOLEAN,
                                 Constants.INCLUDE_MEDIA,
                                 "Download attachments and images too; much larger (default false)")
-                        .setRequired(false));
+                        .setRequired(false),
+                new OptionData(
+                                OptionType.INTEGER,
+                                Constants.EXPORT_MAX_SIZE_MB,
+                                "Pause once the export passes this many MB; resume to go on (default no cap)")
+                        .setRequired(false)
+                        .setMinValue(1));
     }
 
     @Override
@@ -100,7 +106,8 @@ class StartChannelExport extends Subcommand {
                 ChannelExportFormat.fromOption(event.getOption(Constants.EXPORT_FORMAT, OptionMapping::getAsString)),
                 after,
                 before,
-                event.getOption(Constants.INCLUDE_MEDIA, false, OptionMapping::getAsBoolean));
+                event.getOption(Constants.INCLUDE_MEDIA, false, OptionMapping::getAsBoolean),
+                event.getOption(Constants.EXPORT_MAX_SIZE_MB, OptionMapping::getAsInt));
 
         boolean dispatched = new RepositoryDispatchEvent(
                         ChannelExportRequest.DISPATCH_EVENT_TYPE, request.toDispatchPayload())
