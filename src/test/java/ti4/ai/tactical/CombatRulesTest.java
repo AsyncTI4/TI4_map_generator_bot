@@ -266,6 +266,26 @@ class CombatRulesTest extends BaseTi4Test {
                 .isEqualTo("FFCC_nekro_assignDamage_" + unit);
     }
 
+    // The first round starts only once the opponent has assigned the barrage hits: the fighters they destroy must be
+    // gone
+    // before dice are rolled, and Fight with Precision is judged on whether any round was rolled before they died.
+    @Test
+    void waitsWhileTheOpponentIsAssigningBarrageHits() {
+        AiPrompt roll = prompt(
+                "roll",
+                PromptSource.COMBAT_THREAD,
+                NOW - CombatRules.ROLL_GRACE_MILLIS,
+                "combatRoll_" + position + "_space");
+        AiPrompt theirHits = prompt(
+                "theirs",
+                PromptSource.COMBAT_THREAD,
+                NOW - CombatRules.ROLL_GRACE_MILLIS,
+                "FFCC_sol_autoAssignAFBHits_" + position + "_1");
+
+        assertThat(CombatRules.next(test.contextAt(NOW + 3_600_000L, roll, theirHits)))
+                .isEmpty();
+    }
+
     // Rolling while the opponent still assigns last round's hits would start the next round under them.
     @Test
     void waitsWhileTheOpponentIsAssigningHits() {

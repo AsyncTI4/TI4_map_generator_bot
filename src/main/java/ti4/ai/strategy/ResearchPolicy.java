@@ -16,6 +16,7 @@ import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.secrets.SecretValue;
+import ti4.ai.tactical.PrecisionRules;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -146,6 +147,8 @@ public class ResearchPolicy {
     private static final Set<String> TRANSIT_DIODES = Set.of("td", "absol_td");
     private static final List<String> GROUND_SECRETS = List.of("mtm", "otf");
     private static final double GROUND_SECRET_SHARE = 0.4;
+    private static final Set<String> DESTROYER_UPGRADES = Set.of("dd2", "absol_dd2");
+    private static final double BARRAGE_SECRET_SHARE = 0.3;
     private static final Map<Character, TechnologyType> PREREQUISITE_COLOURS = Map.of(
             'B', TechnologyType.PROPULSION,
             'G', TechnologyType.BIOTIC,
@@ -193,7 +196,17 @@ public class ResearchPolicy {
                 + steppingStoneValue(game, seat, tech)
                 + custodiansRaceValue(game, seat, alias)
                 + openingReachValue(game, seat, alias)
-                + groundSecretValue(game, seat, tech);
+                + groundSecretValue(game, seat, tech)
+                + barrageSecretValue(game, seat, tech);
+    }
+
+    private static double barrageSecretValue(Game game, Player seat, TechnologyModel tech) {
+        if (!DESTROYER_UPGRADES.contains(tech.getAlias())
+                || !PrecisionRules.held(seat)
+                || !ListTechService.isTechResearchable(tech, seat)) {
+            return 0;
+        }
+        return BARRAGE_SECRET_SHARE * ScoringStakes.scoreValue(game, seat, 1);
     }
 
     private static double groundSecretValue(Game game, Player seat, TechnologyModel tech) {

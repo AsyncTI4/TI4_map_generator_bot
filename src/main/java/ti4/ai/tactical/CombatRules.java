@@ -36,6 +36,7 @@ public class CombatRules {
     private static final String CONFIRMED_SUFFIX = "_confirmed";
     private static final String ASSIGN_PREFIX = "autoAssign";
     private static final String AFB_SUFFIX = "_afb";
+    private static final String AFB_HIT_PREFIX = "autoAssignAFBHits_";
     private static final String SPACE_CANNON_OFFENCE_SUFFIX = "_spacecannonoffence";
     private static final String SPACE_CANNON_DEFENCE_SUFFIX = "_spacecannondefence";
     private static final String ASSAULT_CANNON = "asc";
@@ -552,7 +553,11 @@ public class CombatRules {
         return prompts.stream()
                 .filter(prompt -> prompt.source() == PromptSource.COMBAT_THREAD)
                 .flatMap(prompt -> prompt.enabledButtons().stream())
-                .anyMatch(button -> isRoundHit(button) && sameCombat(button, roll));
+                .anyMatch(button -> (isRoundHit(button) || isBarrageHit(button)) && sameCombat(button, roll));
+    }
+
+    private static boolean isBarrageHit(PromptButton button) {
+        return button.handlerId().startsWith(AFB_HIT_PREFIX);
     }
 
     private static boolean isRoundHit(PromptButton button) {

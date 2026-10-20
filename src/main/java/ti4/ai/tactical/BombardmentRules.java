@@ -69,18 +69,7 @@ public class BombardmentRules {
         int needed = Math.ceilDiv(
                 BoardView.groundForces(planet, defender) + BoardView.undamaged(planet, defender, UnitType.Mech),
                 hitMultiplier(seat));
-        double[] hits = {1.0};
-        for (double chance : dieChances(seat, ships)) {
-            double[] next = new double[hits.length + 1];
-            for (int count = 0; count < hits.length; count++) {
-                next[count] += hits[count] * (1 - chance);
-                next[count + 1] += hits[count] * chance;
-            }
-            hits = next;
-        }
-        double enough = 0;
-        for (int count = needed; count < hits.length; count++) enough += hits[count];
-        return enough;
+        return DiceOdds.atLeast(dieChances(seat, ships), needed);
     }
 
     public static Optional<AiDecision> beforeLanding(AiTurnContext context, List<AiPrompt> turn, Tile tile) {
