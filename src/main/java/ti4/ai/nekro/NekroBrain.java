@@ -25,7 +25,9 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.FactionBrain;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.expedition.ExpeditionRules;
+import ti4.ai.explore.CrownOfEmphidiaRules;
 import ti4.ai.explore.ExplorationRules;
+import ti4.ai.explore.MawOfWorldsRules;
 import ti4.ai.explore.RelicActionRules;
 import ti4.ai.hacan.CarthAgentRules;
 import ti4.ai.hacan.DatahubRules;
@@ -136,6 +138,11 @@ public class NekroBrain implements FactionBrain {
             "convert_2_comms",
             "addIonStorm_",
             "crownofemphidiaexplore",
+            RelicActionRules.CODEX_PICK,
+            RelicActionRules.NANOFORGE_PLANET,
+            RelicActionRules.JR_CHOICE,
+            RelicActionRules.JR_STRUCTURE,
+            RelicActionRules.CIRCLET_TARGET,
             "acquireATech",
             "generic_button_id_",
             "genericReact4",
@@ -165,10 +172,13 @@ public class NekroBrain implements FactionBrain {
             TradeRules::observe,
             this::finishCommandTokenGain,
             StrategyCardRules::exhaustAiDevelopmentForResearch,
+            StrategyCardRules::exhaustProphetsTearsForResearch,
             PaymentRules::pay,
             SecretCostRules::pay,
             NekroLeaderRules::payAgentCost,
             RelicActionRules::next,
+            CrownOfEmphidiaRules::scorePoint,
+            MawOfWorldsRules::purge,
             LegendaryRules::next,
             AvernusRules::next,
             ExpeditionRules::next,

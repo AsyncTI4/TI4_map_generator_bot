@@ -11,6 +11,7 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FactionAggression;
 import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.MecatolStake;
+import ti4.ai.eval.ShardPrize;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.SpendCost;
@@ -94,7 +95,9 @@ final class OffenseOutlook {
             double base = BoardView.planetValue(planet);
             double explore = terms.exploreValues().getOrDefault(planet.getName(), 0.0);
             double custodians = BoardView.hasCustodians(planet) ? VP : 0;
-            planets += w * g * (base + explore + custodians + FracturePrize.gain(planet));
+            planets += w
+                    * g
+                    * (base + explore + custodians + FracturePrize.gain(planet) + ShardPrize.gain(game, seat, planet));
             territory += w * g * terms.territoryValues().getOrDefault(planet.getName(), 0.0);
             if (isMecatol(planet)) {
                 mecatolHold += w * g * MecatolStake.ownHoldValue(game, seat);
@@ -107,6 +110,7 @@ final class OffenseOutlook {
                 if (FracturePrize.isStyx(planet)) {
                     fractureDenial += w * g * standings.denialWeight(opponent) * FracturePrize.point(planet);
                 }
+                fractureDenial += w * g * standings.denialWeight(opponent) * ShardPrize.gain(game, seat, planet);
             }
         }
         double hurt = standings.hurtWeight(opponent);

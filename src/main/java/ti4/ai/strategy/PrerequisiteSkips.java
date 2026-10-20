@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.tactical.ProductionPlanner;
@@ -21,15 +22,20 @@ public class PrerequisiteSkips {
     static final double VALUE_PER_RESOURCE = 0.7;
     private static final String PSYCHOARCHAEOLOGY = "pa";
     private static final String AI_DEVELOPMENT = "aida";
+    private static final String PROPHETS_TEARS = "prophetstears";
     private static final Map<Character, TechnologyType> COLOURS = Map.of(
             'B', TechnologyType.PROPULSION,
             'G', TechnologyType.BIOTIC,
             'R', TechnologyType.WARFARE,
             'Y', TechnologyType.CYBERNETIC);
 
-    public record Plan(List<String> planets, boolean aiDevelopment, double resourcesLost) {
+    public record Plan(List<String> planets, boolean aiDevelopment, double resourcesLost, boolean prophetsTears) {
 
-        static final Plan NONE = new Plan(List.of(), false, 0);
+        static final Plan NONE = new Plan(List.of(), false, 0, false);
+
+        Plan(List<String> planets, boolean aiDevelopment, double resourcesLost) {
+            this(planets, aiDevelopment, resourcesLost, false);
+        }
 
         public double valueLost() {
             return VALUE_PER_RESOURCE * resourcesLost;
@@ -37,6 +43,24 @@ public class PrerequisiteSkips {
     }
 
     public static Plan of(Game game, Player seat, TechnologyModel tech) {
+        Plan plan = withoutProphetsTears(game, seat, tech);
+        if (!seat.hasRelicReady(PROPHETS_TEARS) || missing(seat, tech).isEmpty() || seat.hasTech(PSYCHOARCHAEOLOGY)) {
+            return plan;
+        }
+        return withProphetsTears(game, plan);
+    }
+
+    private static Plan withProphetsTears(Game game, Plan plan) {
+        Optional<String> dearest =
+                plan.planets().stream().max(Comparator.comparingInt(planet -> spendValue(game, planet)));
+        if (dearest.isEmpty()) return new Plan(plan.planets(), plan.aiDevelopment(), plan.resourcesLost(), true);
+        List<String> kept = plan.planets().stream()
+                .filter(planet -> !planet.equals(dearest.get()))
+                .toList();
+        return new Plan(kept, plan.aiDevelopment(), plan.resourcesLost() - spendValue(game, dearest.get()), true);
+    }
+
+    private static Plan withoutProphetsTears(Game game, Player seat, TechnologyModel tech) {
         Map<TechnologyType, Integer> missing = missing(seat, tech);
         if (missing.isEmpty() || seat.hasTech(PSYCHOARCHAEOLOGY)) return Plan.NONE;
         List<String> planets = new ArrayList<>();

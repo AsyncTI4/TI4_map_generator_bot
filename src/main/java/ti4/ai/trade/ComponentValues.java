@@ -1,8 +1,6 @@
 package ti4.ai.trade;
 
 import java.util.List;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -20,17 +18,7 @@ public class ComponentValues {
     private static final double REACH_UNCERTAIN = 0.5;
     private static final double ENDGAME = 0.5;
     private static final double NOT_ENDGAME = 1.0;
-    private static final double FRAGMENT = 1.0;
-    private static final double FRAGMENT_COMPLETING_SET = 2.0;
-    private static final double FRAGMENT_FOR_HERETICAL_WORKS = 3.0;
-    private static final int FRAGMENTS_PER_RELIC = 3;
-    private static final int HERETICAL_WORKS_FRAGMENTS = 2;
-    private static final String HERETICAL_WORKS = "dhw";
-    private static final String CULTURAL = "CRF";
-    private static final String INDUSTRIAL = "IRF";
-    private static final String HAZARDOUS = "HRF";
-    private static final String UNKNOWN = "URF";
-    static final List<String> FRAGMENT_KINDS = List.of(CULTURAL, INDUSTRIAL, HAZARDOUS, UNKNOWN);
+    static final List<String> FRAGMENT_KINDS = FragmentValue.KINDS;
 
     static double receive(Game game, Player seat, Player from, DealItem item, double trustInFrom) {
         return receive(game, seat, from, item, trustInFrom, false);
@@ -43,7 +31,7 @@ public class ComponentValues {
             case COMMODITIES -> COMMODITY_RECEIVED * amount;
             case SEND_DEBT -> debtReceivable(game, seat, from, amount, trustInFrom);
             case CLEAR_DEBT -> DEBT_LIABILITY * amount;
-            case FRAGMENTS -> fragments(seat, item, seatPrivate);
+            case FRAGMENTS -> fragmentsReceived(seat, item, seatPrivate);
             case PROMISSORY -> receivedNote(game, seat, from, item);
             case ACTION_CARDS -> TradeActionCards.receiveValue(game, seat, from, item, seatPrivate);
             case PLANETS -> TradePlanets.receiveValue(game, item);
@@ -62,7 +50,7 @@ public class ComponentValues {
             case COMMODITIES -> ownCommodity(game, seat, to) * amount;
             case SEND_DEBT -> DEBT_LIABILITY * amount;
             case CLEAR_DEBT -> debtReceivable(game, seat, to, amount, trustInTo);
-            case FRAGMENTS -> NotesForTrade.INFINITE;
+            case FRAGMENTS -> fragmentsGiven(seat, item, seatPrivate);
             case PROMISSORY -> givenNote(game, seat, to, item, seatPrivate);
             case ACTION_CARDS -> TradeActionCards.giveCost(game, seat, to, item, seatPrivate);
             case PLANETS -> NotesForTrade.INFINITE;
@@ -118,50 +106,26 @@ public class ComponentValues {
     }
 
     static int fragmentsOfKind(Player player, String kind) {
-        return switch (kind) {
-            case CULTURAL -> player.getCrf();
-            case INDUSTRIAL -> player.getIrf();
-            case HAZARDOUS -> player.getHrf();
-            case UNKNOWN -> player.getUrf();
-            default -> 0;
-        };
+        return FragmentValue.Holdings.of(player).of(kind);
     }
 
     public static double gainedFragment(Player seat, String kind) {
-        int held = FRAGMENT_KINDS.stream()
-                .mapToInt(known -> fragmentsOfKind(seat, known))
-                .sum();
-        boolean hereticalWorks =
-                seat.getSecretsUnscored().containsKey(HERETICAL_WORKS) && held < HERETICAL_WORKS_FRAGMENTS;
-        return fragmentValue(hereticalWorks, fragmentsToward(seat, kind));
+        return FragmentValue.gainedFragment(seat, kind);
     }
 
-    private static double fragments(Player seat, DealItem item, boolean seatPrivate) {
-        int towardSet = fragmentsToward(seat, item.fragmentKind());
-        int held = FRAGMENT_KINDS.stream()
-                .mapToInt(kind -> fragmentsOfKind(seat, kind))
-                .sum();
-        boolean hereticalWorks = !seatPrivate && seat.getSecretsUnscored().containsKey(HERETICAL_WORKS);
-        return IntStream.range(0, item.amount())
-                .mapToDouble(index ->
-                        fragmentValue(hereticalWorks && held + index < HERETICAL_WORKS_FRAGMENTS, towardSet + index))
-                .sum();
+    private static double fragmentsReceived(Player seat, DealItem item, boolean seatPrivate) {
+        FragmentValue.Holdings held = FragmentValue.Holdings.of(seat);
+        double gain = FragmentValue.gain(
+                held, item.fragmentKind(), item.amount(), !seatPrivate && FragmentValue.holdsHereticalWorks(seat));
+        boolean completes = held.with(item.fragmentKind(), item.amount()).relics() > held.relics();
+        return completes ? gain + FragmentValue.TRADE_TEMPO : gain;
     }
 
-    private static int fragmentsToward(Player seat, String kind) {
-        int known = UNKNOWN.equals(kind) ? largestKnownKind(seat) : fragmentsOfKind(seat, kind);
-        return known + fragmentsOfKind(seat, UNKNOWN);
-    }
-
-    private static int largestKnownKind(Player seat) {
-        return Stream.of(CULTURAL, INDUSTRIAL, HAZARDOUS)
-                .mapToInt(kind -> fragmentsOfKind(seat, kind))
-                .max()
-                .orElse(0);
-    }
-
-    private static double fragmentValue(boolean forHereticalWorks, int towardSet) {
-        if (forHereticalWorks) return FRAGMENT_FOR_HERETICAL_WORKS;
-        return towardSet == FRAGMENTS_PER_RELIC - 1 ? FRAGMENT_COMPLETING_SET : FRAGMENT;
+    private static double fragmentsGiven(Player seat, DealItem item, boolean seatPrivate) {
+        return FragmentValue.loss(
+                FragmentValue.Holdings.of(seat),
+                item.fragmentKind(),
+                item.amount(),
+                !seatPrivate && FragmentValue.holdsHereticalWorks(seat));
     }
 }

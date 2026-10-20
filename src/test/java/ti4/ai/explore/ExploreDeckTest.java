@@ -66,15 +66,15 @@ class ExploreDeckTest extends BaseTi4Test {
         assertThat(value("hazardous")).isCloseTo((2 + 1) / 2.0, within(EXACT));
     }
 
-    // A first fragment is worth 1; the one that completes a set of three, 2.
+    // A first fragment is worth 2; the one that completes a set of three, 3.
     @Test
     void aFragmentIsWorthMoreWhenItCompletesASet() {
         deck("crf1");
-        assertThat(value("cultural")).isCloseTo(1.0, within(EXACT));
+        assertThat(value("cultural")).isCloseTo(2.0, within(EXACT));
 
         test.nekro.addFragment("crf2");
         test.nekro.addFragment("crf3");
-        assertThat(value("cultural")).isCloseTo(2.0, within(EXACT));
+        assertThat(value("cultural")).isCloseTo(3.0, within(EXACT));
     }
 
     // The Demilitarized Zone costs at least 1.5, and the structures it returns to reinforcements on top.

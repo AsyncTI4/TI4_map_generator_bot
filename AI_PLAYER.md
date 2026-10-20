@@ -72,8 +72,8 @@ would throw a hit away for free.
 
 **Trading:** they trade through the bot's own transaction buttons and never read chat. They start deals on their
 own turn, in the agenda phase, as Trade holder with the players who followed, and ask for debt payments at any time;
-they answer offers whenever they arrive. They trade trade goods, commodities, debt and at most one of their own
-promissory notes per deal, never action cards, relics or secret objectives. They keep the terms they accept (an AI
+they answer offers whenever they arrive. They trade trade goods, commodities, debt, relic fragments, spare action cards and at most one of their own
+promissory notes per deal, never relics or secret objectives. They keep the terms they accept (an AI
 that followed another AI's Trade pays the announced fee) and remember who pays: human players they can't trust get
 less (no free Trade follow, no loans).
 
@@ -816,12 +816,18 @@ to build one by hand:
     resets on undo or restart.
   - **What it starts.** On its own turn, before its action (at most 2 offers a turn): paying its own debt, buying the
     trade goods it is short for a spend objective (the cheapest package of commodities, debt or a note the lender would
-    accept, at most twice a round), a 1:1 commodity wash, a promissory note deal, selling commodities when nobody has
+    accept, at most twice a round), a 1:1 commodity wash, a promissory note deal, a relic fragment deal, selling commodities when nobody has
     any to wash, and collecting debt from human players. A **note deal** (`NoteDeals`) is the best of: one of its own
     colour notes sold for 1 to 6 trade goods, the partner's _Support for the Throne_ or _Alliance_ (while in their hand,
     which their play areas show) or, under duress, _Ceasefire_ bought for 1 to 6, or a one-for-one note swap with or
     without a trade good; it must clear the usual margins for both sides (at most 2 a round, one per partner). The
-    partner's note is picked in the builder by its name, never by its hand number. In the agenda phase: paying debt (with the "Send" buttons of the bot's debt
+    partner's note is picked in the builder by its name, never by its hand number. A **fragment deal**
+    (`FragmentDeals`) is the best of: one fragment sold for 1 to 4 trade goods, one bought for 1 to 4, or a one-for-one
+    swap of two different kinds with or without a trade good, again within the usual margins for both sides (at most 2
+    a round, one per partner). A fragment that completes a set is worth 1 more in a trade (the relic comes sooner), so
+    the last fragment of a set sells for 3 trade goods (the seller's lone fragment costs 2, the buyer gets 3 + 1), a
+    lone fragment that completes nothing is not worth 2 to anyone else, and the swap of two lone fragments that each
+    complete the other side's set clears best. The builder picks fragments by kind and amount (`Frags_<kind><n>`). In the agenda phase: paying debt (with the "Send" buttons of the bot's debt
     reminder, never "Erase"), collecting debt and washing (with another AI only when its faction sorts first). At
     most 12 new offers an hour, 3 waiting for an answer, and one unsolicited offer per human player per round.
   - **Trade card.** As holder it bills each follower once (its pending offers wait up to 30 minutes for trade goods to
@@ -1095,8 +1101,8 @@ to build one by hand:
   share a system with another player's but no combat starts, it hands the choice over.
 - **Exploration** (`ti4.ai.explore`). Everything an exploration gives is valued in resources: a trade good 1, a
   command token 2 (nothing once none is left in reinforcements), an action card 1 (nothing at the hand limit), its own
-  commodity a third (0.6 with someone to wash it with), a relic fragment 1 (2 for the one that completes a set, 3 while
-  Destroy Heretical Works needs two).
+  commodity a third (0.6 with someone to wash it with), a relic fragment 2 (3 for the one that completes a set of
+  three; while it holds an unscored Destroy Heretical Works, each of its first two fragments is worth 2 more).
   - **Decks.** The decks are public, so a deck is worth the average of the cards still in its draw pile: an attachment
     by the resources and influence it adds (a research facility 0.3, or 1.6 on a planet with a technology specialty),
     the Demilitarized Zone by -1.5 less the space docks (4) and PDS (3) it returns, Mercenary Outfit 0.75, Freelancers
@@ -1135,7 +1141,12 @@ to build one by hand:
     is worth at least 0.25 more than the payment and declines otherwise.
   - **Command tokens** from Volatile Fuel Source (or any exploration that asks for them) go to the pool the command
     token policy grows first.
-  - **Relic fragments.** With three of one kind (unknown fragments fill in last), it purges exactly three as a
+  - **Relic fragments.** A fragment is worth 2 trade goods, and 3 when it is the third of a kind, so a set of three is
+    worth 7 and a relic is bought or sold at about that. Unknown fragments stand in for any kind; the 3 goes to the
+    fragment that completes a set (`FragmentValue`), and while it holds an unscored _Destroy Heretical Works_ each of
+    its first two fragments is worth 2 more. Receiving a fragment is worth the rise in the value of what it holds,
+    giving one the fall (a fragment of a complete set costs 3, a spare one 2), so it never parts with a set it is about
+    to purge. With three of one kind (unknown fragments fill in last), it purges exactly three as a
     component action and draws the relic: instead of a tactical action when no plan scores 2.5 (1 for having the relic
     sooner, 1.5 for waiting to see what the others do), and before passing. It keeps two fragments back while it holds
     an unscored _Destroy Heretical Works_, one relic a turn.
@@ -1147,6 +1158,28 @@ to build one by hand:
     reinforcements and the scoring reserve leaves 6 resources. The bot gives it the tokens without charging anything, so
     it first presses the message's "Exhaust Planets" button (before the tokens, which close the message) and pays
     exactly 6 through the research payment, then takes the tokens as for any Propagation.
+- **Relics** (`ti4.ai.explore`). A relic whose ACTION it takes is a component action, played **instead of a weak
+  tactical action** (the relic's net value plus the 1.5 for stalling must beat the best plan) or **before passing**
+  (any positive net), one component action a turn. `RelicFlows` picks the relic with the best net; each one is a
+  `RelicFlow` that answers the buttons the bot posts after the press. Values are in trade goods.
+  | Relic | What the AI does |
+  | --- | --- |
+  | Relic fragments, Enigmatic Device | above |
+  | Dynamis Core | purges it for the trade goods of its commodity value, less what the extra 2 commodity value would be worth over the next 3 rounds (its own commodity 0.3, or 0.6 with an outlet) |
+  | Nano-Forge | attaches it to the safest non-home, non-legendary planet it holds: +2 resources, +2 influence (0.6 each) and a legendary planet (2), times 0.6 if an enemy can reach it |
+  | The Codex | retrieves up to 3 of the best discarded action cards by keep value; the net is the gain over the cards it would have to discard, and it stops when the next card is not worth more than its worst by 0.3 |
+  | JR-XS455-O | exhausted before passing to give itself a trade good (never the 3 resources for a structure) |
+  | Circlet of the Void | exhausted to explore a frontier token in a system without another player's ships (a frontier card, 1.5) |
+  | Book of Latvinia | researches the best two technologies without prerequisites when drawn (in the 2 minutes after the draw); purged for its point (8) only once it controls all four technology specialties, otherwise kept |
+  | Stellar Converter | destroys a rival's non-home, non-legendary planet next to its bombardment when the planet is worth at least 4 (its value, structures and ground forces, times 0.6, 0.9 for the leader); never a planet with its own units |
+  | The Crown of Emphidia | purges it for its point as soon as the bot offers the button (control of the Tomb of Emphidia in the status phase); the exploration use is above |
+  | Maw of Worlds | purges it in the status phase for the best technology it could research when that is worth at least 2 more than the votes the exhausted planets would have cast (0.25 per influence) |
+  | The Prophet's Tears | replaces the cheapest planet it would exhaust to skip a prerequisite; when a research needs no skip it draws an action card (room in hand permitting) |
+  | Scepter of Emelpar | decides a follow as if a strategy token were free, exhausts the Scepter first (the bot then counts the card as followed without charging a token) and makes the follow; a ready Scepter also counts as a spare token when it checks whether it can follow |
+  | The Triad | counted as a planet when paying (3 resources and 3 influence, plus one per kind of fragment held) |
+  | Shard of the Throne | a planet that would hand over the Shard (a legendary planet or one in the holder's home system) carries a point (8) more to defend, and one more to take or deny |
+  | Obsidian, Quantumcore, Lightrail Ordnance, Metali Void Armaments, Metali Void Shielding | passive; the bot applies them, the combat estimates do not know them |
+  | Dominus Orb, Crown of Thalnos, Heart of Ixth, Neuraloop, The Silver Flame | not used: the AI never presses their buttons (a Heart of Ixth prompt is declined, the Silver Flame is a gamble that destroys the home system 90% of the time) |
 - **Expeditions** (`ti4.ai.expedition`). A Thunder's Edge expedition slice is claimed at the end of a turn, from the
   end-of-turn abilities menu (or the passing menu), not as a component action, so it replaces no action and is decided
   after the action, with the money the action brought (Trade, Diplomacy and Politics before it count). The AI claims
@@ -1388,6 +1421,11 @@ Seven small generic changes don't reference `ti4.ai`:
     queued scores land when the status phase starts). It ends with every secret scored over the batch.
   - `LegendarySelfPlayTest` hands five seats a legendary planet each (Mallice, Hope's End, Primor, Ordinian, Emelpar) when
     the first action phase begins and checks that the seats exhaust them through the bot's real buttons.
+  - `RelicSelfPlayTest` hands six seats relics (Dynamis Core, JR-XS455-O, the Codex, Nano-Forge, the Circlet of the Void with a
+    frontier token, the Crown of Emphidia with a Tomb, three cultural fragments, and the Book of Latvinia drawn through the
+    bot) when the first action phase begins and checks that the seats use them through the bot's real buttons. A batch
+    prints, relic by relic, the games in which it was drawn, the average round, the times it was used, passed between
+    seats and held unused at the end (`RelicTracker`), and the points of the seats that held one against the table.
   - `-Dai.secrets.hold=false` plays without patience with action secrets. The batch prints the secrets scored per seat
     by phase and the average round in which the action secrets were scored.
 - In a dev guild:

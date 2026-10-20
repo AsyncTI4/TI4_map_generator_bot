@@ -62,6 +62,10 @@ class EnigmaticDeviceRules {
         return menu.map(match -> match.press(reason));
     }
 
+    static void continueWithFreeTechnology(AiTurnContext context) {
+        ComponentFlow.put(context, FLOW, RESEARCH);
+    }
+
     static Optional<AiDecision> next(AiTurnContext context) {
         Optional<List<String>> state = ComponentFlow.fields(context, FLOW);
         if (state.isEmpty()) return Optional.empty();

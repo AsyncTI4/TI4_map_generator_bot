@@ -88,6 +88,72 @@ class OfferResponderTest extends BaseTi4Test {
         assertThat(answer(table, wash)).isEmpty();
     }
 
+    // A lone industrial fragment is worth 2 to Nekro; Sol holds two, so for Sol it is the one that completes a set.
+    // Nekro sells it for 3 trade goods, which leaves it a trade good ahead, and does not take 2.
+    @Test
+    void sellsALoneFragmentForThreeTradeGoodsButNotForTwo() {
+        TradeTable table = table(false);
+        table.nekro.setIrf(1);
+        table.sol.setIrf(2);
+        table.stock(table.sol, 3, 5);
+
+        assertThat(pressed(answer(
+                        table,
+                        offer(
+                                table,
+                                "three",
+                                1,
+                                "sendingnekro_receivingsol_Frags_IRF1",
+                                "sendingsol_receivingnekro_TGs_3"))))
+                .isEqualTo("acceptOffer_blue_1");
+        assertThat(pressed(answer(
+                        table,
+                        offer(
+                                table,
+                                "two",
+                                2,
+                                "sendingnekro_receivingsol_Frags_IRF1",
+                                "sendingsol_receivingnekro_TGs_2"))))
+                .isNotEqualTo("acceptOffer_blue_1");
+    }
+
+    // The fragments of a set about to be purged are not for sale at a price that does not cover the relic.
+    @Test
+    void keepsTheFragmentsOfACompleteSet() {
+        TradeTable table = table(false);
+        table.nekro.setCrf(3);
+        table.stock(table.sol, 3, 5);
+
+        assertThat(pressed(answer(
+                        table,
+                        offer(
+                                table,
+                                "set",
+                                1,
+                                "sendingnekro_receivingsol_Frags_CRF1",
+                                "sendingsol_receivingnekro_TGs_3"))))
+                .isNotEqualTo("acceptOffer_blue_1");
+    }
+
+    // The last fragment of Nekro's set is bought for 2 trade goods, which leaves it a trade good ahead, not for 3.
+    @Test
+    void buysTheLastFragmentOfASetForTwoTradeGoods() {
+        TradeTable table = table(false);
+        table.nekro.setCrf(2);
+        table.sol.setCrf(1);
+        table.stock(table.nekro, 3, 5);
+
+        assertThat(pressed(answer(
+                        table,
+                        offer(
+                                table,
+                                "buy",
+                                1,
+                                "sendingsol_receivingnekro_Frags_CRF1",
+                                "sendingnekro_receivingsol_TGs_2"))))
+                .isEqualTo("acceptOffer_blue_1");
+    }
+
     // Not neighbours in the action phase: commodities can't change hands, so the deal is refused.
     @Test
     void rejectsAnIllegalDeal() {

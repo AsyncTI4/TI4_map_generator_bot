@@ -53,7 +53,7 @@ class CounterOffers {
                 context,
                 partner,
                 incoming.withoutUnsupported()
-                        .without(item -> item.type() == ItemType.FRAGMENTS)
+                        .without(item -> unheldFragments(item, seat, partner))
                         .without(item -> unrequestable(item, ours))
                         .withoutNotes(theirs));
         deal = clamp(deal, ours, theirs, ItemType.COMMODITIES, TradeBudget.spareCommodities(context, partner));
@@ -64,6 +64,12 @@ class CounterOffers {
         deal = clamp(deal, theirs, ours, ItemType.COMMODITIES, partner.getCommodities());
         deal = clamp(deal, theirs, ours, ItemType.TRADE_GOODS, partner.getTg());
         return clamp(deal, theirs, ours, ItemType.CLEAR_DEBT, partner.getDebtTokenCount(seat.getColor()));
+    }
+
+    private static boolean unheldFragments(DealItem item, Player seat, Player partner) {
+        if (item.type() != ItemType.FRAGMENTS) return false;
+        Player holder = item.isFrom(seat.getFaction()) ? seat : partner;
+        return ComponentValues.fragmentsOfKind(holder, item.fragmentKind()) < item.amount();
     }
 
     private static boolean unrequestable(DealItem item, String ours) {

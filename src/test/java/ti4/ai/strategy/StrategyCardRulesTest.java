@@ -349,6 +349,42 @@ class StrategyCardRulesTest extends BaseTi4Test {
                 .contains("nekroTechExhaust");
     }
 
+    // With no strategy token left, the Scepter of Emelpar pays for the follow: it is exhausted first (which marks the
+    // card followed without a token), and the follow itself is then still made.
+    @Test
+    void followsTechnologyWithTheScepterOfEmelparWhenItHasNoStrategyToken() {
+        test.nekroHome();
+        test.nekro.setStrategicCC(0);
+        test.nekro.addRelic("emelpar");
+        someoneElsePlayed(TECHNOLOGY);
+        AiPrompt card = technologyCardForNekro();
+        AiPrompt scepter = prompt("scepter", PromptSource.AI_THREAD, NOW, "scepterE_follow_7", "deleteButtons");
+
+        Optional<AiDecision> exhaust = StrategyCardRules.follow(test.context(card, scepter));
+
+        assertThat(exhaust.map(AiTestGame::pressedId)).contains("scepterE_follow_7");
+        test.nekro.addExhaustedRelic("emelpar");
+        test.nekro.getFollowedSCs().add(TECHNOLOGY);
+        Set<String> pressed =
+                Set.of(AiTurnContext.pressKey(scepter, scepter.buttons().getFirst()));
+
+        assertThat(StrategyCardRules.follow(test.context(pressed, card, scepter))
+                        .map(AiTestGame::pressedId))
+                .contains("FFCC_nekro_nekroFollowTech");
+    }
+
+    // The Scepter is not offered when the seat could not use the card anyway: nothing is exhausted for a follow it
+    // would not make.
+    @Test
+    void keepsTheScepterWhenItWouldNotFollow() {
+        someoneElsePlayed(TECHNOLOGY);
+        test.nekro.addRelic("emelpar");
+        AiPrompt scepter = prompt("scepter", PromptSource.AI_THREAD, NOW, "scepterE_follow_7", "deleteButtons");
+
+        assertThat(StrategyCardRules.follow(test.context(technologyCardForNekro(), scepter)))
+                .isEmpty();
+    }
+
     @Test
     void doesNotFollowTechnologyForPropagationWithoutTheResources() {
         someoneElsePlayed(TECHNOLOGY);

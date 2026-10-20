@@ -39,6 +39,9 @@ final class SelfPlayGame {
     static final long STALL_MILLIS = 2 * 60 * 60 * 1000L;
     private static final List<String> TRADE_TURN_KEYS =
             List.of("tradeTurnDrafts|", "tradeWindow|", "tradeNoteDeals|", "tradeNoteDealWith|");
+    // -Dai.selfplay.relics=2 draws that many relics for every seat when the first action phase begins, through the
+    // bot's own relic draw, so a batch can study how the seats use each relic.
+    private static final int RELICS_PER_SEAT = Integer.getInteger("ai.selfplay.relics", 0);
     private static final long FRACTURE_SEED = Long.getLong("ai.selfplay.fractureseed", 7L);
     private static final String OWNER_ID = "300000000000000001";
     private static final String AGENDA_FLIP_STAMP = "lastAgendaReactTime";
@@ -73,6 +76,7 @@ final class SelfPlayGame {
             PromissoryTracker.Summary promissory,
             ObjectiveTracker.Summary objectives,
             FractureTracker.Summary fracture,
+            RelicTracker.Summary relics,
             String report,
             long wallSeconds) {
 
@@ -196,6 +200,8 @@ final class SelfPlayGame {
     private final java.util.Set<String> heldCards = new java.util.LinkedHashSet<>();
     private final List<Integer> playRounds = new ArrayList<>();
     private final ObjectiveTracker objectives = new ObjectiveTracker();
+    private final RelicTracker relics = new RelicTracker();
+    private boolean relicsHandedOut;
     private final FractureTracker fracture;
     private String probedTurn = "";
     private int fleetLogRound;
@@ -381,7 +387,12 @@ final class SelfPlayGame {
             recordPlayRounds(game);
             env.promissory.observe(game);
             objectives.observe(game);
+            relics.observe(game);
             if (fracture.due(game)) force(game, fracture::enter);
+            if (relicsDue(game)) {
+                relicsHandedOut = true;
+                force(game, this::handOutRelics);
+            }
             fracture.observe(game);
             probeStyx(game);
             logFleets(game);
@@ -416,6 +427,21 @@ final class SelfPlayGame {
                 ageAgendaFlipGuard();
             }
             env.advance(STEP_MILLIS);
+        }
+    }
+
+    private boolean relicsDue(Game game) {
+        return RELICS_PER_SEAT > 0
+                && !relicsHandedOut
+                && "action".equalsIgnoreCase(game.getPhaseOfGame())
+                && game.getActivePlayer() != null;
+    }
+
+    private void handOutRelics(Game game) {
+        for (Player seat : game.getRealPlayers()) {
+            for (int i = 0; i < RELICS_PER_SEAT; i++) {
+                ti4.helpers.RelicHelper.drawRelicAndNotify(seat, ownerEvent(), game);
+            }
         }
     }
 
@@ -607,6 +633,7 @@ final class SelfPlayGame {
                 env.promissory.summary(game),
                 objectives.summary(game),
                 fracture.summary(),
+                relics.summary(game),
                 report(ending, game, ticks),
                 (System.nanoTime() - wallStart) / 1_000_000_000L);
     }

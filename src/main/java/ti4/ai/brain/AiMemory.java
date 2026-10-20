@@ -37,6 +37,15 @@ public final class AiMemory {
         values.remove(key);
     }
 
+    public synchronized Map<String, String> snapshot() {
+        return new LinkedHashMap<>(values);
+    }
+
+    public synchronized void restore(Map<String, String> snapshot) {
+        values.clear();
+        values.putAll(snapshot);
+    }
+
     public synchronized List<String> keysStartingWith(String prefix) {
         return values.keySet().stream().filter(key -> key.startsWith(prefix)).toList();
     }

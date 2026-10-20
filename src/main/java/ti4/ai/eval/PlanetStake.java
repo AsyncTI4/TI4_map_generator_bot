@@ -28,6 +28,7 @@ public class PlanetStake {
         }
         return stake
                 + FracturePrize.point(planet)
+                + ShardPrize.stake(game, seat, planet)
                 + Math.max(0, -objectives.gain(objectives.before().withoutPlanet(name)));
     }
 

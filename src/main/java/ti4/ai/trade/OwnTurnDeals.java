@@ -70,6 +70,7 @@ class OwnTurnDeals {
                 .or(() -> desperation(context, partners))
                 .or(() -> wash(context, partners, partner -> true))
                 .or(() -> NoteDeals.propose(context, partners))
+                .or(() -> FragmentDeals.propose(context, partners))
                 .or(() -> MilitarySupportDeals.propose(context, partners))
                 .or(() -> sell(context, partners))
                 .or(() -> CardSales.propose(context, partners))

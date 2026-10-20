@@ -10,17 +10,28 @@ import ti4.ai.perception.AiPrompt;
 @UtilityClass
 public class RelicActionRules {
 
+    public static final String CODEX_PICK = CodexFlow.PICK_PREFIX;
+    public static final String NANOFORGE_PLANET = NanoforgeFlow.PLANET_PREFIX;
+    public static final String JR_CHOICE = JuniorFlow.CHOOSE_PREFIX;
+    public static final String JR_STRUCTURE = JuniorFlow.STRUCTURE_PREFIX;
+    public static final String CIRCLET_TARGET = CircletFlow.TARGET_PREFIX;
+
     public static Optional<AiDecision> insteadOfTacticalAction(AiTurnContext context, List<AiPrompt> thisTurn) {
         return FragmentRules.insteadOfTacticalAction(context, thisTurn)
-                .or(() -> EnigmaticDeviceRules.insteadOfTacticalAction(context, thisTurn));
+                .or(() -> EnigmaticDeviceRules.insteadOfTacticalAction(context, thisTurn))
+                .or(() -> RelicFlows.insteadOfTacticalAction(context, thisTurn));
     }
 
     public static Optional<AiDecision> beforePassing(AiTurnContext context, List<AiPrompt> thisTurn) {
         return FragmentRules.beforePassing(context, thisTurn)
-                .or(() -> EnigmaticDeviceRules.beforePassing(context, thisTurn));
+                .or(() -> EnigmaticDeviceRules.beforePassing(context, thisTurn))
+                .or(() -> RelicFlows.beforePassing(context, thisTurn));
     }
 
     public static Optional<AiDecision> next(AiTurnContext context) {
-        return FragmentRules.next(context).or(() -> EnigmaticDeviceRules.next(context));
+        return LatviniaFlow.freeTechnologies(context)
+                .or(() -> FragmentRules.next(context))
+                .or(() -> EnigmaticDeviceRules.next(context))
+                .or(() -> RelicFlows.next(context));
     }
 }

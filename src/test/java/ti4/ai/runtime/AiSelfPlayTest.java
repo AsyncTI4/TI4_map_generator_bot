@@ -106,6 +106,7 @@ class AiSelfPlayTest extends BaseTi4Test {
                                 java.util.stream.Collectors.counting())));
         printTrading(outcomes);
         printPromissoryNotes(outcomes);
+        printRelics(outcomes);
         printActionCards(outcomes);
         printSecrets(outcomes);
         printObjectives(outcomes);
@@ -751,6 +752,71 @@ class AiSelfPlayTest extends BaseTi4Test {
                 .toList();
         System.out.println("Promissory notes by note over " + outcomes.size() + " games:");
         perNote.forEach(line -> System.out.println("  " + line));
+    }
+
+    // Which relics the seats drew and what they did with them over the batch, relic by relic: games in which it was
+    // drawn, the average round it was gained, how often it was used (a purge, or an exhaust of an exhaust relic), how
+    // often it changed hands and how often it was still held unused at the end; and the victory points of the seats
+    // that held one against the table average.
+    private static void printRelics(List<SelfPlayGame.Outcome> outcomes) {
+        int games = Math.max(1, outcomes.size());
+        Map<String, long[]> byRelic = new java.util.TreeMap<>();
+        Map<String, List<Integer>> drawRounds = new java.util.TreeMap<>();
+        Map<String, List<Integer>> firstUseRounds = new java.util.TreeMap<>();
+        Map<String, List<Integer>> holderPoints = new java.util.TreeMap<>();
+        long gains = 0;
+        double tablePoints = 0;
+        int seats = 0;
+        for (SelfPlayGame.Outcome outcome : outcomes) {
+            RelicTracker.Summary summary = outcome.relics();
+            gains += summary.gains().size();
+            summary.gains().forEach(gain -> {
+                long[] row = byRelic.computeIfAbsent(gain.relic(), ignored -> new long[5]);
+                row[gain.fromSeat() == null ? 0 : 3]++;
+                if (gain.fromSeat() != null) return;
+                drawRounds
+                        .computeIfAbsent(gain.relic(), ignored -> new ArrayList<>())
+                        .add(gain.round());
+                holderPoints
+                        .computeIfAbsent(gain.relic(), ignored -> new ArrayList<>())
+                        .add(summary.points().getOrDefault(gain.faction(), 0));
+            });
+            summary.spends().forEach(spend -> byRelic.computeIfAbsent(spend.relic(), ignored -> new long[5])[1]++);
+            summary.spends().stream()
+                    .collect(java.util.stream.Collectors.groupingBy(
+                            spend -> spend.relic() + "|" + spend.faction(),
+                            java.util.stream.Collectors.minBy(Comparator.comparingInt(RelicTracker.Spend::round))))
+                    .values()
+                    .forEach(first -> first.ifPresent(spend -> firstUseRounds
+                            .computeIfAbsent(spend.relic(), ignored -> new ArrayList<>())
+                            .add(spend.round())));
+            summary.heldAtEnd().keySet().forEach(relic -> byRelic.computeIfAbsent(relic, ignored -> new long[5])[2]++);
+            for (Integer points : summary.points().values()) {
+                tablePoints += points;
+                seats++;
+            }
+        }
+        double tableAverage = seats == 0 ? 0 : tablePoints / seats;
+        System.out.printf(
+                "Relics: %.1f gained per game; the table averaged %.2f points%n", (double) gains / games, tableAverage);
+        System.out.println("Relics by relic over " + outcomes.size() + " games:");
+        byRelic.forEach((relic, row) -> System.out.printf(
+                "  %s: drawn %d (average round %.1f), used %d (first use in round %.1f), passed between seats %d, held at the end %d, holders finished on %.2f points (%+.2f)%n",
+                relic,
+                row[0],
+                average(drawRounds.get(relic)),
+                row[1],
+                average(firstUseRounds.get(relic)),
+                row[3],
+                row[2],
+                average(holderPoints.get(relic)),
+                average(holderPoints.get(relic)) - tableAverage));
+    }
+
+    private static double average(List<Integer> values) {
+        return values == null
+                ? 0
+                : values.stream().mapToInt(Integer::intValue).average().orElse(0);
     }
 
     private static String noteOf(String seatAndNote) {

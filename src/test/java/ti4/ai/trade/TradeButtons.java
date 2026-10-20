@@ -44,6 +44,7 @@ final class TradeButtons {
         }
         if (TradeActionCards.tradable(p1, p2) && p1.getAcCount() > 0) ids.add("newTransact_ACs_" + pair);
         if (!p1.getPromissoryNotes().isEmpty()) ids.add("newTransact_PNs_" + pair);
+        if (FragmentValue.Holdings.of(p1).total() > 0) ids.add("newTransact_Frags_" + pair);
         ids.add((offerMode ? "newTransact_Details_" : "newTransact_DetailsInvert_") + pair + "_~MDL");
         if (offerMode) {
             ids.add("startReturnPNInPlayArea_" + p2.getColor());

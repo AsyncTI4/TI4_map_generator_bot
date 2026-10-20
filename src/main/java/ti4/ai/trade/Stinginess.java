@@ -27,7 +27,6 @@ class Stinginess {
     private static final int MAX_RIVALRY_TENTHS = 9;
     private static final double PARTNER_DEBT = 0.8;
     private static final double PARTNER_NOTE = NotesForTrade.UNKNOWN_NOTE_COST;
-    private static final double PARTNER_FRAGMENT = 1.0;
     private static final double MIRROR_COMPUTING_RATE = 2.0;
     private static final double VOTES_RATE = 1.25;
     private static final double MUNITIONS_RATE = 1.25;
@@ -154,7 +153,8 @@ class Stinginess {
             case TRADE_GOODS, COMMODITIES -> rate * amount;
             case SEND_DEBT, CLEAR_DEBT -> PARTNER_DEBT * amount;
             case PROMISSORY -> noteFromSeat(game, partner, seat, item, seatPrivate);
-            case FRAGMENTS -> PARTNER_FRAGMENT * amount;
+            case FRAGMENTS ->
+                FragmentValue.gain(FragmentValue.Holdings.of(partner), item.fragmentKind(), amount, false);
             case ACTION_CARDS -> TradeActionCards.worthToTable(seat, partner, item);
             case PLANETS -> TradePlanets.worth(game, item.detail());
             case UNSUPPORTED -> 0;
@@ -171,7 +171,8 @@ class Stinginess {
                 namedNoteOfPartner(item)
                         .map(alias -> NotesForTrade.giveCost(game, partner, seat, alias))
                         .orElse(PARTNER_NOTE * amount);
-            case FRAGMENTS -> PARTNER_FRAGMENT * amount;
+            case FRAGMENTS ->
+                FragmentValue.loss(FragmentValue.Holdings.of(partner), item.fragmentKind(), amount, false);
             case ACTION_CARDS -> TradeActionCards.worthToTable(partner, seat, item);
             case PLANETS -> TradePlanets.worth(game, item.detail());
             case UNSUPPORTED -> 0;

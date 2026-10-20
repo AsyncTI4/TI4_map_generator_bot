@@ -16,6 +16,7 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.explore.ExploreValues;
 import ti4.ai.nekro.CommandTokenPolicy;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
@@ -66,6 +67,12 @@ public class StrategyCardRules {
     private static final String AI_DEVELOPMENT = "aida";
     private static final String AIDA_EXHAUST = "exhaustTech_aida";
     static final String AIDA_RESEARCH_KEY = "aidaResearch|";
+    static final String TEARS_RESEARCH_KEY = "tearsResearch|";
+    private static final String PROPHETS_TEARS = "prophetstears";
+    private static final String TEARS_SKIP = "skip";
+    private static final String TEARS_ACTION_CARD = "actionCard";
+    private static final String TEARS_SKIP_BUTTON = "prophetsTears_TechSkip";
+    private static final String TEARS_ACTION_CARD_BUTTON = "prophetsTears_AC";
     private static final String RESEARCH_BUTTON = "acquireATechWithSC_first";
     private static final String SPEAKER_PREFIX = "sc_3_assign_speaker_to_";
     static final int LEADERSHIP_TOKENS = 3;
@@ -343,7 +350,8 @@ public class StrategyCardRules {
         Player seat = context.seat();
         closeFinishedFollows(context);
         List<Integer> unfollowed = game.getPlayedSCs().stream()
-                .filter(initiative -> !seat.getSCs().contains(initiative) && !seat.hasFollowedSC(initiative))
+                .filter(initiative -> !seat.getSCs().contains(initiative)
+                        && (!seat.hasFollowedSC(initiative) || ScepterFollow.pending(context, initiative)))
                 .filter(initiative -> SecondaryQueue.blockerFor(game, seat, initiative, context.now())
                         .isEmpty())
                 .sorted(Comparator.comparingInt(initiative -> followRank(context, StrategyCard.of(game, initiative))))
@@ -351,6 +359,7 @@ public class StrategyCardRules {
         for (int initiative : unfollowed) {
             Optional<AiPrompt> card = CardMessages.cardMessage(context, initiative);
             if (card.isEmpty()) continue;
+            Map<String, String> before = context.memory().snapshot();
             Optional<AiDecision> decision =
                     switch (StrategyCard.of(game, initiative)) {
                         case IMPERIAL -> followImperial(context, card.get());
@@ -366,6 +375,12 @@ public class StrategyCardRules {
                         default -> Optional.empty();
                     };
             if (decision.isPresent()) {
+                Optional<AiDecision> scepter = ScepterFollow.exhaustFirst(context, initiative, decision.get());
+                if (scepter.isPresent()) {
+                    context.memory().restore(before);
+                    ScepterFollow.remember(context, initiative);
+                    return scepter;
+                }
                 if (decision.get() instanceof AiDecision.Press) {
                     SecondaryQueue.followStarted(game, seat, initiative, context.now());
                 }
@@ -510,7 +525,9 @@ public class StrategyCardRules {
         int limit = ButtonHelper.getACLimit(game, seat);
         int room = limit - seat.getAcCount();
         int strategyTokens = seat.getStrategicCC();
-        if (holdsNoActionCards(seat) || strategyTokens == 0 || room < 1) {
+        if (holdsNoActionCards(seat)
+                || (strategyTokens == 0 && !ScepterFollow.covers(context, StrategyCard.POLITICS))
+                || room < 1) {
             return false;
         }
         if (chasesSpyNetwork(game, seat)) {
@@ -639,6 +656,7 @@ public class StrategyCardRules {
         if (best.isEmpty()) return Optional.empty();
         PrerequisiteSkips.Plan skips = PrerequisiteSkips.of(game, seat, Mapper.getTech(best.get()));
         if (skips.aiDevelopment()) context.memory().put(AIDA_RESEARCH_KEY + game.getRound(), "skip");
+        rememberProphetsTears(context, skips);
         Wallet wallet = withoutPlanets(Wallet.of(game, seat), skips.planets());
         Optional<Wallet.Payment> payment = cost > 0
                 ? ScoringReserve.planAfterReserve(wallet, ScoringReserve.of(game, seat), SpendCost.resources(cost))
@@ -648,6 +666,39 @@ public class StrategyCardRules {
         PaymentRules.expect(
                 context, "a technology", withSkipPlanets(payment.get(), skips), PaymentRules.TECHNOLOGY_DONE);
         return Optional.of(options.get(best.get()).press("research " + best.get()));
+    }
+
+    private static void rememberProphetsTears(AiTurnContext context, PrerequisiteSkips.Plan skips) {
+        Player seat = context.seat();
+        if (!seat.hasRelicReady(PROPHETS_TEARS)) return;
+        String key = TEARS_RESEARCH_KEY + context.game().getRound();
+        if (skips.prophetsTears()) {
+            context.memory().put(key, TEARS_SKIP);
+        } else if (ExploreValues.drawnActionCards(context.game(), seat, 1) > 0) {
+            context.memory().put(key, TEARS_ACTION_CARD);
+        }
+    }
+
+    public static Optional<AiDecision> exhaustProphetsTearsForResearch(AiTurnContext context) {
+        String key = TEARS_RESEARCH_KEY + context.game().getRound();
+        Optional<String> use = context.memory().get(key);
+        if (use.isEmpty()) return Optional.empty();
+        if (!context.seat().hasRelicReady(PROPHETS_TEARS)) {
+            context.memory().remove(key);
+            return Optional.empty();
+        }
+        String handler = TEARS_SKIP.equals(use.get()) ? TEARS_SKIP_BUTTON : TEARS_ACTION_CARD_BUTTON;
+        for (AiPrompt prompt : Prompts.newestFirst(context.prompts())) {
+            boolean researchPayment = prompt.firstEnabled(
+                            button -> button.isUnowned() && PaymentRules.TECHNOLOGY_DONE.equals(button.handlerId()))
+                    .isPresent();
+            Optional<PromptButton> tears =
+                    prompt.firstEnabled(button -> button.isUnowned() && handler.equals(button.handlerId()));
+            if (!researchPayment || tears.isEmpty()) continue;
+            context.memory().remove(key);
+            return Optional.of(AiDecision.press(prompt, tears.get(), "exhaust the Prophet's Tears for research"));
+        }
+        return Optional.empty();
     }
 
     public static Optional<AiDecision> exhaustAiDevelopmentForResearch(AiTurnContext context) {
@@ -1195,6 +1246,10 @@ public class StrategyCardRules {
         Player seat = context.seat();
         int saved = tokensSavedForBetterCards(context, card);
         int reservedTokens = ScoringReserve.of(context.game(), seat).tokens();
+        if (ScepterFollow.covers(context, card)) {
+            return seat.getStrategicCC() - saved >= 0
+                    && seat.getStrategicCC() + seat.getTacticalCC() - saved >= reservedTokens;
+        }
         return seat.getStrategicCC() - saved >= 1
                 && seat.getStrategicCC() + seat.getTacticalCC() - 1 - saved >= reservedTokens;
     }
