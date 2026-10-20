@@ -18,7 +18,7 @@ public class StallPlans {
 
     private static final int HOME_RANK = 3;
     private static final int HELD_RANK = 2;
-    private static final int EMPTY_RANK = 1;
+    private static final int OTHER_RANK = 1;
 
     public static Optional<TacticalPlan> enduranceStall(Game game, Player seat) {
         double bonus = Endurance.stallBonus(game, seat);
@@ -26,6 +26,7 @@ public class StallPlans {
         return game.getTileMap().values().stream()
                 .filter(tile -> activatable(game, seat, tile))
                 .filter(tile -> !BoardView.hasEnemyUnits(game, seat, tile))
+                .filter(tile -> rank(seat, tile) >= HELD_RANK)
                 .max(Comparator.comparingInt((Tile tile) -> rank(seat, tile))
                         .thenComparing(Tile::getPosition, Comparator.reverseOrder()))
                 .map(tile -> new TacticalPlan(Kind.POSITION, tile.getPosition(), List.of(), Map.of(), bonus));
@@ -39,6 +40,6 @@ public class StallPlans {
         if (tile == seat.getHomeSystemTile()) return HOME_RANK;
         boolean holdsPlanet = tile.getPlanetUnitHolders().stream()
                 .anyMatch(planet -> seat.getPlanets().contains(planet.getName()));
-        return holdsPlanet || BoardView.hasOwnShips(seat, tile) ? HELD_RANK : EMPTY_RANK;
+        return holdsPlanet || BoardView.hasOwnShips(seat, tile) ? HELD_RANK : OTHER_RANK;
     }
 }

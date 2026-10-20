@@ -85,6 +85,21 @@ class EnduranceBrainTest extends BaseTi4Test {
                 .isNotEqualTo(Optional.of(AiTestGame.HOME));
     }
 
+    // The system picker only offers systems near the seat's units, so a stall never targets an empty system such as
+    // Mecatol Rex: with its home locked and nothing else held, there is no stall.
+    @Test
+    void neverStallsInASystemItHasNothingIn() {
+        test.game.getTileByPosition(AiTestGame.HOME).addCC(Mapper.getCCID(test.nekro.getColor()));
+
+        StallPlans.enduranceStall(test.game, test.nekro)
+                .map(plan -> test.game.getTileByPosition(plan.target()))
+                .ifPresent(tile -> assertThat(tile.getPlanetUnitHolders().stream()
+                                        .anyMatch(planet ->
+                                                test.nekro.getPlanets().contains(planet.getName()))
+                                || ti4.ai.eval.BoardView.hasOwnShips(test.nekro, tile))
+                        .isTrue());
+    }
+
     @Test
     void hasNoStallWithoutATokenToSpendOrAWinnableRace() {
         test.nekro.setTacticalCC(0);
