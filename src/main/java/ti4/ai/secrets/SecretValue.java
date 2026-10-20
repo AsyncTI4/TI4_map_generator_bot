@@ -9,6 +9,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.GameHorizon;
 import ti4.ai.strategy.TechPath;
+import ti4.ai.tactical.GroundCampaign;
 import ti4.ai.tactical.SupplyLines;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -89,6 +90,8 @@ public class SecretValue {
         return switch (secretId) {
             case SEIZE_AN_ICON -> legendaryReach(game, seat);
             case DEFY_SPACE_AND_TIME -> nexusReach(game, seat);
+            case GroundCampaign.OCCUPY_THE_FRINGE, GroundCampaign.MECHANIZE_THE_MILITARY ->
+                GroundCampaign.of(game, seat).eta(secretId).feasibility();
             default -> TraitReach.applies(secretId) ? TraitReach.feasibility(game, seat, secretId, OFF_THE_BOARD) : 1.0;
         };
     }

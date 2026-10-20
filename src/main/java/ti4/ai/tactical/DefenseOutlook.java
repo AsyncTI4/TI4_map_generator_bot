@@ -114,6 +114,7 @@ public final class DefenseOutlook {
     private final Map<String, Double> spaceChances;
     private Double homeDefenseLevel;
     private Planet anchor;
+    private GroundCampaign campaign;
     private boolean anchorKnown;
     private final Map<String, Double> groundChances;
     private final Map<String, Double> fearCeilings = new HashMap<>();
@@ -147,6 +148,12 @@ public final class DefenseOutlook {
         this.alternatives = root == null ? new HashMap<>() : root.alternatives;
         this.spaceChances = root == null ? new HashMap<>() : root.spaceChances;
         this.groundChances = root == null ? new HashMap<>() : root.groundChances;
+    }
+
+    GroundCampaign campaign() {
+        if (root != null) return root.campaign();
+        if (campaign == null) campaign = GroundCampaign.of(game, seat);
+        return campaign;
     }
 
     DefenseOutlook excluding(Exclusion removed) {

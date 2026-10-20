@@ -2,12 +2,9 @@ package ti4.ai.tactical;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
-import java.util.Set;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
@@ -35,7 +32,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
@@ -61,7 +57,6 @@ public class ProductionPlanner {
     private static final int WANTED_UPGRADED_LIGHT_SHIPS = 4;
     private static final int WANTED_CRUISERS = 2;
     private static final int WANTED_MECHS = 2;
-    private static final int MECHANIZE_MECHS = 4;
     private static final int WANTED_SPARE_INFANTRY = 4;
     private static final int INFANTRY_ROOM_PER_CARRIER = 2;
     private static final int ENABLING_SHIPS = 2;
@@ -87,12 +82,8 @@ public class ProductionPlanner {
     private static final String COMMAND_AN_ARMADA = "command_armada";
     private static final String SUPREMACY = "supremacy";
     private static final String MIGHTY_FLEET = "gamf";
-    private static final String OCCUPY_THE_FRINGE = "otf";
-    private static final int FRINGE_GROUND_FORCES = 9;
     private static final String UNVEIL_FLAGSHIP = "uf";
     private static final String MAKE_AN_EXAMPLE = "mew";
-    private static final String MECHANIZE_THE_MILITARY = "mtm";
-    private static final int STUCK_SPARE_MECHS = 2;
     private static final int MAX_DEFENSE_BUNDLES = 6;
     private static final int MAX_DEFENSE_BUNDLE_SIZE = 3;
     private static final int MAX_DEFENSE_MECHS = 2;
@@ -328,8 +319,8 @@ public class ProductionPlanner {
         Builder builder = new Builder(
                 game, seat, tile, new Budget(resources * INFANTRY_PER_RESOURCE, resources, fleetRoom), planet);
         planScoringUnits(builder);
-        if (seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY)) {
-            while (builder.count(UnitType.Mech) < MECHANIZE_MECHS) {
+        if (builder.campaign().holdsMechanize()) {
+            while (builder.count(UnitType.Mech) < builder.campaign().mechsWanted(WANTED_MECHS)) {
                 if (!builder.ground(UnitType.Mech, 1, builder.scoringValue(UnitType.Mech))) break;
             }
         }
@@ -384,7 +375,7 @@ public class ProductionPlanner {
 
     private static void planScoringUnits(Builder builder) {
         Player seat = builder.seat;
-        if (mechsStuckAtHome(builder) || fringeHaulerMissing(builder)) {
+        if (builder.campaign().haulerWanted(builder.tile)) {
             builder.ship(UnitType.Carrier, builder.scoringValue(UnitType.Carrier) + ENABLER_VALUE, true);
         }
         for (UnitType type : heavyShipsWanted(builder)) {
@@ -405,7 +396,7 @@ public class ProductionPlanner {
             builder.enablingShips(model -> model.getBombardDieCount(seat) > 0);
         }
         if (PrecisionRules.held(seat)) builder.barrageShips();
-        if (seat.getSecretsUnscored().containsKey(OCCUPY_THE_FRINGE)) planFringeInfantry(builder);
+        if (builder.campaign().holdsFringe()) planFringeInfantry(builder);
         if (fleetShips == 0 && new ObjectiveValue(builder.game, seat).caresAboutPresence()) {
             int pawns = Math.min(WANTED_PAWNS, builder.count(UnitType.Destroyer) + PAWNS_PER_BUILD);
             builder.shipsUpTo(UnitType.Destroyer, pawns, builder.scoringValue(UnitType.Destroyer), true);
@@ -413,53 +404,9 @@ public class ProductionPlanner {
     }
 
     private static void planFringeInfantry(Builder builder) {
-        Game game = builder.game;
-        Player seat = builder.seat;
-        Optional<Planet> anchor = FringeStack.best(game, seat);
-        int stacked = anchor.map(planet -> BoardView.groundForces(planet, seat))
-                .orElseGet(() -> new ObjectiveValue(game, seat).before().mostGroundForcesWithoutADock());
-        int spare = TacticalPlanner.movableGroundForces(game, seat, builder.tile, builder.defense);
-        int missing = FRINGE_GROUND_FORCES - stacked - spare;
-        boolean anchoredHere = anchor.filter(planet -> game.getTileFromPlanet(planet.getName()) == builder.tile)
-                .isPresent();
-        int movable = GroundDrops.roomNear(game, seat, builder.tile)
-                + (TransitDiodesRules.readyDiodes(seat).isPresent() ? TransitDiodesRules.MOVED_UNITS : 0)
-                - spare;
-        builder.infantry(anchoredHere ? missing : Math.min(missing, movable), builder.scoringValue(UnitType.Infantry));
-    }
-
-    private static boolean fringeHaulerMissing(Builder builder) {
-        Game game = builder.game;
-        Player seat = builder.seat;
-        Optional<Planet> anchor = FringeStack.best(game, seat);
-        if (anchor.isEmpty() || !FringeStack.inOrNextTo(game, seat, builder.tile, anchor.get())) return false;
-        if (BoardView.groundForces(anchor.get(), seat) >= FRINGE_GROUND_FORCES) return false;
-        Set<String> nearby = new HashSet<>(FoWHelper.getAdjacentTiles(game, builder.tile.getPosition(), seat, false));
-        nearby.add(builder.tile.getPosition());
-        return nearby.stream()
-                .map(game::getTileByPosition)
-                .filter(Objects::nonNull)
-                .noneMatch(tile -> hasCapacityShip(seat, tile));
-    }
-
-    private static boolean hasCapacityShip(Player seat, Tile tile) {
-        return BoardView.MOVING_SHIPS.stream()
-                .anyMatch(type ->
-                        BoardView.capacity(seat, type) > 0 && BoardView.count(BoardView.space(tile), seat, type) > 0);
-    }
-
-    private static boolean mechsStuckAtHome(Builder builder) {
-        Player seat = builder.seat;
-        Tile home = seat.getHomeSystemTile();
-        if (!seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY) || home != builder.tile) return false;
-        boolean haulerAtHome = BoardView.MOVING_SHIPS.stream()
-                .anyMatch(type ->
-                        BoardView.capacity(seat, type) > 0 && BoardView.count(BoardView.space(home), seat, type) > 0);
-        if (haulerAtHome) return false;
-        int mechs = home.getUnitHolders().values().stream()
-                .mapToInt(holder -> BoardView.count(holder, seat, UnitType.Mech))
-                .sum();
-        return mechs - 1 >= STUCK_SPARE_MECHS;
+        int spare = TacticalPlanner.movableGroundForces(builder.game, builder.seat, builder.tile, builder.defense);
+        builder.infantry(
+                builder.campaign().infantryToBuild(builder.tile, spare), builder.scoringValue(UnitType.Infantry));
     }
 
     private record DefenseBundle(UnitType type, int count) {
@@ -511,8 +458,7 @@ public class ProductionPlanner {
         builder.overSuppliedCarriersUpTo(wantedCarriers(builder.seat));
         int spare = TacticalPlanner.movableGroundForces(builder.game, builder.seat, builder.tile, builder.defense);
         builder.infantry(WANTED_SPARE_INFANTRY - spare, NEEDED_INFANTRY_VALUE);
-        int wantedMechs =
-                builder.seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY) ? MECHANIZE_MECHS : WANTED_MECHS;
+        int wantedMechs = builder.campaign().mechsWanted(WANTED_MECHS);
         if (firesFromAdjacentSystems(builder.seat) && frontlineInterest(builder) > 0) wantedMechs++;
         while (builder.count(UnitType.Mech) < wantedMechs && builder.leavesRoomToFill(builder.cost(UnitType.Mech))) {
             if (!builder.ground(UnitType.Mech, 1, builder.fillerValue(UnitType.Mech))) return;
@@ -773,6 +719,10 @@ public class ProductionPlanner {
             this.budget = budget;
             this.groundPlanet = groundPlanet;
             this.defense = defense;
+        }
+
+        GroundCampaign campaign() {
+            return defense.campaign();
         }
 
         boolean ship(UnitType type, double value, boolean scoring) {

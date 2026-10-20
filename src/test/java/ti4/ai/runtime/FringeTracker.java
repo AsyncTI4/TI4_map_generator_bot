@@ -9,6 +9,7 @@ import java.util.Set;
 import ti4.ai.eval.BoardView;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.FringeStack;
+import ti4.ai.tactical.GroundCampaign;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
 import ti4.game.Game;
@@ -41,6 +42,9 @@ final class FringeTracker {
             lastRound = game.getRound();
             for (Player seat : game.getRealPlayers()) {
                 if (FringeStack.held(seat)) lines.add(statusLine(game, seat));
+                if (seat.getSecretsUnscored().containsKey(GroundCampaign.MECHANIZE_THE_MILITARY)) {
+                    lines.add(mechanizeCampaignLine(game, seat));
+                }
             }
         }
     }
@@ -87,21 +91,74 @@ final class FringeTracker {
         int builtSinceLastLine = built.getOrDefault(faction, 0);
         built.remove(faction);
         return String.format(
-                "Occupy the Fringe %s r%d: anchor %s, largest stack %d, infantry built %d, haul room %s, garrison %s, in home system %s, in or next to home %s, home planets held %d, protected %s, shifted %d",
-                faction,
-                game.getRound(),
-                anchor,
-                stack,
-                builtSinceLastLine,
-                anchorTile
-                        .map(tile -> String.valueOf(haulRoomNear(game, seat, tile)))
-                        .orElse("n/a"),
-                garrisonReport(game, seat, anchorTile),
-                inHome,
-                nearHome,
-                homePlanets,
-                best.filter(found -> FringeStack.isProtected(game, seat, found)).isPresent(),
-                shifted.getOrDefault(faction, 0));
+                        "Occupy the Fringe %s r%d: anchor %s, largest stack %d, infantry built %d, haul room %s, garrison %s, in home system %s, in or next to home %s, home planets held %d, protected %s, shifted %d",
+                        faction,
+                        game.getRound(),
+                        anchor,
+                        stack,
+                        builtSinceLastLine,
+                        anchorTile
+                                .map(tile -> String.valueOf(haulRoomNear(game, seat, tile)))
+                                .orElse("n/a"),
+                        garrisonReport(game, seat, anchorTile),
+                        inHome,
+                        nearHome,
+                        homePlanets,
+                        best.filter(found -> FringeStack.isProtected(game, seat, found))
+                                .isPresent(),
+                        shifted.getOrDefault(faction, 0))
+                + campaignReport(game, seat, GroundCampaign.OCCUPY_THE_FRINGE);
+    }
+
+    // The campaign behind the line: its anchor and demand, rounds to finish against rounds left, whether it is
+    // spending yet, the transport capacity near the docks, and the components that shorten it.
+    private static String campaignReport(Game game, Player seat, String secret) {
+        GroundCampaign campaign = GroundCampaign.of(game, seat);
+        GroundCampaign.Eta eta = campaign.eta(secret);
+        boolean fringe = GroundCampaign.OCCUPY_THE_FRINGE.equals(secret);
+        return String.format(
+                " | campaign demand %d, eta %d of %d rounds left (slack %d, %s), %s, haul capacity %d, Transit Diodes %s, Sling Relay %s, Carrier II %s",
+                fringe ? campaign.fringeDemand() : campaign.mechDemand(),
+                eta.rounds(),
+                eta.roundsLeft(),
+                eta.slack(),
+                !eta.feasible()
+                        ? "infeasible"
+                        : (fringe ? campaign.fringeActive() : campaign.mechActive()) ? "active" : "waiting",
+                fringe
+                        ? "anchor "
+                                + campaign.anchor()
+                                        .map(planet -> planet.getName())
+                                        .orElse("none")
+                        : "targets "
+                                + campaign.mtmTargets().stream()
+                                        .map(planet -> planet.getName())
+                                        .toList(),
+                haulCapacity(game, seat),
+                componentState(seat, "td"),
+                componentState(seat, "sr"),
+                seat.hasTech("cv2"));
+    }
+
+    private static String componentState(Player seat, String tech) {
+        if (!seat.hasTech(tech)) return "not owned";
+        return seat.hasTechReady(tech) ? "ready" : "used this round";
+    }
+
+    private static int haulCapacity(Game game, Player seat) {
+        int capacity = 0;
+        for (Tile tile : game.getTileMap().values()) {
+            UnitHolder space = BoardView.space(tile);
+            for (UnitType type : BoardView.MOVING_SHIPS) {
+                capacity += BoardView.count(space, seat, type) * BoardView.capacity(seat, type);
+            }
+        }
+        return capacity;
+    }
+
+    private String mechanizeCampaignLine(Game game, Player seat) {
+        return String.format("Mechanize the Military %s r%d", seat.getFaction(), game.getRound())
+                + campaignReport(game, seat, GroundCampaign.MECHANIZE_THE_MILITARY);
     }
 
     private String garrisonReport(Game game, Player seat, Optional<Tile> anchorTile) {
@@ -111,8 +168,23 @@ final class FringeTracker {
         if (plan.isPresent())
             return String.format("%s %.1f", plan.get().kind(), plan.get().score());
         if (groundForcesOffTheAnchor(game, seat) == 0) return "none: no ground forces off the anchor";
-        if (haulRoomNear(game, seat, tile) <= 0) return "none: no haul room near the anchor";
-        return "none: rejected by the planner (reach, gain or defense)";
+        if (movableAnywhere(game, seat) == 0) return "none: (a) ground forces exist but none are movable";
+        if (haulRoomNear(game, seat, tile) <= 0) {
+            return frozenHaulers(game, seat)
+                    ? "none: (b) haulers are frozen by a command token"
+                    : "none: (b) no haul room near the anchor";
+        }
+        return "none: (c)/(d) gain at or below zero, or a leave cost (not split)";
+    }
+
+    private static int movableAnywhere(Game game, Player seat) {
+        return game.getTileMap().values().stream()
+                .mapToInt(tile -> TacticalPlanner.movableGroundForces(game, seat, tile))
+                .sum();
+    }
+
+    private static boolean frozenHaulers(Game game, Player seat) {
+        return game.getTileMap().values().stream().anyMatch(tile -> tile.hasPlayerCC(seat) && roomIn(seat, tile) > 0);
     }
 
     private static int groundForcesOffTheAnchor(Game game, Player seat) {
