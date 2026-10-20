@@ -43,7 +43,7 @@ public class PrecisionRules {
     }
 
     static int enemyFighters(Game game, Player seat, Tile tile) {
-        return game.getRealPlayers().stream()
+        return game.getRealPlayersNNeutral().stream()
                 .filter(other -> other != seat)
                 .mapToInt(other -> BoardView.count(BoardView.space(tile), other, UnitType.Fighter))
                 .max()

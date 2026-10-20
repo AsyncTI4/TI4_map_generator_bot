@@ -389,7 +389,7 @@ public class ActionSecretRules {
                 tile.getPosition(),
                 holder.getName(),
                 opponent.getFaction(),
-                opponent.getTotalVictoryPoints() == game.getHighestScore(),
+                !opponent.isNeutral() && opponent.getTotalVictoryPoints() == game.getHighestScore(),
                 space && BoardView.count(holder, seat, UnitType.Flagship) > 0,
                 space ? heavyShips(holder, opponent) : 0,
                 heavyShipsOnBoard(game, opponent),
@@ -446,7 +446,7 @@ public class ActionSecretRules {
             UnitHolder holder,
             Player opponent) {
         return switch (secret) {
-            case "sar" -> won && watch.opponentLeads();
+            case "sar" -> won && watch.opponentLeads() && !opponent.isNeutral();
             case "btv" -> won && watch.anomaly();
             case "dts" -> won && watch.otherHome();
             case "baf" -> won && watch.betrayable();
@@ -458,7 +458,8 @@ public class ActionSecretRules {
                         && watch.activeSystem()
                         && BoardView.nonFighterShips(holder, seat) >= DEMONSTRATION_SHIPS;
             case "dtgs" ->
-                watch.space()
+                !opponent.isNeutral()
+                        && watch.space()
                         && watch.enemyHeavy() > 0
                         && heavyShipsOnBoard(game, opponent) < watch.enemyHeavyOnBoard();
             case "fwp" -> watch.space() && watch.activeSystem() && watch.fightersCleared();
@@ -474,7 +475,7 @@ public class ActionSecretRules {
     @Nullable
     private static Player foughtOpponent(Game game, Player seat, Tile tile, UnitHolder holder) {
         if (rounds(game, seat, tile.getPosition(), holder.getName()) == 0) return null;
-        for (Player other : game.getRealPlayers()) {
+        for (Player other : game.getRealPlayersNNeutral()) {
             if (other != seat && rounds(game, other, tile.getPosition(), holder.getName()) > 0) return other;
         }
         return null;
@@ -516,7 +517,7 @@ public class ActionSecretRules {
     @Nullable
     private static Player opponentIn(Game game, Player seat, Tile tile, UnitHolder holder) {
         if (!present(seat, tile, holder)) return null;
-        for (Player other : game.getRealPlayers()) {
+        for (Player other : game.getRealPlayersNNeutral()) {
             if (other != seat && present(other, tile, holder)) return other;
         }
         return null;

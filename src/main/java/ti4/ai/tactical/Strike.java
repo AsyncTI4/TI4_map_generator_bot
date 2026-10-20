@@ -37,6 +37,11 @@ record Strike(
                 pulled);
     }
 
+    Strike withExtraDefenderShips(Map<UnitType, Integer> defenders) {
+        return new Strike(
+                target, opponent, origins, moves, ships, damaged, cargo, defenders, extraDefenderGround, rules, pulled);
+    }
+
     Strike withPulled(Map<UnitType, Integer> commanderForces) {
         return new Strike(
                 target,

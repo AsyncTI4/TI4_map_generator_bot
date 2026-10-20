@@ -14,6 +14,8 @@ import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
+import ti4.ai.tactical.NeutralSetups;
+import ti4.ai.tactical.NeutralSetups.Pirates;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -27,7 +29,7 @@ class NeutralUnitCards {
     static final String PIRATE_CONTRACT = "piratecontract1";
     static final String PIRATE_FLEET = "piratefleet";
     static final String MERCENARY_CONTRACT = "mercenarycontract";
-    static final String PIRATE_CONTRACT_PREFIX = "piratecontract";
+    static final String PIRATE_CONTRACT_COPY = "piratecontract[1-4]";
     static final int MERCENARY_TRADE_GOODS = 2;
     static final int PIRATE_FLEET_RESOURCES = 3;
     static final int FIRST_PAGE_PLANETS = 22;
@@ -45,27 +47,28 @@ class NeutralUnitCards {
     static AiCard pirateContract() {
         return AiActionCards.componentOfCopies(
                 PIRATE_CONTRACT,
-                alias -> alias.startsWith(PIRATE_CONTRACT_PREFIX),
-                NeutralUnitCards::pirateContractPlan,
+                alias -> alias.matches(PIRATE_CONTRACT_COPY),
+                Evaluator.atMoment(NeutralUnitCards::pirateContractPlan),
                 "pirateContract",
                 List.of(CONTRACT_SYSTEM_PREFIX),
                 CardChains.chain(CardChains.last(
                         CONTRACT_SYSTEM_PREFIX,
                         Source.OWNED,
-                        (context, position) -> contractValue(context.game(), context.seat(), position),
+                        (context, position) ->
+                                contractValue(context.game(), context.seat(), position, PlayMoment.IN_TURN),
                         "post the pirates in")));
     }
 
     static AiCard pirateFleet() {
         return AiActionCards.componentWithResolveHook(
                 PIRATE_FLEET,
-                NeutralUnitCards::pirateFleetPlan,
+                Evaluator.atMoment(NeutralUnitCards::pirateFleetPlan),
                 "pirateFleet",
                 List.of(FLEET_SYSTEM_PREFIX),
                 CardChains.chain(CardChains.last(
                         FLEET_SYSTEM_PREFIX,
                         Source.OWNED,
-                        (context, position) -> fleetValue(context.game(), context.seat(), position),
+                        (context, position) -> fleetValue(context.game(), context.seat(), position, PlayMoment.IN_TURN),
                         "post the pirate fleet in")),
                 NeutralUnitCards::expectPayment);
     }
@@ -94,18 +97,18 @@ class NeutralUnitCards {
                         "post the mercenaries on")));
     }
 
-    static Optional<Plan> pirateContractPlan(Game game, Player seat) {
+    static Optional<Plan> pirateContractPlan(Game game, Player seat, PlayMoment moment) {
         if (game.isFowMode()) return Optional.empty();
         return legalSystems(game, seat, CONTRACT).stream()
                 .map(tile -> Plan.aimedAt(
-                        contractValue(game, seat, tile.getPosition()),
+                        contractValue(game, seat, tile.getPosition(), moment),
                         tile.getPosition(),
                         "in " + tile.getRepresentation() + "."))
                 .filter(plan -> plan.value() > Double.NEGATIVE_INFINITY)
                 .max(Comparator.comparingDouble(Plan::value).thenComparing(Plan::target, Comparator.reverseOrder()));
     }
 
-    static Optional<Plan> pirateFleetPlan(Game game, Player seat) {
+    static Optional<Plan> pirateFleetPlan(Game game, Player seat, PlayMoment moment) {
         if (game.isFowMode()
                 || ScoringReserve.planAfterReserve(game, seat, SpendCost.resources(PIRATE_FLEET_RESOURCES))
                         .isEmpty()) {
@@ -113,7 +116,7 @@ class NeutralUnitCards {
         }
         return legalSystems(game, seat, FLEET).stream()
                 .map(tile -> Plan.aimedAt(
-                        fleetValue(game, seat, tile.getPosition()),
+                        fleetValue(game, seat, tile.getPosition(), moment),
                         tile.getPosition(),
                         "in " + tile.getRepresentation() + "."))
                 .filter(plan -> plan.value() > Double.NEGATIVE_INFINITY)
@@ -139,25 +142,31 @@ class NeutralUnitCards {
                 .toList();
     }
 
-    private static double contractValue(Game game, Player seat, String position) {
+    private static double contractValue(Game game, Player seat, String position, PlayMoment moment) {
         Tile tile = game.getTileByPosition(position);
-        if (tile == null
-                || !TeHelperActionCards.legalPirateTarget(game, tile, CONTRACT)
-                || onOwnRoutes(game, seat, tile)) {
+        if (tile == null || !TeHelperActionCards.legalPirateTarget(game, tile, CONTRACT)) {
             return Double.NEGATIVE_INFINITY;
         }
-        return Math.min(BLOCK_CAP, blockedRivals(game, seat, tile, false));
+        double blocking = onOwnRoutes(game, seat, tile)
+                ? Double.NEGATIVE_INFINITY
+                : Math.min(BLOCK_CAP, blockedRivals(game, seat, tile, false));
+        double setup = setupValue(game, seat, tile, Pirates.CONTRACT, moment);
+        return setup > 0 ? Math.max(blocking, setup) : blocking;
     }
 
-    private static double fleetValue(Game game, Player seat, String position) {
+    private static double fleetValue(Game game, Player seat, String position, PlayMoment moment) {
         Tile tile = game.getTileByPosition(position);
-        if (tile == null
-                || !TeHelperActionCards.legalPirateTarget(game, tile, FLEET)
-                || onOwnRoutes(game, seat, tile)) {
+        if (tile == null || !TeHelperActionCards.legalPirateTarget(game, tile, FLEET)) {
             return Double.NEGATIVE_INFINITY;
         }
-        double denial = FLEET_BLOCK * contenderPresence(game, seat, tile);
-        return denial > 0 ? denial - PIRATE_FLEET_RESOURCES : Double.NEGATIVE_INFINITY;
+        double denial = onOwnRoutes(game, seat, tile) ? 0 : FLEET_BLOCK * contenderPresence(game, seat, tile);
+        double blocking = denial > 0 ? denial - PIRATE_FLEET_RESOURCES : Double.NEGATIVE_INFINITY;
+        double setup = setupValue(game, seat, tile, Pirates.FLEET, moment);
+        return setup > 0 ? Math.max(blocking, setup - PIRATE_FLEET_RESOURCES) : blocking;
+    }
+
+    private static double setupValue(Game game, Player seat, Tile tile, Pirates pirates, PlayMoment moment) {
+        return moment == PlayMoment.BEFORE_PASSING ? 0 : NeutralSetups.value(game, seat, tile, pirates);
     }
 
     private static boolean onOwnRoutes(Game game, Player seat, Tile tile) {

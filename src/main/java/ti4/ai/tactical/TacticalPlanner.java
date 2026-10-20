@@ -117,6 +117,7 @@ public class TacticalPlanner {
     private static final String DESTROY_THEIR_GREATEST_SHIP = "dtgs";
     private static final Set<String> WHOLE_POINT_SECRETS =
             Set.of(DARKEN_THE_SKIES, DESTROY_THEIR_GREATEST_SHIP, BRAVE_THE_VOID);
+    private static final Set<String> NEUTRAL_TARGET_SECRETS = Set.of(BRAVE_THE_VOID, "uf", "dyp", "fwp");
     private static final String CONQUER_THE_WEAK = "conquer";
     private static final String MECHANIZE_THE_MILITARY = "mtm";
     private static final String ADAPT_NEW_STRATEGIES = "ans";
@@ -2203,7 +2204,11 @@ public class TacticalPlanner {
             double cannonWipe) {
         Set<String> held = seat.getSecretsUnscored().keySet();
         List<String> generic = new ArrayList<>();
-        if (held.contains("sar") && opponent.getTotalVictoryPoints() == game.getHighestScore()) generic.add("sar");
+        if (held.contains("sar")
+                && !opponent.isNeutral()
+                && opponent.getTotalVictoryPoints() == game.getHighestScore()) {
+            generic.add("sar");
+        }
         if (held.contains(BRAVE_THE_VOID) && tile.isAnomaly(game, seat)) generic.add(BRAVE_THE_VOID);
         if (withDarkenTheSkies
                 && held.contains(DARKEN_THE_SKIES)
@@ -2226,6 +2231,7 @@ public class TacticalPlanner {
             if (held.contains("uf") && ships.getOrDefault(UnitType.Flagship, 0) > 0) spaceOnly.add("uf");
             if (held.contains("dyp") && arriving >= DEMONSTRATION_SHIPS) spaceOnly.add("dyp");
             if (held.contains(DESTROY_THEIR_GREATEST_SHIP)
+                    && !opponent.isNeutral()
                     && BoardView.count(holder, opponent, UnitType.Flagship)
                                     + BoardView.count(holder, opponent, UnitType.Warsun)
                             > 0) {
@@ -2233,9 +2239,11 @@ public class TacticalPlanner {
             }
         }
         double bestSpaceOnly = Math.max(
-                secretPoints(game, seat, spaceOnly).stream().findFirst().orElse(0.0),
+                secretPoints(game, seat, opponent, spaceOnly).stream()
+                        .findFirst()
+                        .orElse(0.0),
                 Math.max(space ? barragePoints(game, seat, tile, opponent, ships) : 0, cannonWipe));
-        List<Double> genericPoints = secretPoints(game, seat, generic);
+        List<Double> genericPoints = secretPoints(game, seat, opponent, generic);
         double firstGeneric = genericPoints.isEmpty() ? 0 : genericPoints.get(0);
         double secondGeneric = genericPoints.size() < 2 ? 0 : genericPoints.get(1);
         double spacePoints = 0;
@@ -2258,11 +2266,16 @@ public class TacticalPlanner {
         };
     }
 
-    private static List<Double> secretPoints(Game game, Player seat, List<String> secrets) {
+    private static List<Double> secretPoints(Game game, Player seat, Player opponent, List<String> secrets) {
         return secrets.stream()
-                .map(secret -> secretShare(game, seat, secret))
+                .map(secret -> secretShare(game, seat, opponent, secret))
                 .sorted(Comparator.reverseOrder())
                 .toList();
+    }
+
+    private static double secretShare(Game game, Player seat, Player opponent, String secret) {
+        if (opponent.isNeutral() && NEUTRAL_TARGET_SECRETS.contains(secret)) return 1.0;
+        return secretShare(game, seat, secret);
     }
 
     private static double secretShare(Game game, Player seat, String secret) {
@@ -2277,7 +2290,7 @@ public class TacticalPlanner {
         arriving.forEach((type, count) -> present.merge(type, count, Integer::sum));
         double chance = PrecisionRules.chanceToClear(
                 seat, present, BoardView.count(BoardView.space(tile), opponent, UnitType.Fighter));
-        return secretShare(game, seat, PrecisionRules.FIGHT_WITH_PRECISION) * chance;
+        return secretShare(game, seat, opponent, PrecisionRules.FIGHT_WITH_PRECISION) * chance;
     }
 
     private static Optional<TacticalPlan> produce(Context context, Tile tile) {
