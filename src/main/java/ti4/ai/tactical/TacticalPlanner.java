@@ -596,9 +596,7 @@ public class TacticalPlanner {
     private static Optional<TacticalPlan> occupy(Context context, Tile tile) {
         Player seat = context.seat;
         if (!seat.getSecretsUnscored().containsKey(OCCUPY_THE_FRINGE)) return Optional.empty();
-        Optional<Planet> fringe = ownedPlanets(seat, tile)
-                .filter(planet -> BoardView.count(planet, seat, UnitType.Spacedock) == 0)
-                .max(Comparator.comparingInt(planet -> BoardView.groundForces(planet, seat)));
+        Optional<Planet> fringe = fringeIn(context, tile);
         if (fringe.isEmpty()) return Optional.empty();
         Planet planet = fringe.get();
         return bestGarrison(
@@ -607,6 +605,19 @@ public class TacticalPlanner {
                         origin -> availableGroundForces(context.game, seat, origin, context.defense(), List.of()),
                         arriving -> Map.of(planet.getName(), BoardView.groundForces(planet, seat) + arriving))
                 .map(plan -> withFringePull(context, planet, plan));
+    }
+
+    private static Optional<Planet> fringeIn(Context context, Tile tile) {
+        Player seat = context.seat;
+        Optional<Planet> anchor = FringeStack.best(context.game, seat);
+        if (anchor.isPresent()) {
+            return ownedPlanets(seat, tile)
+                    .filter(planet -> planet.getName().equals(anchor.get().getName()))
+                    .findFirst();
+        }
+        return ownedPlanets(seat, tile)
+                .filter(planet -> BoardView.count(planet, seat, UnitType.Spacedock) == 0)
+                .max(Comparator.comparingInt(planet -> BoardView.groundForces(planet, seat)));
     }
 
     private static TacticalPlan withFringePull(Context context, Planet planet, TacticalPlan plan) {
@@ -2329,9 +2340,7 @@ public class TacticalPlanner {
     private static Optional<GroundShift> fringeShift(Context context, Tile tile) {
         Player seat = context.seat;
         if (!FringeStack.held(seat)) return Optional.empty();
-        Optional<Planet> fringe = ownedPlanets(seat, tile)
-                .filter(planet -> BoardView.count(planet, seat, UnitType.Spacedock) == 0)
-                .max(Comparator.comparingInt(planet -> BoardView.groundForces(planet, seat)));
+        Optional<Planet> fringe = fringeIn(context, tile);
         if (fringe.isEmpty()) return Optional.empty();
         int missing = FringeStack.GROUND_FORCES - BoardView.groundForces(fringe.get(), seat);
         List<UnitMove> spare = spareFromDocks(context, tile);

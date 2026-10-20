@@ -27,6 +27,8 @@ public final class ObjectiveValue {
     private static final double WITHIN_REACH_SHARE = 0.9;
     private static final int STEPS_WITHIN_REACH = 3;
     private static final int TRAIT_STEPS_WITHIN_REACH = 2;
+    private static final int GROUND_STEPS_WITHIN_REACH = 3;
+    private static final Set<String> GROUND_SECRETS = Set.of("mtm", "otf");
     public static final Map<String, String> TRAIT_SECRETS =
             Map.of("mp", "industrial", "faa", "cultural", "mrm", "hazardous");
     private static final int STAGE_TWO_POINTS = 2;
@@ -173,7 +175,8 @@ public final class ObjectiveValue {
 
     private static double partialShare(Target target, int fewestStillNeeded) {
         boolean withinReach = target.points() >= STAGE_TWO_POINTS && fewestStillNeeded <= STEPS_WITHIN_REACH
-                || TRAIT_SECRETS.containsKey(target.id()) && fewestStillNeeded <= TRAIT_STEPS_WITHIN_REACH;
+                || TRAIT_SECRETS.containsKey(target.id()) && fewestStillNeeded <= TRAIT_STEPS_WITHIN_REACH
+                || GROUND_SECRETS.contains(target.id()) && fewestStillNeeded <= GROUND_STEPS_WITHIN_REACH;
         return withinReach ? WITHIN_REACH_SHARE : PARTIAL_SHARE;
     }
 

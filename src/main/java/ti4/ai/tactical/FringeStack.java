@@ -1,6 +1,7 @@
 package ti4.ai.tactical;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -19,8 +20,12 @@ public class FringeStack {
 
     public static final String OCCUPY_THE_FRINGE = "otf";
     public static final int GROUND_FORCES = 9;
-    public static final int PROTECTED_FROM = 5;
-    private static final int GIVEN_UP_AT = 6;
+    public static final int PROTECTED_FROM = 3;
+    private static final int GIVEN_UP_AT = 4;
+    private static final int ANCHOR_SLACK = 2;
+    private static final int IN_DOCK_SYSTEM = 0;
+    private static final int NEXT_TO_DOCK_SYSTEM = 1;
+    private static final int ELSEWHERE = 2;
 
     public static boolean held(Player seat) {
         return seat.getSecretsUnscored().containsKey(OCCUPY_THE_FRINGE);
@@ -28,13 +33,31 @@ public class FringeStack {
 
     public static Optional<Planet> best(Game game, Player seat) {
         if (!held(seat)) return Optional.empty();
-        return seat.getPlanets().stream()
+        List<Planet> candidates = seat.getPlanets().stream()
                 .map(game::getUnitHolderFromPlanet)
                 .filter(Objects::nonNull)
                 .filter(planet -> BoardView.count(planet, seat, UnitType.Spacedock) == 0)
-                .filter(planet -> BoardView.groundForces(planet, seat) > 0)
-                .max(Comparator.comparingInt((Planet planet) -> BoardView.groundForces(planet, seat))
-                        .thenComparing(planet -> nearHome(game, seat, planet.getName())));
+                .toList();
+        int largest = candidates.stream()
+                .mapToInt(planet -> BoardView.groundForces(planet, seat))
+                .max()
+                .orElse(0);
+        if (largest == 0) return Optional.empty();
+        List<Tile> dockSystems = dockSystems(game, seat);
+        return candidates.stream()
+                .filter(planet -> BoardView.groundForces(planet, seat) >= largest - ANCHOR_SLACK)
+                .min(Comparator.comparingInt((Planet planet) -> distanceToDocks(game, seat, dockSystems, planet))
+                        .thenComparing(Comparator.comparingInt((Planet planet) -> BoardView.groundForces(planet, seat))
+                                .reversed())
+                        .thenComparing(planet -> !nearHome(game, seat, planet.getName())));
+    }
+
+    public static boolean inOrNextTo(Game game, Player seat, Tile dockSystem, Planet anchor) {
+        Tile tile = game.getTileFromPlanet(anchor.getName());
+        if (tile == null) return false;
+        if (tile == dockSystem) return true;
+        return FoWHelper.getAdjacentTiles(game, dockSystem.getPosition(), seat, false)
+                .contains(tile.getPosition());
     }
 
     public static boolean isProtected(Game game, Player seat, Planet planet) {
@@ -58,7 +81,26 @@ public class FringeStack {
         return adjacent.contains(tile.getPosition());
     }
 
+    private static List<Tile> dockSystems(Game game, Player seat) {
+        return seat.getPlanets().stream()
+                .map(game::getUnitHolderFromPlanet)
+                .filter(Objects::nonNull)
+                .filter(holder -> BoardView.count(holder, seat, UnitType.Spacedock) > 0)
+                .map(holder -> game.getTileFromPlanet(holder.getName()))
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+    }
+
+    private static int distanceToDocks(Game game, Player seat, List<Tile> dockSystems, Planet planet) {
+        if (dockSystems.stream().anyMatch(dock -> game.getTileFromPlanet(planet.getName()) == dock)) {
+            return IN_DOCK_SYSTEM;
+        }
+        boolean adjacent = dockSystems.stream().anyMatch(dock -> inOrNextTo(game, seat, dock, planet));
+        return adjacent ? NEXT_TO_DOCK_SYSTEM : ELSEWHERE;
+    }
+
     private static boolean givenUp(Game game, int stacked) {
-        return GameHorizon.endInSight(game) && stacked <= GIVEN_UP_AT;
+        return GameHorizon.roundsLeft(game) <= 1 && stacked <= GIVEN_UP_AT;
     }
 }
