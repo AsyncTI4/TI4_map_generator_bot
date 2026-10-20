@@ -118,6 +118,8 @@ final class ObjectiveTracker {
     private final Map<String, Integer> arrivals = new HashMap<>();
     private final Map<String, Set<String>> awayMechPlanets = new HashMap<>();
 
+    private final HomeRaidTracker homeRaids = new HomeRaidTracker();
+
     private Snapshot open;
     private int lastOpenedRound;
     private final List<StatusScoring> statusScoring = new ArrayList<>();
@@ -130,6 +132,7 @@ final class ObjectiveTracker {
     // The snapshot opens once every seat has passed, before the status phase starts: scores a seat queued during the
     // action phase are applied the moment the status phase begins, so a snapshot taken then would already hold them.
     synchronized void observe(Game game) {
+        homeRaids.observe(game);
         if (pastTheOpeningDiscard(game)) recordHeld(game);
         trackMechs(game);
         boolean scoringWindow = actionPhaseOver(game) || inStatusPhase(game);
@@ -139,6 +142,7 @@ final class ObjectiveTracker {
 
     synchronized Summary summary(Game game) {
         if (game == null) return Summary.NOTHING;
+        homeRaids.lines(game).forEach(System.out::println);
         if (open != null) close(game);
         return new Summary(
                 reveals(game),

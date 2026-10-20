@@ -134,14 +134,15 @@ public class ActionSecretRules {
         Game game = context.game();
         Tile tile = game.getTileByPosition(position);
         Player target = game.getActivePlayer() == context.seat() && tile != null
-                ? opponentIn(game, context.seat(), tile, BoardView.space(tile))
+                ? shipOwnerIn(game, context.seat(), tile)
                 : game.getActivePlayer();
         if (target == null
                 || tile == null
                 || !context.seat().getSecretsUnscored().containsKey(DUST)) return;
         int ships = BoardView.nonFighterShips(BoardView.space(tile), target);
-        boolean othersFire = ButtonHelper.getPlayersWithPds2Cover(target, game, position).stream()
-                .anyMatch(shooter -> shooter != context.seat() && shooter != target);
+        boolean othersFire = game.getActivePlayer() != context.seat()
+                && ButtonHelper.getPlayersWithPds2Cover(target, game, position).stream()
+                        .anyMatch(shooter -> shooter != context.seat() && shooter != target);
         if (ships > 0 && !othersFire) {
             context.memory()
                     .put(CANNON_KEY + game.getRound(), context.turnKey() + "|" + position + "|" + target.getFaction());
@@ -461,6 +462,14 @@ public class ActionSecretRules {
             queue(context, List.of(MARTYR), "martyr|" + game.getRound() + "|" + planet);
             return;
         }
+    }
+
+    @Nullable
+    private static Player shipOwnerIn(Game game, Player seat, Tile tile) {
+        for (Player other : game.getRealPlayers()) {
+            if (other != seat && FoWHelper.playerHasActualShipsInSystem(other, tile)) return other;
+        }
+        return null;
     }
 
     @Nullable

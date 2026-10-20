@@ -562,6 +562,7 @@ public class TacticalPlanner {
         List<TacticalPlan> plans = new ArrayList<>();
         context.expansionPlan(tile).ifPresent(plans::add);
         attack(context, tile).ifPresent(plans::add);
+        cannonRaid(context, tile).ifPresent(plans::add);
         produce(context, tile).ifPresent(plans::add);
         position(context, tile).ifPresent(plans::add);
         screen(context, tile).ifPresent(plans::add);
@@ -1101,6 +1102,18 @@ public class TacticalPlanner {
         return context.attackPlan(tile);
     }
 
+    private static Optional<TacticalPlan> cannonRaid(Context context, Tile tile) {
+        Game game = context.game;
+        Player seat = context.seat;
+        if (BoardView.hasOwnShips(seat, tile) || !CannonWipeRules.coversALoneShip(game, seat, tile)) {
+            return Optional.empty();
+        }
+        double chance = CannonWipeRules.chanceToWipe(game, seat, tile, singleOpponent(game, seat, tile), Map.of());
+        double score = ObjectiveValue.VICTORY_POINT_VALUE * chance;
+        if (score < ATTACK_MIN_SCORE) return Optional.empty();
+        return Optional.of(new TacticalPlan(Kind.ATTACK, tile.getPosition(), List.of(), Map.of(), score));
+    }
+
     private static Optional<TacticalPlan> bestAttack(Context context, Tile tile) {
         Player opponent = singleOpponent(context.game, context.seat, tile);
         if (opponent == null) return Optional.empty();
@@ -1313,7 +1326,12 @@ public class TacticalPlanner {
     }
 
     private static boolean homeLandingJustified(Context context, Player opponent, Candidate candidate) {
-        return homeLandingJustified(context, opponent, candidate.quick());
+        return raidsForDarkenTheSkies(context.seat, candidate.estimate())
+                || homeLandingJustified(context, opponent, candidate.quick());
+    }
+
+    private static boolean raidsForDarkenTheSkies(Player seat, StrikeEstimate estimate) {
+        return seat.getSecretsUnscored().containsKey(DARKEN_THE_SKIES) && estimate.groundCombat();
     }
 
     private static boolean homeLandingJustified(Context context, Player opponent, StrikeValue value) {
@@ -2135,11 +2153,31 @@ public class TacticalPlanner {
             boolean space,
             boolean ground) {
         if (!space && !ground) return new double[] {0, 0};
+        double wipe = space ? CannonWipeRules.chanceToWipe(game, seat, tile, opponent, ships) : 0;
+        double[] fought = allocatedBonuses(game, seat, tile, opponent, ships, space, ground, true, 0);
+        if (wipe <= 0) return fought;
+        double[] wiped = allocatedBonuses(game, seat, tile, opponent, ships, space, ground, false, wipe);
+        return wiped[0] + wiped[1] > fought[0] + fought[1] ? wiped : fought;
+    }
+
+    private static double[] allocatedBonuses(
+            Game game,
+            Player seat,
+            Tile tile,
+            Player opponent,
+            Map<UnitType, Integer> ships,
+            boolean space,
+            boolean ground,
+            boolean withDarkenTheSkies,
+            double cannonWipe) {
         Set<String> held = seat.getSecretsUnscored().keySet();
         List<String> generic = new ArrayList<>();
         if (held.contains("sar") && opponent.getTotalVictoryPoints() == game.getHighestScore()) generic.add("sar");
         if (held.contains("btv") && tile.isAnomaly(game, seat)) generic.add("btv");
-        if (held.contains(DARKEN_THE_SKIES) && tile.isHomeSystem(game) && tile != seat.getHomeSystemTile()) {
+        if (withDarkenTheSkies
+                && held.contains(DARKEN_THE_SKIES)
+                && tile.isHomeSystem(game)
+                && tile != seat.getHomeSystemTile()) {
             generic.add(DARKEN_THE_SKIES);
         }
         if (held.contains("baf")
@@ -2165,7 +2203,7 @@ public class TacticalPlanner {
         }
         double bestSpaceOnly = Math.max(
                 secretPoints(game, seat, spaceOnly).stream().findFirst().orElse(0.0),
-                space ? barragePoints(game, seat, tile, opponent, ships) : 0);
+                Math.max(space ? barragePoints(game, seat, tile, opponent, ships) : 0, cannonWipe));
         List<Double> genericPoints = secretPoints(game, seat, generic);
         double firstGeneric = genericPoints.isEmpty() ? 0 : genericPoints.get(0);
         double secondGeneric = genericPoints.size() < 2 ? 0 : genericPoints.get(1);
@@ -2197,6 +2235,7 @@ public class TacticalPlanner {
     }
 
     private static double secretShare(Game game, Player seat, String secret) {
+        if (DARKEN_THE_SKIES.equals(secret)) return 1.0;
         return ActionSecretTiming.pursueNow(game, seat, secret) ? 1.0 : PATIENT_SHARE;
     }
 

@@ -280,4 +280,110 @@ class ActionSecretRulesTest extends BaseTi4Test {
 
         assertThat(tick(scoreButtons("fwp"))).isEmpty();
     }
+
+    private void sharedHomeBattlefield() {
+        battlefield = test.place("01", battlefield.getPosition());
+        test.nekro.setSecret("dts");
+        test.units(battlefield, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(battlefield, "space", test.sol, UnitType.Destroyer, 1);
+        tick();
+    }
+
+    // Darken the Skies: a win in another player's home system.
+    @Test
+    void scoresDarkenTheSkiesAfterWinningAtAnotherPlayersHome() {
+        sharedHomeBattlefield();
+        roundsRolled(test.nekro, 1);
+        roundsRolled(test.sol, 1);
+        destroy(test.sol, UnitType.Destroyer, 1);
+
+        assertThat(tick(scoreButtons("dts")).map(AiTestGame::pressedId)).contains(scoreId("dts"));
+    }
+
+    @Test
+    void scoresNothingForDarkenTheSkiesWhenTheHomeFightIsLost() {
+        sharedHomeBattlefield();
+        roundsRolled(test.nekro, 1);
+        roundsRolled(test.sol, 1);
+        destroy(test.nekro, UnitType.Dreadnought, 1);
+
+        assertThat(tick(scoreButtons("dts"))).isEmpty();
+    }
+
+    // A home fleet that leaves or is shot down by space cannon before any round is rolled was never fought.
+    @Test
+    void scoresNothingForDarkenTheSkiesWhenNoCombatWasRolled() {
+        sharedHomeBattlefield();
+        destroy(test.sol, UnitType.Destroyer, 1);
+
+        assertThat(tick(scoreButtons("dts"))).isEmpty();
+    }
+
+    @Test
+    void scoresNothingForDarkenTheSkiesWhenWinningAtOwnHome() {
+        battlefield = test.game.getTileByPosition(AiTestGame.HOME);
+        test.game.setActiveSystem(battlefield.getPosition());
+        test.nekro.setSecret("dts");
+        test.units(battlefield, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(battlefield, "space", test.sol, UnitType.Destroyer, 1);
+        tick();
+        roundsRolled(test.nekro, 1);
+        roundsRolled(test.sol, 1);
+        destroy(test.sol, UnitType.Destroyer, 1);
+
+        assertThat(tick(scoreButtons("dts"))).isEmpty();
+    }
+
+    private void loneSolDestroyerWithAThirdPartyPds() {
+        test.nekro.setSecret("ttfd");
+        test.units(battlefield, "space", test.sol, UnitType.Destroyer, 1);
+        Player hacan = test.addSeat("7100000555555555", "hacan", "green");
+        test.units(battlefield, "space", hacan, UnitType.Pds, 1);
+    }
+
+    private void fireSpaceCannon() {
+        ActionSecretRules.watchSpaceCannon(
+                test.contextAt(test.game.getLastActivePlayerChange().getTime() + 1000), battlefield.getPosition());
+    }
+
+    private boolean watching() {
+        return test.memory.has("cannonWatch|" + test.game.getRound());
+    }
+
+    // Turn Their Fleets to Dust: when the holder is the active player a third party's cannon can only hit the holder
+    // (LRR 77.5a), so the watch is recorded and the last ship dying before any combat round scores.
+    @Test
+    void scoresDustWhenTheActiveHolderKillsTheLastShipDespiteAThirdPartyPds() {
+        loneSolDestroyerWithAThirdPartyPds();
+        fireSpaceCannon();
+
+        assertThat(watching()).isTrue();
+        destroy(test.sol, UnitType.Destroyer, 1);
+
+        assertThat(tick(scoreButtons("ttfd")).map(AiTestGame::pressedId)).contains(scoreId("ttfd"));
+    }
+
+    // Once a combat round was rolled the ship did not die to the cannon.
+    @Test
+    void scoresNothingForDustOnceACombatRoundWasRolled() {
+        loneSolDestroyerWithAThirdPartyPds();
+        fireSpaceCannon();
+
+        roundsRolled(test.sol, 1);
+        destroy(test.sol, UnitType.Destroyer, 1);
+
+        assertThat(tick(scoreButtons("ttfd"))).isEmpty();
+    }
+
+    // When another player is active, every cannon in range hits that player's fleet, so the holder cannot tell whose
+    // hit destroyed the last ship and does not watch.
+    @Test
+    void doesNotWatchWhenAThirdPartyAlsoFiresAtAnotherPlayersActivation() {
+        loneSolDestroyerWithAThirdPartyPds();
+        test.isActive(test.sol, "action");
+
+        fireSpaceCannon();
+
+        assertThat(watching()).isFalse();
+    }
 }
