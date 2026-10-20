@@ -26,6 +26,9 @@ public final class ObjectiveValue {
     private static final double PARTIAL_SHARE = 0.6;
     private static final double WITHIN_REACH_SHARE = 0.9;
     private static final int STEPS_WITHIN_REACH = 3;
+    private static final int TRAIT_STEPS_WITHIN_REACH = 2;
+    public static final Map<String, String> TRAIT_SECRETS =
+            Map.of("mp", "industrial", "faa", "cultural", "mrm", "hazardous");
     private static final int STAGE_TWO_POINTS = 2;
     public static final int NOT_MODELLED = -1;
     private static final Set<String> ATTACHMENT_OBJECTIVES = Set.of("lost_outposts", "ancient_monuments");
@@ -169,7 +172,8 @@ public final class ObjectiveValue {
     }
 
     private static double partialShare(Target target, int fewestStillNeeded) {
-        boolean withinReach = target.points() >= STAGE_TWO_POINTS && fewestStillNeeded <= STEPS_WITHIN_REACH;
+        boolean withinReach = target.points() >= STAGE_TWO_POINTS && fewestStillNeeded <= STEPS_WITHIN_REACH
+                || TRAIT_SECRETS.containsKey(target.id()) && fewestStillNeeded <= TRAIT_STEPS_WITHIN_REACH;
         return withinReach ? WITHIN_REACH_SHARE : PARTIAL_SHARE;
     }
 
@@ -265,6 +269,10 @@ public final class ObjectiveValue {
     }
 
     private boolean countsForScoring(Planet planet) {
+        return countsForScoring(game, planet);
+    }
+
+    public static boolean countsForScoring(Game game, Planet planet) {
         return !planet.isSpaceStation(game) && !planet.isFake();
     }
 

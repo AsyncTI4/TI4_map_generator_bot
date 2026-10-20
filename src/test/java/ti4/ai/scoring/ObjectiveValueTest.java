@@ -1,6 +1,7 @@
 package ti4.ai.scoring;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import java.util.List;
 import java.util.Map;
@@ -341,5 +342,43 @@ class ObjectiveValueTest extends BaseTi4Test {
                 .after(neighbour, List.of(new Footprint.Move(AiTestGame.HOME, UnitType.Destroyer, 1)), List.of());
 
         assertThat(value.gain(after)).isPositive().isLessThan(ObjectiveValue.VICTORY_POINT_VALUE / 3);
+    }
+
+    private double traitStepGain(String secret, int held, String[] tiles, String[] planets) {
+        for (int i = 0; i < tiles.length; i++)
+            test.place(
+                    tiles[i],
+                    PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).get(i));
+        test.nekro.setSecret(secret);
+        for (int i = 0; i < held; i++) test.nekro.addPlanet(planets[i]);
+        ObjectiveValue value = new ObjectiveValue(test.game, test.nekro);
+        return value.gain(value.before().withPlanet(planets[held]));
+    }
+
+    // A trait-count secret is a one point objective that needs four planets: a step with two or fewer still needed is
+    // worth 0.9 of an even share, a step with more the ordinary 0.6. Monopolize Production: 0 to 1 is 8 * 0.6 / 4 =
+    // 1.2, 1 to 2 is 8 * 0.9 / 3 = 2.4, 2 to 3 is 8 * 0.9 / 2 = 3.6 (it was 2.4 with the ordinary share).
+    @Test
+    void pullsHarderOnceAnIndustrialSecretIsTwoPlanetsAway() {
+        String[] tiles = {"19", "21", "22", "23"};
+        String[] planets = {"wellon", "thibah", "tarmann", "saudor"};
+
+        assertThat(traitStepGain("mp", 0, tiles, planets)).isCloseTo(1.2, within(0.001));
+        setUp();
+        assertThat(traitStepGain("mp", 1, tiles, planets)).isCloseTo(2.4, within(0.001));
+        setUp();
+        assertThat(traitStepGain("mp", 2, tiles, planets)).isCloseTo(3.6, within(0.001));
+    }
+
+    @Test
+    void pullsHarderOnceACulturalOrHazardousSecretIsTwoPlanetsAway() {
+        assertThat(traitStepGain("faa", 2, new String[] {"25", "26", "29", "28"}, new String[] {
+                    "quann", "lodor", "rarron", "torkan"
+                }))
+                .isCloseTo(3.6, within(0.001));
+        setUp();
+        assertThat(traitStepGain(
+                        "mrm", 2, new String[] {"20", "24", "35"}, new String[] {"vefutii", "meharxull", "bereg"}))
+                .isCloseTo(3.6, within(0.001));
     }
 }

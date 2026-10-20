@@ -3,6 +3,7 @@ package ti4.ai.secrets;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
@@ -141,6 +142,7 @@ class SecretValueTest extends BaseTi4Test {
     // 0.47 + 0.5 * 0.02 = 0.245, far below Establish a Perimeter (0.45) and Mine Rare Metals (0.46) with no progress.
     @Test
     void ranksDriveTheDebateBelowStatusSecretsWithNoProgress() {
+        placeBeside(AiTestGame.HOME, "35", "38", "20");
         test.nekro.setSecret("dtd");
         test.nekro.setSecret("eap");
         test.nekro.setSecret("mrm");
@@ -271,6 +273,97 @@ class SecretValueTest extends BaseTi4Test {
         test.nekro.setSecret("survey");
 
         assertThat(value("survey")).isCloseTo(0.5, within(0.01));
+    }
+
+    private List<String> placeBeside(String center, String... tileIds) {
+        List<String> positions = PositionMapper.getAdjacentTilePositions(center).stream()
+                .filter(candidate -> !"x".equals(candidate) && test.game.getTileByPosition(candidate) == null)
+                .limit(tileIds.length)
+                .toList();
+        for (int i = 0; i < positions.size(); i++) test.place(tileIds[i], positions.get(i));
+        return positions;
+    }
+
+    private double traitValue(String secret, Runnable board) {
+        setUp();
+        test.nekro.setSecret(secret);
+        board.run();
+        return value(secret);
+    }
+
+    private static final String[] RICH_INDUSTRIAL = {"36", "19", "21", "22"};
+
+    // Monopolize Production needs four industrial planets. Five reachable ones (Arnor, Lor, Wellon, Thibah, Tarmann
+    // beside the home system, none held) is the full value, 0.5 * 0.51 + 0.5 * 0.51 = 0.51. Four reachable is
+    // 0.1 + 0.9 * (4 - 2) / 3 = 0.7 of it, and two or fewer is the 0.1 floor.
+    @Test
+    void scalesATraitSecretBySoManyOfItsPlanetsAreReachable() {
+        double rich = traitValue("mp", () -> placeBeside(AiTestGame.HOME, RICH_INDUSTRIAL));
+        double four = traitValue("mp", () -> placeBeside(AiTestGame.HOME, "36", "19", "21"));
+        double thin = traitValue("mp", () -> placeBeside(AiTestGame.HOME, "19"));
+
+        assertThat(rich).isCloseTo(0.51, within(0.01));
+        assertThat(four).isCloseTo(rich * 0.7, within(0.005));
+        assertThat(thin).isCloseTo(rich * 0.1, within(0.005));
+    }
+
+    // Reachable is not owned: a trait planet on the far side of a rival home counts half, and one a rival already
+    // holds 0.3. Four industrial planets beside the home system are worth 4; the same four beside Sol's home are
+    // 4 * 0.5 = 2, and four that Sol holds 4 * 0.3 = 1.2, both at the floor.
+    @Test
+    void weighsTraitPlanetsByWhoCanReachThem() {
+        double near = traitValue("mp", () -> placeBeside(AiTestGame.HOME, "36", "19", "21"));
+        double foreign = traitValue("mp", () -> {
+            Tile solHome = test.solHomeBeside(neighbour);
+            placeBeside(solHome.getPosition(), "36", "19", "21");
+        });
+        double rivalHeld = traitValue("mp", () -> {
+            placeBeside(AiTestGame.HOME, "36", "19", "21");
+            for (String planet : List.of("arnor", "lor", "wellon", "thibah")) test.sol.addPlanet(planet);
+        });
+
+        assertThat(near).isCloseTo(0.51 * 0.7, within(0.01));
+        assertThat(foreign).isCloseTo(0.51 * 0.1, within(0.005));
+        assertThat(rivalHeld).isCloseTo(0.51 * 0.1, within(0.005));
+    }
+
+    // Planets the seat already owns count in full, so a trait secret half built stays at full value on a map with few
+    // free planets left.
+    @Test
+    void countsTheTraitPlanetsTheSeatOwnsInFull() {
+        double owned = traitValue("mp", () -> {
+            placeBeside(AiTestGame.HOME, "36", "19", "21");
+            for (String planet : List.of("arnor", "lor", "wellon", "thibah")) test.nekro.addPlanet(planet);
+        });
+
+        assertThat(owned).isGreaterThan(0.51);
+    }
+
+    @Test
+    void discardsAThinTraitSecretButKeepsOneOnARichBoard() {
+        traitValue("mp", () -> {
+            test.nekro.setSecret("eap");
+            placeBeside(AiTestGame.HOME, "19");
+        });
+        assertThat(discarded()).isEqualTo("mp");
+
+        traitValue("mp", () -> {
+            test.nekro.setSecret("eap");
+            placeBeside(AiTestGame.HOME, RICH_INDUSTRIAL);
+        });
+        assertThat(discarded()).isEqualTo("eap");
+    }
+
+    @Test
+    void scalesForgeAnAllianceAndMineRareMetalsTheSameWay() {
+        double richCultural = traitValue("faa", () -> placeBeside(AiTestGame.HOME, "32", "33", "25"));
+        double thinCultural = traitValue("faa", () -> placeBeside(AiTestGame.HOME, "25"));
+        double richHazardous = traitValue("mrm", () -> placeBeside(AiTestGame.HOME, "35", "38", "20"));
+        double thinHazardous = traitValue("mrm", () -> placeBeside(AiTestGame.HOME, "20"));
+
+        assertThat(thinCultural).isCloseTo(richCultural * 0.1, within(0.005));
+        assertThat(thinHazardous).isCloseTo(richHazardous * 0.1, within(0.005));
+        assertThat(richHazardous).isCloseTo(0.46, within(0.01));
     }
 
     private String otherNeighbourOf(String position) {

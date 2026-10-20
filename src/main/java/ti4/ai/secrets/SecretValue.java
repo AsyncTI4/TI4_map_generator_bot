@@ -88,7 +88,7 @@ public class SecretValue {
         return switch (secretId) {
             case SEIZE_AN_ICON -> legendaryReach(game, seat);
             case DEFY_SPACE_AND_TIME -> nexusReach(game, seat);
-            default -> 1.0;
+            default -> TraitReach.applies(secretId) ? TraitReach.feasibility(game, seat, secretId, OFF_THE_BOARD) : 1.0;
         };
     }
 
