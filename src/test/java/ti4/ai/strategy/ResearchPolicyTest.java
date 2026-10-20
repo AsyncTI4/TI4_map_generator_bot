@@ -123,4 +123,20 @@ class ResearchPolicyTest extends BaseTi4Test {
         assertThat(ResearchPolicy.value(test.game, test.nekro, "dd2") - without)
                 .isCloseTo(0.3 * ScoringStakes.scoreValue(test.game, test.nekro, 1), Offset.offset(1e-9));
     }
+
+    // Two docks on Qucenn (1 resource) and Rarron (0) make 3 + 2 = 5 production. Space Dock II lifts every dock by 2,
+    // to
+    // 9, which completes Produce en Masse; a flat 2 would only reach 7.
+    @Test
+    void valuesSpaceDockIiForEachDockInTheBestSystemWhileProduceEnMassIsHeld() {
+        ti4.game.Tile tile = test.place("29", "101");
+        test.nekro.addPlanet("qucenn");
+        test.nekro.addPlanet("rarron");
+        test.units(tile, "qucenn", test.nekro, ti4.helpers.Units.UnitType.Spacedock, 1);
+        test.units(tile, "rarron", test.nekro, ti4.helpers.Units.UnitType.Spacedock, 1);
+        double without = ResearchPolicy.value(test.game, test.nekro, "sd2");
+        test.nekro.setSecret("pem");
+
+        assertThat(ResearchPolicy.value(test.game, test.nekro, "sd2")).isGreaterThan(without);
+    }
 }

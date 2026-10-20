@@ -67,12 +67,15 @@ class StructurePolicy {
             int missing = threshold - ListPlayerInfoService.getPlayerProgressOnObjective(id, game, seat);
             if (missing > 0) shortfall = Math.min(shortfall, missing);
         }
+        if (MassProduction.oneDockFromScoring(game, seat)) shortfall = Math.min(shortfall, 1);
         return shortfall;
     }
 
     static Optional<String> next(Game game, Player seat) {
         boolean fuelsWarMachine = seat.getSecretsUnscored().containsKey(FUEL_THE_WAR_MACHINE);
-        if (underCap(game, seat, "sd") && dockSite(game, seat, fuelsWarMachine).isPresent()) {
+        if (underCap(game, seat, "sd")
+                && (MassProduction.drives(game, seat)
+                        || dockSite(game, seat, fuelsWarMachine).isPresent())) {
             return Optional.of(SPACE_DOCK);
         }
         return pds(game, seat);
@@ -84,12 +87,7 @@ class StructurePolicy {
 
     static Optional<String> planetFor(Game game, Player seat, String unit, Collection<String> candidates) {
         Comparator<Planet> preference = SPACE_DOCK.equals(unit)
-                ? Comparator.comparing((Planet planet) -> isDockSite(game, seat, planet))
-                        .thenComparingInt(planet -> dockPreference(game, seat, planet))
-                        .thenComparingInt(Planet::getResources)
-                        .thenComparingInt(planet -> isHome(game, planet) ? 0 : 1)
-                        .thenComparingInt(planet -> systemResources(game, seat, planet))
-                        .thenComparingInt(Planet::getInfluence)
+                ? dockPreference(game, seat)
                 : Comparator.comparingInt((Planet planet) -> isHome(game, planet) ? 0 : 1)
                         .thenComparingInt(planet -> -structures(seat, planet))
                         .thenComparingInt(planet -> planet.getResources() + planet.getInfluence());
@@ -99,6 +97,19 @@ class StructurePolicy {
                 .filter(planet -> !PDS.equals(unit) || BoardView.count(planet, seat, UnitType.Pds) < MAX_PDS_PER_PLANET)
                 .max(preference)
                 .map(Planet::getName);
+    }
+
+    private static Comparator<Planet> dockPreference(Game game, Player seat) {
+        Comparator<Planet> usual = Comparator.comparing((Planet planet) -> isDockSite(game, seat, planet))
+                .thenComparingInt(planet -> dockPreference(game, seat, planet))
+                .thenComparingInt(Planet::getResources)
+                .thenComparingInt(planet -> isHome(game, planet) ? 0 : 1)
+                .thenComparingInt(planet -> systemResources(game, seat, planet))
+                .thenComparingInt(Planet::getInfluence);
+        if (!MassProduction.drives(game, seat)) return usual;
+        return Comparator.comparing((Planet planet) -> MassProduction.canHostDock(game, seat, planet))
+                .thenComparingInt(planet -> MassProduction.productionWithDockOn(game, seat, planet))
+                .thenComparing(usual);
     }
 
     private static Optional<Planet> dockSite(Game game, Player seat, boolean anyPlanet) {

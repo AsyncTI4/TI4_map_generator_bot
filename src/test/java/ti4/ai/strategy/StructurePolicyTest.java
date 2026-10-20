@@ -107,6 +107,76 @@ class StructurePolicyTest extends BaseTi4Test {
                 .contains("lodor");
     }
 
+    // New Albion (1 resource) is no dock site, but Starpoint's dock plus a dock on New Albion makes 5 + 3 = 8
+    // production in one system, which is Produce en Masse: the build is a dock and Construction is worth following.
+    @Test
+    void buildsTheDockThatCompletesProduceEnMass() {
+        Tile tile = test.place("27", "101");
+        test.nekro.addPlanet("starpoint");
+        test.nekro.addPlanet("newalbion");
+        test.units(tile, "starpoint", test.nekro, UnitType.Spacedock, 1);
+        assertThat(StructurePolicy.next(test.game, test.nekro)).contains(StructurePolicy.PDS);
+        assertThat(StructurePolicy.nearsStructureObjective(test.game, test.nekro))
+                .isFalse();
+
+        test.nekro.setSecret("pem");
+
+        assertThat(StructurePolicy.next(test.game, test.nekro)).contains(StructurePolicy.SPACE_DOCK);
+        assertThat(StructurePolicy.nearsStructureObjective(test.game, test.nekro))
+                .isTrue();
+        assertThat(StructurePolicy.planetFor(
+                        test.game, test.nekro, StructurePolicy.SPACE_DOCK, List.of("starpoint", "newalbion")))
+                .contains("newalbion");
+    }
+
+    // With Starpoint's dock alone nothing a single dock does reaches 8, so Produce en Masse changes nothing.
+    @Test
+    void ignoresProduceEnMassWhenNoDockReachesIt() {
+        Tile tile = test.place("27", "101");
+        test.nekro.addPlanet("starpoint");
+        test.units(tile, "starpoint", test.nekro, UnitType.Spacedock, 1);
+        test.nekro.setSecret("pem");
+
+        assertThat(StructurePolicy.next(test.game, test.nekro)).contains(StructurePolicy.PDS);
+        assertThat(StructurePolicy.nearsStructureObjective(test.game, test.nekro))
+                .isFalse();
+    }
+
+    // Hacan's home holds Arretze (2), Hercant (1) and Kamdorn (0): docks on all three make 4 + 3 + 2 = 9. Two more
+    // docks
+    // are a build the seat takes, but not one Construction is followed for.
+    @Test
+    void buildsTowardProduceEnMassTwoDocksAwayWithoutFollowingConstruction() {
+        Player hacan = test.addSeat("200000000000000003", "hacan", "red");
+        Tile home = test.place("16", "304");
+        hacan.addPlanet("arretze");
+        hacan.addPlanet("hercant");
+        hacan.addPlanet("kamdorn");
+        test.units(home, "arretze", hacan, UnitType.Spacedock, 1);
+        hacan.setSecret("pem");
+
+        assertThat(StructurePolicy.next(test.game, hacan)).contains(StructurePolicy.SPACE_DOCK);
+        assertThat(StructurePolicy.nearsStructureObjective(test.game, hacan)).isFalse();
+        assertThat(StructurePolicy.planetFor(
+                        test.game, hacan, StructurePolicy.SPACE_DOCK, List.of("arretze", "hercant", "kamdorn")))
+                .contains("hercant");
+    }
+
+    // With Space Dock II a dock on Jol makes the home system 6 + 5 = 11, so the second home planet beats a richer
+    // forward planet that only lifts a different system.
+    @Test
+    void prefersTheSecondHomePlanetWhileProduceEnMassIsOneDockAway() {
+        Player jolnar = jolNarAtHome();
+        test.place("26", "101");
+        jolnar.addPlanet("lodor");
+        jolnar.addTech("sd2");
+        jolnar.setSecret("pem");
+
+        assertThat(StructurePolicy.nearsStructureObjective(test.game, jolnar)).isTrue();
+        assertThat(StructurePolicy.planetFor(test.game, jolnar, StructurePolicy.SPACE_DOCK, List.of("jol", "lodor")))
+                .contains("jol");
+    }
+
     private Player jolNarAtHome() {
         Player jolnar = test.addSeat("200000000000000002", "jolnar", "green");
         Tile home = test.place("12", "304");

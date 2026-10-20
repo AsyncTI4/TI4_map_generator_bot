@@ -215,6 +215,7 @@ class AiSelfPlayTest extends BaseTi4Test {
                         1));
         printObjectiveRates(summaries);
         printSecretMix(summaries);
+        ProduceTracker.printBatch();
     }
 
     // Every secret scored over the batch, most scored first, with its share of all scored secrets: the mix to hold

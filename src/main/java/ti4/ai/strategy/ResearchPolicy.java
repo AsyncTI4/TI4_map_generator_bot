@@ -144,7 +144,6 @@ public class ResearchPolicy {
     private static final int PAIR = 2;
     private static final double RESEARCHES_PER_ROUND = 1.5;
     private static final String SPACE_DOCK_UPGRADE = "sd2";
-    private static final int DOCK_UPGRADE_PRODUCTION = 2;
     private static final double STEPPING_STONE_SHARE = 0.3;
     private static final Set<String> TRANSIT_DIODES = Set.of("td", "absol_td");
     private static final List<String> GROUND_SECRETS = List.of("mtm", "otf");
@@ -384,10 +383,9 @@ public class ResearchPolicy {
 
     private static int progress(Game game, String objective, Player seat, TechnologyModel adding) {
         if (PRODUCE_EN_MASSE.equals(objective)) {
-            int production = ButtonHelper.checkHighestProductionSystem(seat, game);
             return adding != null && SPACE_DOCK_UPGRADE.equals(adding.getAlias())
-                    ? production + DOCK_UPGRADE_PRODUCTION
-                    : production;
+                    ? MassProduction.bestWithDockUpgrade(game, seat)
+                    : ButtonHelper.checkHighestProductionSystem(seat, game);
         }
         if (UNIT_UPGRADE_OBJECTIVES.contains(objective)) {
             return ButtonHelper.getNumberOfUnitUpgrades(seat) + (adding != null && adding.isUnitUpgrade() ? 1 : 0);
