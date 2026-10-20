@@ -49,6 +49,16 @@ class BattleMath {
 
     static double cannonFireLeaving(Game game, Tile tile, Player shooter, Collection<UnitHolder> leaving) {
         double expected = 0;
+        for (CannonDice stack : cannonDice(game, tile, shooter, leaving)) {
+            expected += stack.dice() * hitChance(stack.hitsOn());
+        }
+        return expected;
+    }
+
+    record CannonDice(int dice, int hitsOn) {}
+
+    static List<CannonDice> cannonDice(Game game, Tile tile, Player shooter, Collection<UnitHolder> leaving) {
+        List<CannonDice> stacks = new ArrayList<>();
         for (String position : FoWHelper.getAdjacentTiles(game, tile.getPosition(), shooter, false, true)) {
             Tile nearby = game.getTileByPosition(position);
             if (nearby == null) continue;
@@ -60,11 +70,11 @@ class BattleMath {
                     if (model == null || (!inSystem && !model.getDeepSpaceCannon(shooter))) continue;
                     if (XXCHA_MECH.equals(model.getId()) && ButtonHelper.isLawInPlay(game, ARTICLES_OF_WAR)) continue;
                     int dice = model.getSpaceCannonDieCount(shooter) * holder.getUnitCount(key);
-                    expected += dice * hitChance(model.getSpaceCannonHitsOn(shooter));
+                    stacks.add(new CannonDice(dice, model.getSpaceCannonHitsOn(shooter)));
                 }
             }
         }
-        return expected;
+        return stacks;
     }
 
     static double spaceCannonHits(Player owner, UnitHolder holder) {
