@@ -267,6 +267,11 @@ class AiSelfPlayTest extends BaseTi4Test {
     // Each Mechanize the Military holder at each status phase: mechs on the board / planets with a mech / mechs at
     // home, carriers (at home), mechs built so far and mechs that first reached a planet away from home.
     private static void printMechanizeHolders(List<ObjectiveTracker.Summary> summaries) {
+        int index = 0;
+        for (ObjectiveTracker.Summary summary : summaries) {
+            index++;
+            for (String line : summary.secretHolders()) System.out.println("Holder g" + index + " " + line);
+        }
         int game = 0;
         for (ObjectiveTracker.Summary summary : summaries) {
             game++;

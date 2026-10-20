@@ -50,6 +50,10 @@ public class TechPath {
         return after == 0 ? 1 : Math.min(1, STEP_SHARE * stepsDone / before.getAsInt());
     }
 
+    public static OptionalInt researchesNeeded(Game game, Player seat, String objective) {
+        return researchesNeeded(game, seat, objective, null);
+    }
+
     static OptionalInt researchesNeeded(Game game, Player seat, String objective, @Nullable TechnologyModel adding) {
         if (StrategyCardRules.cannotResearch(seat) || game.isTwilightsFallMode()) return OptionalInt.empty();
         int threshold = ListPlayerInfoService.getObjectiveThreshold(objective, game);

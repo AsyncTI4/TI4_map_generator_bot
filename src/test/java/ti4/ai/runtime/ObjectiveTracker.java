@@ -48,6 +48,7 @@ final class ObjectiveTracker {
             List<String> secretsHeld,
             Map<String, List<Integer>> groundProgress,
             List<MechanizeHolder> mechanize,
+            List<String> secretHolders,
             int seats) {
 
         static final Summary NOTHING = new Summary(
@@ -58,6 +59,7 @@ final class ObjectiveTracker {
                 List.of(),
                 List.of(),
                 Map.of(),
+                List.of(),
                 List.of(),
                 0);
 
@@ -109,6 +111,8 @@ final class ObjectiveTracker {
             int bareHeldPlanets) {}
 
     private final List<MechanizeHolder> mechanize = new ArrayList<>();
+    // One line per Seize an Icon or Adapt New Strategies holder at each status phase.
+    private final List<String> secretHolders = new ArrayList<>();
     private final Map<String, Integer> mechTotals = new HashMap<>();
     private final Map<String, Integer> mechsBuilt = new HashMap<>();
     private final Map<String, Integer> arrivals = new HashMap<>();
@@ -149,6 +153,7 @@ final class ObjectiveTracker {
                         .toList(),
                 groundProgressByHolder(),
                 List.copyOf(mechanize),
+                List.copyOf(secretHolders),
                 game.getRealPlayers().size());
     }
 
@@ -260,6 +265,38 @@ final class ObjectiveTracker {
         return bare;
     }
 
+    private void recordIconAndStrategies(Game game) {
+        for (Player seat : game.getRealPlayers()) {
+            if (seat.getSecretsUnscored().containsKey("sai")
+                    || seat.getSecretsScored().containsKey("sai")) {
+                List<String> legendary = seat.getPlanets().stream()
+                        .filter(name -> game.getPlanetsInfo().get(name) != null
+                                && game.getPlanetsInfo().get(name).isLegendary())
+                        .toList();
+                secretHolders.add(String.format(
+                        "Seize an Icon %s r%d: legendary held %s%s",
+                        seat.getFaction(),
+                        game.getRound(),
+                        legendary,
+                        seat.getSecretsScored().containsKey("sai") ? ", scored" : ""));
+            }
+            if (seat.getSecretsUnscored().containsKey("ans")
+                    || seat.getSecretsScored().containsKey("ans")) {
+                boolean inScar = game.getTileMap().values().stream()
+                        .anyMatch(tile -> tile.isScar(game) && ti4.ai.eval.BoardView.hasOwnShips(seat, tile));
+                secretHolders.add(String.format(
+                        "Adapt New Strategies %s r%d: own faction techs %d, route %s, ships in a scar %s, strategy tokens %d%s",
+                        seat.getFaction(),
+                        game.getRound(),
+                        ti4.ai.secrets.SecretValue.ownFactionTechnologies(seat),
+                        ti4.ai.strategy.TechPath.researchesNeeded(game, seat, "ans"),
+                        inScar,
+                        seat.getStrategicCC(),
+                        seat.getSecretsScored().containsKey("ans") ? ", scored" : ""));
+            }
+        }
+    }
+
     private void recordGroundProgress(Game game) {
         for (Player seat : game.getRealPlayers()) {
             ti4.ai.scoring.ObjectiveValue value = null;
@@ -298,6 +335,7 @@ final class ObjectiveTracker {
     private void open(Game game) {
         recordGroundProgress(game);
         recordMechanize(game);
+        recordIconAndStrategies(game);
         Map<String, Set<String>> publics = new HashMap<>();
         Map<String, Integer> secrets = new HashMap<>();
         List<Pending> pending = new ArrayList<>();
