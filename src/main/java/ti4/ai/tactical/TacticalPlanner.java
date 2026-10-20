@@ -116,6 +116,8 @@ public class TacticalPlanner {
     private static final String MECHANIZE_THE_MILITARY = "mtm";
     private static final int MECHANIZED_PLANETS = 4;
     private static final int FRINGE_GROUND_FORCES = 9;
+    private static final double FRINGE_NEAR_HOME_PULL = 0.15;
+    private static final double FRINGE_STACK_PULL = 0.4;
     private static final double SECRET_CARGO_SHARE = 0.3;
     private static final double COMPLETING_CARGO_SHARE = 0.5;
     private static final String ADAPT_NEW_STRATEGIES = "ans";
@@ -593,10 +595,24 @@ public class TacticalPlanner {
         if (fringe.isEmpty()) return Optional.empty();
         Planet planet = fringe.get();
         return bestGarrison(
-                context,
-                tile,
-                origin -> availableGroundForces(context.game, seat, origin, context.defense(), List.of()),
-                arriving -> Map.of(planet.getName(), BoardView.groundForces(planet, seat) + arriving));
+                        context,
+                        tile,
+                        origin -> availableGroundForces(context.game, seat, origin, context.defense(), List.of()),
+                        arriving -> Map.of(planet.getName(), BoardView.groundForces(planet, seat) + arriving))
+                .map(plan -> withFringePull(context, planet, plan));
+    }
+
+    private static TacticalPlan withFringePull(Context context, Planet planet, TacticalPlan plan) {
+        Player seat = context.seat;
+        int arriving = plan.landings().getOrDefault(planet.getName(), 0) - BoardView.groundForces(planet, seat);
+        boolean nearHome = FringeStack.nearHome(context.game, seat, planet.getName());
+        boolean reinforcesStack = FringeStack.best(context.game, seat)
+                .filter(stack -> stack.getName().equals(planet.getName()))
+                .filter(stack -> BoardView.groundForces(stack, seat) >= FringeStack.PROTECTED_FROM)
+                .isPresent();
+        double pull = (nearHome ? FRINGE_NEAR_HOME_PULL : 0) + (reinforcesStack ? FRINGE_STACK_PULL : 0);
+        return new TacticalPlan(
+                plan.kind(), plan.target(), plan.moves(), plan.landings(), plan.score() + pull * arriving);
     }
 
     private static Optional<TacticalPlan> mechanize(Context context, Tile tile) {
@@ -2218,7 +2234,7 @@ public class TacticalPlanner {
         if (build.isEmpty()) return Optional.empty();
         double objectiveGain = context.builtGain(tile, build);
         boolean forScoring = build.scoring() || objectiveGain > 0;
-        Optional<MechShift> shift = mechShift(context, tile);
+        Optional<GroundShift> shift = groundShift(context, tile);
         boolean worthBuilding = build.units() >= ProductionPlanner.MIN_UNITS || forScoring || build.defense();
         if (!worthBuilding && shift.isEmpty()) return Optional.empty();
         TacticalPlan plan =
@@ -2226,16 +2242,23 @@ public class TacticalPlanner {
         return Optional.of(shift.map(found -> found.before(plan)).orElse(plan));
     }
 
-    private record MechShift(List<UnitMove> moves, String planet, int wanted, double value) {
+    private record GroundShift(List<UnitMove> moves, String planet, int wanted, double value) {
         TacticalPlan before(TacticalPlan produce) {
             return new TacticalPlan(
                     produce.kind(), produce.target(), moves, Map.of(planet, wanted), produce.score() + value);
         }
     }
 
-    private static Optional<MechShift> mechShift(Context context, Tile tile) {
+    private static Optional<GroundShift> groundShift(Context context, Tile tile) {
+        if (BoardView.hasEnemyUnits(context.game, context.seat, tile)) return Optional.empty();
+        return Stream.of(mechShift(context, tile), fringeShift(context, tile))
+                .flatMap(Optional::stream)
+                .max(Comparator.comparingDouble(GroundShift::value));
+    }
+
+    private static Optional<GroundShift> mechShift(Context context, Tile tile) {
         Player seat = context.seat;
-        if (!mechanizes(seat) || BoardView.hasEnemyUnits(context.game, seat, tile)) return Optional.empty();
+        if (!mechanizes(seat)) return Optional.empty();
         Optional<Planet> bare = ownedPlanets(seat, tile)
                 .filter(planet -> BoardView.count(planet, seat, UnitType.Mech) == 0)
                 .findFirst();
@@ -2243,19 +2266,64 @@ public class TacticalPlanner {
                 .filter(planet -> BoardView.count(planet, seat, UnitType.Mech) >= 2)
                 .findFirst();
         if (bare.isEmpty() || spare.isEmpty()) return Optional.empty();
-        List<UnitMove> moves = new ArrayList<>(
-                List.of(new UnitMove(tile.getPosition(), spare.get().getName(), UnitType.Mech, 1)));
+        List<UnitMove> mech =
+                List.of(new UnitMove(tile.getPosition(), spare.get().getName(), UnitType.Mech, 1));
+        return shiftOnto(context, tile, bare.get(), mech, 1);
+    }
+
+    private static Optional<GroundShift> fringeShift(Context context, Tile tile) {
+        Player seat = context.seat;
+        if (!FringeStack.held(seat)) return Optional.empty();
+        Optional<Planet> fringe = ownedPlanets(seat, tile)
+                .filter(planet -> BoardView.count(planet, seat, UnitType.Spacedock) == 0)
+                .max(Comparator.comparingInt(planet -> BoardView.groundForces(planet, seat)));
+        if (fringe.isEmpty()) return Optional.empty();
+        int missing = FringeStack.GROUND_FORCES - BoardView.groundForces(fringe.get(), seat);
+        List<UnitMove> spare = spareFromDocks(context, tile);
+        if (missing <= 0 || spare.isEmpty()) return Optional.empty();
+        return shiftOnto(context, tile, fringe.get(), spare, missing);
+    }
+
+    private static List<UnitMove> spareFromDocks(Context context, Tile tile) {
+        Player seat = context.seat;
+        List<UnitMove> available = availableGroundForces(context.game, seat, tile, context.defense(), List.of());
+        boolean guarded = context.defense().isGuarded(tile);
+        List<UnitMove> spare = new ArrayList<>();
+        for (Planet dock : ownedPlanets(seat, tile)
+                .filter(planet -> BoardView.count(planet, seat, UnitType.Spacedock) > 0)
+                .toList()) {
+            List<UnitMove> here = available.stream()
+                    .filter(move -> move.holder().equals(dock.getName()))
+                    .toList();
+            int keep = guarded && unitCount(here) >= BoardView.groundForces(dock, seat) ? 1 : 0;
+            spare.addAll(take(here, unitCount(here) - keep));
+        }
+        return spare;
+    }
+
+    private static Optional<GroundShift> shiftOnto(
+            Context context, Tile tile, Planet destination, List<UnitMove> cargo, int most) {
+        Player seat = context.seat;
+        int room = capacityOf(seat, shipsAt(seat, tile)) - BoardView.groundForces(BoardView.space(tile), seat);
+        List<UnitMove> moves = new ArrayList<>();
         double cost = 0;
-        if (capacityOf(seat, shipsAt(seat, tile)) <= BoardView.groundForces(BoardView.space(tile), seat)) {
+        if (room <= 0) {
             Optional<Map.Entry<List<UnitMove>, Double>> hauler = nearestHauler(context, tile);
             if (hauler.isEmpty()) return Optional.empty();
-            moves.addAll(0, hauler.get().getKey());
+            moves.addAll(hauler.get().getKey());
             cost = hauler.get().getValue();
+            room = capacityOf(seat, hauler.get().getKey());
         }
-        double gain = context.objectiveGain(tile, moves, List.of(bare.get().getName()));
+        List<UnitMove> lifted = take(cargo, Math.min(most, room));
+        if (lifted.isEmpty()) return Optional.empty();
+        moves.addAll(lifted);
+        double gain = context.objectiveGain(tile, moves, List.of(destination.getName()));
         if (gain - cost <= 0) return Optional.empty();
-        return Optional.of(
-                new MechShift(moves, bare.get().getName(), BoardView.groundForces(bare.get(), seat) + 1, gain - cost));
+        return Optional.of(new GroundShift(
+                moves,
+                destination.getName(),
+                BoardView.groundForces(destination, seat) + unitCount(lifted),
+                gain - cost));
     }
 
     private static Optional<Map.Entry<List<UnitMove>, Double>> nearestHauler(Context context, Tile tile) {
@@ -2990,8 +3058,11 @@ public class TacticalPlanner {
             DefenseOutlook defense,
             List<UnitMove> shipsLeaving,
             @Nullable Blend blend) {
-        if (origin.isHomeSystem(game)) return defense.groundToKeep(origin, planet, shipsLeaving, blend);
-        return game.mecatols().contains(planet.getName()) ? MECATOL_GARRISON : 0;
+        int fringe = FringeStack.kept(game, seat, planet);
+        if (origin.isHomeSystem(game)) {
+            return Math.max(fringe, defense.groundToKeep(origin, planet, shipsLeaving, blend));
+        }
+        return Math.max(fringe, game.mecatols().contains(planet.getName()) ? MECATOL_GARRISON : 0);
     }
 
     public static CommanderReach.Garrison garrison(Game game, Player seat) {

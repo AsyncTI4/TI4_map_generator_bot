@@ -65,7 +65,7 @@ class GroundDropsTest extends BaseTi4Test {
     }
 
     @Test
-    void completingOccupyTheFringeIsWorthMostOfAPoint() {
+    void completingOccupyTheFringeIsWorthMostOfAPointAndBuildingTowardItASharePerDrop() {
         board.test.place(
                 "26",
                 board.stagingPosition.equals(board.otherNeighbourOfHome())
@@ -87,7 +87,7 @@ class GroundDropsTest extends BaseTi4Test {
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(short_).isLessThan(1.0);
+        assertThat(short_).isGreaterThan(1.0).isLessThan(completing.infantry());
         assertThat(completing.infantry()).isGreaterThan(6.0);
     }
 
