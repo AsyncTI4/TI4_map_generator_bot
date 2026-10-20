@@ -128,6 +128,19 @@ public class TestBedPresetService {
         }
     }
 
+    private static void validateTeamMateYou(TestBedPreset preset, List<Seat> seats, List<String> errors) {
+        long teamSeats = seats.stream().filter(Seat::isTeamMateYou).count();
+        if (teamSeats == 0) return;
+        if (preset.getYou() != null) errors.add("`teamMateYou` needs a preset without `you`.");
+        if (teamSeats > 1) errors.add("Only one seat may set `teamMateYou`.");
+    }
+
+    private static void validateBotAccount(List<Seat> seats, List<String> errors) {
+        if (seats.stream().filter(Seat::isBotAccount).count() > 1) {
+            errors.add("Only one seat may set `botAccount`.");
+        }
+    }
+
     public static Seat withDefaults(Seat seat, @Nullable Seat defaults) {
         if (defaults == null) return seat;
         Seat merged = new Seat();
@@ -135,6 +148,8 @@ public class TestBedPresetService {
         merged.setColor(seat.getColor());
         merged.setHome(seat.getHome());
         merged.setSpeaker(seat.isSpeaker());
+        merged.setTeamMateYou(seat.isTeamMateYou());
+        merged.setBotAccount(seat.isBotAccount());
         merged.setSc(seat.getSc());
         merged.setAcs(firstNonNull(seat.getAcs(), defaults.getAcs()));
         merged.setSos(firstNonNull(seat.getSos(), defaults.getSos()));
@@ -178,6 +193,8 @@ public class TestBedPresetService {
             errors.add("`combat` needs `start` to be `action`.");
         }
         validateSeatIdentities(seats, errors);
+        validateTeamMateYou(preset, seats, errors);
+        validateBotAccount(seats, errors);
         validateGameState(preset, errors);
         TestBedScriptService.validateShortcuts(
                 preset.getShortcuts(), TestBedScriptService.knownSeatNames(preset), errors);

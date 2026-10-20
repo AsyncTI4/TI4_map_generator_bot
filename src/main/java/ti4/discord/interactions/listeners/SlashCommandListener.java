@@ -33,8 +33,11 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
             Constants.EDIT_TRACK_RECORD,
             Constants.IMPORT_MAP_JSON);
 
-    private static final Set<String> UNECHOED_COMMANDS =
-            Set.of("rules ask", Constants.FOW + " " + Constants.WHISPER, Constants.BOTHELPER + " impersonate");
+    private static final Set<String> UNECHOED_COMMANDS = Set.of(
+            "rules ask",
+            Constants.FOW + " " + Constants.WHISPER,
+            Constants.BOTHELPER + " impersonate",
+            Constants.BOTHELPER + " " + Constants.PLAYER_GAMES);
 
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {

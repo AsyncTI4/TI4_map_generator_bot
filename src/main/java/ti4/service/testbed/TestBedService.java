@@ -126,6 +126,10 @@ public class TestBedService {
         return isVirtualSeatId(player.getUserID());
     }
 
+    public static boolean isBotAccountSeat(Player player) {
+        return JdaService.jda != null && JdaService.jda.getSelfUser().getId().equals(player.getUserID());
+    }
+
     public static boolean isVirtualSeatInTestBed(Game game, Player player) {
         return isVirtualSeat(player) && isTestBed(game);
     }

@@ -32,7 +32,7 @@ public class TestBedChannelService {
 
     public static void createFogPrivateChannel(Game game, Player seat, Member developer) {
         if (seat.getPrivateChannelID() != null && !seat.getPrivateChannelID().isBlank()) return;
-        if (TestBedService.isVirtualSeat(seat)) {
+        if (TestBedService.isVirtualSeat(seat) || TestBedService.isBotAccountSeat(seat)) {
             createVirtualSeatChannel(game, seat, developer);
         } else {
             CreateFoWGameService.createPrivateChannelForPlayer(developer, game);
