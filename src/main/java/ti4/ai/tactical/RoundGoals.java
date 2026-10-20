@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.IconStake;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.Territory;
@@ -43,7 +44,7 @@ public final class RoundGoals {
     static RoundGoals of(Game game, Player seat, Territory territory) {
         List<Goal> goals = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            double claim = expansionValue(game, seat, territory, tile);
+            double claim = expansionValue(game, seat, territory, tile) + iconValue(game, seat, tile);
             double presence = mecatolValue(game, seat, tile) + frontierValue(seat, tile);
             if (claim > 0) goals.add(new Goal(tile.getPosition(), claim, true, claimablePlanets(game, tile)));
             if (presence > 0) goals.add(new Goal(tile.getPosition(), presence, false, 0));
@@ -90,6 +91,11 @@ public final class RoundGoals {
         return value;
     }
 
+    private static double iconValue(Game game, Player seat, Tile tile) {
+        if (tile.isMecatol(game) || BoardView.hasEnemyUnits(game, seat, tile)) return 0;
+        return IconStake.freeValue(game, seat, tile);
+    }
+
     private static int claimablePlanets(Game game, Tile tile) {
         return (int) tile.getPlanetUnitHolders().stream()
                 .filter(planet ->
@@ -99,7 +105,7 @@ public final class RoundGoals {
 
     private static double mecatolValue(Game game, Player seat, Tile tile) {
         if (!tile.isMecatol(game) || seat.controlsMecatol(true)) return 0;
-        return MecatolStake.ownHoldValue(game, seat);
+        return MecatolStake.ownHoldValue(game, seat) + IconStake.freeValue(game, seat, tile);
     }
 
     private static double frontierValue(Player seat, Tile tile) {

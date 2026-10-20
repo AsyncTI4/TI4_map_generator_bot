@@ -1164,8 +1164,9 @@ public class StrategyCardRules {
             }
         }
         int reservedTokens = ScoringReserve.of(game, seat).tokens();
-        return seat.getStrategicCC() - saved >= 1
-                && seat.getStrategicCC() + seat.getTacticalCC() - 1 - saved >= reservedTokens;
+        int scar = ScarToken.kept(game, seat);
+        return seat.getStrategicCC() - saved - scar >= 1
+                && seat.getStrategicCC() + seat.getTacticalCC() - 1 - saved - scar >= reservedTokens;
     }
 
     public static Optional<Double> secondaryValue(Game game, Player seat, StrategyCard card) {
@@ -1246,12 +1247,13 @@ public class StrategyCardRules {
         Player seat = context.seat();
         int saved = tokensSavedForBetterCards(context, card);
         int reservedTokens = ScoringReserve.of(context.game(), seat).tokens();
+        int scar = ScarToken.kept(context.game(), seat);
         if (ScepterFollow.covers(context, card)) {
-            return seat.getStrategicCC() - saved >= 0
-                    && seat.getStrategicCC() + seat.getTacticalCC() - saved >= reservedTokens;
+            return seat.getStrategicCC() - saved - scar >= 0
+                    && seat.getStrategicCC() + seat.getTacticalCC() - saved - scar >= reservedTokens;
         }
-        return seat.getStrategicCC() - saved >= 1
-                && seat.getStrategicCC() + seat.getTacticalCC() - 1 - saved >= reservedTokens;
+        return seat.getStrategicCC() - saved - scar >= 1
+                && seat.getStrategicCC() + seat.getTacticalCC() - 1 - saved - scar >= reservedTokens;
     }
 
     public static boolean cannotResearch(Player seat) {

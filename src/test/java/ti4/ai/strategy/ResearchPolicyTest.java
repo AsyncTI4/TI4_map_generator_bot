@@ -6,6 +6,7 @@ import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
@@ -102,5 +103,24 @@ class ResearchPolicyTest extends BaseTi4Test {
         assertThat(ResearchPolicy.value(test.game, test.nekro, "hm")).isCloseTo(metabolism * 0.6, Offset.offset(1e-9));
         assertThat(ResearchPolicy.value(test.game, test.nekro, "nm")).isCloseTo(motivator * 0.6, Offset.offset(1e-9));
         assertThat(ResearchPolicy.value(test.game, test.nekro, "gd")).isEqualTo(drive);
+    }
+
+    // Destroyer II rolls three anti-fighter barrage dice at 6 instead of two at 9, which Fight with Precision needs to
+    // clear a stack of fighters. It adds 0.3 of a point while the secret is held and the two red technologies it
+    // requires are owned; the AI does not research toward it.
+    @Test
+    void valuesDestroyerIiForFightWithPrecisionOnlyWhenItCanBeResearchedNow() {
+        double plain = ResearchPolicy.value(test.game, test.nekro, "dd2");
+        test.nekro.setSecret("fwp");
+        assertThat(ResearchPolicy.value(test.game, test.nekro, "dd2")).isEqualTo(plain);
+        test.nekro.removeSecret(test.nekro.getSecretsUnscored().get("fwp"));
+
+        test.nekro.addTech("ps");
+        test.nekro.addTech("da");
+        double without = ResearchPolicy.value(test.game, test.nekro, "dd2");
+        test.nekro.setSecret("fwp");
+
+        assertThat(ResearchPolicy.value(test.game, test.nekro, "dd2") - without)
+                .isCloseTo(0.3 * ScoringStakes.scoreValue(test.game, test.nekro, 1), Offset.offset(1e-9));
     }
 }

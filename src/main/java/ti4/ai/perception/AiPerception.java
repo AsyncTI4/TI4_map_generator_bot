@@ -33,6 +33,7 @@ public class AiPerception {
 
     public static final String DELEGATION_PREFIX = "aiSeatPick_";
     private static final int COMBAT_THREADS_TO_READ = 2;
+    public static final String OFFER_REJECTED = "has been rejected";
     private static final Pattern SYSTEM_POSITION = Pattern.compile("-system-([^-]+)-turn-");
 
     private record CombatThread(String name, long latestMessageId, List<AiPrompt> prompts) {}
@@ -119,6 +120,7 @@ public class AiPerception {
 
     static boolean kept(PromptSource source, List<PromptButton> buttons, String content) {
         if (source == PromptSource.COMBAT_THREAD) return true;
+        if (source == PromptSource.AI_THREAD && content != null && content.contains(OFFER_REJECTED)) return true;
         return source == PromptSource.PUBLIC && AiPrompt.isTableTalk(buttons, content);
     }
 

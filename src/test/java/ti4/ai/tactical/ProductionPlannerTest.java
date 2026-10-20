@@ -12,6 +12,7 @@ import ti4.ai.tactical.ProductionPlanner.BuildPlan;
 import ti4.game.Tile;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.image.PositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 class ProductionPlannerTest extends BaseTi4Test {
@@ -138,6 +139,32 @@ class ProductionPlannerTest extends BaseTi4Test {
 
         assertThat(plan.units(UnitType.Destroyer)).isEqualTo(2);
         assertThat(plan.scoring()).isTrue();
+    }
+
+    // Two destroyers anywhere on the board used to satisfy Fight with Precision. A dock a destroyer trip from enemy
+    // fighters now wants three barrage ships of its own, so two sitting at another system do not count.
+    @Test
+    void buildsBarrageShipsAtADockFacingFighters() {
+        test.nekro.setSecret("fwp");
+        test.nekro.setTg(6);
+        String first = AiTestGame.neighbourOf(AiTestGame.HOME);
+        test.units(test.place("46", first), "space", test.sol, UnitType.Fighter, 2);
+        test.units(test.place("26", otherNeighbour(first)), "space", test.nekro, UnitType.Destroyer, 2);
+
+        BuildPlan plan = plan();
+
+        assertThat(plan.units(UnitType.Destroyer)).isEqualTo(3);
+        assertThat(plan.scoring()).isTrue();
+    }
+
+    @Test
+    void countsBarrageShipsAnywhereWhenNoFightersAreNearTheDock() {
+        test.nekro.setSecret("fwp");
+        test.nekro.setTg(6);
+        test.units(
+                test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME)), "space", test.nekro, UnitType.Destroyer, 2);
+
+        assertThat(plan().units(UnitType.Destroyer)).isZero();
     }
 
     // Gather a Mighty Fleet wants five dreadnoughts, and each one built is progress the planner can see.
@@ -279,6 +306,30 @@ class ProductionPlannerTest extends BaseTi4Test {
                 1);
 
         assertThat(plan().units(UnitType.Mech)).isEqualTo(3);
+    }
+
+    // Four mechs sit on Mordai II and both carriers are away: while Mechanize the Military is held, a carrier is built
+    // at
+    // home to take the spare mechs out.
+    @Test
+    void buildsACarrierAtHomeForMechsStuckThereWhileMechanizeIsHeld() {
+        Tile away = test.place("22", AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.units(away, "space", test.nekro, UnitType.Carrier, 2);
+        test.units(home, "mordaiii", test.nekro, UnitType.Mech, 4);
+        test.nekro.setTg(10);
+        int without = plan().units(UnitType.Carrier);
+
+        test.nekro.setSecret("mtm");
+
+        assertThat(without).isZero();
+        assertThat(plan().units(UnitType.Carrier)).isEqualTo(1);
+    }
+
+    private static String otherNeighbour(String position) {
+        return PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+                .filter(candidate -> !"x".equals(candidate) && !position.equals(candidate))
+                .findFirst()
+                .orElseThrow();
     }
 
     private BuildPlan plan() {

@@ -18,7 +18,8 @@ public record TacticalPlan(
         POSITION,
         DEFEND,
         STAGE,
-        PICKUP
+        PICKUP,
+        GARRISON
     }
 
     public record UnitMove(String origin, String holder, UnitType type, int count) {}

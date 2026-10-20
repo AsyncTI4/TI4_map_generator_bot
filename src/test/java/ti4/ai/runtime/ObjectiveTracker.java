@@ -45,10 +45,23 @@ final class ObjectiveTracker {
             List<Chance> chances,
             WinningPathBreakdown leaderPath,
             List<String> secretsScored,
+            List<String> secretsHeld,
+            Map<String, List<Integer>> groundProgress,
+            List<MechanizeHolder> mechanize,
+            List<String> secretHolders,
             int seats) {
 
         static final Summary NOTHING = new Summary(
-                List.of(), List.of(), List.of(), new WinningPathBreakdown(0, 0, 0, 0, Map.of()), List.of(), 0);
+                List.of(),
+                List.of(),
+                List.of(),
+                new WinningPathBreakdown(0, 0, 0, 0, Map.of()),
+                List.of(),
+                List.of(),
+                Map.of(),
+                List.of(),
+                List.of(),
+                0);
 
         // For each status phase the game reached, from round 1: the share of seats that scored at least one public
         // objective (or secret) in it.
@@ -78,14 +91,47 @@ final class ObjectiveTracker {
 
     private record Pending(String userId, String objective, int shortBy) {}
 
+    // A Mechanize the Military holder at the start of one status phase: mechs on the board, planets with a mech, mechs
+    // in the home system, own carriers (and those in the home system), mechs built so far and how often a mech first
+    // arrived on a planet outside the home system while the secret was held.
+    record MechanizeHolder(
+            String faction,
+            int round,
+            int mechs,
+            int mechPlanets,
+            int mechsHome,
+            int carriers,
+            int carriersHome,
+            int built,
+            int arrivedAway,
+            boolean scored,
+            int homeInfantry,
+            int keptHome,
+            int movableHomeMechs,
+            int bareHeldPlanets) {}
+
+    private final List<MechanizeHolder> mechanize = new ArrayList<>();
+    // One line per Seize an Icon or Adapt New Strategies holder at each status phase.
+    private final List<String> secretHolders = new ArrayList<>();
+    private final Map<String, Integer> mechTotals = new HashMap<>();
+    private final Map<String, Integer> mechsBuilt = new HashMap<>();
+    private final Map<String, Integer> arrivals = new HashMap<>();
+    private final Map<String, Set<String>> awayMechPlanets = new HashMap<>();
+
     private Snapshot open;
     private int lastOpenedRound;
     private final List<StatusScoring> statusScoring = new ArrayList<>();
     private final List<Chance> chances = new ArrayList<>();
+    private final Set<String> held = new java.util.LinkedHashSet<>();
+    // Mechanize the Military and Occupy the Fringe: the most progress each holder had at any status phase.
+    private static final List<String> GROUND_SECRETS = List.of("mtm", "otf");
+    private final Map<String, Integer> groundProgress = new java.util.LinkedHashMap<>();
 
     // The snapshot opens once every seat has passed, before the status phase starts: scores a seat queued during the
     // action phase are applied the moment the status phase begins, so a snapshot taken then would already hold them.
     synchronized void observe(Game game) {
+        if (pastTheOpeningDiscard(game)) recordHeld(game);
+        trackMechs(game);
         boolean scoringWindow = actionPhaseOver(game) || inStatusPhase(game);
         if (open != null && (!scoringWindow || game.getRound() != open.round())) close(game);
         if (scoringWindow && open == null && game.getRound() != lastOpenedRound) open(game);
@@ -102,7 +148,177 @@ final class ObjectiveTracker {
                 game.getRealPlayers().stream()
                         .flatMap(seat -> seat.getSecretsScored().keySet().stream())
                         .toList(),
+                held.stream()
+                        .map(entry -> entry.substring(entry.indexOf('|') + 1))
+                        .toList(),
+                groundProgressByHolder(),
+                List.copyOf(mechanize),
+                List.copyOf(secretHolders),
                 game.getRealPlayers().size());
+    }
+
+    // Seats are dealt two secrets and discard one before round 1; the one discarded there was never really held.
+    private static boolean pastTheOpeningDiscard(Game game) {
+        return game.getRound() > 1 || ACTION_PHASE.equals(game.getPhaseOfGame());
+    }
+
+    private void recordHeld(Game game) {
+        for (Player seat : game.getRealPlayers()) {
+            for (String secret : seat.getSecretsUnscored().keySet()) held.add(seat.getFaction() + "|" + secret);
+            for (String secret : seat.getSecretsScored().keySet()) held.add(seat.getFaction() + "|" + secret);
+        }
+    }
+
+    private static boolean holdsMechanize(Player seat) {
+        return seat.getSecretsUnscored().containsKey("mtm")
+                || seat.getSecretsScored().containsKey("mtm");
+    }
+
+    private void trackMechs(Game game) {
+        for (Player seat : game.getRealPlayers()) {
+            if (!holdsMechanize(seat)) continue;
+            String faction = seat.getFaction();
+            int total = 0;
+            Set<String> away = new HashSet<>();
+            ti4.game.Tile home = seat.getHomeSystemTile();
+            for (ti4.game.Tile tile : game.getTileMap().values()) {
+                for (ti4.game.UnitHolder holder : tile.getUnitHolders().values()) {
+                    int here = ti4.ai.eval.BoardView.count(holder, seat, ti4.helpers.Units.UnitType.Mech);
+                    total += here;
+                    if (here > 0 && holder instanceof ti4.game.Planet && tile != home) away.add(holder.getName());
+                }
+            }
+            Integer before = mechTotals.put(faction, total);
+            if (before != null && total > before) mechsBuilt.merge(faction, total - before, Integer::sum);
+            Set<String> previous = awayMechPlanets.put(faction, away);
+            if (previous != null) {
+                long arrived = away.stream()
+                        .filter(planet -> !previous.contains(planet))
+                        .count();
+                if (arrived > 0) arrivals.merge(faction, (int) arrived, Integer::sum);
+            }
+        }
+    }
+
+    private void recordMechanize(Game game) {
+        for (Player seat : game.getRealPlayers()) {
+            if (!holdsMechanize(seat)) continue;
+            ti4.game.Tile home = seat.getHomeSystemTile();
+            int mechs = 0;
+            int planets = 0;
+            int mechsHome = 0;
+            int carriers = 0;
+            int carriersHome = 0;
+            for (ti4.game.Tile tile : game.getTileMap().values()) {
+                for (ti4.game.UnitHolder holder : tile.getUnitHolders().values()) {
+                    int here = ti4.ai.eval.BoardView.count(holder, seat, ti4.helpers.Units.UnitType.Mech);
+                    mechs += here;
+                    if (here > 0 && holder instanceof ti4.game.Planet) planets++;
+                    if (tile == home) mechsHome += here;
+                    int carriersHere = ti4.ai.eval.BoardView.count(holder, seat, ti4.helpers.Units.UnitType.Carrier);
+                    carriers += carriersHere;
+                    if (tile == home) carriersHome += carriersHere;
+                }
+            }
+            String faction = seat.getFaction();
+            mechanize.add(new MechanizeHolder(
+                    faction,
+                    game.getRound(),
+                    mechs,
+                    planets,
+                    mechsHome,
+                    carriers,
+                    carriersHome,
+                    mechsBuilt.getOrDefault(faction, 0),
+                    arrivals.getOrDefault(faction, 0),
+                    seat.getSecretsScored().containsKey("mtm"),
+                    homeInfantry(seat, home),
+                    kept(game, seat),
+                    Math.max(0, mechsHome - Math.max(0, kept(game, seat) - homeInfantry(seat, home))),
+                    bareHeldPlanets(game, seat, home)));
+        }
+    }
+
+    // Ground forces the planner keeps at home when the ships there leave; while Mechanize is held infantry stay first.
+    private static int kept(Game game, Player seat) {
+        return ti4.ai.tactical.TacticalPlanner.groundKeptHomeWhileTransportsLeave(game, seat);
+    }
+
+    private static int homeInfantry(Player seat, ti4.game.Tile home) {
+        if (home == null) return 0;
+        return home.getUnitHolders().values().stream()
+                .mapToInt(holder -> ti4.ai.eval.BoardView.count(holder, seat, ti4.helpers.Units.UnitType.Infantry))
+                .sum();
+    }
+
+    private static int bareHeldPlanets(Game game, Player seat, ti4.game.Tile home) {
+        int bare = 0;
+        for (String name : seat.getPlanets()) {
+            ti4.game.Tile tile = game.getTileFromPlanet(name);
+            if (tile == null || tile == home) continue;
+            if (game.getUnitHolderFromPlanet(name) instanceof ti4.game.Planet planet
+                    && !planet.isSpaceStation(game)
+                    && ti4.ai.eval.BoardView.count(planet, seat, ti4.helpers.Units.UnitType.Mech) == 0) {
+                bare++;
+            }
+        }
+        return bare;
+    }
+
+    private void recordIconAndStrategies(Game game) {
+        for (Player seat : game.getRealPlayers()) {
+            if (seat.getSecretsUnscored().containsKey("sai")
+                    || seat.getSecretsScored().containsKey("sai")) {
+                List<String> legendary = seat.getPlanets().stream()
+                        .filter(name -> game.getPlanetsInfo().get(name) != null
+                                && game.getPlanetsInfo().get(name).isLegendary())
+                        .toList();
+                secretHolders.add(String.format(
+                        "Seize an Icon %s r%d: legendary held %s%s",
+                        seat.getFaction(),
+                        game.getRound(),
+                        legendary,
+                        seat.getSecretsScored().containsKey("sai") ? ", scored" : ""));
+            }
+            if (seat.getSecretsUnscored().containsKey("ans")
+                    || seat.getSecretsScored().containsKey("ans")) {
+                boolean inScar = game.getTileMap().values().stream()
+                        .anyMatch(tile -> tile.isScar(game) && ti4.ai.eval.BoardView.hasOwnShips(seat, tile));
+                secretHolders.add(String.format(
+                        "Adapt New Strategies %s r%d: own faction techs %d, route %s, ships in a scar %s, strategy tokens %d%s",
+                        seat.getFaction(),
+                        game.getRound(),
+                        ti4.ai.secrets.SecretValue.ownFactionTechnologies(seat),
+                        ti4.ai.strategy.TechPath.researchesNeeded(game, seat, "ans"),
+                        inScar,
+                        seat.getStrategicCC(),
+                        seat.getSecretsScored().containsKey("ans") ? ", scored" : ""));
+            }
+        }
+    }
+
+    private void recordGroundProgress(Game game) {
+        for (Player seat : game.getRealPlayers()) {
+            ti4.ai.scoring.ObjectiveValue value = null;
+            for (String secret : GROUND_SECRETS) {
+                if (!seat.getSecretsUnscored().containsKey(secret)) continue;
+                if (value == null) value = new ti4.ai.scoring.ObjectiveValue(game, seat);
+                int progress = value.progress(secret, value.before());
+                groundProgress.merge(seat.getFaction() + "|" + secret, progress, Math::max);
+            }
+            for (String secret : GROUND_SECRETS) {
+                if (seat.getSecretsScored().containsKey(secret))
+                    groundProgress.put(seat.getFaction() + "|" + secret, 99);
+            }
+        }
+    }
+
+    private Map<String, List<Integer>> groundProgressByHolder() {
+        Map<String, List<Integer>> bySecret = new java.util.TreeMap<>();
+        groundProgress.forEach((key, progress) -> bySecret.computeIfAbsent(
+                        key.substring(key.indexOf('|') + 1), secret -> new ArrayList<>())
+                .add(progress));
+        return bySecret;
     }
 
     private static boolean actionPhaseOver(Game game) {
@@ -117,6 +333,9 @@ final class ObjectiveTracker {
     }
 
     private void open(Game game) {
+        recordGroundProgress(game);
+        recordMechanize(game);
+        recordIconAndStrategies(game);
         Map<String, Set<String>> publics = new HashMap<>();
         Map<String, Integer> secrets = new HashMap<>();
         List<Pending> pending = new ArrayList<>();

@@ -3,10 +3,12 @@ package ti4.ai.scoring;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import ti4.ai.eval.BoardView;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -15,7 +17,13 @@ import ti4.helpers.Units.UnitType;
 
 public final class Footprint {
 
-    public record Move(String origin, UnitType type, int count) {}
+    public record Move(String origin, String holder, UnitType type, int count) {
+        public Move(String origin, UnitType type, int count) {
+            this(origin, BoardView.SPACE, type, count);
+        }
+    }
+
+    private record Ground(Map<String, Integer> forces, Map<String, Integer> mechs, Set<String> docks) {}
 
     private final Map<String, Integer> units;
     private final Map<String, Integer> ships;
@@ -23,6 +31,7 @@ public final class Footprint {
     private final Map<String, Integer> heavyShips;
     private final Set<String> planets;
     private final int dreadnoughts;
+    private final Ground ground;
 
     private Footprint(
             Map<String, Integer> units,
@@ -30,13 +39,15 @@ public final class Footprint {
             Map<String, Integer> nonFighterShips,
             Map<String, Integer> heavyShips,
             Set<String> planets,
-            int dreadnoughts) {
+            int dreadnoughts,
+            Ground ground) {
         this.units = units;
         this.ships = ships;
         this.nonFighterShips = nonFighterShips;
         this.heavyShips = heavyShips;
         this.planets = planets;
         this.dreadnoughts = dreadnoughts;
+        this.ground = ground;
     }
 
     private static boolean isHeavy(UnitType type) {
@@ -67,7 +78,30 @@ public final class Footprint {
             if (heavy > 0) heavyShips.put(position, heavy);
             dreadnoughts += shipsHere.getOrDefault(UnitType.Dreadnought, 0);
         }
-        return new Footprint(units, ships, nonFighterShips, heavyShips, new HashSet<>(seat.getPlanets()), dreadnoughts);
+        return new Footprint(
+                units,
+                ships,
+                nonFighterShips,
+                heavyShips,
+                new HashSet<>(seat.getPlanets()),
+                dreadnoughts,
+                ground(game, seat));
+    }
+
+    private static Ground ground(Game game, Player seat) {
+        Map<String, Integer> forces = new HashMap<>();
+        Map<String, Integer> mechs = new HashMap<>();
+        Set<String> docks = new HashSet<>();
+        for (Tile tile : game.getTileMap().values()) {
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                int here = BoardView.groundForces(planet, seat);
+                if (here > 0) forces.put(planet.getName(), here);
+                int mechsHere = BoardView.count(planet, seat, UnitType.Mech);
+                if (mechsHere > 0) mechs.put(planet.getName(), mechsHere);
+                if (BoardView.count(planet, seat, UnitType.Spacedock) > 0) docks.add(planet.getName());
+            }
+        }
+        return new Ground(forces, mechs, docks);
     }
 
     public Footprint after(String target, Collection<Move> moves, Collection<String> gainedPlanets) {
@@ -86,7 +120,55 @@ public final class Footprint {
         }
         Set<String> newPlanets = new HashSet<>(planets);
         newPlanets.addAll(gainedPlanets);
-        return new Footprint(newUnits, newShips, newNonFighter, newHeavy, newPlanets, dreadnoughts);
+        return new Footprint(
+                newUnits,
+                newShips,
+                newNonFighter,
+                newHeavy,
+                newPlanets,
+                dreadnoughts,
+                groundAfter(target, moves, gainedPlanets));
+    }
+
+    private Ground groundAfter(String target, Collection<Move> moves, Collection<String> landedOn) {
+        Map<String, Integer> forces = new HashMap<>(ground.forces());
+        Map<String, Integer> mechs = new HashMap<>(ground.mechs());
+        int arrivingInfantry = 0;
+        int arrivingMechs = 0;
+        for (Move move : moves) {
+            if (!isGroundForce(move.type())) continue;
+            if (!BoardView.SPACE.equals(move.holder())) {
+                take(forces, move.holder(), move.count());
+                if (move.type() == UnitType.Mech) take(mechs, move.holder(), move.count());
+            }
+            if (move.origin().equals(target) && BoardView.SPACE.equals(move.holder())) continue;
+            if (move.type() == UnitType.Mech) {
+                arrivingMechs += move.count();
+            } else {
+                arrivingInfantry += move.count();
+            }
+        }
+        List<String> landings = List.copyOf(landedOn);
+        if (landings.isEmpty()) return new Ground(forces, mechs, ground.docks());
+        for (String planet : landings) {
+            if (arrivingMechs == 0) break;
+            if (mechs.containsKey(planet)) continue;
+            mechs.put(planet, 1);
+            forces.merge(planet, 1, Integer::sum);
+            arrivingMechs--;
+        }
+        String first = landings.getFirst();
+        if (arrivingMechs > 0) mechs.merge(first, arrivingMechs, Integer::sum);
+        forces.merge(first, arrivingMechs + arrivingInfantry, Integer::sum);
+        return new Ground(forces, mechs, ground.docks());
+    }
+
+    private static boolean isGroundForce(UnitType type) {
+        return type == UnitType.Infantry || type == UnitType.Mech;
+    }
+
+    private static void take(Map<String, Integer> counts, String key, int amount) {
+        counts.computeIfPresent(key, (ignored, count) -> count > amount ? count - amount : null);
     }
 
     public Footprint withoutShipsIn(String position) {
@@ -99,19 +181,19 @@ public final class Footprint {
         newShips.remove(position);
         newNonFighter.remove(position);
         newHeavy.remove(position);
-        return new Footprint(newUnits, newShips, newNonFighter, newHeavy, planets, dreadnoughts);
+        return new Footprint(newUnits, newShips, newNonFighter, newHeavy, planets, dreadnoughts, ground);
     }
 
     public Footprint withPlanet(String planet) {
         Set<String> newPlanets = new HashSet<>(planets);
         newPlanets.add(planet);
-        return new Footprint(units, ships, nonFighterShips, heavyShips, newPlanets, dreadnoughts);
+        return new Footprint(units, ships, nonFighterShips, heavyShips, newPlanets, dreadnoughts, ground);
     }
 
     public Footprint withoutPlanet(String planet) {
         Set<String> newPlanets = new HashSet<>(planets);
         newPlanets.remove(planet);
-        return new Footprint(units, ships, nonFighterShips, heavyShips, newPlanets, dreadnoughts);
+        return new Footprint(units, ships, nonFighterShips, heavyShips, newPlanets, dreadnoughts, ground);
     }
 
     public Footprint withBuilt(String position, Map<UnitType, Integer> built) {
@@ -128,7 +210,7 @@ public final class Footprint {
             if (isHeavy(type)) newHeavy.merge(position, count, Integer::sum);
         });
         int newDreadnoughts = dreadnoughts + built.getOrDefault(UnitType.Dreadnought, 0);
-        return new Footprint(newUnits, newShips, newNonFighter, newHeavy, planets, newDreadnoughts);
+        return new Footprint(newUnits, newShips, newNonFighter, newHeavy, planets, newDreadnoughts, ground);
     }
 
     public Set<String> heavyShipSystems() {
@@ -174,5 +256,17 @@ public final class Footprint {
 
     public Set<String> planets() {
         return planets;
+    }
+
+    public Set<String> mechPlanets() {
+        return ground.mechs().keySet();
+    }
+
+    public int mostGroundForcesWithoutADock() {
+        return ground.forces().entrySet().stream()
+                .filter(entry -> !ground.docks().contains(entry.getKey()))
+                .mapToInt(Map.Entry::getValue)
+                .max()
+                .orElse(0);
     }
 }

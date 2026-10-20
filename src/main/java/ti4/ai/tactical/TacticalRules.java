@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.brain.AiDecision;
@@ -55,6 +56,7 @@ public class TacticalRules {
     private static final String FLEET_LOGISTICS = "fl";
     private static final double URGENT_SCORE = 0.75 * ObjectiveValue.VICTORY_POINT_VALUE;
     private static final String HAZARDOUS = "hazardous";
+    private static final String MECHANIZE_THE_MILITARY = "mtm";
     private static final String TACTICAL_ACTION = "tacticalAction";
     private static final List<String> ANOTHER_ACTION_BUTTONS = List.of("doAnotherAction", "confirmSecondAction");
     private static final String FIELD = "|";
@@ -191,12 +193,21 @@ public class TacticalRules {
     }
 
     public static Optional<AiDecision> start(AiTurnContext context) {
+        return start(context, hints -> TacticalPlanner.best(context.game(), context.seat(), hints));
+    }
+
+    public static Optional<AiDecision> stall(AiTurnContext context) {
+        return start(context, hints -> StallPlans.enduranceStall(context.game(), context.seat()));
+    }
+
+    private static Optional<AiDecision> start(
+            AiTurnContext context, Function<List<SetupHint>, Optional<TacticalPlan>> planner) {
         List<AiPrompt> turn = Prompts.thisTurn(context);
         List<AiPrompt> pickers = pickers(context, turn);
         Optional<AiPrompt> picker = pickers.stream().findFirst();
         List<SetupHint> hints = setupHints(context);
         Optional<TacticalPlan> plan = rememberedPlan(context).or(() -> {
-            Optional<TacticalPlan> computed = TacticalPlanner.best(context.game(), context.seat(), hints);
+            Optional<TacticalPlan> computed = planner.apply(hints);
             computed.ifPresent(found -> remember(context, found));
             return computed;
         });
@@ -472,7 +483,7 @@ public class TacticalRules {
 
     private static Optional<PromptButton> landButton(
             Game game, AiPrompt prompt, Tile tile, Landing landing, Player seat) {
-        for (UnitType type : landingOrder(game, tile, landing.planet())) {
+        for (UnitType type : landingOrder(game, seat, tile, landing.planet())) {
             int inSpace = BoardView.count(BoardView.space(tile), seat, type);
             if (inSpace == 0) continue;
             int amount = Math.min(2, Math.min(inSpace, landing.wanted()));
@@ -483,11 +494,15 @@ public class TacticalRules {
         return Optional.empty();
     }
 
-    private static List<UnitType> landingOrder(Game game, Tile tile, String planetName) {
+    private static List<UnitType> landingOrder(Game game, Player seat, Tile tile, String planetName) {
+        Planet planet = tile.getUnitHolders().get(planetName) instanceof Planet found ? found : null;
         boolean claimingHazardous = BoardView.controller(game, planetName) == null
-                && tile.getUnitHolders().get(planetName) instanceof Planet planet
+                && planet != null
                 && planet.getPlanetTypes().contains(HAZARDOUS);
-        return claimingHazardous
+        boolean mechanizes = planet != null
+                && seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY)
+                && BoardView.count(planet, seat, UnitType.Mech) == 0;
+        return claimingHazardous || mechanizes
                 ? List.of(UnitType.Mech, UnitType.Infantry)
                 : List.of(UnitType.Infantry, UnitType.Mech);
     }

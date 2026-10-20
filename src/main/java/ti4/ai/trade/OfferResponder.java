@@ -65,6 +65,11 @@ class OfferResponder {
             }
             if (waitsFor(context, offerer.get())) continue;
             Verdict verdict = verdict(context, offerer.get(), deal);
+            if (OfferRejections.answering(context, offerer.get())) {
+                boolean taken = verdict.kind() == Kind.ACCEPT;
+                OfferRejections.answered(context, offerer.get(), taken);
+                if (!taken) return reject(context, offer, offerer.get());
+            }
             if (verdict.kind() == Kind.COUNTER && OfferBuilder.active(context)) continue;
             return execute(context, offer, offerer.get(), deal, verdict);
         }

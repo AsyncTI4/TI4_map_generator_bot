@@ -15,6 +15,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
+import ti4.ai.endurance.Endurance;
 import ti4.ai.eval.BoardView;
 import ti4.ai.expedition.ExpeditionRules;
 import ti4.ai.expedition.ExpeditionUnlock;
@@ -56,6 +57,8 @@ public class TechRules {
     private static final String BIO_STIMS_EXHAUST = "exhaustTech_bs";
     private static final String BIO_STIMS_READY = "biostimsReady_";
     private static final String BIO_STIMS_READY_PLANET = "biostimsReady_planet_";
+    private static final String SLING_RELAY = "sr";
+    private static final String BIO_STIMS_READY_SLING_RELAY = "biostimsReady_tech_sr";
     private static final String END_OF_TURN_ABILITIES = "endOfTurnAbilities";
     private static final String MAGEN_PLACE_PREFIX = "useMagenDefense_";
     private static final String PSYCHOARCHAEOLOGY = "pa";
@@ -176,7 +179,8 @@ public class TechRules {
         String state = context.memory().get(key).orElse("");
         if (BIO_STIMS_EXHAUSTED.equals(state)) return readyWithBioStims(context, thisTurn, key);
         if (!state.isEmpty() || !context.seat().hasTechReady(BIO_STIMS)) return Optional.empty();
-        if (bestTechSkipPlanet(context).isEmpty()) return Optional.empty();
+        boolean refill = refillsSlingRelay(context.game(), context.seat());
+        if (!refill && bestTechSkipPlanet(context).isEmpty()) return Optional.empty();
         Optional<Match> exhaust = Prompts.owned(thisTurn, context.faction(), BIO_STIMS_EXHAUST::equals);
         if (exhaust.isPresent()) {
             context.memory().put(key, BIO_STIMS_EXHAUSTED);
@@ -188,12 +192,21 @@ public class TechRules {
 
     private static Optional<AiDecision> readyWithBioStims(AiTurnContext context, List<AiPrompt> thisTurn, String key) {
         Optional<String> planet = bestTechSkipPlanet(context);
-        Optional<Match> ready = planet.flatMap(
-                        name -> Prompts.unowned(thisTurn, (BIO_STIMS_READY_PLANET + name)::equals))
+        Optional<Match> slingRelay = refillsSlingRelay(context.game(), context.seat())
+                ? Prompts.unowned(thisTurn, BIO_STIMS_READY_SLING_RELAY::equals)
+                : Optional.empty();
+        Optional<Match> ready = slingRelay
+                .or(() -> planet.flatMap(name -> Prompts.unowned(thisTurn, (BIO_STIMS_READY_PLANET + name)::equals)))
                 .or(() -> Prompts.unowned(thisTurn, id -> id.startsWith(BIO_STIMS_READY)));
         if (ready.isEmpty()) return Optional.empty();
         context.memory().put(key, BIO_STIMS_DONE);
         return Optional.of(ready.get().press("ready a planet with Bio-Stims"));
+    }
+
+    private static boolean refillsSlingRelay(Game game, Player seat) {
+        return seat.hasTech(SLING_RELAY)
+                && seat.getExhaustedTechs().contains(SLING_RELAY)
+                && Endurance.race(game, seat).filter(Endurance.Race::contested).isPresent();
     }
 
     private static Optional<String> bestTechSkipPlanet(AiTurnContext context) {

@@ -146,7 +146,8 @@ public final class CustodiansRace {
             if (mecatol == null || arrival.isEmpty()) return 0;
             double prize = ObjectiveValue.VICTORY_POINT_VALUE
                     + MecatolStake.holdValue(game, seatOfInterest)
-                    + mecatolPlanetValue();
+                    + mecatolPlanetValue()
+                    + IconStake.freeValue(game, seatOfInterest, mecatol);
             return prize * winChance(seatOfInterest, arrival.getAsInt(), order);
         }
 
@@ -227,7 +228,9 @@ public final class CustodiansRace {
             return payable.computeIfAbsent(player.getFaction(), faction -> {
                 if (player == seat) {
                     return ScoringReserve.planAfterReserve(game, seat, SpendCost.influence(COST))
-                            .isPresent();
+                                    .isPresent()
+                            || IconStake.behindCustodians(game, seat)
+                                    && Wallet.of(game, seat).canPay(SpendCost.influence(COST));
                 }
                 return Wallet.of(game, player).canPay(SpendCost.influence(COST));
             });

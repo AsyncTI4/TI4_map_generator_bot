@@ -231,6 +231,73 @@ class AiSelfPlayTest extends BaseTi4Test {
                         secretName(entry.getKey()), entry.getValue(), 100.0 * entry.getValue() / total))
                 .collect(java.util.stream.Collectors.joining(", "));
         System.out.println("Secrets scored over the batch (" + total + "): " + mix);
+        printSecretConversion(summaries);
+    }
+
+    // How often a seat that held each secret at some point of the game went on to score it, most held first.
+    private static void printSecretConversion(List<ObjectiveTracker.Summary> summaries) {
+        Map<String, Long> held = summaries.stream()
+                .flatMap(summary -> summary.secretsHeld().stream())
+                .collect(java.util.stream.Collectors.groupingBy(id -> id, java.util.stream.Collectors.counting()));
+        Map<String, Long> scored = summaries.stream()
+                .flatMap(summary -> summary.secretsScored().stream())
+                .collect(java.util.stream.Collectors.groupingBy(id -> id, java.util.stream.Collectors.counting()));
+        String rows = held.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry::getKey))
+                .map(entry -> String.format(
+                        "%s %d/%d",
+                        secretName(entry.getKey()), scored.getOrDefault(entry.getKey(), 0L), entry.getValue()))
+                .collect(java.util.stream.Collectors.joining(", "));
+        System.out.println("Secrets scored/held (seats that held each one at some point): " + rows);
+        printGroundProgress(summaries);
+    }
+
+    // For each holder of Mechanize the Military (4 mech planets) or Occupy the Fringe (9 ground forces on a planet
+    // without a dock): the most progress it had at a status phase, as a count of holders per step; 99 is scored.
+    private static void printGroundProgress(List<ObjectiveTracker.Summary> summaries) {
+        Map<String, java.util.TreeMap<Integer, Integer>> steps = new java.util.TreeMap<>();
+        for (ObjectiveTracker.Summary summary : summaries) {
+            summary.groundProgress()
+                    .forEach((secret, progress) ->
+                            progress.forEach(best -> steps.computeIfAbsent(secret, id -> new java.util.TreeMap<>())
+                                    .merge(best, 1, Integer::sum)));
+        }
+        steps.forEach((secret, counts) -> System.out.println(
+                "Best progress per holder at a status phase, " + secretName(secret) + ": " + counts));
+        printMechanizeHolders(summaries);
+    }
+
+    // Each Mechanize the Military holder at each status phase: mechs on the board / planets with a mech / mechs at
+    // home, carriers (at home), mechs built so far and mechs that first reached a planet away from home.
+    private static void printMechanizeHolders(List<ObjectiveTracker.Summary> summaries) {
+        int index = 0;
+        for (ObjectiveTracker.Summary summary : summaries) {
+            index++;
+            for (String line : summary.secretHolders()) System.out.println("Holder g" + index + " " + line);
+        }
+        int game = 0;
+        for (ObjectiveTracker.Summary summary : summaries) {
+            game++;
+            for (ObjectiveTracker.MechanizeHolder holder : summary.mechanize()) {
+                System.out.printf(
+                        "Mechanize holder g%d %s r%d: mechs %d on %d planets (%d at home), carriers %d (%d at home), built %d, arrived away %d, home infantry %d, kept home %d, movable home mechs %d, bare held planets %d%s%n",
+                        game,
+                        holder.faction(),
+                        holder.round(),
+                        holder.mechs(),
+                        holder.mechPlanets(),
+                        holder.mechsHome(),
+                        holder.carriers(),
+                        holder.carriersHome(),
+                        holder.built(),
+                        holder.arrivedAway(),
+                        holder.homeInfantry(),
+                        holder.keptHome(),
+                        holder.movableHomeMechs(),
+                        holder.bareHeldPlanets(),
+                        holder.scored() ? ", scored" : "");
+            }
+        }
     }
 
     private static String secretName(String id) {
@@ -382,6 +449,7 @@ class AiSelfPlayTest extends BaseTi4Test {
                 "position",
                 "defend",
                 "stage",
+                "garrison",
                 "attack on another home",
                 "attack landing on a home",
                 "attack on Mecatol",

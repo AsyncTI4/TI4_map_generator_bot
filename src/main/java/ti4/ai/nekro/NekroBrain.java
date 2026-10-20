@@ -75,6 +75,8 @@ import ti4.ai.tactical.SlingRelayRules;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
 import ti4.ai.tactical.TacticalRules;
+import ti4.ai.tactical.TransitDiodesRules;
+import ti4.ai.tech.EntropicScarRules;
 import ti4.ai.tech.TechRules;
 import ti4.ai.trade.TradeRules;
 import ti4.ai.xxcha.PeaceAccordsRules;
@@ -189,12 +191,14 @@ public class NekroBrain implements FactionBrain {
             NekroRules::commanderDraw,
             NekroRules::dacxiveAnimators,
             TechRules::reviveInfantry,
+            EntropicScarRules::next,
             TechRules::placeSpinnerInfantry,
             TechRules::placeSelfAssemblyMech,
             TechRules::placeMagenInfantry,
             TechRules::continueProductionBiomes,
             DatahubRules::next,
             SlingRelayRules::next,
+            TransitDiodesRules::next,
             TechRules::nullificationField,
             TechRules::neuralParasite,
             TechRules::salvageOperations,
@@ -230,6 +234,7 @@ public class NekroBrain implements FactionBrain {
             this::discardExcessActionCards,
             TradeRules::rescindStale,
             TradeRules::answerOffers,
+            TradeRules::askWhatTheyWant,
             ActionCardResponses::respond,
             SabotageRules::answerWindowsAimedAtSeat,
             SabotageRules::followUp,
@@ -537,6 +542,8 @@ public class NekroBrain implements FactionBrain {
         }
         if (TacticalRules.pickingSystem(context)) return TacticalRules.start(context);
         if (TacticalRules.actionTaken(context)) return Optional.empty();
+        Optional<AiDecision> diodes = TransitDiodesRules.start(context, thisTurn);
+        if (diodes.isPresent()) return diodes;
         Optional<AiDecision> warfareFirst = warfareBeforeFollowUp(context, thisTurn);
         if (warfareFirst.isPresent()) return warfareFirst;
         Optional<AiDecision> sling = SlingRelayRules.insteadOfTacticalAction(context, thisTurn);
@@ -587,6 +594,8 @@ public class NekroBrain implements FactionBrain {
         if (convoysBeforePassing.isPresent()) return convoysBeforePassing;
         Optional<AiDecision> beforePassing = TechRules.beforePassing(context, thisTurn);
         if (beforePassing.isPresent()) return beforePassing;
+        Optional<AiDecision> enduranceStall = TacticalRules.stall(context);
+        if (enduranceStall.isPresent()) return enduranceStall;
         Optional<AiDecision> redrawBeforePassing = SecretRedrawRules.endOfTurn(context, thisTurn);
         if (redrawBeforePassing.isPresent()) return redrawBeforePassing;
         Optional<AiDecision> legendaryBeforePassing = LegendaryRules.beforePassing(context, thisTurn);

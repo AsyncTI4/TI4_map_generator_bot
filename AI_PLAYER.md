@@ -168,6 +168,14 @@ to build one by hand:
     for fleet objectives), otherwise infantry and fighters (for spare capacity) only when an enemy fleet can reach
     the system or the money is spare beyond its best dock's production and a research; Mirror Computing counts each
     trade good as 2 in every payment plan;
+  - **Entropic Scars** (`EntropicScarRules`): while it has ships in a scar (an anomaly, Thunder's Edge) at the start of the
+    status phase it presses the faction technology it values most (`ResearchPolicy.value`, which includes the secret
+    objectives below) for a strategy token, prerequisites ignored, as long as the technology is worth more than the
+    token at the tech tempo, otherwise it presses "No Thanks". Each offer message is answered once, and only while
+    the ships are still there. While it holds _Adapt New Strategies_ and has no ships in a scar, a position move into a
+    reachable scar is worth 0.6 of a point divided by the faction technologies still missing. While it holds the secret
+    with ships in or beside a scar it keeps one strategy token for the purchase (`ScarToken`), and while a reachable
+    research route still needs work it takes a third strategy token at the status phase so it can follow Technology;
   - technologies it does not use: Transit Diodes, Chaos Mapping, Instinct Training, Quantum Datahub Node, Wormhole
     Generator and the remaining faction technologies with an action or a choice it has no rule for. They are worth
     the least when it researches or copies a technology;
@@ -227,18 +235,45 @@ to build one by hand:
       _Form a Spy Network_, 2 relic fragments for _Destroy Heretical Works_. A cost (like a spend public objective's
       planets) stays owed until it is paid, even when the bot queues the score behind slower players.
       _Adapt New Strategies_ counts only the seat's own faction technologies, so Nekro's copies never score it.
+      Research walks the route to _Adapt New Strategies_ and _Master the Laws of Physics_ (`TechPath`): the researches
+      still needed are the seat's cheapest two faction technologies (each one research, plus one per prerequisite it
+      lacks after its technology specialty planets and breakthrough synergy, where a synergy colour counts as either
+      of its two) or the colour closest to four (synergy colours pooled, as the bot's own progress check does). If
+      that fits in the researches left (one per round the leader still needs) a technology that shortens the route
+      carries 1.1 times its even share of the point and the one that finishes it the whole point; otherwise the
+      route is worth nothing, and the secret's keep value falls to what it has already completed. Nekro (no
+      research, Valefar Assimilators never count) never has a route.
     - **Action phase:** at most one per combat (a space combat and each ground combat are separate). Before anything
       else on every tick it records each combat it is in (opponent, whether that opponent leads on points, its
       flagship, the system), and it also picks up a combat it only saw after the fact from the bot's combat round
       trackers. It judges each combat when it ends, and counts a win only if both sides rolled a round: _Spark a
       Rebellion_, _Brave the Void_, _Darken the Skies_, _Unveil Flagship_, _Betray a Friend_, _Demonstrate Your
       Power_, _Destroy Their Greatest Ship_ (the enemy's flagship or war sun gone from the board, not just
-      retreated), _Fight with Precision_ (anti-fighter barrage clears the fighters before the first round), _Turn
+      retreated), _Fight with Precision_ (anti-fighter barrage clears the fighters before the first round, counted even when the
+      fighters were all the opponent had, which ends the combat before another look; the seat waits for the barrage
+      hits to be assigned before rolling the first round), _Turn
       Their Fleets to Dust_ (its space cannon, and no other player's, destroys an invader's last ships), _Become a
       Martyr_ and _Prove Endurance_. Earned secrets wait in a queue, so two combats in one turn can score two.
       _Make an Example of Their World_ scores when its bombardment destroys the last ground forces on a planet
       before it lands; it builds ships with bombardment for it and keeps the secret while it has some.
       When a combat meets two, the rarer one (by how often real players finished it) is scored.
+    - **Prove Endurance** (`ti4.ai.endurance`). It is scored by passing last, so a seat holding it counts the actions each
+      player still has (`StallCount`) and stalls only while it can outlast them. A count is the tactic tokens (its own
+      less the ones a scoring reserve keeps), unplayed strategy cards, ready technologies with an ACTION (its own: Sling
+      Relay with a space dock and Production Biomes), 1 more when Bio-Stims is ready and could refill one, relics with
+      an ACTION and unlocked leaders with an ACTION (another player's are read from their public cards; its own are the
+      _Enigmatic Device_ and relic fragments it can purge), and the component action cards in the hand: its own count
+      0.8 each, another player's hand counts its size times the share of component action cards in the deck times 0.8.
+      The race compares its count with the best of the players who have not passed. The chance to win is
+      `1 / (1 + e^(-lead / 1.5))`, and above 0.3 the race is contested: every stall (`Stall.value`: the 1.5 for a stall plus
+      the chance times a point (`ScoringStakes.scoreValue`) over the rival's count plus one) is worth more, so cards,
+      relics, _Enigmatic Device_ and Sling Relay are used before passing, Bio-Stims readies an exhausted Sling Relay
+      rather than a planet, and with no other action left it spends a tactic token on a tactical action that moves
+      nothing (`StallPlans`: its home system first, then a system it holds, never one with enemy units or its own
+      token). Below 0.3 it passes as before. While the race cannot be won the component action cards get no stall
+      value at all (`Stall.cardActionValue`), so they are saved for a round where it can, unless the card is worth
+      playing for what it does. Holding it adds 0.75 to researching Sling Relay and Bio-Stims and 0.5 per token to
+      picking Leadership (`CardUse.LEADERSHIP_ENDURANCE`).
     - **Patience.** Saving an action secret means not going out of its way to meet the condition early; a combat
       that has already met it is always scored. The tactical planner counts a qualifying secret as a full point when it
       should pursue it now and as a quarter of a point when it can be patient. Human tables usually finish by round 5
@@ -250,13 +285,47 @@ to build one by hand:
       are pursued at once. `-Dai.secrets.hold=false` turns patience off.
     - **Agenda phase:** no limit: _Dictate Policy_ (3 laws in play) and _Drive the Debate_ (it or its planet is
       elected by the agenda just resolved, never one from an earlier round), for which it also votes for itself.
+    - **Seize an Icon** (`IconStake`). While it holds the secret and controls no legendary planet it chases one.
+      The planner already credits a landing or an attack that takes a legendary planet with the secret's full point;
+      on top of that it claims the legendary planet of a system first when the landing forces cannot cover every
+      planet, takes a rival's legendary planet through the structures on it (outside a home system structures
+      otherwise forbid the landing), stages for one a rival holds, and `marchPlans` moves a transport with up to two
+      ground forces one system closer to the nearest free legendary planet it cannot reach this action (worth 0.6 of a
+      point times the share of the distance closed, less the counterstrike, the cost of leaving and the distance). A
+      free legendary planet is also a round goal for the advance plans, in any territory zone. For a legendary Mecatol
+      Rex (Thunder's Edge) the secret's point joins the custodians race prize, and the custodians are paid out of the
+      scoring reserve, since the point of the custodians plus the icon outweighs a spend objective. A held legendary
+      planet needs no extra rule to be kept until the status phase: losing it loses the secret, which already makes its
+      system guarded. The standard self-play map (tiles 18-48) has no legendary planet, so only a map with one (Primor,
+      Hope's End, Mallice, a Thunder's Edge Mecatol Rex) exercises this.
     - **Keeping secrets.** When it holds too many it discards the one with the lowest keep value: the chance the
       secret gets scored times what a point from its phase is worth (action 1.2). The chance blends how often real
       players finished the secret (`SecretStatistics`) with the board: progress for a status secret, and for an action
       secret the chance per round of meeting its condition (`ActionSecretOdds`), higher with a ship placed for it and
       0.6 when it can make the condition happen next turn. A secret it can score right now is worth a flat 2.0, and a
       status secret is halved when other scorable ones already fill the rounds left. It uses Imperial to replace the
-      rest; it never pursues _Mechanize the Military_, _Occupy the Fringe_ or _Strengthen Bonds_ yet.
+      rest. It pursues _Mechanize the Military_ and _Occupy the Fringe_ like the other board secrets: the tactical
+      planner counts the planets holding one of its mechs and the most ground forces on a planet without its space dock,
+      lands a mech first on a planet that has none while it holds _Mechanize the Military_, and with _Occupy the Fringe_
+      in hand plans garrison moves that carry ground forces onto a planet it holds without a dock. With _Mechanize the
+      Military_ in hand, home keeps infantry back before mechs, expansions load mechs first and land one on each
+      planet, a pickup that would complete the secret is worth half a point, production adds a carrier at home when two or
+      more spare mechs sit there with none to take them, a forward dock goes to a planet that shares its system with
+      another held planet, building at a dock first lifts a spare mech onto a held planet in that system without one
+      (using a ship already there, or one from next door), and garrison moves carry spare mechs (never a planet's last one) to held planets that have none,
+      one each, and with _Occupy the Fringe_ in hand production buys the infantry its biggest dockless stack still lacks,
+      up to what its carriers in or next to the system can move (plus 4 with Transit Diodes ready). A carrier pickup at a
+      system holding that cargo is worth more while either secret is held. With Transit Diodes ready
+      (`TransitDiodesRules`) it moves up to 4 ground forces at the start of its turn: spare mechs to bare planets, or
+      infantry onto the dockless stack. Research values Transit Diodes for these secrets only when its prerequisites are
+      already met. With _Strengthen Bonds_ (another player's note in its play area) or
+      _Betray a Friend_ (beat a player whose note is in its play area; only a neighbour's note counts, one per owner) it
+      buys the notes that land in a play area (`NoteSecrets`): such a note is worth 0.9 of a point more for _Strengthen
+      Bonds_ and 0.4 for _Betray a Friend_, while the secret is unmet. Its first ask is the owner's fair price for the
+      note; each ask that did not land raises the next by 1 trade good in rounds 1 and 2, 2 in the middle rounds and 3
+      once the end is in sight, up to 9.
+      With an unscored _Destroy Heretical Works_ it never purges fragments for a relic unless 2 are left, and fragment
+      trades value its first two fragments 2 trade goods higher (`FragmentValue`, `FragmentDeals`).
     - **Drawing and trading secrets** (`SecretDraws`). Like human players it draws a secret whenever it can (Imperial,
       an exploration, _Impersonation_, _Strategize_), and with a full hand draws anyway and discards its weakest, unless
       every secret it still holds is worth keeping (a keep value of 0.75 or more: one it can score, one close to done or
@@ -468,7 +537,8 @@ to build one by hand:
   - **When it plays.** Only on its own turn, in the action phase, and a component action card is the turn's action:
     the turn ends once it is resolved. A component action also stalls: it takes the turn without committing
     anything while the other players keep acting, which is worth 1.5 trade goods (`Stall.ACTION_VALUE`, the same
-    figure relics, _Enigmatic Device_ and the _Sling Relay_ use) as long as at least one other player has not passed.
+    figure relics, _Enigmatic Device_ and the _Sling Relay_ use, more while it holds _Prove Endurance_ and can outlast
+    the table) as long as at least one other player has not passed.
     That is added to what every component action card does now, even a card whose effect gives nothing (_Industrial
     Initiative_ with no industrial planet is a pure stall). A card that cannot legally be played (no legal target, _War
     Effort_ with no room for the cruiser) has no value. The
@@ -837,6 +907,12 @@ to build one by hand:
   - **Builder.** An offer is built with the bot's transaction buttons, one press per tick: `transaction`, the
     partner, what it asks for, what it gives (so an old Accept pressed during the build can only make the partner
     pay), then "Send the Offer". A counter-offer starts from "Reject and CounterOffer" on the offer it received.
+  - **Rejections** (`OfferRejections`). It reads the bot's "your offer ... has been rejected" notice in its private
+    thread, rescinds the rejected offer and makes no new unsolicited offer to that player for the rest of the round.
+    When the rejected offer asked a human for a promissory note (or a relic fragment) it asks in table talk what they would want for it;
+    their next offer is the answer, taken if it clears the usual margin and otherwise rejected (no counter-offer), and the
+    note deal with that player then waits until the next round. A rejection from an AI seat drops the note deal the
+    same way.
   - **Recovery.** An offer counts as accepted once its items with the partner are gone. It rescinds an offer that
     gets no answer in time (5 minutes for an AI; for a human, until the phase ends, at most 12 hours or 24 for a Trade
     bill or a debt collection), whose window has closed, that it can no longer cover, or that crossed the partner's
@@ -915,8 +991,9 @@ to build one by hand:
        Flagship_. Destroyers to stack five (or eight) ships for _Raise a Fleet_ (_Command an Armada_) unless a big
        enough stack already exists; the fleet pool grows to match what it can field, never past 4 under _Fleet
        Regulations_. Dreadnoughts up to five for _Gather a Mighty Fleet_. Two ships with bombardment (dreadnoughts
-       first) for _Make an Example of Their World_ and two with anti-fighter barrage (destroyers) for _Fight with
-       Precision_. A few destroyers to move around for presence objectives.
+       first) for _Make an Example of Their World_ and ships with anti-fighter barrage (destroyers) for _Fight with
+       Precision_: two anywhere on the board, but three at the dock itself when a destroyer trip from it reaches a system
+       holding enemy fighters. A few destroyers to move around for presence objectives.
     2. **Core.** Carriers up to two, the infantry the dock is short of a carrier load, and two mechs (four for
        _Mechanize the Military_).
     3. **Fracture fleet.** At the dock nearest an ingress (within two moves) while Styx is not the seat's, a carrier,
@@ -949,6 +1026,13 @@ to build one by hand:
     cruiser makes the presence move and a carrier only does when it completes something worth the slots. The same
     charge applies to a staging group's empty haulers, to an idle hauler following from a different system, and to a
     hauler that attacks on its own with no ground forces or fighters.
+  - **Fight with Precision** (`PrecisionRules`). The barrage dice of the ships in and arriving at a system give the chance
+    that they destroy all of an opponent's fighters there (destroyer 2 dice at 9, Destroyer II 3 at 6). An attack counts
+    that chance of a point (a quarter when patient) among the combat secrets, so it competes with the other secret the
+    combat meets and does not need the combat to be won. Positioning moves barrage ships (or a group) to a system
+    empty of enemy ships from which a barrage reaches fighters it could not clear from where they were, worth the
+    gain in that chance less the exposure of the new position. Research adds 0.3 of a point to Destroyer II while the
+    secret is held and the two red technologies are owned.
   - **Pickup**: carriers go where units wait. When the units in a system with the seat's space dock (the infantry and
     mechs on its planets that the garrison does not keep, those in its space area) and the fighters beyond the dock
     allowance outnumber the capacity of the ships already there, a hauler from a system with nothing for it to carry
@@ -1461,6 +1545,10 @@ Seven small generic changes don't reference `ti4.ai`:
   acting, so the AI plays its weakest cards as soon as it has nothing better to do. In smoke runs it played _Master
   Plan_ on 75% of draws, against 38% for human players. The stall value (1.5) and the "spend the card that gains most
   over keeping it" rule are not yet checked against human play rates in a large self-play batch.
+- **Prove Endurance.** The stall count is an estimate from public cards and a guess for hidden hands. Its own count leaves
+  out heroes, agents and promissory notes with an ACTION, and it does not trade for other players' notes to stall with.
+  Nothing here has been measured in a large self-play batch yet; the 1.5 stall, the 0.3 contest line and the logistic
+  spread of 1.5 are first guesses.
 - **Action cards, Overrule.** It only performs Imperial and Technology. The bot cannot yet run the other primaries
   from an overruled card, though human players also overrule Warfare (10% of plays), Construction (9%) and
   Leadership (6%). Overruling the seat's own readied Imperial and then playing it assumes the table accepts that.

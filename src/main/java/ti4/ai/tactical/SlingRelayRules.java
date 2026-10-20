@@ -10,6 +10,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
+import ti4.ai.endurance.Endurance;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.scoring.PaymentRules;
 import ti4.ai.scoring.ScoringReserve;
@@ -54,10 +55,11 @@ public class SlingRelayRules {
         Game game = context.game();
         Player seat = context.seat();
         double perResource = ProductionPlanner.fillerValuePerResource(game);
+        double stall = Stall.value(game, seat);
         Optional<Choice> choice =
-                options(game, seat).max(Comparator.comparingDouble(option -> actionValue(option, perResource)));
+                options(game, seat).max(Comparator.comparingDouble(option -> actionValue(option, perResource, stall)));
         if (choice.isEmpty()) return Optional.empty();
-        double sling = actionValue(choice.get(), perResource);
+        double sling = actionValue(choice.get(), perResource, stall);
         Optional<TacticalPlan> plan = TacticalRules.rememberedPlan(context).or(() -> {
             Optional<TacticalPlan> computed = TacticalPlanner.best(game, seat);
             computed.ifPresent(found -> TacticalRules.remember(context, found));
@@ -72,9 +74,9 @@ public class SlingRelayRules {
         return context.seat().hasTechReady(SLING_RELAY) && !context.memory().has(SLING_KEY + context.turnKey());
     }
 
-    private static double actionValue(Choice choice, double perResource) {
+    private static double actionValue(Choice choice, double perResource, double stall) {
         BuildOrder ship = choice.ship();
-        double value = ship.value() - perResource * ship.cost() + Stall.ACTION_VALUE;
+        double value = ship.value() - perResource * ship.cost() + stall;
         return ship.scoring() ? value + UNLOCKED_SHIP_VALUE : value;
     }
 
@@ -135,9 +137,10 @@ public class SlingRelayRules {
 
     static Optional<Choice> best(Game game, Player seat) {
         int freeResources = freeResources(game, seat);
+        double stall = STALL_VALUE + Endurance.stallBonus(game, seat);
         return options(game, seat)
-                .filter(choice -> netValue(choice, freeResources) > 0)
-                .max(Comparator.comparingDouble(choice -> netValue(choice, freeResources)));
+                .filter(choice -> netValue(choice, freeResources, stall) > 0)
+                .max(Comparator.comparingDouble(choice -> netValue(choice, freeResources, stall)));
     }
 
     private static Stream<Choice> options(Game game, Player seat) {
@@ -154,8 +157,8 @@ public class SlingRelayRules {
         return Math.min(ProductionPlanner.spendableResources(game, seat), planetResources);
     }
 
-    private static double netValue(Choice choice, int freeResources) {
+    private static double netValue(Choice choice, int freeResources, double stall) {
         double tradeGoods = Math.max(0, Math.ceil(choice.ship().cost()) - freeResources);
-        return choice.ship().value() + STALL_VALUE - TRADE_GOOD_VALUE * tradeGoods;
+        return choice.ship().value() + stall - TRADE_GOOD_VALUE * tradeGoods;
     }
 }

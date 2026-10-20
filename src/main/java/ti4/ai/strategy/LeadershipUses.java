@@ -3,6 +3,7 @@ package ti4.ai.strategy;
 import java.util.List;
 import java.util.OptionalInt;
 import lombok.experimental.UtilityClass;
+import ti4.ai.endurance.Endurance;
 import ti4.ai.eval.CustodiansRace.Order;
 import ti4.ai.eval.CustodiansRace.Snapshot;
 import ti4.ai.expedition.ExpeditionUnlock;
@@ -19,7 +20,11 @@ class LeadershipUses {
                 new Benefit(CardUse.LEADERSHIP_TEMPO, firstInTheRace(in)),
                 new Benefit(
                         CardUse.LEADERSHIP_EXPEDITION,
-                        CardValueScale.EXPEDITION_FIRST_SHARE * ExpeditionUnlock.claimingFirst(in.game(), in.seat())));
+                        CardValueScale.EXPEDITION_FIRST_SHARE * ExpeditionUnlock.claimingFirst(in.game(), in.seat())),
+                new Benefit(
+                        CardUse.LEADERSHIP_ENDURANCE,
+                        Endurance.leadershipValue(
+                                in.seat(), Math.min(StrategyCardRules.LEADERSHIP_TOKENS, in.reinforcements()))));
     }
 
     private static double firstInTheRace(PlanInputs in) {

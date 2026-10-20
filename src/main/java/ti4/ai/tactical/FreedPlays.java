@@ -84,7 +84,7 @@ public class FreedPlays {
 
         private int completedObjectives(TacticalPlan plan) {
             List<Footprint.Move> moves = plan.moves().stream()
-                    .map(move -> new Footprint.Move(move.origin(), move.type(), move.count()))
+                    .map(move -> new Footprint.Move(move.origin(), move.holder(), move.type(), move.count()))
                     .toList();
             return objectives.completedPoints(objectives
                     .before()

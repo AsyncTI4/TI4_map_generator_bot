@@ -12,6 +12,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.eval.BoardView;
 import ti4.ai.promissory.PlayAreaNotes;
+import ti4.ai.tactical.PrecisionRules;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -359,17 +360,20 @@ public class ActionSecretRules {
     }
 
     private static void observe(AiTurnContext context, Watch watch, Tile tile, UnitHolder holder, Player opponent) {
-        if (!watch.space() || watch.fightersCleared() || watch.enemyFighters() == 0) return;
-        if (BoardView.count(holder, opponent, UnitType.Fighter) > 0) return;
-        Game game = context.game();
-        String seatRounds =
-                game.getStoredValue("combatRoundTracker" + context.faction() + tile.getPosition() + holder.getName());
-        String opponentRounds = game.getStoredValue(
-                "combatRoundTracker" + opponent.getFaction() + tile.getPosition() + holder.getName());
-        if (seatRounds.isBlank() && opponentRounds.isBlank()) {
+        if (watch.fightersCleared()) return;
+        if (clearedBeforeARound(context, watch, tile, holder, opponent)) {
             context.memory()
                     .put(WATCH_KEY + watch.key(), watch.withFightersCleared().encode());
         }
+    }
+
+    private static boolean clearedBeforeARound(
+            AiTurnContext context, Watch watch, Tile tile, UnitHolder holder, Player opponent) {
+        if (!watch.space() || watch.enemyFighters() == 0) return false;
+        if (BoardView.count(holder, opponent, UnitType.Fighter) > 0) return false;
+        if (!PrecisionRules.hasBarrage(context.seat(), BoardView.ships(holder, context.seat()))) return false;
+        return rounds(context.game(), context.seat(), tile.getPosition(), holder.getName()) == 0
+                && rounds(context.game(), opponent, tile.getPosition(), holder.getName()) == 0;
     }
 
     private static void resolve(
@@ -379,9 +383,11 @@ public class ActionSecretRules {
         boolean fought = rounds(game, seat, watch.position(), watch.holder()) > 0
                 && rounds(game, opponent, watch.position(), watch.holder()) > 0;
         boolean won = fought && present(seat, tile, holder) && !present(opponent, tile, holder);
+        Watch judged =
+                clearedBeforeARound(context, watch, tile, holder, opponent) ? watch.withFightersCleared() : watch;
         List<String> met = new ArrayList<>();
         for (String secret : COMBAT_SECRETS) {
-            if (held.contains(secret) && conditionMet(game, secret, watch, fought, won, seat, holder, opponent)) {
+            if (held.contains(secret) && conditionMet(game, secret, judged, fought, won, seat, holder, opponent)) {
                 met.add(secret);
             }
         }

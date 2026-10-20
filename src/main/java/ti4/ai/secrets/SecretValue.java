@@ -8,6 +8,7 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.strategy.TechPath;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -25,9 +26,7 @@ public class SecretValue {
             "csl", 0.3,
             "dfat", 0.3,
             "fc", 0.6,
-            "pem", 0.6,
-            "otf", 0.15,
-            "mtm", 0.15);
+            "pem", 0.6);
     private static final String ADAPT_NEW_STRATEGIES = "ans";
     private static final String SEIZE_AN_ICON = "sai";
     private static final String DEFY_SPACE_AND_TIME = "dfat";
@@ -177,6 +176,7 @@ public class SecretValue {
         int threshold = ListPlayerInfoService.getObjectiveThreshold(secretId, game);
         if (threshold <= 0) return achievableCompletion(secretId);
         double share = Math.min(1.0, (double) progress(game, seat, secretId) / threshold);
+        if (TechPath.follows(secretId) && !TechPath.reachable(game, seat, secretId)) return share >= 1.0 ? 1.0 : 0.0;
         double runway = Math.min(1.0, GameHorizon.roundsLeft(game) / STATUS_RUNWAY_ROUNDS);
         return share + (1 - share) * achievableCompletion(secretId) * runway;
     }

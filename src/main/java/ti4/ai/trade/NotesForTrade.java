@@ -56,6 +56,10 @@ class NotesForTrade {
     }
 
     static double receiveValue(Game game, Player seat, String alias) {
+        return baseReceiveValue(game, seat, alias) + NoteSecrets.value(game, seat, alias);
+    }
+
+    private static double baseReceiveValue(Game game, Player seat, String alias) {
         Player owner = game.getPNOwner(alias);
         boolean own = Standings.same(owner, seat);
         if (alias.endsWith(NoteGiving.THRONE)) {

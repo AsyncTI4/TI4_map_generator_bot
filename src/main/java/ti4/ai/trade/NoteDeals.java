@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.ToIntFunction;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.AiDecision;
@@ -36,12 +37,16 @@ class NoteDeals {
         List<Player> eligible = partners.stream()
                 .filter(partner -> OwnTurnDeals.mayApproach(context, partner))
                 .filter(partner -> !context.memory().has(partnerKey(game, partner)))
+                .filter(partner -> !OfferRejections.dropped(context, partner))
                 .toList();
         for (Option option : best(context, eligible)) {
             Optional<AiDecision> start =
                     OfferBuilder.start(context, option.partner(), option.deal(), Purpose.NOTE_DEAL);
             if (start.isEmpty()) continue;
             TradeMemory.increment(context.memory(), roundKey);
+            if (asksForAChasedNote(game, context.seat(), option)) NoteSecrets.asked(context.memory(), option.partner());
+            askedNote(game, context.seat(), option)
+                    .ifPresent(alias -> OfferRejections.noteAsked(context.memory(), option.partner(), alias));
             context.memory().put(partnerKey(game, option.partner()), String.valueOf(context.now()));
             return start;
         }
@@ -54,7 +59,11 @@ class NoteDeals {
         List<Option> options = new ArrayList<>();
         for (Player partner : partners) {
             double trust = Trust.of(context, partner);
-            for (Deal deal : candidates(game, seat, partner, TradeBudget.spareTradeGoods(game, seat, partner))) {
+            int spare = TradeBudget.spareTradeGoods(game, seat, partner);
+            ToIntFunction<String> floor = alias -> NoteSecrets.chases(game, seat, alias)
+                    ? NoteSecrets.askFloor(context.memory(), game, seat, partner, alias)
+                    : 1;
+            for (Deal deal : candidates(game, seat, partner, spare, floor)) {
                 if (!TradeValue.coverable(game, seat, partner, deal)) continue;
                 if (!TradeValue.proposable(game, seat, partner, deal, trust)) continue;
                 options.add(new Option(
@@ -68,6 +77,11 @@ class NoteDeals {
     }
 
     static List<Deal> candidates(Game game, Player seat, Player partner, int spareTradeGoods) {
+        return candidates(game, seat, partner, spareTradeGoods, alias -> 1);
+    }
+
+    static List<Deal> candidates(
+            Game game, Player seat, Player partner, int spareTradeGoods, ToIntFunction<String> floor) {
         String ours = seat.getFaction();
         String theirs = partner.getFaction();
         List<DealItem> given = ownNotes(seat, partner).stream()
@@ -77,7 +91,8 @@ class NoteDeals {
                         ItemType.PROMISSORY,
                         String.valueOf(seat.getPromissoryNotes().get(alias))))
                 .toList();
-        List<DealItem> asked = partnerNotes(game, seat, partner).stream()
+        List<String> askedAliases = partnerNotes(game, seat, partner);
+        List<DealItem> asked = askedAliases.stream()
                 .map(alias -> new DealItem(theirs, ours, ItemType.PROMISSORY, NotesForTrade.detailOf(alias)))
                 .toList();
         List<Deal> deals = new ArrayList<>();
@@ -86,9 +101,12 @@ class NoteDeals {
                 deals.add(Deal.EMPTY.with(note).adjust(theirs, ours, ItemType.TRADE_GOODS, price));
             }
         }
-        for (DealItem note : asked) {
-            for (int price = 1; price <= Math.min(MAX_PRICE, spareTradeGoods); price++) {
-                deals.add(Deal.EMPTY.with(note).adjust(ours, theirs, ItemType.TRADE_GOODS, price));
+        for (int index = 0; index < asked.size(); index++) {
+            String alias = askedAliases.get(index);
+            int lowest = floor.applyAsInt(alias);
+            int highest = Math.min(lowest > 1 ? NoteSecrets.MAX_PRICE : MAX_PRICE, spareTradeGoods);
+            for (int price = lowest; price <= highest; price++) {
+                deals.add(Deal.EMPTY.with(asked.get(index)).adjust(ours, theirs, ItemType.TRADE_GOODS, price));
             }
         }
         for (DealItem mine : given) {
@@ -100,6 +118,21 @@ class NoteDeals {
             }
         }
         return deals;
+    }
+
+    private static boolean asksForAChasedNote(Game game, Player seat, Option option) {
+        return askedNote(game, seat, option)
+                .filter(alias -> NoteSecrets.chases(game, seat, alias))
+                .isPresent();
+    }
+
+    private static Optional<String> askedNote(Game game, Player seat, Option option) {
+        return option.deal().items().stream()
+                .filter(item ->
+                        item.type() == ItemType.PROMISSORY && item.receiver().equals(seat.getFaction()))
+                .map(item -> NotesForTrade.aliasOf(game, item))
+                .flatMap(Optional::stream)
+                .findFirst();
     }
 
     private static List<String> ownNotes(Player seat, Player partner) {
