@@ -478,6 +478,9 @@ _Avoid_: Clog, blocker
 Describes a System containing a Player's Command token, whose units cannot move out of it. Players saying "that System is locked down" mean either that the units in it cannot be moved out, or that other units can be moved in.
 _Avoid_: Frozen, pinned
 
+**Tech skip**:
+A Planet with a Technology specialty, also called a tech spec or skip. Also applies to other sources of a specialty, such as the Yin Alliance.
+
 **Point blocked**:
 Stopped from scoring, as when a Player is kept from meeting an objective's requirement.
 _Avoid_: Score blocked
