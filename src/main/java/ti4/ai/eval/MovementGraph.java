@@ -5,6 +5,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
@@ -16,6 +17,22 @@ import ti4.helpers.FoWHelper;
 public class MovementGraph {
 
     private static final int NEBULA_MOVE = 1;
+    private static final String ANTIMASS_DEFLECTORS = "amd";
+    private static final ThreadLocal<Boolean> ASSUMING_ANTIMASS = new ThreadLocal<>();
+
+    public static <T> T withAntimassDeflectors(Supplier<T> evaluation) {
+        Boolean before = ASSUMING_ANTIMASS.get();
+        ASSUMING_ANTIMASS.set(Boolean.TRUE);
+        try {
+            return evaluation.get();
+        } finally {
+            if (before == null) {
+                ASSUMING_ANTIMASS.remove();
+            } else {
+                ASSUMING_ANTIMASS.set(before);
+            }
+        }
+    }
 
     public static Map<String, Integer> reach(Game game, Player player, String origin, int moveValue) {
         return reach(game, player, origin, moveValue, Set.of());
@@ -64,6 +81,8 @@ public class MovementGraph {
     }
 
     private static boolean hasAntimassDeflectors(Player player) {
-        return player.hasTech("amd") || player.hasTech("absol_amd");
+        return Boolean.TRUE.equals(ASSUMING_ANTIMASS.get())
+                || player.hasTech(ANTIMASS_DEFLECTORS)
+                || player.hasTech("absol_amd");
     }
 }

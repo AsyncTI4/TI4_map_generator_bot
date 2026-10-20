@@ -3,6 +3,7 @@ package ti4.ai.strategy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -132,8 +133,8 @@ public class ResearchPolicy {
             Map.entry("gls", 1.5),
             Map.entry("td", 1.0),
             Map.entry("x89", 1.0));
-    private static final Set<String> UNIT_UPGRADE_OBJECTIVES = Set.of("develop", "revolutionize");
-    private static final Set<String> COLOUR_PAIR_OBJECTIVES = Set.of("diversify", "master_science");
+    static final Set<String> UNIT_UPGRADE_OBJECTIVES = Set.of("develop", "revolutionize");
+    static final Set<String> COLOUR_PAIR_OBJECTIVES = Set.of("diversify", "master_science");
     private static final Set<String> STATUS_PHASE_INCOME = Set.of("hm", "nm");
     private static final double OPENING_STATUS_PHASES = 5;
     private static final String GRAVITY_DRIVE = "gd";
@@ -142,7 +143,7 @@ public class ResearchPolicy {
     private static final int FRACTURE_MARCH_ROUNDS = 3;
     private static final double GRAVITY_DRIVE_RACE_SHARE = 0.5;
     private static final String PRODUCE_EN_MASSE = "pem";
-    private static final int PAIR = 2;
+    static final int PAIR = 2;
     private static final double RESEARCHES_PER_ROUND = 1.5;
     private static final String SPACE_DOCK_UPGRADE = "sd2";
     private static final double STEPPING_STONE_SHARE = 0.3;
@@ -154,9 +155,18 @@ public class ResearchPolicy {
     private static final double BARRAGE_SECRET_SHARE = 0.3;
 
     public static Optional<String> best(Game game, Player seat, Collection<String> candidates) {
-        return candidates.stream()
+        List<String> valid = candidates.stream()
                 .filter(alias -> Mapper.getTech(alias) != null)
-                .max(Comparator.comparingDouble((String alias) -> researchValue(game, seat, alias))
+                .distinct()
+                .toList();
+        if (valid.isEmpty()) return Optional.empty();
+        Map<String, Double> bonuses = ResearchPlan.of(game, seat).bonuses(valid);
+        Map<String, Double> scores = new HashMap<>();
+        for (String alias : valid) {
+            scores.put(alias, researchValue(game, seat, alias) + bonuses.getOrDefault(alias, 0.0));
+        }
+        return valid.stream()
+                .max(Comparator.comparingDouble((String alias) -> scores.get(alias))
                         .thenComparing(Comparator.naturalOrder()));
     }
 
@@ -200,13 +210,13 @@ public class ResearchPolicy {
                 + Endurance.researchValue(seat, alias);
     }
 
-    private static double fractureMarchValue(Game game, Player seat, String alias) {
+    static double fractureMarchValue(Game game, Player seat, String alias) {
         if (!CARRIER_II.equals(alias) || GameHorizon.roundsLeft(game) < FRACTURE_MARCH_ROUNDS) return 0;
         if (FractureCampaign.dock(game, seat).isEmpty()) return 0;
         return FRACTURE_MARCH_VALUE * FractureCampaign.routeShare(game, seat);
     }
 
-    private static double barrageSecretValue(Game game, Player seat, TechnologyModel tech) {
+    static double barrageSecretValue(Game game, Player seat, TechnologyModel tech) {
         if (!DESTROYER_UPGRADES.contains(tech.getAlias())
                 || !PrecisionRules.held(seat)
                 || !ListTechService.isTechResearchable(tech, seat)) {
@@ -215,7 +225,7 @@ public class ResearchPolicy {
         return BARRAGE_SECRET_SHARE * ScoringStakes.scoreValue(game, seat, 1);
     }
 
-    private static double groundSecretValue(Game game, Player seat, TechnologyModel tech) {
+    static double groundSecretValue(Game game, Player seat, TechnologyModel tech) {
         boolean diodes = TRANSIT_DIODES.contains(tech.getAlias());
         if (!diodes && !CARRIER_II.equals(tech.getAlias()) || !ListTechService.isTechResearchable(tech, seat)) return 0;
         GroundCampaign campaign = GroundCampaign.of(game, seat);
@@ -243,12 +253,12 @@ public class ResearchPolicy {
         return Math.max(best, drive);
     }
 
-    private static double openingReachValue(Game game, Player seat, String alias) {
+    static double openingReachValue(Game game, Player seat, String alias) {
         if (!GRAVITY_DRIVE.equals(alias)) return 0;
         return OpeningOutlook.gain(game, seat, OpeningOutlook.Boost.GRAVITY_DRIVE);
     }
 
-    private static double custodiansRaceValue(Game game, Player seat, String alias) {
+    static double custodiansRaceValue(Game game, Player seat, String alias) {
         if (!GRAVITY_DRIVE.equals(alias) || !CustodiansRace.open(game)) return 0;
         CustodiansRace.Snapshot race = CustodiansRace.of(game, seat);
         double withDrive =
@@ -384,7 +394,7 @@ public class ResearchPolicy {
         return 0;
     }
 
-    private static List<String> objectivesInPlay(Game game, Player seat) {
+    static List<String> objectivesInPlay(Game game, Player seat) {
         List<String> objectives = new ArrayList<>();
         for (String id : game.getRevealedPublicObjectives().keySet()) {
             if (!ObjectivePolicy.hasScored(game, seat, id)) objectives.add(id);

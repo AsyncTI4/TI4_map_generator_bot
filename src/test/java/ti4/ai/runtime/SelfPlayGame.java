@@ -205,6 +205,8 @@ final class SelfPlayGame {
     private final FractureTracker fracture;
     private String probedTurn = "";
     private int fleetLogRound;
+    private final ResearchPlanLog researchPlans =
+            ResearchPlanLog.enabled() ? new ResearchPlanLog(System.out::println) : null;
 
     SelfPlayGame(SelfPlayEnvironment env, String name) {
         this(env, name, 0);
@@ -356,6 +358,15 @@ final class SelfPlayGame {
         }
     }
 
+    private void logResearchPlans(Game game) {
+        if (researchPlans == null) return;
+        try {
+            researchPlans.observe(game);
+        } catch (RuntimeException e) {
+            System.out.println("RESEARCHPLAN error " + e);
+        }
+    }
+
     // -Dai.selfplay.styxprobe=true: one diagnostic line for the active seat at the start of each of its action-phase
     // turns.
     private void probeStyx(Game game) {
@@ -396,6 +407,7 @@ final class SelfPlayGame {
             fracture.observe(game);
             probeStyx(game);
             logFleets(game);
+            logResearchPlans(game);
             closeOverrulePicks(game, false);
             if (stopWhen.test(game)) return outcome(Ending.STOP_CONDITION, game, ticks);
             if (AiTickRunner.reachedVictoryPoints(game)) return outcome(Ending.VICTORY_POINTS, game, ticks);

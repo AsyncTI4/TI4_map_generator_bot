@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -25,8 +26,18 @@ public class TechPath {
     public static final String LAWS_OF_PHYSICS = "mlp";
     static final double RESEARCHES_PER_ROUND = 1.0;
     static final double STEP_SHARE = 2.0;
-    private static final Set<String> VALEFAR_ASSIMILATORS = Set.of("vax", "vay");
+    static final Set<String> VALEFAR_ASSIMILATORS = Set.of("vax", "vay");
     private static final int ADAPT_THRESHOLD = 2;
+
+    public record Route(int researches, List<TechnologyModel> techs, List<String> notes) {}
+
+    public static Optional<Route> route(Game game, Player seat, String objective) {
+        return TechRoutes.route(game, seat, objective);
+    }
+
+    public static Optional<Route> routeTo(Game game, Player seat, TechnologyModel tech) {
+        return TechRoutes.routeTo(game, seat, tech);
+    }
 
     public static boolean follows(String objective) {
         return ADAPT_NEW_STRATEGIES.equals(objective) || LAWS_OF_PHYSICS.equals(objective);
@@ -114,7 +125,7 @@ public class TechPath {
         return best;
     }
 
-    private static int researches(
+    static int researches(
             Player seat,
             List<TechnologyModel> order,
             Map<TechnologyType, Integer> owned,
@@ -136,7 +147,7 @@ public class TechPath {
         return researches;
     }
 
-    private static Map<TechnologyType, Integer> skips(Game game, Player seat) {
+    static Map<TechnologyType, Integer> skips(Game game, Player seat) {
         Map<TechnologyType, Integer> skips = new EnumMap<>(TechnologyType.class);
         for (String name : seat.getPlanets()) {
             Planet planet = game.getPlanetsInfo().get(name);
