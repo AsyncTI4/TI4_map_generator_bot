@@ -15,6 +15,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+import ti4.service.game.TeamMateAccessService;
 
 class AddTeamMate extends GameStateSubcommand {
 
@@ -44,13 +45,18 @@ class AddTeamMate extends GameStateSubcommand {
 
         List<String> added = new ArrayList<>();
         List<String> alreadyOnTeam = new ArrayList<>();
+        List<String> notOnServer = new ArrayList<>();
         for (User user : users) {
             if (player.getTeamMateIDs().contains(user.getId())) {
                 alreadyOnTeam.add(user.getAsMention());
-                continue;
+            } else {
+                player.addTeamMateID(user.getId());
+                added.add(user.getAsMention());
             }
-            player.addTeamMateID(user.getId());
-            added.add(user.getAsMention());
+            if (!TeamMateAccessService.isOnGameServer(game, user.getId())) {
+                notOnServer.add(user.getAsMention());
+            }
+            TeamMateAccessService.grantAccess(game, player, user.getId());
         }
         if (!added.isEmpty()) {
             game.setCommunityMode(true);
@@ -63,7 +69,12 @@ class AddTeamMate extends GameStateSubcommand {
                                 ? null
                                 : String.join(", ", alreadyOnTeam)
                                         + (alreadyOnTeam.size() == 1 ? " is" : " are")
-                                        + " already a part of " + team)
+                                        + " already a part of " + team,
+                        notOnServer.isEmpty()
+                                ? null
+                                : String.join(", ", notOnServer)
+                                        + (notOnServer.size() == 1 ? " is" : " are")
+                                        + " not on this server, so they cannot be given access to the game channels.")
                 .filter(Objects::nonNull)
                 .reduce((first, second) -> first + "\n" + second)
                 .orElse("");

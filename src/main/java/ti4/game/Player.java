@@ -696,6 +696,11 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     @Nullable
+    public ThreadChannel getExistingCardsInfoThread() {
+        return getCardsInfoThread(false);
+    }
+
+    @Nullable
     private ThreadChannel getCardsInfoThread(boolean createIfMissing) {
         if (isNpc() || isDummy()) return null;
 
