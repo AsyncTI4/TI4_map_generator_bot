@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.FrameShiftBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PirateHordeBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.CombatInitiativeLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PoliticalMarriageLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RetrofittingLLButtonHandler;
@@ -66,6 +68,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
@@ -83,6 +86,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.helpers.thundersedge.TeHelperPromissories;
@@ -340,11 +344,14 @@ public final class ButtonHelperTacticalAction {
         ThronesUnitHandler.clearPendingGholaWindows(game);
         RevenantLeadersHandler.clearRedLeaderTacticalState(game);
         ThronesTechHandler.clearRiftTouchedBastion(game);
+        FrameShiftBrActionCardHandler.clear(game);
+        PirateHordeBrActionCardHandler.completeTacticalAction(event, game, player);
         game.removeStoredValue("vanguardReinforce" + player.getFaction());
         TheodisiLegendaryButtonHandler.clearRemoteFactory(game, player);
         game.removeStoredValue("safeHarborUsed");
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
         SarcosaHeroHandler.completeNeutralTacticalAction(game, player);
+        BlueReverieArtifactRelicHandler.clearUnknownArtifactMoveRestriction(game);
     }
 
     @ButtonHandler("doneWithTacticalAction")
@@ -700,6 +707,7 @@ public final class ButtonHelperTacticalAction {
         KryxosBreakthroughHandler.clearPrototypeInnovators(game);
         MyrrLeadersHandler.clearMyrrAgent(game);
         ThronesUnitHandler.clearPendingGholaWindows(game);
+        FrameShiftBrActionCardHandler.clear(game);
         MyrrTechHandler.clearSegmentedStructuring(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
         DreamLeadersHandler.clearDreamAgentAnomaly(game);
@@ -747,6 +755,10 @@ public final class ButtonHelperTacticalAction {
             if (!game.isFowMode()) {
                 message +=
                         " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
+            }
+            if (player.hasTech("fsd")) {
+                message +=
+                        "\n-# Reminder: You have _Fractal Spike Drives_; units you transport may move out of systems containing your command tokens, and you may treat wormholes as either ingress tokens or gravity rifts.";
             }
             List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, ringButtons);
@@ -854,6 +866,8 @@ public final class ButtonHelperTacticalAction {
         }
         game.setActiveSystem(pos);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        BlueReverieTechHelper.offerNetworkedConstructors(game, tile);
+        BlueReverieArtifactRelicHandler.offerUnknownArtifact(game, player);
         TheodisiLegendaryButtonHandler.offerActivationAbility(game, player);
         BlueReverieHelper.offerShameixBanePrompts(game, player, tile);
         BlueReverieRelicHandler.offerAendsTorch(game, player, tile);
@@ -1420,6 +1434,10 @@ public final class ButtonHelperTacticalAction {
                     }
                 }
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                if (PirateHordeBrActionCardHandler.isActive(game, player)
+                        && (unitModel == null || !unitModel.getIsShip())) {
+                    continue;
+                }
                 boolean isFlightStructure =
                         player.hasAbility("radiant_grafting_flight") && unitModel != null && unitModel.getIsStructure();
                 if (unitHolder instanceof Planet
@@ -1454,8 +1472,10 @@ public final class ButtonHelperTacticalAction {
                         "Use Tnelis Commander",
                         FactionEmojis.tnelis));
 
-            buttons.add(Buttons.gray(
-                    factionChecker + "unitTacticalMove_" + tile.getPosition() + "_moveAll", "Move All Units"));
+            if (!PirateHordeBrActionCardHandler.isActive(game, player)) {
+                buttons.add(Buttons.gray(
+                        factionChecker + "unitTacticalMove_" + tile.getPosition() + "_moveAll", "Move All Units"));
+            }
             buttons.add(Buttons.blue(
                     factionChecker + "doneWithOneSystem_" + tile.getPosition(), "Done Moving Units From This System"));
         }
