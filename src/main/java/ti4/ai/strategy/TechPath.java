@@ -24,8 +24,9 @@ public class TechPath {
     public static final String ADAPT_NEW_STRATEGIES = "ans";
     public static final String LAWS_OF_PHYSICS = "mlp";
     static final double RESEARCHES_PER_ROUND = 1.0;
-    static final double STEP_SHARE = 1.1;
+    static final double STEP_SHARE = 2.0;
     private static final Set<String> VALEFAR_ASSIMILATORS = Set.of("vax", "vay");
+    private static final int ADAPT_THRESHOLD = 2;
 
     public static boolean follows(String objective) {
         return ADAPT_NEW_STRATEGIES.equals(objective) || LAWS_OF_PHYSICS.equals(objective);
@@ -59,6 +60,14 @@ public class TechPath {
         }
         if (ADAPT_NEW_STRATEGIES.equals(objective)) return factionTechnologies(game, seat, threshold, adding);
         return OptionalInt.empty();
+    }
+
+    public static OptionalInt factionTechsNeeded(Player seat) {
+        int needed = ADAPT_THRESHOLD - SecretValue.ownFactionTechnologies(seat);
+        long available = seat.getNotResearchedFactionTechs().stream()
+                .filter(alias -> !VALEFAR_ASSIMILATORS.contains(alias) && Mapper.getTech(alias) != null)
+                .count();
+        return needed <= 0 || available >= needed ? OptionalInt.of(Math.max(0, needed)) : OptionalInt.empty();
     }
 
     private static OptionalInt factionTechnologies(

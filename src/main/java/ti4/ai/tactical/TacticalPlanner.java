@@ -44,6 +44,7 @@ import ti4.ai.scoring.Wallet;
 import ti4.ai.secrets.ActionSecretTiming;
 import ti4.ai.strategy.MecatolCash;
 import ti4.ai.strategy.OpeningHold;
+import ti4.ai.strategy.TechPath;
 import ti4.ai.tactical.DefenseOutlook.Blend;
 import ti4.ai.tactical.IncomingForces.Exclusion;
 import ti4.ai.tactical.TacticalPlan.Kind;
@@ -110,6 +111,8 @@ public class TacticalPlanner {
     private static final int FRINGE_GROUND_FORCES = 9;
     private static final double SECRET_CARGO_SHARE = 0.3;
     private static final double COMPLETING_CARGO_SHARE = 0.5;
+    private static final String ADAPT_NEW_STRATEGIES = "ans";
+    private static final double SCAR_SHARE = 0.6;
     private static final String MAKE_AN_EXAMPLE = "mew";
     private static final int DEMONSTRATION_SHIPS = 3;
     private static final double PATIENT_SHARE = 0.25;
@@ -2311,7 +2314,10 @@ public class TacticalPlanner {
         Player seat = context.seat;
         double frontier = frontierExplore(seat, tile);
         boolean barrage = PrecisionRules.held(seat);
-        if (!context.objectives().caresAboutPresence() && frontier == 0 && !barrage) return Optional.empty();
+        double scar = scarGain(context, tile);
+        if (!context.objectives().caresAboutPresence() && frontier == 0 && !barrage && scar == 0) {
+            return Optional.empty();
+        }
         if (BoardView.hasEnemyShips(game, seat, tile) || context.coveredByEnemySpaceCannon(tile)) {
             return Optional.empty();
         }
@@ -2327,7 +2333,7 @@ public class TacticalPlanner {
                 Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, moves);
                 if (legal.isEmpty()) continue;
                 double barrageGain = barrageGain(context, origin, tile, legal.get());
-                double gain = context.objectiveGain(tile, legal.get(), List.of()) + frontier + barrageGain;
+                double gain = context.objectiveGain(tile, legal.get(), List.of()) + frontier + barrageGain + scar;
                 if (gain <= 0) continue;
                 double score = gain
                         - barrageExposure(context, tile, legal.get(), barrageGain)
@@ -2345,6 +2351,18 @@ public class TacticalPlanner {
             if (group.isPresent() && (best == null || group.get().score() > best.score())) best = group.get();
         }
         return Optional.ofNullable(best);
+    }
+
+    private static double scarGain(Context context, Tile tile) {
+        Game game = context.game;
+        Player seat = context.seat;
+        if (!tile.isScar(game) || !seat.getSecretsUnscored().containsKey(ADAPT_NEW_STRATEGIES)) return 0;
+        boolean alreadyInAScar = game.getTileMap().values().stream()
+                .anyMatch(other -> other.isScar(game) && BoardView.hasOwnShips(seat, other));
+        if (alreadyInAScar) return 0;
+        OptionalInt needed = TechPath.factionTechsNeeded(seat);
+        if (needed.isEmpty() || needed.getAsInt() <= 0) return 0;
+        return ObjectiveValue.VICTORY_POINT_VALUE * SCAR_SHARE / needed.getAsInt();
     }
 
     private static double barrageGain(Context context, Tile origin, Tile tile, List<UnitMove> moves) {
@@ -2394,7 +2412,10 @@ public class TacticalPlanner {
         Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, departing);
         if (legal.isEmpty()) return Optional.empty();
         double barrageGain = barrageGain(context, origin, tile, legal.get());
-        double gain = context.objectiveGain(tile, legal.get(), List.of()) + frontierExplore(seat, tile) + barrageGain;
+        double gain = context.objectiveGain(tile, legal.get(), List.of())
+                + frontierExplore(seat, tile)
+                + barrageGain
+                + scarGain(context, tile);
         if (gain <= 0) return Optional.empty();
         int farthest = legal.get().stream()
                 .filter(move -> BoardView.MOVING_SHIPS.contains(move.type()))

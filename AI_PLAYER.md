@@ -172,7 +172,8 @@ to build one by hand:
     status phase it presses the faction technology it values most (`ResearchPolicy.value`, which includes the secret
     objectives below) for a strategy token, prerequisites ignored, as long as the technology is worth more than the
     token at the tech tempo, otherwise it presses "No Thanks". Each offer message is answered once, and only while
-    the ships are still there. It does not yet move ships into a scar for it;
+    the ships are still there. While it holds _Adapt New Strategies_ and has no ships in a scar, a position move into a
+    reachable scar is worth 0.6 of a point divided by the faction technologies still missing;
   - technologies it does not use: Transit Diodes, Chaos Mapping, Instinct Training, Quantum Datahub Node, Wormhole
     Generator and the remaining faction technologies with an action or a choice it has no rule for. They are worth
     the least when it researches or copies a technology;

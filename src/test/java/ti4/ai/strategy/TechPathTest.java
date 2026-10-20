@@ -113,7 +113,8 @@ class TechPathTest extends BaseTi4Test {
         test.sol.setSecret("ans");
         double held = ResearchPolicy.value(test.game, test.sol, "dxa");
 
-        assertThat(held - notHeld).isCloseTo(ResearchPolicy.OBJECTIVE_WEIGHT * 1.1 / 4, Offset.offset(1e-9));
+        assertThat(held - notHeld)
+                .isCloseTo(ResearchPolicy.OBJECTIVE_WEIGHT * TechPath.STEP_SHARE / 4, Offset.offset(1e-9));
     }
 
     // Master the Laws of Physics needs four of one colour: Sol has one of each, so three more. A second green
