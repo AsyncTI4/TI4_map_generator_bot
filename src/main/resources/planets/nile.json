@@ -8,7 +8,7 @@
     ],
     "resources": 3,
     "influence": 1,
-    "planetTypes": "LIGHTNING",
+    "planetType": "LIGHTNING",
     "techSpecialties": [
         "BIOTIC"
     ],
