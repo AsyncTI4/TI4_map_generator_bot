@@ -1,0 +1,196 @@
+package ti4.ai.runtime;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.image.Mapper;
+import ti4.model.PublicObjectiveModel;
+import ti4.service.info.ListPlayerInfoService;
+import ti4.service.statistics.game.WinningPathBreakdown;
+import ti4.service.statistics.game.WinningPathHelper;
+
+/**
+ * What one self-play game did with its public objectives, read from public state on every step of the run. Each
+ * status phase has a snapshot, taken just before it: the public objectives and secrets every seat had scored, and how
+ * far short each seat was of every revealed public objective it had not scored. The snapshot closes when the status
+ * phase ends, or the game does, and records what each seat scored in it.
+ */
+final class ObjectiveTracker {
+
+    static final int UNMODELLED = -1;
+    private static final String STATUS_PHASE_PREFIX = "status";
+    private static final String ACTION_PHASE = "action";
+
+    // One seat facing one revealed public objective it had not scored, at the start of a status phase: how far short it
+    // was (0 means it met it, UNMODELLED that the bot cannot measure the objective) and whether it scored it there.
+    record Chance(String objective, int round, int shortBy, boolean scored) {}
+
+    // What one seat scored in one round's status phase.
+    record StatusScoring(int round, String faction, int publics, int secrets) {}
+
+    // One revealed public objective at the end of the game, with its points and how many seats scored it.
+    record Reveal(String objective, int points, int scorers) {}
+
+    // The leader's points by source come from the same helper as the bot's "Winners Path to Victory" statistic, so the
+    // batch reads side by side with human games.
+    record Summary(
+            List<Reveal> reveals,
+            List<StatusScoring> statusScoring,
+            List<Chance> chances,
+            WinningPathBreakdown leaderPath,
+            List<String> secretsScored,
+            int seats) {
+
+        static final Summary NOTHING = new Summary(
+                List.of(), List.of(), List.of(), new WinningPathBreakdown(0, 0, 0, 0, Map.of()), List.of(), 0);
+
+        // For each status phase the game reached, from round 1: the share of seats that scored at least one public
+        // objective (or secret) in it.
+        List<Double> scoringShareByRound(boolean publics) {
+            int lastRound =
+                    statusScoring.stream().mapToInt(StatusScoring::round).max().orElse(0);
+            List<Double> shares = new ArrayList<>();
+            for (int round = 1; round <= lastRound; round++) {
+                int current = round;
+                List<StatusScoring> phase = statusScoring.stream()
+                        .filter(scoring -> scoring.round() == current)
+                        .toList();
+                long scored = phase.stream()
+                        .filter(scoring -> (publics ? scoring.publics() : scoring.secrets()) > 0)
+                        .count();
+                shares.add(phase.isEmpty() ? 0 : (double) scored / phase.size());
+            }
+            return shares;
+        }
+    }
+
+    private record Snapshot(
+            int round,
+            Map<String, Set<String>> publicsBefore,
+            Map<String, Integer> secretsBefore,
+            List<Pending> pending) {}
+
+    private record Pending(String userId, String objective, int shortBy) {}
+
+    private Snapshot open;
+    private int lastOpenedRound;
+    private final List<StatusScoring> statusScoring = new ArrayList<>();
+    private final List<Chance> chances = new ArrayList<>();
+
+    // The snapshot opens once every seat has passed, before the status phase starts: scores a seat queued during the
+    // action phase are applied the moment the status phase begins, so a snapshot taken then would already hold them.
+    synchronized void observe(Game game) {
+        boolean scoringWindow = actionPhaseOver(game) || inStatusPhase(game);
+        if (open != null && (!scoringWindow || game.getRound() != open.round())) close(game);
+        if (scoringWindow && open == null && game.getRound() != lastOpenedRound) open(game);
+    }
+
+    synchronized Summary summary(Game game) {
+        if (game == null) return Summary.NOTHING;
+        if (open != null) close(game);
+        return new Summary(
+                reveals(game),
+                List.copyOf(statusScoring),
+                List.copyOf(chances),
+                leaderPath(game),
+                game.getRealPlayers().stream()
+                        .flatMap(seat -> seat.getSecretsScored().keySet().stream())
+                        .toList(),
+                game.getRealPlayers().size());
+    }
+
+    private static boolean actionPhaseOver(Game game) {
+        return ACTION_PHASE.equals(game.getPhaseOfGame())
+                && !game.getRealPlayers().isEmpty()
+                && game.getRealPlayers().stream().allMatch(Player::isPassed);
+    }
+
+    private static boolean inStatusPhase(Game game) {
+        String phase = game.getPhaseOfGame();
+        return phase != null && phase.startsWith(STATUS_PHASE_PREFIX);
+    }
+
+    private void open(Game game) {
+        Map<String, Set<String>> publics = new HashMap<>();
+        Map<String, Integer> secrets = new HashMap<>();
+        List<Pending> pending = new ArrayList<>();
+        for (Player seat : game.getRealPlayers()) {
+            Set<String> scored = scoredPublics(game, seat);
+            publics.put(seat.getUserID(), scored);
+            secrets.put(seat.getUserID(), seat.getSecretsScored().size());
+            for (String objective : revealedPublics(game)) {
+                if (!scored.contains(objective)) {
+                    pending.add(new Pending(seat.getUserID(), objective, shortBy(game, seat, objective)));
+                }
+            }
+        }
+        open = new Snapshot(game.getRound(), publics, secrets, pending);
+        lastOpenedRound = game.getRound();
+    }
+
+    private void close(Game game) {
+        Map<String, Set<String>> newlyScored = new HashMap<>();
+        for (Player seat : game.getRealPlayers()) {
+            Set<String> before = open.publicsBefore().get(seat.getUserID());
+            if (before == null) continue;
+            Set<String> scoredNow = new HashSet<>(scoredPublics(game, seat));
+            scoredNow.removeAll(before);
+            newlyScored.put(seat.getUserID(), scoredNow);
+            int secrets = seat.getSecretsScored().size() - open.secretsBefore().getOrDefault(seat.getUserID(), 0);
+            statusScoring.add(new StatusScoring(open.round(), seat.getFaction(), scoredNow.size(), secrets));
+        }
+        for (Pending pending : open.pending()) {
+            boolean scored =
+                    newlyScored.getOrDefault(pending.userId(), Set.of()).contains(pending.objective());
+            chances.add(new Chance(pending.objective(), open.round(), pending.shortBy(), scored));
+        }
+        open = null;
+    }
+
+    private static int shortBy(Game game, Player seat, String objective) {
+        int threshold = ListPlayerInfoService.getObjectiveThreshold(objective, game);
+        if (threshold <= 0) return UNMODELLED;
+        int progress = ListPlayerInfoService.getPlayerProgressOnObjective(objective, game, seat);
+        return Math.max(0, threshold - progress);
+    }
+
+    private static List<String> revealedPublics(Game game) {
+        return game.getRevealedPublicObjectives().keySet().stream()
+                .filter(id -> Mapper.getPublicObjective(id) != null)
+                .toList();
+    }
+
+    private static Set<String> scoredPublics(Game game, Player seat) {
+        Set<String> scored = new HashSet<>();
+        game.getScoredPublicObjectives().forEach((id, userIds) -> {
+            if (Mapper.getPublicObjective(id) != null && userIds.contains(seat.getUserID())) scored.add(id);
+        });
+        return scored;
+    }
+
+    private static List<Reveal> reveals(Game game) {
+        List<Reveal> reveals = new ArrayList<>();
+        for (String id : revealedPublics(game)) {
+            PublicObjectiveModel model = Mapper.getPublicObjective(id);
+            List<String> scorers = game.getScoredPublicObjectives().getOrDefault(id, List.of());
+            int seats = (int) game.getRealPlayers().stream()
+                    .filter(seat -> scorers.contains(seat.getUserID()))
+                    .count();
+            reveals.add(new Reveal(id, model.getPoints(), seats));
+        }
+        return reveals;
+    }
+
+    private static WinningPathBreakdown leaderPath(Game game) {
+        return game.getRealPlayers().stream()
+                .max(Comparator.comparingInt(Player::getTotalVictoryPoints))
+                .map(leader -> WinningPathHelper.breakDownWinningPath(game, leader))
+                .orElse(Summary.NOTHING.leaderPath());
+    }
+}

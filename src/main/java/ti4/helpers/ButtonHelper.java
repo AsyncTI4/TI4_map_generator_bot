@@ -4330,26 +4330,38 @@ public class ButtonHelper {
 
     public static int[] checkFleetAndCapacity(
             Player player, Game game, Tile tile, boolean ignoreFighters, boolean issuePing) {
+        return evaluateFleetAndCapacity(player, game, tile, ignoreFighters, issuePing)
+                .counts();
+    }
+
+    public static FleetCheck fleetCheck(Player player, Game game, Tile tile) {
+        return evaluateFleetAndCapacity(player, game, tile, false, false);
+    }
+
+    public record FleetCheck(int[] counts, boolean fleetSupplyViolated, boolean capacityViolated, int capacitySlack) {}
+
+    private static FleetCheck evaluateFleetAndCapacity(
+            Player player, Game game, Tile tile, boolean ignoreFighters, boolean issuePing) {
         String tileRepresentation = tile.getRepresentation();
         int[] values = {0, 0, 0, 0};
         if (tileRepresentation == null || "null".equalsIgnoreCase(tileRepresentation)) {
-            return values;
+            return new FleetCheck(values, false, false, Integer.MAX_VALUE);
         }
         if (tileRepresentation.toLowerCase().contains("nombox")) {
-            return values;
+            return new FleetCheck(values, false, false, Integer.MAX_VALUE);
         }
         if (!game.isCcNPlasticLimit()) {
-            return values;
+            return new FleetCheck(values, false, false, Integer.MAX_VALUE);
         }
         int armadaValue = 0;
         if (player == null) {
-            return values;
+            return new FleetCheck(values, false, false, Integer.MAX_VALUE);
         }
         if (player.isNpc() && player.isDummy()) {
-            return values;
+            return new FleetCheck(values, false, false, Integer.MAX_VALUE);
         }
         if ("neutral".equals(player.getFaction()) && Constants.dicecordId.equals(player.getUserID())) {
-            return values;
+            return new FleetCheck(values, false, false, Integer.MAX_VALUE);
         }
         if (player.hasAbility("armada")) {
             armadaValue = 2;
@@ -4604,6 +4616,7 @@ public class ButtonHelper {
             capacity += ageOfFightersFleet;
         }
 
+        int capacitySlack = capacity - numInfNFightersNMechs;
         if (numInfNFightersNMechs > capacity) {
             int overflow = numInfNFightersNMechs - capacity;
             int fighter2Overflow = Math.min(overflow, numFighter2s);
@@ -4761,7 +4774,7 @@ public class ButtonHelper {
                 fightersIgnored
             };
 
-            return capNCap;
+            return new FleetCheck(capNCap, fleetSupplyViolated, capacityViolated, capacitySlack);
         }
         int[] capNCap2 = {
             ((numFighter2sFleet + numOfCapitalShips + 1) / 2),
@@ -4770,7 +4783,7 @@ public class ButtonHelper {
             fightersIgnored,
             numFighter2s
         };
-        return capNCap2;
+        return new FleetCheck(capNCap2, fleetSupplyViolated, capacityViolated, capacitySlack);
     }
 
     private static List<String> getAllPlanetsAdjacentToTileNotOwnedByPlayer(Tile tile, Game game, Player player) {

@@ -2,6 +2,7 @@ package ti4.service.actioncard;
 
 import java.util.Calendar;
 import java.util.Set;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -24,6 +25,12 @@ import ti4.service.unit.CheckUnitContainmentService;
 @UtilityClass
 public class SabotageService {
 
+    private static final String WAR_MACHINE_TITLE = "War Machine";
+    private static final String WAR_MACHINE_SPENT = "warmachine";
+    private static final String FLANK_SPEED_TITLE = "Flank Speed";
+    private static final String FLANK_SPEED_BOOST = "flankspeedBoost";
+    private static final String CANCELED_WINDOWS = "canceledActionCardWindows";
+    private static final String CANCELED_WINDOW_SEPARATOR = "_";
     private static final Set<String> ALL_SABOTAGE_CARD_ALIASES = Set.of(
             "sabo1",
             "sabo2",
@@ -155,6 +162,22 @@ public class SabotageService {
             return playerName + " has _Unyielding Will_ and, thus their action cards cannot be cancelled.";
         }
         return null;
+    }
+
+    public static boolean wasWindowCanceled(Game game, String messageId) {
+        return Set.of(game.getStoredValue(CANCELED_WINDOWS).split(CANCELED_WINDOW_SEPARATOR))
+                .contains(messageId);
+    }
+
+    public static void rememberCanceledWindow(Game game, String messageId) {
+        String canceled = game.getStoredValue(CANCELED_WINDOWS);
+        game.setStoredValue(
+                CANCELED_WINDOWS, canceled.isEmpty() ? messageId : canceled + CANCELED_WINDOW_SEPARATOR + messageId);
+    }
+
+    public static void undoEffectsOfCanceledCard(Game game, @Nullable Player cardPlayer, String title) {
+        if (WAR_MACHINE_TITLE.equals(title) && cardPlayer != null) cardPlayer.removeSpentThing(WAR_MACHINE_SPENT);
+        if (FLANK_SPEED_TITLE.equals(title)) game.removeStoredValue(FLANK_SPEED_BOOST);
     }
 
     public static boolean isShameixBaneCancellationBlocked(Player canceller, Player actionCardPlayer) {
