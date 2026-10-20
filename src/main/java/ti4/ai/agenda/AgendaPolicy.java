@@ -190,10 +190,12 @@ public class AgendaPolicy {
 
     static double score(Game game, Player speaker, String agenda, String outcome) {
         double score = outcomeScore(game, speaker, agenda, outcome);
-        if (speaker.getSecretsUnscored().containsKey(DRIVE_THE_DEBATE) && electsSelf(game, speaker, outcome)) {
-            return Math.max(score, DRIVE_THE_DEBATE_SCORE);
-        }
+        if (holdsDriveTheDebateFor(game, speaker, outcome)) return Math.max(score, DRIVE_THE_DEBATE_SCORE);
         return score;
+    }
+
+    static boolean holdsDriveTheDebateFor(Game game, Player speaker, String outcome) {
+        return speaker.getSecretsUnscored().containsKey(DRIVE_THE_DEBATE) && electsSelf(game, speaker, outcome);
     }
 
     static boolean hasRequiredTrait(String agenda, Planet planet) {

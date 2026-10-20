@@ -37,6 +37,8 @@ public class AgendaVoting {
     private static final long CLOCK_SKEW_MILLIS = 5_000L;
     private static final String MUTINY = "mutiny";
     private static final double ALL_IN_SCORE = 2;
+    private static final double CAN_WIN_ELECTION = 0.25;
+    private static final double SURE_ELECTION = 0.8;
     private static final String FIELD = "~";
     private static final String GALACTIC_THREAT = "galactic_threat";
     private static final String XXCHA_COMMANDER = "xxchacommander";
@@ -233,13 +235,37 @@ public class AgendaVoting {
             if (stopsRider.isPresent()) return ballotFor(game, stopsRider.get(), available);
         }
         List<String> outcomes = AgendaOutcomes.of(game);
+        AgendaForecast forecast = AgendaForecast.of(game, seat);
         Optional<String> best = outcomes.stream()
                 .filter(outcome -> score(game, seat, agenda, outcome, available) > 0)
+                .filter(outcome -> !isLostElection(game, seat, agenda, outcome, available, forecast))
                 .max(Comparator.comparingDouble(outcome -> score(game, seat, agenda, outcome, available)));
         if (best.isEmpty()) return Optional.empty();
         double score = score(game, seat, agenda, best.get(), available);
-        int votes = score >= ALL_IN_SCORE ? available : (available + 1) / 2;
+        int votes = score >= ALL_IN_SCORE
+                ? votesToWin(game, seat, agenda, best.get(), available, forecast)
+                : (available + 1) / 2;
         return ballotFor(game, best.get(), votes);
+    }
+
+    private static boolean drivesTheDebateAlone(Game game, Player seat, String agenda, String outcome) {
+        return AgendaPolicy.holdsDriveTheDebateFor(game, seat, outcome)
+                && AgendaPolicy.publicScore(game, seat, agenda, outcome) < ALL_IN_SCORE;
+    }
+
+    private static boolean isLostElection(
+            Game game, Player seat, String agenda, String outcome, int available, AgendaForecast forecast) {
+        if (forecast.isEmpty() || !drivesTheDebateAlone(game, seat, agenda, outcome)) return false;
+        return forecast.withVotes(seat, outcome, available).chance(outcome) < CAN_WIN_ELECTION;
+    }
+
+    private static int votesToWin(
+            Game game, Player seat, String agenda, String outcome, int available, AgendaForecast forecast) {
+        if (forecast.isEmpty() || !drivesTheDebateAlone(game, seat, agenda, outcome)) return available;
+        for (int votes = 1; votes < available; votes++) {
+            if (forecast.withVotes(seat, outcome, votes).chance(outcome) >= SURE_ELECTION) return votes;
+        }
+        return available;
     }
 
     private static Optional<String> outcomeThatStopsARivalRider(Game game, Player seat, int votes) {

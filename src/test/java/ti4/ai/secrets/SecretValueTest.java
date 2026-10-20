@@ -151,6 +151,56 @@ class SecretValueTest extends BaseTi4Test {
         assertThat(discarded()).isEqualTo("dtd");
     }
 
+    private double solValue(String secret) {
+        return SecretValue.keepValue(test.game, test.sol, secret);
+    }
+
+    private void custodiansTaken() {
+        test.game.addCustomPO("Custodians", 0);
+        test.game.scorePublicObjective(test.nekro.getUserID(), 0);
+    }
+
+    // A seat that can vote has Drive the Debate only once the agenda phase exists: before the Custodians are taken no
+    // agenda is ever revealed, so only the 0.47 prior is left, 0.5 * 0.47 = 0.235, far below Establish a Perimeter
+    // (0.45). Once they are taken, Sol holds all the influence at the table, so each of the roughly ten agendas left is
+    // an election about a third of the time that it wins: 1 - 0.9^10 = 0.65 is capped at 0.5, and 0.5 * 0.47 + 0.5 *
+    // 0.5 = 0.485 outranks Establish a Perimeter and Mine Rare Metals with no progress.
+    @Test
+    void keepsDriveTheDebateOnlyWhileAgendaPhasesRemain() {
+        test.solHomeBeside(neighbour);
+        test.sol.setSecret("dtd");
+        test.sol.setSecret("eap");
+        test.sol.setSecret("mrm");
+        double beforeCustodians = solValue("dtd");
+        String discardedBefore =
+                SecretValue.lowestValueSecret(test.game, test.sol).orElseThrow();
+
+        custodiansTaken();
+
+        assertThat(beforeCustodians).isCloseTo(0.235, within(0.01));
+        assertThat(discardedBefore).isEqualTo("dtd");
+        assertThat(solValue("dtd")).isCloseTo(0.485, within(0.01));
+        assertThat(solValue("dtd")).isGreaterThan(solValue("eap")).isGreaterThan(solValue("mrm"));
+        assertThat(SecretValue.lowestValueSecret(test.game, test.sol).orElseThrow())
+                .isNotEqualTo("dtd");
+    }
+
+    // A seat with a sliver of the table's influence rarely wins an election: its chance falls with the share of the
+    // influence squared, so Drive the Debate is worth less to it than to the seat that holds the votes.
+    @Test
+    void valuesDriveTheDebateByTheSeatsShareOfTheVotes() {
+        custodiansTaken();
+        test.solHomeBeside(neighbour);
+        test.sol.setSecret("dtd");
+        double leading = solValue("dtd");
+
+        controls("37", "101", "arinam", "meer");
+        controls("24", "102", "meharxull");
+        double outvoted = solValue("dtd");
+
+        assertThat(leading).isGreaterThan(outvoted);
+    }
+
     // Betray a Friend: with another player's promissory note in the play area, 0.125 a round is 1 - 0.875^5 = 0.49
     // and the value 1.2 * (0.5 * 0.49 + 0.5 * 0.49) = 0.59; without it 0.05 a round is 0.23, 1.2 * (0.245 + 0.115) =
     // 0.43; Turn Their Fleets to Dust with no PDS (36%, 0.03 a round) is 1.2 * (0.18 + 0.07) = 0.30.
