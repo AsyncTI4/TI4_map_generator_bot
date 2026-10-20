@@ -227,10 +227,16 @@ public class ActionCardRules {
     }
 
     static Optional<AiDecision> startPlay(AiTurnContext context, String key, String alias, PlayMoment moment) {
+        Optional<AiCard> card = AiActionCards.of(alias);
+        if (card.isEmpty()) return Optional.empty();
+        Plan plan = card.get().planFor(context.game(), context.seat(), moment).orElse(Plan.of(0));
+        return startPlay(context, key, alias, plan);
+    }
+
+    static Optional<AiDecision> startPlay(AiTurnContext context, String key, String alias, Plan plan) {
         Integer index = context.seat().getActionCards().get(alias);
         Optional<AiCard> card = AiActionCards.of(alias);
         if (index == null || card.isEmpty()) return Optional.empty();
-        Plan plan = card.get().planFor(context.game(), context.seat(), moment).orElse(Plan.of(0));
         String title = SabotageWindow.title(alias);
         Optional<Match> play = ActionCardHand.playButton(
                 context, index, card.get().playSuffix().apply(context.game()), Long.MIN_VALUE);

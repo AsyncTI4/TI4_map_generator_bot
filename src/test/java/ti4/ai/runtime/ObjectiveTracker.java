@@ -121,6 +121,7 @@ final class ObjectiveTracker {
 
     private final ProduceTracker produce = new ProduceTracker();
     private final HomeRaidTracker homeRaids = new HomeRaidTracker();
+    private final DirectHitTracker directHits = new DirectHitTracker();
 
     private Snapshot open;
     private int lastOpenedRound;
@@ -135,6 +136,7 @@ final class ObjectiveTracker {
     // action phase are applied the moment the status phase begins, so a snapshot taken then would already hold them.
     synchronized void observe(Game game) {
         homeRaids.observe(game);
+        directHits.observe(game);
         if (pastTheOpeningDiscard(game)) recordHeld(game);
         trackMechs(game);
         produce.observe(game);
@@ -147,6 +149,7 @@ final class ObjectiveTracker {
     synchronized Summary summary(Game game) {
         if (game == null) return Summary.NOTHING;
         homeRaids.lines(game).forEach(System.out::println);
+        directHits.lines(game).forEach(System.out::println);
         if (open != null) close(game);
         NexusWatch.print(game);
         produce.finish(game);

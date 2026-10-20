@@ -38,6 +38,8 @@ public class CombatCardRules {
     }
 
     public static Optional<AiDecision> atRoundStart(AiTurnContext context, CombatMoment moment) {
+        Optional<AiDecision> directHit = DirectHitRules.atRoundStart(context, moment);
+        if (directHit.isPresent()) return directHit;
         Game game = context.game();
         Player seat = context.seat();
         if (!AiSettings.isCombatCardsEnabled()
@@ -50,6 +52,14 @@ public class CombatCardRules {
         if (context.memory().has(key)) return Optional.empty();
         return bestAtRoundStart(context, moment)
                 .flatMap(alias -> ActionCardRules.startPlay(context, key, alias, PlayMoment.IN_TURN));
+    }
+
+    public static void watchSpaceCannon(AiTurnContext context, String position) {
+        DirectHitRules.openCannon(context, position);
+    }
+
+    public static Optional<AiDecision> afterSpaceCannon(AiTurnContext context) {
+        return DirectHitRules.afterCannon(context);
     }
 
     static boolean outdated(AiTurnContext context, String key) {

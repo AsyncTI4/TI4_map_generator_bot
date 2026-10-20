@@ -55,6 +55,22 @@ public class CombatForecast {
         return duel(game, seat, position, holderName).map(Duel::repairSwing).orElse(0.0);
     }
 
+    public record ShipLoss(double winBefore, double winAfter, double stake) {
+
+        public double swing() {
+            return (winAfter - winBefore) * stake;
+        }
+    }
+
+    public static Optional<ShipLoss> enemyShipLoss(
+            Game game, Player seat, String position, Player opponent, UnitType type) {
+        Tile tile = game.getTileByPosition(position);
+        if (tile == null || !BoardView.hasOwnShips(seat, tile) || !BoardView.hasOwnShips(opponent, tile)) {
+            return Optional.empty();
+        }
+        return new Duel(game, seat, opponent, tile, BoardView.space(tile), false).enemyShipLoss(type);
+    }
+
     public record SpaceOutlook(double win, double ourLoss, double theirLoss) {}
 
     public static Optional<SpaceOutlook> spaceOutlook(Game game, Player seat, String position) {
@@ -199,6 +215,21 @@ public class CombatForecast {
                     ? CombatOdds.resolveFirstRound(own, enemy, boosted, enemy).attackerWins()
                     : CombatOdds.resolveFirstRound(enemy, own, enemy, boosted).defenderWins();
             return (after - before) * stake(own, enemy);
+        }
+
+        Optional<ShipLoss> enemyShipLoss(UnitType type) {
+            Force own = own();
+            Force enemy = enemy();
+            List<Combatant> remaining = new ArrayList<>(enemy.units());
+            int index = IntStream.range(0, remaining.size())
+                    .filter(i -> remaining.get(i).type() == type)
+                    .reduce((first, second) -> remaining.get(second).sustain() ? first : second)
+                    .orElse(-1);
+            if (index < 0) return Optional.empty();
+            remaining.remove(index);
+            double before = CombatForces.win(own, enemy, attacks());
+            double after = CombatForces.win(own, enemy.withUnits(remaining), attacks());
+            return Optional.of(new ShipLoss(before, after, stake(own, enemy)));
         }
 
         double repairSwing() {

@@ -112,6 +112,7 @@ public class TacticalPlanner {
     private static final double CUSTODIANS_VALUE = ObjectiveValue.VICTORY_POINT_VALUE;
     private static final double MECATOL_CASH_SHARE = 0.75;
     private static final String DARKEN_THE_SKIES = "dts";
+    private static final String DESTROY_THEIR_GREATEST_SHIP = "dtgs";
     private static final String CONQUER_THE_WEAK = "conquer";
     private static final String OCCUPY_THE_FRINGE = "otf";
     private static final String MECHANIZE_THE_MILITARY = "mtm";
@@ -2213,11 +2214,11 @@ public class TacticalPlanner {
                     + BoardView.nonFighterShips(holder, seat);
             if (held.contains("uf") && ships.getOrDefault(UnitType.Flagship, 0) > 0) spaceOnly.add("uf");
             if (held.contains("dyp") && arriving >= DEMONSTRATION_SHIPS) spaceOnly.add("dyp");
-            if (held.contains("dtgs")
+            if (held.contains(DESTROY_THEIR_GREATEST_SHIP)
                     && BoardView.count(holder, opponent, UnitType.Flagship)
                                     + BoardView.count(holder, opponent, UnitType.Warsun)
                             > 0) {
-                spaceOnly.add("dtgs");
+                spaceOnly.add(DESTROY_THEIR_GREATEST_SHIP);
             }
         }
         double bestSpaceOnly = Math.max(
@@ -2254,7 +2255,7 @@ public class TacticalPlanner {
     }
 
     private static double secretShare(Game game, Player seat, String secret) {
-        if (DARKEN_THE_SKIES.equals(secret)) return 1.0;
+        if (DARKEN_THE_SKIES.equals(secret) || DESTROY_THEIR_GREATEST_SHIP.equals(secret)) return 1.0;
         return ActionSecretTiming.pursueNow(game, seat, secret) ? 1.0 : PATIENT_SHARE;
     }
 
