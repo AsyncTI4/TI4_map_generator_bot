@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -28,11 +29,16 @@ class FractureSelfPlayTest extends BaseTi4Test {
     private static final int RELIC_PATIENCE_TICKS = 25;
     private static final String STYX = "styx";
     private static final String COCYTUS = "cocytus";
+    private static final int ATTEMPTS = 3;
+    private static final List<String> FRACTURE_POSITIONS =
+            List.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7");
+    private static final String SHARD_OF_THE_THRONE = "shard";
 
     @Test
     void aSeatTakesStyxFromTheNeutralUnitsAndScoresItsPoint() throws Exception {
-        Attack scenario = new Attack("frac3", STYX, 8, 4, 16);
-        SelfPlayGame.Outcome outcome = play(scenario);
+        Played played = play(() -> new Attack("frac3", STYX, 8, 4, 16));
+        Attack scenario = played.scenario();
+        SelfPlayGame.Outcome outcome = played.outcome();
 
         assertThat(outcome.ending()).as(outcome.report()).isEqualTo(SelfPlayGame.Ending.STOP_CONDITION);
         assertThat(scenario.taken).as(outcome.report()).isTrue();
@@ -43,8 +49,9 @@ class FractureSelfPlayTest extends BaseTi4Test {
     // From the egress Styx is two moves away, so a dreadnought fleet needs Flank Speed to strike this action.
     @Test
     void aSeatPlaysFlankSpeedToStrikeStyxFromTheEgress() throws Exception {
-        Attack scenario = new Attack("frac2", STYX, 8, 4, 16).withFlankSpeed();
-        SelfPlayGame.Outcome outcome = play(scenario);
+        Played played = play(() -> new Attack("frac2", STYX, 8, 4, 16).withFlankSpeed());
+        Attack scenario = played.scenario();
+        SelfPlayGame.Outcome outcome = played.outcome();
 
         assertThat(outcome.ending()).as(outcome.report()).isEqualTo(SelfPlayGame.Ending.STOP_CONDITION);
         assertThat(scenario.taken).as(outcome.report()).isTrue();
@@ -55,15 +62,29 @@ class FractureSelfPlayTest extends BaseTi4Test {
     // Cocytus.
     @Test
     void aSeatTakesCocytusAndDrawsItsRelic() throws Exception {
-        Attack scenario = new Attack("frac2", COCYTUS, 2, 1, 4);
-        SelfPlayGame.Outcome outcome = play(scenario);
+        Played played = play(() -> new Attack("frac2", COCYTUS, 2, 1, 4));
+        Attack scenario = played.scenario();
+        SelfPlayGame.Outcome outcome = played.outcome();
 
         assertThat(outcome.ending()).as(outcome.report()).isEqualTo(SelfPlayGame.Ending.STOP_CONDITION);
         assertThat(scenario.taken).as(outcome.report()).isTrue();
         assertThat(scenario.relicsGained).as(outcome.report()).isEqualTo(1);
     }
 
-    private static SelfPlayGame.Outcome play(Attack scenario) throws Exception {
+    private record Played(Attack scenario, SelfPlayGame.Outcome outcome) {}
+
+    // The neutral dice are real, and a fleet that lands a handful of infantry can lose the battle on them (about one
+    // game in ten for the Cocytus fleet). A scenario whose fleet died in the Fracture says nothing about the planning,
+    // so it is played again on a fresh game; only a fleet that survives, or never attacks, is judged.
+    private static Played play(Supplier<Attack> scenarios) throws Exception {
+        Played played = playOnce(scenarios.get());
+        for (int attempt = 1; attempt < ATTEMPTS && played.scenario().fleetLost; attempt++) {
+            played = playOnce(scenarios.get());
+        }
+        return played;
+    }
+
+    private static Played playOnce(Attack scenario) throws Exception {
         try (SelfPlayEnvironment env = new SelfPlayEnvironment(System.currentTimeMillis())) {
             SelfPlayGame selfPlay =
                     new SelfPlayGame(env, "aifrac" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000));
@@ -73,7 +94,7 @@ class FractureSelfPlayTest extends BaseTi4Test {
                 SelfPlayGame.Outcome outcome = selfPlay.run(scenario, VIRTUAL_DAY, MAX_TICKS);
                 System.out.println(outcome.report());
                 System.out.println("Fracture scenario: " + scenario.lastSeen);
-                return outcome;
+                return new Played(scenario, outcome);
             } finally {
                 AiRuntime.forget(selfPlay.name);
                 GameManager.delete(selfPlay.name);
@@ -96,6 +117,7 @@ class FractureSelfPlayTest extends BaseTi4Test {
         private int pointsBefore;
         private int relicsBefore;
         boolean taken;
+        boolean fleetLost;
         private int waitingForRelic;
         String lastSeen = "not started";
         int pointsGained;
@@ -131,12 +153,32 @@ class FractureSelfPlayTest extends BaseTi4Test {
             lastSeen = "attacker " + attacker + ", holder " + (holder == null ? "nobody" : holder.getFaction())
                     + ", neutral units left " + neutralUnitsRemain(game) + ", relics "
                     + (seat.getRelics().size() - relicsBefore) + ", round " + game.getRound();
-            if (holder != seat || neutralUnitsRemain(game)) return false;
+            if (holder != seat || neutralUnitsRemain(game)) {
+                fleetLost = arrangedRound > 0 && !hasUnitsInTheFracture(game, seat) && isNoUnitInTransit(game);
+                return fleetLost;
+            }
             taken = true;
             round = game.getRound();
-            pointsGained = seat.getTotalVictoryPoints() - pointsBefore;
+            pointsGained = seat.getTotalVictoryPoints() - pointsBefore - relicPoints(seat);
             relicsGained = seat.getRelics().size() - relicsBefore;
             return relicsGained > 0 || ++waitingForRelic > RELIC_PATIENCE_TICKS;
+        }
+
+        // Shard of the Throne gives its holder a point on top of the one the planet scores.
+        private int relicPoints(Player seat) {
+            return seat.getRelics().contains(SHARD_OF_THE_THRONE) ? 1 : 0;
+        }
+
+        private boolean hasUnitsInTheFracture(Game game, Player seat) {
+            return FRACTURE_POSITIONS.stream()
+                    .map(game::getTileByPosition)
+                    .anyMatch(tile -> tile.getUnitHolders().values().stream()
+                            .anyMatch(
+                                    holder -> !holder.getUnitKeysForPlayer(seat).isEmpty()));
+        }
+
+        private boolean isNoUnitInTransit(Game game) {
+            return game.getTacticalActionDisplacement().isEmpty();
         }
 
         private boolean neutralUnitsRemain(Game game) {
