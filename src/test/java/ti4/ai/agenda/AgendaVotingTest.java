@@ -5,6 +5,7 @@ import static ti4.ai.AiTestGame.NOW;
 import static ti4.ai.AiTestGame.prompt;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
@@ -110,6 +111,63 @@ class AgendaVotingTest extends BaseTi4Test {
 
         test.game.setCurrentAgendaInfo("Law_Elect Planet_8_holy_planet_of_ixth");
         assertThat(AgendaVoting.plan(test.game, sol)).isEmpty();
+    }
+
+    // Execution Directive punishes whoever is elected, so Sol would never elect itself without Drive the Debate; with
+    // it,
+    // the election is worth a point. Hacan leads on points and Xxcha, the rival, puts its votes on the leader, so only
+    // Sol's votes can stop that.
+    private void driveTheDebateElection(int solVotes, int rivalVotes) {
+        Player leader = test.addSeat("200000000000000003", "hacan", "green");
+        test.addSeat("200000000000000002", "xxcha", "red");
+        test.game.scorePublicObjective(leader.getUserID(), test.game.addCustomPO("Test points", 2));
+        test.game.setPhaseOfGame("agendawaiting");
+        test.game.setSpeakerUserID(sol.getUserID());
+        test.game.setCurrentAgendaInfo("Directive_Elect Player_7_execution");
+        test.game.setStoredValue(
+                "agendaStartVoteCounts",
+                "{\"blue\":" + solVotes + ",\"red\":" + rivalVotes + ",\"green\":0,\"black\":0}");
+        sol.setSecret("dtd");
+    }
+
+    private int everythingSolHas() {
+        return ti4.helpers.AgendaHelper.getSpecificPlanetsVoteWorth(sol, test.game, "jord");
+    }
+
+    // Sol holds Drive the Debate but Xxcha has six times its votes and is backing the leader: Sol cannot win the
+    // election, so it does not spend its votes on itself (it can still back the leader, as it would without the card).
+    @Test
+    void castsNoVotesInAnElectionItCannotWinWithDriveTheDebate() {
+        driveTheDebateElection(everythingSolHas(), everythingSolHas() * 6);
+
+        assertThat(AgendaVoting.plan(test.game, sol).map(AgendaVoting.Ballot::outcome))
+                .isNotEqualTo(Optional.of("sol"));
+    }
+
+    // The same election with the votes on Sol's side: it spends only enough to beat the two votes against it (a tie
+    // goes to Sol as speaker), not everything it has.
+    @Test
+    void spendsOnlyEnoughToWinTheElectionWithDriveTheDebate() {
+        test.place("19", AiTestGame.neighbourOf("304"));
+        sol.addPlanet("wellon");
+        int everything =
+                everythingSolHas() + ti4.helpers.AgendaHelper.getSpecificPlanetsVoteWorth(sol, test.game, "wellon");
+        driveTheDebateElection(everything, 2);
+
+        Optional<AgendaVoting.Ballot> ballot = AgendaVoting.plan(test.game, sol);
+
+        assertThat(ballot.map(AgendaVoting.Ballot::outcome)).contains("sol");
+        assertThat(ballot.map(AgendaVoting.Ballot::votes).orElse(0)).isBetween(2, everything - 1);
+    }
+
+    // Without Drive the Debate Sol never elects itself to Execution Directive, however many votes it has.
+    @Test
+    void neverElectsItselfToExecutionDirectiveWithoutDriveTheDebate() {
+        driveTheDebateElection(everythingSolHas(), 2);
+        sol.removeSecret(sol.getSecretsUnscored().get("dtd"));
+
+        assertThat(AgendaVoting.plan(test.game, sol).map(AgendaVoting.Ballot::outcome))
+                .isNotEqualTo(Optional.of("sol"));
     }
 
     private static final String ARMS_REDUCTION = "Directive_For/Against_7_arms_reduction";

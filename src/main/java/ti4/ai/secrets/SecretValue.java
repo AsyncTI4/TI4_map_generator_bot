@@ -48,7 +48,6 @@ public class SecretValue {
     private static final double READY_VALUE = 2.0;
     private static final double CONGESTION_FACTOR = 0.5;
     private static final double ACTION_PHASE_VALUE = 1.2;
-    private static final double DRIVE_THE_DEBATE_CHANCE = 0.1;
     private static final double DRIVE_THE_DEBATE_UNDER_THREAT_CHANCE = 0.02;
     private static final double STATUS_RUNWAY_ROUNDS = 3.0;
     private static final int LAST_EARLY_ROUND = 2;
@@ -228,7 +227,8 @@ public class SecretValue {
             return Math.min(1.0, (double) game.getLaws().size() / LAWS_FOR_DICTATE_POLICY);
         }
         if (DRIVE_THE_DEBATE.equals(secretId)) {
-            return seat.hasAbility("galactic_threat") ? DRIVE_THE_DEBATE_UNDER_THREAT_CHANCE : DRIVE_THE_DEBATE_CHANCE;
+            if (seat.hasAbility("galactic_threat")) return DRIVE_THE_DEBATE_UNDER_THREAT_CHANCE;
+            return DriveTheDebateOdds.chance(game, seat);
         }
         return achievableCompletion(secretId);
     }
