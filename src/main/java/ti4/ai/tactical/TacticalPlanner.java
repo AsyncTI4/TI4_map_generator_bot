@@ -1933,8 +1933,9 @@ public class TacticalPlanner {
                 spaceOnly.add("dtgs");
             }
         }
-        double bestSpaceOnly =
-                secretPoints(game, seat, spaceOnly).stream().findFirst().orElse(0.0);
+        double bestSpaceOnly = Math.max(
+                secretPoints(game, seat, spaceOnly).stream().findFirst().orElse(0.0),
+                space ? barragePoints(game, seat, tile, opponent, ships) : 0);
         List<Double> genericPoints = secretPoints(game, seat, generic);
         double firstGeneric = genericPoints.isEmpty() ? 0 : genericPoints.get(0);
         double secondGeneric = genericPoints.size() < 2 ? 0 : genericPoints.get(1);
@@ -1960,9 +1961,23 @@ public class TacticalPlanner {
 
     private static List<Double> secretPoints(Game game, Player seat, List<String> secrets) {
         return secrets.stream()
-                .map(secret -> ActionSecretTiming.pursueNow(game, seat, secret) ? 1.0 : PATIENT_SHARE)
+                .map(secret -> secretShare(game, seat, secret))
                 .sorted(Comparator.reverseOrder())
                 .toList();
+    }
+
+    private static double secretShare(Game game, Player seat, String secret) {
+        return ActionSecretTiming.pursueNow(game, seat, secret) ? 1.0 : PATIENT_SHARE;
+    }
+
+    private static double barragePoints(
+            Game game, Player seat, Tile tile, Player opponent, Map<UnitType, Integer> arriving) {
+        if (!PrecisionRules.held(seat)) return 0;
+        Map<UnitType, Integer> present = new EnumMap<>(BoardView.ships(BoardView.space(tile), seat));
+        arriving.forEach((type, count) -> present.merge(type, count, Integer::sum));
+        double chance = PrecisionRules.chanceToClear(
+                seat, present, BoardView.count(BoardView.space(tile), opponent, UnitType.Fighter));
+        return secretShare(game, seat, PrecisionRules.FIGHT_WITH_PRECISION) * chance;
     }
 
     private static Optional<TacticalPlan> produce(Context context, Tile tile) {
@@ -2240,7 +2255,8 @@ public class TacticalPlanner {
         Game game = context.game;
         Player seat = context.seat;
         double frontier = frontierExplore(seat, tile);
-        if (!context.objectives().caresAboutPresence() && frontier == 0) return Optional.empty();
+        boolean barrage = PrecisionRules.held(seat);
+        if (!context.objectives().caresAboutPresence() && frontier == 0 && !barrage) return Optional.empty();
         if (BoardView.hasEnemyShips(game, seat, tile) || context.coveredByEnemySpaceCannon(tile)) {
             return Optional.empty();
         }
@@ -2255,9 +2271,11 @@ public class TacticalPlanner {
                 List<UnitMove> moves = List.of(new UnitMove(origin.getPosition(), BoardView.SPACE, type, 1));
                 Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, moves);
                 if (legal.isEmpty()) continue;
-                double gain = context.objectiveGain(tile, legal.get(), List.of()) + frontier;
+                double barrageGain = barrageGain(context, origin, tile, legal.get());
+                double gain = context.objectiveGain(tile, legal.get(), List.of()) + frontier + barrageGain;
                 if (gain <= 0) continue;
                 double score = gain
+                        - barrageExposure(context, tile, legal.get(), barrageGain)
                         - DISTANCE_COST * context.distance(origin, tile, type)
                         - SHIP_COST_WEIGHT * fleetCost(seat, legal.get())
                         - context.defense().leaveCost(origin, legal.get())
@@ -2272,6 +2290,24 @@ public class TacticalPlanner {
             if (group.isPresent() && (best == null || group.get().score() > best.score())) best = group.get();
         }
         return Optional.ofNullable(best);
+    }
+
+    private static double barrageGain(Context context, Tile origin, Tile tile, List<UnitMove> moves) {
+        Player seat = context.seat;
+        if (!PrecisionRules.held(seat)) return 0;
+        Map<UnitType, Integer> arrived = new EnumMap<>(BoardView.ships(BoardView.space(tile), seat));
+        moves.stream()
+                .filter(move -> BoardView.MOVING_SHIPS.contains(move.type()))
+                .forEach(move -> arrived.merge(move.type(), move.count(), Integer::sum));
+        double after = PrecisionRules.bestChance(context.game, seat, tile, arrived, context::reach);
+        double before = PrecisionRules.bestChance(
+                context.game, seat, origin, BoardView.ships(BoardView.space(origin), seat), context::reach);
+        double share = secretShare(context.game, seat, PrecisionRules.FIGHT_WITH_PRECISION);
+        return Math.max(0, ObjectiveValue.VICTORY_POINT_VALUE * share * (after - before));
+    }
+
+    private static double barrageExposure(Context context, Tile tile, List<UnitMove> moves, double barrageGain) {
+        return barrageGain > 0 ? context.exposure(tile, moves, List.of()) : 0;
     }
 
     private static double frontierExplore(Player seat, Tile tile) {
@@ -2302,7 +2338,8 @@ public class TacticalPlanner {
         if (movedNonFighterShips(departing) < 2) return Optional.empty();
         Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, departing);
         if (legal.isEmpty()) return Optional.empty();
-        double gain = context.objectiveGain(tile, legal.get(), List.of()) + frontierExplore(seat, tile);
+        double barrageGain = barrageGain(context, origin, tile, legal.get());
+        double gain = context.objectiveGain(tile, legal.get(), List.of()) + frontierExplore(seat, tile) + barrageGain;
         if (gain <= 0) return Optional.empty();
         int farthest = legal.get().stream()
                 .filter(move -> BoardView.MOVING_SHIPS.contains(move.type()))
@@ -2310,6 +2347,7 @@ public class TacticalPlanner {
                 .max()
                 .orElse(0);
         double score = gain
+                - barrageExposure(context, tile, legal.get(), barrageGain)
                 - DISTANCE_COST * farthest
                 - GROUP_MOVE_COST * movedNonFighterShips(legal.get())
                 - context.defense().leaveCost(origin, legal.get())

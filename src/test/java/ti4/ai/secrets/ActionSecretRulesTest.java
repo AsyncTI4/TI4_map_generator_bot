@@ -231,4 +231,53 @@ class ActionSecretRulesTest extends BaseTi4Test {
 
         assertThat(tick(scoreButtons("dyp")).map(AiTestGame::pressedId)).contains(scoreId("dyp"));
     }
+
+    // Fight with Precision: the barrage destroys the last of an opponent's fighters before any combat round is rolled.
+    @Test
+    void scoresFightWithPrecisionWhenTheBarrageClearsTheFightersBesideAnotherShip() {
+        test.nekro.setSecret("fwp");
+        test.units(battlefield, "space", test.nekro, UnitType.Destroyer, 2);
+        test.units(battlefield, "space", test.sol, UnitType.Fighter, 2);
+        test.units(battlefield, "space", test.sol, UnitType.Cruiser, 1);
+        tick();
+
+        destroy(test.sol, UnitType.Fighter, 2);
+        tick();
+        roundsRolled(test.nekro, 1);
+        roundsRolled(test.sol, 1);
+        destroy(test.sol, UnitType.Cruiser, 1);
+
+        assertThat(tick(scoreButtons("fwp")).map(AiTestGame::pressedId)).contains(scoreId("fwp"));
+    }
+
+    // When the fighters were all the opponent had, the barrage ends the combat before the AI can look at the cleared
+    // fighters, yet the point is still earned.
+    @Test
+    void scoresFightWithPrecisionWhenTheFightersWereAllTheOpponentHad() {
+        test.nekro.setSecret("fwp");
+        test.units(battlefield, "space", test.nekro, UnitType.Destroyer, 2);
+        test.units(battlefield, "space", test.sol, UnitType.Fighter, 2);
+        tick();
+
+        destroy(test.sol, UnitType.Fighter, 2);
+
+        assertThat(tick(scoreButtons("fwp")).map(AiTestGame::pressedId)).contains(scoreId("fwp"));
+    }
+
+    @Test
+    void scoresNothingWhenSomeFightersSurviveTheBarrage() {
+        test.nekro.setSecret("fwp");
+        test.units(battlefield, "space", test.nekro, UnitType.Destroyer, 2);
+        test.units(battlefield, "space", test.sol, UnitType.Fighter, 3);
+        test.units(battlefield, "space", test.sol, UnitType.Cruiser, 1);
+        tick();
+
+        destroy(test.sol, UnitType.Fighter, 2);
+        roundsRolled(test.nekro, 1);
+        roundsRolled(test.sol, 1);
+        destroy(test.sol, UnitType.Cruiser, 1);
+        destroy(test.sol, UnitType.Fighter, 1);
+
+        assertThat(tick(scoreButtons("fwp"))).isEmpty();
+    }
 }

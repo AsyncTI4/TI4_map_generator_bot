@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
@@ -81,7 +82,6 @@ public class ProductionPlanner {
     private static final int FRINGE_GROUND_FORCES = 9;
     private static final String UNVEIL_FLAGSHIP = "uf";
     private static final String MAKE_AN_EXAMPLE = "mew";
-    private static final String FIGHT_WITH_PRECISION = "fwp";
     private static final String MECHANIZE_THE_MILITARY = "mtm";
     private static final int STUCK_SPARE_MECHS = 2;
     private static final int MAX_DEFENSE_BUNDLES = 6;
@@ -393,9 +393,7 @@ public class ProductionPlanner {
         if (seat.getSecretsUnscored().containsKey(MAKE_AN_EXAMPLE)) {
             builder.enablingShips(model -> model.getBombardDieCount(seat) > 0);
         }
-        if (seat.getSecretsUnscored().containsKey(FIGHT_WITH_PRECISION)) {
-            builder.enablingShips(model -> model.getAfbDieCount(seat) > 0);
-        }
+        if (PrecisionRules.held(seat)) builder.barrageShips();
         if (seat.getSecretsUnscored().containsKey(OCCUPY_THE_FRINGE)) {
             int stacked = new ObjectiveValue(builder.game, seat).before().mostGroundForcesWithoutADock();
             int spare = TacticalPlanner.movableGroundForces(builder.game, seat, builder.tile, builder.defense);
@@ -767,15 +765,32 @@ public class ProductionPlanner {
         }
 
         void enablingShips(Predicate<UnitModel> ability) {
+            enablingShips(ability, ENABLING_SHIPS, this::count);
+        }
+
+        void barrageShips() {
+            Predicate<UnitModel> barrage = model -> model.getAfbDieCount(seat) > 0;
+            if (!PrecisionRules.facesFighters(game, seat, tile)) {
+                enablingShips(barrage);
+                return;
+            }
+            enablingShips(barrage, PrecisionRules.FORWARD_SHIPS, this::countHere);
+        }
+
+        private void enablingShips(Predicate<UnitModel> ability, int wanted, ToIntFunction<UnitType> counted) {
             List<UnitType> types = BoardView.MOVING_SHIPS.stream()
                     .filter(type -> BoardView.model(seat, type).filter(ability).isPresent())
                     .sorted(Comparator.comparingDouble(this::cost))
                     .toList();
-            int have = types.stream().mapToInt(this::count).sum();
+            int have = types.stream().mapToInt(counted).sum();
             for (UnitType type : types) {
-                double value = scoringValue(type) + ENABLER_VALUE / ENABLING_SHIPS;
-                while (have < ENABLING_SHIPS && ship(type, value, true)) have++;
+                double value = scoringValue(type) + ENABLER_VALUE / wanted;
+                while (have < wanted && ship(type, value, true)) have++;
             }
+        }
+
+        private int countHere(UnitType type) {
+            return BoardView.count(BoardView.space(tile), seat, type) + planned(type);
         }
 
         boolean ground(UnitType type, int count, double valueEach) {

@@ -16,6 +16,7 @@ import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -958,6 +959,66 @@ class TacticalPlannerTest extends BaseTi4Test {
                 .isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
     }
 
+    // Three destroyers (six barrage dice at 9) clear one fighter with probability 1 - 0.8^6. The secret is rare enough
+    // that the seat pursues it at once (a chance of 0.13 a round does not promise a later chance), so the bonus is a
+    // full point times that chance. It is nothing without the secret or when the target holds no fighters.
+    @Test
+    void valuesAnAttackWhoseBarrageClearsTheFightersForFightWithPrecision() {
+        Tile target = test.place("46", neighbour);
+        test.units(target, "space", test.sol, UnitType.Fighter, 1);
+        test.units(target, "space", test.sol, UnitType.Destroyer, 1);
+        test.units(home, "space", test.nekro, UnitType.Destroyer, 3);
+        List<UnitMove> ships = List.of(new UnitMove(AiTestGame.HOME, "space", UnitType.Destroyer, 3));
+        double chance = 1 - Math.pow(0.8, 6);
+
+        assertThat(barrageBonus(target, ships)).isZero();
+        test.nekro.setSecret("fwp");
+        assertThat(barrageBonus(target, ships)).isCloseTo(VP * chance, within(EXACT));
+        target.removeUnit("space", Units.getUnitKey(UnitType.Fighter, test.sol.getColor()), 1);
+        assertThat(barrageBonus(target, ships)).isZero();
+    }
+
+    private double barrageBonus(Tile target, List<UnitMove> ships) {
+        return TacticalPlanner.actionSecretBonus(test.game, test.nekro, target, test.sol, ships, true, false);
+    }
+
+    // Holding Fight with Precision, three destroyers at home are worth moving next door to a system two steps from
+    // fighters they could not reach from home: a barrage ship that can reach the fighters next turn.
+    @Test
+    void positionsBarrageShipsWithinReachOfFighters() {
+        String near = AiTestGame.neighbourOf(AiTestGame.HOME);
+        String middle = stepAwayFrom(near, AiTestGame.HOME);
+        String far = stepAwayFrom(middle, near);
+        test.place("26", near);
+        test.place("27", middle);
+        test.place("46", far);
+        test.units(test.game.getTileByPosition(far), "space", test.sol, UnitType.Fighter, 1);
+        test.units(home, "space", test.nekro, UnitType.Destroyer, 3);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+
+        assertThat(positionAt(middle)).isEmpty();
+
+        test.nekro.setSecret("fwp");
+        Optional<TacticalPlan> plan = positionAt(middle);
+
+        assertThat(plan).isPresent();
+        assertThat(plan.get().moves()).contains(new UnitMove(AiTestGame.HOME, "space", UnitType.Destroyer, 3));
+    }
+
+    private Optional<TacticalPlan> positionAt(String position) {
+        return TacticalPlanner.forTarget(test.game, test.nekro, position)
+                .filter(found -> found.kind() == Kind.POSITION);
+    }
+
+    private static String stepAwayFrom(String position, String behind) {
+        List<String> behindRing = new ArrayList<>(PositionMapper.getAdjacentTilePositions(behind));
+        behindRing.add(behind);
+        return PositionMapper.getAdjacentTilePositions(position).stream()
+                .filter(candidate -> !"x".equals(candidate) && !behindRing.contains(candidate))
+                .findFirst()
+                .orElseThrow();
+    }
+
     private static boolean movesOutOfHome(TacticalPlan plan) {
         return plan.moves().stream().anyMatch(move -> AiTestGame.HOME.equals(move.origin()));
     }
@@ -979,6 +1040,7 @@ class TacticalPlannerTest extends BaseTi4Test {
 
     private static final int IMPERIAL = 8;
     private static final double EXACT = 1e-9;
+    private static final double VP = ObjectiveValue.VICTORY_POINT_VALUE;
 
     // Sol at 6 of 10: the late game, when a held Overrule is played for points.
     private void lateGame() {

@@ -246,7 +246,9 @@ to build one by hand:
       trackers. It judges each combat when it ends, and counts a win only if both sides rolled a round: _Spark a
       Rebellion_, _Brave the Void_, _Darken the Skies_, _Unveil Flagship_, _Betray a Friend_, _Demonstrate Your
       Power_, _Destroy Their Greatest Ship_ (the enemy's flagship or war sun gone from the board, not just
-      retreated), _Fight with Precision_ (anti-fighter barrage clears the fighters before the first round), _Turn
+      retreated), _Fight with Precision_ (anti-fighter barrage clears the fighters before the first round, counted even when the
+      fighters were all the opponent had, which ends the combat before another look; the seat waits for the barrage
+      hits to be assigned before rolling the first round), _Turn
       Their Fleets to Dust_ (its space cannon, and no other player's, destroys an invader's last ships), _Become a
       Martyr_ and _Prove Endurance_. Earned secrets wait in a queue, so two combats in one turn can score two.
       _Make an Example of Their World_ scores when its bombardment destroys the last ground forces on a planet
@@ -920,8 +922,9 @@ to build one by hand:
        Flagship_. Destroyers to stack five (or eight) ships for _Raise a Fleet_ (_Command an Armada_) unless a big
        enough stack already exists; the fleet pool grows to match what it can field, never past 4 under _Fleet
        Regulations_. Dreadnoughts up to five for _Gather a Mighty Fleet_. Two ships with bombardment (dreadnoughts
-       first) for _Make an Example of Their World_ and two with anti-fighter barrage (destroyers) for _Fight with
-       Precision_. A few destroyers to move around for presence objectives.
+       first) for _Make an Example of Their World_ and ships with anti-fighter barrage (destroyers) for _Fight with
+       Precision_: two anywhere on the board, but three at the dock itself when a destroyer trip from it reaches a system
+       holding enemy fighters. A few destroyers to move around for presence objectives.
     2. **Core.** Carriers up to two, the infantry the dock is short of a carrier load, and two mechs (four for
        _Mechanize the Military_).
     3. **Surplus.** Its flagship, a war sun when it has the technology, dreadnoughts up to three, upgraded cruisers
@@ -950,6 +953,13 @@ to build one by hand:
     cruiser makes the presence move and a carrier only does when it completes something worth the slots. The same
     charge applies to a staging group's empty haulers, to an idle hauler following from a different system, and to a
     hauler that attacks on its own with no ground forces or fighters.
+  - **Fight with Precision** (`PrecisionRules`). The barrage dice of the ships in and arriving at a system give the chance
+    that they destroy all of an opponent's fighters there (destroyer 2 dice at 9, Destroyer II 3 at 6). An attack counts
+    that chance of a point (a quarter when patient) among the combat secrets, so it competes with the other secret the
+    combat meets and does not need the combat to be won. Positioning moves barrage ships (or a group) to a system
+    empty of enemy ships from which a barrage reaches fighters it could not clear from where they were, worth the
+    gain in that chance less the exposure of the new position. Research adds 0.3 of a point to Destroyer II while the
+    secret is held and the two red technologies are owned.
   - **Pickup**: carriers go where units wait. When the units in a system with the seat's space dock (the infantry and
     mechs on its planets that the garrison does not keep, those in its space area) and the fighters beyond the dock
     allowance outnumber the capacity of the ships already there, a hauler from a system with nothing for it to carry
