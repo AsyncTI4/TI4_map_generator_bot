@@ -51,6 +51,7 @@ import ti4.helpers.PdsCoverageHelper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.MapGenerator.VerticalAlign;
 import ti4.logging.BotLogger;
@@ -1916,6 +1917,9 @@ public class TileGenerator {
             return false;
         }
         if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains("superweapon_mors"))) {
+            return true;
+        }
+        if (unitHolder instanceof Planet planet && BlueReverieTechHelper.hasEcologicalEngineeringShield(game, planet)) {
             return true;
         }
         if (unitHolder instanceof Planet planet

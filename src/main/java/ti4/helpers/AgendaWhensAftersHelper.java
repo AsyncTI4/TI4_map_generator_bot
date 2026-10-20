@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.cron.AutoPingCron;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
 import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -208,6 +209,9 @@ public final class AgendaWhensAftersHelper {
                 names.add(whenPromissoryNoteLabel(pnId));
             }
         }
+        if (player.hasRelic("culturalartifact")) {
+            names.add("Cultural Artifact");
+        }
         return names;
     }
 
@@ -237,6 +241,10 @@ public final class AgendaWhensAftersHelper {
                     && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || "favor".equals(pnId))) {
                 buttons.add(Buttons.red("queueWhen_pn_" + pnId, whenPromissoryNoteLabel(pnId)));
             }
+        }
+        Button culturalArtifactButton = BlueReverieArtifactRelicHandler.getCulturalArtifactButton(player);
+        if (culturalArtifactButton != null) {
+            buttons.add(culturalArtifactButton);
         }
         return buttons;
     }
@@ -523,6 +531,8 @@ public final class AgendaWhensAftersHelper {
                                     offerEveryoneWhensQueue(game);
                                 }
                             }
+                            case "relic" ->
+                                BlueReverieArtifactRelicHandler.resolveCulturalArtifact(event, game, player);
                         }
                     }
                     return;

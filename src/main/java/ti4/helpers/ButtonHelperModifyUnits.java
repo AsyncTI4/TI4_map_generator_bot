@@ -34,6 +34,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
@@ -2462,6 +2463,12 @@ public final class ButtonHelperModifyUnits {
                         });
             }
         }
+        if (unitKey != null) {
+            UnitModel producedUnit = player.getUnitFromUnitKey(unitKey);
+            if (producedUnit != null) {
+                BlueReverieArtifactRelicHandler.offerIndustrialArtifact(game, player, producedUnit);
+            }
+        }
         if ("sd".equalsIgnoreCase(unitID)) {
             tile = game.getTileFromPlanet(planetName);
             if (tile != null) {
@@ -2742,6 +2749,12 @@ public final class ButtonHelperModifyUnits {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
                     }
                 }
+            }
+        }
+        if (!willSkipBuild && unitKey != null) {
+            UnitModel producedUnit = player.getUnitFromUnitKey(unitKey);
+            if (producedUnit != null) {
+                BlueReverieArtifactRelicHandler.offerIndustrialArtifact(game, player, producedUnit);
             }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), playerRep + " " + successMessage);

@@ -1222,6 +1222,9 @@ public final class AgendaHelper {
                                     game, winningR, UnitType.Mech);
                             ButtonHelperFactionSpecific.resolveEdynAgendaStuffStep1(winningR, game, tiles);
                         }
+                        if (specificVote.contains("Antiquities Rider")) {
+                            RelicHelper.drawRelicAndNotify(winningR, event, game);
+                        }
                         if (specificVote.contains("Atokera Commander")) {
                             if (!getWinningVoters(winner, game).contains(winningR)
                                     && !getLosingVoters(winner, game).contains(winningR)) {
@@ -1858,7 +1861,8 @@ public final class AgendaHelper {
         }
 
         boolean executive = player.getFaction().equals(game.getStoredValue("executiveOrder"))
-                && game.getStoredValue("executiveOrderBr").isEmpty();
+                && game.getStoredValue("executiveOrderBr").isEmpty()
+                && game.getStoredValue("proFormaSession").isEmpty();
         if (player.hasUnlockedBreakthrough("xxchabt") || executive) {
             voteAmount = Math.max(p.getResources(), p.getInfluence());
         }
@@ -1945,7 +1949,8 @@ public final class AgendaHelper {
             }
             if (player.isSpeaker()
                     && !game.getStoredValue("executiveOrder").isEmpty()
-                    && game.getStoredValue("executiveOrderBr").isEmpty()) {
+                    && game.getStoredValue("executiveOrderBr").isEmpty()
+                    && game.getStoredValue("proFormaSession").isEmpty()) {
                 planetButtons.add(Buttons.gray(
                         "exhaustForVotes_hacanCommanderTg",
                         "Spend Trade Goods for 1 Vote Each",
@@ -2374,7 +2379,8 @@ public final class AgendaHelper {
             voteCount = baseResourceCount + baseInfluenceCount;
         }
 
-        boolean executive = player.getFaction().equalsIgnoreCase(game.getStoredValue("executiveOrder"));
+        boolean executive = player.getFaction().equalsIgnoreCase(game.getStoredValue("executiveOrder"))
+                && game.getStoredValue("proFormaSession").isEmpty();
         if (player.hasUnlockedBreakthrough("xxchabt") || executive) {
             voteCount = planets.stream()
                     .map(planetsInfo::get)

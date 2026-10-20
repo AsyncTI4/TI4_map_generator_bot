@@ -13,6 +13,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.FrameShiftBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PirateHordeBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamFactionTechHandler;
@@ -21,6 +23,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -416,6 +419,9 @@ public class TacticalActionOutputService {
         // Calculate base move value (pretty easy)
         int baseMoveValue = model.getMoveValue();
         if (baseMoveValue == 0) return 0;
+        if (model.getIsShip() && BlueReverieArtifactRelicHandler.hasUnknownArtifactMoveRestriction(game, player)) {
+            baseMoveValue = 1;
+        }
         if (tile.isNebula(game)
                 && !RealityFieldImpactorService.nullifies(game, tile)
                 && !DreamAbilitiesHandler.ignoresNebula(player, game, tile)
@@ -428,6 +434,9 @@ public class TacticalActionOutputService {
                         && AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile))
                 && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)) {
             baseMoveValue = 1;
+        }
+        if (model.getIsShip() && PirateHordeBrActionCardHandler.isActive(game, player)) {
+            baseMoveValue *= 2;
         }
         if (skipBonus) return baseMoveValue;
 
@@ -467,6 +476,10 @@ public class TacticalActionOutputService {
         }
 
         if (player.hasTech("tf-planesplitter") && tile.isFracture()) {
+            bonusMoveValue++;
+        }
+
+        if (model.getIsShip() && FrameShiftBrActionCardHandler.isActive(game, player) && tile.isFracture()) {
             bonusMoveValue++;
         }
 

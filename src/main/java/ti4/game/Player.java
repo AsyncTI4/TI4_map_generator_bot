@@ -2724,6 +2724,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 "mutagenindustrial",
                 "mutagencultural",
                 "mutagenfrontier",
+                "culturalartifact",
+                "hazardousartifact",
+                "industrialartifact",
+                "unknownartifact",
                 "ancientexcavators30k",
                 "dauntingweaponsschematics30k",
                 "enhancedmobilitycore30k");

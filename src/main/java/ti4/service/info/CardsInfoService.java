@@ -47,6 +47,7 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -568,6 +569,10 @@ public class CardsInfoService {
                     player.factionButtonChecker() + "repairUnitsL4",
                     "Repair All Your Damaged Units",
                     FactionEmojis.Letnev));
+        }
+        Button viralEntanglementButton = BlueReverieTechHelper.getViralEntanglementButton(player);
+        if (viralEntanglementButton != null) {
+            buttons.add(viralEntanglementButton);
         }
         Button doubleDragonsDeploy = ThurvialiUnitHandler.getDoubleDragonsDeployButton(game, player);
         if (doubleDragonsDeploy != null) {
