@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -704,7 +705,8 @@ public class ButtonHelperCommanders {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1 Trade Good", MiscEmojis.tg));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
+                    MessageChannel channel = event == null ? player.getCorrectChannel() : event.getMessageChannel();
+                    MessageHelper.sendMessageToChannelWithButtons(channel, mMessage, buttons);
                 }
                 case AUTO -> {
                     String message = player.getRepresentationUnfogged()

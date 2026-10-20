@@ -102,6 +102,7 @@ public class Source {
         combosloth,
         newdawn,
         deepreaches,
+        merford,
 
         // eronous' stuff
         eronous,

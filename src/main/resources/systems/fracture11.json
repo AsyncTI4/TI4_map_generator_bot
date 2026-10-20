@@ -7,9 +7,6 @@
         "frac11"
     ],
     "imagePath": "fracture11.png",
-    "planets": [
-        ""
-    ],
     "shipPositionsType": "TYPE04",
     "tileBack": "fracture",
     "isAstroid": true,
