@@ -32,7 +32,7 @@ public class ConvoysRules {
         Optional<String> note = playable(context);
         if (note.isEmpty()) return Optional.empty();
         double value = value(context.game(), context.seat());
-        if (tacticalActionBeats(context, value + Stall.ACTION_VALUE)) return Optional.empty();
+        if (tacticalActionBeats(context, value + Stall.value(context.game(), context.seat()))) return Optional.empty();
         return open(context, thisTurn, note.get(), "play Trade Convoys instead of a weak tactical action");
     }
 

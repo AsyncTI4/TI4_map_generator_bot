@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.brain.AiDecision;
@@ -191,12 +192,21 @@ public class TacticalRules {
     }
 
     public static Optional<AiDecision> start(AiTurnContext context) {
+        return start(context, hints -> TacticalPlanner.best(context.game(), context.seat(), hints));
+    }
+
+    public static Optional<AiDecision> stall(AiTurnContext context) {
+        return start(context, hints -> StallPlans.enduranceStall(context.game(), context.seat()));
+    }
+
+    private static Optional<AiDecision> start(
+            AiTurnContext context, Function<List<SetupHint>, Optional<TacticalPlan>> planner) {
         List<AiPrompt> turn = Prompts.thisTurn(context);
         List<AiPrompt> pickers = pickers(context, turn);
         Optional<AiPrompt> picker = pickers.stream().findFirst();
         List<SetupHint> hints = setupHints(context);
         Optional<TacticalPlan> plan = rememberedPlan(context).or(() -> {
-            Optional<TacticalPlan> computed = TacticalPlanner.best(context.game(), context.seat(), hints);
+            Optional<TacticalPlan> computed = planner.apply(hints);
             computed.ifPresent(found -> context.memory().put(PLAN_KEY + actionKey(context), found.encode()));
             return computed;
         });

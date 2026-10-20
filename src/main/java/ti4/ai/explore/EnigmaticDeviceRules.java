@@ -44,7 +44,7 @@ class EnigmaticDeviceRules {
         Game game = context.game();
         double net =
                 researchValue(game, context.seat()) - ProductionPlanner.fillerValuePerResource(game) * RESEARCH_COST;
-        if (ComponentFlow.tacticalActionBeats(context, net + Stall.ACTION_VALUE)) {
+        if (ComponentFlow.tacticalActionBeats(context, net + Stall.value(context.game(), context.seat()))) {
             return Optional.empty();
         }
         return open(context, thisTurn, "research with the Enigmatic Device instead of a weak tactical action");

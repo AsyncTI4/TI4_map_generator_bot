@@ -101,6 +101,10 @@ public class AiActionCards {
         return of(alias).isPresent();
     }
 
+    public static boolean isComponentCard(String alias) {
+        return of(alias).filter(AiCard::isComponentAction).isPresent();
+    }
+
     public static boolean isSabotage(String alias) {
         return of(alias).filter(AiCard::isSabotage).isPresent();
     }
@@ -245,7 +249,7 @@ public class AiActionCards {
 
     private static Evaluator withStall(Evaluator evaluator) {
         return Evaluator.atMoment((game, seat, moment) ->
-                evaluator.plan(game, seat, moment).map(plan -> plan.plus(Stall.actionValue(game, seat))));
+                evaluator.plan(game, seat, moment).map(plan -> plan.plus(Stall.cardActionValue(game, seat))));
     }
 
     private static double summitValue(Game game, Player seat) {

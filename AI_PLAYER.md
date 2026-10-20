@@ -254,6 +254,23 @@ to build one by hand:
       _Make an Example of Their World_ scores when its bombardment destroys the last ground forces on a planet
       before it lands; it builds ships with bombardment for it and keeps the secret while it has some.
       When a combat meets two, the rarer one (by how often real players finished it) is scored.
+    - **Prove Endurance** (`ti4.ai.endurance`). It is scored by passing last, so a seat holding it counts the actions each
+      player still has (`StallCount`) and stalls only while it can outlast them. A count is the tactic tokens (its own
+      less the ones a scoring reserve keeps), unplayed strategy cards, ready technologies with an ACTION (its own: Sling
+      Relay with a space dock and Production Biomes), 1 more when Bio-Stims is ready and could refill one, relics with
+      an ACTION and unlocked leaders with an ACTION (another player's are read from their public cards; its own are the
+      _Enigmatic Device_ and relic fragments it can purge), and the component action cards in the hand: its own count
+      0.8 each, another player's hand counts its size times the share of component action cards in the deck times 0.8.
+      The race compares its count with the best of the players who have not passed. The chance to win is
+      `1 / (1 + e^(-lead / 1.5))`, and above 0.3 the race is contested: every stall (`Stall.value`: the 1.5 for a stall plus
+      the chance times a point (`ScoringStakes.scoreValue`) over the rival's count plus one) is worth more, so cards,
+      relics, _Enigmatic Device_ and Sling Relay are used before passing, Bio-Stims readies an exhausted Sling Relay
+      rather than a planet, and with no other action left it spends a tactic token on a tactical action that moves
+      nothing (`StallPlans`: its home system first, then a system it holds, never one with enemy units or its own
+      token). Below 0.3 it passes as before. While the race cannot be won the component action cards get no stall
+      value at all (`Stall.cardActionValue`), so they are saved for a round where it can, unless the card is worth
+      playing for what it does. Holding it adds 0.75 to researching Sling Relay and Bio-Stims and 0.5 per token to
+      picking Leadership (`CardUse.LEADERSHIP_ENDURANCE`).
     - **Patience.** Saving an action secret means not going out of its way to meet the condition early; a combat
       that has already met it is always scored. The tactical planner counts a qualifying secret as a full point when it
       should pursue it now and as a quarter of a point when it can be patient. Human tables usually finish by round 5
@@ -510,7 +527,8 @@ to build one by hand:
   - **When it plays.** Only on its own turn, in the action phase, and a component action card is the turn's action:
     the turn ends once it is resolved. A component action also stalls: it takes the turn without committing
     anything while the other players keep acting, which is worth 1.5 trade goods (`Stall.ACTION_VALUE`, the same
-    figure relics, _Enigmatic Device_ and the _Sling Relay_ use) as long as at least one other player has not passed.
+    figure relics, _Enigmatic Device_ and the _Sling Relay_ use, more while it holds _Prove Endurance_ and can outlast
+    the table) as long as at least one other player has not passed.
     That is added to what every component action card does now, even a card whose effect gives nothing (_Industrial
     Initiative_ with no industrial planet is a pure stall). A card that cannot legally be played (no legal target, _War
     Effort_ with no room for the cruiser) has no value. The
@@ -1282,6 +1300,10 @@ Seven small generic changes don't reference `ti4.ai`:
   acting, so the AI plays its weakest cards as soon as it has nothing better to do. In smoke runs it played _Master
   Plan_ on 75% of draws, against 38% for human players. The stall value (1.5) and the "spend the card that gains most
   over keeping it" rule are not yet checked against human play rates in a large self-play batch.
+- **Prove Endurance.** The stall count is an estimate from public cards and a guess for hidden hands. Its own count leaves
+  out heroes, agents and promissory notes with an ACTION, and it does not trade for other players' notes to stall with.
+  Nothing here has been measured in a large self-play batch yet; the 1.5 stall, the 0.3 contest line and the logistic
+  spread of 1.5 are first guesses.
 - **Action cards, Overrule.** It only performs Imperial and Technology. The bot cannot yet run the other primaries
   from an overruled card, though human players also overrule Warfare (10% of plays), Construction (9%) and
   Leadership (6%). Overruling the seat's own readied Imperial and then playing it assumes the table accepts that.

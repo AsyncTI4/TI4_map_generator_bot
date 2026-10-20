@@ -136,7 +136,7 @@ public class ActionCardValue {
         if (ECONOMIC.equals(alias)) {
             value += ReadyingValue.of(game, seat, exhaustedCulturalPlanets(game, seat));
         }
-        return Optional.of(Plan.of(value + Stall.actionValue(game, seat)));
+        return Optional.of(Plan.of(value + Stall.cardActionValue(game, seat)));
     }
 
     private static boolean isPlayable(Game game, Player seat, String alias) {
