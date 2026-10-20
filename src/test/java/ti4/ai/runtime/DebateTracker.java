@@ -114,7 +114,8 @@ final class DebateTracker {
         for (String entry : votes.values()) {
             for (String piece : entry.split(";")) {
                 int split = piece.indexOf('_');
-                if (split > 0 && piece.substring(0, split).equalsIgnoreCase(holder.getColor())) {
+                String voter = split > 0 ? piece.substring(0, split) : "";
+                if (voter.equalsIgnoreCase(holder.getFaction()) || voter.equalsIgnoreCase(holder.getColor())) {
                     total += number(piece.substring(split + 1));
                 }
             }
