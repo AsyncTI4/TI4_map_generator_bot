@@ -2599,7 +2599,7 @@ public class TacticalPlanner {
         return Optional.of(merge(joined));
     }
 
-    private static Optional<TacticalPlan> position(Context context, Tile tile) {
+    static Optional<TacticalPlan> position(Context context, Tile tile) {
         Game game = context.game;
         Player seat = context.seat;
         double frontier = frontierExplore(seat, tile);
@@ -2611,6 +2611,7 @@ public class TacticalPlanner {
         if (BoardView.hasEnemyShips(game, seat, tile)) return Optional.empty();
         boolean covered = context.coveredByEnemySpaceCannon(tile);
         if (covered && !SeatCover.chases(game, seat, tile, context.objectives())) return Optional.empty();
+        boolean contested = covered || SeatCover.contests(game, seat, tile, context.objectives());
         TacticalPlan best = null;
         for (Tile origin : context.origins()) {
             if (origin == tile) continue;
@@ -2635,13 +2636,13 @@ public class TacticalPlanner {
                         context,
                         tile,
                         new TacticalPlan(Kind.POSITION, tile.getPosition(), legal.get(), Map.of(), score));
-                Optional<TacticalPlan> allowed = covered ? underCannon(context, tile, plan) : Optional.of(plan);
+                Optional<TacticalPlan> allowed = contested ? underCannon(context, tile, plan) : Optional.of(plan);
                 if (allowed.isPresent() && (best == null || allowed.get().score() > best.score())) {
                     best = allowed.get();
                 }
             }
             Optional<TacticalPlan> group = groupPosition(context, tile, origin);
-            if (covered) group = group.flatMap(plan -> underCannon(context, tile, plan));
+            if (contested) group = group.flatMap(plan -> underCannon(context, tile, plan));
             if (group.isPresent() && (best == null || group.get().score() > best.score())) best = group.get();
         }
         return Optional.ofNullable(best);
@@ -2651,10 +2652,13 @@ public class TacticalPlanner {
         double fire = BattleMath.expectedCannonFire(context.game, context.seat, tile);
         Footprint after =
                 context.footprintAfter(tile, plan.moves(), plan.landings().keySet());
-        if (!SeatCover.completesThroughCannon(context.game, context.objectives(), after, fire)) {
+        if (!SeatCover.completesThroughCannon(
+                context.game, context.seat, tile, context.objectives(), after, plan.moves(), fire)) {
             return Optional.empty();
         }
-        double score = plan.score() - SeatCover.exposure(context.seat, tile, plan.moves(), fire);
+        double shortfall = SeatCover.shortfall(context.game, context.seat, tile, context.objectives(), plan.moves());
+        double score = plan.score() - shortfall - SeatCover.exposure(context.seat, tile, plan.moves(), fire);
+        if (shortfall > 0 && score <= 0) return Optional.empty();
         return Optional.of(new TacticalPlan(plan.kind(), plan.target(), plan.moves(), plan.landings(), score));
     }
 

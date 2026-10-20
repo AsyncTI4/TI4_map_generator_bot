@@ -126,6 +126,7 @@ final class ObjectiveTracker {
     private final DebateTracker debate = new DebateTracker();
     private final DirectHitTracker directHits = new DirectHitTracker();
     private final PerimeterTracker perimeter = new PerimeterTracker();
+    private final SupplyLinesTracker supplyLines = new SupplyLinesTracker();
 
     private Snapshot open;
     private int lastOpenedRound;
@@ -143,6 +144,7 @@ final class ObjectiveTracker {
         traits.observe(game);
         debate.observe(game);
         directHits.observe(game);
+        supplyLines.observe(game);
         if (pastTheOpeningDiscard(game)) recordHeld(game);
         trackMechs(game);
         produce.observe(game);
@@ -161,6 +163,7 @@ final class ObjectiveTracker {
         debate.lines(game).forEach(System.out::println);
         directHits.lines(game).forEach(System.out::println);
         perimeter.lines(game).forEach(System.out::println);
+        supplyLines.lines(game).forEach(System.out::println);
         if (open != null) close(game);
         NexusWatch.print(game);
         produce.finish(game);
@@ -364,6 +367,7 @@ final class ObjectiveTracker {
         recordMechanize(game);
         produce.record(game);
         seatOfTheEmpire.record(game);
+        supplyLines.record(game);
         recordIconAndStrategies(game);
         perimeter.record(game);
         Map<String, Set<String>> publics = new HashMap<>();

@@ -9,6 +9,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.GameHorizon;
 import ti4.ai.strategy.TechPath;
+import ti4.ai.tactical.SupplyLines;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -30,6 +31,7 @@ public class SecretValue {
             "dfat", 0.3,
             "fc", 0.6,
             "pem", 0.6);
+    private static final double REACHABLE_SUPPLY_LINES = 0.6;
     private static final String ADAPT_NEW_STRATEGIES = "ans";
     private static final String SEIZE_AN_ICON = "sai";
     private static final String DEFY_SPACE_AND_TIME = "dfat";
@@ -192,7 +194,8 @@ public class SecretValue {
 
     private static double completionChance(Game game, Player seat, String secretId) {
         double priorShare = priorShare(game);
-        return priorShare * achievableCompletion(secretId) + (1 - priorShare) * situationalChance(game, seat, secretId);
+        return priorShare * achievableCompletion(game, seat, secretId)
+                + (1 - priorShare) * situationalChance(game, seat, secretId);
     }
 
     private static double priorShare(Game game) {
@@ -200,8 +203,15 @@ public class SecretValue {
         return game.getRound() <= LAST_MIDDLE_ROUND ? MIDDLE_PRIOR_SHARE : LATE_PRIOR_SHARE;
     }
 
-    private static double achievableCompletion(String secretId) {
-        return SecretStatistics.completion(secretId) * STATUS_ACHIEVABILITY.getOrDefault(secretId, 1.0);
+    private static double achievableCompletion(Game game, Player seat, String secretId) {
+        return SecretStatistics.completion(secretId) * achievability(game, seat, secretId);
+    }
+
+    private static double achievability(Game game, Player seat, String secretId) {
+        if (SupplyLines.CUT_SUPPLY_LINES.equals(secretId)) {
+            return SupplyLines.targetInReach(game, seat) ? REACHABLE_SUPPLY_LINES : STATUS_ACHIEVABILITY.get(secretId);
+        }
+        return STATUS_ACHIEVABILITY.getOrDefault(secretId, 1.0);
     }
 
     private static double situationalChance(Game game, Player seat, String secretId) {
@@ -209,17 +219,17 @@ public class SecretValue {
             case STATUS -> statusChance(game, seat, secretId);
             case ACTION -> ActionSecretOdds.beforeGameEnds(game, seat, secretId);
             case AGENDA -> agendaChance(game, seat, secretId);
-            case UNKNOWN -> achievableCompletion(secretId);
+            case UNKNOWN -> achievableCompletion(game, seat, secretId);
         };
     }
 
     private static double statusChance(Game game, Player seat, String secretId) {
         int threshold = ListPlayerInfoService.getObjectiveThreshold(secretId, game);
-        if (threshold <= 0) return achievableCompletion(secretId);
+        if (threshold <= 0) return achievableCompletion(game, seat, secretId);
         double share = Math.min(1.0, (double) progress(game, seat, secretId) / threshold);
         if (TechPath.follows(secretId) && !TechPath.reachable(game, seat, secretId)) return share >= 1.0 ? 1.0 : 0.0;
         double runway = Math.min(1.0, GameHorizon.roundsLeft(game) / STATUS_RUNWAY_ROUNDS);
-        return share + (1 - share) * achievableCompletion(secretId) * runway;
+        return share + (1 - share) * achievableCompletion(game, seat, secretId) * runway;
     }
 
     private static double agendaChance(Game game, Player seat, String secretId) {
@@ -230,6 +240,6 @@ public class SecretValue {
             if (seat.hasAbility("galactic_threat")) return DRIVE_THE_DEBATE_UNDER_THREAT_CHANCE;
             return DriveTheDebateOdds.chance(game, seat);
         }
-        return achievableCompletion(secretId);
+        return achievableCompletion(game, seat, secretId);
     }
 }
