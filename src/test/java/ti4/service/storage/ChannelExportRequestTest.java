@@ -1,0 +1,56 @@
+package ti4.service.storage;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+class ChannelExportRequestTest {
+
+    @Test
+    void payloadMatchesWhatTheArchiveWorkflowReads() {
+        var request = new ChannelExportRequest(
+                "111",
+                List.of("111", "222", "333"),
+                "20261019-120000",
+                ChannelExportFormat.HTML,
+                LocalDate.of(2026, 1, 1),
+                null,
+                true);
+
+        assertThat(request.toDispatchPayload())
+                .containsExactly(
+                        Map.entry("channel", "111"),
+                        Map.entry("channels", "111 222 333"),
+                        Map.entry("export_id", "20261019-120000"),
+                        Map.entry("format", "HtmlDark"),
+                        Map.entry("after", "2026-01-01"),
+                        Map.entry("before", ""),
+                        Map.entry("media", "true"));
+    }
+
+    @Test
+    void payloadStaysUnderGitHubsTenPropertyLimit() {
+        // RespositoryDispatchClientPayload silently drops the whole payload at 10 or more properties.
+        var request =
+                new ChannelExportRequest("111", List.of("111"), "id", ChannelExportFormat.JSON, null, null, false);
+
+        assertThat(request.toDispatchPayload()).hasSizeLessThan(10);
+    }
+
+    @Test
+    void exportIdIsAUtcTimestampSafeForFileNames() {
+        assertThat(ChannelExportRequest.newExportId(Instant.parse("2026-10-19T04:05:06Z")))
+                .isEqualTo("20261019-040506");
+    }
+
+    @Test
+    void formatFallsBackToJson() {
+        assertThat(ChannelExportFormat.fromOption(null)).isEqualTo(ChannelExportFormat.JSON);
+        assertThat(ChannelExportFormat.fromOption("csv")).isEqualTo(ChannelExportFormat.JSON);
+        assertThat(ChannelExportFormat.fromOption("HTML")).isEqualTo(ChannelExportFormat.HTML);
+    }
+}

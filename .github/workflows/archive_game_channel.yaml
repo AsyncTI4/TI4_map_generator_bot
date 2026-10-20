@@ -1,4 +1,4 @@
-on: 
+on:
   repository_dispatch:
       types: [archive_game_channel]
 name: ArchiveGameChannel
@@ -9,17 +9,75 @@ jobs:
     name: Archive Game Channel
     runs-on: ubuntu-latest
     steps:
-    - name: executing remote ssh commands
+    - name: start detached channel export on host
       uses: appleboy/ssh-action@master
       env:
         DISCORD_BOT_KEY: ${{ secrets.CHAT_EXPORT_BOT_KEY }}
         CHANNEL_ID: ${{ github.event.client_payload.channel }}
+        CHANNEL_IDS: ${{ github.event.client_payload.channels }}
+        EXPORT_ID: ${{ github.event.client_payload.export_id }}
+        EXPORT_FORMAT: ${{ github.event.client_payload.format }}
+        EXPORT_AFTER: ${{ github.event.client_payload.after }}
+        EXPORT_BEFORE: ${{ github.event.client_payload.before }}
+        EXPORT_MEDIA: ${{ github.event.client_payload.media }}
+        EXPORT_ROOT: ${{ vars.HOST_TI4_SAVES_DIR }}/exported_channels
       with:
         host: ${{ secrets.HOSTINGER_SSH_HOST }}
         username: ${{ secrets.HOSTINGER_SSH_USER }}
         password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
         port: ${{ secrets.HOSTINGER_SSH_PORT }}
-        envs: DISCORD_BOT_KEY, CHANNEL_ID
+        envs: DISCORD_BOT_KEY,CHANNEL_ID,CHANNEL_IDS,EXPORT_ID,EXPORT_FORMAT,EXPORT_AFTER,EXPORT_BEFORE,EXPORT_MEDIA,EXPORT_ROOT
+        # The export itself runs detached on the host so long channels are not cut off by the SSH
+        # command timeout. Layout under exported_channels/<channel id>/:
+        #   <export id>/          working directory while the export runs
+        #   <export id>.log       exporter output
+        #   <export id>.tar.gz    finished export
+        #   <export id>.done      written last on success
+        #   <export id>.failed    written on any failure (with the reason)
         script: |
-          docker version
-          docker run --rm -v ${{ vars.HOST_TI4_SAVES_DIR }}/exported_channels:/out --user $(id -u):$(id -g) tyrrrz/discordchatexporter:stable export -t $DISCORD_BOT_KEY -c $CHANNEL_ID
+          set -eu
+          is_digits() { case "$1" in ''|*[!0-9]*) return 1 ;; esac; return 0; }
+          is_optional_date() { case "$1" in ''|[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) return 0 ;; esac; return 1; }
+
+          is_digits "$CHANNEL_ID" || { echo "Invalid channel id: $CHANNEL_ID"; exit 1; }
+          case "$EXPORT_ID" in ''|*[!0-9A-Za-z_-]*) echo "Invalid export id: $EXPORT_ID"; exit 1 ;; esac
+
+          EXPORT_DIR="$EXPORT_ROOT/$CHANNEL_ID"
+          EXPORT_BASE="$EXPORT_DIR/$EXPORT_ID"
+          mkdir -p "$EXPORT_DIR"
+          fail() { echo "$1" > "$EXPORT_BASE.failed"; echo "$1"; exit 1; }
+
+          CHANNEL_IDS="${CHANNEL_IDS:-$CHANNEL_ID}"
+          for id in $CHANNEL_IDS; do
+            is_digits "$id" || fail "Invalid channel id in list: $id"
+          done
+          case "$EXPORT_FORMAT" in Json|HtmlDark) ;; *) fail "Invalid format: $EXPORT_FORMAT" ;; esac
+          is_optional_date "${EXPORT_AFTER:-}" || fail "Invalid after date: $EXPORT_AFTER"
+          is_optional_date "${EXPORT_BEFORE:-}" || fail "Invalid before date: $EXPORT_BEFORE"
+          case "${EXPORT_MEDIA:-false}" in true|false) ;; *) fail "Invalid media flag: $EXPORT_MEDIA" ;; esac
+
+          EXPORT_ARGS="export -c $CHANNEL_IDS -f $EXPORT_FORMAT -o /out/"
+          if [ -n "${EXPORT_AFTER:-}" ]; then EXPORT_ARGS="$EXPORT_ARGS --after $EXPORT_AFTER"; fi
+          if [ -n "${EXPORT_BEFORE:-}" ]; then EXPORT_ARGS="$EXPORT_ARGS --before $EXPORT_BEFORE"; fi
+          if [ "${EXPORT_MEDIA:-false}" = "true" ]; then EXPORT_ARGS="$EXPORT_ARGS --media"; fi
+
+          mkdir -p "$EXPORT_BASE"
+          export EXPORT_BASE EXPORT_ARGS EXPORT_ID
+          export DISCORD_TOKEN="$DISCORD_BOT_KEY"
+          docker version > /dev/null || fail "Docker is not available on the host"
+
+          nohup sh -c '
+            if docker run --rm --cpus 1 --memory 1g --user "$(id -u):$(id -g)" \
+                 -e DISCORD_TOKEN -v "$EXPORT_BASE":/out \
+                 tyrrrz/discordchatexporter:stable $EXPORT_ARGS \
+               && tar -czf "$EXPORT_BASE.tar.gz.partial" -C "$EXPORT_BASE" . \
+               && mv "$EXPORT_BASE.tar.gz.partial" "$EXPORT_BASE.tar.gz" \
+               && rm -rf "$EXPORT_BASE"; then
+              touch "$EXPORT_BASE.done"
+            else
+              rm -f "$EXPORT_BASE.tar.gz.partial"
+              echo "Export failed, see $EXPORT_ID.log" > "$EXPORT_BASE.failed"
+            fi
+          ' > "$EXPORT_BASE.log" 2>&1 < /dev/null &
+
+          echo "Started export $EXPORT_ID for channel $CHANNEL_ID"
