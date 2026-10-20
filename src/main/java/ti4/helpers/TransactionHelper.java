@@ -4,10 +4,12 @@ import java.awt.image.BufferedImage;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -32,6 +34,7 @@ import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButt
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
+import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -45,6 +48,7 @@ import ti4.image.TransactionGenerator;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.TechnologyModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -55,7 +59,9 @@ import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.image.FileUploadService;
 import ti4.service.info.CardsInfoService;
+import ti4.service.info.LeaderInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.info.TechInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.relic.SendRelicService;
@@ -111,6 +117,45 @@ public class TransactionHelper {
 
     public static boolean useNewTransactionModel(Game game) {
         return game.isFowMode() ? game.getFowOption(FOWOption.NEW_TRANSACTIONS) : game.isNewTransactionMethod();
+    }
+
+    public static void activateEntanglement(Game game, Player player) {
+        game.setStoredValue(entanglementKey(player), "active");
+    }
+
+    public static boolean isEntanglementActive(Game game, Player p1, Player p2) {
+        return "active".equals(game.getStoredValue(entanglementKey(p1)))
+                || "active".equals(game.getStoredValue(entanglementKey(p2)));
+    }
+
+    private static void clearEntanglement(Game game, Player p1, Player p2) {
+        game.removeStoredValue(entanglementKey(p1));
+        game.removeStoredValue(entanglementKey(p2));
+    }
+
+    private static String entanglementKey(Player player) {
+        return "entanglement_" + player.getFaction();
+    }
+
+    private static List<Leader> getEntanglementLeaders(Player player) {
+        return player.getLeaders().stream()
+                .filter(leader ->
+                        Constants.AGENT.equals(leader.getType()) || Constants.COMMANDER.equals(leader.getType()))
+                .toList();
+    }
+
+    private static List<Leader> getEntanglementLeaders(Player player, String type) {
+        return getEntanglementLeaders(player).stream()
+                .filter(leader -> type.equals(leader.getType()))
+                .toList();
+    }
+
+    private static List<String> getEntanglementTechs(Player player) {
+        return player.getTechs().stream()
+                .filter(tech -> Mapper.getTech(tech) != null)
+                .filter(tech -> Mapper.getTech(tech).isFactionTech())
+                .filter(tech -> !Mapper.getTech(tech).isUnitUpgrade())
+                .toList();
     }
 
     private static boolean canSeeSheet(Game game, Player target, Player viewer) {
@@ -218,6 +263,17 @@ public class TransactionHelper {
                         genericPnDemand += Integer.parseInt(detail.substring("generic".length()));
                     } else if (!holdsPromissoryNote(sender, detail)) {
                         shortfalls.add(new Shortfall(sender, "a promissory note no longer held"));
+                    }
+                }
+                case "EntanglementAgent", "EntanglementCommander" -> {
+                    if (!getEntanglementLeaders(sender).stream()
+                            .anyMatch(leader -> leader.getId().equals(detail))) {
+                        shortfalls.add(new Shortfall(sender, "an agent or commander no longer held"));
+                    }
+                }
+                case "EntanglementTechnology" -> {
+                    if (!getEntanglementTechs(sender).contains(detail)) {
+                        shortfalls.add(new Shortfall(sender, "a faction technology no longer held"));
                     }
                 }
                 default -> {}
@@ -391,6 +447,10 @@ public class TransactionHelper {
                             ButtonHelperCommanders.resolveNekroCommanderCheck(receiver, furtherDetail, game);
                             CommanderUnlockCheckService.checkPlayer(receiver, "nekro");
                         }
+                        case "EntanglementAgent", "EntanglementCommander" ->
+                            transferEntanglementLeader(sender, receiver, furtherDetail, game);
+                        case "EntanglementTechnology" ->
+                            transferEntanglementTechnology(sender, receiver, furtherDetail, game);
                         case "MonumentUnits" ->
                             MonumentsButtonHandler.resolveHacanMonumentUnitTrade(
                                     event, game, sender, receiver, furtherDetail);
@@ -416,6 +476,7 @@ public class TransactionHelper {
                 p2.getCardsInfoThread(), p2.getRepresentationUnfogged() + " " + privateSummary);
 
         p1.clearTransactionItemsWithPlayer(p2);
+        clearEntanglement(game, p1, p2);
         if (!debtOnly) {
             ButtonHelperActionCards.lieInWaitCheck(p1, p2, game);
             if (!hasOptedOutOfOwnTransactionPillage(game, p1) && !hasOptedOutOfOwnTransactionPillage(game, p2)) {
@@ -432,6 +493,37 @@ public class TransactionHelper {
                 && !game.isTwilightsFallMode()
                 && !game.getStoredValue("willPillageOwnTransactions" + player.getFaction())
                         .isEmpty();
+    }
+
+    private static boolean transferEntanglementLeader(Player sender, Player receiver, String leaderID, Game game) {
+        Leader leader = sender.getLeaders().stream()
+                .filter(candidate -> candidate.getId().equals(leaderID))
+                .filter(candidate ->
+                        Constants.AGENT.equals(candidate.getType()) || Constants.COMMANDER.equals(candidate.getType()))
+                .findFirst()
+                .orElse(null);
+        if (leader == null || receiver.hasLeader(leaderID)) return false;
+        sender.removeLeader(leader);
+        receiver.addLeader(leader);
+        LeaderInfoService.sendLeadersInfo(game, sender);
+        LeaderInfoService.sendLeadersInfo(game, receiver);
+        return true;
+    }
+
+    private static boolean transferEntanglementTechnology(Player sender, Player receiver, String techID, Game game) {
+        TechnologyModel tech = Mapper.getTech(techID);
+        if (tech == null
+                || !sender.hasTech(techID)
+                || receiver.hasTech(techID)
+                || !tech.isFactionTech()
+                || tech.isUnitUpgrade()) return false;
+        sender.removeTech(techID);
+        receiver.addTech(techID);
+        ButtonHelperCommanders.resolveNekroCommanderCheck(receiver, techID, game);
+        CommanderUnlockCheckService.checkPlayer(receiver, "nekro");
+        TechInfoService.sendTechInfo(sender);
+        TechInfoService.sendTechInfo(receiver);
+        return true;
     }
 
     private static void announceFogRatification(Game game, Player p1, Player p2, String publicSummary) {
@@ -698,6 +790,10 @@ public class TransactionHelper {
                         }
                     }
                     case "Technology" ->
+                        trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
+                    case "EntanglementAgent", "EntanglementCommander" ->
+                        trans.append(Mapper.getLeader(furtherDetail).getName());
+                    case "EntanglementTechnology" ->
                         trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
                     case "MonumentUnits" -> {
                         String[] unitDetails = furtherDetail.split("\\|", 4);
@@ -1142,6 +1238,25 @@ public class TransactionHelper {
                     }
                 }
             }
+            case "EntanglementAgent", "EntanglementCommander" -> {
+                String leaderType = "EntanglementAgent".equals(thingToTrans) ? Constants.AGENT : Constants.COMMANDER;
+                message += " Please choose the " + leaderType + " you wish to " + requestOrOffer + ".";
+                for (Leader leader : getEntanglementLeaders(p1, leaderType)) {
+                    stuffToTransButtons.add(Buttons.gray(
+                            "offerToTransact_" + thingToTrans + "_" + p1.getColor() + "_" + p2.getColor() + "_"
+                                    + leader.getId(),
+                            leader.getName()));
+                }
+            }
+            case "EntanglementTechnology" -> {
+                message += " Please choose the faction technology you wish to " + requestOrOffer + ".";
+                for (String tech : getEntanglementTechs(p1)) {
+                    stuffToTransButtons.add(Buttons.gray(
+                            "offerToTransact_EntanglementTechnology_" + p1.getColor() + "_" + p2.getColor() + "_"
+                                    + tech,
+                            Mapper.getTech(tech).getName()));
+                }
+            }
             case "AlliancePlanets" -> {
                 message += " Please choose the planet you wish to " + requestOrOffer + ".";
                 for (String planet : p1.getPlanets()) {
@@ -1335,7 +1450,11 @@ public class TransactionHelper {
                         List.of(p1.getFaction(), p2.getFaction()).contains(game.getStoredValue("blackmarketdealing"));
                 blackmarket |= p1.hasStoredValue("bmd") || p2.hasStoredValue("bmd");
                 blackmarket |= MonumentsPoKButtonHandler.canTradeRelicsWithNaazMonument(game, p1, p2);
-                for (String relic : (blackmarket ? p1.getActualRelics() : p1.getTradableRelics())) {
+                Set<String> tradableRelics = new HashSet<>(p1.getTradableRelics());
+                if (blackmarket) {
+                    tradableRelics.addAll(p1.getActualRelics());
+                }
+                for (String relic : tradableRelics) {
                     String name = Mapper.getRelic(relic).getName();
                     stuffToTransButtons.add(Buttons.gray(prefix + "_" + relic, name, ExploreEmojis.Relic));
                 }
@@ -1481,6 +1600,14 @@ public class TransactionHelper {
         Player p1 = game.getPlayerFromColorOrFaction(sender);
         Player p2 = game.getPlayerFromColorOrFaction(receiver);
         if (p1 == null || p2 == null) return;
+        if (("EntanglementAgent".equals(item)
+                        || "EntanglementCommander".equals(item)
+                        || "EntanglementTechnology".equals(item))
+                && !isEntanglementActive(game, p1, p2)) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "That Entanglement transaction is no longer active.");
+            return;
+        }
         if ("washComms".equalsIgnoreCase(item)) {
             int oldP1Comms = p1.getCommodities();
             int newP1Comms = 0;
@@ -1926,6 +2053,25 @@ public class TransactionHelper {
                 }
                 MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
             }
+            case "EntanglementAgent", "EntanglementCommander" -> {
+                String leaderType = "EntanglementAgent".equals(thingToTrans) ? Constants.AGENT : Constants.COMMANDER;
+                String message = "Please choose the " + leaderType + " you wish to send.";
+                for (Leader leader : getEntanglementLeaders(p1, leaderType)) {
+                    stuffToTransButtons.add(Buttons.gray(
+                            factionChecker + "send_" + thingToTrans + "_" + p2.getFaction() + "_" + leader.getId(),
+                            leader.getName()));
+                }
+                MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
+            }
+            case "EntanglementTechnology" -> {
+                String message = "Please choose the faction technology you wish to send.";
+                for (String tech : getEntanglementTechs(p1)) {
+                    stuffToTransButtons.add(Buttons.gray(
+                            factionChecker + "send_EntanglementTechnology_" + p2.getFaction() + "_" + tech,
+                            Mapper.getTech(tech).getName()));
+                }
+                MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
+            }
             case "Frags" -> {
                 String message = "Please choose the amount of relic fragments you wish to send";
 
@@ -1974,7 +2120,9 @@ public class TransactionHelper {
             case "Relics" -> {
                 String message = " Click the relics you wish to send.";
                 String prefix = "send_Relics_" + p2.getFaction() + "_";
-                for (String relic : p1.getActualRelics()) {
+                Set<String> relics = new HashSet<>(p1.getActualRelics());
+                relics.addAll(p1.getTradableRelics());
+                for (String relic : relics) {
                     String name = Mapper.getRelic(relic).getName();
                     stuffToTransButtons.add(Buttons.gray(prefix + relic, name, ExploreEmojis.Relic));
                 }
@@ -1995,6 +2143,14 @@ public class TransactionHelper {
         String amountToTrans = buttonID.substring(buttonID.indexOf('_') + 1);
         Player p2 = game.getPlayerFromColorOrFaction(factionToTrans);
         if (p2 == null) return;
+        if (("EntanglementAgent".equals(thingToTrans)
+                        || "EntanglementCommander".equals(thingToTrans)
+                        || "EntanglementTechnology".equals(thingToTrans))
+                && !isEntanglementActive(game, p1, p2)) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "That Entanglement transaction is no longer active.");
+            return;
+        }
 
         String message2 = "";
         String ident = p1.getRepresentation();
@@ -2245,6 +2401,14 @@ public class TransactionHelper {
                         p2.getRepresentation() + ", you have received the technology _" + Mapper.getTech(amountToTrans)
                                 + "_ from a transaction.");
             }
+            case "EntanglementAgent", "EntanglementCommander" -> {
+                if (!transferEntanglementLeader(p1, p2, amountToTrans, game)) return;
+                message2 = ident + " sent " + Mapper.getLeader(amountToTrans).getName() + " to " + ident2 + ".";
+            }
+            case "EntanglementTechnology" -> {
+                if (!transferEntanglementTechnology(p1, p2, amountToTrans, game)) return;
+                message2 = ident + " sent " + Mapper.getTech(amountToTrans).getName() + " to " + ident2 + ".";
+            }
             case "Relics" ->
                 SendRelicService.handleSendRelic(
                         event,
@@ -2479,6 +2643,21 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_Technology_" + p1.getColor() + "_" + p2.getColor(), "Technology"));
         }
+        if (seeP1 && isEntanglementActive(game, p1, p2)) {
+            if (!getEntanglementLeaders(p1, Constants.AGENT).isEmpty()) {
+                stuffToTransButtons.add(
+                        Buttons.gray("newTransact_EntanglementAgent_" + p1.getColor() + "_" + p2.getColor(), "Agents"));
+            }
+            if (!getEntanglementLeaders(p1, Constants.COMMANDER).isEmpty()) {
+                stuffToTransButtons.add(Buttons.gray(
+                        "newTransact_EntanglementCommander_" + p1.getColor() + "_" + p2.getColor(), "Commanders"));
+            }
+            if (!getEntanglementTechs(p1).isEmpty()) {
+                stuffToTransButtons.add(Buttons.gray(
+                        "newTransact_EntanglementTechnology_" + p1.getColor() + "_" + p2.getColor(),
+                        "Faction Technologies"));
+            }
+        }
         if (!ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game)
                 .isEmpty()) {
             stuffToTransButtons.add(Buttons.green(
@@ -2514,7 +2693,8 @@ public class TransactionHelper {
                     Buttons.red("getNewTransaction_" + p2.getColor() + "_" + p1.getColor(), "Offer More"));
             stuffToTransButtons.add(Buttons.gray("sendOffer_" + p1.getColor(), "Send the Offer"));
         }
-        stuffToTransButtons.add(Buttons.red("deleteButtons", "Delete This Transaction"));
+        stuffToTransButtons.add(
+                Buttons.red("endTransaction_" + p1.getColor() + "_" + p2.getColor(), "Delete This Transaction"));
 
         return stuffToTransButtons;
     }
@@ -2641,6 +2821,20 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.green(factionChecker + "transact_Technology_" + p2.getFaction(), "Technology"));
         }
+        if (isEntanglementActive(game, p1, p2)) {
+            if (!getEntanglementLeaders(p1, Constants.AGENT).isEmpty()) {
+                stuffToTransButtons.add(
+                        Buttons.gray(factionChecker + "transact_EntanglementAgent_" + p2.getFaction(), "Agents"));
+            }
+            if (!getEntanglementLeaders(p1, Constants.COMMANDER).isEmpty()) {
+                stuffToTransButtons.add(Buttons.gray(
+                        factionChecker + "transact_EntanglementCommander_" + p2.getFaction(), "Commanders"));
+            }
+            if (!getEntanglementTechs(p1).isEmpty()) {
+                stuffToTransButtons.add(Buttons.gray(
+                        factionChecker + "transact_EntanglementTechnology_" + p2.getFaction(), "Faction Technologies"));
+            }
+        }
         if (!ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game)
                 .isEmpty()) {
             stuffToTransButtons.add(Buttons.green(
@@ -2689,6 +2883,7 @@ public class TransactionHelper {
                     player.getRepresentation() + "you rescinded the latest offer to "
                             + p2.getRepresentation(false, false));
             player.clearTransactionItemsWithPlayer(p2);
+            clearEntanglement(game, player, p2);
             ButtonHelper.deleteMessage(event);
         }
     }
@@ -2702,8 +2897,23 @@ public class TransactionHelper {
                     p1.getCardsInfoThread(),
                     p1.getRepresentation() + " your offer to " + player.getRepresentation(false, false)
                             + " has been rejected.");
+            clearEntanglement(game, p1, player);
             ButtonHelper.deleteMessage(event);
         }
+    }
+
+    @ButtonHandler("endTransaction_")
+    public static void endTransaction(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] parts = buttonID.split("_");
+        Player p1 = parts.length == 3 ? game.getPlayerFromColorOrFaction(parts[1]) : null;
+        Player p2 = parts.length == 3 ? game.getPlayerFromColorOrFaction(parts[2]) : null;
+        if (p1 == null || p2 == null || (player != p1 && player != p2)) {
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        p1.clearTransactionItemsWithPlayer(p2);
+        clearEntanglement(game, p1, p2);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("acceptOffer_")
@@ -2774,6 +2984,7 @@ public class TransactionHelper {
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         CommanderUnlockCheckService.checkPlayer(player2, "hacan");
         ButtonHelperFactionSpecific.checkViabilityTradeConvoys(game, player, player2);
+        if (player2 != null) clearEntanglement(game, player, player2);
         ButtonHelper.deleteMessage(event);
     }
 

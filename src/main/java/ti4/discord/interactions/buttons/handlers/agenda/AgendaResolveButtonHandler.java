@@ -513,6 +513,7 @@ class AgendaResolveButtonHandler {
             buttons = StartTurnService.getStartOfTurnButtons(executiveOrderPlayer, game, true, event);
             game.removeStoredValue("executiveOrder");
             game.removeStoredValue("executiveOrderBr");
+            game.removeStoredValue("proFormaSession");
             game.updateActivePlayer(executiveOrderPlayer);
             Player oldSpeaker = game.getPlayer(game.getStoredValue("oldSpeakerExecutiveOrder"));
             game.setSpeaker(oldSpeaker);

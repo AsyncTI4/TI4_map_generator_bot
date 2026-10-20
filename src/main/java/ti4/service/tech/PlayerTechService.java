@@ -231,6 +231,10 @@ public class PlayerTechService {
             }
             tech = "dskortg";
         }
+        if (tech.startsWith("aws_")) {
+            pos = tech.substring("aws_".length());
+            tech = "aws";
+        }
         String inf = "";
         if (tech.contains("_inf") && tech.contains("absol_aida")) {
             tech = tech.replace("_inf", "");
@@ -303,6 +307,7 @@ public class PlayerTechService {
                 ThurvialiTechHandler.resolveMutualism(game, player);
                 deleteTheOneButtonIfButtonEvent(event);
             }
+            case "aws" -> BlueReverieTechHelper.offerAtmanWeaveSuppressorsPlanets(event, game, player, pos);
             case "tharcanumbg" -> {
                 ArcanumTechHandler.resolveSealOfRevelation(event, game, player);
                 deleteTheOneButtonIfButtonEvent(event);

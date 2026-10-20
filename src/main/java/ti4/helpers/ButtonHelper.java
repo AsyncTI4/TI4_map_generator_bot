@@ -1270,7 +1270,8 @@ public class ButtonHelper {
                 && tileHasShips) {
             return true;
         }
-        if (player.hasTech("tf-networkeddeployment") && CommandCounterHelper.hasCC(player, tile)) {
+        if ((player.hasTech("tf-networkeddeployment") || player.hasTech("nc"))
+                && CommandCounterHelper.hasCC(player, tile)) {
             return true;
         }
         if (player.hasAbility("rallying_cry")
@@ -2572,7 +2573,8 @@ public class ButtonHelper {
                 || player.hasTech("tf-desperados")
                 || player.hasAbility("desperados_br")
                 || player.hasTech("tf-fraactalspikedrives")
-                || !game.getStoredValue("phantomEnergy").isEmpty()) {
+                || !game.getStoredValue("phantomEnergy").isEmpty()
+                || player.hasTech("fsd")) {
             return true;
         }
         return player.getLeader("nomadhero").map(Leader::isActive).orElse(false);
@@ -4583,6 +4585,13 @@ public class ButtonHelper {
         }
         if (TwilightsFallMonumentsButtonHandler.hasPurpleTfMonumentInSpace(game, player, tile)) {
             numOfCapitalShips = Math.max(0, numOfCapitalShips - 2);
+        }
+        if (tile.hasPlayerCC(player) && player.hasTech("rgs")) {
+            numOfCapitalShips = Math.max(0, numOfCapitalShips - 2);
+
+            if (FoWHelper.playerHasShipsInSystem(player, tile)) {
+                capacity += 2;
+            }
         }
         if (numOfCapitalShips > fleetCap) {
             fleetSupplyViolated = true;

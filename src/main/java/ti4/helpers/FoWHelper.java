@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.FrameShiftBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.game.Game;
@@ -716,7 +717,14 @@ public final class FoWHelper {
         }
 
         if (game.getActivePlayer() != null
-                && game.getActivePlayer().hasTech("tf-fraactalspikedrives")
+                && (game.getActivePlayer().hasTech("tf-fraactalspikedrives")
+                        || game.getActivePlayer().hasTech("fsd"))
+                && !tile.getWormholes(game).isEmpty()) {
+            adjToFeatures.add(Feature.egress);
+        }
+
+        if (game.getActivePlayer() != null
+                && FrameShiftBrActionCardHandler.isActive(game, game.getActivePlayer())
                 && !tile.getWormholes(game).isEmpty()) {
             adjToFeatures.add(Feature.egress);
         }
@@ -737,6 +745,13 @@ public final class FoWHelper {
                 continue;
             }
             if (adjToFeatures.contains(Feature.ingress) && t.hasIngress()) {
+                adjacentPositions.add(t.getPosition());
+                continue;
+            }
+            if (game.getActivePlayer() != null
+                    && FrameShiftBrActionCardHandler.isActive(game, game.getActivePlayer())
+                    && adjToFeatures.contains(Feature.ingress)
+                    && !t.getWormholes(game).isEmpty()) {
                 adjacentPositions.add(t.getPosition());
                 continue;
             }

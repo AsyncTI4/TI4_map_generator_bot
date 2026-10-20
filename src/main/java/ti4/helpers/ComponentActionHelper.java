@@ -56,6 +56,7 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.explore.BlueReverieArtifactService;
 import ti4.service.fow.BlindSelectionService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
@@ -1342,6 +1343,7 @@ public class ComponentActionHelper {
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Used the "
                         + Mapper.getRelic(relicID).getName() + " relic.");
         String purgeOrExhaust = "purged";
+        boolean discardedArtifact = false;
         List<String> juniorRelics = List.of("titanprototype", "absol_jr");
         if (juniorRelics.contains(relicID)) { // EXHAUST THE RELIC
             List<Button> buttons2 = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
@@ -1424,9 +1426,14 @@ public class ComponentActionHelper {
                     event.getMessageChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
 
         } else { // PURGE THE RELIC
-            player.removeRelic(relicID);
-            player.removeExhaustedRelic(relicID);
-            if (!"nanoforge".equals(relicID)) {
+            discardedArtifact = BlueReverieArtifactService.discardArtifact(game, player, relicID);
+            if (!discardedArtifact) {
+                player.removeRelic(relicID);
+                player.removeExhaustedRelic(relicID);
+            } else {
+                purgeOrExhaust = "discarded";
+            }
+            if (!discardedArtifact && !"nanoforge".equals(relicID)) {
                 DSHelperBreakthroughs.doLanefirBtCheck(game, player);
                 OblivionUnitHandler.doOblivionMechCheck(game, player);
             }
