@@ -32,8 +32,12 @@ class ConstructionUses {
         produce.add(production.get());
         double opening = OpeningOutlook.gain(in.game(), in.seat(), OpeningOutlook.Boost.HOME_PRODUCTION);
         if (opening > 0) produce.add(new Benefit(CardUse.OPENING_EXPANSION, opening));
-        structure(in, StructurePolicy.next(in.game(), in.seat()), "").ifPresent(produce::add);
-        if (StructurePolicy.structureShortfall(in.game(), in.seat()) <= ONE_STRUCTURE) produce.add(objective());
+        structure(in, StructurePolicy.primaryFirst(in.game(), in.seat(), in.round()), "")
+                .ifPresent(produce::add);
+        if (StructurePolicy.structureShortfall(in.game(), in.seat()) <= ONE_STRUCTURE
+                || StructurePolicy.nearsPerimeter(in.game(), in.seat())) {
+            produce.add(objective(in));
+        }
         return total(produce) > total(structures) ? produce : structures;
     }
 
@@ -73,7 +77,7 @@ class ConstructionUses {
     private static List<Benefit> structures(PlanInputs in) {
         Game game = in.game();
         Player seat = in.seat();
-        Optional<String> first = StructurePolicy.next(game, seat);
+        Optional<String> first = StructurePolicy.primaryFirst(game, seat, in.round());
         if (first.isEmpty()) return List.of();
         List<Benefit> benefits = new ArrayList<>();
         double pds = 0;
@@ -86,7 +90,7 @@ class ConstructionUses {
         Optional<String> threatened = threatenedSeatTile(in);
         if (pds > 0 && threatened.isPresent()) pds += CardValueScale.THREATENED_PDS;
         benefits.add(new Benefit(CardUse.CONSTRUCTION_PDS, pds, threatened.orElse("")));
-        if (StructurePolicy.nearsStructureObjective(game, seat)) benefits.add(objective());
+        if (StructurePolicy.nearsStructureObjective(game, seat)) benefits.add(objective(in));
         return benefits;
     }
 
@@ -107,10 +111,12 @@ class ConstructionUses {
         return Optional.of(new Benefit(CardUse.CONSTRUCTION_DOCK, dock, planet));
     }
 
-    private static Benefit objective() {
+    private static Benefit objective(PlanInputs in) {
         return new Benefit(
                 CardUse.CONSTRUCTION_OBJECTIVE,
-                CardValueScale.STRUCTURE_OBJECTIVE_SHARE * CardValueScale.VICTORY_POINT);
+                CardValueScale.STRUCTURE_OBJECTIVE_SHARE
+                        * CardValueScale.VICTORY_POINT
+                        * StructurePolicy.objectiveScale(in.game(), in.seat()));
     }
 
     private static Optional<String> threatenedSeatTile(PlanInputs in) {

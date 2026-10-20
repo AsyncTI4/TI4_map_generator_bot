@@ -1009,7 +1009,8 @@ public class StrategyCardRules {
             if (CardMessages.done(context, step)) continue;
             CardMessages.markDone(context, step);
             Optional<String> unit = CONSTRUCTION_FIRST.equals(step)
-                    ? StructurePolicy.next(context.game(), context.seat())
+                    ? StructurePolicy.primaryFirst(
+                            context.game(), context.seat(), context.game().getRound())
                     : StructurePolicy.pds(context.game(), context.seat());
             if (unit.isEmpty()) return Optional.empty();
             return requestStructure(context, card.get(), unit.get(), "place a structure with Construction");
@@ -1041,7 +1042,7 @@ public class StrategyCardRules {
         }
         Optional<PromptButton> button = card.enabledHandler("construction_" + StructurePolicy.PDS);
         if (button.isEmpty() || context.alreadyPressed(card, button.get())) return Optional.empty();
-        Optional<String> unit = StructurePolicy.next(game, seat);
+        Optional<String> unit = StructurePolicy.secondary(game, seat);
         if (unit.isEmpty()) return Optional.empty();
         return requestStructure(context, card, unit.get(), "follow Construction to place a structure");
     }
@@ -1222,7 +1223,7 @@ public class StrategyCardRules {
                 yield press;
             }
             case CONSTRUCTION ->
-                StructurePolicy.next(game, seat).flatMap(unit -> requestStructure(context, prompt, unit, reason));
+                StructurePolicy.secondary(game, seat).flatMap(unit -> requestStructure(context, prompt, unit, reason));
             case WARFARE -> startWarfareBuild(context, prompt, reason);
             case POLITICS -> CardMessages.pressOnce(context, prompt, STRATEGIZE_POLITICS_BUTTON, reason);
             case TRADE -> CardMessages.pressOnce(context, prompt, TRADE_REFRESH_BUTTON, reason);

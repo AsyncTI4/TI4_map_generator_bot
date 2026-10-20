@@ -125,6 +125,7 @@ final class ObjectiveTracker {
     private final SeatTracker seatOfTheEmpire = new SeatTracker();
     private final DebateTracker debate = new DebateTracker();
     private final DirectHitTracker directHits = new DirectHitTracker();
+    private final PerimeterTracker perimeter = new PerimeterTracker();
 
     private Snapshot open;
     private int lastOpenedRound;
@@ -146,6 +147,7 @@ final class ObjectiveTracker {
         trackMechs(game);
         produce.observe(game);
         fringe.observe(game, secretHolders);
+        perimeter.observe(game);
         boolean scoringWindow = actionPhaseOver(game) || inStatusPhase(game);
         if (open != null && (!scoringWindow || game.getRound() != open.round())) close(game);
         if (scoringWindow && open == null && game.getRound() != lastOpenedRound) open(game);
@@ -158,6 +160,7 @@ final class ObjectiveTracker {
         seatOfTheEmpire.lines(game).forEach(System.out::println);
         debate.lines(game).forEach(System.out::println);
         directHits.lines(game).forEach(System.out::println);
+        perimeter.lines(game).forEach(System.out::println);
         if (open != null) close(game);
         NexusWatch.print(game);
         produce.finish(game);
@@ -362,6 +365,7 @@ final class ObjectiveTracker {
         produce.record(game);
         seatOfTheEmpire.record(game);
         recordIconAndStrategies(game);
+        perimeter.record(game);
         Map<String, Set<String>> publics = new HashMap<>();
         Map<String, Integer> secrets = new HashMap<>();
         List<Pending> pending = new ArrayList<>();

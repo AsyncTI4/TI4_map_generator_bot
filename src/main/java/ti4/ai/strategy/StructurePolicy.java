@@ -38,6 +38,10 @@ class StructurePolicy {
     private static final int SLICE_SEARCH_DEPTH = 6;
     private static final String STYX = "styx";
     private static final int STRUCTURES_SHORT = 2;
+    private static final String ESTABLISH_A_PERIMETER = "eap";
+    private static final int PERIMETER_NEAR = 3;
+    private static final int PRIMARY_STRUCTURES = 2;
+    private static final int NO_SHORTFALL = Integer.MAX_VALUE;
     private static final Set<String> STRUCTURE_OBJECTIVES =
             Set.of("build_defenses", "infrastructure", "massive_cities", "protect_border", "eap", "fwm");
 
@@ -49,7 +53,26 @@ class StructurePolicy {
     }
 
     static boolean nearsStructureObjective(Game game, Player seat) {
-        return structureShortfall(game, seat) <= STRUCTURES_SHORT;
+        return structureShortfall(game, seat) <= STRUCTURES_SHORT || nearsPerimeter(game, seat);
+    }
+
+    static boolean nearsPerimeter(Game game, Player seat) {
+        return perimeterShortfall(game, seat) <= PERIMETER_NEAR;
+    }
+
+    static int perimeterShortfall(Game game, Player seat) {
+        if (!seat.getSecretsUnscored().containsKey(ESTABLISH_A_PERIMETER)
+                || pds(game, seat).isEmpty()) {
+            return NO_SHORTFALL;
+        }
+        int missing = shortfallOf(game, seat, ESTABLISH_A_PERIMETER);
+        return missing > 0 ? missing : NO_SHORTFALL;
+    }
+
+    static double objectiveScale(Game game, Player seat) {
+        if (structureShortfall(game, seat) <= STRUCTURES_SHORT) return 1;
+        int perimeter = perimeterShortfall(game, seat);
+        return perimeter == NO_SHORTFALL ? 1 : Math.min(1, (double) STRUCTURES_SHORT / perimeter);
     }
 
     static int structureShortfall(Game game, Player seat) {
@@ -60,15 +83,19 @@ class StructurePolicy {
         seat.getSecretsUnscored().keySet().stream()
                 .filter(STRUCTURE_OBJECTIVES::contains)
                 .forEach(objectives::add);
-        int shortfall = Integer.MAX_VALUE;
+        int shortfall = NO_SHORTFALL;
         for (String id : objectives) {
-            int threshold = ListPlayerInfoService.getObjectiveThreshold(id, game);
-            if (threshold <= 0) continue;
-            int missing = threshold - ListPlayerInfoService.getPlayerProgressOnObjective(id, game, seat);
+            int missing = shortfallOf(game, seat, id);
             if (missing > 0) shortfall = Math.min(shortfall, missing);
         }
         if (MassProduction.oneDockFromScoring(game, seat)) shortfall = Math.min(shortfall, 1);
         return shortfall;
+    }
+
+    private static int shortfallOf(Game game, Player seat, String objective) {
+        int threshold = ListPlayerInfoService.getObjectiveThreshold(objective, game);
+        if (threshold <= 0) return 0;
+        return threshold - ListPlayerInfoService.getPlayerProgressOnObjective(objective, game, seat);
     }
 
     static Optional<String> next(Game game, Player seat) {
@@ -79,6 +106,37 @@ class StructurePolicy {
             return Optional.of(SPACE_DOCK);
         }
         return pds(game, seat);
+    }
+
+    static Optional<String> secondary(Game game, Player seat) {
+        return buildsPerimeter(game, seat) ? pds(game, seat) : next(game, seat);
+    }
+
+    static Optional<String> primaryFirst(Game game, Player seat, int round) {
+        int perimeter = perimeterShortfall(game, seat);
+        boolean closesNow = perimeter <= PRIMARY_STRUCTURES;
+        boolean docksDone = round > CardValueScale.LAST_EARLY_DOCK_ROUND;
+        boolean pdsFirst = buildsPerimeter(game, seat) && (closesNow || docksDone);
+        return pdsFirst ? pds(game, seat) : next(game, seat);
+    }
+
+    private static boolean buildsPerimeter(Game game, Player seat) {
+        int perimeter = perimeterShortfall(game, seat);
+        return perimeter != NO_SHORTFALL && !closerDockObjective(game, seat, perimeter);
+    }
+
+    private static boolean closerDockObjective(Game game, Player seat, int perimeter) {
+        boolean dockNext = next(game, seat).filter(SPACE_DOCK::equals).isPresent();
+        return dockNext && competingDockShortfall(game, seat) < perimeter;
+    }
+
+    private static int competingDockShortfall(Game game, Player seat) {
+        int shortfall = MassProduction.docksNeeded(game, seat);
+        if (seat.getSecretsUnscored().containsKey(FUEL_THE_WAR_MACHINE)) {
+            int missing = shortfallOf(game, seat, FUEL_THE_WAR_MACHINE);
+            if (missing > 0) shortfall = Math.min(shortfall, missing);
+        }
+        return shortfall;
     }
 
     static Optional<String> pds(Game game, Player seat) {
