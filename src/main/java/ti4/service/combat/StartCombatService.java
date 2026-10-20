@@ -25,6 +25,7 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnosisLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionTargetingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
@@ -70,6 +71,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.Ka
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -94,6 +96,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.Mapper;
@@ -228,6 +231,11 @@ public class StartCombatService {
             Tile tile,
             GenericInteractionCreateEvent event,
             String specialCombatTitle) {
+        if ("-war-games".equals(specialCombatTitle)) {
+            WarGamesBrActionCardHandler.beginCombat(game, player, tile);
+        } else {
+            WarGamesBrActionCardHandler.clear(game);
+        }
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
         XinCommanderHandler.beginCombat(game, tile, Constants.SPACE);
         if (CombatContestSettings.isEnabledStatic()) {
@@ -279,6 +287,7 @@ public class StartCombatService {
             GenericInteractionCreateEvent event,
             UnitHolder unitHolder,
             Tile tile) {
+        WarGamesBrActionCardHandler.clear(game);
         XinTechHandler.offerAstromanticCloakStarButtons(game, player, unitHolder, unitHolder.getName());
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
         XinCommanderHandler.beginCombat(game, tile, unitHolder.getName());
@@ -625,6 +634,12 @@ public class StartCombatService {
                                     + "\n-# This is not automated.");
                 }
             }
+            if (player1.hasTech("nfc")) {
+                BlueReverieTechHelper.sendNearFieldCloakingCombatMessages(threadChannel, game, player1, player2);
+            }
+            if (player2.hasTech("nfc")) {
+                BlueReverieTechHelper.sendNearFieldCloakingCombatMessages(threadChannel, game, player2, player1);
+            }
             String ms2 = StartTurnService.getMissedSCFollowsText(game, player1);
             if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
                 MessageHelper.sendMessageToChannel(threadChannel, ms2);
@@ -706,6 +721,7 @@ public class StartCombatService {
         if (isGroundCombat && !game.isFowMode()) {
             List<Button> autoButtons = new ArrayList<>();
             boolean thalnos = false;
+            List<Player> playersWithX89 = new ArrayList<>();
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                 if (!uH.getName().equalsIgnoreCase(unitHolderName)) {
                     continue;
@@ -747,6 +763,9 @@ public class StartCombatService {
                     if (player.hasRelic("thalnos")) {
                         thalnos = true;
                     }
+                    if (!playersWithX89.contains(player) && player.hasTech("x89c4")) {
+                        playersWithX89.add(player);
+                    }
 
                     String magenFmt = "%s, a reminder to use _%s_. The button should be above, ";
                     magenFmt += "but it (and SPACE CANNON) are not part of automated ground combat.";
@@ -776,6 +795,12 @@ public class StartCombatService {
                             " One of you may have __The Crown of Thalnos__, and thus not wish to automate the combat.";
                 }
                 MessageHelper.sendMessageToChannelWithButtons(threadChannel, automMessage, autoButtons);
+                for (Player p : playersWithX89) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            "This is a reminder that " + p.getRepresentationNoPing()
+                                    + " has X89 and thus their ground forces' hits will be doubled.");
+                }
             }
         }
         // DS Lanefir ATS Armaments
@@ -1773,11 +1798,19 @@ public class StartCombatService {
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p2, tile);
             XinUnitHandler.addSentinelRepairButton(buttons, p1, tile, combatHolder);
             XinUnitHandler.addSentinelRepairButton(buttons, p2, tile, combatHolder);
+            BlueReverieTechHelper.addAtmanWeaveSuppressorsButton(buttons, p1, tile);
+            BlueReverieTechHelper.addAtmanWeaveSuppressorsButton(buttons, p2, tile);
         }
         if (isGroundCombat) {
             ThurvialiBreakthroughHandler.addNeurograftingReadyButtons(buttons, p1);
             ThurvialiBreakthroughHandler.addNeurograftingReadyButtons(buttons, p2);
         }
+        BlueReverieArtifactRelicHandler.addHazardousArtifactCombatButton(buttons, p1, pos);
+        if (p2 != p1) {
+            BlueReverieArtifactRelicHandler.addHazardousArtifactCombatButton(buttons, p2, pos);
+        }
+        BlueReverieTechHelper.addStasisFieldGeneratorsButton(buttons, p1);
+        BlueReverieTechHelper.addStasisFieldGeneratorsButton(buttons, p2);
         if ("justPicture".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Buttons.blue(
                     "refreshViewOfSystem_" + pos + "_" + p1.getFaction() + "_" + p2.getFaction() + "_" + groundOrSpace,

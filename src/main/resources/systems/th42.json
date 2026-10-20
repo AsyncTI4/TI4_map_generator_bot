@@ -1,0 +1,16 @@
+{
+    "id": "th42",
+    "name": "Ptera Station",
+    "aliases": [
+        "th42",
+        "ptera",
+        "pterastation"
+    ],
+    "imagePath": "th42.png",
+    "planets": [
+        "pterastation"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "blue",
+    "source": "theodisi"
+}

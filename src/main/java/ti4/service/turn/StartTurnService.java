@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.BorrowedTimeLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PoliticalMarriageLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
@@ -57,6 +58,9 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
+import ti4.helpers.thirtyk.ThirtyKRelicHooks;
+import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.helpers.twilight_kart.TkHelperGenomes;
@@ -99,6 +103,7 @@ public class StartTurnService {
     private static final String FOW_FOLLOW_REMINDERS = "fowFollowReminders";
 
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
+        WarGamesBrActionCardHandler.clear(game);
         player.setInRoundTurnCount(player.getInRoundTurnCount() + 1);
         VanguardPromissoryHandler.returnGuildCallAtOwnerTurnStart(event, game, player);
         PoliticalMarriageLLButtonHandler.clearExpiredRestriction(game, player);
@@ -195,6 +200,8 @@ public class StartTurnService {
         game.updateActivePlayer(player);
         game.setPhaseOfGame("action");
         AeternaPromissoryHandler.offerStasisFighterPlacement(event, game, player);
+        ThirtyKSecretHooks.onTurnStart(game, player);
+        ThirtyKRelicHooks.onTurnStart(game, player);
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
         SabotageService.startOfTurnSaboWindowReminders(game, player);
         boolean isFowPrivateGame = game.isFowMode();
@@ -553,6 +560,7 @@ public class StartTurnService {
         List<Button> startButtons = new ArrayList<>();
         Button economicBoonButton = LostLegaciesRelicHandler.getEconomicBoonStartTurnButton(game, player);
         if (economicBoonButton != null) startButtons.add(economicBoonButton);
+        if (!doneActionThisTurn) startButtons.addAll(ThirtyKExploreHooks.getStartOfTurnButtons(player));
         if (!doneActionThisTurn
                 && player.hasRelicReady("waxing_moonphase")
                 && AeternaAbilityHandler.canReturnCapturedNeutralUnits(game, player, 2)) {

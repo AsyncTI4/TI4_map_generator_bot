@@ -418,6 +418,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         neutral.addTech("dd2");
         neutral.addTech("cv2");
         neutral.addTech("cr2");
+        neutral.addTech("dn2");
         neutral.addTech("ws");
         return neutral;
     }
@@ -430,8 +431,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     @NotNull
     public Player getNeutral() {
-        if (getPlayerFromColorOrFaction("neutral") == null) return setupNeutralPlayer();
-        return getPlayerFromColorOrFaction("neutral");
+        Player neutral = getPlayerFromColorOrFaction("neutral");
+        if (neutral == null) return setupNeutralPlayer();
+        neutral.addTech("dn2");
+        return neutral;
     }
 
     @NotNull
@@ -938,17 +941,26 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         super.setRound(Math.max(1, round));
     }
 
-    @Override
-    public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
-        boolean isFracturedTIGL = TIGLHelper.isFracturedTIGLGame(this);
-        boolean hasAlwaysIncompatibleMode = isAllianceMode() || isCommunityMode();
-        boolean hasStandardOnlyIncompatibleMode = isAbsolMode()
+    public boolean hasTiglIncompatibleMode() {
+        return isAllianceMode() || isCommunityMode();
+    }
+
+    public boolean hasStandardLadderIncompatibleMode() {
+        return isAbsolMode()
                 || isMiltyModMode()
                 || isDiscordantStarsMode()
                 || isBlueReverieMode()
                 || isHomebrewSCMode()
                 || isFowMode();
-        if (hasAlwaysIncompatibleMode || (!isFracturedTIGL && hasStandardOnlyIncompatibleMode)) {
+    }
+
+    public boolean canBeCompetitiveTIGLGame(boolean isFractured) {
+        return !hasTiglIncompatibleMode() && (isFractured || !hasStandardLadderIncompatibleMode());
+    }
+
+    @Override
+    public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
+        if (!canBeCompetitiveTIGLGame(TIGLHelper.isFracturedTIGLGame(this))) {
             competitiveTIGLGame = false;
         }
         super.setCompetitiveTIGLGame(competitiveTIGLGame);
@@ -1204,6 +1216,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public TextChannel getActionsChannel() {
         return getMainGameChannel();
+    }
+
+    public TextChannel getTableTalkOrActionsChannel() {
+        TextChannel tableTalk = getTableTalkChannel();
+        return tableTalk == null ? getActionsChannel() : tableTalk;
     }
 
     public ThreadChannel getBotMapUpdatesThread() {
@@ -3520,15 +3537,13 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         SourceSettings sources = miltySettings.getSourceSettings();
         if (sources.getAbsol().isVal()) setAbsolMode(true);
         setMonumentsMode(sources.getMonuments().isVal());
+        setLostLegaciesTiles(sources.getLostLegaciesTiles().isVal());
 
         GameSettings settings = miltySettings.getGameSettings();
         setVp(settings.getPointTotal().getVal());
 
         if (getMaxSOCountPerPlayer() != 4) {
             setMaxSOCountPerPlayer(settings.getSecrets().getVal());
-        }
-        if (settings.getTigl().isVal()) {
-            TIGLHelper.initializeTIGLGame(this, settings.getTiglFractured().isVal());
         }
         setAllianceMode(settings.getAlliance().isVal());
 
@@ -3550,15 +3565,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         SourceSettings sources = draftSettings.getSourceSettings();
         if (sources.getAbsol().isVal()) setAbsolMode(true);
         setMonumentsMode(sources.getMonuments().isVal());
+        setLostLegaciesTiles(sources.getLostLegaciesTiles().isVal());
 
         setVp(gameSetupSettings.getPointTotal().getVal());
 
         if (getMaxSOCountPerPlayer() != 4) {
             setMaxSOCountPerPlayer(gameSetupSettings.getSecrets().getVal());
-        }
-        if (gameSetupSettings.getTigl().isVal()) {
-            TIGLHelper.initializeTIGLGame(
-                    this, gameSetupSettings.getTiglFractured().isVal());
         }
         setAllianceMode(gameSetupSettings.getAlliance().isVal());
 
@@ -3592,7 +3604,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             if (isOmegaPhaseMode()) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        "This game is using Omega Phase, so the objective setup was ignored. If there's a problem with it, use `/omegaphase "
+                        "This game is using Omega Phase, so the objective setup was ignored. If there's a problem with it, use `/homebrew omegaphase "
                                 + Constants.RESET_OMEGA_PHASE_OBJECTIVES + "`");
             } else {
                 setUpPeekableObjectives(stage1Count, 1);
@@ -5011,6 +5023,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isDiscordantStarsMode()
                 || isBlueReverieMode()
                 || isUnchartedSpaceStuff()
+                || isLostLegaciesTiles()
                 || isFrankenGame()
                 || isMiltyModMode()
                 || isThundersEdgeDemo()

@@ -1,0 +1,17 @@
+{
+    "id": "th26",
+    "name": "Velis/Mora",
+    "aliases": [
+        "th26",
+        "velis",
+        "mora"
+    ],
+    "imagePath": "th26.png",
+    "planets": [
+        "velis",
+        "mora"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "blue",
+    "source": "theodisi"
+}

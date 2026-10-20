@@ -1,0 +1,25 @@
+{
+    "id": "qilinstation",
+    "tileId": "fracture8",
+    "name": "Qilin Station",
+    "aliases": [
+        "qilin Station",
+        "qilin"
+
+    ],
+    "resources": 1,
+    "influence": 2,
+    "planetTypes": [
+        "SPACESTATION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "qilinstation",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 195.0,
+            "y": 202.0
+        }
+    },
+    "flavorText": "*Designed with massive concentric ring arrays to conteract intense gravitational shear, this orbital station stabilizes the local spacetime around it by spinning an endless sea of cosmic debris into the abyss.*",
+    "source": "merford"
+}

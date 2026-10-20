@@ -1,0 +1,15 @@
+{
+    "id": "th20",
+    "name": "Vespix",
+    "aliases": [
+        "th20",
+        "vespix"
+    ],
+    "imagePath": "th20.png",
+    "planets": [
+        "vespix"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "blue",
+    "source": "theodisi"
+}

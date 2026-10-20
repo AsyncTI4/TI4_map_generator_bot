@@ -126,9 +126,18 @@ A single action row can hold **either** up to 5 buttons **or** one select menu â
   `Player.fogSafeEmoji()` / `getFactionEmojiOrColor()`. If none of them fits, suggest a cheap best-effort
   fix (e.g. `game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel()`). If even that
   isn't feasible, leave a compact TODO in the method saying what leaks, so it can be made fog safe later.
+- **Domain vocabulary lives in [GLOSSARY.md](GLOSSARY.md).** Use its terms in code, messages and
+  PR text, and check it for TI4 rules, table slang (wash, plastic, guac, X-1) and Discord surface
+  names. Add new terms there when you introduce a domain concept.
+- **The published TI4 rules live in [docs/rules/](docs/rules/README.md).** Living Rules Reference
+  text by topic, rulings per card type and per faction (files named by bot faction alias), setup,
+  Thunder's Edge rules and the designer FAQ. Grep it before implementing or changing rules logic,
+  and cite rule numbers as "LRR 41.2". Its README lists which source wins when they disagree.
 - **Component-specific rules live in [COMPONENT_RULES.md](COMPONENT_RULES.md).** Open it only
   when your change touches a component listed below; otherwise skip it.
   - Border anomalies: any file or class named `BorderAnomaly*` or `border_anomal*`.
+  - 30k Content Lab cards: source `thirtyk`, files or classes named `thirtyk` / `ThirtyK*`, card ids
+    ending in `30k` or `jmsc`.
 
 ### Testing of new functionality and/or bug fixes
 The repo includes a testbed: a developer-only feature for testing on a live Discord dev bot

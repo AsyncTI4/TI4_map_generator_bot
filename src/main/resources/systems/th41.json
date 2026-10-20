@@ -1,0 +1,19 @@
+{
+    "id": "th41",
+    "name": "Drethis/Veilwatch",
+    "aliases": [
+        "th41",
+        "drethis",
+        "veilwatch"
+    ],
+    "imagePath": "th41.png",
+    "planets": [
+        "drethis",
+        "veilwatch"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "red",
+    "isAsteroidField": true,
+    "isNebula": true,
+    "source": "theodisi"
+}

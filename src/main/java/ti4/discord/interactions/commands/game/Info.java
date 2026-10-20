@@ -30,7 +30,7 @@ class Info extends GameStateSubcommand {
     private static final String MODERN = "modern";
 
     public Info() {
-        super(Constants.INFO, "Game information:", false, false);
+        super(Constants.INFO, "Show game information", false, false);
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, MODERN, "Readable embed layout (default false: classic text)"));
     }

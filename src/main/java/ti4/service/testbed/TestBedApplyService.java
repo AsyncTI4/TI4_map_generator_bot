@@ -56,6 +56,7 @@ public class TestBedApplyService {
         TestBedService.markAsTestBed(game, true);
         TestBedShortcuts.store(game, preset.getShortcuts());
         recordAppliedPreset(game, preset);
+        TestBedComponentService.applyDecks(game, preset, event, warnings);
         placeMap(game, preset, warnings);
         List<SeatPlan> plans = planSeats(game, preset, event.getUser());
         if (game.isFowMode()) prepareFog(game, plans, event.getMember(), warnings);

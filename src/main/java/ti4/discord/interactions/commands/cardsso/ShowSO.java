@@ -17,7 +17,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 class ShowSO extends GameStateSubcommand {
 
     ShowSO() {
-        super(Constants.SHOW_SO, "Show a Secret Objective to a player", true, true);
+        super(Constants.SHOW_SO, "Show a chosen Secret Objective to a player", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER,
                         Constants.SECRET_OBJECTIVE_ID,

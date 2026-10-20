@@ -55,6 +55,8 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
@@ -1220,6 +1222,9 @@ public final class AgendaHelper {
                                     game, winningR, UnitType.Mech);
                             ButtonHelperFactionSpecific.resolveEdynAgendaStuffStep1(winningR, game, tiles);
                         }
+                        if (specificVote.contains("Antiquities Rider")) {
+                            RelicHelper.drawRelicAndNotify(winningR, event, game);
+                        }
                         if (specificVote.contains("Atokera Commander")) {
                             if (!getWinningVoters(winner, game).contains(winningR)
                                     && !getLosingVoters(winner, game).contains(winningR)) {
@@ -1727,6 +1732,7 @@ public final class AgendaHelper {
             if (thing.contains("planet_") && !prevoting) {
                 String planet = thing.replace("planet_", "");
                 player.exhaustPlanet(planet);
+                ThirtyKExploreHooks.onPlanetExhausted(event, game, player, planet);
                 UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                 if (uH != null) {
                     if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
@@ -1784,6 +1790,7 @@ public final class AgendaHelper {
                         }
                         if (!prevoting) {
                             player.exhaustPlanet(planet);
+                            ThirtyKExploreHooks.onPlanetExhausted(event, game, player, planet);
                         }
                     }
                     if (!prevoting) {
@@ -1854,7 +1861,8 @@ public final class AgendaHelper {
         }
 
         boolean executive = player.getFaction().equals(game.getStoredValue("executiveOrder"))
-                && game.getStoredValue("executiveOrderBr").isEmpty();
+                && game.getStoredValue("executiveOrderBr").isEmpty()
+                && game.getStoredValue("proFormaSession").isEmpty();
         if (player.hasUnlockedBreakthrough("xxchabt") || executive) {
             voteAmount = Math.max(p.getResources(), p.getInfluence());
         }
@@ -1941,7 +1949,8 @@ public final class AgendaHelper {
             }
             if (player.isSpeaker()
                     && !game.getStoredValue("executiveOrder").isEmpty()
-                    && game.getStoredValue("executiveOrderBr").isEmpty()) {
+                    && game.getStoredValue("executiveOrderBr").isEmpty()
+                    && game.getStoredValue("proFormaSession").isEmpty()) {
                 planetButtons.add(Buttons.gray(
                         "exhaustForVotes_hacanCommanderTg",
                         "Spend Trade Goods for 1 Vote Each",
@@ -2370,7 +2379,8 @@ public final class AgendaHelper {
             voteCount = baseResourceCount + baseInfluenceCount;
         }
 
-        boolean executive = player.getFaction().equalsIgnoreCase(game.getStoredValue("executiveOrder"));
+        boolean executive = player.getFaction().equalsIgnoreCase(game.getStoredValue("executiveOrder"))
+                && game.getStoredValue("proFormaSession").isEmpty();
         if (player.hasUnlockedBreakthrough("xxchabt") || executive) {
             voteCount = planets.stream()
                     .map(planetsInfo::get)
@@ -2926,6 +2936,7 @@ public final class AgendaHelper {
         game.setStoredValue("Pass On Shenanigans", "");
         game.setStoredValue("Abstain On Agenda", "");
         game.resetCurrentAgendaVotes();
+        ThirtyKActionCardHooks.onAgendaVotesReset(game);
         game.setHasHackElectionBeenPlayed(false);
         game.removeStoredValue("hackElectionFaction");
         game.removeStoredValue("viabilityFavorXxcha");

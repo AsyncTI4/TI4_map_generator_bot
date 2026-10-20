@@ -641,7 +641,7 @@ public class Tile {
     public boolean isGravityRift(Game game, Player player) {
         if (hasAnyToken("token_gravityrift.png", "token_ds_wound.png", "token_vortex.png")) return true;
         if (player != null
-                && player.hasTech("tf-fraactalspikedrives")
+                && (player.hasTech("tf-fraactalspikedrives") || player.hasTech("fsd"))
                 && !getWormholes(game).isEmpty()) {
             return true;
         }

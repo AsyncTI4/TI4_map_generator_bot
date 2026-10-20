@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.FrameShiftBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PirateHordeBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.CombatInitiativeLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PoliticalMarriageLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RetrofittingLLButtonHandler;
@@ -65,6 +67,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
@@ -82,9 +86,11 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.helpers.thundersedge.TeHelperPromissories;
+import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
@@ -95,7 +101,6 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
-import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.LoreService;
@@ -136,6 +141,7 @@ public final class ButtonHelperTacticalAction {
         RetrofittingLLButtonHandler.returnRetrofittedTechs(game);
         XytherisAbilityHandler.clearStingOfTheHiveRollState(game);
         OblivionAbilityHandler.offerReflectionExplore(event, game);
+        TheodisiLegendaryButtonHandler.offerEndOfTacticalActionAbilities(game, player);
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
             if (player.hasUnit("lunarium_carrier2")) {
                 LunariumAbilityHandler.resolveCrypticHaulerIIFighters(
@@ -338,10 +344,14 @@ public final class ButtonHelperTacticalAction {
         ThronesUnitHandler.clearPendingGholaWindows(game);
         RevenantLeadersHandler.clearRedLeaderTacticalState(game);
         ThronesTechHandler.clearRiftTouchedBastion(game);
+        FrameShiftBrActionCardHandler.clear(game);
+        PirateHordeBrActionCardHandler.completeTacticalAction(event, game, player);
         game.removeStoredValue("vanguardReinforce" + player.getFaction());
+        TheodisiLegendaryButtonHandler.clearRemoteFactory(game, player);
         game.removeStoredValue("safeHarborUsed");
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
         SarcosaHeroHandler.completeNeutralTacticalAction(game, player);
+        BlueReverieArtifactRelicHandler.clearUnknownArtifactMoveRestriction(game);
     }
 
     @ButtonHandler("doneWithTacticalAction")
@@ -697,6 +707,7 @@ public final class ButtonHelperTacticalAction {
         KryxosBreakthroughHandler.clearPrototypeInnovators(game);
         MyrrLeadersHandler.clearMyrrAgent(game);
         ThronesUnitHandler.clearPendingGholaWindows(game);
+        FrameShiftBrActionCardHandler.clear(game);
         MyrrTechHandler.clearSegmentedStructuring(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
         DreamLeadersHandler.clearDreamAgentAnomaly(game);
@@ -744,6 +755,10 @@ public final class ButtonHelperTacticalAction {
             if (!game.isFowMode()) {
                 message +=
                         " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
+            }
+            if (player.hasTech("fsd")) {
+                message +=
+                        "\n-# Reminder: You have _Fractal Spike Drives_; units you transport may move out of systems containing your command tokens, and you may treat wormholes as either ingress tokens or gravity rifts.";
             }
             List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, ringButtons);
@@ -851,6 +866,9 @@ public final class ButtonHelperTacticalAction {
         }
         game.setActiveSystem(pos);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        BlueReverieTechHelper.offerNetworkedConstructors(game, tile);
+        BlueReverieArtifactRelicHandler.offerUnknownArtifact(game, player);
+        TheodisiLegendaryButtonHandler.offerActivationAbility(game, player);
         BlueReverieHelper.offerShameixBanePrompts(game, player, tile);
         BlueReverieRelicHandler.offerAendsTorch(game, player, tile);
         SarcosaCommanderHandler.offerAdjacencySelection(game, player);
@@ -972,6 +990,7 @@ public final class ButtonHelperTacticalAction {
                 KaltrimUnitHandler.offerButtonsToCaptureConsulateInf(game, consulateOwner, player, tile);
             }
         }
+        KaltrimUnitHandler.offerShrineInfantryRemoval(game, player, tile);
         KaltrimTechHandler.offerKaldurArrestField(player, game, tile);
         Player agentOwner = game.getPlayerFromLeader("scrapyardagent");
         if (agentOwner != null && agentOwner.hasUnexhaustedLeader("scrapyardagent")) {
@@ -1149,44 +1168,6 @@ public final class ButtonHelperTacticalAction {
         if (!game.isL1Hero()) {
             // All players get to use Magen
             Tile activeSystem = tile;
-            for (Player magenPlayer : game.getPlayers().values()) {
-                boolean has =
-                        activeSystem.containsPlayersUnitsWithModelCondition(magenPlayer, UnitModel::getIsStructure);
-                if (magenPlayer.hasAbility("byssus")) {
-                    for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
-                        if (planet.getUnitCount(UnitType.Mech, magenPlayer) > 0) {
-                            has = true;
-                        }
-                    }
-                }
-                for (UnitHolder p : activeSystem.getPlanetUnitHolders()) {
-                    for (String token : p.getTokenList()) {
-                        if (magenPlayer.getPlanets().contains(p.getName()) && token.contains("superweapon")) {
-                            has = true;
-                            break;
-                        }
-                    }
-                }
-                if (!has || !magenPlayer.hasTech("md")) continue;
-
-                String id = magenPlayer.factionButtonChecker() + "useMagenDefense_" + activeSystem.getPosition();
-                Button useMagen = Buttons.red(id, "Use Magen Defense Grid", TechEmojis.WarfareTech);
-                String magenMsg = magenPlayer.getRepresentation()
-                        + " you can, and must, use _Magen Defense Grid_ to place an infantry with each of your structures in the active system.";
-                MessageHelper.sendMessageToChannelWithButton(magenPlayer.getCorrectChannel(), magenMsg, useMagen);
-            }
-
-            for (Player btb : game.getRealPlayers()) {
-                if (!btb.ownsUnit("tk-blacktrenchbulwark")) continue;
-                if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, btb, UnitType.Pds)
-                        .contains(activeSystem)) continue;
-
-                String id = btb.factionButtonChecker() + "useMagenDefense_" + activeSystem.getPosition();
-                Button use = Buttons.red(id, "Use Black Trench Bulwark", UnitEmojis.pds);
-                String msg = btb.getRepresentation()
-                        + " you can, and must, use _Black Trench Bulwark_ to place an infantry with each of your pds in the active system.";
-                MessageHelper.sendMessageToChannelWithButton(btb.getCorrectChannel(), msg, use);
-            }
 
             for (Player archive : game.getRealPlayers()) {
                 if (!archive.ownsUnit("tk-visionariaarchive")) continue;
@@ -1362,6 +1343,35 @@ public final class ButtonHelperTacticalAction {
         if (!game.isFowMode()) {
             if (!game.isL1Hero()) {
                 ButtonHelper.resolveOnActivationEnemyAbilities(game, tile, player, false, event);
+                Tile activeSystem = tile;
+                for (Player magenPlayer : game.getPlayers().values()) {
+                    boolean has =
+                            activeSystem.containsPlayersUnitsWithModelCondition(magenPlayer, UnitModel::getIsStructure);
+                    if (magenPlayer.hasAbility("byssus")) {
+                        for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
+                            if (planet.getUnitCount(UnitType.Mech, magenPlayer) > 0) {
+                                has = true;
+                            }
+                        }
+                    }
+                    for (UnitHolder p : activeSystem.getPlanetUnitHolders()) {
+                        for (String token : p.getTokenList()) {
+                            if (magenPlayer.getPlanets().contains(p.getName()) && token.contains("superweapon")) {
+                                has = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!has || !magenPlayer.hasTech("md")) continue;
+                    TeHelperTechs.resolveMagen(game, magenPlayer, activeSystem, false);
+                }
+
+                for (Player btb : game.getRealPlayers()) {
+                    if (!btb.ownsUnit("tk-blacktrenchbulwark")) continue;
+                    if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, btb, UnitType.Pds)
+                            .contains(activeSystem)) continue;
+                    TeHelperTechs.resolveMagen(game, btb, activeSystem, true);
+                }
             }
         }
         game.removeStoredValue("crucibleBoost");
@@ -1415,6 +1425,10 @@ public final class ButtonHelperTacticalAction {
                     }
                 }
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                if (PirateHordeBrActionCardHandler.isActive(game, player)
+                        && (unitModel == null || !unitModel.getIsShip())) {
+                    continue;
+                }
                 boolean isFlightStructure =
                         player.hasAbility("radiant_grafting_flight") && unitModel != null && unitModel.getIsStructure();
                 if (unitHolder instanceof Planet
@@ -1449,8 +1463,10 @@ public final class ButtonHelperTacticalAction {
                         "Use Tnelis Commander",
                         FactionEmojis.tnelis));
 
-            buttons.add(Buttons.gray(
-                    factionChecker + "unitTacticalMove_" + tile.getPosition() + "_moveAll", "Move All Units"));
+            if (!PirateHordeBrActionCardHandler.isActive(game, player)) {
+                buttons.add(Buttons.gray(
+                        factionChecker + "unitTacticalMove_" + tile.getPosition() + "_moveAll", "Move All Units"));
+            }
             buttons.add(Buttons.blue(
                     factionChecker + "doneWithOneSystem_" + tile.getPosition(), "Done Moving Units From This System"));
         }

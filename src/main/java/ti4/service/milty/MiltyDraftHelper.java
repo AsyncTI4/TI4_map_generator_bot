@@ -28,7 +28,6 @@ import ti4.image.ImageHelper;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
-import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
@@ -301,6 +300,9 @@ public class MiltyDraftHelper {
         if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
+        if (game.isLostLegaciesTiles()) {
+            sources.add(ComponentSource.theodisi);
+        }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             sources.add(ComponentSource.thunders_edge);
         }
@@ -358,6 +360,9 @@ public class MiltyDraftHelper {
             if (isInvalid(tileModel)) continue;
 
             if (!sources.contains(tileModel.getSource())) continue;
+            if (tileModel.getSource() == ComponentSource.theodisi && !TileHelper.isLostLegaciesTile(tileModel)) {
+                continue;
+            }
             if (tileModel.getTileBack() == TileBack.GREEN || tileModel.isHyperlane()) continue;
 
             MiltyDraftTile draftTile = getDraftTileFromModel(tileModel);
@@ -445,15 +450,10 @@ public class MiltyDraftHelper {
 
     // TODO (Jazz): add map template
     public static List<MiltyDraftSlice> parseSlices(String input, List<ComponentSource> sources) throws Exception {
-        try {
-            input = input.replace("|", ";");
-            MiltyDraftManager manager = new MiltyDraftManager();
-            manager.init(sources);
-            manager.loadSlicesFromString(input);
-            return manager.getSlices();
-        } catch (Exception e) {
-            BotLogger.error("invalid slice string", e);
-            throw e;
-        }
+        input = input.replace("|", ";");
+        MiltyDraftManager manager = new MiltyDraftManager();
+        manager.init(sources);
+        manager.loadSlicesFromString(input);
+        return manager.getSlices();
     }
 }

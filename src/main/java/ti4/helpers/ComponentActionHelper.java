@@ -37,6 +37,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKRelics;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.helpers.thundersedge.TeHelperBreakthroughs;
 import ti4.image.Mapper;
@@ -55,6 +56,7 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.explore.BlueReverieArtifactService;
 import ti4.service.fow.BlindSelectionService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
@@ -381,6 +383,11 @@ public class ComponentActionHelper {
             }
             if ("quantum_entangler".equalsIgnoreCase(relic)
                     && (game.getAllRelics().size() < 3 || game.getRealPlayers().size() < 2)) {
+                continue;
+            }
+            if (ThirtyKRelics.handlesComponentAction(relic)) {
+                ThirtyKRelics.componentActionButton(game, p1, relic, factionChecker + prefix)
+                        .ifPresent(compButtons::add);
                 continue;
             }
 
@@ -1327,11 +1334,16 @@ public class ComponentActionHelper {
             MutagenService.resolveMutagenPurge(event, game, player, true);
             return;
         }
+        if (ThirtyKRelics.handlesComponentAction(relicID)) {
+            ThirtyKRelics.resolveComponentAction(game, player, event, relicID);
+            return;
+        }
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Used the "
                         + Mapper.getRelic(relicID).getName() + " relic.");
         String purgeOrExhaust = "purged";
+        boolean discardedArtifact = false;
         List<String> juniorRelics = List.of("titanprototype", "absol_jr");
         if (juniorRelics.contains(relicID)) { // EXHAUST THE RELIC
             List<Button> buttons2 = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
@@ -1414,9 +1426,14 @@ public class ComponentActionHelper {
                     event.getMessageChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
 
         } else { // PURGE THE RELIC
-            player.removeRelic(relicID);
-            player.removeExhaustedRelic(relicID);
-            if (!"nanoforge".equals(relicID)) {
+            discardedArtifact = BlueReverieArtifactService.discardArtifact(game, player, relicID);
+            if (!discardedArtifact) {
+                player.removeRelic(relicID);
+                player.removeExhaustedRelic(relicID);
+            } else {
+                purgeOrExhaust = "discarded";
+            }
+            if (!discardedArtifact && !"nanoforge".equals(relicID)) {
                 DSHelperBreakthroughs.doLanefirBtCheck(game, player);
                 OblivionUnitHandler.doOblivionMechCheck(game, player);
             }

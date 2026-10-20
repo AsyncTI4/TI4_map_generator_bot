@@ -82,6 +82,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
@@ -1269,7 +1270,8 @@ public class ButtonHelper {
                 && tileHasShips) {
             return true;
         }
-        if (player.hasTech("tf-networkeddeployment") && CommandCounterHelper.hasCC(player, tile)) {
+        if ((player.hasTech("tf-networkeddeployment") || player.hasTech("nc"))
+                && CommandCounterHelper.hasCC(player, tile)) {
             return true;
         }
         if (player.hasAbility("rallying_cry")
@@ -2571,7 +2573,8 @@ public class ButtonHelper {
                 || player.hasTech("tf-desperados")
                 || player.hasAbility("desperados_br")
                 || player.hasTech("tf-fraactalspikedrives")
-                || !game.getStoredValue("phantomEnergy").isEmpty()) {
+                || !game.getStoredValue("phantomEnergy").isEmpty()
+                || player.hasTech("fsd")) {
             return true;
         }
         return player.getLeader("nomadhero").map(Leader::isActive).orElse(false);
@@ -4583,6 +4586,13 @@ public class ButtonHelper {
         if (TwilightsFallMonumentsButtonHandler.hasPurpleTfMonumentInSpace(game, player, tile)) {
             numOfCapitalShips = Math.max(0, numOfCapitalShips - 2);
         }
+        if (tile.hasPlayerCC(player) && player.hasTech("rgs")) {
+            numOfCapitalShips = Math.max(0, numOfCapitalShips - 2);
+
+            if (FoWHelper.playerHasShipsInSystem(player, tile)) {
+                capacity += 2;
+            }
+        }
         if (numOfCapitalShips > fleetCap) {
             fleetSupplyViolated = true;
         }
@@ -4953,6 +4963,10 @@ public class ButtonHelper {
         if (player.hasRelicReady("waning_moonphase")) {
             passButtons.add(AeternaAbilityHandler.getWaningMoonButton(player));
         }
+        Button avarinButton = TheodisiLegendaryButtonHandler.getAvarinPassButton(player);
+        if (avarinButton != null) {
+            passButtons.add(avarinButton);
+        }
 
         if (player.hasReadyBreakthrough("veldyrbt") || player.hasTech("tf-harnessedaurora")) {
             passButtons.add(Buttons.green(
@@ -5030,6 +5044,10 @@ public class ButtonHelper {
         }
         Button cosmicBoonButton = LostLegaciesRelicHandler.getCosmicBoonTokenButton(game, player);
         if (cosmicBoonButton != null) endButtons.add(cosmicBoonButton);
+        Button celyonButton = TheodisiLegendaryButtonHandler.getCelyonEndTurnButton(player);
+        if (celyonButton != null) {
+            endButtons.add(celyonButton);
+        }
 
         // Legendary Planets
         List<String> implementedLegendaryPlanets = List.of(

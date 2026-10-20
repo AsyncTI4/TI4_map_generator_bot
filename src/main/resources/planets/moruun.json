@@ -1,0 +1,28 @@
+{
+    "id": "moruun",
+    "tileId": "th32",
+    "name": "Moruun",
+    "aliases": [
+        "moruun"
+    ],
+    "resources": 1,
+    "influence": 0,
+    "planetTypes": [
+        "INDUSTRIAL",
+        "HAZARDOUS"
+    ],
+    "planetLayout": {
+        "unitHolderName": "moruun",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 226,
+            "y": 229
+        },
+        "planetRadius": 65
+    },
+    "positionInTile": {
+        "x": 226,
+        "y": 229
+    },
+    "source": "theodisi"
+}

@@ -1,0 +1,25 @@
+{
+    "id": "janus",
+    "tileId": "fracture17",
+    "name": "Janus",
+    "aliases": [
+        "janus",
+        "jan"
+     
+    ],
+    "resources": 3,
+    "influence": 4,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "planetLayout": {
+        "unitHolderName": "janus",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 226.0,
+            "y": 200.0
+        }
+    },
+    "flavorText": "*Caught in a localized temporal distortion, this dual-faced world exists simultanceously as an ancient ruin and an active industrial powerhouse.*",
+    "source": "merford"
+}

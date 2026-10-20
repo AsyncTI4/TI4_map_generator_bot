@@ -1,0 +1,27 @@
+{
+    "id": "nidhogg",
+    "tileId": "fracture23",
+    "name": "Nidhogg",
+    "aliases": [
+        "nidhogg",
+        "nid",
+        "fracture23",
+        "frac23"
+    ],
+
+    "resources": 3,
+    "influence": 3,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "planetLayout": {
+        "unitHolderName": "nidhogg",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 171.0,
+            "y": 131.0
+        }
+    },
+    "flavorText": "*A closossal, magma-bleeding fissure splits this frigid world apart, forged by the relentless gravitational violence of the surrounding Egress.*",
+    "source": "merford"
+}

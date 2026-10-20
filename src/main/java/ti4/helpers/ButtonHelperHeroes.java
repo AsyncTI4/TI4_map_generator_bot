@@ -1722,7 +1722,7 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile1 : game.getTileMap().values()) {
             String pos1 = tile1.getPosition();
-            for (Player p2 : game.getRealPlayers()) {
+            for (Player p2 : game.getRealPlayersNNeutral()) {
                 if (FoWHelper.playerHasShipsInSystem(p2, tile1)) {
                     boolean adjacentPeeps = false;
                     for (String pos2 : FoWHelper.getAdjacentTiles(game, pos1, p2, false)) {

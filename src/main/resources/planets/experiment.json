@@ -1,0 +1,30 @@
+{
+    "id": "experiment",
+    "tileId": "fracture17",
+    "name": "Experiment",
+    "aliases": [
+        "experiment",
+        "exp",
+        "fracture17",
+        "frac17"
+    ],
+    "resources": 0,
+    "influence": 0,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "legendaryAbilityName": "Machine of the Lum Mad",
+    "legendaryAbilityText": "At any time, you may spend 3 influence and exhaust this card to look at 1 unrevealed public objective.",
+    "legendaryAbilityFlavourText": ".",
+    "planetLayout": {
+        "unitHolderName": "experiment",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 171.0,
+            "y": 131.0
+        }
+    },
+    "flavourText": "*.*",
+    "contrastColor": "orange",
+    "source": "merford"
+}

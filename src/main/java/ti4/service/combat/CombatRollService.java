@@ -72,6 +72,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.Ka
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixUnitHandler;
+import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
@@ -102,6 +103,7 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
@@ -165,7 +167,9 @@ public class CombatRollService {
         buttons.addAll(stingOfTheHiveButtons);
         String assignmentMessage = opponent.getRepresentationNoPing() + ", you may automatically assign "
                 + (hits == 1 ? "the hit" : "hits") + "."
-                + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, hits, event, true, true);
+                + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, hits, event, true, true)
+                + BlueReverieTechHelper.getStasisFieldGeneratorsHitAssignmentReminder(
+                        game, player, CombatRollType.SpaceCannonOffence);
         if (!stingOfTheHiveButtons.isEmpty()) {
             assignmentMessage += "\n-# Wait for " + player.getRepresentationNoPing()
                     + " to decide whether to cancel hits and place mine tokens before assigning hits.";
@@ -181,6 +185,19 @@ public class CombatRollService {
             Planet combatPlanet,
             int hits,
             GenericInteractionCreateEvent event) {
+        sendGroundCombatHitAssignment(
+                game, player, opponent, tile, combatPlanet, hits, event, "_Self-Assembly Routines_");
+    }
+
+    public void sendGroundCombatHitAssignment(
+            Game game,
+            Player player,
+            Player opponent,
+            Tile tile,
+            Planet combatPlanet,
+            int hits,
+            GenericInteractionCreateEvent event,
+            String source) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
                 opponent.factionButtonChecker() + AutoAssignGroundHitsButtonIds.format(combatPlanet.getName(), hits),
@@ -207,7 +224,8 @@ public class CombatRollService {
                 opponent.getRepresentationUnfogged()
                         + ", please assign "
                         + (hits == 1 ? "the hit" : "the hits")
-                        + " produced by _Self-Assembly Routines_.",
+                        + " produced by "
+                        + source,
                 buttons);
     }
 
@@ -638,6 +656,7 @@ public class CombatRollService {
                 rollType,
                 combatOnHolder,
                 Constants.COMBAT_MODIFIERS);
+        TheodisiLegendaryButtonHandler.addAvarinCombatModifier(modifiers, game, player, tile, rollType);
 
         List<NamedCombatModifierModel> extraRolls = CombatModHelper.getModifiers(
                 player,
@@ -741,6 +760,10 @@ public class CombatRollService {
         RiggedExplosivesLLButtonHandler.destroyFailedRiggedExplosives(event, game, player, tile, rollType, payload);
         FOWCombatThreadMirroring.mirrorCombatMessage(event, player, game, message);
         int h = rollResult.totalHits();
+        if (rollType == CombatRollType.combatround) {
+            TheodisiLegendaryButtonHandler.offerPelorHit(
+                    game, player, opponent, tile, combatOnHolder, rollType, h, event);
+        }
         int massHypnosisHits =
                 MassHypnosisLLButtonHandler.getRedirectedHits(game, player, tile, combatOnHolder, rollType, payload);
 
@@ -841,6 +864,12 @@ public class CombatRollService {
         if (rollType == CombatRollType.combatround && opponent != player) {
             ToldarTechHandler.recordCombatRoundHits(game, player, tile, combatOnHolder, round2, h);
         }
+        if (rollType != CombatRollType.bombardment) {
+            BlueReverieTechHelper.registerStasisFieldGeneratorsUnitAbilityHits(
+                    game, player, opponent, tile, rollType, h);
+        }
+        BlueReverieTechHelper.offerStasisFieldGeneratorsReleasePrompt(
+                event, game, player, opponent, tile, combatOnHolder, rollType, bombardPlanet, payload);
         if (massHypnosisHits > 0 && !game.isFowMode()) {
             sendSpaceAssignHitsButtons(event, game, player, tile, massHypnosisHits);
         }
@@ -1084,7 +1113,8 @@ public class CombatRollService {
             }
             if (rollType == CombatRollType.AFB && h > 0) {
                 String msg2 = opponent.getRepresentation() + ", you may automatically assign "
-                        + (h == 1 ? "the hit" : "hits") + " from AFB.";
+                        + (h == 1 ? "the hit" : "hits") + " from AFB."
+                        + BlueReverieTechHelper.getStasisFieldGeneratorsHitAssignmentReminder(game, player, rollType);
                 if (opponent.isNpc() || opponent.isDummy()) {
                     buttons.add(Buttons.green(
                             opponent.dummyPlayerSpoof() + "autoAssignAFBHits_" + tile.getPosition() + "_" + h,
@@ -1176,6 +1206,23 @@ public class CombatRollService {
         }
 
         if (rollType == CombatRollType.SpaceCannonDefence && h > 0 && opponent != player) {
+            if (player.hasTech("sfg") && combatOnHolder instanceof Planet planet) {
+                List<Button> buttons = List.of(
+                        Buttons.green(
+                                opponent.factionButtonChecker()
+                                        + AutoAssignGroundHitsButtonIds.format(planet.getName(), h),
+                                "Auto-assign Hit" + (h == 1 ? "" : "s")),
+                        Buttons.red(
+                                "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
+                                "Manually Assign Hit" + (h == 1 ? "" : "s")));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        game.isFowMode() ? opponent.getCorrectChannel() : event.getMessageChannel(),
+                        opponent.getRepresentationNoPing() + ", assign the SPACE CANNON DEFENCE hit"
+                                + (h == 1 ? "" : "s") + "."
+                                + BlueReverieTechHelper.getStasisFieldGeneratorsHitAssignmentReminder(
+                                        game, player, rollType),
+                        buttons);
+            }
             List<Button> stingOfTheHiveButtons = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
                     game, player, tile, CombatRollType.SpaceCannonDefence, opponent, h);
             if (!stingOfTheHiveButtons.isEmpty()) {
@@ -1229,6 +1276,8 @@ public class CombatRollService {
                                 && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(bombardPlanet))) {
                             if (p2.isRealPlayer()) {
                                 List<Button> targetButtons = new ArrayList<>(buttons);
+                                BlueReverieTechHelper.registerStasisFieldGeneratorsUnitAbilityHits(
+                                        game, player, p2, tile, rollType, h);
                                 List<Button> stingOfTheHiveButtons =
                                         XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
                                                 game, player, tile, CombatRollType.bombardment, p2, h);
@@ -1236,7 +1285,9 @@ public class CombatRollService {
                                     targetButtons.addAll(stingOfTheHiveButtons);
                                 }
                                 String assignmentMessage = p2.getRepresentation()
-                                        + ", please assign the BOMBARDMENT hit" + (h == 1 ? "" : "s") + ".";
+                                        + ", please assign the BOMBARDMENT hit" + (h == 1 ? "" : "s") + "."
+                                        + BlueReverieTechHelper.getStasisFieldGeneratorsHitAssignmentReminder(
+                                                game, player, rollType);
                                 if (!stingOfTheHiveButtons.isEmpty()) {
                                     assignmentMessage += "\n-# Wait for " + player.getRepresentationNoPing()
                                             + " to decide whether to cancel hits and place mine tokens before assigning hits.";
@@ -1254,6 +1305,8 @@ public class CombatRollService {
                                                                 .getName(),
                                                         h),
                                         "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
+                                BlueReverieTechHelper.registerStasisFieldGeneratorsUnitAbilityHits(
+                                        game, player, p2, tile, rollType, h);
                                 List<Button> stingOfTheHiveButtons =
                                         XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
                                                 game, player, tile, CombatRollType.bombardment, p2, h);
@@ -1262,7 +1315,9 @@ public class CombatRollService {
                                 }
                                 String assignmentMessage =
                                         player.getRepresentation() + ", please assign the BOMBARDMENT hit"
-                                                + (h == 1 ? "" : "s") + " for the dummy player.";
+                                                + (h == 1 ? "" : "s") + " for the dummy player."
+                                                + BlueReverieTechHelper.getStasisFieldGeneratorsHitAssignmentReminder(
+                                                        game, player, rollType);
                                 if (!stingOfTheHiveButtons.isEmpty()) {
                                     assignmentMessage += "\n-# Wait for " + player.getRepresentationNoPing()
                                             + " to decide whether to cancel hits and place mine tokens before assigning hits.";
@@ -1344,7 +1399,8 @@ public class CombatRollService {
             msg2 += "\nReminder: You have the _" + relicModel.getName() + "_ relic,";
             msg2 += " you may SUSTAIN DAMAGE on one of your non-fighter ships instead of taking a hit.";
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                game.isFowMode() ? opponent.getCorrectChannel() : event.getMessageChannel(), msg2, buttons);
     }
 
     private static void offerDuraniumRepairWithoutHits(
@@ -1634,6 +1690,9 @@ public class CombatRollService {
             if (xytherisHeroBonus) {
                 modifierToHit += 4;
             }
+            int thirtyKBonus = ThirtyKExploreHooks.spaceCannonRollBonus(rollType, unitModel, perUnitHolder);
+            modifierToHit += thirtyKBonus;
+            resultBuilder.append(ThirtyKExploreHooks.spaceCannonBonusNote(unitModel, thirtyKBonus));
             List<NamedCombatModifierModel> availableExtraRolls = extraRolls.stream()
                     .filter(m -> !consumedBestMods.contains(m.getModifier().getAlias()))
                     .collect(Collectors.toList());
@@ -2262,6 +2321,7 @@ public class CombatRollService {
                         }
                     }
                 }
+                KaloraUnitHandler.offerDreadnoughtTradeGoods(player, unitModel, rollType, resultRolls, numOfUnit);
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "kaltrimcommander")) {
                     int num1s = 0;
                     for (DiceHelper.Die die : resultRolls) {

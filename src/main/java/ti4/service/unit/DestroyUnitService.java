@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
@@ -54,6 +55,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.message.MessageHelper;
@@ -200,9 +202,13 @@ public class DestroyUnitService {
         MonumentsDSButtonHandler.offerKyroReliquaryRelocation(event, game, units);
         if (combat) {
             LostLegaciesRelicHandler.offerNeutralReplacement(event, game, units);
+            if (WarGamesBrActionCardHandler.isCombatActive(game)) {
+                WarGamesBrActionCardHandler.replaceDestroyedNeutralUnits(event, game, units, true);
+            }
         }
         MidgardLegendaryButtonHandler.offerMusterManheim(event, game, units, combat);
         TeHelperAbilities.offerStrandedStructureRemoval(event, game, units);
+        ThirtyKActionCardHooks.afterUnitsDestroyed(event, game, units);
 
         // Handle other destroyed units individually
         for (RemovedUnit u : units) handleDestroyedUnit(event, game, units, u, combat);
@@ -248,6 +254,7 @@ public class DestroyUnitService {
 
         List<Player> capturing = CaptureUnitService.listCapturingFlagshipPlayers(game, allUnits, unit);
         List<Player> devours = CaptureUnitService.listCapturingCombatPlayers(game, unit);
+        Player stasisFieldGeneratorsCapturer = BlueReverieTechHelper.consumeStasisFieldGeneratorsCapture(game, unit);
         if (combat) {
             capturing.addAll(devours);
         }
@@ -373,10 +380,16 @@ public class DestroyUnitService {
             default -> Consumers.nop();
         }
 
+        if (stasisFieldGeneratorsCapturer != null) {
+            capturing.removeIf(capturer -> capturer == stasisFieldGeneratorsCapturer);
+        }
         Set<String> counted = new HashSet<>();
         for (Player cabal : capturing) {
             if (!counted.add(cabal.getColorID())) continue;
             CaptureUnitService.executeCapture(event, game, cabal, unit);
+        }
+        if (stasisFieldGeneratorsCapturer != null) {
+            BlueReverieTechHelper.captureWithStasisFieldGenerators(event, game, stasisFieldGeneratorsCapturer, unit);
         }
         if (player != null
                 && combat

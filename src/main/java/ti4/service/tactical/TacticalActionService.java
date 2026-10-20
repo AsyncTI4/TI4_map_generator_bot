@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PirateHordeBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.CombatInitiativeLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
@@ -429,6 +430,11 @@ public class TacticalActionService {
             Tile tile = tileEntry.getValue();
             boolean movedFrom = TacticalActionDisplacementService.hasDisplacementFromPosition(game, tile.getPosition());
             boolean hasUnits = hasUnitsOrAlliedUnitsWithoutCC(player, game, event, tile);
+            if (PirateHordeBrActionCardHandler.isActive(game, player)
+                    && !movedFrom
+                    && !PirateHordeBrActionCardHandler.hasNeutralShips(game, tile)) {
+                continue;
+            }
             boolean canSelect = (movedFrom || hasUnits)
                     && (!CommandCounterHelper.hasCC(event, player.getColor(), tile)
                             || ButtonHelper.canMoveOutOfLockedSystems(player, game)

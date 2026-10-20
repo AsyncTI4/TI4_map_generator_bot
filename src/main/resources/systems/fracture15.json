@@ -1,0 +1,15 @@
+{
+    "id": "fracture15",
+    "name": "Charon",
+    "aliases": [
+        "fracture15",
+        "charon",
+        "char",
+        "frac15"
+    ],
+    "imagePath": "fracture15.png",
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

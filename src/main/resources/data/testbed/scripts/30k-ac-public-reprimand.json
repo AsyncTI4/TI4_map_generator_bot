@@ -1,0 +1,41 @@
+{
+  "name": "30k-ac-public-reprimand",
+  "description": "Hacan plays Public Reprimand on Sol, Sol chooses to lose its trade goods.",
+  "preset": "30k-2p",
+  "stopOnFail": true,
+  "steps": [
+    {
+      "expect": {
+        "state": "hacan.acIds",
+        "contains": "publicreprimand30k"
+      }
+    },
+    {
+      "as": "hacan",
+      "press": "ac_play_from_hand_{ac:publicreprimand30k}",
+      "in": "hacan:cards-info"
+    },
+    {
+      "as": "hacan",
+      "press": "thkAcReprimand_{sol.color}",
+      "in": "hacan"
+    },
+    {
+      "as": "sol",
+      "press": "thkAcReprimandLose_{hacan.color}",
+      "in": "sol"
+    },
+    {
+      "expect": {
+        "state": "sol.tg",
+        "equals": "0"
+      }
+    },
+    {
+      "expect": {
+        "in": "hacan",
+        "contains": "lose all of their trade goods"
+      }
+    }
+  ]
+}

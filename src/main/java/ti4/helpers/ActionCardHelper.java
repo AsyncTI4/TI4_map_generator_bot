@@ -24,8 +24,22 @@ import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.ActionCardPingButtonHandler;
-import ti4.discord.interactions.buttons.handlers.actioncards.EscapeClauseActionCardHandler;
-import ti4.discord.interactions.buttons.handlers.actioncards.FreedomFightersDsActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.AuditBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.DubiousOccultistBRActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EntanglementBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EntenteBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EscapeClauseActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.FrameShiftBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.FreedomFightersDsActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.InnovativeOfficerBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PartisansBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PirateHordeBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.ProFormaSessionBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.RepurposeBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.StasisTeamsBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.StolenFilesBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.UnconventionalDiplomacyBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
@@ -37,6 +51,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.thirtyk.ThirtyKActionCards;
 import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.helpers.twilight_kart.TkHelperActionCards;
 import ti4.image.Mapper;
@@ -823,14 +838,14 @@ public class ActionCardHelper {
         List<Button> buttons = new ArrayList<>();
 
         boolean actionCardIsSabotageOrShatter = isSabotageOrShatter(acID);
-        if (actionCardIsCancelable && !actionCardIsSabotageOrShatter) {
+        boolean actionCardIsImmediateCancellation = actionCardIsSabotageOrShatter;
+        if (actionCardIsCancelable && !actionCardIsImmediateCancellation) {
             Button sabotageButton = Buttons.red(
                     "sabotage_ac_" + actionCardTitle + "_" + player.getFaction(),
                     "Cancel Action Card With Sabotage",
                     MiscEmojis.Sabotage);
             buttons.add(sabotageButton);
         }
-
         MonumentsButtonHandler.gainKVDTradeGoods(game, player, actionCardTitle);
 
         if (actionCardIsCancelable) {
@@ -912,10 +927,10 @@ public class ActionCardHelper {
                         player.getCorrectChannel().getName(),
                         getCombatReplayTrackedEvent(actionCard));
 
-        if (actionCardIsSabotageOrShatter) {
+        if (actionCardIsImmediateCancellation) {
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                     mainGameChannel, message, Collections.singletonList(acEmbed), null, pingPrompt);
-            if (game.isWildWildGalaxyMode()) {
+            if (actionCardIsSabotageOrShatter && game.isWildWildGalaxyMode()) {
                 Button codex1 = Buttons.green("codexCardPick_1", "Card #1");
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
@@ -1033,6 +1048,48 @@ public class ActionCardHelper {
 
             if ("escape_clause".equals(automationID)) {
                 EscapeClauseActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("audit".equals(automationID)) {
+                AuditBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("dubious_occultist".equals(automationID)) {
+                DubiousOccultistBRActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("entanglement".equals(automationID)) {
+                EntanglementBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("entente".equals(automationID)) {
+                EntenteBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("frame_shift".equals(automationID)) {
+                FrameShiftBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("innovative_officer".equals(automationID)) {
+                InnovativeOfficerBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("partisans".equals(automationID)) {
+                PartisansBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("pirate_horde".equals(automationID)) {
+                PirateHordeBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("pro_forma_session".equals(automationID)) {
+                ProFormaSessionBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("repurpose".equals(automationID)) {
+                RepurposeBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("stolen_files".equals(automationID)) {
+                StolenFilesBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("unconventional_diplomacy".equals(automationID)) {
+                UnconventionalDiplomacyBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("stasis_teams".equals(automationID)) {
+                StasisTeamsBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("war_games".equals(automationID)) {
+                WarGamesBrActionCardHandler.offerResolution(game, player, introMsg);
             }
 
             List<Button> codedButtons = new ArrayList<>();
@@ -2224,8 +2281,14 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("realignment".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "willRevolution", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             TeHelperActionCards.resolveTeActionCard(actionCard, player, introMsg);
             TkHelperActionCards.resolveTkActionCard(actionCard, player, introMsg);
+            ThirtyKActionCards.resolveActionCard(actionCard, player, introMsg);
 
             TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(
                     Constants.AC, actionCard.getAlias(), player.getNumberOfTurns());

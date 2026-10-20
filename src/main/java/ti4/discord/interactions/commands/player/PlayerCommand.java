@@ -44,7 +44,7 @@ public class PlayerCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "Player";
+        return "Your faction: stats, turns, passing, strategy cards, sending goods, color and teams";
     }
 
     @Override

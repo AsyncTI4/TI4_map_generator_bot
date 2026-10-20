@@ -8,6 +8,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.DiscordantStarsHelper;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -30,6 +31,7 @@ class TransientGameInfoUpdater {
             DiscordantStarsHelper.checkUltimateAuthority(game);
             MonumentsService.syncZelianAsteroidFieldToken(game);
             TeHelperGeneral.checkTransientInfo(game);
+            BlueReverieTechHelper.syncEcologicalEngineeringAttachments(game);
             for (Player player : game.getRealPlayers()) {
                 CommanderUnlockCheckService.checkPlayer(player, "ta");
                 MonumentsBRButtonHandler.checkMonumentHonorDishonorFlip(game, player);

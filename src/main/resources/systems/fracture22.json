@@ -1,0 +1,16 @@
+{
+    "id": "fracture22",
+    "name": "Fracture Set3 Peak Egress",
+    "aliases": [
+        "fracture2p",
+        "egresspeak",
+        "frac22",
+        "fracpeakegrs"
+    ],
+    "hasEgress": true,
+    "imagePath": "fracture22.png",
+    "shipPositionsType": "TYPE08",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

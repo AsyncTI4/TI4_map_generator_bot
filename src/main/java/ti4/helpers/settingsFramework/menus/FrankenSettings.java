@@ -295,6 +295,7 @@ public class FrankenSettings extends SettingsMenu {
         game.setDiscordantStarsMode(isEffectiveDiscordantStarsEnabled());
         game.setBlueReverieMode(isEffectiveBlueReverieEnabled());
         game.setUnchartedSpaceStuff(homebrewSettings.getUnchartedSpace().isVal());
+        game.setLostLegaciesTiles(homebrewSettings.getLostLegaciesTiles().isVal());
         game.setStoredValue(
                 Constants.INCLUDE_ERONOUS_TILES,
                 Boolean.toString(homebrewSettings.getEronous().isVal()));

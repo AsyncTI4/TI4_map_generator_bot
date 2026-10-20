@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraUnitHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -73,6 +74,7 @@ public class CombatModifierModel implements ModelInterface {
                         }
                     }
                 }
+                best = KaloraUnitHandler.preferDreadnoughtForBombardment(best, sortedAllUnits, rollType, player);
                 isInScope = Objects.equals(best.getAsyncId(), unit.getAsyncId());
             }
             if ("_bestCap_".equals(scope)) {
