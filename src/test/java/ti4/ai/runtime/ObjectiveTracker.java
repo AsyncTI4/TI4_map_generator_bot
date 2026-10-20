@@ -127,6 +127,7 @@ final class ObjectiveTracker {
     private final DirectHitTracker directHits = new DirectHitTracker();
     private final PerimeterTracker perimeter = new PerimeterTracker();
     private final SupplyLinesTracker supplyLines = new SupplyLinesTracker();
+    private final VoidMartyrTracker voidMartyr = new VoidMartyrTracker();
 
     private Snapshot open;
     private int lastOpenedRound;
@@ -145,6 +146,7 @@ final class ObjectiveTracker {
         debate.observe(game);
         directHits.observe(game);
         supplyLines.observe(game);
+        voidMartyr.observe(game);
         if (pastTheOpeningDiscard(game)) recordHeld(game);
         trackMechs(game);
         produce.observe(game);
@@ -164,6 +166,7 @@ final class ObjectiveTracker {
         directHits.lines(game).forEach(System.out::println);
         perimeter.lines(game).forEach(System.out::println);
         supplyLines.lines(game).forEach(System.out::println);
+        voidMartyr.lines(game).forEach(System.out::println);
         if (open != null) close(game);
         NexusWatch.print(game);
         produce.finish(game);

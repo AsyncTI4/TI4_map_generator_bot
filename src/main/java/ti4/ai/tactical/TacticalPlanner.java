@@ -112,7 +112,11 @@ public class TacticalPlanner {
     private static final double CUSTODIANS_VALUE = ObjectiveValue.VICTORY_POINT_VALUE;
     private static final double MECATOL_CASH_SHARE = 0.75;
     private static final String DARKEN_THE_SKIES = "dts";
+    private static final String BRAVE_THE_VOID = "btv";
+    private static final String BECOME_A_MARTYR = "bam";
     private static final String DESTROY_THEIR_GREATEST_SHIP = "dtgs";
+    private static final Set<String> WHOLE_POINT_SECRETS =
+            Set.of(DARKEN_THE_SKIES, DESTROY_THEIR_GREATEST_SHIP, BRAVE_THE_VOID);
     private static final String CONQUER_THE_WEAK = "conquer";
     private static final String OCCUPY_THE_FRINGE = "otf";
     private static final String MECHANIZE_THE_MILITARY = "mtm";
@@ -1353,12 +1357,13 @@ public class TacticalPlanner {
     }
 
     private static boolean homeLandingJustified(Context context, Player opponent, Candidate candidate) {
-        return raidsForDarkenTheSkies(context.seat, candidate.estimate())
+        return raidsForHeldSecret(context.seat, candidate.estimate())
                 || homeLandingJustified(context, opponent, candidate.quick());
     }
 
-    private static boolean raidsForDarkenTheSkies(Player seat, StrikeEstimate estimate) {
-        return seat.getSecretsUnscored().containsKey(DARKEN_THE_SKIES) && estimate.groundCombat();
+    private static boolean raidsForHeldSecret(Player seat, StrikeEstimate estimate) {
+        Set<String> held = seat.getSecretsUnscored().keySet();
+        return estimate.groundCombat() && (held.contains(DARKEN_THE_SKIES) || held.contains(BECOME_A_MARTYR));
     }
 
     private static boolean homeLandingJustified(Context context, Player opponent, StrikeValue value) {
@@ -2200,7 +2205,7 @@ public class TacticalPlanner {
         Set<String> held = seat.getSecretsUnscored().keySet();
         List<String> generic = new ArrayList<>();
         if (held.contains("sar") && opponent.getTotalVictoryPoints() == game.getHighestScore()) generic.add("sar");
-        if (held.contains("btv") && tile.isAnomaly(game, seat)) generic.add("btv");
+        if (held.contains(BRAVE_THE_VOID) && tile.isAnomaly(game, seat)) generic.add(BRAVE_THE_VOID);
         if (withDarkenTheSkies
                 && held.contains(DARKEN_THE_SKIES)
                 && tile.isHomeSystem(game)
@@ -2262,7 +2267,7 @@ public class TacticalPlanner {
     }
 
     private static double secretShare(Game game, Player seat, String secret) {
-        if (DARKEN_THE_SKIES.equals(secret) || DESTROY_THEIR_GREATEST_SHIP.equals(secret)) return 1.0;
+        if (WHOLE_POINT_SECRETS.contains(secret)) return 1.0;
         return ActionSecretTiming.pursueNow(game, seat, secret) ? 1.0 : PATIENT_SHARE;
     }
 

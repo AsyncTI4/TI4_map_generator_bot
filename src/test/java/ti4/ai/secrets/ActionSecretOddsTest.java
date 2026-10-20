@@ -147,4 +147,22 @@ class ActionSecretOddsTest extends BaseTi4Test {
         assertThat(ActionSecretOdds.beforeGameEnds(test.game, test.nekro, "dyp"))
                 .isCloseTo(0.21, within(1e-9));
     }
+
+    // Losing a home planet is rare unless the board sets it up: a planet held in another home that can be taken back,
+    // or the seat's own home with an enemy fleet beside it that outweighs the ships guarding it.
+    @Test
+    void becomeAMartyrRisesWithAForeignHomePlanetHeldOrAnOutmatchedHome() {
+        assertThat(perRound("bam")).isEqualTo(0.03);
+
+        Tile next = enemyNextDoor();
+        assertThat(perRound("bam")).isEqualTo(0.20);
+
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        assertThat(perRound("bam")).isEqualTo(0.03);
+        next.removeUnit("space", ti4.helpers.Units.getUnitKey(UnitType.Destroyer, test.sol.getColor()), 1);
+
+        test.solHomeBeside(AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.nekro.addPlanet("jord");
+        assertThat(perRound("bam")).isEqualTo(0.30);
+    }
 }

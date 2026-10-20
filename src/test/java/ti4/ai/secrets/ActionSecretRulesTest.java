@@ -450,4 +450,42 @@ class ActionSecretRulesTest extends BaseTi4Test {
                         .orElse(""))
                 .startsWith("dtgs|");
     }
+
+    private void looksAtTheBoard(long millisAfterTurnStart) {
+        ActionSecretRules.observe(
+                test.contextAt(test.game.getLastActivePlayerChange().getTime() + millisAfterTurnStart));
+    }
+
+    private String pendingSecrets() {
+        return test.memory.get("actionSecretPending|" + test.game.getRound()).orElse("");
+    }
+
+    // Losing a planet in another player's home system scores Become a Martyr, however the planet is lost.
+    @Test
+    void queuesBecomeAMartyrOnceAForeignHomePlanetIsLost() {
+        test.nekro.setSecret("bam");
+        test.solHomeBeside(battlefield.getPosition());
+        test.nekro.addPlanet("jord");
+        looksAtTheBoard(1000);
+        assertThat(pendingSecrets()).isEmpty();
+
+        test.nekro.removePlanet("jord");
+        looksAtTheBoard(2000);
+
+        assertThat(pendingSecrets()).startsWith("bam|");
+    }
+
+    @Test
+    void queuesBecomeAMartyrWhenTheForeignHomePlanetIsLostOnAnotherPlayersTurn() {
+        test.nekro.setSecret("bam");
+        test.solHomeBeside(battlefield.getPosition());
+        test.nekro.addPlanet("jord");
+        test.isActive(test.sol, "action");
+        looksAtTheBoard(1000);
+
+        test.nekro.removePlanet("jord");
+        looksAtTheBoard(2000);
+
+        assertThat(pendingSecrets()).startsWith("bam|");
+    }
 }
