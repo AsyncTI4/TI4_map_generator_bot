@@ -28,7 +28,7 @@ import ti4.helpers.StatusHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.helpers.async.RoundSummaryHelper;
-import ti4.image.MapRenderPipeline;
+import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.GameMessageManager;

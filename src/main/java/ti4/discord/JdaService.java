@@ -71,7 +71,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
-import ti4.image.MapRenderPipeline;
+import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.logging.LogBufferManager;
 import ti4.model.Mapper;

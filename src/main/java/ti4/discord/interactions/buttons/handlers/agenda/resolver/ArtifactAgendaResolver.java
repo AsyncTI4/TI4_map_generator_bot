@@ -7,7 +7,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.AgendaSummaryHelper;
-import ti4.image.SystemContextImage;
+import ti4.image.tile.SystemContextImage;
 import ti4.message.MessageHelper;
 import ti4.service.agenda.IxthianArtifactService;
 import ti4.service.emoji.PlanetEmojis;

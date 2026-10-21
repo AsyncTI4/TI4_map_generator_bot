@@ -6,7 +6,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
-import ti4.image.ImageResources;
+import ti4.image.io.ImageResources;
 import ti4.model.Mapper;
 
 public class PlanetRemove extends PlanetAddRemove {

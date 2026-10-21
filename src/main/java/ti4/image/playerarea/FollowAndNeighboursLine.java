@@ -5,10 +5,10 @@ import java.awt.Graphics2D;
 import java.util.Set;
 import ti4.game.Player;
 import ti4.helpers.Storage;
-import ti4.image.ColorUtil;
-import ti4.image.FactionIcons;
-import ti4.image.OutlinedText;
-import ti4.image.Strokes;
+import ti4.image.draw.ColorUtil;
+import ti4.image.draw.FactionIcons;
+import ti4.image.draw.OutlinedText;
+import ti4.image.draw.Strokes;
 
 final class FollowAndNeighboursLine {
 

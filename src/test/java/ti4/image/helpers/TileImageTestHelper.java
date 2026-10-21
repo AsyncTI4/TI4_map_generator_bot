@@ -10,9 +10,9 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
-import ti4.image.ImageHelper;
-import ti4.image.SystemContextImage;
-import ti4.image.TileImageTest;
+import ti4.image.io.ImageHelper;
+import ti4.image.tile.SystemContextImage;
+import ti4.image.tile.TileImageTest;
 import ti4.model.Mapper;
 
 @UtilityClass

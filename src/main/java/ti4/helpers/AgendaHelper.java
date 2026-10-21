@@ -57,7 +57,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
-import ti4.image.BannerGenerator;
+import ti4.image.card.BannerGenerator;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;

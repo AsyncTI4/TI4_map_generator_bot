@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map.Entry;
 import ti4.game.Player;
 import ti4.helpers.Storage;
-import ti4.image.ColorUtil;
-import ti4.image.HorizontalAlign;
-import ti4.image.OutlinedText;
-import ti4.image.PlayerTokens;
-import ti4.image.ShapeDrawing;
+import ti4.image.draw.ColorUtil;
+import ti4.image.draw.HorizontalAlign;
+import ti4.image.draw.OutlinedText;
+import ti4.image.draw.PlayerTokens;
+import ti4.image.draw.ShapeDrawing;
 import ti4.model.Mapper;
 
 final class PlotCards {

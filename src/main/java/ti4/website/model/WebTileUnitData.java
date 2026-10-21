@@ -17,8 +17,8 @@ import ti4.helpers.PdsCoverage;
 import ti4.helpers.PdsCoverageHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PlanetShields;
-import ti4.image.PlayerTokens;
+import ti4.image.draw.PlayerTokens;
+import ti4.image.tile.PlanetShields;
 import ti4.website.WebPdsCoverage;
 
 @Data

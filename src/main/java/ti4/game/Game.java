@@ -85,7 +85,7 @@ import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.GameSetupSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
-import ti4.image.GalaxyNames;
+import ti4.image.map.GalaxyNames;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;

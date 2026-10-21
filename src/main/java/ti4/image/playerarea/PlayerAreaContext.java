@@ -5,8 +5,7 @@ import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.FoWHelper;
-import ti4.image.NeighbourMap;
-import ti4.image.WebsiteOverlays;
+import ti4.image.draw.WebsiteOverlays;
 
 public final class PlayerAreaContext {
 

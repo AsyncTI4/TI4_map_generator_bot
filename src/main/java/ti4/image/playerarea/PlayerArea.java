@@ -5,8 +5,8 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import ti4.game.Player;
-import ti4.image.ColorUtil;
-import ti4.image.Strokes;
+import ti4.image.draw.ColorUtil;
+import ti4.image.draw.Strokes;
 
 final class PlayerArea {
 

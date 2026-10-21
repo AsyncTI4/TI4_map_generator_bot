@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Tile;
-import ti4.image.SystemContextImage;
+import ti4.image.tile.SystemContextImage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;

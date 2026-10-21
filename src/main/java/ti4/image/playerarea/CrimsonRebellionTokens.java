@@ -3,8 +3,8 @@ package ti4.image.playerarea;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.ImageHelper;
-import ti4.image.ImageResources;
+import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageResources;
 
 final class CrimsonRebellionTokens {
 

@@ -6,7 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import lombok.experimental.UtilityClass;
 import org.junit.jupiter.api.Assertions;
-import ti4.image.ImageEncoder;
+import ti4.image.io.ImageEncoder;
 
 @UtilityClass
 public class ImageTestHelper {

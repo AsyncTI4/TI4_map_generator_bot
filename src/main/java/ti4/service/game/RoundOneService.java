@@ -18,7 +18,7 @@ import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.image.ImageHelper;
+import ti4.image.io.ImageHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;

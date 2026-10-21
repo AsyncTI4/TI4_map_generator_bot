@@ -17,7 +17,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
-import ti4.image.MapSegment;
+import ti4.image.map.MapSegment;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
 import ti4.service.option.FOWOptionService.FOWOption;

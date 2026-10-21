@@ -24,7 +24,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.URLReaderHelper;
-import ti4.image.ImageResources;
+import ti4.image.io.ImageResources;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;

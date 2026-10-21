@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import ti4.helpers.Storage;
-import ti4.image.ColorUtil;
+import ti4.image.draw.ColorUtil;
 import ti4.model.Mapper;
 import ti4.model.PositionMapper;
 import ti4.model.UnitTokenPosition;

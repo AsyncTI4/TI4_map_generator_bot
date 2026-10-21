@@ -33,7 +33,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadGetter;
-import ti4.image.MapRenderPipeline;
+import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;

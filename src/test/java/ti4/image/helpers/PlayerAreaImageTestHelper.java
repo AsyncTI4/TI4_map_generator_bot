@@ -7,10 +7,10 @@ import java.io.File;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.game.Player;
-import ti4.image.ImageHelper;
-import ti4.image.PlayerAreaImageTest;
-import ti4.image.WebsiteOverlays;
+import ti4.image.draw.WebsiteOverlays;
+import ti4.image.io.ImageHelper;
 import ti4.image.playerarea.PlayerAreaContext;
+import ti4.image.playerarea.PlayerAreaImageTest;
 import ti4.image.playerarea.PlayerAreas;
 
 @UtilityClass

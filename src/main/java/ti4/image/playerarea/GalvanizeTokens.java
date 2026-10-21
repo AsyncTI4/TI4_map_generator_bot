@@ -4,7 +4,7 @@ import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.UnitHolder;
-import ti4.image.ImageHelper;
+import ti4.image.io.ImageHelper;
 
 final class GalvanizeTokens {
 

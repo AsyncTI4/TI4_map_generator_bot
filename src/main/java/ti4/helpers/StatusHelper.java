@@ -32,7 +32,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.thundersedge.TeHelperTechs;
-import ti4.image.BannerGenerator;
+import ti4.image.card.BannerGenerator;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.GameMessageType;

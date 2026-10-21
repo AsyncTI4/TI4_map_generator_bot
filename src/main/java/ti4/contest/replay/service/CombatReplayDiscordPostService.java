@@ -20,7 +20,7 @@ import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.helpers.ThreadGetter;
-import ti4.image.SystemContextImage;
+import ti4.image.tile.SystemContextImage;
 import ti4.message.MessageHelper;
 
 @Service

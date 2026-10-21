@@ -30,7 +30,7 @@ import ti4.website.EgressClientManager;
  * the map harness used to get by stubbing ImageHelper.readURLScaled to null. {@link #deterministicImages()} answers
  * with a small PNG whose colours derive from the URL, so pictures that draw emoji are pinned by position and size.
  */
-final class FakeImageNetwork implements AutoCloseable {
+public final class FakeImageNetwork implements AutoCloseable {
 
     private final MockedStatic<EgressClientManager> egress;
 
@@ -49,11 +49,11 @@ final class FakeImageNetwork implements AutoCloseable {
         egress.when(EgressClientManager::getHttpClient).thenReturn(client);
     }
 
-    static FakeImageNetwork notFound() {
+    public static FakeImageNetwork notFound() {
         return new FakeImageNetwork(false);
     }
 
-    static FakeImageNetwork deterministicImages() {
+    public static FakeImageNetwork deterministicImages() {
         return new FakeImageNetwork(true);
     }
 

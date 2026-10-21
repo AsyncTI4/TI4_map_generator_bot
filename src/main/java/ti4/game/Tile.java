@@ -35,7 +35,7 @@ import ti4.helpers.RenderRandom;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.image.ImageResources;
+import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.Mapper;

@@ -2,7 +2,7 @@ package ti4.image.playerarea;
 
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.OutlinedText;
+import ti4.image.draw.OutlinedText;
 import ti4.service.game.MonumentsService;
 
 final class WinnuVault {

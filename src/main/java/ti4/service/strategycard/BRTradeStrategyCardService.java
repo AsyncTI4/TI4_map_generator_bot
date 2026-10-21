@@ -15,7 +15,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.NewStuffHelper;
-import ti4.image.ImageResources;
+import ti4.image.io.ImageResources;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 

@@ -7,11 +7,11 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import ti4.game.Player;
 import ti4.helpers.Storage;
-import ti4.image.ImageHelper;
-import ti4.image.ImageResources;
-import ti4.image.OutlinedText;
-import ti4.image.PaImage;
-import ti4.image.VerticalText;
+import ti4.image.draw.OutlinedText;
+import ti4.image.draw.PaImage;
+import ti4.image.draw.VerticalText;
+import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageResources;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 

@@ -19,7 +19,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
-import ti4.image.FactionIcons;
+import ti4.image.draw.FactionIcons;
 import ti4.model.Mapper;
 
 @Data

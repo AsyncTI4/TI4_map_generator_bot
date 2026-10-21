@@ -10,7 +10,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.persistence.TestGameHarness;
-import ti4.image.MapSegment;
+import ti4.image.map.MapSegment;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 

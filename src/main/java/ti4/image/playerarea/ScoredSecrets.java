@@ -11,11 +11,11 @@ import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Storage;
-import ti4.image.ColorUtil;
-import ti4.image.ImageHelper;
-import ti4.image.ImageResources;
-import ti4.image.PlayerTokens;
-import ti4.image.Strokes;
+import ti4.image.draw.ColorUtil;
+import ti4.image.draw.PlayerTokens;
+import ti4.image.draw.Strokes;
+import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
 import ti4.model.Mapper;
 

@@ -35,7 +35,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
-import ti4.image.ImageResources;
+import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;

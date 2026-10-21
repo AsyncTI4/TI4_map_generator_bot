@@ -5,7 +5,7 @@ import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButto
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.OutlinedText;
+import ti4.image.draw.OutlinedText;
 import ti4.service.VeiledHeartService;
 import ti4.service.game.MonumentsService;
 

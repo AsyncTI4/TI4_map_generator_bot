@@ -6,9 +6,9 @@ import java.awt.Stroke;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Player;
 import ti4.helpers.Storage;
-import ti4.image.OutlinedText;
-import ti4.image.PaImage;
-import ti4.image.Strokes;
+import ti4.image.draw.OutlinedText;
+import ti4.image.draw.PaImage;
+import ti4.image.draw.Strokes;
 
 final class UnitValues {
 

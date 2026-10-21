@@ -84,7 +84,7 @@ import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKRelicHooks;
-import ti4.image.ColorUtil;
+import ti4.image.draw.ColorUtil;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.GameMessage;

@@ -43,7 +43,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKRelicHooks;
 import ti4.helpers.thirtyk.ThirtyKTransactions;
-import ti4.image.TransactionGenerator;
+import ti4.image.card.TransactionGenerator;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;

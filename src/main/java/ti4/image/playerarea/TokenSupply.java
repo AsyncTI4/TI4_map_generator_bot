@@ -4,8 +4,8 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import ti4.image.ImageHelper;
-import ti4.image.ImageResources;
+import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageResources;
 
 final class TokenSupply {
 

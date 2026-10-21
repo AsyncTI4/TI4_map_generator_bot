@@ -11,7 +11,7 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.image.MapSegment;
+import ti4.image.map.MapSegment;
 import ti4.message.MessageHelper;
 
 class MapSegmentCommand extends GameStateSubcommand {

@@ -11,11 +11,11 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Storage;
-import ti4.image.ColorUtil;
-import ti4.image.FactionIcons;
-import ti4.image.OutlinedText;
-import ti4.image.ShapeDrawing;
-import ti4.image.Strokes;
+import ti4.image.draw.ColorUtil;
+import ti4.image.draw.FactionIcons;
+import ti4.image.draw.OutlinedText;
+import ti4.image.draw.ShapeDrawing;
+import ti4.image.draw.Strokes;
 import ti4.model.StrategyCardModel;
 
 final class IdentityBlock {

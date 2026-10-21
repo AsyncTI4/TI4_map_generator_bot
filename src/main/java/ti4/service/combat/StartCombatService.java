@@ -99,7 +99,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.helpers.twilight_kart.TkHelperGenomes;
-import ti4.image.SystemContextImage;
+import ti4.image.tile.SystemContextImage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;

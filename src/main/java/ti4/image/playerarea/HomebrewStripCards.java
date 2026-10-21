@@ -5,8 +5,8 @@ import java.awt.Graphics2D;
 import java.util.List;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperAbilities;
-import ti4.image.PaImage;
-import ti4.image.Strokes;
+import ti4.image.draw.PaImage;
+import ti4.image.draw.Strokes;
 
 final class HomebrewStripCards {
 

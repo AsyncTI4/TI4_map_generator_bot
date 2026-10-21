@@ -11,15 +11,14 @@ import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Storage;
-import ti4.image.FactionIcons;
-import ti4.image.HorizontalAlign;
-import ti4.image.NeighbourMap;
-import ti4.image.OutlinedText;
-import ti4.image.RemoteImages;
-import ti4.image.RowWrap;
-import ti4.image.Strokes;
-import ti4.image.VerticalAlign;
-import ti4.image.WebsiteOverlays;
+import ti4.image.draw.FactionIcons;
+import ti4.image.draw.HorizontalAlign;
+import ti4.image.draw.OutlinedText;
+import ti4.image.draw.RowWrap;
+import ti4.image.draw.Strokes;
+import ti4.image.draw.VerticalAlign;
+import ti4.image.draw.WebsiteOverlays;
+import ti4.image.io.RemoteImages;
 
 public final class PlayerAreaHeader {
 

@@ -8,10 +8,10 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
-import ti4.image.OutlinedText;
-import ti4.image.PaImage;
-import ti4.image.ShapeDrawing;
-import ti4.image.Strokes;
+import ti4.image.draw.OutlinedText;
+import ti4.image.draw.PaImage;
+import ti4.image.draw.ShapeDrawing;
+import ti4.image.draw.Strokes;
 import ti4.model.ExploreModel;
 import ti4.model.Mapper;
 

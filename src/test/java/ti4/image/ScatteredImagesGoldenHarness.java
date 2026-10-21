@@ -54,6 +54,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.RenderRandom;
+import ti4.image.io.ImageHelper;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;

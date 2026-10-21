@@ -27,7 +27,7 @@ import ti4.helpers.ButtonHelperTwilightsFallActionCards;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
-import ti4.image.VerticalText;
+import ti4.image.draw.VerticalText;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.Mapper;

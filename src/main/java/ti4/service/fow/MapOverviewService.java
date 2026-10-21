@@ -12,8 +12,8 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.FoWHelper;
-import ti4.image.CompactOverviewGenerator;
-import ti4.image.MapRenderPipeline;
+import ti4.image.map.CompactOverviewGenerator;
+import ti4.image.map.MapRenderPipeline;
 import ti4.message.MessageHelper;
 import ti4.service.option.FOWOptionService.FOWOption;
 

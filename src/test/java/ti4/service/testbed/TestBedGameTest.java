@@ -28,7 +28,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
-import ti4.image.MapSegment;
+import ti4.image.map.MapSegment;
 import ti4.model.Mapper;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedScript.Shortcut;
