@@ -4,6 +4,7 @@ import static ti4.image.tile.TileGeometry.TILE_PADDING;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
@@ -40,7 +41,7 @@ final class TraitsStep implements TileStepPainter {
     }
 
     private static String traitFile(Game game, Tile tile, Planet planet) {
-        List<String> traits = planet.getPlanetType();
+        List<String> traits = new ArrayList<>(planet.getPlanetType());
         if (traits.isEmpty() && StringUtils.isNotBlank(planet.getOriginalPlanetType())) {
             traits.add(planet.getOriginalPlanetType());
         }
@@ -52,7 +53,7 @@ final class TraitsStep implements TileStepPainter {
             return ImageResources.faction(Mapper.getPlanet(planet.getName()).getFactionHomeworld() + ".png");
         }
         if (traits.size() == 1) {
-            String t = planet.getPlanetType().getFirst();
+            String t = traits.getFirst();
             return ImageResources.general(
                     ("" + t.charAt(0)).toUpperCase() + t.substring(1).toLowerCase() + ".png");
         }
