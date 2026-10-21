@@ -14,7 +14,7 @@ import ti4.model.ColorModel;
 import ti4.model.StrategyCardModel;
 
 @UtilityClass
-class ColorUtil {
+public class ColorUtil {
 
     public static final Color EliminatedColor = new Color(150, 0, 24); // Carmine
     public static final Color ActiveColor = new Color(80, 200, 120); // Emerald

@@ -317,10 +317,10 @@ final class HexTileStats {
     }
 
     private void drawPAImage(int x, int y, String resourceName) {
-        PlayerAreaGenerator.drawPAImage(g2, x, y, resourceName);
+        PaImage.draw(g2, x, y, resourceName);
     }
 
     private void drawPAImageScaled(int x, int y, String resourceName, int size) {
-        PlayerAreaGenerator.drawPAImageScaled(g2, x, y, resourceName, size, size);
+        PaImage.drawScaled(g2, x, y, resourceName, size, size);
     }
 }

@@ -3905,21 +3905,8 @@ public class PlayerAreaGenerator {
         }
     }
 
-    public static Rectangle drawPAImage(Graphics g, int x, int y, String resourceName) {
-        try {
-            String resourcePath = ResourceHelper.getPAResource(resourceName);
-            BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
-            g.drawImage(resourceBufferedImage, x, y, null);
-            if (resourceBufferedImage != null)
-                return new Rectangle(x, y, resourceBufferedImage.getWidth(), resourceBufferedImage.getHeight());
-        } catch (Exception e) {
-            BotLogger.error("Could not display play area: " + resourceName, e);
-        }
-        return new Rectangle(new Point(x, y));
-    }
-
     private Rectangle drawPAImage(int x, int y, String resourceName) {
-        return drawPAImage(graphics, x, y, resourceName);
+        return PaImage.draw(graphics, x, y, resourceName);
     }
 
     private String getUnitPath(UnitKey unit) {
@@ -3938,34 +3925,15 @@ public class PlayerAreaGenerator {
     }
 
     private void drawPAImageScaled(int x, int y, String resourceName, int size) {
-        drawPAImageScaled(graphics, x, y, resourceName, size, size);
+        PaImage.drawScaled(graphics, x, y, resourceName, size, size);
     }
 
     private void drawPAImageScaled(int x, int y, String resourceName, int width, int height) {
-        drawPAImageScaled(graphics, x, y, resourceName, width, height);
-    }
-
-    public static void drawPAImageScaled(Graphics graphics, int x, int y, String resourceName, int width, int height) {
-        try {
-            String resourcePath = ResourceHelper.getPAResource(resourceName);
-            BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, width, height);
-            graphics.drawImage(resourceBufferedImage, x, y, null);
-        } catch (Exception e) {
-            BotLogger.error("Could not display play area: " + resourceName, e);
-        }
+        PaImage.drawScaled(graphics, x, y, resourceName, width, height);
     }
 
     private void drawPAImageOpaque(int x, int y, String resourceName, float opacity) {
-        try {
-            String resourcePath = ResourceHelper.getPAResource(resourceName);
-            BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
-            Graphics2D g2 = (Graphics2D) graphics;
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
-            g2.drawImage(resourceBufferedImage, x, y, null);
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
-        } catch (Exception e) {
-            BotLogger.error("Could not display play area: " + resourceName, e);
-        }
+        PaImage.drawOpaque((Graphics2D) graphics, x, y, resourceName, opacity);
     }
 
     private int objectivesSO(int y, Player player) {

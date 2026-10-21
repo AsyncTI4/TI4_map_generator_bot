@@ -30,7 +30,7 @@ final class CardDeckRow {
         g2.setFont(Storage.getFont24());
 
         for (DeckBadge badge : badges(game)) {
-            PlayerAreaGenerator.drawPAImageScaled(g2, x, y, badge.cardBack(), CARD_WIDTH, CARD_HEIGHT);
+            PaImage.drawScaled(g2, x, y, badge.cardBack(), CARD_WIDTH, CARD_HEIGHT);
             DrawingUtil.superDrawString(
                     g2,
                     badge.count(),

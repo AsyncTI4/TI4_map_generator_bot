@@ -213,6 +213,6 @@ final class AnchorStats {
     }
 
     private void drawPAImage(int x, int y, String resourceName) {
-        PlayerAreaGenerator.drawPAImage(g2, x, y, resourceName);
+        PaImage.draw(g2, x, y, resourceName);
     }
 }
