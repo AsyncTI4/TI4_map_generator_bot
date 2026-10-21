@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
@@ -39,10 +41,12 @@ import org.mockito.Mockito;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.RenderRandom;
 import ti4.helpers.Storage;
+import ti4.message.MessageHelper;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.user.AFKService;
@@ -50,7 +54,8 @@ import ti4.testUtils.BaseTi4Test;
 import ti4.website.model.WebsiteOverlay;
 
 /**
- * Golden-image harness for the map renderer. It is gated on the system property golden.saves so CI never runs it.
+ * Golden-image harness for the map renderer and the tile renderer's standalone entry points (system context images,
+ * per-step tile layers, overview images). It is gated on the system property golden.saves so CI never runs it.
  *
  * <pre>
  * mvn -o test -Dtest=MapRenderGoldenHarness -Dgolden.saves=DIR -Dgolden.out=DIR -Dgolden.mode=baseline|compare
@@ -77,21 +82,72 @@ class MapRenderGoldenHarness extends BaseTi4Test {
     private static final int BOARD_VARIANT_GAMES = 2;
     private static final int MIN_PLAYERS_FOR_DISTANCES = 4;
 
+    private static final int CONTEXT_HOME_SYSTEMS = 3;
+    private static final int MAX_CONTEXT_RINGS = 2;
+    private static final int NUCLEUS_PLAYERS = 6;
+    private static final String NUCLEUS_TEMPLATE = "6pStandardNucleus";
+
     private enum Mutation {
         NONE,
         SEGMENTS,
         BOARDS,
         HIDE_FLIP,
-        DISTANCES
+        DISTANCES,
+        NUCLEUS
     }
+
+    // MAP is a whole map render. The other kinds cover the tile renderer's standalone entry points: the "system with
+    // context" image (CONTEXT), every TileStep layer of every tile (STEPS, digested per tile) and the overview images
+    // that composite scaled tile layers.
+    private enum Kind {
+        MAP,
+        CONTEXT,
+        STEPS,
+        OVERVIEW_GM,
+        OVERVIEW_PLAYER,
+        OVERVIEW_MAP
+    }
+
+    // Who asks for the image. PUBLIC: no event. FOG: the first player's private-channel event. FOG_SECOND: that event
+    // plus an explicit second player (StartCombatService). PUB_VIEWER: the first player's event from an ordinary
+    // channel, so the tile renderer knows a viewer without a private view (sweep tokens, jails). EXPLICIT_FIRST: no
+    // event plus an explicit first player (ButtonHelper). FOG_GM: a private-channel event from a user who is not a
+    // player, so the view is private without a viewer.
+    private enum Viewer {
+        PUBLIC,
+        FOG,
+        FOG_SECOND,
+        PUB_VIEWER,
+        EXPLICIT_FIRST,
+        FOG_GM
+    }
+
+    private static final String NON_PLAYER_USER_ID = "100000000000000001";
+    private static final List<TileStep> VIEWER_SENSITIVE_STEPS =
+            List.of(TileStep.Tile, TileStep.Extras, TileStep.Units);
 
     private record Spec(
             String id,
+            Kind kind,
             DisplayType displayType,
-            boolean privateView,
+            Viewer viewer,
             String segment,
             Mutation mutation,
-            boolean eager) {}
+            boolean eager,
+            String focus,
+            int rings,
+            TileStep step) {}
+
+    private static Spec mapSpec(
+            String id, DisplayType displayType, boolean privateView, String segment, Mutation mutation, boolean eager) {
+        Viewer viewer = privateView ? Viewer.FOG : Viewer.PUBLIC;
+        return new Spec(id, Kind.MAP, displayType, viewer, segment, mutation, eager, null, 0, null);
+    }
+
+    private static Spec tileSpec(
+            String id, Kind kind, Viewer viewer, Mutation mutation, String focus, int rings, TileStep step) {
+        return new Spec(id, kind, DisplayType.all, viewer, null, mutation, false, focus, rings, step);
+    }
 
     private record RenderOutcome(
             String id,
@@ -102,6 +158,8 @@ class MapRenderGoldenHarness extends BaseTi4Test {
             String blocks,
             String overlays,
             String random,
+            String state,
+            int messages,
             long constructorMs,
             long drawMs,
             long hashMs) {}
@@ -110,20 +168,104 @@ class MapRenderGoldenHarness extends BaseTi4Test {
             Game game, DisplayType displayType, GenericInteractionCreateEvent event, String segment) {}
 
     private record RenderedCanvas(
-            BufferedImage canvas, List<WebsiteOverlay> overlays, long constructorNanos, long drawNanos)
+            BufferedImage canvas,
+            List<WebsiteOverlay> overlays,
+            LayerDigest layers,
+            long constructorNanos,
+            long drawNanos)
             implements AutoCloseable {
         @Override
         public void close() {}
     }
+
+    private static int connectionStripRenders;
+    private static final AtomicInteger MESSAGES = new AtomicInteger();
+
+    private record LayerDigest(int tiles, String sha, String perTile) {}
 
     private static RenderedCanvas renderCanvas(RenderRequest request) {
         long start = System.nanoTime();
         RenderContext context = MapRenderer.resolve(
                 new MapRenderRequest(request.game(), request.displayType(), request.event(), request.segment()));
         long constructed = System.nanoTime();
+        if (!context.board().connections().isEmpty()) connectionStripRenders++;
         BufferedImage canvas = MapRenderer.paint(context, RenderTimings.disabled());
         long drawn = System.nanoTime();
-        return new RenderedCanvas(canvas, context.overlays().asList(), constructed - start, drawn - constructed);
+        return new RenderedCanvas(canvas, context.overlays().asList(), null, constructed - start, drawn - constructed);
+    }
+
+    private static RenderedCanvas produce(Game game, Spec spec) throws Exception {
+        List<Player> players = game.getRealPlayers();
+        GenericInteractionCreateEvent event = eventFor(spec.viewer(), players);
+        Player explicitViewer =
+                switch (spec.viewer()) {
+                    case FOG_SECOND -> players.get(1);
+                    case EXPLICIT_FIRST -> players.getFirst();
+                    default -> null;
+                };
+        long start = System.nanoTime();
+        return switch (spec.kind()) {
+            case MAP -> renderCanvas(new RenderRequest(game, spec.displayType(), event, spec.segment()));
+            case CONTEXT -> timed(contextImage(game, event, spec.rings(), spec.focus(), explicitViewer), start);
+            case OVERVIEW_GM -> timed(CompactOverviewGenerator.gmImage(game), start);
+            case OVERVIEW_PLAYER -> timed(CompactOverviewGenerator.playerImage(game, players.getFirst(), event), start);
+            case OVERVIEW_MAP -> timed(MapOverviewGenerator.render(game, true), start);
+            case STEPS -> {
+                LayerDigest digest = digestLayers(game, event, spec.step());
+                yield new RenderedCanvas(null, List.of(), digest, 0, System.nanoTime() - start);
+            }
+        };
+    }
+
+    private static RenderedCanvas timed(BufferedImage canvas, long start) {
+        return new RenderedCanvas(canvas, List.of(), null, 0, System.nanoTime() - start);
+    }
+
+    // The only two places that name the tile renderer's API, so a restructure edits nothing else in the harness.
+    private static BufferedImage contextImage(
+            Game game, GenericInteractionCreateEvent event, int rings, String focus, Player explicitViewer) {
+        return new TileGenerator(game, event, null, rings, focus, explicitViewer).createMainImage();
+    }
+
+    private static Function<Tile, BufferedImage> layerSource(
+            Game game, GenericInteractionCreateEvent event, TileStep step) {
+        TileGenerator generator = new TileGenerator(game, event, DisplayType.all);
+        return tile -> generator.draw(tile, step);
+    }
+
+    // Draws one layer per tile of the viewer's tile map (fog-substituted for private views, as BoardSection does) and
+    // folds each layer's pixels, or the exception it threw, into one digest. perTile keeps a short hash per position
+    // so a mismatch names the tiles that changed.
+    private static LayerDigest digestLayers(Game game, GenericInteractionCreateEvent event, TileStep step)
+            throws Exception {
+        Map<String, Tile> tiles = new TreeMap<>(FogView.of(game, event).tiles());
+        Function<Tile, BufferedImage> source = layerSource(game, event, step);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        StringBuilder perTile = new StringBuilder();
+        for (Map.Entry<String, Tile> entry : tiles.entrySet()) {
+            String outcome;
+            try {
+                BufferedImage layer = source.apply(entry.getValue());
+                outcome = layer.getWidth() + "x" + layer.getHeight() + ":" + layerHash(layer);
+            } catch (Exception e) {
+                outcome = e.getClass().getName() + ": " + oneLine(e.getMessage());
+            }
+            digest.update((entry.getKey() + "=" + outcome + "\n").getBytes(StandardCharsets.UTF_8));
+            if (perTile.length() > 0) perTile.append(',');
+            perTile.append(entry.getKey()).append(':').append(Integer.toHexString(outcome.hashCode()));
+        }
+        return new LayerDigest(tiles.size(), HexFormat.of().formatHex(digest.digest()), perTile.toString());
+    }
+
+    private static String layerHash(BufferedImage layer) {
+        int[] data = layer.getRGB(0, 0, layer.getWidth(), layer.getHeight(), null, 0, layer.getWidth());
+        long first = 17;
+        long second = 31;
+        for (int value : data) {
+            first = first * 1_000_003L + value;
+            second = (second ^ value) * 0x9E3779B97F4A7C15L;
+        }
+        return Long.toHexString(first) + Long.toHexString(second);
     }
 
     @Test
@@ -148,12 +290,18 @@ class MapRenderGoldenHarness extends BaseTi4Test {
         StringBuilder summary = new StringBuilder();
         Totals totals = new Totals();
         boolean distancesPlanned = false;
+        boolean nucleusPlanned = false;
         int fogGamesSeen = 0;
 
         try (MockedStatic<DateTimeHelper> dateTime = mockStatic(DateTimeHelper.class, Mockito.CALLS_REAL_METHODS);
                 MockedStatic<AFKService> afk = mockStatic(AFKService.class, Mockito.CALLS_REAL_METHODS);
-                MockedStatic<ImageHelper> images = mockStatic(ImageHelper.class, Mockito.CALLS_REAL_METHODS)) {
+                MockedStatic<ImageHelper> images = mockStatic(ImageHelper.class, Mockito.CALLS_REAL_METHODS);
+                MockedStatic<MessageHelper> messages = mockStatic(MessageHelper.class, invocation -> {
+                    MESSAGES.incrementAndGet();
+                    return invocation.callRealMethod();
+                })) {
             dateTime.when(DateTimeHelper::getFormattedTimestamp).thenReturn("2000.01.01 - 00.00.00");
+            dateTime.when(DateTimeHelper::getFormattedTimestampWithMillis).thenReturn("2000.01.01 - 00.00.00.000");
             afk.when(() -> AFKService.userIsAFK(anyString())).thenReturn(false);
             images.when(() -> ImageHelper.readURLScaled(anyString(), anyInt(), anyInt()))
                     .thenReturn(null);
@@ -171,10 +319,13 @@ class MapRenderGoldenHarness extends BaseTi4Test {
                 boolean boards = fog && fogGamesSeen < BOARD_VARIANT_GAMES;
                 boolean distances =
                         !fog && !distancesPlanned && probe.getRealPlayers().size() >= MIN_PLAYERS_FOR_DISTANCES;
+                boolean nucleus =
+                        !fog && !nucleusPlanned && probe.getRealPlayers().size() == NUCLEUS_PLAYERS;
                 if (fog) fogGamesSeen++;
                 if (distances) distancesPlanned = true;
+                if (nucleus) nucleusPlanned = true;
 
-                List<Spec> specs = plan(save, probe, fog, eager, boards, distances).stream()
+                List<Spec> specs = plan(save, probe, fog, eager, boards, distances, nucleus).stream()
                         .filter(spec -> idFilter.matcher(spec.id()).matches())
                         .toList();
                 List<RenderOutcome> records = new ArrayList<>();
@@ -236,6 +387,9 @@ class MapRenderGoldenHarness extends BaseTi4Test {
             Assertions.assertEquals(0, totals.mismatches, "renders differing from the baseline, see summary.txt");
         }
         Assertions.assertEquals(0, totals.failures, "saves that failed to load");
+        if (only.isEmpty() && ".*".equals(idFilter.pattern())) {
+            Assertions.assertTrue(connectionStripRenders > 0, "no render exercised the sector connection strip");
+        }
     }
 
     private static final class Totals {
@@ -311,6 +465,7 @@ class MapRenderGoldenHarness extends BaseTi4Test {
             case HIDE_FLIP ->
                 game.setFowOption(FOWOption.HIDE_PLAYER_INFOS, !game.getFowOption(FOWOption.HIDE_PLAYER_INFOS));
             case DISTANCES -> applyDistances(game);
+            case NUCLEUS -> game.setMapTemplateID(NUCLEUS_TEMPLATE);
         }
     }
 
@@ -356,18 +511,18 @@ class MapRenderGoldenHarness extends BaseTi4Test {
     }
 
     private static List<Spec> plan(
-            Path save, Game probe, boolean fog, boolean eager, boolean boards, boolean distances) {
+            Path save, Game probe, boolean fog, boolean eager, boolean boards, boolean distances, boolean nucleus) {
         List<Spec> specs = new ArrayList<>();
         boolean hasViewer = fog && !probe.getRealPlayers().isEmpty();
         for (DisplayType type : DisplayType.values()) {
-            specs.add(new Spec("pub-" + type.name(), type, false, null, Mutation.NONE, false));
+            specs.add(mapSpec("pub-" + type.name(), type, false, null, Mutation.NONE, false));
             if (hasViewer) {
-                specs.add(new Spec("fog-" + type.name(), type, true, null, Mutation.NONE, false));
+                specs.add(mapSpec("fog-" + type.name(), type, true, null, Mutation.NONE, false));
             }
         }
         if (hasViewer) {
             for (DisplayType type : List.of(DisplayType.all, DisplayType.stats)) {
-                specs.add(new Spec("hideflip-fog-" + type.name(), type, true, null, Mutation.HIDE_FLIP, false));
+                specs.add(mapSpec("hideflip-fog-" + type.name(), type, true, null, Mutation.HIDE_FLIP, false));
             }
         }
         if (fog) {
@@ -375,27 +530,27 @@ class MapRenderGoldenHarness extends BaseTi4Test {
         }
         if (boards) {
             for (DisplayType type : List.of(DisplayType.all, DisplayType.map, DisplayType.stats)) {
-                specs.add(new Spec("boards-pub-" + type.name(), type, false, null, Mutation.BOARDS, false));
+                specs.add(mapSpec("boards-pub-" + type.name(), type, false, null, Mutation.BOARDS, false));
                 if (hasViewer) {
-                    specs.add(new Spec("boards-fog-" + type.name(), type, true, null, Mutation.BOARDS, false));
+                    specs.add(mapSpec("boards-fog-" + type.name(), type, true, null, Mutation.BOARDS, false));
                 }
             }
             addSegmentSpecs(specs, save, Mutation.BOARDS, "boardseg", hasViewer, SEGMENT_DISPLAY_TYPES);
         }
         if (distances) {
-            specs.add(new Spec("dist-all", DisplayType.all, false, null, Mutation.DISTANCES, false));
-            specs.add(new Spec("dist-map", DisplayType.map, false, null, Mutation.DISTANCES, false));
+            specs.add(mapSpec("dist-all", DisplayType.all, false, null, Mutation.DISTANCES, false));
+            specs.add(mapSpec("dist-map", DisplayType.map, false, null, Mutation.DISTANCES, false));
         }
         if (eager) {
             for (DisplayType type : List.of(DisplayType.all, DisplayType.landscape, DisplayType.stats)) {
-                specs.add(new Spec("eager-pub-" + type.name(), type, false, null, Mutation.NONE, true));
+                specs.add(mapSpec("eager-pub-" + type.name(), type, false, null, Mutation.NONE, true));
             }
             if (hasViewer) {
-                specs.add(new Spec("eager-fog-all", DisplayType.all, true, null, Mutation.NONE, true));
+                specs.add(mapSpec("eager-fog-all", DisplayType.all, true, null, Mutation.NONE, true));
             }
             if (fog) {
                 for (String name : segmentNames(save, Mutation.SEGMENTS)) {
-                    specs.add(new Spec(
+                    specs.add(mapSpec(
                             "eager-seg-" + sanitize(name) + (hasViewer ? "-fog" : "-pub") + "-all",
                             DisplayType.all,
                             hasViewer,
@@ -405,17 +560,133 @@ class MapRenderGoldenHarness extends BaseTi4Test {
                 }
             }
         }
+        addTileSpecs(specs, probe, hasViewer, nucleus);
         return specs;
+    }
+
+    private static void addTileSpecs(List<Spec> specs, Game probe, boolean hasViewer, boolean nucleus) {
+        List<Viewer> everyRing = viewersFor(probe, hasViewer, List.of(Viewer.PUBLIC, Viewer.FOG));
+        List<Viewer> oneRing = viewersFor(
+                probe, hasViewer, List.of(Viewer.FOG_SECOND, Viewer.PUB_VIEWER, Viewer.EXPLICIT_FIRST, Viewer.FOG_GM));
+        focusPositions(probe).forEach((label, position) -> {
+            for (int rings = 0; rings <= MAX_CONTEXT_RINGS; rings++) {
+                List<Viewer> viewers = rings == 1 ? concat(everyRing, oneRing) : everyRing;
+                for (Viewer viewer : viewers) {
+                    String id = "ctx-" + label + "-c" + rings + "-" + suffix(viewer);
+                    specs.add(tileSpec(id, Kind.CONTEXT, viewer, Mutation.NONE, position, rings, null));
+                }
+            }
+        });
+        List<Viewer> stepViewers = viewersFor(probe, hasViewer, List.of(Viewer.PUB_VIEWER, Viewer.FOG_GM));
+        for (TileStep step : TileStep.values()) {
+            List<Viewer> viewers = VIEWER_SENSITIVE_STEPS.contains(step) ? concat(everyRing, stepViewers) : everyRing;
+            for (Viewer viewer : viewers) {
+                String id = "steps-" + step.name() + "-" + suffix(viewer);
+                specs.add(tileSpec(id, Kind.STEPS, viewer, Mutation.NONE, null, 0, step));
+            }
+        }
+        if (nucleus) {
+            specs.add(tileSpec(
+                    "steps-nucleus-template", Kind.STEPS, Viewer.PUBLIC, Mutation.NUCLEUS, null, 0, TileStep.Nucleus));
+        }
+        for (Viewer viewer : viewersFor(probe, hasViewer, List.of(Viewer.PUB_VIEWER, Viewer.FOG_GM))) {
+            specs.add(new Spec(
+                    "viewer-" + suffix(viewer) + "-all",
+                    Kind.MAP,
+                    DisplayType.all,
+                    viewer,
+                    null,
+                    Mutation.NONE,
+                    false,
+                    null,
+                    0,
+                    null));
+        }
+        specs.add(tileSpec("overview-gm", Kind.OVERVIEW_GM, Viewer.PUBLIC, Mutation.NONE, null, 0, null));
+        specs.add(tileSpec("overview-map", Kind.OVERVIEW_MAP, Viewer.PUBLIC, Mutation.NONE, null, 0, null));
+        for (Viewer viewer : viewersFor(probe, hasViewer, List.of(Viewer.PUBLIC, Viewer.FOG))) {
+            if (probe.getRealPlayers().isEmpty()) break;
+            String id = "overview-player-" + suffix(viewer);
+            specs.add(tileSpec(id, Kind.OVERVIEW_PLAYER, viewer, Mutation.NONE, null, 0, null));
+        }
+    }
+
+    private static List<Viewer> viewersFor(Game probe, boolean hasViewer, List<Viewer> wanted) {
+        int players = probe.getRealPlayers().size();
+        return wanted.stream()
+                .filter(viewer -> switch (viewer) {
+                    case PUBLIC -> true;
+                    case FOG, FOG_GM -> hasViewer;
+                    case FOG_SECOND -> hasViewer && players >= 2;
+                    case PUB_VIEWER, EXPLICIT_FIRST -> players >= 1;
+                })
+                .toList();
+    }
+
+    private static List<Viewer> concat(List<Viewer> first, List<Viewer> second) {
+        return Stream.concat(first.stream(), second.stream()).toList();
+    }
+
+    private static String suffix(Viewer viewer) {
+        return switch (viewer) {
+            case PUBLIC -> "pub";
+            case FOG -> "fog";
+            case FOG_SECOND -> "fogp2";
+            case PUB_VIEWER -> "pubviewer";
+            case EXPLICIT_FIRST -> "nullp1";
+            case FOG_GM -> "foggm";
+        };
+    }
+
+    // Home systems, Mecatol, the first anomaly and the busiest system, deduplicated by position in that order.
+    private static Map<String, String> focusPositions(Game game) {
+        Map<String, String> byPosition = new LinkedHashMap<>();
+        List<Player> players = game.getRealPlayers();
+        for (int i = 0; i < Math.min(CONTEXT_HOME_SYSTEMS, players.size()); i++) {
+            Tile home = players.get(i).getHomeSystemTile();
+            if (home != null) byPosition.putIfAbsent(home.getPosition(), "hs" + (i + 1));
+        }
+        Tile mecatol = game.getMecatolTile();
+        if (mecatol != null) byPosition.putIfAbsent(mecatol.getPosition(), "mecatol");
+        Map<String, Tile> sorted = new TreeMap<>(game.getTileMap());
+        sorted.values().stream()
+                .filter(tile -> isAnomaly(game, tile))
+                .findFirst()
+                .ifPresent(tile -> byPosition.putIfAbsent(tile.getPosition(), "anomaly"));
+        String busiest = null;
+        int most = 0;
+        for (Tile tile : sorted.values()) {
+            int units = tile.getUnitHolders().values().stream()
+                    .flatMap(holder -> holder.getUnits().values().stream())
+                    .mapToInt(Integer::intValue)
+                    .sum();
+            if (units > most) {
+                most = units;
+                busiest = tile.getPosition();
+            }
+        }
+        if (busiest != null) byPosition.putIfAbsent(busiest, "busiest");
+        Map<String, String> byLabel = new LinkedHashMap<>();
+        byPosition.forEach((position, label) -> byLabel.put(label, position));
+        return byLabel;
+    }
+
+    private static boolean isAnomaly(Game game, Tile tile) {
+        try {
+            return tile.getTileModel() != null && tile.isAnomaly(game, null);
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 
     private static void addSegmentSpecs(
             List<Spec> specs, Path save, Mutation mutation, String prefix, boolean hasViewer, List<DisplayType> types) {
         for (String name : segmentNames(save, mutation)) {
             for (DisplayType type : types) {
-                specs.add(new Spec(
+                specs.add(mapSpec(
                         prefix + "-" + sanitize(name) + "-pub-" + type.name(), type, false, name, mutation, false));
                 if (hasViewer) {
-                    specs.add(new Spec(
+                    specs.add(mapSpec(
                             prefix + "-" + sanitize(name) + "-fog-" + type.name(), type, true, name, mutation, false));
                 }
             }
@@ -432,14 +703,29 @@ class MapRenderGoldenHarness extends BaseTi4Test {
             return failed(spec, "load returned null");
         }
         apply(spec.mutation(), game);
-        GenericInteractionCreateEvent event = null;
-        if (spec.privateView()) {
-            event = privateViewOf(game.getRealPlayers().getFirst().getUserID());
-        }
-        RenderRequest request = new RenderRequest(game, spec.displayType(), event, spec.segment());
+        MESSAGES.set(0);
         try (AutoCloseable mode = spec.eager() ? RenderRandom.eager() : RenderRandom.neutral();
-                RenderedCanvas rendered = renderCanvas(request)) {
+                RenderedCanvas rendered = produce(game, spec)) {
+            int messages = MESSAGES.get();
+            String state = gameStateDigest(game);
             long hashStart = System.nanoTime();
+            if (rendered.layers() != null) {
+                LayerDigest layers = rendered.layers();
+                return new RenderOutcome(
+                        spec.id(),
+                        null,
+                        layers.tiles(),
+                        0,
+                        layers.sha(),
+                        layers.perTile(),
+                        "[]",
+                        randomCounts(RenderRandom.callCounts()),
+                        state,
+                        messages,
+                        rendered.constructorNanos() / 1_000_000,
+                        rendered.drawNanos() / 1_000_000,
+                        (System.nanoTime() - hashStart) / 1_000_000);
+            }
             BufferedImage canvas = rendered.canvas();
             String sha = sha256(canvas);
             String blocks = blockHashes(canvas);
@@ -455,6 +741,8 @@ class MapRenderGoldenHarness extends BaseTi4Test {
                     blocks,
                     overlays,
                     random,
+                    state,
+                    messages,
                     rendered.constructorNanos() / 1_000_000,
                     rendered.drawNanos() / 1_000_000,
                     (hashed - hashStart) / 1_000_000);
@@ -464,11 +752,81 @@ class MapRenderGoldenHarness extends BaseTi4Test {
     }
 
     private static RenderOutcome failed(Spec spec, String error) {
-        return new RenderOutcome(spec.id(), error, 0, 0, "", "", "", "", 0, 0, 0);
+        return new RenderOutcome(spec.id(), error, 0, 0, "", "", "", "", "", 0, 0, 0, 0);
+    }
+
+    // Renders mutate the live game (fog filtering, tile distances, and anything a tile helper writes back), so the
+    // save text after the render is part of the outcome. The last-modified stamp is the wall clock and is dropped.
+    private static String gameStateDigest(Game game) throws Exception {
+        Path file = Files.createTempFile("golden-state", ".txt");
+        try {
+            Class<?> saver = Class.forName("ti4.game.persistence.GameSaveService");
+            Method saveGame = saver.getDeclaredMethod("saveGame", Game.class, Path.class);
+            saveGame.setAccessible(true);
+            saveGame.invoke(null, game, file);
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            List<String> kept = new ArrayList<>();
+            for (String line : Files.readAllLines(file, StandardCharsets.UTF_8)) {
+                if (line.startsWith(Constants.LAST_MODIFIED_DATE + " ")) continue;
+                line = sortedEnumKeyedLine(line);
+                kept.add(line);
+                digest.update((line + "\n").getBytes(StandardCharsets.UTF_8));
+            }
+            String state = HexFormat.of().formatHex(digest.digest()).substring(0, 16);
+            String dumpDir = System.getProperty("golden.statedump");
+            if (dumpDir != null) {
+                Path dump = Path.of(dumpDir, game.getName() + "-" + state + ".txt");
+                Files.createDirectories(dump.getParent());
+                Files.write(dump, kept, StandardCharsets.UTF_8);
+            }
+            return state;
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
+
+    // fow_options is written from a HashMap keyed by an enum, whose identity hash codes change between JVMs.
+    private static String sortedEnumKeyedLine(String line) {
+        String prefix = "fow_options ";
+        if (!line.startsWith(prefix)) return line;
+        List<String> entries =
+                new ArrayList<>(List.of(line.substring(prefix.length()).split(";")));
+        java.util.Collections.sort(entries);
+        return prefix + String.join(";", entries);
+    }
+
+    // Helpful NullPointerException messages name the method that failed, so a pure move would change them; only the
+    // exception class takes part in the verdict.
+    private static String errorClass(String error) {
+        if (error == null) return null;
+        int colon = error.indexOf(':');
+        return colon < 0 ? error : error.substring(0, colon);
     }
 
     private static String oneLine(String message) {
         return message == null ? "" : message.replace('\n', ' ').replace('\r', ' ');
+    }
+
+    private static GenericInteractionCreateEvent eventFor(Viewer viewer, List<Player> players) {
+        return switch (viewer) {
+            case PUBLIC, EXPLICIT_FIRST -> null;
+            case FOG, FOG_SECOND -> privateViewOf(players.getFirst().getUserID());
+            case PUB_VIEWER -> channelEventOf(players.getFirst().getUserID(), "game-actions");
+            case FOG_GM -> channelEventOf(NON_PLAYER_USER_ID, "fog-gm-private");
+        };
+    }
+
+    private static GenericInteractionCreateEvent channelEventOf(String userId, String channelName) {
+        GenericInteractionCreateEvent event = mock(GenericInteractionCreateEvent.class, RETURNS_DEEP_STUBS);
+        User user = mock(User.class);
+        when(user.getId()).thenReturn(userId);
+        Member member = mock(Member.class);
+        when(member.getUser()).thenReturn(user);
+        when(event.getUser()).thenReturn(user);
+        when(event.getMember()).thenReturn(member);
+        when(event.getMessageChannel().getName()).thenReturn(channelName);
+        when(event.getChannel().getName()).thenReturn(channelName);
+        return event;
     }
 
     private static GenericInteractionCreateEvent privateViewOf(String userId) {
@@ -582,7 +940,7 @@ class MapRenderGoldenHarness extends BaseTi4Test {
 
     private static String verdict(RenderOutcome expected, RenderOutcome actual) {
         if (expected == null) return "MISSING IN BASELINE";
-        if (!java.util.Objects.equals(expected.error(), actual.error())) {
+        if (!java.util.Objects.equals(errorClass(expected.error()), errorClass(actual.error()))) {
             return "ERROR DIFFERS expected=" + expected.error() + " actual=" + actual.error();
         }
         if (expected.error() != null) return "IDENTICAL";
@@ -594,6 +952,10 @@ class MapRenderGoldenHarness extends BaseTi4Test {
             problems.add("PIXELS");
         }
         if (!expected.overlays().equals(actual.overlays())) problems.add("OVERLAYS");
+        if (!expected.state().equals(actual.state())) problems.add("GAME-STATE");
+        if (expected.messages() != actual.messages()) {
+            problems.add("MESSAGES expected=" + expected.messages() + " actual=" + actual.messages());
+        }
         if (!expected.random().equals(actual.random())) {
             problems.add("RANDOM-CALLS expected=[" + expected.random() + "] actual=[" + actual.random() + "]");
         }
@@ -610,6 +972,12 @@ class MapRenderGoldenHarness extends BaseTi4Test {
             StringBuilder summary)
             throws Exception {
         if (expected == null || actual.error() != null || expected.error() != null) return;
+        if (spec.kind() == Kind.STEPS) {
+            summary.append("  tiles differing: ")
+                    .append(differingTiles(expected, actual))
+                    .append('\n');
+            return;
+        }
         boolean sizeSame = expected.width() == actual.width() && expected.height() == actual.height();
         if (sizeSame && !expected.sha().equals(actual.sha())) {
             summary.append("  box(blocks)=").append(blockBox(expected, actual)).append('\n');
@@ -683,16 +1051,22 @@ class MapRenderGoldenHarness extends BaseTi4Test {
                 + " -> " + diffPng;
     }
 
+    private static String differingTiles(RenderOutcome expected, RenderOutcome actual) {
+        Set<String> before = Set.of(expected.blocks().split(","));
+        List<String> changed = new ArrayList<>();
+        for (String entry : actual.blocks().split(",")) {
+            if (!before.contains(entry)) changed.add(entry.substring(0, Math.max(0, entry.indexOf(':'))));
+        }
+        return changed.isEmpty() ? "(tile set differs)" : String.join(" ", changed);
+    }
+
     private static void writePng(Path save, Spec spec, Path target) throws IOException {
+        if (spec.kind() == Kind.STEPS) return;
         Files.createDirectories(target.getParent());
         Game game = loadFresh(save);
         apply(spec.mutation(), game);
-        GenericInteractionCreateEvent event = spec.privateView()
-                ? privateViewOf(game.getRealPlayers().getFirst().getUserID())
-                : null;
         try (AutoCloseable mode = spec.eager() ? RenderRandom.eager() : RenderRandom.neutral();
-                RenderedCanvas rendered =
-                        renderCanvas(new RenderRequest(game, spec.displayType(), event, spec.segment()))) {
+                RenderedCanvas rendered = produce(game, spec)) {
             ImageIO.write(rendered.canvas(), "png", target.toFile());
         } catch (IOException | RuntimeException e) {
             throw e;
@@ -717,6 +1091,8 @@ class MapRenderGoldenHarness extends BaseTi4Test {
                 builder.append("blocks ").append(record.blocks()).append('\n');
                 builder.append("random ").append(record.random()).append('\n');
                 builder.append("overlays ").append(record.overlays()).append('\n');
+                builder.append("state ").append(record.state()).append('\n');
+                builder.append("messages ").append(record.messages()).append('\n');
             }
             builder.append("time ")
                     .append(record.constructorMs())
@@ -741,6 +1117,8 @@ class MapRenderGoldenHarness extends BaseTi4Test {
         String blocks = "";
         String overlays = "";
         String random = "";
+        String state = "";
+        int messages = 0;
         long[] time = new long[3];
         for (String line : Files.readAllLines(file, StandardCharsets.UTF_8)) {
             int space = line.indexOf(' ');
@@ -756,6 +1134,8 @@ class MapRenderGoldenHarness extends BaseTi4Test {
                     blocks = "";
                     overlays = "";
                     random = "";
+                    state = "";
+                    messages = 0;
                     time = new long[3];
                 }
                 case "error" -> error = value;
@@ -768,6 +1148,8 @@ class MapRenderGoldenHarness extends BaseTi4Test {
                 case "blocks" -> blocks = value;
                 case "random" -> random = value;
                 case "overlays" -> overlays = value;
+                case "state" -> state = value;
+                case "messages" -> messages = Integer.parseInt(value);
                 case "time" -> {
                     String[] parts = value.split(" ");
                     time = new long[] {Long.parseLong(parts[0]), Long.parseLong(parts[1]), Long.parseLong(parts[2])};
@@ -776,8 +1158,8 @@ class MapRenderGoldenHarness extends BaseTi4Test {
                     records.put(
                             id,
                             new RenderOutcome(
-                                    id, error, width, height, sha, blocks, overlays, random, time[0], time[1],
-                                    time[2]));
+                                    id, error, width, height, sha, blocks, overlays, random, state, messages, time[0],
+                                    time[1], time[2]));
                 default -> {}
             }
         }

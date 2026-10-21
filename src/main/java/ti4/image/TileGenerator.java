@@ -10,9 +10,6 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,6 +39,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -235,7 +233,7 @@ public class TileGenerator {
 
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
-            String timeStamp = getTimeStamp();
+            String timeStamp = DateTimeHelper.getFormattedTimestampWithMillis();
             graphics.drawString(game.getName() + " " + timeStamp, 0, 34);
         } catch (Exception e) {
             BotLogger.error(game.getName() + ": Could not save generated system info image", e);
@@ -261,12 +259,6 @@ public class TileGenerator {
             tilesToCheck = nextTiles;
         }
         return tileSet;
-    }
-
-    @NotNull
-    private static String getTimeStamp() {
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss.SSS");
-        return ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
     }
 
     private void addTile(Graphics graphics, Tile tile, TileStep step) {
