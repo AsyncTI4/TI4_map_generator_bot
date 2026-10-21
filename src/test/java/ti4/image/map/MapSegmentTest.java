@@ -13,6 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Tile;
+import ti4.model.GalaxyNames;
+import ti4.model.SegmentNames;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 
@@ -68,13 +70,13 @@ class MapSegmentTest extends BaseTi4Test {
 
     @Test
     void namesAreShortLowercaseSlugsAndOnlyMainAndFractureAreReserved() {
-        assertTrue(MapSegment.isValidName("north-2"));
-        assertFalse(MapSegment.isValidName("North"));
-        assertFalse(MapSegment.isValidName("with space"));
-        assertFalse(MapSegment.isValidName("a".repeat(21)));
-        assertTrue(MapSegment.isReservedName(MapSegment.MAIN));
-        assertTrue(MapSegment.isReservedName(MapSegment.FRACTURE));
-        assertFalse(MapSegment.isReservedName("orion"));
+        assertTrue(SegmentNames.isValid("north-2"));
+        assertFalse(SegmentNames.isValid("North"));
+        assertFalse(SegmentNames.isValid("with space"));
+        assertFalse(SegmentNames.isValid("a".repeat(21)));
+        assertTrue(SegmentNames.isReserved(MapSegment.MAIN));
+        assertTrue(SegmentNames.isReserved(MapSegment.FRACTURE));
+        assertFalse(SegmentNames.isReserved("orion"));
     }
 
     @Test
@@ -283,7 +285,7 @@ class MapSegmentTest extends BaseTi4Test {
 
         assertEquals(Set.of("b401"), positionsOf("board-b"));
         assertTrue(MapSegment.find(game, "board-b").orElseThrow().isDetached());
-        assertTrue(MapSegment.isReservedName("board-b"));
+        assertTrue(SegmentNames.isReserved("board-b"));
 
         game.removeTile("b401");
         assertFalse(names().contains("board-b"), "fully covered by the named sector");

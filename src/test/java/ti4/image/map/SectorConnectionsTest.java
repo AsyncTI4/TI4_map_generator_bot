@@ -12,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.image.map.SectorConnections.Connection;
+import ti4.model.GalaxyNames;
 import ti4.testUtils.BaseTi4Test;
 
 class SectorConnectionsTest extends BaseTi4Test {

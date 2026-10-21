@@ -17,6 +17,7 @@ import ti4.game.Tile;
 import ti4.image.map.CompactOverviewGenerator.Layout;
 import ti4.image.map.CompactOverviewGenerator.Panel;
 import ti4.image.map.CompactOverviewGenerator.Placed;
+import ti4.model.GalaxyNames;
 import ti4.testUtils.BaseTi4Test;
 
 class CompactOverviewGeneratorTest extends BaseTi4Test {

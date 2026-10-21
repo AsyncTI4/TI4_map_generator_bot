@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
@@ -21,7 +20,9 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.FoWHelper;
 import ti4.model.BoardPosition;
+import ti4.model.GalaxyNames;
 import ti4.model.PositionMapper;
+import ti4.model.SegmentNames;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 public record MapSegment(
@@ -42,16 +43,14 @@ public record MapSegment(
     public static final int MAX_RADIUS = 9;
     public static final int MAX_SEGMENTS = 20;
     public static final int MAX_GAP = 2;
-    public static final String MAIN = "main";
-    public static final String FRACTURE = "fracture";
+    public static final String MAIN = SegmentNames.MAIN;
+    public static final String FRACTURE = SegmentNames.FRACTURE;
     private static final String STORAGE_KEY = "fowMapSegments";
     private static final String DEFAULT_KEY = "fowMapSegmentDefault";
     private static final String AUTO_KEY = "fowMapAutoSectors";
     private static final String GAP_KEY = "fowMapSegmentGap";
     private static final String PIN_KEY = "fowMapSectorNames";
     private static final String CLUSTER_TOKEN = "c";
-    private static final Pattern NAME_PATTERN = Pattern.compile("[a-z0-9-]{1,20}");
-    private static final Pattern BOARD_NAME_PATTERN = Pattern.compile("board-[a-g]");
     private static final List<String> FRACTURE_POSITIONS =
             IntStream.rangeClosed(1, 25).mapToObj(i -> "frac" + i).toList();
 
@@ -85,7 +84,7 @@ public record MapSegment(
                 .map(String::trim)
                 .filter(position -> PositionMapper.getTilePosition(position) != null)
                 .collect(Collectors.toSet());
-        if (!isValidName(name) || isReservedName(name) || positions.isEmpty()) {
+        if (!SegmentNames.isValid(name) || SegmentNames.isReserved(name) || positions.isEmpty()) {
             return Optional.empty();
         }
         return Optional.of(new Pin(name, positions));
@@ -100,16 +99,6 @@ public record MapSegment(
                                         .sorted(MapFrame.POSITION_ORDER)
                                         .collect(Collectors.joining(",")))
                         .collect(Collectors.joining(";")));
-    }
-
-    public static boolean isValidName(@Nullable String name) {
-        return name != null && NAME_PATTERN.matcher(name).matches();
-    }
-
-    public static boolean isReservedName(String name) {
-        return MAIN.equals(name)
-                || FRACTURE.equals(name)
-                || BOARD_NAME_PATTERN.matcher(name).matches();
     }
 
     // TODO: clusters are recomputed on every call (several per render); cache per game keyed on occupied positions
@@ -305,7 +294,7 @@ public record MapSegment(
 
     @Nullable
     public static String putPin(Game game, String name, Set<String> positions) {
-        if (!isValidName(name) || isReservedName(name)) {
+        if (!SegmentNames.isValid(name) || SegmentNames.isReserved(name)) {
             return "`" + name + "` is not a usable sector name.";
         }
         List<Pin> pins = new ArrayList<>(pins(game));
@@ -328,10 +317,10 @@ public record MapSegment(
 
     @Nullable
     public static String validate(Game game, String name, String centre, @Nullable Integer radius, boolean cluster) {
-        if (!isValidName(name)) {
+        if (!SegmentNames.isValid(name)) {
             return "Segment names use lowercase letters, digits and `-`, up to 20 characters.";
         }
-        if (isReservedName(name)) {
+        if (SegmentNames.isReserved(name)) {
             return "`" + MAIN + "`, `" + FRACTURE + "` and `board-a` to `board-g` are reserved segment names.";
         }
         if (radius == null && !cluster) {
@@ -421,10 +410,10 @@ public record MapSegment(
 
     @Nullable
     public static String rename(Game game, String from, String to) {
-        if (!isValidName(to)) {
+        if (!SegmentNames.isValid(to)) {
             return "Segment names use lowercase letters, digits and `-`, up to 20 characters.";
         }
-        if (isReservedName(from) || isReservedName(to)) {
+        if (SegmentNames.isReserved(from) || SegmentNames.isReserved(to)) {
             return "`" + MAIN + "`, `" + FRACTURE + "` and `board-a` to `board-g` are built in and cannot be renamed or"
                     + " reused.";
         }
@@ -624,8 +613,8 @@ public record MapSegment(
         String name = StringUtils.substringBefore(entry, "=");
         String centre = StringUtils.substringBetween(entry, "=", ":");
         String extent = StringUtils.substringAfterLast(entry, ":").trim();
-        if (!isValidName(name)
-                || isReservedName(name)
+        if (!SegmentNames.isValid(name)
+                || SegmentNames.isReserved(name)
                 || centre == null
                 || PositionMapper.getTilePosition(centre) == null) {
             return Optional.empty();

@@ -1,4 +1,4 @@
-package ti4.image.map;
+package ti4.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
-import ti4.model.BoardPosition;
 
 public final class GalaxyNames {
 
@@ -93,7 +92,7 @@ public final class GalaxyNames {
         if (!IDS.contains(id)) {
             return "Galaxies are `main` and `a` to `g`.";
         }
-        if (!MapSegment.isValidName(name) || MapSegment.isReservedName(name)) {
+        if (!SegmentNames.isValid(name) || SegmentNames.isReserved(name)) {
             return "Galaxy names use lowercase letters, digits and `-`, up to 20 characters, and cannot be `main`,"
                     + " `fracture` or `board-…`.";
         }
@@ -146,7 +145,7 @@ public final class GalaxyNames {
         }
         Arrays.stream(stored.split(";"))
                 .map(entry -> entry.split("=", 2))
-                .filter(parts -> parts.length == 2 && IDS.contains(parts[0]) && MapSegment.isValidName(parts[1]))
+                .filter(parts -> parts.length == 2 && IDS.contains(parts[0]) && SegmentNames.isValid(parts[1]))
                 .forEach(parts -> names.put(parts[0], parts[1]));
         return names;
     }
