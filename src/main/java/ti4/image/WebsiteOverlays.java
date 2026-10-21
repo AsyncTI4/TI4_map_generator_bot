@@ -21,6 +21,14 @@ public final class WebsiteOverlays {
         overlays.add(new WebsiteOverlay(title, text, List.of(x, y, width, height)));
     }
 
+    int size() {
+        return overlays.size();
+    }
+
+    void truncateTo(int size) {
+        overlays.subList(size, overlays.size()).clear();
+    }
+
     public List<WebsiteOverlay> asList() {
         return overlays;
     }

@@ -3,6 +3,7 @@ package ti4.image;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,9 @@ class MegaGamePlayerAreasTest extends BaseTi4Test {
     private static final List<String> COLORS =
             List.of("blue", "yellow", "purple", "red", "green", "orange", "black", "pink", "gray", "lightgray");
 
+    private static final int MIN_PLAYER_AREA_HEIGHT = 300;
+    private static final int GENEROUS_TAIL = 80;
+
     private Game game;
 
     @BeforeEach
@@ -28,6 +32,17 @@ class MegaGamePlayerAreasTest extends BaseTi4Test {
         game.newGameSetup();
         game.setName("mega-game-player-areas-test");
         MapFrame.positionsWithin("000", 3).forEach(position -> game.setTile(new Tile("19", position)));
+    }
+
+    private static int lastNonBlackRow(BufferedImage image) {
+        for (int y = image.getHeight() - 1; y >= 0; y--) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                if ((image.getRGB(x, y) & 0xFFFFFF) != 0) {
+                    return y;
+                }
+            }
+        }
+        return -1;
     }
 
     private void seatPlayers(int count) {
@@ -113,7 +128,9 @@ class MegaGamePlayerAreasTest extends BaseTi4Test {
         RenderContext context = MapRenderer.resolve(new MapRenderRequest(game, DisplayType.stats, null, null));
         int twoColumns = 10 + 2 * BoardLayout.smallestRegularPlayerAreaWidth() + PlayerAreaGenerator.COLUMN_GAP;
         assertTrue(context.canvas().width() >= twoColumns, "both columns fit side by side");
-        assertTrue(context.canvas().height() < 10 * 340, "five areas per column, not ten stacked");
-        MapRenderer.paint(context, RenderTimings.disabled());
+        BufferedImage image = MapRenderer.paint(context, RenderTimings.disabled());
+        assertTrue(image.getHeight() < 10 * MIN_PLAYER_AREA_HEIGHT, "five areas per column, not ten stacked");
+        int tail = image.getHeight() - 1 - lastNonBlackRow(image);
+        assertTrue(tail >= 0 && tail < GENEROUS_TAIL, "tail below the last drawn pixel was " + tail);
     }
 }

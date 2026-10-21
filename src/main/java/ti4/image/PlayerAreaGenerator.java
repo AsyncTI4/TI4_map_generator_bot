@@ -185,7 +185,7 @@ public class PlayerAreaGenerator {
         return (totalWidth - left - COLUMN_GAP * (columnCount - 1)) / columnCount;
     }
 
-    public void drawAllPlayerAreas(Point topLeftOfAllPAs) {
+    public int drawAllPlayerAreas(Point topLeftOfAllPAs) {
         graphics.setFont(Storage.getFont32());
         int x = topLeftOfAllPAs.x;
         List<Player> playersWithAreas = game.getRealAndEliminatedPlayers().stream()
@@ -225,8 +225,9 @@ public class PlayerAreaGenerator {
         if (!spectatorNames.isEmpty()) {
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
-            drawString((Graphics2D) graphics, "Spectators: " + spectatorNames, x, bottom + 15, totalWidth);
+            bottom = drawString((Graphics2D) graphics, "Spectators: " + spectatorNames, x, bottom + 15, totalWidth);
         }
+        return bottom;
     }
 
     private boolean skipsPlayerArea(Player player) {
@@ -236,7 +237,7 @@ public class PlayerAreaGenerator {
                 || ("neutral".equals(player.getFaction()) && player.isDummy());
     }
 
-    private static void drawString(Graphics2D g2, String text, int x, int y, float maxWidth) {
+    private static int drawString(Graphics2D g2, String text, int x, int y, float maxWidth) {
         var attributedString = new AttributedString(text);
         attributedString.addAttribute(TextAttribute.FONT, g2.getFont());
         AttributedCharacterIterator characterIterator = attributedString.getIterator();
@@ -251,6 +252,7 @@ public class PlayerAreaGenerator {
             layout.draw(g2, x, drawPosY);
             drawPosY += layout.getDescent() + layout.getLeading();
         }
+        return (int) Math.ceil(drawPosY);
     }
 
     public Rectangle drawPlayerAreaOLD(Player player, Point topLeft) {

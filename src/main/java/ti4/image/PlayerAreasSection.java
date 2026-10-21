@@ -8,13 +8,13 @@ final class PlayerAreasSection {
 
     private PlayerAreasSection() {}
 
-    static void draw(RenderContext ctx, Graphics2D g2, int left, int y) {
+    static int draw(RenderContext ctx, Graphics2D g2, int left, int y) {
         DisplayType basicType = ctx.basicType();
         if (basicType != DisplayType.all && basicType != DisplayType.stats) {
-            return;
+            return y;
         }
         Point topLeft = new Point(BoardLayout.PLAYER_AREAS_LEFT + left, y);
-        new PlayerAreaGenerator(
+        return new PlayerAreaGenerator(
                         g2,
                         ctx.game(),
                         ctx.fog().isPrivate(),

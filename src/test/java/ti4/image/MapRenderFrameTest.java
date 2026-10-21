@@ -66,16 +66,16 @@ class MapRenderFrameTest extends BaseTi4Test {
         RenderContext context = render(game, DisplayType.map, null);
         assertEquals(
                 Math.max(1000, BoardLayout.getMapWidth(game)), context.canvas().width());
-        assertEquals(BoardLayout.getMapHeight(game) + STRIP, context.canvas().height());
+        assertEquals(BoardLayout.getMapHeight(game) + STRIP, context.canvas().allocatedHeight());
     }
 
     @Test
     void fogMapIsFramedToThePlacedTiles() {
-        int classicHeight = render(game, DisplayType.map, null).canvas().height();
+        int classicHeight = render(game, DisplayType.map, null).canvas().allocatedHeight();
 
         game.setFowMode(true);
         RenderContext framed = render(game, DisplayType.map, null);
-        assertTrue(framed.canvas().height() < classicHeight, "empty outer rings are dropped");
+        assertTrue(framed.canvas().allocatedHeight() < classicHeight, "empty outer rings are dropped");
         assertTrue(framed.canvas().width() < Math.max(1000, BoardLayout.getMapWidth(game)), "narrower too");
         assertTrue(framed.canvas().width() >= 11 * 150, "the 10-point score track still fits");
         paint(framed);
@@ -89,7 +89,7 @@ class MapRenderFrameTest extends BaseTi4Test {
         RenderContext context = render(game, DisplayType.map, "core");
         assertEquals(
                 Math.max(1000, BoardLayout.getMapWidth(game)), context.canvas().width());
-        assertEquals(BoardLayout.getMapHeight(game) + STRIP, context.canvas().height());
+        assertEquals(BoardLayout.getMapHeight(game) + STRIP, context.canvas().allocatedHeight());
         assertNull(context.board().shownSegmentName(), "sectors are ignored");
     }
 
@@ -134,7 +134,7 @@ class MapRenderFrameTest extends BaseTi4Test {
     @Test
     void mapsSpreadBeyondNineRingsAreCappedToOneSubMap() {
         RenderContext context = render(twoFarApartClusters(), DisplayType.map, null);
-        assertTrue(context.canvas().height() <= MapFrame.MAX_HEIGHT + STRIP, "within the 9-ring cap");
+        assertTrue(context.canvas().allocatedHeight() <= MapFrame.MAX_HEIGHT + STRIP, "within the 9-ring cap");
         assertTrue(context.canvas().width() <= MapFrame.MAX_WIDTH);
         paint(context);
     }
@@ -196,7 +196,7 @@ class MapRenderFrameTest extends BaseTi4Test {
         assertTrue(hex.x >= 0
                 && hex.x + TileGenerator.TILE_WIDTH <= context.canvas().width());
         assertTrue(hex.y >= 0
-                && hex.y + TileGenerator.TILE_HEIGHT <= context.canvas().height());
+                && hex.y + TileGenerator.TILE_HEIGHT <= context.canvas().allocatedHeight());
         paint(context);
     }
 

@@ -30,9 +30,22 @@ final class MapRenderer {
     }
 
     static BufferedImage paint(RenderContext ctx, RenderTimings timings) {
+        return paint(ctx, timings, ctx.canvas().allocatedHeight());
+    }
+
+    static BufferedImage paint(RenderContext ctx, RenderTimings timings, int allocatedHeight) {
+        return paint(ctx, timings, allocatedHeight, true);
+    }
+
+    private static BufferedImage paint(
+            RenderContext ctx, RenderTimings timings, int allocatedHeight, boolean mayPaintAgain) {
         MapCanvasLayout layout = ctx.canvas();
-        BufferedImage canvas = new BufferedImage(layout.width(), layout.height(), BufferedImage.TYPE_INT_RGB);
+        BufferedImage canvas = new BufferedImage(layout.width(), allocatedHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2 = canvas.createGraphics();
+        int playerAreasTop;
+        int bottom;
+        GraphicsState stateBeforePlayerAreas;
+        int overlaysBeforePlayerAreas;
         try {
             timings.startTiles();
             BoardSection.draw(ctx, g2);
@@ -40,14 +53,67 @@ final class MapRenderer {
             timings.stopTiles();
 
             timings.startGraphics();
-            drawInfoArea(ctx, g2);
+            playerAreasTop = drawInfoArea(ctx, g2);
+            stateBeforePlayerAreas = GraphicsState.capture(g2);
+            overlaysBeforePlayerAreas = ctx.overlays().size();
+            bottom = PlayerAreasSection.draw(ctx, g2, layout.landscapeShift(), playerAreasTop);
+        } finally {
+            g2.dispose();
+        }
+        if (!layout.heightFollowsContent()) {
+            return canvas;
+        }
+        int height = layout.heightFor(drawnBottom(canvas, bottom));
+        if (height > allocatedHeight && !mayPaintAgain) {
+            return canvas;
+        }
+        if (height > allocatedHeight && (layout.isLandscape() || playerAreasTop >= allocatedHeight)) {
+            ctx.overlays().truncateTo(0);
+            return paint(ctx, timings, height, false);
+        }
+        if (height > allocatedHeight) {
+            BufferedImage infoArea = copyOfTopRows(canvas, playerAreasTop);
+            canvas = null;
+            return redrawPlayerAreasOnTallerCanvas(
+                    ctx, infoArea, playerAreasTop, height, stateBeforePlayerAreas, overlaysBeforePlayerAreas);
+        }
+        return height < allocatedHeight ? canvas.getSubimage(0, 0, canvas.getWidth(), height) : canvas;
+    }
+
+    private static int drawnBottom(BufferedImage canvas, int playerAreasBottom) {
+        if (playerAreasBottom >= canvas.getHeight()) {
+            return playerAreasBottom;
+        }
+        return CanvasBottom.ofDrawnContent(canvas, playerAreasBottom);
+    }
+
+    private static BufferedImage copyOfTopRows(BufferedImage canvas, int rows) {
+        BufferedImage copy = new BufferedImage(canvas.getWidth(), rows, BufferedImage.TYPE_INT_RGB);
+        copy.getRaster().setRect(canvas.getRaster().createChild(0, 0, canvas.getWidth(), rows, 0, 0, null));
+        return copy;
+    }
+
+    private static BufferedImage redrawPlayerAreasOnTallerCanvas(
+            RenderContext ctx,
+            BufferedImage infoArea,
+            int playerAreasTop,
+            int height,
+            GraphicsState stateBeforePlayerAreas,
+            int overlaysBeforePlayerAreas) {
+        BufferedImage canvas = new BufferedImage(infoArea.getWidth(), height, BufferedImage.TYPE_INT_RGB);
+        canvas.getRaster().setRect(infoArea.getRaster());
+        ctx.overlays().truncateTo(overlaysBeforePlayerAreas);
+        Graphics2D g2 = canvas.createGraphics();
+        try {
+            stateBeforePlayerAreas.applyTo(g2);
+            PlayerAreasSection.draw(ctx, g2, ctx.canvas().landscapeShift(), playerAreasTop);
         } finally {
             g2.dispose();
         }
         return canvas;
     }
 
-    private static void drawInfoArea(RenderContext ctx, Graphics2D g2) {
+    private static int drawInfoArea(RenderContext ctx, Graphics2D g2) {
         int left = ctx.canvas().landscapeShift();
         int y = HeaderSection.draw(ctx, g2, left);
         y = ScoreTrackSection.draw(ctx, g2, left, y + SCORE_TRACK_TOP_MARGIN);
@@ -60,6 +126,6 @@ final class MapRenderer {
         if (MapSideStatsSection.isDrawn(ctx)) {
             MapSideStatsSection.draw(ctx, g2);
         }
-        PlayerAreasSection.draw(ctx, g2, left, y);
+        return y;
     }
 }

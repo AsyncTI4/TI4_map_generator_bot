@@ -9,9 +9,13 @@ final class MapCanvasLayout {
 
     private static final int STATS_ONLY_GAME_INFO_HEIGHT = 40;
     private static final int LANDSCAPE_PLAYER_COLUMNS_WIDTH = 4 * 520;
+    private static final int ALLOCATION_SLACK_DIVISOR = 5;
+    private static final int BOTTOM_MARGIN = 20;
 
     private final int width;
-    private final int height;
+    private final int estimatedHeight;
+    private final int minimumHeight;
+    private final boolean heightFollowsContent;
     private final int heightForGameInfo;
     private final int playerAreasWidth;
     private final int mapWidth;
@@ -20,14 +24,18 @@ final class MapCanvasLayout {
 
     private MapCanvasLayout(
             int width,
-            int height,
+            int estimatedHeight,
+            int minimumHeight,
+            boolean heightFollowsContent,
             int heightForGameInfo,
             int playerAreasWidth,
             int mapWidth,
             int stripWidth,
             boolean landscape) {
         this.width = width;
-        this.height = height;
+        this.estimatedHeight = estimatedHeight;
+        this.minimumHeight = minimumHeight;
+        this.heightFollowsContent = heightFollowsContent;
         this.heightForGameInfo = heightForGameInfo;
         this.playerAreasWidth = playerAreasWidth;
         this.mapWidth = mapWidth;
@@ -53,25 +61,30 @@ final class MapCanvasLayout {
         int heightForGameInfo;
         int height;
         int width;
+        int minimumHeight;
         switch (basicType) {
             case stats:
                 heightForGameInfo = STATS_ONLY_GAME_INFO_HEIGHT;
                 height = heightOfPlayerAreasSection;
+                minimumHeight = 0;
                 width = playerAreasWidth;
                 break;
             case map:
                 heightForGameInfo = mapHeight;
                 height = mapHeight + BoardLayout.SPACE_FOR_TILE_HEIGHT * 2;
+                minimumHeight = height;
                 width = board.framedWidth();
                 break;
             default:
                 if (displayType == DisplayType.landscape) {
                     heightForGameInfo = STATS_ONLY_GAME_INFO_HEIGHT;
                     height = Math.max(heightOfPlayerAreasSection, mapHeight);
+                    minimumHeight = mapHeight;
                     width = landscapeWidth(mapWidth);
                 } else {
                     heightForGameInfo = mapHeight;
                     height = mapHeight + heightOfPlayerAreasSection;
+                    minimumHeight = mapHeight;
                     width = megaGame ? Math.max(board.framedWidth(), playerAreasWidth) : board.framedWidth();
                 }
         }
@@ -79,6 +92,8 @@ final class MapCanvasLayout {
         return new MapCanvasLayout(
                 width,
                 height,
+                minimumHeight,
+                basicType != DisplayType.map,
                 heightForGameInfo,
                 playerAreasWidth,
                 mapWidth,
@@ -94,8 +109,19 @@ final class MapCanvasLayout {
         return width;
     }
 
-    int height() {
-        return height;
+    boolean heightFollowsContent() {
+        return heightFollowsContent;
+    }
+
+    int allocatedHeight() {
+        if (!heightFollowsContent) {
+            return estimatedHeight;
+        }
+        return estimatedHeight + estimatedHeight / ALLOCATION_SLACK_DIVISOR;
+    }
+
+    int heightFor(int contentBottom) {
+        return Math.max(minimumHeight, contentBottom + BOTTOM_MARGIN);
     }
 
     int heightForGameInfo() {

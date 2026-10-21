@@ -493,14 +493,16 @@ class MapRenderGoldenHarness extends BaseTi4Test {
         return canvas.getRGB(0, 0, canvas.getWidth(), canvas.getHeight(), null, 0, canvas.getWidth());
     }
 
+    // A canvas cropped with getSubimage shares the larger backing array, so only the first width*height ints count.
     private static String sha256(BufferedImage canvas) throws Exception {
         int[] data = pixels(canvas);
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         digest.update((canvas.getWidth() + "x" + canvas.getHeight() + ":").getBytes(StandardCharsets.UTF_8));
         ByteBuffer buffer = ByteBuffer.allocate(1 << 20);
-        for (int i = 0; i < data.length; ) {
+        int length = canvas.getWidth() * canvas.getHeight();
+        for (int i = 0; i < length; ) {
             buffer.clear();
-            int count = Math.min(data.length - i, buffer.capacity() / 4);
+            int count = Math.min(length - i, buffer.capacity() / 4);
             buffer.asIntBuffer().put(data, i, count);
             buffer.limit(count * 4);
             digest.update(buffer);

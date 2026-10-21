@@ -55,7 +55,7 @@ class MapRenderTimingBench extends BaseTi4Test {
                         "%s\t%d\t%d\t%d\t%d",
                         save.getFileName().toString().replace(".txt", ""),
                         ctx.canvas().width(),
-                        ctx.canvas().height(),
+                        ctx.canvas().allocatedHeight(),
                         (constructed - start) / 1_000_000,
                         (drawn - constructed) / 1_000_000));
                 System.out.println("[timing] pass " + pass + " " + lines.getLast());
