@@ -34,6 +34,8 @@ import ti4.website.EgressClientManager;
 @UtilityClass
 public class ImageHelper {
 
+    private static final int WEBP_ENCODER_METHOD = 2;
+
     @Nullable
     public static BufferedImage read(String filePath) {
         if (filePath == null) {
@@ -235,6 +237,7 @@ public class ImageHelper {
             writeParam.setCompressionType(CompressionType.Lossy);
             writeParam.setUseSharpYUV(false);
             writeParam.setAlphaCompressionAlgorithm(0);
+            writeParam.setMethod(WEBP_ENCODER_METHOD);
 
             writer.write(null, new IIOImage(image, null, null), writeParam);
             imageOutputStream.flush();
