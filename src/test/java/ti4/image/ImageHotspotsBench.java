@@ -4,6 +4,8 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,7 +26,8 @@ import ti4.testUtils.BaseTi4Test;
 /**
  * Where warm map renders spend their time, for the image-helper performance work. The corpus is rendered once to fill
  * the image caches, then rendered golden.hotspots.passes more times (default 2) with a JFR recording running, so the
- * profile shows steady-state cost instead of first-time file reads. Paint and encode are timed separately, and the
+ * profile shows steady-state cost instead of first-time file reads. Paint and encode are timed separately, both as wall
+ * clock and as CPU time of the rendering thread (steadier when other processes load the machine), and the
  * image caches report hits, misses, load time and the decoded size of what they hold.
  *
  * <pre>
@@ -36,6 +39,8 @@ import ti4.testUtils.BaseTi4Test;
  */
 @EnabledIfSystemProperty(named = "golden.hotspots.saves", matches = ".+")
 class ImageHotspotsBench extends BaseTi4Test {
+
+    private static final ThreadMXBean THREADS = ManagementFactory.getThreadMXBean();
 
     @Test
     void profileWarmRenders() throws Exception {
@@ -49,9 +54,9 @@ class ImageHotspotsBench extends BaseTi4Test {
                 .toList();
         List<Path> saves = listSaves(savesDir, System.getProperty("golden.only", ""));
 
-        renderAll(saves, types, new long[2]);
+        renderAll(saves, types, new long[4]);
         Map<String, CacheStats> before = snapshotStats();
-        long[] warm = new long[2];
+        long[] warm = new long[4];
         try (Recording recording = new Recording(Configuration.getConfiguration("profile"))) {
             recording.start();
             for (int pass = 0; pass < passes; pass++) {
@@ -62,8 +67,13 @@ class ImageHotspotsBench extends BaseTi4Test {
         }
         List<String> lines = new ArrayList<>();
         lines.add(String.format(
-                "warm passes=%d renders=%d paintMs=%d encodeMs=%d",
-                passes, saves.size() * types.size() * passes, warm[0] / 1_000_000, warm[1] / 1_000_000));
+                "warm passes=%d renders=%d paintMs=%d encodeMs=%d paintCpuMs=%d encodeCpuMs=%d",
+                passes,
+                saves.size() * types.size() * passes,
+                warm[0] / 1_000_000,
+                warm[1] / 1_000_000,
+                warm[2] / 1_000_000,
+                warm[3] / 1_000_000));
         for (Map.Entry<String, Cache<?, ?>> entry : CacheManager.getNamesToCaches()) {
             if (!entry.getKey().toLowerCase().contains("image")) continue;
             CacheStats delta = entry.getValue().stats().minus(before.get(entry.getKey()));
@@ -86,13 +96,18 @@ class ImageHotspotsBench extends BaseTi4Test {
             for (DisplayType type : types) {
                 Game game = load(save);
                 long start = System.nanoTime();
+                long startCpu = THREADS.getCurrentThreadCpuTime();
                 RenderContext context = MapRenderer.resolve(new MapRenderRequest(game, type, null, null));
                 BufferedImage canvas = MapRenderer.paint(context, RenderTimings.disabled());
                 long painted = System.nanoTime();
+                long paintedCpu = THREADS.getCurrentThreadCpuTime();
                 ImageEncoder.forDiscord(canvas);
                 long encoded = System.nanoTime();
+                long encodedCpu = THREADS.getCurrentThreadCpuTime();
                 nanos[0] += painted - start;
                 nanos[1] += encoded - painted;
+                nanos[2] += paintedCpu - startCpu;
+                nanos[3] += encodedCpu - paintedCpu;
             }
         }
     }
