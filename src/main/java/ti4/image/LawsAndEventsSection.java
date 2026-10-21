@@ -217,7 +217,7 @@ final class LawsAndEventsSection {
             if (convertToGeneric || electedPlayer == null) {
                 paintIcon(g2, "agenda.png", x, y);
             } else {
-                DrawingUtil.drawPlayerFactionIconImage(g2, electedPlayer, x + 2, y + 2, 95, 95);
+                FactionIcons.draw(g2, electedPlayer, x + 2, y + 2, 95, 95);
             }
         }
         if (!game.getStoredValue("controlTokensOnAgenda" + lawEntry.getValue()).isEmpty()) {
@@ -233,7 +233,7 @@ final class LawsAndEventsSection {
                 }
                 float scale = 0.80f;
                 BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
-                DrawingUtil.drawControlToken(
+                PlayerTokens.drawControlToken(
                         g2,
                         controlTokenImage,
                         game.getPlayerFromColorOrFaction(debtToken),

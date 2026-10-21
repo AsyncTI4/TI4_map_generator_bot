@@ -155,7 +155,7 @@ class MapCanvasHeightTest extends BaseTi4Test {
         BufferedImage cropped =
                 paint(DisplayType.stats, paint(DisplayType.stats).getHeight() * 2);
 
-        EncodedImage encoded = MapImageEncoder.encode(cropped);
+        EncodedImage encoded = ImageEncoder.forDiscord(cropped);
 
         BufferedImage decoded = javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream(encoded.bytes()));
         assertEquals(cropped.getWidth(), decoded.getWidth());
@@ -166,10 +166,10 @@ class MapCanvasHeightTest extends BaseTi4Test {
     void theEncoderPicksTheFormatFromTheCroppedSize() throws Exception {
         BufferedImage tall = new BufferedImage(40, 16_500, BufferedImage.TYPE_INT_RGB);
 
-        assertEquals("jpg", MapImageEncoder.encode(tall).format());
+        assertEquals("jpg", ImageEncoder.forDiscord(tall).format());
         assertEquals(
                 "webp",
-                MapImageEncoder.encode(tall.getSubimage(0, 0, 40, 16_000)).format());
+                ImageEncoder.forDiscord(tall.getSubimage(0, 0, 40, 16_000)).format());
     }
 
     @Test

@@ -19,7 +19,7 @@ import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.DrawingUtil;
+import ti4.image.ColorUtil;
 import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
 import ti4.image.Mapper;
@@ -100,7 +100,7 @@ class SampleDecals extends Subcommand {
         UnitKey base = Units.getUnitKey(UnitType.Dreadnought, colorID);
         BufferedImage noDecal = ImageHelper.read(ResourceHelper.getInstance().getUnitFile(base));
         for (String d : decals) {
-            String decalName = String.format("%s_%s%s", d, "dn", DrawingUtil.getBlackWhiteFileSuffix(colorID));
+            String decalName = String.format("%s_%s%s", d, "dn", ColorUtil.blackWhiteFileSuffix(colorID));
             BufferedImage decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decalName));
             graphic.drawImage(noDecal, x + SPACING, y + SPACING, null);
             graphic.drawImage(decal, x + SPACING, y + SPACING, null);

@@ -64,13 +64,13 @@ final class HexTileStats {
         ColorModel playerColor = Mapper.getColor(player.getColor());
         float bgAlpha = 0.10f;
         Color bgColor = player.isActivePlayer() ? Color.green : (player.isPassed() ? Color.red : Color.BLACK);
-        BufferedImage tint = DrawingUtil.tintedBackground(bgColor, bgAlpha);
+        BufferedImage tint = HexOverlays.tint(bgColor, bgAlpha);
         for (String pos : statTiles) {
             Point p = points.get(pos);
             List<Integer> adjDir = new ArrayList<>();
             List<String> adjPos = PositionMapper.getAdjacentTilePositions(pos);
             for (int i = 0; i < 6; i++) if (statTiles.contains(adjPos.get(i))) adjDir.add(i);
-            BufferedImage hex = DrawingUtil.hexBorder(game.getHexBorderStyle(), playerColor, adjDir);
+            BufferedImage hex = HexOverlays.border(game.getHexBorderStyle(), playerColor, adjDir);
             g2.drawImage(tint, p.x, p.y, null);
             g2.drawImage(hex, p.x, p.y, null);
         }
@@ -95,8 +95,8 @@ final class HexTileStats {
         point = PositionMapper.getPlayerStats("factionicon");
         int size = 275;
         point.translate(statTileMid.x - (size / 2), statTileMid.y - (size / 2));
-        DrawingUtil.drawPlayerFactionIconImageUnderlay(g2, player, point.x, point.y, size, size);
-        DrawingUtil.drawPlayerFactionIconImageOpaque(g2, player, point.x, point.y, size, size, 0.40f);
+        FactionIcons.drawUnderlay(g2, player, point.x, point.y, size, size);
+        FactionIcons.drawFaded(g2, player, point.x, point.y, size, size, 0.40f);
     }
 
     private void drawUsername(Game game, Player player, Point statTileMid, HorizontalAlign center) {
@@ -195,9 +195,9 @@ final class HexTileStats {
             }
         }
 
-        DrawingUtil.drawCCOfPlayer(g2, ccID, point.x, point.y, player.getTacticalCC(), player, false, rightAlign);
+        PlayerTokens.drawCommandCounters(g2, ccID, point.x, point.y, player.getTacticalCC(), player, false, rightAlign);
         FleetCommandCounters.draw(g2, fleetCCID, point.x, point.y + 65, player, rightAlign);
-        DrawingUtil.drawCCOfPlayer(
+        PlayerTokens.drawCommandCounters(
                 g2, ccID, point.x, point.y + 130, player.getStrategicCC(), player, false, rightAlign);
 
         int additionalFleetSupply = 0;

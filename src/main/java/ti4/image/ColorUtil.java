@@ -14,7 +14,7 @@ import ti4.model.ColorModel;
 import ti4.model.StrategyCardModel;
 
 @UtilityClass
-class ColorUtil {
+public class ColorUtil {
 
     public static final Color EliminatedColor = new Color(150, 0, 24); // Carmine
     public static final Color ActiveColor = new Color(80, 200, 120); // Emerald
@@ -39,6 +39,10 @@ class ColorUtil {
         return (colorModel != null && colorModel.getSecondaryColor() != null)
                 ? colorModel.getSecondaryColor()
                 : getPlayerMainColor(p);
+    }
+
+    public String blackWhiteFileSuffix(String colorId) {
+        return "black".equalsIgnoreCase(Mapper.getColor(colorId).getTextColor()) ? "_blk.png" : "_wht.png";
     }
 
     private Color getColor(String color) {

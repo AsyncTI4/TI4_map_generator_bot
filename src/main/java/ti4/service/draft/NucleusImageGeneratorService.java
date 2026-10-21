@@ -21,10 +21,10 @@ import ti4.game.UnitHolder;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Storage;
 import ti4.image.HorizontalAlign;
-import ti4.image.ImageHelper;
 import ti4.image.Mapper;
 import ti4.image.OutlinedText;
 import ti4.image.PositionMapper;
+import ti4.image.RemoteImages;
 import ti4.image.TileGenerator;
 import ti4.image.TileStep;
 import ti4.logging.BotLogger;
@@ -497,6 +497,6 @@ public class NucleusImageGeneratorService {
     }
 
     private BufferedImage getEmojiImage(TI4Emoji emoji) {
-        return ImageHelper.readEmojiImageScaled(emoji, EMOJI_SIZE);
+        return RemoteImages.emoji(emoji, EMOJI_SIZE);
     }
 }

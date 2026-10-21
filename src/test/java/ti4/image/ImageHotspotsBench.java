@@ -89,7 +89,7 @@ class ImageHotspotsBench extends BaseTi4Test {
                 RenderContext context = MapRenderer.resolve(new MapRenderRequest(game, type, null, null));
                 BufferedImage canvas = MapRenderer.paint(context, RenderTimings.disabled());
                 long painted = System.nanoTime();
-                MapImageEncoder.encode(canvas);
+                ImageEncoder.forDiscord(canvas);
                 long encoded = System.nanoTime();
                 nanos[0] += painted - start;
                 nanos[1] += encoded - painted;

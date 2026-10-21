@@ -359,13 +359,13 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
         VerticalText.drawWrappedColumns(g2, "Many debt holders listed here in a long string", x += 60, 700, 90);
         VerticalText.drawWrappedColumns(g2, "Unbreakablelongwordwithoutspaces and more", x += 200, 700, 90);
         y = 760;
-        DrawingUtil.drawRedX(g2, 100, y + 50, 60, true);
-        DrawingUtil.drawRedX(g2, 200, y + 50, 40, false);
+        ShapeDrawing.redX(g2, 100, y + 50, 60, true);
+        ShapeDrawing.redX(g2, 200, y + 50, 40, false);
         g2.setStroke(Strokes.STROKE_5);
-        DrawingUtil.drawRectWithTwoColorGradient(g2, Color.RED, Color.BLUE, 300, y, 200, 100);
-        DrawingUtil.drawRectWithTwoColorGradient(g2, Color.GREEN, null, new Rectangle(550, y, 200, 100));
-        DrawingUtil.drawRectWithTwoColorGradient(g2, null, Color.MAGENTA, new Rectangle(800, y, 200, 100));
-        DrawingUtil.drawEmoji(g2, MiscEmojis.tg, 1050, y, 50);
+        ShapeDrawing.gradientOutline(g2, Color.RED, Color.BLUE, 300, y, 200, 100);
+        ShapeDrawing.gradientOutline(g2, Color.GREEN, null, new Rectangle(550, y, 200, 100));
+        ShapeDrawing.gradientOutline(g2, null, Color.MAGENTA, new Rectangle(800, y, 200, 100));
+        RemoteImages.drawEmoji(g2, MiscEmojis.tg, 1050, y, 50);
         g2.dispose();
         return image;
     }
@@ -378,21 +378,23 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
         int y = 10;
         for (Player player : players) {
             int x = 10;
-            DrawingUtil.drawCCOfPlayer(g2, Mapper.getCCID(player.getColor()), x, y, 3, player, false);
-            DrawingUtil.drawCCOfPlayer(g2, Mapper.getCCID(player.getColor()), x += 200, y, 2, player, true, false);
-            DrawingUtil.drawCCOfPlayer(g2, Mapper.getCCID(player.getColor()), x += 200, y, 0, player, false);
-            DrawingUtil.getAndDrawControlToken(g2, player, x += 120, y, false, 1.0f);
-            DrawingUtil.getAndDrawControlToken(g2, player, x += 80, y, true, 0.6f);
-            DrawingUtil.drawPlayerFactionIconImage(g2, player, x += 80, y, 95, 95);
-            DrawingUtil.drawPlayerFactionIconImageOpaque(g2, player, x += 100, y, 60, 60, 0.4f);
-            DrawingUtil.drawPlayerFactionIconImageOpaque(g2, player, x += 70, y, 60, 60, 1.0f);
-            DrawingUtil.drawPlayerFactionIconImageUnderlay(g2, player, x += 70, y, 80, 80);
-            g2.drawImage(DrawingUtil.getPlayerFactionIconImage(player), x += 90, y, null);
-            g2.drawImage(DrawingUtil.getPlayerFactionIconImageScaled(player, 0.5f), x += 100, y, null);
-            g2.drawImage(DrawingUtil.getFactionIconImageScaled(player.getFaction(), 40, 30), x += 60, y, null);
-            BufferedImage tintedBackground = DrawingUtil.tintedBackground(ColorUtil.getPlayerMainColor(player), 0.4f);
+            PlayerTokens.drawCommandCounters(g2, Mapper.getCCID(player.getColor()), x, y, 3, player, false, true);
+            PlayerTokens.drawCommandCounters(
+                    g2, Mapper.getCCID(player.getColor()), x += 200, y, 2, player, true, false);
+            PlayerTokens.drawCommandCounters(
+                    g2, Mapper.getCCID(player.getColor()), x += 200, y, 0, player, false, true);
+            PlayerTokens.readAndDrawControlToken(g2, player, x += 120, y, false, 1.0f);
+            PlayerTokens.readAndDrawControlToken(g2, player, x += 80, y, true, 0.6f);
+            FactionIcons.draw(g2, player, x += 80, y, 95, 95);
+            FactionIcons.drawFaded(g2, player, x += 100, y, 60, 60, 0.4f);
+            FactionIcons.drawFaded(g2, player, x += 70, y, 60, 60, 1.0f);
+            FactionIcons.drawUnderlay(g2, player, x += 70, y, 80, 80);
+            g2.drawImage(FactionIcons.of(player), x += 90, y, null);
+            g2.drawImage(FactionIcons.scaled(player, 0.5f), x += 100, y, null);
+            g2.drawImage(FactionIcons.ofFaction(player.getFaction(), 40, 30), x += 60, y, null);
+            BufferedImage tintedBackground = HexOverlays.tint(ColorUtil.getPlayerMainColor(player), 0.4f);
             g2.drawImage(tintedBackground, x += 50, y, 100, 90, null);
-            Player byMarker = DrawingUtil.getPlayerByControlMarker(players, Mapper.getControlID(player.getColor()));
+            Player byMarker = PlayerTokens.ownerOfToken(players, Mapper.getControlID(player.getColor()));
             g2.setColor(byMarker == player ? Color.GREEN : Color.RED);
             g2.fillRect(x += 110, y, 10, 10);
             y += 160;
@@ -411,9 +413,9 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
             ColorModel color = colors.get(i);
             int x = (i % columns) * 200;
             int y = (i / columns) * 400;
-            g2.drawImage(DrawingUtil.hexBorder("solid", color, List.of()), x, y, 200, 200, null);
-            g2.drawImage(DrawingUtil.hexBorder("dash", color, List.of(1, 4), 2.0f), x, y + 200, 200, 200, null);
-            String suffix = DrawingUtil.getBlackWhiteFileSuffix(color.getAlias());
+            g2.drawImage(HexOverlays.border("solid", color, List.of()), x, y, 200, 200, null);
+            g2.drawImage(HexOverlays.border("dash", color, List.of(1, 4), 2.0f), x, y + 200, 200, 200, null);
+            String suffix = ColorUtil.blackWhiteFileSuffix(color.getAlias());
             g2.setColor("_blk.png".equals(suffix) ? Color.BLACK : Color.WHITE);
             g2.fillRect(x, y, 8, 8);
         }

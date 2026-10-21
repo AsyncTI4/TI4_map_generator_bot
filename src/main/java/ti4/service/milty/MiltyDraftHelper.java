@@ -26,6 +26,7 @@ import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
 import ti4.image.Mapper;
 import ti4.image.OutlinedText;
+import ti4.image.RemoteImages;
 import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -278,11 +279,11 @@ public class MiltyDraftHelper {
     }
 
     private static BufferedImage getEmojiImage(TI4Emoji emoji) {
-        return ImageHelper.readEmojiImageScaled(emoji, 40);
+        return RemoteImages.emoji(emoji, 40);
     }
 
     private static BufferedImage getEmojiImage(String emojiString) {
-        return ImageHelper.readEmojiImageScaled(emojiString, 40);
+        return RemoteImages.emoji(emojiString, 40);
     }
 
     public static void initDraftTiles(MiltyDraftManager manager, Game game) {

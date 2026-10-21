@@ -61,7 +61,7 @@ final class PriorityTrackSection {
                 int firstX = Math.min(boxCenter, boxFarRight) + trackXShift;
                 int tokenX = spaceOnTrack * BOX_WIDTH + firstX;
                 int tokenY = y + BOX_BUFFER + lowerVerticalQuarter;
-                DrawingUtil.drawControlToken(g2, controlTokenImage, player, tokenX, tokenY, false, TOKEN_SCALE);
+                PlayerTokens.drawControlToken(g2, controlTokenImage, player, tokenX, tokenY, false, TOKEN_SCALE);
             } catch (Exception e) {
                 BotLogger.error("Could not display player: " + player.getUserName(), e);
             }

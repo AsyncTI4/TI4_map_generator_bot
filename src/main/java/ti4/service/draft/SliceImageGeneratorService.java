@@ -22,6 +22,7 @@ import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
 import ti4.image.Mapper;
 import ti4.image.OutlinedText;
+import ti4.image.RemoteImages;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.service.draft.draftables.FactionDraftable;
@@ -288,10 +289,10 @@ public class SliceImageGeneratorService {
     }
 
     private static BufferedImage getEmojiImage(TI4Emoji emoji) {
-        return ImageHelper.readEmojiImageScaled(emoji, 40);
+        return RemoteImages.emoji(emoji, 40);
     }
 
     private static BufferedImage getEmojiImage(String emojiString) {
-        return ImageHelper.readEmojiImageScaled(emojiString, 40);
+        return RemoteImages.emoji(emojiString, 40);
     }
 }

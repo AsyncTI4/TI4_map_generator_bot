@@ -152,10 +152,10 @@ final class AnchorStats {
             deltaSplitY = point.y;
         }
 
-        DrawingUtil.drawCCOfPlayer(
+        PlayerTokens.drawCommandCounters(
                 g2, ccID, x + deltaSplitX, y - deltaSplitY, player.getTacticalCC(), player, false, false);
         FleetCommandCounters.draw(g2, fleetCCID, x + deltaSplitX, y + 65 - deltaSplitY, player, false);
-        DrawingUtil.drawCCOfPlayer(
+        PlayerTokens.drawCommandCounters(
                 g2, ccID, x + deltaSplitX, y + 130 - deltaSplitY, player.getStrategicCC(), player, false, false);
 
         if (player.isSpeaker()) {

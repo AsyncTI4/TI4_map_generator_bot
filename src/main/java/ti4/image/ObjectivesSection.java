@@ -1,6 +1,5 @@
 package ti4.image;
 
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ final class ObjectivesSection {
     private ObjectivesSection() {}
 
     static int rowWidth(Game game, int scoreTokenSpacing) {
-        Graphics probe = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).getGraphics();
+        Graphics2D probe = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
         try {
             probe.setFont(Storage.getFont26());
             List<Objective> stage1 = Objective.retrievePublic1(game);
@@ -102,7 +101,7 @@ final class ObjectivesSection {
         return y;
     }
 
-    private static int columnWidth(Game game, Graphics probe, List<Objective> objectives, int scoreTokenSpacing) {
+    private static int columnWidth(Game game, Graphics2D probe, List<Objective> objectives, int scoreTokenSpacing) {
         int maxTextWidth = ObjectiveBox.getMaxTextWidth(game, probe, objectives);
         return ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenSpacing);
     }

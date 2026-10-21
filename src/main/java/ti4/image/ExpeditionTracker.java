@@ -35,7 +35,7 @@ final class ExpeditionTracker {
         for (Claim claim : claims) {
             if (claim.claimant() != null) {
                 Player p = game.getPlayerFromColorOrFaction(claim.claimant());
-                DrawingUtil.getAndDrawControlToken(
+                PlayerTokens.readAndDrawControlToken(
                         g2,
                         p,
                         x + claim.offsetX(),

@@ -61,7 +61,7 @@ final class TurnOrderTracker {
 
     private static void addIcon(List<Icon> icons, Player player) {
         if (player.getFaction() == null) return;
-        BufferedImage image = DrawingUtil.getPlayerFactionIconImage(player);
+        BufferedImage image = FactionIcons.of(player);
         if (image != null) {
             icons.add(new Icon(player, image));
         }

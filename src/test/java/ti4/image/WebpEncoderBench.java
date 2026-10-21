@@ -83,7 +83,7 @@ class WebpEncoderBench extends BaseTi4Test {
                 }
                 long pixels = (long) canvas.getWidth() * canvas.getHeight();
                 boolean large = pixels > LARGE_CANVAS_PIXELS;
-                int production = ImageHelper.writeWebp(canvas).length;
+                int production = ImageEncoder.webp(canvas).length;
                 int method4 = encode(canvas, 4, 0).length;
                 System.out.println("[bench] production writer " + production + " bytes, method 4 thread 0 " + method4);
                 for (int method : large ? new int[] {0, 2, 4, 6} : new int[] {0, 1, 2, 3, 4, 5, 6}) {

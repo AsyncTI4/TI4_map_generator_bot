@@ -94,11 +94,10 @@ final class ScoreTrackSection {
                                     boxWidth - tokenWidth - BOX_BUFFER)
                             + x;
                     int tokenY = y + BOX_BUFFER + (availableSpacePerRow * row) + centreVertically;
-                    DrawingUtil.drawControlToken(
+                    PlayerTokens.drawControlToken(
                             g2,
                             controlTokenImage,
-                            DrawingUtil.getPlayerByControlMarker(
-                                    game.getPlayers().values(), controlID),
+                            PlayerTokens.ownerOfToken(game.getPlayers().values(), controlID),
                             tokenX,
                             tokenY,
                             convertToGeneric,

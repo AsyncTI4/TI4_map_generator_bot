@@ -130,9 +130,9 @@ public final class TransactionGenerator {
 
     private static void drawIdentityIcon(Graphics2D g2, Player player, boolean canSeeSheet, int x, int y) {
         if (canSeeSheet) {
-            g2.drawImage(DrawingUtil.getPlayerFactionIconImageScaled(player, 40, 40), x, y, null);
+            g2.drawImage(FactionIcons.scaled(player, 40, 40), x, y, null);
         } else {
-            DrawingUtil.drawEmoji(g2, ColorEmojis.getColorEmoji(player.getColor()), x, y, 40);
+            RemoteImages.drawEmoji(g2, ColorEmojis.getColorEmoji(player.getColor()), x, y, 40);
         }
     }
 
@@ -159,14 +159,14 @@ public final class TransactionGenerator {
         g2.drawImage(meme, 0, 0, null);
 
         // Draw faction icons
-        DrawingUtil.drawPlayerFactionIconImage(g2, p1, 31, 139, 50, 50);
-        DrawingUtil.drawPlayerFactionIconImage(g2, p2, 358, 139, 50, 50);
+        FactionIcons.draw(g2, p1, 31, 139, 50, 50);
+        FactionIcons.draw(g2, p2, 358, 139, 50, 50);
 
         // Draw the hero icon (or a good doggo) over the face in the meme
         TI4Emoji hero = LeaderEmojis.getLeaderEmoji(p1.getFaction() + "hero");
         if (MiscEmojis.goodDogs().contains(hero))
-            DrawingUtil.drawEmoji(g2, hero, 210, 294, 200); // good doggies are smaller
-        else DrawingUtil.drawEmoji(g2, hero, 60, 294, 500);
+            RemoteImages.drawEmoji(g2, hero, 210, 294, 200); // good doggies are smaller
+        else RemoteImages.drawEmoji(g2, hero, 60, 294, 500);
 
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
         for (Player player : List.of(p1, p2)) {
@@ -323,7 +323,7 @@ public final class TransactionGenerator {
     private static void drawEmojiWithCenteredText(
             Graphics2D g2, TI4Emoji emoji, String text, boolean faded, int x, int y) {
         if (faded) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-        DrawingUtil.drawEmoji(g2, emoji, x, y, 50);
+        RemoteImages.drawEmoji(g2, emoji, x, y, 50);
         if (faded) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
 
         Font before = g2.getFont();

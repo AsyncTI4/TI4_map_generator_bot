@@ -84,7 +84,7 @@ import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKRelicHooks;
-import ti4.image.DrawingUtil;
+import ti4.image.ColorUtil;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
@@ -218,7 +218,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             setDecalSet(null);
             return null;
         }
-        return String.format("%s_%s%s", getDecalSet(), unitType, DrawingUtil.getBlackWhiteFileSuffix(getColorID()));
+        return String.format("%s_%s%s", getDecalSet(), unitType, ColorUtil.blackWhiteFileSuffix(getColorID()));
     }
 
     public boolean hasSpaceStation() {

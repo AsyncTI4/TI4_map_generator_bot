@@ -30,8 +30,8 @@ public class BannerGenerator {
         String pnColorFile = "pa_pn_color_" + Mapper.getColorID(player.getColor()) + ".png";
         BufferedImage colorImage = ImageHelper.readScaled(ResourceHelper.getPAResource(pnColorFile), 1.5f);
         BufferedImage gradientImage = ImageHelper.read(ResourceHelper.getExtraFile("factionbanner_gradient.png"));
-        BufferedImage smallFactionImage = DrawingUtil.getPlayerFactionIconImageScaled(player, 0.26f);
-        BufferedImage largeFactionImage = DrawingUtil.getPlayerFactionIconImageScaled(player, 1.4f);
+        BufferedImage smallFactionImage = FactionIcons.scaled(player, 0.26f);
+        BufferedImage largeFactionImage = FactionIcons.scaled(player, 1.4f);
         Graphics2D bannerG = bannerImage.createGraphics();
 
         bannerG.drawImage(backgroundImage, 0, 0, null);
