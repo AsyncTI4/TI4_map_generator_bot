@@ -40,10 +40,18 @@ class Facilitation {
         Player seat = context.seat();
         Optional<Player> holder = TradeCardRules.tradeHolder(game, seat);
         if (holder.isEmpty() || !offers(game, holder.get(), offerer) || TradeCardRules.paid(game, seat)) return false;
+        if (TradeLegality.neighbours(game, seat, holder.get())) return false;
         boolean onlyCommodities = deal.items().stream().allMatch(item -> item.type() == ItemType.COMMODITIES);
         int sent = deal.total(seat.getFaction(), ItemType.COMMODITIES);
         int back = deal.total(offerer.getFaction(), ItemType.COMMODITIES);
-        return onlyCommodities && back >= 1 && back <= sent && sent - back <= MAX_FEE && sent <= seat.getCommodities();
+        Optional<Integer> fee = TradeTerms.feeFor(game, holder.get(), seat, Trust.of(context, seat));
+        int kept = sent - back;
+        return onlyCommodities
+                && fee.isPresent()
+                && back >= 1
+                && kept >= fee.get()
+                && kept <= MAX_FEE
+                && sent <= seat.getCommodities();
     }
 
     private static Optional<AiDecision> washes(AiTurnContext context, List<Player> partners, Player holder) {
@@ -56,6 +64,7 @@ class Facilitation {
                 .filter(follower -> !Standings.same(follower, hacan))
                 .filter(follower -> partners.stream().anyMatch(partner -> Standings.same(partner, follower)))
                 .filter(follower -> !TradeCardRules.paid(game, follower))
+                .filter(follower -> !TradeLegality.neighbours(game, follower, holder))
                 .filter(follower -> follower.getCommodities() >= 1)
                 .filter(follower -> !Stinginess.feedsRival(game, hacan, follower))
                 .filter(follower -> !context.memory().has(offeredKey(game, follower)))

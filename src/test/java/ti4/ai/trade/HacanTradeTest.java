@@ -145,6 +145,27 @@ class HacanTradeTest extends BaseTi4Test {
                 .isEmpty();
     }
 
+    // A follower that neighbours the holder pays it directly, so Hacan skips Nekro and washes with Letnev instead.
+    @Test
+    void doesNotFacilitateForAFollowerThatNeighboursTheHolder() {
+        table.nekroAndSolNeighbour();
+
+        hacanTurn();
+
+        assertThat(draft().partner()).isEqualTo("letnev");
+        assertThat(draft().purpose()).isEqualTo(Purpose.FACILITATED_WASH);
+    }
+
+    @Test
+    void aNeighbouringFollowerRefusesTheFacilitatedWash() {
+        table.nekroAndSolNeighbour();
+        AiTurnContext nekro = table.test.contextFor(table.nekro, Set.of(), NOW);
+        Deal wash =
+                deal("nekro", "hacan", "sendingnekro_receivinghacan_Comms_3", "sendinghacan_receivingnekro_Comms_2");
+
+        assertThat(Facilitation.accepts(nekro, hacan, wash)).isFalse();
+    }
+
     // A holder that leads the table is not helped, and neither is a follower Hacan would be feeding.
     @Test
     void doesNotFacilitateForARivalLeader() {
@@ -201,6 +222,16 @@ class HacanTradeTest extends BaseTi4Test {
                                 "hacan",
                                 "sendingnekro_receivinghacan_Comms_3",
                                 "sendinghacan_receivingnekro_TGs_2")))
+                .isFalse();
+
+        assertThat(Facilitation.accepts(
+                        nekro,
+                        hacan,
+                        deal(
+                                "nekro",
+                                "hacan",
+                                "sendingnekro_receivinghacan_Comms_3",
+                                "sendinghacan_receivingnekro_Comms_3")))
                 .isFalse();
 
         TradeCardRules.stampPaid(table.game, table.nekro, table.sol);
@@ -431,6 +462,7 @@ class HacanTradeTest extends BaseTi4Test {
         assertThat(draft().target().total("sol", ItemType.COMMODITIES)).isEqualTo(3);
         assertThat(draft().target().total("hacan", ItemType.COMMODITIES)).isEqualTo(3);
 
+        table.test.isActive(hacan, "action");
         table.stock(table.sol, 0, 3);
         assertThat(CarthDeals.bestTarget(hacanContext())).containsSame(table.sol);
     }
