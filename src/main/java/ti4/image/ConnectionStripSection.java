@@ -96,7 +96,7 @@ final class ConnectionStripSection {
         }
         drawLabel(g2, connection.sectorName(), cell, LABEL_HEIGHT / 2, Storage.getFont28());
         int size = (int) (600 * TILE_SCALE);
-        int padding = (int) (BoardLayout.TILE_PADDING * TILE_SCALE);
+        int padding = (int) (TileGeometry.TILE_PADDING * TILE_SCALE);
         int hexHeight = (int) (TileGeometry.TILE_HEIGHT * TILE_SCALE);
         BufferedImage tileImage;
         try {

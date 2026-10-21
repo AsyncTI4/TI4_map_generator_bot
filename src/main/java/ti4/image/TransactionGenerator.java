@@ -27,8 +27,8 @@ import ti4.service.emoji.TI4Emoji;
 
 public final class TransactionGenerator {
 
-    private static final BasicStroke TEXT_OUTLINE = new BasicStroke(2.0f);
-    private static final BasicStroke COUNT_OUTLINE = new BasicStroke(5.0f);
+    private static final BasicStroke TEXT_OUTLINE = Strokes.STROKE_2;
+    private static final BasicStroke COUNT_OUTLINE = Strokes.STROKE_5;
     private static final double NINETY_DEGREES_RADIANS = 1.570_796_326_794_896_6;
     private static final int SHEET_WIDTH = 500;
     private static final int SHEET_HEIGHT = 160;

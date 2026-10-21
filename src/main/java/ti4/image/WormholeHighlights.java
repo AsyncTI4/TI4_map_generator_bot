@@ -33,9 +33,9 @@ final class WormholeHighlights implements OffBoardHighlights {
         }
 
         offBoardHighlighting = (alphaOnMap ? 0 : 1) + (betaOnMap ? 0 : 1) + (gammaOnMap ? 0 : 1);
-        int x = miscTile.x + (BoardLayout.TILE_WIDTH - 80) / 2;
+        int x = miscTile.x + (TileGeometry.TILE_WIDTH - 80) / 2;
         x += (offBoardHighlighting == 3 ? 40 : 0) + (offBoardHighlighting == 2 ? 30 : 0);
-        int y = miscTile.y + (BoardLayout.SPACE_FOR_TILE_HEIGHT - 80) / 2 + (player.isSpeaker() ? 30 : 0);
+        int y = miscTile.y + (TileGeometry.TILE_HEIGHT - 80) / 2 + (player.isSpeaker() ? 30 : 0);
         boolean reconstruction =
                 (ButtonHelper.isLawInPlay(game, "wormhole_recon") || ButtonHelper.isLawInPlay(game, "absol_recon"));
         boolean travelBan =

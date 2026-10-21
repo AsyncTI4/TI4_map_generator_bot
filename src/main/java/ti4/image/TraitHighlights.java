@@ -65,11 +65,11 @@ final class TraitHighlights implements OffBoardHighlights {
                 g2.drawImage(
                         bufferedImage,
                         miscTile.x
-                                + (BoardLayout.TILE_WIDTH - bufferedImage.getWidth()) / 2
+                                + (TileGeometry.TILE_WIDTH - bufferedImage.getWidth()) / 2
                                 - 30
                                 + i * 60 / (offBoardHighlighting - 1),
                         miscTile.y
-                                + (BoardLayout.SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                                + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
                                 - 30
                                 + i * 60 / (offBoardHighlighting - 1)
                                 + (player.isSpeaker() ? 30 : 0),
@@ -82,9 +82,9 @@ final class TraitHighlights implements OffBoardHighlights {
                         Math.sqrt(24_000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
                 g2.drawImage(
                         bufferedImage,
-                        miscTile.x + (BoardLayout.TILE_WIDTH - bufferedImage.getWidth()) / 2,
+                        miscTile.x + (TileGeometry.TILE_WIDTH - bufferedImage.getWidth()) / 2,
                         miscTile.y
-                                + (BoardLayout.SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                                + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
                                 + (player.isSpeaker() ? 30 : 0),
                         null);
             }

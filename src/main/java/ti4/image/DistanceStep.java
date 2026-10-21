@@ -14,7 +14,7 @@ final class DistanceStep implements TileStepPainter {
 
     private static final int UNREACHABLE = 100;
     private static final int MAX_LABELLED_DISTANCE = 10;
-    private static final BasicStroke OUTLINE = new BasicStroke(4.0f);
+    private static final BasicStroke OUTLINE = Strokes.STROKE_4;
 
     @Override
     public void paint(TileScene scene, TileLayer layer) {

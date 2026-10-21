@@ -26,6 +26,16 @@ public final class PaImage {
         return new Rectangle(new Point(x, y));
     }
 
+    public static void drawGeneral(Graphics2D g2, int x, int y, String resourceName) {
+        try {
+            String resourcePath = ImageResources.general(resourceName);
+            BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
+            g2.drawImage(resourceBufferedImage, x, y, null);
+        } catch (Exception e) {
+            logFailure(resourceName, e);
+        }
+    }
+
     public static void drawScaled(Graphics g, int x, int y, String resourceName, int width, int height) {
         try {
             String resourcePath = ResourceHelper.getPAResource(resourceName);

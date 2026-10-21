@@ -24,7 +24,7 @@ record ProductionBadge(int production, int capacity, int capacityUsed, int ignor
     private static final int WIDE_X_OFFSET = -15;
     private static final int FOUR_HOLDER_X_OFFSET = -155;
     private static final Set<String> WIDE_LAYOUT_TILE_IDS = Set.of("25", "26", "64");
-    private static final BasicStroke CAPACITY_OUTLINE = new BasicStroke(4.0f);
+    private static final BasicStroke CAPACITY_OUTLINE = Strokes.STROKE_4;
 
     static ProductionBadge measure(Game game, Tile tile) {
         int production = 0;

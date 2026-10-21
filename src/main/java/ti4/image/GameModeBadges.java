@@ -29,7 +29,7 @@ final class GameModeBadges {
         int deltaX = 0;
         int deltaY = BADGE_ABOVE_NAME;
         if (game.isCompetitiveTIGLGame()) {
-            GeneralImage.draw(
+            PaImage.drawGeneral(
                     g2,
                     x + deltaX,
                     y + deltaY,
@@ -52,22 +52,22 @@ final class GameModeBadges {
             deltaX += 100;
         }
         if (game.isAbsolMode()) {
-            GeneralImage.draw(g2, x + deltaX, y + deltaY, "GameMode_Absol.png");
+            PaImage.drawGeneral(g2, x + deltaX, y + deltaY, "GameMode_Absol.png");
             overlays.add("Absol", null, x + deltaX, y + deltaY, 90, 90);
             deltaX += 100;
         }
         if (game.isNoSwapMode()) {
-            GeneralImage.draw(g2, x + deltaX, y + deltaY, "NoSwap.png");
+            PaImage.drawGeneral(g2, x + deltaX, y + deltaY, "NoSwap.png");
             overlays.add("No Support Swap", null, x + deltaX, y + deltaY, 180, 90);
             deltaX += 190;
         }
         if (game.isMiltyModMode()) {
-            GeneralImage.draw(g2, x + deltaX, y + deltaY, "GameMode_MiltyMod.png");
+            PaImage.drawGeneral(g2, x + deltaX, y + deltaY, "GameMode_MiltyMod.png");
             overlays.add("MiltyMod", null, x + deltaX, y + deltaY, 90, 90);
             deltaX += 100;
         }
         if (game.isDiscordantStarsMode()) {
-            GeneralImage.draw(g2, x + deltaX, y + deltaY, "GameMode_DiscordantStars.png");
+            PaImage.drawGeneral(g2, x + deltaX, y + deltaY, "GameMode_DiscordantStars.png");
             overlays.add("Discordant Stars", null, x + deltaX, y + deltaY, 90, 90);
         }
     }

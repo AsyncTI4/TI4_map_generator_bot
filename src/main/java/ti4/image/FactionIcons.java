@@ -30,7 +30,7 @@ public final class FactionIcons {
     private static final int UNICODE_PADDING = 5;
     private static final int UNDERLAY_ALPHA_THRESHOLD = 127;
     private static final int OPAQUE_BLACK = 0xFF000000;
-    private static final BasicStroke UNICODE_OUTLINE = new BasicStroke(4.0f);
+    private static final BasicStroke UNICODE_OUTLINE = Strokes.STROKE_4;
     private static final int MAX_REMEMBERED_SILHOUETTES = 256;
     private static final Cache<BufferedImage, BufferedImage> SILHOUETTES = Caffeine.newBuilder()
             .weakKeys()

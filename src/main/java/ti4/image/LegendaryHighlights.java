@@ -33,11 +33,11 @@ final class LegendaryHighlights implements OffBoardHighlights {
                     g2.drawImage(
                             bufferedImage,
                             miscTile.x
-                                    + (BoardLayout.TILE_WIDTH - bufferedImage.getWidth()) / 2
+                                    + (TileGeometry.TILE_WIDTH - bufferedImage.getWidth()) / 2
                                     - 30
                                     + i * 60 / (offBoardHighlighting + (hasNanoForge ? 1 : 0) - 1),
                             miscTile.y
-                                    + (BoardLayout.SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                                    + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
                                     - 30
                                     + i * 60 / (offBoardHighlighting + (hasNanoForge ? 1 : 0) - 1)
                                     + (player.isSpeaker() ? 30 : 0),
@@ -46,9 +46,9 @@ final class LegendaryHighlights implements OffBoardHighlights {
             } else {
                 g2.drawImage(
                         bufferedImage,
-                        miscTile.x + (BoardLayout.TILE_WIDTH - bufferedImage.getWidth()) / 2,
+                        miscTile.x + (TileGeometry.TILE_WIDTH - bufferedImage.getWidth()) / 2,
                         miscTile.y
-                                + (BoardLayout.SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                                + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
                                 + (player.isSpeaker() ? 30 : 0),
                         null);
             }
@@ -61,18 +61,18 @@ final class LegendaryHighlights implements OffBoardHighlights {
                         24_000.0f / (offBoardHighlighting + 1) / bufferedImage.getWidth() / bufferedImage.getHeight()));
                 g2.drawImage(
                         bufferedImage,
-                        miscTile.x + (BoardLayout.TILE_WIDTH - bufferedImage.getWidth()) / 2 + 30,
+                        miscTile.x + (TileGeometry.TILE_WIDTH - bufferedImage.getWidth()) / 2 + 30,
                         miscTile.y
-                                + (BoardLayout.SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                                + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
                                 + 30
                                 + (player.isSpeaker() ? 30 : 0),
                         null);
             } else {
                 g2.drawImage(
                         bufferedImage,
-                        miscTile.x + (BoardLayout.TILE_WIDTH - bufferedImage.getWidth()) / 2,
+                        miscTile.x + (TileGeometry.TILE_WIDTH - bufferedImage.getWidth()) / 2,
                         miscTile.y
-                                + (BoardLayout.SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                                + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
                                 + (player.isSpeaker() ? 30 : 0),
                         null);
             }

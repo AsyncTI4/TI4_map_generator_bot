@@ -75,7 +75,7 @@ final class MapCanvasLayout {
                 break;
             case map:
                 heightForGameInfo = mapHeight;
-                height = mapHeight + BoardLayout.SPACE_FOR_TILE_HEIGHT * 2;
+                height = mapHeight + TileGeometry.TILE_HEIGHT * 2;
                 minimumHeight = height;
                 width = board.framedWidth();
                 break;

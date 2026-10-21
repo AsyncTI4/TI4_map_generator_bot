@@ -27,7 +27,7 @@ final class GhostHexes {
         for (String position : frontierPositions(ctx)) {
             Rectangle hex = board.hexBounds(position);
             if (hex != null
-                    && !board.isOutsideFrame(hex.x - BoardLayout.TILE_PADDING, hex.y - BoardLayout.TILE_PADDING)) {
+                    && !board.isOutsideFrame(hex.x - TileGeometry.TILE_PADDING, hex.y - TileGeometry.TILE_PADDING)) {
                 drawHex(g2, position, hex, !drawnPositions.contains(position));
             }
         }

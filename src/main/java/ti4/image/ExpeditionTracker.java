@@ -24,7 +24,7 @@ final class ExpeditionTracker {
         if (!isShown(game)) return;
         Expeditions exp = game.getExpeditions();
 
-        GeneralImage.draw(g2, x, y, "Expeditions.png");
+        PaImage.drawGeneral(g2, x, y, "Expeditions.png");
         List<Claim> claims = List.of(
                 new Claim(exp.getTradeGoods(), 47, 101),
                 new Claim(exp.getFiveRes(), 114, 5),

@@ -55,7 +55,7 @@ final class TechSkipHighlights implements OffBoardHighlights {
                         bufferedImage,
                         miscTile.x + (345 - bufferedImage.getWidth()) / 2 - 30 + i * 60 / (offBoardHighlighting - 1),
                         miscTile.y
-                                + (BoardLayout.SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                                + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
                                 - 30
                                 + i * 60 / (offBoardHighlighting - 1)
                                 + (player.isSpeaker() ? 30 : 0),
@@ -69,7 +69,7 @@ final class TechSkipHighlights implements OffBoardHighlights {
                     bufferedImage,
                     miscTile.x + (345 - bufferedImage.getWidth()) / 2,
                     miscTile.y
-                            + (BoardLayout.SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                            + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
                             + (player.isSpeaker() ? 30 : 0),
                     null);
         }

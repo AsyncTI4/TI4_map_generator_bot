@@ -11,9 +11,9 @@ import ti4.model.Mapper;
 
 final class BannerImages {
 
-    private static final BasicStroke THIN_OUTLINE = new BasicStroke(2.0f);
-    private static final BasicStroke ROUND_OUTLINE = new BasicStroke(6.0f);
-    private static final BasicStroke PHASE_OUTLINE = new BasicStroke(8.0f);
+    private static final BasicStroke THIN_OUTLINE = Strokes.STROKE_2;
+    private static final BasicStroke ROUND_OUTLINE = Strokes.STROKE_6;
+    private static final BasicStroke PHASE_OUTLINE = Strokes.STROKE_8;
     private static final double NINETY_DEGREES_RADIANS = 1.570_796_326_794_896_6;
     private static final int STRIP_HEIGHT = 50;
     private static final int STRIP_BACKGROUND_WIDTH = 325;

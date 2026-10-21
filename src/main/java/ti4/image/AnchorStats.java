@@ -49,7 +49,7 @@ final class AnchorStats {
                     deltaY = playerStatsAnchorPoint.y - 80;
                     deltaSplitX = 200;
                 } else if (anchorLocationIndex == 0) {
-                    deltaX = playerStatsAnchorPoint.x + BoardLayout.EXTRA_X + BoardLayout.SPACE_FOR_TILE_HEIGHT;
+                    deltaX = playerStatsAnchorPoint.x + BoardLayout.EXTRA_X + TileGeometry.TILE_HEIGHT;
                     deltaY = playerStatsAnchorPoint.y;
                     deltaSplitX = 200;
                 } else if (anchorLocationIndex == 1) {

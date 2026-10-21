@@ -19,9 +19,6 @@ final class BoardLayout {
     static final int RING_MIN_COUNT = 3;
     static final int EXTRA_X = 300;
     static final int EXTRA_Y = 200;
-    static final int TILE_PADDING = 100;
-    static final int SPACE_FOR_TILE_HEIGHT = 300;
-    static final int TILE_WIDTH = 345;
     static final int PLAYER_AREAS_LEFT = 10;
     static final int MINIMUM_WIDTH_OF_PLAYER_AREA = 1000;
     static final Set<String> CORNER_POSITIONS = Set.of("tl", "tr", "bl", "br");
@@ -235,8 +232,8 @@ final class BoardLayout {
     @Nullable
     Point tileOrigin(String position, Point projected) {
         Point scaled = PositionMapper.getScaledTilePosition(game, position, projected.x, projected.y, fractureYbump);
-        int tileX = scaled.x + EXTRA_X - TILE_PADDING - frameOffsetX();
-        int tileY = scaled.y + EXTRA_Y - TILE_PADDING - frameOffsetY();
+        int tileX = scaled.x + EXTRA_X - TileGeometry.TILE_PADDING - frameOffsetX();
+        int tileY = scaled.y + EXTRA_Y - TileGeometry.TILE_PADDING - frameOffsetY();
         if (mapFrame != null && framing.pinnedCorners().contains(position)) {
             return pinnedCornerTileOrigin(position);
         }
@@ -254,15 +251,15 @@ final class BoardLayout {
         boolean top = "tl".equalsIgnoreCase(corner) || "tr".equalsIgnoreCase(corner);
         int hexLeft = left ? contentLeft + CORNER_MARGIN : contentRight - CORNER_MARGIN - TileGeometry.TILE_WIDTH;
         int hexTop = top ? CORNER_TOP : mapFrame.height() - CORNER_MARGIN - TileGeometry.TILE_HEIGHT;
-        return new Point(hexLeft - TILE_PADDING, hexTop - TILE_PADDING);
+        return new Point(hexLeft - TileGeometry.TILE_PADDING, hexTop - TileGeometry.TILE_PADDING);
     }
 
     boolean isOutsideFrame(int tileX, int tileY) {
         if (mapFrame == null) {
             return false;
         }
-        int hexLeft = tileX + TILE_PADDING;
-        int hexTop = tileY + TILE_PADDING;
+        int hexLeft = tileX + TileGeometry.TILE_PADDING;
+        int hexTop = tileY + TileGeometry.TILE_PADDING;
         return hexLeft + TileGeometry.TILE_WIDTH <= 0
                 || hexTop + TileGeometry.TILE_HEIGHT <= 0
                 || hexLeft >= mapFrame.width()
@@ -283,7 +280,7 @@ final class BoardLayout {
     }
 
     private static int getMapHeight(int ringCount) {
-        return (ringCount + 1) * SPACE_FOR_TILE_HEIGHT * 2 + EXTRA_Y * 2;
+        return (ringCount + 1) * TileGeometry.TILE_HEIGHT * 2 + EXTRA_Y * 2;
     }
 
     private static int getMapPlayerCount(Game game) {

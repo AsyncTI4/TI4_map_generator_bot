@@ -18,8 +18,8 @@ final class DraftTileLabel {
     private static final Pattern DIGIT_PATTERN = Pattern.compile("[0-9]");
     private static final Point NUMBER_POSITION = new Point(85, 140);
     private static final Point COLOR_POSITION = new Point(172, 228);
-    private static final BasicStroke NUMBER_OUTLINE = new BasicStroke(8.0f);
-    private static final BasicStroke COLOR_OUTLINE = new BasicStroke(6.0f);
+    private static final BasicStroke NUMBER_OUTLINE = Strokes.STROKE_8;
+    private static final BasicStroke COLOR_OUTLINE = Strokes.STROKE_6;
 
     private DraftTileLabel() {}
 

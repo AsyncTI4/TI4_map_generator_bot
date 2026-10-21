@@ -26,7 +26,7 @@ public class MapOverviewGenerator {
     private static final int PADDING = 200;
     private static final int CORNER_MARGIN = 20;
     private static final int CORNER_COLUMN = TileGeometry.TILE_WIDTH + 2 * CORNER_MARGIN;
-    private static final BasicStroke SECTOR_LABEL_OUTLINE = new BasicStroke(6);
+    private static final BasicStroke SECTOR_LABEL_OUTLINE = Strokes.STROKE_6;
     private static final List<TileStep> STEPS =
             List.of(TileStep.Tile, TileStep.Extras, TileStep.Units, TileStep.TileNumber);
 

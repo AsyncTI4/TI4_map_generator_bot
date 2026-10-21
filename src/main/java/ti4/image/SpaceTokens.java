@@ -34,7 +34,7 @@ final class SpaceTokens {
             Math.round(((float) TILE_WIDTH / 8 + TILE_PADDING) * (1 - MIRAGE_DRAG_RATIO));
     private static final int MIRAGE_DRAG_Y =
             Math.round(((float) (3 * TILE_HEIGHT) / 4 + TILE_PADDING) * (1 - MIRAGE_DRAG_RATIO));
-    private static final BasicStroke COUNT_OUTLINE = new BasicStroke(4.0f);
+    private static final BasicStroke COUNT_OUTLINE = Strokes.STROKE_4;
 
     private SpaceTokens() {}
 

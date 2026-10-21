@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 
 public final class OutlinedText {
 
-    private static final BasicStroke DEFAULT_OUTLINE = new BasicStroke(2);
+    private static final BasicStroke DEFAULT_OUTLINE = Strokes.STROKE_2;
 
     private OutlinedText() {}
 
