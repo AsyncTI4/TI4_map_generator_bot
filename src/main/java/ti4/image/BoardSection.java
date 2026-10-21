@@ -3,7 +3,6 @@ package ti4.image;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
-import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,12 +23,14 @@ final class BoardSection {
     private final Graphics2D g2;
     private final Game game;
     private final BoardLayout board;
+    private final TileLayers tileLayers;
 
     private BoardSection(RenderContext ctx, Graphics2D g2) {
         this.ctx = ctx;
         this.g2 = g2;
         this.game = ctx.game();
         this.board = ctx.board();
+        this.tileLayers = TileLayers.of(game, ctx.event(), ctx.displayType());
     }
 
     static void draw(RenderContext ctx, Graphics2D g2) {
@@ -146,9 +147,7 @@ final class BoardSection {
                 return;
             }
 
-            TileLayers tileLayers = TileLayers.of(game, ctx.event(), ctx.displayType());
-            BufferedImage tileImage = tileLayers.draw(tile, step);
-            g2.drawImage(tileImage, origin.x, origin.y, null);
+            tileLayers.paint(tile, step, g2, origin.x, origin.y);
         } catch (Exception exception) {
             BotLogger.error(
                     "Tile Error, when building map `" + game.getName() + "`, tile: " + tile.getTileID(), exception);

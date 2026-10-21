@@ -2,8 +2,10 @@ package ti4.image;
 
 import static ti4.image.TileGeometry.LAYER_SIZE;
 
-import java.awt.Graphics;
+import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.EnumMap;
 import java.util.Map;
@@ -18,7 +20,11 @@ public final class TileLayers {
 
     private static final Map<TileStep, TileStepPainter> PAINTERS = painters();
 
+    private static final Rectangle FULL_LAYER = new Rectangle(0, 0, LAYER_SIZE, LAYER_SIZE);
+
     private final TileScene scene;
+    private BufferedImage scratch;
+    private Rectangle scratchDirty;
 
     private TileLayers(TileScene scene) {
         this.scene = scene;
@@ -64,17 +70,63 @@ public final class TileLayers {
     }
 
     public BufferedImage draw(Tile tile, TileStep step) {
-        BufferedImage layerImage = new BufferedImage(LAYER_SIZE, LAYER_SIZE, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = layerImage.createGraphics();
-        TileLayer layer = new TileLayer(tile, tile.getTileModel().getShipPositionsType(), g);
-        TileStepPainter painter = PAINTERS.get(step);
-        if (painter != null) {
-            painter.paint(scene, layer);
-        }
+        BufferedImage layerImage = newLayerImage();
+        renderInto(layerImage, tile, step);
         return layerImage;
     }
 
-    void paint(Tile tile, TileStep step, Graphics target, int x, int y) {
-        target.drawImage(draw(tile, step), x, y, null);
+    void paint(Tile tile, TileStep step, Graphics2D target, int x, int y) {
+        BufferedImage layerImage = clearedScratch();
+        scratchDirty = FULL_LAYER;
+        renderInto(layerImage, tile, step);
+        Rectangle painted = PaintedBounds.of(layerImage);
+        scratchDirty = painted;
+        if (painted == null) {
+            return;
+        }
+        if (isIntegerTranslation(target.getTransform())) {
+            BufferedImage paintedPart = layerImage.getSubimage(painted.x, painted.y, painted.width, painted.height);
+            target.drawImage(paintedPart, x + painted.x, y + painted.y, null);
+        } else {
+            target.drawImage(layerImage, x, y, null);
+        }
+    }
+
+    private void renderInto(BufferedImage layerImage, Tile tile, TileStep step) {
+        Graphics2D g = layerImage.createGraphics();
+        try {
+            TileLayer layer = new TileLayer(tile, tile.getTileModel().getShipPositionsType(), g);
+            TileStepPainter painter = PAINTERS.get(step);
+            if (painter != null) {
+                painter.paint(scene, layer);
+            }
+        } finally {
+            g.dispose();
+        }
+    }
+
+    private BufferedImage clearedScratch() {
+        if (scratch == null) {
+            scratch = newLayerImage();
+        } else if (scratchDirty != null) {
+            Graphics2D g = scratch.createGraphics();
+            g.setComposite(AlphaComposite.Clear);
+            g.fillRect(scratchDirty.x, scratchDirty.y, scratchDirty.width, scratchDirty.height);
+            g.dispose();
+        }
+        scratchDirty = null;
+        return scratch;
+    }
+
+    private static BufferedImage newLayerImage() {
+        return new BufferedImage(LAYER_SIZE, LAYER_SIZE, BufferedImage.TYPE_INT_ARGB);
+    }
+
+    private static boolean isIntegerTranslation(AffineTransform transform) {
+        int type = transform.getType();
+        boolean translationOnly = (type & ~AffineTransform.TYPE_TRANSLATION) == 0;
+        return translationOnly
+                && transform.getTranslateX() == Math.rint(transform.getTranslateX())
+                && transform.getTranslateY() == Math.rint(transform.getTranslateY());
     }
 }

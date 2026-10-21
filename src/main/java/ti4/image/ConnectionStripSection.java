@@ -2,7 +2,6 @@ package ti4.image;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
@@ -60,10 +59,11 @@ final class ConnectionStripSection {
                 VerticalAlign.Center,
                 Strokes.STROKE_4,
                 Color.BLACK);
+        TileLayers tileLayers = TileLayers.of(ctx.game(), ctx.event(), ctx.displayType());
         for (int index = 0; index < cells; index++) {
             Point cell = cellOrigin(index, perRow, cells, width, stripTop);
             if (index < drawn.size()) {
-                drawConnection(ctx, g2, drawn.get(index), cell);
+                drawConnection(ctx, tileLayers, g2, drawn.get(index), cell);
             } else {
                 String more = "+" + (connections.size() - drawn.size()) + " more";
                 drawLabel(g2, more, cell, ROW_HEIGHT / 2, Storage.getFont28());
@@ -85,7 +85,11 @@ final class ConnectionStripSection {
     }
 
     private static void drawConnection(
-            RenderContext ctx, Graphics2D g2, SectorConnections.Connection connection, Point cell) {
+            RenderContext ctx,
+            TileLayers tileLayers,
+            Graphics2D g2,
+            SectorConnections.Connection connection,
+            Point cell) {
         Tile tile = ctx.fog().tiles().get(connection.position());
         if (tile == null) {
             return;
@@ -96,7 +100,7 @@ final class ConnectionStripSection {
         int hexHeight = (int) (TileGeometry.TILE_HEIGHT * TILE_SCALE);
         BufferedImage tileImage;
         try {
-            tileImage = tileImage(ctx, tile);
+            tileImage = tileImage(tileLayers, tile);
         } catch (Exception e) {
             Game game = ctx.game();
             BotLogger.error("Connection strip error in `" + game.getName() + "`, tile: " + tile.getTileID(), e);
@@ -121,12 +125,12 @@ final class ConnectionStripSection {
                 Color.BLACK);
     }
 
-    private static BufferedImage tileImage(RenderContext ctx, Tile tile) {
-        BufferedImage image = new BufferedImage(600, 600, BufferedImage.TYPE_INT_ARGB);
-        Graphics tileGraphics = image.getGraphics();
-        TileLayers tileLayers = TileLayers.of(ctx.game(), ctx.event(), ctx.displayType());
+    private static BufferedImage tileImage(TileLayers tileLayers, Tile tile) {
+        BufferedImage image =
+                new BufferedImage(TileGeometry.LAYER_SIZE, TileGeometry.LAYER_SIZE, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D tileGraphics = image.createGraphics();
         for (TileStep step : List.of(TileStep.Tile, TileStep.Units)) {
-            tileGraphics.drawImage(tileLayers.draw(tile, step), 0, 0, null);
+            tileLayers.paint(tile, step, tileGraphics, 0, 0);
         }
         tileGraphics.dispose();
         return image;

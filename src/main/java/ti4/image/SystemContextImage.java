@@ -1,7 +1,7 @@
 package ti4.image;
 
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
@@ -71,7 +71,7 @@ public final class SystemContextImage {
         int width = TileGeometry.TILE_WIDTH + (RING_WIDTH * 2 * rings) + MARGIN_X;
         int height = TileGeometry.TILE_HEIGHT * (2 * rings + 1) + MARGIN_Y;
         var mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        var graphics = mainImage.getGraphics();
+        var graphics = mainImage.createGraphics();
 
         try {
             Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
@@ -140,7 +140,7 @@ public final class SystemContextImage {
         return tileSet;
     }
 
-    private void addTile(Graphics graphics, Tile tile, TileStep step) {
+    private void addTile(Graphics2D graphics, Tile tile, TileStep step) {
         if (tile == null || tile.getTileID() == null) {
             return;
         }
