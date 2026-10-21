@@ -14,6 +14,7 @@ import ti4.service.info.ListPlayerInfoService;
 public class IconStake {
 
     public static final String SEIZE_AN_ICON = "sai";
+    private static final double TRAIT_CLAIM_PULL = 2.0;
 
     public static boolean seeks(Game game, Player seat) {
         return seat.getSecretsUnscored().containsKey(SEIZE_AN_ICON)
@@ -47,9 +48,14 @@ public class IconStake {
 
     public static Comparator<Planet> claimOrder(Game game, Player seat) {
         boolean seeking = seeks(game, seat);
+        List<TraitNeeds.Need> needs = TraitNeeds.of(game, seat);
         return Comparator.comparingInt((Planet planet) -> seeking && planet.isLegendary() ? 0 : 1)
-                .thenComparing(
-                        Comparator.comparingDouble(BoardView::planetValue).reversed());
+                .thenComparing(Comparator.comparingDouble((Planet planet) -> claimValue(planet, needs))
+                        .reversed());
+    }
+
+    private static double claimValue(Planet planet, List<TraitNeeds.Need> needs) {
+        return BoardView.planetValue(planet) + (TraitNeeds.wanted(needs, planet) ? TRAIT_CLAIM_PULL : 0);
     }
 
     private static boolean holdsLegendaryPlanetOf(Game game, Player seat, Tile tile, boolean freeOnly) {

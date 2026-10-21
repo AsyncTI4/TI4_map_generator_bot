@@ -85,22 +85,25 @@ public final class ObjectiveValue {
 
     public double gain(Footprint after) {
         double total = 0;
+        for (Target target : targets) total += gainOf(target, after);
+        return total;
+    }
+
+    public double traitSecretGain(Footprint after) {
+        double total = 0;
         for (Target target : targets) {
-            int now = target.before();
-            int then = progress(target.id(), after);
-            if (then == now || then == NOT_MODELLED) continue;
-            double points = VICTORY_POINT_VALUE * target.points();
-            if (now >= target.threshold()) {
-                if (then < target.threshold()) total -= points;
-                continue;
-            }
-            if (then >= target.threshold()) {
-                total += points;
-            } else {
-                total += partialGain(target, now, then);
-            }
+            if (TRAIT_SECRETS.containsKey(target.id())) total += gainOf(target, after);
         }
         return total;
+    }
+
+    private double gainOf(Target target, Footprint after) {
+        int now = target.before();
+        int then = progress(target.id(), after);
+        if (then == now || then == NOT_MODELLED) return 0;
+        double points = VICTORY_POINT_VALUE * target.points();
+        if (now >= target.threshold()) return then < target.threshold() ? -points : 0;
+        return then >= target.threshold() ? points : partialGain(target, now, then);
     }
 
     public int completedPoints(Footprint after) {

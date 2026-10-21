@@ -117,6 +117,7 @@ final class OffenseOutlook {
         double economyDenial = hurt * ECONOMY_DENIAL_SHARE * heldPlanetValue;
         Defenders after = afterStrike(strike, estimate);
         List<Planet> planetsAfter = planetsAfter(target, landed);
+        ownObjective -= retakenObjective(strike, estimate, after, planetsAfter, terms.exposedObjective() * meanGround);
         Denial denial = objectiveDenial(strike, estimate, landed, after, planetsAfter, terms);
         double kills = hurt * KILL_SHARE * estimate.theirExpectedLoss();
         double blockade = blockade(strike, estimate, landed, hurt);
@@ -334,6 +335,12 @@ final class OffenseOutlook {
 
     private static boolean isNomadic(Player player) {
         return NOMADIC_ABILITIES.stream().anyMatch(player::hasAbility) || player.hasTech(NOMADIC_TECH);
+    }
+
+    private double retakenObjective(
+            Strike strike, StrikeEstimate estimate, Defenders after, List<Planet> planetsAfter, double exposed) {
+        if (exposed <= 0) return 0;
+        return estimate.spaceWin() * exposed * retake(strike, estimate, after, planetsAfter);
     }
 
     private double retake(Strike strike, StrikeEstimate estimate, Defenders after, List<Planet> planetsAfter) {

@@ -1415,7 +1415,8 @@ public class TacticalPlanner {
         boolean structures = conquering
                 || tile == opponent.getHomeSystemTile()
                 || threat >= DESPERATE_THREAT
-                || IconStake.marks(game, context.seat, tile);
+                || IconStake.marks(game, context.seat, tile)
+                || TraitRaid.allowsStructures(context, tile, opponent);
         return new StrikeRules(conquering, minWin, structures, homeLandings, context.canPayCustodians());
     }
 
@@ -1475,7 +1476,8 @@ public class TacticalPlanner {
                 homeDefence,
                 retake,
                 example,
-                territoryValues(context, tile));
+                territoryValues(context, tile),
+                TraitRaid.exposedObjective(context, tile, strike, estimate));
     }
 
     private static Map<String, Double> territoryValues(Context context, Tile tile) {
@@ -3206,8 +3208,8 @@ public class TacticalPlanner {
     }
 
     static final class Context {
-        private final Game game;
-        private final Player seat;
+        final Game game;
+        final Player seat;
         private final Set<String> freed;
         private final List<SetupHint> hints;
         private final Map<String, Map<String, Integer>> reachCache = new HashMap<>();
