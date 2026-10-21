@@ -225,12 +225,7 @@ public class PlayerAreaGenerator {
         if (!spectatorNames.isEmpty()) {
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
-            bottom = drawString(
-                    (Graphics2D) graphics,
-                    "Spectators: " + spectatorNames,
-                    x,
-                    bottom + 15,
-                    totalWidth - (x - BoardLayout.PLAYER_AREAS_LEFT));
+            bottom = drawString((Graphics2D) graphics, "Spectators: " + spectatorNames, x, bottom + 15, totalWidth - x);
         }
         return bottom;
     }
