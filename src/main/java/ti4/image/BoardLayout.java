@@ -22,6 +22,8 @@ final class BoardLayout {
     static final int PLAYER_AREAS_LEFT = 10;
     static final int MINIMUM_WIDTH_OF_PLAYER_AREA = 1000;
     static final Set<String> CORNER_POSITIONS = Set.of("tl", "tr", "bl", "br");
+    private static final int FRACTURE_BUMP = 400;
+    private static final int EXPANDED_FRACTURE_BUMP = 600;
 
     private static final int PLAYER_STATS_HEIGHT = 650;
     private static final int CORNER_MARGIN = 20;
@@ -72,16 +74,8 @@ final class BoardLayout {
             FogView fog,
             MapSideStatLayout stats,
             int scoreTokenSpacing) {
-        int fractureYbump = 0;
-        int mapHeight = getMapHeight(game);
-        if (FractureService.isFractureRegionOnMap(game)) {
-            fractureYbump = 400;
-            mapHeight += fractureYbump;
-        }
-        if (FractureService.isFractureExpandedRegionOnMap(game)) {
-            fractureYbump += 600;
-            mapHeight += 600;
-        }
+        int fractureYbump = fractureYbump(game);
+        int mapHeight = getMapHeight(game) + fractureYbump;
 
         FrameResolver.Framing framing =
                 new FrameResolver(game, displayType, requestedSegment, fog, stats, fractureYbump).resolve();
@@ -158,6 +152,11 @@ final class BoardLayout {
 
     int fractureYbump() {
         return fractureYbump;
+    }
+
+    static int fractureYbump(Game game) {
+        int bump = FractureService.isFractureRegionOnMap(game) ? FRACTURE_BUMP : 0;
+        return FractureService.isFractureExpandedRegionOnMap(game) ? bump + EXPANDED_FRACTURE_BUMP : bump;
     }
 
     @Nullable

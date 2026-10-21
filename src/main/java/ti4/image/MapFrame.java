@@ -19,7 +19,6 @@ public record MapFrame(int offsetX, int offsetY, int width, int height) {
 
     static final int MAX_WIDTH = 5800;
     static final int MAX_HEIGHT = 6400;
-    private static final Set<String> CORNER_POSITIONS = Set.of("tl", "tr", "bl", "br");
     static final Comparator<String> POSITION_ORDER =
             Comparator.comparingInt(String::length).thenComparing(Comparator.naturalOrder());
 
@@ -45,7 +44,7 @@ public record MapFrame(int offsetX, int offsetY, int width, int height) {
 
     @Nullable
     static Rectangle hexBounds(Game game, @Nullable String position, int fractureYbump, int padX, int padY) {
-        if (position == null || CORNER_POSITIONS.contains(position.toLowerCase())) return null;
+        if (position == null || BoardLayout.CORNER_POSITIONS.contains(position.toLowerCase())) return null;
         Point raw = PositionMapper.getTilePosition(position);
         if (raw == null) return null;
         Point scaled = PositionMapper.getScaledTilePosition(game, position, raw.x, raw.y, fractureYbump);
