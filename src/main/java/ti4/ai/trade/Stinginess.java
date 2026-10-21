@@ -78,6 +78,10 @@ class Stinginess {
         return Math.min(MAX_RIVALRY_TENTHS, tenths) / TENTHS;
     }
 
+    static boolean leads(Game game, Player player) {
+        return strictLeader(game, player);
+    }
+
     static boolean feedsRival(Game game, Player self, Player other) {
         return rivalry(game, self, other) >= FEEDS_LEADER;
     }

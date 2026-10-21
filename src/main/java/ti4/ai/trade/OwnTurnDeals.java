@@ -296,6 +296,10 @@ class OwnTurnDeals {
         return Optional.empty();
     }
 
+    static void noteApproach(AiTurnContext context, Player partner) {
+        if (!AiSeats.isAiSeat(partner)) TradeMemory.increment(context.memory(), unsolicitedKey(context, partner));
+    }
+
     static boolean mayApproach(AiTurnContext context, Player partner) {
         if (OfferRejections.coolingDown(context, partner)) return false;
         if (AiSeats.isAiSeat(partner)) return true;

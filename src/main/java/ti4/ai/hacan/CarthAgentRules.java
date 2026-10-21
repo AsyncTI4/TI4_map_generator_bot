@@ -40,6 +40,10 @@ public class CarthAgentRules {
         Optional<Match> use = Prompts.owned(Prompts.thisTurn(context), context.faction(), USE_AGENT::equals)
                 .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
         if (use.isEmpty()) return Optional.empty();
+        if (other.isPresent()) {
+            Optional<AiDecision> ask = TradeRules.carthAsk(context, other.get());
+            if (ask.isPresent()) return ask;
+        }
         context.memory().put(KEY + context.turnKey(), String.valueOf(context.now()));
         other.ifPresent(target -> TradeRules.rememberCarthTarget(context, target));
         String reason = other.isPresent()

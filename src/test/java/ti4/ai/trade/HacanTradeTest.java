@@ -229,7 +229,7 @@ class HacanTradeTest extends BaseTi4Test {
 
     private void giveHacanTheAgent() {
         hacan.addLeader("hacanagent");
-        table.stock(hacan, 1, 0);
+        table.stock(hacan, 6, 0);
         table.stock(table.nekro, 3, 0);
         table.stock(letnev, 3, 0);
         table.stock(table.sol, 0, 0);
@@ -339,5 +339,112 @@ class HacanTradeTest extends BaseTi4Test {
                 TradeValue.of(table.game, hacan, table.nekro, wash, 1.0).selfGain();
 
         assertThat(crossing - below).isCloseTo(2.0, within(EXACT));
+    }
+    // Hacan's take is what the target sends: value 4 at 3/1 and value 5 at 3/2 give it the same 3, so the target that
+    // gains less (Sol, 1 trade good) wins.
+    @Test
+    void carthBreaksATieByTheSmallerTargetGain() {
+        giveHacanTheAgent();
+        table.nekro.setCommoditiesBase(5);
+        table.stock(table.nekro, 0, 0);
+
+        CarthDeals.Plan plan = CarthDeals.bestPlan(hacanContext()).orElseThrow();
+
+        assertThat(plan.target()).isSameAs(table.sol);
+        assertThat(plan.gain()).isEqualTo(1);
+        assertThat(plan.received()).isEqualTo(3);
+    }
+
+    // Value 6 asks 2 and sends 4, which beats value 4 at 3/1.
+    @Test
+    void carthPrefersTheBiggerTakeEvenAtTwoTradeGoods() {
+        giveHacanTheAgent();
+        table.nekro.setCommoditiesBase(6);
+        table.stock(table.nekro, 0, 0);
+
+        CarthDeals.Plan plan = CarthDeals.bestPlan(hacanContext()).orElseThrow();
+
+        assertThat(plan.target()).isSameAs(table.nekro);
+        assertThat(plan.gain()).isEqualTo(2);
+        assertThat(plan.received()).isEqualTo(4);
+    }
+
+    // Nekro (value 4) is stingy toward a Hacan on 7 points and counters 2/2, which gives Hacan 2; Sol (value 3, level
+    // with Hacan) takes 2/1, which gives Hacan the same 2 for less, so Sol is chosen.
+    @Test
+    void carthSkipsAStingyCounterWhenAnotherTargetGivesAsMuch() {
+        giveHacanTheAgent();
+        table.points(hacan, 7);
+        table.points(table.sol, 7);
+        table.nekro.setCommoditiesBase(4);
+        table.stock(table.nekro, 0, 0);
+        table.sol.setCommoditiesBase(3);
+        table.stock(table.sol, 0, 0);
+
+        assertThat(CarthDeals.requiredGain(table.game, table.nekro, hacan)).isEqualTo(2);
+        CarthDeals.Plan plan = CarthDeals.bestPlan(hacanContext()).orElseThrow();
+
+        assertThat(plan.target()).isSameAs(table.sol);
+        assertThat(plan.gain()).isEqualTo(1);
+        assertThat(plan.received()).isEqualTo(2);
+    }
+
+    // 1 trade good is enough up to value 4, 2 are needed from value 5.
+    @Test
+    void anAiTargetWantsTwoTradeGoodsFromValueFive() {
+        table.sol.setCommoditiesBase(4);
+        assertThat(CarthDeals.acceptable(table.game, table.sol, hacan, 1)).isTrue();
+
+        table.sol.setCommoditiesBase(5);
+        assertThat(CarthDeals.acceptable(table.game, table.sol, hacan, 1)).isFalse();
+        assertThat(CarthDeals.acceptable(table.game, table.sol, hacan, 2)).isTrue();
+    }
+
+    // A target facing a Hacan that is close to winning only takes an even split: 2 of 4.
+    @Test
+    void aStingyTargetOnlyAcceptsAnEvenSplit() {
+        table.points(hacan, 8);
+        table.sol.setCommoditiesBase(4);
+
+        assertThat(CarthDeals.acceptable(table.game, table.sol, hacan, 1)).isFalse();
+        assertThat(CarthDeals.acceptable(table.game, table.sol, hacan, 2)).isTrue();
+    }
+
+    // Sol, on its own turn, holds 3 commodities: the agent would replenish nothing, so Hacan first offers a 3-for-3
+    // wash
+    // (Hacan keeps the 1 commodity it needs to give back). Afterwards Sol is a target.
+    @Test
+    void carthWashesATargetsCommoditiesBeforeTheAgent() {
+        giveHacanTheAgent();
+        table.stock(hacan, 6, 0);
+        table.stock(table.sol, 3, 0);
+        table.test.isActive(table.sol, "action");
+
+        assertThat(CarthDeals.bestPlan(hacanContext())).isEmpty();
+        assertThat(CarthDeals.preWash(hacanContext()).map(AiTestGame::pressedId))
+                .contains("transaction");
+
+        assertThat(draft().partner()).isEqualTo("sol");
+        assertThat(draft().purpose()).isEqualTo(Purpose.WASH);
+        assertThat(draft().target().total("sol", ItemType.COMMODITIES)).isEqualTo(3);
+        assertThat(draft().target().total("hacan", ItemType.COMMODITIES)).isEqualTo(3);
+
+        table.stock(table.sol, 0, 3);
+        assertThat(CarthDeals.bestTarget(hacanContext())).containsSame(table.sol);
+    }
+
+    // The ask goes to a human only, once; an AI target is judged by the shared acceptance function instead.
+    @Test
+    void carthAsksAHumanOnceAndNeverAnAi() {
+        giveHacanTheAgent();
+        Player human = table.humanSeat("xxcha", "green");
+
+        assertThat(CarthDeals.ask(hacanContext(), table.sol)).isEmpty();
+        Optional<AiDecision> ask = CarthDeals.ask(hacanContext(), human);
+        assertThat(ask.orElseThrow())
+                .isInstanceOfSatisfying(
+                        AiDecision.Announce.class,
+                        announce -> assertThat(announce.text()).contains("Carth of Golden Sands", "1 trade goods"));
+        assertThat(CarthDeals.ask(hacanContext(), human)).isEmpty();
     }
 }
