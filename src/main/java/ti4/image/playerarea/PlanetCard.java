@@ -63,8 +63,6 @@ final class PlanetCard {
                                 + ". Removing planet from player.");
                 return deltaX;
             }
-            planet.updateTriadStats(player);
-            planet.updateGroveStats(player);
             PlanetModel planetModel = planet.getPlanetModel();
             if (planetModel == null) return deltaX;
 
