@@ -17,6 +17,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.image.PaImage;
 import ti4.image.VoltronDecal;
 import ti4.logging.BotLogger;
@@ -172,11 +173,8 @@ final class UnitUpgradeSheet {
         UnitModel unit = Mapper.getUnitModelByTechUpgrade("ws");
         Point unitOffset = unitOffset(unit.getAsyncId());
         UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
-        BufferedImage wsCrackImage = ImageHelper.read(ResourceHelper.getInstance()
-                .getTokenFile("agenda_publicize_weapon_schematics"
-                        + (player.hasWarsunTech()
-                                ? DrawingUtil.getBlackWhiteFileSuffix(unitKey.colorID())
-                                : "_blk.png")));
+        BufferedImage wsCrackImage = ImageHelper.read(ImageResources.token("agenda_publicize_weapon_schematics"
+                + (player.hasWarsunTech() ? DrawingUtil.getBlackWhiteFileSuffix(unitKey.colorID()) : "_blk.png")));
         ctx.g2().drawImage(wsCrackImage, x + unitOffset.x, y + unitOffset.y, null);
     }
 
@@ -318,7 +316,7 @@ final class UnitUpgradeSheet {
 
     private static void drawUnit(PlayerAreaContext ctx, UnitKey unitKey, int x, int y) {
         try {
-            BufferedImage img = ImageHelper.read(ResourceHelper.getInstance().getUnitFile(unitKey));
+            BufferedImage img = ImageHelper.read(ImageResources.unit(unitKey));
             ctx.g2().drawImage(img, x, y, null);
         } catch (Exception e) {
             BotLogger.error("Could not display UU", e);
@@ -328,7 +326,7 @@ final class UnitUpgradeSheet {
     private static void drawPaOverlay(
             PlayerAreaContext ctx, Player player, String fileName, int x, int y, String failure) {
         try {
-            BufferedImage img = ImageHelper.read(ResourceHelper.getPAResource(fileName));
+            BufferedImage img = ImageHelper.read(ImageResources.playerArea(fileName));
             ctx.g2().drawImage(img, x, y, null);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(player), failure, e);

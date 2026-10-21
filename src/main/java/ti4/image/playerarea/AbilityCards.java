@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import ti4.ResourceHelper;
 import ti4.game.Player;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.image.Strokes;
 import ti4.logging.BotLogger;
 import ti4.model.AbilityModel;
@@ -66,7 +66,7 @@ final class AbilityCards {
         String cardImage = CARD_IMAGES.get(abilityID);
         if (cardImage != null) {
             String fileName = cardImage + (isExhaustedLocked ? "_exh" : "_rdy") + ".png";
-            BufferedImage image = ImageHelper.read(ResourceHelper.getPAResource(fileName));
+            BufferedImage image = ImageHelper.read(ImageResources.playerArea(fileName));
             g2.drawImage(image, x, y, null);
         } else {
             String iconFaction = ctx.game().isLiberationC4Mode() && "ghost".equals(abilityModel.getFaction())

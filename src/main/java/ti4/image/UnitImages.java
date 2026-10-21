@@ -8,7 +8,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import javax.annotation.Nullable;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.CalendarHelper;
@@ -26,7 +25,7 @@ final class UnitImages {
 
     @Nullable
     static String unitPath(UnitKey unitKey, Game game) {
-        String unitPath = ResourceHelper.getInstance().getUnitFile(unitKey);
+        String unitPath = ImageResources.unit(unitKey);
         if (unitPath == null) return null;
 
         unitPath = switch (unitKey.unitType()) {
@@ -46,7 +45,7 @@ final class UnitImages {
                 boolean hasM2Tech = game.getPNOwner("cavalry") != null
                         && game.getPNOwner("cavalry").hasTech("m2");
                 String version = hasM2Tech ? "Memoria_2.png" : "Memoria_1.png";
-                yield ResourceHelper.getInstance().getUnitFile(version);
+                yield ImageResources.unit(version);
             }
             default -> unitPath;
         };
@@ -59,7 +58,7 @@ final class UnitImages {
         if (isBlank(decalFileName)) {
             return null;
         }
-        return ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decalFileName));
+        return ImageHelper.read(ImageResources.decal(decalFileName));
     }
 
     @Nullable
@@ -67,7 +66,7 @@ final class UnitImages {
         BufferedImage overlay = null;
         int spookyOdds = CalendarHelper.isNearHalloween() ? SPOOKY_ODDS_NEAR_HALLOWEEN : SPOOKY_ODDS;
         if (unitKey.unitType() == UnitType.Warsun && RenderRandom.oneIn("unit.spoopyWarsun", spookyOdds)) {
-            overlay = ImageHelper.read(ResourceHelper.getInstance().getSpoopyFile());
+            overlay = ImageHelper.read(ImageResources.spoopyFace());
         }
         if (unitKey.unitType() == UnitType.Lady) {
             overlay = decal("units_ds_ghemina_lady_wht.png");
@@ -85,7 +84,7 @@ final class UnitImages {
     }
 
     private static BufferedImage decal(String name) {
-        return ImageHelper.read(ResourceHelper.getInstance().getDecalFile(name));
+        return ImageHelper.read(ImageResources.decal(name));
     }
 
     private static BufferedImage aurelionLabel() {

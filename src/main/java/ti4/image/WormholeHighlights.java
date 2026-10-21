@@ -4,7 +4,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.Set;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -52,8 +51,8 @@ final class WormholeHighlights implements OffBoardHighlights {
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             g2.drawImage(bufferedImage, x, y, null);
             if (travelBan) {
-                BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
-                        .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
+                BufferedImage blockedWormholeImage = ImageHelper.read(
+                        ImageResources.token("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                 g2.drawImage(blockedWormholeImage, x + 40, y + 40, null);
             }
             if (reconstruction) {
@@ -68,8 +67,8 @@ final class WormholeHighlights implements OffBoardHighlights {
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             g2.drawImage(bufferedImage, x, y, null);
             if (travelBan) {
-                BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
-                        .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
+                BufferedImage blockedWormholeImage = ImageHelper.read(
+                        ImageResources.token("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                 g2.drawImage(blockedWormholeImage, x + 40, y + 40, null);
             }
             if (reconstruction) {

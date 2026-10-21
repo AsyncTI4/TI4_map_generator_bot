@@ -4,7 +4,6 @@ import static ti4.image.TileGeometry.TILE_HEIGHT;
 import static ti4.image.TileGeometry.TILE_WIDTH;
 
 import java.awt.image.BufferedImage;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -27,7 +26,7 @@ final class ExileStep implements TileStepPainter {
             HighlightGuards.fogOut(layer);
             return;
         }
-        String breachFile = ResourceHelper.getInstance().getTokenFile("token_breachActive.png");
+        String breachFile = ImageResources.token("token_breachActive.png");
         BufferedImage breach = ImageHelper.readScaled(breachFile, 2.0f);
         if (breach != null) {
             layer.drawOnHex(

@@ -9,7 +9,6 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Tile;
@@ -49,9 +48,9 @@ final class AttachmentsStep implements TileStepPainter {
 
     private static void drawAttachments(TileLayer layer, Planet planet, List<String> attachments) {
         int number = attachments.size();
-        String chevronFile = ResourceHelper.getInstance().getGeneralFile("misc_chevrons_basic.png");
+        String chevronFile = ImageResources.general("misc_chevrons_basic.png");
         if (attachments.contains("attachment_tombofemphidia.png")) {
-            chevronFile = ResourceHelper.getInstance().getGeneralFile("misc_chevrons_toe.png");
+            chevronFile = ImageResources.general("misc_chevrons_toe.png");
         }
         BufferedImage source = ImageHelper.read(chevronFile);
         float scale = (float) Math.sqrt(TraitsStep.ICON_AREA / source.getWidth() / source.getHeight());

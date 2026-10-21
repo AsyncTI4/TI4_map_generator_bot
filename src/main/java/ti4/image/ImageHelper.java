@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 import org.jetbrains.annotations.NotNull;
 import ti4.logging.BotLogger;
-import ti4.service.emoji.TI4Emoji;
 
 public final class ImageHelper {
 
@@ -51,15 +50,6 @@ public final class ImageHelper {
             }
             return scale(image, width, height);
         });
-    }
-
-    // TODO: readEmojiImageScaled and readURLScaled delegate for PlayerAreaGenerator; remove after its rewrite merges.
-    public static BufferedImage readEmojiImageScaled(TI4Emoji emoji, int size) {
-        return RemoteImages.emoji(emoji, size);
-    }
-
-    public static BufferedImage readURLScaled(String imageURL, int width, int height) {
-        return RemoteImages.readScaled(imageURL, width, height);
     }
 
     public static BufferedImage scale(BufferedImage originalImage, float percent) {

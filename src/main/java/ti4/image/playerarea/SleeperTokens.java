@@ -2,10 +2,10 @@ package ti4.image.playerarea;
 
 import java.awt.Point;
 import java.util.List;
-import ti4.ResourceHelper;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 
 final class SleeperTokens {
 
@@ -18,7 +18,7 @@ final class SleeperTokens {
         if (!player.hasAbility("awaken") || player.hasTech("tf-awaken")) {
             return xDeltaFromRight;
         }
-        String sleeperFile = ResourceHelper.getInstance().getTokenFile(Constants.TOKEN_SLEEPER_PNG);
+        String sleeperFile = ImageResources.token(Constants.TOKEN_SLEEPER_PNG);
         int remaining = POSITIONS.size() - ctx.game().getSleeperTokensPlacedCount();
         return TokenSupply.drawRemaining(
                 ctx, slot, POSITIONS, ImageHelper.read(sleeperFile), remaining, xDeltaFromRight, y);

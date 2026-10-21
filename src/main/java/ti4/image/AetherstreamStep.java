@@ -4,7 +4,6 @@ import static ti4.image.TileGeometry.TILE_HEIGHT;
 import static ti4.image.TileGeometry.TILE_WIDTH;
 
 import java.awt.image.BufferedImage;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.FoWHelper;
@@ -25,8 +24,8 @@ final class AetherstreamStep implements TileStepPainter {
             HighlightGuards.fogOut(layer);
             return;
         }
-        String batFile = ResourceHelper.getInstance()
-                .getGeneralFile("zobat" + (RenderRandom.oneIn("tile.shinyZobat", SHINY_ODDS) ? "_shiny" : "") + ".png");
+        String batFile = ImageResources.general(
+                "zobat" + (RenderRandom.oneIn("tile.shinyZobat", SHINY_ODDS) ? "_shiny" : "") + ".png");
         BufferedImage bat = ImageHelper.read(batFile);
         if (bat != null) {
             layer.drawOnHex(

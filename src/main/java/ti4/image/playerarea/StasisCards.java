@@ -5,11 +5,11 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.List;
-import ti4.ResourceHelper;
 import ti4.game.Player;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.image.PaImage;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
@@ -52,8 +52,8 @@ final class StasisCards {
         xDeltaFromRight += CARD_STEP;
         int x = slot.rightEdge() - xDeltaFromRight;
         Graphics2D g2 = ctx.g2();
-        BufferedImage fighter = ImageHelper.readScaled(
-                ResourceHelper.getInstance().getUnitFile(Mapper.getUnitKey("ff", player.getColor())), 36, 36);
+        BufferedImage fighter =
+                ImageHelper.readScaled(ImageResources.unit(Mapper.getUnitKey("ff", player.getColor())), 36, 36);
         g2.drawImage(fighter, x + 4, y + 10, null);
         g2.setColor(Color.WHITE);
         g2.setFont(Storage.getFont16());

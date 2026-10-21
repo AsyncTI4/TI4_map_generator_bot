@@ -9,7 +9,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -38,7 +37,7 @@ final class UnitBadges {
         }
 
         String factionTag = player.getFactionModel().getShortTag();
-        BufferedImage plaquette = ImageHelper.read(ResourceHelper.getInstance().getUnitFile("unittags_plaquette.png"));
+        BufferedImage plaquette = ImageHelper.read(ImageResources.unit("unittags_plaquette.png"));
         Point plaquetteOffset = tagOffset(unitKey.asyncID());
         int tagX = imagePos.x() + plaquetteOffset.x;
         int tagY = imagePos.y() + plaquetteOffset.y;

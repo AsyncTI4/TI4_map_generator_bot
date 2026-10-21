@@ -4,7 +4,6 @@ import static ti4.image.TileGeometry.TILE_PADDING;
 
 import java.awt.image.BufferedImage;
 import java.util.Set;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.FoWHelper;
@@ -38,9 +37,9 @@ final class WormholesStep implements TileStepPainter {
     }
 
     private static String wormholeTokenFile(String wormhole) {
-        String file = ResourceHelper.getInstance().getTokenFile("token_wh" + wormhole + ".png");
+        String file = ImageResources.token("token_wh" + wormhole + ".png");
         if (file == null) {
-            file = ResourceHelper.getInstance().getTokenFile("token_custom_eronous_wh" + wormhole + ".png");
+            file = ImageResources.token("token_custom_eronous_wh" + wormhole + ".png");
         }
         return file;
     }

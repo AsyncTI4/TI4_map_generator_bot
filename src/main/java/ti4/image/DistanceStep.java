@@ -5,7 +5,6 @@ import static ti4.image.TileGeometry.TILE_PADDING;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.Storage;
@@ -35,7 +34,7 @@ final class DistanceStep implements TileStepPainter {
         int x = TILE_PADDING + layer.spiralOffsetX();
         int y = TILE_PADDING + layer.spiralOffsetY();
         if (distance > 0) {
-            BufferedImage distanceColor = ImageHelper.read(ResourceHelper.getTileFile("Distance" + distance + ".png"));
+            BufferedImage distanceColor = ImageHelper.read(ImageResources.tile("Distance" + distance + ".png"));
             layer.g().drawImage(distanceColor, x, y, null);
         }
         if (distance <= MAX_LABELLED_DISTANCE) {

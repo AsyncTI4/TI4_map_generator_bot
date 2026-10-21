@@ -1,9 +1,9 @@
 package ti4.image.playerarea;
 
-import ti4.ResourceHelper;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.model.Mapper;
 
 final class SpeakerAndTyrant {
@@ -26,7 +26,7 @@ final class SpeakerAndTyrant {
     }
 
     private static void drawToken(PlayerAreaContext ctx, AreaSlot slot, String token, int xDeltaFromRight, int y) {
-        String tokenFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(token));
+        String tokenFile = ImageResources.token(Mapper.getTokenID(token));
         if (tokenFile != null) {
             ctx.g2().drawImage(ImageHelper.read(tokenFile), slot.rightEdge() - xDeltaFromRight, y + 25, null);
         }

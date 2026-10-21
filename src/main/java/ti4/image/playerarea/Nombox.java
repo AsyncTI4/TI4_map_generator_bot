@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.UnitHolder;
@@ -23,6 +22,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.image.PaImage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -128,7 +128,7 @@ final class Nombox {
             Player owner = game.getPlayerFromColorOrFaction(unitKey.getColor());
 
             try {
-                String unitPath = ResourceHelper.getInstance().getUnitFile(unitKey);
+                String unitPath = ImageResources.unit(unitKey);
                 if (unitPath != null) {
                     if (unitKey.unitType() == UnitType.Fighter) {
                         unitPath = unitPath.replace(Constants.COLOR_FF, Constants.BULK_FF);
@@ -161,8 +161,7 @@ final class Nombox {
             boolean justNumber = unitKey.unitType() == UnitType.Fighter || unitKey.unitType() == UnitType.Infantry;
             UnitModel model = owner == null ? null : owner.getUnitFromUnitKey(unitKey);
             boolean voltron = model != null && "naaz_voltron".equals(model.getAlias());
-            BufferedImage voltronDecal =
-                    ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
+            BufferedImage voltronDecal = ImageHelper.read(ImageResources.decal("Voltron.png"));
             BufferedImage spoopy = unitKey.unitType() == UnitType.Warsun ? rollSpoopyWarsun() : null;
 
             if (justNumber) {
@@ -175,8 +174,7 @@ final class Nombox {
 
             Optional<BufferedImage> decal = Optional.ofNullable(owner)
                     .map(p -> p.getDecalFile(unitKey.asyncID()))
-                    .map(decalFileName ->
-                            ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decalFileName)));
+                    .map(decalFileName -> ImageHelper.read(ImageResources.decal(decalFileName)));
 
             for (int i = 0; i < unitCount; i++) {
                 g2.drawImage(image, position.x, position.y + deltaY, null);
@@ -198,7 +196,7 @@ final class Nombox {
     private static BufferedImage rollSpoopyWarsun() {
         int chanceToSeeSpoop = CalendarHelper.isNearHalloween() ? 10 : 1000;
         if (RenderRandom.oneIn("playerArea.spoopyWarsun", chanceToSeeSpoop)) {
-            return ImageHelper.read(ResourceHelper.getInstance().getSpoopyFile());
+            return ImageHelper.read(ImageResources.spoopyFace());
         }
         return null;
     }

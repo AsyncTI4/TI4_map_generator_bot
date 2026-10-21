@@ -1,6 +1,5 @@
 package ti4.image;
 
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Tile;
 
@@ -21,7 +20,7 @@ final class AnomaliesStep implements TileStepPainter {
             return;
         }
         layer.drawOnHex(
-                ImageHelper.read(ResourceHelper.getTileFile("tile_anomaly_chevron.png")),
+                ImageHelper.read(ImageResources.tile("tile_anomaly_chevron.png")),
                 layer.spiralOffsetX() + CHEVRON_X,
                 layer.spiralOffsetY() + CHEVRON_Y);
     }

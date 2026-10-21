@@ -1,7 +1,6 @@
 package ti4.image;
 
 import java.awt.image.BufferedImage;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
@@ -27,13 +26,11 @@ final class LawWormholeMarks {
     }
 
     static BufferedImage blockedWormholeImage(boolean half) {
-        return ImageHelper.read(
-                ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (half ? "_half" : "") + ".png"));
+        return ImageHelper.read(ImageResources.token("agenda_wormhole_blocked" + (half ? "_half" : "") + ".png"));
     }
 
     static BufferedImage reconstructionPartnerImage(String partnerWormhole) {
-        return ImageHelper.readScaled(
-                ResourceHelper.getInstance().getTokenFile("token_wh" + partnerWormhole + ".png"), 40.0f / 65);
+        return ImageHelper.readScaled(ImageResources.token("token_wh" + partnerWormhole + ".png"), 40.0f / 65);
     }
 
     static void draw(Game game, TileLayer layer) {
@@ -62,8 +59,7 @@ final class LawWormholeMarks {
 
     private static void drawNebulaBypass(TileLayer layer) {
         Tile tile = layer.tile();
-        BufferedImage nebulaBypass =
-                ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_shared_research.png"));
+        BufferedImage nebulaBypass = ImageHelper.read(ImageResources.token("agenda_shared_research.png"));
         if (layer.isSpiral()) {
             switch (tile.getTileID()) {
                 case "51" -> layer.drawOnHex(nebulaBypass, 42, 235);

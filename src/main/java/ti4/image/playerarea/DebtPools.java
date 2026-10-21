@@ -19,6 +19,7 @@ import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
 import ti4.image.ImageResources;
 import ti4.image.PaImage;
+import ti4.image.RemoteImages;
 import ti4.image.Strokes;
 import ti4.model.Mapper;
 import ti4.service.emoji.TI4Emoji;
@@ -134,7 +135,7 @@ final class DebtPools {
     private static BufferedImage bankImage(Game game, String poolName, String bankSource) {
         Emoji bankEmoji = Emoji.fromFormatted(bankSource);
         if (bankEmoji instanceof CustomEmoji customEmoji) {
-            BufferedImage bankImage = ImageHelper.readURLScaled(customEmoji.getImageUrl(), 120, 120);
+            BufferedImage bankImage = RemoteImages.readScaled(customEmoji.getImageUrl(), 120, 120);
             if (bankImage != null) {
                 return bankImage;
             }
@@ -142,7 +143,7 @@ final class DebtPools {
                     TI4Emoji.findEmojiFromJustName(customEmoji.getName()).asEmoji();
             game.setDebtPoolIcon(poolName, replacement.getFormatted());
             if (replacement instanceof CustomEmoji replacementCustom) {
-                return ImageHelper.readURLScaled(replacementCustom.getImageUrl(), 120, 120);
+                return RemoteImages.readScaled(replacementCustom.getImageUrl(), 120, 120);
             }
             return null;
         }

@@ -24,7 +24,7 @@ final class UnitDecals {
                 || !(player.ownsUnitSubstring("cabal_spacedock") || player.hasTech("tf-dimensionaltear"))) {
             return;
         }
-        BufferedImage dimTear = ImageHelper.read(ResourceHelper.getInstance().getDecalFile("DimensionalTear.png"));
+        BufferedImage dimTear = ImageHelper.read(ImageResources.decal("DimensionalTear.png"));
         if (dimTear != null) {
             int dtX = imageX + (unitImage.getWidth() - dimTear.getWidth()) / 2;
             int dtY = imageY + (unitImage.getHeight() - dimTear.getHeight()) / 2;
@@ -57,8 +57,7 @@ final class UnitDecals {
         if ("81".equals(tile.getTileID())
                 && "muaat".equals(player.getFaction())
                 && unitKey.unitType() == UnitType.Warsun) {
-            BufferedImage faceNovaSeed =
-                    ImageHelper.read(ResourceHelper.getInstance().getDecalFile("NovaSeed.png"));
+            BufferedImage faceNovaSeed = ImageHelper.read(ImageResources.decal("NovaSeed.png"));
             g.drawImage(faceNovaSeed, imageX, imageY, null);
         } else if (overlay != null) {
             g.drawImage(overlay, imageX, imageY, null);
@@ -85,6 +84,6 @@ final class UnitDecals {
     }
 
     private static void drawToken(Graphics g, String tokenFile, int imageX, int imageY) {
-        g.drawImage(ImageHelper.read(ResourceHelper.getInstance().getTokenFile(tokenFile)), imageX, imageY, null);
+        g.drawImage(ImageHelper.read(ImageResources.token(tokenFile)), imageX, imageY, null);
     }
 }

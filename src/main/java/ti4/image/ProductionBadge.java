@@ -9,7 +9,6 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Set;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -68,8 +67,7 @@ record ProductionBadge(int production, int capacity, int capacityUsed, int ignor
         if (production == 11) {
             textModifier = 0;
         }
-        BufferedImage gearImage =
-                ImageHelper.readScaled(ResourceHelper.getTileFile("production_representation.png"), 64, 64);
+        BufferedImage gearImage = ImageHelper.readScaled(ImageResources.tile("production_representation.png"), 64, 64);
         int xMod = xOffset(tile);
         g.drawImage(
                 gearImage, TILE_PADDING + ANCHOR.x + xMod - 29, TILE_PADDING + ANCHOR.y + ANCHOR_Y_OFFSET - 4, null);
@@ -81,8 +79,7 @@ record ProductionBadge(int production, int capacity, int capacityUsed, int ignor
     }
 
     private void drawCapacity(Tile tile, Graphics2D g) {
-        BufferedImage carrierImage =
-                ImageHelper.readScaled(ResourceHelper.getTileFile("capacity_representation.png"), 64, 21);
+        BufferedImage carrierImage = ImageHelper.readScaled(ImageResources.tile("capacity_representation.png"), 64, 21);
         int xMod = xOffset(tile);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setStroke(new BasicStroke(6));

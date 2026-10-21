@@ -5,7 +5,6 @@ import static ti4.image.TileGeometry.TILE_PADDING;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.List;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Tile;
@@ -47,11 +46,11 @@ final class TechSkipsStep implements TileStepPainter {
 
     private static String skipFile(String skip) {
         return switch (skip.toLowerCase()) {
-            case "biotic" -> ResourceHelper.getInstance().getGeneralFile("Biotic light.png");
-            case "cybernetic" -> ResourceHelper.getInstance().getGeneralFile("Cybernetic light.png");
-            case "propulsion" -> ResourceHelper.getInstance().getGeneralFile("Propulsion_light.png");
-            case "warfare" -> ResourceHelper.getInstance().getGeneralFile("Warfare_light.png");
-            default -> ResourceHelper.getInstance().getGeneralFile("Generic_Technology.png");
+            case "biotic" -> ImageResources.general("Biotic light.png");
+            case "cybernetic" -> ImageResources.general("Cybernetic light.png");
+            case "propulsion" -> ImageResources.general("Propulsion_light.png");
+            case "warfare" -> ImageResources.general("Warfare_light.png");
+            default -> ImageResources.general("Generic_Technology.png");
         };
     }
 

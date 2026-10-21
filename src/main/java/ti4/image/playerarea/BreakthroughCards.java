@@ -9,8 +9,8 @@ import ti4.game.Player;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.HorizontalAlign;
-import ti4.image.ImageHelper;
 import ti4.image.PaImage;
+import ti4.image.RemoteImages;
 import ti4.image.Strokes;
 import ti4.image.VerticalAlign;
 import ti4.logging.BotLogger;
@@ -88,7 +88,7 @@ final class BreakthroughCards {
     }
 
     private static void drawTradeGoods(Graphics2D g2, int tradeGoods, int x, int y) {
-        BufferedImage tg = ImageHelper.readEmojiImageScaled(MiscEmojis.tg, 40);
+        BufferedImage tg = RemoteImages.emoji(MiscEmojis.tg, 40);
         g2.drawImage(tg, x + 2, y - 40, null);
         g2.setFont(Storage.getFont32());
         DrawingUtil.superDrawString(

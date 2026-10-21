@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.ResourceHelper;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -144,8 +143,7 @@ class SampleColors extends Subcommand {
                         stroke,
                         Color.BLACK);
 
-                String file = ResourceHelper.getInstance()
-                        .getUnitFile(("lgy".equals(alias) ? "orca" : "split" + alias) + "_dn.png");
+                String file = ImageResources.unit(("lgy".equals(alias) ? "orca" : "split" + alias) + "_dn.png");
                 if (file != null) {
                     dread = ImageHelper.read(file);
                     graphic.drawImage(

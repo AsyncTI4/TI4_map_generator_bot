@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import ti4.ResourceHelper;
 import ti4.logging.BotLogger;
 
 public final class PaImage {
@@ -15,7 +14,7 @@ public final class PaImage {
 
     public static Rectangle draw(Graphics g, int x, int y, String resourceName) {
         try {
-            String resourcePath = ResourceHelper.getPAResource(resourceName);
+            String resourcePath = ImageResources.playerArea(resourceName);
             BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
             g.drawImage(resourceBufferedImage, x, y, null);
             if (resourceBufferedImage != null)
@@ -38,7 +37,7 @@ public final class PaImage {
 
     public static void drawScaled(Graphics g, int x, int y, String resourceName, int width, int height) {
         try {
-            String resourcePath = ResourceHelper.getPAResource(resourceName);
+            String resourcePath = ImageResources.playerArea(resourceName);
             BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, width, height);
             g.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
@@ -48,7 +47,7 @@ public final class PaImage {
 
     public static void drawOpaque(Graphics2D g2, int x, int y, String resourceName, float opacity) {
         try {
-            String resourcePath = ResourceHelper.getPAResource(resourceName);
+            String resourcePath = ImageResources.playerArea(resourceName);
             BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
             g2.drawImage(resourceBufferedImage, x, y, null);

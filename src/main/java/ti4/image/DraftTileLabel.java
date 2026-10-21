@@ -8,7 +8,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.regex.Pattern;
-import ti4.ResourceHelper;
 import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
 import ti4.model.TileHelper;
@@ -30,7 +29,7 @@ final class DraftTileLabel {
         String tileID = layer.tile().getTileID();
         Graphics2D g = layer.g();
         if (tileID.endsWith("blank")) {
-            BufferedImage green = ImageHelper.readScaled(ResourceHelper.getTileFile("00_green.png"), 73, 63);
+            BufferedImage green = ImageHelper.readScaled(ImageResources.tile("00_green.png"), 73, 63);
             layer.drawOnHex(green, 49, 119);
         } else {
             g.setFont(Storage.getFont50());

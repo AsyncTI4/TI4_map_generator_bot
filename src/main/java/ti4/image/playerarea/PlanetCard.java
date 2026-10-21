@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -16,6 +15,7 @@ import ti4.helpers.Storage;
 import ti4.image.ColorUtil;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.image.PaImage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -179,7 +179,7 @@ final class PlanetCard {
             PlayerAreaContext ctx, Planet planet, PlanetModel planetModel, boolean abilityExhausted, int x, int y) {
         Graphics2D g2 = ctx.g2();
         if (planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG)) {
-            String tokenPath = ResourceHelper.getInstance().getTokenFile(Constants.GLEDGE_CORE_PNG);
+            String tokenPath = ImageResources.token(Constants.GLEDGE_CORE_PNG);
             BufferedImage image = ImageHelper.readScaled(tokenPath, 0.25f);
             g2.drawImage(image, x + 15, y + 112, null);
         }
@@ -284,7 +284,7 @@ final class PlanetCard {
     }
 
     private static void drawDetail(Graphics2D g2, int x, int y, String resourceName) {
-        String resourcePath = ResourceHelper.getInstance().getPlanetResource(resourceName);
+        String resourcePath = ImageResources.planetCard(resourceName);
         g2.drawImage(ImageHelper.read(resourcePath), x, y, null);
     }
 }

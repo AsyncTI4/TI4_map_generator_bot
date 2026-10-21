@@ -4,8 +4,8 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import ti4.ResourceHelper;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 
 final class TokenSupply {
 
@@ -54,7 +54,7 @@ final class TokenSupply {
                 ctx,
                 slot,
                 zigzag(maxTokens, 54, 50),
-                ImageHelper.read(ResourceHelper.getInstance().getTokenFile(tokenName)),
+                ImageHelper.read(ImageResources.token(tokenName)),
                 tokensRemaining,
                 xDeltaFromRight,
                 y);

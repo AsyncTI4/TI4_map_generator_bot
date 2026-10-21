@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Player;
@@ -13,6 +12,7 @@ import ti4.helpers.RelicHelper;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.image.PaImage;
 import ti4.image.Strokes;
 import ti4.logging.BotLogger;
@@ -127,7 +127,7 @@ final class RelicCards {
         PaImage.draw(g2, x, y, "pa_relics_fakerelicicon.png");
 
         String relicFileName = "pa_relics_" + relicID + statusSuffix(isExhausted) + ".png";
-        String resourcePath = ResourceHelper.getPAResource(relicFileName);
+        String resourcePath = ImageResources.playerArea(relicFileName);
         try {
             BufferedImage relicImage = ImageHelper.read(resourcePath);
             if (relicImage == null) {

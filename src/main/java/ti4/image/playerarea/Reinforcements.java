@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.components.buttons.Button;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.UnitHolder;
@@ -16,6 +15,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.image.PaImage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -73,8 +73,7 @@ final class Reinforcements {
 
         UnitModel model = player.getUnitFromUnitKey(unitKey);
         boolean voltron = model != null && "naaz_voltron".equals(model.getAlias());
-        BufferedImage voltronDecal =
-                ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
+        BufferedImage voltronDecal = ImageHelper.read(ImageResources.decal("Voltron.png"));
 
         int numInReinforcements = unitCap - count;
         if ((player.hasUnlockedBreakthrough("freesystemsbt") || player.hasTech("tf-rallyingmarshalls"))
@@ -82,11 +81,11 @@ final class Reinforcements {
                 && model.getUnitType() == UnitType.Infantry) {
             numInReinforcements = withRallyingInfantry(game, player, numInReinforcements, unitCap);
         }
-        BufferedImage image = ImageHelper.read(ResourceHelper.getInstance().getUnitFile(unitKey));
+        BufferedImage image = ImageHelper.read(ImageResources.unit(unitKey));
         String decal = player.getDecalFile(unitID);
         BufferedImage decalImage = null;
         if (decal != null) {
-            decalImage = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decal));
+            decalImage = ImageHelper.read(ImageResources.decal(decal));
         }
         for (int i = 0; i < numInReinforcements; i++) {
             Point position = reinforcementsPosition.getPosition(unitID);

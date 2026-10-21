@@ -3,7 +3,6 @@ package ti4.image;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.Set;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.RenderRandom;
@@ -61,7 +60,7 @@ public final class VoltronDecal {
             drawMinis(unitKey, imageX, imageY, graphics, game);
             return;
         }
-        BufferedImage voltron = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decalFile(style, unitKey)));
+        BufferedImage voltron = ImageHelper.read(ImageResources.decal(decalFile(style, unitKey)));
         graphics.drawImage(voltron, imageX - OVERHANG, imageY - OVERHANG, null);
     }
 

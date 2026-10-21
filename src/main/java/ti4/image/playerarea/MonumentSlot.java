@@ -5,6 +5,7 @@ import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.game.MonumentsService;
@@ -28,8 +29,8 @@ final class MonumentSlot {
         if (MonumentsService.hasMonumentOnBoard(game, player)) {
             image = ImageHelper.read(ResourceHelper.getResourceFromFolder("units/", "outline_monument.png"));
         } else {
-            image = ImageHelper.read(ResourceHelper.getInstance()
-                    .getUnitFile(Mapper.getUnitKey(monument.getUnitType().toString(), player.getColor())));
+            image = ImageHelper.read(
+                    ImageResources.unit(Mapper.getUnitKey(monument.getUnitType().toString(), player.getColor())));
         }
         ctx.g2().drawImage(image, x + 20, y + 40, null);
         if (NekroMonumentService.hasAssimilatorOnMonument(game, player)) {

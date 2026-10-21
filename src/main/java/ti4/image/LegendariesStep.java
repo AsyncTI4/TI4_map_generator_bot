@@ -6,7 +6,6 @@ import static ti4.image.TileGeometry.TILE_WIDTH;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Tile;
@@ -45,7 +44,7 @@ final class LegendariesStep implements TileStepPainter {
     }
 
     private static void drawCouncil(Graphics2D g) {
-        String councilFile = ResourceHelper.getInstance().getFactionFile("agenda.png");
+        String councilFile = ImageResources.faction("agenda.png");
         BufferedImage council = ImageHelper.readScaled(councilFile, COUNCIL_SCALE);
         if (council == null) return;
 
@@ -61,7 +60,7 @@ final class LegendariesStep implements TileStepPainter {
     private static void drawLegendaryMarks(TileLayer layer, int number) {
         int x = TILE_PADDING + layer.spiralOffsetX();
         int y = TILE_PADDING + layer.spiralOffsetY();
-        String legendaryFile = ResourceHelper.getInstance().getGeneralFile("Legendary_complete.png");
+        String legendaryFile = ImageResources.general("Legendary_complete.png");
         BufferedImage mark = ImageHelper.readScaled(legendaryFile, 0.5f);
         if (number >= 2) {
             mark = ImageHelper.scale(mark, (float) Math.sqrt(Math.sqrt(1.0f / number)));

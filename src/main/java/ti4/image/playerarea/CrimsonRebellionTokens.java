@@ -1,10 +1,10 @@
 package ti4.image.playerarea;
 
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 
 final class CrimsonRebellionTokens {
 
@@ -25,7 +25,7 @@ final class CrimsonRebellionTokens {
 
     private static int drawBreachTokens(
             PlayerAreaContext ctx, AreaSlot slot, Player player, int xDeltaFromRight, int y) {
-        String breachFile = ResourceHelper.getInstance().getTokenFile(Constants.TOKEN_BREACH_ACTIVE);
+        String breachFile = ImageResources.token(Constants.TOKEN_BREACH_ACTIVE);
         int totalBreaches = countBreaches(ctx.game());
         if (totalBreaches > BREACH_TOKENS) {
             warnTooMany(ctx, player, "breach", totalBreaches, "Breach tokens");
@@ -42,7 +42,7 @@ final class CrimsonRebellionTokens {
 
     private static int drawSeverTokens(
             PlayerAreaContext ctx, AreaSlot slot, Player player, int xDeltaFromRight, int y) {
-        String severFile = ResourceHelper.getInstance().getTokenFile(Constants.TOKEN_SEVERED);
+        String severFile = ImageResources.token(Constants.TOKEN_SEVERED);
         int severTokens = (int) ctx.game().getTileMap().values().stream()
                 .flatMap(tile -> tile.getUnitHolders().values().stream())
                 .filter(unitHolder -> unitHolder.getTokenList().contains(Constants.TOKEN_SEVERED))

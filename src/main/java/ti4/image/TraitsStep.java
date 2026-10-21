@@ -6,7 +6,6 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Tile;
@@ -44,17 +43,15 @@ final class TraitsStep implements TileStepPainter {
         }
 
         if (tile.isMecatol(game)) {
-            return ResourceHelper.getInstance().getFactionFile("agenda.png");
+            return ImageResources.faction("agenda.png");
         }
         if ("faction".equalsIgnoreCase(planet.getOriginalPlanetType())) {
-            return ResourceHelper.getInstance()
-                    .getFactionFile(Mapper.getPlanet(planet.getName()).getFactionHomeworld() + ".png");
+            return ImageResources.faction(Mapper.getPlanet(planet.getName()).getFactionHomeworld() + ".png");
         }
         if (traits.size() == 1) {
             String t = planet.getPlanetType().getFirst();
-            return ResourceHelper.getInstance()
-                    .getGeneralFile(
-                            ("" + t.charAt(0)).toUpperCase() + t.substring(1).toLowerCase() + ".png");
+            return ImageResources.general(
+                    ("" + t.charAt(0)).toUpperCase() + t.substring(1).toLowerCase() + ".png");
         }
         if (!traits.isEmpty()) {
             String t = "";
@@ -62,9 +59,9 @@ final class TraitsStep implements TileStepPainter {
             t += traits.contains("hazardous") ? "H" : "";
             t += traits.contains("industrial") ? "I" : "";
             if ("CHI".equals(t)) {
-                return ResourceHelper.getInstance().getPlanetResource("pc_attribute_combo_CHI_big.png");
+                return ImageResources.planetCard("pc_attribute_combo_CHI_big.png");
             }
-            return ResourceHelper.getInstance().getPlanetResource("pc_attribute_combo_" + t + ".png");
+            return ImageResources.planetCard("pc_attribute_combo_" + t + ".png");
         }
         return "";
     }

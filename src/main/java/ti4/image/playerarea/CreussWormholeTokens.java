@@ -3,7 +3,6 @@ package ti4.image.playerarea;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Set;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -85,13 +84,12 @@ final class CreussWormholeTokens {
 
     private static void drawLawOverlays(Graphics2D g2, LawOverlays laws, String doubledWormholeToken, int x, int y) {
         if (laws.travelBan()) {
-            BufferedImage blocked = ImageHelper.read(ResourceHelper.getInstance()
-                    .getTokenFile("agenda_wormhole_blocked" + (laws.reconstruction() ? "_half" : "") + ".png"));
+            BufferedImage blocked = ImageHelper.read(
+                    ImageResources.token("agenda_wormhole_blocked" + (laws.reconstruction() ? "_half" : "") + ".png"));
             g2.drawImage(blocked, x + 40, y + 40, null);
         }
         if (laws.reconstruction()) {
-            BufferedImage doubled =
-                    ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile(doubledWormholeToken), 40.0f / 65);
+            BufferedImage doubled = ImageHelper.readScaled(ImageResources.token(doubledWormholeToken), 40.0f / 65);
             g2.drawImage(doubled, x, y, null);
         }
     }

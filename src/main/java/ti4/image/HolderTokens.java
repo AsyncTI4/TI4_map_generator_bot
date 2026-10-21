@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Tile;
@@ -71,9 +70,9 @@ final class HolderTokens {
     private static void drawShield(Tile tile, Graphics2D g, Planet planetHolder, Point centerPosition) {
         String tokenPath =
                 switch (StringUtils.defaultString(planetHolder.getContrastColor())) {
-                    case "orange" -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield_orange.png");
-                    case "test" -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield_test.png");
-                    default -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
+                    case "orange" -> ImageResources.token("token_planetaryShield_orange.png");
+                    case "test" -> ImageResources.token("token_planetaryShield_test.png");
+                    default -> ImageResources.token("token_planetaryShield.png");
                 };
         float scale = planetHolder.getRadius() / 58.0f;
         BufferedImage shield = ImageHelper.readScaled(tokenPath, scale);

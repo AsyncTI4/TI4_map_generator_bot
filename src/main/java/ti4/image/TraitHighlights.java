@@ -5,7 +5,6 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -30,14 +29,12 @@ final class TraitHighlights implements OffBoardHighlights {
                     if (custodiaVigilia.getFactionHomeworld() == null) {
                         traitFile = ImageResources.general("Legendary_complete.png");
                     } else {
-                        traitFile = ResourceHelper.getInstance()
-                                .getFactionFile(custodiaVigilia.getFactionHomeworld() + ".png");
+                        traitFile = ImageResources.faction(custodiaVigilia.getFactionHomeworld() + ".png");
                     }
                 } else if (traits.size() == 1) {
                     String t = planetReal.getPlanetType().getFirst();
-                    traitFile = ResourceHelper.getInstance()
-                            .getGeneralFile(("" + t.charAt(0)).toUpperCase()
-                                    + t.substring(1).toLowerCase() + ".png");
+                    traitFile = ImageResources.general(
+                            ("" + t.charAt(0)).toUpperCase() + t.substring(1).toLowerCase() + ".png");
                 } else if (!traits.isEmpty()) {
                     String t = "";
                     t += traits.contains("cultural") ? "C" : "";
