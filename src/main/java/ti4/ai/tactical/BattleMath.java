@@ -35,11 +35,7 @@ class BattleMath {
     }
 
     static double expectedCannonFire(Game game, Player seat, Tile tile) {
-        double expected = 0;
-        for (Player other : game.getRealPlayers()) {
-            if (other != seat) expected += cannonFire(game, tile, other, null);
-        }
-        return expected;
+        return CannonExposure.expectedHits(game, seat, tile);
     }
 
     static int ownCannonHits(Game game, Player seat, Tile tile, Collection<Tile> origins) {

@@ -118,7 +118,7 @@ public class TraitRaid {
         if (!TacticalPlanner.activatable(context.game, context.seat, tile)) return ClaimGate.NOT_ACTIVATABLE;
         if (context.expansionPlan(tile).isPresent()) return ClaimGate.EXPANDABLE;
         if (BoardView.hasEnemyUnits(context.game, context.seat, tile)) return ClaimGate.ENEMY_IN_SYSTEM;
-        if (context.coveredByEnemySpaceCannon(tile)) return ClaimGate.SPACE_CANNON;
+        if (!context.cannonChances(tile).isEmpty()) return ClaimGate.SPACE_CANNON;
         return ClaimGate.NO_REACH;
     }
 

@@ -75,6 +75,22 @@ class StrikeEvaluatorTest extends BaseTi4Test {
         assertThat(estimate.ourExpectedLoss()).isPositive();
     }
 
+    // The defending PDS fires its space cannon defense at the committed ground forces before the ground combat, so
+    // the same landing party wins less often than against the bare planet.
+    @Test
+    void aPdsOnTheDefendedPlanetShootsTheLandingBeforeTheGroundCombat() {
+        owns(sardakk(), target, "lodor", UnitType.Infantry, 1);
+        double bare = estimate(rules(true, true, false), UnitType.Carrier, 2, UnitType.Infantry, 3)
+                .groundWins()
+                .get("lodor");
+
+        owns(sardakk(), target, "lodor", UnitType.Pds, 1);
+        StrikeEstimate guarded = estimate(rules(true, true, false), UnitType.Carrier, 2, UnitType.Infantry, 3);
+
+        assertThat(guarded.groundWins().get("lodor")).isLessThan(bare);
+        assertThat(guarded.ourExpectedLoss()).isPositive();
+    }
+
     @Test
     void aPlanetWithStructuresIsLeftAloneUnlessTheRulesAllowIt() {
         owns(sardakk(), target, "lodor", UnitType.Pds, 1);

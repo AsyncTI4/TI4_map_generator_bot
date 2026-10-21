@@ -21,8 +21,6 @@ public class SupplyLines {
 
     public static final String CUT_SUPPLY_LINES = "csl";
     private static final double OWNER_CAN_RETURN_HOLD = 0.5;
-    private static final String ANTIMASS_DEFLECTORS = "amd";
-    private static final String ABSOL_ANTIMASS_DEFLECTORS = "absol_amd";
 
     static boolean chases(Game game, Player seat, Tile tile, ObjectiveValue objectives) {
         return seat.getSecretsUnscored().containsKey(CUT_SUPPLY_LINES)
@@ -34,7 +32,7 @@ public class SupplyLines {
     static double survival(Game game, Player seat, Tile tile, List<UnitMove> arriving) {
         int hitsToKillAll = hitsToKillAll(seat, arriving);
         if (hitsToKillAll == 0) return 0;
-        List<Double> chances = cannonChances(game, seat, tile);
+        List<Double> chances = CannonExposure.dieChances(game, seat, tile);
         return chances.isEmpty() ? 1 : 1 - DiceOdds.atLeast(chances, hitsToKillAll);
     }
 
@@ -110,18 +108,5 @@ public class SupplyLines {
 
     private static boolean sustains(Player player, UnitType type) {
         return BoardView.model(player, type).filter(UnitModel::getSustainDamage).isPresent();
-    }
-
-    private static List<Double> cannonChances(Game game, Player seat, Tile tile) {
-        int penalty = seat.hasTech(ANTIMASS_DEFLECTORS) || seat.hasTech(ABSOL_ANTIMASS_DEFLECTORS) ? 1 : 0;
-        List<Double> chances = new ArrayList<>();
-        for (Player shooter : game.getRealPlayers()) {
-            if (shooter == seat) continue;
-            for (BattleMath.CannonDice stack : BattleMath.cannonDice(game, tile, shooter, List.of())) {
-                double chance = BattleMath.hitChance(stack.hitsOn() + penalty);
-                for (int die = 0; die < stack.dice(); die++) chances.add(chance);
-            }
-        }
-        return chances;
     }
 }
