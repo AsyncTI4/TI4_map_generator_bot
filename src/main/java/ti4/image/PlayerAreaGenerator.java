@@ -3796,8 +3796,7 @@ public class PlayerAreaGenerator {
                         32,
                         32,
                         unitPainted.contains(unit.getAsyncId()));
-                UnitRenderGenerator.optionallyDrawEidolonMaximumDecal(
-                        unitKey, deltaX + x + unitOffset.x, y + unitOffset.y, graphics, game);
+                VoltronDecal.drawIfVoltron(unitKey, deltaX + x + unitOffset.x, y + unitOffset.y, graphics, game);
             }
             if (isPurged) {
                 DrawingUtil.drawRedX(

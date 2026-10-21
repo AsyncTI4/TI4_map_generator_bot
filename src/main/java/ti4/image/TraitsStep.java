@@ -1,0 +1,86 @@
+package ti4.image;
+
+import static ti4.image.TileGeometry.TILE_PADDING;
+
+import java.awt.Point;
+import java.awt.image.BufferedImage;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import ti4.ResourceHelper;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
+
+final class TraitsStep implements TileStepPainter {
+
+    static final float ICON_AREA = 9200.0f;
+
+    @Override
+    public void paint(TileScene scene, TileLayer layer) {
+        Game game = scene.game();
+        Tile tile = layer.tile();
+        if (HighlightGuards.isFogOrHyperlane(game, tile) || HighlightGuards.isTileImageMissing(tile)) {
+            return;
+        }
+        HighlightGuards.fogOut(layer);
+
+        for (UnitHolder uh : tile.getUnitHolders().values()) {
+            if (!(uh instanceof Planet planet)) {
+                continue;
+            }
+            String traitFile = traitFile(game, tile, planet);
+            if (traitFile != null && !traitFile.isEmpty()) {
+                drawTrait(layer, planet, traitFile, tile.isMecatol(game));
+            }
+        }
+    }
+
+    private static String traitFile(Game game, Tile tile, Planet planet) {
+        List<String> traits = planet.getPlanetType();
+        if (traits.isEmpty() && StringUtils.isNotBlank(planet.getOriginalPlanetType())) {
+            traits.add(planet.getOriginalPlanetType());
+        }
+
+        if (tile.isMecatol(game)) {
+            return ResourceHelper.getInstance().getFactionFile("agenda.png");
+        }
+        if ("faction".equalsIgnoreCase(planet.getOriginalPlanetType())) {
+            return ResourceHelper.getInstance()
+                    .getFactionFile(Mapper.getPlanet(planet.getName()).getFactionHomeworld() + ".png");
+        }
+        if (traits.size() == 1) {
+            String t = planet.getPlanetType().getFirst();
+            return ResourceHelper.getInstance()
+                    .getGeneralFile(
+                            ("" + t.charAt(0)).toUpperCase() + t.substring(1).toLowerCase() + ".png");
+        }
+        if (!traits.isEmpty()) {
+            String t = "";
+            t += traits.contains("cultural") ? "C" : "";
+            t += traits.contains("hazardous") ? "H" : "";
+            t += traits.contains("industrial") ? "I" : "";
+            if ("CHI".equals(t)) {
+                return ResourceHelper.getInstance().getPlanetResource("pc_attribute_combo_CHI_big.png");
+            }
+            return ResourceHelper.getInstance().getPlanetResource("pc_attribute_combo_" + t + ".png");
+        }
+        return "";
+    }
+
+    private static void drawTrait(TileLayer layer, Planet planet, String traitFile, boolean mecatol) {
+        BufferedImage icon = ImageHelper.read(traitFile);
+        icon = ImageHelper.scale(icon, (float) Math.sqrt(ICON_AREA / icon.getWidth() / icon.getHeight()));
+        int w = icon.getWidth();
+        int h = icon.getHeight();
+        int innerBorder = mecatol ? 3 : 2;
+        int outerBorder = innerBorder + (mecatol ? -1 : 2);
+        int padding = outerBorder + (mecatol ? 3 : 2);
+        IconHalo halo = IconHalo.twoTone(icon, innerBorder, outerBorder, padding);
+
+        Point position = planet.getHolderCenterPosition(layer.tile());
+        position = new Point(position.x - w / 2 + TILE_PADDING, position.y - h / 2 + TILE_PADDING);
+        halo.drawBehind(layer.g(), position.x, position.y);
+        layer.g().drawImage(icon, position.x, position.y, null);
+    }
+}
