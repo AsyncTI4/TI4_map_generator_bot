@@ -10,6 +10,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -77,6 +78,7 @@ import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.PlayerNeighbourGraph;
 import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
@@ -3314,32 +3316,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public Set<Player> getNeighbouringPlayers(boolean checkEquiv) {
-        Game game = this.game;
-        Set<Player> adjacentPlayers = new HashSet<>();
-        Set<Player> realPlayers = new HashSet<>(
-                game.getPlayers().values().stream().filter(Player::isRealPlayer).toList());
-
-        Set<Tile> playersTiles = new HashSet<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (FoWHelper.playerIsInSystem(game, tile, this, true)) {
-                playersTiles.add(tile);
-            }
-        }
-
-        for (Tile tile : playersTiles) {
-            adjacentPlayers.addAll(FoWHelper.getAdjacentPlayers(game, tile.getPosition(), false));
-            if (realPlayers.size() == adjacentPlayers.size()) break;
-        }
-        adjacentPlayers.remove(this);
-        if (checkEquiv && realPlayers.size() < 30) {
-            for (Player p2 : realPlayers) {
-                if (!adjacentPlayers.contains(p2)
-                        && p2.getNeighbouringPlayers(false).contains(this)) {
-                    adjacentPlayers.add(p2);
-                }
-            }
-        }
-        return adjacentPlayers;
+        PlayerNeighbourGraph graph = new PlayerNeighbourGraph(game);
+        if (checkEquiv) return graph.neighboursOf(this);
+        return new LinkedHashSet<>(graph.directNeighboursOf(this));
     }
 
     public boolean isNeighboursWith(Player player) {
