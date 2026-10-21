@@ -15,8 +15,8 @@ import ti4.testUtils.BaseTi4Test;
 
 /**
  * Wall-clock timing of whole map renders (constructor = canvas sizing, draw = paint plus encode) for DisplayType.all.
- * Uses only API that exists both before and after the render rewrite, so the same file can be copied to an older
- * checkout. Production randomness and no mocks, as in the bot. The corpus is rendered twice and the second pass is
+ * Uses MapRenderer, so it only runs on checkouts that have the render pipeline split out (before the rewrite, the
+ * same measurement went through MapGenerator.draw). Production randomness and no mocks, as in the bot. The corpus is rendered twice and the second pass is
  * reported, so the JIT is warm.
  *
  * <pre>
@@ -47,18 +47,17 @@ class MapRenderTimingBench extends BaseTi4Test {
             for (Path save : saves) {
                 Game game = load(save);
                 long start = System.nanoTime();
-                try (MapGenerator generator = new MapGenerator(game, DisplayType.all, null)) {
-                    long constructed = System.nanoTime();
-                    generator.draw();
-                    long drawn = System.nanoTime();
-                    lines.add(String.format(
-                            "%s\t%d\t%d\t%d\t%d",
-                            save.getFileName().toString().replace(".txt", ""),
-                            generator.imageWidth(),
-                            generator.imageHeight(),
-                            (constructed - start) / 1_000_000,
-                            (drawn - constructed) / 1_000_000));
-                }
+                RenderContext ctx = MapRenderer.resolve(new MapRenderRequest(game, DisplayType.all, null, null));
+                long constructed = System.nanoTime();
+                MapRenderer.render(ctx, RenderTimings.disabled());
+                long drawn = System.nanoTime();
+                lines.add(String.format(
+                        "%s\t%d\t%d\t%d\t%d",
+                        save.getFileName().toString().replace(".txt", ""),
+                        ctx.canvas().width(),
+                        ctx.canvas().height(),
+                        (constructed - start) / 1_000_000,
+                        (drawn - constructed) / 1_000_000));
                 System.out.println("[timing] pass " + pass + " " + lines.getLast());
             }
         }

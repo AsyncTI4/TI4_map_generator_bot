@@ -38,17 +38,25 @@ public class MapRenderPipeline {
         String gameName = renderEvent.game.getName();
         var timedRunnable =
                 new TimedRunnable("Render event task for " + gameName, EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
-                    try (var mapGenerator = new MapGenerator(
-                            renderEvent.game, renderEvent.displayType, renderEvent.event, renderEvent.segment)) {
-                        mapGenerator.draw();
+                    RenderTimings timings = RenderTimings.start();
+                    try {
+                        MapRenderResult result = MapRenderer.render(
+                                new MapRenderRequest(
+                                        renderEvent.game,
+                                        renderEvent.displayType,
+                                        renderEvent.event,
+                                        renderEvent.segment),
+                                timings);
                         if (renderEvent.uploadToDiscord) {
-                            uploadToDiscord(mapGenerator, renderEvent.callback());
+                            uploadToDiscord(renderEvent.game, result, timings, renderEvent.callback());
                         }
                         if (renderEvent.uploadToWebsite) {
-                            mapGenerator.uploadToWebsite();
+                            MapUploads.toWebsite(renderEvent.game, result, timings);
                         }
                     } catch (Exception e) {
                         BotLogger.error(new LogOrigin(renderEvent.game), "Failed to render event.", e);
+                    } finally {
+                        timings.log(renderEvent.game, renderEvent.event);
                     }
                 });
 
@@ -70,13 +78,14 @@ public class MapRenderPipeline {
         ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }
 
-    private static void uploadToDiscord(MapGenerator mapGenerator, Consumer<FileUpload> callback) {
-        try (var fileUpload = mapGenerator.createFileUpload()) {
+    private static void uploadToDiscord(
+            Game game, MapRenderResult result, RenderTimings timings, Consumer<FileUpload> callback) {
+        try (var fileUpload = MapUploads.toDiscord(game, result, timings)) {
             if (fileUpload != null && callback != null) {
                 callback.accept(fileUpload);
             }
         } catch (IOException e) {
-            BotLogger.error("Could not render images for " + mapGenerator.getGameName(), e);
+            BotLogger.error("Could not render images for " + game.getName(), e);
         }
     }
 

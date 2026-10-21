@@ -114,7 +114,7 @@ class MegaGamePlayerAreasTest extends BaseTi4Test {
             int twoColumns = 10 + 2 * BoardLayout.smallestRegularPlayerAreaWidth() + PlayerAreaGenerator.COLUMN_GAP;
             assertTrue(generator.imageWidth() >= twoColumns, "both columns fit side by side");
             assertTrue(generator.imageHeight() < 10 * 340, "five areas per column, not ten stacked");
-            generator.draw();
+            generator.drawCanvas();
         }
     }
 }

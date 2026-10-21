@@ -77,7 +77,7 @@ class MapGeneratorFrameTest extends BaseTi4Test {
             assertTrue(generator.imageHeight() < classicHeight, "empty outer rings are dropped");
             assertTrue(generator.imageWidth() < Math.max(1000, BoardLayout.getMapWidth(game)), "narrower too");
             assertTrue(generator.imageWidth() >= 11 * 150, "the 10-point score track still fits");
-            generator.draw();
+            generator.drawCanvas();
         }
     }
 
@@ -105,7 +105,7 @@ class MapGeneratorFrameTest extends BaseTi4Test {
         MapSegment.put(twoMaps, new MapSegment("south", "1237", 1));
         try (MapGenerator generator = render(twoMaps, DisplayType.all, "south")) {
             assertEquals(BoardLayout.getMapWidth(twoMaps, 3), generator.imageWidth());
-            generator.draw();
+            generator.drawCanvas();
         }
     }
 
@@ -142,7 +142,7 @@ class MapGeneratorFrameTest extends BaseTi4Test {
         try (MapGenerator generator = render(twoFarApartClusters(), DisplayType.map, null)) {
             assertTrue(generator.imageHeight() <= MapFrame.MAX_HEIGHT + STRIP, "within the 9-ring cap");
             assertTrue(generator.imageWidth() <= MapFrame.MAX_WIDTH);
-            generator.draw();
+            generator.drawCanvas();
         }
     }
 
@@ -158,14 +158,14 @@ class MapGeneratorFrameTest extends BaseTi4Test {
         try (MapGenerator main = render(game, DisplayType.map, null)) {
             assertTrue(main.isInShownRegion("000"));
             assertFalse(main.isInShownRegion("frac1"));
-            main.draw();
+            main.drawCanvas();
         }
         try (MapGenerator fracture = render(game, DisplayType.map, MapSegment.FRACTURE)) {
             assertEquals(MapSegment.FRACTURE, fracture.shownSegmentName());
             assertTrue(fracture.isInShownRegion("frac1"));
             assertFalse(fracture.isInShownRegion("000"));
             assertTrue(fracture.pinnedCorners().isEmpty(), "corner tiles stay out of the Fracture view");
-            fracture.draw();
+            fracture.drawCanvas();
         }
     }
 
@@ -186,7 +186,7 @@ class MapGeneratorFrameTest extends BaseTi4Test {
             assertEquals(MapSegment.FRACTURE, generator.shownSegmentName());
             assertTrue(generator.isInShownRegion("frac1"));
             assertFalse(generator.isInShownRegion("000"));
-            generator.draw();
+            generator.drawCanvas();
         }
     }
 
@@ -207,7 +207,7 @@ class MapGeneratorFrameTest extends BaseTi4Test {
             hex.translate(TILE_PADDING, TILE_PADDING);
             assertTrue(hex.x >= 0 && hex.x + TileGenerator.TILE_WIDTH <= generator.imageWidth());
             assertTrue(hex.y >= 0 && hex.y + TileGenerator.TILE_HEIGHT <= generator.imageHeight());
-            generator.draw();
+            generator.drawCanvas();
         }
     }
 

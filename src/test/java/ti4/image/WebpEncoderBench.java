@@ -123,8 +123,9 @@ class WebpEncoderBench extends BaseTi4Test {
         readGame.setAccessible(true);
         Game game = (Game) readGame.invoke(null, save.toFile());
         try (AutoCloseable ignored = RenderRandom.neutral()) {
-            MapGenerator generator = new MapGenerator(game, DisplayType.all, null);
-            return generator.drawCanvas();
+            return MapRenderer.paint(
+                    MapRenderer.resolve(new MapRenderRequest(game, DisplayType.all, null, null)),
+                    RenderTimings.disabled());
         }
     }
 

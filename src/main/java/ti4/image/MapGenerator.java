@@ -25,9 +25,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.StopWatch;
 import ti4.ResourceHelper;
 import ti4.game.Expeditions;
 import ti4.game.Game;
@@ -47,7 +45,6 @@ import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
-import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.ColorModel;
@@ -55,12 +52,8 @@ import ti4.model.EventModel;
 import ti4.model.ModelInterface;
 import ti4.model.PlanetModel;
 import ti4.model.StrategyCardModel;
-import ti4.service.image.FileUploadService;
 import ti4.service.map.FractureService;
 import ti4.service.option.FOWOptionService.FOWOption;
-import ti4.settings.GlobalSettings;
-import ti4.spring.api.overlay.MapOverlayService;
-import ti4.website.AsyncTi4WebsiteHelper;
 import ti4.website.model.WebsiteOverlay;
 
 public class MapGenerator implements AutoCloseable {
@@ -84,14 +77,12 @@ public class MapGenerator implements AutoCloseable {
     private final RenderContext ctx;
     private final Graphics2D graphics;
     private final BufferedImage mainImage;
-    private byte[] mainImageBytes;
-    private String imageFormat = "webp";
     private final GenericInteractionCreateEvent event;
     private final int scoreTokenSpacing;
     private final Game game;
     private final DisplayType displayType;
     private final DisplayType displayTypeBasic;
-    private final boolean debug;
+    private final RenderTimings timings;
     private final int width;
     private final int height;
     private final int heightForGameInfo;
@@ -102,13 +93,6 @@ public class MapGenerator implements AutoCloseable {
     private final int playerAreasWidth;
     private final int stripWidth;
 
-    private StopWatch debugAbsoluteStartTime;
-    private StopWatch debugTileTime;
-    private StopWatch debugImageGraphicsTime;
-    private StopWatch debugDrawTime;
-    private StopWatch debugDiscordTime;
-    private StopWatch debugWebsiteTime;
-
     MapGenerator(Game game, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
         this(game, displayType, event, null);
     }
@@ -118,13 +102,16 @@ public class MapGenerator implements AutoCloseable {
             @Nullable DisplayType displayType,
             @Nullable GenericInteractionCreateEvent event,
             @Nullable String requestedSegment) {
-        debug = GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, Boolean.FALSE);
-        if (debug) debugAbsoluteStartTime = StopWatch.createStarted();
+        this(
+                RenderContext.build(new MapRenderRequest(game, displayType, event, requestedSegment)),
+                RenderTimings.disabled());
+    }
 
-        ctx = RenderContext.build(new MapRenderRequest(game, displayType, event, requestedSegment));
-        this.game = game;
-        this.event = event;
+    MapGenerator(RenderContext ctx, RenderTimings timings) {
+        this.ctx = ctx;
+        this.timings = timings;
+        game = ctx.game();
+        event = ctx.event();
         displayTypeBasic = ctx.basicType();
         this.displayType = ctx.displayType();
         scoreTokenSpacing = ctx.scoreTokenSpacing();
@@ -170,27 +157,6 @@ public class MapGenerator implements AutoCloseable {
 
     boolean isInShownRegion(@Nullable String position) {
         return board.isInShownRegion(position);
-    }
-
-    FileUpload createFileUpload() {
-        if (debug) debugDiscordTime = StopWatch.createStarted();
-        game.incrementMapImageGenerationCount();
-        FileUpload fileUpload = FileUploadService.createFileUpload(mainImageBytes, game.getName(), imageFormat);
-        if (debug) debugDiscordTime.stop();
-        if (debug && !AsyncTi4WebsiteHelper.uploadsEnabled()) FileUploadService.saveLocalPng(mainImage, "MapDebug");
-        return fileUpload;
-    }
-
-    void uploadToWebsite() {
-        if (debug) debugWebsiteTime = StopWatch.createStarted();
-        sendToWebsite();
-        if (debug) debugWebsiteTime.stop();
-    }
-
-    void draw() {
-        if (debug) debugDrawTime = StopWatch.createStarted();
-        drawGame();
-        if (debug) debugDrawTime.stop();
     }
 
     private void setupTilesForDisplayTypeAllAndMap(Map<String, Tile> tilesToDisplay) {
@@ -272,58 +238,6 @@ public class MapGenerator implements AutoCloseable {
         sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.TileNumber));
     }
 
-    private void logDebug() {
-        if (!debug) return;
-        debugAbsoluteStartTime.stop();
-
-        StringBuilder sb = new StringBuilder();
-
-        String totalTimeStr = DateTimeHelper.getTimeRepresentationNanoSeconds(debugAbsoluteStartTime.getNanoTime());
-        String totalLine = String.format("%-34s%s", "Total time (" + game.getName() + "):", totalTimeStr);
-        sb.append(totalLine);
-
-        sb.append(debugString("  Draw time:", 36, debugDrawTime, debugAbsoluteStartTime));
-        sb.append(debugString("    Tile time (of Draw Time):", 38, debugTileTime, debugDrawTime));
-        sb.append(debugString("    Graphics time (of Draw Time):", 38, debugImageGraphicsTime, debugDrawTime));
-        sb.append(debugString("  Discord time:", 36, debugDiscordTime, debugAbsoluteStartTime));
-        sb.append(debugString("  Website time:", 36, debugWebsiteTime, debugAbsoluteStartTime));
-        sb.append('\n');
-
-        String message = "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```";
-        MessageHelper.sendMessageToEventServerBotLogChannel(event, message);
-    }
-
-    private static String debugString(String name, int padRight, StopWatch subStopWatch, StopWatch totalStopWatch) {
-        if (subStopWatch == null || totalStopWatch == null) {
-            return "";
-        }
-        long subTime = subStopWatch.getNanoTime();
-        long totalTime = totalStopWatch.getNanoTime();
-        double percentage = ((double) subTime / totalTime) * 100.0;
-        String timeStr = DateTimeHelper.getTimeRepresentationNanoSeconds(subTime);
-        return String.format("\n%-" + padRight + "s%s (%2.2f%%)", name, timeStr, percentage);
-    }
-
-    private void sendToWebsite() {
-        try {
-            String testing = System.getenv("TESTING");
-            if (testing == null && displayTypeBasic == DisplayType.all && !fog.isPrivate()) {
-                saveWebsiteOverlays();
-                AsyncTi4WebsiteHelper.putPlayerData(game.getID(), game);
-            }
-        } catch (Exception e) {
-            BotLogger.error("Failed to send to game info to website", e);
-        }
-    }
-
-    private void saveWebsiteOverlays() {
-        try {
-            MapOverlayService.getBean().saveOverlays(game.getName(), websiteOverlays.asList());
-        } catch (Exception e) {
-            BotLogger.error(new LogOrigin(game), "Failed to save website overlays", e);
-        }
-    }
-
     private void drawMapTilesInsideFrame() {
         Shape previousClip = graphics.getClip();
         if (board.mapFrame() != null) {
@@ -343,25 +257,13 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private void paintCanvas() {
-        if (debug) debugTileTime = StopWatch.createStarted();
+        timings.startTiles();
         drawMapTilesInsideFrame();
         ConnectionStripSection.draw(ctx, graphics);
-        if (debug) debugTileTime.stop();
+        timings.stopTiles();
 
-        if (debug) debugImageGraphicsTime = StopWatch.createStarted();
+        timings.startGraphics();
         drawImage();
-    }
-
-    private void drawGame() {
-        paintCanvas();
-        if (mainImage.getWidth() > WEBP_MAX_DIMENSION || mainImage.getHeight() > WEBP_MAX_DIMENSION) {
-            mainImageBytes = ImageHelper.writeJpg(mainImage);
-            imageFormat = "jpg";
-        } else {
-            mainImageBytes = ImageHelper.writeWebp(mainImage);
-            imageFormat = "webp";
-        }
-        if (debug) debugImageGraphicsTime.stop();
     }
 
     static boolean isEasterEggRoll(int roll) {
@@ -612,9 +514,7 @@ public class MapGenerator implements AutoCloseable {
 
     @Override
     public void close() {
-        mainImage.flush();
         graphics.dispose();
-        logDebug();
     }
 
     private void drawGeneralImage(int x, int y, String resourceName) {
