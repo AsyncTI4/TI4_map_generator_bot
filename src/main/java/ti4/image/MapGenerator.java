@@ -2,21 +2,15 @@ package ti4.image;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
-import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorConvertOp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +18,6 @@ import javax.annotation.Nullable;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
-import ti4.game.Expeditions;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -32,13 +25,9 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.RenderRandom;
 import ti4.helpers.Storage;
-import ti4.helpers.TIGLHelper;
-import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -52,18 +41,11 @@ import ti4.website.model.WebsiteOverlay;
 
 public class MapGenerator implements AutoCloseable {
 
-    private static final int SC_LABEL_SPACING = 25;
-    private static final String EASTER_EGG_NAME = "A wild brainchild";
-    private static final int EASTER_EGG_ODDS = 200;
-    private static final Color EASTER_EGG_TEXT = new Color(255, 200, 0);
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke3 = new BasicStroke(3.0f);
     private static final BasicStroke stroke4 = new BasicStroke(4.0f);
     private static final BasicStroke stroke5 = new BasicStroke(5.0f);
     private static final BasicStroke stroke6 = new BasicStroke(6.0f);
-    private static final int WEBP_MAX_DIMENSION = 16_383;
-    private static final ColorConvertOp GRAYSCALE_CONVERT_OP =
-            new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
 
     private final RenderContext ctx;
     private final Graphics2D graphics;
@@ -169,160 +151,10 @@ public class MapGenerator implements AutoCloseable {
         drawImage();
     }
 
-    static boolean isEasterEggRoll(int roll) {
-        return roll == 0;
-    }
-
-    private void drawSegmentLabel() {
-        String label = board.segmentLabel();
-        if (label == null) {
-            return;
-        }
-        if (isSectorTitle(label) && isEasterEggRoll(RenderRandom.nextInt("segmentTitle.easterEgg", EASTER_EGG_ODDS))) {
-            String text = "Map: " + EASTER_EGG_NAME + "!";
-            Font big = Storage.getFont80();
-            Font font = graphics.getFontMetrics(big).stringWidth(text) < width - 40 ? big : Storage.getFont64();
-            drawSegmentTitle(text, font, EASTER_EGG_TEXT, stroke4, Color.BLACK);
-        } else {
-            drawSegmentTitle("Map: " + label, Storage.getFont64(), Color.WHITE, stroke4, Color.BLACK);
-        }
-        graphics.setFont(Storage.getFont32());
-    }
-
-    private boolean isSectorTitle(String label) {
-        MapSegment shownSegment = board.shownSegment();
-        return shownSegment != null && !shownSegment.isFracture() && label.equals(shownSegment.displayName(game));
-    }
-
-    private void drawSegmentTitle(String text, Font font, Color color, Stroke stroke, Color outline) {
-        graphics.setFont(font);
-        DrawingUtil.superDrawString(
-                graphics, text, width / 2, 110, color, HorizontalAlign.Center, VerticalAlign.Center, stroke, outline);
-    }
-
     private void drawImage() {
-        graphics.setFont(Storage.getFont32());
-        graphics.setColor(Color.WHITE);
-        String timeStamp = DateTimeHelper.getFormattedTimestamp();
-        graphics.drawString(game.getName() + " " + game.getCreationDate() + " - " + timeStamp, 0, 34);
-        drawSegmentLabel();
-        int landscapeShift = (displayType == DisplayType.landscape ? mapWidth : 0);
-        int y = heightForGameInfo + 60;
-        int x = landscapeShift + BoardLayout.PLAYER_AREAS_LEFT;
-        Point coord;
-
-        int deltaX = 0;
-
-        Graphics2D g2 = (Graphics2D) graphics;
-        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
-        // GAME MODES
-        int deltaY = -150;
-        if (game.isCompetitiveTIGLGame()) {
-            drawGeneralImage(
-                    x + deltaX,
-                    y + deltaY,
-                    TIGLHelper.isFracturedTIGLGame(game) ? "GameMode_TIGL_Fractured.png" : "GameMode_TIGL.png");
-            TIGLRank rank = game.getMinimumTIGLRankAtGameStart();
-            if (rank != null) {
-                graphics.setFont(Storage.getFont18());
-                DrawingUtil.superDrawString(
-                        graphics,
-                        rank.getShortName(),
-                        x + deltaX + 50,
-                        y + deltaY + 75,
-                        Color.WHITE,
-                        HorizontalAlign.Center,
-                        VerticalAlign.Top,
-                        stroke2,
-                        Color.BLACK);
-                graphics.setFont(Storage.getFont32());
-            }
-            deltaX += 100;
-        }
-        if (game.isAbsolMode()) {
-            drawGeneralImage(x + deltaX, y + deltaY, "GameMode_Absol.png");
-            addWebsiteOverlay("Absol", null, x + deltaX, y + deltaY, 90, 90);
-            deltaX += 100;
-        }
-        if (game.isNoSwapMode()) {
-            drawGeneralImage(x + deltaX, y + deltaY, "NoSwap.png");
-            addWebsiteOverlay("No Support Swap", null, x + deltaX, y + deltaY, 180, 90);
-            deltaX += 190;
-        }
-        if (game.isMiltyModMode()) {
-            drawGeneralImage(x + deltaX, y + deltaY, "GameMode_MiltyMod.png");
-            addWebsiteOverlay("MiltyMod", null, x + deltaX, y + deltaY, 90, 90);
-            deltaX += 100;
-        }
-        if (game.isDiscordantStarsMode()) {
-            drawGeneralImage(x + deltaX, y + deltaY, "GameMode_DiscordantStars.png");
-            addWebsiteOverlay("Discordant Stars", null, x + deltaX, y + deltaY, 90, 90);
-        }
-
-        deltaY = 35;
-        y += 40; // needed for ghost HS on br
-
-        String server;
-        if (game.getGuild() == null) {
-            server = "asyncti_icon_nothing";
-        } else {
-            switch (game.getGuild().getId()) {
-                case "943410040369479690" -> server = "asyncti_icon_hub";
-                case "1176104225932058694" -> server = "asyncti_icon_warsuntzu";
-                case "1145823841227112598" -> server = "asyncti_icon_dreadnot";
-                case "1250131684393881610" -> server = "asyncti_icon_tommerhawk";
-                case "1312882116597518416" -> server = "asyncti_icon_dudersdomain";
-                case "1090910555327434774" -> server = "asyncti_icon_stroterarea";
-                case "1209956332380229672" -> server = "asyncti_icon_fighterclub";
-                case "1378702133297414164" -> server = "asyncti_icon_whatsupdock";
-                case "1410728648817770526" -> server = "asyncti_icon_shipflag";
-                case "1434181175944941649" -> server = "asyncti_icon_pdstrians";
-                case "1434180793139204198" -> server = "asyncti_icon_greatcarrierreef";
-                case "1434632452097446040" -> server = "asyncti_icon_tournaments";
-                case "1458845770672377989" -> server = "asyncti_icon_planetaryducksystem";
-                case "1458844879709929532" -> server = "asyncti_icon_stroatymcstroatface";
-                case "1458845518393246032" -> server = "asyncti_icon_dannelscampground";
-                // fog of war?
-                // megagames?
-                default -> server = "asyncti_icon_unknown";
-            }
-        }
-        String serverPath = ResourceHelper.getResourceFromFolder("server_icons/", server + ".png");
-        int serverSize = 96;
-        BufferedImage serverImage = ImageHelper.readScaled(serverPath, serverSize, serverSize);
-        graphics.drawImage(serverImage, x, y - 3 * serverSize / 4, null);
-
-        // GAME FUN NAME
-        graphics.setFont(Storage.getFont50());
-        graphics.setColor(Color.WHITE);
-        graphics.drawString(game.getCustomName(), landscapeShift + 4 * serverSize / 3, y);
-        deltaX = graphics.getFontMetrics().stringWidth(game.getCustomName()) + 5 * serverSize / 3;
-
-        // STRATEGY CARDS
-        coord = drawStrategyCards(new Point(x, y));
-        coord.translate(100, 0);
-
-        // ROUND
-        graphics.setColor(Color.WHITE);
-        graphics.setFont(Storage.getFont64());
-        String roundString = "ROUND: " + game.getRound();
-        int roundLen = graphics.getFontMetrics().stringWidth(roundString);
-        if (coord.x > stripWidth - roundLen - 100 * game.getRealPlayers().size()) {
-            coord = new Point(landscapeShift + 20, coord.y + 100);
-        }
-        graphics.drawString(roundString, coord.x, coord.y);
-
-        // CARD DECKS
-        drawCardDecks(Math.max(x + deltaX, coord.x), y - 75);
-
-        // TURN ORDER
-        coord = drawTurnOrderTracker(coord.x + roundLen + 100 + landscapeShift, coord.y);
-
-        drawExpeditionTracker(stripWidth - MapCanvasLayout.EXPEDITION_TRACKER_RIGHT_OFFSET, coord.y - 265);
-
-        y = coord.y + 30;
-        x = 10 + landscapeShift;
+        int landscapeShift = ctx.canvas().landscapeShift();
+        int y = HeaderSection.draw(ctx, graphics, landscapeShift);
+        int x = BoardLayout.PLAYER_AREAS_LEFT + landscapeShift;
         int tempY = y;
         tempY = ScoreTrackSection.draw(ctx, graphics, landscapeShift, tempY + 20);
         if (PriorityTrackSection.isShown(game)) {
@@ -355,22 +187,8 @@ public class MapGenerator implements AutoCloseable {
         graphics.dispose();
     }
 
-    private void drawGeneralImage(int x, int y, String resourceName) {
-        try {
-            String resourcePath = ResourceHelper.getInstance().getGeneralFile(resourceName);
-            BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
-            graphics.drawImage(resourceBufferedImage, x, y, null);
-        } catch (Exception e) {
-            BotLogger.error("Could not display play area: " + resourceName, e);
-        }
-    }
-
     private void drawPAImageScaled(int x, int y, String resourceName, int size) {
         PlayerAreaGenerator.drawPAImageScaled(graphics, x, y, resourceName, size, size);
-    }
-
-    private void drawPAImageScaled(int x, int y, String resourceName, int width, int height) {
-        PlayerAreaGenerator.drawPAImageScaled(graphics, x, y, resourceName, width, height);
     }
 
     public enum HorizontalAlign {
@@ -383,425 +201,6 @@ public class MapGenerator implements AutoCloseable {
         Top,
         Center,
         Bottom
-    }
-
-    private record StrategyCardLabel(int sc, int tradeGoods, int width) {}
-
-    private Point drawStrategyCards(Point coord) {
-        List<StrategyCardLabel> labels = strategyCardLabels();
-        int rowStart = coord.x;
-        int maxRowWidth = strategyCardRowRightLimit() - rowStart + SC_LABEL_SPACING;
-        List<List<StrategyCardLabel>> rows = PlayerAreaGenerator.isMegaGame(game)
-                ? RowWrap.balancedRows(labels, label -> label.width() + SC_LABEL_SPACING, 0, maxRowWidth)
-                : oneStripOfStrategyCards(labels, rowStart);
-
-        int x = rowStart;
-        int deltaY = coord.y + 80;
-        for (int row = 0; row < rows.size(); row++) {
-            if (row > 0) {
-                x = 20 + (displayType == DisplayType.landscape ? mapWidth : 0);
-                deltaY += 100;
-            }
-            for (StrategyCardLabel label : rows.get(row)) {
-                drawStrategyCardLabel(label, x, coord.y, deltaY);
-                x += label.width() + SC_LABEL_SPACING;
-            }
-        }
-        return new Point(x, deltaY);
-    }
-
-    private List<List<StrategyCardLabel>> oneStripOfStrategyCards(List<StrategyCardLabel> labels, int rowStart) {
-        boolean landscape = displayType == DisplayType.landscape;
-        int rightLimit = (landscape ? mapWidth + 4 * 520 + BoardLayout.EXTRA_X * 2 : stripWidth) - 100;
-        List<List<StrategyCardLabel>> rows = new ArrayList<>();
-        rows.add(new ArrayList<>());
-        int x = rowStart;
-        for (StrategyCardLabel label : labels) {
-            rows.getLast().add(label);
-            x += label.width() + SC_LABEL_SPACING;
-            if (x > rightLimit) {
-                x = 20 + (landscape ? mapWidth : 0);
-                rows.add(new ArrayList<>());
-            }
-        }
-        return rows;
-    }
-
-    private List<StrategyCardLabel> strategyCardLabels() {
-        Set<Integer> scPicked = new HashSet<>();
-        for (Player player : game.getPlayers().values()) {
-            scPicked.addAll(player.getSCs());
-        }
-        List<StrategyCardLabel> labels = new ArrayList<>();
-        for (Map.Entry<Integer, Integer> scTGs : game.getScTradeGoods().entrySet()) {
-            int sc = scTGs.getKey();
-            if (sc == 0) {
-                continue;
-            }
-            int tradeGoods = fog.isPrivate() || scPicked.contains(sc) ? 0 : scTGs.getValue();
-            graphics.setFont(Storage.getFont64());
-            int width = graphics.getFontMetrics().stringWidth(Integer.toString(sc));
-            if (tradeGoods > 0) {
-                graphics.setFont(Storage.getFont24());
-                width = Math.max(width, graphics.getFontMetrics().stringWidth("TG:" + tradeGoods));
-            }
-            labels.add(new StrategyCardLabel(sc, tradeGoods, width));
-        }
-        return labels;
-    }
-
-    private int strategyCardRowRightLimit() {
-        if (displayType == DisplayType.landscape) {
-            return mapWidth + 4 * 520 + BoardLayout.EXTRA_X * 2 - 100;
-        }
-        if (showsExpeditionTracker()) {
-            return stripWidth - MapCanvasLayout.EXPEDITION_TRACKER_RIGHT_OFFSET - SC_LABEL_SPACING;
-        }
-        return stripWidth - 100;
-    }
-
-    private void drawStrategyCardLabel(StrategyCardLabel label, int x, int y, int baseline) {
-        int sc = label.sc();
-        String scText = Integer.toString(sc);
-        graphics.setFont(Storage.getFont64());
-        int textWidth = graphics.getFontMetrics().stringWidth(scText);
-        boolean scPicked = game.getPlayers().values().stream()
-                .anyMatch(player -> player.getSCs().contains(sc));
-
-        if (!fog.isPrivate() && !scPicked) {
-            graphics.setColor(ColorUtil.getSCColor(sc, game));
-            if (!game.getStoredValue("exhaustedSC" + sc).isEmpty()) {
-                graphics.setColor(Color.GRAY);
-            }
-            graphics.drawString(scText, x, baseline);
-            addWebsiteOverlay(game.getStrategyCardModelByInitiative(sc).orElse(null), x, y + 24, textWidth, 60);
-            if (label.tradeGoods() > 0) {
-                graphics.setFont(Storage.getFont24());
-                graphics.setColor(Color.WHITE);
-                String tgMsg = "TG:" + label.tradeGoods();
-                int tgMsgTextWidth = graphics.getFontMetrics().stringWidth(tgMsg);
-                graphics.drawString(tgMsg, x + textWidth / 2 - tgMsgTextWidth / 2, baseline + 30);
-            }
-        }
-        if (fog.isPrivate() && game.getScPlayed().getOrDefault(sc, false)) {
-            graphics.setColor(Color.GRAY);
-            graphics.setFont(Storage.getFont64());
-            graphics.drawString(scText, x, baseline);
-        }
-    }
-
-    private Point drawTurnOrderTracker(int x, int y) {
-        boolean convertToGenericSC = fog.isPrivate();
-        String activePlayerUserID = game.getActivePlayerID();
-        if (!convertToGenericSC && activePlayerUserID != null && "action".equals(game.getPhaseOfGame())) {
-            graphics.setFont(Storage.getFont20());
-            graphics.setColor(ColorUtil.ActiveColor);
-            graphics.drawString("ACTIVE", x + 10, y + 35);
-            graphics.setFont(Storage.getFont16());
-            graphics.setColor(Color.LIGHT_GRAY);
-            graphics.drawString("NEXT UP", x + 112, y + 34);
-
-            Player activePlayer = game.getPlayer(activePlayerUserID);
-            List<Player> allPlayers = new ArrayList<>(game.getRealPlayers());
-            allPlayers.sort(Player.comparingInitiative());
-
-            int rotationDistance = allPlayers.size() - allPlayers.indexOf(activePlayer);
-            Collections.rotate(allPlayers, rotationDistance);
-            for (Player player : allPlayers) {
-                if (player.isPassed() || player.getSCs().isEmpty()) continue;
-                String faction = player.getFaction();
-                if (faction != null) {
-                    BufferedImage bufferedImage = DrawingUtil.getPlayerFactionIconImage(player);
-                    if (bufferedImage != null) {
-                        graphics.drawImage(bufferedImage, x, y - 70, null);
-                        if (!player.hasCustomFactionEmoji()) {
-                            addWebsiteOverlay(player.getFactionModel(), x + 10, y - 60, 75, 75);
-                        }
-                        x += 100;
-                    }
-                }
-            }
-            x += 100;
-            for (Player player : game.getPassedPlayers()) {
-                String faction = player.getFaction();
-                if (faction != null) {
-                    BufferedImage bufferedImage = DrawingUtil.getPlayerFactionIconImage(player);
-                    if (bufferedImage != null) {
-                        bufferedImage = makeGrayscale(bufferedImage);
-                        graphics.drawImage(bufferedImage, x, y - 70, null);
-                        graphics.setColor(Color.RED);
-                        graphics.drawString("PASSED", x + 10, y + 34);
-                        x += 100;
-                    }
-                }
-            }
-        }
-        return new Point(x, y);
-    }
-
-    private boolean showsExpeditionTracker() {
-        return game.isThundersEdge()
-                && game.getExpeditions().getRemainingExpeditionCount() > 0
-                && game.getTileFromPlanet("thundersedge") == null
-                && !game.isTwilightsFallMode();
-    }
-
-    private void drawExpeditionTracker(int x, int y) {
-        if (!showsExpeditionTracker()) return;
-        Expeditions exp = game.getExpeditions();
-
-        drawGeneralImage(x, y, "Expeditions.png");
-        if (exp.getTradeGoods() != null) {
-            Player p = game.getPlayerFromColorOrFaction(exp.getTradeGoods());
-            DrawingUtil.getAndDrawControlToken(graphics, p, x + 47, y + 101, fog.isPrivate(), 1.0f);
-        }
-        if (exp.getFiveRes() != null) {
-            Player p = game.getPlayerFromColorOrFaction(exp.getFiveRes());
-            DrawingUtil.getAndDrawControlToken(graphics, p, x + 114, y + 5, fog.isPrivate(), 1.0f);
-        }
-        if (exp.getActionCards() != null) {
-            Player p = game.getPlayerFromColorOrFaction(exp.getActionCards());
-            DrawingUtil.getAndDrawControlToken(graphics, p, x + 182, y + 101, fog.isPrivate(), 1.0f);
-        }
-        if (exp.getTechSkip() != null) {
-            Player p = game.getPlayerFromColorOrFaction(exp.getTechSkip());
-            DrawingUtil.getAndDrawControlToken(graphics, p, x + 47, y + 150, fog.isPrivate(), 1.0f);
-        }
-        if (exp.getSecret() != null) {
-            Player p = game.getPlayerFromColorOrFaction(exp.getSecret());
-            DrawingUtil.getAndDrawControlToken(graphics, p, x + 114, y + 243, fog.isPrivate(), 1.0f);
-        }
-        if (exp.getFiveInf() != null) {
-            Player p = game.getPlayerFromColorOrFaction(exp.getFiveInf());
-            DrawingUtil.getAndDrawControlToken(graphics, p, x + 182, y + 150, fog.isPrivate(), 1.0f);
-        }
-    }
-
-    private int drawCardDecks(int x, int y) {
-        if (game.isFowMode()) return x;
-
-        int cardWidth = 60;
-        int cardHeight = 90;
-        int horSpacing = cardWidth + 15;
-        int textY = y + cardHeight - 10;
-        Stroke outline = stroke2;
-        String overlayText;
-
-        graphics.setFont(Storage.getFont24());
-
-        drawPAImageScaled(x, y, "cardback_secret.jpg", cardWidth, cardHeight);
-        DrawingUtil.superDrawString(
-                graphics,
-                Integer.toString(game.getSecretObjectiveDeckSize()),
-                x + cardWidth / 2,
-                textY,
-                Color.WHITE,
-                HorizontalAlign.Center,
-                VerticalAlign.Bottom,
-                outline,
-                Color.BLACK);
-        overlayText =
-                game.getSecretObjectiveDeckSize() + "/" + game.getSecretObjectiveFullDeckSize() + " cards in the deck";
-        addWebsiteOverlay("Secret Objective Deck", overlayText, x, y, cardWidth, cardHeight);
-        x += horSpacing;
-
-        drawPAImageScaled(
-                x,
-                y,
-                game.isTwilightsFallMode() ? "cardback_action_tf.jpg" : "cardback_action.jpg",
-                cardWidth,
-                cardHeight);
-        DrawingUtil.superDrawString(
-                graphics,
-                Integer.toString(game.getActionCards().size()),
-                x + cardWidth / 2,
-                textY,
-                Color.WHITE,
-                HorizontalAlign.Center,
-                VerticalAlign.Bottom,
-                outline,
-                Color.BLACK);
-        overlayText = game.getActionCards().size() + "/" + game.getActionCardFullDeckSize() + " cards in the deck";
-        addWebsiteOverlay("Action Card Deck", overlayText, x, y, cardWidth, cardHeight);
-        x += horSpacing;
-
-        drawPAImageScaled(x, y, "cardback_cultural.jpg", cardWidth, cardHeight);
-        DrawingUtil.superDrawString(
-                graphics,
-                Integer.toString(game.getExploreDeck("cultural").size()),
-                x + cardWidth / 2,
-                textY,
-                Color.WHITE,
-                HorizontalAlign.Center,
-                VerticalAlign.Bottom,
-                outline,
-                Color.BLACK);
-        overlayText = game.getCulturalExploreDeckSize() + "/" + game.getCulturalExploreFullDeckSize()
-                + " in the deck \n" + game.getCulturalExploreDiscardSize() + " cards in the discard pile";
-        addWebsiteOverlay("Cultural Explore Deck", overlayText, x, y, cardWidth, cardHeight);
-        x += horSpacing;
-
-        drawPAImageScaled(x, y, "cardback_industrial.jpg", cardWidth, cardHeight);
-        DrawingUtil.superDrawString(
-                graphics,
-                Integer.toString(game.getExploreDeck("industrial").size()),
-                x + cardWidth / 2,
-                textY,
-                Color.WHITE,
-                HorizontalAlign.Center,
-                VerticalAlign.Bottom,
-                outline,
-                Color.BLACK);
-        overlayText = game.getIndustrialExploreDeckSize() + "/" + game.getIndustrialExploreFullDeckSize()
-                + " in the deck \n" + game.getIndustrialExploreDiscardSize() + " cards in the discard pile";
-        addWebsiteOverlay("Industrial Explore Deck", overlayText, x, y, cardWidth, cardHeight);
-        x += horSpacing;
-
-        drawPAImageScaled(x, y, "cardback_hazardous.jpg", cardWidth, cardHeight);
-        DrawingUtil.superDrawString(
-                graphics,
-                Integer.toString(game.getExploreDeck("hazardous").size()),
-                x + cardWidth / 2,
-                textY,
-                Color.WHITE,
-                HorizontalAlign.Center,
-                VerticalAlign.Bottom,
-                outline,
-                Color.BLACK);
-        overlayText = game.getHazardousExploreDeckSize() + "/" + game.getHazardousExploreFullDeckSize()
-                + " in the deck \n" + game.getHazardousExploreDiscardSize() + " cards in the discard pile";
-        addWebsiteOverlay("Hazardous Explore Deck", overlayText, x, y, cardWidth, cardHeight);
-        x += horSpacing;
-
-        drawPAImageScaled(x, y, "cardback_frontier.jpg", cardWidth, cardHeight);
-        DrawingUtil.superDrawString(
-                graphics,
-                Integer.toString(game.getExploreDeck("frontier").size()),
-                x + cardWidth / 2,
-                textY,
-                Color.WHITE,
-                HorizontalAlign.Center,
-                VerticalAlign.Bottom,
-                outline,
-                Color.BLACK);
-        overlayText = game.getFrontierExploreDeckSize() + "/" + game.getFrontierExploreFullDeckSize()
-                + " in the deck \n" + game.getFrontierExploreDiscardSize() + " cards in the discard pile";
-        addWebsiteOverlay("Frontier Explore Deck", overlayText, x, y, cardWidth, cardHeight);
-        x += horSpacing;
-
-        drawPAImageScaled(x, y, "cardback_relic.jpg", cardWidth, cardHeight);
-        DrawingUtil.superDrawString(
-                graphics,
-                Integer.toString(game.getRelicDeckSize()),
-                x + cardWidth / 2,
-                textY,
-                Color.WHITE,
-                HorizontalAlign.Center,
-                VerticalAlign.Bottom,
-                outline,
-                Color.BLACK);
-        overlayText = game.getRelicDeckSize() + "/" + game.getRelicFullDeckSize() + " cards in the deck";
-        addWebsiteOverlay("Relic Deck", overlayText, x, y, cardWidth, cardHeight);
-        x += horSpacing;
-
-        drawPAImageScaled(
-                x, y, game.isTwilightsFallMode() ? "cardback_edict.jpg" : "cardback_agenda.png", cardWidth, cardHeight);
-        DrawingUtil.superDrawString(
-                graphics,
-                Integer.toString(game.getAgendaDeckSize()),
-                x + cardWidth / 2,
-                textY,
-                Color.WHITE,
-                HorizontalAlign.Center,
-                VerticalAlign.Bottom,
-                outline,
-                Color.BLACK);
-        overlayText = game.getAgendaDeckSize() + "/" + game.getAgendaFullDeckSize() + " cards in the deck";
-        addWebsiteOverlay("Agenda Deck", overlayText, x, y, cardWidth, cardHeight);
-        x += horSpacing;
-
-        if (game.isTwilightsFallMode()) {
-            int cardCount, fullDeck;
-
-            cardCount = game.getAbilitySpliceDeck(false).size();
-            fullDeck = Mapper.getDeck(game.getAbilitySpliceDeckID()).getCardCount();
-            drawPAImageScaled(x, y, "cardback_tf_ability.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(
-                    graphics,
-                    Integer.toString(cardCount),
-                    x + cardWidth / 2,
-                    textY,
-                    Color.WHITE,
-                    HorizontalAlign.Center,
-                    VerticalAlign.Bottom,
-                    outline,
-                    Color.BLACK);
-            overlayText = cardCount + "/" + fullDeck + " cards in the deck";
-            addWebsiteOverlay("Ability Splice Deck", overlayText, x, y, cardWidth, cardHeight);
-            x += horSpacing;
-
-            cardCount = game.getUnitSpliceDeck(false).size();
-            fullDeck = Mapper.getDeck(game.getUnitSpliceDeckID()).getCardCount();
-            drawPAImageScaled(x, y, "cardback_unit_upgrade.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(
-                    graphics,
-                    Integer.toString(cardCount),
-                    x + cardWidth / 2,
-                    textY,
-                    Color.WHITE,
-                    HorizontalAlign.Center,
-                    VerticalAlign.Bottom,
-                    outline,
-                    Color.BLACK);
-            overlayText = cardCount + "/" + fullDeck + " cards in the deck";
-            addWebsiteOverlay("Unit Upgrade Splice Deck", overlayText, x, y, cardWidth, cardHeight);
-            x += horSpacing;
-
-            cardCount = game.getGenomeSpliceDeck(false).size();
-            fullDeck = Mapper.getDeck(game.getGenomeSpliceDeckID()).getCardCount();
-            drawPAImageScaled(x, y, "cardback_genome.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(
-                    graphics,
-                    Integer.toString(cardCount),
-                    x + cardWidth / 2,
-                    textY,
-                    Color.WHITE,
-                    HorizontalAlign.Center,
-                    VerticalAlign.Bottom,
-                    outline,
-                    Color.BLACK);
-            overlayText = cardCount + "/" + fullDeck + " cards in the deck";
-            addWebsiteOverlay("Genome Splice Deck", overlayText, x, y, cardWidth, cardHeight);
-            x += horSpacing;
-
-            cardCount = game.getParadigmSpliceDeck(false).size();
-            fullDeck = Mapper.getDeck(game.getParadigmSpliceDeckID()).getCardCount();
-            drawPAImageScaled(x, y, "cardback_paradigm.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(
-                    graphics,
-                    Integer.toString(cardCount),
-                    x + cardWidth / 2,
-                    textY,
-                    Color.WHITE,
-                    HorizontalAlign.Center,
-                    VerticalAlign.Bottom,
-                    outline,
-                    Color.BLACK);
-            overlayText = cardCount + "/" + fullDeck + " cards in the deck";
-            addWebsiteOverlay("Paradigm Deck", overlayText, x, y, cardWidth, cardHeight);
-            x += horSpacing;
-
-            if (game.getTyrantUserID().isEmpty()) {
-                String tyrantFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.TYRANT));
-                if (tyrantFile != null) {
-                    BufferedImage bufferedImage = ImageHelper.read(tyrantFile);
-                    graphics.drawImage(bufferedImage, x + 15, y - 13, null);
-                }
-                x += 200;
-            }
-        }
-
-        return x;
     }
 
     private void playerInfo(Game game) {
@@ -1978,12 +1377,6 @@ public class MapGenerator implements AutoCloseable {
             BufferedImage bufferedImage = ImageHelper.read(factionFile);
             graphics.drawImage(bufferedImage, x + 2, y + 2, null);
         }
-    }
-
-    // The first parameter is the scale factor (contrast), the second is the offset
-    // (brightness)
-    private static BufferedImage makeGrayscale(BufferedImage image) {
-        return GRAYSCALE_CONVERT_OP.filter(image, null);
     }
 
     private void addWebsiteOverlay(String overlayTitle, String overlayText, int x, int y, int width, int height) {

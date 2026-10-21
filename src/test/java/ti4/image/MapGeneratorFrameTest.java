@@ -52,9 +52,9 @@ class MapGeneratorFrameTest extends BaseTi4Test {
 
     @Test
     void segmentTitleIsSwappedForTheEasterEggOnlyOnARollOfZero() {
-        assertTrue(MapGenerator.isEasterEggRoll(0));
-        assertFalse(MapGenerator.isEasterEggRoll(1));
-        assertFalse(MapGenerator.isEasterEggRoll(199));
+        assertTrue(SegmentTitle.isEasterEggRoll(0));
+        assertFalse(SegmentTitle.isEasterEggRoll(1));
+        assertFalse(SegmentTitle.isEasterEggRoll(199));
     }
 
     @Test
