@@ -31,7 +31,7 @@ class TextWrapTest {
         TextWrap.Lines lines = TextWrap.wrapToWidth("alpha beta gamma delta", TEN_PIXELS_PER_CHARACTER, 150, true);
 
         assertEquals("alpha beta", lines.first());
-        assertEquals(" gamma delta", lines.second());
+        assertEquals("gamma delta", lines.second());
     }
 
     @Test

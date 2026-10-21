@@ -11,27 +11,19 @@ final class TextWrap {
 
     static Lines wrapToWidth(String text, FontMetrics metrics, int maxWidth, boolean breakAtLastSpace) {
         int length = text.length();
-        int trimmed = 0;
-        int width = metrics.stringWidth(text);
-        while (width > maxWidth) {
-            trimmed++;
-            width = metrics.stringWidth(text.substring(0, length - trimmed));
+        int cut = length;
+        while (cut > 0 && metrics.stringWidth(text.substring(0, cut)) > maxWidth) {
+            cut--;
         }
-        if (trimmed == 0) {
+        if (cut == length) {
             return new Lines(text, null);
         }
         if (breakAtLastSpace) {
-            trimmed = trimmedToLastSpace(text, trimmed);
+            int space = text.lastIndexOf(' ', cut);
+            if (space > 0) {
+                return new Lines(text.substring(0, space), text.substring(space + 1));
+            }
         }
-        return new Lines(text.substring(0, length - trimmed), text.substring(length - trimmed));
-    }
-
-    private static int trimmedToLastSpace(String text, int trimmed) {
-        int length = text.length();
-        int atSpace = trimmed;
-        while (atSpace < length && text.charAt(length - atSpace) != ' ') {
-            atSpace++;
-        }
-        return atSpace < length ? atSpace : trimmed;
+        return new Lines(text.substring(0, cut), text.substring(cut));
     }
 }
