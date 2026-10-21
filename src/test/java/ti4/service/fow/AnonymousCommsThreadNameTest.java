@@ -12,7 +12,7 @@ import ti4.testUtils.BaseTi4Test;
 class AnonymousCommsThreadNameTest extends BaseTi4Test {
 
     // Sidebars cut long names, so the partner's color leads; "-private" stays last for the fog checks
-    // (TileGenerator, /game info, spin) that look at the thread's own name.
+    // (the tile renderer, /game info, spin) that look at the thread's own name.
     @Test
     void partnerThreadLeadsWithHueAndColor() {
         assertEquals("🔴 Red-comms-private", AnonymousCommsService.partnerThreadName("red"));

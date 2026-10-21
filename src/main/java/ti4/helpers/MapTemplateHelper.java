@@ -17,8 +17,8 @@ import ti4.game.Tile;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
+import ti4.image.TileLayers;
 import ti4.image.TileStep;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -237,7 +237,7 @@ public final class MapTemplateHelper {
 
     public static FileUpload generateTemplatePreviewImage(
             GenericInteractionCreateEvent event, Game game, MapTemplateModel model) {
-        TileGenerator generator = new TileGenerator(game, event, DisplayType.all);
+        TileLayers tileLayers = TileLayers.of(game, event, DisplayType.all);
 
         int rings = model.numRings();
         int size = (rings * 2 + 1) * 300 + 200;
@@ -254,7 +254,7 @@ public final class MapTemplateHelper {
 
             Tile toAdd = getTileFromTemplateTile(tile);
             if (toAdd != null) {
-                BufferedImage tileImg = generator.draw(toAdd, TileStep.Tile);
+                BufferedImage tileImg = tileLayers.draw(toAdd, TileStep.Tile);
                 g2.drawImage(tileImg, pos.x + center.x - 100, pos.y + center.y - 100, null);
             }
         }

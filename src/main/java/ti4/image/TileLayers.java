@@ -12,26 +12,20 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
-import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -39,7 +33,6 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -52,19 +45,18 @@ import ti4.helpers.Units;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
-import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
 import ti4.model.ShipPositionModel.ShipPosition;
 import ti4.model.UnitModel;
-import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
-import ti4.service.image.FileUploadService;
 import ti4.service.map.CustomHyperlaneService;
 
-public class TileGenerator {
+public final class TileLayers {
 
-    private static final int TILE_PADDING = 100;
+    private static final int TILE_PADDING = TileGeometry.TILE_PADDING;
+    private static final int TILE_WIDTH = TileGeometry.TILE_WIDTH;
+    private static final int TILE_HEIGHT = TileGeometry.TILE_HEIGHT;
     private static final Point TILE_POSITION_POINT = new Point(255, 295);
     // top-left of the fog-vision token, tucked inside the hex's bottom-left edge
     private static final Point FOW_VISION_TOKEN_POINT = new Point(75, 236);
@@ -73,21 +65,13 @@ public class TileGenerator {
     private static final BasicStroke stroke6 = new BasicStroke(6.0f);
     private static final BasicStroke stroke7 = new BasicStroke(7.0f);
     private static final BasicStroke stroke8 = new BasicStroke(8.0f);
-    private static final int TILE_EXTRA_WIDTH = 260;
-    private static final int EXTRA_X = 100;
-    private static final int EXTRA_Y = 100;
-
-    static final int TILE_WIDTH = 345;
-    static final int TILE_HEIGHT = 300;
     private static final Pattern DIGIT_PATTERN = Pattern.compile("[0-9]");
 
     private final Game game;
-    private final GenericInteractionCreateEvent event;
     private final boolean isFoWPrivate;
     private final Player fowPlayer;
-    private final int context;
-    private final String focusTile;
     private final DisplayType displayType;
+    private final TileViewer viewer;
 
     // Map of nucleus slice number to border color. This should correspond to the
     // colors used in the MapTemplateHelper.getTileFromTemplateTile for draft tiles, given a player number.
@@ -102,187 +86,33 @@ public class TileGenerator {
             7, "ethereal",
             8, "forest");
 
-    // Map to aggregate unit coordinates by faction from all UnitRenderGenerator
-    // calls
-    private final Map<String, Map<String, List<Point>>> unitCoordinatesByFaction = new HashMap<>();
-
-    public TileGenerator(@NotNull Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
-        this(game, event, displayType, 0, "000", null);
-    }
-
-    public TileGenerator(
-            @NotNull Game game,
-            GenericInteractionCreateEvent event,
-            @Nullable DisplayType displayType,
-            int context,
-            @NotNull String focusTile) {
-        this(game, event, displayType, context, focusTile, null);
-    }
-
-    public TileGenerator(
-            @NotNull Game game,
-            GenericInteractionCreateEvent event,
-            @Nullable DisplayType displayType,
-            int context,
-            @NotNull String focusTile,
-            @Nullable Player fowPlayer) {
+    private TileLayers(Game game, @Nullable DisplayType displayType, TileViewer viewer) {
         this.game = game;
-        this.event = event;
         this.displayType = displayType;
-        this.context = context;
-        this.focusTile = focusTile;
-        isFoWPrivate = isFowModeActive();
-        this.fowPlayer = fowPlayer != null
-                ? fowPlayer
-                : (event != null
-                        ? CommandHelper.getPlayerFromGame(
-                                game, event.getMember(), event.getUser().getId())
-                        : null);
+        this.viewer = viewer;
+        isFoWPrivate = viewer.privateView();
+        fowPlayer = viewer.player();
     }
 
-    private boolean isFowModeActive() {
-        return game.isFowMode()
-                && event != null
-                && (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)
-                        || event instanceof UserOverridenGenericInteractionCreateEvent);
+    public static TileLayers of(
+            Game game, @Nullable GenericInteractionCreateEvent event, @Nullable DisplayType displayType) {
+        return of(game, event, displayType, null);
     }
 
-    /**
-     * Get the aggregated unit coordinates by faction from all UnitRenderGenerator
-     * calls
-     *
-     * @return Map where key is faction/player identifier, secondary key is unit ID,
-     *         and value is list of coordinates
-     */
-    public Map<String, Map<String, List<Point>>> getUnitCoordinatesByFaction() {
-        return new HashMap<>(unitCoordinatesByFaction);
+    public static TileLayers of(
+            Game game,
+            @Nullable GenericInteractionCreateEvent event,
+            @Nullable DisplayType displayType,
+            @Nullable Player explicitViewer) {
+        return new TileLayers(game, displayType, TileViewer.resolve(game, event, explicitViewer));
     }
 
-    /**
-     * Helper method to aggregate unit coordinates from a UnitRenderGenerator into
-     * the main map
-     *
-     * @param unitRenderGenerator The UnitRenderGenerator to get coordinates from
-     */
-    private void aggregateUnitCoordinates(UnitRenderGenerator unitRenderGenerator) {
-        Map<String, Map<String, List<Point>>> renderCoordinates = unitRenderGenerator.getUnitCoordinatesByFaction();
-        if (renderCoordinates != null) {
-            for (Map.Entry<String, Map<String, List<Point>>> factionEntry : renderCoordinates.entrySet()) {
-                String faction = factionEntry.getKey();
-                Map<String, List<Point>> unitMap = factionEntry.getValue();
-
-                for (Map.Entry<String, List<Point>> unitEntry : unitMap.entrySet()) {
-                    String unitId = unitEntry.getKey();
-                    List<Point> coordinates = unitEntry.getValue();
-
-                    unitCoordinatesByFaction
-                            .computeIfAbsent(faction, _ -> new HashMap<>())
-                            .computeIfAbsent(unitId, _ -> new ArrayList<>())
-                            .addAll(coordinates);
-                }
-            }
-        }
+    TileViewer viewer() {
+        return viewer;
     }
 
-    public FileUpload createFileUpload() {
-        return FileUploadService.createFileUpload(createMainImage(), game.getName());
-    }
-
-    public BufferedImage createMainImage() {
-        Map<String, Tile> tilesToDisplay = new HashMap<>(game.getTileMap());
-        Set<String> systemsInRange = getTilesToShow(game, context, focusTile);
-        Set<String> keysToRemove = new HashSet<>(tilesToDisplay.keySet());
-        keysToRemove.removeAll(systemsInRange);
-        for (String tile_ : keysToRemove) {
-            tilesToDisplay.remove(tile_);
-        }
-
-        // Resolve fog of war vision limitations
-        if (isFoWPrivate) {
-            Set<String> tilesToShow = FoWHelper.fowFilter(game, fowPlayer);
-            Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
-            keys.removeAll(tilesToShow);
-            for (String key : keys) {
-                tilesToDisplay.remove(key);
-                if (fowPlayer != null) {
-                    tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
-                }
-            }
-        }
-
-        int width = TILE_WIDTH + (TILE_EXTRA_WIDTH * 2 * context) + EXTRA_X;
-        int height = TILE_HEIGHT * (2 * context + 1) + EXTRA_Y;
-        var mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        var graphics = mainImage.getGraphics();
-
-        try {
-            Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
-            tileMap.remove(null);
-
-            Set<String> tiles = tileMap.keySet();
-            Set<String> tilesWithExtra =
-                    new HashSet<>(game.getAdjacentTileOverrides().values());
-            tilesWithExtra.addAll(game.getBorderAnomalies().stream()
-                    .map(BorderAnomalyHolder::getTile)
-                    .collect(Collectors.toSet()));
-
-            tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Tile));
-            tilesWithExtra.forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Extras));
-            tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Units));
-            tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.TileNumber));
-
-            graphics.setFont(Storage.getFont32());
-            graphics.setColor(Color.WHITE);
-            String timeStamp = DateTimeHelper.getFormattedTimestampWithMillis();
-            graphics.drawString(game.getName() + " " + timeStamp, 0, 34);
-        } catch (Exception e) {
-            BotLogger.error(game.getName() + ": Could not save generated system info image", e);
-        }
-
-        return mainImage;
-    }
-
-    private static Set<String> getTilesToShow(Game game, int context, String focusTile) {
-        Set<String> tileSet = new HashSet<>(Collections.singleton(focusTile));
-        Set<String> tilesToCheck = new HashSet<>(Collections.singleton(focusTile));
-        for (int i = 0; i < context; i++) {
-            Set<String> nextTiles = new HashSet<>();
-            for (String tile : tilesToCheck) {
-                Set<String> adj = FoWHelper.traverseAdjacencies(game, true, tile);
-                for (String tile_ : adj) {
-                    if (!tileSet.contains(tile_)) {
-                        tileSet.add(tile_);
-                        nextTiles.add(tile_);
-                    }
-                }
-            }
-            tilesToCheck = nextTiles;
-        }
-        return tileSet;
-    }
-
-    private void addTile(Graphics graphics, Tile tile, TileStep step) {
-        if (tile == null || tile.getTileID() == null) {
-            return;
-        }
-        try {
-            String position = tile.getPosition();
-            Point positionPoint = PositionMapper.getTilePosition(position);
-            if (positionPoint == null) {
-                throw new Exception("Could not map tile to a position on the map: " + game.getName());
-            }
-
-            Point p = PositionMapper.getTilePosition(focusTile);
-            int offsetY = p == null ? 0 : -1 * p.y + (EXTRA_Y / 2) + (context * TILE_HEIGHT);
-            int offsetX = p == null ? 0 : -1 * p.x + (EXTRA_X / 2) + (context * TILE_EXTRA_WIDTH);
-            int tileX = positionPoint.x + offsetX - TILE_PADDING;
-            int tileY = positionPoint.y + offsetY - TILE_PADDING;
-
-            BufferedImage tileImage = draw(tile, step);
-            graphics.drawImage(tileImage, tileX, tileY, null);
-        } catch (Exception exception) {
-            BotLogger.error("Tile Error, when building map: " + tile.getTileID(), exception);
-        }
+    void paint(Tile tile, TileStep step, Graphics target, int x, int y) {
+        target.drawImage(draw(tile, step), x, y, null);
     }
 
     public BufferedImage draw(Tile tile, TileStep step) {
@@ -534,7 +364,7 @@ public class TileGenerator {
                         new ArrayList<>(tile.getUnitHolders().values());
                 UnitHolder spaceUnitHolder = tile.getSpaceUnitHolder();
                 if (spaceUnitHolder != null) {
-                    addSleeperToken(tile, tileGraphics, spaceUnitHolder, TileGenerator::isValidCustodianToken, game);
+                    addSleeperToken(tile, tileGraphics, spaceUnitHolder, TileLayers::isValidCustodianToken, game);
                     drawTokensOnTile(tile, tileGraphics, spaceUnitHolder, game);
                     unitHolders.remove(spaceUnitHolder);
                     unitHolders.add(spaceUnitHolder);
@@ -554,7 +384,7 @@ public class TileGenerator {
                     }
                 }
                 for (UnitHolder unitHolder : unitHolders) {
-                    addSleeperToken(tile, tileGraphics, unitHolder, TileGenerator::isValidToken, game);
+                    addSleeperToken(tile, tileGraphics, unitHolder, TileLayers::isValidToken, game);
                     addControl(tile, tileGraphics, unitHolder, rectangles);
                 }
                 if (game.isShowGears() && !game.isFowMode()) {
@@ -680,7 +510,6 @@ public class TileGenerator {
                             radius,
                             fowPlayer);
                     unitRenderGenerator.render();
-                    aggregateUnitCoordinates(unitRenderGenerator);
                 }
             }
             case Distance -> {

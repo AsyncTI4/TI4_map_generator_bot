@@ -1,7 +1,7 @@
 package ti4.image;
 
-import static ti4.image.TileGenerator.TILE_HEIGHT;
-import static ti4.image.TileGenerator.TILE_WIDTH;
+import static ti4.image.TileGeometry.TILE_HEIGHT;
+import static ti4.image.TileGeometry.TILE_WIDTH;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;

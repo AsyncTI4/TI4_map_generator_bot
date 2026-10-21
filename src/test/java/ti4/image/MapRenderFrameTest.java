@@ -194,9 +194,9 @@ class MapRenderFrameTest extends BaseTi4Test {
         Point hex = context.board().pinnedCornerTileOrigin("tl");
         hex.translate(TILE_PADDING, TILE_PADDING);
         assertTrue(hex.x >= 0
-                && hex.x + TileGenerator.TILE_WIDTH <= context.canvas().width());
+                && hex.x + TileGeometry.TILE_WIDTH <= context.canvas().width());
         assertTrue(hex.y >= 0
-                && hex.y + TileGenerator.TILE_HEIGHT <= context.canvas().allocatedHeight());
+                && hex.y + TileGeometry.TILE_HEIGHT <= context.canvas().allocatedHeight());
         paint(context);
     }
 

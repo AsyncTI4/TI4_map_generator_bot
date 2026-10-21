@@ -64,7 +64,7 @@ class BoardPositionTest extends BaseTi4Test {
 
         assertEquals(4, game.getRingCount());
         assertEquals(5, PositionMapper.layoutRingCount(game));
-        assertTrue(scaled(game, "a515").x - scaled(game, "403").x > TileGenerator.TILE_WIDTH, "maps must not overlap");
+        assertTrue(scaled(game, "a515").x - scaled(game, "403").x > TileGeometry.TILE_WIDTH, "maps must not overlap");
     }
 
     // Below 8 rings the spacing is unchanged; from 9 to 16 rings the maps spread just enough not to overlap,
@@ -82,7 +82,7 @@ class BoardPositionTest extends BaseTi4Test {
         assertEquals(12, PositionMapper.layoutRingCount(game));
         assertEquals((2 * 12 + 2) * 260, scaled(game, "a101").x - scaled(game, "101").x);
         assertTrue(
-                scaled(game, "a1250").x - scaled(game, "1219").x >= TileGenerator.TILE_WIDTH, "maps must not overlap");
+                scaled(game, "a1250").x - scaled(game, "1219").x >= TileGeometry.TILE_WIDTH, "maps must not overlap");
     }
 
     private static Point scaled(Game game, String position) {

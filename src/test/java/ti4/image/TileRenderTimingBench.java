@@ -106,7 +106,7 @@ class TileRenderTimingBench extends BaseTi4Test {
     }
 
     private static void contextImage(Game game, String position) {
-        new TileGenerator(game, null, null, CONTEXT_RINGS, position).createMainImage();
+        SystemContextImage.render(game, null, CONTEXT_RINGS, position, null);
     }
 
     private static Game load(Path save) throws Exception {

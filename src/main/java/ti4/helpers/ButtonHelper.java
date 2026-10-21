@@ -115,7 +115,7 @@ import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.image.TileGenerator;
+import ti4.image.SystemContextImage;
 import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -4749,8 +4749,7 @@ public class ButtonHelper {
                             "Remove Units in " + tile.getRepresentationForButtons(game, player)));
                     buttons.add(Buttons.red("deleteButtons", "Dismiss These Buttons"));
 
-                    FileUpload systemWithContext =
-                            new TileGenerator(game, null, null, 0, tile.getPosition(), player).createFileUpload();
+                    FileUpload systemWithContext = SystemContextImage.upload(game, null, 0, tile.getPosition(), player);
                     MessageHelper.sendFileToChannelWithButtonsAfter(
                             player.getCorrectChannel(), systemWithContext, message, buttons);
                     game.setStoredValue(

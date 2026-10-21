@@ -115,7 +115,7 @@ final class FrameResolver {
     }
 
     private void makeRoomForPinnedCorners(Rectangle bounds) {
-        int column = TileGenerator.TILE_WIDTH + CORNER_MARGIN;
+        int column = TileGeometry.TILE_WIDTH + CORNER_MARGIN;
         if (isPinned("tl") || isPinned("bl")) {
             bounds.x -= column;
             bounds.width += column;

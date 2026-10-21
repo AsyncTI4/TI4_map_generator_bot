@@ -250,8 +250,8 @@ final class BoardLayout {
         int contentRight = Math.min(mapFrame.width(), frameContent.x + frameContent.width - mapFrame.offsetX());
         boolean left = "tl".equalsIgnoreCase(corner) || "bl".equalsIgnoreCase(corner);
         boolean top = "tl".equalsIgnoreCase(corner) || "tr".equalsIgnoreCase(corner);
-        int hexLeft = left ? contentLeft + CORNER_MARGIN : contentRight - CORNER_MARGIN - TileGenerator.TILE_WIDTH;
-        int hexTop = top ? CORNER_TOP : mapFrame.height() - CORNER_MARGIN - TileGenerator.TILE_HEIGHT;
+        int hexLeft = left ? contentLeft + CORNER_MARGIN : contentRight - CORNER_MARGIN - TileGeometry.TILE_WIDTH;
+        int hexTop = top ? CORNER_TOP : mapFrame.height() - CORNER_MARGIN - TileGeometry.TILE_HEIGHT;
         return new Point(hexLeft - TILE_PADDING, hexTop - TILE_PADDING);
     }
 
@@ -261,8 +261,8 @@ final class BoardLayout {
         }
         int hexLeft = tileX + TILE_PADDING;
         int hexTop = tileY + TILE_PADDING;
-        return hexLeft + TileGenerator.TILE_WIDTH <= 0
-                || hexTop + TileGenerator.TILE_HEIGHT <= 0
+        return hexLeft + TileGeometry.TILE_WIDTH <= 0
+                || hexTop + TileGeometry.TILE_HEIGHT <= 0
                 || hexLeft >= mapFrame.width()
                 || hexTop >= mapFrame.height();
     }

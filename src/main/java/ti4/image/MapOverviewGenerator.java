@@ -29,7 +29,7 @@ public class MapOverviewGenerator {
     private static final int TILE_PADDING = 100;
     private static final int TILE_IMAGE_SIZE = 600;
     private static final int CORNER_MARGIN = 20;
-    private static final int CORNER_COLUMN = TileGenerator.TILE_WIDTH + 2 * CORNER_MARGIN;
+    private static final int CORNER_COLUMN = TileGeometry.TILE_WIDTH + 2 * CORNER_MARGIN;
     private static final Set<String> CORNER_POSITIONS = Set.of("tl", "tr", "bl", "br");
     private static final BasicStroke SECTOR_LABEL_OUTLINE = new BasicStroke(6);
     private static final List<TileStep> STEPS =
@@ -76,7 +76,7 @@ public class MapOverviewGenerator {
     }
 
     private static void drawTiles(Game game, Graphics2D graphics, Layout layout) {
-        TileGenerator tileGenerator = new TileGenerator(game, null, DisplayType.map);
+        TileLayers tileLayers = TileLayers.of(game, null, DisplayType.map);
         Map<String, Tile> tiles = new TreeMap<>(game.getTileMap());
         int drawnSize = layout.scaled(TILE_IMAGE_SIZE);
         for (TileStep step : STEPS) {
@@ -84,7 +84,7 @@ public class MapOverviewGenerator {
                 Rectangle hex = layout.hexBounds(game, position);
                 if (hex == null) return;
                 try {
-                    BufferedImage tileImage = tileGenerator.draw(tile, step);
+                    BufferedImage tileImage = tileLayers.draw(tile, step);
                     int x = layout.toCanvasX(hex.x - TILE_PADDING);
                     int y = layout.toCanvasY(hex.y - TILE_PADDING);
                     graphics.drawImage(tileImage, x, y, drawnSize, drawnSize, null);
@@ -133,7 +133,7 @@ public class MapOverviewGenerator {
             gridPositions.removeIf(position -> CORNER_POSITIONS.contains(position.toLowerCase()));
             Rectangle content = MapFrame.bounds(game, gridPositions, fractureYbump, 0, 0);
             if (content == null) {
-                content = new Rectangle(0, 0, TileGenerator.TILE_WIDTH, TileGenerator.TILE_HEIGHT);
+                content = new Rectangle(0, 0, TileGeometry.TILE_WIDTH, TileGeometry.TILE_HEIGHT);
             }
             content.grow(PADDING, PADDING);
             Rectangle leftColumn = null;
@@ -189,8 +189,8 @@ public class MapOverviewGenerator {
             if (column == null) return null;
             int top = corner.startsWith("t")
                     ? column.y + PADDING
-                    : column.y + column.height - PADDING - TileGenerator.TILE_HEIGHT;
-            return new Rectangle(column.x + CORNER_MARGIN, top, TileGenerator.TILE_WIDTH, TileGenerator.TILE_HEIGHT);
+                    : column.y + column.height - PADDING - TileGeometry.TILE_HEIGHT;
+            return new Rectangle(column.x + CORNER_MARGIN, top, TileGeometry.TILE_WIDTH, TileGeometry.TILE_HEIGHT);
         }
 
         Polygon hexPolygon(Rectangle hex) {

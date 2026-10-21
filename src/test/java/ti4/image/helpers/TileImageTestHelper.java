@@ -8,12 +8,11 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.DisplayType;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.image.ImageHelper;
 import ti4.image.Mapper;
-import ti4.image.TileGenerator;
+import ti4.image.SystemContextImage;
 import ti4.image.TileImageTest;
 
 @UtilityClass
@@ -23,8 +22,7 @@ public class TileImageTestHelper {
             String.join(File.separator, List.of(".", "src", "test", "java", "ti4", "image", "static", "tileLayout"));
 
     private static BufferedImage generateTestImage(Tile tile) {
-        TileGenerator gen = new TileGenerator(TileImageTest.testGame, null, DisplayType.all, 0, tile.getPosition());
-        return gen.createMainImage();
+        return SystemContextImage.render(TileImageTest.testGame, null, 0, tile.getPosition(), null);
     }
 
     public static void runTest(Tile t, String filename) {

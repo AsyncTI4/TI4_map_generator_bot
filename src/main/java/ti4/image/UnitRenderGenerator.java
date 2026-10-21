@@ -43,9 +43,6 @@ class UnitRenderGenerator {
 
     private final ResourceHelper resourceHelper = ResourceHelper.getInstance();
 
-    // Map to store unit coordinates organized by faction and unit ID
-    private final Map<String, Map<String, List<Point>>> unitCoordinatesByFaction = new HashMap<>();
-
     private record ImagePosition(int originalX, int originalY, int x, int y) {}
 
     private record SystemContext(
@@ -214,14 +211,6 @@ class UnitRenderGenerator {
                 imagePos = calculateImagePosition(posCtx, position);
                 int imageX = imagePos.x();
                 int imageY = imagePos.y();
-
-                // Collect unit coordinates by faction and unit ID
-                String factionKey = player.getFaction();
-                String unitId = unitKey.asyncID();
-                unitCoordinatesByFaction
-                        .computeIfAbsent(factionKey, _ -> new HashMap<>())
-                        .computeIfAbsent(unitId, _ -> new ArrayList<>())
-                        .add(new Point(imageX, imageY));
 
                 if (unitKey.unitType() == UnitType.Spacedock
                         && (player.ownsUnitSubstring("cabal_spacedock") || player.hasTech("tf-dimensionaltear"))) {
@@ -611,7 +600,7 @@ class UnitRenderGenerator {
             UnitType unitType,
             int amt) {
         int imageDmgX, imageDmgY;
-        Point adjustedUnitPos = TileGenerator.offsetTokenPositionForTokenPlanets(unitPos, unitHolder, tile);
+        Point adjustedUnitPos = TileLayers.offsetTokenPositionForTokenPlanets(unitPos, unitHolder, tile);
 
         if (unitType == UnitType.Infantry || unitType == UnitType.Fighter) {
             imageDmgX = getCenteredDamageX(adjustedUnitPos, imagePos, unitImage, galvTag);
@@ -903,7 +892,7 @@ class UnitRenderGenerator {
     }
 
     private ImagePosition calculateImagePosition(PositioningContext posCtx, Point position) {
-        position = TileGenerator.offsetTokenPositionForTokenPlanets(position, unitHolder, tile);
+        position = TileLayers.offsetTokenPositionForTokenPlanets(position, unitHolder, tile);
         int xOriginal = posCtx.centerPosition.x + position.x;
         int yOriginal = posCtx.centerPosition.y + position.y;
 
@@ -948,16 +937,5 @@ class UnitRenderGenerator {
             case "sd", "csd", "plenaryorbital" -> new Point(-10, 20); // Space Dock
             default -> new Point(0, 0);
         };
-    }
-
-    /**
-     * Returns a map of unit coordinates organized by faction and unit ID.
-     * The map contains faction names as keys, unit IDs as secondary keys, and lists of pixel coordinates as values.
-     * Coordinates represent the top-left corner of where each unit was rendered.
-     *
-     * @return Map where keys are faction names, secondary keys are unit IDs, and values are lists of unit coordinates
-     */
-    public Map<String, Map<String, List<Point>>> getUnitCoordinatesByFaction() {
-        return new HashMap<>(unitCoordinatesByFaction);
     }
 }

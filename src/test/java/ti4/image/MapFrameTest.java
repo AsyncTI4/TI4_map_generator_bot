@@ -40,13 +40,13 @@ class MapFrameTest extends BaseTi4Test {
     void singleTileFrameIsOneHexPlusPaddingAndCentredInTheMinimumWidth() {
         MapFrame frame = MapFrame.around(game, List.of("000"), 0, PAD_X, PAD_Y, 2000);
         assertNotNull(frame);
-        assertEquals(TileGenerator.TILE_HEIGHT + 2 * PAD_Y, frame.height());
+        assertEquals(TileGeometry.TILE_HEIGHT + 2 * PAD_Y, frame.height());
         assertEquals(2000, frame.width());
 
         // The hex's left edge after the offset is applied, as BoardLayout.tileOrigin places it.
         Point raw = PositionMapper.getTilePosition("000");
         Point scaled = PositionMapper.getScaledTilePosition(game, "000", raw.x, raw.y, 0);
-        assertEquals((frame.width() - TileGenerator.TILE_WIDTH) / 2, scaled.x + PAD_X - frame.offsetX());
+        assertEquals((frame.width() - TileGeometry.TILE_WIDTH) / 2, scaled.x + PAD_X - frame.offsetX());
         assertEquals(PAD_Y, scaled.y + PAD_Y - frame.offsetY());
     }
 
@@ -59,7 +59,7 @@ class MapFrameTest extends BaseTi4Test {
     void overCapWindowSlidesToKeepTheHomeSystemButNeverLeavesTheSubMap() {
         Rectangle subMap = new Rectangle(0, 0, 10_000, 10_000);
         // Home system near the right edge: centring on it would reach past the sub-map.
-        Rectangle home = new Rectangle(9500, 100, TileGenerator.TILE_WIDTH, TileGenerator.TILE_HEIGHT);
+        Rectangle home = new Rectangle(9500, 100, TileGeometry.TILE_WIDTH, TileGeometry.TILE_HEIGHT);
 
         MapFrame frame = MapFrame.fit(subMap, 1000, home);
 

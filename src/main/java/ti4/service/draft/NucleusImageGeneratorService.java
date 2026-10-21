@@ -26,7 +26,7 @@ import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.image.TileGenerator;
+import ti4.image.TileLayers;
 import ti4.image.TileStep;
 import ti4.logging.BotLogger;
 import ti4.model.FactionModel;
@@ -103,8 +103,8 @@ public class NucleusImageGeneratorService {
         for (Tile tile : tileMap.values()) {
             try {
                 Point tilePos = getTilePosition(game, tile.getPosition());
-                TileGenerator tileGenerator = new TileGenerator(game, null, DisplayType.map);
-                BufferedImage tileImage = tileGenerator.draw(tile, TileStep.Nucleus);
+                TileLayers tileLayers = TileLayers.of(game, null, DisplayType.map);
+                BufferedImage tileImage = tileLayers.draw(tile, TileStep.Nucleus);
                 graphicsMain.drawImage(tileImage, tilePos.x, tilePos.y, null);
                 tileImagePoints.put(tile.getPosition(), tilePos);
             } catch (Exception e) {

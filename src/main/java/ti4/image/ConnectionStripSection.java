@@ -93,7 +93,7 @@ final class ConnectionStripSection {
         drawLabel(g2, connection.sectorName(), cell, LABEL_HEIGHT / 2, Storage.getFont28());
         int size = (int) (600 * TILE_SCALE);
         int padding = (int) (BoardLayout.TILE_PADDING * TILE_SCALE);
-        int hexHeight = (int) (TileGenerator.TILE_HEIGHT * TILE_SCALE);
+        int hexHeight = (int) (TileGeometry.TILE_HEIGHT * TILE_SCALE);
         BufferedImage tileImage;
         try {
             tileImage = tileImage(ctx, tile);
@@ -124,9 +124,9 @@ final class ConnectionStripSection {
     private static BufferedImage tileImage(RenderContext ctx, Tile tile) {
         BufferedImage image = new BufferedImage(600, 600, BufferedImage.TYPE_INT_ARGB);
         Graphics tileGraphics = image.getGraphics();
-        TileGenerator tileGenerator = new TileGenerator(ctx.game(), ctx.event(), ctx.displayType());
+        TileLayers tileLayers = TileLayers.of(ctx.game(), ctx.event(), ctx.displayType());
         for (TileStep step : List.of(TileStep.Tile, TileStep.Units)) {
-            tileGraphics.drawImage(tileGenerator.draw(tile, step), 0, 0, null);
+            tileGraphics.drawImage(tileLayers.draw(tile, step), 0, 0, null);
         }
         tileGraphics.dispose();
         return image;

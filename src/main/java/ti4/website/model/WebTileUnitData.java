@@ -18,7 +18,7 @@ import ti4.helpers.PdsCoverageHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
-import ti4.image.TileGenerator;
+import ti4.image.TileLayers;
 import ti4.website.WebPdsCoverage;
 
 @Data
@@ -163,7 +163,7 @@ public final class WebTileUnitData {
         }
 
         // Set planetary shield status
-        planetData.setPlanetaryShield(TileGenerator.shouldPlanetHaveShield(planet, game));
+        planetData.setPlanetaryShield(TileLayers.shouldPlanetHaveShield(planet, game));
     }
 
     /**
@@ -367,7 +367,7 @@ public final class WebTileUnitData {
             planetData.setInfluence(planet.getInfluence());
 
             // Set planetary shield status
-            planetData.setPlanetaryShield(TileGenerator.shouldPlanetHaveShield(planet, game));
+            planetData.setPlanetaryShield(TileLayers.shouldPlanetHaveShield(planet, game));
 
             // Add planet to special tile
             specialTileData.planets.put(planetId, planetData);

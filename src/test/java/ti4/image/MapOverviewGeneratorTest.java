@@ -43,6 +43,6 @@ class MapOverviewGeneratorTest extends BaseTi4Test {
     void smallMapIsNotBlownUp() {
         BufferedImage image = MapOverviewGenerator.render(gameWith("000"), false);
         // One 3-hex-tall cluster plus padding stays at its natural size.
-        assertTrue(image.getHeight() < 3 * TileGenerator.TILE_HEIGHT + 2 * 200 + 10);
+        assertTrue(image.getHeight() < 3 * TileGeometry.TILE_HEIGHT + 2 * 200 + 10);
     }
 }

@@ -146,8 +146,8 @@ final class BoardSection {
                 return;
             }
 
-            TileGenerator tileGenerator = new TileGenerator(game, ctx.event(), ctx.displayType());
-            BufferedImage tileImage = tileGenerator.draw(tile, step);
+            TileLayers tileLayers = TileLayers.of(game, ctx.event(), ctx.displayType());
+            BufferedImage tileImage = tileLayers.draw(tile, step);
             g2.drawImage(tileImage, origin.x, origin.y, null);
         } catch (Exception exception) {
             BotLogger.error(

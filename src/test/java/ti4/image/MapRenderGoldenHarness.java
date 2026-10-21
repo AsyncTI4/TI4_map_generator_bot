@@ -224,18 +224,18 @@ class MapRenderGoldenHarness extends BaseTi4Test {
     // The only two places that name the tile renderer's API, so a restructure edits nothing else in the harness.
     private static BufferedImage contextImage(
             Game game, GenericInteractionCreateEvent event, int rings, String focus, Player explicitViewer) {
-        return new TileGenerator(game, event, null, rings, focus, explicitViewer).createMainImage();
+        return SystemContextImage.render(game, event, rings, focus, explicitViewer);
     }
 
     private static Function<Tile, BufferedImage> layerSource(
             Game game, GenericInteractionCreateEvent event, TileStep step) {
-        TileGenerator generator = new TileGenerator(game, event, DisplayType.all);
-        return tile -> generator.draw(tile, step);
+        TileLayers layers = TileLayers.of(game, event, DisplayType.all);
+        return tile -> layers.draw(tile, step);
     }
 
     // Draws one layer per tile of the viewer's tile map (fog-substituted for private views, as BoardSection does) and
-    // folds each layer's pixels, or the class of the exception it threw, into one digest. perTile keeps a short hash per position
-    // so a mismatch names the tiles that changed.
+    // folds each layer's pixels, or the class of the exception it threw, into one digest. perTile keeps a short hash
+    // per position so a mismatch names the tiles that changed.
     private static LayerDigest digestLayers(Game game, GenericInteractionCreateEvent event, TileStep step)
             throws Exception {
         Map<String, Tile> tiles = new TreeMap<>(FogView.of(game, event).tiles());

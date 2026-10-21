@@ -49,7 +49,7 @@ public record MapFrame(int offsetX, int offsetY, int width, int height) {
         Point raw = PositionMapper.getTilePosition(position);
         if (raw == null) return null;
         Point scaled = PositionMapper.getScaledTilePosition(game, position, raw.x, raw.y, fractureYbump);
-        return new Rectangle(scaled.x + padX, scaled.y + padY, TileGenerator.TILE_WIDTH, TileGenerator.TILE_HEIGHT);
+        return new Rectangle(scaled.x + padX, scaled.y + padY, TileGeometry.TILE_WIDTH, TileGeometry.TILE_HEIGHT);
     }
 
     static Polygon hexPolygon(Rectangle hex) {

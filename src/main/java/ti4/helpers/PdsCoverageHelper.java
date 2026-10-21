@@ -21,7 +21,7 @@ public final class PdsCoverageHelper {
 
     /**
      * Calculate PDS coverage for a specific tile, returning comprehensive coverage data per faction.
-     * This method contains all the logic from TileGenerator's SpaceCannon case.
+     * This method contains all the logic from the tile renderer's SpaceCannon step.
      *
      * @param game The game instance
      * @param tile The tile to calculate coverage for

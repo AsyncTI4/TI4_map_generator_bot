@@ -115,7 +115,7 @@ public final class CompactOverviewGenerator {
                 game,
                 gmPanels(game),
                 new HashMap<>(game.getTileMap()),
-                new TileGenerator(game, null, DisplayType.map),
+                TileLayers.of(game, null, DisplayType.map),
                 GM_STEPS,
                 GM_MAX_SIZE,
                 game.getName() + " - GM overview");
@@ -127,7 +127,7 @@ public final class CompactOverviewGenerator {
                 game,
                 playerPanels(game, player, tiles.keySet()),
                 tiles,
-                new TileGenerator(game, event, DisplayType.map, 0, "000", player),
+                TileLayers.of(game, event, DisplayType.map, player),
                 PLAYER_STEPS,
                 PLAYER_MAX_SIZE,
                 game.getName() + " - " + player.getFaction() + " overview");
@@ -179,8 +179,8 @@ public final class CompactOverviewGenerator {
         Map<String, Rectangle> corners = new LinkedHashMap<>();
         for (String corner : List.of("tl", "tr", "bl", "br")) {
             if (allowed.contains(corner) && game.getTileByPosition(corner) != null) {
-                int x = corners.size() * (TileGenerator.TILE_WIDTH + CORNER_SPACING);
-                corners.put(corner, new Rectangle(x, 0, TileGenerator.TILE_WIDTH, TileGenerator.TILE_HEIGHT));
+                int x = corners.size() * (TileGeometry.TILE_WIDTH + CORNER_SPACING);
+                corners.put(corner, new Rectangle(x, 0, TileGeometry.TILE_WIDTH, TileGeometry.TILE_HEIGHT));
             }
         }
         if (!corners.isEmpty()) {
@@ -258,7 +258,7 @@ public final class CompactOverviewGenerator {
             Game game,
             List<Panel> panels,
             Map<String, Tile> tiles,
-            TileGenerator tileGenerator,
+            TileLayers tileLayers,
             List<TileStep> steps,
             int maxSize,
             String header) {
@@ -270,7 +270,7 @@ public final class CompactOverviewGenerator {
             graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             drawPanelFrames(graphics, layout);
-            drawTiles(game, graphics, layout, tiles, tileGenerator, steps);
+            drawTiles(game, graphics, layout, tiles, tileLayers, steps);
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
             graphics.drawString(header, 10, 34);
@@ -312,7 +312,7 @@ public final class CompactOverviewGenerator {
             Graphics2D graphics,
             Layout layout,
             Map<String, Tile> tiles,
-            TileGenerator tileGenerator,
+            TileLayers tileLayers,
             List<TileStep> steps) {
         double scale = layout.scale();
         int drawnSize = (int) Math.ceil(TILE_IMAGE_SIZE * scale);
@@ -326,7 +326,7 @@ public final class CompactOverviewGenerator {
                     int rawX = box.contentLeft() + hex.x - box.content().x - TILE_PADDING;
                     int rawY = box.y() + TITLE_BAND + hex.y - box.content().y - TILE_PADDING;
                     try {
-                        BufferedImage tileImage = tileGenerator.draw(tile, step);
+                        BufferedImage tileImage = tileLayers.draw(tile, step);
                         graphics.drawImage(
                                 tileImage,
                                 (int) Math.round(rawX * scale),

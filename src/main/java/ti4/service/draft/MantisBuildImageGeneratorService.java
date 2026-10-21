@@ -17,7 +17,7 @@ import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.HorizontalAlign;
 import ti4.image.PositionMapper;
-import ti4.image.TileGenerator;
+import ti4.image.TileLayers;
 import ti4.image.TileStep;
 import ti4.logging.BotLogger;
 import ti4.service.image.FileUploadService;
@@ -70,14 +70,14 @@ public class MantisBuildImageGeneratorService {
 
         Map<String, Tile> tileMap = getRelevantTiles(mapBuildContext);
 
-        TileGenerator tileGenerator = new TileGenerator(game, null, DisplayType.map);
+        TileLayers tileLayers = TileLayers.of(game, null, DisplayType.map);
         Map<String, Point> tileImagePoints = new HashMap<>();
 
         // Add all on-board game tiles to the image
         for (Tile tile : tileMap.values()) {
             try {
                 Point tilePos = getPositionPoint(game, tile.getPosition());
-                BufferedImage tileImage = tileGenerator.draw(tile, TileStep.TileUnannotated);
+                BufferedImage tileImage = tileLayers.draw(tile, TileStep.TileUnannotated);
                 graphicsMain.drawImage(tileImage, tilePos.x, tilePos.y, null);
                 tileImagePoints.put(tile.getPosition(), tilePos);
             } catch (Exception e) {
@@ -141,8 +141,8 @@ public class MantisBuildImageGeneratorService {
     private void drawPendingTile(Graphics graphics, Game game, Tile tile) {
         Point tilePoint = getPositionPoint(game, PENDING_TILE_POS);
         Point base = new Point(tilePoint.x + TILE_PADDING, tilePoint.y + TILE_PADDING + 20 - 150);
-        TileGenerator tileGenerator = new TileGenerator(game, null, DisplayType.map);
-        BufferedImage tileImage = tileGenerator.draw(tile, TileStep.Tile);
+        TileLayers tileLayers = TileLayers.of(game, null, DisplayType.map);
+        BufferedImage tileImage = tileLayers.draw(tile, TileStep.Tile);
         graphics.drawImage(tileImage, base.x - 100, base.y - 200, null);
 
         HorizontalAlign hCenter = HorizontalAlign.Center;
