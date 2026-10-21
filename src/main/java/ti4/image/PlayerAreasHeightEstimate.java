@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.image.playerarea.PlayerAreaColumns;
+import ti4.image.playerarea.PlayerAreaHeader;
+import ti4.image.playerarea.ScoredSecrets;
 
 final class PlayerAreasHeightEstimate {
 
@@ -33,7 +36,7 @@ final class PlayerAreasHeightEstimate {
     static int megaGamePlayerAreasMinimumWidth() {
         return BoardLayout.PLAYER_AREAS_LEFT
                 + 2 * BoardLayout.smallestRegularPlayerAreaWidth()
-                + PlayerAreaGenerator.COLUMN_GAP;
+                + PlayerAreaColumns.COLUMN_GAP;
     }
 
     int heightOfPlayerAreasSection() {
@@ -60,7 +63,7 @@ final class PlayerAreasHeightEstimate {
     }
 
     private int heightOfPlayerAreasSection(int objectivesY) {
-        int playersY = PlayerAreaGenerator.isMegaGame(game)
+        int playersY = PlayerAreaColumns.isMegaGame(game)
                 ? alignedPlayerAreaRowsHeight()
                 : stackedPlayerAreasHeight() - hiddenPlayerAreasHeight();
         int unrealPlayers = game.getNotRealPlayers().size();
@@ -94,8 +97,8 @@ final class PlayerAreasHeightEstimate {
         List<Player> shownPlayers = game.getRealAndEliminatedPlayers().stream()
                 .filter(player -> !hasNoPlayerArea(player) && !fog.shouldConvertToGeneric(player))
                 .toList();
-        List<List<Player>> columns = PlayerAreaGenerator.splitIntoColumns(game, shownPlayers);
-        int columnWidth = PlayerAreaGenerator.columnWidth(playerAreasRight, playerAreasLeft, columns.size());
+        List<List<Player>> columns = PlayerAreaColumns.split(game, shownPlayers);
+        int columnWidth = PlayerAreaColumns.columnWidth(playerAreasRight, playerAreasLeft, columns.size());
         int height = 0;
         for (int row = 0; row < columns.getFirst().size(); row++) {
             int rowHeight = 0;
@@ -117,16 +120,16 @@ final class PlayerAreasHeightEstimate {
 
     private int playerAreaHeightAdjustment(Player player, int areaWidth) {
         boolean headerCanGrow =
-                PlayerAreaGenerator.isMegaGame(game) || player.getTeamMateIDs().size() > 1;
+                PlayerAreaColumns.isMegaGame(game) || player.getTeamMateIDs().size() > 1;
         int adjustment = headerCanGrow
-                ? PlayerAreaGenerator.estimateExtraHeaderHeight(
-                        game, neighbours, player, playerAreasLeft, playerAreasLeft + areaWidth)
+                ? PlayerAreaHeader.extraHeight(game, neighbours, player, playerAreasLeft, playerAreasLeft + areaWidth)
                 : 0;
         if (player.isEliminated()) {
             return adjustment - 190;
         }
-        if (player.getSecretsScored().size() >= 4) {
-            return adjustment + (player.getSecretsScored().size() - 4) * 43 + 23;
+        int secretRows = ScoredSecrets.rowCount(game, player);
+        if (secretRows >= 4) {
+            return adjustment + (secretRows - 4) * 43 + 23;
         }
         return adjustment;
     }

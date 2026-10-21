@@ -12,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
+import ti4.image.playerarea.PlayerAreaColumns;
 import ti4.testUtils.BaseTi4Test;
 
 class MegaGamePlayerAreasTest extends BaseTi4Test {
@@ -96,17 +97,14 @@ class MegaGamePlayerAreasTest extends BaseTi4Test {
     void eightPlayersKeepOneColumn() {
         seatPlayers(8);
 
-        assertEquals(
-                1,
-                PlayerAreaGenerator.splitIntoColumns(game, game.getRealPlayers())
-                        .size());
+        assertEquals(1, PlayerAreaColumns.split(game, game.getRealPlayers()).size());
     }
 
     @Test
     void moreThanEightPlayersSplitIntoTwoColumnsWithTheExtraAreaOnTheLeft() {
         seatPlayers(9);
 
-        List<List<Player>> columns = PlayerAreaGenerator.splitIntoColumns(game, game.getRealPlayers());
+        List<List<Player>> columns = PlayerAreaColumns.split(game, game.getRealPlayers());
 
         assertEquals(2, columns.size());
         assertEquals(5, columns.get(0).size());
@@ -126,7 +124,7 @@ class MegaGamePlayerAreasTest extends BaseTi4Test {
         seatPlayers(10);
 
         RenderContext context = MapRenderer.resolve(new MapRenderRequest(game, DisplayType.stats, null, null));
-        int twoColumns = 10 + 2 * BoardLayout.smallestRegularPlayerAreaWidth() + PlayerAreaGenerator.COLUMN_GAP;
+        int twoColumns = 10 + 2 * BoardLayout.smallestRegularPlayerAreaWidth() + PlayerAreaColumns.COLUMN_GAP;
         assertTrue(context.canvas().width() >= twoColumns, "both columns fit side by side");
         BufferedImage image = MapRenderer.paint(context, RenderTimings.disabled());
         assertTrue(image.getHeight() < 10 * MIN_PLAYER_AREA_HEIGHT, "five areas per column, not ten stacked");

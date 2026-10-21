@@ -94,7 +94,8 @@ class MapRenderGoldenHarness extends BaseTi4Test {
         BOARDS,
         HIDE_FLIP,
         DISTANCES,
-        NUCLEUS
+        NUCLEUS,
+        PLAYER_AREA_VARIETY
     }
 
     // MAP is a whole map render. The other kinds cover the tile renderer's standalone entry points: the "system with
@@ -472,6 +473,7 @@ class MapRenderGoldenHarness extends BaseTi4Test {
                 game.setFowOption(FOWOption.HIDE_PLAYER_INFOS, !game.getFowOption(FOWOption.HIDE_PLAYER_INFOS));
             case DISTANCES -> applyDistances(game);
             case NUCLEUS -> game.setMapTemplateID(NUCLEUS_TEMPLATE);
+            case PLAYER_AREA_VARIETY -> PlayerAreaVariety.apply(game);
         }
     }
 
@@ -561,6 +563,10 @@ class MapRenderGoldenHarness extends BaseTi4Test {
         if (distances) {
             specs.add(mapSpec("dist-all", DisplayType.all, false, null, Mutation.DISTANCES, false));
             specs.add(mapSpec("dist-map", DisplayType.map, false, null, Mutation.DISTANCES, false));
+            for (DisplayType type : List.of(DisplayType.all, DisplayType.landscape, DisplayType.stats)) {
+                specs.add(
+                        mapSpec("variety-pub-" + type.name(), type, false, null, Mutation.PLAYER_AREA_VARIETY, false));
+            }
         }
         if (eager) {
             for (DisplayType type : List.of(DisplayType.all, DisplayType.landscape, DisplayType.stats)) {

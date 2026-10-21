@@ -3,7 +3,7 @@ package ti4.image;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.image.playerarea.PlayerAreaContext;
+import ti4.image.playerarea.PlayerAreas;
 import ti4.testUtils.BaseTi4Test;
 
 class UnknownTechPlayerAreaTest extends BaseTi4Test {
@@ -54,8 +56,8 @@ class UnknownTechPlayerAreaTest extends BaseTi4Test {
     private void drawPlayerArea() {
         int width = 3000;
         BufferedImage image = new BufferedImage(width, 450, BufferedImage.TYPE_INT_ARGB);
-        Graphics graphics = image.getGraphics();
-        new PlayerAreaGenerator(graphics, game, false, null, new WebsiteOverlays(), width, 54)
-                .drawPlayerAreaOLD(player, new Point(5, 5));
+        Graphics2D graphics = image.createGraphics();
+        PlayerAreas.drawSingle(
+                PlayerAreaContext.publicView(graphics, game, new WebsiteOverlays()), player, new Point(5, 5), width);
     }
 }

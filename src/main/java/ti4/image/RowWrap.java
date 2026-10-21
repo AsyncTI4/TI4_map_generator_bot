@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.ToIntFunction;
 
-final class RowWrap {
+public final class RowWrap {
 
     private RowWrap() {}
 
-    static <T> List<List<T>> wrapIntoRows(
+    public static <T> List<List<T>> wrapIntoRows(
             List<T> items, ToIntFunction<T> width, int separatorWidth, int rowWidth, int lastRowWidth) {
         List<List<T>> rows = fillRows(items, width, separatorWidth, rowWidth);
         if (rows.isEmpty()) {

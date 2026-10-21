@@ -47,6 +47,7 @@ public class MapRenderPipeline {
                                         renderEvent.event,
                                         renderEvent.segment),
                                 timings);
+                        result.playerAreaWarnings().send(renderEvent.game);
                         if (renderEvent.uploadToDiscord) {
                             uploadToDiscord(renderEvent.game, result, timings, renderEvent.callback());
                         }

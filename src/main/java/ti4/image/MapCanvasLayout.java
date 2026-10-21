@@ -2,6 +2,7 @@ package ti4.image;
 
 import ti4.game.Game;
 import ti4.helpers.DisplayType;
+import ti4.image.playerarea.PlayerAreaColumns;
 
 final class MapCanvasLayout {
 
@@ -52,7 +53,7 @@ final class MapCanvasLayout {
             BoardLayout board) {
         int mapWidth = board.mapWidth();
         int mapHeight = board.mapHeight();
-        boolean megaGame = PlayerAreaGenerator.isMegaGame(game);
+        boolean megaGame = PlayerAreaColumns.isMegaGame(game);
         boolean landscape = displayType == DisplayType.landscape;
         int playerAreasLeft = BoardLayout.PLAYER_AREAS_LEFT + (landscape ? mapWidth : 0);
         int playerAreasWidth = playerAreasWidth(landscape, megaGame, mapWidth);

@@ -11,7 +11,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.model.UnitModel;
 import ti4.settings.users.UserSettingsManager;
 
-final class VoltronDecal {
+public final class VoltronDecal {
 
     private static final Set<String> WARM_COLORS = Set.of(
             "red",
@@ -48,7 +48,7 @@ final class VoltronDecal {
 
     private VoltronDecal() {}
 
-    static void drawIfVoltron(UnitKey unitKey, int imageX, int imageY, Graphics graphics, Game game) {
+    public static void drawIfVoltron(UnitKey unitKey, int imageX, int imageY, Graphics graphics, Game game) {
         UnitModel model = game.getUnitFromUnitKey(unitKey);
         if (model == null || !"naaz_voltron".equals(model.getAlias())) return;
         String style = "eyes";

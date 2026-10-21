@@ -3,6 +3,8 @@ package ti4.image;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import ti4.helpers.DisplayType;
+import ti4.image.playerarea.PlayerAreaContext;
+import ti4.image.playerarea.PlayerAreas;
 
 final class PlayerAreasSection {
 
@@ -14,15 +16,10 @@ final class PlayerAreasSection {
             return y;
         }
         Point topLeft = new Point(BoardLayout.PLAYER_AREAS_LEFT + left, y);
-        return new PlayerAreaGenerator(
-                        g2,
-                        ctx.game(),
-                        ctx.fog().isPrivate(),
-                        ctx.fog().viewer(),
-                        ctx.overlays(),
-                        ctx.canvas().playerAreasWidth(),
-                        ctx.scoreTokenSpacing(),
-                        ctx.neighbours())
-                .drawAllPlayerAreas(topLeft);
+        PlayerAreaContext areaContext = PlayerAreaContext.of(
+                g2, ctx.game(), ctx.fog().isPrivate(), ctx.fog().viewer(), ctx.overlays(), ctx.neighbours());
+        int bottom = PlayerAreas.drawAll(areaContext, topLeft, ctx.canvas().playerAreasWidth());
+        ctx.replacePlayerAreaWarnings(areaContext.warnings());
+        return bottom;
     }
 }

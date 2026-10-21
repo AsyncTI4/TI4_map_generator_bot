@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.helpers.DisplayType;
+import ti4.image.playerarea.PlayerAreaColumns;
 import ti4.service.map.FractureService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
@@ -290,7 +291,7 @@ final class BoardLayout {
 
     // TODO: explain why this exists. Can we get rid of it?
     private static boolean hasExtraRow(Game game, int ringCount) {
-        return !PlayerAreaGenerator.isMegaGame(game)
+        return !PlayerAreaColumns.isMegaGame(game)
                 && (getMapHeight(ringCount) - EXTRA_Y) < (getMapPlayerCount(game) / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
     }
 
