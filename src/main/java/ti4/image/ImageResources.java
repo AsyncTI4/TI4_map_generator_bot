@@ -1,11 +1,13 @@
 package ti4.image;
 
+import java.io.File;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import ti4.ResourceHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.RenderRandom;
 import ti4.helpers.Units.UnitKey;
+import ti4.logging.BotLogger;
 
 public final class ImageResources {
 
@@ -63,14 +65,22 @@ public final class ImageResources {
     }
 
     @Nullable
-    public static String peekMarker(String name) {
-        return find("peek_marker/", name);
-    }
-
-    @Nullable
     public static String attachment(String name) {
         String attachment = find("attachment_token/", name);
         return attachment != null ? attachment : token(name);
+    }
+
+    @Nullable
+    public static String tokenOrAttachment(String tokenID) {
+        String tokenPath = attachment(tokenID);
+        if (tokenPath == null || !(new File(tokenPath).exists())) {
+            tokenPath = token(tokenID);
+            if (tokenPath == null) {
+                BotLogger.warning("Could not find token path: " + tokenID);
+                return null;
+            }
+        }
+        return tokenPath;
     }
 
     @Nullable

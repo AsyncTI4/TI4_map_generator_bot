@@ -232,7 +232,7 @@ final class LawsAndEventsSection {
                     continue;
                 }
                 float scale = 0.80f;
-                BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+                BufferedImage controlTokenImage = ImageHelper.readScaled(ImageResources.commandToken(controlID), scale);
                 PlayerTokens.drawControlToken(
                         g2,
                         controlTokenImage,

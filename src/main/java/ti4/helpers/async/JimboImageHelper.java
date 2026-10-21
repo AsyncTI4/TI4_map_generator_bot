@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.helpers.Storage;
 import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.image.OutlinedText;
 import ti4.image.VerticalAlign;
 import ti4.model.Mapper;
@@ -28,7 +29,7 @@ final class JimboImageHelper {
             String name = Mapper.getTokensToName().get(tok);
             return (name != null) ? name : tok;
         };
-        return generateImage(tokens, Mapper::getTokenPath, getTokenName);
+        return generateImage(tokens, ImageResources::tokenOrAttachment, getTokenName);
     }
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------

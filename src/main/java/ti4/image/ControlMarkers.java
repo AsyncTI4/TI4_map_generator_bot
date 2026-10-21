@@ -13,7 +13,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
-import ti4.model.Mapper;
 import ti4.model.PositionMapper;
 import ti4.model.UnitTokenPosition;
 
@@ -45,7 +44,7 @@ final class ControlMarkers {
             Point position = unitTokenPosition.getPosition(controlID);
             position = TokenPlanets.offset(position, unitHolder, tile);
 
-            BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), SCALE);
+            BufferedImage controlTokenImage = ImageHelper.readScaled(ImageResources.commandToken(controlID), SCALE);
             if (controlTokenImage == null) continue;
 
             int imgX;

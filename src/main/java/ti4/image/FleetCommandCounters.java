@@ -13,7 +13,7 @@ final class FleetCommandCounters {
     private FleetCommandCounters() {}
 
     static void draw(Graphics g2, String ccID, int x, int y, Player player, boolean rightAlign) {
-        String ccPath = Mapper.getCCPath(ccID);
+        String ccPath = ImageResources.commandToken(ccID);
         int ccCount = player.getFleetCC();
         boolean hasArmada = player.hasAbility("armada");
         List<String> mahactCC = player.getMahactCC();
@@ -22,13 +22,13 @@ final class FleetCommandCounters {
 
         try {
             BufferedImage ccImage = ImageHelper.read(ccPath);
-            BufferedImage blankCC = ImageHelper.read(Mapper.getCCPath("command_blank.png"));
+            BufferedImage blankCC = ImageHelper.read(ImageResources.commandToken("command_blank.png"));
             int delta = rightAlign ? -20 : 20;
 
             if (hasArmada) {
                 BufferedImage armadaLowerCCImage =
-                        ImageHelper.read(Mapper.getCCPath(Mapper.getCCID(player.getColor())));
-                BufferedImage armadaCCImage = ImageHelper.read(Mapper.getCCPath("fleet_armada.png"));
+                        ImageHelper.read(ImageResources.commandToken(Mapper.getCCID(player.getColor())));
+                BufferedImage armadaCCImage = ImageHelper.read(ImageResources.commandToken("fleet_armada.png"));
                 for (int i = 0; i < 2; i++) {
                     g2.drawImage(armadaLowerCCImage, x, y, null);
                     g2.drawImage(armadaCCImage, x, y, null);
@@ -52,7 +52,7 @@ final class FleetCommandCounters {
                     x += delta;
                 }
                 for (String ccColor : mahactCC) {
-                    String fleetCCID = Mapper.getCCPath(Mapper.getFleetCCID(ccColor));
+                    String fleetCCID = ImageResources.commandToken(Mapper.getFleetCCID(ccColor));
                     BufferedImage ccImageExtra = ImageHelper.readScaled(fleetCCID, 1.0f);
                     g2.drawImage(ccImageExtra, x, y, null);
                     x += delta;

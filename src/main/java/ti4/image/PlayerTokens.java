@@ -27,8 +27,8 @@ public final class PlayerTokens {
             boolean hideFactionIcon,
             boolean rightAlign) {
         try {
-            BufferedImage counter = ImageHelper.read(Mapper.getCCPath(commandCounterId));
-            BufferedImage blank = ImageHelper.read(Mapper.getCCPath("command_blank.png"));
+            BufferedImage counter = ImageHelper.read(ImageResources.commandToken(commandCounterId));
+            BufferedImage blank = ImageHelper.read(ImageResources.commandToken("command_blank.png"));
             BufferedImage icon = hideFactionIcon
                     ? null
                     : FactionIcons.scaled(player, COMMAND_COUNTER_ICON_SIZE, COMMAND_COUNTER_ICON_SIZE);
@@ -53,7 +53,7 @@ public final class PlayerTokens {
     public static void readAndDrawControlToken(
             Graphics2D g2, @Nullable Player player, int x, int y, boolean hideFactionIcon, float scale) {
         String color = player == null || hideFactionIcon ? "gray" : player.getColor();
-        BufferedImage token = ImageHelper.readScaled(Mapper.getCCPath(Mapper.getControlID(color)), scale);
+        BufferedImage token = ImageHelper.readScaled(ImageResources.commandToken(Mapper.getControlID(color)), scale);
         drawControlToken(g2, token, player, x, y, hideFactionIcon, scale);
     }
 

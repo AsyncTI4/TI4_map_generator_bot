@@ -152,7 +152,7 @@ public class Tile {
 
     @Nullable
     public static String getCCPath(String ccID) {
-        return Mapper.getCCPath(ccID);
+        return ImageResources.commandToken(ccID);
     }
 
     @Nullable
@@ -162,7 +162,7 @@ public class Tile {
 
     @Nullable
     public static String getTokenPath(String tokenID) {
-        return Mapper.getTokenPath(tokenID);
+        return ImageResources.tokenOrAttachment(tokenID);
     }
 
     public static Predicate<Tile> tileHasPlayersInfAndCC(Player player) {

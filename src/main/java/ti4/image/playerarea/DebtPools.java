@@ -17,6 +17,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.image.PaImage;
 import ti4.image.Strokes;
 import ti4.model.Mapper;
@@ -107,7 +108,7 @@ final class DebtPools {
         boolean hideFactionIcon = debtPlayer != null && ctx.hidesStatsOf(debtPlayer);
 
         float scale = 0.60f;
-        BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+        BufferedImage controlTokenImage = ImageHelper.readScaled(ImageResources.commandToken(controlID), scale);
         int tokenDeltaX = 0;
         for (int i = 0; i < numTokens; i++) {
             DrawingUtil.drawControlToken(

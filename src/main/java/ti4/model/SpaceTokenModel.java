@@ -8,6 +8,7 @@ import java.util.Set;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import ti4.image.ImageResources;
 import ti4.model.Source.ComponentSource;
 import ti4.model.WormholeModel.Wormhole;
 import ti4.service.emoji.ExploreEmojis;
@@ -64,7 +65,7 @@ public class SpaceTokenModel implements TokenModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public String getFilePath() {
-        return Mapper.getTokenPath(imagePath);
+        return ImageResources.tokenOrAttachment(imagePath);
     }
 
     public List<Wormhole> getWormholes() {

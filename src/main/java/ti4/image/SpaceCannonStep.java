@@ -87,7 +87,8 @@ final class SpaceCannonStep implements TileStepPainter {
         } else {
             g.setColor(Color.BLACK);
         }
-        BufferedImage token = ImageHelper.readScaled(Mapper.getCCPath(Mapper.getControlID(player.getColor())), scale);
+        BufferedImage token =
+                ImageHelper.readScaled(ImageResources.commandToken(Mapper.getControlID(player.getColor())), scale);
         DrawingUtil.drawControlToken(g, token, player, x, y, false, scale / 2);
         DrawingUtil.drawCenteredString(
                 g,

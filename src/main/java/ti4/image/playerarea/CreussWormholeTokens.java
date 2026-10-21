@@ -9,6 +9,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.model.Mapper;
 
 final class CreussWormholeTokens {
@@ -75,7 +76,7 @@ final class CreussWormholeTokens {
     }
 
     private static void drawToken(PlayerAreaContext ctx, AreaSlot slot, String tokenID, int xDeltaFromRight, int y) {
-        String tokenFile = Mapper.getTokenPath(tokenID);
+        String tokenFile = ImageResources.tokenOrAttachment(tokenID);
         if (ctx.game().isLiberationC4Mode()) {
             tokenFile = tokenFile.replace("token_creuss", "token_crimsoncreuss");
         }

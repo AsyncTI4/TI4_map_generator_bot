@@ -50,7 +50,8 @@ final class PriorityTrackSection {
             try {
                 String controlID = Mapper.getControlID(player.getColor());
 
-                BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), TOKEN_SCALE);
+                BufferedImage controlTokenImage =
+                        ImageHelper.readScaled(ImageResources.commandToken(controlID), TOKEN_SCALE);
                 int tokenWidth = controlTokenImage == null ? 51 : controlTokenImage.getWidth();
                 int tokenHeight = controlTokenImage == null ? 33 : controlTokenImage.getHeight();
                 int centreHorizontally = Math.max(0, (availableSpacePerColumn - tokenWidth) / 2);

@@ -41,7 +41,7 @@ class ObjectiveBox {
 
     static int scoreTokenSpacing() {
         String controlID = Mapper.getControlID("red");
-        BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), 0.45f);
+        BufferedImage bufferedImage = ImageHelper.readScaled(ImageResources.commandToken(controlID), 0.45f);
         return bufferedImage != null ? bufferedImage.getWidth() + 6 : 30;
     }
 
@@ -125,7 +125,7 @@ class ObjectiveBox {
                 }
 
                 BufferedImage controlTokenImage =
-                        ImageHelper.readScaled(Mapper.getCCPath(controlID), controlTokenScale);
+                        ImageHelper.readScaled(ImageResources.commandToken(controlID), controlTokenScale);
                 if (objective.isMultiScoring(game) || game.isFowMode()) {
                     PlayerTokens.drawControlToken(
                             graphics, controlTokenImage, player, x, y, convertToGeneric, controlTokenScale);

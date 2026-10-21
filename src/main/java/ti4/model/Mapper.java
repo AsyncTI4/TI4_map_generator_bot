@@ -35,7 +35,6 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
-import ti4.image.ImageResources;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.model.DeckModel.DeckType;
@@ -1328,29 +1327,6 @@ public class Mapper {
 
     public static String getSweepID(String color) {
         return "sweep_" + getColorID(color) + ".png";
-    }
-
-    @Nullable
-    public static String getCCPath(String ccID) {
-        return ImageResources.commandToken(ccID);
-    }
-
-    @Nullable
-    public static String getPeekMarkerPath(String markerID) {
-        return ImageResources.peekMarker(markerID);
-    }
-
-    @Nullable
-    public static String getTokenPath(String tokenID) {
-        String tokenPath = ImageResources.attachment(tokenID);
-        if (tokenPath == null || !(new File(tokenPath).exists())) {
-            tokenPath = ImageResources.token(tokenID);
-            if (tokenPath == null) {
-                BotLogger.warning("Could not find token path: " + tokenID);
-                return null;
-            }
-        }
-        return tokenPath;
     }
 
     // ####################

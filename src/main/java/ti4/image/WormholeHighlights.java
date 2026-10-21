@@ -42,13 +42,13 @@ final class WormholeHighlights implements OffBoardHighlights {
                 ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban");
 
         if (!gammaOnMap) {
-            String tokenFile = Mapper.getTokenPath(gammaID);
+            String tokenFile = ImageResources.tokenOrAttachment(gammaID);
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             g2.drawImage(bufferedImage, x, y, null);
             x -= (offBoardHighlighting == 3 ? 40 : 0) + (offBoardHighlighting == 2 ? 60 : 0);
         }
         if (!betaOnMap) {
-            String tokenFile = Mapper.getTokenPath(betaID);
+            String tokenFile = ImageResources.tokenOrAttachment(betaID);
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             g2.drawImage(bufferedImage, x, y, null);
             if (travelBan) {
@@ -64,7 +64,7 @@ final class WormholeHighlights implements OffBoardHighlights {
             x -= (offBoardHighlighting == 3 ? 40 : 0) + (offBoardHighlighting == 2 ? 60 : 0);
         }
         if (!alphaOnMap) {
-            String tokenFile = Mapper.getTokenPath(alphaID);
+            String tokenFile = ImageResources.tokenOrAttachment(alphaID);
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             g2.drawImage(bufferedImage, x, y, null);
             if (travelBan) {
