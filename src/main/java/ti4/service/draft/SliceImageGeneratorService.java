@@ -16,9 +16,9 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.UnitHolder;
-import ti4.helpers.Storage;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.image.io.RemoteImages;
@@ -218,7 +218,7 @@ public class SliceImageGeneratorService {
 
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(Color.white);
-        graphics.setFont(Storage.getFont50());
+        graphics.setFont(Fonts.ti(50));
         OutlinedText.draw(
                 graphics, totalsString, hs.x + 172, hs.y + 110, Color.white, hCenter, null, outlineStroke, Color.black);
         OutlinedText.draw(
@@ -245,7 +245,7 @@ public class SliceImageGeneratorService {
 
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(Color.white);
-        graphics.setFont(Storage.getFont64());
+        graphics.setFont(Fonts.ti(64));
         OutlinedText.draw(
                 graphics,
                 slice.getName(),
@@ -259,7 +259,7 @@ public class SliceImageGeneratorService {
 
         if (player != null) {
             graphics.setColor(Color.white);
-            graphics.setFont(Storage.getFont50());
+            graphics.setFont(Fonts.ti(50));
 
             String playerName = player.getUserName();
             OutlinedText.draw(
@@ -268,7 +268,7 @@ public class SliceImageGeneratorService {
             if (factionModel != null) {
                 String factionName = factionModel.getFactionName();
                 if (factionModel.getAlias().startsWith("keleres")) factionName = "The Council Keleres";
-                graphics.setFont(Storage.getFont35());
+                graphics.setFont(Fonts.ti(35));
                 OutlinedText.draw(
                         graphics,
                         factionName,

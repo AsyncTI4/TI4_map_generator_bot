@@ -3,7 +3,6 @@ package ti4.image.map;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import ti4.game.Game;
-import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.image.draw.HorizontalAlign;
@@ -12,6 +11,7 @@ import ti4.image.draw.PaImage;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
 import ti4.image.draw.WebsiteOverlays;
+import ti4.image.io.Fonts;
 
 final class GameModeBadges {
 
@@ -42,7 +42,7 @@ final class GameModeBadges {
                     TIGLHelper.isFracturedTIGLGame(game) ? "GameMode_TIGL_Fractured.png" : "GameMode_TIGL.png");
             TIGLRank rank = game.getMinimumTIGLRankAtGameStart();
             if (rank != null) {
-                g2.setFont(Storage.getFont18());
+                g2.setFont(Fonts.ti(18));
                 OutlinedText.draw(
                         g2,
                         rank.getShortName(),
@@ -53,7 +53,7 @@ final class GameModeBadges {
                         VerticalAlign.Top,
                         Strokes.STROKE_2,
                         Color.BLACK);
-                g2.setFont(Storage.getFont32());
+                g2.setFont(Fonts.ti(32));
             }
             deltaX += 100;
         }

@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Storage;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
@@ -113,7 +113,7 @@ final class BorderDecorationsStep implements TileStepPainter {
         Graphics2D arrow = arrowImage.createGraphics();
         AffineTransform arrowTextTransform = arrow.getTransform();
 
-        arrow.setFont(secondaryTile.length() > 3 ? Storage.getFont14() : Storage.getFont16());
+        arrow.setFont(secondaryTile.length() > 3 ? Fonts.ti(14) : Fonts.ti(16));
         arrow.setColor(Color.BLACK);
 
         boolean pointsSouth = direction >= 2 && direction <= 4;

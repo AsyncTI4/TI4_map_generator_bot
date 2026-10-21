@@ -9,11 +9,11 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.regex.Pattern;
 import ti4.helpers.PatternHelper;
-import ti4.helpers.Storage;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.model.TileHelper;
@@ -38,7 +38,7 @@ final class DraftTileLabel {
             BufferedImage green = ImageHelper.readScaled(ImageResources.tile("00_green.png"), 73, 63);
             layer.drawOnHex(green, 49, 119);
         } else {
-            g.setFont(Storage.getFont50());
+            g.setFont(Fonts.ti(50));
             OutlinedText.draw(
                     g,
                     draftNumber(tileID),
@@ -50,7 +50,7 @@ final class DraftTileLabel {
                     NUMBER_OUTLINE,
                     Color.BLACK);
         }
-        g.setFont(Storage.getFont24());
+        g.setFont(Fonts.ti(24));
         OutlinedText.draw(
                 g,
                 draftColor(tileID),

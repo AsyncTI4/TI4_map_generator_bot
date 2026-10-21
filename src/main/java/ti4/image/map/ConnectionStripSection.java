@@ -9,11 +9,11 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import ti4.game.Game;
 import ti4.game.Tile;
-import ti4.helpers.Storage;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
+import ti4.image.io.Fonts;
 import ti4.image.tile.TileGeometry;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
@@ -55,7 +55,7 @@ final class ConnectionStripSection {
 
         g2.setColor(Color.BLACK);
         g2.fillRect(0, stripTop, width, height(connections, width));
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
         OutlinedText.draw(
                 g2,
                 "Connections to other maps",
@@ -73,10 +73,10 @@ final class ConnectionStripSection {
                 drawConnection(ctx, tileLayers, g2, drawn.get(index), cell);
             } else {
                 String more = "+" + (connections.size() - drawn.size()) + " more";
-                drawLabel(g2, more, cell, ROW_HEIGHT / 2, Storage.getFont28());
+                drawLabel(g2, more, cell, ROW_HEIGHT / 2, Fonts.ti(28));
             }
         }
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
     }
 
     private static int connectionsPerRow(int stripWidth) {
@@ -101,7 +101,7 @@ final class ConnectionStripSection {
         if (tile == null) {
             return;
         }
-        drawLabel(g2, connection.sectorName(), cell, LABEL_HEIGHT / 2, Storage.getFont28());
+        drawLabel(g2, connection.sectorName(), cell, LABEL_HEIGHT / 2, Fonts.ti(28));
         int size = (int) (600 * TILE_SCALE);
         int padding = (int) (TileGeometry.TILE_PADDING * TILE_SCALE);
         int hexHeight = (int) (TileGeometry.TILE_HEIGHT * TILE_SCALE);
@@ -115,7 +115,7 @@ final class ConnectionStripSection {
         }
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g2.drawImage(tileImage, cell.x + (CELL_WIDTH - size) / 2, cell.y + LABEL_HEIGHT - padding, size, size, null);
-        drawLabel(g2, connection.position(), cell, LABEL_HEIGHT + hexHeight + 18, Storage.getFont24());
+        drawLabel(g2, connection.position(), cell, LABEL_HEIGHT + hexHeight + 18, Fonts.ti(24));
     }
 
     private static void drawLabel(Graphics2D g2, String text, Point cell, int centreY, Font font) {

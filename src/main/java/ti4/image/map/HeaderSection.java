@@ -6,7 +6,7 @@ import java.awt.RenderingHints;
 import java.util.List;
 import ti4.game.Game;
 import ti4.helpers.DateTimeHelper;
-import ti4.helpers.Storage;
+import ti4.image.io.Fonts;
 
 final class HeaderSection {
 
@@ -20,7 +20,7 @@ final class HeaderSection {
     static int draw(RenderContext ctx, Graphics2D g2, int landscapeShift) {
         Game game = ctx.game();
         MapCanvasLayout canvas = ctx.canvas();
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
         g2.setColor(Color.WHITE);
         String timeStamp = DateTimeHelper.getFormattedTimestamp();
         g2.drawString(game.getName() + " " + game.getCreationDate() + " - " + timeStamp, 0, 34);
@@ -36,7 +36,7 @@ final class HeaderSection {
 
         ServerIcon.draw(game, g2, x, y);
 
-        g2.setFont(Storage.getFont50());
+        g2.setFont(Fonts.ti(50));
         g2.setColor(Color.WHITE);
         g2.drawString(game.getCustomName(), landscapeShift + 4 * ServerIcon.SIZE / 3, y);
         int nameEnd = g2.getFontMetrics().stringWidth(game.getCustomName()) + 5 * ServerIcon.SIZE / 3;
@@ -44,7 +44,7 @@ final class HeaderSection {
         List<StrategyCardRow.Label> labels = StrategyCardRow.labels(ctx, g2);
 
         g2.setColor(Color.WHITE);
-        g2.setFont(Storage.getFont64());
+        g2.setFont(Fonts.ti(64));
         String roundString = "ROUND: " + game.getRound();
         int roundLen = g2.getFontMetrics().stringWidth(roundString);
 
@@ -68,7 +68,7 @@ final class HeaderSection {
         StrategyCardRow.draw(ctx, g2, labels, placement.labelRows());
 
         g2.setColor(Color.WHITE);
-        g2.setFont(Storage.getFont64());
+        g2.setFont(Fonts.ti(64));
         g2.drawString(roundString, placement.round().x, placement.round().y);
 
         CardDeckRow.draw(ctx, g2, placement.decks().x, placement.decks().y);

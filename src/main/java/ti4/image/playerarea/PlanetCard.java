@@ -11,11 +11,11 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.image.draw.ColorUtil;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.VerticalText;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
@@ -83,11 +83,9 @@ final class PlanetCard {
 
             g2.setColor(isExhausted ? Color.GRAY : Color.WHITE);
             if (planetModel.getShrinkNamePNAttach()) {
-                VerticalText.draw(
-                        g2, planetModel.getShortName().toUpperCase(), cardX + 9, y + 144, Storage.getFont16());
+                VerticalText.draw(g2, planetModel.getShortName().toUpperCase(), cardX + 9, y + 144, Fonts.ti(16));
             } else {
-                VerticalText.draw(
-                        g2, planetModel.getShortName().toUpperCase(), cardX + 7, y + 144, Storage.getFont18());
+                VerticalText.draw(g2, planetModel.getShortName().toUpperCase(), cardX + 7, y + 144, Fonts.ti(18));
             }
             drawCommodities(ctx, player, planet, cardX, y);
             return deltaX + CARD_STEP;
@@ -246,7 +244,7 @@ final class PlanetCard {
         drawDetail(g2, x + DETAIL_X, y + 103, resFileName);
         drawDetail(g2, x + DETAIL_X, y + 125, infFileName);
 
-        g2.setFont(Storage.getFont16());
+        g2.setFont(Fonts.ti(16));
         int offset = 11 - g2.getFontMetrics().stringWidth("" + resources) / 2;
         if (gardenWorld) {
             g2.setColor(Color.BLACK);
@@ -268,7 +266,7 @@ final class PlanetCard {
         if (!game.getStoredValue("CommsOnPlanet" + planet.getName()).isEmpty()) {
             int comms = Integer.parseInt(game.getStoredValue("CommsOnPlanet" + planet.getName()));
             g2.setColor(Color.GRAY);
-            g2.setFont(Storage.getFont26());
+            g2.setFont(Fonts.ti(26));
             int offset = 20 - g2.getFontMetrics().stringWidth("" + comms) / 2;
             if (game.isFacilitiesMode()) {
                 g2.setColor(ColorUtil.TradeGoodColor);
@@ -277,7 +275,7 @@ final class PlanetCard {
         }
         if (player.getHarvestCounter() > 0 && "uikos".equalsIgnoreCase(planet.getName())) {
             int harvest = player.getHarvestCounter();
-            g2.setFont(Storage.getFont26());
+            g2.setFont(Fonts.ti(26));
             int offset = 20 - g2.getFontMetrics().stringWidth("" + harvest) / 2;
             g2.setColor(Color.GRAY);
             g2.drawString(Integer.toString(harvest), x + offset - 10, y + 69);

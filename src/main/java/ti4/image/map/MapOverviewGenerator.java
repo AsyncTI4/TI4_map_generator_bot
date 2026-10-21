@@ -16,11 +16,11 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
-import ti4.helpers.Storage;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
+import ti4.image.io.Fonts;
 import ti4.image.tile.TileGeometry;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
@@ -91,7 +91,7 @@ public class MapOverviewGenerator {
                 area = area == null ? new Rectangle(hex) : area.union(hex);
             }
             if (area != null) {
-                graphics.setFont(Storage.getFont64());
+                graphics.setFont(Fonts.ti(64));
                 OutlinedText.draw(
                         graphics,
                         segment.name(),

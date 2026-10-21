@@ -16,10 +16,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.VerticalAlign;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
@@ -51,8 +51,8 @@ class SampleColors extends Subcommand {
         int DREADSUBHIGHT = 76;
         int DREADTEXHIGHT = DREADSUBHIGHT + 23 + 2 * SPACING;
         int LINEHEIGHT = 12;
-        Font bigFont = Storage.getFont12();
-        Font smallFont = Storage.getFont8();
+        Font bigFont = Fonts.ti(12);
+        Font smallFont = Fonts.ti(8);
         int PAGEWIDTH = 2400;
         int PAGEHIGHT = 3600;
         BasicStroke stroke = new BasicStroke(2.0f);
@@ -72,8 +72,8 @@ class SampleColors extends Subcommand {
             DREADSUBHIGHT = 76;
             DREADTEXHIGHT = DREADSUBHIGHT + 32 + 2 * SPACING;
             LINEHEIGHT = 20;
-            bigFont = Storage.getFont16();
-            smallFont = Storage.getFont12();
+            bigFont = Fonts.ti(16);
+            smallFont = Fonts.ti(12);
             hues.add(input.getAsString());
             if (MULTI.equals(input.getAsString())) {
                 fewer = 1;

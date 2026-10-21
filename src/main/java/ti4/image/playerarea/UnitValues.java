@@ -5,10 +5,10 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Player;
-import ti4.helpers.Storage;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.Strokes;
+import ti4.image.io.Fonts;
 
 final class UnitValues {
 
@@ -65,9 +65,9 @@ final class UnitValues {
         String healthValue = String.valueOf(player.getTotalHPValueOfUnits(type));
         String combatValue = String.valueOf(player.getTotalCombatValueOfUnits(type));
 
-        g2.setFont(Storage.getFont18());
+        g2.setFont(Fonts.ti(18));
         OutlinedText.drawCenteredWhiteOnBlack(g2, StringUtils.capitalize(type), xCenter, yTop + 32);
-        g2.setFont(Storage.getFont24());
+        g2.setFont(Fonts.ti(24));
         OutlinedText.drawCenteredWhiteOnBlack(g2, totResValue, xCenter, yTop + ROW_HEIGHT + 20);
         OutlinedText.drawCenteredWhiteOnBlack(g2, healthValue, xCenter, yTop + ROW_HEIGHT * 2 + 20);
         OutlinedText.drawCenteredWhiteOnBlack(g2, combatValue, xCenter, yTop + ROW_HEIGHT * 3 + 20);

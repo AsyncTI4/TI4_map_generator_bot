@@ -7,11 +7,11 @@ import java.util.List;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.ShapeDrawing;
 import ti4.image.draw.Strokes;
+import ti4.image.io.Fonts;
 import ti4.model.ExploreModel;
 import ti4.model.Mapper;
 
@@ -49,7 +49,7 @@ final class SupplyBlock {
     }
 
     private static void drawCommandCounters(Graphics2D g2, Player player, int x, int y) {
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
         g2.setColor(Color.WHITE);
         g2.drawString(player.getCCRepresentation(), x + 40, y + 75);
         g2.drawString("T/F/S", x + 40, y + 35);

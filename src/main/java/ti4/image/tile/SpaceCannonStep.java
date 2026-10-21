@@ -16,16 +16,16 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.PdsCoverage;
 import ti4.helpers.PdsCoverageHelper;
-import ti4.helpers.Storage;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.PlayerTokens;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.model.Mapper;
 
 final class SpaceCannonStep implements TileStepPainter {
 
-    private record Fonts(Font big, Font small) {}
+    private record DiceFonts(Font big, Font small) {}
 
     @Override
     public void paint(TileScene scene, TileLayer layer) {
@@ -53,7 +53,7 @@ final class SpaceCannonStep implements TileStepPainter {
             return;
         }
         float scale = pdsDice.size() >= 3 ? 6.0f / pdsDice.size() : 3.0f;
-        Fonts fonts = fontsFor(pdsDice.size());
+        DiceFonts fonts = fontsFor(pdsDice.size());
         int x = TILE_PADDING + layer.spiralOffsetX() + (int) ((345 - 73 * scale) / 2);
         int y = TILE_PADDING + layer.spiralOffsetY() + (int) ((300 - pdsDice.size() * 48 * scale) / 2);
         for (Map.Entry<String, List<Integer>> entry : pdsDice.entrySet()) {
@@ -64,13 +64,13 @@ final class SpaceCannonStep implements TileStepPainter {
         }
     }
 
-    private static Fonts fontsFor(int players) {
+    private static DiceFonts fontsFor(int players) {
         return switch (players) {
-            case 1, 2 -> new Fonts(Storage.getFont64(), Storage.getFont32());
-            case 3 -> new Fonts(Storage.getFont40(), Storage.getFont20());
-            case 4 -> new Fonts(Storage.getFont32(), Storage.getFont16());
-            case 5 -> new Fonts(Storage.getFont24(), Storage.getFont12());
-            default -> new Fonts(Storage.getFont16(), Storage.getFont8());
+            case 1, 2 -> new DiceFonts(Fonts.ti(64), Fonts.ti(32));
+            case 3 -> new DiceFonts(Fonts.ti(40), Fonts.ti(20));
+            case 4 -> new DiceFonts(Fonts.ti(32), Fonts.ti(16));
+            case 5 -> new DiceFonts(Fonts.ti(24), Fonts.ti(12));
+            default -> new DiceFonts(Fonts.ti(16), Fonts.ti(8));
         };
     }
 
@@ -79,7 +79,7 @@ final class SpaceCannonStep implements TileStepPainter {
             Player player,
             PdsCoverage coverage,
             List<Integer> dice,
-            Fonts fonts,
+            DiceFonts fonts,
             float scale,
             int x,
             int y) {

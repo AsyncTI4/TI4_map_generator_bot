@@ -7,8 +7,8 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import ti4.game.Game;
 import ti4.game.Tile;
-import ti4.helpers.Storage;
 import ti4.image.draw.OutlinedText;
+import ti4.image.io.Fonts;
 
 final class EmptiesStep implements TileStepPainter {
 
@@ -33,6 +33,6 @@ final class EmptiesStep implements TileStepPainter {
         g.setColor(Color.RED);
         g.fillOval(x, y, MARK_SIZE, MARK_SIZE);
         g.setColor(Color.WHITE);
-        OutlinedText.drawCentered(g, "!", new Rectangle(x, y, MARK_SIZE, MARK_SIZE), Storage.getFont80());
+        OutlinedText.drawCentered(g, "!", new Rectangle(x, y, MARK_SIZE, MARK_SIZE), Fonts.ti(80));
     }
 }

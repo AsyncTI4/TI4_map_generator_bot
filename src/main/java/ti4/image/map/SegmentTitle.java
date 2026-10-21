@@ -5,11 +5,11 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import ti4.helpers.RenderRandom;
-import ti4.helpers.Storage;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
+import ti4.image.io.Fonts;
 
 final class SegmentTitle {
 
@@ -34,15 +34,13 @@ final class SegmentTitle {
         if (isSectorTitle(ctx, label)
                 && isEasterEggRoll(RenderRandom.nextInt("segmentTitle.easterEgg", EASTER_EGG_ODDS))) {
             String text = "Map: " + EASTER_EGG_NAME + "!";
-            Font big = Storage.getFont80();
-            Font font = g2.getFontMetrics(big).stringWidth(text) < width - EASTER_EGG_SIDE_MARGIN
-                    ? big
-                    : Storage.getFont64();
+            Font big = Fonts.ti(80);
+            Font font = g2.getFontMetrics(big).stringWidth(text) < width - EASTER_EGG_SIDE_MARGIN ? big : Fonts.ti(64);
             drawTitle(g2, width, text, font, EASTER_EGG_TEXT, Strokes.STROKE_4, Color.BLACK);
         } else {
-            drawTitle(g2, width, "Map: " + label, Storage.getFont64(), Color.WHITE, Strokes.STROKE_4, Color.BLACK);
+            drawTitle(g2, width, "Map: " + label, Fonts.ti(64), Color.WHITE, Strokes.STROKE_4, Color.BLACK);
         }
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
     }
 
     private static boolean isSectorTitle(RenderContext ctx, String label) {

@@ -8,12 +8,12 @@ import java.util.List;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.model.Mapper;
@@ -34,7 +34,7 @@ final class CardDeckRow {
         if (game.isFowMode()) return;
 
         int textY = y + CARD_HEIGHT - 10;
-        g2.setFont(Storage.getFont24());
+        g2.setFont(Fonts.ti(24));
 
         for (DeckBadge badge : badges(game)) {
             PaImage.drawScaled(g2, x, y, badge.cardBack(), CARD_WIDTH, CARD_HEIGHT);

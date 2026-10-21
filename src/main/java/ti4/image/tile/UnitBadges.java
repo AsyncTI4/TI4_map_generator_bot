@@ -12,13 +12,13 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.VerticalAlign;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.image.tile.UnitPlacement.ImagePosition;
@@ -51,7 +51,7 @@ final class UnitBadges {
         g.drawImage(plaquette, tagX, tagY, null);
         FactionIcons.draw(g, player, tagX, tagY, 32, 32);
         g.setColor(Color.WHITE);
-        OutlinedText.drawCentered(g, factionTag, new Rectangle(tagX + 25, tagY + 17, 40, 13), Storage.getFont13());
+        OutlinedText.drawCentered(g, factionTag, new Rectangle(tagX + 25, tagY + 17, 40, 13), Fonts.ti(13));
     }
 
     private static Point tagOffset(String unitID) {
@@ -75,7 +75,7 @@ final class UnitBadges {
                 };
         Color color = blackText ? Color.BLACK : Color.WHITE;
         Color outline = blackText ? Color.WHITE : Color.BLACK;
-        g.setFont(count > 9 ? Storage.getFont28() : Storage.getFont24());
+        g.setFont(count > 9 ? Fonts.ti(28) : Fonts.ti(24));
         int offsetX = COUNT_POSITION.x + (count > 9 ? 5 : 0);
         int offsetY = COUNT_POSITION.y + (count > 9 ? 5 : 0);
         OutlinedText.draw(
@@ -114,7 +114,7 @@ final class UnitBadges {
         imageDmgX += TILE_PADDING;
         imageDmgY += TILE_PADDING;
         g.drawImage(galvTag, imageDmgX, imageDmgY, null);
-        g.setFont(Storage.getFont20());
+        g.setFont(Fonts.ti(20));
         OutlinedText.drawCentered(
                 g, Integer.toString(amount), imageDmgX + 38, imageDmgY + 16, Color.white, null, Color.black);
     }

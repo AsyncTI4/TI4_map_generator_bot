@@ -6,10 +6,10 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import ti4.game.Player;
-import ti4.helpers.Storage;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.VerticalText;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.model.Mapper;
@@ -57,7 +57,7 @@ final class StasisCards {
                 ImageHelper.readScaled(ImageResources.unit(Mapper.getUnitKey("ff", player.getColor())), 36, 36);
         g2.drawImage(fighter, x + 4, y + 10, null);
         g2.setColor(Color.WHITE);
-        g2.setFont(Storage.getFont16());
+        g2.setFont(Fonts.ti(16));
         VerticalText.drawOneOrTwoLines(g2, "Corsairs' Cove", x + 7, y + 116, 100);
         drawCount(g2, stasisFighters, x, y);
         CardRect.draw(
@@ -77,7 +77,7 @@ final class StasisCards {
                 g2,
                 Integer.toString(count),
                 new Rectangle(x + (shrinkText ? 2 : 4), y + (shrinkText ? 123 : 121), 42, 30),
-                shrinkText ? Storage.getFont30() : Storage.getFont36());
+                shrinkText ? Fonts.ti(30) : Fonts.ti(36));
     }
 
     static String infantryIITech(List<String> techs) {

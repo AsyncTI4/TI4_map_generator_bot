@@ -41,7 +41,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.RenderRandom;
-import ti4.helpers.Storage;
 import ti4.image.card.BannerGenerator;
 import ti4.image.card.TransactionGenerator;
 import ti4.image.draw.ColorUtil;
@@ -55,6 +54,7 @@ import ti4.image.draw.Strokes;
 import ti4.image.draw.TextWrap;
 import ti4.image.draw.VerticalAlign;
 import ti4.image.draw.VerticalText;
+import ti4.image.io.Fonts;
 import ti4.image.io.RemoteImages;
 import ti4.image.map.CompactOverviewGenerator;
 import ti4.image.map.MapOverviewGenerator;
@@ -310,7 +310,7 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
                 game -> BannerGenerator.drawFactionBanner(real(withCustomIcons(game), 1)));
         StringBuilder layouts = new StringBuilder();
         Graphics2D g2 = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics();
-        for (Font font : List.of(Storage.getFont16(), Storage.getFont24(), Storage.getFont32())) {
+        for (Font font : List.of(Fonts.ti(16), Fonts.ti(24), Fonts.ti(32))) {
             g2.setFont(font);
             for (int width : List.of(40, 120, 300)) {
                 layouts.append(String.join("|", TextWrap.layoutLines(SAMPLE, g2.getFontMetrics(), width)))
@@ -328,7 +328,7 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
         Graphics2D g2 = image.createGraphics();
         g2.setColor(Color.DARK_GRAY);
         g2.fillRect(0, 0, image.getWidth(), image.getHeight());
-        g2.setFont(Storage.getFont24());
+        g2.setFont(Fonts.ti(24));
         int y = 40;
         for (HorizontalAlign h : HorizontalAlign.values()) {
             for (VerticalAlign v : VerticalAlign.values()) {
@@ -355,14 +355,14 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
         OutlinedText.drawCentered(g2, "Centered red", 300, y, Color.RED, Strokes.STROKE_6, Color.WHITE);
         OutlinedText.drawCentered(g2, "Centered gfx", 800, y, Color.YELLOW, Strokes.STROKE_3, Color.BLACK);
         y += 40;
-        OutlinedText.drawCentered(g2, "In a rectangle", new Rectangle(20, y, 400, 60), Storage.getFont32());
+        OutlinedText.drawCentered(g2, "In a rectangle", new Rectangle(20, y, 400, 60), Fonts.ti(32));
         y += 80;
-        g2.setFont(Storage.getFont20());
+        g2.setFont(Fonts.ti(20));
         g2.setColor(Color.WHITE);
         int x = 40;
-        VerticalText.draw(g2, "Vertical text", x, 700, Storage.getFont20());
-        VerticalText.draw(g2, "Right aligned", x += 40, 700, Storage.getFont20(), true);
-        g2.setFont(Storage.getFont18());
+        VerticalText.draw(g2, "Vertical text", x, 700, Fonts.ti(20));
+        VerticalText.draw(g2, "Right aligned", x += 40, 700, Fonts.ti(20), true);
+        g2.setFont(Fonts.ti(18));
         for (String text : List.of(
                 "Short",
                 "Two words here please",

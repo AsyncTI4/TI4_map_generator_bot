@@ -14,12 +14,12 @@ import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.PlayerTokens;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalText;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.image.io.RemoteImages;
@@ -68,7 +68,7 @@ final class DebtPools {
         }
 
         int deltaX = 24;
-        g2.setFont(Storage.getFont18());
+        g2.setFont(Fonts.ti(18));
         VerticalText.drawWrappedColumns(g2, pool.getKey().toUpperCase(), x - 4, y + 148, 146);
 
         int tokenDeltaY = 0;
@@ -127,7 +127,7 @@ final class DebtPools {
 
         if (overflow > 0) {
             g2.setColor(Color.WHITE);
-            g2.setFont(Storage.getFont18());
+            g2.setFont(Fonts.ti(18));
             g2.drawString("+" + overflow, x + tokenDeltaX + 29, y + 22);
             tokenDeltaX += 2 + g2.getFontMetrics().stringWidth("+" + overflow);
         }
@@ -158,7 +158,7 @@ final class DebtPools {
     private static BufferedImage unicodeEmojiImage(UnicodeEmoji emoji) {
         BufferedImage img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g3 = img.createGraphics();
-        g3.setFont(Storage.getEmojiFont());
+        g3.setFont(Fonts.emoji());
         OutlinedText.draw(
                 g3, emoji.getFormatted(), 20, 60, Color.white, null, null, new BasicStroke(4.0f), Color.black);
         GlyphVector gv = g3.getFont().createGlyphVector(g3.getFontRenderContext(), emoji.getFormatted());

@@ -12,10 +12,10 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.image.draw.ColorUtil;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.PlayerTokens;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.image.tile.TileGeometry;
@@ -142,7 +142,7 @@ final class AnchorStats {
             String scText = sc == 0 ? " " : Integer.toString(sc);
             scText = Game.getSCNumberIfNaaluInPlay(player, scText);
             g2.setColor(ColorUtil.getSCColor(sc, game));
-            g2.setFont(Storage.getFont64());
+            g2.setFont(Fonts.ti(64));
             point = PositionMapper.getPlayerStats(Constants.STATS_SC);
             if (sc != 0) {
                 g2.drawString(scText, point.x + deltaX + 64 * count, point.y + deltaY);
@@ -151,7 +151,7 @@ final class AnchorStats {
         }
 
         g2.setColor(Color.WHITE);
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
         String ccID = Mapper.getCCID(player.getColor());
         String fleetCCID = Mapper.getFleetCCID(player.getColor());
         point = PositionMapper.getPlayerStats(Constants.STATS_CC);

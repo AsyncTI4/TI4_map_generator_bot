@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.Storage;
+import ti4.image.io.Fonts;
 
 public final class PlayerAreas {
 
@@ -26,7 +26,7 @@ public final class PlayerAreas {
     public static int drawAll(PlayerAreaContext ctx, Point topLeft, int totalWidth) {
         Game game = ctx.game();
         Graphics2D g2 = ctx.g2();
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
         int x = topLeft.x;
         List<Player> playersWithAreas = game.getRealAndEliminatedPlayers().stream()
                 .filter(player -> !PlayerArea.isSkipped(ctx, player))
@@ -71,7 +71,7 @@ public final class PlayerAreas {
             return y;
         }
         Graphics2D g2 = ctx.g2();
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
         g2.setColor(Color.WHITE);
         return drawWrapped(g2, "Spectators: " + spectatorNames, x, y + SPECTATORS_GAP, totalWidth - x);
     }

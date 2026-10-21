@@ -7,11 +7,11 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import ti4.game.Game;
 import ti4.game.Tile;
-import ti4.helpers.Storage;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 
@@ -44,7 +44,7 @@ final class DistanceStep implements TileStepPainter {
             layer.g().drawImage(distanceColor, x, y, null);
         }
         if (distance <= MAX_LABELLED_DISTANCE) {
-            layer.g().setFont(Storage.getFont110());
+            layer.g().setFont(Fonts.ti(110));
             OutlinedText.draw(
                     layer.g(),
                     distance.toString(),

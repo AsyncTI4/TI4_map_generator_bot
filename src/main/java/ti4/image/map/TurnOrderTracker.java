@@ -11,9 +11,9 @@ import java.util.List;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.Storage;
 import ti4.image.draw.ColorUtil;
 import ti4.image.draw.FactionIcons;
+import ti4.image.io.Fonts;
 
 final class TurnOrderTracker {
 
@@ -77,10 +77,10 @@ final class TurnOrderTracker {
         if (order == null) {
             return;
         }
-        g2.setFont(Storage.getFont20());
+        g2.setFont(Fonts.ti(20));
         g2.setColor(ColorUtil.ActiveColor);
         g2.drawString("ACTIVE", x + 10, y + 35);
-        g2.setFont(Storage.getFont16());
+        g2.setFont(Fonts.ti(16));
         g2.setColor(Color.LIGHT_GRAY);
         g2.drawString("NEXT UP", x + 112, y + 34);
 

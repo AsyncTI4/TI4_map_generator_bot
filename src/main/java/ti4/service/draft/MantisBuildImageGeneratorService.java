@@ -13,9 +13,9 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
-import ti4.helpers.Storage;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
+import ti4.image.io.Fonts;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
 import ti4.logging.BotLogger;
@@ -125,7 +125,7 @@ public class MantisBuildImageGeneratorService {
 
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(Color.white);
-        graphics.setFont(Storage.getFont64());
+        graphics.setFont(Fonts.ti(64));
         OutlinedText.draw(
                 graphics,
                 positionName,
@@ -147,7 +147,7 @@ public class MantisBuildImageGeneratorService {
 
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(new Color(184, 141, 42));
-        graphics.setFont(Storage.getFont64());
+        graphics.setFont(Fonts.ti(64));
         OutlinedText.draw(
                 graphics, "CURRENT", base.x + 172, base.y - 80, Color.white, hCenter, null, outlineStroke, Color.black);
     }

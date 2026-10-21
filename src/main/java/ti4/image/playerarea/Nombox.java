@@ -17,11 +17,11 @@ import ti4.game.UnitHolder;
 import ti4.helpers.CalendarHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.RenderRandom;
-import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.PaImage;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
@@ -165,7 +165,7 @@ final class Nombox {
             BufferedImage spoopy = unitKey.unitType() == UnitType.Warsun ? rollSpoopyWarsun() : null;
 
             if (justNumber) {
-                g2.setFont(Storage.getFont40());
+                g2.setFont(Fonts.ti(40));
                 g2.setColor(Color.WHITE);
                 g2.drawString(Integer.toString(countOfUnits), position.x, position.y);
                 break;

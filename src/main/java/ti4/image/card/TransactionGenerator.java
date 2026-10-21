@@ -14,7 +14,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.Storage;
 import ti4.helpers.TransactionHelper;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.HorizontalAlign;
@@ -22,6 +21,7 @@ import ti4.image.draw.OutlinedText;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.TextWrap;
 import ti4.image.draw.VerticalAlign;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.image.io.RemoteImages;
@@ -120,7 +120,7 @@ public final class TransactionGenerator {
         for (Side side : sides) {
             drawIdentityIcon(g2, side.player(), side.canSeeSheet(), side.x(SHEET_MARGIN, ICON_SIZE), SHEET_MARGIN);
         }
-        g2.setFont(Storage.getFont18());
+        g2.setFont(Fonts.ti(18));
         for (Side side : sides) {
             drawStringMultilineVertCenter(
                     g2,
@@ -259,7 +259,7 @@ public final class TransactionGenerator {
         int emojiRowY = 0;
         int emojisInRow = 0;
         boolean sendingNothing = true;
-        g2.setFont(Storage.getFont24());
+        g2.setFont(Fonts.ti(24));
         for (String raw : items) {
             if (!raw.contains("sending" + sender.getFaction())) continue;
             sendingNothing = false;
@@ -318,7 +318,7 @@ public final class TransactionGenerator {
             }
         }
         if (sendingNothing) {
-            g2.setFont(Storage.getFont24());
+            g2.setFont(Fonts.ti(24));
             y += drawMemeText(g2, nothingMessage(game, sender), x, y, align);
         }
         return y;
@@ -379,7 +379,7 @@ public final class TransactionGenerator {
         if (faded) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
 
         Font before = g2.getFont();
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
         if (text != null) {
             OutlinedText.draw(
                     g2,

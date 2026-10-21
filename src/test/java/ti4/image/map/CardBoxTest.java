@@ -8,7 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import ti4.helpers.Storage;
+import ti4.image.io.Fonts;
 import ti4.testUtils.BaseTi4Test;
 
 class CardBoxTest extends BaseTi4Test {
@@ -28,9 +28,9 @@ class CardBoxTest extends BaseTi4Test {
         BufferedImage image = new BufferedImage(CANVAS_WIDTH, height + 1, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2 = image.createGraphics();
         try {
-            g2.setFont(Storage.getFont35());
+            g2.setFont(Fonts.ti(35));
             CardBox.drawText(g2, 0, 0, Color.BLACK, 33, "", lines);
-            assertEquals(Storage.getFont26().getSize(), g2.getFont().getSize());
+            assertEquals(Fonts.ti(26).getSize(), g2.getFont().getSize());
         } finally {
             g2.dispose();
         }

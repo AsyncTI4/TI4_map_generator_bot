@@ -10,12 +10,12 @@ import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.image.draw.ColorUtil;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalText;
+import ti4.image.io.Fonts;
 import ti4.model.LeaderModel;
 import ti4.model.Mapper;
 import ti4.service.VeiledHeartService;
@@ -99,7 +99,7 @@ final class LeaderCards {
 
         if (leader.getTgCount() != 0) {
             g2.setColor(ColorUtil.TradeGoodColor);
-            g2.setFont(Storage.getFont32());
+            g2.setFont(Fonts.ti(32));
             int offset = 20 - g2.getFontMetrics().stringWidth("" + leader.getTgCount()) / 2;
             g2.drawString(Integer.toString(leader.getTgCount()), x + offset, y + 25);
         } else {
@@ -108,7 +108,7 @@ final class LeaderCards {
 
         LeaderModel leaderModel = Mapper.getLeader(leader.getId());
         if (leaderModel == null) {
-            g2.setFont(Storage.getFont14());
+            g2.setFont(Fonts.ti(14));
             VerticalText.drawOneOrTwoLines(g2, leader.getId(), x + 7, y + 30, 120, true);
             return x + CARD_STEP;
         }
@@ -116,13 +116,13 @@ final class LeaderCards {
         String name = game.isTwilightsFallMode() ? leaderModel.getTFShortName() : leaderModel.getShortName();
 
         if ("yssarilagent".equalsIgnoreCase(leader.getId()) && !game.isTwilightsFallMode()) {
-            VerticalText.draw(g2, "Clever, Clever".toUpperCase(), x + 8, y + 30, Storage.getFont14(), true);
-            VerticalText.draw(g2, "Ssruu".toUpperCase(), x + 23, y + 30, Storage.getFont18(), true);
+            VerticalText.draw(g2, "Clever, Clever".toUpperCase(), x + 8, y + 30, Fonts.ti(14), true);
+            VerticalText.draw(g2, "Ssruu".toUpperCase(), x + 23, y + 30, Fonts.ti(18), true);
         } else if (shrink) {
-            g2.setFont(Storage.getFont16());
+            g2.setFont(Fonts.ti(16));
             VerticalText.drawOneOrTwoLines(g2, name, x + 9, y + 30, 120, true);
         } else {
-            g2.setFont(Storage.getFont18());
+            g2.setFont(Fonts.ti(18));
             VerticalText.drawOneOrTwoLines(g2, name, x + 7, y + 30, 120, true);
         }
         return x + CARD_STEP;

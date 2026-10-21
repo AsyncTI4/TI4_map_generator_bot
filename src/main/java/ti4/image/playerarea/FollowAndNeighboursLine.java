@@ -4,11 +4,11 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Set;
 import ti4.game.Player;
-import ti4.helpers.Storage;
 import ti4.image.draw.ColorUtil;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.Strokes;
+import ti4.image.io.Fonts;
 
 final class FollowAndNeighboursLine {
 
@@ -36,7 +36,7 @@ final class FollowAndNeighboursLine {
             return 0;
         }
         Graphics2D g2 = ctx.g2();
-        g2.setFont(Storage.getFont20());
+        g2.setFont(Fonts.ti(20));
         int drawX = x + TEXT_INDENT;
         int drawY = y + BASELINE;
         int xSpacer = 165;
@@ -52,7 +52,7 @@ final class FollowAndNeighboursLine {
 
     private static void drawNeighbours(PlayerAreaContext ctx, Player player, int x, int y, int xSpacer) {
         Graphics2D g2 = ctx.g2();
-        g2.setFont(Storage.getFont20());
+        g2.setFont(Fonts.ti(20));
         int drawX = x + TEXT_INDENT;
         int drawY = y + BASELINE;
         Set<Player> neighbours = ctx.neighbours().withEquivalents(player);
@@ -63,7 +63,7 @@ final class FollowAndNeighboursLine {
         if (guildShips.isEmpty()) {
             return;
         }
-        g2.setFont(Storage.getFont30());
+        g2.setFont(Fonts.ti(30));
         xSpacer += ICON_STEP;
         drawLabel(g2, "(", drawX + xSpacer, drawY + 2, Color.red);
         xSpacer += 20;

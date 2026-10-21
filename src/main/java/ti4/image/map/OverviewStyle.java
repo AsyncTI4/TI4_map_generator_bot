@@ -5,7 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.List;
-import ti4.helpers.Storage;
+import ti4.image.io.Fonts;
 
 final class OverviewStyle {
 
@@ -41,7 +41,7 @@ final class OverviewStyle {
     }
 
     static void drawHeader(Graphics2D graphics, String header) {
-        graphics.setFont(Storage.getFont32());
+        graphics.setFont(Fonts.ti(32));
         graphics.setColor(Color.WHITE);
         graphics.drawString(header, HEADER_X, HEADER_BASELINE);
     }

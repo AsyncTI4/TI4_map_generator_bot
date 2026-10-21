@@ -19,9 +19,9 @@ import ti4.game.Planet;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.DisplayType;
-import ti4.helpers.Storage;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
+import ti4.image.io.Fonts;
 import ti4.image.io.RemoteImages;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
@@ -239,7 +239,7 @@ public class NucleusImageGeneratorService {
 
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(Color.white);
-        graphics.setFont(Storage.getFont64());
+        graphics.setFont(Fonts.ti(64));
         OutlinedText.draw(
                 graphics,
                 pseudoSlice.getName(),
@@ -317,7 +317,7 @@ public class NucleusImageGeneratorService {
         }
 
         graphics.setColor(Color.white);
-        graphics.setFont(Storage.getFont50());
+        graphics.setFont(Fonts.ti(50));
         OutlinedText.draw(
                 graphics,
                 totalsString,
@@ -351,7 +351,7 @@ public class NucleusImageGeneratorService {
 
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(Color.white);
-        graphics.setFont(Storage.getFont50());
+        graphics.setFont(Fonts.ti(50));
 
         OutlinedText.draw(
                 graphics,

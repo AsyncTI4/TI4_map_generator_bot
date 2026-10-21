@@ -8,10 +8,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import ti4.game.Player;
-import ti4.helpers.Storage;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalText;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
@@ -75,10 +75,10 @@ final class AbilityCards {
                     : abilityModel.getFaction();
             FactionIcons.drawFaction(g2, iconFaction, x - 1, y, 42, 42);
             if (abilityModel.getShrinkName()) {
-                g2.setFont(Storage.getFont16());
+                g2.setFont(Fonts.ti(16));
                 VerticalText.drawOneOrTwoLines(g2, abilityModel.getShortName(), x + 9, y + 144, 130);
             } else {
-                g2.setFont(Storage.getFont18());
+                g2.setFont(Fonts.ti(18));
                 VerticalText.drawOneOrTwoLines(g2, abilityModel.getShortName(), x + 7, y + 144, 130);
             }
         }

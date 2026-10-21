@@ -18,7 +18,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Storage;
+import ti4.image.io.Fonts;
 import ti4.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.PositionMapper;
@@ -90,7 +90,7 @@ public final class SystemContextImage {
             tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Units));
             tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.TileNumber));
 
-            graphics.setFont(Storage.getFont32());
+            graphics.setFont(Fonts.ti(32));
             graphics.setColor(Color.WHITE);
             String timeStamp = DateTimeHelper.getFormattedTimestampWithMillis();
             graphics.drawString(game.getName() + " " + timeStamp, 0, 34);

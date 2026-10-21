@@ -14,10 +14,10 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.Storage;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.Strokes;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 
@@ -76,7 +76,7 @@ record ProductionBadge(int production, int capacity, int capacityUsed, int ignor
         int xMod = xOffset(tile);
         g.drawImage(
                 gearImage, TILE_PADDING + ANCHOR.x + xMod - 29, TILE_PADDING + ANCHOR.y + ANCHOR_Y_OFFSET - 4, null);
-        g.setFont(Storage.getFont35());
+        g.setFont(Fonts.ti(35));
         g.drawString(
                 production + "",
                 TILE_PADDING + ANCHOR.x + xMod + 15 + textModifier - 25,
@@ -98,7 +98,7 @@ record ProductionBadge(int production, int capacity, int capacityUsed, int ignor
 
         g.drawImage(carrierImage, gearX + 24, gearY + 60, null);
         g.setColor(Color.WHITE);
-        g.setFont(Storage.getFont12());
+        g.setFont(Fonts.ti(12));
         String msg = capacityUsed + " / " + capacity;
         if (ignoredFighters > 0) {
             msg = capacityUsed + " / " + (capacity + ignoredFighters) + "*";

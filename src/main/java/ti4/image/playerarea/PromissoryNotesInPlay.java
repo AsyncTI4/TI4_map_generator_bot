@@ -8,11 +8,11 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalText;
+import ti4.image.io.Fonts;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.LeaderModel;
@@ -80,7 +80,7 @@ final class PromissoryNotesInPlay {
             g2.setColor(Color.GRAY);
         }
         if (hidden && revealsFaction) {
-            g2.setFont(Storage.getFont18());
+            g2.setFont(Fonts.ti(18));
             VerticalText.drawOneOrTwoLines(g2, HIDDEN_CARD_TEXT, x + 7, y + 4, 120, true);
         } else {
             writeName(g2, promissoryNote, x + 9, y + 4, findAttachedPlanet(game, promissoryNote));
@@ -128,10 +128,10 @@ final class PromissoryNotesInPlay {
         if (attached != null) text += "\n@" + attached.getShortNamePNAttach();
 
         if (model.getShrinkName()) {
-            g2.setFont(Storage.getFont16());
+            g2.setFont(Fonts.ti(16));
             VerticalText.drawOneOrTwoLines(g2, text, x, y, 120, true);
         } else {
-            g2.setFont(Storage.getFont18());
+            g2.setFont(Fonts.ti(18));
             VerticalText.drawOneOrTwoLines(g2, text, x - 2, y, 120, true);
         }
     }

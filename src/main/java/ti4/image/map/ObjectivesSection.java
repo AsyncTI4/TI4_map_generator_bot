@@ -5,8 +5,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import ti4.game.Game;
-import ti4.helpers.Storage;
 import ti4.image.draw.Strokes;
+import ti4.image.io.Fonts;
 
 final class ObjectivesSection {
 
@@ -19,7 +19,7 @@ final class ObjectivesSection {
     static int rowWidth(Game game, int scoreTokenSpacing) {
         Graphics2D probe = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
         try {
-            probe.setFont(Storage.getFont26());
+            probe.setFont(Fonts.ti(26));
             List<Objective> stage1 = Objective.retrievePublic1(game);
             List<Objective> stage2 = new ArrayList<>(Objective.retrievePublic2(game));
             if (game.isOmegaPhaseMode()) {
@@ -43,7 +43,7 @@ final class ObjectivesSection {
         Game game = ctx.game();
         int scoreTokenSpacing = ctx.scoreTokenSpacing();
         g2.setStroke(Strokes.STROKE_3);
-        g2.setFont(Storage.getFont26());
+        g2.setFont(Fonts.ti(26));
 
         int top = y;
         int x = LEFT_MARGIN + left;

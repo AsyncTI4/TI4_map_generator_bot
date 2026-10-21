@@ -13,12 +13,12 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.Tyr
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.image.draw.ColorUtil;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalText;
+import ti4.image.io.Fonts;
 import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
@@ -149,7 +149,7 @@ final class TechCards {
         if (isPurged) g2.setColor(Color.RED);
         drawName(g2, techModel, x, y);
         if ("dslaner".equalsIgnoreCase(tech) || "tf-dslaner".equalsIgnoreCase(tech)) {
-            VerticalText.draw(g2, "" + player.getAtsCount(), x + 15, y + 140, Storage.getFont16());
+            VerticalText.draw(g2, "" + player.getAtsCount(), x + 15, y + 140, Fonts.ti(16));
         }
         CardRect.draw(ctx, x - 2, y - 2, CardRect.WIDTH, CardRect.HEIGHT, techModel);
     }
@@ -172,10 +172,10 @@ final class TechCards {
 
     static void drawName(Graphics2D g2, TechnologyModel techModel, int x, int y) {
         if (techModel.getShrinkName()) {
-            g2.setFont(Storage.getFont16());
+            g2.setFont(Fonts.ti(16));
             VerticalText.drawOneOrTwoLines(g2, techModel.getShortName(), x + 9, y + 116, 116);
         } else {
-            g2.setFont(Storage.getFont18());
+            g2.setFont(Fonts.ti(18));
             VerticalText.drawOneOrTwoLines(g2, techModel.getShortName(), x + 7, y + 116, 116);
         }
     }

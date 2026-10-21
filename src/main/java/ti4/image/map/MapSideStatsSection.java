@@ -6,7 +6,7 @@ import java.util.List;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.DisplayType;
-import ti4.helpers.Storage;
+import ti4.image.io.Fonts;
 import ti4.image.playerarea.PlayerAreaColumns;
 import ti4.service.option.FOWOptionService.FOWOption;
 
@@ -27,7 +27,7 @@ final class MapSideStatsSection {
 
     static void draw(RenderContext ctx, Graphics2D g2) {
         Game game = ctx.game();
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
         g2.setColor(Color.WHITE);
 
         int ringCount = Math.clamp(game.getRingCount(), BoardLayout.RING_MIN_COUNT, BoardLayout.RING_MAX_COUNT);

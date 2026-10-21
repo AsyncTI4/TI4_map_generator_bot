@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.image.draw.ColorUtil;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.HexOverlays;
@@ -24,6 +23,7 @@ import ti4.image.draw.PaImage;
 import ti4.image.draw.PlayerTokens;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.model.ColorModel;
@@ -115,7 +115,7 @@ final class HexTileStats {
 
     private void drawUsername(Player player, Point statTileMid, HorizontalAlign center) {
         Point point;
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
         String userName = player.getUserName();
         point = PositionMapper.getPlayerStats("newuserName");
         if (!game.hideUserNames()) {
@@ -135,7 +135,7 @@ final class HexTileStats {
 
     private void drawFactionNameAndColorStroters(Player player, Point statTileMid, HorizontalAlign center) {
         Point point;
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
         point = PositionMapper.getPlayerStats("newfaction");
         point.translate(statTileMid.x, statTileMid.y);
         String factionText = player.getFactionModel() == null
@@ -149,7 +149,7 @@ final class HexTileStats {
 
     private void drawVictoryPoints(Player player, Point statTileMid, HorizontalAlign center) {
         Point point;
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
         String vpCount = "VP: " + player.getTotalVictoryPoints() + " / " + game.getVp();
         point = PositionMapper.getPlayerStats("newvp");
         point.translate(statTileMid.x, statTileMid.y);
@@ -187,7 +187,7 @@ final class HexTileStats {
     private Point drawCommandCounters(Player player, int dir1, Point statTile1, Point statTile2, int dir2) {
         Point point;
         Point miscTile;
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
         String ccID = Mapper.getCCID(player.getColor());
         String fleetCCID = Mapper.getFleetCCID(player.getColor());
         point = PositionMapper.getPlayerStats("newcc");
@@ -225,7 +225,7 @@ final class HexTileStats {
 
         HorizontalAlign align = HorizontalAlign.Left;
         List<String> reps = Arrays.asList(player.getCCRepresentation().split("/"));
-        g2.setFont(Storage.getFont28());
+        g2.setFont(Fonts.ti(28));
         point.translate(rightAlign ? 58 : -3, 32);
         String fleetCCs = player.getFleetCC() + additionalFleetSupply + addFS;
         OutlinedText.draw(g2, reps.get(0), point.x, point.y, Color.WHITE, align, null, Strokes.STROKE_4, Color.BLACK);
@@ -238,7 +238,7 @@ final class HexTileStats {
     private void drawStrategyCardNumbers(
             Player player, Point statTileMid, HorizontalAlign center, VerticalAlign bottom) {
         Point point;
-        g2.setFont(Storage.getFont80());
+        g2.setFont(Fonts.ti(80));
         int scsize = 96;
         List<Integer> playerSCs = new ArrayList<>(player.getSCs());
         if (player.hasTheZeroToken()) playerSCs.add(0);
@@ -276,7 +276,7 @@ final class HexTileStats {
             }
         }
         g2.setColor(Color.WHITE);
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
     }
 
     private void drawPassedActiveOrAfk(Player player, Point miscTile, HorizontalAlign center) {

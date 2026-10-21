@@ -5,8 +5,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
-import ti4.helpers.Storage;
 import ti4.image.draw.TextWrap;
+import ti4.image.io.Fonts;
 
 final class CardBox {
 
@@ -23,7 +23,7 @@ final class CardBox {
     private CardBox() {}
 
     static FontMetrics bodyMetrics(Graphics2D g2) {
-        return g2.getFontMetrics(Storage.getFont26());
+        return g2.getFontMetrics(Fonts.ti(26));
     }
 
     static FontMetrics bodyMetrics() {
@@ -45,7 +45,7 @@ final class CardBox {
     }
 
     static void drawFrame(Graphics2D g2, int x, int y, int height, Color frameColor) {
-        g2.setFont(Storage.getFont35());
+        g2.setFont(Fonts.ti(35));
         g2.setColor(frameColor);
         g2.drawRect(x, y, WIDTH, height);
     }
@@ -54,7 +54,7 @@ final class CardBox {
             Graphics2D g2, int x, int y, Color titleColor, int titleBaseline, String title, List<String> bodyLines) {
         g2.setColor(titleColor);
         g2.drawString(title, x + TEXT_LEFT, y + titleBaseline);
-        g2.setFont(Storage.getFont26());
+        g2.setFont(Fonts.ti(26));
         g2.setColor(Color.WHITE);
         for (int i = 0; i < bodyLines.size(); i++) {
             g2.drawString(bodyLines.get(i), x + TEXT_LEFT, y + BODY_FIRST_LINE + i * BODY_LINE_STEP);

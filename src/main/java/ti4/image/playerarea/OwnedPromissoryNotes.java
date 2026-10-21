@@ -7,11 +7,11 @@ import java.util.Comparator;
 import java.util.List;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.Storage;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalText;
+import ti4.image.io.Fonts;
 import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.Source.ComponentSource;
@@ -63,13 +63,13 @@ final class OwnedPromissoryNotes {
         g2.setColor(holder != null ? Color.GRAY : Color.WHITE);
 
         if ("dspntnel".equals(pnID)) {
-            g2.setFont(Storage.getFont16());
+            g2.setFont(Fonts.ti(16));
             VerticalText.drawOneOrTwoLines(g2, "Plots Within Plots", x + 9, y + 144, 150);
         } else if (promissoryNote.getShrinkName()) {
-            g2.setFont(Storage.getFont16());
+            g2.setFont(Fonts.ti(16));
             VerticalText.drawOneOrTwoLines(g2, promissoryNote.getShortName(), x + 9, y + 144, 120);
         } else {
-            g2.setFont(Storage.getFont18());
+            g2.setFont(Fonts.ti(18));
             VerticalText.drawOneOrTwoLines(g2, promissoryNote.getShortName(), x + 7, y + 144, 120);
         }
         CardRect.draw(ctx, x - 2, y - 2, CardRect.WIDTH, CardRect.HEIGHT, promissoryNote);

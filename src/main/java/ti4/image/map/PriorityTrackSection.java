@@ -6,12 +6,12 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.Storage;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.image.draw.ColorUtil;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.PlayerTokens;
 import ti4.image.draw.Strokes;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
@@ -35,14 +35,14 @@ final class PriorityTrackSection {
         Game game = ctx.game();
         String trackName = game.isOmegaPhaseMode() ? "PRIORITY:" : "SPEAKER:";
         g2.setStroke(Strokes.STROKE_5);
-        g2.setFont(Storage.getFont50());
+        g2.setFont(Fonts.ti(50));
         var priorityTrack = PriorityTrackHelper.getPriorityTrack(game);
-        OutlinedText.drawCentered(g2, trackName, new Rectangle(x, y, LABEL_WIDTH, BOX_HEIGHT), Storage.getFont64());
+        OutlinedText.drawCentered(g2, trackName, new Rectangle(x, y, LABEL_WIDTH, BOX_HEIGHT), Fonts.ti(64));
         int trackXShift = x + LABEL_WIDTH;
         for (int i = 0; i < priorityTrack.size(); i++) {
             g2.setColor(Color.WHITE);
             Rectangle rect = new Rectangle(i * BOX_WIDTH + trackXShift, y, BOX_WIDTH, BOX_HEIGHT / 2);
-            OutlinedText.drawCentered(g2, Integer.toString(i + 1), rect, Storage.getFont50());
+            OutlinedText.drawCentered(g2, Integer.toString(i + 1), rect, Fonts.ti(50));
             g2.setColor(ColorUtil.getSCColor(6, game, true));
             g2.drawRect(i * BOX_WIDTH + trackXShift, y, BOX_WIDTH, BOX_HEIGHT);
         }

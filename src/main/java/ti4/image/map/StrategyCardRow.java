@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.Storage;
 import ti4.image.draw.ColorUtil;
+import ti4.image.io.Fonts;
 
 final class StrategyCardRow {
 
@@ -43,10 +43,10 @@ final class StrategyCardRow {
                 continue;
             }
             int tradeGoods = ctx.fog().isPrivate() || scPicked.contains(sc) ? 0 : scTGs.getValue();
-            g2.setFont(Storage.getFont64());
+            g2.setFont(Fonts.ti(64));
             int width = g2.getFontMetrics().stringWidth(Integer.toString(sc));
             if (tradeGoods > 0) {
-                g2.setFont(Storage.getFont24());
+                g2.setFont(Fonts.ti(24));
                 width = Math.max(width, g2.getFontMetrics().stringWidth("TG:" + tradeGoods));
             }
             labels.add(new Label(sc, tradeGoods, width));
@@ -59,7 +59,7 @@ final class StrategyCardRow {
         boolean fogPrivate = ctx.fog().isPrivate();
         int sc = label.sc();
         String scText = Integer.toString(sc);
-        g2.setFont(Storage.getFont64());
+        g2.setFont(Fonts.ti(64));
         int textWidth = g2.getFontMetrics().stringWidth(scText);
         boolean scPicked = game.getPlayers().values().stream()
                 .anyMatch(player -> player.getSCs().contains(sc));
@@ -78,7 +78,7 @@ final class StrategyCardRow {
                             textWidth,
                             60);
             if (label.tradeGoods() > 0) {
-                g2.setFont(Storage.getFont24());
+                g2.setFont(Fonts.ti(24));
                 g2.setColor(Color.WHITE);
                 String tgMsg = "TG:" + label.tradeGoods();
                 int tgMsgTextWidth = g2.getFontMetrics().stringWidth(tgMsg);
@@ -87,7 +87,7 @@ final class StrategyCardRow {
         }
         if (fogPrivate && game.getScPlayed().getOrDefault(sc, false)) {
             g2.setColor(Color.GRAY);
-            g2.setFont(Storage.getFont64());
+            g2.setFont(Fonts.ti(64));
             g2.drawString(scText, x, baseline);
         }
     }

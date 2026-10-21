@@ -12,9 +12,9 @@ import java.util.List;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Tile;
-import ti4.helpers.Storage;
 import ti4.image.draw.IconHalo;
 import ti4.image.draw.OutlinedText;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 
@@ -81,9 +81,6 @@ final class AttachmentsStep implements TileStepPainter {
         g.fillOval(position.x + w / 2 - 36, position.y + h / 2 - 8 + 4, 72, 72);
         g.setColor(Color.WHITE);
         OutlinedText.drawCentered(
-                g,
-                "" + number,
-                new Rectangle(position.x + w / 2 - 40, position.y + h / 2 - 8, 80, 80),
-                Storage.getFont48());
+                g, "" + number, new Rectangle(position.x + w / 2 - 40, position.y + h / 2 - 8, 80, 80), Fonts.ti(48));
     }
 }

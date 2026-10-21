@@ -24,10 +24,10 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Storage;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.VerticalAlign;
+import ti4.image.io.Fonts;
 import ti4.image.tile.TileGeometry;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
@@ -45,7 +45,7 @@ public final class CompactOverviewGenerator {
     private static final int TITLE_MARGIN = 60;
     private static final FontMetrics TITLE_METRICS = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
             .createGraphics()
-            .getFontMetrics(Storage.getFont32().deriveFont(TITLE_BAND * 0.6f));
+            .getFontMetrics(Fonts.ti(32).deriveFont(TITLE_BAND * 0.6f));
     private static final String CORNERS_TITLE = "corners";
     private static final List<TileStep> GM_STEPS =
             List.of(TileStep.Tile, TileStep.Extras, TileStep.Units, TileStep.TileNumber);
@@ -271,7 +271,7 @@ public final class CompactOverviewGenerator {
 
     private static void drawPanelFrames(Graphics2D graphics, Layout layout) {
         double scale = layout.scale();
-        Font titleFont = Storage.getFont32().deriveFont((float) Math.max(16, TITLE_BAND * 0.6 * scale));
+        Font titleFont = Fonts.ti(32).deriveFont((float) Math.max(16, TITLE_BAND * 0.6 * scale));
         for (int index = 0; index < layout.placed().size(); index++) {
             Placed box = layout.placed().get(index);
             Color color = OverviewStyle.color(index);

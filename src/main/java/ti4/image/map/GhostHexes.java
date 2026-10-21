@@ -10,11 +10,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import ti4.game.Player;
-import ti4.helpers.Storage;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
+import ti4.image.io.Fonts;
 import ti4.image.tile.TileGeometry;
 import ti4.model.PositionMapper;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -76,7 +76,7 @@ final class GhostHexes {
         g2.drawPolygon(MapFrame.hexPolygon(hex));
         g2.setStroke(previousStroke);
         if (withNumber) {
-            g2.setFont(Storage.getFont40());
+            g2.setFont(Fonts.ti(40));
             OutlinedText.draw(
                     g2,
                     position,

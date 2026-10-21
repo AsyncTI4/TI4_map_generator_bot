@@ -9,12 +9,12 @@ import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRel
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Player;
 import ti4.helpers.RelicHelper;
-import ti4.helpers.Storage;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.PlayerTokens;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalText;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
@@ -104,13 +104,13 @@ final class RelicCards {
             String emelpar = RelicHelper.sillySpelling();
             int spaceIndex = emelpar.lastIndexOf(' ');
             emelpar = emelpar.substring(0, spaceIndex) + "\n" + emelpar.substring(spaceIndex);
-            g2.setFont(Storage.getFont18());
+            g2.setFont(Fonts.ti(18));
             VerticalText.drawOneOrTwoLines(g2, emelpar, x + 7, y + 30, 120, true);
         } else if (relicModel.getShrinkName()) {
-            g2.setFont(Storage.getFont16());
+            g2.setFont(Fonts.ti(16));
             VerticalText.drawOneOrTwoLines(g2, relicModel.getShortName(), x + 9, y + 30, 120, true);
         } else {
-            g2.setFont(Storage.getFont18());
+            g2.setFont(Fonts.ti(18));
             VerticalText.drawOneOrTwoLines(g2, relicModel.getShortName(), x + 7, y + 30, 120, true);
         }
     }
@@ -133,7 +133,7 @@ final class RelicCards {
         try {
             BufferedImage relicImage = ImageHelper.read(resourcePath);
             if (relicImage == null) {
-                g2.setFont(Storage.getFont20());
+                g2.setFont(Fonts.ti(20));
                 VerticalText.drawTwoLines(g2, relicModel.getShortName(), x + 5, y + 140, 130);
             } else {
                 g2.drawImage(relicImage, x, y, null);

@@ -15,11 +15,11 @@ import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.RenderRandom;
-import ti4.helpers.Storage;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.Strokes;
+import ti4.image.io.Fonts;
 import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
@@ -174,13 +174,10 @@ final class PlanetRow {
         FactionIcons.drawFactionFaded(g2, "xxcha", x + 75 - 94 / 2, y + 75 - 94 / 2, 95, 95, 0.15f);
         g2.setColor(Color.WHITE);
         OutlinedText.drawCentered(
-                g2,
-                String.valueOf(availablePlayerResources),
-                new Rectangle(x, y + 75 - 35 + 5, 150, 35),
-                Storage.getFont35());
+                g2, String.valueOf(availablePlayerResources), new Rectangle(x, y + 75 - 35 + 5, 150, 35), Fonts.ti(35));
         g2.setColor(Color.GRAY);
         OutlinedText.drawCentered(
-                g2, String.valueOf(totalPlayerResources), new Rectangle(x, y + 75 + 5, 150, 24), Storage.getFont24());
+                g2, String.valueOf(totalPlayerResources), new Rectangle(x, y + 75 + 5, 150, 24), Fonts.ti(24));
     }
 
     private static void drawSplitSummary(PlayerAreaContext ctx, Player player, int x, int y) {
@@ -214,16 +211,16 @@ final class PlanetRow {
         g2.setColor(Color.WHITE);
         if (Constants.cagesId.equals(player.getUserID())) g2.setColor(Color.decode("#f616ce"));
         OutlinedText.drawCentered(
-                g2, String.valueOf(availablePlayerFlex), new Rectangle(x, y + 115, 150, 20), Storage.getFont18());
+                g2, String.valueOf(availablePlayerFlex), new Rectangle(x, y + 115, 150, 20), Fonts.ti(18));
     }
 
     private static void drawColumn(
             Graphics2D g2, int x, int y, int available, int total, int optimal, Color optimalColor) {
         g2.setColor(Color.WHITE);
-        OutlinedText.drawCentered(g2, String.valueOf(available), new Rectangle(x, y + 30, 32, 32), Storage.getFont32());
+        OutlinedText.drawCentered(g2, String.valueOf(available), new Rectangle(x, y + 30, 32, 32), Fonts.ti(32));
         g2.setColor(Color.GRAY);
-        OutlinedText.drawCentered(g2, String.valueOf(total), new Rectangle(x, y + 55, 32, 32), Storage.getFont20());
+        OutlinedText.drawCentered(g2, String.valueOf(total), new Rectangle(x, y + 55, 32, 32), Fonts.ti(20));
         g2.setColor(optimalColor);
-        OutlinedText.drawCentered(g2, String.valueOf(optimal), new Rectangle(x, y + 90, 32, 32), Storage.getFont18());
+        OutlinedText.drawCentered(g2, String.valueOf(optimal), new Rectangle(x, y + 90, 32, 32), Fonts.ti(18));
     }
 }

@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.Storage;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
@@ -18,6 +17,7 @@ import ti4.image.draw.RowWrap;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
 import ti4.image.draw.WebsiteOverlays;
+import ti4.image.io.Fonts;
 import ti4.image.io.RemoteImages;
 
 public final class PlayerAreaHeader {
@@ -94,7 +94,7 @@ public final class PlayerAreaHeader {
 
     private int teammateNamesHeight(boolean lastHeaderRow) {
         List<String> teammateIDs = orderedTeammateIDs();
-        ctx.g2().setFont(Storage.getFont32());
+        ctx.g2().setFont(Fonts.ti(32));
         if (teammateIDs.size() == 1) {
             String userName = PlayerNames.discordName(ctx.game(), player, player.getUserID());
             return soloNameNeedsTwoRows(userName, lastHeaderRow) ? 2 * ROW_HEIGHT : ROW_HEIGHT;
@@ -104,7 +104,7 @@ public final class PlayerAreaHeader {
 
     private int drawTeammateNames(int y, boolean lastHeaderRow) {
         List<String> teammateIDs = orderedTeammateIDs();
-        ctx.g2().setFont(Storage.getFont32());
+        ctx.g2().setFont(Fonts.ti(32));
         if (teammateIDs.size() == 1) {
             return drawSoloPlayerName(y, lastHeaderRow);
         }
@@ -213,18 +213,18 @@ public final class PlayerAreaHeader {
         Set<Player> neighbours = ctx.neighbours().withEquivalents(player);
         List<NeighbourToken> tokens = new ArrayList<>();
         String label = neighbours.isEmpty() ? "No Neighbors" : "Neighbors: ";
-        tokens.add(new NeighbourToken(label, Storage.getFont20(), 0, null, 0, NEIGHBOUR_LABEL_WIDTH));
+        tokens.add(new NeighbourToken(label, Fonts.ti(20), 0, null, 0, NEIGHBOUR_LABEL_WIDTH));
         neighbours.stream()
                 .filter(neighbour -> neighbour.getFaction() != null)
                 .forEach(neighbour -> tokens.add(new NeighbourToken(null, null, 0, neighbour, 0, NEIGHBOUR_ICON_STEP)));
 
         Set<Player> guildShips = GuildShipPartners.of(ctx.game(), player, neighbours);
         if (!guildShips.isEmpty()) {
-            tokens.add(new NeighbourToken("(", Storage.getFont30(), 2, null, NEIGHBOUR_ICON_STEP, 20));
+            tokens.add(new NeighbourToken("(", Fonts.ti(30), 2, null, NEIGHBOUR_ICON_STEP, 20));
             guildShips.stream()
                     .filter(partner -> partner.getFaction() != null)
                     .forEach(partner -> tokens.add(new NeighbourToken(null, null, 0, partner, 0, NEIGHBOUR_ICON_STEP)));
-            tokens.add(new NeighbourToken(")", Storage.getFont30(), 2, null, 0, 12));
+            tokens.add(new NeighbourToken(")", Fonts.ti(30), 2, null, 0, 12));
         }
         return tokens;
     }

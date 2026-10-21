@@ -10,10 +10,10 @@ import java.util.Map;
 import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.Storage;
 import ti4.image.draw.ColorUtil;
 import ti4.image.draw.PlayerTokens;
 import ti4.image.draw.Strokes;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
@@ -33,7 +33,7 @@ public final class ScoredSecrets {
         Graphics2D g2 = ctx.g2();
         g2.setStroke(Strokes.STROKE_3);
         Map<String, String> secretObjectiveNames = Mapper.getSecretObjectivesJustNames();
-        g2.setFont(Storage.getFont26());
+        g2.setFont(Fonts.ti(26));
         g2.setColor(ColorUtil.Stage1RevealedColor);
 
         int x = slot.left() + TEXT_INDENT;

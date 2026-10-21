@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import ti4.game.Player;
-import ti4.helpers.Storage;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.image.io.RemoteImages;
@@ -190,7 +190,7 @@ public final class FactionIcons {
     private static BufferedImage renderUnicode(UnicodeEmoji emoji) {
         BufferedImage canvas = new BufferedImage(UNICODE_CANVAS, UNICODE_CANVAS, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = canvas.createGraphics();
-        g2.setFont(Storage.getEmojiFont());
+        g2.setFont(Fonts.emoji());
         String text = emoji.getFormatted();
         OutlinedText.draw(g2, text, 20, 60, Color.white, null, null, UNICODE_OUTLINE, Color.black);
         Rectangle bounds = g2.getFont()

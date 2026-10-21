@@ -16,6 +16,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.TextWrap;
+import ti4.image.io.Fonts;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
 import ti4.message.MessageHelper;
@@ -259,18 +260,18 @@ public final class MapTemplateHelper {
                 g2.drawImage(tileImg, pos.x + center.x - 100, pos.y + center.y - 100, null);
             }
         }
-        g2.setFont(Storage.getFont80());
+        g2.setFont(Fonts.ti(80));
         int y = 100;
         OutlinedText.draw(g2, "Template: " + model.getAlias(), 10, y, null, null, null, null, null);
         y += 100;
         if (model.getAuthor() != null) {
             // g2.(Storage);
-            g2.setFont(Storage.getFont64());
+            g2.setFont(Fonts.ti(64));
             OutlinedText.draw(g2, "Author: " + model.getAuthor(), 10, y, null, null, null, null, null);
             y += 70;
         }
         if (model.getDescr() != null) {
-            g2.setFont(Storage.getFont48());
+            g2.setFont(Fonts.ti(48));
             List<String> layout = TextWrap.layoutLines(model.getDescr(), g2.getFontMetrics(), 650);
             for (String line : layout) {
                 OutlinedText.draw(g2, line, 20, y, null, null, null, null, null);

@@ -10,12 +10,12 @@ import java.util.List;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Storage;
 import ti4.image.draw.ColorUtil;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.ShapeDrawing;
 import ti4.image.draw.Strokes;
+import ti4.image.io.Fonts;
 import ti4.model.StrategyCardModel;
 
 final class IdentityBlock {
@@ -62,7 +62,7 @@ final class IdentityBlock {
         Graphics2D g2 = ctx.g2();
         Color scColor = ColorUtil.getSCColor(sc, game);
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
-        g2.setFont(big ? Storage.getFont64() : Storage.getFont32());
+        g2.setFont(big ? Fonts.ti(64) : Fonts.ti(32));
 
         if (sc == ButtonHelper.getKyroHeroSC(game)) sc = 9;
         OutlinedText.drawCentered(g2, Integer.toString(sc), pt.x, pt.y, scColor, Strokes.STROKE_4, Color.black);
@@ -82,7 +82,7 @@ final class IdentityBlock {
         AffineTransform transform = g2.getTransform();
         g2.translate(x + 47 - 3, y + 47 - 6);
         g2.rotate(-Math.PI / 4);
-        g2.setFont(Storage.getFont20());
+        g2.setFont(Fonts.ti(20));
         if (label != null) {
             Color color = "PASSED".equals(label)
                     ? ColorUtil.PassedColor

@@ -3,7 +3,7 @@ package ti4.image.playerarea;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import ti4.helpers.Storage;
+import ti4.image.io.Fonts;
 
 final class TechInitials {
 
@@ -20,7 +20,7 @@ final class TechInitials {
     }
 
     static void drawLarge(Graphics2D g2, String letter, Color foreground, int x, int y) {
-        g2.setFont(Storage.getFont48());
+        g2.setFont(Fonts.ti(48));
         int offset = 20 - g2.getFontMetrics().stringWidth(letter) / 2;
         drawOutlined(g2, letter, foreground, x + offset, y + 148, 2);
     }
@@ -28,7 +28,7 @@ final class TechInitials {
     private static void drawTwo(Graphics2D g2, String initials, Color foreground, int x, int y) {
         String left = initials.substring(0, 1);
         String right = initials.substring(1, 2);
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
         FontMetrics metrics = g2.getFontMetrics();
         int offsetLeft = Math.max(0, 10 - metrics.stringWidth(left) / 2);
         int offsetRight = Math.min(40 - metrics.stringWidth(right), 30 - metrics.stringWidth(right) / 2);
@@ -40,7 +40,7 @@ final class TechInitials {
         String left = initials.substring(0, 1);
         String middle = initials.substring(1, 2);
         String right = initials.substring(2, 3);
-        g2.setFont(Storage.getFont24());
+        g2.setFont(Fonts.ti(24));
         FontMetrics metrics = g2.getFontMetrics();
         int offsetLeft = Math.max(0, 7 - metrics.stringWidth(left) / 2);
         int offsetMiddle = 20 - metrics.stringWidth(middle) / 2;

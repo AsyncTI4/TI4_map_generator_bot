@@ -3,7 +3,7 @@ package ti4.image.playerarea;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import ti4.helpers.Storage;
+import ti4.image.io.Fonts;
 import ti4.model.Mapper;
 import ti4.model.PositionMapper;
 import ti4.model.UnitTokenPosition;
@@ -21,7 +21,7 @@ final class ReinforcementNumber {
         Point position = textPosition.getPosition(id);
         String text = String.valueOf(reinforcementsCount);
 
-        g2.setFont(Storage.getFont35());
+        g2.setFont(Fonts.ti(35));
         int offset = 20 - g2.getFontMetrics().stringWidth(text) / 2;
         boolean darkUnit = reinforcementsCount > 0
                 && "_blk.png"

@@ -19,11 +19,11 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.helpers.Storage;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
@@ -189,7 +189,7 @@ final class SpaceTokens {
         if (count < 2) {
             return;
         }
-        g.setFont(Storage.getFont24());
+        g.setFont(Fonts.ti(24));
         OutlinedText.draw(
                 g,
                 Integer.toString(count),

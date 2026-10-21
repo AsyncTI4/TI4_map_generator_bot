@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import ti4.game.Player;
-import ti4.helpers.Storage;
 import ti4.image.draw.ColorUtil;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.PlayerTokens;
 import ti4.image.draw.ShapeDrawing;
+import ti4.image.io.Fonts;
 import ti4.model.Mapper;
 
 final class PlotCards {
@@ -44,7 +44,7 @@ final class PlotCards {
         ShapeDrawing.gradientOutline(g2, main, accent, left, y, width, HEIGHT);
 
         g2.setColor(Color.white);
-        g2.setFont(Storage.getFont20());
+        g2.setFont(Fonts.ti(20));
         int firstRowY = y + 28;
         for (int i = 0; i < plots.size(); i++) {
             int column = i / ROWS_PER_COLUMN;

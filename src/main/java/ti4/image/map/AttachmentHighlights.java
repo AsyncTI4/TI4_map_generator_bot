@@ -13,8 +13,8 @@ import java.util.Map;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
-import ti4.helpers.Storage;
 import ti4.image.draw.OutlinedText;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.image.tile.TileGeometry;
@@ -82,7 +82,7 @@ final class AttachmentHighlights implements OffBoardHighlights {
                                             + (player.isSpeaker() ? 30 : 0),
                                     80,
                                     80),
-                            Storage.getFont48());
+                            Fonts.ti(48));
                 }
             }
         } else if (offBoardHighlighting == 1) {
@@ -120,7 +120,7 @@ final class AttachmentHighlights implements OffBoardHighlights {
                                 miscTile.y + (TileGeometry.TILE_HEIGHT - 16) / 2 + (player.isSpeaker() ? 30 : 0),
                                 80,
                                 80),
-                        Storage.getFont48());
+                        Fonts.ti(48));
             }
         }
         return offBoardHighlighting;

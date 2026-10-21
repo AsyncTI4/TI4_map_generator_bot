@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.Storage;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
@@ -14,6 +13,7 @@ import ti4.image.draw.PaImage;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
 import ti4.image.draw.VerticalText;
+import ti4.image.io.Fonts;
 import ti4.image.io.RemoteImages;
 import ti4.logging.BotLogger;
 import ti4.model.BreakthroughModel;
@@ -63,10 +63,10 @@ final class BreakthroughCards {
             BreakthroughModel background = copiedDataBreach == null ? model : copiedDataBreach;
             PaImage.draw(g2, x, y, background.getBackgroundResource(unlocked && !exhausted));
             if (model.getShrinkName()) {
-                g2.setFont(Storage.getFont16());
+                g2.setFont(Fonts.ti(16));
                 VerticalText.drawOneOrTwoLines(g2, model.getShortName(), x + 11, y + 144, 120);
             } else {
-                g2.setFont(Storage.getFont18());
+                g2.setFont(Fonts.ti(18));
                 VerticalText.drawOneOrTwoLines(g2, model.getShortName(), x + 9, y + 144, 120);
             }
 
@@ -92,7 +92,7 @@ final class BreakthroughCards {
     private static void drawTradeGoods(Graphics2D g2, int tradeGoods, int x, int y) {
         BufferedImage tg = RemoteImages.emoji(MiscEmojis.tg, 40);
         g2.drawImage(tg, x + 2, y - 40, null);
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
         OutlinedText.draw(
                 g2,
                 Integer.toString(tradeGoods),

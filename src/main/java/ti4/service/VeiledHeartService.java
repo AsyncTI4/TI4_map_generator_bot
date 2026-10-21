@@ -24,9 +24,9 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTwilightsFallActionCards;
 import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.image.draw.VerticalText;
+import ti4.image.io.Fonts;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.Mapper;
@@ -733,7 +733,7 @@ public class VeiledHeartService {
 
     public static int veiledField(Graphics2D graphics, int x, int y, VeiledCardType type, int deltaX, Player player) {
         graphics.setColor(Color.LIGHT_GRAY);
-        graphics.setFont(Storage.getFont18());
+        graphics.setFont(Fonts.ti(18));
         String text = "VEILED\n" + type.toString();
         long cardCount = getVeiledCards(type, player).count();
         for (long l = 0; l < cardCount; ++l) {

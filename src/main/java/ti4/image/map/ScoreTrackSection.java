@@ -10,10 +10,10 @@ import org.apache.commons.collections4.ListUtils;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.RenderRandom;
-import ti4.helpers.Storage;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.PlayerTokens;
 import ti4.image.draw.Strokes;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
@@ -37,7 +37,7 @@ final class ScoreTrackSection {
         Game game = ctx.game();
         FogView fog = ctx.fog();
         g2.setStroke(Strokes.STROKE_5);
-        g2.setFont(Storage.getFont50());
+        g2.setFont(Fonts.ti(50));
 
         int pinkLimit = pinkLimit(game);
         int greyLimit = greyLimit(game);
@@ -46,7 +46,7 @@ final class ScoreTrackSection {
         for (int i = 1 + Math.max(game.getVp(), pinkLimit); i <= greyLimit; i++) {
             g2.setColor(Color.WHITE);
             Rectangle rect = new Rectangle(i * boxWidth + x, y, boxWidth, BOX_HEIGHT);
-            OutlinedText.drawCentered(g2, Integer.toString(i), rect, Storage.getFont50());
+            OutlinedText.drawCentered(g2, Integer.toString(i), rect, Fonts.ti(50));
             g2.setColor(Color.GRAY);
             g2.drawRect(i * boxWidth + x, y, boxWidth, BOX_HEIGHT);
         }
@@ -54,7 +54,7 @@ final class ScoreTrackSection {
         for (int i = game.getVp() + 1; i <= pinkLimit; i++) {
             g2.setColor(Color.WHITE);
             Rectangle rect = new Rectangle(i * boxWidth + x, y, boxWidth, BOX_HEIGHT);
-            OutlinedText.drawCentered(g2, Integer.toString(i), rect, Storage.getFont50());
+            OutlinedText.drawCentered(g2, Integer.toString(i), rect, Fonts.ti(50));
             g2.setColor(Color.PINK);
             g2.drawRect(i * boxWidth + x, y, boxWidth, BOX_HEIGHT);
         }
@@ -62,7 +62,7 @@ final class ScoreTrackSection {
         for (int i = 0; i <= game.getVp(); i++) {
             g2.setColor(Color.WHITE);
             Rectangle rect = new Rectangle(i * boxWidth + x, y, boxWidth, BOX_HEIGHT);
-            OutlinedText.drawCentered(g2, Integer.toString(i), rect, Storage.getFont50());
+            OutlinedText.drawCentered(g2, Integer.toString(i), rect, Fonts.ti(50));
             g2.setColor(Color.RED);
             g2.drawRect(i * boxWidth + x, y, boxWidth, BOX_HEIGHT);
         }

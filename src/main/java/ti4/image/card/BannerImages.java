@@ -5,13 +5,13 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import ti4.game.Player;
-import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.model.Mapper;
@@ -40,7 +40,7 @@ final class BannerImages {
         drawStrip(g2, player.getColor());
         g2.drawImage(smallIcon, 2, 24, null);
         g2.drawImage(largeIcon, 180, -42, null);
-        g2.setFont(Storage.getFont16());
+        g2.setFont(Fonts.ti(16));
         g2.setColor(Color.WHITE);
         drawWhiteOnBlack(g2, player.bannerName(), 29, 44);
         int initiativeX = player.getInitiative() > 9 ? 287 : 300;
@@ -55,7 +55,7 @@ final class BannerImages {
         Graphics2D g2 = banner.createGraphics();
         drawStrip(g2, AGENDA_STRIP_COLOR);
         g2.drawImage(agendaIcon, 0, 0, null);
-        g2.setFont(Storage.getFont28());
+        g2.setFont(Fonts.ti(28));
         g2.setColor(Color.WHITE);
         drawWhiteOnBlack(g2, "Agenda #" + number, 55, 35);
         return banner;
@@ -67,10 +67,10 @@ final class BannerImages {
                 ImageResources.extra(phase + "banner.png"), PHASE_BANNER_WIDTH, PHASE_BANNER_HEIGHT);
         Graphics2D g2 = banner.createGraphics();
         g2.drawImage(background, 0, 0, null);
-        g2.setFont(Storage.getFont48());
+        g2.setFont(Fonts.ti(48));
         g2.setColor(Color.WHITE);
         drawCentered(g2, phaseLabel.toUpperCase() + " PHASE", 110, PHASE_OUTLINE);
-        g2.setFont(Storage.getFont32());
+        g2.setFont(Fonts.ti(32));
         drawCentered(g2, "ROUND " + StringHelper.numberToWords(round).toUpperCase(), 221, ROUND_OUTLINE);
         return banner;
     }

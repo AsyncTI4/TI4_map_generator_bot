@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.helpers.Storage;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.VerticalAlign;
+import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.model.Mapper;
@@ -41,7 +41,7 @@ final class JimboImageHelper {
         for (T model : models) {
             BufferedImage img = ImageHelper.square(ImageHelper.read(getImgPath.apply(model)));
             Graphics2D g2 = img.createGraphics();
-            g2.setFont(Storage.getFont32());
+            g2.setFont(Fonts.ti(32));
             OutlinedText.draw(
                     g2,
                     getDisplayName.apply(model),
