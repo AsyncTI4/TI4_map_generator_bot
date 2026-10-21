@@ -121,7 +121,7 @@ public void handleMyButton(ButtonInteractionEvent event, Game game, Player playe
 
 ### 4. Data / Content System
 
-- **`Mapper`** (in `ti4.image`): static utility class; loaded at startup via `Mapper.init()`. Provides access to all game content: factions, tiles, planets, technologies, colors, leaders, etc.
+- **`Mapper`** (in `ti4.model`): static utility class; loaded at startup via `Mapper.init()`. Provides access to all game content: factions, tiles, planets, technologies, colors, leaders, etc.
   - `Mapper.getColors()` returns a new `ArrayList` from a `HashMap`-backed map — order is not guaranteed.
   - `Mapper.getColor("null")` returns `null` — always guard against this.
 - **`TileHelper`**: maps tile IDs to `TileModel`, planet IDs to `PlanetModel`.
