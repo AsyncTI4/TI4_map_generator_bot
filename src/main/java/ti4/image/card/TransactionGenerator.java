@@ -33,6 +33,7 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
+import ti4.service.fow.FogMemoryService;
 
 public final class TransactionGenerator {
 
@@ -110,6 +111,7 @@ public final class TransactionGenerator {
     }
 
     public static BufferedImage drawTransactableStuffImage(Player p1, Player p2, Player viewer) {
+        FogMemoryService.ensureInitialized(p1.getGame(), viewer);
         List<Side> sides =
                 List.of(new Side(p1, canSeeSheet(p1, viewer), false), new Side(p2, canSeeSheet(p2, viewer), true));
         BufferedImage image = new BufferedImage(SHEET_WIDTH, SHEET_HEIGHT, BufferedImage.TYPE_INT_ARGB);
@@ -197,7 +199,7 @@ public final class TransactionGenerator {
 
     private static boolean canSeeSheet(Player target, Player viewer) {
         Game game = target.getGame();
-        return viewer == null || !game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, target, viewer);
+        return viewer == null || !game.isFowMode() || FoWHelper.canSeeStatsOfPlayerInCurrentFog(game, target, viewer);
     }
 
     private static void drawIdentityIcon(Graphics2D g2, Player player, boolean canSeeSheet, int x, int y) {

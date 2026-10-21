@@ -6,6 +6,8 @@ import ti4.helpers.DisplayType;
 import ti4.image.draw.GraphicsState;
 import ti4.image.io.EncodedImage;
 import ti4.image.io.ImageEncoder;
+import ti4.service.fow.FogMemoryService;
+import ti4.service.fow.FogViewer;
 
 final class MapRenderer {
 
@@ -14,7 +16,9 @@ final class MapRenderer {
     private MapRenderer() {}
 
     static RenderContext resolve(MapRenderRequest request) {
-        return RenderContext.build(request);
+        FogViewer viewer = FogViewer.resolve(request.game(), request.event(), null);
+        FogMemoryService.refresh(request.game(), viewer);
+        return RenderContext.build(request, viewer);
     }
 
     static MapRenderResult render(MapRenderRequest request, RenderTimings timings) {

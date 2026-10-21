@@ -7,6 +7,7 @@ import ti4.helpers.DisplayType;
 import ti4.image.draw.WebsiteOverlays;
 import ti4.image.playerarea.NeighbourMap;
 import ti4.image.playerarea.PlayerAreaWarnings;
+import ti4.service.fow.FogViewer;
 
 final class RenderContext {
 
@@ -51,13 +52,13 @@ final class RenderContext {
         this.canvas = canvas;
     }
 
-    static RenderContext build(MapRenderRequest request) {
+    static RenderContext build(MapRenderRequest request, FogViewer viewer) {
         Game game = request.game();
         NeighbourMap neighbours = new NeighbourMap(game);
         DisplayType displayType = effectiveDisplayType(game, request.displayType());
         DisplayType basicType = basicTypeOf(displayType);
         int scoreTokenSpacing = ObjectiveBox.scoreTokenSpacing();
-        FogView fog = FogView.of(game, request.event());
+        FogView fog = FogView.of(game, viewer);
         MapSideStatLayout statLayout = new MapSideStatLayout(game, fog);
         BoardLayout board = BoardLayout.resolve(
                 game, displayType, basicType, request.segment(), fog, statLayout, scoreTokenSpacing);

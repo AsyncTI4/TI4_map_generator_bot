@@ -58,11 +58,11 @@ public record FogViewer(
     }
 
     public boolean canSeeStats(@Nullable Player owner) {
-        return player != null && owner != null && FoWHelper.canSeeStatsOfPlayer(game, owner, player);
+        return player != null && owner != null && FoWHelper.canSeeStatsOfPlayerInCurrentFog(game, owner, player);
     }
 
     public boolean canSeeStatsOfFaction(String faction) {
-        return player != null && FoWHelper.canSeeStatsOfFaction(game, faction, player);
+        return player != null && FoWHelper.canSeeStatsOfFactionInCurrentFog(game, faction, player);
     }
 
     public boolean seesHomeSystem(@Nullable Player owner) {
@@ -70,7 +70,7 @@ public record FogViewer(
     }
 
     public Set<String> visibleSystems() {
-        return player == null ? Collections.emptySet() : FoWHelper.fowFilter(game, player);
+        return player == null ? Collections.emptySet() : FoWHelper.visibleSystems(game, player);
     }
 
     public Set<String> positionsInReach() {

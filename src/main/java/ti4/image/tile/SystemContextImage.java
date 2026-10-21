@@ -23,6 +23,7 @@ import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.PositionMapper;
+import ti4.service.fow.FogMemoryService;
 import ti4.service.fow.FogViewer;
 
 public final class SystemContextImage {
@@ -63,7 +64,9 @@ public final class SystemContextImage {
             int rings,
             String focusPosition,
             @Nullable Player explicitViewer) {
-        TileLayers layers = TileLayers.of(game, event, null, explicitViewer);
+        FogViewer viewer = FogViewer.resolve(game, event, explicitViewer);
+        FogMemoryService.refresh(game, viewer);
+        TileLayers layers = TileLayers.forPreparedViewer(game, viewer, null);
         return new SystemContextImage(game, layers, rings, focusPosition).draw();
     }
 

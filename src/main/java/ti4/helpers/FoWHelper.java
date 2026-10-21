@@ -288,15 +288,32 @@ public final class FoWHelper {
     }
 
     public static boolean canSeeStatsOfFaction(Game game, String faction, Player viewingPlayer) {
+        return canSeeStatsOfFaction(game, faction, viewingPlayer, true);
+    }
+
+    public static boolean canSeeStatsOfFactionInCurrentFog(Game game, String faction, Player viewingPlayer) {
+        return canSeeStatsOfFaction(game, faction, viewingPlayer, false);
+    }
+
+    private static boolean canSeeStatsOfFaction(
+            Game game, String faction, Player viewingPlayer, boolean initializeFog) {
         for (Player player : game.getRealPlayers()) {
             if (faction.equalsIgnoreCase(player.getFaction())) {
-                return canSeeStatsOfPlayer(game, player, viewingPlayer);
+                return canSeeStatsOfPlayer(game, player, viewingPlayer, initializeFog);
             }
         }
         return false;
     }
 
     public static boolean canSeeStatsOfPlayer(Game game, Player player, Player viewingPlayer) {
+        return canSeeStatsOfPlayer(game, player, viewingPlayer, true);
+    }
+
+    public static boolean canSeeStatsOfPlayerInCurrentFog(Game game, Player player, Player viewingPlayer) {
+        return canSeeStatsOfPlayer(game, player, viewingPlayer, false);
+    }
+
+    private static boolean canSeeStatsOfPlayer(Game game, Player player, Player viewingPlayer, boolean initializeFog) {
         if (game == null || !player.isRealPlayer() || !viewingPlayer.isRealPlayer()) {
             return false;
         }
@@ -312,7 +329,9 @@ public final class FoWHelper {
                         || hasMahactCCInFleet(game, player, viewingPlayer))) {
             return true;
         }
-        initializeFog(game, viewingPlayer, false);
+        if (initializeFog) {
+            initializeFog(game, viewingPlayer, false);
+        }
         return hasHomeSystemInView(player, viewingPlayer);
     }
 
@@ -323,16 +342,19 @@ public final class FoWHelper {
     public static Set<String> fowFilter(Game game, Player player) {
         if (player != null) {
             updateFog(game, player);
-
-            Set<String> systems = new HashSet<>();
-            for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
-                if (!tileEntry.getValue().hasFog(player)) {
-                    systems.add(tileEntry.getKey());
-                }
-            }
-            return systems;
+            return visibleSystems(game, player);
         }
         return Collections.emptySet();
+    }
+
+    public static Set<String> visibleSystems(Game game, Player player) {
+        Set<String> systems = new HashSet<>();
+        for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
+            if (!tileEntry.getValue().hasFog(player)) {
+                systems.add(tileEntry.getKey());
+            }
+        }
+        return systems;
     }
 
     private static void initializeFog(Game game, @NotNull Player player, boolean forceRecalculate) {
@@ -468,6 +490,10 @@ public final class FoWHelper {
 
     public static void updateFog(Game game, Player player) {
         if (player != null) initializeFog(game, player, true);
+    }
+
+    public static void ensureFogInitialized(Game game, @NotNull Player player) {
+        initializeFog(game, player, false);
     }
 
     private static void updatePlayerFogTiles(Game game, Player player) {

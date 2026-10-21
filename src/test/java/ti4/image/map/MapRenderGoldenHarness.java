@@ -254,8 +254,8 @@ class MapRenderGoldenHarness extends BaseTi4Test {
     // per position so a mismatch names the tiles that changed.
     private static LayerDigest digestLayers(Game game, GenericInteractionCreateEvent event, TileStep step)
             throws Exception {
-        Map<String, Tile> tiles = new TreeMap<>(FogView.of(game, event).tiles());
         Function<Tile, BufferedImage> source = layerSource(game, event, step);
+        Map<String, Tile> tiles = new TreeMap<>(FogView.of(game, event).tiles());
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         StringBuilder perTile = new StringBuilder();
         for (Map.Entry<String, Tile> entry : tiles.entrySet()) {

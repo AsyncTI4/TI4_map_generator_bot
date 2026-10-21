@@ -123,6 +123,19 @@ class FogViewerRenderTest extends BaseTi4Test {
     }
 
     @Test
+    void resolvingARenderRemembersWhatThePrivateViewerSawButBuildingTheViewDoesNot() {
+        GenericInteractionCreateEvent event = FogEvents.eventIn("111", "fog-111-private");
+
+        FogView.of(game, event);
+        assertTrue(viewer.getFogTiles().isEmpty());
+        assertFalse(viewer.isFogInitialized());
+
+        MapRenderer.resolve(new MapRenderRequest(game, DisplayType.all, event, null));
+        assertFalse(viewer.getFogTiles().isEmpty());
+        assertTrue(viewer.isFogInitialized());
+    }
+
+    @Test
     void sideStatsForAPrivateViewWithoutAViewerPlaceNoStatTiles() {
         FogView fog = FogView.of(game, FogEvents.eventIn("999", "gm-private"));
 

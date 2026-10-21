@@ -69,7 +69,7 @@ class FogSafePlayerAreaTest extends BaseTi4Test {
     // The holder's own area is drawn because the viewer is the holder; only the note's owner is out of sight.
     private List<WebsiteOverlay> drawHolderAreaWithOwnerHidden() {
         try (MockedStatic<FoWHelper> fog = mockStatic(FoWHelper.class, Mockito.CALLS_REAL_METHODS)) {
-            fog.when(() -> FoWHelper.canSeeStatsOfPlayer(any(), eq(owner), any()))
+            fog.when(() -> FoWHelper.canSeeStatsOfPlayerInCurrentFog(any(), eq(owner), any()))
                     .thenReturn(false);
             return drawHolderArea(true);
         }

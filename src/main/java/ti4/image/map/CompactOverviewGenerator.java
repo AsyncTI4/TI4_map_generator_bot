@@ -33,6 +33,7 @@ import ti4.image.tile.TileGeometry;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
 import ti4.logging.BotLogger;
+import ti4.service.fow.FogMemoryService;
 
 public final class CompactOverviewGenerator {
 
@@ -114,6 +115,7 @@ public final class CompactOverviewGenerator {
     }
 
     public static BufferedImage playerImage(Game game, Player player, @Nullable GenericInteractionCreateEvent event) {
+        FogMemoryService.refreshForPlayerOverview(game, player);
         Map<String, Tile> tiles = knownTiles(game, player);
         return render(
                 game,
@@ -134,7 +136,7 @@ public final class CompactOverviewGenerator {
     }
 
     static Map<String, Tile> knownTiles(Game game, Player player) {
-        Set<String> visible = FoWHelper.fowFilter(game, player);
+        Set<String> visible = FoWHelper.visibleSystems(game, player);
         Map<String, Tile> tiles = new HashMap<>();
         game.getTileMap().forEach((position, tile) -> {
             if (visible.contains(position)) {
