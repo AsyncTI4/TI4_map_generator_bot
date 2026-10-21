@@ -90,7 +90,7 @@ public class MapRenderPipeline {
         }
     }
 
-    public static void renderToWebsiteOnly(Game game, @Nullable GenericInteractionCreateEvent event) {
+    static void renderToWebsiteOnly(Game game, @Nullable GenericInteractionCreateEvent event) {
         if (GlobalSettings.getSetting(
                 GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(),
                 Boolean.class,

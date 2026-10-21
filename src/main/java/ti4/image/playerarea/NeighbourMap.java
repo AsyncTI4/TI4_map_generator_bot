@@ -30,7 +30,7 @@ public final class NeighbourMap {
         return cached;
     }
 
-    public Set<Player> withEquivalents(Player player) {
+    Set<Player> withEquivalents(Player player) {
         Set<Player> cached = withEquivalents.get(player);
         if (cached == null) {
             cached = inGameOrder(collectWithEquivalents(player));

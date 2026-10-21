@@ -5,7 +5,7 @@ import ti4.game.Game;
 
 public final class PlayerAreaColumns {
 
-    public static final int MEGA_GAME_MIN_PLAYERS = 9;
+    static final int MEGA_GAME_MIN_PLAYERS = 9;
     public static final int COLUMN_GAP = 10;
 
     private PlayerAreaColumns() {}

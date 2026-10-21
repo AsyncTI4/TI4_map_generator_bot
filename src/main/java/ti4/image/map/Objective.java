@@ -12,7 +12,7 @@ import ti4.logging.BotLogger;
 import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 
-public record Objective(
+record Objective(
         String key,
         ti4.image.map.Objective.Type type,
         Integer index,
