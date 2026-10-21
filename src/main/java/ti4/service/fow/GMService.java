@@ -178,7 +178,7 @@ public final class GMService {
     /**
      * Renders the full (unfogged) map and posts it into the FoW activity-log thread. The thread lives
      * in the GM-only channel, so the unfogged view leaks nothing. A null render event keeps the map
-     * unfogged (see {@code MapGenerator.isFowModeActive}). No-op outside FoW.
+     * unfogged (see {@code FogView.of}). No-op outside FoW.
      */
     public static void refreshMapInActivityThread(Game game) {
         if (!game.isFowMode()) return;

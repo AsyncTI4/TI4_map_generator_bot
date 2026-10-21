@@ -18,7 +18,7 @@ public class WebStatTilePositions {
         WebStatTilePositions webStatTilePositions = new WebStatTilePositions();
         Map<String, List<String>> factionToStatTiles = new HashMap<>();
 
-        // Logic adapted from MapGenerator.playerInfo() method
+        // Logic adapted from MapSideStatLayout; unlike it, a tile search that fails does not stop later players
         List<Player> statOrder = game.getRealPlayers();
 
         Set<String> statTilesInUse = new HashSet<>();

@@ -110,11 +110,10 @@ class MegaGamePlayerAreasTest extends BaseTi4Test {
     void megaGameStatsAreLaidOutInTwoColumns() {
         seatPlayers(10);
 
-        try (MapGenerator generator = new MapGenerator(game, DisplayType.stats, null, null)) {
-            int twoColumns = 10 + 2 * BoardLayout.smallestRegularPlayerAreaWidth() + PlayerAreaGenerator.COLUMN_GAP;
-            assertTrue(generator.imageWidth() >= twoColumns, "both columns fit side by side");
-            assertTrue(generator.imageHeight() < 10 * 340, "five areas per column, not ten stacked");
-            generator.drawCanvas();
-        }
+        RenderContext context = MapRenderer.resolve(new MapRenderRequest(game, DisplayType.stats, null, null));
+        int twoColumns = 10 + 2 * BoardLayout.smallestRegularPlayerAreaWidth() + PlayerAreaGenerator.COLUMN_GAP;
+        assertTrue(context.canvas().width() >= twoColumns, "both columns fit side by side");
+        assertTrue(context.canvas().height() < 10 * 340, "five areas per column, not ten stacked");
+        MapRenderer.paint(context, RenderTimings.disabled());
     }
 }

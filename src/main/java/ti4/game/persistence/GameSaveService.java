@@ -102,7 +102,7 @@ class GameSaveService {
         TransientGameInfoUpdater.update(game);
 
         // Ugly fix to update seen tiles data for fog since doing it in
-        // MapGenerator/TileGenerator won't save changes anymore
+        // the map renderer won't save changes anymore
         if (game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 FoWHelper.updateFog(game, player);

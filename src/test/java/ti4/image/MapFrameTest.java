@@ -43,7 +43,7 @@ class MapFrameTest extends BaseTi4Test {
         assertEquals(TileGenerator.TILE_HEIGHT + 2 * PAD_Y, frame.height());
         assertEquals(2000, frame.width());
 
-        // The hex's left edge after the offset is applied, as MapGenerator.addTile draws it.
+        // The hex's left edge after the offset is applied, as BoardLayout.tileOrigin places it.
         Point raw = PositionMapper.getTilePosition("000");
         Point scaled = PositionMapper.getScaledTilePosition(game, "000", raw.x, raw.y, 0);
         assertEquals((frame.width() - TileGenerator.TILE_WIDTH) / 2, scaled.x + PAD_X - frame.offsetX());

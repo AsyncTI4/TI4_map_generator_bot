@@ -59,7 +59,7 @@ import ti4.website.model.WebsiteOverlay;
  * </pre>
  *
  * Every render reloads the save from disk, because rendering mutates the game (fog filtering, tile distances, debt
- * pool icons). Rendering runs on the test thread through the package-private canvas seam of MapGenerator, so static
+ * pool icons). Rendering runs on the test thread through MapRenderer.resolve and MapRenderer.paint (the canvas without encoding), so static
  * mocks and the global RenderRandom mode apply. Random choices are pinned by RenderRandom.neutral() (or eager() for
  * the easter egg subset); the wall clock, AFK status and network emoji fetches are pinned with static mocks that keep
  * every other method real (CALLS_REAL_METHODS) so only the named method is replaced. No pixel is masked.
@@ -110,26 +110,20 @@ class MapRenderGoldenHarness extends BaseTi4Test {
             Game game, DisplayType displayType, GenericInteractionCreateEvent event, String segment) {}
 
     private record RenderedCanvas(
-            BufferedImage canvas,
-            List<WebsiteOverlay> overlays,
-            long constructorNanos,
-            long drawNanos,
-            MapGenerator generator)
+            BufferedImage canvas, List<WebsiteOverlay> overlays, long constructorNanos, long drawNanos)
             implements AutoCloseable {
         @Override
-        public void close() {
-            generator.close();
-        }
+        public void close() {}
     }
 
     private static RenderedCanvas renderCanvas(RenderRequest request) {
         long start = System.nanoTime();
-        MapGenerator generator =
-                new MapGenerator(request.game(), request.displayType(), request.event(), request.segment());
+        RenderContext context = MapRenderer.resolve(
+                new MapRenderRequest(request.game(), request.displayType(), request.event(), request.segment()));
         long constructed = System.nanoTime();
-        BufferedImage canvas = generator.drawCanvas();
+        BufferedImage canvas = MapRenderer.paint(context, RenderTimings.disabled());
         long drawn = System.nanoTime();
-        return new RenderedCanvas(canvas, generator.overlays(), constructed - start, drawn - constructed, generator);
+        return new RenderedCanvas(canvas, context.overlays().asList(), constructed - start, drawn - constructed);
     }
 
     @Test

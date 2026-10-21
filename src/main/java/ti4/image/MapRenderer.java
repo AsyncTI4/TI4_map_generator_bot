@@ -1,9 +1,12 @@
 package ti4.image;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import ti4.helpers.DisplayType;
 
 final class MapRenderer {
+
+    private static final int SCORE_TRACK_TOP_MARGIN = 20;
 
     private MapRenderer() {}
 
@@ -27,8 +30,36 @@ final class MapRenderer {
     }
 
     static BufferedImage paint(RenderContext ctx, RenderTimings timings) {
-        try (MapGenerator generator = new MapGenerator(ctx, timings)) {
-            return generator.drawCanvas();
+        MapCanvasLayout layout = ctx.canvas();
+        BufferedImage canvas = new BufferedImage(layout.width(), layout.height(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = canvas.createGraphics();
+        try {
+            timings.startTiles();
+            BoardSection.draw(ctx, g2);
+            ConnectionStripSection.draw(ctx, g2);
+            timings.stopTiles();
+
+            timings.startGraphics();
+            drawInfoArea(ctx, g2);
+        } finally {
+            g2.dispose();
         }
+        return canvas;
+    }
+
+    private static void drawInfoArea(RenderContext ctx, Graphics2D g2) {
+        int left = ctx.canvas().landscapeShift();
+        int y = HeaderSection.draw(ctx, g2, left);
+        y = ScoreTrackSection.draw(ctx, g2, left, y + SCORE_TRACK_TOP_MARGIN);
+        if (PriorityTrackSection.isShown(ctx.game())) {
+            y = PriorityTrackSection.draw(ctx, g2, left, y);
+        }
+        y = ObjectivesSection.draw(ctx, g2, left, y);
+        y = LawsAndEventsSection.drawLaws(ctx, g2, left, y);
+        y = LawsAndEventsSection.drawEvents(ctx, g2, left, y);
+        if (MapSideStatsSection.isDrawn(ctx)) {
+            MapSideStatsSection.draw(ctx, g2);
+        }
+        PlayerAreasSection.draw(ctx, g2, left, y);
     }
 }

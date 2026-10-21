@@ -19,7 +19,8 @@ import ti4.testUtils.BaseTi4Test;
 
 class FogPlayerAreasHeightTest extends BaseTi4Test {
 
-    // Matches MapGenerator's per-player estimate for a seat with no teammates and fewer than 4 secrets.
+    // Matches the per-player estimate of PlayerAreasHeightEstimate for a seat with no teammates and fewer than 4
+    // secrets.
     private static final int PLAYER_AREA_HEIGHT = 340;
 
     private Game game;
@@ -54,9 +55,9 @@ class FogPlayerAreasHeightTest extends BaseTi4Test {
     }
 
     private int statsHeight(UserOverridenGenericInteractionCreateEvent event) {
-        try (MapGenerator generator = new MapGenerator(game, DisplayType.stats, event, null)) {
-            return generator.imageHeight();
-        }
+        return MapRenderer.resolve(new MapRenderRequest(game, DisplayType.stats, event, null))
+                .canvas()
+                .height();
     }
 
     private static UserOverridenGenericInteractionCreateEvent privateViewOf(String userId) {
