@@ -1,7 +1,11 @@
 package ti4;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.io.File;
+import java.util.Optional;
 import javax.annotation.Nullable;
+import ti4.cache.CacheManager;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.ImageResources;
@@ -9,6 +13,15 @@ import ti4.image.ImageResources;
 public final class ResourceHelper {
 
     private static final ResourceHelper INSTANCE = new ResourceHelper();
+    private static final int MAX_REMEMBERED_PATHS = 10_000;
+    private static final Cache<String, Optional<String>> RESOLVED_PATHS = Caffeine.newBuilder()
+            .maximumSize(MAX_REMEMBERED_PATHS)
+            .recordStats()
+            .build();
+
+    static {
+        CacheManager.registerCache("resourcePathCache", RESOLVED_PATHS);
+    }
 
     private ResourceHelper() {}
 
@@ -76,10 +89,13 @@ public final class ResourceHelper {
     @Nullable
     public static String getResourceFromFolder(String folder, String name) {
         File resourceFile = getFile(folder, name);
-        if (resourceFile.exists()) {
-            return resourceFile.getAbsolutePath();
-        }
-        return null;
+        return RESOLVED_PATHS
+                .get(resourceFile.getPath(), _ -> existingPath(resourceFile))
+                .orElse(null);
+    }
+
+    private static Optional<String> existingPath(File file) {
+        return file.exists() ? Optional.of(file.getAbsolutePath()) : Optional.empty();
     }
 
     public static File getFile(String folder, String name) {
