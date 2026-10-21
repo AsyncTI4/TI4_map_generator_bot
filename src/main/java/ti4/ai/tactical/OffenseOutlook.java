@@ -153,7 +153,7 @@ final class OffenseOutlook {
         if (full && value - losses - extraOrigins >= floor) {
             double harm = estimate.theirExpectedLoss() + heldPlanetValue + denial.harmPoints();
             anger = anger(strike, harm);
-            counter = w * counterstrike(strike, estimate, after, planetsAfter, landed);
+            counter = w * counterstrike(strike, estimate, after, planetsAfter, landed, terms.seatStake());
             nekroFeed = nekroFeed(opponent, estimate);
             capture = VUIL_RAITH.equals(opponent.getFaction()) ? CAPTURE_VALUE * estimate.ourLossChance() * hurt : 0;
             cancel = cancel(strike);
@@ -494,7 +494,12 @@ final class OffenseOutlook {
     }
 
     private double counterstrike(
-            Strike strike, StrikeEstimate estimate, Defenders after, List<Planet> planetsAfter, List<Planet> landed) {
+            Strike strike,
+            StrikeEstimate estimate,
+            Defenders after,
+            List<Planet> planetsAfter,
+            List<Planet> landed,
+            double seatStake) {
         double shipStake = 0.5 * after.shipCost(seat);
         double planetStake = landed.stream()
                 .mapToDouble(planet -> BoardView.planetValue(planet)
@@ -502,7 +507,8 @@ final class OffenseOutlook {
                         + (isMecatol(planet) ? MecatolStake.ownHoldValue(game, seat) : 0))
                 .sum();
         return world(strike, estimate)
-                .counterstrike(strike.target(), after, planetsAfter, shipStake, planetStake, strike.opponent());
+                .counterstrike(
+                        strike.target(), after, planetsAfter, shipStake, planetStake, seatStake, strike.opponent());
     }
 
     private double defenseRelief(Strike strike, StrikeEstimate estimate, boolean originsOnly) {

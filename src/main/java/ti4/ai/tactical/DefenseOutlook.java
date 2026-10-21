@@ -434,6 +434,17 @@ public final class DefenseOutlook {
             double shipStake,
             double planetStake,
             Player struck) {
+        return counterstrike(tile, after, planetsAfter, shipStake, planetStake, 0, struck);
+    }
+
+    double counterstrike(
+            Tile tile,
+            Defenders after,
+            List<Planet> planetsAfter,
+            double shipStake,
+            double planetStake,
+            double immediateStake,
+            Player struck) {
         if (isGuarded(tile)) return 0;
         double worst = 0;
         for (Player enemy : enemies()) {
@@ -444,7 +455,8 @@ public final class DefenseOutlook {
                 double fear = Math.min(1, fearCeiling(enemy, tile, horizon, force, planetsAfter) * eagerness);
                 if (fear <= 0) continue;
                 Chances chances = chancesAgainst(enemy, tile, horizon, after, planetsAfter);
-                double exposed = chances.space() * shipStake + chances.take() * planetStake;
+                double seatStake = horizon == Horizon.IMMEDIATE ? immediateStake : 0;
+                double exposed = chances.space() * shipStake + chances.take() * (planetStake + seatStake);
                 worst = Math.max(worst, weight(enemy, horizon) * fear * exposed);
             }
         }
