@@ -54,7 +54,9 @@ final class DebtPools {
                 bankSource = DEFAULT_BANK_IMAGE;
                 PaImage.draw(g2, x, y, bankSource);
             } else {
-                bankSource = TI4Emoji.getRandomizedEmoji(0, null).toString();
+                bankSource = TI4Emoji.getRandomizedEmoji(0, game.getName() + pool.getKey())
+                        .toString();
+                game.setDebtPoolIcon(pool.getKey(), bankSource);
             }
         }
         if (!DEFAULT_BANK_IMAGE.equals(bankSource)) {
