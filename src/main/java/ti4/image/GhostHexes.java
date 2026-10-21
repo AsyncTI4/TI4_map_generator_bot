@@ -71,7 +71,7 @@ final class GhostHexes {
         g2.setStroke(previousStroke);
         if (withNumber) {
             g2.setFont(Storage.getFont40());
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     g2,
                     position,
                     (int) hex.getCenterX(),

@@ -110,7 +110,7 @@ public class MapOverviewGenerator {
             }
             if (area != null) {
                 graphics.setFont(Storage.getFont64());
-                DrawingUtil.superDrawString(
+                OutlinedText.draw(
                         graphics,
                         segment.name(),
                         layout.toCanvasX((int) area.getCenterX()),

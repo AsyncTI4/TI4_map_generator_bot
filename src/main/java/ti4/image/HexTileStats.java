@@ -106,7 +106,7 @@ final class HexTileStats {
         point = PositionMapper.getPlayerStats("newuserName");
         if (!game.hideUserNames()) {
             String name = userName.substring(0, Math.min(userName.length(), 15));
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     g2,
                     name,
                     statTileMid.x + point.x,
@@ -130,8 +130,7 @@ final class HexTileStats {
         if (player.getDisplayName() != null && !"null".equals(player.getDisplayName())) {
             factionText = player.getDisplayName();
         }
-        DrawingUtil.superDrawString(
-                g2, factionText, point.x, point.y, Color.WHITE, center, null, Strokes.STROKE_5, Color.BLACK);
+        OutlinedText.draw(g2, factionText, point.x, point.y, Color.WHITE, center, null, Strokes.STROKE_5, Color.BLACK);
     }
 
     private void drawVictoryPoints(Game game, Player player, Point statTileMid, HorizontalAlign center) {
@@ -140,8 +139,7 @@ final class HexTileStats {
         String vpCount = "VP: " + player.getTotalVictoryPoints() + " / " + game.getVp();
         point = PositionMapper.getPlayerStats("newvp");
         point.translate(statTileMid.x, statTileMid.y);
-        DrawingUtil.superDrawString(
-                g2, vpCount, point.x, point.y, Color.WHITE, center, null, Strokes.STROKE_5, Color.BLACK);
+        OutlinedText.draw(g2, vpCount, point.x, point.y, Color.WHITE, center, null, Strokes.STROKE_5, Color.BLACK);
     }
 
     private void drawSecretObjectiveIcons(Game game, Player player, Point statTileMid) {
@@ -216,11 +214,9 @@ final class HexTileStats {
         g2.setFont(Storage.getFont28());
         point.translate(rightAlign ? 58 : -3, 32);
         String fleetCCs = player.getFleetCC() + additionalFleetSupply + addFS;
-        DrawingUtil.superDrawString(
-                g2, reps.get(0), point.x, point.y, Color.WHITE, align, null, Strokes.STROKE_4, Color.BLACK);
-        DrawingUtil.superDrawString(
-                g2, fleetCCs, point.x, point.y + 65, Color.WHITE, align, null, Strokes.STROKE_4, Color.BLACK);
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(g2, reps.get(0), point.x, point.y, Color.WHITE, align, null, Strokes.STROKE_4, Color.BLACK);
+        OutlinedText.draw(g2, fleetCCs, point.x, point.y + 65, Color.WHITE, align, null, Strokes.STROKE_4, Color.BLACK);
+        OutlinedText.draw(
                 g2, reps.get(2), point.x, point.y + 130, Color.WHITE, align, null, Strokes.STROKE_4, Color.BLACK);
         return miscTile;
     }
@@ -249,7 +245,7 @@ final class HexTileStats {
                 point.translate(scsize, 0);
             } else {
                 int fontYoffset = (scsize / 2) + 25;
-                DrawingUtil.superDrawString(
+                OutlinedText.draw(
                         g2,
                         Integer.toString(sc),
                         point.x,
@@ -276,19 +272,18 @@ final class HexTileStats {
         if (player.isPassed()) {
             point = PositionMapper.getPlayerStats("newpassed");
             point.translate(miscTile.x, miscTile.y);
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     g2, "PASSED", point.x, point.y, ColorUtil.PassedColor, center, null, Strokes.STROKE_4, Color.BLACK);
         } else if (player.getUserID().equals(activePlayerID) && "action".equals(phase)) {
             point = PositionMapper.getPlayerStats("newpassed");
             point.translate(miscTile.x, miscTile.y);
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     g2, "ACTIVE", point.x, point.y, ColorUtil.ActiveColor, center, null, Strokes.STROKE_4, Color.BLACK);
         }
         if (player.isAFK()) {
             point = PositionMapper.getPlayerStats("newafk");
             point.translate(miscTile.x, miscTile.y);
-            DrawingUtil.superDrawString(
-                    g2, "AFK", point.x, point.y, Color.gray, center, null, Strokes.STROKE_4, Color.BLACK);
+            OutlinedText.draw(g2, "AFK", point.x, point.y, Color.gray, center, null, Strokes.STROKE_4, Color.BLACK);
         }
         g2.setColor(Color.WHITE);
     }

@@ -1,16 +1,17 @@
 package ti4.helpers.async;
 
 import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.helpers.Storage;
-import ti4.image.DrawingUtil;
 import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
 import ti4.image.Mapper;
+import ti4.image.OutlinedText;
 import ti4.image.VerticalAlign;
 import ti4.model.TileModel;
 import ti4.service.image.FileUploadService;
@@ -40,7 +41,7 @@ final class JimboImageHelper {
             BufferedImage img = ImageHelper.square(ImageHelper.read(getImgPath.apply(model)));
             Graphics2D g2 = img.createGraphics();
             g2.setFont(Storage.getFont32());
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     g2,
                     getDisplayName.apply(model),
                     img.getWidth() / 2,

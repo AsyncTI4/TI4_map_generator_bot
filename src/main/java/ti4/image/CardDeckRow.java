@@ -31,7 +31,7 @@ final class CardDeckRow {
 
         for (DeckBadge badge : badges(game)) {
             PlayerAreaGenerator.drawPAImageScaled(g2, x, y, badge.cardBack(), CARD_WIDTH, CARD_HEIGHT);
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     g2,
                     badge.count(),
                     x + CARD_WIDTH / 2,

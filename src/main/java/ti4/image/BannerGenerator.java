@@ -1,6 +1,7 @@
 package ti4.image;
 
 import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -31,7 +32,7 @@ public class BannerGenerator {
         BufferedImage gradientImage = ImageHelper.read(ResourceHelper.getExtraFile("factionbanner_gradient.png"));
         BufferedImage smallFactionImage = DrawingUtil.getPlayerFactionIconImageScaled(player, 0.26f);
         BufferedImage largeFactionImage = DrawingUtil.getPlayerFactionIconImageScaled(player, 1.4f);
-        Graphics bannerG = bannerImage.getGraphics();
+        Graphics2D bannerG = bannerImage.createGraphics();
 
         bannerG.drawImage(backgroundImage, 0, 0, null);
         Graphics2D bannerG2d = (Graphics2D) bannerG;
@@ -45,13 +46,13 @@ public class BannerGenerator {
         bannerG.setColor(Color.WHITE);
 
         String name = player.bannerName();
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 bannerG, name, 29, 44, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke2, Color.BLACK);
         int mod = 0;
         if (player.getInitiative() > 9) {
             mod = 13;
         }
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 bannerG,
                 "#" + player.getInitiative(),
                 300 - mod,
@@ -71,7 +72,7 @@ public class BannerGenerator {
     }
 
     public static void drawAgendaBanner(int num, Game game) {
-        Graphics bannerG;
+        Graphics2D bannerG;
         BufferedImage bannerImage = new BufferedImage(225, 50, BufferedImage.TYPE_INT_ARGB);
         BufferedImage backgroundImage =
                 ImageHelper.readScaled(ResourceHelper.getExtraFile("factionbanner_background.png"), 325, 50);
@@ -79,7 +80,7 @@ public class BannerGenerator {
         String pnColorFile = "pa_pn_color_" + Mapper.getColorID("blue") + ".png";
         BufferedImage colorImage = ImageHelper.readScaled(ResourceHelper.getPAResource(pnColorFile), 1.5f);
         BufferedImage gradientImage = ImageHelper.read(ResourceHelper.getExtraFile("factionbanner_gradient.png"));
-        bannerG = bannerImage.getGraphics();
+        bannerG = bannerImage.createGraphics();
 
         bannerG.drawImage(backgroundImage, 0, 0, null);
 
@@ -92,7 +93,7 @@ public class BannerGenerator {
         bannerG.setFont(Storage.getFont28());
         bannerG.setColor(Color.WHITE);
 
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 bannerG,
                 "Agenda #" + num,
                 55,
@@ -119,11 +120,11 @@ public class BannerGenerator {
         BufferedImage backgroundImage =
                 ImageHelper.readScaled(ResourceHelper.getExtraFile(phase + "banner.png"), 511, 331);
 
-        Graphics bannerG = bannerImage.getGraphics();
+        Graphics2D bannerG = bannerImage.createGraphics();
         bannerG.drawImage(backgroundImage, 0, 0, null);
         bannerG.setFont(Storage.getFont48());
         bannerG.setColor(Color.WHITE);
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 bannerG,
                 altPhaseName.toUpperCase() + " PHASE",
                 255,
@@ -136,7 +137,7 @@ public class BannerGenerator {
         bannerG.setFont(Storage.getFont32());
 
         String roundText = "ROUND " + StringHelper.numberToWords(round).toUpperCase();
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 bannerG,
                 roundText,
                 255,

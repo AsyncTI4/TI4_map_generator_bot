@@ -294,11 +294,11 @@ public final class TransactionGenerator {
     private static void drawStringMultilineVertCenter(
             Graphics2D g2, String text, int x, int centerY, int width, HorizontalAlign hAlign) {
         int lineHeight = g2.getFontMetrics().getHeight();
-        List<String> toDraw = DrawingUtil.layoutText(g2, text, width);
+        List<String> toDraw = TextWrap.layoutLines(text, g2.getFontMetrics(), width);
         int height = totalMultilineHeight(g2, toDraw.size());
         int deltaY = g2.getFontMetrics().getAscent() - height / 2;
         for (String line : toDraw) {
-            DrawingUtil.superDrawString(g2, line, x, centerY + deltaY, null, hAlign, null, stroke2, null);
+            OutlinedText.draw(g2, line, x, centerY + deltaY, null, hAlign, null, stroke2, null);
             deltaY += lineHeight;
         }
     }
@@ -306,10 +306,10 @@ public final class TransactionGenerator {
     private static int drawStringMultiLine(
             Graphics2D g2, String text, int x, int y, int width, HorizontalAlign hAlign) {
         int lineHeight = g2.getFontMetrics().getHeight();
-        List<String> toDraw = DrawingUtil.layoutText(g2, text, width);
+        List<String> toDraw = TextWrap.layoutLines(text, g2.getFontMetrics(), width);
         int deltaY = 0;
         for (String line : toDraw) {
-            DrawingUtil.superDrawString(g2, line, x, y + deltaY, null, hAlign, null, stroke2, null);
+            OutlinedText.draw(g2, line, x, y + deltaY, null, hAlign, null, stroke2, null);
             deltaY += lineHeight;
         }
         return deltaY;
@@ -329,7 +329,7 @@ public final class TransactionGenerator {
         Font before = g2.getFont();
         g2.setFont(Storage.getFont32());
         if (text != null)
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     g2,
                     text,
                     x + 25,

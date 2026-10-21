@@ -40,7 +40,7 @@ final class ScoreTrackSection {
         for (int i = 1 + Math.max(game.getVp(), pinkLimit); i <= greyLimit; i++) {
             g2.setColor(Color.WHITE);
             Rectangle rect = new Rectangle(i * boxWidth + x, y, boxWidth, BOX_HEIGHT);
-            DrawingUtil.drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
+            OutlinedText.drawCentered(g2, Integer.toString(i), rect, Storage.getFont50());
             g2.setColor(Color.GRAY);
             g2.drawRect(i * boxWidth + x, y, boxWidth, BOX_HEIGHT);
         }
@@ -48,7 +48,7 @@ final class ScoreTrackSection {
         for (int i = game.getVp() + 1; i <= pinkLimit; i++) {
             g2.setColor(Color.WHITE);
             Rectangle rect = new Rectangle(i * boxWidth + x, y, boxWidth, BOX_HEIGHT);
-            DrawingUtil.drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
+            OutlinedText.drawCentered(g2, Integer.toString(i), rect, Storage.getFont50());
             g2.setColor(Color.PINK);
             g2.drawRect(i * boxWidth + x, y, boxWidth, BOX_HEIGHT);
         }
@@ -56,7 +56,7 @@ final class ScoreTrackSection {
         for (int i = 0; i <= game.getVp(); i++) {
             g2.setColor(Color.WHITE);
             Rectangle rect = new Rectangle(i * boxWidth + x, y, boxWidth, BOX_HEIGHT);
-            DrawingUtil.drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
+            OutlinedText.drawCentered(g2, Integer.toString(i), rect, Storage.getFont50());
             g2.setColor(Color.RED);
             g2.drawRect(i * boxWidth + x, y, boxWidth, BOX_HEIGHT);
         }

@@ -37,7 +37,7 @@ final class GameModeBadges {
             TIGLRank rank = game.getMinimumTIGLRankAtGameStart();
             if (rank != null) {
                 g2.setFont(Storage.getFont18());
-                DrawingUtil.superDrawString(
+                OutlinedText.draw(
                         g2,
                         rank.getShortName(),
                         x + deltaX + 50,

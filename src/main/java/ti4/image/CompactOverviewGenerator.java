@@ -294,7 +294,7 @@ public final class CompactOverviewGenerator {
             graphics.setStroke(new BasicStroke((float) Math.max(2, 6 * scale)));
             graphics.drawRoundRect(left, top, width, height, 16, 16);
             graphics.setFont(titleFont);
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     graphics,
                     box.panel().title(),
                     left + width / 2,

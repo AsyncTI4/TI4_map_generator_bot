@@ -75,7 +75,7 @@ final class AttachmentHighlights implements OffBoardHighlights {
                             72,
                             72);
                     g2.setColor(Color.WHITE);
-                    DrawingUtil.drawCenteredString(
+                    OutlinedText.drawCentered(
                             g2,
                             "" + attachCount.get(planet),
                             new Rectangle(
@@ -116,7 +116,7 @@ final class AttachmentHighlights implements OffBoardHighlights {
                         72,
                         72);
                 g2.setColor(Color.WHITE);
-                DrawingUtil.drawCenteredString(
+                OutlinedText.drawCentered(
                         g2,
                         "" + attachCount.get(planet),
                         new Rectangle(

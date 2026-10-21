@@ -44,8 +44,11 @@ import ti4.helpers.RenderRandom;
 import ti4.helpers.Storage;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
+import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
+import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.image.FileUploadService;
+import ti4.service.map.CustomHyperlaneService;
 import ti4.service.user.AFKService;
 import ti4.testUtils.BaseTi4Test;
 
@@ -97,10 +100,14 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
                 MockedStatic<FileUploadService> uploads =
                         mockStatic(FileUploadService.class, Mockito.CALLS_REAL_METHODS);
                 MockedStatic<MessageHelper> messages = mockStatic(MessageHelper.class, Mockito.CALLS_REAL_METHODS);
+                MockedStatic<ApplicationEmojiService> emojis =
+                        mockStatic(ApplicationEmojiService.class, Mockito.CALLS_REAL_METHODS);
                 FakeImageNetwork network = FakeImageNetwork.deterministicImages();
                 AutoCloseable random = RenderRandom.neutral()) {
             dateTime.when(DateTimeHelper::getFormattedTimestamp).thenReturn("2000.01.01 - 00.00.00");
             afk.when(() -> AFKService.userIsAFK(anyString())).thenReturn(false);
+            emojis.when(() -> ApplicationEmojiService.getApplicationEmoji(anyString()))
+                    .thenAnswer(invocation -> applicationEmoji(invocation.getArgument(0)));
             uploads.when(() -> FileUploadService.createFileUpload(any(BufferedImage.class), anyString()))
                     .thenAnswer(invocation -> capture(invocation.getArgument(0)));
             uploads.when(() -> FileUploadService.createFileUpload(any(BufferedImage.class), anyString(), anyString()))
@@ -208,6 +215,9 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
             for (int i = 0; i < HYPERLANE_MATRICES.size(); i++) {
                 String matrix = HYPERLANE_MATRICES.get(i);
                 record(name + "/hyperlane" + i, save, game -> hyperlane(game, matrix));
+                record(name + "/hyperlane" + i + "-again", save, game -> hyperlane(game, matrix));
+                String rotated = CustomHyperlaneService.rotateMatrix60(matrix);
+                record(name + "/hyperlane" + i + "-rotated", save, game -> hyperlane(game, rotated));
             }
             record(name + "/hyperlane-empty", save, game -> hyperlane(game, null));
         }
@@ -236,6 +246,22 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
         return TransactionGenerator.drawTradeOfferMeme(game, sender, receiver);
     }
 
+    /**
+     * Seat 0 gets a custom Discord emoji as faction icon (fetched from FakeImageNetwork, 5 px smaller) and seat 1 a
+     * unicode emoji (drawn with the emoji font and cropped), so both non-file branches of the icon lookup are pinned.
+     */
+    private static Game withCustomIcons(Game game) {
+        real(game, 0).setFactionEmoji("<:customicon:123456789012345678>");
+        real(game, 1).setFactionEmoji("🦊");
+        return game;
+    }
+
+    /** Every TI4Emoji resolves to a custom emoji with a name-derived id, so emoji pictures are drawn from placeholders. */
+    private static CachedEmoji applicationEmoji(String name) {
+        String id = Long.toString(100_000_000_000_000_000L + Math.floorMod(name.hashCode(), 1_000_000_000));
+        return new CachedEmoji(name, id, "<:" + name + ":" + id + ">", 0);
+    }
+
     private static BufferedImage hyperlane(Game game, String matrix) {
         String position = "101";
         if (matrix != null) game.getCustomHyperlaneData().put(position, matrix);
@@ -247,12 +273,29 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
         record("sheet/text", save, ImageGeneratorsGoldenHarness::textSheet);
         record("sheet/tokens", save, ImageGeneratorsGoldenHarness::tokenSheet);
         record("sheet/hex-borders", save, _ -> hexBorderSheet());
+        record("sheet/tokens-custom-icons", save, game -> tokenSheet(withCustomIcons(game)));
+        record("sheet/stuff-custom-icons", save, game -> {
+            withCustomIcons(game);
+            return TransactionGenerator.drawTransactableStuffImage(real(game, 0), real(game, 1));
+        });
+        record("sheet/trade-offer-custom-icons", save, game -> {
+            withCustomIcons(game);
+            return tradeOffer(game, real(game, 0), real(game, 1));
+        });
+        recordUpload(
+                "sheet/banner-custom-icon",
+                save,
+                game -> BannerGenerator.drawFactionBanner(real(withCustomIcons(game), 0)));
+        recordUpload(
+                "sheet/banner-unicode-icon",
+                save,
+                game -> BannerGenerator.drawFactionBanner(real(withCustomIcons(game), 1)));
         StringBuilder layouts = new StringBuilder();
         Graphics2D g2 = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics();
         for (Font font : List.of(Storage.getFont16(), Storage.getFont24(), Storage.getFont32())) {
             g2.setFont(font);
             for (int width : List.of(40, 120, 300)) {
-                layouts.append(String.join("|", DrawingUtil.layoutText(g2, SAMPLE, width)))
+                layouts.append(String.join("|", TextWrap.layoutLines(SAMPLE, g2.getFontMetrics(), width)))
                         .append('\n');
             }
         }
@@ -271,15 +314,14 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
         int y = 40;
         for (HorizontalAlign h : HorizontalAlign.values()) {
             for (VerticalAlign v : VerticalAlign.values()) {
-                DrawingUtil.superDrawString(
-                        g2, "Align " + h + v, 300, y, Color.ORANGE, h, v, Strokes.STROKE_4, Color.BLUE);
+                OutlinedText.draw(g2, "Align " + h + v, 300, y, Color.ORANGE, h, v, Strokes.STROKE_4, Color.BLUE);
                 y += 34;
             }
         }
-        DrawingUtil.superDrawString(g2, "null colours", 20, y, null, null, null, null, null);
-        DrawingUtil.superDrawString(g2, "plain", 300, y, Color.GREEN, null, null, null, null);
-        DrawingUtil.superDrawString(
-                (java.awt.Graphics) g2,
+        OutlinedText.draw(g2, "null colours", 20, y, null, null, null, null, null);
+        OutlinedText.draw(g2, "plain", 300, y, Color.GREEN, null, null, null, null);
+        OutlinedText.draw(
+                g2,
                 "via Graphics",
                 500,
                 y,
@@ -289,20 +331,19 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
                 Strokes.STROKE_2,
                 Color.BLACK);
         y += 40;
-        DrawingUtil.superDrawStringCenteredDefault(g2, "Centered default", 300, y);
-        DrawingUtil.superDrawStringCenteredDefault((java.awt.Graphics) g2, "Centered via Graphics", 800, y);
+        OutlinedText.drawCenteredWhiteOnBlack(g2, "Centered default", 300, y);
+        OutlinedText.drawCenteredWhiteOnBlack(g2, "Centered via Graphics", 800, y);
         y += 40;
-        DrawingUtil.superDrawStringCentered(g2, "Centered red", 300, y, Color.RED, Strokes.STROKE_6, Color.WHITE);
-        DrawingUtil.superDrawStringCentered(
-                (java.awt.Graphics) g2, "Centered gfx", 800, y, Color.YELLOW, Strokes.STROKE_3, Color.BLACK);
+        OutlinedText.drawCentered(g2, "Centered red", 300, y, Color.RED, Strokes.STROKE_6, Color.WHITE);
+        OutlinedText.drawCentered(g2, "Centered gfx", 800, y, Color.YELLOW, Strokes.STROKE_3, Color.BLACK);
         y += 40;
-        DrawingUtil.drawCenteredString(g2, "In a rectangle", new Rectangle(20, y, 400, 60), Storage.getFont32());
+        OutlinedText.drawCentered(g2, "In a rectangle", new Rectangle(20, y, 400, 60), Storage.getFont32());
         y += 80;
         g2.setFont(Storage.getFont20());
         g2.setColor(Color.WHITE);
         int x = 40;
-        DrawingUtil.drawTextVertically(g2, "Vertical text", x, 700, Storage.getFont20());
-        DrawingUtil.drawTextVertically(g2, "Right aligned", x += 40, 700, Storage.getFont20(), true);
+        VerticalText.draw(g2, "Vertical text", x, 700, Storage.getFont20());
+        VerticalText.draw(g2, "Right aligned", x += 40, 700, Storage.getFont20(), true);
         g2.setFont(Storage.getFont18());
         for (String text : List.of(
                 "Short",
@@ -311,12 +352,12 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
                 "Nospacesatallinthisone",
                 "a bbbbbbbbbbbbb",
                 "ccccccccccccc d")) {
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, text, x += 60, 700, 120);
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, text, x += 60, 700, 120, true);
+            VerticalText.drawOneOrTwoLines(g2, text, x += 60, 700, 120);
+            VerticalText.drawOneOrTwoLines(g2, text, x += 60, 700, 120, true);
         }
-        DrawingUtil.drawTwoLinesOfTextVertically(g2, "First row\nsecond row", x += 60, 700, 150);
-        DrawingUtil.drawDebtBoxText(g2, "Many debt holders listed here in a long string", x += 60, 700, 90);
-        DrawingUtil.drawDebtBoxText(g2, "Unbreakablelongwordwithoutspaces and more", x += 200, 700, 90);
+        VerticalText.drawTwoLines(g2, "First row\nsecond row", x += 60, 700, 150);
+        VerticalText.drawWrappedColumns(g2, "Many debt holders listed here in a long string", x += 60, 700, 90);
+        VerticalText.drawWrappedColumns(g2, "Unbreakablelongwordwithoutspaces and more", x += 200, 700, 90);
         y = 760;
         DrawingUtil.drawRedX(g2, 100, y + 50, 60, true);
         DrawingUtil.drawRedX(g2, 200, y + 50, 40, false);

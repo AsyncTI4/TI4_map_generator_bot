@@ -1,6 +1,7 @@
 package ti4.discord.interactions.commands.help;
 
 import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +23,7 @@ import ti4.image.DrawingUtil;
 import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
 import ti4.image.Mapper;
+import ti4.image.OutlinedText;
 import ti4.image.VerticalAlign;
 import ti4.message.MessageHelper;
 import ti4.service.UnitDecalService;
@@ -122,7 +124,7 @@ class SampleDecals extends Subcommand {
             String row2 = (mid == -1 ? "" : label.substring(mid + 1));
             int drawX = x + DREADWIDTH / 2;
             int drawY = y + DREADSUBHIGHT + SPACING;
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     graphic,
                     row1,
                     drawX,
@@ -132,7 +134,7 @@ class SampleDecals extends Subcommand {
                     VerticalAlign.Top,
                     stroke,
                     Color.BLACK);
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     graphic,
                     row2,
                     drawX,
@@ -143,7 +145,7 @@ class SampleDecals extends Subcommand {
                     stroke,
                     Color.BLACK);
             graphic.setFont(smallFont);
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     graphic,
                     d,
                     drawX,

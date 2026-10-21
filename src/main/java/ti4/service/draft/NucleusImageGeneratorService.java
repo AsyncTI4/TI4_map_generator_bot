@@ -2,7 +2,6 @@ package ti4.service.draft;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -21,10 +20,10 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Storage;
-import ti4.image.DrawingUtil;
 import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
 import ti4.image.Mapper;
+import ti4.image.OutlinedText;
 import ti4.image.PositionMapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileStep;
@@ -87,7 +86,7 @@ public class NucleusImageGeneratorService {
         int width = getMapWidth(draftManager.getGame());
         int height = getMapHeight(draftManager.getGame());
         BufferedImage mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics graphicsMain = mainImage.getGraphics();
+        Graphics2D graphicsMain = mainImage.createGraphics();
 
         Game game = draftManager.getGame();
         String mapTemplateId = game.getMapTemplateID();
@@ -231,7 +230,7 @@ public class NucleusImageGeneratorService {
         return summaryEmojis;
     }
 
-    private void drawSliceStats(Graphics graphics, Point positionPoint, Game game, MiltyDraftSlice pseudoSlice) {
+    private void drawSliceStats(Graphics2D graphics, Point positionPoint, Game game, MiltyDraftSlice pseudoSlice) {
         if (pseudoSlice == null) {
             return;
         }
@@ -241,7 +240,7 @@ public class NucleusImageGeneratorService {
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(Color.white);
         graphics.setFont(Storage.getFont64());
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 graphics,
                 pseudoSlice.getName(),
                 base.x + 172,
@@ -319,7 +318,7 @@ public class NucleusImageGeneratorService {
 
         graphics.setColor(Color.white);
         graphics.setFont(Storage.getFont50());
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 graphics,
                 totalsString,
                 base.x + 172,
@@ -329,7 +328,7 @@ public class NucleusImageGeneratorService {
                 null,
                 OUTLINE_STROKE,
                 Color.black);
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 graphics,
                 optimalString,
                 base.x + 172,
@@ -342,7 +341,7 @@ public class NucleusImageGeneratorService {
     }
 
     private void drawPlayerInfo(
-            Graphics graphics, Point positionPoint, String playerUserName, List<TI4Emoji> summaryEmojis) {
+            Graphics2D graphics, Point positionPoint, String playerUserName, List<TI4Emoji> summaryEmojis) {
         if (playerUserName == null || playerUserName.isBlank()) {
             return;
         }
@@ -354,7 +353,7 @@ public class NucleusImageGeneratorService {
         graphics.setColor(Color.white);
         graphics.setFont(Storage.getFont50());
 
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 graphics,
                 playerUserName,
                 playerNamePoint.x,

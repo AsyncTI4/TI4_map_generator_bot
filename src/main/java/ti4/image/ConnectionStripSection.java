@@ -50,7 +50,7 @@ final class ConnectionStripSection {
         g2.setColor(Color.BLACK);
         g2.fillRect(0, stripTop, width, height(connections, width));
         g2.setFont(Storage.getFont32());
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 g2,
                 "Connections to other maps",
                 width / 2,
@@ -109,7 +109,7 @@ final class ConnectionStripSection {
 
     private static void drawLabel(Graphics2D g2, String text, Point cell, int centreY, Font font) {
         g2.setFont(font);
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 g2,
                 text,
                 cell.x + CELL_WIDTH / 2,

@@ -2,10 +2,15 @@ package ti4.image;
 
 import java.awt.FontMetrics;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import javax.annotation.Nullable;
+import ti4.logging.BotLogger;
 
-final class TextWrap {
+public final class TextWrap {
+
+    private static final Pattern LINE_BREAK = Pattern.compile("[\\n\n]");
 
     record Lines(String first, @Nullable String second) {}
 
@@ -38,6 +43,63 @@ final class TextWrap {
         }
         int progress = Math.max(cut, 1);
         return new Lines(text.substring(0, progress), text.substring(progress));
+    }
+
+    static String trimToWidth(String text, FontMetrics metrics, int maxWidth) {
+        for (int i = 0; i < text.length(); i++) {
+            if (metrics.stringWidth(text.substring(0, i + 1)) > maxWidth) {
+                return text.substring(0, i);
+            }
+        }
+        return text;
+    }
+
+    public static List<String> layoutLines(String text, FontMetrics metrics, int maxWidth) {
+        List<String> paragraphs = new ArrayList<>(Arrays.asList(LINE_BREAK.split(text)));
+        List<String> lines = new ArrayList<>();
+        try {
+            for (String paragraph : paragraphs) {
+                String line = paragraph.trim();
+                while (width(line, metrics) > maxWidth) {
+                    int split = lastSpaceWithin(line, metrics, maxWidth);
+                    if (split == -1) {
+                        split = lastCharacterWithin(line, metrics, maxWidth);
+                    }
+                    lines.add(line.substring(0, split).trim());
+                    line = line.substring(split).trim();
+                }
+                if (!line.isEmpty()) {
+                    lines.add(line);
+                }
+            }
+        } catch (Exception e) {
+            BotLogger.warning("Error laying out text with width `" + maxWidth + "`:\n```" + text + "\n```", e);
+            return paragraphs;
+        }
+        return lines;
+    }
+
+    private static int lastSpaceWithin(String line, FontMetrics metrics, int maxWidth) {
+        int split = -1;
+        int nextSpace = line.indexOf(' ');
+        while (nextSpace != -1 && width(line.substring(0, nextSpace), metrics) < maxWidth) {
+            split = nextSpace;
+            nextSpace = line.indexOf(' ', split + 1);
+        }
+        return split;
+    }
+
+    private static int lastCharacterWithin(String line, FontMetrics metrics, int maxWidth) {
+        for (int i = 1; i < line.length(); i++) {
+            if (width(line.substring(0, i), metrics) > maxWidth) {
+                return i - 1;
+            }
+        }
+        return -1;
+    }
+
+    private static int width(String text, FontMetrics metrics) {
+        return text.isBlank() ? 0 : metrics.stringWidth(text);
     }
 
     private static int longestPrefixWithin(String text, FontMetrics metrics, int maxWidth) {
