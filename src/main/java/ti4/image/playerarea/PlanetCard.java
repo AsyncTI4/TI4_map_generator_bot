@@ -56,11 +56,9 @@ final class PlanetCard {
         try {
             Planet planet = game.getPlanetsInfo().get(planetName);
             if (planet == null) {
-                player.removePlanet(planetName);
                 BotLogger.warning(
                         new LogOrigin(player),
-                        "Planet " + planetName + " not found in game " + game.getName()
-                                + ". Removing planet from player.");
+                        "Planet " + planetName + " not found in game " + game.getName() + ". Skipping its card.");
                 return deltaX;
             }
             PlanetModel planetModel = planet.getPlanetModel();

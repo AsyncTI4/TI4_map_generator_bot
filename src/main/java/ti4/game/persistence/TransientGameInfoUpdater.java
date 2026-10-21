@@ -1,5 +1,7 @@
 package ti4.game.persistence;
 
+import java.util.ArrayList;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
@@ -20,6 +22,7 @@ class TransientGameInfoUpdater {
 
     static void update(Game game) {
         try {
+            removePlanetsMissingFromTheGame(game);
             ButtonHelperFactionSpecific.checkIihqAttachment(game);
             DiscordantStarsHelper.checkGardenWorlds(game);
             DiscordantStarsHelper.checkTFTerraform(game);
@@ -40,6 +43,21 @@ class TransientGameInfoUpdater {
         } catch (Exception e) {
             BotLogger.error(
                     new LogOrigin(game), "Error adding transient attachment tokens for game " + game.getName(), e);
+        }
+    }
+
+    private static void removePlanetsMissingFromTheGame(Game game) {
+        Set<String> knownPlanets = game.getPlanetsInfo().keySet();
+        for (Player player : game.getPlayers().values()) {
+            for (String planet : new ArrayList<>(player.getPlanets())) {
+                if (!knownPlanets.contains(planet)) {
+                    player.removePlanet(planet);
+                    BotLogger.warning(
+                            new LogOrigin(player),
+                            "Planet " + planet + " not found in game " + game.getName()
+                                    + ". Removed planet from player.");
+                }
+            }
         }
     }
 }

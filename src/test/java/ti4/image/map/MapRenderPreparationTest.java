@@ -1,6 +1,7 @@
 package ti4.image.map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,5 +62,14 @@ class MapRenderPreparationTest extends BaseTi4Test {
         assertEquals(
                 base + game.getPlanetsPlayerIsCoexistingOn(holder).size(),
                 game.getPlanetsInfo().get("grove").getInfluence());
+    }
+
+    @Test
+    void renderingSkipsAPlanetThatIsNotInTheGameAndLeavesThePlayerAlone() {
+        holder.addPlanet("nosuchplanet");
+
+        MapRenderer.paint(resolve(), RenderTimings.disabled());
+
+        assertTrue(holder.getPlanets().contains("nosuchplanet"));
     }
 }
