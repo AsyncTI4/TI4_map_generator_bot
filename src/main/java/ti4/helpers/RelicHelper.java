@@ -428,7 +428,7 @@ public class RelicHelper {
     public static String sillySpelling() {
         StringBuilder empelar = new StringBuilder("Scepter of E");
         List<Character> letters = Arrays.asList('m', 'e', 'l', 'p', 'a');
-        Collections.shuffle(letters);
+        RenderRandom.shuffle("relic.sillySpelling", letters);
         for (Character c : letters) {
             empelar.append(c);
         }
