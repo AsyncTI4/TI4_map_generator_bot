@@ -99,6 +99,7 @@ public record CombatRollPayload(
             int value,
             Integer maxDice,
             String type,
+            String valueScalingType,
             String scopeUnitAsyncId,
             String scopeDisplay,
             Map<String, Integer> effectiveValueByUnitAsyncId) {

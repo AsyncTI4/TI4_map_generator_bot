@@ -2754,6 +2754,7 @@ public class CombatRollService {
                         modifier.getValue(),
                         modifier.getMaxDice(),
                         modifier.getType(),
+                        modifier.getValueScalingType(),
                         modifier.getScope(),
                         resolveScopeDisplay(modifier, units),
                         effectiveValues));

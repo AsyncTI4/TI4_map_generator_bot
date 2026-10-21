@@ -1,9 +1,11 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -963,19 +965,9 @@ public class CombatModHelper {
                 }
                 case "opponent_sftt" -> scalingCount = getOpponentSfttCount(opponent);
                 case "nonhome_system_with_planet" -> scalingCount = getSystemsWithControlledPlanets(game, player);
-                case "galvanized_unit_count" -> {
-                    scalingCount = getGalvanizedUnitCount(
-                            game, unitHolder, origUnit, player, rollType == CombatRollType.bombardment);
-                    if (rollType == CombatRollType.SpaceCannonOffence && origUnit.getDeepSpaceCannon()) {
-                        for (String adjPos :
-                                FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
-                            Tile tile = game.getTileByPosition(adjPos);
-                            for (UnitHolder uH : tile.getUnitHolders().values()) {
-                                scalingCount += getGalvanizedUnitCount(game, uH, origUnit, player);
-                            }
-                        }
-                    }
-                }
+                case "galvanized_unit_count" ->
+                    scalingCount =
+                            getGalvanizedScalingCount(game, unitHolder, origUnit, player, activeSystem, rollType);
                 case "unique_ships" -> scalingCount = getUniqueNonFighterShipCount(activeSystem, player);
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
@@ -1043,6 +1035,28 @@ public class CombatModHelper {
             }
         }
         return count;
+    }
+
+    private static int getGalvanizedScalingCount(
+            Game game,
+            UnitHolder unitHolder,
+            UnitModel origUnit,
+            Player player,
+            Tile activeSystem,
+            CombatRollType rollType) {
+        if (rollType != CombatRollType.SpaceCannonOffence || !origUnit.getDeepSpaceCannon()) {
+            return getGalvanizedUnitCount(game, unitHolder, origUnit, player, rollType == CombatRollType.bombardment);
+        }
+        Set<UnitHolder> holders = Collections.newSetFromMap(new IdentityHashMap<>());
+        holders.add(unitHolder);
+        for (String adjacentPosition :
+                FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+            holders.addAll(
+                    game.getTileByPosition(adjacentPosition).getUnitHolders().values());
+        }
+        return holders.stream()
+                .mapToInt(holder -> getGalvanizedUnitCount(game, holder, origUnit, player))
+                .sum();
     }
 
     private static int getGalvanizedUnitCount(Game game, UnitHolder uH, UnitModel origUnit, Player player) {

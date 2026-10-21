@@ -10,6 +10,7 @@ import ti4.contest.replay.core.CombatRollPayload.CombatRollNotePlacement;
 import ti4.contest.replay.core.CombatRollPayload.DieRoll;
 import ti4.contest.replay.core.CombatRollPayload.ModifierDisplay;
 import ti4.contest.replay.core.CombatRollPayload.UnitRoll;
+import ti4.helpers.CombatMessageHelper;
 import ti4.service.emoji.DiceEmojis;
 import ti4.service.emoji.MiscEmojis;
 
@@ -50,42 +51,24 @@ public class CombatRollPayloadRenderer {
         if (modifiers == null || modifiers.isEmpty()) return;
         message.append("With modifiers: \n");
         for (ModifierDisplay modifier : modifiers) {
-            if (StringUtils.isNotBlank(modifier.sourceName())) {
-                if (modifier.maxDice() != null) {
-                    String plusPrefix = modifier.value() < 0 ? "" : "+";
-                    message.append(plusPrefix)
-                            .append(modifier.value())
-                            .append(" to up to ")
-                            .append(modifier.maxDice())
-                            .append(modifier.maxDice() == 1 ? " die" : " dice")
-                            .append(" from ")
-                            .append(modifier.sourceName().replace("Optional[", ""))
-                            .append("\n");
-                } else {
-                    message.append(modifier.sourceName().replace("Optional[", ""))
-                            .append("\n");
-                }
-            } else {
-                String plusPrefix = modifier.value() < 0 ? "" : "+";
-                String scope = StringUtils.defaultIfBlank(modifier.scopeDisplay(), "all");
-                if (modifier.maxDice() != null) {
-                    message.append(plusPrefix)
-                            .append(modifier.value())
-                            .append(" to up to ")
-                            .append(modifier.maxDice())
-                            .append(modifier.maxDice() == 1 ? " die" : " dice")
-                            .append(" for ")
-                            .append(scope)
-                            .append("\n");
-                } else {
-                    message.append(plusPrefix)
-                            .append(modifier.value())
-                            .append(" for ")
-                            .append(scope)
-                            .append("\n");
-                }
-            }
+            String line = CombatMessageHelper.withExtraDiceNotice(
+                    modifier.type(), modifier.value(), modifier.valueScalingType(), describeModifier(modifier));
+            message.append(line).append("\n");
         }
+    }
+
+    private String describeModifier(ModifierDisplay modifier) {
+        String plusPrefix = modifier.value() < 0 ? "" : "+";
+        String diceLabel = modifier.maxDice() == null ? "" : modifier.maxDice() == 1 ? " die" : " dice";
+        if (StringUtils.isNotBlank(modifier.sourceName())) {
+            String sourceName = modifier.sourceName().replace("Optional[", "");
+            if (modifier.maxDice() == null) return sourceName;
+            return plusPrefix + modifier.value() + " to up to " + modifier.maxDice() + diceLabel + " from "
+                    + sourceName;
+        }
+        String scope = StringUtils.defaultIfBlank(modifier.scopeDisplay(), "all");
+        if (modifier.maxDice() == null) return plusPrefix + modifier.value() + " for " + scope;
+        return plusPrefix + modifier.value() + " to up to " + modifier.maxDice() + diceLabel + " for " + scope;
     }
 
     private void appendUnitRolls(StringBuilder message, List<UnitRoll> unitRolls) {
