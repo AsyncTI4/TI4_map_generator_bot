@@ -1,11 +1,13 @@
 package ti4.ai.explore;
 
+import java.util.List;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.PlanetStake;
 import ti4.ai.legendary.LegendaryPlanets;
 import ti4.ai.secrets.SecretDrawValue;
+import ti4.ai.strategy.ReadyingValue;
 import ti4.ai.trade.ComponentValues;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -36,9 +38,9 @@ public class CardValue {
             case "irf" -> ComponentValues.gainedFragment(seat, "IRF");
             case "hrf" -> ComponentValues.gainedFragment(seat, "HRF");
             case "urf" -> ComponentValues.gainedFragment(seat, "URF");
-            case "vfs" -> site.viaMechOrInfantry(ExploreValues.tokenValue(game, seat));
+            case "vfs" -> site.viaMechOrInfantry(ExploreGains.commandToken(game, seat));
             case "exp" -> site.viaMechOrInfantry(readyValue(site));
-            case "cm" -> site.viaMechOrInfantry(ExploreValues.TRADE_GOOD);
+            case "cm" -> site.viaMechOrInfantry(ExploreGains.tradeGood(game, seat));
             case "frln" -> site.outlook().canFundFreelancers() ? ExploreValues.FREELANCERS : 0;
             case "mo" -> ExploreValues.MERCENARY_OUTFIT;
             case "lf" -> Math.max(mechOption(site), gainedCommodity(game, seat));
@@ -67,9 +69,9 @@ public class CardValue {
         boolean alreadyReady = seat.getPlanets().contains(planet)
                 && !seat.getExhaustedPlanets().contains(planet);
         if (seat.hasTech(PRE_FAB_ARCOLOGIES) || alreadyReady) return 0;
-        double worth = Math.max(
-                BoardView.planetResources(site.game(), planet), BoardView.planetInfluence(site.game(), planet));
-        return site.outlook().canSpendReadied(planet) ? ExploreValues.READY_PLANET_SHARE * worth : 0;
+        return ReadyingValue.bestSingle(site.game(), seat, List.of(planet))
+                .map(ReadyingValue.Pick::value)
+                .orElse(0.0);
     }
 
     public static boolean canPlaceMech(ExploreSite site) {

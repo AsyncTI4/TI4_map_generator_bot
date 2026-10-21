@@ -188,17 +188,41 @@ class ExploreOutlookTest extends BaseTi4Test {
         assertThat(need()).isZero();
     }
 
-    // Readying a planet is worth 0.9 of its value while the AI can still spend it this round, and nothing once it has
-    // passed.
+    // Readying a planet is worth what it will be spent on before it would ready anyway: here the build its resources
+    // add at the home dock. With no tactic token to activate the dock it is worth less than an infantry (only the
+    // Thunder's Edge
+    // expedition keeps a little), and once the AI has passed nothing is left to spend it on.
+    @Test
+    void aReadiedPlanetIsWorthWhatItWillBeSpentOn() {
+        test.nekro.exhaustPlanet("tequran");
+        ExploreSite tequran = ExploreSite.onBoard(test.game, test.nekro, "tequran", outlook());
+        assertThat(CardValue.readyValue(tequran)).isGreaterThan(ExploreValues.INFANTRY_UNIT);
+
+        test.nekro.setTacticalCC(0);
+        ExploreSite withoutTactic = ExploreSite.onBoard(test.game, test.nekro, "tequran", outlook());
+        assertThat(CardValue.readyValue(withoutTactic)).isLessThan(ExploreValues.INFANTRY_UNIT);
+    }
+
     @Test
     void aReadiedPlanetIsWorthNothingOnceTheAiHasPassed() {
         test.nekro.exhaustPlanet("tequran");
-        ExploreSite tequran = ExploreSite.onBoard(test.game, test.nekro, "tequran", outlook());
-        assertThat(CardValue.readyValue(tequran)).isCloseTo(1.8, within(EXACT));
-
         test.nekro.setPassed(true);
         ExploreSite afterPassing = ExploreSite.onBoard(test.game, test.nekro, "tequran", outlook());
         assertThat(CardValue.readyValue(afterPassing)).isZero();
+    }
+
+    // A planet that completes a spend objective is worth most of the point, whether or not the AI has passed.
+    @Test
+    void aReadiedPlanetThatCompletesASpendObjectiveIsWorthMostOfThePoint() {
+        test.nekro.getPlanets().forEach(test.nekro::exhaustPlanet);
+        test.nekro.refreshPlanet("mordaiii");
+        test.nekro.setTg(2);
+        test.nekro.setTacticalCC(0);
+        test.nekro.setPassed(true);
+        test.game.getRevealedPublicObjectives().put("monument", 1);
+
+        ExploreSite tequran = ExploreSite.onBoard(test.game, test.nekro, "tequran", outlook());
+        assertThat(CardValue.readyValue(tequran)).isGreaterThan(5);
     }
 
     // Freelancers is worth having when the seat could pay 2 resources of influence or resources for a unit.

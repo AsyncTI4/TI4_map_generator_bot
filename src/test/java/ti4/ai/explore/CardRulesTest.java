@@ -223,6 +223,52 @@ class CardRulesTest extends BaseTi4Test {
                 .isEqualTo("resolveExpeditionInf_zohbat");
     }
 
+    // With no tactic token to build with, the only use left for Zohbat's 3 resources is the Technology follow, which
+    // costs 4 and that Mordai II no longer pays for: Zohbat and a trade good do.
+    @Test
+    void expeditionReadiesAPlanetOnlyForTheTechnologyFollow() {
+        exhaustedZohbatWithOneInfantry();
+        test.nekro.exhaustPlanet("mordaiii");
+        test.nekro.setTg(1);
+        test.nekro.setTacticalCC(0);
+        test.sol.addSC(7);
+        test.nekro.setStrategicCC(1);
+
+        assertThat(pressedId(next(expedition("resolveExpeditionInf_zohbat")).orElseThrow()))
+                .isEqualTo("resolveExpeditionInf_zohbat");
+    }
+
+    // A readied planet that nothing will spend is not worth an infantry: no tactic token to build with, no card to
+    // follow.
+    @Test
+    void expeditionDeclinesWhenNothingWillSpendThePlanet() {
+        test.units(site, "tequran", test.nekro, UnitType.Infantry, 2);
+        test.nekro.exhaustPlanet("tequran");
+        test.nekro.setTacticalCC(0);
+
+        assertThat(pressedId(next(expedition("resolveExpeditionInf_tequran")).orElseThrow()))
+                .isEqualTo(DECLINE);
+    }
+
+    // A spare infantry costs 0.7 and a command token is worth at least 2, so Volatile Fuel Source takes the token even
+    // with no use for it in sight.
+    @Test
+    void volatileFuelSourceTakesTheTokenWithASpareInfantryAndNoUseInSight() {
+        test.units(site, "tequran", test.nekro, UnitType.Infantry, 2);
+
+        assertThat(pressedId(next(volatile_("resolveVolatileInf_tequran")).orElseThrow()))
+                .isEqualTo("resolveVolatileInf_tequran");
+    }
+
+    // A trade good (1) beats a truly spare infantry (0.7).
+    @Test
+    void coreMineTakesTheTradeGoodWithASpareInfantry() {
+        test.units(site, "tequran", test.nekro, UnitType.Infantry, 2);
+
+        assertThat(pressedId(next(coreMine("resolveCoreMineInf_tequran")).orElseThrow()))
+                .isEqualTo("resolveCoreMineInf_tequran");
+    }
+
     // The same Zohbat with nothing left to spend it on this round (no tactic token to produce with, no card to follow,
     // no spend objective): the readied resources would sit unused, so the infantry stays.
     @Test

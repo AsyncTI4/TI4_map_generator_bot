@@ -1,33 +1,21 @@
 package ti4.ai.explore;
 
-import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.PlanetStake;
 import ti4.ai.eval.Threats;
-import ti4.ai.scoring.ObjectiveCatalog;
-import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ObjectiveValue;
-import ti4.ai.scoring.Wallet;
 import ti4.ai.tactical.ProductionPlanner;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 
 public final class ExploreOutlook {
 
     private static final int ONE_MORE_RESOURCE = 1;
-    private static final String SLING_RELAY = "sr";
-    private static final Set<StrategyCard> SPENDING_CARDS =
-            EnumSet.of(StrategyCard.LEADERSHIP, StrategyCard.WARFARE, StrategyCard.TECHNOLOGY);
 
     private final Game game;
     private final Player seat;
@@ -70,38 +58,6 @@ public final class ExploreOutlook {
     public boolean willSpendMore() {
         if (spendsMore == null) spendsMore = computeSpendsMore();
         return spendsMore;
-    }
-
-    public boolean canSpendReadied(String planet) {
-        if (helpsScoreASpendObjective(planet)) return true;
-        if (seat.isPassed()) return false;
-        return willSpendMore() || hasReadySlingRelay() || spendingStrategyCardLeft();
-    }
-
-    private boolean helpsScoreASpendObjective(String planet) {
-        if (!Helper.canPlayerScorePOs(game, seat)) return false;
-        Wallet now = Wallet.of(game, seat);
-        Wallet readied = now.withPlanets(game, List.of(planet));
-        return game.getRevealedPublicObjectives().keySet().stream()
-                .filter(id -> !ObjectivePolicy.hasScored(game, seat, id))
-                .map(ObjectiveCatalog::spendCost)
-                .flatMap(Optional::stream)
-                .anyMatch(cost -> !now.canPay(cost) && readied.canPay(cost));
-    }
-
-    private boolean hasReadySlingRelay() {
-        return seat.hasTech(SLING_RELAY) && !seat.getExhaustedTechs().contains(SLING_RELAY);
-    }
-
-    private boolean spendingStrategyCardLeft() {
-        for (Player player : game.getRealPlayers()) {
-            for (int card : player.getSCs()) {
-                if (game.getPlayedSCs().contains(card)) continue;
-                if (!SPENDING_CARDS.contains(StrategyCard.of(game, card))) continue;
-                if (player == seat || seat.getStrategicCC() > 0) return true;
-            }
-        }
-        return false;
     }
 
     public double planetStake(Planet planet) {
