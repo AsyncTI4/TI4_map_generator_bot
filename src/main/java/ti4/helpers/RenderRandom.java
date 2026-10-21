@@ -45,6 +45,14 @@ public class RenderRandom {
         };
     }
 
+    public static int cosmeticInt(int bound) {
+        return switch (mode) {
+            case NEUTRAL -> bound - 1;
+            case EAGER -> 0;
+            case PRODUCTION -> ThreadLocalRandom.current().nextInt(bound);
+        };
+    }
+
     public static double nextDouble(String tag) {
         return switch (record(tag)) {
             case NEUTRAL -> 0.5;
