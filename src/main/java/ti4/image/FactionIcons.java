@@ -3,6 +3,8 @@ package ti4.image;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -28,6 +30,11 @@ public final class FactionIcons {
     private static final int UNDERLAY_ALPHA_THRESHOLD = 127;
     private static final int OPAQUE_BLACK = 0xFF000000;
     private static final BasicStroke UNICODE_OUTLINE = new BasicStroke(4.0f);
+    private static final int MAX_REMEMBERED_SILHOUETTES = 256;
+    private static final Cache<BufferedImage, BufferedImage> SILHOUETTES = Caffeine.newBuilder()
+            .weakKeys()
+            .maximumSize(MAX_REMEMBERED_SILHOUETTES)
+            .build();
 
     private FactionIcons() {}
 
@@ -108,7 +115,17 @@ public final class FactionIcons {
                             "icon " + icon.getWidth() + "x" + icon.getHeight() + " exceeds " + width + "x" + height));
             return;
         }
-        g2.drawImage(silhouette(icon, width, height), x, y, null);
+        g2.drawImage(silhouetteOf(icon, width, height), x, y, null);
+    }
+
+    private static BufferedImage silhouetteOf(BufferedImage icon, int width, int height) {
+        BufferedImage cached = SILHOUETTES.getIfPresent(icon);
+        if (cached != null && cached.getWidth() == width && cached.getHeight() == height) {
+            return cached;
+        }
+        BufferedImage silhouette = silhouette(icon, width, height);
+        SILHOUETTES.put(icon, silhouette);
+        return silhouette;
     }
 
     private static BufferedImage silhouette(BufferedImage icon, int width, int height) {
