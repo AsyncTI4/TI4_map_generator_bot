@@ -26,14 +26,11 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
-import ti4.model.AgendaModel;
 import ti4.model.ColorModel;
-import ti4.model.EventModel;
 import ti4.model.ModelInterface;
 import ti4.model.PlanetModel;
 import ti4.model.StrategyCardModel;
@@ -161,8 +158,8 @@ public class MapGenerator implements AutoCloseable {
             tempY = PriorityTrackSection.draw(ctx, graphics, landscapeShift, tempY);
         }
         y = ObjectivesSection.draw(ctx, graphics, landscapeShift, tempY);
-        y = laws(y);
-        y = events(y);
+        y = LawsAndEventsSection.drawLaws(ctx, graphics, landscapeShift, y);
+        y = LawsAndEventsSection.drawEvents(ctx, graphics, landscapeShift, y);
         if (MapSideStatsSection.drawsPlayerInfo(game, displayType, fog) && !board.isShowingSeparateFracture()) {
             playerInfo(game);
         }
@@ -1170,212 +1167,6 @@ public class MapGenerator implements AutoCloseable {
             }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(player), "Ignored exception during map generation", e);
-        }
-    }
-
-    private int laws(int y) {
-        if (displayTypeBasic == DisplayType.map) {
-            return y;
-        }
-        int x = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
-        int lawWidth = 1178 + 8;
-        Graphics2D g2 = (Graphics2D) graphics;
-        g2.setStroke(stroke3);
-
-        Map<String, Integer> laws = game.getLaws();
-        Map<String, String> lawsInfo = game.getLawsInfo();
-        boolean secondColumn = false;
-        for (Map.Entry<String, Integer> lawEntry : laws.entrySet()) {
-            String lawID = lawEntry.getKey();
-            String lawNumberID = "(" + lawEntry.getValue() + ") ";
-            String optionalText = lawsInfo.get(lawID);
-            graphics.setFont(Storage.getFont35());
-            graphics.setColor(ColorUtil.LawColor);
-            AgendaModel agendaModel = Mapper.getAgenda(lawID);
-
-            graphics.drawRect(x, y, 1178, 110);
-            if (agendaModel != null) {
-                addWebsiteOverlay(agendaModel, x, y, 1178, 110);
-            }
-            String agendaTitle = Mapper.getAgendaTitle(lawID);
-            if (agendaTitle == null) {
-                agendaTitle = Mapper.getAgendaJustNames().get(lawID);
-            }
-            if (agendaTitle == null) {
-                BotLogger.error("Unable to find law with id '" + lawID + "' during map generation. Skipping.");
-                continue;
-            }
-            if (optionalText != null
-                    && !optionalText.isEmpty()
-                    && game.getPlayerFromColorOrFaction(optionalText) == null) {
-                agendaTitle += "   [" + optionalText + "]";
-            }
-            graphics.drawString(agendaTitle, x + 95, y + 33);
-            graphics.setFont(Storage.getFont26());
-            graphics.setColor(Color.WHITE);
-            String agendaText = Mapper.getAgendaText(lawID);
-            if (agendaText == null) {
-                agendaText = Mapper.getAgendaForOnly(lawID);
-            }
-            agendaText = lawNumberID + agendaText;
-            int width = g2.getFontMetrics().stringWidth(agendaText);
-
-            int index = 0;
-            int agendaTextLength = agendaText.length();
-            while (width > 1076) {
-                index++;
-                String substringText = agendaText.substring(0, agendaTextLength - index);
-                width = g2.getFontMetrics().stringWidth(substringText);
-            }
-            if (index > 0) {
-                while (index < agendaTextLength && agendaText.charAt(agendaTextLength - index) != ' ') {
-                    index++;
-                }
-                graphics.drawString(agendaText.substring(0, agendaTextLength - index), x + 95, y + 70);
-                graphics.drawString(agendaText.substring(agendaTextLength - index), x + 95, y + 96);
-            } else {
-                graphics.drawString(agendaText, x + 95, y + 70);
-            }
-            try {
-                String agendaType = Mapper.getAgendaType(lawID);
-
-                if (optionalText == null
-                        || optionalText.isEmpty()
-                        || game.getPlayerFromColorOrFaction(optionalText) == null) {
-                    paintAgendaIcon(y, x);
-                } else if ("0".equals(agendaType)) {
-                    Player electedPlayer = null;
-                    boolean convertToGeneric = false;
-                    for (Player player : game.getPlayers().values()) {
-                        if (optionalText.equals(player.getFaction()) || optionalText.equals(player.getColor())) {
-                            if (fog.shouldConvertToGeneric(player)) {
-                                convertToGeneric = true;
-                            }
-                            electedPlayer = player;
-                            break;
-                        }
-                    }
-                    if (convertToGeneric || electedPlayer == null) {
-                        paintAgendaIcon(y, x);
-                    } else {
-                        DrawingUtil.drawPlayerFactionIconImage(graphics, electedPlayer, x + 2, y + 2, 95, 95);
-                    }
-                }
-                if (!game.getStoredValue("controlTokensOnAgenda" + lawEntry.getValue())
-                        .isEmpty()) {
-                    int tokenDeltaY = 0;
-                    int count = 0;
-                    for (String debtToken : game.getStoredValue("controlTokensOnAgenda" + lawEntry.getValue())
-                            .split("_")) {
-
-                        boolean hideFactionIcon = fog.isPrivate()
-                                && !FoWHelper.canSeeStatsOfPlayer(
-                                        game, game.getPlayerFromColorOrFaction(debtToken), fog.viewer());
-                        String controlID =
-                                hideFactionIcon ? Mapper.getControlID("gray") : Mapper.getControlID(debtToken);
-                        if (controlID.contains("null")) {
-                            continue;
-                        }
-                        float scale = 0.80f;
-                        BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
-                        DrawingUtil.drawControlToken(
-                                graphics,
-                                controlTokenImage,
-                                game.getPlayerFromColorOrFaction(debtToken),
-                                x + (count / 3) * 55,
-                                y + tokenDeltaY - (count / 3) * 90,
-                                hideFactionIcon,
-                                scale);
-                        tokenDeltaY += 30;
-                        count += 1;
-                    }
-                }
-
-            } catch (Exception e) {
-                BotLogger.error("Could not paint agenda icon", e);
-            }
-
-            if (!secondColumn) {
-                secondColumn = true;
-                x += lawWidth;
-            } else {
-                secondColumn = false;
-                y += 118;
-                x -= lawWidth;
-            }
-        }
-        return y + 3 + (secondColumn ? 118 : 0);
-    }
-
-    private int events(int y) {
-        int x = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
-        Graphics2D g2 = (Graphics2D) graphics;
-        g2.setStroke(stroke3);
-
-        Map<String, Integer> events = game.getEventsInEffect();
-        boolean secondColumn = false;
-        for (Map.Entry<String, Integer> event : events.entrySet()) {
-            String eventID = event.getKey();
-            String eventNumberID = "(" + event.getValue() + ") ";
-
-            graphics.setFont(Storage.getFont35());
-            graphics.setColor(Color.BLUE);
-            graphics.drawRect(x, y, 1178, 110);
-
-            EventModel eventModel = Mapper.getEvent(eventID);
-
-            graphics.setColor(Color.WHITE);
-            graphics.drawString(eventModel.getName(), x + 95, y + 30);
-            graphics.setFont(Storage.getFont26());
-
-            String eventText = eventModel.getMapText();
-            eventText = eventNumberID + eventText;
-            int width = g2.getFontMetrics().stringWidth(eventText);
-
-            int index = 0;
-            int textLength = eventText.length();
-            while (width > 1076) {
-                index++;
-                String substringText = eventText.substring(0, textLength - index);
-                width = g2.getFontMetrics().stringWidth(substringText);
-            }
-            if (index > 0) {
-                graphics.drawString(eventText.substring(0, textLength - index), x + 95, y + 70);
-                graphics.drawString(eventText.substring(textLength - index), x + 95, y + 96);
-            } else {
-                graphics.drawString(eventText, x + 95, y + 70);
-            }
-            try {
-                paintEventIcon(y, x);
-            } catch (Exception e) {
-                BotLogger.error("Could not paint event icon", e);
-            }
-
-            if (!secondColumn) {
-                secondColumn = true;
-                x += 1178 + 8;
-            } else {
-                secondColumn = false;
-                y += 112;
-                x = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
-            }
-        }
-        return secondColumn ? y + 115 : y + 3;
-    }
-
-    private void paintAgendaIcon(int y, int x) {
-        String factionFile = ResourceHelper.getInstance().getFactionFile("agenda.png");
-        if (factionFile != null) {
-            BufferedImage bufferedImage = ImageHelper.read(factionFile);
-            graphics.drawImage(bufferedImage, x + 2, y + 2, null);
-        }
-    }
-
-    private void paintEventIcon(int y, int x) {
-        String factionFile = ResourceHelper.getInstance().getFactionFile("event.png");
-        if (factionFile != null) {
-            BufferedImage bufferedImage = ImageHelper.read(factionFile);
-            graphics.drawImage(bufferedImage, x + 2, y + 2, null);
         }
     }
 
