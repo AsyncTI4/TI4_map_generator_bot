@@ -50,6 +50,7 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.actioncard.KnownActionCardsService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -336,6 +337,9 @@ public class CardsInfoService {
         }
         if (player.hasUnlockedBreakthrough("yssarilbt")) {
             buttons.add(Buttons.green("startYssarilbt", "Use Yssaril Breakthrough", FactionEmojis.Yssaril));
+        }
+        if (KnownActionCardsService.shouldShowKnownActionCardsButton(player)) {
+            buttons.add(Buttons.gray("showKnownActionCards", "Show Known Action Cards", CardEmojis.ActionCard));
         }
         if (player.hasAbility("pillage") && !game.isTwilightsFallMode()) {
             if (game.getStoredValue("willPillageOwnTransactions" + player.getFaction())
