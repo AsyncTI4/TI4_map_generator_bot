@@ -2,8 +2,8 @@ package ti4.image;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.RenderingHints;
+import java.util.List;
 import ti4.game.Game;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Storage;
@@ -12,9 +12,8 @@ final class HeaderSection {
 
     private static final int GAME_INFO_TOP_MARGIN = 60;
     private static final int GHOST_HOME_SYSTEM_CLEARANCE = 40;
-    private static final int CARD_DECKS_ABOVE_BASELINE = 75;
-    private static final int EXPEDITION_TRACKER_ABOVE_BASELINE = 265;
-    private static final int BOTTOM_MARGIN = 30;
+    private static final int WRAPPED_ROW_LEFT = 20;
+    private static final int LABEL_RIGHT_MARGIN = 100;
 
     private HeaderSection() {}
 
@@ -42,29 +41,49 @@ final class HeaderSection {
         g2.drawString(game.getCustomName(), landscapeShift + 4 * ServerIcon.SIZE / 3, y);
         int nameEnd = g2.getFontMetrics().stringWidth(game.getCustomName()) + 5 * ServerIcon.SIZE / 3;
 
-        Point coord = StrategyCardRow.draw(ctx, g2, new Point(x, y));
-        coord.translate(100, 0);
+        List<StrategyCardRow.Label> labels = StrategyCardRow.labels(ctx, g2);
 
         g2.setColor(Color.WHITE);
         g2.setFont(Storage.getFont64());
         String roundString = "ROUND: " + game.getRound();
         int roundLen = g2.getFontMetrics().stringWidth(roundString);
-        if (coord.x
-                > canvas.stripWidth() - roundLen - 100 * game.getRealPlayers().size()) {
-            coord = new Point(landscapeShift + 20, coord.y + 100);
-        }
-        g2.drawString(roundString, coord.x, coord.y);
 
-        CardDeckRow.draw(ctx, g2, Math.max(x + nameEnd, coord.x), y - CARD_DECKS_ABOVE_BASELINE);
-
-        coord = TurnOrderTracker.draw(ctx, g2, coord.x + roundLen + 100 + landscapeShift, coord.y);
-
-        ExpeditionTracker.draw(
-                ctx,
-                g2,
+        TurnOrderTracker.Order turnOrder = TurnOrderTracker.order(ctx);
+        HeaderLayout.Placement placement = HeaderLayout.place(new HeaderLayout.Inputs(
+                x,
+                landscapeShift + WRAPPED_ROW_LEFT,
+                y,
+                nameEnd,
+                labels.stream().map(StrategyCardRow.Label::width).toList(),
+                flowRight(canvas) - LABEL_RIGHT_MARGIN,
+                roundLen,
+                canvas.stripWidth() - roundLen - 100 * game.getRealPlayers().size(),
+                TurnOrderTracker.width(turnOrder),
+                landscapeShift,
+                CardDeckRow.width(game),
+                flowRight(canvas) - HeaderLayout.RIGHT_MARGIN,
+                ExpeditionTracker.isShown(game),
                 canvas.stripWidth() - MapCanvasLayout.EXPEDITION_TRACKER_RIGHT_OFFSET,
-                coord.y - EXPEDITION_TRACKER_ABOVE_BASELINE);
+                canvas.stripWidth() - HeaderLayout.TRACKER_SIZE - HeaderLayout.RIGHT_MARGIN));
 
-        return coord.y + BOTTOM_MARGIN;
+        StrategyCardRow.draw(ctx, g2, labels, placement.labelRows());
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(Storage.getFont64());
+        g2.drawString(roundString, placement.round().x, placement.round().y);
+
+        CardDeckRow.draw(ctx, g2, placement.decks().x, placement.decks().y);
+
+        TurnOrderTracker.draw(ctx, g2, turnOrder, placement.turnOrder().x, placement.turnOrder().y);
+
+        if (placement.tracker() != null) {
+            ExpeditionTracker.draw(ctx, g2, placement.tracker().x, placement.tracker().y);
+        }
+
+        return placement.bottom();
+    }
+
+    private static int flowRight(MapCanvasLayout canvas) {
+        return canvas.isLandscape() ? canvas.landscapeRightEdge() : canvas.stripWidth();
     }
 }

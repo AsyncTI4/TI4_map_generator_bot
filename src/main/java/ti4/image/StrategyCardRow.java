@@ -2,7 +2,6 @@ package ti4.image;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -14,56 +13,23 @@ import ti4.helpers.Storage;
 
 final class StrategyCardRow {
 
-    private static final int LABEL_SPACING = 25;
-    private static final int WRAPPED_ROW_LEFT = 20;
-    private static final int WRAPPED_ROW_STEP = 100;
-    private static final int RIGHT_MARGIN = 100;
+    private static final int OVERLAY_ABOVE_BASELINE = 56;
 
-    private record Label(int sc, int tradeGoods, int width) {}
+    record Label(int sc, int tradeGoods, int width) {}
 
     private StrategyCardRow() {}
 
-    static Point draw(RenderContext ctx, Graphics2D g2, Point coord) {
-        List<Label> labels = labels(ctx, g2);
-        int rowStart = coord.x;
-        int maxRowWidth = rightLimit(ctx) - rowStart + LABEL_SPACING;
-        List<List<Label>> rows = PlayerAreaGenerator.isMegaGame(ctx.game())
-                ? RowWrap.balancedRows(labels, label -> label.width() + LABEL_SPACING, 0, maxRowWidth)
-                : oneStrip(ctx, labels, rowStart);
-
-        int x = rowStart;
-        int deltaY = coord.y + 80;
-        for (int row = 0; row < rows.size(); row++) {
-            if (row > 0) {
-                x = WRAPPED_ROW_LEFT + ctx.canvas().landscapeShift();
-                deltaY += WRAPPED_ROW_STEP;
-            }
-            for (Label label : rows.get(row)) {
-                drawLabel(ctx, g2, label, x, coord.y, deltaY);
-                x += label.width() + LABEL_SPACING;
+    static void draw(RenderContext ctx, Graphics2D g2, List<Label> labels, List<HeaderLayout.LabelRow> rows) {
+        for (HeaderLayout.LabelRow row : rows) {
+            int x = row.x();
+            for (Label label : labels.subList(row.first(), row.end())) {
+                drawLabel(ctx, g2, label, x, row.baseline());
+                x += label.width() + HeaderLayout.LABEL_SPACING;
             }
         }
-        return new Point(x, deltaY);
     }
 
-    private static List<List<Label>> oneStrip(RenderContext ctx, List<Label> labels, int rowStart) {
-        MapCanvasLayout canvas = ctx.canvas();
-        int rightLimit = (canvas.isLandscape() ? canvas.landscapeRightEdge() : canvas.stripWidth()) - RIGHT_MARGIN;
-        List<List<Label>> rows = new ArrayList<>();
-        rows.add(new ArrayList<>());
-        int x = rowStart;
-        for (Label label : labels) {
-            rows.getLast().add(label);
-            x += label.width() + LABEL_SPACING;
-            if (x > rightLimit) {
-                x = WRAPPED_ROW_LEFT + canvas.landscapeShift();
-                rows.add(new ArrayList<>());
-            }
-        }
-        return rows;
-    }
-
-    private static List<Label> labels(RenderContext ctx, Graphics2D g2) {
+    static List<Label> labels(RenderContext ctx, Graphics2D g2) {
         Game game = ctx.game();
         Set<Integer> scPicked = new HashSet<>();
         for (Player player : game.getPlayers().values()) {
@@ -87,18 +53,7 @@ final class StrategyCardRow {
         return labels;
     }
 
-    private static int rightLimit(RenderContext ctx) {
-        MapCanvasLayout canvas = ctx.canvas();
-        if (canvas.isLandscape()) {
-            return canvas.landscapeRightEdge() - RIGHT_MARGIN;
-        }
-        if (ExpeditionTracker.isShown(ctx.game())) {
-            return canvas.stripWidth() - MapCanvasLayout.EXPEDITION_TRACKER_RIGHT_OFFSET - LABEL_SPACING;
-        }
-        return canvas.stripWidth() - RIGHT_MARGIN;
-    }
-
-    private static void drawLabel(RenderContext ctx, Graphics2D g2, Label label, int x, int y, int baseline) {
+    private static void drawLabel(RenderContext ctx, Graphics2D g2, Label label, int x, int baseline) {
         Game game = ctx.game();
         boolean fogPrivate = ctx.fog().isPrivate();
         int sc = label.sc();
@@ -114,7 +69,13 @@ final class StrategyCardRow {
                 g2.setColor(Color.GRAY);
             }
             g2.drawString(scText, x, baseline);
-            ctx.overlays().add(game.getStrategyCardModelByInitiative(sc).orElse(null), x, y + 24, textWidth, 60);
+            ctx.overlays()
+                    .add(
+                            game.getStrategyCardModelByInitiative(sc).orElse(null),
+                            x,
+                            baseline - OVERLAY_ABOVE_BASELINE,
+                            textWidth,
+                            60);
             if (label.tradeGoods() > 0) {
                 g2.setFont(Storage.getFont24());
                 g2.setColor(Color.WHITE);

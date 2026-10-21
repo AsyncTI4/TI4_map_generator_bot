@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.helpers.Constants;
@@ -44,13 +45,25 @@ final class CardDeckRow {
             x += HORIZONTAL_SPACING;
         }
 
-        if (game.isTwilightsFallMode() && game.getTyrantUserID().isEmpty()) {
-            String tyrantFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.TYRANT));
-            if (tyrantFile != null) {
-                BufferedImage bufferedImage = ImageHelper.read(tyrantFile);
-                g2.drawImage(bufferedImage, x + 15, y - 13, null);
-            }
+        String tyrantFile = unclaimedTyrantFile(game);
+        if (tyrantFile != null) {
+            BufferedImage bufferedImage = ImageHelper.read(tyrantFile);
+            g2.drawImage(bufferedImage, x + 15, y - 13, null);
         }
+    }
+
+    static int width(Game game) {
+        if (game.isFowMode()) return 0;
+        int width = badges(game).size() * HORIZONTAL_SPACING;
+        return unclaimedTyrantFile(game) == null ? width - (HORIZONTAL_SPACING - CARD_WIDTH) : width + TYRANT_SPACING;
+    }
+
+    @Nullable
+    private static String unclaimedTyrantFile(Game game) {
+        if (!game.isTwilightsFallMode() || !game.getTyrantUserID().isEmpty()) {
+            return null;
+        }
+        return ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.TYRANT));
     }
 
     private static List<DeckBadge> badges(Game game) {
