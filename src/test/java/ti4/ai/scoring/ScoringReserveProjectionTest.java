@@ -27,16 +27,17 @@ class ScoringReserveProjectionTest extends BaseTi4Test {
         test.nekro.setTg(1);
     }
 
-    // Holding the unplayed Trade card: 3 trade goods from the primary and 3 washed commodities make 4 + 1 + 6 = 11, so
-    // the seat must keep 2 resources of Mordai II and cannot spend the planet on units.
+    // Holding the unplayed Trade card: the 3 trade goods of the primary make 4 + 1 + 3 = 8, so the seat must keep 5
+    // resources (Mordai II and its trade good) and cannot spend the planet on units. Commodities it might wash are not
+    // counted.
     @Test
     void keepsResourcesForAMonumentTheTradeCardWillFund() {
         test.nekro.addSC(TRADE);
 
-        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(6);
+        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(3);
         assertThat(ScoringReserve.reserved(test.game, test.nekro)).hasValueSatisfying(reserved -> {
             assertThat(reserved.objectiveId()).isEqualTo("monument");
-            assertThat(reserved.cost()).isEqualTo(SpendCost.resources(2));
+            assertThat(reserved.cost()).isEqualTo(SpendCost.resources(5));
         });
         assertThat(ScoringReserve.planAfterReserve(test.game, test.nekro, SpendCost.resources(4)))
                 .isEmpty();
@@ -55,17 +56,112 @@ class ScoringReserveProjectionTest extends BaseTi4Test {
                 .isPresent();
     }
 
-    // Commodities already in hand still count after Trade was played: with 3 of them the seat reaches 8 and keeps
-    // Mordai II.
+    // Commodities in hand are only counted for a Masters of Trade seat, whose even wash with the Trade holder is
+    // certain;
+    // for any other seat a wash depends on a partner and a fee.
     @Test
-    void countsCommoditiesStillToWash() {
+    void countsOnlyAMastersOfTradeWash() {
         test.sol.addSC(TRADE);
         test.game.setSCPlayed(TRADE, true);
         test.nekro.setCommodities(3);
 
+        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isZero();
+        assertThat(ScoringReserve.reserved(test.game, test.nekro)).isEmpty();
+
+        test.nekro.addAbility("master_of_trade");
+
         assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(3);
         assertThat(ScoringReserve.reserved(test.game, test.nekro))
                 .hasValueSatisfying(reserved -> assertThat(reserved.cost()).isEqualTo(SpendCost.resources(5)));
+    }
+
+    // Before Trade is played a Masters of Trade seat washes no more than the Trade holder has commodities to give.
+    @Test
+    void theEvenWashIsLimitedByTheTradeHoldersCommodities() {
+        test.sol.addSC(TRADE);
+        test.sol.setCommoditiesBase(4);
+        test.nekro.setCommoditiesBase(6);
+        test.nekro.addAbility("master_of_trade");
+
+        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(4);
+
+        test.nekro.addSC(TRADE);
+        test.sol.removeSC(TRADE);
+
+        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(3);
+    }
+
+    // Amass Wealth for a seat whose washed trade goods exceed the 3 the objective asks for: the spare one has to pay
+    // influence (Mordai II has none), not resources, or the seat's planets could not pay and nothing would be kept.
+    @Test
+    void sparesExpectedTradeGoodsForInfluenceWhenResourcesAreAbundant() {
+        test.game.getRevealedPublicObjectives().remove("monument");
+        test.game.getRevealedPublicObjectives().put("amass_wealth", 1);
+        test.nekro.setTg(0);
+        test.place("10", "201");
+        test.place("14", "202");
+        test.nekro.addPlanet("wrenterra");
+        test.nekro.addPlanet("archontau");
+        test.sol.addSC(TRADE);
+        test.sol.setCommoditiesBase(4);
+        test.nekro.setCommoditiesBase(6);
+        test.nekro.addAbility("master_of_trade");
+
+        assertThat(ExpectedTradeGoods.netOf(SpendCost.each(3), 4, 1)).isEqualTo(new SpendCost(2, 3, 0, 0));
+        assertThat(ExpectedTradeGoods.netOfInfluenceFirst(SpendCost.each(3), 4, 1))
+                .isEqualTo(new SpendCost(3, 2, 0, 0));
+        assertThat(ScoringReserve.reserved(test.game, test.nekro)).hasValueSatisfying(reserved -> {
+            assertThat(reserved.objectiveId()).isEqualTo("amass_wealth");
+            assertThat(reserved.cost()).isEqualTo(new SpendCost(3, 2, 0, 0));
+            assertThat(reserved.expectedTradeGoods()).isEqualTo(4);
+        });
+    }
+
+    // A Letnev-like holder of the unplayed Trade card (6 resources, 1 influence) with 2 trade goods in hand: the
+    // primary pays the objective's 3, the trade goods cover the influence its planets lack, and the home stays unspent.
+    @Test
+    void keepsTheHomeForAmassWealthWhenTheTradePrimaryAndHeldGoodsCoverIt() {
+        test.game.getRevealedPublicObjectives().remove("monument");
+        test.game.getRevealedPublicObjectives().put("amass_wealth", 1);
+        test.place("10", "201");
+        test.nekro.addPlanet("wrenterra");
+        test.nekro.addSC(TRADE);
+        test.nekro.setTg(2);
+
+        assertThat(ScoringReserve.reserved(test.game, test.nekro)).hasValueSatisfying(reserved -> {
+            assertThat(reserved.objectiveId()).isEqualTo("amass_wealth");
+            assertThat(reserved.cost()).isEqualTo(new SpendCost(3, 3, 0, 0));
+        });
+        assertThat(ScoringReserve.planAfterReserve(test.game, test.nekro, SpendCost.resources(4)))
+                .isEmpty();
+
+        test.nekro.setTg(0);
+
+        assertThat(ScoringReserve.reserved(test.game, test.nekro)).isEmpty();
+        assertThat(ScoringReserve.planAfterReserve(test.game, test.nekro, SpendCost.resources(4)))
+                .isPresent();
+    }
+
+    // A Sol-like holder (Jord 4 resources and 2 influence, plus a 3 influence planet): Jord pays the resources, the
+    // other planet the influence, and the primary the trade goods, so units may not be built from either.
+    @Test
+    void keepsASolLikeHomeForAmassWealth() {
+        test.game.getRevealedPublicObjectives().remove("monument");
+        test.game.getRevealedPublicObjectives().put("amass_wealth", 1);
+        test.place("01", "201");
+        test.place("34", "202");
+        test.nekro.removePlanet("mordaiii");
+        test.nekro.addPlanet("jord");
+        test.nekro.addPlanet("centauri");
+        test.nekro.addSC(TRADE);
+        test.nekro.setTg(0);
+
+        assertThat(ScoringReserve.reserved(test.game, test.nekro)).hasValueSatisfying(reserved -> {
+            assertThat(reserved.objectiveId()).isEqualTo("amass_wealth");
+            assertThat(reserved.cost()).isEqualTo(new SpendCost(3, 3, 0, 0));
+        });
+        assertThat(ScoringReserve.planAfterReserve(test.game, test.nekro, SpendCost.resources(4)))
+                .isEmpty();
     }
 
     // Outside the action phase there is nothing to protect.

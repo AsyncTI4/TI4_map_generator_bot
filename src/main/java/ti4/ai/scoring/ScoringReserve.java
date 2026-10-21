@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
 import ti4.game.Game;
@@ -82,17 +83,22 @@ public class ScoringReserve {
                 wallet.tradeGoodValue(),
                 wallet.pooling());
         return bestAffordableSpend(game, seat, projected)
-                .map(spend -> netOfIncome(spend, expected, readied, wallet))
-                .filter(spend -> wallet.canPay(spend.cost()));
+                .flatMap(spend -> netOfIncome(spend, expected, readied, wallet));
     }
 
-    private static Reserved netOfIncome(Reserved spend, int expected, List<Wallet.PlanetValue> readied, Wallet wallet) {
+    private static Optional<Reserved> netOfIncome(
+            Reserved spend, int expected, List<Wallet.PlanetValue> readied, Wallet wallet) {
         int tradeGoodValue = wallet.tradeGoodValue();
         SpendCost afterReadying = ExpectedReadying.netOf(spend.cost(), readied, wallet.pooling());
-        return new Reserved(
-                spend.objectiveId(),
-                ExpectedTradeGoods.netOf(afterReadying, expected, tradeGoodValue),
-                ExpectedTradeGoods.tradeGoodsUsed(afterReadying, expected, tradeGoodValue));
+        return Stream.of(
+                        ExpectedTradeGoods.netOf(afterReadying, expected, tradeGoodValue),
+                        ExpectedTradeGoods.netOfInfluenceFirst(afterReadying, expected, tradeGoodValue))
+                .filter(wallet::canPay)
+                .findFirst()
+                .map(net -> new Reserved(
+                        spend.objectiveId(),
+                        net,
+                        ExpectedTradeGoods.tradeGoodsUsed(afterReadying, net, expected, tradeGoodValue)));
     }
 
     private static List<Wallet.PlanetValue> concat(List<Wallet.PlanetValue> first, List<Wallet.PlanetValue> second) {

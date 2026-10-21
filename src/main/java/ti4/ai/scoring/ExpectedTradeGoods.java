@@ -1,5 +1,6 @@
 package ti4.ai.scoring;
 
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiSettings;
 import ti4.ai.brain.StrategyCard;
@@ -14,7 +15,7 @@ public class ExpectedTradeGoods {
 
     public static int beforeStatus(Game game, Player seat) {
         int primary = holdsUnplayedTrade(game, seat) ? TRADE_PRIMARY : 0;
-        return primary + washableCommodities(game, seat);
+        return primary + evenWash(game, seat);
     }
 
     public static int ifHoldingTrade(Game game, Player seat) {
@@ -31,22 +32,26 @@ public class ExpectedTradeGoods {
         return AiSettings.isTradingEnabled() && game.getRealPlayers().size() >= 2;
     }
 
-    private static int washableCommodities(Game game, Player seat) {
-        if (!canWash(game)) return 0;
+    private static int evenWash(Game game, Player seat) {
+        if (!canWash(game) || !seat.hasAbility(MASTERS_OF_TRADE)) return 0;
         int held = Math.max(
                 0, seat.getCommodities() - PromisedTradeGoods.sent(seat, PromisedTradeGoods.COMMODITIES, null));
-        if (!tradeStillToBePlayed(game)) return held;
-        return Math.max(held, seat.getCommoditiesTotal());
+        if (holdsUnplayedTrade(game, seat)) return 0;
+        int partner = unplayedTradeHolders(game, seat)
+                .mapToInt(Player::getCommoditiesTotal)
+                .max()
+                .orElse(0);
+        return partner == 0 ? held : Math.min(Math.max(held, seat.getCommoditiesTotal()), partner);
+    }
+
+    private static Stream<Player> unplayedTradeHolders(Game game, Player seat) {
+        return game.getRealPlayers().stream()
+                .filter(player -> player != seat)
+                .filter(player -> player.getSCs().stream().anyMatch(initiative -> isUnplayedTrade(game, initiative)));
     }
 
     private static boolean holdsUnplayedTrade(Game game, Player seat) {
         return seat.getSCs().stream().anyMatch(initiative -> isUnplayedTrade(game, initiative));
-    }
-
-    private static boolean tradeStillToBePlayed(Game game) {
-        return game.getRealPlayers().stream()
-                .flatMap(player -> player.getSCs().stream())
-                .anyMatch(initiative -> isUnplayedTrade(game, initiative));
     }
 
     private static boolean isUnplayedTrade(Game game, int initiative) {
@@ -55,12 +60,25 @@ public class ExpectedTradeGoods {
     }
 
     public static int tradeGoodsUsed(SpendCost cost, int tradeGoods, int tradeGoodValue) {
-        SpendCost net = netOf(cost, tradeGoods, tradeGoodValue);
+        return tradeGoodsUsed(cost, netOf(cost, tradeGoods, tradeGoodValue), tradeGoods, tradeGoodValue);
+    }
+
+    public static int tradeGoodsUsed(SpendCost cost, SpendCost net, int tradeGoods, int tradeGoodValue) {
         int covered = cost.tradeGoods()
                 - net.tradeGoods()
                 + Math.ceilDiv(cost.resources() - net.resources(), tradeGoodValue)
                 + Math.ceilDiv(cost.influence() - net.influence(), tradeGoodValue);
         return Math.min(Math.max(0, tradeGoods), covered);
+    }
+
+    public static SpendCost netOfInfluenceFirst(SpendCost cost, int tradeGoods, int tradeGoodValue) {
+        int left = Math.max(0, tradeGoods);
+        int keptTradeGoods = Math.max(0, cost.tradeGoods() - left);
+        left -= cost.tradeGoods() - keptTradeGoods;
+        int influence = Math.max(0, cost.influence() - left * tradeGoodValue);
+        left -= Math.ceilDiv(cost.influence() - influence, tradeGoodValue);
+        int resources = Math.max(0, cost.resources() - left * tradeGoodValue);
+        return new SpendCost(resources, influence, keptTradeGoods, cost.tokens());
     }
 
     public static SpendCost netOf(SpendCost cost, int tradeGoods, int tradeGoodValue) {

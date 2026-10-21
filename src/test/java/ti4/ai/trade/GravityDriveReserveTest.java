@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.scoring.SpendCost;
 import ti4.ai.strategy.OpeningHold;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.tactical.ProductionPlanner;
@@ -93,12 +94,46 @@ class GravityDriveReserveTest extends BaseTi4Test {
         assertThat(OpeningHold.gravityDriveReserve(test.game, hacan).resources())
                 .isEqualTo(FOLLOW_COST - TRADE_PRIMARY);
 
+        hacan.addPlanet("lodor");
+        hacan.setTg(2);
         test.game.getRevealedPublicObjectives().put("trade_routes", 1);
         changed();
 
         assertThat(ti4.ai.scoring.ScoringReserve.expectedTradeGoodsCounted(test.game, hacan))
-                .isEqualTo(5);
+                .isEqualTo(TRADE_PRIMARY);
         assertThat(ProductionPlanner.reserve(test.game, hacan).resources()).isEqualTo(FOLLOW_COST);
+    }
+
+    // Amass Wealth's reserve and the Gravity Drive follow both stay reserved when the planets and trade goods cover the
+    // two together.
+    @Test
+    void keepsBothReservesWhenTheyFit() {
+        test.sol.addSC(TECHNOLOGY);
+        hacan.addPlanet("lodor");
+        hacan.setTg(8);
+        test.game.getRevealedPublicObjectives().put("amass_wealth", 1);
+        changed();
+
+        assertThat(OpeningHold.awaitsGravityDrive(test.game, hacan)).isTrue();
+        assertThat(ProductionPlanner.reserve(test.game, hacan)).isEqualTo(new SpendCost(7, 3, 3, 0));
+    }
+
+    // Amass Wealth is worth more than the follow: when the Trade primary makes the follow look affordable but the
+    // planets cannot pay both reserves now, only the scoring reserve is kept, so the seat is not frozen out of every
+    // build.
+    @Test
+    void dropsTheDriveWhenBothReservesDoNotFit() {
+        test.sol.addSC(TECHNOLOGY);
+        hacan.addSC(TRADE);
+        hacan.addPlanet("lodor");
+        hacan.setTg(2);
+        test.game.getRevealedPublicObjectives().put("amass_wealth", 1);
+        changed();
+
+        assertThat(OpeningHold.awaitsGravityDrive(test.game, hacan)).isTrue();
+        assertThat(OpeningHold.gravityDriveReserve(test.game, hacan).resources())
+                .isEqualTo(FOLLOW_COST);
+        assertThat(ProductionPlanner.reserve(test.game, hacan)).isEqualTo(new SpendCost(3, 3, 0, 0));
     }
 
     // Nobody holds Technology: there is nothing to wait for, and the same seat may spend freely.

@@ -177,6 +177,11 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
             String[] probeState = {"", "", ""};
             ScoringDiagnostic diagnostic = new ScoringDiagnostic();
             env.decisionListener = diagnostic::onDecision;
+            diagnostic.ledger = () -> {
+                synchronized (env.tradeLedger) {
+                    return List.copyOf(env.tradeLedger);
+                }
+            };
             if (PROBE != null) {
                 synchronized (env) {
                     env.watched.add("[probe] seating " + seating + ", speaker "
