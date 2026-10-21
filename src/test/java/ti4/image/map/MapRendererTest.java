@@ -1,10 +1,13 @@
 package ti4.image.map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Tile;
@@ -41,5 +44,29 @@ class MapRendererTest extends BaseTi4Test {
                 false,
                 MapRenderer.render(new MapRenderRequest(game, DisplayType.map, null, null), RenderTimings.disabled())
                         .eligibleForWebsite());
+    }
+
+    @Test
+    void shownDistancesSurvivePaintAndAreClearedWhenTheRenderCompletes() {
+        Game game = smallGame();
+        game.setTileDistances(new HashMap<>(Map.of("000", 1)));
+        RenderContext context = MapRenderer.resolve(new MapRenderRequest(game, DisplayType.map, null, null));
+
+        MapRenderer.paint(context, RenderTimings.disabled());
+        assertFalse(game.getTileDistances().isEmpty());
+
+        MapRenderer.draw(context, RenderTimings.disabled());
+        assertTrue(game.getTileDistances().isEmpty());
+    }
+
+    @Test
+    void aStatsOnlyRenderKeepsTheDistancesForALaterMapRender() {
+        Game game = smallGame();
+        game.setTileDistances(new HashMap<>(Map.of("000", 1)));
+        RenderContext context = MapRenderer.resolve(new MapRenderRequest(game, DisplayType.stats, null, null));
+
+        MapRenderer.draw(context, RenderTimings.disabled());
+
+        assertFalse(game.getTileDistances().isEmpty());
     }
 }

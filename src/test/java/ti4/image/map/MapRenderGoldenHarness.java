@@ -205,7 +205,7 @@ class MapRenderGoldenHarness extends BaseTi4Test {
                 new MapRenderRequest(request.game(), request.displayType(), request.event(), request.segment()));
         long constructed = System.nanoTime();
         if (!context.board().connections().isEmpty()) connectionStripRenders++;
-        BufferedImage canvas = MapRenderer.paint(context, RenderTimings.disabled());
+        BufferedImage canvas = MapRenderer.draw(context, RenderTimings.disabled());
         long drawn = System.nanoTime();
         return new RenderedCanvas(canvas, context.overlays().asList(), null, constructed - start, drawn - constructed);
     }

@@ -49,9 +49,13 @@ final class BoardSection {
         g2.setClip(previousClip);
     }
 
-    private void drawTiles(Map<String, Tile> tilesToDisplay) {
+    static boolean drawsTiles(RenderContext ctx) {
         DisplayType basicType = ctx.basicType();
-        if (basicType != DisplayType.all && basicType != DisplayType.map) {
+        return basicType == DisplayType.all || basicType == DisplayType.map;
+    }
+
+    private void drawTiles(Map<String, Tile> tilesToDisplay) {
+        if (!drawsTiles(ctx)) {
             return;
         }
         Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
@@ -74,7 +78,6 @@ final class BoardSection {
         sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Units));
         if (!game.getTileDistances().isEmpty()) {
             sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Distance));
-            game.setTileDistances(new HashMap<>());
         }
         TileStep displayTypeStep = displayTypeStep(ctx.displayType());
         if (displayTypeStep != null) {

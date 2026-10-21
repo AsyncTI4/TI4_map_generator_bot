@@ -2,6 +2,7 @@ package ti4.image.map;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 import ti4.helpers.DisplayType;
 import ti4.image.draw.GraphicsState;
 import ti4.image.io.EncodedImage;
@@ -27,7 +28,7 @@ final class MapRenderer {
 
     static MapRenderResult render(RenderContext ctx, RenderTimings timings) {
         timings.startDraw();
-        BufferedImage canvas = paint(ctx, timings);
+        BufferedImage canvas = draw(ctx, timings);
         EncodedImage encoded = ImageEncoder.forDiscord(canvas);
         timings.stopGraphics();
         timings.stopDraw();
@@ -35,6 +36,18 @@ final class MapRenderer {
                 ctx.basicType() == DisplayType.all && !ctx.fog().isPrivate();
         return new MapRenderResult(
                 canvas, encoded, ctx.overlays().asList(), eligibleForWebsite, ctx.playerAreaWarnings());
+    }
+
+    static BufferedImage draw(RenderContext ctx, RenderTimings timings) {
+        BufferedImage canvas = paint(ctx, timings);
+        clearShownDistances(ctx);
+        return canvas;
+    }
+
+    private static void clearShownDistances(RenderContext ctx) {
+        if (BoardSection.drawsTiles(ctx)) {
+            ctx.game().setTileDistances(new HashMap<>());
+        }
     }
 
     static BufferedImage paint(RenderContext ctx, RenderTimings timings) {
