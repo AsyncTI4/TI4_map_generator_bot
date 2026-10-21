@@ -95,7 +95,8 @@ class MapRenderGoldenHarness extends BaseTi4Test {
         HIDE_FLIP,
         DISTANCES,
         NUCLEUS,
-        PLAYER_AREA_VARIETY
+        PLAYER_AREA_VARIETY,
+        VEILED_HEART
     }
 
     // MAP is a whole map render. The other kinds cover the tile renderer's standalone entry points: the "system with
@@ -472,6 +473,7 @@ class MapRenderGoldenHarness extends BaseTi4Test {
             case DISTANCES -> applyDistances(game);
             case NUCLEUS -> game.setMapTemplateID(NUCLEUS_TEMPLATE);
             case PLAYER_AREA_VARIETY -> PlayerAreaVariety.apply(game);
+            case VEILED_HEART -> VeiledHeartVariety.apply(game);
         }
     }
 
@@ -583,6 +585,14 @@ class MapRenderGoldenHarness extends BaseTi4Test {
                             Mutation.SEGMENTS,
                             true));
                 }
+            }
+        }
+        if (probe.isTwilightsFallMode() && probe.getRealPlayers().size() >= 2) {
+            for (DisplayType type : List.of(DisplayType.all, DisplayType.stats)) {
+                specs.add(mapSpec("veiled-pub-" + type.name(), type, false, null, Mutation.VEILED_HEART, false));
+            }
+            if (hasViewer) {
+                specs.add(mapSpec("veiled-fog-all", DisplayType.all, true, null, Mutation.VEILED_HEART, false));
             }
         }
         addTileSpecs(specs, probe, hasViewer, nucleus);
