@@ -1,5 +1,6 @@
 package ti4.ai.secrets;
 
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiSettings;
 import ti4.ai.eval.GameHorizon;
@@ -12,9 +13,11 @@ public class ActionSecretTiming {
 
     private static final double SHARED_COMBAT_FACTOR = 0.85;
     private static final double PATIENCE_CONFIDENCE = 0.4;
+    private static final Set<String> NEVER_SAVED = Set.of("mew", "dtgs");
 
     public static boolean pursueNow(Game game, Player seat, String secretId) {
-        return !AiSettings.isSecretHoldEnabled()
+        return NEVER_SAVED.contains(secretId)
+                || !AiSettings.isSecretHoldEnabled()
                 || GameHorizon.endInSight(game)
                 || holdsAStandingDustTarget(game, seat, secretId)
                 || worriedAboutTheBoard(game, seat, secretId);

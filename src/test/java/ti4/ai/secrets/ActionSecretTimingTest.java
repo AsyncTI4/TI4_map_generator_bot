@@ -57,6 +57,19 @@ class ActionSecretTimingTest extends BaseTi4Test {
         return ActionSecretTiming.pursueNow(test.game, test.nekro, secret);
     }
 
+    // Make an Example of Their World and Destroy Their Greatest Ship are never saved for later: in round 1, with
+    // nobody scoring and plenty of rounds left, the seat still pursues them while it stays patient with dyp.
+    @Test
+    void neverSavesMakeAnExampleOrDestroyTheirGreatestShip() {
+        test.game.setRound(1);
+        test.nekro.setSecret("mew");
+        test.nekro.setSecret("dtgs");
+
+        assertThat(pursues("mew")).isTrue();
+        assertThat(pursues("dtgs")).isTrue();
+        assertThat(pursues("dyp")).isFalse();
+    }
+
     // With an enemy a move away the chance of the condition is 0.6 a round, but only the ordinary 0.3 is counted on.
     // Round 1, nobody scoring: three rounds before the end, so four chances: 1 - 0.7^4 = 0.76. Round 3, the leader on
     // 4: the leader needs one more round to get to 6, so two chances: 1 - 0.7^2 = 0.51. Round 4, the leader on 5: one

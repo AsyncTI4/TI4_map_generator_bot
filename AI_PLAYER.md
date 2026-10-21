@@ -282,7 +282,8 @@ to build one by hand:
       the condition in a later round anyway: the chance of meeting it in the rounds before the likely last round and
       in that last round (its ordinary per-round rate, never counting on an enemy staying within reach, times 0.85 for
       each other combat secret in hand as they compete for the same combats) must be at least 0.4. So rare secrets
-      are pursued at once. `-Dai.secrets.hold=false` turns patience off.
+      are pursued at once. _Make an Example of Their World_ and _Destroy Their Greatest Ship_ are never saved: the
+      seat pursues them from round 1. `-Dai.secrets.hold=false` turns patience off.
     - **Agenda phase:** no limit: _Dictate Policy_ (3 laws in play) and _Drive the Debate_ (it or its planet is
       elected by the agenda just resolved, never one from an earlier round), for which it also votes for itself.
     - **Seize an Icon** (`IconStake`). While it holds the secret and controls no legendary planet it chases one.
