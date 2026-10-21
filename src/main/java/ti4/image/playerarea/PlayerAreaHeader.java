@@ -55,7 +55,7 @@ public final class PlayerAreaHeader {
         try {
             PlayerAreaContext probeContext =
                     PlayerAreaContext.of(probe, game, false, null, new WebsiteOverlays(), neighbours);
-            return new PlayerAreaHeader(probeContext, new AreaSlot(areaRight, 0), player, areaLeft).height()
+            return new PlayerAreaHeader(probeContext, new AreaSlot(areaLeft, areaRight), player, areaLeft).height()
                     - ROW_HEIGHT;
         } finally {
             probe.dispose();

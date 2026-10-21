@@ -43,7 +43,7 @@ public final class PlayerAreas {
                     column++) {
                 int columnLeft = x + column * (columnWidth + PlayerAreaColumns.COLUMN_GAP);
                 int rightEdge = column == columns.size() - 1 ? totalWidth : columnLeft + columnWidth;
-                AreaSlot slot = new AreaSlot(rightEdge, columnLeft - x);
+                AreaSlot slot = new AreaSlot(columnLeft, rightEdge);
                 frames.add(PlayerArea.draw(ctx, slot, columns.get(column).get(row), new Point(columnLeft, y)));
             }
             int rowHeight = frames.stream()
@@ -57,7 +57,7 @@ public final class PlayerAreas {
     }
 
     public static Rectangle drawSingle(PlayerAreaContext ctx, Player player, Point topLeft, int totalWidth) {
-        PlayerAreaFrame frame = PlayerArea.draw(ctx, new AreaSlot(totalWidth, 0), player, topLeft);
+        PlayerAreaFrame frame = PlayerArea.draw(ctx, new AreaSlot(topLeft.x, totalWidth), player, topLeft);
         frame.draw(ctx.g2(), frame.bounds().height);
         return frame.bounds();
     }

@@ -1,3 +1,3 @@
 package ti4.image.playerarea;
 
-record AreaSlot(int rightEdge, int columnOffset) {}
+record AreaSlot(int left, int rightEdge) {}

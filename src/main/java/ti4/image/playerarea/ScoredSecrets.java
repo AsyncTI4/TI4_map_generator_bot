@@ -20,7 +20,7 @@ import ti4.logging.BotLogger;
 
 final class ScoredSecrets {
 
-    private static final int LEFT_MARGIN = 50;
+    private static final int TEXT_INDENT = 40;
     private static final int ROW_HEIGHT = 43;
     private static final int MARKER_OFFSET = 515;
     private static final float MARKER_SCALE = 0.55f;
@@ -35,7 +35,7 @@ final class ScoredSecrets {
         g2.setFont(Storage.getFont26());
         g2.setColor(ColorUtil.Stage1RevealedColor);
 
-        int x = LEFT_MARGIN + slot.columnOffset();
+        int x = slot.left() + TEXT_INDENT;
         if (player.isSearchWarrant()) {
             g2.setColor(Color.LIGHT_GRAY);
             y = drawRows(ctx, player, player.getSecrets(), secretObjectiveNames, Set.of(), x, y);
