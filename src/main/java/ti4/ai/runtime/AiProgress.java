@@ -1,9 +1,12 @@
 package ti4.ai.runtime;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 import lombok.experimental.UtilityClass;
+import ti4.ai.fallback.FallbackLog;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -19,7 +22,7 @@ class AiProgress {
                 game.getPhaseOfGame(),
                 game.getActivePlayerID(),
                 game.getPlayedSCs(),
-                new TreeMap<>(game.getStoredValueMap()),
+                new TreeMap<>(withoutFallbackLog(game.getStoredValueMap())),
                 game.getTacticalActionDisplacement(),
                 unitPositions(game, seat),
                 seat.getTg(),
@@ -38,6 +41,12 @@ class AiProgress {
                 seat.getExhaustedPlanets(),
                 seat.getCurrentProducedUnits(),
                 List.copyOf(seat.getTransactionItems()));
+    }
+
+    private static Map<String, String> withoutFallbackLog(Map<String, String> storedValues) {
+        Map<String, String> kept = new HashMap<>(storedValues);
+        kept.keySet().removeIf(FallbackLog::isLogKey);
+        return kept;
     }
 
     private static int unitPositions(Game game, Player seat) {

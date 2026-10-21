@@ -63,13 +63,14 @@ class CardRules {
 
     private static Optional<AiDecision> unitCard(AiTurnContext context, AiPrompt prompt, ExploreOutlook outlook) {
         if (has(prompt, VOLATILE)) {
-            double token = ExploreValues.tokenValue(context.game(), context.seat());
+            double token = ExploreGains.commandToken(context.game(), context.seat());
             return viaUnit(context, prompt, outlook, VOLATILE, token);
         }
         if (has(prompt, EXPEDITION)) {
             return viaUnit(context, prompt, outlook, EXPEDITION, readyValue(context, prompt, outlook));
         }
-        if (has(prompt, CORE_MINE)) return viaUnit(context, prompt, outlook, CORE_MINE, ExploreValues.TRADE_GOOD);
+        if (has(prompt, CORE_MINE))
+            return viaUnit(context, prompt, outlook, CORE_MINE, ExploreGains.tradeGood(context.game(), context.seat()));
         return Optional.empty();
     }
 

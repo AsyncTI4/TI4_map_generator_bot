@@ -137,8 +137,23 @@ public class CommandTokenPolicy {
         return allocation;
     }
 
+    public static Map<Pool, Integer> idealKeepingFleet(Game game, Player seat, int tokens) {
+        Map<Pool, Integer> allocation = new EnumMap<>(Pool.class);
+        for (Pool pool : Pool.values()) allocation.put(pool, 0);
+        allocation.put(Pool.FLEET, Math.min(tokens, seat.getFleetCC()));
+        int remaining = tokens - allocation.get(Pool.FLEET);
+        for (Level level : priorities(game, seat)) {
+            if (level.pool() == Pool.FLEET) continue;
+            int take = Math.min(remaining, Math.max(0, level.count() - allocation.get(level.pool())));
+            allocation.merge(level.pool(), take, Integer::sum);
+            remaining -= take;
+        }
+        allocation.merge(Pool.TACTIC, remaining, Integer::sum);
+        return allocation;
+    }
+
     public static Optional<String> midRoundSurplus(Game game, Player seat) {
-        Map<Pool, Integer> ideal = ideal(game, seat, totalTokens(seat));
+        Map<Pool, Integer> ideal = idealKeepingFleet(game, seat, totalTokens(seat));
         for (Pool pool : List.of(Pool.STRATEGY, Pool.TACTIC)) {
             if (pool.count(seat) > ideal.get(pool)) return Optional.of(pool.shrink());
         }
@@ -146,7 +161,7 @@ public class CommandTokenPolicy {
     }
 
     public static String poolToRefill(Game game, Player seat) {
-        Map<Pool, Integer> ideal = ideal(game, seat, totalTokens(seat) - netGainSoFar(game, seat));
+        Map<Pool, Integer> ideal = idealKeepingFleet(game, seat, totalTokens(seat) - netGainSoFar(game, seat));
         return List.of(Pool.TACTIC, Pool.STRATEGY).stream()
                 .max(Comparator.comparingInt(pool -> ideal.get(pool) - pool.count(seat)))
                 .orElse(Pool.TACTIC)

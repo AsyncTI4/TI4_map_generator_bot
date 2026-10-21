@@ -912,6 +912,7 @@ final class SelfPlayGame {
                     .append(ti4.helpers.Storage.getGameFile(name + ".txt").exists())
                     .append('\n');
             appendTail(report, "Bot warnings and errors", interesting(env.botProblems), 40);
+            appendTail(report, "AI fallbacks", env.fallbacks, 25);
             return report.toString();
         }
         report.append("Round ")
@@ -954,6 +955,7 @@ final class SelfPlayGame {
         report.append("Missing Spring beans: ").append(env.missingBeans).append('\n');
         appendTail(report, "Circuit breaker", env.circuitBreakerReasons, 10);
         appendTail(report, "Bot warnings and errors", interesting(env.botProblems), 25);
+        appendTail(report, "AI fallbacks", env.fallbacks, 25);
         appendTail(report, "Fake Discord action failures", env.discord.actionFailures(), 15);
         appendTail(report, "Fake Discord callback failures", env.discord.callbackFailures(), 15);
         appendTail(report, "Unsupported JDA calls (distinct)", distinct(env.discord.unsupportedCalls()), 30);

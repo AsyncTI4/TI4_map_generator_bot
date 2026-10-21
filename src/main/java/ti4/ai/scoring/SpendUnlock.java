@@ -22,6 +22,18 @@ public class SpendUnlock {
         return unlockedPoints(game, player, now, after);
     }
 
+    public static int pointsUnlockedByTokens(Game game, Player player, int tokens) {
+        Wallet now = Wallet.of(game, player);
+        Wallet after = new Wallet(
+                now.planets(),
+                now.tradeGoods(),
+                now.tacticTokens() + tokens,
+                now.strategyTokens(),
+                now.tradeGoodValue(),
+                now.pooling());
+        return unlockedPoints(game, player, now, after);
+    }
+
     public static int pointsLostByExhausting(Game game, Player player, String planet) {
         if (!hasUnscoredSpendObjective(game, player)) return 0;
         Wallet now = Wallet.of(game, player);

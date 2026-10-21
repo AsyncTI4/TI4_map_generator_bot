@@ -247,6 +247,24 @@ class CommandTokenPolicyTest extends BaseTi4Test {
                 .containsEntry(CommandTokenPolicy.Pool.STRATEGY, 2);
     }
 
+    // Mid-round only the tactic and strategy pools move, so the split they are measured against leaves the fleet
+    // pool where it is, however many fleet tokens the standing split would like.
+    @Test
+    void midRoundSplitKeepsTheFleetPoolWhereItIs() {
+        test.game.getRevealedPublicObjectives().put("raise_fleet", 1);
+        test.aiIsActive("action");
+        tokens(3, 3, 2);
+        test.units(test.nekroHome(), "space", test.nekro, UnitType.Dreadnought, 4);
+
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 8)).containsEntry(CommandTokenPolicy.Pool.FLEET, 5);
+        assertThat(CommandTokenPolicy.idealKeepingFleet(test.game, test.nekro, 8))
+                .containsEntry(CommandTokenPolicy.Pool.FLEET, 3);
+        assertThat(CommandTokenPolicy.midRoundSurplus(test.game, test.nekro)).contains("decrease_strategy_cc");
+        test.nekro.setStrategicCC(0);
+        test.nekro.setTacticalCC(5);
+        assertThat(CommandTokenPolicy.midRoundSurplus(test.game, test.nekro)).isEmpty();
+    }
+
     private static final int IMPERIAL = 8;
 
     private void tokens(int tactic, int fleet, int strategy) {

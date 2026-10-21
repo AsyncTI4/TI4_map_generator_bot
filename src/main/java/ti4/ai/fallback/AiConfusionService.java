@@ -19,6 +19,7 @@ import ti4.ai.perception.PromptButton;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -124,18 +125,26 @@ public class AiConfusionService {
                                 : "Use `/ai delegate` to choose for it."));
     }
 
-    public static void announcePrivateChoice(Game game, Player seat) {
+    public static void announcePrivateChoice(Game game, Player seat, int tokensRestored) {
         notice(
                 game,
                 "🤖 " + seat.getRepresentationNoPing()
-                        + " was unsure about a private choice and picked a safe option.");
+                        + " was unsure about a private choice and picked a safe option."
+                        + restoredSuffix(tokensRestored));
     }
 
-    public static void announceSelfPlayChoice(Game game, Player seat, PromptButton choice, String reason) {
+    public static void announceSelfPlayChoice(
+            Game game, Player seat, PromptButton choice, String reason, int tokensRestored) {
         notice(
                 game,
                 "🤖 " + seat.getRepresentationNoPing() + " was unsure (" + reason + "). No human plays in this game, so"
-                        + " it picked **" + choice.label() + "**.");
+                        + " it picked **" + choice.label() + "**." + restoredSuffix(tokensRestored));
+    }
+
+    private static String restoredSuffix(int tokensRestored) {
+        return tokensRestored == 0
+                ? ""
+                : " It first put " + StringHelper.pluralize(tokensRestored, "command token") + " back.";
     }
 
     public static void announceStuck(Game game, Player seat, String reasons) {

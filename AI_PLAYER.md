@@ -26,6 +26,7 @@ releasable versions; this document describes what exists today.
 | `/ai add` | Adds an AI seat and sets it up at the given home position. |
 | `/ai status` | Shows whether each AI seat is running, paused, or disabled on the bot. Never shows aggression. |
 | `/ai pause` / `/ai resume` | While paused, an AI acts only through the table: blocking choices are posted for any player to make. |
+| `/ai fallbacks` | Lists the last 10 times an AI seat was unsure, made no progress or timed out, with what it did about it. Players, the owner and developers only; the prompt, button and decision details are left out for private prompts and in Fog of War games unless you are a developer. |
 | `/ai delegate` | If an AI is holding up the game and doesn't know what to do, post its options for the table now. Without `faction_or_color` it only applies to seats that are waiting on something. |
 | `/ai watch` | Developers only: creates a new game with its channels in this channel's category, sets up the standard map, seats an AI in every chair (3 to 6, default 6, random supported factions) and starts it, so you can watch it play itself. Options: `seats`, `game_name` (default `aiwatch<N>`) and `pace` (`fast` by default: shorter pauses while no human plays). You are added to each AI's private thread. |
 | `/ai remove` | Removes an AI seat before the game starts and restores what adding it changed (map tile; speaker and game flags once the last AI seat leaves). Afterwards, use `/game replace` to hand a seat to a human. |
@@ -355,7 +356,9 @@ to build one by hand:
 
   Every fleet level stays within _Fleet Regulations_' 4, and _Raise a Fleet_ is ignored under it. A normal round
   ends near 2 tactic, 2 strategy and 3 fleet. When it must lose a token (for example for a Nekro agent), it takes it
-  from the pool furthest above its share, a fleet token at its largest stack last.
+  from the pool furthest above its share, a fleet token at its largest stack last. Redistribution during Thunder's
+  Edge Warfare moves tokens only between tactic and strategy, against the split that keeps the fleet pool as it is
+  (`idealKeepingFleet`); it refills whatever it took out before finishing, so it never ends a token short.
 - **Strategy cards.** Every card is picked with a plan for its use (`StrategyCardPlanner`): a list of concrete
   benefits its primary would bring this seat on the current board, valued on one scale (a victory point is 8, a trade
   good 1, the same scale as tactical plans). Nothing the seat would get anyway counts, so Imperial with nothing to
@@ -1213,16 +1216,20 @@ to build one by hand:
     tactical action only for a planet whose deck is worth more than nothing, then used on the best one.
   - **Cards that ask.** Unowned buttons are only the AI's own on its turn, in a message for it (or one that names no
     one else). Removing an infantry costs 0.7 (production limits included). It costs half the value of
-    the best planet left to claim when it is needed for that: more planets within reach of its ships than the seat has
-    other ground forces. When it is the last ground force and an enemy fleet can reach the system it also costs 0.15 of
+    the claim it would leave unmet when it is needed for that. The seat plans its next activations (its tactic
+    tokens, at most 3, and one per ship with capacity): each takes the best unclaimed system within that ship's move
+    that holds none of its ground forces, needing an infantry or mech per free planet. The ground forces it can
+    count on are those in the home system and on the ship's way to the target (a command token does not matter, it
+    is next round); the planets it cannot fund are the cost, and an infantry that no such ship can pick up costs
+    nothing extra. When it is the last ground force and an enemy fleet can reach the system it also costs 0.15 of
     the planet's stake (`PlanetStake`, also used for retreats), because the enemy pays a token and risks retaliation
     to take it anyway. A mech is free. So a Volatile Fuel Source (2) or Core Mine (1) is usually taken, and kept only
     when the infantry is needed to claim more. A card with no decline button is always answered, even when neither
     option gains anything, and one left with only Decline is declined.
     | Card | Choice |
     | --- | --- |
-    | Volatile Fuel Source, Core Mine | the command token (2), or the trade good (1), when the mech or infantry is worth it; otherwise it declines |
-    | Expedition | readies the planet when 0.9 of its larger value is worth more than the infantry, and only if it can spend it this round: a dock it can still activate that would build more with one more resource, an unexhausted Sling Relay, a Leadership, Warfare or Technology card still to be played (its own, or another's with a strategy token to follow), or a revealed spend objective the planet completes (that one counts even after passing); never with Pre-Fab Arcologies or a planet that is ready |
+    | Volatile Fuel Source, Core Mine | the command token or the trade good, when the mech or infantry is worth it; otherwise it declines. A token is 2 (nothing once none is left in reinforcements), plus 1 when the pool the command token policy would grow is the fleet (supply) or the strategy pool with more follows wanted than tokens, or the tactical plan value over 2 when it grows tactics, plus a spend-objective point it unlocks (0.8 of a point). A trade good is 1, plus the same unlock value when it closes a trade good gap (Amass Wealth); either beats a spare infantry (0.7) |
+    | Expedition | readies the planet when what it will be spent on (`ReadyingValue`, the same value Diplomacy uses: half the resources or influence a build, a Technology or Leadership follow or a Custodians landing would consume that the seat could not pay without it, most of a point when it completes a spend objective, plus a tech skip or Thunder's Edge expedition it opens) is worth more than the infantry; a planet nothing will spend is worth nothing; never with Pre-Fab Arcologies or a planet that is ready |
     | Local Fabricators | a mech (2, a little more for an empty planet) paid with a commodity or trade good, unless none is left in reinforcements or the planet has the Demilitarized Zone; otherwise a commodity |
     | Functioning Base | an action card for a commodity or trade good, unless the hand is full; otherwise a commodity |
     | Abandoned Warehouses, Merchant Station | convert commodities to trade goods or gain commodities, whichever is worth more |
@@ -1392,6 +1399,14 @@ to build one by hand:
   - Private prompts are only ever declined, and only when a declining option exists.
     Otherwise the AI says it is stuck.
   - It never presses buttons that open a form.
+  - A fallback that presses "Done Redistributing Command Tokens" first puts back any command tokens the seat is short of
+    its starting allocation (the `originalCCsFor<faction>` stored value), in the pool each came
+    from or else the tactic pool (`RedistributionGuard`), and does not press Done if it cannot.
+  - Every fallback (unsure, no progress, a stall timeout, a player asking for the hand-over, the loop stop and every
+    "stuck" notice) is recorded by `FallbackLog`: one `BotLogger.info` line starting `AI fallback game=… round=… phase=…
+    seat=faction/color kind=… reason=… prompt=… text=… buttons=[…] recent=[…] pending=… outcome=…`, and the last 10 in
+    the game stored values `aiFallbackLog|slot0` to `slot9` (base64) with `aiFallbackLog|next`, so they survive a
+    restart. `/ai fallbacks` lists them and the self-play report prints an "AI fallbacks" section.
 - **Guards.**
   - At most 2 attempts per prompt and state (staged movement and unit positions count as progress).
   - At least 1.5 s between actions in a game, and at most 150 actions an hour per seat.

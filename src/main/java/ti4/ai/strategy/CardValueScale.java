@@ -7,7 +7,7 @@ import ti4.ai.scoring.ObjectiveValue;
 @UtilityClass
 public class CardValueScale {
 
-    static final double VICTORY_POINT = ObjectiveValue.VICTORY_POINT_VALUE;
+    public static final double VICTORY_POINT = ObjectiveValue.VICTORY_POINT_VALUE;
     public static final double TRADE_GOOD = 1.0;
     static final double COMMODITY = 0.5;
     public static final double TOKEN_FLOOR = 1.5;
@@ -37,7 +37,7 @@ public class CardValueScale {
     static final double MIN_LOCK_EXPOSURE = 1.0;
     static final double NEAR_WIN_MULTIPLIER = 1.5;
     static final int NEAR_WIN_GAP = 3;
-    static final double SPEND_UNLOCK_SHARE = 0.8;
+    public static final double SPEND_UNLOCK_SHARE = 0.8;
     static final double MECATOL_THREATENED_SHARE = 0.75;
     static final double MECATOL_TAKE_SHARE = 0.5;
     static final double SPEAKER_RACE_SHARE = 0.2;

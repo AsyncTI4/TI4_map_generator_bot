@@ -24,6 +24,9 @@ import ti4.ai.brain.FactionBrainRegistry;
 import ti4.ai.deal.HumanAiDealMessage;
 import ti4.ai.fallback.AiConfusionService;
 import ti4.ai.fallback.DelegatedPress;
+import ti4.ai.fallback.FallbackLog;
+import ti4.ai.fallback.RedistributionGuard;
+import ti4.ai.fallback.RedistributionGuard.Finish;
 import ti4.ai.perception.AiPerception;
 import ti4.ai.perception.AiPerception.Snapshot;
 import ti4.ai.perception.AiPrompt;
@@ -40,6 +43,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.service.game.GameUndoNameService;
 
@@ -51,6 +55,13 @@ class AiTickRunner {
     private static final int GAME_FAILURE_LIMIT = 3;
     private static final int GLOBAL_FAILURE_LIMIT = 10;
     private static final Deque<Long> RECENT_FAILURES = new ArrayDeque<>();
+    private static final int RECENT_DECISIONS_RECORDED = 5;
+    private static final String UNSURE = "UNSURE";
+    private static final String NO_PROGRESS = "NO_PROGRESS";
+    private static final String TIMEOUT = "TIMEOUT";
+    private static final String REQUESTED = "REQUESTED";
+
+    private record Cause(String kind, String reason, String pending) {}
 
     private record SeatTick(
             AiLane lane,
@@ -182,9 +193,11 @@ class AiTickRunner {
                                 tick.state().memory(),
                                 now))
                 : AiDecision.idle();
+        rememberDecision(tick, decision);
         return switch (decision) {
             case AiDecision.Press press -> handlePress(tick, press);
-            case AiDecision.Unsure unsure -> fallBack(tick, unsure.prompt(), unsure.reason(), false);
+            case AiDecision.Unsure unsure ->
+                fallBack(tick, unsure.prompt(), new Cause(UNSURE, unsure.reason(), describe(unsure)), false);
             case AiDecision.Wait wait -> {
                 if (!tick.state().hasDelegationRequest()) yield SeatResult.wakeAt(wait.untilMillis());
                 SeatResult idle = handleIdle(tick);
@@ -200,6 +213,24 @@ class AiTickRunner {
                 yield SeatResult.act();
             }
         };
+    }
+
+    private static void rememberDecision(SeatTick tick, AiDecision decision) {
+        switch (decision) {
+            case AiDecision.Press press ->
+                tick.state().recordDecision(press.prompt().key(), describe(press));
+            case AiDecision.Unsure unsure ->
+                tick.state().recordDecision(unsure.prompt().key(), describe(unsure));
+            default -> {}
+        }
+    }
+
+    private static String describe(AiDecision.Press press) {
+        return "press " + press.button().handlerId() + " \"" + press.button().label() + "\" (" + press.reason() + ")";
+    }
+
+    private static String describe(AiDecision.Unsure unsure) {
+        return "unsure (" + unsure.reason() + ")";
     }
 
     private static boolean mayActOnItsOwn(SeatTick tick) {
@@ -233,7 +264,11 @@ class AiTickRunner {
                 recordFailure(tick.lane(), tick.now());
                 tick.state().recordAttempt(attemptKey);
             }
-            return fallBack(tick, press.prompt(), "its choice made no progress", false);
+            return fallBack(
+                    tick,
+                    press.prompt(),
+                    new Cause(NO_PROGRESS, "its choice made no progress", describe(press)),
+                    false);
         }
         tick.state().recordAttempt(attemptKey);
         if (pressAsSeat(tick, press.prompt(), press.button())) {
@@ -288,27 +323,38 @@ class AiTickRunner {
                 .max(Comparator.comparingLong(AiPrompt::createdAtMillis));
         String why = reasons.isEmpty() ? "a player asked it to hand over its choice" : "waiting on " + described;
         state.restartStall(tick.now());
-        if (blocking.isPresent()) return fallBack(tick, blocking.get(), why, forced);
+        Cause cause = new Cause(forced ? REQUESTED : TIMEOUT, why, "");
+        if (blocking.isPresent()) return fallBack(tick, blocking.get(), cause, forced);
         if (forced || state.markStuckAnnounced()) {
             AiConfusionService.announceStuck(
                     tick.game(), tick.seat(), reasons.isEmpty() ? "nothing it can hand over" : described);
-            return SeatResult.act();
+            return recorded(tick, null, cause, "stuck: no prompt it can hand over", SeatResult.act());
         }
         return SeatResult.wakeAt(tick.now() + threshold);
     }
 
-    private static SeatResult fallBack(SeatTick tick, AiPrompt prompt, String reason, boolean requested) {
+    private static SeatResult fallBack(SeatTick tick, AiPrompt prompt, Cause cause, boolean requested) {
         AiSeatState state = tick.state();
         state.restartStall(tick.now());
         if (state.wasDelegated(prompt.key())) return SeatResult.wakeAt(0);
         if (requested || state.consumeDelegationRequest() != DelegationRequest.NONE) {
             state.clearFallbacks();
         } else {
-            switch (state.recordFallback(reason + "@" + turnKey(tick.game()), AiSettings.MAX_REPEATED_FALLBACKS)) {
+            switch (state.recordFallback(
+                    cause.reason() + "@" + turnKey(tick.game()), AiSettings.MAX_REPEATED_FALLBACKS)) {
                 case STOP_AND_ANNOUNCE -> {
                     AiConfusionService.announceLoop(
-                            tick.game(), tick.seat(), reason, AiSettings.MAX_REPEATED_FALLBACKS + 1, tick.selfPlay());
-                    return SeatResult.act();
+                            tick.game(),
+                            tick.seat(),
+                            cause.reason(),
+                            AiSettings.MAX_REPEATED_FALLBACKS + 1,
+                            tick.selfPlay());
+                    return recorded(
+                            tick,
+                            prompt,
+                            cause,
+                            "stopped choosing on its own: the same fallback repeated",
+                            SeatResult.act());
                 }
                 case STOPPED -> {
                     return SeatResult.wakeAt(0);
@@ -320,28 +366,74 @@ class AiTickRunner {
         if (!state.canDelegate(round, AiSettings.MAX_DELEGATIONS_PER_ROUND)
                 || !tick.lane().recordGameDelegation(round, AiSettings.MAX_GAME_DELEGATIONS_PER_ROUND)) {
             if (state.markStuckAnnounced()) {
-                AiConfusionService.announceStuck(tick.game(), tick.seat(), reason);
-                return SeatResult.act();
+                AiConfusionService.announceStuck(tick.game(), tick.seat(), cause.reason());
+                return recorded(tick, prompt, cause, "stuck: no delegations left this round", SeatResult.act());
             }
             return SeatResult.wakeAt(0);
         }
         state.recordDelegation(prompt.key());
-        if (tick.selfPlay() && !tick.profile().isPaused()) return chooseWithoutHumans(tick, prompt, reason);
+        if (tick.selfPlay() && !tick.profile().isPaused()) return chooseWithoutHumans(tick, prompt, cause);
         if (!prompt.isHidden()) {
-            if (!AiConfusionService.delegate(tick.game(), tick.seat(), prompt, reason, offerable(tick, prompt))) {
-                AiConfusionService.announceStuck(tick.game(), tick.seat(), reason);
-            }
-            return SeatResult.act();
+            boolean posted = AiConfusionService.delegate(
+                    tick.game(), tick.seat(), prompt, cause.reason(), offerable(tick, prompt));
+            if (!posted) AiConfusionService.announceStuck(tick.game(), tick.seat(), cause.reason());
+            return recorded(
+                    tick,
+                    prompt,
+                    cause,
+                    posted ? "asked the table to choose" : "stuck: could not post the choices",
+                    SeatResult.act());
         }
         Optional<PromptButton> safeChoice = AiConfusionService.safeDefault(prompt);
         if (safeChoice.isEmpty() || tick.profile().isPaused() || !mayActOnItsOwn(tick)) {
             AiConfusionService.announceStuck(tick.game(), tick.seat(), "a private choice");
-            return SeatResult.act();
+            return recorded(tick, prompt, cause, "stuck: private choice with no safe option", SeatResult.act());
         }
-        if (pressAsSeat(tick, prompt, safeChoice.get())) {
-            AiConfusionService.announcePrivateChoice(tick.game(), tick.seat());
+        Finish finish = pressFallbackChoice(tick, prompt, safeChoice.get());
+        if (finish.pressed()) {
+            AiConfusionService.announcePrivateChoice(tick.game(), tick.seat(), finish.restored());
         }
-        return SeatResult.act();
+        return recorded(tick, prompt, cause, outcomeOf(safeChoice.get(), finish), SeatResult.act());
+    }
+
+    private static Finish pressFallbackChoice(SeatTick tick, AiPrompt prompt, PromptButton choice) {
+        return RedistributionGuard.pressRestoringTokens(
+                () -> liveGame(tick),
+                tick.seat().getUserID(),
+                prompt,
+                choice,
+                button -> pressAsSeat(tick, prompt, button));
+    }
+
+    private static Game liveGame(SeatTick tick) {
+        ManagedGame managed = GameManager.getManagedGame(tick.game().getName());
+        return managed == null ? tick.game() : managed.getGame();
+    }
+
+    private static String outcomeOf(PromptButton choice, Finish finish) {
+        String restored = finish.restored() == 0
+                ? ""
+                : " after restoring " + StringHelper.pluralize(finish.restored(), "command token");
+        return (finish.pressed() ? "picked " : "could not press ") + choice.label() + restored;
+    }
+
+    private static SeatResult recorded(SeatTick tick, AiPrompt prompt, Cause cause, String outcome, SeatResult result) {
+        List<String> recent =
+                prompt == null ? List.of() : tick.state().recentDecisionsOn(prompt.key(), RECENT_DECISIONS_RECORDED);
+        Game game = liveGame(tick);
+        FallbackLog.record(
+                game,
+                FallbackLog.capture(
+                        game,
+                        tick.seat(),
+                        prompt,
+                        cause.kind(),
+                        cause.reason(),
+                        recent,
+                        cause.pending(),
+                        outcome,
+                        tick.now()));
+        return result;
     }
 
     private static String turnKey(Game game) {
@@ -364,17 +456,21 @@ class AiTickRunner {
                 .orElse(true);
     }
 
-    private static SeatResult chooseWithoutHumans(SeatTick tick, AiPrompt prompt, String reason) {
+    private static SeatResult chooseWithoutHumans(SeatTick tick, AiPrompt prompt, Cause cause) {
         Optional<PromptButton> choice = AiConfusionService.selfPlayChoice(prompt)
                 .filter(button -> offerable(tick, prompt).test(button.customId()));
         if (choice.isEmpty() || !mayActOnItsOwn(tick)) {
-            AiConfusionService.announceStuck(tick.game(), tick.seat(), reason);
-            return SeatResult.act();
+            AiConfusionService.announceStuck(tick.game(), tick.seat(), cause.reason());
+            return recorded(tick, prompt, cause, "stuck: no choice it may make for itself", SeatResult.act());
         }
-        if (pressAsSeat(tick, prompt, choice.get())) {
-            AiConfusionService.announceSelfPlayChoice(tick.game(), tick.seat(), choice.get(), reason);
+        Finish finish = pressFallbackChoice(tick, prompt, choice.get());
+        if (finish.pressed()) {
+            AiConfusionService.announceSelfPlayChoice(
+                    tick.game(), tick.seat(), choice.get(), cause.reason(), finish.restored());
+        } else if (finish.restored() > 0) {
+            AiConfusionService.announceStuck(tick.game(), tick.seat(), "it could not put its command tokens back");
         }
-        return SeatResult.act();
+        return recorded(tick, prompt, cause, outcomeOf(choice.get(), finish), SeatResult.act());
     }
 
     private static boolean referee(
