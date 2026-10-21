@@ -18,13 +18,16 @@ final class PlayerAreasHeightEstimate {
     private final Game game;
     private final FogView fog;
     private final NeighbourMap neighbours;
-    private final int playerAreasWidth;
+    private final int playerAreasLeft;
+    private final int playerAreasRight;
 
-    PlayerAreasHeightEstimate(Game game, FogView fog, NeighbourMap neighbours, int playerAreasWidth) {
+    PlayerAreasHeightEstimate(
+            Game game, FogView fog, NeighbourMap neighbours, int playerAreasLeft, int playerAreasRight) {
         this.game = game;
         this.fog = fog;
         this.neighbours = neighbours;
-        this.playerAreasWidth = playerAreasWidth;
+        this.playerAreasLeft = playerAreasLeft;
+        this.playerAreasRight = playerAreasRight;
     }
 
     static int megaGamePlayerAreasMinimumWidth() {
@@ -79,7 +82,7 @@ final class PlayerAreasHeightEstimate {
             }
         }
         for (Player player : game.getRealAndEliminatedPlayers()) {
-            playersY += playerAreaHeightAdjustment(player, playerAreasWidth - BoardLayout.PLAYER_AREAS_LEFT);
+            playersY += playerAreaHeightAdjustment(player, playerAreasRight - playerAreasLeft);
         }
         return playersY;
     }
@@ -89,8 +92,7 @@ final class PlayerAreasHeightEstimate {
                 .filter(player -> !hasNoPlayerArea(player) && !fog.shouldConvertToGeneric(player))
                 .toList();
         List<List<Player>> columns = PlayerAreaGenerator.splitIntoColumns(game, shownPlayers);
-        int columnWidth =
-                PlayerAreaGenerator.columnWidth(playerAreasWidth, BoardLayout.PLAYER_AREAS_LEFT, columns.size());
+        int columnWidth = PlayerAreaGenerator.columnWidth(playerAreasRight, playerAreasLeft, columns.size());
         int height = 0;
         for (int row = 0; row < columns.getFirst().size(); row++) {
             int rowHeight = 0;
@@ -115,11 +117,7 @@ final class PlayerAreasHeightEstimate {
                 PlayerAreaGenerator.isMegaGame(game) || player.getTeamMateIDs().size() > 1;
         int adjustment = headerCanGrow
                 ? PlayerAreaGenerator.estimateExtraHeaderHeight(
-                        game,
-                        neighbours,
-                        player,
-                        BoardLayout.PLAYER_AREAS_LEFT,
-                        BoardLayout.PLAYER_AREAS_LEFT + areaWidth)
+                        game, neighbours, player, playerAreasLeft, playerAreasLeft + areaWidth)
                 : 0;
         if (player.isEliminated()) {
             return adjustment - 190;
@@ -137,7 +135,7 @@ final class PlayerAreasHeightEstimate {
         return game.getRealAndEliminatedPlayers().stream()
                 .filter(player -> !hasNoPlayerArea(player) && fog.shouldConvertToGeneric(player))
                 .mapToInt(player -> TYPICAL_PLAYER_AREA_HEIGHT
-                        + playerAreaHeightAdjustment(player, playerAreasWidth - BoardLayout.PLAYER_AREAS_LEFT))
+                        + playerAreaHeightAdjustment(player, playerAreasRight - playerAreasLeft))
                 .sum();
     }
 }

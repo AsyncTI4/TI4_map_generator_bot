@@ -53,10 +53,12 @@ final class MapCanvasLayout {
         int mapWidth = board.mapWidth();
         int mapHeight = board.mapHeight();
         boolean megaGame = PlayerAreaGenerator.isMegaGame(game);
-        int playerAreasWidth =
-                megaGame ? Math.max(mapWidth, PlayerAreasHeightEstimate.megaGamePlayerAreasMinimumWidth()) : mapWidth;
-        int heightOfPlayerAreasSection =
-                new PlayerAreasHeightEstimate(game, fog, neighbours, playerAreasWidth).heightOfPlayerAreasSection();
+        boolean landscape = displayType == DisplayType.landscape;
+        int playerAreasLeft = BoardLayout.PLAYER_AREAS_LEFT + (landscape ? mapWidth : 0);
+        int playerAreasWidth = playerAreasWidth(landscape, megaGame, mapWidth);
+        int heightOfPlayerAreasSection = new PlayerAreasHeightEstimate(
+                        game, fog, neighbours, playerAreasLeft, playerAreasWidth)
+                .heightOfPlayerAreasSection();
 
         int heightForGameInfo;
         int height;
@@ -76,7 +78,7 @@ final class MapCanvasLayout {
                 width = board.framedWidth();
                 break;
             default:
-                if (displayType == DisplayType.landscape) {
+                if (landscape) {
                     heightForGameInfo = STATS_ONLY_GAME_INFO_HEIGHT;
                     height = Math.max(heightOfPlayerAreasSection, mapHeight);
                     minimumHeight = mapHeight;
@@ -98,7 +100,14 @@ final class MapCanvasLayout {
                 playerAreasWidth,
                 mapWidth,
                 stripWidth,
-                displayType == DisplayType.landscape);
+                landscape);
+    }
+
+    private static int playerAreasWidth(boolean landscape, boolean megaGame, int mapWidth) {
+        if (landscape) {
+            return landscapeWidth(mapWidth);
+        }
+        return megaGame ? Math.max(mapWidth, PlayerAreasHeightEstimate.megaGamePlayerAreasMinimumWidth()) : mapWidth;
     }
 
     private static int landscapeWidth(int mapWidth) {

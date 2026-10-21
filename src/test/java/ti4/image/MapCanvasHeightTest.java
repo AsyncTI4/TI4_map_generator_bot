@@ -190,4 +190,29 @@ class MapCanvasHeightTest extends BaseTi4Test {
         assertEquals(71, CanvasBottom.ofDrawnContent(image, 40));
         assertEquals(90, CanvasBottom.ofDrawnContent(image, 90));
     }
+
+    @Test
+    void landscapePlayerAreasFillTheColumnRightOfTheMap() {
+        BufferedImage image = paint(DisplayType.landscape);
+
+        int framePixels = 0;
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = image.getWidth() - 8; x < image.getWidth(); x++) {
+                if ((image.getRGB(x, y) & 0xFFFFFF) != 0) {
+                    framePixels++;
+                }
+            }
+        }
+        assertTrue(framePixels > 500, "player area frames reach the right edge of the column, found " + framePixels);
+    }
+
+    @Test
+    void landscapeSpectatorsWrapInsideTheColumn() {
+        int withoutSpectators = paint(DisplayType.landscape).getHeight();
+        addSpectators(400);
+
+        BufferedImage image = paint(DisplayType.landscape);
+
+        assertTrue(image.getHeight() > withoutSpectators, "the wrapped spectator lines extend the canvas");
+    }
 }

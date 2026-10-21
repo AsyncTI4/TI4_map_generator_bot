@@ -41,7 +41,6 @@ final class HeaderLayout {
             int roundWidth,
             int roundWrapFromX,
             int turnOrderWidth,
-            int turnOrderShift,
             int decksWidth,
             int flowRight,
             boolean trackerShown,
@@ -115,7 +114,7 @@ final class HeaderLayout {
             displaced++;
         }
 
-        int turnOrderX = roundX + in.roundWidth() + ROUND_GAP + in.turnOrderShift();
+        int turnOrderX = roundX + in.roundWidth() + ROUND_GAP;
         int turnOrderBaseline = roundBaseline;
         if (in.turnOrderWidth() > 0 && blocked(in, tracker, turnOrderBox(in, turnOrderX, turnOrderBaseline))) {
             turnOrderX = in.wrappedLeft();

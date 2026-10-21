@@ -33,7 +33,6 @@ class HeaderLayoutTest {
                 ROUND_WIDTH,
                 stripWidth - ROUND_WIDTH - 100 * players,
                 turnOrderWidth,
-                0,
                 decksWidth,
                 stripWidth - HeaderLayout.RIGHT_MARGIN,
                 tracker,
@@ -155,21 +154,7 @@ class HeaderLayoutTest {
     @Test
     void theTrackerStaysInsideTheCanvasTop() {
         HeaderLayout.Inputs in = new HeaderLayout.Inputs(
-                LEFT,
-                WRAPPED_LEFT,
-                140,
-                500,
-                List.of(40, 40),
-                2840,
-                ROUND_WIDTH,
-                2000,
-                0,
-                0,
-                600,
-                2920,
-                true,
-                1740,
-                2620);
+                LEFT, WRAPPED_LEFT, 140, 500, List.of(40, 40), 2840, ROUND_WIDTH, 2000, 0, 600, 2920, true, 1740, 2620);
 
         HeaderLayout.Placement placement = HeaderLayout.place(in);
 

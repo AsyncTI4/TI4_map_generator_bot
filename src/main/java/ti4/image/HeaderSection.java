@@ -55,16 +55,15 @@ final class HeaderSection {
                 y,
                 nameEnd,
                 labels.stream().map(StrategyCardRow.Label::width).toList(),
-                flowRight(canvas) - LABEL_RIGHT_MARGIN,
+                stripEdge(canvas) - LABEL_RIGHT_MARGIN,
                 roundLen,
-                canvas.stripWidth() - roundLen - 100 * game.getRealPlayers().size(),
+                stripEdge(canvas) - roundLen - 100 * game.getRealPlayers().size(),
                 TurnOrderTracker.width(turnOrder),
-                landscapeShift,
                 CardDeckRow.width(game),
-                flowRight(canvas) - HeaderLayout.RIGHT_MARGIN,
+                stripEdge(canvas) - HeaderLayout.RIGHT_MARGIN,
                 ExpeditionTracker.isShown(game),
-                canvas.stripWidth() - MapCanvasLayout.EXPEDITION_TRACKER_RIGHT_OFFSET,
-                canvas.stripWidth() - HeaderLayout.TRACKER_SIZE - HeaderLayout.RIGHT_MARGIN));
+                stripEdge(canvas) - MapCanvasLayout.EXPEDITION_TRACKER_RIGHT_OFFSET,
+                stripEdge(canvas) - HeaderLayout.TRACKER_SIZE - HeaderLayout.RIGHT_MARGIN));
 
         StrategyCardRow.draw(ctx, g2, labels, placement.labelRows());
 
@@ -83,7 +82,7 @@ final class HeaderSection {
         return placement.bottom();
     }
 
-    private static int flowRight(MapCanvasLayout canvas) {
+    private static int stripEdge(MapCanvasLayout canvas) {
         return canvas.isLandscape() ? canvas.landscapeRightEdge() : canvas.stripWidth();
     }
 }
