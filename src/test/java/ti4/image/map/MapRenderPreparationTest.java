@@ -1,6 +1,7 @@
 package ti4.image.map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
@@ -92,6 +93,15 @@ class MapRenderPreparationTest extends BaseTi4Test {
         resolve();
 
         assertEquals(DebtPoolIconService.defaultIcon(game, "favours"), game.getDebtPoolIcon("favours"));
+    }
+
+    @Test
+    void resolvingARenderNormalizesAFactionEmojiThatIsNotAnEmoji() {
+        holder.setFactionEmoji("not an emoji");
+
+        resolve();
+
+        assertNull(holder.getFactionEmojiRaw());
     }
 
     @Test

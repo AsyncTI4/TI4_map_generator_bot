@@ -1857,6 +1857,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 : FactionEmojis.getFactionIcon(getFaction()).toString();
     }
 
+    public void normalizeFactionEmoji() {
+        normalizeCustomFactionEmoji();
+    }
+
     @Nullable
     private String normalizeCustomFactionEmoji() {
         String emoji = super.getFactionEmoji();
