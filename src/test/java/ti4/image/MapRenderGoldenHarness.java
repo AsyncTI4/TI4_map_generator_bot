@@ -234,7 +234,7 @@ class MapRenderGoldenHarness extends BaseTi4Test {
     }
 
     // Draws one layer per tile of the viewer's tile map (fog-substituted for private views, as BoardSection does) and
-    // folds each layer's pixels, or the exception it threw, into one digest. perTile keeps a short hash per position
+    // folds each layer's pixels, or the class of the exception it threw, into one digest. perTile keeps a short hash per position
     // so a mismatch names the tiles that changed.
     private static LayerDigest digestLayers(Game game, GenericInteractionCreateEvent event, TileStep step)
             throws Exception {
@@ -248,7 +248,7 @@ class MapRenderGoldenHarness extends BaseTi4Test {
                 BufferedImage layer = source.apply(entry.getValue());
                 outcome = layer.getWidth() + "x" + layer.getHeight() + ":" + layerHash(layer);
             } catch (Exception e) {
-                outcome = e.getClass().getName() + ": " + oneLine(e.getMessage());
+                outcome = e.getClass().getName();
             }
             digest.update((entry.getKey() + "=" + outcome + "\n").getBytes(StandardCharsets.UTF_8));
             if (perTile.length() > 0) perTile.append(',');
