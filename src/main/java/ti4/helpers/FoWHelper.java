@@ -1066,7 +1066,7 @@ public final class FoWHelper {
      * <p>
      * Also takes into account player abilities and agendas
      */
-    private static Set<String> getWormholeAdjacencies(Game game, String position, Player player, boolean neighbors) {
+    static Set<String> getWormholeAdjacencies(Game game, String position, Player player, boolean neighbors) {
         return getWormholeAdjacencies(game, position, player, neighbors, false);
     }
 
@@ -1304,7 +1304,7 @@ public final class FoWHelper {
         }
         if (playerPlanets.stream().anyMatch(unitHolderNames::contains)) {
             return true;
-        } else if (tile.isMecatol(game) && player.hasIIHQ()) {
+        } else if (player.hasIIHQ() && tile.isMecatol(game)) {
             return true;
         } else if ("s11".equals(tile.getTileID()) && canSeeStatsOfFaction(game, "cabal", player)) {
             return true;
