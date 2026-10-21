@@ -27,7 +27,7 @@ import ti4.testUtils.discord.FakeChannel;
 // report of the game state, the AI's recent decisions and presses, and what the bot logged.
 class AiSelfPlayTest extends BaseTi4Test {
 
-    private static final List<String> FACTIONS = AiSettings.SUPPORTED_FACTIONS.subList(0, 6);
+    private static final List<String> FACTIONS = AiSettings.DEFAULT_FACTIONS;
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
     private static final Set<SelfPlayGame.Ending> FINISHED =
             EnumSet.of(SelfPlayGame.Ending.VICTORY_POINTS, SelfPlayGame.Ending.OBJECTIVES_EXHAUSTED);
@@ -1145,8 +1145,8 @@ class AiSelfPlayTest extends BaseTi4Test {
         return String.join(", ", averages);
     }
 
-    // -Dai.selfplay.factions=sol,jolnar,xxcha,yin,nekro,sardakk seats those factions instead of the first six supported
-    // ones.
+    // -Dai.selfplay.factions=sol,jolnar,xxcha,yin,nekro,sardakk seats those factions instead of the six built-out
+    // default factions (AiSettings.DEFAULT_FACTIONS).
     private static List<String> factions() {
         String chosen = System.getProperty("ai.selfplay.factions", "");
         if (chosen.isBlank()) return FACTIONS;

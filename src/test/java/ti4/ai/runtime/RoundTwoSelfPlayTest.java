@@ -43,10 +43,10 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
     private static final int LAST_ROUND = 2;
 
-    // -Dai.selfplay.roundtwo.factions=xxcha,hacan,... seats those factions instead of the first six supported ones.
+    // -Dai.selfplay.roundtwo.factions=xxcha,hacan,... seats those factions instead of the built-out default factions.
     private static List<String> factions() {
         String chosen = System.getProperty("ai.selfplay.roundtwo.factions", "");
-        if (chosen.isBlank()) return AiSettings.SUPPORTED_FACTIONS.subList(0, 6);
+        if (chosen.isBlank()) return AiSettings.DEFAULT_FACTIONS;
         return List.of(chosen.split(","));
     }
 

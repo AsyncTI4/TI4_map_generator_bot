@@ -28,7 +28,7 @@ import ti4.testUtils.BaseTi4Test;
 // strategy cards it picked. Run with -Dai.selfplay.roundone=true, -Dai.selfplay.games=N, -Dai.selfplay.threads=T.
 class RoundOneSelfPlayTest extends BaseTi4Test {
 
-    private static final List<String> FACTIONS = AiSettings.SUPPORTED_FACTIONS.subList(0, 6);
+    private static final List<String> FACTIONS = AiSettings.DEFAULT_FACTIONS;
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
     private static final int ROUNDS = Integer.getInteger("ai.selfplay.rounds", 1);
 
