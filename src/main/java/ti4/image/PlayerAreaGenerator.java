@@ -3048,6 +3048,7 @@ public class PlayerAreaGenerator {
         List<String> purgedTechs = player.getPurgedTechs();
         if (!purgedTechs.isEmpty()) {
             purgedTechs = new ArrayList<>(purgedTechs);
+            purgedTechs.removeIf(tech -> Mapper.getTech(tech) == null);
             purgedTechs.sort(techComparator);
             deltaX = techField(x, y, purgedTechs, Collections.emptyList(), deltaX, player);
         }
@@ -3360,7 +3361,7 @@ public class PlayerAreaGenerator {
             graphics.setColor(Color.DARK_GRAY);
 
             TechnologyModel techModel = Mapper.getTech(tech);
-            if (techModel.isUnitUpgrade()) {
+            if (techModel == null || techModel.isUnitUpgrade()) {
                 continue;
             }
 
@@ -3492,6 +3493,9 @@ public class PlayerAreaGenerator {
         }
         for (String tech : techs) {
             TechnologyModel techInformation = Mapper.getTech(tech);
+            if (techInformation == null) {
+                continue;
+            }
             if ("inf2".equals(techInformation.getBaseUpgrade().orElse("")) || "inf2".equals(tech)) {
                 return tech;
             }
@@ -3565,7 +3569,7 @@ public class PlayerAreaGenerator {
                     Arrays.asList(game.getStoredValue("zealotsHeroTechs").split("-"));
             for (String tech : techs) {
                 TechnologyModel techInformation = Mapper.getTech(tech);
-                if (!techInformation.isUnitUpgrade()) {
+                if (techInformation == null || !techInformation.isUnitUpgrade()) {
                     continue;
                 }
 
@@ -3635,7 +3639,7 @@ public class PlayerAreaGenerator {
         if (zealotsHeroPurged) {
             for (String tech : player.getPurgedTechs()) {
                 TechnologyModel techInformation = Mapper.getTech(tech);
-                if (!techInformation.isUnitUpgrade()) {
+                if (techInformation == null || !techInformation.isUnitUpgrade()) {
                     continue;
                 }
 
