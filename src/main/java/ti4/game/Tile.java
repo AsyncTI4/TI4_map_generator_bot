@@ -501,15 +501,8 @@ public class Tile {
 
     @JsonIgnore
     public String getRepresentation() {
-        try {
-            if (Mapper.getTileRepresentations().get(tileID) == null) {
-                return tileID + "(" + getPosition() + ")";
-            }
-            return Mapper.getTileRepresentations().get(tileID);
-        } catch (Exception e) {
-            // DO NOTHING
-        }
-        return null;
+        String representation = Mapper.getTileRepresentation(tileID);
+        return representation == null ? tileID + "(" + getPosition() + ")" : representation;
     }
 
     @JsonIgnore

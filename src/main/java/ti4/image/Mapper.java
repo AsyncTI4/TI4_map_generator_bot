@@ -1520,9 +1520,10 @@ public class Mapper {
     // ####################
     // Tiles
 
-    public static Map<String, String> getTileRepresentations() {
-        return TileHelper.getAllTileModels().stream()
-                .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
+    @Nullable
+    public static String getTileRepresentation(String tileID) {
+        TileModel tile = TileHelper.getTileById(tileID);
+        return tile == null ? null : tile.getNameNullSafe();
     }
 
     public static String getTileID(String tileID) {
