@@ -31,6 +31,7 @@ public record ResearchPlan(
 
     public enum Status {
         READY,
+        SCAR_PURCHASE,
         FEASIBLE,
         TOO_LONG,
         UNREACHABLE
@@ -108,6 +109,7 @@ public record ResearchPlan(
         String status =
                 switch (goal.status()) {
                     case READY -> " ready to score";
+                    case SCAR_PURCHASE -> " needs an Entropic Scar purchase";
                     case FEASIBLE -> " needs " + goal.needed() + " researches, feasible";
                     case TOO_LONG -> " needs " + goal.needed() + " researches, too long";
                     case UNREACHABLE -> " unreachable";
@@ -126,6 +128,7 @@ public record ResearchPlan(
         parts.put("secrets", sorted(seat.getSecretsUnscored().keySet()));
         parts.put("public objectives", publics(game, seat));
         parts.put("specialty planets", specialtyPlanets(game, seat));
+        parts.put("scar purchase", String.valueOf(ScarToken.canBuy(game, seat)));
         parts.put(
                 "synergies",
                 seat.getSynergies().stream().map(TechnologyType::name).sorted().collect(Collectors.joining(",")));
@@ -201,12 +204,17 @@ public record ResearchPlan(
                 continue;
             }
             int needed = route.get().researches();
-            Status status = needed == 0 ? Status.READY : needed <= left ? Status.FEASIBLE : Status.TOO_LONG;
+            Status status = statusOf(route.get(), left);
             goals.add(new Goal(objective, points, needed, status, route.get().notes()));
             if (status == Status.FEASIBLE) {
                 candidates.add(new Candidate(objective, points * ResearchPolicy.OBJECTIVE_WEIGHT, route.get(), true));
             }
         }
+    }
+
+    private static Status statusOf(TechPath.Route route, int left) {
+        if (route.researches() == 0) return route.needsScarPurchase() ? Status.SCAR_PURCHASE : Status.READY;
+        return route.researches() <= left ? Status.FEASIBLE : Status.TOO_LONG;
     }
 
     private static void addAntimassReach(

@@ -55,6 +55,17 @@ class EntropicScarRulesTest extends BaseTi4Test {
         assertThat(pressedId(next(OFFER).orElseThrow())).isEqualTo("FFCC_sol_entropicScar_so2");
     }
 
+    // Holding Adapt New Strategies with one faction technology already, the second one is the point: it is bought with
+    // the last strategy token even though it is the lesser technology.
+    @Test
+    void buysTheTechnologyThatCompletesAdaptNewStrategies() {
+        test.sol.setSecret("ans");
+        test.sol.addTech("ac2");
+        test.sol.setStrategicCC(1);
+
+        assertThat(pressedId(next(OFFER).orElseThrow())).isEqualTo("FFCC_sol_entropicScar_so2");
+    }
+
     // With no strategy token to spend the offer is declined, which also removes the message.
     @Test
     void declinesWithoutAStrategyToken() {

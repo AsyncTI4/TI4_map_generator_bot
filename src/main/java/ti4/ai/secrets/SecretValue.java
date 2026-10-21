@@ -16,7 +16,6 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.image.Mapper;
-import ti4.model.TechnologyModel;
 import ti4.model.TokenModel;
 import ti4.model.WormholeModel.Wormhole;
 import ti4.service.info.ListPlayerInfoService;
@@ -33,7 +32,6 @@ public class SecretValue {
             "fc", 0.6,
             "pem", 0.6);
     private static final double REACHABLE_SUPPLY_LINES = 0.6;
-    private static final String ADAPT_NEW_STRATEGIES = "ans";
     private static final String SEIZE_AN_ICON = "sai";
     private static final String DEFY_SPACE_AND_TIME = "dfat";
     private static final String MALLICE = "mallice";
@@ -46,7 +44,6 @@ public class SecretValue {
     private static final int OPENING_ROUND = 1;
     private static final String DICTATE_POLICY = "dp";
     private static final String DRIVE_THE_DEBATE = "dtd";
-    private static final Set<String> VALEFAR_ASSIMILATORS = Set.of("vax", "vay");
     private static final int LAWS_FOR_DICTATE_POLICY = 3;
     private static final double READY_VALUE = 2.0;
     private static final double CONGESTION_FACTOR = 0.5;
@@ -154,18 +151,11 @@ public class SecretValue {
     }
 
     private static int progress(Game game, Player seat, String secretId) {
-        if (ADAPT_NEW_STRATEGIES.equals(secretId)) return ownFactionTechnologies(seat);
         return ListPlayerInfoService.getPlayerProgressOnObjective(secretId, game, seat);
     }
 
     public static int ownFactionTechnologies(Player seat) {
-        int count = 0;
-        for (String alias : seat.getTechs()) {
-            TechnologyModel tech = Mapper.getTech(alias);
-            if (tech == null || VALEFAR_ASSIMILATORS.contains(alias)) continue;
-            if (tech.getFaction().filter(seat.getFaction()::equals).isPresent()) count++;
-        }
-        return count;
+        return ListPlayerInfoService.countAdaptNewStrategiesTechnologies(seat, false);
     }
 
     private static int scoringOrder(String secretId) {

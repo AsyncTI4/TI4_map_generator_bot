@@ -58,7 +58,7 @@ class TechRoutes {
         }
         candidates.sort(Comparator.comparing(TechnologyModel::getAlias));
         if (candidates.size() < needed) return Optional.empty();
-        int free = ScarToken.kept(state.game, state.seat) > 0 ? 1 : 0;
+        int free = ScarToken.canBuy(state.game, state.seat) ? 1 : 0;
         return Optional.of(cheapest(state, candidates, needed, free));
     }
 
@@ -82,6 +82,7 @@ class TechRoutes {
                 state.add(tech, 0);
             } else {
                 state.notes.add("Entropic Scar supplies " + tech.getAlias());
+                state.scarTechs.add(tech.getAlias());
             }
         }
         return state.finish();
@@ -179,6 +180,7 @@ class TechRoutes {
         private final List<TechnologyModel> techs = new ArrayList<>();
         private final Set<String> taken = new HashSet<>();
         private final List<String> notes = new ArrayList<>();
+        private final List<String> scarTechs = new ArrayList<>();
         private int researches;
 
         State(Game game, Player seat) {
@@ -267,7 +269,7 @@ class TechRoutes {
         TechPath.Route finish() {
             int skipped = skips.values().stream().mapToInt(Integer::intValue).sum();
             if (skipped > 0) notes.add(skipped + " specialty skips counted");
-            return new TechPath.Route(researches, List.copyOf(techs), List.copyOf(notes));
+            return new TechPath.Route(researches, List.copyOf(techs), List.copyOf(notes), List.copyOf(scarTechs));
         }
     }
 }
