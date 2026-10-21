@@ -124,6 +124,7 @@ public class MapGenerator implements AutoCloseable {
     private final GenericInteractionCreateEvent event;
     private final int scoreTokenSpacing;
     private final Game game;
+    private final NeighbourMap neighbours;
     private final DisplayType displayType;
     private final DisplayType displayTypeBasic;
     private final boolean debug;
@@ -197,6 +198,7 @@ public class MapGenerator implements AutoCloseable {
         if (debug) debugAbsoluteStartTime = StopWatch.createStarted();
 
         this.game = game;
+        this.neighbours = new NeighbourMap(game);
         this.displayType = defaultIfNull(displayType);
         this.event = event;
         this.requestedSegment = requestedSegment;
@@ -374,7 +376,7 @@ public class MapGenerator implements AutoCloseable {
                 PlayerAreaGenerator.isMegaGame(game) || player.getTeamMateIDs().size() > 1;
         int adjustment = headerCanGrow
                 ? PlayerAreaGenerator.estimateExtraHeaderHeight(
-                        game, player, PLAYER_AREAS_LEFT, PLAYER_AREAS_LEFT + areaWidth)
+                        game, neighbours, player, PLAYER_AREAS_LEFT, PLAYER_AREAS_LEFT + areaWidth)
                 : 0;
         if (player.isEliminated()) {
             return adjustment - 190;
@@ -1337,7 +1339,8 @@ public class MapGenerator implements AutoCloseable {
                             fowPlayer,
                             websiteOverlays,
                             playerAreasWidth,
-                            scoreTokenSpacing)
+                            scoreTokenSpacing,
+                            neighbours)
                     .drawAllPlayerAreas(topLeft);
         }
     }

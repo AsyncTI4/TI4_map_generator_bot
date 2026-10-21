@@ -27,6 +27,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -117,6 +118,7 @@ public class PlayerAreaGenerator {
     private int rightEdge;
     private int columnOffset;
     private final int scoreTokenSpacing;
+    private final NeighbourMap neighbours;
     private final ResourceHelper resourceHelper = ResourceHelper.getInstance();
     private final Map<UnitKey, Integer> unitCount = new HashMap<>();
 
@@ -139,6 +141,26 @@ public class PlayerAreaGenerator {
             List<WebsiteOverlay> websiteOverlays,
             int totalWidth,
             int scoreTokenSpacing) {
+        this(
+                graphics,
+                game,
+                isFoWPrivate,
+                frogPlayer,
+                websiteOverlays,
+                totalWidth,
+                scoreTokenSpacing,
+                new NeighbourMap(game));
+    }
+
+    public PlayerAreaGenerator(
+            Graphics graphics,
+            Game game,
+            boolean isFoWPrivate,
+            Player frogPlayer,
+            List<WebsiteOverlay> websiteOverlays,
+            int totalWidth,
+            int scoreTokenSpacing,
+            NeighbourMap neighbours) {
         this.graphics = graphics;
         this.game = game;
         this.isFoWPrivate = isFoWPrivate;
@@ -147,6 +169,7 @@ public class PlayerAreaGenerator {
         this.totalWidth = totalWidth;
         this.rightEdge = totalWidth;
         this.scoreTokenSpacing = scoreTokenSpacing;
+        this.neighbours = neighbours;
     }
 
     public static boolean isMegaGame(Game game) {
@@ -328,7 +351,7 @@ public class PlayerAreaGenerator {
             graphics.setFont(Storage.getFont20());
             int drawX = x + 9;
             int drawY = y + 125;
-            Set<Player> neighbors = player.getNeighbouringPlayers(true);
+            Set<Player> neighbors = neighbours.withEquivalents(player);
             Set<Player> guildShips = guildShipPartners(player, neighbors);
             if (neighbors.isEmpty()) {
                 DrawingUtil.superDrawString(
@@ -556,10 +579,11 @@ public class PlayerAreaGenerator {
         return player.getUserName() + afk;
     }
 
-    public static int estimateExtraHeaderHeight(Game game, Player player, int areaLeft, int areaRight) {
+    public static int estimateExtraHeaderHeight(
+            Game game, NeighbourMap neighbours, Player player, int areaLeft, int areaRight) {
         Graphics probe = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).getGraphics();
         try {
-            return new PlayerAreaGenerator(probe, game, false, null, new ArrayList<>(), areaRight, 0)
+            return new PlayerAreaGenerator(probe, game, false, null, new ArrayList<>(), areaRight, 0, neighbours)
                             .headerHeight(player, areaLeft)
                     - HEADER_ROW_HEIGHT;
         } finally {
@@ -697,7 +721,7 @@ public class PlayerAreaGenerator {
     }
 
     private Set<Player> guildShipPartners(Player player, Set<Player> neighbors) {
-        Set<Player> guildShips = new HashSet<>();
+        Set<Player> guildShips = new LinkedHashSet<>();
         for (Player p2 : game.getRealPlayers()) {
             if (player == p2 || neighbors.contains(p2)) {
                 continue;
@@ -728,7 +752,7 @@ public class PlayerAreaGenerator {
     }
 
     private List<NeighborToken> neighborTokens(Player player) {
-        Set<Player> neighbors = player.getNeighbouringPlayers(true);
+        Set<Player> neighbors = neighbours.withEquivalents(player);
         List<NeighborToken> tokens = new ArrayList<>();
         String label = neighbors.isEmpty() ? "No Neighbors" : "Neighbors: ";
         tokens.add(new NeighborToken(label, Storage.getFont20(), 0, null, 0, NEIGHBOR_LABEL_WIDTH));
