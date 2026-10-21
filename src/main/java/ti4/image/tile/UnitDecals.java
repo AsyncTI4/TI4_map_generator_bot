@@ -10,10 +10,10 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.draw.ColorUtil;
 import ti4.image.draw.VoltronDecal;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 
 final class UnitDecals {
@@ -71,13 +71,19 @@ final class UnitDecals {
     static void drawLawDecals(Graphics2D g, Game game, UnitKey unitKey, int imageX, int imageY) {
         if (unitKey.unitType() == UnitType.Mech
                 && ButtonHelper.anyLawInPlay(game, "articles_war", "absol_articleswar")) {
-            drawToken(g, "agenda_articles_of_war" + ColorUtil.blackWhiteFileSuffix(unitKey.colorID()), imageX, imageY);
+            drawToken(
+                    g,
+                    "agenda_articles_of_war"
+                            + Mapper.getColor(unitKey.colorID()).blackWhiteFileSuffix(),
+                    imageX,
+                    imageY);
         }
         VoltronDecal.drawIfVoltron(unitKey, imageX, imageY, g, game);
         if (unitKey.unitType() == UnitType.Warsun && ButtonHelper.isLawInPlay(game, "schematics")) {
             drawToken(
                     g,
-                    "agenda_publicize_weapon_schematics" + ColorUtil.blackWhiteFileSuffix(unitKey.colorID()),
+                    "agenda_publicize_weapon_schematics"
+                            + Mapper.getColor(unitKey.colorID()).blackWhiteFileSuffix(),
                     imageX,
                     imageY);
         }

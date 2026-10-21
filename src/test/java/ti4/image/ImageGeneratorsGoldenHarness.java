@@ -433,7 +433,7 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
             int y = (i / columns) * 400;
             g2.drawImage(HexOverlays.border("solid", color, List.of()), x, y, 200, 200, null);
             g2.drawImage(HexOverlays.border("dash", color, List.of(1, 4), 2.0f), x, y + 200, 200, 200, null);
-            String suffix = ColorUtil.blackWhiteFileSuffix(color.getAlias());
+            String suffix = Mapper.getColor(color.getAlias()).blackWhiteFileSuffix();
             g2.setColor("_blk.png".equals(suffix) ? Color.BLACK : Color.WHITE);
             g2.fillRect(x, y, 8, 8);
         }

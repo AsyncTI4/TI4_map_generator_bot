@@ -59,6 +59,10 @@ public class ColorModel implements ModelInterface {
         return getColorCategories().size() > 1;
     }
 
+    public String blackWhiteFileSuffix() {
+        return "black".equalsIgnoreCase(getTextColor()) ? "_blk.png" : "_wht.png";
+    }
+
     @JsonIgnore
     private String getRepresentation(boolean includeName) {
         if (includeName) return ColorEmojis.getColorEmojiWithName(name);

@@ -15,7 +15,6 @@ import ti4.game.Player;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitKey;
-import ti4.image.draw.ColorUtil;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.ShapeDrawing;
@@ -176,7 +175,7 @@ final class UnitUpgradeSheet {
         Point unitOffset = unitOffset(unit.getAsyncId());
         UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
         BufferedImage wsCrackImage = ImageHelper.read(ImageResources.token("agenda_publicize_weapon_schematics"
-                + (player.hasWarsunTech() ? ColorUtil.blackWhiteFileSuffix(unitKey.colorID()) : "_blk.png")));
+                + (player.hasWarsunTech() ? Mapper.getColor(unitKey.colorID()).blackWhiteFileSuffix() : "_blk.png")));
         ctx.g2().drawImage(wsCrackImage, x + unitOffset.x, y + unitOffset.y, null);
     }
 

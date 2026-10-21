@@ -17,7 +17,6 @@ import ti4.game.Tile;
 import ti4.helpers.PdsCoverage;
 import ti4.helpers.PdsCoverageHelper;
 import ti4.helpers.Storage;
-import ti4.image.draw.ColorUtil;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.PlayerTokens;
 import ti4.image.io.ImageHelper;
@@ -87,7 +86,7 @@ final class SpaceCannonStep implements TileStepPainter {
         int numberOfDice = coverage.getCount();
         boolean rerolls = coverage.isHasRerolls();
         float expectedHits = coverage.getExpected();
-        if ("_wht.png".equals(ColorUtil.blackWhiteFileSuffix(player.getColorID()))) {
+        if ("_wht.png".equals(Mapper.getColor(player.getColorID()).blackWhiteFileSuffix())) {
             g.setColor(Color.WHITE);
         } else {
             g.setColor(Color.BLACK);

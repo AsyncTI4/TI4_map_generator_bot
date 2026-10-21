@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import ti4.helpers.Storage;
-import ti4.image.draw.ColorUtil;
 import ti4.model.Mapper;
 import ti4.model.PositionMapper;
 import ti4.model.UnitTokenPosition;
@@ -25,7 +24,9 @@ final class ReinforcementNumber {
         g2.setFont(Storage.getFont35());
         int offset = 20 - g2.getFontMetrics().stringWidth(text) / 2;
         boolean darkUnit = reinforcementsCount > 0
-                && "_blk.png".equalsIgnoreCase(ColorUtil.blackWhiteFileSuffix(Mapper.getColorID(color)));
+                && "_blk.png"
+                        .equalsIgnoreCase(
+                                Mapper.getColor(Mapper.getColorID(color)).blackWhiteFileSuffix());
         g2.setColor(reinforcementsCount <= 0 ? Color.YELLOW : darkUnit ? Color.WHITE : Color.BLACK);
         for (int i = -2; i <= 2; i++) {
             for (int j = (i == -2 || i == 2 ? -1 : -2); j <= (i == -2 || i == 2 ? 1 : 2); j++) {

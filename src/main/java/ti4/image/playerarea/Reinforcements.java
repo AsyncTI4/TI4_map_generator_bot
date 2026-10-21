@@ -13,7 +13,6 @@ import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.draw.ColorUtil;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.PlayerTokens;
 import ti4.image.io.ImageHelper;
@@ -115,7 +114,9 @@ final class Reinforcements {
                     x + position.x - offset,
                     y + position.y,
                     "pa_reinforcements_dragon"
-                            + (numInReinforcements > 0 ? ColorUtil.blackWhiteFileSuffix(playerColor) : "_red.png"));
+                            + (numInReinforcements > 0
+                                    ? Mapper.getColor(playerColor).blackWhiteFileSuffix()
+                                    : "_red.png"));
         }
 
         if (numInReinforcements > -10) {
