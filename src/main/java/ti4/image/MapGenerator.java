@@ -8,21 +8,18 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -46,22 +43,16 @@ import ti4.helpers.Units.UnitKey;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.AgendaModel;
-import ti4.model.BorderAnomalyHolder;
 import ti4.model.ColorModel;
 import ti4.model.EventModel;
 import ti4.model.ModelInterface;
 import ti4.model.PlanetModel;
 import ti4.model.StrategyCardModel;
-import ti4.service.map.FractureService;
-import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.website.model.WebsiteOverlay;
 
 public class MapGenerator implements AutoCloseable {
 
     private static final int SC_LABEL_SPACING = 25;
-    private static final Color GHOST_RING = new Color(255, 255, 255, 128);
-    private static final Color GHOST_NUMBER = new Color(255, 255, 255, 150);
-    private static final Color GHOST_NUMBER_OUTLINE = new Color(0, 0, 0, 120);
     private static final String EASTER_EGG_NAME = "A wild brainchild";
     private static final int EASTER_EGG_ODDS = 200;
     private static final Color EASTER_EGG_TEXT = new Color(255, 200, 0);
@@ -159,94 +150,6 @@ public class MapGenerator implements AutoCloseable {
         return board.isInShownRegion(position);
     }
 
-    private void setupTilesForDisplayTypeAllAndMap(Map<String, Tile> tilesToDisplay) {
-        if (displayTypeBasic != DisplayType.all && displayTypeBasic != DisplayType.map) {
-            return;
-        }
-        Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
-        tileMap.keySet().removeIf(position -> !isInShownRegion(position));
-        boolean showFracture = FractureService.isFractureRegionOnMap(game);
-        // Show Grey Setup Tiles
-        if (game.isShowMapSetup() || tilesToDisplay.isEmpty()) {
-            int ringCount = game.getRingCount();
-            ringCount = Math.clamp(ringCount, BoardLayout.RING_MIN_COUNT, BoardLayout.RING_MAX_COUNT);
-            for (String position : PositionMapper.getTilePositions()) {
-                String tileRing = "0";
-                if (position.startsWith("frac") && !showFracture) continue;
-                if (position.length() == 3) {
-                    tileRing = position.substring(0, 1);
-                } else if (position.length() == 4) {
-                    tileRing = position.substring(0, 2);
-                }
-                int tileRingNumber = -1;
-                try {
-                    tileRingNumber = Integer.parseInt(tileRing);
-                } catch (Exception e) {
-                    BotLogger.error("Hitting an error", e);
-                }
-
-                Tile setupTile = null;
-                if (tileRingNumber > -1 && tileRingNumber <= ringCount && !tileMap.containsKey(position)) {
-                    setupTile = new Tile("0gray", position);
-                } else if (tileRingNumber > -1 && tileRingNumber <= ringCount + 1 && !tileMap.containsKey(position)) {
-                    setupTile = new Tile("0border", position);
-                }
-                if (setupTile != null) {
-                    addTile(setupTile, TileStep.Tile);
-                    addTile(setupTile, TileStep.TileNumber);
-                }
-            }
-        }
-
-        tileMap.remove(null);
-        List<String> sortedTiles = tileMap.keySet().stream().sorted().toList();
-        Set<String> tilesWithExtra =
-                new HashSet<>(game.getAdjacentTileOverrides().values());
-        tilesWithExtra.addAll(game.getBorderAnomalies().stream()
-                .map(BorderAnomalyHolder::getTile)
-                .collect(Collectors.toSet()));
-
-        sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Tile));
-        drawGhostHexes(tileMap.keySet());
-        tilesWithExtra.forEach(key -> addTile(tileMap.get(key), TileStep.Extras));
-        sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Units));
-        if (!game.getTileDistances().isEmpty()) {
-            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Distance));
-            game.setTileDistances(new HashMap<>()); // clear distances after consuming them
-        }
-        if (displayType == DisplayType.wormholes) {
-            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Wormholes));
-        } else if (displayType == DisplayType.anomalies) {
-            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Anomalies));
-        } else if (displayType == DisplayType.aetherstream) {
-            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Aetherstream));
-        } else if (displayType == DisplayType.exile) {
-            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Exile));
-        } else if (displayType == DisplayType.legendaries) {
-            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Legendaries));
-        } else if (displayType == DisplayType.empties) {
-            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Empties));
-        } else if (displayType == DisplayType.spacecannon) {
-            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.SpaceCannon));
-        } else if (displayType == DisplayType.traits) {
-            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Traits));
-        } else if (displayType == DisplayType.techskips) {
-            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.TechSkips));
-        } else if (displayType == DisplayType.attachments) {
-            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Attachments));
-        }
-        sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.TileNumber));
-    }
-
-    private void drawMapTilesInsideFrame() {
-        Shape previousClip = graphics.getClip();
-        if (board.mapFrame() != null) {
-            graphics.setClip(0, 0, width, board.mapFrame().height());
-        }
-        setupTilesForDisplayTypeAllAndMap(fog.tiles());
-        graphics.setClip(previousClip);
-    }
-
     BufferedImage drawCanvas() {
         paintCanvas();
         return mainImage;
@@ -258,7 +161,7 @@ public class MapGenerator implements AutoCloseable {
 
     private void paintCanvas() {
         timings.startTiles();
-        drawMapTilesInsideFrame();
+        BoardSection.draw(ctx, graphics);
         ConnectionStripSection.draw(ctx, graphics);
         timings.stopTiles();
 
@@ -295,71 +198,6 @@ public class MapGenerator implements AutoCloseable {
         graphics.setFont(font);
         DrawingUtil.superDrawString(
                 graphics, text, width / 2, 110, color, HorizontalAlign.Center, VerticalAlign.Center, stroke, outline);
-    }
-
-    private void drawGhostHexes(Set<String> drawnPositions) {
-        for (String position : ghostFrontierPositions()) {
-            Rectangle hex = MapFrame.hexBounds(
-                    game,
-                    position,
-                    board.fractureYbump(),
-                    BoardLayout.EXTRA_X - board.frameOffsetX(),
-                    BoardLayout.EXTRA_Y - board.frameOffsetY());
-            if (hex != null
-                    && !board.isOutsideFrame(hex.x - BoardLayout.TILE_PADDING, hex.y - BoardLayout.TILE_PADDING)) {
-                drawGhostHex(position, hex, !drawnPositions.contains(position));
-            }
-        }
-    }
-
-    private Set<String> ghostFrontierPositions() {
-        if (!fog.isPrivate()
-                || fog.viewer() == null
-                || !fog.viewer().isFogGhostHexes()
-                || !game.getFowOption(FOWOption.GHOST_HEXES)) {
-            return Set.of();
-        }
-        Set<String> known = fog.seenPositions();
-        List<String> sources = known.stream()
-                .filter(position -> board.isInShownRegion(position)
-                        && !board.pinnedCorners().contains(position))
-                .toList();
-        return frontier(sources, known);
-    }
-
-    static Set<String> frontier(Collection<String> sources, Set<String> known) {
-        Set<String> frontier = new HashSet<>();
-        for (String source : sources) {
-            for (String neighbour : PositionMapper.getAdjacentTilePositions(source)) {
-                if (!known.contains(neighbour) && PositionMapper.isTilePositionValid(neighbour)) {
-                    frontier.add(neighbour);
-                }
-            }
-        }
-        return frontier;
-    }
-
-    private void drawGhostHex(String position, Rectangle hex, boolean withNumber) {
-        Graphics2D g2 = (Graphics2D) graphics;
-        Stroke previousStroke = g2.getStroke();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(GHOST_RING);
-        g2.setStroke(stroke3);
-        g2.drawPolygon(MapFrame.hexPolygon(hex));
-        g2.setStroke(previousStroke);
-        if (withNumber) {
-            g2.setFont(Storage.getFont40());
-            DrawingUtil.superDrawString(
-                    g2,
-                    position,
-                    (int) hex.getCenterX(),
-                    (int) hex.getCenterY(),
-                    GHOST_NUMBER,
-                    HorizontalAlign.Center,
-                    VerticalAlign.Center,
-                    stroke3,
-                    GHOST_NUMBER_OUTLINE);
-        }
     }
 
     private void drawImage() {
@@ -2139,34 +1977,6 @@ public class MapGenerator implements AutoCloseable {
         if (factionFile != null) {
             BufferedImage bufferedImage = ImageHelper.read(factionFile);
             graphics.drawImage(bufferedImage, x + 2, y + 2, null);
-        }
-    }
-
-    private void addTile(Tile tile, TileStep step) {
-        if (tile == null || tile.getTileID() == null) {
-            return;
-        }
-        try {
-            String position = tile.getPosition();
-            Point positionPoint = PositionMapper.getTilePosition(position);
-            if (positionPoint == null) {
-                if ("-1".equalsIgnoreCase(tile.getTileID())) {
-                    return;
-                }
-                throw new Exception("Could not map tile to a position on the map: " + game.getName());
-            }
-
-            Point origin = board.tileOrigin(position, positionPoint);
-            if (origin == null) {
-                return;
-            }
-
-            TileGenerator tileGenerator = new TileGenerator(game, event, displayType);
-            BufferedImage tileImage = tileGenerator.draw(tile, step);
-            graphics.drawImage(tileImage, origin.x, origin.y, null);
-        } catch (Exception exception) {
-            BotLogger.error(
-                    "Tile Error, when building map `" + game.getName() + "`, tile: " + tile.getTileID(), exception);
         }
     }
 

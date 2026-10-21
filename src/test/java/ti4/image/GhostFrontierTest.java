@@ -14,9 +14,9 @@ class GhostFrontierTest extends BaseTi4Test {
     @Test
     void frontierIsPureGridGeometryAroundTheSources() {
         assertEquals(
-                Set.of("101", "102", "103", "104", "105", "106"), MapGenerator.frontier(List.of("000"), Set.of("000")));
+                Set.of("101", "102", "103", "104", "105", "106"), GhostHexes.frontier(List.of("000"), Set.of("000")));
 
-        Set<String> frontier = MapGenerator.frontier(List.of("101"), Set.of("101", "201"));
+        Set<String> frontier = GhostHexes.frontier(List.of("101"), Set.of("101", "201"));
         assertEquals(
                 Set.of("000", "102", "106", "202", "212"), frontier, "201 is known: neither ghosted nor spread from");
     }
