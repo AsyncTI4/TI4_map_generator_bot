@@ -23,6 +23,7 @@ final class PromissoryNotesInPlay {
 
     private static final int CARD_STEP = 48;
     private static final String HIDDEN_NAME = "Promissory Note";
+    private static final String HIDDEN_CARD_TEXT = "Hidden\nNote";
     private static final String HIDDEN_OVERLAY_TEXT = "Held from a player you cannot see.";
 
     private PromissoryNotesInPlay() {}
@@ -79,7 +80,7 @@ final class PromissoryNotesInPlay {
         }
         if (hidden && revealsFaction) {
             g2.setFont(Storage.getFont18());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, HIDDEN_NAME, x + 7, y + 4, 120, true);
+            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, HIDDEN_CARD_TEXT, x + 7, y + 4, 120, true);
         } else {
             writeName(g2, promissoryNote, x + 9, y + 4, findAttachedPlanet(game, promissoryNote));
         }
