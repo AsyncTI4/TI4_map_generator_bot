@@ -29,7 +29,16 @@ public class TechPath {
     static final Set<String> VALEFAR_ASSIMILATORS = Set.of("vax", "vay");
     private static final int ADAPT_THRESHOLD = 2;
 
-    public record Route(int researches, List<TechnologyModel> techs, List<String> notes) {}
+    public record Route(int researches, List<TechnologyModel> techs, List<String> notes, List<String> scarTechs) {
+
+        public Route(int researches, List<TechnologyModel> techs, List<String> notes) {
+            this(researches, techs, notes, List.of());
+        }
+
+        public boolean needsScarPurchase() {
+            return !scarTechs.isEmpty();
+        }
+    }
 
     public static Optional<Route> route(Game game, Player seat, String objective) {
         return TechRoutes.route(game, seat, objective);
@@ -87,8 +96,7 @@ public class TechPath {
 
     private static OptionalInt factionTechnologies(
             Game game, Player seat, int threshold, @Nullable TechnologyModel adding) {
-        boolean addsOwn = adding != null
-                && adding.getFaction().filter(seat.getFaction()::equals).isPresent();
+        boolean addsOwn = adding != null && ListPlayerInfoService.countsForAdaptNewStrategies(adding.getAlias(), false);
         int needed = threshold - SecretValue.ownFactionTechnologies(seat) - (addsOwn ? 1 : 0);
         if (needed <= 0) return OptionalInt.of(0);
         List<TechnologyModel> candidates = new ArrayList<>();

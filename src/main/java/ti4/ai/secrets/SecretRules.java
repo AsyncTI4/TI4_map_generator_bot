@@ -15,20 +15,21 @@ import ti4.helpers.Constants;
 public class SecretRules {
 
     private static final int LAWS_FOR_DICTATE_POLICY = 3;
+    private static final String OPTED_OUT = "None";
 
     public static Optional<AiDecision> scoreStatusSecret(AiTurnContext context) {
         Game game = context.game();
         if (!"statusScoring".equalsIgnoreCase(game.getPhaseOfGame())) return Optional.empty();
-        if (!game.getStoredValue(context.faction() + "round" + game.getRound() + "SO")
-                .isEmpty()) {
-            return Optional.empty();
-        }
+        String decided = game.getStoredValue(context.faction() + "round" + game.getRound() + "SO");
+        boolean optedOut = OPTED_OUT.equals(decided);
+        if (!decided.isEmpty() && !optedOut) return Optional.empty();
         Player seat = context.seat();
         Optional<String> best = SecretValue.bestScorableStatusSecret(game, seat);
         if (best.isPresent()) {
             Optional<AiDecision> score = scoreWithCost(context, best.get(), "score a secret");
             if (score.isPresent()) return score;
         }
+        if (optedOut) return Optional.empty();
         for (AiPrompt prompt : Prompts.newestFirst(context.prompts())) {
             if (prompt.isHidden()) continue;
             Optional<PromptButton> noScoring = prompt.enabledHandler(Constants.SO_NO_SCORING);

@@ -316,10 +316,11 @@ final class ObjectiveTracker {
                 boolean inScar = game.getTileMap().values().stream()
                         .anyMatch(tile -> tile.isScar(game) && ti4.ai.eval.BoardView.hasOwnShips(seat, tile));
                 secretHolders.add(String.format(
-                        "Adapt New Strategies %s r%d: own faction techs %d, route %s, ships in a scar %s, strategy tokens %d%s",
+                        "Adapt New Strategies %s r%d: own faction techs %d (bot counts %d), route %s, ships in a scar %s, strategy tokens %d%s",
                         seat.getFaction(),
                         game.getRound(),
                         ti4.ai.secrets.SecretValue.ownFactionTechnologies(seat),
+                        ti4.service.info.ListPlayerInfoService.getPlayerProgressOnObjective("ans", game, seat),
                         ti4.ai.strategy.TechPath.researchesNeeded(game, seat, "ans"),
                         inScar,
                         seat.getStrategicCC(),

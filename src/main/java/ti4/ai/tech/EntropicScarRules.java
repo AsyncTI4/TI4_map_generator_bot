@@ -11,6 +11,7 @@ import ti4.ai.brain.Prompts;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.strategy.ResearchPolicy;
+import ti4.ai.strategy.ScarToken;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -78,11 +79,8 @@ public class EntropicScarRules {
     }
 
     private static boolean worthIt(Game game, Player seat, String alias) {
-        return (seat.getStrategicCC() >= 1 || hasScepter(seat))
-                && ResearchPolicy.TECH_TEMPO * ResearchPolicy.value(game, seat, alias) >= STRATEGY_TOKEN_VALUE;
-    }
-
-    private static boolean hasScepter(Player seat) {
-        return seat.hasRelicReady("emelpar") || seat.hasRelicReady("absol_emelpar");
+        if (!ScarToken.canPay(seat)) return false;
+        return ScarToken.completesAdaptNewStrategies(game, seat, alias)
+                || ResearchPolicy.TECH_TEMPO * ResearchPolicy.value(game, seat, alias) >= STRATEGY_TOKEN_VALUE;
     }
 }
