@@ -8,10 +8,10 @@ import java.util.function.Function;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
+import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
-import ti4.image.MapGenerator.HorizontalAlign;
-import ti4.image.MapGenerator.VerticalAlign;
 import ti4.image.Mapper;
+import ti4.image.VerticalAlign;
 import ti4.model.TileModel;
 import ti4.service.image.FileUploadService;
 

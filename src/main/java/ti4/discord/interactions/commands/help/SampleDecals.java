@@ -19,9 +19,10 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
+import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
-import ti4.image.MapGenerator;
 import ti4.image.Mapper;
+import ti4.image.VerticalAlign;
 import ti4.message.MessageHelper;
 import ti4.service.UnitDecalService;
 import ti4.service.image.FileUploadService;
@@ -127,8 +128,8 @@ class SampleDecals extends Subcommand {
                     drawX,
                     drawY,
                     Color.WHITE,
-                    MapGenerator.HorizontalAlign.Center,
-                    MapGenerator.VerticalAlign.Top,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Top,
                     stroke,
                     Color.BLACK);
             DrawingUtil.superDrawString(
@@ -137,8 +138,8 @@ class SampleDecals extends Subcommand {
                     drawX,
                     drawY + LINEHEIGHT,
                     Color.WHITE,
-                    MapGenerator.HorizontalAlign.Center,
-                    MapGenerator.VerticalAlign.Top,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Top,
                     stroke,
                     Color.BLACK);
             graphic.setFont(smallFont);
@@ -148,8 +149,8 @@ class SampleDecals extends Subcommand {
                     drawX,
                     drawY + 2 * LINEHEIGHT,
                     Color.WHITE,
-                    MapGenerator.HorizontalAlign.Center,
-                    MapGenerator.VerticalAlign.Top,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Top,
                     stroke,
                     Color.BLACK);
 

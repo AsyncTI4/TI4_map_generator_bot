@@ -11,8 +11,6 @@ import java.util.List;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.Storage;
-import ti4.image.MapGenerator.HorizontalAlign;
-import ti4.image.MapGenerator.VerticalAlign;
 import ti4.logging.BotLogger;
 
 final class ConnectionStripSection {

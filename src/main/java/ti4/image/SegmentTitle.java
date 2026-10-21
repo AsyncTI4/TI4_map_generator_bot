@@ -6,8 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import ti4.helpers.RenderRandom;
 import ti4.helpers.Storage;
-import ti4.image.MapGenerator.HorizontalAlign;
-import ti4.image.MapGenerator.VerticalAlign;
 
 final class SegmentTitle {
 

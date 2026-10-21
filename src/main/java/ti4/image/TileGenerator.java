@@ -52,8 +52,6 @@ import ti4.helpers.RenderRandom;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
-import ti4.image.MapGenerator.HorizontalAlign;
-import ti4.image.MapGenerator.VerticalAlign;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.BorderAnomalyHolder;
@@ -385,7 +383,7 @@ public class TileGenerator {
                                         labelX,
                                         labelY + deltaY,
                                         Color.WHITE,
-                                        MapGenerator.HorizontalAlign.Center,
+                                        HorizontalAlign.Center,
                                         null,
                                         null,
                                         null);
@@ -422,8 +420,8 @@ public class TileGenerator {
                                 numX,
                                 numY,
                                 Color.WHITE,
-                                MapGenerator.HorizontalAlign.Center,
-                                MapGenerator.VerticalAlign.Center,
+                                HorizontalAlign.Center,
+                                VerticalAlign.Center,
                                 stroke8,
                                 Color.BLACK);
                     }
@@ -436,8 +434,8 @@ public class TileGenerator {
                             numX,
                             numY,
                             Color.WHITE,
-                            MapGenerator.HorizontalAlign.Center,
-                            MapGenerator.VerticalAlign.Bottom,
+                            HorizontalAlign.Center,
+                            VerticalAlign.Bottom,
                             stroke6,
                             Color.BLACK);
                 }
@@ -721,8 +719,8 @@ public class TileGenerator {
                             x + tileImage.getWidth() / 2,
                             y + tileImage.getHeight() / 2,
                             Color.WHITE,
-                            MapGenerator.HorizontalAlign.Center,
-                            MapGenerator.VerticalAlign.Center,
+                            HorizontalAlign.Center,
+                            VerticalAlign.Center,
                             stroke4,
                             Color.BLACK);
                 }
@@ -1450,8 +1448,8 @@ public class TileGenerator {
                         textX,
                         textY,
                         Color.WHITE,
-                        MapGenerator.HorizontalAlign.Right,
-                        MapGenerator.VerticalAlign.Bottom,
+                        HorizontalAlign.Right,
+                        VerticalAlign.Bottom,
                         stroke7,
                         Color.BLACK);
             }

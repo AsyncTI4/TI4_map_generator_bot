@@ -596,8 +596,8 @@ class UnitRenderGenerator {
                 imagePos.x() + offsetX,
                 imagePos.y() + offsetY,
                 color,
-                MapGenerator.HorizontalAlign.Left,
-                MapGenerator.VerticalAlign.Bottom,
+                HorizontalAlign.Left,
+                VerticalAlign.Bottom,
                 strokeWidth,
                 stroke);
     }

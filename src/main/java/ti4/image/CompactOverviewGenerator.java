@@ -300,8 +300,8 @@ public final class CompactOverviewGenerator {
                     left + width / 2,
                     top + (int) Math.round(TITLE_BAND * scale / 2),
                     color,
-                    MapGenerator.HorizontalAlign.Center,
-                    MapGenerator.VerticalAlign.Center,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Center,
                     new BasicStroke(4),
                     Color.BLACK);
         }

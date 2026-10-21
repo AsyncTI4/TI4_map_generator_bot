@@ -15,7 +15,7 @@ import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
-import ti4.image.MapGenerator.HorizontalAlign;
+import ti4.image.HorizontalAlign;
 import ti4.image.PositionMapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileStep;

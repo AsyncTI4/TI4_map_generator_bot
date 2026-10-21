@@ -116,8 +116,8 @@ public class MapOverviewGenerator {
                         layout.toCanvasX((int) area.getCenterX()),
                         layout.toCanvasY((int) area.getCenterY()),
                         color,
-                        MapGenerator.HorizontalAlign.Center,
-                        MapGenerator.VerticalAlign.Center,
+                        HorizontalAlign.Center,
+                        VerticalAlign.Center,
                         SECTOR_LABEL_OUTLINE,
                         Color.BLACK);
             }

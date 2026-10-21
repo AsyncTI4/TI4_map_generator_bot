@@ -6,8 +6,6 @@ import ti4.game.Game;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
-import ti4.image.MapGenerator.HorizontalAlign;
-import ti4.image.MapGenerator.VerticalAlign;
 
 final class GameModeBadges {
 

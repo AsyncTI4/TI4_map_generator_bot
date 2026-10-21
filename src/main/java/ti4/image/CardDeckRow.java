@@ -9,8 +9,6 @@ import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
-import ti4.image.MapGenerator.HorizontalAlign;
-import ti4.image.MapGenerator.VerticalAlign;
 
 final class CardDeckRow {
 

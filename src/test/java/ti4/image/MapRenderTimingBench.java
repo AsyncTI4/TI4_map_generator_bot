@@ -15,9 +15,9 @@ import ti4.testUtils.BaseTi4Test;
 
 /**
  * Wall-clock timing of whole map renders (constructor = canvas sizing, draw = paint plus encode) for DisplayType.all.
- * Uses MapRenderer, so it only runs on checkouts that have the render pipeline split out (before the rewrite, the
- * same measurement went through the old MapGenerator class). Production randomness and no mocks, as in the bot. The corpus is rendered twice and the second pass is
- * reported, so the JIT is warm.
+ * Uses MapRenderer, so it only runs on checkouts that have the render pipeline split out; before the rewrite the same
+ * measurement went through the old MapGenerator class. Production randomness and no mocks, as in the bot. The corpus
+ * is rendered twice and the second pass is reported, so the JIT is warm.
  *
  * <pre>
  * mvn -o test -Dtest=MapRenderTimingBench -Dgolden.timing.saves=DIR -Dgolden.timing.out=FILE [-Dgolden.only=a,b]

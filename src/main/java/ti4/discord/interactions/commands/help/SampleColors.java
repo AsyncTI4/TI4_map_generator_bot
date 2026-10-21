@@ -19,9 +19,10 @@ import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
+import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
-import ti4.image.MapGenerator;
 import ti4.image.Mapper;
+import ti4.image.VerticalAlign;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -127,8 +128,8 @@ class SampleColors extends Subcommand {
                         x + DREADWIDTH / 2,
                         y + DREADSUBHIGHT + SPACING,
                         Color.WHITE,
-                        MapGenerator.HorizontalAlign.Center,
-                        MapGenerator.VerticalAlign.Top,
+                        HorizontalAlign.Center,
+                        VerticalAlign.Top,
                         stroke,
                         Color.BLACK);
                 graphic.setFont(smallFont);
@@ -138,8 +139,8 @@ class SampleColors extends Subcommand {
                         x + DREADWIDTH / 2,
                         y + DREADSUBHIGHT + LINEHEIGHT + SPACING,
                         Color.WHITE,
-                        MapGenerator.HorizontalAlign.Center,
-                        MapGenerator.VerticalAlign.Top,
+                        HorizontalAlign.Center,
+                        VerticalAlign.Top,
                         stroke,
                         Color.BLACK);
 
@@ -159,8 +160,8 @@ class SampleColors extends Subcommand {
                             x + (multi ? 3 : 1) * DREADWIDTH / 2,
                             y + (multi ? 0 : DREADTEXHIGHT) + DREADSUBHIGHT + SPACING,
                             Color.WHITE,
-                            MapGenerator.HorizontalAlign.Center,
-                            MapGenerator.VerticalAlign.Top,
+                            HorizontalAlign.Center,
+                            VerticalAlign.Top,
                             stroke,
                             Color.BLACK);
                     graphic.setFont(smallFont);
@@ -170,8 +171,8 @@ class SampleColors extends Subcommand {
                             x + (multi ? 3 : 1) * DREADWIDTH / 2,
                             y + (multi ? 0 : DREADTEXHIGHT) + DREADSUBHIGHT + LINEHEIGHT + SPACING,
                             Color.WHITE,
-                            MapGenerator.HorizontalAlign.Center,
-                            MapGenerator.VerticalAlign.Top,
+                            HorizontalAlign.Center,
+                            VerticalAlign.Top,
                             stroke,
                             Color.BLACK);
                     x += (multi ? DREADWIDTH : 0);

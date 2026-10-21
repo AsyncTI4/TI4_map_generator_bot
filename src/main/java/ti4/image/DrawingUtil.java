@@ -37,8 +37,6 @@ import ti4.ResourceHelper;
 import ti4.discord.JdaService;
 import ti4.game.Player;
 import ti4.helpers.Storage;
-import ti4.image.MapGenerator.HorizontalAlign;
-import ti4.image.MapGenerator.VerticalAlign;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.ColorModel;
@@ -63,8 +61,8 @@ public class DrawingUtil {
             int x,
             int y,
             Color textColor,
-            MapGenerator.HorizontalAlign h,
-            MapGenerator.VerticalAlign v,
+            HorizontalAlign h,
+            VerticalAlign v,
             Stroke outlineSize,
             Color outlineColor) {
         superDrawString((Graphics2D) g, txt, x, y, textColor, h, v, outlineSize, outlineColor);
@@ -88,8 +86,8 @@ public class DrawingUtil {
             int x,
             int y,
             Color textColor,
-            MapGenerator.HorizontalAlign horizontalAlignment,
-            MapGenerator.VerticalAlign verticalAlignment,
+            HorizontalAlign horizontalAlignment,
+            VerticalAlign verticalAlignment,
             Stroke outlineSize,
             Color outlineColor) {
         if (txt == null) return;

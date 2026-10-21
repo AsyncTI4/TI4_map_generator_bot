@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Set;
 import ti4.game.Player;
 import ti4.helpers.Storage;
-import ti4.image.MapGenerator.HorizontalAlign;
-import ti4.image.MapGenerator.VerticalAlign;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 final class GhostHexes {

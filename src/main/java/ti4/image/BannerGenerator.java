@@ -46,15 +46,7 @@ public class BannerGenerator {
 
         String name = player.bannerName();
         DrawingUtil.superDrawString(
-                bannerG,
-                name,
-                29,
-                44,
-                Color.WHITE,
-                MapGenerator.HorizontalAlign.Left,
-                MapGenerator.VerticalAlign.Bottom,
-                stroke2,
-                Color.BLACK);
+                bannerG, name, 29, 44, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke2, Color.BLACK);
         int mod = 0;
         if (player.getInitiative() > 9) {
             mod = 13;
@@ -65,8 +57,8 @@ public class BannerGenerator {
                 300 - mod,
                 44,
                 Color.WHITE,
-                MapGenerator.HorizontalAlign.Left,
-                MapGenerator.VerticalAlign.Bottom,
+                HorizontalAlign.Left,
+                VerticalAlign.Bottom,
                 stroke2,
                 Color.BLACK);
 
@@ -106,8 +98,8 @@ public class BannerGenerator {
                 55,
                 35,
                 Color.WHITE,
-                MapGenerator.HorizontalAlign.Left,
-                MapGenerator.VerticalAlign.Bottom,
+                HorizontalAlign.Left,
+                VerticalAlign.Bottom,
                 stroke2,
                 Color.BLACK);
 
@@ -137,8 +129,8 @@ public class BannerGenerator {
                 255,
                 110,
                 Color.WHITE,
-                MapGenerator.HorizontalAlign.Center,
-                MapGenerator.VerticalAlign.Center,
+                HorizontalAlign.Center,
+                VerticalAlign.Center,
                 stroke8,
                 Color.BLACK);
         bannerG.setFont(Storage.getFont32());
@@ -150,8 +142,8 @@ public class BannerGenerator {
                 255,
                 221,
                 Color.WHITE,
-                MapGenerator.HorizontalAlign.Center,
-                MapGenerator.VerticalAlign.Center,
+                HorizontalAlign.Center,
+                VerticalAlign.Center,
                 stroke6,
                 Color.BLACK);
 
