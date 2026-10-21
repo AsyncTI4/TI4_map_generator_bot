@@ -1,6 +1,6 @@
 package ti4.image.map;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import ti4.game.Player;
@@ -14,7 +14,7 @@ final class FleetCommandCounters {
 
     private FleetCommandCounters() {}
 
-    static void draw(Graphics g2, String ccID, int x, int y, Player player, boolean rightAlign) {
+    static void draw(Graphics2D g2, String ccID, int x, int y, Player player, boolean rightAlign) {
         String ccPath = ImageResources.commandToken(ccID);
         int ccCount = player.getFleetCC();
         boolean hasArmada = player.hasAbility("armada");

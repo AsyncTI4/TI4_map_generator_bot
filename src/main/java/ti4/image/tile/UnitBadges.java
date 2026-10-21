@@ -79,7 +79,7 @@ final class UnitBadges {
         int offsetX = COUNT_POSITION.x + (count > 9 ? 5 : 0);
         int offsetY = COUNT_POSITION.y + (count > 9 ? 5 : 0);
         OutlinedText.draw(
-                (Graphics2D) g,
+                g,
                 count == 1 ? " 1" : Integer.toString(count),
                 imagePos.x() + offsetX,
                 imagePos.y() + offsetY,

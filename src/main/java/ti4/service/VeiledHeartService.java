@@ -1,7 +1,6 @@
 package ti4.service;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -732,13 +731,13 @@ public class VeiledHeartService {
         }
     }
 
-    public static int veiledField(Graphics graphics, int x, int y, VeiledCardType type, int deltaX, Player player) {
+    public static int veiledField(Graphics2D graphics, int x, int y, VeiledCardType type, int deltaX, Player player) {
         graphics.setColor(Color.LIGHT_GRAY);
         graphics.setFont(Storage.getFont18());
         String text = "VEILED\n" + type.toString();
         long cardCount = getVeiledCards(type, player).count();
         for (long l = 0; l < cardCount; ++l) {
-            VerticalText.drawOneOrTwoLines((Graphics2D) graphics, text, x + deltaX + 7, y + 116, 116);
+            VerticalText.drawOneOrTwoLines(graphics, text, x + deltaX + 7, y + 116, 116);
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             deltaX += 48;
         }

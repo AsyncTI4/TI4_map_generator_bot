@@ -2,7 +2,7 @@ package ti4.image.tile;
 
 import static ti4.image.tile.TileGeometry.TILE_PADDING;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -45,7 +45,7 @@ final class WormholeIconSpots {
 
     private WormholeIconSpots() {}
 
-    static void draw(Tile tile, Graphics graphics, BufferedImage icon, int offset, String wormholes, boolean all) {
+    static void draw(Tile tile, Graphics2D graphics, BufferedImage icon, int offset, String wormholes, boolean all) {
         List<Spot> spots = SPOTS_BY_TILE.get(tile.getTileID());
         if (spots != null) {
             for (Spot spot : spots) {

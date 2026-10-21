@@ -1,7 +1,6 @@
 package ti4.image.draw;
 
 import java.awt.AlphaComposite;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -14,7 +13,7 @@ public final class PaImage {
 
     private PaImage() {}
 
-    public static Rectangle draw(Graphics g, int x, int y, String resourceName) {
+    public static Rectangle draw(Graphics2D g, int x, int y, String resourceName) {
         try {
             String resourcePath = ImageResources.playerArea(resourceName);
             BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
@@ -37,7 +36,7 @@ public final class PaImage {
         }
     }
 
-    public static void drawScaled(Graphics g, int x, int y, String resourceName, int width, int height) {
+    public static void drawScaled(Graphics2D g, int x, int y, String resourceName, int width, int height) {
         try {
             String resourcePath = ImageResources.playerArea(resourceName);
             BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, width, height);

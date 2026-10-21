@@ -1,6 +1,6 @@
 package ti4.image.tile;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
@@ -23,7 +23,7 @@ final class UnitDecals {
     private UnitDecals() {}
 
     static void drawDimensionalTear(
-            Graphics g, UnitKey unitKey, Player player, BufferedImage unitImage, int imageX, int imageY) {
+            Graphics2D g, UnitKey unitKey, Player player, BufferedImage unitImage, int imageX, int imageY) {
         if (unitKey.unitType() != UnitType.Spacedock
                 || !(player.ownsUnitSubstring("cabal_spacedock") || player.hasTech("tf-dimensionaltear"))) {
             return;
@@ -49,7 +49,7 @@ final class UnitDecals {
         return wrongPlace;
     }
 
-    static void drawMisplacedMarker(Graphics g, UnitKey unitKey, boolean bulk, float scale, int imageX, int imageY) {
+    static void drawMisplacedMarker(Graphics2D g, UnitKey unitKey, boolean bulk, float scale, int imageX, int imageY) {
         String badPath = ResourceHelper.getPositionFile("badpos_" + (bulk ? "tkn_" : "") + unitKey.asyncID() + ".png");
         BufferedImage badPositionImage =
                 scale == 1.0f ? ImageHelper.read(badPath) : ImageHelper.readScaled(badPath, scale);
@@ -57,7 +57,7 @@ final class UnitDecals {
     }
 
     static void drawOverlay(
-            Graphics g, Tile tile, UnitKey unitKey, Player player, BufferedImage overlay, int imageX, int imageY) {
+            Graphics2D g, Tile tile, UnitKey unitKey, Player player, BufferedImage overlay, int imageX, int imageY) {
         if ("81".equals(tile.getTileID())
                 && "muaat".equals(player.getFaction())
                 && unitKey.unitType() == UnitType.Warsun) {
@@ -68,7 +68,7 @@ final class UnitDecals {
         }
     }
 
-    static void drawLawDecals(Graphics g, Game game, UnitKey unitKey, int imageX, int imageY) {
+    static void drawLawDecals(Graphics2D g, Game game, UnitKey unitKey, int imageX, int imageY) {
         if (unitKey.unitType() == UnitType.Mech
                 && ButtonHelper.anyLawInPlay(game, "articles_war", "absol_articleswar")) {
             drawToken(g, "agenda_articles_of_war" + ColorUtil.blackWhiteFileSuffix(unitKey.colorID()), imageX, imageY);
@@ -83,7 +83,7 @@ final class UnitDecals {
         }
     }
 
-    private static void drawToken(Graphics g, String tokenFile, int imageX, int imageY) {
+    private static void drawToken(Graphics2D g, String tokenFile, int imageX, int imageY) {
         g.drawImage(ImageHelper.read(ImageResources.token(tokenFile)), imageX, imageY, null);
     }
 }

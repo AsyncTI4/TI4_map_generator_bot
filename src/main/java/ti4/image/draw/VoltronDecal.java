@@ -1,6 +1,6 @@
 package ti4.image.draw;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Set;
 import ti4.game.Game;
@@ -49,7 +49,7 @@ public final class VoltronDecal {
 
     private VoltronDecal() {}
 
-    public static void drawIfVoltron(UnitKey unitKey, int imageX, int imageY, Graphics graphics, Game game) {
+    public static void drawIfVoltron(UnitKey unitKey, int imageX, int imageY, Graphics2D graphics, Game game) {
         UnitModel model = game.getUnitFromUnitKey(unitKey);
         if (model == null || !"naaz_voltron".equals(model.getAlias())) return;
         String style = "eyes";
@@ -66,7 +66,7 @@ public final class VoltronDecal {
         graphics.drawImage(voltron, imageX - OVERHANG, imageY - OVERHANG, null);
     }
 
-    private static void drawMinis(UnitKey unitKey, int imageX, int imageY, Graphics graphics, Game game) {
+    private static void drawMinis(UnitKey unitKey, int imageX, int imageY, Graphics2D graphics, Game game) {
         BufferedImage unitImage = ImageHelper.readScaled(ImageResources.unitPath(unitKey, game), 0.5f);
         double angle = 2 * Math.PI * RenderRandom.nextDouble("unit.voltronMinis.angle");
         for (int i = 0; i < 3; i++) {
