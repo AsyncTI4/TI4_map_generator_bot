@@ -63,13 +63,13 @@ class CardRulesTest extends BaseTi4Test {
                 .isEqualTo("resolveVolatileInf_tequran");
     }
 
-    // The infantry is kept when it is needed to claim a planet worth more: Lodor, a carrier away, and no other
-    // ground force to take it.
+    // The infantry is kept when it is needed to claim a planet worth more: Lodor, next to a carrier that has no
+    // other ground force to land.
     @Test
     void volatileFuelSourceKeepsTheInfantryNeededForExpansion() {
         test.units(site, "tequran", test.nekro, UnitType.Infantry, 1);
-        test.units(test.game.getTileByPosition(AiTestGame.HOME), "space", test.nekro, UnitType.Carrier, 1);
-        test.place("26", otherNeighbourOfHome());
+        test.units(site, "space", test.nekro, UnitType.Carrier, 1);
+        test.place("26", besideSite(0));
         test.nekro.addPlanet("torkan");
 
         assertThat(pressedId(next(volatile_("resolveVolatileInf_tequran")).orElseThrow()))
@@ -114,10 +114,9 @@ class CardRulesTest extends BaseTi4Test {
     // value of the planet (Lodor) it could still take.
     @Test
     void coreMineDeclinesWhileTheInfantryCanStillClaimAPlanet() {
-        test.units(site, "tequran", test.nekro, UnitType.Infantry, 2);
-        Tile home = test.game.getTileByPosition(AiTestGame.HOME);
-        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
-        test.place("26", otherNeighbourOfHome());
+        test.units(site, "tequran", test.nekro, UnitType.Infantry, 1);
+        test.units(site, "space", test.nekro, UnitType.Carrier, 1);
+        test.place("26", besideSite(0));
 
         assertThat(pressedId(next(coreMine("resolveCoreMineInf_tequran")).orElseThrow()))
                 .isEqualTo(DECLINE);
@@ -156,6 +155,38 @@ class CardRulesTest extends BaseTi4Test {
 
         assertThat(pressedId(next(expedition("resolveExpeditionInf_tequran")).orElseThrow()))
                 .isEqualTo("resolveExpeditionInf_tequran");
+    }
+
+    // A carrier in the system with 4 infantry (3 on Tequran, 1 on Torkan) and one-planet systems around it: one
+    // activation claims one system, so the infantry on Tequran are spare and readying its 2 resources is worth one.
+    @Test
+    void expeditionReadiesAPlanetWhenTheCarrierHasInfantryToSpare() {
+        test.nekro.addPlanet("torkan");
+        test.units(site, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(site, "tequran", test.nekro, UnitType.Infantry, 3);
+        test.units(site, "torkan", test.nekro, UnitType.Infantry, 1);
+        test.place("26", besideSite(0));
+        test.place("25", besideSite(0));
+        test.nekro.exhaustPlanet("tequran");
+        test.sol.addSC(7);
+        test.nekro.setStrategicCC(1);
+
+        ExploreOutlook outlook = new ExploreOutlook(test.game, test.nekro);
+        ExploreSite tequran = ExploreSite.onBoard(test.game, test.nekro, "tequran", outlook);
+        assertThat(outlook.expansionNeed(tequran.holder())).isZero();
+        assertThat(tequran.infantryCost()).isLessThan(CardValue.readyValue(tequran));
+        assertThat(pressedId(next(expedition("resolveExpeditionInf_tequran")).orElseThrow()))
+                .isEqualTo("resolveExpeditionInf_tequran");
+    }
+
+    private String besideSite(int skipped) {
+        return PositionMapper.getAdjacentTilePositions(position).stream()
+                .filter(candidate -> !"x".equals(candidate)
+                        && !AiTestGame.HOME.equals(candidate)
+                        && test.game.getTileByPosition(candidate) == null)
+                .skip(skipped)
+                .findFirst()
+                .orElseThrow();
     }
 
     // Pre-Fab Arcologies readies the planet by itself, so the card adds nothing.

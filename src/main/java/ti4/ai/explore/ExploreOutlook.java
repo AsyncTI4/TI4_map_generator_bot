@@ -2,14 +2,11 @@ package ti4.ai.explore;
 
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import ti4.ai.brain.StrategyCard;
-import ti4.ai.eval.BoardView;
-import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.PlanetStake;
 import ti4.ai.eval.Threats;
 import ti4.ai.scoring.ObjectiveCatalog;
@@ -35,7 +32,7 @@ public final class ExploreOutlook {
     private final Game game;
     private final Player seat;
     private final Map<String, Boolean> enemyReach = new HashMap<>();
-    private List<Planet> claimablePlanets;
+    private ExpansionOutlook expansion;
     private Boolean spendsMore;
     private Boolean fundsFreelancers;
     private ObjectiveValue objectives;
@@ -62,27 +59,8 @@ public final class ExploreOutlook {
     }
 
     public double expansionNeed(Planet holding) {
-        List<Planet> claimable = claimablePlanets();
-        if (claimable.size() <= groundForcesElsewhere(holding)) return 0;
-        double best =
-                claimable.stream().mapToDouble(BoardView::planetValue).max().orElse(0);
-        return ExploreValues.EXPANSION_SHARE * best;
-    }
-
-    private List<Planet> claimablePlanets() {
-        if (claimablePlanets == null) claimablePlanets = computeClaimablePlanets();
-        return claimablePlanets;
-    }
-
-    private int groundForcesElsewhere(Planet holding) {
-        int forces = 0;
-        for (Tile tile : game.getTileMap().values()) {
-            forces += BoardView.groundForces(BoardView.space(tile), seat);
-            for (Planet planet : tile.getPlanetUnitHolders()) {
-                if (!planet.getName().equals(holding.getName())) forces += BoardView.groundForces(planet, seat);
-            }
-        }
-        return forces;
+        if (expansion == null) expansion = new ExpansionOutlook(game, seat);
+        return expansion.need(holding);
     }
 
     public boolean enemyCanReach(Tile tile) {
@@ -141,37 +119,6 @@ public final class ExploreOutlook {
     private ObjectiveValue objectives() {
         if (objectives == null) objectives = new ObjectiveValue(game, seat);
         return objectives;
-    }
-
-    private List<Planet> computeClaimablePlanets() {
-        Set<String> reachable = new HashSet<>();
-        for (Tile origin : game.getTileMap().values()) {
-            int move = fastestShipMove(origin);
-            if (move > 0)
-                reachable.addAll(MovementGraph.reach(game, seat, origin.getPosition(), move)
-                        .keySet());
-        }
-        return game.getTileMap().values().stream()
-                .filter(tile -> reachable.contains(tile.getPosition()))
-                .flatMap(tile -> tile.getPlanetUnitHolders().stream())
-                .filter(this::isClaimable)
-                .toList();
-    }
-
-    private int fastestShipMove(Tile origin) {
-        return BoardView.ships(BoardView.space(origin), seat).keySet().stream()
-                .filter(type -> type != UnitType.Fighter)
-                .mapToInt(type -> BoardView.moveValueWithGravityDrive(seat, type))
-                .max()
-                .orElse(0);
-    }
-
-    private boolean isClaimable(Planet planet) {
-        boolean worthHaving = !planet.getPlanetTypes().isEmpty() || planet.getResources() > 0;
-        return worthHaving
-                && BoardView.controller(game, planet.getName()) == null
-                && !BoardView.hasCustodians(planet)
-                && !BoardView.enemyGroundForcesOn(game, seat, planet);
     }
 
     private boolean computeSpendsMore() {

@@ -1213,8 +1213,12 @@ to build one by hand:
     tactical action only for a planet whose deck is worth more than nothing, then used on the best one.
   - **Cards that ask.** Unowned buttons are only the AI's own on its turn, in a message for it (or one that names no
     one else). Removing an infantry costs 0.7 (production limits included). It costs half the value of
-    the best planet left to claim when it is needed for that: more planets within reach of its ships than the seat has
-    other ground forces. When it is the last ground force and an enemy fleet can reach the system it also costs 0.15 of
+    the claim it would leave unmet when it is needed for that. The seat plans its next activations (its tactic
+    tokens, at most 3, and one per ship with capacity): each takes the best unclaimed system within that ship's move
+    that holds none of its ground forces, needing an infantry or mech per free planet. The ground forces it can
+    count on are those in the home system and on the ship's way to the target (a command token does not matter, it
+    is next round); the planets it cannot fund are the cost, and an infantry that no such ship can pick up costs
+    nothing extra. When it is the last ground force and an enemy fleet can reach the system it also costs 0.15 of
     the planet's stake (`PlanetStake`, also used for retreats), because the enemy pays a token and risks retaliation
     to take it anyway. A mech is free. So a Volatile Fuel Source (2) or Core Mine (1) is usually taken, and kept only
     when the infantry is needed to claim more. A card with no decline button is always answered, even when neither
