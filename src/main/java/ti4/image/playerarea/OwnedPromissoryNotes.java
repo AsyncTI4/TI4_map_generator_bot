@@ -8,9 +8,10 @@ import java.util.List;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Storage;
-import ti4.image.DrawingUtil;
+import ti4.image.FactionIcons;
 import ti4.image.PaImage;
 import ti4.image.Strokes;
+import ti4.image.VerticalText;
 import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.Source.ComponentSource;
@@ -56,23 +57,23 @@ final class OwnedPromissoryNotes {
                 : "pa_promissory_light.png";
         PaImage.drawScaled(g2, x + 1, y + 1, light, 38, 28);
         if (game.isFrankenGame() && promissoryNote.getFaction().isPresent()) {
-            FactionIcons.draw(g2, promissoryNote.getFaction().get(), x - 1, y + 108, 42, 42);
+            FactionIcons.drawFaction(g2, promissoryNote.getFaction().get(), x - 1, y + 108, 42, 42);
         }
         Player holder = !game.isFowMode() && promissoryNote.getPlayArea() ? holderOf(game, pnID) : null;
         g2.setColor(holder != null ? Color.GRAY : Color.WHITE);
 
         if ("dspntnel".equals(pnID)) {
             g2.setFont(Storage.getFont16());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, "Plots Within Plots", x + 9, y + 144, 150);
+            VerticalText.drawOneOrTwoLines(g2, "Plots Within Plots", x + 9, y + 144, 150);
         } else if (promissoryNote.getShrinkName()) {
             g2.setFont(Storage.getFont16());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, promissoryNote.getShortName(), x + 9, y + 144, 120);
+            VerticalText.drawOneOrTwoLines(g2, promissoryNote.getShortName(), x + 9, y + 144, 120);
         } else {
             g2.setFont(Storage.getFont18());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, promissoryNote.getShortName(), x + 7, y + 144, 120);
+            VerticalText.drawOneOrTwoLines(g2, promissoryNote.getShortName(), x + 7, y + 144, 120);
         }
         CardRect.draw(ctx, x - 2, y - 2, CardRect.WIDTH, CardRect.HEIGHT, promissoryNote);
-        DrawingUtil.drawPlayerFactionIconImageOpaque(g2, holder, x - 1, y + 25, 42, 42, 0.5f);
+        FactionIcons.drawFaded(g2, holder, x - 1, y + 25, 42, 42, 0.5f);
     }
 
     private static Player holderOf(Game game, String pnID) {

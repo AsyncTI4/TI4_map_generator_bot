@@ -9,10 +9,11 @@ import java.util.List;
 import java.util.Map;
 import ti4.game.Player;
 import ti4.helpers.Storage;
-import ti4.image.DrawingUtil;
+import ti4.image.FactionIcons;
 import ti4.image.ImageHelper;
 import ti4.image.ImageResources;
 import ti4.image.Strokes;
+import ti4.image.VerticalText;
 import ti4.logging.BotLogger;
 import ti4.model.AbilityModel;
 import ti4.model.Mapper;
@@ -72,13 +73,13 @@ final class AbilityCards {
             String iconFaction = ctx.game().isLiberationC4Mode() && "ghost".equals(abilityModel.getFaction())
                     ? "redcreuss"
                     : abilityModel.getFaction();
-            FactionIcons.draw(g2, iconFaction, x - 1, y, 42, 42);
+            FactionIcons.drawFaction(g2, iconFaction, x - 1, y, 42, 42);
             if (abilityModel.getShrinkName()) {
                 g2.setFont(Storage.getFont16());
-                DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + 9, y + 144, 130);
+                VerticalText.drawOneOrTwoLines(g2, abilityModel.getShortName(), x + 9, y + 144, 130);
             } else {
                 g2.setFont(Storage.getFont18());
-                DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + 7, y + 144, 130);
+                VerticalText.drawOneOrTwoLines(g2, abilityModel.getShortName(), x + 7, y + 144, 130);
             }
         }
         CardRect.draw(ctx, x - 2, y - 2, CardRect.WIDTH, CardRect.HEIGHT, abilityModel);

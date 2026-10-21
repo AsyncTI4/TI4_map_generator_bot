@@ -67,17 +67,13 @@ final class UnitDecals {
     static void drawLawDecals(Graphics g, Game game, UnitKey unitKey, int imageX, int imageY) {
         if (unitKey.unitType() == UnitType.Mech
                 && ButtonHelper.anyLawInPlay(game, "articles_war", "absol_articleswar")) {
-            drawToken(
-                    g,
-                    "agenda_articles_of_war" + DrawingUtil.getBlackWhiteFileSuffix(unitKey.colorID()),
-                    imageX,
-                    imageY);
+            drawToken(g, "agenda_articles_of_war" + ColorUtil.blackWhiteFileSuffix(unitKey.colorID()), imageX, imageY);
         }
         VoltronDecal.drawIfVoltron(unitKey, imageX, imageY, g, game);
         if (unitKey.unitType() == UnitType.Warsun && ButtonHelper.isLawInPlay(game, "schematics")) {
             drawToken(
                     g,
-                    "agenda_publicize_weapon_schematics" + DrawingUtil.getBlackWhiteFileSuffix(unitKey.colorID()),
+                    "agenda_publicize_weapon_schematics" + ColorUtil.blackWhiteFileSuffix(unitKey.colorID()),
                     imageX,
                     imageY);
         }

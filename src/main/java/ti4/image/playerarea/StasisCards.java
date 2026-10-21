@@ -7,10 +7,11 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import ti4.game.Player;
 import ti4.helpers.Storage;
-import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
 import ti4.image.ImageResources;
+import ti4.image.OutlinedText;
 import ti4.image.PaImage;
+import ti4.image.VerticalText;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 
@@ -57,7 +58,7 @@ final class StasisCards {
         g2.drawImage(fighter, x + 4, y + 10, null);
         g2.setColor(Color.WHITE);
         g2.setFont(Storage.getFont16());
-        DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, "Corsairs' Cove", x + 7, y + 116, 100);
+        VerticalText.drawOneOrTwoLines(g2, "Corsairs' Cove", x + 7, y + 116, 100);
         drawCount(g2, stasisFighters, x, y);
         CardRect.draw(
                 ctx,
@@ -72,7 +73,7 @@ final class StasisCards {
 
     private static void drawCount(Graphics2D g2, int count, int x, int y) {
         boolean shrinkText = count >= 20;
-        DrawingUtil.drawCenteredString(
+        OutlinedText.drawCentered(
                 g2,
                 Integer.toString(count),
                 new Rectangle(x + (shrinkText ? 2 : 4), y + (shrinkText ? 123 : 121), 42, 30),

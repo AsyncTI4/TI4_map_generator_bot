@@ -1,6 +1,6 @@
 package ti4.image;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -41,7 +41,7 @@ final class UnitHolderRenderer {
     private final Game game;
     private final Tile tile;
     private final DisplayType displayType;
-    private final Graphics g;
+    private final Graphics2D g;
     private final List<Rectangle> occupied;
     private final int degree;
     private final int degreeChange;
@@ -55,7 +55,7 @@ final class UnitHolderRenderer {
             Game game,
             @Nullable DisplayType displayType,
             Tile tile,
-            Graphics g,
+            Graphics2D g,
             List<Rectangle> occupied,
             int degree,
             int degreeChange,

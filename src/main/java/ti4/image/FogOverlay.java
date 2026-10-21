@@ -39,18 +39,17 @@ final class FogOverlay {
     private static void drawRoundLabel(Graphics2D g, String label) {
         int labelX = TILE_PADDING + ROUND_LABEL_POSITION.x;
         int labelY = TILE_PADDING + ROUND_LABEL_POSITION.y;
-        DrawingUtil.superDrawString(g, label, labelX, labelY, Color.WHITE, null, null, null, null);
+        OutlinedText.draw(g, label, labelX, labelY, Color.WHITE, null, null, null, null);
     }
 
     private static void drawCentredLabel(Graphics2D g, String label) {
         int labelX = TILE_PADDING + (TILE_WIDTH / 2);
         int labelY = TILE_PADDING + (TILE_HEIGHT / 2);
         int lineHeight = g.getFontMetrics().getHeight();
-        List<String> lines = DrawingUtil.layoutText(g, label, TILE_WIDTH - TILE_PADDING);
+        List<String> lines = TextWrap.layoutLines(label, g.getFontMetrics(), TILE_WIDTH - TILE_PADDING);
         int deltaY = 0;
         for (String line : lines) {
-            DrawingUtil.superDrawString(
-                    g, line, labelX, labelY + deltaY, Color.WHITE, HorizontalAlign.Center, null, null, null);
+            OutlinedText.draw(g, line, labelX, labelY + deltaY, Color.WHITE, HorizontalAlign.Center, null, null, null);
             deltaY += lineHeight;
         }
     }

@@ -11,9 +11,11 @@ import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Storage;
-import ti4.image.DrawingUtil;
+import ti4.image.FactionIcons;
 import ti4.image.HorizontalAlign;
 import ti4.image.NeighbourMap;
+import ti4.image.OutlinedText;
+import ti4.image.RemoteImages;
 import ti4.image.RowWrap;
 import ti4.image.Strokes;
 import ti4.image.VerticalAlign;
@@ -177,11 +179,11 @@ public final class PlayerAreaHeader {
     }
 
     private int avatarTextOffset() {
-        return ctx.game().hideUserNames() ? 0 : DrawingUtil.DISCORD_AVATAR_SIZE + 8;
+        return ctx.game().hideUserNames() ? 0 : RemoteImages.DISCORD_AVATAR_SIZE + 8;
     }
 
     private void drawText(String text, int textX, int rowTop) {
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 ctx.g2(),
                 text,
                 textX,
@@ -195,7 +197,7 @@ public final class PlayerAreaHeader {
 
     private void drawAvatar(String userID, int avatarX, int rowTop) {
         if (!ctx.game().hideUserNames()) {
-            ctx.g2().drawImage(DrawingUtil.getUserDiscordAvatar(userID), avatarX, rowTop + 5, null);
+            ctx.g2().drawImage(RemoteImages.discordAvatar(userID), avatarX, rowTop + 5, null);
         }
     }
 
@@ -237,12 +239,11 @@ public final class PlayerAreaHeader {
             for (NeighbourToken token : row) {
                 cursor += token.leadingGap();
                 if (token.player() != null) {
-                    DrawingUtil.drawPlayerFactionIconImage(
-                            g2, token.player(), cursor, rowTop + 6, NEIGHBOUR_ICON_SIZE, NEIGHBOUR_ICON_SIZE);
+                    FactionIcons.draw(g2, token.player(), cursor, rowTop + 6, NEIGHBOUR_ICON_SIZE, NEIGHBOUR_ICON_SIZE);
                 } else {
                     g2.setFont(token.font());
                     int baseline = rowTop + 26 + token.baselineDrop();
-                    DrawingUtil.superDrawString(
+                    OutlinedText.draw(
                             g2, token.text(), cursor, baseline, Color.red, null, null, Strokes.STROKE_2, Color.black);
                 }
                 cursor += token.width();

@@ -184,7 +184,7 @@ final class SpaceTokens {
             return;
         }
         g.setFont(Storage.getFont24());
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 g,
                 Integer.toString(count),
                 drawX + tokenImage.getWidth() / 2,

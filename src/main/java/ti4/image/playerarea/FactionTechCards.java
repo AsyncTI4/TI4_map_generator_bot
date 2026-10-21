@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.util.List;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.image.FactionIcons;
 import ti4.image.PaImage;
 import ti4.image.Strokes;
 import ti4.model.Mapper;
@@ -48,7 +49,7 @@ final class FactionTechCards {
         if (techModel.getFaction().isPresent()) {
             String faction = techModel.getFaction().get();
             String icon = game.isLiberationC4Mode() && "ghost".equals(faction) ? "redcreuss" : faction;
-            FactionIcons.drawOpaque(g2, icon, x + 1, y + 108, 42, 42, 0.5f);
+            FactionIcons.drawFactionFaded(g2, icon, x + 1, y + 108, 42, 42, 0.5f);
         }
         TechCards.drawName(g2, techModel, x, y);
         CardRect.draw(ctx, x - 2, y - 2, CardRect.WIDTH, CardRect.HEIGHT, techModel);

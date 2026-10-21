@@ -12,7 +12,9 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Storage;
 import ti4.image.ColorUtil;
-import ti4.image.DrawingUtil;
+import ti4.image.FactionIcons;
+import ti4.image.OutlinedText;
+import ti4.image.ShapeDrawing;
 import ti4.image.Strokes;
 import ti4.model.StrategyCardModel;
 
@@ -23,7 +25,7 @@ final class IdentityBlock {
     private IdentityBlock() {}
 
     static void drawFactionIcon(PlayerAreaContext ctx, Player player, int x, int y) {
-        DrawingUtil.drawPlayerFactionIconImage(ctx.g2(), player, x, y, ICON_SIZE, ICON_SIZE);
+        FactionIcons.draw(ctx.g2(), player, x, y, ICON_SIZE, ICON_SIZE);
         if (!player.hasCustomFactionEmoji()) {
             ctx.overlays().add(player.getFactionModel(), x + 10, y + 10, 75, 75);
         }
@@ -63,11 +65,10 @@ final class IdentityBlock {
         g2.setFont(big ? Storage.getFont64() : Storage.getFont32());
 
         if (sc == ButtonHelper.getKyroHeroSC(game)) sc = 9;
-        DrawingUtil.superDrawStringCentered(
-                g2, Integer.toString(sc), pt.x, pt.y, scColor, Strokes.STROKE_4, Color.black);
+        OutlinedText.drawCentered(g2, Integer.toString(sc), pt.x, pt.y, scColor, Strokes.STROKE_4, Color.black);
         if (Color.GRAY.equals(scColor)) {
             int off = big ? 15 : 8;
-            DrawingUtil.drawRedX(g2, pt.x + off, pt.y + off, 2 * off, big);
+            ShapeDrawing.redX(g2, pt.x + off, pt.y + off, 2 * off, big);
         }
         if (scModel != null) {
             int overlaySize = big ? 50 : 30;
@@ -86,7 +87,7 @@ final class IdentityBlock {
             Color color = "PASSED".equals(label)
                     ? ColorUtil.PassedColor
                     : "ACTIVE".equals(label) ? ColorUtil.ActiveColor : ColorUtil.EliminatedColor;
-            DrawingUtil.superDrawStringCentered(g2, label, 0, 0, color, Strokes.STROKE_4, Color.BLACK);
+            OutlinedText.drawCentered(g2, label, 0, 0, color, Strokes.STROKE_4, Color.BLACK);
         }
         g2.setTransform(transform);
     }

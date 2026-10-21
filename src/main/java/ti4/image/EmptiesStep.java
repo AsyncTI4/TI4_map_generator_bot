@@ -32,6 +32,6 @@ final class EmptiesStep implements TileStepPainter {
         g.setColor(Color.RED);
         g.fillOval(x, y, MARK_SIZE, MARK_SIZE);
         g.setColor(Color.WHITE);
-        DrawingUtil.drawCenteredString(g, "!", new Rectangle(x, y, MARK_SIZE, MARK_SIZE), Storage.getFont80());
+        OutlinedText.drawCentered(g, "!", new Rectangle(x, y, MARK_SIZE, MARK_SIZE), Storage.getFont80());
     }
 }

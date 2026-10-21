@@ -8,8 +8,9 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
-import ti4.image.DrawingUtil;
+import ti4.image.OutlinedText;
 import ti4.image.PaImage;
+import ti4.image.ShapeDrawing;
 import ti4.image.Strokes;
 import ti4.model.ExploreModel;
 import ti4.model.Mapper;
@@ -88,9 +89,9 @@ final class SupplyBlock {
 
     private static void drawCardCount(Graphics2D g2, int x, int y, String image, String count, boolean outlined) {
         Rectangle card = PaImage.draw(g2, x, y, image);
-        DrawingUtil.superDrawStringCenteredDefault(g2, count, (int) card.getCenterX(), y + 75);
+        OutlinedText.drawCenteredWhiteOnBlack(g2, count, (int) card.getCenterX(), y + 75);
         if (outlined) {
-            DrawingUtil.drawRectWithTwoColorGradient(g2, Color.black, null, card);
+            ShapeDrawing.gradientOutline(g2, Color.black, null, card);
         }
     }
 

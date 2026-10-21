@@ -49,7 +49,7 @@ final class NucleusStep implements TileStepPainter {
         }
         if (mapTile.getHome() != null && mapTile.getHome() && mapTile.getPlayerNumber() != null) {
             String color = NUCLEUS_SLICE_COLORS.getOrDefault(mapTile.getPlayerNumber(), "black");
-            BufferedImage border = DrawingUtil.hexBorder("solid", Mapper.getColor(color), List.of(), SEAT_BORDER_WIDTH);
+            BufferedImage border = HexOverlays.border("solid", Mapper.getColor(color), List.of(), SEAT_BORDER_WIDTH);
             g.drawImage(border, TILE_PADDING, TILE_PADDING, null);
         }
     }
@@ -84,8 +84,7 @@ final class NucleusStep implements TileStepPainter {
             String color = NUCLEUS_SLICE_COLORS.getOrDefault(entry.getKey(), "black");
             List<Integer> openSides = new ArrayList<>(ALL_SIDES);
             openSides.removeAll(entry.getValue());
-            BufferedImage border =
-                    DrawingUtil.hexBorder("solid", Mapper.getColor(color), openSides, SLICE_BORDER_WIDTH);
+            BufferedImage border = HexOverlays.border("solid", Mapper.getColor(color), openSides, SLICE_BORDER_WIDTH);
             g.drawImage(border, TILE_PADDING, TILE_PADDING, null);
         }
     }

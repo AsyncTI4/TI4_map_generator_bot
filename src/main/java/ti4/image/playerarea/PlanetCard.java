@@ -13,10 +13,11 @@ import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.image.ColorUtil;
-import ti4.image.DrawingUtil;
+import ti4.image.FactionIcons;
 import ti4.image.ImageHelper;
 import ti4.image.ImageResources;
 import ti4.image.PaImage;
+import ti4.image.VerticalText;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.Mapper;
@@ -82,10 +83,10 @@ final class PlanetCard {
 
             g2.setColor(isExhausted ? Color.GRAY : Color.WHITE);
             if (planetModel.getShrinkNamePNAttach()) {
-                DrawingUtil.drawTextVertically(
+                VerticalText.draw(
                         g2, planetModel.getShortName().toUpperCase(), cardX + 9, y + 144, Storage.getFont16());
             } else {
-                DrawingUtil.drawTextVertically(
+                VerticalText.draw(
                         g2, planetModel.getShortName().toUpperCase(), cardX + 7, y + 144, Storage.getFont18());
             }
             drawCommodities(ctx, player, planet, cardX, y);
@@ -152,7 +153,7 @@ final class PlanetCard {
         Graphics2D g2 = ctx.g2();
         String planetDisplayIcon = traitIcon(ctx.game(), player, planet, planetName);
         if (coexistence.coexist() && coexistence.faction().isEmpty()) {
-            FactionIcons.draw(g2, "coexist", x - 2 + 20, y - 2 + 40, 30, 30);
+            FactionIcons.drawFaction(g2, "coexist", x - 2 + 20, y - 2 + 40, 30, 30);
         }
         if (planetDisplayIcon == null || planetDisplayIcon.isEmpty()) {
             return;
@@ -164,13 +165,13 @@ final class PlanetCard {
             planetDisplayIcon = "keleres";
         }
         if (Mapper.isValidFaction(planetDisplayIcon) || "redcreuss".equals(planetDisplayIcon)) {
-            FactionIcons.draw(g2, planetDisplayIcon, x - 2, y - 2, 52, 52);
+            FactionIcons.drawFaction(g2, planetDisplayIcon, x - 2, y - 2, 52, 52);
         } else if ("triad".equals(planetName)) {
             PaImage.draw(g2, x + 3, y - 2, "pa_relics_icon.png");
         } else {
             drawDetail(g2, x + 1, y + 2, "pc_attribute_" + planetDisplayIcon + ".png");
             if (coexistence.coexist() && Mapper.isValidFaction(coexistence.faction())) {
-                FactionIcons.draw(g2, coexistence.faction(), x - 2 + 20, y - 2 + 40, 30, 30);
+                FactionIcons.drawFaction(g2, coexistence.faction(), x - 2 + 20, y - 2 + 40, 30, 30);
             }
         }
     }

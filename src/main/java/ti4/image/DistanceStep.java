@@ -39,7 +39,7 @@ final class DistanceStep implements TileStepPainter {
         }
         if (distance <= MAX_LABELLED_DISTANCE) {
             layer.g().setFont(Storage.getFont110());
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     layer.g(),
                     distance.toString(),
                     x + tileImage.getWidth() / 2,

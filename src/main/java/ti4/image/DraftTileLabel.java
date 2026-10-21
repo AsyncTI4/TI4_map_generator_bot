@@ -33,7 +33,7 @@ final class DraftTileLabel {
             layer.drawOnHex(green, 49, 119);
         } else {
             g.setFont(Storage.getFont50());
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     g,
                     draftNumber(tileID),
                     TILE_PADDING + NUMBER_POSITION.x,
@@ -45,7 +45,7 @@ final class DraftTileLabel {
                     Color.BLACK);
         }
         g.setFont(Storage.getFont24());
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 g,
                 draftColor(tileID),
                 TILE_PADDING + COLOR_POSITION.x,

@@ -82,15 +82,15 @@ final class SpaceCannonStep implements TileStepPainter {
         int numberOfDice = coverage.getCount();
         boolean rerolls = coverage.isHasRerolls();
         float expectedHits = coverage.getExpected();
-        if ("_wht.png".equals(DrawingUtil.getBlackWhiteFileSuffix(player.getColorID()))) {
+        if ("_wht.png".equals(ColorUtil.blackWhiteFileSuffix(player.getColorID()))) {
             g.setColor(Color.WHITE);
         } else {
             g.setColor(Color.BLACK);
         }
         BufferedImage token =
                 ImageHelper.readScaled(ImageResources.commandToken(Mapper.getControlID(player.getColor())), scale);
-        DrawingUtil.drawControlToken(g, token, player, x, y, false, scale / 2);
-        DrawingUtil.drawCenteredString(
+        PlayerTokens.drawControlToken(g, token, player, x, y, false, scale / 2);
+        OutlinedText.drawCentered(
                 g,
                 numberOfDice + (rerolls ? "*" : ""),
                 new Rectangle(
@@ -99,7 +99,7 @@ final class SpaceCannonStep implements TileStepPainter {
                         Math.round(61 * scale / 2),
                         Math.round(24 * scale * 2 / 3)),
                 fonts.big());
-        DrawingUtil.drawCenteredString(
+        OutlinedText.drawCentered(
                 g,
                 "(" + expectedHits + ")",
                 new Rectangle(
@@ -113,7 +113,7 @@ final class SpaceCannonStep implements TileStepPainter {
         } else if (numberOfDice >= 3) {
             drawDiceRows(g, dice, numberOfDice, 2, 12, 24, fonts.small(), scale, x, y);
         } else {
-            DrawingUtil.drawCenteredString(
+            OutlinedText.drawCentered(
                     g,
                     joined(dice),
                     new Rectangle(
@@ -137,7 +137,7 @@ final class SpaceCannonStep implements TileStepPainter {
             int from = row * numberOfDice / rows;
             int to = (row + 1) * numberOfDice / rows;
             String text = joined(dice.subList(from, to)) + (row < rows - 1 ? "," : "");
-            DrawingUtil.drawCenteredString(
+            OutlinedText.drawCentered(
                     g,
                     text,
                     new Rectangle(

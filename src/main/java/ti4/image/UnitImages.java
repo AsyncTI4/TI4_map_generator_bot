@@ -92,8 +92,7 @@ final class UnitImages {
         Graphics2D graphics = label.createGraphics();
         graphics.rotate(Math.PI / 4, 40, 40);
         graphics.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
-        DrawingUtil.superDrawString(
-                graphics, "Aurelion", -1, 45, Color.WHITE, null, null, new BasicStroke(1), Color.BLACK);
+        OutlinedText.draw(graphics, "Aurelion", -1, 45, Color.WHITE, null, null, new BasicStroke(1), Color.BLACK);
         graphics.dispose();
         return label;
     }

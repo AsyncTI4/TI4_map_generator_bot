@@ -1,52 +1,17 @@
-package ti4.image.playerarea;
+package ti4.image;
 
-import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import ti4.image.DrawingUtil;
 import ti4.logging.BotLogger;
 
-final class FactionIcons {
+final class FactionIconBorder {
 
     private static final int INNER_RADIUS = 1;
     private static final int OUTER_RADIUS = 2 + INNER_RADIUS;
 
-    private FactionIcons() {}
+    private FactionIconBorder() {}
 
-    static void draw(Graphics2D g2, String faction, int x, int y, int width, int height) {
-        draw(g2, faction, x, y, width, height, null, false);
-    }
-
-    static void drawBordered(Graphics2D g2, String faction, int x, int y, int width, int height, boolean border) {
-        draw(g2, faction, x, y, width, height, null, border);
-    }
-
-    static void drawOpaque(Graphics2D g2, String faction, int x, int y, int width, int height, float opacity) {
-        draw(g2, faction, x, y, width, height, opacity, false);
-    }
-
-    private static void draw(
-            Graphics2D g2, String faction, int x, int y, int width, int height, Float opacity, boolean border) {
-        BufferedImage icon = DrawingUtil.getFactionIconImageScaled(faction, width, height);
-        if (icon == null) {
-            return;
-        }
-        if (border) {
-            drawBorder(g2, faction, icon, x, y, width, height);
-        }
-        try {
-            float opacityToSet = opacity == null ? 1.0f : opacity;
-            boolean setOpacity = opacity != null && !opacity.equals(1.0f);
-            if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacityToSet));
-            g2.drawImage(icon, x, y, null);
-            if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
-        } catch (Exception e) {
-            BotLogger.error("Could not display faction icon image: " + faction, e);
-        }
-    }
-
-    private static void drawBorder(
-            Graphics2D g2, String faction, BufferedImage icon, int x, int y, int width, int height) {
+    static void draw(Graphics2D g2, String faction, BufferedImage icon, int x, int y, int width, int height) {
         try {
             BufferedImage mask = alphaMask(icon, width, height);
             BufferedImage maskInner =

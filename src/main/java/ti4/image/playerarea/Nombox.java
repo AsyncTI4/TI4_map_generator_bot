@@ -20,7 +20,7 @@ import ti4.helpers.RenderRandom;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.DrawingUtil;
+import ti4.image.FactionIcons;
 import ti4.image.ImageHelper;
 import ti4.image.ImageResources;
 import ti4.image.PaImage;
@@ -69,7 +69,7 @@ final class Nombox {
         }
 
         if (player.getFaction() != null) {
-            BufferedImage factionIcon = DrawingUtil.getPlayerFactionIconImage(player);
+            BufferedImage factionIcon = FactionIcons.of(player);
             if (factionIcon != null) {
                 g2.drawImage(factionIcon, x + 178, y + 33, null);
             }

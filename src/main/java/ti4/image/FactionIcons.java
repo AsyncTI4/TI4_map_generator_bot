@@ -95,6 +95,40 @@ public final class FactionIcons {
         g2.drawImage(icon, x, y, null);
     }
 
+    public static void drawFaction(Graphics2D g2, String faction, int x, int y, int width, int height) {
+        drawFaction(g2, faction, x, y, width, height, null, false);
+    }
+
+    public static void drawFactionBordered(
+            Graphics2D g2, String faction, int x, int y, int width, int height, boolean border) {
+        drawFaction(g2, faction, x, y, width, height, null, border);
+    }
+
+    public static void drawFactionFaded(
+            Graphics2D g2, String faction, int x, int y, int width, int height, float opacity) {
+        drawFaction(g2, faction, x, y, width, height, opacity, false);
+    }
+
+    private static void drawFaction(
+            Graphics2D g2, String faction, int x, int y, int width, int height, Float opacity, boolean border) {
+        BufferedImage icon = ofFaction(faction, width, height);
+        if (icon == null) {
+            return;
+        }
+        if (border) {
+            FactionIconBorder.draw(g2, faction, icon, x, y, width, height);
+        }
+        try {
+            float opacityToSet = opacity == null ? 1.0f : opacity;
+            boolean setOpacity = opacity != null && !opacity.equals(1.0f);
+            if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacityToSet));
+            g2.drawImage(icon, x, y, null);
+            if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+        } catch (Exception e) {
+            BotLogger.error("Could not display faction icon image: " + faction, e);
+        }
+    }
+
     public static void drawFaded(
             Graphics2D g2, Player player, int x, int y, int width, int height, @Nullable Float opacity) {
         BufferedImage icon = scaled(player, width, height);

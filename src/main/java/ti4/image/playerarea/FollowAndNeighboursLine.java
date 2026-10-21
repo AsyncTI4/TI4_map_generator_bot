@@ -6,7 +6,8 @@ import java.util.Set;
 import ti4.game.Player;
 import ti4.helpers.Storage;
 import ti4.image.ColorUtil;
-import ti4.image.DrawingUtil;
+import ti4.image.FactionIcons;
+import ti4.image.OutlinedText;
 import ti4.image.Strokes;
 
 final class FollowAndNeighboursLine {
@@ -27,7 +28,7 @@ final class FollowAndNeighboursLine {
     }
 
     private static void drawLabel(Graphics2D g2, String text, int x, int y, Color color) {
-        DrawingUtil.superDrawString(g2, text, x, y, color, null, null, Strokes.STROKE_2, Color.black);
+        OutlinedText.draw(g2, text, x, y, color, null, null, Strokes.STROKE_2, Color.black);
     }
 
     private static int drawUnfollowedStrategyCards(PlayerAreaContext ctx, Player player, int x, int y) {
@@ -73,7 +74,7 @@ final class FollowAndNeighboursLine {
     private static int drawIcons(Graphics2D g2, Set<Player> players, int x, int y) {
         for (Player other : players) {
             if (other.getFaction() != null) {
-                DrawingUtil.drawPlayerFactionIconImage(g2, other, x, y + BASELINE - 20, ICON_SIZE, ICON_SIZE);
+                FactionIcons.draw(g2, other, x, y + BASELINE - 20, ICON_SIZE, ICON_SIZE);
                 x += ICON_STEP;
             }
         }

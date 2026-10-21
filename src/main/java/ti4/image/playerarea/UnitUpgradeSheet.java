@@ -15,10 +15,12 @@ import ti4.game.Player;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitKey;
-import ti4.image.DrawingUtil;
+import ti4.image.ColorUtil;
+import ti4.image.FactionIcons;
 import ti4.image.ImageHelper;
 import ti4.image.ImageResources;
 import ti4.image.PaImage;
+import ti4.image.ShapeDrawing;
 import ti4.image.VoltronDecal;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -174,7 +176,7 @@ final class UnitUpgradeSheet {
         Point unitOffset = unitOffset(unit.getAsyncId());
         UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
         BufferedImage wsCrackImage = ImageHelper.read(ImageResources.token("agenda_publicize_weapon_schematics"
-                + (player.hasWarsunTech() ? DrawingUtil.getBlackWhiteFileSuffix(unitKey.colorID()) : "_blk.png")));
+                + (player.hasWarsunTech() ? ColorUtil.blackWhiteFileSuffix(unitKey.colorID()) : "_blk.png")));
         ctx.g2().drawImage(wsCrackImage, x + unitOffset.x, y + unitOffset.y, null);
     }
 
@@ -223,7 +225,7 @@ final class UnitUpgradeSheet {
                         shiftTwilightsFallMechIcon(unitFactionOffset, tfCounts.mechs(), tfMechIndex);
                     }
                 }
-                FactionIcons.drawBordered(
+                FactionIcons.drawFactionBordered(
                         g2,
                         unit.getFaction().get().toLowerCase(),
                         x + unitFactionOffset.x,
@@ -234,7 +236,7 @@ final class UnitUpgradeSheet {
                 VoltronDecal.drawIfVoltron(unitKey, x + unitOffset.x, y + unitOffset.y, g2, game);
             }
             if (isPurged) {
-                DrawingUtil.drawRedX(g2, x + unitFactionOffset.x, y + unitFactionOffset.y, 20, true);
+                ShapeDrawing.redX(g2, x + unitFactionOffset.x, y + unitFactionOffset.y, 20, true);
             }
             ctx.overlays().add(unit, x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
         }
@@ -282,7 +284,7 @@ final class UnitUpgradeSheet {
             unitFactionOffset.translate(0, 8);
         }
         for (String fsFaction : flagships) {
-            FactionIcons.drawBordered(
+            FactionIcons.drawFactionBordered(
                     ctx.g2(), fsFaction, x + offs.x, y + offs.y, 32, 32, unitPainted.contains(unit.getAsyncId()));
             Player owner = game.getPlayerFromColorOrFaction(fsFaction);
             UnitModel otherFlagship = owner == null ? null : owner.getUnitByBaseType("flagship");

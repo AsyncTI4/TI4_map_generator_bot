@@ -9,9 +9,10 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
-import ti4.image.DrawingUtil;
+import ti4.image.FactionIcons;
 import ti4.image.PaImage;
 import ti4.image.Strokes;
+import ti4.image.VerticalText;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.LeaderModel;
@@ -80,7 +81,7 @@ final class PromissoryNotesInPlay {
         }
         if (hidden && revealsFaction) {
             g2.setFont(Storage.getFont18());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, HIDDEN_CARD_TEXT, x + 7, y + 4, 120, true);
+            VerticalText.drawOneOrTwoLines(g2, HIDDEN_CARD_TEXT, x + 7, y + 4, 120, true);
         } else {
             writeName(g2, promissoryNote, x + 9, y + 4, findAttachedPlanet(game, promissoryNote));
         }
@@ -111,9 +112,9 @@ final class PromissoryNotesInPlay {
                 PaImage.draw(g2, x, y, "pa_pn_color_" + colorID + ".png");
                 if (!hidden) {
                     if (ctx.game().isFrankenGame()) {
-                        FactionIcons.draw(g2, promissoryNote.getFaction().orElse(""), x - 1, y + 86, 42, 42);
+                        FactionIcons.drawFaction(g2, promissoryNote.getFaction().orElse(""), x - 1, y + 86, 42, 42);
                     }
-                    DrawingUtil.drawPlayerFactionIconImage(g2, owner, x - 1, y + 108, 42, 42);
+                    FactionIcons.draw(g2, owner, x - 1, y + 108, 42, 42);
                 }
                 Leader commander = other.unsafeGetLeader(Constants.COMMANDER);
                 return commander != null && !commander.isLocked();
@@ -128,10 +129,10 @@ final class PromissoryNotesInPlay {
 
         if (model.getShrinkName()) {
             g2.setFont(Storage.getFont16());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, text, x, y, 120, true);
+            VerticalText.drawOneOrTwoLines(g2, text, x, y, 120, true);
         } else {
             g2.setFont(Storage.getFont18());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, text, x - 2, y, 120, true);
+            VerticalText.drawOneOrTwoLines(g2, text, x - 2, y, 120, true);
         }
     }
 

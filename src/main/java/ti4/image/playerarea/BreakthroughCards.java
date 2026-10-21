@@ -7,12 +7,14 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Storage;
-import ti4.image.DrawingUtil;
+import ti4.image.FactionIcons;
 import ti4.image.HorizontalAlign;
+import ti4.image.OutlinedText;
 import ti4.image.PaImage;
 import ti4.image.RemoteImages;
 import ti4.image.Strokes;
 import ti4.image.VerticalAlign;
+import ti4.image.VerticalText;
 import ti4.logging.BotLogger;
 import ti4.model.BreakthroughModel;
 import ti4.service.emoji.MiscEmojis;
@@ -54,7 +56,7 @@ final class BreakthroughCards {
             g2.setColor(textColor);
             g2.setStroke(Strokes.STROKE_2);
 
-            FactionIcons.draw(g2, model.getFaction().orElse(null), x - 1, y + 108, 42, 42);
+            FactionIcons.drawFaction(g2, model.getFaction().orElse(null), x - 1, y + 108, 42, 42);
             BreakthroughModel copiedDataBreach = "netrunnersbt".equals(bt)
                     ? NetrunnersBreakthroughHandler.getCopiedDataBreachBreakthrough(game, player)
                     : null;
@@ -62,10 +64,10 @@ final class BreakthroughCards {
             PaImage.draw(g2, x, y, background.getBackgroundResource(unlocked && !exhausted));
             if (model.getShrinkName()) {
                 g2.setFont(Storage.getFont16());
-                DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, model.getShortName(), x + 11, y + 144, 120);
+                VerticalText.drawOneOrTwoLines(g2, model.getShortName(), x + 11, y + 144, 120);
             } else {
                 g2.setFont(Storage.getFont18());
-                DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, model.getShortName(), x + 9, y + 144, 120);
+                VerticalText.drawOneOrTwoLines(g2, model.getShortName(), x + 9, y + 144, 120);
             }
 
             if (!unlocked) textColor = Color.red;
@@ -74,7 +76,7 @@ final class BreakthroughCards {
             if (copiedDataBreach != null) {
                 String copiedFaction = NetrunnersBreakthroughHandler.getDataBreachTargetFaction(game, player);
                 if (copiedFaction != null) {
-                    FactionIcons.draw(g2, copiedFaction, x + 20, y + 2, 20, 20);
+                    FactionIcons.drawFaction(g2, copiedFaction, x + 20, y + 2, 20, 20);
                 }
             }
             if (player.getBreakthroughTGs(bt) > 0) {
@@ -91,7 +93,7 @@ final class BreakthroughCards {
         BufferedImage tg = RemoteImages.emoji(MiscEmojis.tg, 40);
         g2.drawImage(tg, x + 2, y - 40, null);
         g2.setFont(Storage.getFont32());
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 g2,
                 Integer.toString(tradeGoods),
                 x + 22,

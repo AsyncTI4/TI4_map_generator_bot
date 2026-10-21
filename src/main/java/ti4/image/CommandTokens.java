@@ -29,14 +29,14 @@ final class CommandTokens {
             try {
                 image = ImageHelper.read(ccPath);
                 Point centerPosition = spaceHolder.getHolderCenterPosition(tile);
-                Player player = DrawingUtil.getPlayerByControlMarker(
-                        scene.game().getPlayers().values(), ccID);
+                Player player =
+                        PlayerTokens.ownerOfToken(scene.game().getPlayers().values(), ccID);
                 boolean convertToGeneric = scene.showsGeneric(player);
                 boolean hiddenSweep = ccID.startsWith("sweep") && player != scene.fowPlayer();
                 if (!hiddenSweep) {
                     int imgX = TILE_PADDING + LEFT_MARGIN + deltaX;
                     int imgY = TILE_PADDING + centerPosition.y - LIFT + deltaY;
-                    DrawingUtil.drawCCOfPlayer(g, ccID, imgX, imgY, 1, player, convertToGeneric);
+                    PlayerTokens.drawCommandCounters(g, ccID, imgX, imgY, 1, player, convertToGeneric, true);
                 }
             } catch (Exception e) {
                 BotLogger.error("Could not addCC", e);

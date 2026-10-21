@@ -14,7 +14,7 @@ final class TileNumberStep implements TileStepPainter {
     @Override
     public void paint(TileScene scene, TileLayer layer) {
         TileText.applyTextSize(layer.g(), scene.game());
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 layer.g(),
                 layer.tile().getPosition(),
                 TILE_PADDING + POSITION.x,

@@ -10,11 +10,13 @@ import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButto
 import ti4.game.Player;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Storage;
-import ti4.image.DrawingUtil;
+import ti4.image.FactionIcons;
 import ti4.image.ImageHelper;
 import ti4.image.ImageResources;
 import ti4.image.PaImage;
+import ti4.image.PlayerTokens;
 import ti4.image.Strokes;
+import ti4.image.VerticalText;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.Mapper;
@@ -95,7 +97,7 @@ final class RelicCards {
             PaImage.draw(g2, x, y, "pa_tech_techicons_cyberneticwarfare" + statusSuffix(isExhausted) + ".png");
         }
         if (isOrReplaces(relicModel, relicID, "titanprototype")) {
-            FactionIcons.draw(g2, "relic", x - 1, y + 108, 42, 42);
+            FactionIcons.drawFaction(g2, "relic", x - 1, y + 108, 42, 42);
         }
 
         if (isOrReplaces(relicModel, relicID, "emelpar")) {
@@ -103,13 +105,13 @@ final class RelicCards {
             int spaceIndex = emelpar.lastIndexOf(' ');
             emelpar = emelpar.substring(0, spaceIndex) + "\n" + emelpar.substring(spaceIndex);
             g2.setFont(Storage.getFont18());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, emelpar, x + 7, y + 30, 120, true);
+            VerticalText.drawOneOrTwoLines(g2, emelpar, x + 7, y + 30, 120, true);
         } else if (relicModel.getShrinkName()) {
             g2.setFont(Storage.getFont16());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + 9, y + 30, 120, true);
+            VerticalText.drawOneOrTwoLines(g2, relicModel.getShortName(), x + 9, y + 30, 120, true);
         } else {
             g2.setFont(Storage.getFont18());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + 7, y + 30, 120, true);
+            VerticalText.drawOneOrTwoLines(g2, relicModel.getShortName(), x + 7, y + 30, 120, true);
         }
     }
 
@@ -132,7 +134,7 @@ final class RelicCards {
             BufferedImage relicImage = ImageHelper.read(resourcePath);
             if (relicImage == null) {
                 g2.setFont(Storage.getFont20());
-                DrawingUtil.drawTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + 5, y + 140, 130);
+                VerticalText.drawTwoLines(g2, relicModel.getShortName(), x + 5, y + 140, 130);
             } else {
                 g2.drawImage(relicImage, x, y, null);
             }
@@ -140,12 +142,12 @@ final class RelicCards {
             BotLogger.error(new LogOrigin(player), "Bad file: " + relicFileName, e);
         }
         if (MonumentsBRButtonHandler.hasArmageddonProjectSuperweapon(ctx.game(), player, relicID)) {
-            DrawingUtil.getAndDrawControlToken(g2, player, x + 10, y + 60, false, 0.5f);
+            PlayerTokens.readAndDrawControlToken(g2, player, x + 10, y + 60, false, 0.5f);
         }
         if (BOONS.contains(relicID)) {
             int tokenCount = LostLegaciesRelicHandler.getBoonTokens(ctx.game(), player, relicID);
             for (int token = 0; token < tokenCount; token++) {
-                DrawingUtil.getAndDrawControlToken(
+                PlayerTokens.readAndDrawControlToken(
                         g2, player, x + 2 + token % 3 * 14, y + 52 + token / 3 * 13, false, 0.25f);
             }
         }

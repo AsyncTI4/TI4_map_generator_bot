@@ -12,9 +12,10 @@ import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.image.ColorUtil;
-import ti4.image.DrawingUtil;
+import ti4.image.FactionIcons;
 import ti4.image.PaImage;
 import ti4.image.Strokes;
+import ti4.image.VerticalText;
 import ti4.model.LeaderModel;
 import ti4.model.Mapper;
 import ti4.service.VeiledHeartService;
@@ -93,7 +94,7 @@ final class LeaderCards {
         CardRect.draw(ctx, x - 2, y - 2, CardRect.WIDTH, CardRect.HEIGHT, Mapper.getLeader(leader.getId()));
 
         if (Mapper.isValidLeader(leader.getId())) {
-            FactionIcons.draw(g2, leaderFactionIcon(leader), x - 1, y + 108, 42, 42);
+            FactionIcons.drawFaction(g2, leaderFactionIcon(leader), x - 1, y + 108, 42, 42);
         }
 
         if (leader.getTgCount() != 0) {
@@ -108,22 +109,21 @@ final class LeaderCards {
         LeaderModel leaderModel = Mapper.getLeader(leader.getId());
         if (leaderModel == null) {
             g2.setFont(Storage.getFont14());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, leader.getId(), x + 7, y + 30, 120, true);
+            VerticalText.drawOneOrTwoLines(g2, leader.getId(), x + 7, y + 30, 120, true);
             return x + CARD_STEP;
         }
         boolean shrink = game.isTwilightsFallMode() ? leaderModel.getTFShrinkName() : leaderModel.getShrinkName();
         String name = game.isTwilightsFallMode() ? leaderModel.getTFShortName() : leaderModel.getShortName();
 
         if ("yssarilagent".equalsIgnoreCase(leader.getId()) && !game.isTwilightsFallMode()) {
-            DrawingUtil.drawTextVertically(
-                    g2, "Clever, Clever".toUpperCase(), x + 8, y + 30, Storage.getFont14(), true);
-            DrawingUtil.drawTextVertically(g2, "Ssruu".toUpperCase(), x + 23, y + 30, Storage.getFont18(), true);
+            VerticalText.draw(g2, "Clever, Clever".toUpperCase(), x + 8, y + 30, Storage.getFont14(), true);
+            VerticalText.draw(g2, "Ssruu".toUpperCase(), x + 23, y + 30, Storage.getFont18(), true);
         } else if (shrink) {
             g2.setFont(Storage.getFont16());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, name, x + 9, y + 30, 120, true);
+            VerticalText.drawOneOrTwoLines(g2, name, x + 9, y + 30, 120, true);
         } else {
             g2.setFont(Storage.getFont18());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, name, x + 7, y + 30, 120, true);
+            VerticalText.drawOneOrTwoLines(g2, name, x + 7, y + 30, 120, true);
         }
         return x + CARD_STEP;
     }
@@ -202,7 +202,7 @@ final class LeaderCards {
             CardRect.draw(ctx, x - 2, y - 2, CardRect.WIDTH, CardRect.HEIGHT, "Commander", HIDDEN_COMMANDER_TEXT);
         } else {
             CardRect.draw(ctx, x - 2, y - 2, CardRect.WIDTH, CardRect.HEIGHT, Mapper.getLeader(commander.getId()));
-            DrawingUtil.drawPlayerFactionIconImage(g2, owner, x - 1, y + 108, 42, 42);
+            FactionIcons.draw(g2, owner, x - 1, y + 108, 42, 42);
         }
         PaImage.draw(g2, x, y, overlayPrefix + status + ".png");
         PaImage.draw(g2, x, y, "pa_leaders_pips_ii" + status + ".png");

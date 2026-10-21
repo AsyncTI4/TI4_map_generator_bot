@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Stroke;
-import ti4.image.DrawingUtil;
+import ti4.image.ShapeDrawing;
 
 record PlayerAreaFrame(Rectangle bounds, Color mainColor, Color accentColor, Stroke stroke) {
 
@@ -17,6 +17,6 @@ record PlayerAreaFrame(Rectangle bounds, Color mainColor, Color accentColor, Str
             return;
         }
         g2.setStroke(stroke);
-        DrawingUtil.drawRectWithTwoColorGradient(g2, mainColor, accentColor, bounds.x, bounds.y, bounds.width, height);
+        ShapeDrawing.gradientOutline(g2, mainColor, accentColor, bounds.x, bounds.y, bounds.width, height);
     }
 }

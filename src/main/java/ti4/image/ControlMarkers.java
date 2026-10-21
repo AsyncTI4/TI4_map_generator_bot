@@ -37,8 +37,7 @@ final class ControlMarkers {
                 continue;
             }
 
-            Player player = DrawingUtil.getPlayerByControlMarker(
-                    scene.game().getPlayers().values(), controlID);
+            Player player = PlayerTokens.ownerOfToken(scene.game().getPlayers().values(), controlID);
             boolean convertToGeneric = scene.showsGeneric(player);
 
             Point position = unitTokenPosition.getPosition(controlID);
@@ -59,14 +58,14 @@ final class ControlMarkers {
                 imgY = TILE_PADDING + centerPosition.y;
                 exhaustedFile = "exhaustedControl";
             }
-            DrawingUtil.drawControlToken(g, controlTokenImage, player, imgX, imgY, convertToGeneric, SCALE);
+            PlayerTokens.drawControlToken(g, controlTokenImage, player, imgX, imgY, convertToGeneric, SCALE);
             occupied.add(new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
             if (player != null
                     && player.isRealPlayer()
                     && player.getExhaustedPlanets().contains(unitHolder.getName())) {
                 BufferedImage exhaustedTokenImage = ImageHelper.readScaled(
                         ResourceHelper.getResourceFromFolder("command_token/", exhaustedFile), SCALE);
-                DrawingUtil.drawControlToken(g, exhaustedTokenImage, player, imgX, imgY, convertToGeneric, SCALE);
+                PlayerTokens.drawControlToken(g, exhaustedTokenImage, player, imgX, imgY, convertToGeneric, SCALE);
                 occupied.add(new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
             }
             if (position == null) {

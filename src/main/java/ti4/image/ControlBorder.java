@@ -28,7 +28,7 @@ final class ControlBorder {
         if (scene.isPrivateView() && scene.fowPlayer() == null) openSides.clear();
         String hexBorderStyle = unlocked ? "solid" : game.getHexBorderStyle();
         BufferedImage border =
-                DrawingUtil.hexBorder(hexBorderStyle, Mapper.getColor(controllingPlayer.getColor()), openSides);
+                HexOverlays.border(hexBorderStyle, Mapper.getColor(controllingPlayer.getColor()), openSides);
         layer.g().drawImage(border, TILE_PADDING, TILE_PADDING, null);
     }
 

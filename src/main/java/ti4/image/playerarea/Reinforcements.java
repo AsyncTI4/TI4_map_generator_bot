@@ -13,10 +13,11 @@ import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.DrawingUtil;
+import ti4.image.ColorUtil;
 import ti4.image.ImageHelper;
 import ti4.image.ImageResources;
 import ti4.image.PaImage;
+import ti4.image.PlayerTokens;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.Mapper;
@@ -114,9 +115,7 @@ final class Reinforcements {
                     x + position.x - offset,
                     y + position.y,
                     "pa_reinforcements_dragon"
-                            + (numInReinforcements > 0
-                                    ? DrawingUtil.getBlackWhiteFileSuffix(playerColor)
-                                    : "_red.png"));
+                            + (numInReinforcements > 0 ? ColorUtil.blackWhiteFileSuffix(playerColor) : "_red.png"));
         }
 
         if (numInReinforcements > -10) {
@@ -161,7 +160,8 @@ final class Reinforcements {
                 try {
                     String ccID = Mapper.getCCID(playerColor);
                     Point position = reinforcementsPosition.getPosition(CC_TAG);
-                    DrawingUtil.drawCCOfPlayer(ctx.g2(), ccID, x + position.x, y + position.y, 1, player, false);
+                    PlayerTokens.drawCommandCounters(
+                            ctx.g2(), ccID, x + position.x, y + position.y, 1, player, false, true);
                 } catch (Exception e) {
                     BotLogger.error(new LogOrigin(player), "Could not parse file for CC: " + playerColor, e);
                 }

@@ -4,7 +4,6 @@ import static ti4.image.TileGeometry.TILE_PADDING;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -27,7 +26,8 @@ final class UnitBadges {
 
     private UnitBadges() {}
 
-    static void drawTag(Graphics g, Game game, UnitKey unitKey, Player player, ImagePosition imagePos, int iteration) {
+    static void drawTag(
+            Graphics2D g, Game game, UnitKey unitKey, Player player, ImagePosition imagePos, int iteration) {
         if (iteration != 0 || unitKey.unitType() == UnitType.Infantry || !game.isShowUnitTags()) {
             return;
         }
@@ -43,9 +43,9 @@ final class UnitBadges {
         int tagY = imagePos.y() + plaquetteOffset.y;
 
         g.drawImage(plaquette, tagX, tagY, null);
-        DrawingUtil.drawPlayerFactionIconImage(g, player, tagX, tagY, 32, 32);
+        FactionIcons.draw(g, player, tagX, tagY, 32, 32);
         g.setColor(Color.WHITE);
-        DrawingUtil.drawCenteredString(g, factionTag, new Rectangle(tagX + 25, tagY + 17, 40, 13), Storage.getFont13());
+        OutlinedText.drawCentered(g, factionTag, new Rectangle(tagX + 25, tagY + 17, 40, 13), Storage.getFont13());
     }
 
     private static Point tagOffset(String unitID) {
@@ -61,7 +61,7 @@ final class UnitBadges {
         };
     }
 
-    static void drawBulkCount(Graphics g, UnitKey unitKey, int count, ImagePosition imagePos) {
+    static void drawBulkCount(Graphics2D g, UnitKey unitKey, int count, ImagePosition imagePos) {
         boolean blackText =
                 switch (Mapper.getColor(unitKey.colorID()).getTextColor()) {
                     case "black" -> true;
@@ -72,7 +72,7 @@ final class UnitBadges {
         g.setFont(count > 9 ? Storage.getFont28() : Storage.getFont24());
         int offsetX = COUNT_POSITION.x + (count > 9 ? 5 : 0);
         int offsetY = COUNT_POSITION.y + (count > 9 ? 5 : 0);
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 (Graphics2D) g,
                 count == 1 ? " 1" : Integer.toString(count),
                 imagePos.x() + offsetX,
@@ -85,7 +85,7 @@ final class UnitBadges {
     }
 
     static void drawGalvanizeTag(
-            Graphics g,
+            Graphics2D g,
             Tile tile,
             UnitHolder unitHolder,
             Point unitPos,
@@ -109,12 +109,12 @@ final class UnitBadges {
         imageDmgY += TILE_PADDING;
         g.drawImage(galvTag, imageDmgX, imageDmgY, null);
         g.setFont(Storage.getFont20());
-        DrawingUtil.superDrawStringCentered(
+        OutlinedText.drawCentered(
                 g, Integer.toString(amount), imageDmgX + 38, imageDmgY + 16, Color.white, null, Color.black);
     }
 
     static void drawDamage(
-            Graphics g,
+            Graphics2D g,
             UnitPlacement placement,
             Point unitPos,
             ImagePosition imagePos,

@@ -8,8 +8,10 @@ import java.util.Map.Entry;
 import ti4.game.Player;
 import ti4.helpers.Storage;
 import ti4.image.ColorUtil;
-import ti4.image.DrawingUtil;
 import ti4.image.HorizontalAlign;
+import ti4.image.OutlinedText;
+import ti4.image.PlayerTokens;
+import ti4.image.ShapeDrawing;
 import ti4.model.Mapper;
 
 final class PlotCards {
@@ -39,7 +41,7 @@ final class PlotCards {
         int left = slot.rightEdge() - xDeltaFromRight;
         Color main = ColorUtil.getPlayerMainColor(player);
         Color accent = ColorUtil.getPlayerAccentColor(player);
-        DrawingUtil.drawRectWithTwoColorGradient(g2, main, accent, left, y, width, HEIGHT);
+        ShapeDrawing.gradientOutline(g2, main, accent, left, y, width, HEIGHT);
 
         g2.setColor(Color.white);
         g2.setFont(Storage.getFont20());
@@ -61,7 +63,7 @@ final class PlotCards {
         boolean mutated = name.contains("Mutated ");
         if (mutated) name = name.replace("Mutated ", "");
 
-        DrawingUtil.superDrawString(g2, name, x, plotY, Color.white, HorizontalAlign.Left, null, null, null);
+        OutlinedText.draw(g2, name, x, plotY, Color.white, HorizontalAlign.Left, null, null, null);
         int strWidth = g2.getFontMetrics().stringWidth(name);
         if (mutated && faceup) {
             g2.setColor(Color.red);
@@ -72,7 +74,7 @@ final class PlotCards {
         x += 95;
         for (String faction : player.getPlotCardsFactionsRaw().getOrDefault(alias, List.of())) {
             Player target = ctx.game().getPlayerFromColorOrFaction(faction);
-            DrawingUtil.getAndDrawControlToken(g2, target, x, plotY - 20, ctx.fogPrivate(), 0.6f);
+            PlayerTokens.readAndDrawControlToken(g2, target, x, plotY - 20, ctx.fogPrivate(), 0.6f);
             x += 30;
         }
     }

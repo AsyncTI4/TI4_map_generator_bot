@@ -15,12 +15,14 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
-import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
 import ti4.image.ImageResources;
+import ti4.image.OutlinedText;
 import ti4.image.PaImage;
+import ti4.image.PlayerTokens;
 import ti4.image.RemoteImages;
 import ti4.image.Strokes;
+import ti4.image.VerticalText;
 import ti4.model.Mapper;
 import ti4.service.emoji.TI4Emoji;
 
@@ -67,7 +69,7 @@ final class DebtPools {
 
         int deltaX = 24;
         g2.setFont(Storage.getFont18());
-        DrawingUtil.drawDebtBoxText(g2, pool.getKey().toUpperCase(), x - 4, y + 148, 146);
+        VerticalText.drawWrappedColumns(g2, pool.getKey().toUpperCase(), x - 4, y + 148, 146);
 
         int tokenDeltaY = 0;
         int playerCount = 0;
@@ -112,10 +114,10 @@ final class DebtPools {
         BufferedImage controlTokenImage = ImageHelper.readScaled(ImageResources.commandToken(controlID), scale);
         int tokenDeltaX = 0;
         for (int i = 0; i < numTokens; i++) {
-            DrawingUtil.drawControlToken(
+            PlayerTokens.drawControlToken(
                     g2,
                     controlTokenImage,
-                    DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), controlID),
+                    PlayerTokens.ownerOfToken(game.getPlayers().values(), controlID),
                     x + tokenDeltaX,
                     y + 2,
                     hideFactionIcon,
@@ -157,7 +159,7 @@ final class DebtPools {
         BufferedImage img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g3 = img.createGraphics();
         g3.setFont(Storage.getEmojiFont());
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 g3, emoji.getFormatted(), 20, 60, Color.white, null, null, new BasicStroke(4.0f), Color.black);
         GlyphVector gv = g3.getFont().createGlyphVector(g3.getFontRenderContext(), emoji.getFormatted());
         Rectangle rect = gv.getGlyphPixelBounds(0, g3.getFontRenderContext(), 20, 60);

@@ -98,7 +98,7 @@ record ProductionBadge(int production, int capacity, int capacityUsed, int ignor
         if (ignoredFighters > 0) {
             msg = capacityUsed + " / " + (capacity + ignoredFighters) + "*";
         }
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 g,
                 msg,
                 gearX + 39 + 17,

@@ -76,7 +76,7 @@ final class AttachmentsStep implements TileStepPainter {
         g.setColor(Color.BLACK);
         g.fillOval(position.x + w / 2 - 36, position.y + h / 2 - 8 + 4, 72, 72);
         g.setColor(Color.WHITE);
-        DrawingUtil.drawCenteredString(
+        OutlinedText.drawCentered(
                 g,
                 "" + number,
                 new Rectangle(position.x + w / 2 - 40, position.y + h / 2 - 8, 80, 80),

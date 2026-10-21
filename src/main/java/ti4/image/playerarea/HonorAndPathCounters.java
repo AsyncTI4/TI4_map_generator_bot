@@ -5,7 +5,7 @@ import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButto
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.DrawingUtil;
+import ti4.image.OutlinedText;
 import ti4.service.VeiledHeartService;
 import ti4.service.game.MonumentsService;
 
@@ -36,44 +36,40 @@ final class HonorAndPathCounters {
         if (!hasCounters) {
             int tokenOffset = 50;
             if (hasAuraVault) {
-                DrawingUtil.superDrawStringCenteredDefault(g2, auraTokens(game, player), x, y + tokenOffset);
+                OutlinedText.drawCenteredWhiteOnBlack(g2, auraTokens(game, player), x, y + tokenOffset);
                 tokenOffset += 50;
             }
             if (hasPharusIustitiae) {
-                DrawingUtil.superDrawStringCenteredDefault(g2, pharusTokens(game, player), x, y + tokenOffset);
+                OutlinedText.drawCenteredWhiteOnBlack(g2, pharusTokens(game, player), x, y + tokenOffset);
             }
             return xDeltaFromRight + BLOCK_WIDTH;
         }
         if (game.isVeiledHeartMode()) {
-            DrawingUtil.superDrawStringCenteredDefault(
+            OutlinedText.drawCenteredWhiteOnBlack(
                     g2, "Veiled Cards: " + VeiledHeartService.countVeiledCards(player), x, y + 50);
         } else {
             drawCounters(g2, player, x, y);
         }
         if (hasAuraVault) {
-            DrawingUtil.superDrawStringCenteredDefault(g2, auraTokens(game, player), x, y + 150);
+            OutlinedText.drawCenteredWhiteOnBlack(g2, auraTokens(game, player), x, y + 150);
         }
         if (hasPharusIustitiae) {
-            DrawingUtil.superDrawStringCenteredDefault(
-                    g2, pharusTokens(game, player), x, y + (hasAuraVault ? 200 : 150));
+            OutlinedText.drawCenteredWhiteOnBlack(g2, pharusTokens(game, player), x, y + (hasAuraVault ? 200 : 150));
         }
         return xDeltaFromRight + BLOCK_WIDTH;
     }
 
     private static void drawCounters(Graphics2D g2, Player player, int x, int y) {
         if (player.getHonorCounter() > 0 || player.getDishonorCounter() > 0) {
-            DrawingUtil.superDrawStringCenteredDefault(g2, "Honor Count: " + player.getHonorCounter(), x, y + 50);
+            OutlinedText.drawCenteredWhiteOnBlack(g2, "Honor Count: " + player.getHonorCounter(), x, y + 50);
         } else if (player.getSteelbalanceCounter() > 0 || player.getStarbalanceCounter() > 0) {
-            DrawingUtil.superDrawStringCenteredDefault(
-                    g2, "Steel Count: " + player.getSteelbalanceCounter(), x, y + 50);
-            DrawingUtil.superDrawStringCenteredDefault(g2, "Star Count: " + player.getStarbalanceCounter(), x, y + 100);
+            OutlinedText.drawCenteredWhiteOnBlack(g2, "Steel Count: " + player.getSteelbalanceCounter(), x, y + 50);
+            OutlinedText.drawCenteredWhiteOnBlack(g2, "Star Count: " + player.getStarbalanceCounter(), x, y + 100);
         } else {
-            DrawingUtil.superDrawStringCenteredDefault(
-                    g2, "Path Token Count: " + player.getPathTokenCounter(), x, y + 50);
+            OutlinedText.drawCenteredWhiteOnBlack(g2, "Path Token Count: " + player.getPathTokenCounter(), x, y + 50);
         }
         if (player.getDishonorCounter() > 0) {
-            DrawingUtil.superDrawStringCenteredDefault(
-                    g2, "Dishonor Count: " + player.getDishonorCounter(), x, y + 100);
+            OutlinedText.drawCenteredWhiteOnBlack(g2, "Dishonor Count: " + player.getDishonorCounter(), x, y + 100);
         }
     }
 
