@@ -1,110 +1,29 @@
 package ti4.image;
 
-import java.awt.*;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
 import ti4.message.MessageHelper;
 import ti4.service.image.FileUploadService;
 
-@UtilityClass
-public class BannerGenerator {
+public final class BannerGenerator {
 
-    private static final BasicStroke stroke2 = new BasicStroke(2.0f);
-    private static final BasicStroke stroke6 = new BasicStroke(6.0f);
-    private static final BasicStroke stroke8 = new BasicStroke(8.0f);
-    private static final double NINETY_DEGREES_RADIANS = 1.570_796_326_794_896_6;
-    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -NINETY_DEGREES_RADIANS;
+    private BannerGenerator() {}
 
     public static void drawFactionBanner(Player player) {
-        BufferedImage bannerImage = new BufferedImage(325, 50, BufferedImage.TYPE_INT_ARGB);
-        BufferedImage backgroundImage =
-                ImageHelper.readScaled(ImageResources.extra("factionbanner_background.png"), 325, 50);
-        String pnColorFile = "pa_pn_color_" + Mapper.getColorID(player.getColor()) + ".png";
-        BufferedImage colorImage = ImageHelper.readScaled(ImageResources.playerArea(pnColorFile), 1.5f);
-        BufferedImage gradientImage = ImageHelper.read(ImageResources.extra("factionbanner_gradient.png"));
-        BufferedImage smallFactionImage = FactionIcons.scaled(player, 0.26f);
-        BufferedImage largeFactionImage = FactionIcons.scaled(player, 1.4f);
-        Graphics2D bannerG = bannerImage.createGraphics();
-
-        bannerG.drawImage(backgroundImage, 0, 0, null);
-        Graphics2D bannerG2d = (Graphics2D) bannerG;
-        bannerG2d.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
-        bannerG2d.drawImage(colorImage, -60, 0, null);
-        bannerG2d.rotate(NINETY_DEGREES_RADIANS);
-        bannerG2d.drawImage(gradientImage, 0, 0, null);
-        bannerG2d.drawImage(smallFactionImage, 2, 24, null);
-        bannerG.drawImage(largeFactionImage, 180, -42, null);
-        bannerG.setFont(Storage.getFont16());
-        bannerG.setColor(Color.WHITE);
-
-        String name = player.bannerName();
-        OutlinedText.draw(
-                bannerG, name, 29, 44, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke2, Color.BLACK);
-        int mod = 0;
-        if (player.getInitiative() > 9) {
-            mod = 13;
-        }
-        OutlinedText.draw(
-                bannerG,
-                "#" + player.getInitiative(),
-                300 - mod,
-                44,
-                Color.WHITE,
-                HorizontalAlign.Left,
-                VerticalAlign.Bottom,
-                stroke2,
-                Color.BLACK);
-
-        String turnOrdinal = StringHelper.ordinal(player.getInRoundTurnCount());
-        String descr = player.getFlexibleDisplayName() + "'s " + turnOrdinal + " turn";
-        FileUpload fileUpload = FileUploadService.createFileUpload(
-                        bannerImage, player.getFaction() + player.getColor() + "banner")
-                .setDescription(descr);
-        MessageHelper.sendFileUploadToChannel(player.getCorrectChannel(), fileUpload);
+        String turn = StringHelper.ordinal(player.getInRoundTurnCount());
+        FileUpload upload = FileUploadService.createFileUpload(
+                        BannerImages.faction(player), player.getFaction() + player.getColor() + "banner")
+                .setDescription(player.getFlexibleDisplayName() + "'s " + turn + " turn");
+        MessageHelper.sendFileUploadToChannel(player.getCorrectChannel(), upload);
     }
 
-    public static void drawAgendaBanner(int num, Game game) {
-        Graphics2D bannerG;
-        BufferedImage bannerImage = new BufferedImage(225, 50, BufferedImage.TYPE_INT_ARGB);
-        BufferedImage backgroundImage =
-                ImageHelper.readScaled(ImageResources.extra("factionbanner_background.png"), 325, 50);
-        BufferedImage agendaImage = ImageHelper.readScaled(ImageResources.extra("agenda.png"), 50, 50);
-        String pnColorFile = "pa_pn_color_" + Mapper.getColorID("blue") + ".png";
-        BufferedImage colorImage = ImageHelper.readScaled(ImageResources.playerArea(pnColorFile), 1.5f);
-        BufferedImage gradientImage = ImageHelper.read(ImageResources.extra("factionbanner_gradient.png"));
-        bannerG = bannerImage.createGraphics();
-
-        bannerG.drawImage(backgroundImage, 0, 0, null);
-
-        Graphics2D bannerG2d = (Graphics2D) bannerG;
-        bannerG2d.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
-        bannerG2d.drawImage(colorImage, -60, 0, null);
-        bannerG2d.rotate(NINETY_DEGREES_RADIANS);
-        bannerG2d.drawImage(gradientImage, 0, 0, null);
-        bannerG.drawImage(agendaImage, 0, 0, null);
-        bannerG.setFont(Storage.getFont28());
-        bannerG.setColor(Color.WHITE);
-
-        OutlinedText.draw(
-                bannerG,
-                "Agenda #" + num,
-                55,
-                35,
-                Color.WHITE,
-                HorizontalAlign.Left,
-                VerticalAlign.Bottom,
-                stroke2,
-                Color.BLACK);
-
-        FileUpload fileUpload = FileUploadService.createFileUpload(bannerImage, "agenda" + num + "banner");
-        MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload);
+    public static void drawAgendaBanner(int number, Game game) {
+        FileUpload upload =
+                FileUploadService.createFileUpload(BannerImages.agenda(number), "agenda" + number + "banner");
+        MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), upload);
     }
 
     public static void drawPhaseBanner(String phase, int round, TextChannel channel) {
@@ -112,43 +31,10 @@ public class BannerGenerator {
     }
 
     public static void drawPhaseBanner(String phase, int round, TextChannel channel, String altPhaseName) {
-        if (altPhaseName == null) {
-            altPhaseName = phase;
-        }
-        BufferedImage bannerImage = new BufferedImage(511, 331, BufferedImage.TYPE_INT_ARGB);
-        BufferedImage backgroundImage = ImageHelper.readScaled(ImageResources.extra(phase + "banner.png"), 511, 331);
-
-        Graphics2D bannerG = bannerImage.createGraphics();
-        bannerG.drawImage(backgroundImage, 0, 0, null);
-        bannerG.setFont(Storage.getFont48());
-        bannerG.setColor(Color.WHITE);
-        OutlinedText.draw(
-                bannerG,
-                altPhaseName.toUpperCase() + " PHASE",
-                255,
-                110,
-                Color.WHITE,
-                HorizontalAlign.Center,
-                VerticalAlign.Center,
-                stroke8,
-                Color.BLACK);
-        bannerG.setFont(Storage.getFont32());
-
-        String roundText = "ROUND " + StringHelper.numberToWords(round).toUpperCase();
-        OutlinedText.draw(
-                bannerG,
-                roundText,
-                255,
-                221,
-                Color.WHITE,
-                HorizontalAlign.Center,
-                VerticalAlign.Center,
-                stroke6,
-                Color.BLACK);
-
-        String descr = "Start of " + altPhaseName + " phase, round " + round + ".";
-        FileUpload fileUpload = FileUploadService.createFileUpload(bannerImage, phase + round + "banner")
-                .setDescription(descr);
-        MessageHelper.sendFileUploadToChannel(channel, fileUpload);
+        String label = altPhaseName == null ? phase : altPhaseName;
+        FileUpload upload = FileUploadService.createFileUpload(
+                        BannerImages.phase(phase, round, label), phase + round + "banner")
+                .setDescription("Start of " + label + " phase, round " + round + ".");
+        MessageHelper.sendFileUploadToChannel(channel, upload);
     }
 }
