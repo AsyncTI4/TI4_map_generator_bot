@@ -98,7 +98,6 @@ import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.game.NekroMonumentService;
 import ti4.service.user.AFKService;
-import ti4.website.model.WebsiteOverlay;
 
 public class PlayerAreaGenerator {
 
@@ -113,7 +112,7 @@ public class PlayerAreaGenerator {
     private final Game game;
     private final boolean isFoWPrivate;
     private final Player frogPlayer;
-    private final List<WebsiteOverlay> websiteOverlays;
+    private final WebsiteOverlays websiteOverlays;
     private final int totalWidth;
     private int rightEdge;
     private int columnOffset;
@@ -138,7 +137,7 @@ public class PlayerAreaGenerator {
             Game game,
             boolean isFoWPrivate,
             Player frogPlayer,
-            List<WebsiteOverlay> websiteOverlays,
+            WebsiteOverlays websiteOverlays,
             int totalWidth,
             int scoreTokenSpacing) {
         this(
@@ -157,7 +156,7 @@ public class PlayerAreaGenerator {
             Game game,
             boolean isFoWPrivate,
             Player frogPlayer,
-            List<WebsiteOverlay> websiteOverlays,
+            WebsiteOverlays websiteOverlays,
             int totalWidth,
             int scoreTokenSpacing,
             NeighbourMap neighbours) {
@@ -583,7 +582,7 @@ public class PlayerAreaGenerator {
             Game game, NeighbourMap neighbours, Player player, int areaLeft, int areaRight) {
         Graphics probe = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).getGraphics();
         try {
-            return new PlayerAreaGenerator(probe, game, false, null, new ArrayList<>(), areaRight, 0, neighbours)
+            return new PlayerAreaGenerator(probe, game, false, null, new WebsiteOverlays(), areaRight, 0, neighbours)
                             .headerHeight(player, areaLeft)
                     - HEADER_ROW_HEIGHT;
         } finally {
@@ -4108,10 +4107,10 @@ public class PlayerAreaGenerator {
     }
 
     private void addWebsiteOverlay(String title, String text, int x, int y, int width, int height) {
-        MapGenerator.addWebsiteOverlay(websiteOverlays, title, text, x, y, width, height);
+        websiteOverlays.add(title, text, x, y, width, height);
     }
 
     private void addWebsiteOverlay(ModelInterface dataModel, int x, int y, int width, int height) {
-        MapGenerator.addWebsiteOverlay(websiteOverlays, dataModel, x, y, width, height);
+        websiteOverlays.add(dataModel, x, y, width, height);
     }
 }

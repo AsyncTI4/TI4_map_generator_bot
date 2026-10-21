@@ -4,14 +4,13 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.game.Player;
 import ti4.image.ImageHelper;
 import ti4.image.PlayerAreaGenerator;
 import ti4.image.PlayerAreaImageTest;
-import ti4.website.model.WebsiteOverlay;
+import ti4.image.WebsiteOverlays;
 
 @UtilityClass
 public class PlayerAreaImageTestHelper {
@@ -24,9 +23,9 @@ public class PlayerAreaImageTestHelper {
         int h = 450;
         BufferedImage main = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         Graphics g = main.getGraphics();
-        List<WebsiteOverlay> overlays = new ArrayList<>();
+        WebsiteOverlays overlays = new WebsiteOverlays();
         PlayerAreaGenerator gen = new PlayerAreaGenerator(g, p.getGame(), false, null, overlays, w, 54);
-        System.out.println(overlays);
+        System.out.println(overlays.asList());
         gen.drawPlayerAreaOLD(p, new Point(5, 5));
         return main;
     }

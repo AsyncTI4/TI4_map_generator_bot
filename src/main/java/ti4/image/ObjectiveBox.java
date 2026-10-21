@@ -38,14 +38,14 @@ class ObjectiveBox {
         spaceForTokens = boxWidth - (maxTextWidth + bufferBetweenTextAndTokens * 2);
     }
 
-    public void display(Game game, Graphics graphics, MapGenerator generator, Objective objective) {
+    public void display(Game game, Graphics graphics, FogView fog, WebsiteOverlays overlays, Objective objective) {
         setColor(graphics, objective);
 
         graphics.drawString(objective.getDisplayText(game), x, y + textVerticalOffset);
         graphics.drawRect(x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
         if ((objective.revealed() || game.isRedTapeMode() || game.isCivilizedSocietyMode())
                 && Mapper.getPublicObjective(objective.key()) != null) {
-            generator.addWebsiteOverlay(
+            overlays.add(
                     Mapper.getPublicObjective(objective.key()),
                     x - horizontalBoxOffset,
                     y - spacingBetweenBoxes,
@@ -54,7 +54,7 @@ class ObjectiveBox {
         }
 
         x += maxTextWidth + bufferBetweenTextAndTokens;
-        displayScoreMarkers(game, graphics, generator, objective);
+        displayScoreMarkers(game, graphics, fog, objective);
     }
 
     public static Integer getMaxTextWidth(Game game, Graphics graphics, List<Objective> objectives) {
@@ -87,7 +87,7 @@ class ObjectiveBox {
                 + (game.getRealAndEliminatedAndDummyPlayers().size() * scoreTokenSpacing);
     }
 
-    private void displayScoreMarkers(Game game, Graphics graphics, MapGenerator generator, Objective objective) {
+    private void displayScoreMarkers(Game game, Graphics graphics, FogView fog, Objective objective) {
         List<String> playerIDs;
         if (objective.revealed() && objective.scoredPlayerIDs() != null) {
             playerIDs = objective.scoredPlayerIDs();
@@ -109,7 +109,7 @@ class ObjectiveBox {
                 Player player = game.getPlayer(playerID);
                 if (player == null) continue;
 
-                boolean convertToGeneric = generator.shouldConvertToGeneric(player);
+                boolean convertToGeneric = fog.shouldConvertToGeneric(player);
                 String controlID =
                         convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
 

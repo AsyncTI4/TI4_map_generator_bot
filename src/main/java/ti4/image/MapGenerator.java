@@ -34,7 +34,6 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import ti4.ResourceHelper;
-import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Expeditions;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -63,11 +62,9 @@ import ti4.model.EventModel;
 import ti4.model.ModelInterface;
 import ti4.model.PlanetModel;
 import ti4.model.StrategyCardModel;
-import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
 import ti4.service.map.FractureService;
 import ti4.service.option.FOWOptionService.FOWOption;
-import ti4.service.testbed.TestBedService;
 import ti4.settings.GlobalSettings;
 import ti4.spring.api.overlay.MapOverlayService;
 import ti4.website.AsyncTi4WebsiteHelper;
@@ -132,7 +129,7 @@ public class MapGenerator implements AutoCloseable {
     private final int height;
     private final int heightForGameInfo;
 
-    private final List<WebsiteOverlay> websiteOverlays = new ArrayList<>();
+    private final WebsiteOverlays websiteOverlays = new WebsiteOverlays();
     private final int mapWidth;
     private final int playerAreasWidth;
     private final int stripWidth;
@@ -141,9 +138,7 @@ public class MapGenerator implements AutoCloseable {
     private int maxX = -1;
     private int maxY = -1;
     private int fractureYbump;
-    private boolean isFoWPrivate;
-    private Player fowPlayer;
-    private final Map<String, Tile> tilesToDisplay;
+    private final FogView fog;
 
     @Nullable
     private final String requestedSegment;
@@ -152,8 +147,6 @@ public class MapGenerator implements AutoCloseable {
     private MapSegment shownSegment;
 
     private Set<String> knownSystems = Set.of();
-
-    private Set<String> visibleSystems = Set.of();
 
     private List<SectorConnections.Connection> connections = List.of();
 
@@ -240,8 +233,7 @@ public class MapGenerator implements AutoCloseable {
         }
 
         displayTypeBasic = basicTypeOf(this.displayType);
-        tilesToDisplay = new HashMap<>(game.getTileMap());
-        setupFow(tilesToDisplay);
+        fog = FogView.of(game, event);
         Rectangle frameBounds = computeFrameBounds();
         if (frameBounds != null && segmentLabel(true) != null) {
             frameBounds.y -= SEGMENT_LABEL_SPACE;
@@ -344,7 +336,7 @@ public class MapGenerator implements AutoCloseable {
 
     private int alignedPlayerAreaRowsHeight() {
         List<Player> shownPlayers = game.getRealAndEliminatedPlayers().stream()
-                .filter(player -> !hasNoPlayerArea(player) && !shouldConvertToGeneric(player))
+                .filter(player -> !hasNoPlayerArea(player) && !fog.shouldConvertToGeneric(player))
                 .toList();
         List<List<Player>> columns = PlayerAreaGenerator.splitIntoColumns(game, shownPlayers);
         int columnWidth = PlayerAreaGenerator.columnWidth(playerAreasWidth, PLAYER_AREAS_LEFT, columns.size());
@@ -388,11 +380,11 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private int hiddenPlayerAreasHeight() {
-        if (!isFoWPrivate || fowPlayer == null) {
+        if (!fog.isPrivate() || fog.viewer() == null) {
             return 0;
         }
         return game.getRealAndEliminatedPlayers().stream()
-                .filter(player -> !hasNoPlayerArea(player) && shouldConvertToGeneric(player))
+                .filter(player -> !hasNoPlayerArea(player) && fog.shouldConvertToGeneric(player))
                 .mapToInt(player -> TYPICAL_PLAYER_AREA_HEIGHT
                         + playerAreaHeightAdjustment(player, playerAreasWidth - PLAYER_AREAS_LEFT))
                 .sum();
@@ -552,34 +544,6 @@ public class MapGenerator implements AutoCloseable {
         sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.TileNumber));
     }
 
-    private void setupFow(Map<String, Tile> tilesToDisplay) {
-        if (!isFowModeActive()) {
-            return;
-        }
-        isFoWPrivate = true;
-        // IMPORTANT NOTE : This method used to be local and was refactored to extract
-        // any references to tilesToDisplay
-        fowPlayer = TestBedService.resolveActingPlayer(
-                game,
-                event,
-                CommandHelper.getPlayerFromGame(
-                        game, event.getMember(), event.getUser().getId()));
-
-        Set<String> tilesToShow = FoWHelper.fowFilter(game, fowPlayer);
-        visibleSystems = tilesToShow;
-        Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
-        keys.removeAll(tilesToShow);
-        for (String key : keys) {
-            tilesToDisplay.remove(key);
-            if (fowPlayer != null) {
-                Tile fogTile = fowPlayer.buildFogTile(key, fowPlayer);
-                if (fogTile != null) {
-                    tilesToDisplay.put(key, fogTile);
-                }
-            }
-        }
-    }
-
     @Nullable
     private Rectangle computeFrameBounds() {
         if (!game.isFowMode()
@@ -605,8 +569,8 @@ public class MapGenerator implements AutoCloseable {
             return Set.of();
         }
         Set<String> corners = new HashSet<>();
-        tilesToDisplay.forEach((position, tile) -> {
-            if (CORNER_POSITIONS.contains(position.toLowerCase()) && !isUnseenBlankFogTile(tile)) {
+        fog.tiles().forEach((position, tile) -> {
+            if (CORNER_POSITIONS.contains(position.toLowerCase()) && !fog.isUnseenBlankFogTile(tile)) {
                 corners.add(position);
             }
         });
@@ -677,7 +641,7 @@ public class MapGenerator implements AutoCloseable {
             return null;
         }
         Set<String> inSegment = segment.positions();
-        if (!isFoWPrivate) {
+        if (!fog.isPrivate()) {
             segmentDrawPositions = inSegment;
             return withNearbyStatTiles(inSegment);
         }
@@ -722,7 +686,7 @@ public class MapGenerator implements AutoCloseable {
             return null;
         }
         List<MapSegment> visibleWithFracture =
-                isFoWPrivate ? MapSegment.visibleFrom(game, known) : MapSegment.all(game);
+                fog.isPrivate() ? MapSegment.visibleFrom(game, known) : MapSegment.all(game);
         if (requestedSegment != null) {
             Optional<MapSegment> requested = visibleWithFracture.stream()
                     .filter(segment -> segment.name().equals(requestedSegment))
@@ -738,10 +702,10 @@ public class MapGenerator implements AutoCloseable {
             return knowsGalaxySystems(known) ? null : detachedViewFor(visibleWithFracture);
         }
         Optional<MapSegment> defaultSegment = MapSegment.defaultSegment(game).filter(visible::contains);
-        if (!isFoWPrivate) {
+        if (!fog.isPrivate()) {
             return defaultSegment.orElse(visible.getFirst());
         }
-        String home = homeSystemPosition();
+        String home = fog.homeSystemPosition();
         if (requestedSegment == null
                 && home != null
                 && known.contains(home)
@@ -761,7 +725,7 @@ public class MapGenerator implements AutoCloseable {
 
     @Nullable
     private MapSegment detachedViewFor(List<MapSegment> segments) {
-        String home = homeSystemPosition();
+        String home = fog.homeSystemPosition();
         List<MapSegment> detached =
                 segments.stream().filter(MapSegment::isDetached).toList();
         return detached.stream()
@@ -784,7 +748,7 @@ public class MapGenerator implements AutoCloseable {
         }
         int reach = MapSegment.gap(game) + 1;
         Map<String, Set<String>> links = MapSegment.adjacencyLinks(game, known);
-        String home = homeSystemPosition();
+        String home = fog.homeSystemPosition();
         if (home != null && known.contains(home)) {
             return MapFrame.cluster(known, home, reach, links);
         }
@@ -792,13 +756,8 @@ public class MapGenerator implements AutoCloseable {
     }
 
     @Nullable
-    private String homeSystemPosition() {
-        return isFoWPrivate && fowPlayer != null ? fowPlayer.getHomeSystemPosition() : null;
-    }
-
-    @Nullable
     private Rectangle homeSystemBounds() {
-        return MapFrame.hexBounds(game, homeSystemPosition(), fractureYbump, EXTRA_X, EXTRA_Y);
+        return MapFrame.hexBounds(game, fog.homeSystemPosition(), fractureYbump, EXTRA_X, EXTRA_Y);
     }
 
     private int mapOnlyMinimumWidth() {
@@ -842,8 +801,8 @@ public class MapGenerator implements AutoCloseable {
 
     private Set<String> framedSystemPositions() {
         Set<String> positions = new HashSet<>();
-        tilesToDisplay.forEach((position, tile) -> {
-            if (!isUnseenBlankFogTile(tile)) {
+        fog.tiles().forEach((position, tile) -> {
+            if (!fog.isUnseenBlankFogTile(tile)) {
                 positions.add(position);
             }
         });
@@ -851,19 +810,15 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private int segmentsVisibleToViewer() {
-        return isFoWPrivate
+        return fog.isPrivate()
                 ? MapSegment.visibleFrom(game, knownSystems).size()
                 : MapSegment.all(game).size();
-    }
-
-    private boolean isUnseenBlankFogTile(Tile tile) {
-        return isFoWPrivate && "0b".equals(tile.getTileID()) && StringUtils.isBlank(tile.getFogLabel(fowPlayer));
     }
 
     private boolean drawsPlayerInfo() {
         return displayType != DisplayType.stats
                 && !PlayerAreaGenerator.isMegaGame(game)
-                && (!isFowModeActive() || !game.getFowOption(FOWOption.HIDE_PLAYER_INFOS));
+                && (!fog.isPrivate() || !game.getFowOption(FOWOption.HIDE_PLAYER_INFOS));
     }
 
     private Set<String> statTilePositions() {
@@ -879,17 +834,6 @@ public class MapGenerator implements AutoCloseable {
                     .forEach(positions::add);
         }
         return positions;
-    }
-
-    private boolean isFowModeActive() {
-        return game.isFowMode()
-                && event != null
-                && (FoWHelper.isPrivateGame(game, event)
-                        || event instanceof UserOverridenGenericInteractionCreateEvent);
-    }
-
-    public boolean shouldConvertToGeneric(Player player) {
-        return isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
     }
 
     private void logDebug() {
@@ -927,7 +871,7 @@ public class MapGenerator implements AutoCloseable {
     private void sendToWebsite() {
         try {
             String testing = System.getenv("TESTING");
-            if (testing == null && displayTypeBasic == DisplayType.all && !isFoWPrivate) {
+            if (testing == null && displayTypeBasic == DisplayType.all && !fog.isPrivate()) {
                 saveWebsiteOverlays();
                 AsyncTi4WebsiteHelper.putPlayerData(game.getID(), game);
             }
@@ -938,7 +882,7 @@ public class MapGenerator implements AutoCloseable {
 
     private void saveWebsiteOverlays() {
         try {
-            MapOverlayService.getBean().saveOverlays(game.getName(), websiteOverlays);
+            MapOverlayService.getBean().saveOverlays(game.getName(), websiteOverlays.asList());
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to save website overlays", e);
         }
@@ -949,7 +893,7 @@ public class MapGenerator implements AutoCloseable {
         if (mapFrame != null) {
             graphics.setClip(0, 0, width, mapFrame.height());
         }
-        setupTilesForDisplayTypeAllAndMap(tilesToDisplay);
+        setupTilesForDisplayTypeAllAndMap(fog.tiles());
         graphics.setClip(previousClip);
     }
 
@@ -959,7 +903,7 @@ public class MapGenerator implements AutoCloseable {
     }
 
     List<WebsiteOverlay> overlays() {
-        return websiteOverlays;
+        return websiteOverlays.asList();
     }
 
     private void paintCanvas() {
@@ -1028,10 +972,10 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private List<SectorConnections.Connection> sectorConnections() {
-        if (!isFoWPrivate || fowPlayer == null || !game.getFowOption(FOWOption.MAP_CONNECTIONS)) {
+        if (!fog.isPrivate() || fog.viewer() == null || !game.getFowOption(FOWOption.MAP_CONNECTIONS)) {
             return List.of();
         }
-        return SectorConnections.find(game, fowPlayer, shownSegment, visibleSystems, knownSystems);
+        return SectorConnections.find(game, fog.viewer(), shownSegment, fog.visibleSystems(), knownSystems);
     }
 
     private int connectionStripHeight(int stripWidth) {
@@ -1092,7 +1036,7 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private void drawConnection(SectorConnections.Connection connection, Point cell) {
-        Tile tile = tilesToDisplay.get(connection.position());
+        Tile tile = fog.tiles().get(connection.position());
         if (tile == null) {
             return;
         }
@@ -1155,9 +1099,9 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private Set<String> ghostFrontierPositions() {
-        if (!isFoWPrivate
-                || fowPlayer == null
-                || !fowPlayer.isFogGhostHexes()
+        if (!fog.isPrivate()
+                || fog.viewer() == null
+                || !fog.viewer().isFogGhostHexes()
                 || !game.getFowOption(FOWOption.GHOST_HEXES)) {
             return Set.of();
         }
@@ -1348,8 +1292,8 @@ public class MapGenerator implements AutoCloseable {
             new PlayerAreaGenerator(
                             graphics,
                             game,
-                            isFoWPrivate,
-                            fowPlayer,
+                            fog.isPrivate(),
+                            fog.viewer(),
                             websiteOverlays,
                             playerAreasWidth,
                             scoreTokenSpacing,
@@ -1432,7 +1376,7 @@ public class MapGenerator implements AutoCloseable {
         }
 
         List<Player> players = new ArrayList<>(game.getRealPlayers());
-        if (isFoWPrivate) {
+        if (fog.isPrivate()) {
             RenderRandom.shuffle("scoreTrack.fogShuffle", players);
         }
 
@@ -1448,7 +1392,7 @@ public class MapGenerator implements AutoCloseable {
         for (List<Player> playerChunk : playerChunks) {
             for (Player player : playerChunk) {
                 try {
-                    boolean convertToGeneric = isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+                    boolean convertToGeneric = fog.shouldConvertToGeneric(player);
                     String controlID =
                             convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
 
@@ -1614,7 +1558,7 @@ public class MapGenerator implements AutoCloseable {
             if (sc == 0) {
                 continue;
             }
-            int tradeGoods = isFoWPrivate || scPicked.contains(sc) ? 0 : scTGs.getValue();
+            int tradeGoods = fog.isPrivate() || scPicked.contains(sc) ? 0 : scTGs.getValue();
             graphics.setFont(Storage.getFont64());
             int width = graphics.getFontMetrics().stringWidth(Integer.toString(sc));
             if (tradeGoods > 0) {
@@ -1644,7 +1588,7 @@ public class MapGenerator implements AutoCloseable {
         boolean scPicked = game.getPlayers().values().stream()
                 .anyMatch(player -> player.getSCs().contains(sc));
 
-        if (!isFoWPrivate && !scPicked) {
+        if (!fog.isPrivate() && !scPicked) {
             graphics.setColor(ColorUtil.getSCColor(sc, game));
             if (!game.getStoredValue("exhaustedSC" + sc).isEmpty()) {
                 graphics.setColor(Color.GRAY);
@@ -1659,7 +1603,7 @@ public class MapGenerator implements AutoCloseable {
                 graphics.drawString(tgMsg, x + textWidth / 2 - tgMsgTextWidth / 2, baseline + 30);
             }
         }
-        if (isFoWPrivate && game.getScPlayed().getOrDefault(sc, false)) {
+        if (fog.isPrivate() && game.getScPlayed().getOrDefault(sc, false)) {
             graphics.setColor(Color.GRAY);
             graphics.setFont(Storage.getFont64());
             graphics.drawString(scText, x, baseline);
@@ -1667,7 +1611,7 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private Point drawTurnOrderTracker(int x, int y) {
-        boolean convertToGenericSC = isFoWPrivate;
+        boolean convertToGenericSC = fog.isPrivate();
         String activePlayerUserID = game.getActivePlayerID();
         if (!convertToGenericSC && activePlayerUserID != null && "action".equals(game.getPhaseOfGame())) {
             graphics.setFont(Storage.getFont20());
@@ -1729,27 +1673,27 @@ public class MapGenerator implements AutoCloseable {
         drawGeneralImage(x, y, "Expeditions.png");
         if (exp.getTradeGoods() != null) {
             Player p = game.getPlayerFromColorOrFaction(exp.getTradeGoods());
-            DrawingUtil.getAndDrawControlToken(graphics, p, x + 47, y + 101, isFoWPrivate, 1.0f);
+            DrawingUtil.getAndDrawControlToken(graphics, p, x + 47, y + 101, fog.isPrivate(), 1.0f);
         }
         if (exp.getFiveRes() != null) {
             Player p = game.getPlayerFromColorOrFaction(exp.getFiveRes());
-            DrawingUtil.getAndDrawControlToken(graphics, p, x + 114, y + 5, isFoWPrivate, 1.0f);
+            DrawingUtil.getAndDrawControlToken(graphics, p, x + 114, y + 5, fog.isPrivate(), 1.0f);
         }
         if (exp.getActionCards() != null) {
             Player p = game.getPlayerFromColorOrFaction(exp.getActionCards());
-            DrawingUtil.getAndDrawControlToken(graphics, p, x + 182, y + 101, isFoWPrivate, 1.0f);
+            DrawingUtil.getAndDrawControlToken(graphics, p, x + 182, y + 101, fog.isPrivate(), 1.0f);
         }
         if (exp.getTechSkip() != null) {
             Player p = game.getPlayerFromColorOrFaction(exp.getTechSkip());
-            DrawingUtil.getAndDrawControlToken(graphics, p, x + 47, y + 150, isFoWPrivate, 1.0f);
+            DrawingUtil.getAndDrawControlToken(graphics, p, x + 47, y + 150, fog.isPrivate(), 1.0f);
         }
         if (exp.getSecret() != null) {
             Player p = game.getPlayerFromColorOrFaction(exp.getSecret());
-            DrawingUtil.getAndDrawControlToken(graphics, p, x + 114, y + 243, isFoWPrivate, 1.0f);
+            DrawingUtil.getAndDrawControlToken(graphics, p, x + 114, y + 243, fog.isPrivate(), 1.0f);
         }
         if (exp.getFiveInf() != null) {
             Player p = game.getPlayerFromColorOrFaction(exp.getFiveInf());
-            DrawingUtil.getAndDrawControlToken(graphics, p, x + 182, y + 150, isFoWPrivate, 1.0f);
+            DrawingUtil.getAndDrawControlToken(graphics, p, x + 182, y + 150, fog.isPrivate(), 1.0f);
         }
     }
 
@@ -2014,21 +1958,21 @@ public class MapGenerator implements AutoCloseable {
 
     private StatLayout computeStatLayout() {
         // Do some stuff for FoW
-        boolean fow = isFoWPrivate;
+        boolean fow = fog.isPrivate();
         List<Player> players = new ArrayList<>(game.getPlayers().values());
         List<Player> statOrder = new ArrayList<>(game.getRealPlayers());
         if (fow) {
             RenderRandom.shuffle("statLayout.fogShuffle", players);
             statOrder.clear();
             // always build fowplayer's stat location first
-            statOrder.add(fowPlayer);
+            statOrder.add(fog.viewer());
             // then build the stats of players we can see home systems
             players.stream()
-                    .filter(player -> FoWHelper.hasHomeSystemInView(player, fowPlayer))
+                    .filter(player -> FoWHelper.hasHomeSystemInView(player, fog.viewer()))
                     .forEach(statOrder::add);
             // then build the stats of everyone else
             players.stream()
-                    .filter(player -> FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer))
+                    .filter(player -> FoWHelper.canSeeStatsOfPlayer(game, player, fog.viewer()))
                     .forEach(statOrder::add);
         }
 
@@ -2039,10 +1983,10 @@ public class MapGenerator implements AutoCloseable {
         for (Player p : statOrder) {
             if (p == null || p.getFaction() == null || playerStatTiles.containsKey(p.getFaction())) continue;
             // if we can't see stats anyway, skip this player
-            if (fow && !FoWHelper.canSeeStatsOfPlayer(game, p, fowPlayer)) continue;
+            if (fow && !FoWHelper.canSeeStatsOfPlayer(game, p, fog.viewer())) continue;
 
             List<String> myStatTiles =
-                    PlayerStatsHelper.findThreeNearbyStatTiles(game, p, statTilesInUse, isFoWPrivate, fowPlayer);
+                    PlayerStatsHelper.findThreeNearbyStatTiles(game, p, statTilesInUse, fog.isPrivate(), fog.viewer());
             if (myStatTiles == null) {
                 useNewSystem = false;
                 break;
@@ -2058,7 +2002,7 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private void paintPlayerInfo(Game game, Player player, List<String> statTiles) {
-        boolean convertToGeneric = isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+        boolean convertToGeneric = fog.shouldConvertToGeneric(player);
         if (convertToGeneric) {
             return;
         }
@@ -2794,7 +2738,7 @@ public class MapGenerator implements AutoCloseable {
 
         String userName = player.getUserName();
 
-        boolean convertToGeneric = isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+        boolean convertToGeneric = fog.shouldConvertToGeneric(player);
         if (convertToGeneric) {
             return;
         }
@@ -3011,7 +2955,7 @@ public class MapGenerator implements AutoCloseable {
 
         for (Objective objective : objectives) {
             ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenSpacing);
-            box.display(game, graphics, this, objective);
+            box.display(game, graphics, fog, websiteOverlays, objective);
             y += ObjectiveBox.getVerticalSpacing();
         }
 
@@ -3028,7 +2972,7 @@ public class MapGenerator implements AutoCloseable {
         boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenSpacing);
         for (Objective objective : objectives) {
             ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenSpacing);
-            box.display(game, graphics, this, objective);
+            box.display(game, graphics, fog, websiteOverlays, objective);
             y += ObjectiveBox.getVerticalSpacing();
         }
 
@@ -3042,7 +2986,7 @@ public class MapGenerator implements AutoCloseable {
         boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenSpacing);
         for (Objective objective : objectives) {
             ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenSpacing);
-            box.display(game, graphics, this, objective);
+            box.display(game, graphics, fog, websiteOverlays, objective);
             y += ObjectiveBox.getVerticalSpacing();
         }
 
@@ -3125,7 +3069,7 @@ public class MapGenerator implements AutoCloseable {
                     boolean convertToGeneric = false;
                     for (Player player : game.getPlayers().values()) {
                         if (optionalText.equals(player.getFaction()) || optionalText.equals(player.getColor())) {
-                            if (isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer)) {
+                            if (fog.shouldConvertToGeneric(player)) {
                                 convertToGeneric = true;
                             }
                             electedPlayer = player;
@@ -3145,9 +3089,9 @@ public class MapGenerator implements AutoCloseable {
                     for (String debtToken : game.getStoredValue("controlTokensOnAgenda" + lawEntry.getValue())
                             .split("_")) {
 
-                        boolean hideFactionIcon = isFoWPrivate
+                        boolean hideFactionIcon = fog.isPrivate()
                                 && !FoWHelper.canSeeStatsOfPlayer(
-                                        game, game.getPlayerFromColorOrFaction(debtToken), fowPlayer);
+                                        game, game.getPlayerFromColorOrFaction(debtToken), fog.viewer());
                         String controlID =
                                 hideFactionIcon ? Mapper.getControlID("gray") : Mapper.getControlID(debtToken);
                         if (controlID.contains("null")) {
@@ -3408,24 +3352,11 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private void addWebsiteOverlay(String overlayTitle, String overlayText, int x, int y, int width, int height) {
-        addWebsiteOverlay(websiteOverlays, overlayTitle, overlayText, x, y, width, height);
+        websiteOverlays.add(overlayTitle, overlayText, x, y, width, height);
     }
 
-    void addWebsiteOverlay(ModelInterface dataModel, int x, int y, int width, int height) {
-        addWebsiteOverlay(websiteOverlays, dataModel, x, y, width, height);
-    }
-
-    public static void addWebsiteOverlay(
-            List<WebsiteOverlay> overlays, ModelInterface dataModel, int x, int y, int width, int height) {
-        if (dataModel == null) {
-            return;
-        }
-        overlays.add(new WebsiteOverlay(dataModel, List.of(x, y, width, height)));
-    }
-
-    public static void addWebsiteOverlay(
-            List<WebsiteOverlay> overlays, String title, String text, int x, int y, int w, int h) {
-        overlays.add(new WebsiteOverlay(title, text, List.of(x, y, w, h)));
+    private void addWebsiteOverlay(ModelInterface dataModel, int x, int y, int width, int height) {
+        websiteOverlays.add(dataModel, x, y, width, height);
     }
 
     String getGameName() {
