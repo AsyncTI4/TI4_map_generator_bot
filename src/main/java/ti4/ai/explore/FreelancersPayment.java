@@ -39,13 +39,12 @@ public class FreelancersPayment {
                 .sorted(Comparator.comparingDouble(planet -> opportunity(planet, perResource) / capacityOf(planet)))
                 .limit(MAX_PLANETS_CONSIDERED)
                 .toList();
-        Quote best = null;
         for (int tradeGoods = 0; tradeGoods <= Math.min(seat.getTg(), need); tradeGoods++) {
             int stillNeeded = need - tradeGoods * Wallet.tradeGoodValue(seat);
             Quote quote = cheapestPlanets(wallet, reserve, planets, perResource, stillNeeded, tradeGoods);
-            if (quote != null && (best == null || quote.cost() < best.cost())) best = quote;
+            if (quote != null) return Optional.of(quote);
         }
-        return Optional.ofNullable(best);
+        return Optional.empty();
     }
 
     private static Quote cheapestPlanets(

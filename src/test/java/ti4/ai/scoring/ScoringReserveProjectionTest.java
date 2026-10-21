@@ -25,19 +25,22 @@ class ScoringReserveProjectionTest extends BaseTi4Test {
         test.nekroHome();
         test.game.getRevealedPublicObjectives().put("monument", 1);
         test.nekro.setTg(1);
+        test.nekro.setCommoditiesBase(3);
     }
 
-    // Holding the unplayed Trade card: the 3 trade goods of the primary make 4 + 1 + 3 = 8, so the seat must keep 5
-    // resources (Mordai II and its trade good) and cannot spend the planet on units. Commodities it might wash are not
-    // counted.
+    // Holding the unplayed Trade card: the 3 trade goods of the primary and the 3 commodities it washes make 4 + 1 + 6
+    // =
+    // 11. Planets pay first and trade goods last, so the seat keeps Mordai II and the 1 trade good in hand: 5
+    // resources, of which the 3 trade goods it still expects cover the rest. It cannot spend the planet on units.
     @Test
     void keepsResourcesForAMonumentTheTradeCardWillFund() {
         test.nekro.addSC(TRADE);
 
-        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(3);
+        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(6);
         assertThat(ScoringReserve.reserved(test.game, test.nekro)).hasValueSatisfying(reserved -> {
             assertThat(reserved.objectiveId()).isEqualTo("monument");
             assertThat(reserved.cost()).isEqualTo(SpendCost.resources(5));
+            assertThat(reserved.expectedTradeGoods()).isEqualTo(3);
         });
         assertThat(ScoringReserve.planAfterReserve(test.game, test.nekro, SpendCost.resources(4)))
                 .isEmpty();
@@ -56,45 +59,43 @@ class ScoringReserveProjectionTest extends BaseTi4Test {
                 .isPresent();
     }
 
-    // Commodities in hand are only counted for a Masters of Trade seat, whose even wash with the Trade holder is
-    // certain;
-    // for any other seat a wash depends on a partner and a fee.
+    // A seat that does not hold the unplayed Trade card sells its commodities to the holder at X-1: with a commodity
+    // value of 3 it forecasts 2 trade goods, whatever its faction. The holder counts the primary and its own value.
     @Test
-    void countsOnlyAMastersOfTradeWash() {
+    void aNonHolderForecastsOneLessThanItsCommodityValue() {
+        test.sol.addSC(TRADE);
+        test.sol.setCommoditiesBase(4);
+
+        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(2);
+        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.sol)).isEqualTo(7);
+
+        test.nekro.addAbility("master_of_trade");
+        test.nekro.setCommoditiesBase(6);
+
+        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(5);
+    }
+
+    // After Trade was played, commodities in hand are counted at X-1 while a wash partner holds some, and not at all
+    // otherwise.
+    @Test
+    void commoditiesInHandAfterTradeNeedAWashPartner() {
         test.sol.addSC(TRADE);
         test.game.setSCPlayed(TRADE, true);
         test.nekro.setCommodities(3);
+        test.sol.setCommodities(2);
+
+        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(2);
+
+        test.sol.setCommodities(0);
 
         assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isZero();
-        assertThat(ScoringReserve.reserved(test.game, test.nekro)).isEmpty();
-
-        test.nekro.addAbility("master_of_trade");
-
-        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(3);
-        assertThat(ScoringReserve.reserved(test.game, test.nekro))
-                .hasValueSatisfying(reserved -> assertThat(reserved.cost()).isEqualTo(SpendCost.resources(5)));
     }
 
-    // Before Trade is played a Masters of Trade seat washes no more than the Trade holder has commodities to give.
+    // Amass Wealth for a seat whose forecast exceeds the 3 trade goods the objective asks for: planets pay first, and
+    // the spare trade good is only counted where the planets fall short. Mordai II, Wren Terra and Archon Tau cover
+    // 3 resources and 2 influence, so the spare trade good pays the third influence.
     @Test
-    void theEvenWashIsLimitedByTheTradeHoldersCommodities() {
-        test.sol.addSC(TRADE);
-        test.sol.setCommoditiesBase(4);
-        test.nekro.setCommoditiesBase(6);
-        test.nekro.addAbility("master_of_trade");
-
-        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(4);
-
-        test.nekro.addSC(TRADE);
-        test.sol.removeSC(TRADE);
-
-        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(3);
-    }
-
-    // Amass Wealth for a seat whose washed trade goods exceed the 3 the objective asks for: the spare one has to pay
-    // influence (Mordai II has none), not resources, or the seat's planets could not pay and nothing would be kept.
-    @Test
-    void sparesExpectedTradeGoodsForInfluenceWhenResourcesAreAbundant() {
+    void sparesExpectedTradeGoodsOnlyForWhatThePlanetsCannotPay() {
         test.game.getRevealedPublicObjectives().remove("monument");
         test.game.getRevealedPublicObjectives().put("amass_wealth", 1);
         test.nekro.setTg(0);
@@ -103,13 +104,9 @@ class ScoringReserveProjectionTest extends BaseTi4Test {
         test.nekro.addPlanet("wrenterra");
         test.nekro.addPlanet("archontau");
         test.sol.addSC(TRADE);
-        test.sol.setCommoditiesBase(4);
-        test.nekro.setCommoditiesBase(6);
-        test.nekro.addAbility("master_of_trade");
+        test.nekro.setCommoditiesBase(5);
 
-        assertThat(ExpectedTradeGoods.netOf(SpendCost.each(3), 4, 1)).isEqualTo(new SpendCost(2, 3, 0, 0));
-        assertThat(ExpectedTradeGoods.netOfInfluenceFirst(SpendCost.each(3), 4, 1))
-                .isEqualTo(new SpendCost(3, 2, 0, 0));
+        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(4);
         assertThat(ScoringReserve.reserved(test.game, test.nekro)).hasValueSatisfying(reserved -> {
             assertThat(reserved.objectiveId()).isEqualTo("amass_wealth");
             assertThat(reserved.cost()).isEqualTo(new SpendCost(3, 2, 0, 0));
@@ -118,7 +115,8 @@ class ScoringReserveProjectionTest extends BaseTi4Test {
     }
 
     // A Letnev-like holder of the unplayed Trade card (6 resources, 1 influence) with 2 trade goods in hand: the
-    // primary pays the objective's 3, the trade goods cover the influence its planets lack, and the home stays unspent.
+    // primary pays the objective's 3, the trade goods in hand cover the influence its planets lack, and the home
+    // stays unspent. With no trade goods in hand the forecast covers 2 of the 3 influence, and the home still stays.
     @Test
     void keepsTheHomeForAmassWealthWhenTheTradePrimaryAndHeldGoodsCoverIt() {
         test.game.getRevealedPublicObjectives().remove("monument");
@@ -137,9 +135,12 @@ class ScoringReserveProjectionTest extends BaseTi4Test {
 
         test.nekro.setTg(0);
 
-        assertThat(ScoringReserve.reserved(test.game, test.nekro)).isEmpty();
+        assertThat(ScoringReserve.reserved(test.game, test.nekro)).hasValueSatisfying(reserved -> {
+            assertThat(reserved.cost()).isEqualTo(new SpendCost(3, 1, 0, 0));
+            assertThat(reserved.expectedTradeGoods()).isEqualTo(5);
+        });
         assertThat(ScoringReserve.planAfterReserve(test.game, test.nekro, SpendCost.resources(4)))
-                .isPresent();
+                .isEmpty();
     }
 
     // A Sol-like holder (Jord 4 resources and 2 influence, plus a 3 influence planet): Jord pays the resources, the
@@ -173,17 +174,30 @@ class ScoringReserveProjectionTest extends BaseTi4Test {
         assertThat(ScoringReserve.reserved(test.game, test.nekro)).isEmpty();
     }
 
-    // Expected trade goods pay the trade good part first, then resources, then influence.
+    // Expected trade goods first cover the objective's own trade good part. Planets cover resources and influence, and
+    // a spare expected trade good only fills what the planets cannot.
     @Test
-    void netCostSubtractsTradeGoodsInOrder() {
-        assertThat(ExpectedTradeGoods.netOf(SpendCost.each(3), 4, 1)).isEqualTo(new SpendCost(2, 3, 0, 0));
-        assertThat(ExpectedTradeGoods.netOf(SpendCost.resources(8), 3, 2)).isEqualTo(SpendCost.resources(2));
-        assertThat(ExpectedTradeGoods.netOf(SpendCost.tradeGoods(5), 3, 1)).isEqualTo(SpendCost.tradeGoods(2));
-        assertThat(ExpectedTradeGoods.netOf(SpendCost.tokens(3), 3, 1)).isEqualTo(SpendCost.tokens(3));
-        assertThat(ExpectedTradeGoods.tradeGoodsUsed(SpendCost.resources(8), 3, 2))
+    void netCostLeavesResourcesAndInfluenceToThePlanetsFirst() {
+        assertThat(ExpectedTradeGoods.netOf(SpendCost.each(3), 4, 1, cost -> true))
+                .contains(new SpendCost(3, 3, 0, 0));
+        assertThat(ExpectedTradeGoods.netOf(SpendCost.each(3), 4, 1, cost -> cost.influence() <= 2))
+                .contains(new SpendCost(3, 2, 0, 0));
+        assertThat(ExpectedTradeGoods.netOf(SpendCost.each(3), 4, 1, cost -> cost.resources() <= 2))
+                .contains(new SpendCost(2, 3, 0, 0));
+        assertThat(ExpectedTradeGoods.netOf(SpendCost.each(3), 4, 1, cost -> cost.influence() <= 1))
+                .isEmpty();
+        assertThat(ExpectedTradeGoods.netOf(SpendCost.resources(8), 3, 2, cost -> cost.resources() <= 2))
+                .contains(SpendCost.resources(2));
+        assertThat(ExpectedTradeGoods.netOf(SpendCost.tradeGoods(5), 3, 1, cost -> true))
+                .contains(SpendCost.tradeGoods(2));
+        assertThat(ExpectedTradeGoods.netOf(SpendCost.tokens(3), 3, 1, cost -> true))
+                .contains(SpendCost.tokens(3));
+        assertThat(ExpectedTradeGoods.tradeGoodsUsed(SpendCost.resources(8), SpendCost.resources(2), 3, 2))
                 .isEqualTo(3);
-        assertThat(ExpectedTradeGoods.tradeGoodsUsed(SpendCost.tradeGoods(5), 9, 1))
+        assertThat(ExpectedTradeGoods.tradeGoodsUsed(SpendCost.tradeGoods(5), SpendCost.NONE, 9, 1))
                 .isEqualTo(5);
+        assertThat(ExpectedTradeGoods.netOf(SpendCost.resources(5), 0, 1, cost -> false))
+                .isEmpty();
     }
 
     private static final int DIPLOMACY = 2;
@@ -226,8 +240,8 @@ class ScoringReserveProjectionTest extends BaseTi4Test {
         assertThat(ScoringReserve.reserved(test.game, test.nekro)).isEmpty();
     }
 
-    // Readied planets cover resources first; only the 3 trade goods still needed are counted as spoken for, so the
-    // rest of the expected income stays free for other reserves such as the Gravity Drive follow.
+    // Readied planets and Mordai II cover the resources, and planets pay before trade goods, so none of the expected
+    // income is spoken for and all of it stays free for other reserves such as the Gravity Drive follow.
     @Test
     void readiedPlanetsLeaveExpectedTradeGoodsForOtherReserves() {
         exhaustedCaptures();
@@ -235,10 +249,10 @@ class ScoringReserveProjectionTest extends BaseTi4Test {
         test.nekro.addSC(TRADE);
 
         assertThat(ScoringReserve.reserved(test.game, test.nekro)).hasValueSatisfying(reserved -> {
-            assertThat(reserved.cost()).isEqualTo(SpendCost.NONE);
-            assertThat(reserved.expectedTradeGoods()).isEqualTo(3);
+            assertThat(reserved.cost()).isEqualTo(SpendCost.resources(3));
+            assertThat(reserved.expectedTradeGoods()).isZero();
         });
         assertThat(ScoringReserve.expectedTradeGoodsCounted(test.game, test.nekro))
-                .isEqualTo(3);
+                .isZero();
     }
 }

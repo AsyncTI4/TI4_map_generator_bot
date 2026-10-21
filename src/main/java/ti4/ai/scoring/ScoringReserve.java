@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
 import ti4.game.Game;
@@ -90,11 +89,7 @@ public class ScoringReserve {
             Reserved spend, int expected, List<Wallet.PlanetValue> readied, Wallet wallet) {
         int tradeGoodValue = wallet.tradeGoodValue();
         SpendCost afterReadying = ExpectedReadying.netOf(spend.cost(), readied, wallet.pooling());
-        return Stream.of(
-                        ExpectedTradeGoods.netOf(afterReadying, expected, tradeGoodValue),
-                        ExpectedTradeGoods.netOfInfluenceFirst(afterReadying, expected, tradeGoodValue))
-                .filter(wallet::canPay)
-                .findFirst()
+        return ExpectedTradeGoods.netOf(afterReadying, expected, tradeGoodValue, wallet::canPay)
                 .map(net -> new Reserved(
                         spend.objectiveId(),
                         net,

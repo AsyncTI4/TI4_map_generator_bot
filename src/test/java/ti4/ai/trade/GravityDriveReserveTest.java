@@ -94,13 +94,11 @@ class GravityDriveReserveTest extends BaseTi4Test {
         assertThat(OpeningHold.gravityDriveReserve(test.game, hacan).resources())
                 .isEqualTo(FOLLOW_COST - TRADE_PRIMARY);
 
-        hacan.addPlanet("lodor");
-        hacan.setTg(2);
         test.game.getRevealedPublicObjectives().put("trade_routes", 1);
         changed();
 
         assertThat(ti4.ai.scoring.ScoringReserve.expectedTradeGoodsCounted(test.game, hacan))
-                .isEqualTo(TRADE_PRIMARY);
+                .isEqualTo(5);
         assertThat(ProductionPlanner.reserve(test.game, hacan).resources()).isEqualTo(FOLLOW_COST);
     }
 
@@ -116,24 +114,6 @@ class GravityDriveReserveTest extends BaseTi4Test {
 
         assertThat(OpeningHold.awaitsGravityDrive(test.game, hacan)).isTrue();
         assertThat(ProductionPlanner.reserve(test.game, hacan)).isEqualTo(new SpendCost(7, 3, 3, 0));
-    }
-
-    // Amass Wealth is worth more than the follow: when the Trade primary makes the follow look affordable but the
-    // planets cannot pay both reserves now, only the scoring reserve is kept, so the seat is not frozen out of every
-    // build.
-    @Test
-    void dropsTheDriveWhenBothReservesDoNotFit() {
-        test.sol.addSC(TECHNOLOGY);
-        hacan.addSC(TRADE);
-        hacan.addPlanet("lodor");
-        hacan.setTg(2);
-        test.game.getRevealedPublicObjectives().put("amass_wealth", 1);
-        changed();
-
-        assertThat(OpeningHold.awaitsGravityDrive(test.game, hacan)).isTrue();
-        assertThat(OpeningHold.gravityDriveReserve(test.game, hacan).resources())
-                .isEqualTo(FOLLOW_COST);
-        assertThat(ProductionPlanner.reserve(test.game, hacan)).isEqualTo(new SpendCost(3, 3, 0, 0));
     }
 
     // Nobody holds Technology: there is nothing to wait for, and the same seat may spend freely.

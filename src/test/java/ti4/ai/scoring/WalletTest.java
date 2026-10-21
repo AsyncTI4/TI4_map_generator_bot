@@ -22,6 +22,31 @@ class WalletTest {
         assertThat(payment.tradeGoods()).isZero();
     }
 
+    // Planets exhaust and ready every round, trade goods carry over: a planet bigger than the cost is spent before any
+    // trade good.
+    @Test
+    void spendsAWastefulPlanetRatherThanATradeGood() {
+        Wallet wallet = wallet(4, new PlanetValue("big", 5, 0));
+
+        Wallet.Payment payment = wallet.plan(SpendCost.resources(2)).orElseThrow();
+
+        assertThat(payment.forResources()).containsExactly("big");
+        assertThat(payment.tradeGoods()).isZero();
+    }
+
+    @Test
+    void paysInfluenceWithPlanetsBeforeTradeGoodsToo() {
+        Wallet wallet = wallet(3, new PlanetValue("council", 0, 2), new PlanetValue("mining", 3, 0));
+
+        Wallet.Payment enough = wallet.plan(SpendCost.influence(2)).orElseThrow();
+        Wallet.Payment short_ = wallet.plan(SpendCost.influence(3)).orElseThrow();
+
+        assertThat(enough.forInfluence()).containsExactly("council");
+        assertThat(enough.tradeGoods()).isZero();
+        assertThat(short_.forInfluence()).containsExactly("council");
+        assertThat(short_.tradeGoods()).isEqualTo(1);
+    }
+
     @Test
     void coversAShortfallWithTradeGoods() {
         Wallet wallet = wallet(2, new PlanetValue("a", 4, 1), new PlanetValue("b", 3, 2));
