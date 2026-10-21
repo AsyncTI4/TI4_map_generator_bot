@@ -90,6 +90,7 @@ class MapRenderGoldenHarness extends BaseTi4Test {
     private enum Mutation {
         NONE,
         SEGMENTS,
+        CONNECTIONS,
         BOARDS,
         HIDE_FLIP,
         DISTANCES,
@@ -381,6 +382,7 @@ class MapRenderGoldenHarness extends BaseTi4Test {
                 totals.failures,
                 totals.constructorMs,
                 totals.drawMs));
+        summary.append("connectionStripRenders=").append(connectionStripRenders).append('\n');
         Files.writeString(resultDir.resolve("summary.txt"), summary.toString());
         System.out.println(summary);
         if (compare) {
@@ -461,6 +463,10 @@ class MapRenderGoldenHarness extends BaseTi4Test {
         switch (mutation) {
             case NONE -> {}
             case SEGMENTS -> applySegments(game);
+            case CONNECTIONS -> {
+                applySegments(game);
+                game.setFowOption(FOWOption.MAP_CONNECTIONS, true);
+            }
             case BOARDS -> applyBoards(game);
             case HIDE_FLIP ->
                 game.setFowOption(FOWOption.HIDE_PLAYER_INFOS, !game.getFowOption(FOWOption.HIDE_PLAYER_INFOS));
@@ -527,6 +533,21 @@ class MapRenderGoldenHarness extends BaseTi4Test {
         }
         if (fog) {
             addSegmentSpecs(specs, save, Mutation.SEGMENTS, "seg", hasViewer, SEGMENT_DISPLAY_TYPES);
+            if (hasViewer) {
+                for (String name : segmentNames(save, Mutation.CONNECTIONS)) {
+                    specs.add(new Spec(
+                            "conn-" + sanitize(name) + "-fog-all",
+                            Kind.MAP,
+                            DisplayType.all,
+                            Viewer.FOG,
+                            name,
+                            Mutation.CONNECTIONS,
+                            false,
+                            null,
+                            0,
+                            null));
+                }
+            }
         }
         if (boards) {
             for (DisplayType type : List.of(DisplayType.all, DisplayType.map, DisplayType.stats)) {
