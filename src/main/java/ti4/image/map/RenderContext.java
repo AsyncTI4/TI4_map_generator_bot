@@ -123,6 +123,10 @@ final class RenderContext {
         return basicType;
     }
 
+    boolean drawsBoard() {
+        return basicType == DisplayType.all || basicType == DisplayType.map;
+    }
+
     boolean isLandscape() {
         return canvas.isLandscape();
     }

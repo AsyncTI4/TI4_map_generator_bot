@@ -9,7 +9,10 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitType;
 import ti4.model.Mapper;
 import ti4.service.transaction.DebtPoolIconService;
 import ti4.testUtils.BaseTi4Test;
@@ -32,7 +35,11 @@ class MapRenderPreparationTest extends BaseTi4Test {
     }
 
     private RenderContext resolve() {
-        return MapRenderer.resolve(new MapRenderRequest(game, DisplayType.stats, null, null));
+        return resolve(DisplayType.stats);
+    }
+
+    private RenderContext resolve(DisplayType type) {
+        return MapRenderer.resolve(new MapRenderRequest(game, type, null, null));
     }
 
     @Test
@@ -85,5 +92,44 @@ class MapRenderPreparationTest extends BaseTi4Test {
         resolve();
 
         assertEquals(DebtPoolIconService.defaultIcon(game, "favours"), game.getDebtPoolIcon("favours"));
+    }
+
+    @Test
+    void resolvingABoardRenderWithUnitsOnTheBoardCreatesTheNeutralPlayerBecauseTheLayoutCountsIt() {
+        game.getTileByPosition("101")
+                .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Cruiser, holder.getColorID()), 1);
+
+        resolve(DisplayType.map);
+
+        assertTrue(game.findNeutral().isPresent());
+    }
+
+    @Test
+    void resolvingABoardRenderWithoutUnitsLeavesTheNeutralPlayerOut() {
+        resolve(DisplayType.map);
+
+        assertTrue(game.findNeutral().isEmpty());
+    }
+
+    @Test
+    void resolvingAStatsRenderLeavesTheNeutralPlayerOut() {
+        game.getTileByPosition("101")
+                .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Cruiser, holder.getColorID()), 1);
+
+        resolve(DisplayType.stats);
+
+        assertTrue(game.findNeutral().isEmpty());
+    }
+
+    @Test
+    void paintingNeverCreatesTheNeutralPlayer() {
+        game.getTileByPosition("101")
+                .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Cruiser, holder.getColorID()), 1);
+        RenderContext context = resolve(DisplayType.map);
+        game.getPlayers().remove(game.findNeutral().orElseThrow().getUserID());
+
+        MapRenderer.paint(context, RenderTimings.disabled());
+
+        assertTrue(game.findNeutral().isEmpty());
     }
 }

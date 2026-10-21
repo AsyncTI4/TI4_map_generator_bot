@@ -3,6 +3,9 @@ package ti4.image.map;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Stream;
+import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.image.draw.GraphicsState;
 import ti4.image.io.EncodedImage;
@@ -19,7 +22,18 @@ final class MapRenderer {
     static RenderContext resolve(MapRenderRequest request) {
         FogViewer viewer = FogViewer.resolve(request.game(), request.event(), null);
         MapRenderPreparationService.prepare(request.game(), viewer);
-        return RenderContext.build(request, viewer);
+        RenderContext context = RenderContext.build(request, viewer);
+        if (context.drawsBoard()) {
+            MapRenderPreparationService.prepareBoard(request.game(), tilesToDraw(context));
+        }
+        return context;
+    }
+
+    private static List<Tile> tilesToDraw(RenderContext context) {
+        return Stream.concat(
+                        BoardSection.shownTiles(context).stream(),
+                        ConnectionStripSection.connectedTiles(context).stream())
+                .toList();
     }
 
     static MapRenderResult render(MapRenderRequest request, RenderTimings timings) {
@@ -45,7 +59,7 @@ final class MapRenderer {
     }
 
     private static void clearShownDistances(RenderContext ctx) {
-        if (BoardSection.drawsTiles(ctx)) {
+        if (ctx.drawsBoard()) {
             ctx.game().setTileDistances(new HashMap<>());
         }
     }

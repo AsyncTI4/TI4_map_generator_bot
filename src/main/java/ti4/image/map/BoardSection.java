@@ -49,13 +49,15 @@ final class BoardSection {
         g2.setClip(previousClip);
     }
 
-    static boolean drawsTiles(RenderContext ctx) {
-        DisplayType basicType = ctx.basicType();
-        return basicType == DisplayType.all || basicType == DisplayType.map;
+    static List<Tile> shownTiles(RenderContext ctx) {
+        return ctx.fog().tiles().entrySet().stream()
+                .filter(entry -> entry.getKey() != null && ctx.board().isInShownRegion(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .toList();
     }
 
     private void drawTiles(Map<String, Tile> tilesToDisplay) {
-        if (!drawsTiles(ctx)) {
+        if (!ctx.drawsBoard()) {
             return;
         }
         Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);

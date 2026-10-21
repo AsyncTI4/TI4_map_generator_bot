@@ -7,6 +7,7 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Objects;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.image.draw.HorizontalAlign;
@@ -38,6 +39,13 @@ final class ConnectionStripSection {
         }
         int rows = Math.min(MAX_ROWS, Math.ceilDiv(connections.size(), connectionsPerRow(stripWidth)));
         return HEADER_HEIGHT + rows * ROW_HEIGHT + BOTTOM_CLEARANCE;
+    }
+
+    static List<Tile> connectedTiles(RenderContext ctx) {
+        return ctx.board().connections().stream()
+                .map(connection -> ctx.fog().tiles().get(connection.position()))
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     static void draw(RenderContext ctx, Graphics2D g2) {

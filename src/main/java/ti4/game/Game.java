@@ -437,6 +437,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return neutral;
     }
 
+    public Optional<Player> findNeutral() {
+        return Optional.ofNullable(getPlayerFromColorOrFaction("neutral"));
+    }
+
     @NotNull
     public String getNeutralColor() {
         return getNeutral().getColor();
