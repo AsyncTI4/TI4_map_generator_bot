@@ -6,6 +6,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.image.playerarea.PlayerAreaColumns;
 import ti4.image.playerarea.PlayerAreaHeader;
+import ti4.image.playerarea.ScoredSecrets;
 
 final class PlayerAreasHeightEstimate {
 
@@ -126,8 +127,9 @@ final class PlayerAreasHeightEstimate {
         if (player.isEliminated()) {
             return adjustment - 190;
         }
-        if (player.getSecretsScored().size() >= 4) {
-            return adjustment + (player.getSecretsScored().size() - 4) * 43 + 23;
+        int secretRows = ScoredSecrets.rowCount(game, player);
+        if (secretRows >= 4) {
+            return adjustment + (secretRows - 4) * 43 + 23;
         }
         return adjustment;
     }

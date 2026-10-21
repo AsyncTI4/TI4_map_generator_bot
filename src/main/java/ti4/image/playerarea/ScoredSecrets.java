@@ -18,7 +18,7 @@ import ti4.image.Mapper;
 import ti4.image.Strokes;
 import ti4.logging.BotLogger;
 
-final class ScoredSecrets {
+public final class ScoredSecrets {
 
     private static final int TEXT_INDENT = 40;
     private static final int ROW_HEIGHT = 43;
@@ -40,19 +40,26 @@ final class ScoredSecrets {
             g2.setColor(Color.LIGHT_GRAY);
             y = drawRows(ctx, player, player.getSecrets(), secretObjectiveNames, Set.of(), x, y);
         }
-        Map<String, Integer> secretsScored = new LinkedHashMap<>(player.getSecretsScored());
-        for (String id : game.getSoToPoList()) {
-            secretsScored.remove(withoutExtraSuffix(id));
-        }
+        Map<String, Integer> secretsScored = scoredNotMadePublic(game, player);
         Set<String> scoredIds = new HashSet<>();
         player.getSecrets().keySet().forEach(id -> scoredIds.add(withoutExtraSuffix(id)));
         secretsScored.keySet().forEach(id -> scoredIds.add(withoutExtraSuffix(id)));
         g2.setColor(Color.RED);
         drawRows(ctx, player, secretsScored, secretObjectiveNames, scoredIds, x, y);
-        if (player.isSearchWarrant()) {
-            return secretsScored.size() + player.getSecrets().size();
+        return rowCount(game, player);
+    }
+
+    public static int rowCount(Game game, Player player) {
+        int scored = scoredNotMadePublic(game, player).size();
+        return player.isSearchWarrant() ? scored + player.getSecrets().size() : scored;
+    }
+
+    private static Map<String, Integer> scoredNotMadePublic(Game game, Player player) {
+        Map<String, Integer> secretsScored = new LinkedHashMap<>(player.getSecretsScored());
+        for (String id : game.getSoToPoList()) {
+            secretsScored.remove(withoutExtraSuffix(id));
         }
-        return secretsScored.size();
+        return secretsScored;
     }
 
     private static String withoutExtraSuffix(String id) {
