@@ -1,7 +1,6 @@
 package ti4.image.map;
 
 import javax.annotation.Nullable;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.game.Game;
 import ti4.helpers.DisplayType;
 import ti4.image.draw.WebsiteOverlays;
@@ -12,9 +11,6 @@ import ti4.service.fow.FogViewer;
 final class RenderContext {
 
     private final Game game;
-
-    @Nullable
-    private final GenericInteractionCreateEvent event;
 
     private final DisplayType displayType;
     private final DisplayType basicType;
@@ -29,7 +25,6 @@ final class RenderContext {
 
     private RenderContext(
             Game game,
-            @Nullable GenericInteractionCreateEvent event,
             DisplayType displayType,
             DisplayType basicType,
             FogView fog,
@@ -40,7 +35,6 @@ final class RenderContext {
             BoardLayout board,
             MapCanvasLayout canvas) {
         this.game = game;
-        this.event = event;
         this.displayType = displayType;
         this.basicType = basicType;
         this.fog = fog;
@@ -65,7 +59,6 @@ final class RenderContext {
         MapCanvasLayout canvas = MapCanvasLayout.of(game, displayType, basicType, fog, neighbours, board);
         return new RenderContext(
                 game,
-                request.event(),
                 displayType,
                 basicType,
                 fog,
@@ -108,11 +101,6 @@ final class RenderContext {
 
     Game game() {
         return game;
-    }
-
-    @Nullable
-    GenericInteractionCreateEvent event() {
-        return event;
     }
 
     DisplayType displayType() {
