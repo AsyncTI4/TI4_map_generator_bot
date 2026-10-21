@@ -49,4 +49,23 @@ class TextWrapTest {
         assertEquals("extraordin", lines.first());
         assertEquals("arily wide", lines.second());
     }
+
+    @Test
+    void textThatFitsIsNotCut() {
+        assertEquals("short", TextWrap.ellipsized("short", TEN_PIXELS_PER_CHARACTER, 100));
+    }
+
+    @Test
+    void textThatDoesNotFitEndsInAnEllipsisThatFits() {
+        String cut = TextWrap.ellipsized("alpha beta gamma delta", TEN_PIXELS_PER_CHARACTER, 100);
+
+        assertEquals("alpha b...", cut);
+    }
+
+    @Test
+    void anEllipsisDoesNotFollowTrailingSpaces() {
+        String cut = TextWrap.ellipsized("alpha beta gamma", TEN_PIXELS_PER_CHARACTER, 140);
+
+        assertEquals("alpha beta...", cut);
+    }
 }
