@@ -22,6 +22,8 @@ import ti4.model.PromissoryNoteModel;
 final class PromissoryNotesInPlay {
 
     private static final int CARD_STEP = 48;
+    private static final String HIDDEN_NAME = "Promissory Note";
+    private static final String HIDDEN_OVERLAY_TEXT = "Held from a player you cannot see.";
 
     private PromissoryNotesInPlay() {}
 
@@ -55,7 +57,12 @@ final class PromissoryNotesInPlay {
         PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pn);
         if (promissoryNote == null) return false;
 
-        if (pn.endsWith("_an")) {
+        boolean hidden = ctx.hidesStatsOf(owner);
+        boolean revealsFaction =
+                pn.endsWith("_an") || promissoryNote.getFaction().isPresent();
+        if (hidden && revealsFaction) {
+            CardRect.draw(ctx, x - 2, y - 2, CardRect.WIDTH, CardRect.HEIGHT, HIDDEN_NAME, HIDDEN_OVERLAY_TEXT);
+        } else if (pn.endsWith("_an")) {
             LeaderModel allianceCommander = allianceCommanderModel(owner);
             if (allianceCommander != null) {
                 CardRect.draw(ctx, x - 2, y - 2, CardRect.WIDTH, CardRect.HEIGHT, allianceCommander);
@@ -64,13 +71,18 @@ final class PromissoryNotesInPlay {
             CardRect.draw(ctx, x - 2, y - 2, CardRect.WIDTH, CardRect.HEIGHT, promissoryNote);
         }
 
-        boolean commanderUnlocked = drawOwnerColour(ctx, player, owner, promissoryNote, x, y);
+        boolean commanderUnlocked = drawOwnerColour(ctx, player, owner, promissoryNote, hidden, x, y);
 
         g2.setColor(Color.WHITE);
         if (pn.endsWith("_an") && !commanderUnlocked) {
             g2.setColor(Color.GRAY);
         }
-        writeName(g2, promissoryNote, x + 9, y + 4, findAttachedPlanet(game, promissoryNote));
+        if (hidden && revealsFaction) {
+            g2.setFont(Storage.getFont18());
+            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, HIDDEN_NAME, x + 7, y + 4, 120, true);
+        } else {
+            writeName(g2, promissoryNote, x + 9, y + 4, findAttachedPlanet(game, promissoryNote));
+        }
         return true;
     }
 
@@ -81,18 +93,27 @@ final class PromissoryNotesInPlay {
     }
 
     private static boolean drawOwnerColour(
-            PlayerAreaContext ctx, Player player, Player owner, PromissoryNoteModel promissoryNote, int x, int y) {
+            PlayerAreaContext ctx,
+            Player player,
+            Player owner,
+            PromissoryNoteModel promissoryNote,
+            boolean hidden,
+            int x,
+            int y) {
         Graphics2D g2 = ctx.g2();
         for (Player other : player.getOtherRealPlayers()) {
             String playerColor = other.getColor();
             String playerFaction = other.getFaction();
             if (playerColor != null && playerColor.equals(owner.getColor())
                     || playerFaction != null && playerFaction.equals(owner.getFaction())) {
-                PaImage.draw(g2, x, y, "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png");
-                if (ctx.game().isFrankenGame()) {
-                    FactionIcons.draw(g2, promissoryNote.getFaction().orElse(""), x - 1, y + 86, 42, 42);
+                String colorID = hidden ? Mapper.getColorID("gray") : Mapper.getColorID(playerColor);
+                PaImage.draw(g2, x, y, "pa_pn_color_" + colorID + ".png");
+                if (!hidden) {
+                    if (ctx.game().isFrankenGame()) {
+                        FactionIcons.draw(g2, promissoryNote.getFaction().orElse(""), x - 1, y + 86, 42, 42);
+                    }
+                    DrawingUtil.drawPlayerFactionIconImage(g2, owner, x - 1, y + 108, 42, 42);
                 }
-                DrawingUtil.drawPlayerFactionIconImage(g2, owner, x - 1, y + 108, 42, 42);
                 Leader commander = other.unsafeGetLeader(Constants.COMMANDER);
                 return commander != null && !commander.isLocked();
             }

@@ -23,6 +23,7 @@ import ti4.service.VeiledHeartService.VeiledCardType;
 final class LeaderCards {
 
     private static final int CARD_STEP = 48;
+    private static final String HIDDEN_COMMANDER_TEXT = "Commander of a player you cannot see.";
     private static final Comparator<Leader> LEADER_ORDER = Comparator.comparingInt(LeaderCards::typeRank)
             .thenComparing(LeaderCards::sortName, String::compareToIgnoreCase);
 
@@ -197,8 +198,12 @@ final class LeaderCards {
             PlayerAreaContext ctx, Player owner, Leader commander, String overlayPrefix, int x, int y) {
         Graphics2D g2 = ctx.g2();
         String status = commander.isLocked() ? "_exh" : "_rdy";
-        CardRect.draw(ctx, x - 2, y - 2, CardRect.WIDTH, CardRect.HEIGHT, Mapper.getLeader(commander.getId()));
-        DrawingUtil.drawPlayerFactionIconImage(g2, owner, x - 1, y + 108, 42, 42);
+        if (ctx.hidesStatsOf(owner)) {
+            CardRect.draw(ctx, x - 2, y - 2, CardRect.WIDTH, CardRect.HEIGHT, "Commander", HIDDEN_COMMANDER_TEXT);
+        } else {
+            CardRect.draw(ctx, x - 2, y - 2, CardRect.WIDTH, CardRect.HEIGHT, Mapper.getLeader(commander.getId()));
+            DrawingUtil.drawPlayerFactionIconImage(g2, owner, x - 1, y + 108, 42, 42);
+        }
         PaImage.draw(g2, x, y, overlayPrefix + status + ".png");
         PaImage.draw(g2, x, y, "pa_leaders_pips_ii" + status + ".png");
     }
