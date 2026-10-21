@@ -337,7 +337,7 @@ public final class FOWPlusService {
             case FOWPLUS_EXPLORE_VORTEX:
                 AddTokenCommand.addToken(event, tile, "vortex", game);
                 FoWHelper.pingSystem(game, tile.getPosition(), "Space warps unnaturally.");
-                int nonCarriedFF = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false)[4];
+                int nonCarriedFF = ButtonHelper.fleetAndCapacity(player, game, tile, false)[4];
                 if (nonCarriedFF > 0) {
                     RemoveUnitService.removeUnit(
                             event, tile, game, player, tile.getSpaceUnitHolder(), UnitType.Fighter, nonCarriedFF);

@@ -38,7 +38,7 @@ record ProductionBadge(int production, int capacity, int capacityUsed, int ignor
         for (Player player : game.getRealPlayers()) {
             production = Math.max(production, Helper.getProductionValue(player, game, tile, false));
             if (capacity == 0 && capacityUsed == 0) {
-                int[] fleetAndCapacity = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false);
+                int[] fleetAndCapacity = ButtonHelper.fleetAndCapacity(player, game, tile, false);
                 capacityUsed = fleetAndCapacity[1];
                 capacity = fleetAndCapacity[2];
                 ignoredFighters = fleetAndCapacity[3];
