@@ -47,18 +47,8 @@ final class TechSkipsStep implements TileStepPainter {
         }
     }
 
-    private static String skipFile(String skip) {
-        return switch (skip.toLowerCase()) {
-            case "biotic" -> ImageResources.general("Biotic light.png");
-            case "cybernetic" -> ImageResources.general("Cybernetic light.png");
-            case "propulsion" -> ImageResources.general("Propulsion_light.png");
-            case "warfare" -> ImageResources.general("Warfare_light.png");
-            default -> ImageResources.general("Generic_Technology.png");
-        };
-    }
-
     private static void drawSkip(TileLayer layer, Planet planet, String skip, int index, int number) {
-        String file = skipFile(skip);
+        String file = ImageResources.techSkip(skip);
         BufferedImage source = ImageHelper.read(file);
         float scale = (float)
                 Math.sqrt(TraitsStep.ICON_AREA / source.getWidth() / source.getHeight() / Math.sqrt(1.0f * number));

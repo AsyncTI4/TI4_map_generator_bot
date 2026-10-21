@@ -114,6 +114,17 @@ public final class ImageResources {
     }
 
     @Nullable
+    public static String techSkip(String skip) {
+        return switch (skip.toLowerCase()) {
+            case "biotic" -> general("Biotic light.png");
+            case "cybernetic" -> general("Cybernetic light.png");
+            case "propulsion" -> general("Propulsion_light.png");
+            case "warfare" -> general("Warfare_light.png");
+            default -> general("Generic_Technology.png");
+        };
+    }
+
+    @Nullable
     public static String planetCard(String name) {
         return find("planet_cards/", name);
     }

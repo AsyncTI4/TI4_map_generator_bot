@@ -29,22 +29,7 @@ final class TechSkipHighlights implements OffBoardHighlights {
                     continue;
                 }
                 for (String skip : skips) {
-                    switch (skip.toLowerCase()) {
-                        case "biotic":
-                            techFiles.add(ImageResources.general("Biotic light.png"));
-                            break;
-                        case "cybernetic":
-                            techFiles.add(ImageResources.general("Cybernetic light.png"));
-                            break;
-                        case "propulsion":
-                            techFiles.add(ImageResources.general("Propulsion_light.png"));
-                            break;
-                        case "warfare":
-                            techFiles.add(ImageResources.general("Warfare_light.png"));
-                            break;
-                        default:
-                            techFiles.add(ImageResources.general("Generic_Technology.png"));
-                    }
+                    techFiles.add(ImageResources.techSkip(skip));
                     offBoardHighlighting++;
                 }
             }
