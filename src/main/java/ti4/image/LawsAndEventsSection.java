@@ -1,9 +1,13 @@
 package ti4.image;
 
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -15,33 +19,116 @@ import ti4.model.EventModel;
 final class LawsAndEventsSection {
 
     private static final int LEFT_MARGIN = 5;
-    private static final int LAW_ROW_STEP = 118;
-    private static final int EVENT_ROW_STEP = 112;
+    private static final int LAW_ROW_GAP = 8;
+    private static final int EVENT_ROW_GAP = 2;
+    private static final int BLOCK_BOTTOM_MARGIN = 3;
+    private static final int CARDS_PER_ROW = 2;
     private static final int ICON_INSET = 2;
 
+    private record LawCard(
+            Map.Entry<String, Integer> entry,
+            String optionalText,
+            @Nullable AgendaModel agendaModel,
+            String title,
+            List<String> bodyLines) {
+
+        int height() {
+            return CardBox.heightFor(bodyLines);
+        }
+    }
+
+    private record EventCard(String title, List<String> bodyLines) {
+
+        int height() {
+            return CardBox.heightFor(bodyLines);
+        }
+    }
+
     private LawsAndEventsSection() {}
+
+    static int heightOfLaws(Game game) {
+        List<LawCard> cards = lawCards(game, CardBox.bodyMetrics());
+        return blockHeight(rowHeights(cards.stream().map(LawCard::height).toList()), LAW_ROW_GAP);
+    }
+
+    static int heightOfEvents(Game game) {
+        List<EventCard> cards = eventCards(game, CardBox.bodyMetrics());
+        return blockHeight(rowHeights(cards.stream().map(EventCard::height).toList()), EVENT_ROW_GAP);
+    }
+
+    static List<Integer> rowHeights(List<Integer> cardHeights) {
+        List<Integer> rows = new ArrayList<>();
+        for (int i = 0; i < cardHeights.size(); i += CARDS_PER_ROW) {
+            int rowHeight = 0;
+            for (int j = i; j < Math.min(i + CARDS_PER_ROW, cardHeights.size()); j++) {
+                rowHeight = Math.max(rowHeight, cardHeights.get(j));
+            }
+            rows.add(rowHeight);
+        }
+        return rows;
+    }
+
+    static int blockHeight(List<Integer> rowHeights, int rowGap) {
+        int height = BLOCK_BOTTOM_MARGIN;
+        for (int rowHeight : rowHeights) {
+            height += rowHeight + rowGap;
+        }
+        return height;
+    }
 
     static int drawLaws(RenderContext ctx, Graphics2D g2, int left, int y) {
         if (ctx.basicType() == DisplayType.map) {
             return y;
         }
-        Game game = ctx.game();
-        int x = LEFT_MARGIN + left;
         g2.setStroke(Strokes.STROKE_3);
 
-        Map<String, Integer> laws = game.getLaws();
-        Map<String, String> lawsInfo = game.getLawsInfo();
-        boolean secondColumn = false;
-        for (Map.Entry<String, Integer> lawEntry : laws.entrySet()) {
-            String lawID = lawEntry.getKey();
-            String lawNumberID = "(" + lawEntry.getValue() + ") ";
-            String optionalText = lawsInfo.get(lawID);
-            AgendaModel agendaModel = Mapper.getAgenda(lawID);
-
-            CardBox.drawFrame(g2, x, y, ColorUtil.LawColor);
-            if (agendaModel != null) {
-                ctx.overlays().add(agendaModel, x, y, CardBox.WIDTH, CardBox.HEIGHT);
+        List<LawCard> cards = lawCards(ctx.game(), CardBox.bodyMetrics(g2));
+        List<Integer> rowHeights =
+                rowHeights(cards.stream().map(LawCard::height).toList());
+        int rowY = y;
+        for (int row = 0; row < rowHeights.size(); row++) {
+            int rowHeight = rowHeights.get(row);
+            for (int column = 0; column < CARDS_PER_ROW; column++) {
+                int index = row * CARDS_PER_ROW + column;
+                if (index < cards.size()) {
+                    drawLaw(ctx, g2, cards.get(index), cardX(left, column), rowY, rowHeight);
+                }
             }
+            rowY += rowHeight + LAW_ROW_GAP;
+        }
+        return rowY + BLOCK_BOTTOM_MARGIN;
+    }
+
+    static int drawEvents(RenderContext ctx, Graphics2D g2, int left, int y) {
+        g2.setStroke(Strokes.STROKE_3);
+
+        List<EventCard> cards = eventCards(ctx.game(), CardBox.bodyMetrics(g2));
+        List<Integer> rowHeights =
+                rowHeights(cards.stream().map(EventCard::height).toList());
+        int rowY = y;
+        for (int row = 0; row < rowHeights.size(); row++) {
+            int rowHeight = rowHeights.get(row);
+            for (int column = 0; column < CARDS_PER_ROW; column++) {
+                int index = row * CARDS_PER_ROW + column;
+                if (index < cards.size()) {
+                    drawEvent(g2, cards.get(index), cardX(left, column), rowY, rowHeight);
+                }
+            }
+            rowY += rowHeight + EVENT_ROW_GAP;
+        }
+        return rowY + BLOCK_BOTTOM_MARGIN;
+    }
+
+    private static int cardX(int left, int column) {
+        return LEFT_MARGIN + left + column * CardBox.COLUMN_STEP;
+    }
+
+    private static List<LawCard> lawCards(Game game, FontMetrics bodyMetrics) {
+        List<LawCard> cards = new ArrayList<>();
+        Map<String, String> lawsInfo = game.getLawsInfo();
+        for (Map.Entry<String, Integer> lawEntry : game.getLaws().entrySet()) {
+            String lawID = lawEntry.getKey();
+            String optionalText = lawsInfo.get(lawID);
             String agendaTitle = Mapper.getAgendaTitle(lawID);
             if (agendaTitle == null) {
                 agendaTitle = Mapper.getAgendaJustNames().get(lawID);
@@ -59,58 +146,51 @@ final class LawsAndEventsSection {
             if (agendaText == null) {
                 agendaText = Mapper.getAgendaForOnly(lawID);
             }
-            agendaText = lawNumberID + agendaText;
-            CardBox.drawText(g2, x, y, ColorUtil.LawColor, 33, agendaTitle, agendaText, true);
-            try {
-                paintLawIcons(ctx, g2, lawEntry, optionalText, x, y);
-            } catch (Exception e) {
-                BotLogger.error("Could not paint agenda icon", e);
-            }
-
-            if (!secondColumn) {
-                secondColumn = true;
-                x += CardBox.COLUMN_STEP;
-            } else {
-                secondColumn = false;
-                y += LAW_ROW_STEP;
-                x -= CardBox.COLUMN_STEP;
-            }
+            agendaText = "(" + lawEntry.getValue() + ") " + agendaText;
+            cards.add(new LawCard(
+                    lawEntry,
+                    optionalText,
+                    Mapper.getAgenda(lawID),
+                    agendaTitle,
+                    CardBox.bodyLines(bodyMetrics, agendaText, true)));
         }
-        return y + 3 + (secondColumn ? LAW_ROW_STEP : 0);
+        return cards;
     }
 
-    static int drawEvents(RenderContext ctx, Graphics2D g2, int left, int y) {
-        Game game = ctx.game();
-        int x = LEFT_MARGIN + left;
-        g2.setStroke(Strokes.STROKE_3);
-
-        Map<String, Integer> events = game.getEventsInEffect();
-        boolean secondColumn = false;
-        for (Map.Entry<String, Integer> event : events.entrySet()) {
-            String eventNumberID = "(" + event.getValue() + ") ";
-
-            CardBox.drawFrame(g2, x, y, Color.BLUE);
-
+    private static List<EventCard> eventCards(Game game, FontMetrics bodyMetrics) {
+        List<EventCard> cards = new ArrayList<>();
+        for (Map.Entry<String, Integer> event : game.getEventsInEffect().entrySet()) {
             EventModel eventModel = Mapper.getEvent(event.getKey());
-
-            CardBox.drawText(
-                    g2, x, y, Color.WHITE, 30, eventModel.getName(), eventNumberID + eventModel.getMapText(), true);
-            try {
-                paintIcon(g2, "event.png", x, y);
-            } catch (Exception e) {
-                BotLogger.error("Could not paint event icon", e);
+            if (eventModel == null) {
+                continue;
             }
-
-            if (!secondColumn) {
-                secondColumn = true;
-                x += CardBox.COLUMN_STEP;
-            } else {
-                secondColumn = false;
-                y += EVENT_ROW_STEP;
-                x = LEFT_MARGIN + left;
-            }
+            String body = "(" + event.getValue() + ") " + eventModel.getMapText();
+            cards.add(new EventCard(eventModel.getName(), CardBox.bodyLines(bodyMetrics, body, true)));
         }
-        return secondColumn ? y + 115 : y + 3;
+        return cards;
+    }
+
+    private static void drawLaw(RenderContext ctx, Graphics2D g2, LawCard card, int x, int y, int height) {
+        CardBox.drawFrame(g2, x, y, height, ColorUtil.LawColor);
+        if (card.agendaModel() != null) {
+            ctx.overlays().add(card.agendaModel(), x, y, CardBox.WIDTH, height);
+        }
+        CardBox.drawText(g2, x, y, ColorUtil.LawColor, 33, card.title(), card.bodyLines());
+        try {
+            paintLawIcons(ctx, g2, card.entry(), card.optionalText(), x, y);
+        } catch (Exception e) {
+            BotLogger.error("Could not paint agenda icon", e);
+        }
+    }
+
+    private static void drawEvent(Graphics2D g2, EventCard card, int x, int y, int height) {
+        CardBox.drawFrame(g2, x, y, height, Color.BLUE);
+        CardBox.drawText(g2, x, y, Color.WHITE, 30, card.title(), card.bodyLines());
+        try {
+            paintIcon(g2, "event.png", x, y);
+        } catch (Exception e) {
+            BotLogger.error("Could not paint event icon", e);
+        }
     }
 
     private static void paintLawIcons(

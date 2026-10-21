@@ -1,22 +1,32 @@
 package ti4.image;
 
 import java.awt.FontMetrics;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nullable;
 
 final class TextWrap {
-
-    private static final String ELLIPSIS = "...";
 
     record Lines(String first, @Nullable String second) {}
 
     private TextWrap() {}
 
+    static List<String> wrapAll(String text, FontMetrics metrics, int maxWidth, boolean breakAtLastSpace) {
+        List<String> lines = new ArrayList<>();
+        String remaining = text;
+        while (true) {
+            Lines split = wrapToWidth(remaining, metrics, maxWidth, breakAtLastSpace);
+            lines.add(split.first());
+            if (split.second() == null || split.second().isEmpty()) {
+                return lines;
+            }
+            remaining = split.second();
+        }
+    }
+
     static Lines wrapToWidth(String text, FontMetrics metrics, int maxWidth, boolean breakAtLastSpace) {
         int length = text.length();
-        int cut = length;
-        while (cut > 0 && metrics.stringWidth(text.substring(0, cut)) > maxWidth) {
-            cut--;
-        }
+        int cut = longestPrefixWithin(text, metrics, maxWidth);
         if (cut == length) {
             return new Lines(text, null);
         }
@@ -26,17 +36,25 @@ final class TextWrap {
                 return new Lines(text.substring(0, space), text.substring(space + 1));
             }
         }
-        return new Lines(text.substring(0, cut), text.substring(cut));
+        int progress = Math.max(cut, 1);
+        return new Lines(text.substring(0, progress), text.substring(progress));
     }
 
-    static String ellipsized(String text, FontMetrics metrics, int maxWidth) {
+    private static int longestPrefixWithin(String text, FontMetrics metrics, int maxWidth) {
+        int length = text.length();
         if (metrics.stringWidth(text) <= maxWidth) {
-            return text;
+            return length;
         }
-        String kept = text.stripTrailing();
-        while (!kept.isEmpty() && metrics.stringWidth(kept + ELLIPSIS) > maxWidth) {
-            kept = kept.substring(0, kept.length() - 1).stripTrailing();
+        int fits = 0;
+        int tooWide = length;
+        while (tooWide - fits > 1) {
+            int middle = (fits + tooWide) >>> 1;
+            if (metrics.stringWidth(text.substring(0, middle)) <= maxWidth) {
+                fits = middle;
+            } else {
+                tooWide = middle;
+            }
         }
-        return kept + ELLIPSIS;
+        return fits;
     }
 }

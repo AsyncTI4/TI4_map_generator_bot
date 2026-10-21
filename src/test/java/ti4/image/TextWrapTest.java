@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class TextWrapTest {
@@ -51,21 +52,41 @@ class TextWrapTest {
     }
 
     @Test
-    void textThatFitsIsNotCut() {
-        assertEquals("short", TextWrap.ellipsized("short", TEN_PIXELS_PER_CHARACTER, 100));
+    void textOfAnyLengthIsWrappedOntoAsManyLinesAsItNeeds() {
+        List<String> lines =
+                TextWrap.wrapAll("alpha beta gamma delta epsilon zeta eta", TEN_PIXELS_PER_CHARACTER, 100, true);
+
+        assertEquals(List.of("alpha beta", "gamma", "delta", "epsilon", "zeta eta"), lines);
     }
 
     @Test
-    void textThatDoesNotFitEndsInAnEllipsisThatFits() {
-        String cut = TextWrap.ellipsized("alpha beta gamma delta", TEN_PIXELS_PER_CHARACTER, 100);
-
-        assertEquals("alpha b...", cut);
+    void wrappingAllLinesOfTextThatFitsGivesOneLine() {
+        assertEquals(List.of("fits"), TextWrap.wrapAll("fits", TEN_PIXELS_PER_CHARACTER, 100, true));
     }
 
     @Test
-    void anEllipsisDoesNotFollowTrailingSpaces() {
-        String cut = TextWrap.ellipsized("alpha beta gamma", TEN_PIXELS_PER_CHARACTER, 140);
+    void wrappingAllLinesMidWordFillsEveryLine() {
+        List<String> lines = TextWrap.wrapAll("abcdefghijklmnopqrstuvwxy", TEN_PIXELS_PER_CHARACTER, 100, false);
 
-        assertEquals("alpha beta...", cut);
+        assertEquals(List.of("abcdefghij", "klmnopqrst", "uvwxy"), lines);
+    }
+
+    @Test
+    void aCharacterWiderThanTheLineStillMakesProgress() {
+        List<String> lines = TextWrap.wrapAll("abc", TEN_PIXELS_PER_CHARACTER, 5, false);
+
+        assertEquals(List.of("a", "b", "c"), lines);
+    }
+
+    @Test
+    void aWordWiderThanTheLineIsSplitOnItsOwnLines() {
+        List<String> lines = TextWrap.wrapAll("hi extraordinarily wide", TEN_PIXELS_PER_CHARACTER, 100, true);
+
+        assertEquals(List.of("hi", "extraordin", "arily wide"), lines);
+    }
+
+    @Test
+    void aTrailingSpaceNeverAddsAnEmptyLine() {
+        assertEquals(List.of("alpha"), TextWrap.wrapAll("alpha ", TEN_PIXELS_PER_CHARACTER, 50, true));
     }
 }

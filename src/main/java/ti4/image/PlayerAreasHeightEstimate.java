@@ -65,8 +65,11 @@ final class PlayerAreasHeightEstimate {
                 : stackedPlayerAreasHeight() - hiddenPlayerAreasHeight();
         int unrealPlayers = game.getNotRealPlayers().size();
         playersY += Math.round(unrealPlayers / 20.0f) * HEIGHT_PER_20_UNREAL_PLAYERS;
-        int lawsY = (game.getLaws().size() / LAW_COLUMNS + 1) * LAW_HEIGHT;
-        lawsY += (game.getEventsInEffect().size() / LAW_COLUMNS + 1) * LAW_HEIGHT;
+        int lawsY = Math.max(
+                (game.getLaws().size() / LAW_COLUMNS + 1) * LAW_HEIGHT, LawsAndEventsSection.heightOfLaws(game));
+        lawsY += Math.max(
+                (game.getEventsInEffect().size() / LAW_COLUMNS + 1) * LAW_HEIGHT,
+                LawsAndEventsSection.heightOfEvents(game));
         return playersY + lawsY + objectivesY + BoardLayout.EXTRA_Y * 3;
     }
 
