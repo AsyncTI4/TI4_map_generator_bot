@@ -52,7 +52,7 @@ public class AiPerception {
             List<AiPrompt> prompts = new ArrayList<>();
             String faction = seat.getFaction();
             for (AiPrompt prompt : privateThreads.getOrDefault(seat.getUserID(), List.of())) {
-                if (isRelevant(PromptSource.AI_THREAD, prompt.buttons(), faction, publicWindowPrefixes)) {
+                if (isRelevantInPrivateThread(prompt, faction, publicWindowPrefixes)) {
                     prompts.add(prompt);
                 }
             }
@@ -122,6 +122,17 @@ public class AiPerception {
         if (source == PromptSource.COMBAT_THREAD) return true;
         if (source == PromptSource.AI_THREAD && content != null && content.contains(OFFER_REJECTED)) return true;
         return source == PromptSource.PUBLIC && AiPrompt.isTableTalk(buttons, content);
+    }
+
+    static boolean isRelevantInPrivateThread(AiPrompt prompt, String faction, Set<String> prefixes) {
+        return isRelevant(PromptSource.AI_THREAD, prompt.buttons(), faction, prefixes) || isRejectionNotice(prompt);
+    }
+
+    public static boolean isRejectionNotice(AiPrompt prompt) {
+        return prompt.source() == PromptSource.AI_THREAD
+                && prompt.buttons().isEmpty()
+                && prompt.content() != null
+                && prompt.content().contains(OFFER_REJECTED);
     }
 
     static boolean isRelevant(PromptSource source, List<PromptButton> buttons, String faction, Set<String> prefixes) {

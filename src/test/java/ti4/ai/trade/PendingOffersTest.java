@@ -5,13 +5,16 @@ import static org.assertj.core.api.Assertions.within;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.perception.AiPerception;
 import ti4.ai.perception.AiPrompt;
+import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
@@ -384,5 +387,26 @@ class PendingOffersTest extends BaseTi4Test {
 
         assertThat(PendingOffers.with(at(table, NOW), table.sol)).isTrue();
         assertThat(OfferBuilder.active(at(table, NOW))).isFalse();
+    }
+
+    // Sol pressed Reject: its notice lands in the AI's thread, so the AI withdraws the dead offer at once (it does not
+    // sit out the reply time) and Sol loses no trust for staying silent.
+    @Test
+    void rescindsARejectedOfferAtOnceWithoutPenalty() {
+        TradeTable table = table(false);
+        sent(table, Purpose.SETTLEMENT);
+        table.test.memory.put("tradeFollow|3|sol", "free");
+        AiPrompt mine = TradeButtons.sent("mine", NOW + 1_000L, table.sol);
+        String content = table.nekro.getRepresentation() + " your offer to " + table.sol.getRepresentation(false, false)
+                + " has been rejected.";
+        AiPrompt notice = new AiPrompt("thread", "notice", PromptSource.AI_THREAD, content, List.of(), NOW + 5_000L);
+        AiTurnContext context = at(table, NOW + 10_000L, mine, notice);
+        assertThat(AiPerception.isRejectionNotice(notice)).isTrue();
+
+        TradeRules.observe(context);
+
+        assertThat(pressed(TradeRules.rescindStale(context))).isEqualTo("rescindOffer_blue");
+        assertThat(PendingOffers.with(context, table.sol)).isFalse();
+        assertThat(Trust.of(context, table.sol)).isCloseTo(0.8, within(CLOSE));
     }
 }
