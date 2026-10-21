@@ -87,7 +87,9 @@ public class MapGenerator implements AutoCloseable {
     private static final int SPACE_FOR_TILE_HEIGHT = 300; // space to calculate tile image height with
     private static final int TILE_WIDTH = 345; // typical width of a tile image
     private static final int MINIMUM_WIDTH_OF_PLAYER_AREA = 1000;
+    private static final int PLAYER_AREAS_LEFT = 10;
     private static final int EXPEDITION_TRACKER_RIGHT_OFFSET = 1200;
+    private static final int SC_LABEL_SPACING = 25;
     private static final int SEGMENT_LABEL_SPACE = 150;
     private static final int CORNER_MARGIN = 20;
     private static final int CORNER_TOP = 60;
@@ -131,6 +133,7 @@ public class MapGenerator implements AutoCloseable {
 
     private final List<WebsiteOverlay> websiteOverlays = new ArrayList<>();
     private final int mapWidth;
+    private final int playerAreasWidth;
     private final int stripWidth;
     private int minX = -1;
     private int minY = -1;
@@ -222,14 +225,6 @@ public class MapGenerator implements AutoCloseable {
         int mostObjectivesInAColumn = Math.max(Math.max(stage1PublicObjCount, stage2PublicObjCount), otherObjCount);
         int heightOfObjectivesSection = Math.max((mostObjectivesInAColumn - 5) * 43, 0);
 
-        // Height of sections of players stats and agendas/events in play and objectives
-        int playerCountForMap = game.getRealPlayers().size() + game.getDummies().size();
-        if (game.getRealPlayers().size() > game.getRealPlayersNNeutral().size()) {
-            playerCountForMap--;
-        }
-        int heightOfPlayerAreasSection =
-                getHeightOfPlayerAreasSection(game, playerCountForMap, heightOfObjectivesSection);
-
         // Height of map section
         int mapHeight = getMapHeight(game);
         // noFractureMode stops the Fracture entering play; it must not hide one that is already on the board
@@ -245,7 +240,6 @@ public class MapGenerator implements AutoCloseable {
         displayTypeBasic = basicTypeOf(this.displayType);
         tilesToDisplay = new HashMap<>(game.getTileMap());
         setupFow(tilesToDisplay);
-        heightOfPlayerAreasSection -= hiddenPlayerAreasHeight();
         Rectangle frameBounds = computeFrameBounds();
         if (frameBounds != null && segmentLabel(true) != null) {
             frameBounds.y -= SEGMENT_LABEL_SPACE;
@@ -276,12 +270,17 @@ public class MapGenerator implements AutoCloseable {
             mapHeight += connectionStripHeight(framedWidth);
         }
 
+        // Height of sections of players stats and agendas/events in play and objectives
+        playerAreasWidth =
+                PlayerAreaGenerator.isMegaGame(game) ? Math.max(mapWidth, megaGamePlayerAreasMinimumWidth()) : mapWidth;
+        int heightOfPlayerAreasSection = heightOfPlayerAreasSection(heightOfObjectivesSection);
+
         // Other things
         switch (displayTypeBasic) {
             case stats:
                 heightForGameInfo = 40;
                 height = heightOfPlayerAreasSection;
-                width = mapWidth;
+                width = playerAreasWidth;
                 break;
             case map:
                 heightForGameInfo = mapHeight;
@@ -296,7 +295,9 @@ public class MapGenerator implements AutoCloseable {
                 } else {
                     heightForGameInfo = mapHeight;
                     height = mapHeight + heightOfPlayerAreasSection;
-                    width = framedWidth;
+                    width = PlayerAreaGenerator.isMegaGame(game)
+                            ? Math.max(framedWidth, playerAreasWidth)
+                            : framedWidth;
                 }
         }
         stripWidth = displayTypeBasic == DisplayType.map ? width : mapWidth;
@@ -309,16 +310,12 @@ public class MapGenerator implements AutoCloseable {
     /**
      * Returns the height for the sections Objectives (above 5) + Laws + Events + Players + idk what EXTRA_Y is for
      */
-    private static int getHeightOfPlayerAreasSection(Game game, int playerCountForMap, int objectivesY) {
-        int playersY = playerCountForMap * TYPICAL_PLAYER_AREA_HEIGHT;
+    private int heightOfPlayerAreasSection(int objectivesY) {
+        int playersY = PlayerAreaGenerator.isMegaGame(game)
+                ? alignedPlayerAreaRowsHeight()
+                : stackedPlayerAreasHeight() - hiddenPlayerAreasHeight();
         int unrealPlayers = game.getNotRealPlayers().size();
         playersY += Math.round(unrealPlayers / 20.0f) * 15;
-        for (Player player : game.getPlayers().values()) {
-            if (hasNoPlayerArea(player)) {
-                playersY -= 350;
-            }
-            playersY += playerAreaHeightAdjustment(player);
-        }
         final int columnsOfLaws = 2;
         final int lawHeight = 115;
         int lawsY = (game.getLaws().size() / columnsOfLaws + 1) * lawHeight;
@@ -326,12 +323,59 @@ public class MapGenerator implements AutoCloseable {
         return playersY + lawsY + objectivesY + EXTRA_Y * 3;
     }
 
+    private int stackedPlayerAreasHeight() {
+        int playerCountForMap = game.getRealPlayers().size() + game.getDummies().size();
+        if (game.getRealPlayers().size() > game.getRealPlayersNNeutral().size()) {
+            playerCountForMap--;
+        }
+        int playersY = playerCountForMap * TYPICAL_PLAYER_AREA_HEIGHT;
+        for (Player player : game.getPlayers().values()) {
+            if (hasNoPlayerArea(player)) {
+                playersY -= 350;
+            }
+        }
+        for (Player player : game.getRealAndEliminatedPlayers()) {
+            playersY += playerAreaHeightAdjustment(player, playerAreasWidth - PLAYER_AREAS_LEFT);
+        }
+        return playersY;
+    }
+
+    private int alignedPlayerAreaRowsHeight() {
+        List<Player> shownPlayers = game.getRealAndEliminatedPlayers().stream()
+                .filter(player -> !hasNoPlayerArea(player) && !shouldConvertToGeneric(player))
+                .toList();
+        List<List<Player>> columns = PlayerAreaGenerator.splitIntoColumns(game, shownPlayers);
+        int columnWidth = PlayerAreaGenerator.columnWidth(playerAreasWidth, PLAYER_AREAS_LEFT, columns.size());
+        int height = 0;
+        for (int row = 0; row < columns.getFirst().size(); row++) {
+            int rowHeight = 0;
+            for (List<Player> column : columns) {
+                if (row < column.size()) {
+                    rowHeight = Math.max(
+                            rowHeight,
+                            TYPICAL_PLAYER_AREA_HEIGHT + playerAreaHeightAdjustment(column.get(row), columnWidth));
+                }
+            }
+            height += rowHeight;
+        }
+        return height;
+    }
+
+    private int megaGamePlayerAreasMinimumWidth() {
+        return PLAYER_AREAS_LEFT + 2 * smallestRegularPlayerAreaWidth() + PlayerAreaGenerator.COLUMN_GAP;
+    }
+
     private static boolean hasNoPlayerArea(Player player) {
         return "neutral".equalsIgnoreCase(player.getFaction()) || (player.isNpc() && player.isDummy());
     }
 
-    private static int playerAreaHeightAdjustment(Player player) {
-        int adjustment = (player.getTeamMateIDs().size() - 1) * 35;
+    private int playerAreaHeightAdjustment(Player player, int areaWidth) {
+        boolean headerCanGrow =
+                PlayerAreaGenerator.isMegaGame(game) || player.getTeamMateIDs().size() > 1;
+        int adjustment = headerCanGrow
+                ? PlayerAreaGenerator.estimateExtraHeaderHeight(
+                        game, player, PLAYER_AREAS_LEFT, PLAYER_AREAS_LEFT + areaWidth)
+                : 0;
         if (player.isEliminated()) {
             return adjustment - 190;
         }
@@ -347,7 +391,8 @@ public class MapGenerator implements AutoCloseable {
         }
         return game.getRealAndEliminatedPlayers().stream()
                 .filter(player -> !hasNoPlayerArea(player) && shouldConvertToGeneric(player))
-                .mapToInt(player -> TYPICAL_PLAYER_AREA_HEIGHT + playerAreaHeightAdjustment(player))
+                .mapToInt(player -> TYPICAL_PLAYER_AREA_HEIGHT
+                        + playerAreaHeightAdjustment(player, playerAreasWidth - PLAYER_AREAS_LEFT))
                 .sum();
     }
 
@@ -815,6 +860,7 @@ public class MapGenerator implements AutoCloseable {
 
     private boolean drawsPlayerInfo() {
         return displayType != DisplayType.stats
+                && !PlayerAreaGenerator.isMegaGame(game)
                 && (!isFowModeActive() || !game.getFowOption(FOWOption.HIDE_PLAYER_INFOS));
     }
 
@@ -1150,7 +1196,7 @@ public class MapGenerator implements AutoCloseable {
         drawSegmentLabel();
         int landscapeShift = (displayType == DisplayType.landscape ? mapWidth : 0);
         int y = heightForGameInfo + 60;
-        int x = landscapeShift + 10;
+        int x = landscapeShift + PLAYER_AREAS_LEFT;
         Point coord;
 
         int deltaX = 0;
@@ -1285,7 +1331,13 @@ public class MapGenerator implements AutoCloseable {
         if (displayTypeBasic == DisplayType.all || displayTypeBasic == DisplayType.stats) {
             Point topLeft = new Point(x, y);
             new PlayerAreaGenerator(
-                            graphics, game, isFoWPrivate, fowPlayer, websiteOverlays, mapWidth, scoreTokenSpacing)
+                            graphics,
+                            game,
+                            isFoWPrivate,
+                            fowPlayer,
+                            websiteOverlays,
+                            playerAreasWidth,
+                            scoreTokenSpacing)
                     .drawAllPlayerAreas(topLeft);
         }
     }
@@ -1493,63 +1545,109 @@ public class MapGenerator implements AutoCloseable {
         return y;
     }
 
+    private record StrategyCardLabel(int sc, int tradeGoods, int width) {}
+
     private Point drawStrategyCards(Point coord) {
-        int x = coord.x;
-        int y = coord.y;
-        boolean convertToGenericSC = isFoWPrivate;
-        int deltaY = y + 80;
-        Map<Integer, Integer> strategyCardToTradeGoodCount = game.getScTradeGoods();
-        Collection<Player> players = game.getPlayers().values();
-        Set<Integer> scPicked = new HashSet<>();
-        for (Player player : players) {
-            scPicked.addAll(player.getSCs());
-        }
-        Map<Integer, Boolean> scPlayed = game.getScPlayed();
+        List<StrategyCardLabel> labels = strategyCardLabels();
+        int rowStart = coord.x;
+        int maxRowWidth = strategyCardRowRightLimit() - rowStart + SC_LABEL_SPACING;
+        List<List<StrategyCardLabel>> rows = PlayerAreaGenerator.isMegaGame(game)
+                ? RowWrap.balancedRows(labels, label -> label.width() + SC_LABEL_SPACING, 0, maxRowWidth)
+                : oneStripOfStrategyCards(labels, rowStart);
 
-        for (Map.Entry<Integer, Integer> scTGs : strategyCardToTradeGoodCount.entrySet()) {
-            Integer sc = scTGs.getKey();
-            if (sc == 0) {
-                continue;
-            }
-            StrategyCardModel scModel =
-                    game.getStrategyCardModelByInitiative(sc).orElse(null);
-            graphics.setFont(Storage.getFont64());
-            int textWidth = graphics.getFontMetrics().stringWidth(Integer.toString(sc));
-
-            if (!convertToGenericSC && !scPicked.contains(sc)) {
-                graphics.setColor(ColorUtil.getSCColor(sc, game));
-                if (!game.getStoredValue("exhaustedSC" + sc).isEmpty()) {
-                    graphics.setColor(Color.GRAY);
-                }
-                graphics.setFont(Storage.getFont64());
-                graphics.drawString(Integer.toString(sc), x, deltaY);
-                // graphics.drawRect(x, y + 24, textWidth, 64); // debug
-                addWebsiteOverlay(scModel, x, y + 24, textWidth, 60);
-                Integer tg = scTGs.getValue();
-                if (tg > 0) {
-                    graphics.setFont(Storage.getFont24());
-                    graphics.setColor(Color.WHITE);
-                    String tgMsg = "TG:" + tg;
-                    int tgMsgTextWidth = graphics.getFontMetrics().stringWidth(tgMsg);
-                    graphics.drawString(tgMsg, x + textWidth / 2 - tgMsgTextWidth / 2, deltaY + 30);
-                    textWidth = Math.max(textWidth, tgMsgTextWidth);
-                }
-            }
-            if (convertToGenericSC && scPlayed.getOrDefault(sc, false)) {
-                graphics.setColor(Color.GRAY);
-                graphics.setFont(Storage.getFont64());
-                graphics.drawString(Integer.toString(sc), x, deltaY);
-            }
-            x += textWidth + 25;
-
-            // Drop down a level if there are a lot of SC cards
-            if (x > (displayType == DisplayType.landscape ? mapWidth + 4 * 520 + EXTRA_X * 2 : stripWidth) - 100) {
+        int x = rowStart;
+        int deltaY = coord.y + 80;
+        for (int row = 0; row < rows.size(); row++) {
+            if (row > 0) {
                 x = 20 + (displayType == DisplayType.landscape ? mapWidth : 0);
                 deltaY += 100;
             }
+            for (StrategyCardLabel label : rows.get(row)) {
+                drawStrategyCardLabel(label, x, coord.y, deltaY);
+                x += label.width() + SC_LABEL_SPACING;
+            }
         }
-
         return new Point(x, deltaY);
+    }
+
+    private List<List<StrategyCardLabel>> oneStripOfStrategyCards(List<StrategyCardLabel> labels, int rowStart) {
+        boolean landscape = displayType == DisplayType.landscape;
+        int rightLimit = (landscape ? mapWidth + 4 * 520 + EXTRA_X * 2 : stripWidth) - 100;
+        List<List<StrategyCardLabel>> rows = new ArrayList<>();
+        rows.add(new ArrayList<>());
+        int x = rowStart;
+        for (StrategyCardLabel label : labels) {
+            rows.getLast().add(label);
+            x += label.width() + SC_LABEL_SPACING;
+            if (x > rightLimit) {
+                x = 20 + (landscape ? mapWidth : 0);
+                rows.add(new ArrayList<>());
+            }
+        }
+        return rows;
+    }
+
+    private List<StrategyCardLabel> strategyCardLabels() {
+        Set<Integer> scPicked = new HashSet<>();
+        for (Player player : game.getPlayers().values()) {
+            scPicked.addAll(player.getSCs());
+        }
+        List<StrategyCardLabel> labels = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> scTGs : game.getScTradeGoods().entrySet()) {
+            int sc = scTGs.getKey();
+            if (sc == 0) {
+                continue;
+            }
+            int tradeGoods = isFoWPrivate || scPicked.contains(sc) ? 0 : scTGs.getValue();
+            graphics.setFont(Storage.getFont64());
+            int width = graphics.getFontMetrics().stringWidth(Integer.toString(sc));
+            if (tradeGoods > 0) {
+                graphics.setFont(Storage.getFont24());
+                width = Math.max(width, graphics.getFontMetrics().stringWidth("TG:" + tradeGoods));
+            }
+            labels.add(new StrategyCardLabel(sc, tradeGoods, width));
+        }
+        return labels;
+    }
+
+    private int strategyCardRowRightLimit() {
+        if (displayType == DisplayType.landscape) {
+            return mapWidth + 4 * 520 + EXTRA_X * 2 - 100;
+        }
+        if (showsExpeditionTracker()) {
+            return stripWidth - EXPEDITION_TRACKER_RIGHT_OFFSET - SC_LABEL_SPACING;
+        }
+        return stripWidth - 100;
+    }
+
+    private void drawStrategyCardLabel(StrategyCardLabel label, int x, int y, int baseline) {
+        int sc = label.sc();
+        String scText = Integer.toString(sc);
+        graphics.setFont(Storage.getFont64());
+        int textWidth = graphics.getFontMetrics().stringWidth(scText);
+        boolean scPicked = game.getPlayers().values().stream()
+                .anyMatch(player -> player.getSCs().contains(sc));
+
+        if (!isFoWPrivate && !scPicked) {
+            graphics.setColor(ColorUtil.getSCColor(sc, game));
+            if (!game.getStoredValue("exhaustedSC" + sc).isEmpty()) {
+                graphics.setColor(Color.GRAY);
+            }
+            graphics.drawString(scText, x, baseline);
+            addWebsiteOverlay(game.getStrategyCardModelByInitiative(sc).orElse(null), x, y + 24, textWidth, 60);
+            if (label.tradeGoods() > 0) {
+                graphics.setFont(Storage.getFont24());
+                graphics.setColor(Color.WHITE);
+                String tgMsg = "TG:" + label.tradeGoods();
+                int tgMsgTextWidth = graphics.getFontMetrics().stringWidth(tgMsg);
+                graphics.drawString(tgMsg, x + textWidth / 2 - tgMsgTextWidth / 2, baseline + 30);
+            }
+        }
+        if (isFoWPrivate && game.getScPlayed().getOrDefault(sc, false)) {
+            graphics.setColor(Color.GRAY);
+            graphics.setFont(Storage.getFont64());
+            graphics.drawString(scText, x, baseline);
+        }
     }
 
     private Point drawTurnOrderTracker(int x, int y) {
@@ -1601,13 +1699,16 @@ public class MapGenerator implements AutoCloseable {
         return new Point(x, y);
     }
 
+    private boolean showsExpeditionTracker() {
+        return game.isThundersEdge()
+                && game.getExpeditions().getRemainingExpeditionCount() > 0
+                && game.getTileFromPlanet("thundersedge") == null
+                && !game.isTwilightsFallMode();
+    }
+
     private void drawExpeditionTracker(int x, int y) {
+        if (!showsExpeditionTracker()) return;
         Expeditions exp = game.getExpeditions();
-        boolean thundersEdgeOnBoard = game.getTileFromPlanet("thundersedge") != null;
-        if (!game.isThundersEdge()
-                || exp.getRemainingExpeditionCount() == 0
-                || thundersEdgeOnBoard
-                || game.isTwilightsFallMode()) return;
 
         drawGeneralImage(x, y, "Expeditions.png");
         if (exp.getTradeGoods() != null) {
@@ -3237,7 +3338,8 @@ public class MapGenerator implements AutoCloseable {
 
     private static boolean hasExtraRow(
             Game game, int ringCount) { // TODO: explain why this exists. Can we get rid of it?
-        return (getMapHeight(ringCount) - EXTRA_Y) < (getMapPlayerCount(game) / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
+        return !PlayerAreaGenerator.isMegaGame(game)
+                && (getMapHeight(ringCount) - EXTRA_Y) < (getMapPlayerCount(game) / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
     }
 
     /**
@@ -3253,14 +3355,22 @@ public class MapGenerator implements AutoCloseable {
     }
 
     static int getMapWidth(Game game, int rings) {
+        int mapWidth = ringsWidth(rings);
+        mapWidth += hasExtraRow(game, rings) ? EXTRA_X : 0;
+        return mapWidth;
+    }
+
+    private static int ringsWidth(int rings) {
         float ringCount = rings;
         ringCount += ringCount == RING_MIN_COUNT
                 ? 1.5f
                 : 1; // make it thick if it's a 3-ring? why? player areas? // also 1.5 * 3 > 1 * 4, weird! 1.5f ->
         // 1.33f?
-        int mapWidth = (int) (ringCount * 520 + EXTRA_X * 2);
-        mapWidth += hasExtraRow(game, rings) ? EXTRA_X : 0;
-        return mapWidth;
+        return (int) (ringCount * 520 + EXTRA_X * 2);
+    }
+
+    static int smallestRegularPlayerAreaWidth() {
+        return ringsWidth(RING_MIN_COUNT) - PLAYER_AREAS_LEFT;
     }
 
     static int extraBoardsWidth(Game game) {
@@ -3291,6 +3401,9 @@ public class MapGenerator implements AutoCloseable {
 
     public static void addWebsiteOverlay(
             List<WebsiteOverlay> overlays, ModelInterface dataModel, int x, int y, int width, int height) {
+        if (dataModel == null) {
+            return;
+        }
         overlays.add(new WebsiteOverlay(dataModel, List.of(x, y, width, height)));
     }
 
