@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.deal.HumanAiDeal;
+import ti4.ai.deal.HumanAiDealStore;
 import ti4.ai.trade.TradeCardRules.FollowChoice;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
@@ -433,18 +435,83 @@ class HacanTradeTest extends BaseTi4Test {
         assertThat(CarthDeals.bestTarget(hacanContext())).containsSame(table.sol);
     }
 
-    // The ask goes to a human only, once; an AI target is judged by the shared acceptance function instead.
+    // A human target gets a deal with steps, not a table-talk ask: Carth replenishes them, they send 3 of their 4
+    // commodities and get 1 back. Carth is not spent until they accept.
     @Test
-    void carthAsksAHumanOnceAndNeverAnAi() {
+    void carthProposesADealToAHumanInsteadOfSpendingTheAgent() {
         giveHacanTheAgent();
         Player human = table.humanSeat("xxcha", "green");
+        human.setCommoditiesBase(4);
+        table.stock(human, 0, 0);
 
-        assertThat(CarthDeals.ask(hacanContext(), table.sol)).isEmpty();
-        Optional<AiDecision> ask = CarthDeals.ask(hacanContext(), human);
-        assertThat(ask.orElseThrow())
-                .isInstanceOfSatisfying(
-                        AiDecision.Announce.class,
-                        announce -> assertThat(announce.text()).contains("Carth of Golden Sands", "1 trade goods"));
-        assertThat(CarthDeals.ask(hacanContext(), human)).isEmpty();
+        AiDecision decision = CarthDeals.propose(hacanContext(), human).orElseThrow();
+
+        HumanAiDeal deal = ((AiDecision.Propose) decision).deal();
+        assertThat(deal.aiFaction()).isEqualTo("hacan");
+        assertThat(deal.humanFaction()).isEqualTo("xxcha");
+        assertThat(deal.status()).isEqualTo(HumanAiDeal.Status.PENDING);
+        assertThat(deal.steps())
+                .containsExactly(
+                        HumanAiDeal.Step.exhaust(
+                                "hacanagent", "xxcha", 3, "uses Carth of Golden Sands to replenish your commodities"),
+                        HumanAiDeal.Step.transfer("xxcha", "hacan", HumanAiDeal.Item.COMMODITIES, 3),
+                        HumanAiDeal.Step.transfer("hacan", "xxcha", HumanAiDeal.Item.COMMODITIES, 1));
+        assertThat(hacan.hasUnexhaustedLeader("hacanagent")).isTrue();
+    }
+
+    // With no commodity to spare Hacan sends the trade good instead.
+    @Test
+    void carthPaysAHumanInTradeGoodsWhenItHasNoCommodity() {
+        giveHacanTheAgent();
+        table.stock(hacan, 0, 2);
+        Player human = table.humanSeat("xxcha", "green");
+        human.setCommoditiesBase(4);
+        table.stock(human, 0, 0);
+
+        HumanAiDeal deal =
+                ((AiDecision.Propose) CarthDeals.propose(hacanContext(), human).orElseThrow()).deal();
+
+        assertThat(deal.steps().getLast())
+                .isEqualTo(HumanAiDeal.Step.transfer("hacan", "xxcha", HumanAiDeal.Item.TRADE_GOODS, 1));
+    }
+
+    // A denied or expired deal puts the human on the rejection cooldown and frees the AI to look at the next candidate;
+    // while one is pending the AI waits.
+    @Test
+    void aDeniedOrExpiredDealCoolsTheHumanDown() {
+        giveHacanTheAgent();
+        Player human = table.humanSeat("xxcha", "green");
+        human.setCommoditiesBase(4);
+        table.stock(human, 0, 0);
+        HumanAiDeal deal =
+                ((AiDecision.Propose) CarthDeals.propose(hacanContext(), human).orElseThrow()).deal();
+        HumanAiDealStore.save(table.game, deal);
+
+        assertThat(HumanDealWatch.pending(hacanContext())).isTrue();
+        HumanDealWatch.observe(hacanContext());
+        assertThat(OfferRejections.coolingDown(hacanContext(), human)).isFalse();
+
+        HumanAiDealStore.save(table.game, deal.withStatus(HumanAiDeal.Status.DENIED));
+        HumanDealWatch.observe(hacanContext());
+        assertThat(HumanDealWatch.pending(hacanContext())).isFalse();
+        assertThat(OfferRejections.coolingDown(hacanContext(), human)).isTrue();
+    }
+
+    @Test
+    void anUnansweredDealExpiresIntoARejection() {
+        giveHacanTheAgent();
+        Player human = table.humanSeat("xxcha", "green");
+        human.setCommoditiesBase(4);
+        table.stock(human, 0, 0);
+        HumanAiDeal deal =
+                ((AiDecision.Propose) CarthDeals.propose(hacanContext(), human).orElseThrow()).deal();
+        HumanAiDealStore.save(table.game, deal);
+
+        AiTurnContext later = table.test.contextFor(hacan, Set.of(), deal.expiresAt() + 1);
+        HumanDealWatch.observe(later);
+
+        assertThat(HumanAiDealStore.latestFor(table.game, "hacan").orElseThrow().status())
+                .isEqualTo(HumanAiDeal.Status.EXPIRED);
+        assertThat(OfferRejections.coolingDown(later, human)).isTrue();
     }
 }

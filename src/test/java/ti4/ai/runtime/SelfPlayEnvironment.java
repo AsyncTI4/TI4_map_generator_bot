@@ -649,6 +649,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
             case AiDecision.Wait wait -> "wait (" + wait.reason() + ")";
             case AiDecision.Idle idle -> "idle";
             case AiDecision.Announce announce -> "announce (" + announce.text() + ")";
+            case AiDecision.Propose propose -> "propose (" + propose.deal().purpose() + ")";
         };
     }
 

@@ -18,6 +18,7 @@ public class TradeRules {
         OfferRejections.observe(context);
         PendingOffers.observe(context);
         TradeCardRules.observe(context);
+        HumanDealWatch.observe(context);
         return Optional.empty();
     }
 
@@ -68,8 +69,12 @@ public class TradeRules {
         return CarthDeals.remembered(context);
     }
 
-    public static Optional<AiDecision> carthAsk(AiTurnContext context, Player target) {
-        return CarthDeals.ask(context, target);
+    public static Optional<AiDecision> carthProposal(AiTurnContext context, Player target) {
+        return CarthDeals.propose(context, target);
+    }
+
+    public static boolean humanDealPending(AiTurnContext context) {
+        return HumanDealWatch.pending(context);
     }
 
     public static boolean carthAccepts(Game game, Player hacan, Player target, int gain) {

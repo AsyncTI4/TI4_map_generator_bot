@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.AiSeats;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
@@ -34,16 +35,17 @@ public class CarthAgentRules {
         Game game = context.game();
         Player seat = context.seat();
         if (!seat.hasLeader(AGENT) || !seat.hasUnexhaustedLeader(AGENT) || !onOwnTurn(context)) return Optional.empty();
-        if (context.memory().has(KEY + context.turnKey())) return Optional.empty();
+        if (context.memory().has(KEY + context.turnKey()) || TradeRules.humanDealPending(context)) {
+            return Optional.empty();
+        }
         Optional<Player> other = otherTarget(context);
         if (other.isEmpty() && !worthGaining(game, seat)) return Optional.empty();
+        if (other.isPresent() && !AiSeats.isAiSeat(other.get())) {
+            return TradeRules.carthProposal(context, other.get());
+        }
         Optional<Match> use = Prompts.owned(Prompts.thisTurn(context), context.faction(), USE_AGENT::equals)
                 .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
         if (use.isEmpty()) return Optional.empty();
-        if (other.isPresent()) {
-            Optional<AiDecision> ask = TradeRules.carthAsk(context, other.get());
-            if (ask.isPresent()) return ask;
-        }
         context.memory().put(KEY + context.turnKey(), String.valueOf(context.now()));
         other.ifPresent(target -> TradeRules.rememberCarthTarget(context, target));
         String reason = other.isPresent()

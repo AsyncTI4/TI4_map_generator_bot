@@ -1,6 +1,9 @@
 package ti4.ai.trade;
 
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
@@ -8,6 +11,7 @@ import ti4.ai.AiSeats;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.deal.HumanAiDeal;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -19,7 +23,9 @@ class CarthDeals {
     private static final String AGENT = "hacanagent";
     private static final String TARGET_KEY = "hacanAgentTarget|";
     private static final String OFFERED_KEY = "hacanAgentOffered|";
-    private static final String ASKED_KEY = "hacanAgentAsked|";
+    private static final String PROPOSED_KEY = "hacanAgentProposed|";
+    private static final String LEADER_NAME = "Carth of Golden Sands";
+    private static final long HUMAN_REPLY_MILLIS = Duration.ofHours(12).toMillis();
     private static final int SMALL_VALUE = 4;
     private static final int MIN_RECEIVED = 2;
 
@@ -64,16 +70,39 @@ class CarthDeals {
                 .map(faction -> context.game().getPlayerFromColorOrFaction(faction));
     }
 
-    static Optional<AiDecision> ask(AiTurnContext context, Player target) {
-        String key = ASKED_KEY + context.turnKey();
-        if (AiSeats.isAiSeat(target) || context.memory().has(key)) return Optional.empty();
-        context.memory().put(key, String.valueOf(context.now()));
-        int gain = requiredGain(context.game(), target, context.seat());
-        int sent = target.getCommoditiesTotal() - gain;
-        String text = "🤖 " + target.getRepresentationNoPing() + ", will you take " + gain
-                + " trade goods if I use Carth of Golden Sands on you? You would send me " + sent
-                + " of the commodities it gives you and I would send you " + gain + ".";
-        return Optional.of(new AiDecision.Announce(text));
+    static Optional<AiDecision> propose(AiTurnContext context, Player target) {
+        Game game = context.game();
+        Player seat = context.seat();
+        Plan plan = plan(game, seat, target);
+        int commodities = Math.min(plan.gain(), TradeBudget.freeCommodities(context));
+        int tradeGoods = plan.gain() - commodities;
+        if (tradeGoods > TradeBudget.freeTradeGoods(game, seat)) return Optional.empty();
+        String ours = seat.getFaction();
+        String theirs = target.getFaction();
+        List<HumanAiDeal.Step> steps = new ArrayList<>();
+        steps.add(HumanAiDeal.Step.exhaust(
+                AGENT, theirs, plan.received(), "uses " + LEADER_NAME + " to replenish your commodities"));
+        steps.add(HumanAiDeal.Step.transfer(theirs, ours, HumanAiDeal.Item.COMMODITIES, plan.received()));
+        if (commodities > 0) {
+            steps.add(HumanAiDeal.Step.transfer(ours, theirs, HumanAiDeal.Item.COMMODITIES, commodities));
+        }
+        if (tradeGoods > 0) {
+            steps.add(HumanAiDeal.Step.transfer(ours, theirs, HumanAiDeal.Item.TRADE_GOODS, tradeGoods));
+        }
+        HumanAiDeal deal = new HumanAiDeal(
+                Long.toString(context.now(), Character.MAX_RADIX),
+                ours,
+                theirs,
+                LEADER_NAME + ": " + plan.gain() + " trade goods for you",
+                game.getRound(),
+                context.now() + HUMAN_REPLY_MILLIS,
+                HumanAiDeal.Status.PENDING,
+                "",
+                "",
+                steps);
+        context.memory().put(proposedKey(context, target), String.valueOf(context.now()));
+        OwnTurnDeals.noteApproach(context, target);
+        return Optional.of(new AiDecision.Propose(deal));
     }
 
     static Optional<AiDecision> preWash(AiTurnContext context) {
@@ -161,8 +190,13 @@ class CarthDeals {
                 .filter(other -> !TradeLegality.windowUsed(context, other))
                 .filter(other -> !PendingOffers.with(context, other))
                 .filter(other -> AiSeats.isAiSeat(other) || OwnTurnDeals.mayApproach(context, other))
+                .filter(other -> !context.memory().has(proposedKey(context, other)))
                 .map(other -> plan(game, seat, other))
                 .filter(plan -> plan.gain() <= give && plan.received() >= MIN_RECEIVED);
+    }
+
+    private static String proposedKey(AiTurnContext context, Player target) {
+        return PROPOSED_KEY + context.turnKey() + "|" + target.getFaction();
     }
 
     private static Plan plan(Game game, Player seat, Player target) {

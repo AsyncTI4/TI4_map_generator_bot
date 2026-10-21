@@ -495,6 +495,12 @@ public final class ButtonHelperAgents {
                     player.getCorrectChannel(), "Could not find player, please resolve manually.");
             return;
         }
+        replenishWithHacanAgent(event, game, player, p2);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static void replenishWithHacanAgent(
+            GenericInteractionCreateEvent event, Game game, Player player, Player p2) {
         String message;
         if (p2 == player) {
             message = player.getRepresentationUnfogged() + " increased your commodities by two";
@@ -512,7 +518,6 @@ public final class ButtonHelperAgents {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("mercerMove_")
@@ -989,6 +994,11 @@ public final class ButtonHelperAgents {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
                     + "Carth of Golden Sands, the Hacan" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
+            Player refreshed = rest.contains("_") ? game.getPlayerFromColorOrFaction(rest.split("_")[1]) : null;
+            if (refreshed != null) {
+                replenishWithHacanAgent(event, game, player, refreshed);
+                return;
+            }
             message = trueIdentity + ", please choose the faction on which you wish to use " + ssruuClever
                     + "Carth of Golden Sands, the Hacan" + ssruuSlash + " agent.";
             List<Button> buttons = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "hacanAgentRefresh", null);

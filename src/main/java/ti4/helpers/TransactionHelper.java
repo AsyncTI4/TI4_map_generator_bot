@@ -276,7 +276,7 @@ public class TransactionHelper {
         };
     }
 
-    private static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
+    public static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
         GameEventService.commit(
                 game,

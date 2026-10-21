@@ -48,7 +48,7 @@ class OfferRejections {
                 .findFirst();
     }
 
-    private static void rejected(AiTurnContext context, Player partner, long at) {
+    static void rejected(AiTurnContext context, Player partner, long at) {
         AiMemory memory = context.memory();
         memory.put(
                 REJECTED_ROUND_KEY + partner.getFaction(),
