@@ -1,7 +1,7 @@
 package ti4.image;
 
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import ti4.game.Game;
@@ -44,7 +44,7 @@ class ObjectiveBox {
         return bufferedImage != null ? bufferedImage.getWidth() + 6 : 30;
     }
 
-    public void display(Game game, Graphics graphics, FogView fog, WebsiteOverlays overlays, Objective objective) {
+    public void display(Game game, Graphics2D graphics, FogView fog, WebsiteOverlays overlays, Objective objective) {
         setColor(graphics, objective);
 
         graphics.drawString(objective.getDisplayText(game), x, y + textVerticalOffset);
@@ -63,7 +63,7 @@ class ObjectiveBox {
         displayScoreMarkers(game, graphics, fog, objective);
     }
 
-    public static Integer getMaxTextWidth(Game game, Graphics graphics, List<Objective> objectives) {
+    public static Integer getMaxTextWidth(Game game, Graphics2D graphics, List<Objective> objectives) {
         int maxTextWidth = 0;
         for (Objective objective : objectives) {
             maxTextWidth =
@@ -93,7 +93,7 @@ class ObjectiveBox {
                 + (game.getRealAndEliminatedAndDummyPlayers().size() * scoreTokenSpacing);
     }
 
-    private void displayScoreMarkers(Game game, Graphics graphics, FogView fog, Objective objective) {
+    private void displayScoreMarkers(Game game, Graphics2D graphics, FogView fog, Objective objective) {
         List<String> playerIDs;
         if (objective.revealed() && objective.scoredPlayerIDs() != null) {
             playerIDs = objective.scoredPlayerIDs();
@@ -126,7 +126,7 @@ class ObjectiveBox {
                 BufferedImage controlTokenImage =
                         ImageHelper.readScaled(Mapper.getCCPath(controlID), controlTokenScale);
                 if (objective.isMultiScoring(game) || game.isFowMode()) {
-                    DrawingUtil.drawControlToken(
+                    PlayerTokens.drawControlToken(
                             graphics, controlTokenImage, player, x, y, convertToGeneric, controlTokenScale);
                     x += controlTokenSpacing;
 
@@ -134,7 +134,7 @@ class ObjectiveBox {
                     int xPosition = x
                             + controlTokenSpacing
                                     * (game.getRealPlayers().indexOf(player)); // TODO: fix cabal at index 0 for pbd1000
-                    DrawingUtil.drawControlToken(
+                    PlayerTokens.drawControlToken(
                             graphics, controlTokenImage, player, xPosition, y, convertToGeneric, controlTokenScale);
                 }
             }
@@ -143,7 +143,7 @@ class ObjectiveBox {
         }
     }
 
-    private static void setColor(Graphics graphics, Objective objective) {
+    private static void setColor(Graphics2D graphics, Objective objective) {
         switch (objective.type()) {
             case Stage1 -> {
                 if (objective.revealed()) {

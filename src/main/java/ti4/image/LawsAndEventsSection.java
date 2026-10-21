@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.DisplayType;
@@ -217,7 +216,7 @@ final class LawsAndEventsSection {
             if (convertToGeneric || electedPlayer == null) {
                 paintIcon(g2, "agenda.png", x, y);
             } else {
-                DrawingUtil.drawPlayerFactionIconImage(g2, electedPlayer, x + 2, y + 2, 95, 95);
+                FactionIcons.draw(g2, electedPlayer, x + 2, y + 2, 95, 95);
             }
         }
         if (!game.getStoredValue("controlTokensOnAgenda" + lawEntry.getValue()).isEmpty()) {
@@ -233,7 +232,7 @@ final class LawsAndEventsSection {
                 }
                 float scale = 0.80f;
                 BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
-                DrawingUtil.drawControlToken(
+                PlayerTokens.drawControlToken(
                         g2,
                         controlTokenImage,
                         game.getPlayerFromColorOrFaction(debtToken),
@@ -248,7 +247,7 @@ final class LawsAndEventsSection {
     }
 
     private static void paintIcon(Graphics2D g2, String factionFileName, int x, int y) {
-        String factionFile = ResourceHelper.getInstance().getFactionFile(factionFileName);
+        String factionFile = ImageResources.faction(factionFileName);
         if (factionFile != null) {
             BufferedImage bufferedImage = ImageHelper.read(factionFile);
             g2.drawImage(bufferedImage, x + ICON_INSET, y + ICON_INSET, null);

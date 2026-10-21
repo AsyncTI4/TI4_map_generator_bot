@@ -50,7 +50,6 @@ public record MapSegment(
     private static final String CLUSTER_TOKEN = "c";
     private static final Pattern NAME_PATTERN = Pattern.compile("[a-z0-9-]{1,20}");
     private static final Pattern BOARD_NAME_PATTERN = Pattern.compile("board-[a-g]");
-    private static final Set<String> CORNER_POSITIONS = Set.of("tl", "tr", "bl", "br");
     private static final List<String> FRACTURE_POSITIONS =
             IntStream.rangeClosed(1, 25).mapToObj(i -> "frac" + i).toList();
 
@@ -294,7 +293,7 @@ public record MapSegment(
 
     public static boolean canJoinSector(String position) {
         return !isFracturePosition(position)
-                && !CORNER_POSITIONS.contains(position.toLowerCase())
+                && !BoardLayout.CORNER_POSITIONS.contains(position.toLowerCase())
                 && PositionMapper.getTilePosition(position) != null;
     }
 
@@ -356,7 +355,7 @@ public record MapSegment(
     private static Set<String> placedGridPositions(Game game) {
         return game.getTileMap().keySet().stream()
                 .filter(position -> !isFracturePosition(position))
-                .filter(position -> !CORNER_POSITIONS.contains(position.toLowerCase()))
+                .filter(position -> !BoardLayout.CORNER_POSITIONS.contains(position.toLowerCase()))
                 .filter(position -> PositionMapper.getTilePosition(position) != null)
                 .collect(Collectors.toSet());
     }
@@ -579,7 +578,7 @@ public record MapSegment(
     static Set<String> uncoveredMainPositions(Game game, List<MapSegment> segments) {
         return game.getTileMap().keySet().stream()
                 .filter(position -> !isDetachedPosition(game, position))
-                .filter(position -> !CORNER_POSITIONS.contains(position.toLowerCase()))
+                .filter(position -> !BoardLayout.CORNER_POSITIONS.contains(position.toLowerCase()))
                 .filter(position -> segments.stream()
                         .noneMatch(segment -> segment.positions().contains(position)))
                 .collect(Collectors.toSet());

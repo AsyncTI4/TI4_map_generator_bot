@@ -3,7 +3,7 @@ package ti4.discord.interactions.commands.help;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,10 +18,11 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
-import ti4.image.DrawingUtil;
 import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.image.Mapper;
+import ti4.image.OutlinedText;
 import ti4.image.VerticalAlign;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -105,8 +106,8 @@ class SampleColors extends Subcommand {
         int y = top;
 
         BufferedImage coloursImage = new BufferedImage(PAGEWIDTH, PAGEHIGHT, BufferedImage.TYPE_INT_ARGB);
-        BufferedImage backgroundImage = ImageHelper.read(ResourceHelper.getExtraFile("starfield.png"));
-        Graphics graphic = coloursImage.getGraphics();
+        BufferedImage backgroundImage = ImageHelper.read(ImageResources.extra("starfield.png"));
+        Graphics2D graphic = coloursImage.createGraphics();
         graphic.drawImage(backgroundImage, 0, 0, null);
 
         for (String h : hues) {
@@ -118,11 +119,10 @@ class SampleColors extends Subcommand {
                 }
                 String alias = c.getAlias();
 
-                BufferedImage dread =
-                        ImageHelper.read(ResourceHelper.getInstance().getUnitFile(alias + "_dn.png"));
+                BufferedImage dread = ImageHelper.read(ImageResources.unit(alias + "_dn.png"));
                 graphic.drawImage(dread, x + SPACING, y + SPACING, null);
                 graphic.setFont(bigFont);
-                DrawingUtil.superDrawString(
+                OutlinedText.draw(
                         graphic,
                         c.getName(),
                         x + DREADWIDTH / 2,
@@ -133,7 +133,7 @@ class SampleColors extends Subcommand {
                         stroke,
                         Color.BLACK);
                 graphic.setFont(smallFont);
-                DrawingUtil.superDrawString(
+                OutlinedText.draw(
                         graphic,
                         alias,
                         x + DREADWIDTH / 2,
@@ -154,7 +154,7 @@ class SampleColors extends Subcommand {
                             y + SPACING + (multi ? 0 : DREADTEXHIGHT),
                             null);
                     graphic.setFont(bigFont);
-                    DrawingUtil.superDrawString(
+                    OutlinedText.draw(
                             graphic,
                             ("lgy".equals(alias) ? "orca" : "split" + c.getName()),
                             x + (multi ? 3 : 1) * DREADWIDTH / 2,
@@ -165,7 +165,7 @@ class SampleColors extends Subcommand {
                             stroke,
                             Color.BLACK);
                     graphic.setFont(smallFont);
-                    DrawingUtil.superDrawString(
+                    OutlinedText.draw(
                             graphic,
                             ("lgy".equals(alias) ? "orca" : "split" + alias),
                             x + (multi ? 3 : 1) * DREADWIDTH / 2,

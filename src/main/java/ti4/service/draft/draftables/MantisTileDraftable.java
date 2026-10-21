@@ -162,7 +162,7 @@ public class MantisTileDraftable extends Draftable {
     private DraftChoice produceChoice(DraftItem tile) {
         String tileID = tile.getItemId();
         String choiceKey = makeChoiceKey(tileID);
-        String representation = Mapper.getTileRepresentations().get(tileID);
+        String representation = Mapper.getTileRepresentation(tileID);
         if (representation == null) {
             representation = tileID;
         }

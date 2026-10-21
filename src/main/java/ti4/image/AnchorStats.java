@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -152,15 +151,15 @@ final class AnchorStats {
             deltaSplitY = point.y;
         }
 
-        DrawingUtil.drawCCOfPlayer(
+        PlayerTokens.drawCommandCounters(
                 g2, ccID, x + deltaSplitX, y - deltaSplitY, player.getTacticalCC(), player, false, false);
         FleetCommandCounters.draw(g2, fleetCCID, x + deltaSplitX, y + 65 - deltaSplitY, player, false);
-        DrawingUtil.drawCCOfPlayer(
+        PlayerTokens.drawCommandCounters(
                 g2, ccID, x + deltaSplitX, y + 130 - deltaSplitY, player.getStrategicCC(), player, false, false);
 
         if (player.isSpeaker()) {
             String speakerID = Mapper.getTokenID(Constants.SPEAKER);
-            String speakerFile = ResourceHelper.getInstance().getTokenFile(speakerID);
+            String speakerFile = ImageResources.token(speakerID);
             if (speakerFile != null) {
                 BufferedImage bufferedImage = ImageHelper.read(speakerFile);
                 point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
@@ -174,7 +173,7 @@ final class AnchorStats {
             }
         }
         if (player.isTyrant()) {
-            String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID("tyrant"));
+            String speakerFile = ImageResources.token(Mapper.getTokenID("tyrant"));
             if (speakerFile != null) {
                 BufferedImage bufferedImage = ImageHelper.read(speakerFile);
                 point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);

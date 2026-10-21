@@ -41,6 +41,10 @@ public class ColorUtil {
                 : getPlayerMainColor(p);
     }
 
+    public String blackWhiteFileSuffix(String colorId) {
+        return "black".equalsIgnoreCase(Mapper.getColor(colorId).getTextColor()) ? "_blk.png" : "_wht.png";
+    }
+
     private Color getColor(String color) {
         color = Mapper.getColorName(color);
         if (color == null) return Color.WHITE;

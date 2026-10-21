@@ -8,7 +8,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Storage;
-import ti4.image.ImageHelper;
+import ti4.image.ImageEncoder;
 import ti4.logging.BotLogger;
 
 @UtilityClass
@@ -26,9 +26,9 @@ public class FileUploadService {
             BufferedImage bufferedImage, String filenamePrefix, String fileFormat, boolean saveLocalCopy) {
         byte[] imageBytes;
         switch (fileFormat) {
-            case "png" -> imageBytes = ImageHelper.writePng(bufferedImage);
-            case "jpg" -> imageBytes = ImageHelper.writeJpg(bufferedImage);
-            case "webp" -> imageBytes = ImageHelper.writeWebp(bufferedImage);
+            case "png" -> imageBytes = ImageEncoder.png(bufferedImage);
+            case "jpg" -> imageBytes = ImageEncoder.jpg(bufferedImage);
+            case "webp" -> imageBytes = ImageEncoder.webp(bufferedImage);
             default -> throw new IllegalArgumentException("Unsupported file format: " + fileFormat);
         }
         return createFileUpload(imageBytes, filenamePrefix, fileFormat, saveLocalCopy);
@@ -49,7 +49,7 @@ public class FileUploadService {
     }
 
     public static void saveLocalPng(BufferedImage image, String filenamePrefix) {
-        byte[] imageBytes = ImageHelper.writePng(image);
+        byte[] imageBytes = ImageEncoder.png(image);
         optionallySaveToLocal(imageBytes, filenamePrefix, "png");
     }
 

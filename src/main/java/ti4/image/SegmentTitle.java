@@ -49,7 +49,7 @@ final class SegmentTitle {
     private static void drawTitle(
             Graphics2D g2, int width, String text, Font font, Color color, Stroke stroke, Color outline) {
         g2.setFont(font);
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 g2,
                 text,
                 width / 2,

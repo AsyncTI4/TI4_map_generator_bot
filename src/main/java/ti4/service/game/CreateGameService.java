@@ -48,6 +48,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -475,7 +476,7 @@ public class CreateGameService {
                                 }
                                 MessageHelper.sendMessageToChannel(introThread, message);
                                 BufferedImage colorsImage = ImageHelper.readScaled(
-                                        ResourceHelper.getExtraFile("Compiled_Async_colors.png"), 731, 593);
+                                        ImageResources.extra("Compiled_Async_colors.png"), 731, 593);
                                 FileUpload fileUpload = FileUploadService.createFileUpload(colorsImage, "colors");
                                 MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
                             } catch (Exception e) {

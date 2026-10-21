@@ -1365,19 +1365,19 @@ public class Mapper {
 
     @Nullable
     public static String getCCPath(String ccID) {
-        return ResourceHelper.getInstance().getCCFile(ccID);
+        return ImageResources.commandToken(ccID);
     }
 
     @Nullable
     public static String getPeekMarkerPath(String markerID) {
-        return ResourceHelper.getInstance().getPeekMarkerFile(markerID);
+        return ImageResources.peekMarker(markerID);
     }
 
     @Nullable
     public static String getTokenPath(String tokenID) {
-        String tokenPath = ResourceHelper.getInstance().getAttachmentFile(tokenID);
+        String tokenPath = ImageResources.attachment(tokenID);
         if (tokenPath == null || !(new File(tokenPath).exists())) {
-            tokenPath = ResourceHelper.getInstance().getTokenFile(tokenID);
+            tokenPath = ImageResources.token(tokenID);
             if (tokenPath == null) {
                 BotLogger.warning("Could not find token path: " + tokenID);
                 return null;
@@ -1426,7 +1426,7 @@ public class Mapper {
     }
 
     private static boolean isValidAsyncUnitID(String asyncUnitID) {
-        return getUnitIDList().contains(asyncUnitID);
+        return units.values().stream().anyMatch(unit -> Objects.equals(asyncUnitID, unit.getAsyncId()));
     }
 
     public static Set<String> getUnitIDList() {
@@ -1520,9 +1520,10 @@ public class Mapper {
     // ####################
     // Tiles
 
-    public static Map<String, String> getTileRepresentations() {
-        return TileHelper.getAllTileModels().stream()
-                .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
+    @Nullable
+    public static String getTileRepresentation(String tileID) {
+        TileModel tile = TileHelper.getTileById(tileID);
+        return tile == null ? null : tile.getNameNullSafe();
     }
 
     public static String getTileID(String tileID) {

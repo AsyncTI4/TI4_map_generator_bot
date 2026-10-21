@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -29,19 +28,19 @@ final class TechSkipHighlights implements OffBoardHighlights {
                 for (String skip : skips) {
                     switch (skip.toLowerCase()) {
                         case "biotic":
-                            techFiles.add(ResourceHelper.getInstance().getGeneralFile("Biotic light.png"));
+                            techFiles.add(ImageResources.general("Biotic light.png"));
                             break;
                         case "cybernetic":
-                            techFiles.add(ResourceHelper.getInstance().getGeneralFile("Cybernetic light.png"));
+                            techFiles.add(ImageResources.general("Cybernetic light.png"));
                             break;
                         case "propulsion":
-                            techFiles.add(ResourceHelper.getInstance().getGeneralFile("Propulsion_light.png"));
+                            techFiles.add(ImageResources.general("Propulsion_light.png"));
                             break;
                         case "warfare":
-                            techFiles.add(ResourceHelper.getInstance().getGeneralFile("Warfare_light.png"));
+                            techFiles.add(ImageResources.general("Warfare_light.png"));
                             break;
                         default:
-                            techFiles.add(ResourceHelper.getInstance().getGeneralFile("Generic_Technology.png"));
+                            techFiles.add(ImageResources.general("Generic_Technology.png"));
                     }
                     offBoardHighlighting++;
                 }

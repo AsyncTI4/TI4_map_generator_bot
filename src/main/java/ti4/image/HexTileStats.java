@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -64,13 +63,13 @@ final class HexTileStats {
         ColorModel playerColor = Mapper.getColor(player.getColor());
         float bgAlpha = 0.10f;
         Color bgColor = player.isActivePlayer() ? Color.green : (player.isPassed() ? Color.red : Color.BLACK);
-        BufferedImage tint = DrawingUtil.tintedBackground(bgColor, bgAlpha);
+        BufferedImage tint = HexOverlays.tint(bgColor, bgAlpha);
         for (String pos : statTiles) {
             Point p = points.get(pos);
             List<Integer> adjDir = new ArrayList<>();
             List<String> adjPos = PositionMapper.getAdjacentTilePositions(pos);
             for (int i = 0; i < 6; i++) if (statTiles.contains(adjPos.get(i))) adjDir.add(i);
-            BufferedImage hex = DrawingUtil.hexBorder(game.getHexBorderStyle(), playerColor, adjDir);
+            BufferedImage hex = HexOverlays.border(game.getHexBorderStyle(), playerColor, adjDir);
             g2.drawImage(tint, p.x, p.y, null);
             g2.drawImage(hex, p.x, p.y, null);
         }
@@ -95,8 +94,8 @@ final class HexTileStats {
         point = PositionMapper.getPlayerStats("factionicon");
         int size = 275;
         point.translate(statTileMid.x - (size / 2), statTileMid.y - (size / 2));
-        DrawingUtil.drawPlayerFactionIconImageUnderlay(g2, player, point.x, point.y, size, size);
-        DrawingUtil.drawPlayerFactionIconImageOpaque(g2, player, point.x, point.y, size, size, 0.40f);
+        FactionIcons.drawUnderlay(g2, player, point.x, point.y, size, size);
+        FactionIcons.drawFaded(g2, player, point.x, point.y, size, size, 0.40f);
     }
 
     private void drawUsername(Game game, Player player, Point statTileMid, HorizontalAlign center) {
@@ -106,7 +105,7 @@ final class HexTileStats {
         point = PositionMapper.getPlayerStats("newuserName");
         if (!game.hideUserNames()) {
             String name = userName.substring(0, Math.min(userName.length(), 15));
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     g2,
                     name,
                     statTileMid.x + point.x,
@@ -130,8 +129,7 @@ final class HexTileStats {
         if (player.getDisplayName() != null && !"null".equals(player.getDisplayName())) {
             factionText = player.getDisplayName();
         }
-        DrawingUtil.superDrawString(
-                g2, factionText, point.x, point.y, Color.WHITE, center, null, Strokes.STROKE_5, Color.BLACK);
+        OutlinedText.draw(g2, factionText, point.x, point.y, Color.WHITE, center, null, Strokes.STROKE_5, Color.BLACK);
     }
 
     private void drawVictoryPoints(Game game, Player player, Point statTileMid, HorizontalAlign center) {
@@ -140,8 +138,7 @@ final class HexTileStats {
         String vpCount = "VP: " + player.getTotalVictoryPoints() + " / " + game.getVp();
         point = PositionMapper.getPlayerStats("newvp");
         point.translate(statTileMid.x, statTileMid.y);
-        DrawingUtil.superDrawString(
-                g2, vpCount, point.x, point.y, Color.WHITE, center, null, Strokes.STROKE_5, Color.BLACK);
+        OutlinedText.draw(g2, vpCount, point.x, point.y, Color.WHITE, center, null, Strokes.STROKE_5, Color.BLACK);
     }
 
     private void drawSecretObjectiveIcons(Game game, Player player, Point statTileMid) {
@@ -197,9 +194,9 @@ final class HexTileStats {
             }
         }
 
-        DrawingUtil.drawCCOfPlayer(g2, ccID, point.x, point.y, player.getTacticalCC(), player, false, rightAlign);
+        PlayerTokens.drawCommandCounters(g2, ccID, point.x, point.y, player.getTacticalCC(), player, false, rightAlign);
         FleetCommandCounters.draw(g2, fleetCCID, point.x, point.y + 65, player, rightAlign);
-        DrawingUtil.drawCCOfPlayer(
+        PlayerTokens.drawCommandCounters(
                 g2, ccID, point.x, point.y + 130, player.getStrategicCC(), player, false, rightAlign);
 
         int additionalFleetSupply = 0;
@@ -216,11 +213,9 @@ final class HexTileStats {
         g2.setFont(Storage.getFont28());
         point.translate(rightAlign ? 58 : -3, 32);
         String fleetCCs = player.getFleetCC() + additionalFleetSupply + addFS;
-        DrawingUtil.superDrawString(
-                g2, reps.get(0), point.x, point.y, Color.WHITE, align, null, Strokes.STROKE_4, Color.BLACK);
-        DrawingUtil.superDrawString(
-                g2, fleetCCs, point.x, point.y + 65, Color.WHITE, align, null, Strokes.STROKE_4, Color.BLACK);
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(g2, reps.get(0), point.x, point.y, Color.WHITE, align, null, Strokes.STROKE_4, Color.BLACK);
+        OutlinedText.draw(g2, fleetCCs, point.x, point.y + 65, Color.WHITE, align, null, Strokes.STROKE_4, Color.BLACK);
+        OutlinedText.draw(
                 g2, reps.get(2), point.x, point.y + 130, Color.WHITE, align, null, Strokes.STROKE_4, Color.BLACK);
         return miscTile;
     }
@@ -249,7 +244,7 @@ final class HexTileStats {
                 point.translate(scsize, 0);
             } else {
                 int fontYoffset = (scsize / 2) + 25;
-                DrawingUtil.superDrawString(
+                OutlinedText.draw(
                         g2,
                         Integer.toString(sc),
                         point.x,
@@ -276,19 +271,18 @@ final class HexTileStats {
         if (player.isPassed()) {
             point = PositionMapper.getPlayerStats("newpassed");
             point.translate(miscTile.x, miscTile.y);
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     g2, "PASSED", point.x, point.y, ColorUtil.PassedColor, center, null, Strokes.STROKE_4, Color.BLACK);
         } else if (player.getUserID().equals(activePlayerID) && "action".equals(phase)) {
             point = PositionMapper.getPlayerStats("newpassed");
             point.translate(miscTile.x, miscTile.y);
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     g2, "ACTIVE", point.x, point.y, ColorUtil.ActiveColor, center, null, Strokes.STROKE_4, Color.BLACK);
         }
         if (player.isAFK()) {
             point = PositionMapper.getPlayerStats("newafk");
             point.translate(miscTile.x, miscTile.y);
-            DrawingUtil.superDrawString(
-                    g2, "AFK", point.x, point.y, Color.gray, center, null, Strokes.STROKE_4, Color.BLACK);
+            OutlinedText.draw(g2, "AFK", point.x, point.y, Color.gray, center, null, Strokes.STROKE_4, Color.BLACK);
         }
         g2.setColor(Color.WHITE);
     }
@@ -297,7 +291,7 @@ final class HexTileStats {
         Point point;
         if (player.isSpeaker()) {
             String speakerID = Mapper.getTokenID(Constants.SPEAKER);
-            String speakerFile = ResourceHelper.getInstance().getTokenFile(speakerID);
+            String speakerFile = ImageResources.token(speakerID);
             BufferedImage img = ImageHelper.read(speakerFile);
             if (img != null) {
                 point = PositionMapper.getPlayerStats("newspeaker");
@@ -306,7 +300,7 @@ final class HexTileStats {
             }
         }
         if (player.isTyrant()) {
-            String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID("tyrant"));
+            String speakerFile = ImageResources.token(Mapper.getTokenID("tyrant"));
             BufferedImage img = ImageHelper.read(speakerFile);
             if (img != null) {
                 point = PositionMapper.getPlayerStats("newspeaker");

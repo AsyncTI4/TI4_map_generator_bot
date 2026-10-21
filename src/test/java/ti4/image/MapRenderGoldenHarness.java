@@ -1,6 +1,5 @@
 package ti4.image;
 
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -66,8 +65,9 @@ import ti4.website.model.WebsiteOverlay;
  * Every render reloads the save from disk, because rendering mutates the game (fog filtering, tile distances, debt
  * pool icons). Rendering runs on the test thread through MapRenderer.resolve and MapRenderer.paint (the canvas without encoding), so static
  * mocks and the global RenderRandom mode apply. Random choices are pinned by RenderRandom.neutral() (or eager() for
- * the easter egg subset); the wall clock, AFK status and network emoji fetches are pinned with static mocks that keep
- * every other method real (CALLS_REAL_METHODS) so only the named method is replaced. No pixel is masked.
+ * the easter egg subset); the wall clock and AFK status are pinned with static mocks that keep
+ * every other method real (CALLS_REAL_METHODS) so only the named method is replaced, and every network image fetch answers 404 (FakeImageNetwork), so custom
+ * faction emoji and avatars are missing exactly as when the fetch fails. No pixel is masked.
  *
  * Per render the harness records the canvas size, a SHA-256 of the raster, CRC-like hashes per 128px block (to
  * localize a mismatch without storing pictures), the website overlays as order-sensitive JSON, the RenderRandom call
@@ -297,7 +297,7 @@ class MapRenderGoldenHarness extends BaseTi4Test {
 
         try (MockedStatic<DateTimeHelper> dateTime = mockStatic(DateTimeHelper.class, Mockito.CALLS_REAL_METHODS);
                 MockedStatic<AFKService> afk = mockStatic(AFKService.class, Mockito.CALLS_REAL_METHODS);
-                MockedStatic<ImageHelper> images = mockStatic(ImageHelper.class, Mockito.CALLS_REAL_METHODS);
+                FakeImageNetwork network = FakeImageNetwork.notFound();
                 MockedStatic<MessageHelper> messages = mockStatic(MessageHelper.class, invocation -> {
                     MESSAGES.incrementAndGet();
                     return invocation.callRealMethod();
@@ -305,8 +305,6 @@ class MapRenderGoldenHarness extends BaseTi4Test {
             dateTime.when(DateTimeHelper::getFormattedTimestamp).thenReturn("2000.01.01 - 00.00.00");
             dateTime.when(DateTimeHelper::getFormattedTimestampWithMillis).thenReturn("2000.01.01 - 00.00.00.000");
             afk.when(() -> AFKService.userIsAFK(anyString())).thenReturn(false);
-            images.when(() -> ImageHelper.readURLScaled(anyString(), anyInt(), anyInt()))
-                    .thenReturn(null);
 
             for (Path save : saves) {
                 String gameName = gameNameOf(save);

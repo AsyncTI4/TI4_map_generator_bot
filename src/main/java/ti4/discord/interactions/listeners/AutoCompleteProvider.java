@@ -1290,7 +1290,7 @@ class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Predicate<MiltyDraftTile> matchesEnteredText = tile -> {
                     String representation =
-                            Mapper.getTileRepresentations().get(tile.getTile().getTileID());
+                            Mapper.getTileRepresentation(tile.getTile().getTileID());
                     return representation != null
                             && representation.toLowerCase().contains(enteredValue);
                 };
@@ -1301,8 +1301,7 @@ class AutoCompleteProvider {
                         .toList();
                 event.replyChoices(tiles.stream()
                                 .map(t -> new Command.Choice(
-                                        Mapper.getTileRepresentations()
-                                                        .get(t.getTile().getTileID()) + " ("
+                                        Mapper.getTileRepresentation(t.getTile().getTileID()) + " ("
                                                 + t.getTile().getTileID() + ")",
                                         t.getTile().getTileID()))
                                 .toList())

@@ -2,7 +2,7 @@ package ti4.service.draft;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -14,8 +14,8 @@ import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Storage;
-import ti4.image.DrawingUtil;
 import ti4.image.HorizontalAlign;
+import ti4.image.OutlinedText;
 import ti4.image.PositionMapper;
 import ti4.image.TileLayers;
 import ti4.image.TileStep;
@@ -66,7 +66,7 @@ public class MantisBuildImageGeneratorService {
         int width = getMapWidth(game);
         int height = getMapHeight(game);
         BufferedImage mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics graphicsMain = mainImage.getGraphics();
+        Graphics2D graphicsMain = mainImage.createGraphics();
 
         Map<String, Tile> tileMap = getRelevantTiles(mapBuildContext);
 
@@ -120,13 +120,13 @@ public class MantisBuildImageGeneratorService {
         return mainImage;
     }
 
-    private void drawAvailability(Graphics graphics, String positionName, Point positionPoint, Game game) {
+    private void drawAvailability(Graphics2D graphics, String positionName, Point positionPoint, Game game) {
         Point base = new Point(positionPoint.x + TILE_PADDING, positionPoint.y + TILE_PADDING + 20);
 
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(Color.white);
         graphics.setFont(Storage.getFont64());
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 graphics,
                 positionName,
                 base.x + 172,
@@ -138,7 +138,7 @@ public class MantisBuildImageGeneratorService {
                 Color.black);
     }
 
-    private void drawPendingTile(Graphics graphics, Game game, Tile tile) {
+    private void drawPendingTile(Graphics2D graphics, Game game, Tile tile) {
         Point tilePoint = getPositionPoint(game, PENDING_TILE_POS);
         Point base = new Point(tilePoint.x + TILE_PADDING, tilePoint.y + TILE_PADDING + 20 - 150);
         TileLayers tileLayers = TileLayers.of(game, null, DisplayType.map);
@@ -148,7 +148,7 @@ public class MantisBuildImageGeneratorService {
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(new Color(184, 141, 42));
         graphics.setFont(Storage.getFont64());
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 graphics, "CURRENT", base.x + 172, base.y - 80, Color.white, hCenter, null, outlineStroke, Color.black);
     }
 

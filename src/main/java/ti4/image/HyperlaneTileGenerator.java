@@ -14,13 +14,12 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.QuadCurve2D;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import ti4.ResourceHelper;
+import java.util.concurrent.ConcurrentHashMap;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.service.map.CustomHyperlaneService;
@@ -131,7 +130,7 @@ final class HyperlaneTileGenerator {
 
     // Cache for overlays to avoid re-generating the same overlay multiple times
     // Key as canonical matrix to save only once for each unique matrix and rotate as needed
-    private static final Map<String, BufferedImage> HYPERLANE_CACHE = new HashMap<>();
+    private static final Map<String, BufferedImage> HYPERLANE_CACHE = new ConcurrentHashMap<>();
 
     /*
      * Connection matrix format: 0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0
@@ -228,7 +227,7 @@ final class HyperlaneTileGenerator {
             long seed = matrix.hashCode();
             int tileIndex = Math.floorMod(seed, RANDOM_BACKGROUNDS.size());
             String randomTile = RANDOM_BACKGROUNDS.get(tileIndex);
-            String randomTilePath = ResourceHelper.getTileFile(randomTile);
+            String randomTilePath = ImageResources.tile(randomTile);
             if (randomTilePath != null) {
                 tilePath = randomTilePath;
             }
@@ -294,7 +293,7 @@ final class HyperlaneTileGenerator {
 
     // Connection rules to angles with shape cache
     private static class ConnectionRule {
-        private final Map<List<Integer>, Shape> rotatedCache = new HashMap<>();
+        private final Map<List<Integer>, Shape> rotatedCache = new ConcurrentHashMap<>();
         private final Map<List<Integer>, Integer> angleMap;
         private final Shape template;
 

@@ -30,13 +30,12 @@ final class PriorityTrackSection {
         g2.setStroke(Strokes.STROKE_5);
         g2.setFont(Storage.getFont50());
         var priorityTrack = PriorityTrackHelper.getPriorityTrack(game);
-        DrawingUtil.drawCenteredString(
-                g2, trackName, new Rectangle(x, y, LABEL_WIDTH, BOX_HEIGHT), Storage.getFont64());
+        OutlinedText.drawCentered(g2, trackName, new Rectangle(x, y, LABEL_WIDTH, BOX_HEIGHT), Storage.getFont64());
         int trackXShift = x + LABEL_WIDTH;
         for (int i = 0; i < priorityTrack.size(); i++) {
             g2.setColor(Color.WHITE);
             Rectangle rect = new Rectangle(i * BOX_WIDTH + trackXShift, y, BOX_WIDTH, BOX_HEIGHT / 2);
-            DrawingUtil.drawCenteredString(g2, Integer.toString(i + 1), rect, Storage.getFont50());
+            OutlinedText.drawCentered(g2, Integer.toString(i + 1), rect, Storage.getFont50());
             g2.setColor(ColorUtil.getSCColor(6, game, true));
             g2.drawRect(i * BOX_WIDTH + trackXShift, y, BOX_WIDTH, BOX_HEIGHT);
         }
@@ -62,7 +61,7 @@ final class PriorityTrackSection {
                 int firstX = Math.min(boxCenter, boxFarRight) + trackXShift;
                 int tokenX = spaceOnTrack * BOX_WIDTH + firstX;
                 int tokenY = y + BOX_BUFFER + lowerVerticalQuarter;
-                DrawingUtil.drawControlToken(g2, controlTokenImage, player, tokenX, tokenY, false, TOKEN_SCALE);
+                PlayerTokens.drawControlToken(g2, controlTokenImage, player, tokenX, tokenY, false, TOKEN_SCALE);
             } catch (Exception e) {
                 BotLogger.error("Could not display player: " + player.getUserName(), e);
             }

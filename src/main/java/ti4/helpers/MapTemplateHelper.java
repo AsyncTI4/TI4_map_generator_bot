@@ -14,9 +14,10 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
+import ti4.image.OutlinedText;
 import ti4.image.PositionMapper;
+import ti4.image.TextWrap;
 import ti4.image.TileHelper;
 import ti4.image.TileLayers;
 import ti4.image.TileStep;
@@ -260,19 +261,19 @@ public final class MapTemplateHelper {
         }
         g2.setFont(Storage.getFont80());
         int y = 100;
-        DrawingUtil.superDrawString(g2, "Template: " + model.getAlias(), 10, y, null, null, null, null, null);
+        OutlinedText.draw(g2, "Template: " + model.getAlias(), 10, y, null, null, null, null, null);
         y += 100;
         if (model.getAuthor() != null) {
             // g2.(Storage);
             g2.setFont(Storage.getFont64());
-            DrawingUtil.superDrawString(g2, "Author: " + model.getAuthor(), 10, y, null, null, null, null, null);
+            OutlinedText.draw(g2, "Author: " + model.getAuthor(), 10, y, null, null, null, null, null);
             y += 70;
         }
         if (model.getDescr() != null) {
             g2.setFont(Storage.getFont48());
-            List<String> layout = DrawingUtil.layoutText(g2, model.getDescr(), 650);
+            List<String> layout = TextWrap.layoutLines(model.getDescr(), g2.getFontMetrics(), 650);
             for (String line : layout) {
-                DrawingUtil.superDrawString(g2, line, 20, y, null, null, null, null, null);
+                OutlinedText.draw(g2, line, 20, y, null, null, null, null, null);
                 y += 70;
             }
         }

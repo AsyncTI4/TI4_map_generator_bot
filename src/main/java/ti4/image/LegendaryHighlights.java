@@ -3,7 +3,6 @@ package ti4.image;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.model.PlanetModel;
@@ -22,7 +21,7 @@ final class LegendaryHighlights implements OffBoardHighlights {
                             : 0;
         }
         if (offBoardHighlighting >= 1) {
-            String legendaryFile = ResourceHelper.getInstance().getGeneralFile("Legendary_complete.png");
+            String legendaryFile = ImageResources.general("Legendary_complete.png");
             BufferedImage bufferedImage = ImageHelper.read(legendaryFile);
             if (offBoardHighlighting + (hasNanoForge ? 1 : 0) >= 2) {
                 bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24_000.0f
@@ -54,7 +53,7 @@ final class LegendaryHighlights implements OffBoardHighlights {
             }
         }
         if (hasNanoForge) {
-            String relicFile = ResourceHelper.getInstance().getGeneralFile("Relic.png");
+            String relicFile = ImageResources.general("Relic.png");
             BufferedImage bufferedImage = ImageHelper.read(relicFile);
             if (offBoardHighlighting >= 1) {
                 bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(

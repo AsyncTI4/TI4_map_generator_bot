@@ -6,9 +6,10 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import ti4.ResourceHelper;
+import java.util.function.ToIntFunction;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.FoWHelper;
@@ -25,102 +26,163 @@ import ti4.service.emoji.TI4Emoji;
 
 public final class TransactionGenerator {
 
-    private static final BasicStroke stroke2 = new BasicStroke(2.0f);
-    private static final BasicStroke stroke5 = new BasicStroke(5.0f);
+    private static final BasicStroke TEXT_OUTLINE = new BasicStroke(2.0f);
+    private static final BasicStroke COUNT_OUTLINE = new BasicStroke(5.0f);
     private static final double NINETY_DEGREES_RADIANS = 1.570_796_326_794_896_6;
-    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -NINETY_DEGREES_RADIANS;
+    private static final int SHEET_WIDTH = 500;
+    private static final int SHEET_HEIGHT = 160;
+    private static final int SHEET_MARGIN = 5;
+    private static final int ICON_SIZE = 40;
+    private static final int NAME_INSET = 50;
+    private static final int NAME_CENTER_Y = 25;
+    private static final int EMOJI_SIZE = 50;
+    private static final int EMOJI_STEP = EMOJI_SIZE + 5;
+    private static final int FIRST_ROW_Y = 50;
+    private static final int SECOND_ROW_Y = 105;
+    private static final List<String> EMOJI_ITEMS = List.of("TGs", "Comms", "ACs", "PNs", "Frags");
+    private static final int MEME_EMOJIS_PER_ROW = 3;
+    private static final int MEME_LINE_STEP = 55;
+    private static final int MEME_TEXT_WIDTH = 250;
+    private static final int MEME_TEXT_DROP = 40;
+
+    private TransactionGenerator() {}
+
+    private record Side(Player player, boolean canSeeSheet, boolean mirrored) {
+
+        int x(int offsetFromOwnEdge, int itemWidth) {
+            return mirrored ? SHEET_WIDTH - offsetFromOwnEdge - itemWidth : offsetFromOwnEdge;
+        }
+    }
+
+    private record Cell(Function<Player, TI4Emoji> emoji, ToIntFunction<Player> count) {
+
+        static Cell of(TI4Emoji emoji, ToIntFunction<Player> count) {
+            return new Cell(_ -> emoji, count);
+        }
+
+        static Cell fragments(TI4Emoji emoji, String prefix) {
+            return of(emoji, player -> (int) player.getFragments().stream()
+                    .filter(fragment -> fragment.startsWith(prefix))
+                    .count());
+        }
+    }
+
+    private record TransactionItem(String raw, String kind, String detail, int amount) {
+
+        static TransactionItem parse(String item) {
+            String[] parts = item.split("_");
+            String kind = parts[2];
+            String detail = item.replace(parts[0] + "_" + parts[1] + "_" + parts[2] + "_", "");
+            int amount = 1;
+            if (hasTrailingCount(kind, detail)) {
+                amount = Integer.parseInt("" + detail.charAt(detail.length() - 1));
+                detail = detail.substring(0, detail.length() - 1);
+            }
+            return new TransactionItem(item, kind, detail, amount);
+        }
+
+        private static boolean hasTrailingCount(String kind, String detail) {
+            return "frags".equalsIgnoreCase(kind)
+                    || (("PNs".equalsIgnoreCase(kind) || "ACs".equalsIgnoreCase(kind)) && detail.contains("generic"));
+        }
+
+        boolean isEmoji() {
+            return EMOJI_ITEMS.contains(kind);
+        }
+
+        Integer countUnlessSingle() {
+            return amount == 1 ? null : amount;
+        }
+    }
 
     public static BufferedImage drawTransactableStuffImage(Player p1, Player p2) {
         return drawTransactableStuffImage(p1, p2, null);
     }
 
     public static BufferedImage drawTransactableStuffImage(Player p1, Player p2, Player viewer) {
-        boolean seeP1 = canSeeSheet(p1, viewer);
-        boolean seeP2 = canSeeSheet(p2, viewer);
-        int width = 500, height = 160;
-        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = (Graphics2D) img.getGraphics();
+        List<Side> sides =
+                List.of(new Side(p1, canSeeSheet(p1, viewer), false), new Side(p2, canSeeSheet(p2, viewer), true));
+        BufferedImage image = new BufferedImage(SHEET_WIDTH, SHEET_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
         g2.setBackground(Color.black);
+        drawColorBands(g2, p1, p2);
 
-        double widthRatio = 11.0 / 16.0;
-        double heightRatio = 22.0 / 16.0;
-        int pnHeight = (int) (height * heightRatio);
-        int pnWidth = (int) (width * widthRatio);
-        // Add player 1's color
-        String pn1 = "pa_pn_color_" + Mapper.getColorID(p1.getColor()) + ".png";
-        BufferedImage color1 = ImageHelper.readScaled(ResourceHelper.getPAResource(pn1), pnWidth, pnHeight);
-        g2.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
-        g2.drawImage(color1, -1 * pnHeight, 0, null);
-        g2.rotate(NINETY_DEGREES_RADIANS);
-
-        // Add player 2's color
-        String pn2 = "pa_pn_color_" + Mapper.getColorID(p2.getColor()) + ".png";
-        BufferedImage color2 = ImageHelper.readScaled(ResourceHelper.getPAResource(pn2), pnWidth, pnHeight);
-        g2.rotate(NINETY_DEGREES_RADIANS);
-        g2.drawImage(color2, height - pnHeight, -1 * width, null);
-        g2.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
-
-        // Faction Icons
-        int x = 5, y = 5;
-        drawIdentityIcon(g2, p1, seeP1, x, y);
-        x = width - 45;
-        drawIdentityIcon(g2, p2, seeP2, x, y);
-
-        // Faction Names
-        g2.setFont(Storage.getFont18());
-        x = 50;
-        y = 25;
-        drawStringMultilineVertCenter(g2, identityName(p1, seeP1), x, y, (width - 100) / 2, HorizontalAlign.Left);
-        x = width - 50;
-        drawStringMultilineVertCenter(g2, identityName(p2, seeP2), x, y, (width - 100) / 2, HorizontalAlign.Right);
-
-        // STUFF TIME !!!
-        int emojiSize = 50;
-        // First Line, TGs and Comms and PNs (and ACs)
-        y = 50;
-        x = 5;
-        // TGs
-        drawEmojiWithCenteredCount(g2, MiscEmojis.tg, p1.getTg(), seeP1, x, y);
-        drawEmojiWithCenteredCount(g2, MiscEmojis.tg, p2.getTg(), seeP2, width - x - emojiSize, y);
-        x += emojiSize + 5;
-        // Comms
-        drawEmojiWithCenteredCount(g2, MiscEmojis.comm, p1.getCommodities(), seeP1, x, y);
-        drawEmojiWithCenteredCount(g2, MiscEmojis.comm, p2.getCommodities(), seeP2, width - x - emojiSize, y);
-        // PNs
-        x += emojiSize + 5;
-        drawEmojiWithCenteredCount(g2, CardEmojis.PN, p1.getPromissoryNotes().size(), seeP1, x, y);
-        drawEmojiWithCenteredCount(g2, CardEmojis.PN, p2.getPromissoryNotes().size(), seeP2, width - x - emojiSize, y);
-        // ACs
-        if ((seeP1 && (p1.hasAbility("arbiters") || p1.hasTech("tf-guildships")))
-                || (seeP2 && (p2.hasAbility("arbiters") || p2.hasTech("tf-guildships")))) {
-            x += emojiSize + 5;
-            drawEmojiWithCenteredCount(
-                    g2, CardEmojis.getACEmoji(p1), p1.getActionCards().size(), seeP1, x, y);
-            drawEmojiWithCenteredCount(
-                    g2, CardEmojis.getACEmoji(p2), p2.getActionCards().size(), seeP2, width - x - emojiSize, y);
+        for (Side side : sides) {
+            drawIdentityIcon(g2, side.player(), side.canSeeSheet(), side.x(SHEET_MARGIN, ICON_SIZE), SHEET_MARGIN);
         }
+        g2.setFont(Storage.getFont18());
+        for (Side side : sides) {
+            drawStringMultilineVertCenter(
+                    g2,
+                    identityName(side.player(), side.canSeeSheet()),
+                    side.x(NAME_INSET, 0),
+                    NAME_CENTER_Y,
+                    (SHEET_WIDTH - 2 * NAME_INSET) / 2,
+                    side.mirrored() ? HorizontalAlign.Right : HorizontalAlign.Left);
+        }
+        drawCellRow(g2, sides, firstRowCells(sides), FIRST_ROW_Y);
+        drawCellRow(g2, sides, fragmentCells(), SECOND_ROW_Y);
+        return image;
+    }
 
-        // Second Line, Frags
-        // Frags
-        Function<String, Integer> p1fragcount = str ->
-                (int) p1.getFragments().stream().filter(f -> f.startsWith(str)).count();
-        Function<String, Integer> p2fragcount = str ->
-                (int) p2.getFragments().stream().filter(f -> f.startsWith(str)).count();
-        y = 105;
-        x = 5;
-        drawEmojiWithCenteredCount(g2, ExploreEmojis.CFrag, p1fragcount.apply("crf"), seeP1, x, y);
-        drawEmojiWithCenteredCount(g2, ExploreEmojis.CFrag, p2fragcount.apply("crf"), seeP2, width - x - emojiSize, y);
-        x += emojiSize + 5;
-        drawEmojiWithCenteredCount(g2, ExploreEmojis.HFrag, p1fragcount.apply("hrf"), seeP1, x, y);
-        drawEmojiWithCenteredCount(g2, ExploreEmojis.HFrag, p2fragcount.apply("hrf"), seeP2, width - x - emojiSize, y);
-        x += emojiSize + 5;
-        drawEmojiWithCenteredCount(g2, ExploreEmojis.IFrag, p1fragcount.apply("irf"), seeP1, x, y);
-        drawEmojiWithCenteredCount(g2, ExploreEmojis.IFrag, p2fragcount.apply("irf"), seeP2, width - x - emojiSize, y);
-        x += emojiSize + 5;
-        drawEmojiWithCenteredCount(g2, ExploreEmojis.UFrag, p1fragcount.apply("urf"), seeP1, x, y);
-        drawEmojiWithCenteredCount(g2, ExploreEmojis.UFrag, p2fragcount.apply("urf"), seeP2, width - x - emojiSize, y);
+    private static void drawColorBands(Graphics2D g2, Player p1, Player p2) {
+        int bandHeight = (int) (SHEET_HEIGHT * (22.0 / 16.0));
+        int bandWidth = (int) (SHEET_WIDTH * (11.0 / 16.0));
+        BufferedImage firstBand = colorBand(p1, bandWidth, bandHeight);
+        g2.rotate(-NINETY_DEGREES_RADIANS);
+        g2.drawImage(firstBand, -bandHeight, 0, null);
+        g2.rotate(NINETY_DEGREES_RADIANS);
+        BufferedImage secondBand = colorBand(p2, bandWidth, bandHeight);
+        g2.rotate(NINETY_DEGREES_RADIANS);
+        g2.drawImage(secondBand, SHEET_HEIGHT - bandHeight, -SHEET_WIDTH, null);
+        g2.rotate(-NINETY_DEGREES_RADIANS);
+    }
 
-        return img;
+    private static BufferedImage colorBand(Player player, int width, int height) {
+        String file = "pa_pn_color_" + Mapper.getColorID(player.getColor()) + ".png";
+        return ImageHelper.readScaled(ImageResources.playerArea(file), width, height);
+    }
+
+    private static List<Cell> firstRowCells(List<Side> sides) {
+        List<Cell> cells = new ArrayList<>(List.of(
+                Cell.of(MiscEmojis.tg, Player::getTg),
+                Cell.of(MiscEmojis.comm, Player::getCommodities),
+                Cell.of(CardEmojis.PN, player -> player.getPromissoryNotes().size())));
+        if (sides.stream().anyMatch(TransactionGenerator::showsActionCards)) {
+            cells.add(new Cell(
+                    CardEmojis::getACEmoji, player -> player.getActionCards().size()));
+        }
+        return cells;
+    }
+
+    private static boolean showsActionCards(Side side) {
+        Player player = side.player();
+        return side.canSeeSheet() && (player.hasAbility("arbiters") || player.hasTech("tf-guildships"));
+    }
+
+    private static List<Cell> fragmentCells() {
+        return List.of(
+                Cell.fragments(ExploreEmojis.CFrag, "crf"),
+                Cell.fragments(ExploreEmojis.HFrag, "hrf"),
+                Cell.fragments(ExploreEmojis.IFrag, "irf"),
+                Cell.fragments(ExploreEmojis.UFrag, "urf"));
+    }
+
+    private static void drawCellRow(Graphics2D g2, List<Side> sides, List<Cell> cells, int y) {
+        for (int column = 0; column < cells.size(); column++) {
+            Cell cell = cells.get(column);
+            int offset = SHEET_MARGIN + column * EMOJI_STEP;
+            for (Side side : sides) {
+                Player player = side.player();
+                drawEmojiWithCenteredCount(
+                        g2,
+                        cell.emoji().apply(player),
+                        cell.count().applyAsInt(player),
+                        side.canSeeSheet(),
+                        side.x(offset, EMOJI_SIZE),
+                        y);
+            }
+        }
     }
 
     private static boolean canSeeSheet(Player target, Player viewer) {
@@ -130,9 +192,9 @@ public final class TransactionGenerator {
 
     private static void drawIdentityIcon(Graphics2D g2, Player player, boolean canSeeSheet, int x, int y) {
         if (canSeeSheet) {
-            g2.drawImage(DrawingUtil.getPlayerFactionIconImageScaled(player, 40, 40), x, y, null);
+            g2.drawImage(FactionIcons.scaled(player, ICON_SIZE, ICON_SIZE), x, y, null);
         } else {
-            DrawingUtil.drawEmoji(g2, ColorEmojis.getColorEmoji(player.getColor()), x, y, 40);
+            RemoteImages.drawEmoji(g2, ColorEmojis.getColorEmoji(player.getColor()), x, y, ICON_SIZE);
         }
     }
 
@@ -152,138 +214,118 @@ public final class TransactionGenerator {
     }
 
     public static BufferedImage drawTradeOfferMeme(Game game, Player p1, Player p2) {
-        BufferedImage meme = ImageHelper.read(ResourceHelper.getExtraFile("trade_offer_base.png"));
+        BufferedImage meme = ImageHelper.read(ImageResources.extra("trade_offer_base.png"));
         if (meme == null) return null;
-        BufferedImage img = new BufferedImage(meme.getWidth(), meme.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = img.createGraphics();
+        BufferedImage image = new BufferedImage(meme.getWidth(), meme.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
         g2.drawImage(meme, 0, 0, null);
+        FactionIcons.draw(g2, p1, 31, 139, 50, 50);
+        FactionIcons.draw(g2, p2, 358, 139, 50, 50);
+        drawHeroOverTheFace(g2, p1);
 
-        // Draw faction icons
-        DrawingUtil.drawPlayerFactionIconImage(g2, p1, 31, 139, 50, 50);
-        DrawingUtil.drawPlayerFactionIconImage(g2, p2, 358, 139, 50, 50);
-
-        // Draw the hero icon (or a good doggo) over the face in the meme
-        TI4Emoji hero = LeaderEmojis.getLeaderEmoji(p1.getFaction() + "hero");
-        if (MiscEmojis.goodDogs().contains(hero))
-            DrawingUtil.drawEmoji(g2, hero, 210, 294, 200); // good doggies are smaller
-        else DrawingUtil.drawEmoji(g2, hero, 60, 294, 500);
-
-        List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
-        for (Player player : List.of(p1, p2)) {
-            boolean sendingNothing = true;
-            HorizontalAlign hAlign = player == p2 ? HorizontalAlign.Left : HorizontalAlign.Right;
-            int x = player == p2 ? 10 : 590;
-            int y = 200;
-
-            int emojiXShift = player == p2 ? 55 : -55;
-            int emojiShift1 = player == p2 ? 0 : -50;
-            int emojiRow = 0;
-            int emojiCount = 0;
-            g2.setFont(Storage.getFont24());
-            for (String item : transactionItems) {
-                if (!item.contains("sending" + player.getFaction())) continue;
-                sendingNothing = false;
-
-                String thingToTransact = item.split("_")[2];
-                String furtherDetail = item.replace(
-                        item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
-                int amountToTransact = 1;
-                if ("frags".equalsIgnoreCase(thingToTransact)
-                        || (("PNs".equalsIgnoreCase(thingToTransact) || "ACs".equalsIgnoreCase(thingToTransact))
-                                && furtherDetail.contains("generic"))) {
-                    amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
-                    furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
-                }
-
-                boolean skipYShift = false;
-                boolean isEmoji = List.of("TGs", "Comms", "ACs", "PNs", "Frags").contains(thingToTransact);
-                int emojiX = x + emojiShift1;
-                if (isEmoji) {
-                    if (emojiRow == 0 || emojiCount == 3) {
-                        emojiRow = y;
-                        emojiCount = 1;
-                    } else {
-                        emojiX += emojiCount * emojiXShift;
-                        emojiCount++;
-                        skipYShift = true;
-                    }
-                }
-
-                switch (thingToTransact) {
-                    case "TGs" -> {
-                        amountToTransact = Integer.parseInt(furtherDetail);
-                        drawEmojiWithCenteredInt(g2, MiscEmojis.tg, amountToTransact, emojiX, emojiRow);
-                        if (!skipYShift) y += 55;
-                    }
-                    case "Comms" -> {
-                        amountToTransact = Integer.parseInt(furtherDetail);
-                        drawEmojiWithCenteredInt(g2, MiscEmojis.comm, amountToTransact, emojiX, emojiRow);
-                        if (!skipYShift) y += 55;
-                    }
-                    case "ACs" -> {
-                        Integer amt = amountToTransact == 1 ? null : amountToTransact;
-                        drawEmojiWithCenteredInt(g2, CardEmojis.getACEmoji(game), amt, emojiX, emojiRow);
-                        if (!skipYShift) y += 55;
-                    }
-                    case "PNs" -> {
-                        Integer amt = amountToTransact == 1 ? null : amountToTransact;
-                        drawEmojiWithCenteredInt(g2, CardEmojis.PN, amt, emojiX, emojiRow);
-                        if (!skipYShift) y += 55;
-                    }
-                    case "Frags" -> {
-                        Integer amt = amountToTransact == 1 ? null : amountToTransact;
-                        drawEmojiWithCenteredInt(g2, ExploreEmojis.getFragEmoji(furtherDetail), amt, emojiX, emojiRow);
-                        if (!skipYShift) y += 55;
-                    }
-                    case "SendDebt" -> {
-                        amountToTransact = Integer.parseInt(furtherDetail);
-                        String txt = amountToTransact + " debt tokens";
-                        y += drawStringMultiLine(g2, txt, x, y + 40, 250, hAlign);
-                    }
-                    case "ClearDebt" -> {
-                        amountToTransact = Integer.parseInt(furtherDetail);
-                        String txt = "Clear " + amountToTransact + " debt";
-                        y += drawStringMultiLine(g2, txt, x, y + 40, 250, hAlign);
-                    }
-                    case "shipOrders", "starCharts" -> {
-                        String txt = Mapper.getRelic(furtherDetail).getName();
-                        y += drawStringMultiLine(g2, txt, x, y + 40, 250, hAlign);
-                    }
-                    case "Planets", "AlliancePlanets", "dmz" -> {
-                        TI4Emoji emoji = PlanetEmojis.getPlanetEmoji(furtherDetail);
-                        drawEmojiWithCenteredInt(g2, emoji, null, emojiX, y);
-
-                        String txt = Helper.getPlanetRepresentationNoResInf(furtherDetail, game);
-                        int textX = x + (hAlign == HorizontalAlign.Left ? 55 : -55);
-                        y += drawStringMultiLine(g2, txt, textX, y + 40, 250, hAlign);
-                    }
-                    case "action" -> {
-                        String txt = "In-game " + furtherDetail + " action";
-                        y += drawStringMultiLine(g2, txt, x, y + 40, 250, hAlign);
-                    }
-                    case "details" -> {
-                        String txt = furtherDetail.replace("fin777", " ");
-                        y += drawStringMultiLine(g2, txt, x, y + 40, 250, hAlign);
-                    }
-                    default -> {
-                        String txt = "\"" + item + "\"";
-                        y += drawStringMultiLine(g2, txt, x, y + 40, 250, hAlign);
-                    }
-                }
-            }
-            if (sendingNothing) {
-                String nothing = game.getStoredValue(player.getFaction() + "NothingMessage");
-                if (nothing.isEmpty()) {
-                    nothing = TransactionHelper.getNothingMessage();
-                    game.setStoredValue(player.getFaction() + "NothingMessage", nothing);
-                }
-                g2.setFont(Storage.getFont24());
-                y += drawStringMultiLine(g2, nothing, x, y + 40, 250, hAlign);
-            }
-            if (y > img.getHeight()) return null; // overflowed, default back to text
+        List<String> items = p1.getTransactionItemsWithPlayer(p2);
+        for (Player sender : List.of(p1, p2)) {
+            int bottom = drawSentItems(g2, game, sender, sender == p2, items);
+            if (bottom > image.getHeight()) return null;
         }
+        return image;
+    }
 
-        return img;
+    private static void drawHeroOverTheFace(Graphics2D g2, Player player) {
+        TI4Emoji hero = LeaderEmojis.getLeaderEmoji(player.getFaction() + "hero");
+        if (MiscEmojis.goodDogs().contains(hero)) {
+            RemoteImages.drawEmoji(g2, hero, 210, 294, 200);
+        } else {
+            RemoteImages.drawEmoji(g2, hero, 60, 294, 500);
+        }
+    }
+
+    private static int drawSentItems(Graphics2D g2, Game game, Player sender, boolean leftColumn, List<String> items) {
+        HorizontalAlign align = leftColumn ? HorizontalAlign.Left : HorizontalAlign.Right;
+        int x = leftColumn ? 10 : 590;
+        int y = 200;
+        int emojiStep = leftColumn ? 55 : -55;
+        int emojiStart = x + (leftColumn ? 0 : -50);
+        int emojiRowY = 0;
+        int emojisInRow = 0;
+        boolean sendingNothing = true;
+        g2.setFont(Storage.getFont24());
+        for (String raw : items) {
+            if (!raw.contains("sending" + sender.getFaction())) continue;
+            sendingNothing = false;
+            TransactionItem item = TransactionItem.parse(raw);
+
+            boolean sharesEmojiRow = false;
+            int emojiX = emojiStart;
+            if (item.isEmoji()) {
+                if (emojiRowY == 0 || emojisInRow == MEME_EMOJIS_PER_ROW) {
+                    emojiRowY = y;
+                    emojisInRow = 1;
+                } else {
+                    emojiX += emojisInRow * emojiStep;
+                    emojisInRow++;
+                    sharesEmojiRow = true;
+                }
+            }
+            int lineStep = sharesEmojiRow ? 0 : MEME_LINE_STEP;
+            switch (item.kind()) {
+                case "TGs" -> {
+                    drawEmojiWithCenteredInt(g2, MiscEmojis.tg, Integer.parseInt(item.detail()), emojiX, emojiRowY);
+                    y += lineStep;
+                }
+                case "Comms" -> {
+                    drawEmojiWithCenteredInt(g2, MiscEmojis.comm, Integer.parseInt(item.detail()), emojiX, emojiRowY);
+                    y += lineStep;
+                }
+                case "ACs" -> {
+                    drawEmojiWithCenteredInt(
+                            g2, CardEmojis.getACEmoji(game), item.countUnlessSingle(), emojiX, emojiRowY);
+                    y += lineStep;
+                }
+                case "PNs" -> {
+                    drawEmojiWithCenteredInt(g2, CardEmojis.PN, item.countUnlessSingle(), emojiX, emojiRowY);
+                    y += lineStep;
+                }
+                case "Frags" -> {
+                    TI4Emoji fragment = ExploreEmojis.getFragEmoji(item.detail());
+                    drawEmojiWithCenteredInt(g2, fragment, item.countUnlessSingle(), emojiX, emojiRowY);
+                    y += lineStep;
+                }
+                case "SendDebt" -> y += drawMemeText(g2, Integer.parseInt(item.detail()) + " debt tokens", x, y, align);
+                case "ClearDebt" ->
+                    y += drawMemeText(g2, "Clear " + Integer.parseInt(item.detail()) + " debt", x, y, align);
+                case "shipOrders", "starCharts" ->
+                    y += drawMemeText(g2, Mapper.getRelic(item.detail()).getName(), x, y, align);
+                case "Planets", "AlliancePlanets", "dmz" -> {
+                    drawEmojiWithCenteredInt(g2, PlanetEmojis.getPlanetEmoji(item.detail()), null, emojiX, y);
+                    String planet = Helper.getPlanetRepresentationNoResInf(item.detail(), game);
+                    int textX = x + (align == HorizontalAlign.Left ? 55 : -55);
+                    y += drawMemeText(g2, planet, textX, y, align);
+                }
+                case "action" -> y += drawMemeText(g2, "In-game " + item.detail() + " action", x, y, align);
+                case "details" -> y += drawMemeText(g2, item.detail().replace("fin777", " "), x, y, align);
+                default -> y += drawMemeText(g2, "\"" + item.raw() + "\"", x, y, align);
+            }
+        }
+        if (sendingNothing) {
+            g2.setFont(Storage.getFont24());
+            y += drawMemeText(g2, nothingMessage(game, sender), x, y, align);
+        }
+        return y;
+    }
+
+    private static String nothingMessage(Game game, Player sender) {
+        String key = sender.getFaction() + "NothingMessage";
+        String nothing = game.getStoredValue(key);
+        if (nothing.isEmpty()) {
+            nothing = TransactionHelper.getNothingMessage();
+            game.setStoredValue(key, nothing);
+        }
+        return nothing;
+    }
+
+    private static int drawMemeText(Graphics2D g2, String text, int x, int y, HorizontalAlign align) {
+        return drawStringMultiLine(g2, text, x, y + MEME_TEXT_DROP, MEME_TEXT_WIDTH, align);
     }
 
     private static int totalMultilineHeight(Graphics2D g2, int numLines) {
@@ -294,11 +336,11 @@ public final class TransactionGenerator {
     private static void drawStringMultilineVertCenter(
             Graphics2D g2, String text, int x, int centerY, int width, HorizontalAlign hAlign) {
         int lineHeight = g2.getFontMetrics().getHeight();
-        List<String> toDraw = DrawingUtil.layoutText(g2, text, width);
-        int height = totalMultilineHeight(g2, toDraw.size());
+        List<String> lines = TextWrap.layoutLines(text, g2.getFontMetrics(), width);
+        int height = totalMultilineHeight(g2, lines.size());
         int deltaY = g2.getFontMetrics().getAscent() - height / 2;
-        for (String line : toDraw) {
-            DrawingUtil.superDrawString(g2, line, x, centerY + deltaY, null, hAlign, null, stroke2, null);
+        for (String line : lines) {
+            OutlinedText.draw(g2, line, x, centerY + deltaY, null, hAlign, null, TEXT_OUTLINE, null);
             deltaY += lineHeight;
         }
     }
@@ -306,10 +348,10 @@ public final class TransactionGenerator {
     private static int drawStringMultiLine(
             Graphics2D g2, String text, int x, int y, int width, HorizontalAlign hAlign) {
         int lineHeight = g2.getFontMetrics().getHeight();
-        List<String> toDraw = DrawingUtil.layoutText(g2, text, width);
+        List<String> lines = TextWrap.layoutLines(text, g2.getFontMetrics(), width);
         int deltaY = 0;
-        for (String line : toDraw) {
-            DrawingUtil.superDrawString(g2, line, x, y + deltaY, null, hAlign, null, stroke2, null);
+        for (String line : lines) {
+            OutlinedText.draw(g2, line, x, y + deltaY, null, hAlign, null, TEXT_OUTLINE, null);
             deltaY += lineHeight;
         }
         return deltaY;
@@ -323,22 +365,23 @@ public final class TransactionGenerator {
     private static void drawEmojiWithCenteredText(
             Graphics2D g2, TI4Emoji emoji, String text, boolean faded, int x, int y) {
         if (faded) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-        DrawingUtil.drawEmoji(g2, emoji, x, y, 50);
+        RemoteImages.drawEmoji(g2, emoji, x, y, EMOJI_SIZE);
         if (faded) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
 
         Font before = g2.getFont();
         g2.setFont(Storage.getFont32());
-        if (text != null)
-            DrawingUtil.superDrawString(
+        if (text != null) {
+            OutlinedText.draw(
                     g2,
                     text,
-                    x + 25,
-                    y + 25,
+                    x + EMOJI_SIZE / 2,
+                    y + EMOJI_SIZE / 2,
                     Color.white,
                     HorizontalAlign.Center,
                     VerticalAlign.Center,
-                    stroke5,
+                    COUNT_OUTLINE,
                     Color.black);
+        }
         g2.setFont(before);
     }
 }

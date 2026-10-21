@@ -2,7 +2,6 @@ package ti4.service.milty;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -15,7 +14,6 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -23,10 +21,12 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.Storage;
-import ti4.image.DrawingUtil;
 import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.image.Mapper;
+import ti4.image.OutlinedText;
+import ti4.image.RemoteImages;
 import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -66,7 +66,7 @@ public class MiltyDraftHelper {
         int width = scaled * spanW;
         int height = scaled * spanH;
         BufferedImage mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics graphicsMain = mainImage.getGraphics();
+        Graphics2D graphicsMain = mainImage.createGraphics();
 
         int index = 0;
         int deltaX = 0;
@@ -119,7 +119,7 @@ public class MiltyDraftHelper {
         Point hs = tilePositions.getFirst();
 
         List<String> tileStrings = new ArrayList<>();
-        tileStrings.add(ResourceHelper.getTileFile("00_green.png"));
+        tileStrings.add(ImageResources.tile("00_green.png"));
         tileStrings.addAll(
                 slice.getTiles().stream().map(t -> t.getTile().getTilePath()).toList());
 
@@ -127,7 +127,7 @@ public class MiltyDraftHelper {
         BufferedImage fogFilter = ImageHelper.read(fow);
 
         BufferedImage sliceImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
-        Graphics graphics = sliceImage.getGraphics();
+        Graphics2D graphics = sliceImage.createGraphics();
 
         int index = 0;
         for (String tilePath : tileStrings) {
@@ -204,9 +204,9 @@ public class MiltyDraftHelper {
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(Color.white);
         graphics.setFont(Storage.getFont50());
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 graphics, totalsString, hs.x + 172, hs.y + 110, Color.white, hCenter, null, outlineStroke, Color.black);
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 graphics,
                 optimalString,
                 hs.x + 172,
@@ -227,12 +227,12 @@ public class MiltyDraftHelper {
         Point hs = tilePositions.getFirst();
 
         BufferedImage sliceImage = partialSliceImage(slice, mapTemplate, player != null);
-        Graphics graphics = sliceImage.getGraphics();
+        Graphics2D graphics = sliceImage.createGraphics();
 
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(Color.white);
         graphics.setFont(Storage.getFont64());
-        DrawingUtil.superDrawString(
+        OutlinedText.draw(
                 graphics,
                 slice.getName(),
                 hs.x + 172,
@@ -250,7 +250,7 @@ public class MiltyDraftHelper {
             PlayerDraft pd = manager.getPlayerDraft(player);
             String playerName = player.getUserName();
             String faction = pd.getFaction() == null ? "no faction" : pd.getFaction();
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     graphics, playerName, hs.x + 172, hs.y + 230, Color.red, hCenter, null, outlineStroke, Color.black);
 
             if (pd.getFaction() != null) {
@@ -258,7 +258,7 @@ public class MiltyDraftHelper {
                 String factionName = factionModel.getFactionName();
                 if (factionModel.getAlias().startsWith("keleres")) factionName = "The Council Keleres";
                 graphics.setFont(Storage.getFont35());
-                DrawingUtil.superDrawString(
+                OutlinedText.draw(
                         graphics,
                         factionName,
                         hs.x + 172,
@@ -279,11 +279,11 @@ public class MiltyDraftHelper {
     }
 
     private static BufferedImage getEmojiImage(TI4Emoji emoji) {
-        return ImageHelper.readEmojiImageScaled(emoji, 40);
+        return RemoteImages.emoji(emoji, 40);
     }
 
     private static BufferedImage getEmojiImage(String emojiString) {
-        return ImageHelper.readEmojiImageScaled(emojiString, 40);
+        return RemoteImages.emoji(emojiString, 40);
     }
 
     public static void initDraftTiles(MiltyDraftManager manager, Game game) {

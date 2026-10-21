@@ -27,7 +27,7 @@ final class TraitHighlights implements OffBoardHighlights {
 
                 if ("faction".equalsIgnoreCase(planetReal.getOriginalPlanetType()) && traits.isEmpty()) {
                     if (custodiaVigilia.getFactionHomeworld() == null) {
-                        traitFile = ResourceHelper.getInstance().getGeneralFile("Legendary_complete.png");
+                        traitFile = ImageResources.general("Legendary_complete.png");
                     } else {
                         traitFile = ResourceHelper.getInstance()
                                 .getFactionFile(custodiaVigilia.getFactionHomeworld() + ".png");
@@ -43,9 +43,9 @@ final class TraitHighlights implements OffBoardHighlights {
                     t += traits.contains("hazardous") ? "H" : "";
                     t += traits.contains("industrial") ? "I" : "";
                     if ("CHI".equals(t)) {
-                        traitFile = ResourceHelper.getInstance().getPlanetResource("pc_attribute_combo_CHI_big.png");
+                        traitFile = ImageResources.planetCard("pc_attribute_combo_CHI_big.png");
                     } else {
-                        traitFile = ResourceHelper.getInstance().getPlanetResource("pc_attribute_combo_" + t + ".png");
+                        traitFile = ImageResources.planetCard("pc_attribute_combo_" + t + ".png");
                     }
                 }
                 traitFiles.add(traitFile);

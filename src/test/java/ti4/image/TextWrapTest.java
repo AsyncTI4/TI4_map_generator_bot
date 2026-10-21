@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 class TextWrapTest {
 
@@ -18,6 +19,22 @@ class TextWrapTest {
             return CHARACTER_WIDTH * text.length();
         }
     };
+
+    @Test
+    @Timeout(5)
+    void layoutFallsBackToTheGivenLinesWhenNotEvenOneCharacterFits() {
+        // Before the fix the first character was split off as an empty line forever.
+        List<String> lines = TextWrap.layoutLines("wide\nwords", TEN_PIXELS_PER_CHARACTER, 5);
+
+        assertEquals(List.of("wide", "words"), lines);
+    }
+
+    @Test
+    void layoutBreaksAtSpacesAndInsideOverlongWords() {
+        List<String> lines = TextWrap.layoutLines("alpha beta gammadeltaepsilon", TEN_PIXELS_PER_CHARACTER, 100);
+
+        assertEquals(List.of("alpha", "beta", "gammadelta", "epsilon"), lines);
+    }
 
     @Test
     void textThatFitsStaysOnOneLine() {

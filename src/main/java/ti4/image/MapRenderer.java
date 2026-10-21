@@ -21,7 +21,7 @@ final class MapRenderer {
     static MapRenderResult render(RenderContext ctx, RenderTimings timings) {
         timings.startDraw();
         BufferedImage canvas = paint(ctx, timings);
-        EncodedImage encoded = MapImageEncoder.encode(canvas);
+        EncodedImage encoded = ImageEncoder.forDiscord(canvas);
         timings.stopGraphics();
         timings.stopDraw();
         boolean eligibleForWebsite =

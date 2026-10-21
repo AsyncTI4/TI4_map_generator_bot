@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -31,7 +30,7 @@ final class CardDeckRow {
 
         for (DeckBadge badge : badges(game)) {
             PaImage.drawScaled(g2, x, y, badge.cardBack(), CARD_WIDTH, CARD_HEIGHT);
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     g2,
                     badge.count(),
                     x + CARD_WIDTH / 2,
@@ -63,7 +62,7 @@ final class CardDeckRow {
         if (!game.isTwilightsFallMode() || !game.getTyrantUserID().isEmpty()) {
             return null;
         }
-        return ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.TYRANT));
+        return ImageResources.token(Mapper.getTokenID(Constants.TYRANT));
     }
 
     private static List<DeckBadge> badges(Game game) {

@@ -17,8 +17,8 @@ import ti4.helpers.PdsCoverage;
 import ti4.helpers.PdsCoverageHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.DrawingUtil;
 import ti4.image.PlanetShields;
+import ti4.image.PlayerTokens;
 import ti4.website.WebPdsCoverage;
 
 @Data
@@ -74,8 +74,7 @@ public final class WebTileUnitData {
         UnitHolder spaceHolder = tile.getUnitHolders().get(Constants.SPACE);
         if (spaceHolder != null) {
             for (String ccID : spaceHolder.getCcList()) {
-                Player player =
-                        DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), ccID);
+                Player player = PlayerTokens.ownerOfToken(game.getPlayers().values(), ccID);
                 if (player != null) {
                     tileData.ccs.add(player.getFaction());
                 }
@@ -175,8 +174,7 @@ public final class WebTileUnitData {
         }
         // Get the first control token (there should only be one)
         String controlToken = planet.getControlList().iterator().next();
-        Player controllingPlayer =
-                DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), controlToken);
+        Player controllingPlayer = PlayerTokens.ownerOfToken(game.getPlayers().values(), controlToken);
         return controllingPlayer != null ? controllingPlayer.getFaction() : null;
     }
 

@@ -1,6 +1,7 @@
 package ti4.discord.interactions.commands.help;
 
 import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.List;
@@ -11,17 +12,18 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.ResourceHelper;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.DrawingUtil;
+import ti4.image.ColorUtil;
 import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.image.Mapper;
+import ti4.image.OutlinedText;
 import ti4.image.VerticalAlign;
 import ti4.message.MessageHelper;
 import ti4.service.UnitDecalService;
@@ -90,16 +92,16 @@ class SampleDecals extends Subcommand {
         int n = 0;
 
         BufferedImage coloursImage = new BufferedImage(PAGEWIDTH, PAGEHIGHT, BufferedImage.TYPE_INT_ARGB);
-        BufferedImage backgroundImage = ImageHelper.read(ResourceHelper.getExtraFile("starfield.png"));
+        BufferedImage backgroundImage = ImageHelper.read(ImageResources.extra("starfield.png"));
         Graphics2D graphic = coloursImage.createGraphics();
         graphic.drawImage(backgroundImage, 0, 0, null);
         BasicStroke stroke = new BasicStroke(3.0f);
 
         UnitKey base = Units.getUnitKey(UnitType.Dreadnought, colorID);
-        BufferedImage noDecal = ImageHelper.read(ResourceHelper.getInstance().getUnitFile(base));
+        BufferedImage noDecal = ImageHelper.read(ImageResources.unit(base));
         for (String d : decals) {
-            String decalName = String.format("%s_%s%s", d, "dn", DrawingUtil.getBlackWhiteFileSuffix(colorID));
-            BufferedImage decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decalName));
+            String decalName = String.format("%s_%s%s", d, "dn", ColorUtil.blackWhiteFileSuffix(colorID));
+            BufferedImage decal = ImageHelper.read(ImageResources.decal(decalName));
             graphic.drawImage(noDecal, x + SPACING, y + SPACING, null);
             graphic.drawImage(decal, x + SPACING, y + SPACING, null);
 
@@ -122,7 +124,7 @@ class SampleDecals extends Subcommand {
             String row2 = (mid == -1 ? "" : label.substring(mid + 1));
             int drawX = x + DREADWIDTH / 2;
             int drawY = y + DREADSUBHIGHT + SPACING;
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     graphic,
                     row1,
                     drawX,
@@ -132,7 +134,7 @@ class SampleDecals extends Subcommand {
                     VerticalAlign.Top,
                     stroke,
                     Color.BLACK);
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     graphic,
                     row2,
                     drawX,
@@ -143,7 +145,7 @@ class SampleDecals extends Subcommand {
                     stroke,
                     Color.BLACK);
             graphic.setFont(smallFont);
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     graphic,
                     d,
                     drawX,

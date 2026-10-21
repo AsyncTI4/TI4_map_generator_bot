@@ -6,7 +6,6 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,27 +35,15 @@ public final class CompactOverviewGenerator {
     static final int GAP = 120;
     static final int TITLE_BAND = 90;
     static final int HEADER = 70;
-    private static final int TILE_PADDING = 100;
-    private static final int TILE_IMAGE_SIZE = 600;
     private static final int CORNER_SPACING = 20;
     private static final int TITLE_MARGIN = 60;
     private static final FontMetrics TITLE_METRICS = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
             .createGraphics()
             .getFontMetrics(Storage.getFont32().deriveFont(TITLE_BAND * 0.6f));
     private static final String CORNERS_TITLE = "corners";
-    private static final Set<String> CORNER_POSITIONS = Set.of("tl", "tr", "bl", "br");
     private static final List<TileStep> GM_STEPS =
             List.of(TileStep.Tile, TileStep.Extras, TileStep.Units, TileStep.TileNumber);
     private static final List<TileStep> PLAYER_STEPS = List.of(TileStep.Tile, TileStep.Units, TileStep.TileNumber);
-    private static final List<Color> PANEL_COLORS = List.of(
-            new Color(0, 170, 255),
-            new Color(255, 140, 0),
-            new Color(60, 200, 90),
-            new Color(230, 60, 160),
-            new Color(250, 220, 40),
-            new Color(160, 90, 255),
-            new Color(0, 210, 200),
-            new Color(240, 70, 60));
 
     record Panel(String title, Map<String, Rectangle> hexes, int margin) {
 
@@ -162,7 +149,7 @@ public final class CompactOverviewGenerator {
     }
 
     private static List<Panel> panels(Game game, List<MapSegment> segments, boolean withMain, Set<String> allowed) {
-        int fractureYbump = MapOverviewGenerator.fractureYbump(game);
+        int fractureYbump = BoardLayout.fractureYbump(game);
         List<Panel> panels = new ArrayList<>();
         if (withMain) {
             addPanel(
@@ -184,7 +171,7 @@ public final class CompactOverviewGenerator {
             }
         }
         if (!corners.isEmpty()) {
-            panels.add(new Panel(CORNERS_TITLE, corners, TILE_PADDING));
+            panels.add(new Panel(CORNERS_TITLE, corners, OverviewStyle.TILE_PADDING));
         }
         return panels;
     }
@@ -198,7 +185,7 @@ public final class CompactOverviewGenerator {
             int fractureYbump) {
         Map<String, Rectangle> hexes = new LinkedHashMap<>();
         for (String position : new TreeSet<>(positions)) {
-            if (!allowed.contains(position) || CORNER_POSITIONS.contains(position.toLowerCase())) {
+            if (!allowed.contains(position) || BoardLayout.CORNER_POSITIONS.contains(position.toLowerCase())) {
                 continue;
             }
             Rectangle hex = MapFrame.hexBounds(game, position, fractureYbump, 0, 0);
@@ -265,15 +252,11 @@ public final class CompactOverviewGenerator {
         Layout layout = layout(panels, maxSize);
         BufferedImage image =
                 new BufferedImage(layout.canvasWidth(), layout.canvasHeight(), BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics = image.createGraphics();
+        Graphics2D graphics = OverviewStyle.smoothGraphics(image);
         try {
-            graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             drawPanelFrames(graphics, layout);
             drawTiles(game, graphics, layout, tiles, tileLayers, steps);
-            graphics.setFont(Storage.getFont32());
-            graphics.setColor(Color.WHITE);
-            graphics.drawString(header, 10, 34);
+            OverviewStyle.drawHeader(graphics, header);
         } finally {
             graphics.dispose();
         }
@@ -285,16 +268,16 @@ public final class CompactOverviewGenerator {
         Font titleFont = Storage.getFont32().deriveFont((float) Math.max(16, TITLE_BAND * 0.6 * scale));
         for (int index = 0; index < layout.placed().size(); index++) {
             Placed box = layout.placed().get(index);
-            Color color = PANEL_COLORS.get(index % PANEL_COLORS.size());
+            Color color = OverviewStyle.color(index);
             int left = (int) Math.round(box.x() * scale);
             int top = (int) Math.round(box.y() * scale);
             int width = (int) Math.round(box.width() * scale);
             int height = (int) Math.round(box.height() * scale);
-            graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 160));
+            graphics.setColor(OverviewStyle.translucent(color, 160));
             graphics.setStroke(new BasicStroke((float) Math.max(2, 6 * scale)));
             graphics.drawRoundRect(left, top, width, height, 16, 16);
             graphics.setFont(titleFont);
-            DrawingUtil.superDrawString(
+            OutlinedText.draw(
                     graphics,
                     box.panel().title(),
                     left + width / 2,
@@ -315,7 +298,7 @@ public final class CompactOverviewGenerator {
             TileLayers tileLayers,
             List<TileStep> steps) {
         double scale = layout.scale();
-        int drawnSize = (int) Math.ceil(TILE_IMAGE_SIZE * scale);
+        int drawnSize = (int) Math.ceil(OverviewStyle.TILE_IMAGE_SIZE * scale);
         for (TileStep step : steps) {
             for (Placed box : layout.placed()) {
                 box.panel().hexes().forEach((position, hex) -> {
@@ -323,8 +306,8 @@ public final class CompactOverviewGenerator {
                     if (tile == null) {
                         return;
                     }
-                    int rawX = box.contentLeft() + hex.x - box.content().x - TILE_PADDING;
-                    int rawY = box.y() + TITLE_BAND + hex.y - box.content().y - TILE_PADDING;
+                    int rawX = box.contentLeft() + hex.x - box.content().x - OverviewStyle.TILE_PADDING;
+                    int rawY = box.y() + TITLE_BAND + hex.y - box.content().y - OverviewStyle.TILE_PADDING;
                     try {
                         BufferedImage tileImage = tileLayers.draw(tile, step);
                         graphics.drawImage(

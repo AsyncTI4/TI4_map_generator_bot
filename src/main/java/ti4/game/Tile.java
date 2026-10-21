@@ -22,7 +22,6 @@ import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.helpers.AliasHandler;
@@ -36,6 +35,7 @@ import ti4.helpers.RenderRandom;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.image.ImageResources;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
@@ -157,7 +157,7 @@ public class Tile {
 
     @Nullable
     public static String getAttachmentPath(String tokenID) {
-        return ResourceHelper.getInstance().getAttachmentFile(tokenID);
+        return ImageResources.attachment(tokenID);
     }
 
     @Nullable
@@ -368,7 +368,7 @@ public class Tile {
                 tileName = tileName.replace(".png", "_xmas.png");
             }
         }
-        String tilePath = ResourceHelper.getTileFile(tileName);
+        String tilePath = ImageResources.tile(tileName);
         if (tilePath == null) {
             BotLogger.warning("Could not find tile: " + tileID);
         }
@@ -443,7 +443,7 @@ public class Tile {
         }
 
         String tileName = Mapper.getTileID(fowTileID);
-        String tilePath = ResourceHelper.getTileFile(tileName);
+        String tilePath = ImageResources.tile(tileName);
         if (tilePath == null) {
             BotLogger.warning(new LogOrigin(player), "Could not find tile: " + fowTileID);
         }
@@ -501,16 +501,8 @@ public class Tile {
 
     @JsonIgnore
     public String getRepresentation() {
-        try {
-            TileModel model = TileHelper.getTileById(tileID);
-            if (model == null) {
-                return tileID + "(" + getPosition() + ")";
-            }
-            return model.getNameNullSafe();
-        } catch (Exception e) {
-            // DO NOTHING
-        }
-        return null;
+        String representation = Mapper.getTileRepresentation(tileID);
+        return representation == null ? tileID + "(" + getPosition() + ")" : representation;
     }
 
     @JsonIgnore
