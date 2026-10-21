@@ -22,6 +22,7 @@ import ti4.helpers.DisplayType;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.io.Fonts;
+import ti4.image.io.ImageUploads;
 import ti4.image.io.RemoteImages;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
@@ -39,7 +40,6 @@ import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
-import ti4.service.image.FileUploadService;
 import ti4.service.milty.MiltyDraftSlice;
 import ti4.service.milty.MiltyDraftTile;
 
@@ -77,7 +77,7 @@ public class NucleusImageGeneratorService {
         if (nucleusImage == null) {
             return null;
         }
-        FileUpload fileUpload = FileUploadService.createFileUpload(nucleusImage, uniqueKey);
+        FileUpload fileUpload = ImageUploads.createFileUpload(nucleusImage, uniqueKey);
 
         return fileUpload;
     }

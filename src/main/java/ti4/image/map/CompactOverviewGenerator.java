@@ -28,11 +28,11 @@ import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.VerticalAlign;
 import ti4.image.io.Fonts;
+import ti4.image.io.ImageUploads;
 import ti4.image.tile.TileGeometry;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
 import ti4.logging.BotLogger;
-import ti4.service.image.FileUploadService;
 
 public final class CompactOverviewGenerator {
 
@@ -95,12 +95,11 @@ public final class CompactOverviewGenerator {
     private CompactOverviewGenerator() {}
 
     public static FileUpload gmOverview(Game game) {
-        return FileUploadService.createFileUpload(gmImage(game), game.getName() + "_overview", "webp");
+        return ImageUploads.createFileUpload(gmImage(game), game.getName() + "_overview", "webp");
     }
 
     public static FileUpload playerOverview(Game game, Player player, @Nullable GenericInteractionCreateEvent event) {
-        return FileUploadService.createFileUpload(
-                playerImage(game, player, event), game.getName() + "_my_overview", "webp");
+        return ImageUploads.createFileUpload(playerImage(game, player, event), game.getName() + "_my_overview", "webp");
     }
 
     public static BufferedImage gmImage(Game game) {

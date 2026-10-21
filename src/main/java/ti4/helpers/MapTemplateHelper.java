@@ -17,6 +17,7 @@ import ti4.game.Tile;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.TextWrap;
 import ti4.image.io.Fonts;
+import ti4.image.io.ImageUploads;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
 import ti4.message.MessageHelper;
@@ -26,7 +27,6 @@ import ti4.model.MapTemplateModel.MapTemplateTile;
 import ti4.model.Mapper;
 import ti4.model.PositionMapper;
 import ti4.model.TileHelper;
-import ti4.service.image.FileUploadService;
 import ti4.service.map.AddTileListService;
 import ti4.service.map.AddTileService;
 import ti4.service.milty.MiltyDraftManager;
@@ -278,6 +278,6 @@ public final class MapTemplateHelper {
                 y += 70;
             }
         }
-        return FileUploadService.createFileUpload(img, model.getAlias());
+        return ImageUploads.createFileUpload(img, model.getAlias());
     }
 }

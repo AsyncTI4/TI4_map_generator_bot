@@ -55,6 +55,7 @@ import ti4.image.draw.TextWrap;
 import ti4.image.draw.VerticalAlign;
 import ti4.image.draw.VerticalText;
 import ti4.image.io.Fonts;
+import ti4.image.io.ImageUploads;
 import ti4.image.io.RemoteImages;
 import ti4.image.map.CompactOverviewGenerator;
 import ti4.image.map.MapOverviewGenerator;
@@ -65,7 +66,6 @@ import ti4.model.Mapper;
 import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.MiscEmojis;
-import ti4.service.image.FileUploadService;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.user.AFKService;
 import ti4.testUtils.BaseTi4Test;
@@ -82,7 +82,7 @@ import ti4.testUtils.BaseTi4Test;
  *
  * Every case reloads its save, because several generators write to the game (fog memory, stored "nothing" messages).
  * Randomness runs in RenderRandom.neutral(); network images come from FakeImageNetwork.deterministicImages(), so emoji
- * and custom faction icons are drawn as URL-derived placeholders. Banners are captured at FileUploadService, and the
+ * and custom faction icons are drawn as URL-derived placeholders. Banners are captured at ImageUploads, and the
  * Discord send is a no-op; a send that fails afterwards (no guild in tests) still records the captured picture. Each case records the canvas size and a SHA-256 of its ARGB raster; in compare mode a PNG of
  * every mismatching case is written next to the report (and in any mode for ids matching golden.gen.pngs).
  */
@@ -115,8 +115,7 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
 
         try (MockedStatic<DateTimeHelper> dateTime = mockStatic(DateTimeHelper.class, Mockito.CALLS_REAL_METHODS);
                 MockedStatic<AFKService> afk = mockStatic(AFKService.class, Mockito.CALLS_REAL_METHODS);
-                MockedStatic<FileUploadService> uploads =
-                        mockStatic(FileUploadService.class, Mockito.CALLS_REAL_METHODS);
+                MockedStatic<ImageUploads> uploads = mockStatic(ImageUploads.class, Mockito.CALLS_REAL_METHODS);
                 MockedStatic<MessageHelper> messages = mockStatic(MessageHelper.class, Mockito.CALLS_REAL_METHODS);
                 MockedStatic<ApplicationEmojiService> emojis =
                         mockStatic(ApplicationEmojiService.class, Mockito.CALLS_REAL_METHODS);
@@ -126,9 +125,9 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
             afk.when(() -> AFKService.userIsAFK(anyString())).thenReturn(false);
             emojis.when(() -> ApplicationEmojiService.getApplicationEmoji(anyString()))
                     .thenAnswer(invocation -> applicationEmoji(invocation.getArgument(0)));
-            uploads.when(() -> FileUploadService.createFileUpload(any(BufferedImage.class), anyString()))
+            uploads.when(() -> ImageUploads.createFileUpload(any(BufferedImage.class), anyString()))
                     .thenAnswer(invocation -> capture(invocation.getArgument(0)));
-            uploads.when(() -> FileUploadService.createFileUpload(any(BufferedImage.class), anyString(), anyString()))
+            uploads.when(() -> ImageUploads.createFileUpload(any(BufferedImage.class), anyString(), anyString()))
                     .thenAnswer(invocation -> capture(invocation.getArgument(0)));
             messages.when(() -> MessageHelper.sendFileUploadToChannel(
                             nullable(MessageChannel.class), any(FileUpload.class)))

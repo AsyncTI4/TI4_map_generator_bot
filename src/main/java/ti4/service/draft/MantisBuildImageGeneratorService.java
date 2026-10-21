@@ -16,11 +16,11 @@ import ti4.helpers.DisplayType;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.io.Fonts;
+import ti4.image.io.ImageUploads;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
 import ti4.logging.BotLogger;
 import ti4.model.PositionMapper;
-import ti4.service.image.FileUploadService;
 
 @UtilityClass
 public class MantisBuildImageGeneratorService {
@@ -56,7 +56,7 @@ public class MantisBuildImageGeneratorService {
             return null;
         }
 
-        return FileUploadService.createFileUpload(mapImage, uniqueKey);
+        return ImageUploads.createFileUpload(mapImage, uniqueKey);
     }
 
     private BufferedImage generateImage(

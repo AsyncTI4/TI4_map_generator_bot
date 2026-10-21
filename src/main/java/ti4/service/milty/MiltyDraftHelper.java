@@ -25,6 +25,7 @@ import ti4.image.draw.OutlinedText;
 import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
+import ti4.image.io.ImageUploads;
 import ti4.image.io.RemoteImages;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -38,7 +39,6 @@ import ti4.model.WormholeModel;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
-import ti4.service.image.FileUploadService;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 
 @UtilityClass
@@ -105,7 +105,7 @@ public class MiltyDraftHelper {
             desc.append(slice.ttsString());
         }
 
-        FileUpload fileUpload = FileUploadService.createFileUpload(mainImage, game.getName() + "_miltydraft");
+        FileUpload fileUpload = ImageUploads.createFileUpload(mainImage, game.getName() + "_miltydraft");
         fileUpload.setDescription(desc.toString());
         return fileUpload;
     }

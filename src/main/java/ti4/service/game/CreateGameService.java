@@ -49,11 +49,11 @@ import ti4.helpers.TIGLHelper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
+import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.service.async.ReserveGameNumberService;
-import ti4.service.image.FileUploadService;
 import ti4.service.tigl.TiglSetupService;
 import ti4.settings.GlobalSettings;
 import ti4.settings.users.UserSettingsManager;
@@ -477,7 +477,7 @@ public class CreateGameService {
                                 MessageHelper.sendMessageToChannel(introThread, message);
                                 BufferedImage colorsImage = ImageHelper.readScaled(
                                         ImageResources.extra("Compiled_Async_colors.png"), 731, 593);
-                                FileUpload fileUpload = FileUploadService.createFileUpload(colorsImage, "colors");
+                                FileUpload fileUpload = ImageUploads.createFileUpload(colorsImage, "colors");
                                 MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
                             } catch (Exception e) {
                                 BotLogger.error(new LogOrigin(game), "newPlayerIntro", e);

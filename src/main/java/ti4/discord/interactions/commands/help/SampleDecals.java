@@ -23,10 +23,10 @@ import ti4.image.draw.VerticalAlign;
 import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
+import ti4.image.io.ImageUploads;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.UnitDecalService;
-import ti4.service.image.FileUploadService;
 
 class SampleDecals extends Subcommand {
 
@@ -166,7 +166,7 @@ class SampleDecals extends Subcommand {
             }
         }
         coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
-        FileUpload fileUpload = FileUploadService.createFileUpload(coloursImage, "decal_sample_" + top + "_" + left);
+        FileUpload fileUpload = ImageUploads.createFileUpload(coloursImage, "decal_sample_" + top + "_" + left);
         MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
     }
 }

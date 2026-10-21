@@ -3,9 +3,9 @@ package ti4.image.map;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.game.Game;
 import ti4.image.io.EncodedImage;
+import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
-import ti4.service.image.FileUploadService;
 import ti4.spring.api.overlay.MapOverlayService;
 import ti4.website.AsyncTi4WebsiteHelper;
 
@@ -17,10 +17,10 @@ final class MapUploads {
         timings.startDiscord();
         game.incrementMapImageGenerationCount();
         EncodedImage encoded = result.encoded();
-        FileUpload fileUpload = FileUploadService.createFileUpload(encoded.bytes(), game.getName(), encoded.format());
+        FileUpload fileUpload = ImageUploads.createFileUpload(encoded.bytes(), game.getName(), encoded.format());
         timings.stopDiscord();
         if (timings.isEnabled() && !AsyncTi4WebsiteHelper.uploadsEnabled()) {
-            FileUploadService.saveLocalPng(result.canvas(), "MapDebug");
+            ImageUploads.saveLocalPng(result.canvas(), "MapDebug");
         }
         return fileUpload;
     }

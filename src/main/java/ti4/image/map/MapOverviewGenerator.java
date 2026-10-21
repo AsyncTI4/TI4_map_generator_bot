@@ -21,11 +21,11 @@ import ti4.image.draw.OutlinedText;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
 import ti4.image.io.Fonts;
+import ti4.image.io.ImageUploads;
 import ti4.image.tile.TileGeometry;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
 import ti4.logging.BotLogger;
-import ti4.service.image.FileUploadService;
 
 @UtilityClass
 public class MapOverviewGenerator {
@@ -38,7 +38,7 @@ public class MapOverviewGenerator {
             List.of(TileStep.Tile, TileStep.Extras, TileStep.Units, TileStep.TileNumber);
 
     public static FileUpload createFileUpload(Game game, boolean sectorNames) {
-        return FileUploadService.createFileUpload(render(game, sectorNames), game.getName() + "_overview", "webp");
+        return ImageUploads.createFileUpload(render(game, sectorNames), game.getName() + "_overview", "webp");
     }
 
     public static BufferedImage render(Game game, boolean sectorNames) {

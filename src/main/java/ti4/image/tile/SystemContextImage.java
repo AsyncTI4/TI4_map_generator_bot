@@ -19,10 +19,10 @@ import ti4.game.Tile;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.FoWHelper;
 import ti4.image.io.Fonts;
+import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.PositionMapper;
-import ti4.service.image.FileUploadService;
 
 public final class SystemContextImage {
 
@@ -53,8 +53,7 @@ public final class SystemContextImage {
             int rings,
             String focusPosition,
             @Nullable Player explicitViewer) {
-        return FileUploadService.createFileUpload(
-                render(game, event, rings, focusPosition, explicitViewer), game.getName());
+        return ImageUploads.createFileUpload(render(game, event, rings, focusPosition, explicitViewer), game.getName());
     }
 
     public static BufferedImage render(

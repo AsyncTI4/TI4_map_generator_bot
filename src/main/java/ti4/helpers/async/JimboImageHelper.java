@@ -13,9 +13,9 @@ import ti4.image.draw.VerticalAlign;
 import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
+import ti4.image.io.ImageUploads;
 import ti4.model.Mapper;
 import ti4.model.TileModel;
-import ti4.service.image.FileUploadService;
 
 // Jazz's Interactive Map Builder
 final class JimboImageHelper {
@@ -75,6 +75,6 @@ final class JimboImageHelper {
             g2.drawImage(img, x * size + xoff, y * size, null);
             i++;
         }
-        return FileUploadService.createFileUpload(newImage, "jimboStuff");
+        return ImageUploads.createFileUpload(newImage, "jimboStuff");
     }
 }

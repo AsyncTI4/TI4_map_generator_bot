@@ -1,4 +1,4 @@
-package ti4.service.image;
+package ti4.image.io;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -8,41 +8,28 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Storage;
-import ti4.image.io.ImageEncoder;
 import ti4.logging.BotLogger;
 
 @UtilityClass
-public class FileUploadService {
+public class ImageUploads {
 
     public static FileUpload createFileUpload(BufferedImage bufferedImage, String filenamePrefix, String fileFormat) {
-        return createFileUpload(bufferedImage, filenamePrefix, fileFormat, false);
+        byte[] imageBytes =
+                switch (fileFormat) {
+                    case "png" -> ImageEncoder.png(bufferedImage);
+                    case "jpg" -> ImageEncoder.jpg(bufferedImage);
+                    case "webp" -> ImageEncoder.webp(bufferedImage);
+                    default -> throw new IllegalArgumentException("Unsupported file format: " + fileFormat);
+                };
+        return createFileUpload(imageBytes, filenamePrefix, fileFormat);
     }
 
     public static FileUpload createFileUpload(BufferedImage bufferedImage, String filenamePrefix) {
-        return createFileUpload(bufferedImage, filenamePrefix, "webp", false);
-    }
-
-    private static FileUpload createFileUpload(
-            BufferedImage bufferedImage, String filenamePrefix, String fileFormat, boolean saveLocalCopy) {
-        byte[] imageBytes;
-        switch (fileFormat) {
-            case "png" -> imageBytes = ImageEncoder.png(bufferedImage);
-            case "jpg" -> imageBytes = ImageEncoder.jpg(bufferedImage);
-            case "webp" -> imageBytes = ImageEncoder.webp(bufferedImage);
-            default -> throw new IllegalArgumentException("Unsupported file format: " + fileFormat);
-        }
-        return createFileUpload(imageBytes, filenamePrefix, fileFormat, saveLocalCopy);
+        return createFileUpload(bufferedImage, filenamePrefix, "webp");
     }
 
     public static FileUpload createFileUpload(byte[] bytes, String filenamePrefix, String fileFormat) {
-        return createFileUpload(bytes, filenamePrefix, fileFormat, false);
-    }
-
-    private static FileUpload createFileUpload(
-            byte[] bytes, String filenamePrefix, String fileFormat, boolean saveLocalCopy) {
         if (bytes == null || bytes.length == 0) return null;
-
-        if (saveLocalCopy) optionallySaveToLocal(bytes, filenamePrefix, fileFormat);
 
         String fileName = filenamePrefix + "_" + DateTimeHelper.getFormattedTimestamp() + "." + fileFormat;
         return FileUpload.fromData(bytes, fileName);

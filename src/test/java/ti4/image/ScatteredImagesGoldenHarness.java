@@ -55,6 +55,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.RenderRandom;
 import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageUploads;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
@@ -72,7 +73,6 @@ import ti4.service.draft.SliceImageGeneratorService;
 import ti4.service.draft.TestData;
 import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 import ti4.service.emoji.ApplicationEmojiService;
-import ti4.service.image.FileUploadService;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
@@ -98,7 +98,7 @@ import ti4.testUtils.BaseTi4Test;
  *
  * Randomness runs in RenderRandom.neutral() per case and the per-tag call counts are part of each record; network
  * images come from FakeImageNetwork.deterministicImages(), so emoji are placeholders derived from their URL. Uploads
- * are captured at FileUploadService and the Discord send is a no-op. The sample commands place their picture at a
+ * are captured at ImageUploads and the Discord send is a no-op. The sample commands place their picture at a
  * random offset of a starfield page, so their background is replaced by a transparent one: the cropped picture then
  * no longer depends on the offset. Each record holds the canvas size, a SHA-256 of the ARGB raster, the random call
  * counts, the number of MessageHelper calls and, for deterministic names, the upload name and a digest of its
@@ -150,8 +150,7 @@ class ScatteredImagesGoldenHarness extends BaseTi4Test {
         expected = "compare".equals(mode) ? readBaseline(outDir) : null;
         List<Path> saves = listSaves(savesDir, System.getProperty("golden.only", ""));
 
-        try (MockedStatic<FileUploadService> uploads =
-                        mockStatic(FileUploadService.class, stubOnly(Mockito.CALLS_REAL_METHODS));
+        try (MockedStatic<ImageUploads> uploads = mockStatic(ImageUploads.class, stubOnly(Mockito.CALLS_REAL_METHODS));
                 MockedStatic<MessageHelper> messages = mockStatic(MessageHelper.class, stubOnly(invocation -> {
                     MESSAGES.incrementAndGet();
                     if ("sendFileUploadToChannel".equals(invocation.getMethod().getName())) return null;
@@ -162,9 +161,9 @@ class ScatteredImagesGoldenHarness extends BaseTi4Test {
                 FakeImageNetwork network = FakeImageNetwork.deterministicImages()) {
             emojis.when(() -> ApplicationEmojiService.getApplicationEmoji(anyString()))
                     .thenAnswer(invocation -> applicationEmoji(invocation.getArgument(0)));
-            uploads.when(() -> FileUploadService.createFileUpload(any(BufferedImage.class), anyString()))
+            uploads.when(() -> ImageUploads.createFileUpload(any(BufferedImage.class), anyString()))
                     .thenAnswer(invocation -> capture(invocation.getArgument(0), invocation.getArgument(1)));
-            uploads.when(() -> FileUploadService.createFileUpload(any(BufferedImage.class), anyString(), anyString()))
+            uploads.when(() -> ImageUploads.createFileUpload(any(BufferedImage.class), anyString(), anyString()))
                     .thenAnswer(invocation -> capture(invocation.getArgument(0), invocation.getArgument(1)));
 
             syntheticSlices();

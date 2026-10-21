@@ -22,12 +22,12 @@ import ti4.image.draw.VerticalAlign;
 import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
+import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
 import ti4.model.Mapper;
-import ti4.service.image.FileUploadService;
 
 class SampleColors extends Subcommand {
 
@@ -193,7 +193,7 @@ class SampleColors extends Subcommand {
         coloursImage = coloursImage.getSubimage(left, top, subWidth, subHeight);
         String fileNamePrefix =
                 "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.getFirst() : Constants.ALL);
-        try (var fileUpload = FileUploadService.createFileUpload(coloursImage, fileNamePrefix)) {
+        try (var fileUpload = ImageUploads.createFileUpload(coloursImage, fileNamePrefix)) {
             fileUpload.setDescription(
                     "Colour samples for " + (hues.size() == 1 ? "all the " + hues.getFirst() : "ALL the") + " units.");
             MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
