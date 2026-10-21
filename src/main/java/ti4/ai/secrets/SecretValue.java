@@ -10,6 +10,7 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.eval.GameHorizon;
 import ti4.ai.strategy.TechPath;
 import ti4.ai.tactical.GroundCampaign;
+import ti4.ai.tactical.SeatStrike;
 import ti4.ai.tactical.SupplyLines;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -34,6 +35,7 @@ public class SecretValue {
     private static final double REACHABLE_SUPPLY_LINES = 0.6;
     private static final String SEIZE_AN_ICON = "sai";
     private static final String DEFY_SPACE_AND_TIME = "dfat";
+    private static final String OCCUPY_THE_SEAT = "ose";
     private static final String MALLICE = "mallice";
     private static final String LOCKED_MALLICE = "lockedmallice";
     private static final String GHOST_SHIP = "ghost_ship";
@@ -87,6 +89,7 @@ public class SecretValue {
         return switch (secretId) {
             case SEIZE_AN_ICON -> legendaryReach(game, seat);
             case DEFY_SPACE_AND_TIME -> nexusReach(game, seat);
+            case OCCUPY_THE_SEAT -> SeatStrike.feasibility(game, seat);
             case GroundCampaign.OCCUPY_THE_FRINGE, GroundCampaign.MECHANIZE_THE_MILITARY ->
                 GroundCampaign.of(game, seat).eta(secretId).feasibility();
             default -> TraitReach.applies(secretId) ? TraitReach.feasibility(game, seat, secretId, OFF_THE_BOARD) : 1.0;

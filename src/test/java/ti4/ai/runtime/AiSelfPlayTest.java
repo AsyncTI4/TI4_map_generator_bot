@@ -455,7 +455,14 @@ class AiSelfPlayTest extends BaseTi4Test {
                 "attack landing on a home",
                 "attack on Mecatol",
                 "attack landing on Mecatol",
-                "attack on Mecatol against Imperial");
+                "attack on Mecatol against Imperial",
+                "seat stack left by expand",
+                "seat stack left by attack",
+                "seat stack left by position",
+                "seat stack left by stage",
+                "seat stack left by pickup",
+                "seat stack left by defend",
+                "seat stack left by produce");
         List<String> parts = new ArrayList<>();
         for (String kind : kinds) {
             int total = outcomes.stream()

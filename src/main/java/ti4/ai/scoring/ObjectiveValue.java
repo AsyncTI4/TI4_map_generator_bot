@@ -98,9 +98,26 @@ public final class ObjectiveValue {
     }
 
     private double gainOf(Target target, Footprint after) {
-        int now = target.before();
         int then = progress(target.id(), after);
-        if (then == now || then == NOT_MODELLED) return 0;
+        return then == NOT_MODELLED ? 0 : targetGain(target, then);
+    }
+
+    public double gainOf(String id, Footprint after) {
+        return gainAt(id, progress(id, after));
+    }
+
+    public double gainAt(String id, int progress) {
+        if (progress == NOT_MODELLED) return 0;
+        double total = 0;
+        for (Target target : targets) {
+            if (target.id().equals(id)) total += targetGain(target, progress);
+        }
+        return total;
+    }
+
+    private static double targetGain(Target target, int then) {
+        int now = target.before();
+        if (then == now) return 0;
         double points = VICTORY_POINT_VALUE * target.points();
         if (now >= target.threshold()) return then < target.threshold() ? -points : 0;
         return then >= target.threshold() ? points : partialGain(target, now, then);

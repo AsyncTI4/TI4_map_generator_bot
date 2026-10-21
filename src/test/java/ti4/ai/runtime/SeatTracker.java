@@ -5,6 +5,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import ti4.ai.eval.BoardView;
+import ti4.ai.tactical.TacticalPlanner;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -27,7 +28,9 @@ final class SeatTracker {
             boolean controls,
             Map<UnitType, Integer> ships,
             boolean covered,
-            boolean scored) {}
+            boolean scored,
+            int others,
+            String capture) {}
 
     private final List<Holding> holdings = new ArrayList<>();
 
@@ -44,8 +47,30 @@ final class SeatTracker {
                     && total < SHIPS_NEEDED
                     && ButtonHelper.getPlayersWithPds2Cover(seat, game, mecatol.getPosition()).stream()
                             .anyMatch(player -> player != seat);
-            holdings.add(new Holding(seat.getFaction(), game.getRound(), controls, ships, covered, scored));
+            holdings.add(new Holding(
+                    seat.getFaction(),
+                    game.getRound(),
+                    controls,
+                    ships,
+                    covered,
+                    scored,
+                    othersAt(game, seat, mecatol),
+                    controls || scored ? "-" : bestPlan(game, seat, mecatol)));
         }
+    }
+
+    private static int othersAt(Game game, Player seat, Tile mecatol) {
+        return (int) game.getRealPlayers().stream()
+                .filter(other -> other != seat)
+                .filter(other -> mecatol.containsPlayersUnits(other)
+                        || other.getPlanets().stream().anyMatch(game.mecatols()::contains))
+                .count();
+    }
+
+    private static String bestPlan(Game game, Player seat, Tile mecatol) {
+        return TacticalPlanner.forTarget(game, seat, mecatol.getPosition())
+                .map(plan -> plan.kind().name().toLowerCase() + String.format(" %.1f", plan.score()))
+                .orElse("none");
     }
 
     synchronized List<String> lines(Game game) {
@@ -53,14 +78,16 @@ final class SeatTracker {
         List<String> lines = new ArrayList<>();
         for (Holding holding : holdings) {
             lines.add(String.format(
-                    "OccupyTheSeat %s %s r%d: controls Mecatol %s, ships %s, cannon-blocked %s, scored %s",
+                    "OccupyTheSeat %s %s r%d: controls Mecatol %s, ships %s, cannon-blocked %s, scored %s, others at Mecatol %d, best plan on Mecatol %s",
                     game.getName(),
                     holding.faction(),
                     holding.round(),
                     holding.controls(),
                     holding.ships(),
                     holding.covered(),
-                    holding.scored()));
+                    holding.scored(),
+                    holding.others(),
+                    holding.capture()));
         }
         long blocked = holdings.stream().filter(Holding::covered).count();
         lines.add(String.format(

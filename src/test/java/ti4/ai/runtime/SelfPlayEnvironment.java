@@ -32,6 +32,7 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.FactionBrain;
 import ti4.ai.brain.FactionBrainRegistry;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.eval.BoardView;
 import ti4.ai.eval.Territory;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
@@ -514,11 +515,25 @@ final class SelfPlayEnvironment implements AutoCloseable {
                 kinds.add(PLAN_PREFIX + "attack on Mecatol against Imperial");
             }
         }
+        if (leavesSeatStack(context, plan.get())) {
+            kinds.add(PLAN_PREFIX + "seat stack left by "
+                    + plan.get().kind().name().toLowerCase());
+        }
         synchronized (actionsByRound) {
             Map<String, Integer> round =
                     actionsByRound.computeIfAbsent(context.game().getRound(), ignored -> new java.util.TreeMap<>());
             kinds.forEach(kind -> round.merge(kind, 1, Integer::sum));
         }
+    }
+
+    // A holder of Occupy the Seat of the Empire whose plan moves ships off Mecatol Rex.
+    private static boolean leavesSeatStack(AiTurnContext context, TacticalPlan plan) {
+        Game game = context.game();
+        Tile mecatol = game.getMecatolTile();
+        if (mecatol == null || !context.seat().getSecretsUnscored().containsKey("ose")) return false;
+        return plan.moves().stream()
+                .anyMatch(move ->
+                        move.origin().equals(mecatol.getPosition()) && !BoardView.GROUND_FORCES.contains(move.type()));
     }
 
     // Where an expansion goes, by the territory zone of its target and the round band, for the zone split in the batch

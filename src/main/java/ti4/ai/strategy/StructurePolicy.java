@@ -19,6 +19,7 @@ import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.FracturePrize;
 import ti4.ai.explore.ExploreSite;
 import ti4.ai.scoring.ObjectivePolicy;
+import ti4.ai.tactical.SeatStrike;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -37,6 +38,7 @@ class StructurePolicy {
     private static final String FUEL_THE_WAR_MACHINE = "fwm";
     private static final String MECHANIZE_THE_MILITARY = "mtm";
     private static final int MECH_SPREADING_PREFERENCE = 2;
+    private static final int SEAT_DOCK_PREFERENCE = 2;
     private static final int MIN_FORWARD_DOCK_RESOURCES = 2;
     private static final int RICH_DOCK_RESOURCES = 3;
     private static final int SLICE_SEARCH_DEPTH = 6;
@@ -220,7 +222,9 @@ class StructurePolicy {
     }
 
     private static boolean isForwardDockSite(Game game, Player seat, Planet planet) {
-        return planet.getResources() >= MIN_FORWARD_DOCK_RESOURCES || onOwnIngress(game, seat, planet);
+        return planet.getResources() >= MIN_FORWARD_DOCK_RESOURCES
+                || onOwnIngress(game, seat, planet)
+                || SeatStrike.wantsDockOn(game, seat, planet);
     }
 
     private static boolean secondHomeDockWanted(Game game, Player seat, Planet planet) {
@@ -259,7 +263,8 @@ class StructurePolicy {
         int rich = planet.getResources() >= RICH_DOCK_RESOURCES ? 1 : 0;
         int nearby = STYX.equals(planet.getName()) || inSlice(game, seat, planet) ? 1 : 0;
         int ingress = onOwnIngress(game, seat, planet) ? 2 : 0;
-        return rich + nearby + ingress + mechSpreadingSite(game, seat, planet);
+        int seatDock = SeatStrike.wantsDockOn(game, seat, planet) ? SEAT_DOCK_PREFERENCE : 0;
+        return rich + nearby + ingress + seatDock + mechSpreadingSite(game, seat, planet);
     }
 
     private static boolean onOwnIngress(Game game, Player seat, Planet planet) {
