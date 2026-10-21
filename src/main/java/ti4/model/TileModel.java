@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import org.apache.commons.lang3.StringUtils;
-import ti4.ResourceHelper;
+import ti4.image.ImageResources;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.ExploreEmojis;
@@ -154,7 +154,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     }
 
     private static String computeImageVersion(String imagePath) {
-        String filePath = ResourceHelper.getTileFile(imagePath);
+        String filePath = ImageResources.tile(imagePath);
         if (filePath == null) return "";
         try {
             CRC32 crc = new CRC32();
@@ -168,7 +168,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getTilePath() {
         String tileName = Mapper.getTileID(id);
-        return ResourceHelper.getTileFile(tileName);
+        return ImageResources.tile(tileName);
     }
 
     @JsonIgnore

@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
-import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
@@ -25,6 +24,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.URLReaderHelper;
+import ti4.image.ImageResources;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.json.JsonMapperManager;
@@ -272,7 +272,7 @@ public class MapJsonIOService {
             appendError(sb, tileIO, "Could not find tile: " + tileID);
             return false;
         }
-        String tilePath = ResourceHelper.getTileFile(tileName);
+        String tilePath = ImageResources.tile(tileName);
         if (tilePath == null) {
             appendError(sb, tileIO, "Could not find tile: " + tileID);
             return false;

@@ -20,6 +20,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.image.Mapper;
 import ti4.image.OutlinedText;
 import ti4.image.VerticalAlign;
@@ -105,7 +106,7 @@ class SampleColors extends Subcommand {
         int y = top;
 
         BufferedImage coloursImage = new BufferedImage(PAGEWIDTH, PAGEHIGHT, BufferedImage.TYPE_INT_ARGB);
-        BufferedImage backgroundImage = ImageHelper.read(ResourceHelper.getExtraFile("starfield.png"));
+        BufferedImage backgroundImage = ImageHelper.read(ImageResources.extra("starfield.png"));
         Graphics2D graphic = coloursImage.createGraphics();
         graphic.drawImage(backgroundImage, 0, 0, null);
 
@@ -118,8 +119,7 @@ class SampleColors extends Subcommand {
                 }
                 String alias = c.getAlias();
 
-                BufferedImage dread =
-                        ImageHelper.read(ResourceHelper.getInstance().getUnitFile(alias + "_dn.png"));
+                BufferedImage dread = ImageHelper.read(ImageResources.unit(alias + "_dn.png"));
                 graphic.drawImage(dread, x + SPACING, y + SPACING, null);
                 graphic.setFont(bigFont);
                 OutlinedText.draw(

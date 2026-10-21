@@ -13,7 +13,6 @@ import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
-import ti4.ResourceHelper;
 import ti4.game.Player;
 import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
@@ -72,10 +71,10 @@ public final class FactionIcons {
             return null;
         }
         String path = "coexist".equalsIgnoreCase(factionId)
-                ? ResourceHelper.getInstance().getGeneralFile(factionId + ".png")
-                : ResourceHelper.getInstance().getFactionFile(factionId + ".png");
+                ? ImageResources.general(factionId + ".png")
+                : ImageResources.faction(factionId + ".png");
         if (path == null) path = homebrewBasePath(factionId);
-        if (path == null) path = ResourceHelper.getInstance().getFactionFile(capitalize(factionId) + ".png");
+        if (path == null) path = ImageResources.faction(capitalize(factionId) + ".png");
         if (path == null && !"fogalliance".equalsIgnoreCase(factionId) && !"generic".equalsIgnoreCase(factionId)) {
             BotLogger.warning("Could not find image file for faction icon: " + factionId);
         }
@@ -129,7 +128,7 @@ public final class FactionIcons {
         FactionModel faction = Mapper.getFaction(factionId);
         if (faction == null) return null;
         return faction.getHomebrewReplacesID()
-                .map(base -> ResourceHelper.getInstance().getFactionFile(base + ".png"))
+                .map(base -> ImageResources.faction(base + ".png"))
                 .orElse(null);
     }
 

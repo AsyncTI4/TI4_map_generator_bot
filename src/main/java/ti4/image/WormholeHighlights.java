@@ -56,8 +56,8 @@ final class WormholeHighlights implements OffBoardHighlights {
                 g2.drawImage(blockedWormholeImage, x + 40, y + 40, null);
             }
             if (reconstruction) {
-                BufferedImage doubleWormholeImage = ImageHelper.readScaled(
-                        ResourceHelper.getInstance().getTokenFile("token_whalpha.png"), 40.0f / 65);
+                BufferedImage doubleWormholeImage =
+                        ImageHelper.readScaled(ImageResources.token("token_whalpha.png"), 40.0f / 65);
                 g2.drawImage(doubleWormholeImage, x, y, null);
             }
             x -= (offBoardHighlighting == 3 ? 40 : 0) + (offBoardHighlighting == 2 ? 60 : 0);
@@ -72,8 +72,8 @@ final class WormholeHighlights implements OffBoardHighlights {
                 g2.drawImage(blockedWormholeImage, x + 40, y + 40, null);
             }
             if (reconstruction) {
-                BufferedImage doubleWormholeImage = ImageHelper.readScaled(
-                        ResourceHelper.getInstance().getTokenFile("token_whbeta.png"), 40.0f / 65);
+                BufferedImage doubleWormholeImage =
+                        ImageHelper.readScaled(ImageResources.token("token_whbeta.png"), 40.0f / 65);
                 g2.drawImage(doubleWormholeImage, x, y, null);
             }
             x -= (offBoardHighlighting == 3 ? 40 : 0) + (offBoardHighlighting == 2 ? 60 : 0);

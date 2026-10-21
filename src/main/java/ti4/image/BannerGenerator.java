@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Storage;
@@ -26,10 +25,10 @@ public class BannerGenerator {
     public static void drawFactionBanner(Player player) {
         BufferedImage bannerImage = new BufferedImage(325, 50, BufferedImage.TYPE_INT_ARGB);
         BufferedImage backgroundImage =
-                ImageHelper.readScaled(ResourceHelper.getExtraFile("factionbanner_background.png"), 325, 50);
+                ImageHelper.readScaled(ImageResources.extra("factionbanner_background.png"), 325, 50);
         String pnColorFile = "pa_pn_color_" + Mapper.getColorID(player.getColor()) + ".png";
-        BufferedImage colorImage = ImageHelper.readScaled(ResourceHelper.getPAResource(pnColorFile), 1.5f);
-        BufferedImage gradientImage = ImageHelper.read(ResourceHelper.getExtraFile("factionbanner_gradient.png"));
+        BufferedImage colorImage = ImageHelper.readScaled(ImageResources.playerArea(pnColorFile), 1.5f);
+        BufferedImage gradientImage = ImageHelper.read(ImageResources.extra("factionbanner_gradient.png"));
         BufferedImage smallFactionImage = FactionIcons.scaled(player, 0.26f);
         BufferedImage largeFactionImage = FactionIcons.scaled(player, 1.4f);
         Graphics2D bannerG = bannerImage.createGraphics();
@@ -75,11 +74,11 @@ public class BannerGenerator {
         Graphics2D bannerG;
         BufferedImage bannerImage = new BufferedImage(225, 50, BufferedImage.TYPE_INT_ARGB);
         BufferedImage backgroundImage =
-                ImageHelper.readScaled(ResourceHelper.getExtraFile("factionbanner_background.png"), 325, 50);
-        BufferedImage agendaImage = ImageHelper.readScaled(ResourceHelper.getExtraFile("agenda.png"), 50, 50);
+                ImageHelper.readScaled(ImageResources.extra("factionbanner_background.png"), 325, 50);
+        BufferedImage agendaImage = ImageHelper.readScaled(ImageResources.extra("agenda.png"), 50, 50);
         String pnColorFile = "pa_pn_color_" + Mapper.getColorID("blue") + ".png";
-        BufferedImage colorImage = ImageHelper.readScaled(ResourceHelper.getPAResource(pnColorFile), 1.5f);
-        BufferedImage gradientImage = ImageHelper.read(ResourceHelper.getExtraFile("factionbanner_gradient.png"));
+        BufferedImage colorImage = ImageHelper.readScaled(ImageResources.playerArea(pnColorFile), 1.5f);
+        BufferedImage gradientImage = ImageHelper.read(ImageResources.extra("factionbanner_gradient.png"));
         bannerG = bannerImage.createGraphics();
 
         bannerG.drawImage(backgroundImage, 0, 0, null);
@@ -117,8 +116,7 @@ public class BannerGenerator {
             altPhaseName = phase;
         }
         BufferedImage bannerImage = new BufferedImage(511, 331, BufferedImage.TYPE_INT_ARGB);
-        BufferedImage backgroundImage =
-                ImageHelper.readScaled(ResourceHelper.getExtraFile(phase + "banner.png"), 511, 331);
+        BufferedImage backgroundImage = ImageHelper.readScaled(ImageResources.extra(phase + "banner.png"), 511, 331);
 
         Graphics2D bannerG = bannerImage.createGraphics();
         bannerG.drawImage(backgroundImage, 0, 0, null);

@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.service.map.CustomHyperlaneService;
@@ -228,7 +227,7 @@ final class HyperlaneTileGenerator {
             long seed = matrix.hashCode();
             int tileIndex = Math.floorMod(seed, RANDOM_BACKGROUNDS.size());
             String randomTile = RANDOM_BACKGROUNDS.get(tileIndex);
-            String randomTilePath = ResourceHelper.getTileFile(randomTile);
+            String randomTilePath = ImageResources.tile(randomTile);
             if (randomTilePath != null) {
                 tilePath = randomTilePath;
             }

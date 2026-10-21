@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -32,9 +31,9 @@ final class AttachmentHighlights implements OffBoardHighlights {
                 if (attach.isEmpty()) {
                     continue;
                 }
-                attachFiles.put(planet, ResourceHelper.getInstance().getGeneralFile("misc_chevrons_basic.png"));
+                attachFiles.put(planet, ImageResources.general("misc_chevrons_basic.png"));
                 if (attach.contains("attachment_tombofemphidia.png")) {
-                    attachFiles.put(planet, ResourceHelper.getInstance().getGeneralFile("misc_chevrons_toe.png"));
+                    attachFiles.put(planet, ImageResources.general("misc_chevrons_toe.png"));
                 }
                 attachCount.put(planet, attach.size());
                 offBoardHighlighting++;

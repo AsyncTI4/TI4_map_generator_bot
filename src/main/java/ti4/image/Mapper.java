@@ -1365,19 +1365,19 @@ public class Mapper {
 
     @Nullable
     public static String getCCPath(String ccID) {
-        return ResourceHelper.getInstance().getCCFile(ccID);
+        return ImageResources.commandToken(ccID);
     }
 
     @Nullable
     public static String getPeekMarkerPath(String markerID) {
-        return ResourceHelper.getInstance().getPeekMarkerFile(markerID);
+        return ImageResources.peekMarker(markerID);
     }
 
     @Nullable
     public static String getTokenPath(String tokenID) {
-        String tokenPath = ResourceHelper.getInstance().getAttachmentFile(tokenID);
+        String tokenPath = ImageResources.attachment(tokenID);
         if (tokenPath == null || !(new File(tokenPath).exists())) {
-            tokenPath = ResourceHelper.getInstance().getTokenFile(tokenID);
+            tokenPath = ImageResources.token(tokenID);
             if (tokenPath == null) {
                 BotLogger.warning("Could not find token path: " + tokenID);
                 return null;

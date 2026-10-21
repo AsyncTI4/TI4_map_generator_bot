@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.modals.Modal;
-import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
@@ -24,6 +23,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
+import ti4.image.ImageResources;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
@@ -86,7 +86,7 @@ public class AddTileListService {
             }
             String tileName = Mapper.getTileID(tileID);
             String position = entry.getKey();
-            String tilePath = ResourceHelper.getTileFile(tileName);
+            String tilePath = ImageResources.tile(tileName);
             if (tilePath == null) {
                 throw new Exception("Could not find tile: " + tileID);
             }

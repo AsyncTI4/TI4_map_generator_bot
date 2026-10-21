@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -160,7 +159,7 @@ final class AnchorStats {
 
         if (player.isSpeaker()) {
             String speakerID = Mapper.getTokenID(Constants.SPEAKER);
-            String speakerFile = ResourceHelper.getInstance().getTokenFile(speakerID);
+            String speakerFile = ImageResources.token(speakerID);
             if (speakerFile != null) {
                 BufferedImage bufferedImage = ImageHelper.read(speakerFile);
                 point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
@@ -174,7 +173,7 @@ final class AnchorStats {
             }
         }
         if (player.isTyrant()) {
-            String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID("tyrant"));
+            String speakerFile = ImageResources.token(Mapper.getTokenID("tyrant"));
             if (speakerFile != null) {
                 BufferedImage bufferedImage = ImageHelper.read(speakerFile);
                 point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);

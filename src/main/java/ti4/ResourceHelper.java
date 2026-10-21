@@ -1,35 +1,71 @@
 package ti4;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Nullable;
-import ti4.helpers.Constants;
-import ti4.helpers.RenderRandom;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
+import ti4.image.ImageResources;
 
 public final class ResourceHelper {
 
-    private static final Pattern UNIT_DD_PATTERN = Pattern.compile(Constants.UNIT_DD);
-    private static ResourceHelper resourceHelper;
-    private final Map<String, String> unitCache = new HashMap<>();
-    private final Map<String, String> decalCache = new HashMap<>();
-    private final Map<String, String> spoopyCache = new HashMap<>();
-    private final Map<String, String> ccCache = new HashMap<>();
-    private final Map<String, String> peekMarkerCache = new HashMap<>();
-    private final Map<String, String> factionCache = new HashMap<>();
-    private final Map<String, String> generalCache = new HashMap<>();
-    private final Map<String, String> planetCache = new HashMap<>();
+    private static final ResourceHelper INSTANCE = new ResourceHelper();
 
     private ResourceHelper() {}
 
+    // TODO: the instance and the image lookups below delegate to ImageResources for PlayerAreaGenerator,
+    // TileGenerator and UnitRenderGenerator; remove them after their rewrite branches merge.
     public static ResourceHelper getInstance() {
-        if (resourceHelper == null) {
-            resourceHelper = new ResourceHelper();
-        }
-        return resourceHelper;
+        return INSTANCE;
+    }
+
+    @Nullable
+    public static String getTileFile(String name) {
+        return ImageResources.tile(name);
+    }
+
+    @Nullable
+    public String getFactionFile(String name) {
+        return ImageResources.faction(name);
+    }
+
+    @Nullable
+    public String getGeneralFile(String name) {
+        return ImageResources.general(name);
+    }
+
+    @Nullable
+    public String getUnitFile(String name) {
+        return ImageResources.unit(name);
+    }
+
+    @Nullable
+    public String getUnitFile(UnitKey unit) {
+        return ImageResources.unit(unit);
+    }
+
+    @Nullable
+    public String getDecalFile(String name) {
+        return ImageResources.decal(name);
+    }
+
+    @Nullable
+    public String getSpoopyFile() {
+        return ImageResources.spoopyFace();
+    }
+
+    @Nullable
+    public String getPlanetResource(String name) {
+        return ImageResources.planetCard(name);
+    }
+
+    @Nullable
+    public static String getPAResource(String name) {
+        return ImageResources.playerArea(name);
+    }
+
+    @Nullable
+    public String getTokenFile(String name) {
+        return ImageResources.token(name);
     }
 
     @Nullable
@@ -38,109 +74,11 @@ public final class ResourceHelper {
     }
 
     @Nullable
-    public static String getTileFile(String name) {
-        return getResourceFromFolder("tiles/", name);
-    }
-
-    @Nullable
-    public String getFactionFile(String name) {
-        return getCachedResource(factionCache, "factions/", name);
-    }
-
-    @Nullable
-    public String getGeneralFile(String name) {
-        return getCachedResource(generalCache, "general/", name);
-    }
-
-    // @Deprecated
-    @Nullable
-    public String getUnitFile(String name) {
-        if (name.endsWith(Constants.UNIT_DD) && RenderRandom.oneIn("unit.destroyerEye", Constants.EYE_CHANCE)) {
-            name = UNIT_DD_PATTERN.matcher(name).replaceFirst(Constants.UNIT_DD_EYE);
-        }
-        return getCachedResource(unitCache, "units/", name);
-    }
-
-    @Nullable
-    public String getUnitFile(UnitKey unit) {
-        String name = unit.getFileName();
-        return getCachedResource(unitCache, "units/", name);
-    }
-
-    @Nullable
-    public String getUnitFile(UnitKey unit, boolean eyes) {
-        String name = unit.getFileName(eyes);
-        return getCachedResource(unitCache, "units/", name);
-    }
-
-    @Nullable
-    public String getDecalFile(String name) {
-        return getCachedResource(decalCache, "decals/", name);
-    }
-
-    @Nullable
-    public String getSpoopyFile() {
-        // overlay_jackolantern_1
-        int face = RenderRandom.nextInt("unit.spoopyFace", 1, 4);
-        String name = "overlay_jackolantern_" + face + ".png";
-        return getCachedResource(spoopyCache, "decals/", name);
-    }
-
-    @Nullable
-    public String getCCFile(String name) {
-        return getCachedResource(ccCache, "command_token/", name);
-    }
-
-    @Nullable
-    public String getPeekMarkerFile(String name) {
-        return getCachedResource(peekMarkerCache, "peek_marker/", name);
-    }
-
-    @Nullable
-    public String getAttachmentFile(String name) {
-        File attachmentFile = getFile("attachment_token/", name);
-        if (attachmentFile.exists()) {
-            return attachmentFile.getAbsolutePath();
-        }
-        return getTokenFile(name);
-    }
-
-    @Nullable
-    public String getPlanetResource(String name) {
-        return getCachedResource(planetCache, "planet_cards/", name);
-    }
-
-    @Nullable
-    public static String getPAResource(String name) {
-        return getResourceFromFolder("player_area/", name);
-    }
-
-    @Nullable
-    public String getTokenFile(String name) {
-        return getResourceFromFolder("tokens/", name);
-    }
-
-    @Nullable
-    public static String getExtraFile(String name) {
-        return getResourceFromFolder("extra/", name);
-    }
-
-    private static String getCachedResource(Map<String, String> cache, String folder, String name) {
-        if (cache.containsKey(name)) {
-            return cache.get(name);
-        }
-        String resourcePath = getResourceFromFolder(folder, name);
-        cache.put(name, resourcePath);
-        return resourcePath;
-    }
-
-    @Nullable
     public static String getResourceFromFolder(String folder, String name) {
         File resourceFile = getFile(folder, name);
         if (resourceFile.exists()) {
             return resourceFile.getAbsolutePath();
         }
-        // BotLogger.log("Could not find resource file: " + resourceFile.getAbsolutePath());
         return null;
     }
 

@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -63,7 +62,7 @@ final class CardDeckRow {
         if (!game.isTwilightsFallMode() || !game.getTyrantUserID().isEmpty()) {
             return null;
         }
-        return ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.TYRANT));
+        return ImageResources.token(Mapper.getTokenID(Constants.TYRANT));
     }
 
     private static List<DeckBadge> badges(Game game) {

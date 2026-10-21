@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.DisplayType;
@@ -248,7 +247,7 @@ final class LawsAndEventsSection {
     }
 
     private static void paintIcon(Graphics2D g2, String factionFileName, int x, int y) {
-        String factionFile = ResourceHelper.getInstance().getFactionFile(factionFileName);
+        String factionFile = ImageResources.faction(factionFileName);
         if (factionFile != null) {
             BufferedImage bufferedImage = ImageHelper.read(factionFile);
             g2.drawImage(bufferedImage, x + ICON_INSET, y + ICON_INSET, null);

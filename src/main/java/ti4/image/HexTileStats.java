@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -292,7 +291,7 @@ final class HexTileStats {
         Point point;
         if (player.isSpeaker()) {
             String speakerID = Mapper.getTokenID(Constants.SPEAKER);
-            String speakerFile = ResourceHelper.getInstance().getTokenFile(speakerID);
+            String speakerFile = ImageResources.token(speakerID);
             BufferedImage img = ImageHelper.read(speakerFile);
             if (img != null) {
                 point = PositionMapper.getPlayerStats("newspeaker");
@@ -301,7 +300,7 @@ final class HexTileStats {
             }
         }
         if (player.isTyrant()) {
-            String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID("tyrant"));
+            String speakerFile = ImageResources.token(Mapper.getTokenID("tyrant"));
             BufferedImage img = ImageHelper.read(speakerFile);
             if (img != null) {
                 point = PositionMapper.getPlayerStats("newspeaker");

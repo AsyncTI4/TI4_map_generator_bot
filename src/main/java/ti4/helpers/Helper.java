@@ -94,6 +94,7 @@ import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -719,8 +720,7 @@ public final class Helper {
         }
 
         String tokenPath = token == null ? Mapper.getTokenID(tokenID) : token.getImagePath();
-        BufferedImage tokenImage = ImageHelper.read(
-                tokenPath == null ? null : ResourceHelper.getInstance().getAttachmentFile(tokenPath));
+        BufferedImage tokenImage = ImageHelper.read(tokenPath == null ? null : ImageResources.attachment(tokenPath));
         Integer imageX = null;
         Integer imageY = null;
         if (tokenImage != null) {

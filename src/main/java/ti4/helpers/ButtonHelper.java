@@ -112,6 +112,7 @@ import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.helpers.twilight_kart.TkHelperGenomes;
+import ti4.image.ImageResources;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -7076,7 +7077,7 @@ public class ButtonHelper {
             }
 
             String tileName = Mapper.getTileID(planetTileName);
-            String tilePath = ResourceHelper.getTileFile(tileName);
+            String tilePath = ImageResources.tile(tileName);
             if (tilePath == null) {
                 MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
                 return;

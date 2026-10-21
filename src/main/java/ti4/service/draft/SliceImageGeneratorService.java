@@ -12,7 +12,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -20,6 +19,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Storage;
 import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
+import ti4.image.ImageResources;
 import ti4.image.Mapper;
 import ti4.image.OutlinedText;
 import ti4.image.RemoteImages;
@@ -133,7 +133,7 @@ public class SliceImageGeneratorService {
         Point hs = tilePositions.getFirst();
 
         List<String> tileStrings = new ArrayList<>();
-        tileStrings.add(ResourceHelper.getTileFile("00_green.png"));
+        tileStrings.add(ImageResources.tile("00_green.png"));
         tileStrings.addAll(
                 slice.getTiles().stream().map(t -> t.getTile().getTilePath()).toList());
 
