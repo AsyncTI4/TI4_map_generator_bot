@@ -35,7 +35,9 @@ public class ExpectedTradeGoods {
 
     private static int washableCommodities(Game game, Player seat) {
         if (!canWash(game)) return 0;
-        if (holdsUnplayedTrade(game, seat)) return Math.max(heldCommodities(seat), seat.getCommoditiesTotal());
+        if (holdsUnplayedTrade(game, seat) || seat.hasAbility(MASTERS_OF_TRADE)) {
+            return Math.max(heldCommodities(seat), seat.getCommoditiesTotal());
+        }
         if (tradeStillToBePlayed(game)) return soldToTheTradeHolder(seat.getCommoditiesTotal());
         return hasWashPartner(game, seat) ? soldToTheTradeHolder(heldCommodities(seat)) : 0;
     }

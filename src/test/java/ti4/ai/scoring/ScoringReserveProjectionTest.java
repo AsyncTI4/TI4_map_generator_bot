@@ -60,7 +60,10 @@ class ScoringReserveProjectionTest extends BaseTi4Test {
     }
 
     // A seat that does not hold the unplayed Trade card sells its commodities to the holder at X-1: with a commodity
-    // value of 3 it forecasts 2 trade goods, whatever its faction. The holder counts the primary and its own value.
+    // value of 3 it forecasts 2 trade goods. The holder counts the primary and its own value. A Masters of Trade seat
+    // (Hacan)
+    // replenishes automatically and other seats turn its commodities into trade goods, so it forecasts its full value
+    // whether or not Trade has been played.
     @Test
     void aNonHolderForecastsOneLessThanItsCommodityValue() {
         test.sol.addSC(TRADE);
@@ -72,7 +75,11 @@ class ScoringReserveProjectionTest extends BaseTi4Test {
         test.nekro.addAbility("master_of_trade");
         test.nekro.setCommoditiesBase(6);
 
-        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(5);
+        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(6);
+
+        test.game.setSCPlayed(TRADE, true);
+
+        assertThat(ExpectedTradeGoods.beforeStatus(test.game, test.nekro)).isEqualTo(6);
     }
 
     // After Trade was played, commodities in hand are counted at X-1 while a wash partner holds some, and not at all
