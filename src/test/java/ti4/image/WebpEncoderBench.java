@@ -42,6 +42,8 @@ class WebpEncoderBench extends BaseTi4Test {
 
     private static final long LARGE_CANVAS_PIXELS = 40_000_000L;
     private static final long PSNR_CANVAS_PIXELS = 20_000_000L;
+    private static final int PSNR_GAME_LIMIT = 5;
+    private static final int WEBP_MAX_DIMENSION = 16_383;
     private static final int CROP_SIZE = 700;
 
     private record Result(int method, int threadLevel, long millis, int bytes) {}
@@ -62,19 +64,33 @@ class WebpEncoderBench extends BaseTi4Test {
                     .toList();
         }
         ExecutorService pool = Executors.newFixedThreadPool(2);
+        int psnrGames = 0;
         StringBuilder report = new StringBuilder("game\twidth\theight\tmethod\tthreadLevel\tmillis\tbytes\tpsnr\n");
         try {
             for (Path save : saves) {
                 String name = save.getFileName().toString().replace(".txt", "");
-                BufferedImage canvas = renderCanvas(save);
+                BufferedImage canvas;
+                try {
+                    canvas = renderCanvas(save);
+                } catch (Exception e) {
+                    System.out.println("[bench] render failed, skipped " + name);
+                    continue;
+                }
+                psnrGames++;
+                if (canvas.getWidth() > WEBP_MAX_DIMENSION || canvas.getHeight() > WEBP_MAX_DIMENSION) {
+                    System.out.println("[bench] skipped (jpg in production) " + name);
+                    continue;
+                }
                 long pixels = (long) canvas.getWidth() * canvas.getHeight();
                 boolean large = pixels > LARGE_CANVAS_PIXELS;
-                encode(canvas, 4, 0);
+                int production = ImageHelper.writeWebp(canvas).length;
+                int method4 = encode(canvas, 4, 0).length;
+                System.out.println("[bench] production writer " + production + " bytes, method 4 thread 0 " + method4);
                 for (int method : large ? new int[] {0, 2, 4, 6} : new int[] {0, 1, 2, 3, 4, 5, 6}) {
                     for (int threadLevel : new int[] {0, 1}) {
                         Result result = concurrentEncode(pool, canvas, method, threadLevel, large ? 1 : 2);
                         String psnr = "";
-                        if (threadLevel == 0 && pixels <= PSNR_CANVAS_PIXELS) {
+                        if (threadLevel == 0 && pixels <= PSNR_CANVAS_PIXELS && psnrGames <= PSNR_GAME_LIMIT) {
                             psnr = String.format("%.2f", psnr(canvas, encode(canvas, method, 0)));
                         }
                         report.append(String.format(
