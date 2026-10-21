@@ -201,7 +201,7 @@ public class ArdentiaAbilityHandler {
                 || FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
             return false;
         }
-        String borrowedCc = Tile.getCCPath(ti4.image.Mapper.getCCID(borrowedColor));
-        return borrowedCc != null && !tile.hasCC(ti4.image.Mapper.getCCID(borrowedColor));
+        String borrowedCc = Tile.getCCPath(ti4.model.Mapper.getCCID(borrowedColor));
+        return borrowedCc != null && !tile.hasCC(ti4.model.Mapper.getCCID(borrowedColor));
     }
 }

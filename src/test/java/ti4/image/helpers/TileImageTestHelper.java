@@ -11,9 +11,9 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.image.ImageHelper;
-import ti4.image.Mapper;
 import ti4.image.SystemContextImage;
 import ti4.image.TileImageTest;
+import ti4.model.Mapper;
 
 @UtilityClass
 public class TileImageTestHelper {

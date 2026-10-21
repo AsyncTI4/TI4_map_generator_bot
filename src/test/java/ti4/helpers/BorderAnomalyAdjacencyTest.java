@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.persistence.TestGameHarness;
-import ti4.image.PositionMapper;
+import ti4.model.PositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 class BorderAnomalyAdjacencyTest extends BaseTi4Test {

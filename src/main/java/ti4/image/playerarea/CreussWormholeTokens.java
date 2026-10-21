@@ -9,7 +9,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.image.ImageHelper;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 
 final class CreussWormholeTokens {
 

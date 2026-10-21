@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.jspecify.annotations.NonNull;
 import ti4.discord.JdaService;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;

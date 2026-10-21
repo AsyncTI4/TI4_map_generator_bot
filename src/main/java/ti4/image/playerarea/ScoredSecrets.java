@@ -14,9 +14,9 @@ import ti4.helpers.Storage;
 import ti4.image.ColorUtil;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
-import ti4.image.Mapper;
 import ti4.image.Strokes;
 import ti4.logging.BotLogger;
+import ti4.model.Mapper;
 
 public final class ScoredSecrets {
 

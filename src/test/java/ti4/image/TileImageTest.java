@@ -20,6 +20,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.helpers.ImageTestHelper.TestMode;
 import ti4.image.helpers.TileImageTestHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.service.map.TokenPlanetService;
 import ti4.testUtils.BaseTi4Test;
 

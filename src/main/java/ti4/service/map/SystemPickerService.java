@@ -25,11 +25,11 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.image.BoardPosition;
 import ti4.image.GalaxyNames;
 import ti4.image.MapSegment;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
+import ti4.model.BoardPosition;
+import ti4.model.PositionMapper;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.option.FOWOptionService.FOWOption;
 

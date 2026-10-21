@@ -6,6 +6,7 @@ import java.util.List;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.model.Mapper;
 
 final class FleetCommandCounters {
 

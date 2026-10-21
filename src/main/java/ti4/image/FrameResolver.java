@@ -11,6 +11,8 @@ import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
+import ti4.model.BoardPosition;
+import ti4.model.PositionMapper;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 final class FrameResolver {

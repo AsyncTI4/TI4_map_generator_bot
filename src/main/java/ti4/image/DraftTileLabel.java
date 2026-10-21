@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import ti4.ResourceHelper;
 import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
+import ti4.model.TileHelper;
 
 final class DraftTileLabel {
 

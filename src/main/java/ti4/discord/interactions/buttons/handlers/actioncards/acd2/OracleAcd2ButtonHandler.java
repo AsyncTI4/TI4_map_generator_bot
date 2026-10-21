@@ -10,9 +10,9 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 @UtilityClass
 class OracleAcd2ButtonHandler {

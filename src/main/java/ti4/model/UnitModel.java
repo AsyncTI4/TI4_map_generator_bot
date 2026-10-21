@@ -21,7 +21,6 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperUnits;
-import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.ExploreEmojis;

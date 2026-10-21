@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
-import ti4.image.Mapper;
 import ti4.model.ColorModel;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class AnonymousCommsThreadNameTest extends BaseTi4Test {

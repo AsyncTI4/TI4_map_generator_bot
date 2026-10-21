@@ -14,6 +14,7 @@ import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.PositionMapper;
 
 final class BorderDecorationsStep implements TileStepPainter {
 

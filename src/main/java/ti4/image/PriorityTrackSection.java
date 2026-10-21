@@ -9,6 +9,7 @@ import ti4.game.Player;
 import ti4.helpers.Storage;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.logging.BotLogger;
+import ti4.model.Mapper;
 
 final class PriorityTrackSection {
 

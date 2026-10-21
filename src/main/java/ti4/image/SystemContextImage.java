@@ -21,6 +21,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
+import ti4.model.PositionMapper;
 import ti4.service.image.FileUploadService;
 
 public final class SystemContextImage {

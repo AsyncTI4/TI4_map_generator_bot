@@ -8,8 +8,8 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
+import ti4.model.PositionMapper;
 
 class RemoveTile extends GameStateSubcommand {
 

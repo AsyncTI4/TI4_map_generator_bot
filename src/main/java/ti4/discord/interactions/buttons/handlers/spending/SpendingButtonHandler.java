@@ -29,9 +29,9 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.unit.AddUnitService;
 

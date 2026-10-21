@@ -24,6 +24,7 @@ import ti4.helpers.Constants;
 import ti4.image.playerarea.PlayerAreaContext;
 import ti4.image.playerarea.PlayerAreas;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class PlayerAreaWarningsTest extends BaseTi4Test {

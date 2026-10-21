@@ -16,8 +16,8 @@ import ti4.game.Game;
 import ti4.game.GameStats;
 import ti4.game.GameStats.ActionCardPlay;
 import ti4.game.Player;
-import ti4.image.Mapper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 
 /**
  * The action card report read down the players rather than across the cards: how a player's win

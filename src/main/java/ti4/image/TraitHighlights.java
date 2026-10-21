@@ -10,6 +10,7 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 
 final class TraitHighlights implements OffBoardHighlights {

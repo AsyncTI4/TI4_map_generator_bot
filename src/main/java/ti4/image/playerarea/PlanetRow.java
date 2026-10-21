@@ -17,12 +17,12 @@ import ti4.helpers.Helper;
 import ti4.helpers.RenderRandom;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
-import ti4.image.Mapper;
 import ti4.image.PaImage;
-import ti4.image.PositionMapper;
 import ti4.image.Strokes;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
+import ti4.model.PositionMapper;
 
 final class PlanetRow {
 

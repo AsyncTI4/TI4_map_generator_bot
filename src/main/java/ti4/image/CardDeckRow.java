@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
+import ti4.model.Mapper;
 
 final class CardDeckRow {
 

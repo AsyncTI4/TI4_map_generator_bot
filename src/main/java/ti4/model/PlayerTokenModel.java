@@ -2,7 +2,6 @@ package ti4.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import ti4.image.Mapper;
 
 /**
  * Command, Control, Fleet, + Homebrew stuff

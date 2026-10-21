@@ -7,7 +7,6 @@ import java.util.Set;
 import lombok.Data;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.apache.commons.lang3.StringUtils;
-import ti4.image.Mapper;
 import ti4.service.emoji.ColorEmojis;
 
 @Data

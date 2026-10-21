@@ -20,6 +20,7 @@ import ti4.game.Tile;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.RenderRandom;
+import ti4.model.Mapper;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.testUtils.BaseTi4Test;
 

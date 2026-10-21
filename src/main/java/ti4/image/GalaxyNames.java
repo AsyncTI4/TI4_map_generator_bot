@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
+import ti4.model.BoardPosition;
 
 public final class GalaxyNames {
 

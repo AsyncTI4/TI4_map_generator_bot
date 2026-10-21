@@ -9,12 +9,12 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
+import ti4.model.Mapper;
 
 /**
  * Imports a deck-set configuration exported by the external Ti-Async-Deckcard-tool "Deck-editor".

@@ -11,8 +11,8 @@ import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.thundersedge.TeHelperUnits;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.RelicModel;
 
 class RelicDrawSpecific extends GameStateSubcommand {

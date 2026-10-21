@@ -10,12 +10,12 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
-import ti4.image.Mapper;
 import ti4.image.PaImage;
 import ti4.image.Strokes;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.PromissoryNoteModel;
 

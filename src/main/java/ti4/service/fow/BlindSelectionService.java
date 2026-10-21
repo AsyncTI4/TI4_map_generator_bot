@@ -24,10 +24,10 @@ import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
+import ti4.model.PositionMapper;
 
 /*
  * Flow of Blind Selection:

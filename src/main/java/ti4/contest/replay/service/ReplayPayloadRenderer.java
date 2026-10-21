@@ -23,9 +23,9 @@ import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.model.ActionCardModel;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 
 /**

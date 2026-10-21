@@ -50,11 +50,11 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.SortHelper;
 import ti4.helpers.URLReaderHelper;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
+import ti4.model.PositionMapper;
 
 public final class LoreService {
 

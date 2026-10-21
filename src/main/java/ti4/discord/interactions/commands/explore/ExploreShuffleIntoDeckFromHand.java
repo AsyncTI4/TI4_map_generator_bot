@@ -8,9 +8,9 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.PatternHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
 
 class ExploreShuffleIntoDeckFromHand extends GameStateSubcommand {
 

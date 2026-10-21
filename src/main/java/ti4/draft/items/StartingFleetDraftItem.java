@@ -9,9 +9,9 @@ import ti4.draft.DraftItem;
 import ti4.game.Game;
 import ti4.helpers.Helper;
 import ti4.helpers.PatternHelper;
-import ti4.image.Mapper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 

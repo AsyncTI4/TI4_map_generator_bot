@@ -9,6 +9,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.model.Mapper;
 
 final class WormholeHighlights implements OffBoardHighlights {
 

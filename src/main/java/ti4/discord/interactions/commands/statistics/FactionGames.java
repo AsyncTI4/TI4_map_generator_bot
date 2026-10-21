@@ -8,8 +8,8 @@ import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.SearchGameForFactionHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 class FactionGames extends Subcommand {
 

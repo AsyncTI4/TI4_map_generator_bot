@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import ti4.image.TileHelper;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.testUtils.BaseTi4Test;
 

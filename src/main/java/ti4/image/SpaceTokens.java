@@ -22,6 +22,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.model.Mapper;
+import ti4.model.PositionMapper;
 
 final class SpaceTokens {
 

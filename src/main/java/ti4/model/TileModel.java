@@ -21,7 +21,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import org.apache.commons.lang3.StringUtils;
 import ti4.image.ImageResources;
-import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;

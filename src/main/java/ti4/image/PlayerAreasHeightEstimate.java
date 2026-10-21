@@ -7,6 +7,7 @@ import ti4.game.Player;
 import ti4.image.playerarea.PlayerAreaColumns;
 import ti4.image.playerarea.PlayerAreaHeader;
 import ti4.image.playerarea.ScoredSecrets;
+import ti4.model.Mapper;
 
 final class PlayerAreasHeightEstimate {
 

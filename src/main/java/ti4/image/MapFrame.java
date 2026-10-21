@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import ti4.game.Game;
+import ti4.model.PositionMapper;
 
 public record MapFrame(int offsetX, int offsetY, int width, int height) {
 

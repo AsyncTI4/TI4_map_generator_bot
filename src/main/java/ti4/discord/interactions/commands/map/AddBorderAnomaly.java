@@ -10,9 +10,9 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.Mapper;
 
 public class AddBorderAnomaly extends GameStateSubcommand {
 

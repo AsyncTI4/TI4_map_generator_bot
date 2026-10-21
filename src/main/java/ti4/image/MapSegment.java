@@ -20,6 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.FoWHelper;
+import ti4.model.BoardPosition;
+import ti4.model.PositionMapper;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 public record MapSegment(

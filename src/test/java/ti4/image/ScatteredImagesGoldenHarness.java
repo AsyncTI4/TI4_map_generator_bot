@@ -57,6 +57,8 @@ import ti4.helpers.RenderRandom;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
+import ti4.model.Mapper;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.service.UnitDecalService;
 import ti4.service.draft.DraftLoadService;

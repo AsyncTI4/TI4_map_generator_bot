@@ -4,7 +4,7 @@ import ti4.ResourceHelper;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.image.ImageHelper;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 
 final class SpeakerAndTyrant {
 

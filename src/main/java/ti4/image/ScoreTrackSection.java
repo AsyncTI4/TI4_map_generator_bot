@@ -12,6 +12,7 @@ import ti4.game.Player;
 import ti4.helpers.RenderRandom;
 import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
+import ti4.model.Mapper;
 
 final class ScoreTrackSection {
 

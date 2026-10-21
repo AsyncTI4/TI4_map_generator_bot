@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import ti4.game.Player;
 import ti4.helpers.Storage;
+import ti4.model.PositionMapper;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 final class GhostHexes {

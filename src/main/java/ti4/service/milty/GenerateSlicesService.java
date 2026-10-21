@@ -16,10 +16,10 @@ import ti4.discord.JdaService;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
-import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.MapTemplateModel;
+import ti4.model.PositionMapper;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass

@@ -21,13 +21,13 @@ import ti4.helpers.Storage;
 import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
 import ti4.image.ImageResources;
-import ti4.image.Mapper;
 import ti4.image.OutlinedText;
 import ti4.image.VerticalAlign;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
+import ti4.model.Mapper;
 import ti4.service.image.FileUploadService;
 
 class SampleColors extends Subcommand {

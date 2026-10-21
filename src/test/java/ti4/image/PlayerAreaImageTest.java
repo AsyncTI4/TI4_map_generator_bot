@@ -15,6 +15,7 @@ import ti4.helpers.Constants;
 import ti4.image.helpers.ImageTestHelper.TestMode;
 import ti4.image.helpers.PlayerAreaImageTestHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 /**

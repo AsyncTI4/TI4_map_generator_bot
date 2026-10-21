@@ -15,6 +15,7 @@ import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
+import ti4.model.PositionMapper;
 import ti4.service.map.FractureService;
 
 final class BoardSection {

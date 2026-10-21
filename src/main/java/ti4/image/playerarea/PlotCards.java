@@ -10,7 +10,7 @@ import ti4.helpers.Storage;
 import ti4.image.ColorUtil;
 import ti4.image.DrawingUtil;
 import ti4.image.HorizontalAlign;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 
 final class PlotCards {
 

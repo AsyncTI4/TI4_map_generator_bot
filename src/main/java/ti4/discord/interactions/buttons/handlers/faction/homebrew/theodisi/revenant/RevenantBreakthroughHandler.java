@@ -15,9 +15,9 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.UnusedAgentHelper;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.leader.RefreshLeaderService;
 

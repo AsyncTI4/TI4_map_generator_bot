@@ -17,11 +17,11 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
-import ti4.image.Mapper;
 import ti4.image.PaImage;
 import ti4.image.VoltronDecal;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 

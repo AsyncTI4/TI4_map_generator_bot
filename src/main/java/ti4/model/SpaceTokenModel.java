@@ -8,7 +8,6 @@ import java.util.Set;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.WormholeModel.Wormhole;
 import ti4.service.emoji.ExploreEmojis;

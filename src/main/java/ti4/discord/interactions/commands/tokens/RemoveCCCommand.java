@@ -9,8 +9,8 @@ import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.ColorEmojis;
 
 public class RemoveCCCommand extends AddRemoveTokenCommand {

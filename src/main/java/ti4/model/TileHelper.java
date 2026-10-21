@@ -1,4 +1,4 @@
-package ti4.image;
+package ti4.model;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,9 +21,7 @@ import ti4.helpers.Storage;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.PlanetModel;
 import ti4.model.Source.ComponentSource;
-import ti4.model.TileModel;
 
 public final class TileHelper {
 

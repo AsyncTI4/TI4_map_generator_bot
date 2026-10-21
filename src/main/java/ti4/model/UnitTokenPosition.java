@@ -1,4 +1,4 @@
-package ti4.image;
+package ti4.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

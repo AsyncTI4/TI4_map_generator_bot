@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
-import ti4.image.Mapper;
 import ti4.model.ColorModel;
+import ti4.model.Mapper;
 
 @UtilityClass
 class CommsColorMarker {

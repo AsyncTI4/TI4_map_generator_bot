@@ -17,9 +17,9 @@ import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.thirtyk.ThirtyKAcState;
 import ti4.helpers.thirtyk.ThirtyKDistance;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.fow.PlanetTargetService;
 

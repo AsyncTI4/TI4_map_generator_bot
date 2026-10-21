@@ -14,8 +14,8 @@ import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
-import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
+import ti4.model.TileHelper;
 
 public class ShowDistancesCommand extends GameStateCommand {
 

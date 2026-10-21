@@ -17,9 +17,9 @@ import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
-import ti4.image.Mapper;
 import ti4.image.PaImage;
 import ti4.image.Strokes;
+import ti4.model.Mapper;
 import ti4.service.emoji.TI4Emoji;
 
 final class DebtPools {

@@ -19,8 +19,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.image.SystemContextImage;
-import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
+import ti4.model.TileHelper;
 import ti4.service.combat.StartCombatService;
 
 class SystemInfo extends GameStateSubcommand {

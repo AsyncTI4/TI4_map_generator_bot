@@ -5,8 +5,8 @@ import org.junit.jupiter.api.BeforeAll;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
-import ti4.image.Mapper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.service.player.PlayerColorService;
 import ti4.testUtils.BaseTi4Test;
 

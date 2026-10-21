@@ -5,9 +5,9 @@ import java.awt.Graphics2D;
 import java.util.List;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.Mapper;
 import ti4.image.PaImage;
 import ti4.image.Strokes;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 
 final class FactionTechCards {

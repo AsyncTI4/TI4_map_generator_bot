@@ -14,6 +14,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.image.playerarea.PlayerAreaContext;
 import ti4.image.playerarea.PlayerAreas;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class UnknownTechPlayerAreaTest extends BaseTi4Test {

@@ -13,6 +13,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.image.playerarea.PlayerAreaColumns;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class MegaGamePlayerAreasTest extends BaseTi4Test {

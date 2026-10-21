@@ -260,7 +260,7 @@ public final class WebTileUnitData {
         Map<String, List<WebEntityData>> factionTokens = new HashMap<>();
 
         for (String token : holderTokens) {
-            boolean isAttachment = ti4.image.Mapper.getAttachmentInfo(token) != null;
+            boolean isAttachment = ti4.model.Mapper.getAttachmentInfo(token) != null;
 
             // Skip if we only want attachments and this isn't one
             if (attachmentsOnly && !isAttachment) {
@@ -270,7 +270,7 @@ public final class WebTileUnitData {
             String entityType = isAttachment ? "attachment" : "token";
 
             // For now, we'll treat all tokens as non-faction specific
-            WebEntityData tokenData = new WebEntityData(ti4.image.Mapper.getTokenIDFromTokenPath(token), entityType, 1);
+            WebEntityData tokenData = new WebEntityData(ti4.model.Mapper.getTokenIDFromTokenPath(token), entityType, 1);
             factionTokens.computeIfAbsent("neutral", _ -> new ArrayList<>()).add(tokenData);
         }
 

@@ -2,7 +2,7 @@ package ti4.image.playerarea;
 
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.game.Player;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 
 final class DreamNexusTokens {
 

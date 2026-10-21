@@ -1,7 +1,7 @@
 package ti4.service.emoji;
 
-import ti4.image.Mapper;
 import ti4.model.ColorModel;
+import ti4.model.Mapper;
 
 public enum ColorEmojis implements TI4Emoji {
 

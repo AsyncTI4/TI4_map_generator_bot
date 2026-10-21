@@ -17,10 +17,10 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
+import ti4.model.TileHelper;
 import ti4.service.explore.ExploreService;
 
 @UtilityClass

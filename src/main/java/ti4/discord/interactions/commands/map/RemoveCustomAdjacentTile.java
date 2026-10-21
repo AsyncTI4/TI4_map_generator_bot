@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
+import ti4.model.PositionMapper;
 
 class RemoveCustomAdjacentTile extends GameStateSubcommand {
 

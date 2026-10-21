@@ -22,10 +22,10 @@ import ti4.image.ColorUtil;
 import ti4.image.HorizontalAlign;
 import ti4.image.ImageHelper;
 import ti4.image.ImageResources;
-import ti4.image.Mapper;
 import ti4.image.OutlinedText;
 import ti4.image.VerticalAlign;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.UnitDecalService;
 import ti4.service.image.FileUploadService;
 

@@ -14,11 +14,11 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
+import ti4.model.Mapper;
+import ti4.model.PositionMapper;
 import ti4.model.Source.ComponentSource;
 
 @UtilityClass

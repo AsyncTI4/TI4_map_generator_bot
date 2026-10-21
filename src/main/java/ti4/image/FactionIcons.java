@@ -20,6 +20,7 @@ import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 
 public final class FactionIcons {
 

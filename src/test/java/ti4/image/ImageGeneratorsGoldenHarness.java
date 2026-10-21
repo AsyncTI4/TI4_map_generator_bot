@@ -44,6 +44,7 @@ import ti4.helpers.RenderRandom;
 import ti4.helpers.Storage;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.MiscEmojis;

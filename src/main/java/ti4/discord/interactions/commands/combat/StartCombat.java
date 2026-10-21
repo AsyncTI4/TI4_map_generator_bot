@@ -8,8 +8,8 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
-import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
+import ti4.model.TileHelper;
 import ti4.service.combat.StartCombatService;
 
 class StartCombat extends GameStateSubcommand {

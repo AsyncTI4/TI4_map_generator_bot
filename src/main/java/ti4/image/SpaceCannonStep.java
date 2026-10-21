@@ -17,6 +17,7 @@ import ti4.game.Tile;
 import ti4.helpers.PdsCoverage;
 import ti4.helpers.PdsCoverageHelper;
 import ti4.helpers.Storage;
+import ti4.model.Mapper;
 
 final class SpaceCannonStep implements TileStepPainter {
 

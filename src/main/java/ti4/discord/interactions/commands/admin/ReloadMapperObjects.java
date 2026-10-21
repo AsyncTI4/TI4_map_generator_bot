@@ -3,7 +3,7 @@ package ti4.discord.interactions.commands.admin;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 
 class ReloadMapperObjects extends Subcommand {
 

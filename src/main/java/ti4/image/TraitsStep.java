@@ -11,6 +11,7 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.model.Mapper;
 
 final class TraitsStep implements TileStepPainter {
 

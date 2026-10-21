@@ -1,4 +1,4 @@
-package ti4.image;
+package ti4.model;
 
 import java.awt.Point;
 import java.io.FileInputStream;
@@ -21,10 +21,7 @@ import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
-import ti4.model.PlanetModel;
-import ti4.model.ShipPositionModel;
 import ti4.model.ShipPositionModel.ShipPosition;
-import ti4.model.TileModel;
 
 // Handles positions of map
 public final class PositionMapper {
@@ -122,7 +119,7 @@ public final class PositionMapper {
         return Math.max(mainRings, boardRings);
     }
 
-    static int boardLayoutRingCount(Game game) {
+    public static int boardLayoutRingCount(Game game) {
         return boardLayoutRingCount(layoutRingCount(game));
     }
 

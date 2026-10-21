@@ -16,11 +16,11 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RegexHelper;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyIds;
+import ti4.model.Mapper;
+import ti4.model.PositionMapper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.regex.RegexService;
 

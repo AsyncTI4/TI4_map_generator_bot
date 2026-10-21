@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import ti4.game.Player;
 import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
+import ti4.model.Mapper;
 
 final class BannerImages {
 

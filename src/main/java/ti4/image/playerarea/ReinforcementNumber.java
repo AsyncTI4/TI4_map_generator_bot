@@ -5,9 +5,9 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
-import ti4.image.UnitTokenPosition;
+import ti4.model.Mapper;
+import ti4.model.PositionMapper;
+import ti4.model.UnitTokenPosition;
 
 final class ReinforcementNumber {
 

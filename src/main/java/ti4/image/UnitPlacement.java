@@ -14,6 +14,9 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.model.Mapper;
+import ti4.model.PositionMapper;
+import ti4.model.UnitTokenPosition;
 
 final class UnitPlacement {
 

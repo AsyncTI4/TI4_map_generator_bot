@@ -12,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
+import ti4.model.Mapper;
 
 final class NucleusStep implements TileStepPainter {
 

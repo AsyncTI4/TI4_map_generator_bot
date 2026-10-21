@@ -8,10 +8,10 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.FoWHelper;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.ColorEmojis;
 
 @UtilityClass

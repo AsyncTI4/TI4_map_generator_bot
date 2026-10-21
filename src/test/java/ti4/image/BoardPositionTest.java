@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.RegexHelper;
+import ti4.model.BoardPosition;
+import ti4.model.PositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 class BoardPositionTest extends BaseTi4Test {

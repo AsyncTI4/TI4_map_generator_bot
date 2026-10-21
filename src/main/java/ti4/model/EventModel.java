@@ -11,7 +11,6 @@ import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import software.amazon.awssdk.utils.StringUtils;
-import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 
 @Data

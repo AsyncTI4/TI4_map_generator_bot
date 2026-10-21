@@ -1,4 +1,4 @@
-package ti4.image;
+package ti4.model;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,7 +60,7 @@ public record BoardPosition(char board, String local) {
         return (boardIndex + 1) * (MAX_RING - ringCount) * 2 * HORIZONTAL_TILE_SPACING;
     }
 
-    static int boardWidth(int ringCount) {
+    public static int boardWidth(int ringCount) {
         return (2 * ringCount + 2) * HORIZONTAL_TILE_SPACING;
     }
 }

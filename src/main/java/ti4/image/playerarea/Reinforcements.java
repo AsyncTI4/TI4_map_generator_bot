@@ -16,13 +16,13 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
-import ti4.image.Mapper;
 import ti4.image.PaImage;
-import ti4.image.PositionMapper;
-import ti4.image.UnitTokenPosition;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.model.Mapper;
+import ti4.model.PositionMapper;
 import ti4.model.UnitModel;
+import ti4.model.UnitTokenPosition;
 
 final class Reinforcements {
 

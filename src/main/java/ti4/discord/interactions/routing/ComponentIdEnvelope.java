@@ -1,7 +1,7 @@
 package ti4.discord.interactions.routing;
 
 import org.apache.commons.lang3.StringUtils;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 
 public record ComponentIdEnvelope(
         String rawId,

@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 
 final class LegendaryHighlights implements OffBoardHighlights {

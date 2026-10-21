@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
+import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 
 public record Objective(

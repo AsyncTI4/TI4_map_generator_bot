@@ -8,8 +8,8 @@ import ti4.discord.interactions.buttons.handlers.actioncards.ActionCardPingButto
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
+import ti4.model.PositionMapper;
 import ti4.service.fow.PlanetTargetService;
 
 class TargetSystemPing extends GameStateSubcommand {

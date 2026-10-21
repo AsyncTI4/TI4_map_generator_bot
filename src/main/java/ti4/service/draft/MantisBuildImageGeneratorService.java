@@ -16,10 +16,10 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Storage;
 import ti4.image.HorizontalAlign;
 import ti4.image.OutlinedText;
-import ti4.image.PositionMapper;
 import ti4.image.TileLayers;
 import ti4.image.TileStep;
 import ti4.logging.BotLogger;
+import ti4.model.PositionMapper;
 import ti4.service.image.FileUploadService;
 
 @UtilityClass

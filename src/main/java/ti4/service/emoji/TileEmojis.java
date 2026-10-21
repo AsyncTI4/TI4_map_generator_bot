@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
-import ti4.image.TileHelper;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 
 public enum TileEmojis implements TI4Emoji {

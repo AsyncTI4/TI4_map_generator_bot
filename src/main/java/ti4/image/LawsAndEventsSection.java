@@ -14,6 +14,7 @@ import ti4.helpers.DisplayType;
 import ti4.logging.BotLogger;
 import ti4.model.AgendaModel;
 import ti4.model.EventModel;
+import ti4.model.Mapper;
 
 final class LawsAndEventsSection {
 

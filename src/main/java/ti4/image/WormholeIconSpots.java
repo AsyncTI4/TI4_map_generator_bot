@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import ti4.game.Tile;
+import ti4.model.TileHelper;
 
 final class WormholeIconSpots {
 

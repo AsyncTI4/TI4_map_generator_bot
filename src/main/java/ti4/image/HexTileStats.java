@@ -16,6 +16,8 @@ import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.model.ColorModel;
+import ti4.model.Mapper;
+import ti4.model.PositionMapper;
 import ti4.model.StrategyCardModel;
 
 final class HexTileStats {

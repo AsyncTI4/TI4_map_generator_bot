@@ -25,6 +25,7 @@ import ti4.image.UnitPlacement.ImagePosition;
 import ti4.image.UnitPlacement.UnitShape;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 
 final class UnitHolderRenderer {

@@ -13,6 +13,8 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
+import ti4.model.Mapper;
+import ti4.model.PositionMapper;
 
 final class AnchorStats {
 

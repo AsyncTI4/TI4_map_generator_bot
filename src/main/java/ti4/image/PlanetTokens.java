@@ -13,6 +13,8 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
+import ti4.model.PositionMapper;
+import ti4.model.UnitTokenPosition;
 
 final class PlanetTokens {
 

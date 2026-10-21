@@ -502,7 +502,7 @@ public class ThronesUnitHandler {
         String pendingId = buttonID.substring(DECLINE_GHOLA_RIFT.length());
         String[] payload = game.getStoredValue(PENDING_GHOLA_RIFT + pendingId).split("\\|", 5);
         Tile tile = payload.length == 5 ? game.getTileByPosition(payload[1]) : null;
-        UnitKey unitKey = payload.length == 5 ? ti4.image.Mapper.getUnitKey(payload[2], player.getColorID()) : null;
+        UnitKey unitKey = payload.length == 5 ? ti4.model.Mapper.getUnitKey(payload[2], player.getColorID()) : null;
         Player cabal =
                 payload.length == 5 && !"-".equals(payload[4]) ? game.getPlayerFromColorOrFaction(payload[4]) : null;
         if (payload.length != 5 || !player.getFaction().equals(payload[0]) || tile == null || unitKey == null) {
@@ -530,7 +530,7 @@ public class ThronesUnitHandler {
             Tile tile = payload.length == 5 ? game.getTileByPosition(payload[1]) : null;
             UnitKey unitKey = player == null || payload.length != 5
                     ? null
-                    : ti4.image.Mapper.getUnitKey(payload[2], player.getColorID());
+                    : ti4.model.Mapper.getUnitKey(payload[2], player.getColorID());
             Player cabal = payload.length == 5 && !"-".equals(payload[4])
                     ? game.getPlayerFromColorOrFaction(payload[4])
                     : null;

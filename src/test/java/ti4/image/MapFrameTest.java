@@ -14,6 +14,7 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
+import ti4.model.PositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 class MapFrameTest extends BaseTi4Test {

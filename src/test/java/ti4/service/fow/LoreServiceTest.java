@@ -24,7 +24,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.TileModel;
 import ti4.service.fow.LoreService.LoreEntry;
 import ti4.service.map.CustomHyperlaneService;

@@ -18,6 +18,7 @@ import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.UnitPlacement.ImagePosition;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 
 final class UnitBadges {

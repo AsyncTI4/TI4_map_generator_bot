@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.image.PositionMapper;
-import ti4.image.TileHelper;
+import ti4.model.PositionMapper;
+import ti4.model.TileHelper;
 import ti4.testUtils.BaseTi4Test;
 
 class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {

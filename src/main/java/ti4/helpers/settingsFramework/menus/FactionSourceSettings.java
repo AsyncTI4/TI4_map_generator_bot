@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import tools.jackson.databind.JsonNode;
 

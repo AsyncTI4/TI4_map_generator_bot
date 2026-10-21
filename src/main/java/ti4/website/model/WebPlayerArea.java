@@ -20,7 +20,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.image.FactionIcons;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 
 @Data
 public class WebPlayerArea {
