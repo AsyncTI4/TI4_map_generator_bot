@@ -60,11 +60,12 @@ class WarfareTokens {
                     && button.label().startsWith(DONE_LABEL));
             if (done.isEmpty()) continue;
             int moves = moves(context);
-            boolean withinBudget = moves < 2 * totalTokens(seat);
-            if (withinBudget && CommandTokenPolicy.netGainSoFar(game, seat) < 0) {
+            int netGain = CommandTokenPolicy.netGainSoFar(game, seat);
+            if (netGain < 0) {
                 Optional<PromptButton> grow = prompt.enabledHandler(CommandTokenPolicy.poolToRefill(game, seat));
                 if (grow.isPresent()) return step(context, prompt, grow.get(), moves, "gain a command token");
             }
+            boolean withinBudget = moves < 2 * (totalTokens(seat) - netGain);
             Optional<PromptButton> shrink = withinBudget
                     ? CommandTokenPolicy.midRoundSurplus(game, seat).flatMap(prompt::enabledHandler)
                     : Optional.empty();

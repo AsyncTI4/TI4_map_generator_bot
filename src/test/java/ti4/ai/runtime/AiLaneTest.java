@@ -180,4 +180,21 @@ class AiLaneTest extends BaseTi4Test {
         assertThat(a.wasDelegated("p1")).isTrue();
         assertThat(b.wasDelegated("p1")).isFalse();
     }
+
+    // The fallback record shows the last few things the seat decided on the prompt it fell back on, oldest first,
+    // and nothing it decided on other prompts.
+    @Test
+    void remembersTheRecentDecisionsPerPrompt() {
+        AiSeatState seat = lane.seat(first.getUserID());
+        seat.recordDecision("p1", "one");
+        seat.recordDecision("p2", "other");
+        seat.recordDecision("p1", "two");
+        seat.recordDecision("p1", "three");
+
+        assertThat(seat.recentDecisionsOn("p1", 2)).containsExactly("two", "three");
+        assertThat(seat.recentDecisionsOn("p2", 5)).containsExactly("other");
+
+        seat.forgetAfterUndo();
+        assertThat(seat.recentDecisionsOn("p1", 5)).isEmpty();
+    }
 }

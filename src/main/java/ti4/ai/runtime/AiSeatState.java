@@ -1,9 +1,13 @@
 package ti4.ai.runtime;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import ti4.ai.brain.AiMemory;
@@ -22,7 +26,10 @@ final class AiSeatState {
         STOPPED
     }
 
+    private record Decision(String promptKey, String text) {}
+
     private static final int PRESSED_MEMORY = 200;
+    private static final int DECISION_MEMORY = 60;
     private static final long HOUR_MILLIS = 3_600_000L;
 
     private final Map<String, Integer> attempts = new HashMap<>();
@@ -30,6 +37,7 @@ final class AiSeatState {
     private final Deque<String> pressedOrder = new ArrayDeque<>();
     private final Set<String> pressedKeys = new HashSet<>();
     private final Set<String> delegatedPrompts = new HashSet<>();
+    private final Deque<Decision> decisions = new ArrayDeque<>();
     private AiMemory memory = new AiMemory();
 
     private volatile DelegationRequest delegationRequest = DelegationRequest.NONE;
@@ -61,6 +69,22 @@ final class AiSeatState {
         return attempts.merge(key, 1, Integer::sum);
     }
 
+    void recordDecision(String promptKey, String text) {
+        decisions.addLast(new Decision(promptKey, text));
+        while (decisions.size() > DECISION_MEMORY) decisions.removeFirst();
+    }
+
+    List<String> recentDecisionsOn(String promptKey, int limit) {
+        List<String> found = new ArrayList<>();
+        Iterator<Decision> newestFirst = decisions.descendingIterator();
+        while (newestFirst.hasNext() && found.size() < limit) {
+            Decision decision = newestFirst.next();
+            if (decision.promptKey().equals(promptKey)) found.add(decision.text());
+        }
+        Collections.reverse(found);
+        return found;
+    }
+
     int attemptsFor(String key) {
         return attempts.getOrDefault(key, 0);
     }
@@ -77,6 +101,7 @@ final class AiSeatState {
         memory = new AiMemory();
         pressedKeys.clear();
         pressedOrder.clear();
+        decisions.clear();
         attempts.clear();
         delegatedPrompts.clear();
         stallSince = 0;

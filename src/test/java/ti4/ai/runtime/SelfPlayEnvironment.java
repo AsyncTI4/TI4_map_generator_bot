@@ -79,6 +79,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
     final InMemoryGameMessages gameMessages = new InMemoryGameMessages();
     final Path storage;
     final List<String> botProblems = new ArrayList<>();
+    final List<String> fallbacks = new ArrayList<>();
     final List<String> circuitBreakerReasons = new ArrayList<>();
     final Set<String> missingBeans = new LinkedHashSet<>();
     final Deque<String> trace = new ArrayDeque<>();
@@ -266,6 +267,16 @@ final class SelfPlayEnvironment implements AutoCloseable {
             synchronized (botProblems) {
                 if (botProblems.size() < 2000) botProblems.add(line.toString().trim());
             }
+            return null;
+        }
+        if ("info".equals(name)
+                && invocation.getArguments().length > 0
+                && invocation.getArgument(0) instanceof String text
+                && text.startsWith(ti4.ai.fallback.FallbackLog.LINE_PREFIX)) {
+            synchronized (fallbacks) {
+                if (fallbacks.size() < 2000) fallbacks.add(text);
+            }
+            record(text);
             return null;
         }
         if ("info".equals(name) || name.startsWith("log")) return null;
