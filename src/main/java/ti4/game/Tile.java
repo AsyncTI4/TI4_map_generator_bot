@@ -502,10 +502,11 @@ public class Tile {
     @JsonIgnore
     public String getRepresentation() {
         try {
-            if (Mapper.getTileRepresentations().get(tileID) == null) {
+            TileModel model = TileHelper.getTileById(tileID);
+            if (model == null) {
                 return tileID + "(" + getPosition() + ")";
             }
-            return Mapper.getTileRepresentations().get(tileID);
+            return model.getNameNullSafe();
         } catch (Exception e) {
             // DO NOTHING
         }
