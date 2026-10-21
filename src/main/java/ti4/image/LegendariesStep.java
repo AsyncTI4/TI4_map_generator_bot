@@ -14,6 +14,7 @@ import ti4.helpers.ButtonHelper;
 
 final class LegendariesStep implements TileStepPainter {
 
+    private static final float COUNCIL_SCALE = 2.0f;
     private static final int COUNCIL_BORDER = 3;
     private static final int COUNCIL_PADDING = COUNCIL_BORDER + 2;
     private static final int SPREAD = 60;
@@ -45,11 +46,12 @@ final class LegendariesStep implements TileStepPainter {
 
     private static void drawCouncil(Graphics2D g) {
         String councilFile = ResourceHelper.getInstance().getFactionFile("agenda.png");
-        BufferedImage council = ImageHelper.readScaled(councilFile, 2.0f);
+        BufferedImage council = ImageHelper.readScaled(councilFile, COUNCIL_SCALE);
         if (council == null) return;
 
         int w = council.getWidth();
-        BufferedImage background = IconHalo.blackRing(council, COUNCIL_BORDER, COUNCIL_PADDING);
+        BufferedImage background =
+                IconHalo.blackRing(councilFile, COUNCIL_SCALE, council, COUNCIL_BORDER, COUNCIL_PADDING);
         int x = TILE_PADDING + (TILE_WIDTH - w) / 2;
         int y = TILE_PADDING + (TILE_HEIGHT - w) / 2;
         g.drawImage(background, x - COUNCIL_PADDING, y - COUNCIL_PADDING, null);

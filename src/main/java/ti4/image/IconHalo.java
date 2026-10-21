@@ -2,19 +2,39 @@ package ti4.image;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 record IconHalo(BufferedImage outer, BufferedImage inner, int padding) {
 
+    record HaloedIcon(BufferedImage icon, IconHalo halo) {}
+
+    private record TwoToneKey(String path, float scale, int innerBorder, int outerBorder, int padding) {}
+
+    private record RingKey(String path, float scale, int border, int padding) {}
+
     private static final int BLACK = 0x000000;
     private static final int WHITE = 0xFFFFFF;
+    private static final Map<TwoToneKey, HaloedIcon> TWO_TONE_CACHE = new ConcurrentHashMap<>();
+    private static final Map<RingKey, BufferedImage> RING_CACHE = new ConcurrentHashMap<>();
 
-    static IconHalo twoTone(BufferedImage icon, int innerBorder, int outerBorder, int padding) {
-        return new IconHalo(
-                dilate(icon, outerBorder, padding, WHITE), dilate(icon, innerBorder, padding, BLACK), padding);
+    static HaloedIcon scaledTwoTone(
+            String path, BufferedImage source, float scale, int innerBorder, int outerBorder, int padding) {
+        TwoToneKey key = new TwoToneKey(path, scale, innerBorder, outerBorder, padding);
+        return TWO_TONE_CACHE.computeIfAbsent(key, _ -> {
+            BufferedImage icon = ImageHelper.scale(source, scale);
+            return new HaloedIcon(icon, twoTone(icon, innerBorder, outerBorder, padding));
+        });
     }
 
-    static BufferedImage blackRing(BufferedImage icon, int border, int padding) {
-        return dilate(icon, border, padding, BLACK);
+    static BufferedImage blackRing(String path, float scale, BufferedImage icon, int border, int padding) {
+        return RING_CACHE.computeIfAbsent(
+                new RingKey(path, scale, border, padding), _ -> dilate(icon, border, padding, BLACK));
+    }
+
+    private static IconHalo twoTone(BufferedImage icon, int innerBorder, int outerBorder, int padding) {
+        return new IconHalo(
+                dilate(icon, outerBorder, padding, WHITE), dilate(icon, innerBorder, padding, BLACK), padding);
     }
 
     void drawBehind(Graphics2D g, int iconX, int iconY) {

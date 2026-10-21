@@ -56,12 +56,15 @@ final class TechSkipsStep implements TileStepPainter {
     }
 
     private static void drawSkip(TileLayer layer, Planet planet, String skip, int index, int number) {
-        BufferedImage icon = ImageHelper.read(skipFile(skip));
-        icon = ImageHelper.scale(icon, (float)
-                Math.sqrt(TraitsStep.ICON_AREA / icon.getWidth() / icon.getHeight() / Math.sqrt(1.0f * number)));
+        String file = skipFile(skip);
+        BufferedImage source = ImageHelper.read(file);
+        float scale = (float)
+                Math.sqrt(TraitsStep.ICON_AREA / source.getWidth() / source.getHeight() / Math.sqrt(1.0f * number));
+        IconHalo.HaloedIcon haloed = IconHalo.scaledTwoTone(file, source, scale, INNER_BORDER, OUTER_BORDER, PADDING);
+        BufferedImage icon = haloed.icon();
+        IconHalo halo = haloed.halo();
         int w = icon.getWidth();
         int h = icon.getHeight();
-        IconHalo halo = IconHalo.twoTone(icon, INNER_BORDER, OUTER_BORDER, PADDING);
 
         Point position = planet.getHolderCenterPosition(layer.tile());
         if (number > 1) {

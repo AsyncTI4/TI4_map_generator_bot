@@ -53,11 +53,14 @@ final class AttachmentsStep implements TileStepPainter {
         if (attachments.contains("attachment_tombofemphidia.png")) {
             chevronFile = ResourceHelper.getInstance().getGeneralFile("misc_chevrons_toe.png");
         }
-        BufferedImage icon = ImageHelper.read(chevronFile);
-        icon = ImageHelper.scale(icon, (float) Math.sqrt(TraitsStep.ICON_AREA / icon.getWidth() / icon.getHeight()));
+        BufferedImage source = ImageHelper.read(chevronFile);
+        float scale = (float) Math.sqrt(TraitsStep.ICON_AREA / source.getWidth() / source.getHeight());
+        IconHalo.HaloedIcon haloed =
+                IconHalo.scaledTwoTone(chevronFile, source, scale, INNER_BORDER, OUTER_BORDER, PADDING);
+        BufferedImage icon = haloed.icon();
+        IconHalo halo = haloed.halo();
         int w = icon.getWidth();
         int h = icon.getHeight();
-        IconHalo halo = IconHalo.twoTone(icon, INNER_BORDER, OUTER_BORDER, PADDING);
 
         Point position = planet.getHolderCenterPosition(layer.tile());
         position = new Point(position.x - w / 2 + TILE_PADDING, position.y - h / 2 + TILE_PADDING);

@@ -69,14 +69,17 @@ final class TraitsStep implements TileStepPainter {
     }
 
     private static void drawTrait(TileLayer layer, Planet planet, String traitFile, boolean mecatol) {
-        BufferedImage icon = ImageHelper.read(traitFile);
-        icon = ImageHelper.scale(icon, (float) Math.sqrt(ICON_AREA / icon.getWidth() / icon.getHeight()));
-        int w = icon.getWidth();
-        int h = icon.getHeight();
+        BufferedImage source = ImageHelper.read(traitFile);
+        float scale = (float) Math.sqrt(ICON_AREA / source.getWidth() / source.getHeight());
         int innerBorder = mecatol ? 3 : 2;
         int outerBorder = innerBorder + (mecatol ? -1 : 2);
         int padding = outerBorder + (mecatol ? 3 : 2);
-        IconHalo halo = IconHalo.twoTone(icon, innerBorder, outerBorder, padding);
+        IconHalo.HaloedIcon haloed =
+                IconHalo.scaledTwoTone(traitFile, source, scale, innerBorder, outerBorder, padding);
+        BufferedImage icon = haloed.icon();
+        IconHalo halo = haloed.halo();
+        int w = icon.getWidth();
+        int h = icon.getHeight();
 
         Point position = planet.getHolderCenterPosition(layer.tile());
         position = new Point(position.x - w / 2 + TILE_PADDING, position.y - h / 2 + TILE_PADDING);
