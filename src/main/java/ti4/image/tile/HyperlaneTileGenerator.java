@@ -222,7 +222,7 @@ public final class HyperlaneTileGenerator {
 
     // Randomize hyperlane tile background based on matrix, or use default if no matrix present
     private static BufferedImage getRandomTransformedBackground(Tile tile, String matrix) {
-        String tilePath = tile.getTilePath();
+        String tilePath = ImageResources.tilePath(tile);
         int transform = -1;
         if (matrix != null) {
             // Use matrix hashCode as seed for determinism: same matrix always yields same background/transform

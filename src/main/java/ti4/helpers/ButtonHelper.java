@@ -3700,7 +3700,7 @@ public class ButtonHelper {
             Player ogPlayer,
             GenericInteractionCreateEvent event,
             @Nullable CombatSummaryContext combatSummaryContext) {
-        String tileName = tile.getTilePath();
+        String tileName = ImageResources.tilePath(tile);
         tileName = tileName.substring(tileName.indexOf('_') + 1);
         tileName = tileName.substring(0, tileName.indexOf(".png"));
         tileName = " - " + tileName + "[" + tile.getTileID() + "]";
@@ -4859,7 +4859,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (tile.getPlanetUnitHolders().isEmpty()
-                    && !tile.getTilePath().toLowerCase().contains("hyperlane")) {
+                    && !ImageResources.tilePath(tile).toLowerCase().contains("hyperlane")) {
                 buttons.add(Buttons.green(
                         "echoPlaceFrontier_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
             }
@@ -4915,7 +4915,7 @@ public class ButtonHelper {
         // has to be re-checked here too.
         if (tile == null
                 || !tile.getPlanetUnitHolders().isEmpty()
-                || tile.getTilePath().toLowerCase().contains("hyperlane")) {
+                || ImageResources.tilePath(tile).toLowerCase().contains("hyperlane")) {
             PlanetTargetService.fizzle(event, player);
             return;
         }

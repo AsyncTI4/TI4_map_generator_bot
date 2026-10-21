@@ -50,9 +50,4 @@ public class PlayerTokenModel implements TokenModelInterface, ColorableModelInte
     public String getFileName() {
         return imagePath;
     }
-
-    @JsonIgnore
-    public String getFilePath() {
-        return Mapper.getAttachmentImagePath(imagePath);
-    }
 }

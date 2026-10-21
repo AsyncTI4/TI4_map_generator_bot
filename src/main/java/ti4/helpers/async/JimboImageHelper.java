@@ -21,7 +21,7 @@ import ti4.service.image.FileUploadService;
 final class JimboImageHelper {
 
     public static FileUpload tilesImage(List<TileModel> tiles) {
-        return generateImage(tiles, TileModel::getTilePath, TileModel::getAlias);
+        return generateImage(tiles, ImageResources::tilePath, TileModel::getAlias);
     }
 
     public static FileUpload tokenAndAttachmentImage(List<String> tokens) {

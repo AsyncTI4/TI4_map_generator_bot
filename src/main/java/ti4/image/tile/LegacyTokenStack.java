@@ -9,6 +9,7 @@ import java.util.List;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
 
 final class LegacyTokenStack {
@@ -23,7 +24,7 @@ final class LegacyTokenStack {
         int x = centerPosition.x;
         int y = centerPosition.y - (tokenList.size() > 1 ? STACK_LIFT : 0);
         for (String tokenID : tokenList) {
-            String tokenPath = Tile.getTokenPath(tokenID);
+            String tokenPath = ImageResources.tokenOrAttachment(tokenID);
             if (tokenPath == null) {
                 BotLogger.warning("Could not parse token file for: " + tokenID);
                 continue;

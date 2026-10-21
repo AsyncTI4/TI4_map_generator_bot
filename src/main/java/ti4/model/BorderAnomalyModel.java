@@ -4,14 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
-import ti4.ResourceHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.enums.AutomationStatus;
 
 @Data
 public class BorderAnomalyModel implements ModelInterface {
-
-    private static final String IMAGE_FOLDER = "borders/";
 
     private String id;
     private String name;
@@ -41,11 +38,6 @@ public class BorderAnomalyModel implements ModelInterface {
     @Override
     public String getAlias() {
         return id;
-    }
-
-    @JsonIgnore
-    public String getImageFilePath() {
-        return ResourceHelper.getResourceFromFolder(IMAGE_FOLDER, imagePath);
     }
 
     @JsonIgnore

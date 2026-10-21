@@ -10,6 +10,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.image.draw.PlayerTokens;
 import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
 
 final class CommandTokens {
@@ -23,7 +24,7 @@ final class CommandTokens {
         int deltaX = 0;
         int deltaY = 0;
         for (String ccID : spaceHolder.getCcList()) {
-            String ccPath = Tile.getCCPath(ccID);
+            String ccPath = ImageResources.commandToken(ccID);
             if (ccPath == null) {
                 continue;
             }

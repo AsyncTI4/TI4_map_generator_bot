@@ -6,10 +6,15 @@ import javax.annotation.Nullable;
 import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.helpers.CalendarHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.RenderRandom;
 import ti4.helpers.Units.UnitKey;
 import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
+import ti4.model.Mapper;
+import ti4.model.TileModel;
 
 public final class ImageResources {
 
@@ -20,6 +25,59 @@ public final class ImageResources {
     @Nullable
     public static String tile(String name) {
         return find("tiles/", name);
+    }
+
+    @Nullable
+    public static String tilePath(Tile tile) {
+        String tileID = tile.getTileID();
+        String tileName = Mapper.getTileID(tileID);
+        if (("44".equals(tileID) || ("45".equals(tileID)))
+                && (RenderRandom.oneIn("tile.eyeCucumber", Constants.EYE_CHANCE))) {
+            tileName = "S15_Cucumber.png";
+        }
+        if (("43".equals(tileID) || "80".equals(tileID))) {
+            int baubleChance = CalendarHelper.isNearChristmas() ? 5 : 10_000;
+            if (RenderRandom.oneIn("tile.xmasBauble", baubleChance)) {
+                tileName = tileName.replace(".png", "_xmas.png");
+            }
+        }
+        String tilePath = tile(tileName);
+        if (tilePath == null) {
+            BotLogger.warning("Could not find tile: " + tileID);
+        }
+        return tilePath;
+    }
+
+    @Nullable
+    public static String tilePath(TileModel tileModel) {
+        return tile(Mapper.getTileID(tileModel.getId()));
+    }
+
+    @Nullable
+    public static String fogTilePath(Tile tile, @Nullable Player player) {
+        String tileID = tile.getTileID();
+        String fogTileColor = player == null ? "default" : player.getFogFilter();
+        String fogTileColorSuffix = "_" + fogTileColor;
+        String fowTileID = "fow" + fogTileColorSuffix;
+
+        if ("82b".equals(tileID) || "51".equals(tileID)) {
+            fowTileID = "fowb" + fogTileColorSuffix;
+        }
+        if ("82a".equals(tileID)) {
+            fowTileID = "fowc" + fogTileColorSuffix;
+        }
+
+        String tileName = Mapper.getTileID(fowTileID);
+        String tilePath = tile(tileName);
+        if (tilePath == null) {
+            BotLogger.warning(new LogOrigin(player), "Could not find tile: " + fowTileID);
+        }
+        return tilePath;
+    }
+
+    @Nullable
+    public static String border(String name) {
+        return find("borders/", name);
     }
 
     @Nullable

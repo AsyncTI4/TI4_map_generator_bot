@@ -13,6 +13,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
 import ti4.model.PositionMapper;
 import ti4.model.UnitTokenPosition;
@@ -38,7 +39,7 @@ final class PlanetTokens {
             if (HolderTokens.isGroundToken(tokenID) || HolderTokens.isCustodianToken(tokenID)) {
                 continue;
             }
-            String tokenPath = Tile.getTokenPath(tokenID);
+            String tokenPath = ImageResources.tokenOrAttachment(tokenID);
             if (tokenPath == null) {
                 BotLogger.warning(
                         "Could not parse token file for: " + tokenID + " on tile: " + tile.getAutoCompleteName());

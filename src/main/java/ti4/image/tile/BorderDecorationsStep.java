@@ -6,12 +6,12 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import javax.annotation.Nullable;
-import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Storage;
 import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
@@ -54,7 +54,11 @@ final class BorderDecorationsStep implements TileStepPainter {
             if (anomalyModel != null
                     && borderAnomalyHolder.getTile().equals(tile.getPosition())
                     && isVisible(scene, tile, borderAnomalyHolder, orderedAdjacentPositions)) {
-                drawDecoration(borderAnomalyHolder.getDirection(), null, layer.g(), anomalyModel.getImageFilePath());
+                drawDecoration(
+                        borderAnomalyHolder.getDirection(),
+                        null,
+                        layer.g(),
+                        ImageResources.border(anomalyModel.getImagePath()));
             }
         });
     }
@@ -67,7 +71,7 @@ final class BorderDecorationsStep implements TileStepPainter {
     }
 
     private static String adjacencyArrowImagePath() {
-        return ResourceHelper.getResourceFromFolder("borders/", "adjacency_arrow.png");
+        return ImageResources.border("adjacency_arrow.png");
     }
 
     private static void drawDecoration(

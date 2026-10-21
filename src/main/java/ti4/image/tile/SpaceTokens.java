@@ -25,6 +25,7 @@ import ti4.image.draw.OutlinedText;
 import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
 import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.Mapper;
@@ -63,7 +64,7 @@ final class SpaceTokens {
         }
         int index = 0;
         for (String tokenID : tokenList) {
-            String tokenPath = Tile.getTokenPath(tokenID);
+            String tokenPath = ImageResources.tokenOrAttachment(tokenID);
             if (game.isLiberationC4Mode()) {
                 tokenPath = tokenPath.replace("token_creuss", "token_crimsoncreuss");
                 tokenPath = tokenPath.replace("token_crimsoncreussepsilon", "token_creussepsilon");

@@ -23,6 +23,8 @@ import org.junit.jupiter.api.Test;
 class ImagePackageLayeringTest {
 
     private static final Path ROOT = Path.of("src", "main", "java", "ti4", "image");
+    private static final Path MODEL_ROOT = Path.of("src", "main", "java", "ti4", "model");
+    private static final Path GAME_ROOT = Path.of("src", "main", "java", "ti4", "game");
     private static final Pattern PACKAGE = Pattern.compile("^package\\s+ti4\\.image\\.(\\w+)", Pattern.MULTILINE);
     private static final Pattern IMPORT =
             Pattern.compile("^import\\s+(?:static\\s+)?ti4\\.image\\.(\\w+)\\.", Pattern.MULTILINE);
@@ -64,6 +66,21 @@ class ImagePackageLayeringTest {
             }
         }
         assertEquals(List.of(), violations, "image package dependencies against the layering");
+    }
+
+    @Test
+    void modelAndGameNeverImportImageCode() throws IOException {
+        Pattern imageImport = Pattern.compile("^import\\s+(?:static\\s+)?ti4\\.image\\.", Pattern.MULTILINE);
+        List<String> violations = new ArrayList<>();
+        for (Path root : List.of(MODEL_ROOT, GAME_ROOT)) {
+            try (Stream<Path> files = Files.walk(root)) {
+                for (Path file :
+                        files.filter(path -> path.toString().endsWith(".java")).toList()) {
+                    if (imageImport.matcher(Files.readString(file)).find()) violations.add(file.toString());
+                }
+            }
+        }
+        assertEquals(List.of(), violations, "model and game classes importing ti4.image");
     }
 
     @Test

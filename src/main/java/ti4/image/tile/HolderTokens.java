@@ -103,7 +103,7 @@ final class HolderTokens {
             Point centerPosition,
             String tokenID,
             boolean containsDMZ) {
-        String tokenPath = Tile.getTokenPath(tokenID);
+        String tokenPath = ImageResources.tokenOrAttachment(tokenID);
         if (tokenPath == null) {
             BotLogger.warning(new LogOrigin(game), "Could not find token file for: " + tokenID);
             return;
@@ -119,7 +119,7 @@ final class HolderTokens {
                 scale = planetHolder.getRadius() / 65.0f;
             }
             if (tile.isFracture()) {
-                tokenPath = Tile.getTokenPath("token_worlddestroyed_frac.png");
+                tokenPath = ImageResources.tokenOrAttachment("token_worlddestroyed_frac.png");
             }
             scale *= 1.55f;
         } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {

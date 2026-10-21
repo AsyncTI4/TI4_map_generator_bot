@@ -33,7 +33,7 @@ final class DistanceStep implements TileStepPainter {
             distance = UNREACHABLE;
         }
 
-        BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
+        BufferedImage tileImage = ImageHelper.read(ImageResources.tilePath(tile));
         if (tileImage == null) {
             return;
         }

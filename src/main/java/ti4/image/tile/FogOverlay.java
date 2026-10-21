@@ -14,6 +14,7 @@ import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.TextWrap;
 import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageResources;
 
 final class FogOverlay {
 
@@ -28,7 +29,7 @@ final class FogOverlay {
         }
         Player fowPlayer = scene.fowPlayer();
         Graphics2D g = layer.g();
-        g.drawImage(ImageHelper.read(tile.getFowTilePath(fowPlayer)), TILE_PADDING, TILE_PADDING, null);
+        g.drawImage(ImageHelper.read(ImageResources.fogTilePath(tile, fowPlayer)), TILE_PADDING, TILE_PADDING, null);
         String label = tile.getFogLabel(fowPlayer);
         if (label == null) {
             return;

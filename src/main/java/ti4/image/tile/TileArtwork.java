@@ -41,6 +41,6 @@ final class TileArtwork {
         if (game.isLiberationC4Mode() && "17".equals(tile.getTileID())) {
             return ImageHelper.read(ImageResources.tile("17r_DeltaWH.png"));
         }
-        return ImageHelper.read(tile.getTilePath());
+        return ImageHelper.read(ImageResources.tilePath(tile));
     }
 }

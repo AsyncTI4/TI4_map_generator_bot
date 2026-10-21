@@ -134,10 +134,11 @@ public class SliceImageGeneratorService {
 
         List<String> tileStrings = new ArrayList<>();
         tileStrings.add(ImageResources.tile("00_green.png"));
-        tileStrings.addAll(
-                slice.getTiles().stream().map(t -> t.getTile().getTilePath()).toList());
+        tileStrings.addAll(slice.getTiles().stream()
+                .map(t -> ImageResources.tilePath(t.getTile()))
+                .toList());
 
-        String fow = slice.getTiles().getFirst().getTile().getFowTilePath(null);
+        String fow = ImageResources.fogTilePath(slice.getTiles().getFirst().getTile(), null);
         BufferedImage fogFilter = ImageHelper.read(fow);
 
         BufferedImage sliceImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);

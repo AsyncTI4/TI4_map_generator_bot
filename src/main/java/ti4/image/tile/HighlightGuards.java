@@ -5,6 +5,7 @@ import static ti4.image.tile.TileGeometry.TILE_PADDING;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageResources;
 
 final class HighlightGuards {
 
@@ -15,10 +16,15 @@ final class HighlightGuards {
     }
 
     static boolean isTileImageMissing(Tile tile) {
-        return ImageHelper.read(tile.getTilePath()) == null;
+        return ImageHelper.read(ImageResources.tilePath(tile)) == null;
     }
 
     static void fogOut(TileLayer layer) {
-        layer.g().drawImage(ImageHelper.read(layer.tile().getFowTilePath(null)), TILE_PADDING, TILE_PADDING, null);
+        layer.g()
+                .drawImage(
+                        ImageHelper.read(ImageResources.fogTilePath(layer.tile(), null)),
+                        TILE_PADDING,
+                        TILE_PADDING,
+                        null);
     }
 }

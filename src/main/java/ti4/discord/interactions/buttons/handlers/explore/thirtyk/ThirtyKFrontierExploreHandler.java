@@ -32,6 +32,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKCards;
 import ti4.helpers.thirtyk.ThirtyKDistance;
 import ti4.helpers.thirtyk.ThirtyKTransactions;
+import ti4.image.io.ImageResources;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.RelicModel;
@@ -502,7 +503,8 @@ public class ThirtyKFrontierExploreHandler {
 
     private static boolean isLostCaptainTarget(Game game, Player player, Tile origin, Tile target) {
         if (target == origin || !target.getPlanetUnitHolders().isEmpty()) return false;
-        if (target.getTileModel() == null || target.getTilePath().toLowerCase().contains("hyperlane")) return false;
+        if (target.getTileModel() == null
+                || ImageResources.tilePath(target).toLowerCase().contains("hyperlane")) return false;
         if ("0".equals(target.getTileID()) || "-1".equals(target.getTileID())) return false;
         return !ThirtyKExploreSupport.otherPlayersHaveShips(game, player, target);
     }

@@ -26,18 +26,14 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thron
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.CalendarHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.RenderRandom;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
-import ti4.logging.LogOrigin;
 import ti4.model.Mapper;
 import ti4.model.PositionMapper;
 import ti4.model.TileHelper;
@@ -148,21 +144,6 @@ public class Tile {
     public void inheritFogData(Tile t) {
         fog.putAll(t.getFog());
         fogLabel.putAll(t.getFogLabel());
-    }
-
-    @Nullable
-    public static String getCCPath(String ccID) {
-        return ImageResources.commandToken(ccID);
-    }
-
-    @Nullable
-    public static String getAttachmentPath(String tokenID) {
-        return ImageResources.attachment(tokenID);
-    }
-
-    @Nullable
-    public static String getTokenPath(String tokenID) {
-        return ImageResources.tokenOrAttachment(tokenID);
     }
 
     public static Predicate<Tile> tileHasPlayersInfAndCC(Player player) {
@@ -355,26 +336,6 @@ public class Tile {
         return position != null ? position.toLowerCase() : null;
     }
 
-    @JsonIgnore
-    public String getTilePath() {
-        String tileName = Mapper.getTileID(tileID);
-        if (("44".equals(tileID) || ("45".equals(tileID)))
-                && (RenderRandom.oneIn("tile.eyeCucumber", Constants.EYE_CHANCE))) {
-            tileName = "S15_Cucumber.png";
-        }
-        if (("43".equals(tileID) || "80".equals(tileID))) {
-            int baubleChance = CalendarHelper.isNearChristmas() ? 5 : 10_000;
-            if (RenderRandom.oneIn("tile.xmasBauble", baubleChance)) {
-                tileName = tileName.replace(".png", "_xmas.png");
-            }
-        }
-        String tilePath = ImageResources.tile(tileName);
-        if (tilePath == null) {
-            BotLogger.warning("Could not find tile: " + tileID);
-        }
-        return tilePath;
-    }
-
     public void swapFogData(Player player1, Player player2) {
         if (player1 == null || player2 == null) return;
 
@@ -427,27 +388,6 @@ public class Tile {
 
     public void setFogLabel(@NotNull Player player, String fogLabel_) {
         fogLabel.put(player.getUserID(), fogLabel_);
-    }
-
-    @JsonIgnore
-    public String getFowTilePath(Player player) {
-        String fogTileColor = player == null ? "default" : player.getFogFilter();
-        String fogTileColorSuffix = "_" + fogTileColor;
-        String fowTileID = "fow" + fogTileColorSuffix;
-
-        if ("82b".equals(tileID) || "51".equals(tileID)) { // mallice || creuss
-            fowTileID = "fowb" + fogTileColorSuffix;
-        }
-        if ("82a".equals(tileID)) { // mallicelocked
-            fowTileID = "fowc" + fogTileColorSuffix;
-        }
-
-        String tileName = Mapper.getTileID(fowTileID);
-        String tilePath = ImageResources.tile(tileName);
-        if (tilePath == null) {
-            BotLogger.warning(new LogOrigin(player), "Could not find tile: " + fowTileID);
-        }
-        return tilePath;
     }
 
     public List<Planet> getSpaceStations(Game game) {
