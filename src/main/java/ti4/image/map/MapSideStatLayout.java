@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.PlayerStatsHelper;
 import ti4.helpers.RenderRandom;
 
@@ -55,13 +54,11 @@ final class MapSideStatLayout {
         if (fow) {
             RenderRandom.shuffle("statLayout.fogShuffle", players);
             statOrder.clear();
-            statOrder.add(fog.viewer());
-            players.stream()
-                    .filter(player -> FoWHelper.hasHomeSystemInView(player, fog.viewer()))
-                    .forEach(statOrder::add);
-            players.stream()
-                    .filter(player -> FoWHelper.canSeeStatsOfPlayer(game, player, fog.viewer()))
-                    .forEach(statOrder::add);
+            if (fog.viewer() != null) {
+                statOrder.add(fog.viewer());
+            }
+            players.stream().filter(fog::seesHomeSystem).forEach(statOrder::add);
+            players.stream().filter(fog::canSeeStats).forEach(statOrder::add);
         }
 
         boolean useNewSystem = true;
@@ -69,10 +66,10 @@ final class MapSideStatLayout {
         Map<String, List<String>> playerStatTiles = new LinkedHashMap<>();
         for (Player p : statOrder) {
             if (p == null || p.getFaction() == null || playerStatTiles.containsKey(p.getFaction())) continue;
-            if (fow && !FoWHelper.canSeeStatsOfPlayer(game, p, fog.viewer())) continue;
+            if (fow && !fog.canSeeStats(p)) continue;
 
             List<String> myStatTiles =
-                    PlayerStatsHelper.findThreeNearbyStatTiles(game, p, statTilesInUse, fog.isPrivate(), fog.viewer());
+                    PlayerStatsHelper.findThreeNearbyStatTiles(game, p, statTilesInUse, fog.fogViewer());
             if (myStatTiles == null) {
                 useNewSystem = false;
                 break;

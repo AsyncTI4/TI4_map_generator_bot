@@ -23,6 +23,7 @@ import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.PositionMapper;
+import ti4.service.fow.FogViewer;
 
 public final class SystemContextImage {
 
@@ -108,11 +109,11 @@ public final class SystemContextImage {
             tilesToDisplay.remove(position);
         }
 
-        TileViewer viewer = layers.viewer();
+        FogViewer viewer = layers.viewer();
         if (viewer.privateView()) {
             Player fowPlayer = viewer.player();
             Set<String> hidden = new HashSet<>(tilesToDisplay.keySet());
-            hidden.removeAll(FoWHelper.fowFilter(game, fowPlayer));
+            hidden.removeAll(viewer.visibleSystems());
             for (String position : hidden) {
                 tilesToDisplay.remove(position);
                 if (fowPlayer != null) {

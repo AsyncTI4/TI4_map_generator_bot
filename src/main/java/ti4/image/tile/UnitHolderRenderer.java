@@ -16,7 +16,6 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
@@ -29,6 +28,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
+import ti4.service.fow.FogViewer;
 
 final class UnitHolderRenderer {
 
@@ -50,6 +50,8 @@ final class UnitHolderRenderer {
     private final UnitHolder unitHolder;
     private final int radius;
 
+    private final FogViewer fogViewer;
+
     @Nullable
     private final Player viewer;
 
@@ -63,7 +65,7 @@ final class UnitHolderRenderer {
             int degreeChange,
             UnitHolder unitHolder,
             int radius,
-            @Nullable Player viewer) {
+            FogViewer fogViewer) {
         this.game = game;
         this.tile = tile;
         this.displayType = displayType;
@@ -73,7 +75,8 @@ final class UnitHolderRenderer {
         this.degreeChange = degreeChange;
         this.unitHolder = unitHolder;
         this.radius = radius;
-        this.viewer = viewer;
+        this.fogViewer = fogViewer;
+        this.viewer = fogViewer.player();
     }
 
     void render() {
@@ -85,7 +88,7 @@ final class UnitHolderRenderer {
         UnitPlacement placement = new UnitPlacement(game, tile, unitHolder, occupied, radius, degree, degreeChange);
         String jailFaction = JAIL_FACTIONS_BY_TILE.get(tile.getTileID());
         boolean isJail = jailFaction != null;
-        boolean showJail = viewer == null || (isJail && FoWHelper.canSeeStatsOfFaction(game, jailFaction, viewer));
+        boolean showJail = viewer == null || (isJail && fogViewer.canSeeStatsOfFaction(jailFaction));
 
         BufferedImage dmgImage = ImageHelper.readScaled(Helper.getDamagePath(), BADGE_SCALE);
         BufferedImage galvTag = ImageHelper.readScaled(Helper.getGalvanizeTagPath(), BADGE_SCALE);

@@ -22,6 +22,7 @@ import ti4.helpers.FoWHelper;
 import ti4.image.draw.WebsiteOverlays;
 import ti4.image.map.MapFrame;
 import ti4.model.Mapper;
+import ti4.service.fow.FogViewer;
 import ti4.testUtils.BaseTi4Test;
 import ti4.website.model.WebsiteOverlay;
 
@@ -58,8 +59,8 @@ class FogSafePlayerAreaTest extends BaseTi4Test {
         BufferedImage image = new BufferedImage(3000, 450, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = image.createGraphics();
         WebsiteOverlays overlays = new WebsiteOverlays();
-        PlayerAreaContext ctx =
-                PlayerAreaContext.of(graphics, game, fogPrivate, holder, overlays, new NeighbourMap(game));
+        PlayerAreaContext ctx = PlayerAreaContext.of(
+                graphics, game, new FogViewer(game, fogPrivate, holder), overlays, new NeighbourMap(game));
         PlayerAreas.drawSingle(ctx, holder, new Point(5, 5), 3000);
         graphics.dispose();
         return overlays.asList();

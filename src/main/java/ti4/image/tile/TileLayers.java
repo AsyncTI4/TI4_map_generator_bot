@@ -15,6 +15,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
+import ti4.service.fow.FogViewer;
 
 public final class TileLayers {
 
@@ -40,7 +41,11 @@ public final class TileLayers {
             @Nullable GenericInteractionCreateEvent event,
             @Nullable DisplayType displayType,
             @Nullable Player explicitViewer) {
-        return new TileLayers(new TileScene(game, displayType, TileViewer.resolve(game, event, explicitViewer)));
+        return forViewer(game, FogViewer.resolve(game, event, explicitViewer), displayType);
+    }
+
+    public static TileLayers forViewer(Game game, FogViewer viewer, @Nullable DisplayType displayType) {
+        return new TileLayers(new TileScene(game, displayType, viewer));
     }
 
     private static Map<TileStep, TileStepPainter> painters() {
@@ -65,7 +70,7 @@ public final class TileLayers {
         return painters;
     }
 
-    TileViewer viewer() {
+    FogViewer viewer() {
         return scene.viewer();
     }
 

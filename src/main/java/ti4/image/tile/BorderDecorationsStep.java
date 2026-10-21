@@ -8,7 +8,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Tile;
-import ti4.helpers.FoWHelper;
 import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
@@ -66,8 +65,7 @@ final class BorderDecorationsStep implements TileStepPainter {
     private static boolean isVisible(
             TileScene scene, Tile tile, BorderAnomalyHolder anomaly, List<String> orderedAdjacentPositions) {
         return !scene.hidesFogged(tile)
-                || FoWHelper.getTilePositionsToShow(scene.game(), scene.fowPlayer())
-                        .contains(orderedAdjacentPositions.get(anomaly.getDirection()));
+                || scene.viewer().positionsInReach().contains(orderedAdjacentPositions.get(anomaly.getDirection()));
     }
 
     private static String adjacencyArrowImagePath() {

@@ -7,81 +7,63 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.helpers.FoWHelper;
-import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
-import ti4.service.testbed.TestBedService;
+import ti4.service.fow.FogViewer;
 
 final class FogView {
 
-    private final Game game;
-    private final boolean privateView;
-
-    @Nullable
-    private final Player viewer;
-
+    private final FogViewer viewer;
     private final Set<String> visibleSystems;
     private final Map<String, Tile> tiles;
 
-    private FogView(
-            Game game,
-            boolean privateView,
-            @Nullable Player viewer,
-            Set<String> visibleSystems,
-            Map<String, Tile> tiles) {
-        this.game = game;
-        this.privateView = privateView;
+    private FogView(FogViewer viewer, Set<String> visibleSystems, Map<String, Tile> tiles) {
         this.viewer = viewer;
         this.visibleSystems = visibleSystems;
         this.tiles = tiles;
     }
 
     static FogView of(Game game, @Nullable GenericInteractionCreateEvent event) {
-        if (!isPrivateViewRequested(game, event)) {
-            return unfogged(game);
+        return of(game, FogViewer.resolve(game, event, null));
+    }
+
+    static FogView of(Game game, FogViewer viewer) {
+        if (!viewer.privateView()) {
+            return new FogView(viewer, Set.of(), new HashMap<>(game.getTileMap()));
         }
-        Player viewer = TestBedService.resolveActingPlayer(
-                game,
-                event,
-                CommandHelper.getPlayerFromGame(
-                        game, event.getMember(), event.getUser().getId()));
-        Set<String> visibleSystems = FoWHelper.fowFilter(game, viewer);
+        Player player = viewer.player();
+        Set<String> visibleSystems = viewer.visibleSystems();
         Map<String, Tile> tiles = new HashMap<>(game.getTileMap());
         Set<String> hiddenPositions = new HashSet<>(tiles.keySet());
         hiddenPositions.removeAll(visibleSystems);
         for (String position : hiddenPositions) {
             tiles.remove(position);
-            if (viewer != null) {
-                Tile fogTile = viewer.buildFogTile(position, viewer);
+            if (player != null) {
+                Tile fogTile = player.buildFogTile(position, player);
                 if (fogTile != null) {
                     tiles.put(position, fogTile);
                 }
             }
         }
-        return new FogView(game, true, viewer, visibleSystems, tiles);
+        return new FogView(viewer, visibleSystems, tiles);
     }
 
     static FogView unfogged(Game game) {
-        return new FogView(game, false, null, Set.of(), new HashMap<>(game.getTileMap()));
-    }
-
-    private static boolean isPrivateViewRequested(Game game, @Nullable GenericInteractionCreateEvent event) {
-        return game.isFowMode()
-                && event != null
-                && (FoWHelper.isPrivateGame(game, event)
-                        || event instanceof UserOverridenGenericInteractionCreateEvent);
+        return new FogView(FogViewer.unfogged(game), Set.of(), new HashMap<>(game.getTileMap()));
     }
 
     boolean isPrivate() {
-        return privateView;
+        return viewer.privateView();
+    }
+
+    FogViewer fogViewer() {
+        return viewer;
     }
 
     @Nullable
     Player viewer() {
-        return viewer;
+        return viewer.privateView() ? viewer.player() : null;
     }
 
     Set<String> visibleSystems() {
@@ -93,7 +75,15 @@ final class FogView {
     }
 
     boolean shouldConvertToGeneric(Player player) {
-        return privateView && !FoWHelper.canSeeStatsOfPlayer(game, player, viewer);
+        return viewer.privateView() && !viewer.canSeeStats(player);
+    }
+
+    boolean canSeeStats(@Nullable Player player) {
+        return viewer.canSeeStats(player);
+    }
+
+    boolean seesHomeSystem(@Nullable Player player) {
+        return viewer.seesHomeSystem(player);
     }
 
     Set<String> seenPositions() {
@@ -107,11 +97,11 @@ final class FogView {
     }
 
     boolean isUnseenBlankFogTile(Tile tile) {
-        return privateView && "0b".equals(tile.getTileID()) && StringUtils.isBlank(tile.getFogLabel(viewer));
+        return viewer.privateView() && "0b".equals(tile.getTileID()) && StringUtils.isBlank(tile.getFogLabel(viewer()));
     }
 
     @Nullable
     String homeSystemPosition() {
-        return privateView && viewer != null ? viewer.getHomeSystemPosition() : null;
+        return viewer.privateView() && viewer.player() != null ? viewer.player().getHomeSystemPosition() : null;
     }
 }

@@ -5,9 +5,9 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
-import ti4.helpers.FoWHelper;
+import ti4.service.fow.FogViewer;
 
-record TileScene(Game game, @Nullable DisplayType displayType, TileViewer viewer) {
+record TileScene(Game game, @Nullable DisplayType displayType, FogViewer viewer) {
 
     boolean isPrivateView() {
         return viewer.privateView();
@@ -23,6 +23,6 @@ record TileScene(Game game, @Nullable DisplayType displayType, TileViewer viewer
     }
 
     boolean showsGeneric(@Nullable Player owner) {
-        return isPrivateView() && !FoWHelper.canSeeStatsOfPlayer(game, owner, fowPlayer());
+        return isPrivateView() && !viewer.canSeeStats(owner);
     }
 }

@@ -66,7 +66,7 @@ final class ConnectionStripSection {
                 VerticalAlign.Center,
                 Strokes.STROKE_4,
                 Color.BLACK);
-        TileLayers tileLayers = TileLayers.of(ctx.game(), ctx.event(), ctx.displayType());
+        TileLayers tileLayers = TileLayers.forViewer(ctx.game(), ctx.fog().fogViewer(), ctx.displayType());
         for (int index = 0; index < cells; index++) {
             Point cell = cellOrigin(index, perRow, cells, width, stripTop);
             if (index < drawn.size()) {

@@ -33,7 +33,7 @@ final class BoardSection {
         this.g2 = g2;
         this.game = ctx.game();
         this.board = ctx.board();
-        this.tileLayers = TileLayers.of(game, ctx.event(), ctx.displayType());
+        this.tileLayers = TileLayers.forViewer(game, ctx.fog().fogViewer(), ctx.displayType());
     }
 
     static void draw(RenderContext ctx, Graphics2D g2) {

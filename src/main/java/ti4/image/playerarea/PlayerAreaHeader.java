@@ -19,6 +19,7 @@ import ti4.image.draw.VerticalAlign;
 import ti4.image.draw.WebsiteOverlays;
 import ti4.image.io.Fonts;
 import ti4.image.io.RemoteImages;
+import ti4.service.fow.FogViewer;
 
 public final class PlayerAreaHeader {
 
@@ -55,7 +56,7 @@ public final class PlayerAreaHeader {
         Graphics2D probe = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics();
         try {
             PlayerAreaContext probeContext =
-                    PlayerAreaContext.of(probe, game, false, null, new WebsiteOverlays(), neighbours);
+                    PlayerAreaContext.of(probe, game, FogViewer.unfogged(game), new WebsiteOverlays(), neighbours);
             return new PlayerAreaHeader(probeContext, new AreaSlot(areaLeft, areaRight), player, areaLeft).height()
                     - ROW_HEIGHT;
         } finally {

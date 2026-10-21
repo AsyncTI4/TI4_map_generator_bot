@@ -9,6 +9,7 @@ import lombok.Data;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.PlayerStatsHelper;
+import ti4.service.fow.FogViewer;
 
 @Data
 public class WebStatTilePositions {
@@ -28,7 +29,7 @@ public class WebStatTilePositions {
             }
 
             List<String> myStatTiles =
-                    PlayerStatsHelper.findThreeNearbyStatTiles(game, player, statTilesInUse, false, null);
+                    PlayerStatsHelper.findThreeNearbyStatTiles(game, player, statTilesInUse, FogViewer.unfogged(game));
             if (myStatTiles != null) {
                 statTilesInUse.addAll(myStatTiles);
                 factionToStatTiles.put(player.getFaction(), myStatTiles);

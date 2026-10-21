@@ -14,17 +14,16 @@ import org.apache.commons.collections4.CollectionUtils;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.model.PositionMapper;
+import ti4.service.fow.FogViewer;
 
 public final class PlayerStatsHelper {
     private static final Pattern DIGIT_PATTERN = Pattern.compile("\\d");
 
-    public static List<String> findThreeNearbyStatTiles(
-            Game game, Player player, Set<String> taken, boolean isFoWPrivate, Player fowPlayer) {
-        boolean fow = isFoWPrivate;
+    public static List<String> findThreeNearbyStatTiles(Game game, Player player, Set<String> taken, FogViewer viewer) {
         boolean randomizeLocation = false;
-        if (fow && player != fowPlayer) {
-            if (FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer)) {
-                if (!FoWHelper.hasHomeSystemInView(player, fowPlayer)) {
+        if (viewer.privateView() && player != viewer.player()) {
+            if (viewer.canSeeStats(player)) {
+                if (!viewer.seesHomeSystem(player)) {
                     // if we can see a players stats, but we cannot see their home system - move
                     // their stats somewhere random
                     randomizeLocation = true;

@@ -62,7 +62,7 @@ final class UnitsStep implements TileStepPainter {
                             SPIRAL_DEGREE_STEP,
                             unitHolder,
                             radius,
-                            scene.fowPlayer())
+                            scene.viewer())
                     .render();
         }
     }
