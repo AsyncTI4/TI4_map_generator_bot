@@ -136,4 +136,23 @@ class AiPerceptionTest extends BaseTi4Test {
         assertThat(AiPerception.kept(PromptSource.AI_THREAD, List.of(), AiPrompt.TABLE_TALK + "Sol sends Hacan 1 debt"))
                 .isFalse();
     }
+
+    // The bot tells an offerer in its private thread, with no buttons, that its offer was rejected; without seeing that
+    // notice the AI keeps waiting on a dead offer until its reply time runs out.
+    @Test
+    void seesAnOfferRejectionNoticeInItsOwnThread() {
+        AiPrompt notice = new AiPrompt(
+                "thread",
+                "notice",
+                PromptSource.AI_THREAD,
+                "Nekro your offer to Sol has been rejected.",
+                List.of(),
+                0L);
+        AiPrompt chatter = new AiPrompt("thread", "chatter", PromptSource.AI_THREAD, "Some note.", List.of(), 0L);
+
+        assertThat(AiPerception.isRelevantInPrivateThread(notice, "nekro", WINDOWS))
+                .isTrue();
+        assertThat(AiPerception.isRelevantInPrivateThread(chatter, "nekro", WINDOWS))
+                .isFalse();
+    }
 }

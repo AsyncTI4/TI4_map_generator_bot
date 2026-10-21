@@ -3,12 +3,14 @@ package ti4.ai.perception;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -35,6 +37,7 @@ public class AiPerception {
     private static final int COMBAT_THREADS_TO_READ = 2;
     public static final String OFFER_REJECTED = "has been rejected";
     private static final Pattern SYSTEM_POSITION = Pattern.compile("-system-([^-]+)-turn-");
+    private static final Pattern THREAD_PARTIES = Pattern.compile("-turn-\\d+-(.+?)-vs-(.+)$");
 
     private record CombatThread(String name, long latestMessageId, List<AiPrompt> prompts) {}
 
@@ -52,7 +55,7 @@ public class AiPerception {
             List<AiPrompt> prompts = new ArrayList<>();
             String faction = seat.getFaction();
             for (AiPrompt prompt : privateThreads.getOrDefault(seat.getUserID(), List.of())) {
-                if (isRelevant(PromptSource.AI_THREAD, prompt.buttons(), faction, publicWindowPrefixes)) {
+                if (isRelevantInPrivateThread(prompt, faction, publicWindowPrefixes)) {
                     prompts.add(prompt);
                 }
             }
@@ -124,6 +127,17 @@ public class AiPerception {
         return source == PromptSource.PUBLIC && AiPrompt.isTableTalk(buttons, content);
     }
 
+    static boolean isRelevantInPrivateThread(AiPrompt prompt, String faction, Set<String> prefixes) {
+        return isRelevant(PromptSource.AI_THREAD, prompt.buttons(), faction, prefixes) || isRejectionNotice(prompt);
+    }
+
+    public static boolean isRejectionNotice(AiPrompt prompt) {
+        return prompt.source() == PromptSource.AI_THREAD
+                && prompt.buttons().isEmpty()
+                && prompt.content() != null
+                && prompt.content().contains(OFFER_REJECTED);
+    }
+
     static boolean isRelevant(PromptSource source, List<PromptButton> buttons, String faction, Set<String> prefixes) {
         if (buttons.stream().anyMatch(button -> button.handlerId().startsWith(DELEGATION_PREFIX))) return false;
         if (source == PromptSource.COMBAT_THREAD) return true;
@@ -171,10 +185,16 @@ public class AiPerception {
 
     private static List<ThreadChannel> ongoingCombatThreads(Game game, TextChannel main, List<Player> seats) {
         String prefix = game.getName() + "-round-";
-        return main.getThreadChannels().stream()
+        List<ThreadChannel> candidates = main.getThreadChannels().stream()
                 .filter(thread ->
                         thread.getName().startsWith(prefix) && thread.getName().contains("-vs-"))
                 .filter(thread -> !thread.isArchived())
+                .toList();
+        Map<String, Long> idsByName = new HashMap<>();
+        candidates.forEach(thread -> idsByName.merge(thread.getName(), thread.getIdLong(), Math::max));
+        Set<String> newest = new HashSet<>(newestPerPair(game, idsByName));
+        return candidates.stream()
+                .filter(thread -> newest.contains(thread.getName()))
                 .filter(thread -> seats.stream().anyMatch(seat -> involves(game, seat, thread.getName())))
                 .sorted(Comparator.comparingLong(ThreadChannel::getLatestMessageIdLong)
                         .reversed())
@@ -193,14 +213,47 @@ public class AiPerception {
         if (!matcher.find()) return false;
         Tile tile = game.getTileByPosition(matcher.group(1));
         if (tile == null) return false;
-        if (opposesSeat(seat, ButtonHelper.getPlayersWithShipsInTheSystem(game, tile))) return true;
+        List<Player> named = participants(game, threadName).stream()
+                .filter(other -> other != seat)
+                .toList();
+        if (opposesSeat(seat, named, ButtonHelper.getPlayersWithShipsInTheSystem(game, tile))) return true;
         for (Planet planet : tile.getPlanetUnitHolders()) {
-            if (opposesSeat(seat, ButtonHelper.getPlayersWithUnitsOnAPlanet(game, planet))) return true;
+            if (opposesSeat(seat, named, ButtonHelper.getPlayersWithUnitsOnAPlanet(game, planet))) return true;
         }
         return false;
     }
 
-    private static boolean opposesSeat(Player seat, List<Player> present) {
-        return present.contains(seat) && present.stream().anyMatch(other -> other != seat);
+    private static boolean opposesSeat(Player seat, List<Player> named, List<Player> present) {
+        if (!present.contains(seat)) return false;
+        return present.stream().anyMatch(other -> other != seat && (named.isEmpty() || named.contains(other)));
+    }
+
+    static List<String> newestPerPair(Game game, Map<String, Long> threadIdsByName) {
+        Map<String, String> newestByPair = new HashMap<>();
+        threadIdsByName.forEach((name, id) -> newestByPair.merge(
+                pairKey(game, name),
+                name,
+                (kept, other) -> threadIdsByName.get(other) > threadIdsByName.get(kept) ? other : kept));
+        return List.copyOf(newestByPair.values());
+    }
+
+    private static String pairKey(Game game, String threadName) {
+        List<Player> pair = participants(game, threadName);
+        if (pair.isEmpty()) return threadName;
+        String factions = pair.stream().map(Player::getFaction).sorted().collect(Collectors.joining("+"));
+        return StringUtils.substringBefore(threadName, "-turn-") + "|" + factions;
+    }
+
+    private static List<Player> participants(Game game, String threadName) {
+        Matcher matcher = THREAD_PARTIES.matcher(threadName);
+        if (!matcher.find()) return List.of();
+        return game.getPlayers().values().stream()
+                .filter(player -> startsWithName(matcher.group(1), player) || startsWithName(matcher.group(2), player))
+                .toList();
+    }
+
+    private static boolean startsWithName(String side, Player player) {
+        return (player.getFaction() != null && side.startsWith(player.getFaction()))
+                || (player.getColor() != null && side.startsWith(player.getColor()));
     }
 }

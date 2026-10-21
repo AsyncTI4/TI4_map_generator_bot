@@ -8,7 +8,6 @@ import ti4.ai.brain.AiMemory;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.perception.AiPerception;
 import ti4.ai.perception.AiPrompt;
-import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.image.Mapper;
@@ -40,10 +39,7 @@ class OfferRejections {
     }
 
     static boolean isNotice(AiPrompt prompt) {
-        return prompt.source() == PromptSource.AI_THREAD
-                && prompt.buttons().isEmpty()
-                && prompt.content() != null
-                && prompt.content().contains(NOTICE);
+        return AiPerception.isRejectionNotice(prompt);
     }
 
     private static Optional<Player> rejector(AiTurnContext context, AiPrompt prompt) {
