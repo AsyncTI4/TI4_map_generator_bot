@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import ti4.ai.eval.BoardView;
 import ti4.ai.scoring.ObjectiveValue;
+import ti4.ai.tactical.TraitRaid;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -95,7 +96,7 @@ final class TraitTracker {
             }
         }
         return String.format(
-                "%s %s r%d: %s own %d, free %d, rival %d%s",
+                "%s %s r%d: %s own %d, free %d, rival %d%s%s",
                 seat.getFaction(),
                 secret,
                 game.getRound(),
@@ -103,7 +104,14 @@ final class TraitTracker {
                 mine + ownHomeTrait(game, seat, trait),
                 free,
                 rival,
-                seat.getSecretsScored().containsKey(secret) ? ", scored" : "");
+                seat.getSecretsScored().containsKey(secret) ? ", scored" : "",
+                gates(game, seat));
+    }
+
+    private static String gates(Game game, Player seat) {
+        String raid = TraitRaid.firstBlockingGate(game, seat);
+        String claim = TraitRaid.firstUnclaimedGate(game, seat);
+        return (raid.isEmpty() ? "" : ", raidGate " + raid) + (claim.isEmpty() ? "" : ", claimGate " + claim);
     }
 
     private static int ownHomeTrait(Game game, Player seat, String trait) {

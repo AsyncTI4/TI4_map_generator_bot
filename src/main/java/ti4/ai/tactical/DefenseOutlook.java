@@ -54,7 +54,7 @@ public final class DefenseOutlook {
     private static final double MIN_STANDING_LEVEL = 0.2;
     static final double PUBLIC_SCORING_LOCK = 8.0;
     private static final double NEAR_WIN_SCORING_LOCK = 12.0;
-    private static final double SCORING_CRITICAL = 4.0;
+    static final double SCORING_CRITICAL = 4.0;
     private static final double CONTESTED_GAIN = 4.0;
     private static final double MIN_FEAR = 0.05;
     private static final double HOME_PRIZE = 3.0;
@@ -434,6 +434,17 @@ public final class DefenseOutlook {
             double shipStake,
             double planetStake,
             Player struck) {
+        return counterstrike(tile, after, planetsAfter, shipStake, planetStake, 0, struck);
+    }
+
+    double counterstrike(
+            Tile tile,
+            Defenders after,
+            List<Planet> planetsAfter,
+            double shipStake,
+            double planetStake,
+            double immediateStake,
+            Player struck) {
         if (isGuarded(tile)) return 0;
         double worst = 0;
         for (Player enemy : enemies()) {
@@ -444,7 +455,8 @@ public final class DefenseOutlook {
                 double fear = Math.min(1, fearCeiling(enemy, tile, horizon, force, planetsAfter) * eagerness);
                 if (fear <= 0) continue;
                 Chances chances = chancesAgainst(enemy, tile, horizon, after, planetsAfter);
-                double exposed = chances.space() * shipStake + chances.take() * planetStake;
+                double seatStake = horizon == Horizon.IMMEDIATE ? immediateStake : 0;
+                double exposed = chances.space() * shipStake + chances.take() * (planetStake + seatStake);
                 worst = Math.max(worst, weight(enemy, horizon) * fear * exposed);
             }
         }
@@ -518,7 +530,9 @@ public final class DefenseOutlook {
             ObjectiveValue objectives = own();
             double loss = shipLoss(tile);
             for (Planet planet : seatPlanets(tile)) {
-                loss += Math.max(0, -objectives.gain(objectives.before().withoutPlanet(planet.getName())));
+                double progress =
+                        Math.max(0, -objectives.gain(objectives.before().withoutPlanet(planet.getName())));
+                loss += Math.max(progress, TraitRaid.holdLoss(game, seat, planet));
             }
             return loss;
         });

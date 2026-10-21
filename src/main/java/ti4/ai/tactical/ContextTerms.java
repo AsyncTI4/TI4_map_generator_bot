@@ -10,9 +10,11 @@ record ContextTerms(
         double homeDefence,
         double retakeValue,
         double makeAnExample,
-        Map<String, Double> territoryValues) {
+        Map<String, Double> territoryValues,
+        double exposedObjective,
+        double seatStake) {
 
     static ContextTerms none() {
-        return new ContextTerms(0, Map.of(), 0, 0, 0, 0, 0, Map.of());
+        return new ContextTerms(0, Map.of(), 0, 0, 0, 0, 0, Map.of(), 0, 0);
     }
 }

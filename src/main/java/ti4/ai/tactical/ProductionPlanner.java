@@ -397,10 +397,17 @@ public class ProductionPlanner {
         }
         if (PrecisionRules.held(seat)) builder.barrageShips();
         if (builder.campaign().holdsFringe()) planFringeInfantry(builder);
+        planTraitRaidInfantry(builder);
         if (fleetShips == 0 && new ObjectiveValue(builder.game, seat).caresAboutPresence()) {
             int pawns = Math.min(WANTED_PAWNS, builder.count(UnitType.Destroyer) + PAWNS_PER_BUILD);
             builder.shipsUpTo(UnitType.Destroyer, pawns, builder.scoringValue(UnitType.Destroyer), true);
         }
+    }
+
+    private static void planTraitRaidInfantry(Builder builder) {
+        int spare = TacticalPlanner.movableGroundForces(builder.game, builder.seat, builder.tile, builder.defense);
+        int wanted = TraitRaid.infantryToBuild(builder.game, builder.seat, builder.tile, spare, builder.defense);
+        builder.infantry(wanted, builder.scoringValue(UnitType.Infantry));
     }
 
     private static void planFringeInfantry(Builder builder) {
