@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.image.playerarea.PlayerAreaGenerator;
 import ti4.testUtils.BaseTi4Test;
 
 class UnknownTechPlayerAreaTest extends BaseTi4Test {

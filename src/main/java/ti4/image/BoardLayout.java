@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.helpers.DisplayType;
+import ti4.image.playerarea.PlayerAreaGenerator;
 import ti4.service.map.FractureService;
 import ti4.service.option.FOWOptionService.FOWOption;
 

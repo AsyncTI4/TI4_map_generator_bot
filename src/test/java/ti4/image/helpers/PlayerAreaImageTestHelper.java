@@ -8,9 +8,9 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.game.Player;
 import ti4.image.ImageHelper;
-import ti4.image.PlayerAreaGenerator;
 import ti4.image.PlayerAreaImageTest;
 import ti4.image.WebsiteOverlays;
+import ti4.image.playerarea.PlayerAreaGenerator;
 
 @UtilityClass
 public class PlayerAreaImageTestHelper {

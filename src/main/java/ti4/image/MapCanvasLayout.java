@@ -2,6 +2,7 @@ package ti4.image;
 
 import ti4.game.Game;
 import ti4.helpers.DisplayType;
+import ti4.image.playerarea.PlayerAreaGenerator;
 
 final class MapCanvasLayout {
 

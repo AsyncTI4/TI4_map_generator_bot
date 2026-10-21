@@ -3,6 +3,7 @@ package ti4.image;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import ti4.helpers.DisplayType;
+import ti4.image.playerarea.PlayerAreaGenerator;
 
 final class PlayerAreasSection {
 

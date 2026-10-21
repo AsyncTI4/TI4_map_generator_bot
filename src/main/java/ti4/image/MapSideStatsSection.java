@@ -7,6 +7,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Storage;
+import ti4.image.playerarea.PlayerAreaGenerator;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 final class MapSideStatsSection {
