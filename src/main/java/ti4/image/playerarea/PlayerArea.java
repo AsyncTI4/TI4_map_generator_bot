@@ -51,7 +51,7 @@ final class PlayerArea {
         if (player.isEliminated()) {
             y += IdentityBlock.ICON_SIZE;
             Rectangle bounds = new Rectangle(topLeft.x - 5, topLeft.y, slot.rightEdge() - topLeft.x, y - topLeft.y);
-            return new PlayerAreaFrame(bounds, mainColor, accentColor, g2.getStroke());
+            return new PlayerAreaFrame(bounds, mainColor, accentColor, Strokes.STROKE_5);
         }
 
         FollowAndNeighboursLine.draw(ctx, player, PlayerAreaHeader.showsNeighbours(ctx.game(), player), x, y);
@@ -71,6 +71,6 @@ final class PlayerArea {
             y += 23 + (secretCount - SECRETS_WITHOUT_EXTRA_HEIGHT) * 43;
         }
         Rectangle bounds = new Rectangle(topLeft.x, topLeft.y, slot.rightEdge() - topLeft.x - 5, y - topLeft.y);
-        return new PlayerAreaFrame(bounds, mainColor, accentColor, g2.getStroke());
+        return new PlayerAreaFrame(bounds, mainColor, accentColor, Strokes.STROKE_2);
     }
 }
