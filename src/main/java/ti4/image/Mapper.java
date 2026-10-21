@@ -1426,7 +1426,7 @@ public class Mapper {
     }
 
     private static boolean isValidAsyncUnitID(String asyncUnitID) {
-        return getUnitIDList().contains(asyncUnitID);
+        return units.values().stream().anyMatch(unit -> Objects.equals(asyncUnitID, unit.getAsyncId()));
     }
 
     public static Set<String> getUnitIDList() {
