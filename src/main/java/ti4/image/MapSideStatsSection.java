@@ -7,7 +7,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Storage;
-import ti4.image.playerarea.PlayerAreaGenerator;
+import ti4.image.playerarea.PlayerAreaColumns;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 final class MapSideStatsSection {
@@ -16,7 +16,7 @@ final class MapSideStatsSection {
 
     static boolean drawsPlayerInfo(Game game, DisplayType displayType, FogView fog) {
         return displayType != DisplayType.stats
-                && !PlayerAreaGenerator.isMegaGame(game)
+                && !PlayerAreaColumns.isMegaGame(game)
                 && (!fog.isPrivate() || !game.getFowOption(FOWOption.HIDE_PLAYER_INFOS));
     }
 

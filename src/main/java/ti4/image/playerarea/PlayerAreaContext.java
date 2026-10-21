@@ -16,7 +16,6 @@ public final class PlayerAreaContext {
     private final Player viewer;
     private final WebsiteOverlays overlays;
     private final NeighbourMap neighbours;
-    private final int scoreTokenSpacing;
     private final ReinforcementCounts reinforcementCounts = new ReinforcementCounts();
 
     private PlayerAreaContext(
@@ -25,15 +24,13 @@ public final class PlayerAreaContext {
             boolean fogPrivate,
             @Nullable Player viewer,
             WebsiteOverlays overlays,
-            NeighbourMap neighbours,
-            int scoreTokenSpacing) {
+            NeighbourMap neighbours) {
         this.g2 = g2;
         this.game = game;
         this.fogPrivate = fogPrivate;
         this.viewer = viewer;
         this.overlays = overlays;
         this.neighbours = neighbours;
-        this.scoreTokenSpacing = scoreTokenSpacing;
     }
 
     public static PlayerAreaContext of(
@@ -42,13 +39,12 @@ public final class PlayerAreaContext {
             boolean fogPrivate,
             @Nullable Player viewer,
             WebsiteOverlays overlays,
-            NeighbourMap neighbours,
-            int scoreTokenSpacing) {
-        return new PlayerAreaContext(g2, game, fogPrivate, viewer, overlays, neighbours, scoreTokenSpacing);
+            NeighbourMap neighbours) {
+        return new PlayerAreaContext(g2, game, fogPrivate, viewer, overlays, neighbours);
     }
 
     public static PlayerAreaContext publicView(Graphics2D g2, Game game, WebsiteOverlays overlays) {
-        return of(g2, game, false, null, overlays, new NeighbourMap(game), 54);
+        return of(g2, game, false, null, overlays, new NeighbourMap(game));
     }
 
     Graphics2D g2() {
@@ -74,10 +70,6 @@ public final class PlayerAreaContext {
 
     NeighbourMap neighbours() {
         return neighbours;
-    }
-
-    int scoreTokenSpacing() {
-        return scoreTokenSpacing;
     }
 
     ReinforcementCounts reinforcementCounts() {
