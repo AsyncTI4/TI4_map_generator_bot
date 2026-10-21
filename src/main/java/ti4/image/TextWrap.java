@@ -21,10 +21,17 @@ final class TextWrap {
             return new Lines(text, null);
         }
         if (breakAtLastSpace) {
-            while (trimmed < length && text.charAt(length - trimmed) != ' ') {
-                trimmed++;
-            }
+            trimmed = trimmedToLastSpace(text, trimmed);
         }
         return new Lines(text.substring(0, length - trimmed), text.substring(length - trimmed));
+    }
+
+    private static int trimmedToLastSpace(String text, int trimmed) {
+        int length = text.length();
+        int atSpace = trimmed;
+        while (atSpace < length && text.charAt(length - atSpace) != ' ') {
+            atSpace++;
+        }
+        return atSpace < length ? atSpace : trimmed;
     }
 }

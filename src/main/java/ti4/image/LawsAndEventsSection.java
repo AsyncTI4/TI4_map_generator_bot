@@ -94,7 +94,7 @@ final class LawsAndEventsSection {
             EventModel eventModel = Mapper.getEvent(event.getKey());
 
             CardBox.drawText(
-                    g2, x, y, Color.WHITE, 30, eventModel.getName(), eventNumberID + eventModel.getMapText(), false);
+                    g2, x, y, Color.WHITE, 30, eventModel.getName(), eventNumberID + eventModel.getMapText(), true);
             try {
                 paintIcon(g2, "event.png", x, y);
             } catch (Exception e) {
