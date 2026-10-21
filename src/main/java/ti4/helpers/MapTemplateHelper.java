@@ -1,8 +1,5 @@
 package ti4.helpers;
 
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -14,18 +11,13 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.image.draw.OutlinedText;
-import ti4.image.draw.TextWrap;
-import ti4.image.io.Fonts;
+import ti4.image.draft.TemplatePreview;
 import ti4.image.io.ImageUploads;
-import ti4.image.tile.TileLayers;
-import ti4.image.tile.TileStep;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 import ti4.model.TileHelper;
 import ti4.service.map.AddTileListService;
 import ti4.service.map.AddTileService;
@@ -239,45 +231,6 @@ public final class MapTemplateHelper {
 
     public static FileUpload generateTemplatePreviewImage(
             GenericInteractionCreateEvent event, Game game, MapTemplateModel model) {
-        TileLayers tileLayers = TileLayers.of(game, event, DisplayType.all);
-
-        int rings = model.numRings();
-        int size = (rings * 2 + 1) * 300 + 200;
-        BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = img.createGraphics();
-
-        Point mr = PositionMapper.getTilePosition("000");
-        if (mr == null) mr = new Point(0, 0);
-        Point center = new Point(size / 2 - 173 - mr.x, size / 2 - 150 - mr.y);
-
-        for (MapTemplateTile tile : model.getTemplateTiles()) {
-            Point pos = PositionMapper.getTilePosition(tile.getPos());
-            if (pos == null) continue;
-
-            Tile toAdd = getTileFromTemplateTile(tile);
-            if (toAdd != null) {
-                BufferedImage tileImg = tileLayers.draw(toAdd, TileStep.Tile);
-                g2.drawImage(tileImg, pos.x + center.x - 100, pos.y + center.y - 100, null);
-            }
-        }
-        g2.setFont(Fonts.ti(80));
-        int y = 100;
-        OutlinedText.draw(g2, "Template: " + model.getAlias(), 10, y, null, null, null, null, null);
-        y += 100;
-        if (model.getAuthor() != null) {
-            // g2.(Storage);
-            g2.setFont(Fonts.ti(64));
-            OutlinedText.draw(g2, "Author: " + model.getAuthor(), 10, y, null, null, null, null, null);
-            y += 70;
-        }
-        if (model.getDescr() != null) {
-            g2.setFont(Fonts.ti(48));
-            List<String> layout = TextWrap.layoutLines(model.getDescr(), g2.getFontMetrics(), 650);
-            for (String line : layout) {
-                OutlinedText.draw(g2, line, 20, y, null, null, null, null, null);
-                y += 70;
-            }
-        }
-        return ImageUploads.createFileUpload(img, model.getAlias());
+        return ImageUploads.createFileUpload(TemplatePreview.render(event, game, model), model.getAlias());
     }
 }

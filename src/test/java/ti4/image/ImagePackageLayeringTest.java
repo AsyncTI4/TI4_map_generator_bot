@@ -16,8 +16,9 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 /**
- * The image code is layered: map depends on playerarea, tile, draft and card, which depend on draw, which depends on io.
- * The four middle packages never depend on each other, and nothing below map depends on map. Only imports of other
+ * The image code is layered: map depends on playerarea, draft, tile and card; draft also depends on tile, which draws the
+ * tiles it lays out; tile, playerarea and card depend on draw, which depends on io. Playerarea, tile and card never depend
+ * on each other, and nothing below map depends on map. Only imports of other
  * ti4.image packages are checked.
  */
 class ImagePackageLayeringTest {
@@ -34,7 +35,7 @@ class ImagePackageLayeringTest {
             "draw", Set.of("io"),
             "tile", Set.of("draw", "io"),
             "playerarea", Set.of("draw", "io"),
-            "draft", Set.of("draw", "io"),
+            "draft", Set.of("tile", "draw", "io"),
             "card", Set.of("draw", "io"),
             "map", Set.of("playerarea", "tile", "draft", "card", "draw", "io"));
 
