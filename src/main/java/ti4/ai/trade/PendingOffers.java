@@ -149,6 +149,8 @@ class PendingOffers {
         TechnologyRequest.noteProposalAccepted(context, partner, pending.purpose());
         if (pending.purpose().settles()) {
             context.memory().put(TradeCardRules.settledKey(context.game(), partner), ACCEPTED);
+            if (pending.purpose() != Purpose.FACILITATION_SETTLE)
+                TradeCardRules.stampPaid(context.game(), partner, context.seat());
         }
     }
 

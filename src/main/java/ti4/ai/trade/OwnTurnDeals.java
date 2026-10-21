@@ -63,6 +63,8 @@ class OwnTurnDeals {
         if (partners.isEmpty()) return Optional.empty();
         Optional<AiDecision> payment = payDebt(context, partners);
         if (payment.isPresent()) return payment;
+        Optional<AiDecision> facilitation = Facilitation.start(context, partners);
+        if (facilitation.isPresent()) return facilitation;
         if (TradeMemory.count(context.memory(), turnDraftsKey(context)) >= OWN_TURN_DRAFTS) return Optional.empty();
         Optional<AiDecision> announced = TechnologyRequest.announce(context, partners);
         if (announced.isPresent()) return announced;
@@ -292,6 +294,10 @@ class OwnTurnDeals {
             }
         }
         return Optional.empty();
+    }
+
+    static void noteApproach(AiTurnContext context, Player partner) {
+        if (!AiSeats.isAiSeat(partner)) TradeMemory.increment(context.memory(), unsolicitedKey(context, partner));
     }
 
     static boolean mayApproach(AiTurnContext context, Player partner) {

@@ -44,6 +44,7 @@ class OfferBuilder {
             Purpose.NOTE_DEAL,
             Purpose.FRAGMENT_DEAL,
             Purpose.DESPERATION,
+            Purpose.AGENT_TRADE,
             Purpose.TECHNOLOGY_REQUEST,
             Purpose.TECHNOLOGY_HOLD,
             Purpose.DEBT_PAYMENT,

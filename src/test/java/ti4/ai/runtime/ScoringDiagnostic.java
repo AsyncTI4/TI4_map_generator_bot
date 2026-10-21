@@ -73,7 +73,8 @@ final class ScoringDiagnostic {
             List<String> crowdedOut,
             List<String> brokeAffordable,
             List<String> cards,
-            String board) {
+            String board,
+            String tradeGoodSources) {
 
         Optional<Standing> bestMissedPublic() {
             if (!scoredPublics.isEmpty()) return Optional.empty();
@@ -124,6 +125,41 @@ final class ScoringDiagnostic {
     // Spends that took an affordable, unscored spend objective out of reach ("objective <- purpose"), by round.
     private final Map<Integer, Map<String, List<String>>> broke = new HashMap<>();
     private final Set<Integer> closedRounds = new HashSet<>();
+    // Trade primary played by each seat, by round, read at status time while the card is still marked played.
+    private final Map<Integer, Set<String>> tradePrimary = new HashMap<>();
+    java.util.function.Supplier<List<SelfPlayEnvironment.TradeRecord>> ledger = List::of;
+    private static final java.util.regex.Pattern ITEM =
+            java.util.regex.Pattern.compile("^sending([^_]+)_receiving([^_]+)_([A-Za-z]+)_(\\d{1,6})$");
+
+    // Where the seat's trade goods came from and went in one round: the Trade primary, goods received and sent through
+    // accepted offers by purpose (commodities received arrive as trade goods), the expedition spend, and the trade
+    // goods it still needed for Amass Wealth at status.
+    private String tradeGoodSources(int round, String faction) {
+        Map<String, int[]> byPurpose = new TreeMap<>();
+        for (SelfPlayEnvironment.TradeRecord trade : ledger.get()) {
+            if (trade.round() != round) continue;
+            String purpose = trade.label().isEmpty() ? "other" : trade.label();
+            for (String item : trade.items()) {
+                java.util.regex.Matcher matcher = ITEM.matcher(item);
+                if (!matcher.matches() || !List.of("TGs", "Comms").contains(matcher.group(3))) continue;
+                int amount = Integer.parseInt(matcher.group(4));
+                int[] flow = byPurpose.computeIfAbsent(purpose, key -> new int[2]);
+                if (faction.equals(matcher.group(2))) flow[0] += amount;
+                if (faction.equals(matcher.group(1))) flow[1] += amount;
+            }
+        }
+        List<String> parts = new ArrayList<>();
+        if (tradePrimary.getOrDefault(round, Set.of()).contains(faction)) parts.add("primary +3");
+        byPurpose.forEach((purpose, flow) -> parts.add(purpose + " in " + flow[0] + " out " + flow[1]));
+        int expedition =
+                spendsAtStatus.getOrDefault(round, Map.of()).getOrDefault(faction, Map.of()).entrySet().stream()
+                        .filter(entry -> entry.getKey().contains("expedition"))
+                        .mapToInt(entry -> entry.getValue().tradeGoods())
+                        .sum();
+        if (expedition > 0) parts.add("expedition -" + expedition);
+        return String.join(", ", parts);
+    }
+
     final List<SeatRound> results = new ArrayList<>();
 
     void onDecision(AiTurnContext context, AiDecision decision) {
@@ -132,6 +168,9 @@ final class ScoringDiagnostic {
         if (game == null || seat == null) return;
         settle(game, seat);
         if (decision instanceof AiDecision.Press press) lastPurpose.put(seat.getFaction(), purpose(press.reason()));
+        if (decision instanceof AiDecision.Announce announce && announce.text().contains("plays **Trade**"))
+            System.out.println("TRADEANN r" + game.getRound() + " " + seat.getFaction() + " "
+                    + announce.text().replace("\n", " "));
     }
 
     // Called by the harness on every step with the live game.
@@ -220,6 +259,11 @@ final class ScoringDiagnostic {
         for (Player seat : game.getRealPlayers()) {
             settle(game, seat);
             String faction = seat.getFaction();
+            if (seat.getSCs().stream()
+                    .anyMatch(card -> game.getPlayedSCs().contains(card)
+                            && ti4.ai.brain.StrategyCard.of(game, card) == ti4.ai.brain.StrategyCard.TRADE)) {
+                tradePrimary.computeIfAbsent(round, key -> new HashSet<>()).add(faction);
+            }
             scoredSoFar.put(faction, scored(game, seat));
             Wallet wallet = Wallet.of(game, seat);
             Wallet unspent = unspent(game, seat, wallet, round);
@@ -325,7 +369,8 @@ final class ScoringDiagnostic {
                     crowdedOut.get(round).getOrDefault(faction, List.of()),
                     broke.getOrDefault(round, Map.of()).getOrDefault(faction, List.of()),
                     cards.getOrDefault(round, Map.of()).getOrDefault(faction, List.of()),
-                    statusBoard.getOrDefault(round, Map.of()).getOrDefault(faction, "")));
+                    statusBoard.getOrDefault(round, Map.of()).getOrDefault(faction, ""),
+                    tradeGoodSources(round, faction)));
         }
     }
 
@@ -621,6 +666,7 @@ final class ScoringDiagnostic {
         if (!seat.brokeAffordable().isEmpty())
             parts.put("broke", seat.brokeAffordable().toString());
         parts.put("spent", top(seat.spends(), 8));
+        parts.put("tgsources", "{" + seat.tradeGoodSources() + "}");
         return String.format(
                 "SCOREDIAG g r%d %-8s cards %s %s | %s",
                 seat.round(),

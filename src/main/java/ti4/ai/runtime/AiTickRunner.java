@@ -21,6 +21,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.FactionBrain;
 import ti4.ai.brain.FactionBrainRegistry;
+import ti4.ai.deal.HumanAiDealMessage;
 import ti4.ai.fallback.AiConfusionService;
 import ti4.ai.fallback.DelegatedPress;
 import ti4.ai.perception.AiPerception;
@@ -192,6 +193,10 @@ class AiTickRunner {
             case AiDecision.Idle idle -> handleIdle(tick);
             case AiDecision.Announce announce -> {
                 if (AiRuntime.mayMutate()) AiConfusionService.notice(tick.game(), announce.text());
+                yield SeatResult.act();
+            }
+            case AiDecision.Propose propose -> {
+                if (AiRuntime.mayMutate()) HumanAiDealMessage.post(tick.game(), propose.deal());
                 yield SeatResult.act();
             }
         };

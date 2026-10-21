@@ -270,6 +270,8 @@ public class NekroBrain implements FactionBrain {
             PromissoryRules::holdForCeasefire,
             TradeRules::continueDraft,
             TradeRules::settleTrade,
+            TradeRules::carthDeal,
+            TradeRules::carthPreWash,
             TradeRules::startDeals,
             this::takeTurn,
             StrategyCardRules::follow,

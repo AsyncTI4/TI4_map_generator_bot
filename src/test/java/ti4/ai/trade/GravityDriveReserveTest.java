@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.scoring.SpendCost;
 import ti4.ai.strategy.OpeningHold;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.tactical.ProductionPlanner;
@@ -99,6 +100,20 @@ class GravityDriveReserveTest extends BaseTi4Test {
         assertThat(ti4.ai.scoring.ScoringReserve.expectedTradeGoodsCounted(test.game, hacan))
                 .isEqualTo(5);
         assertThat(ProductionPlanner.reserve(test.game, hacan).resources()).isEqualTo(FOLLOW_COST);
+    }
+
+    // Amass Wealth's reserve and the Gravity Drive follow both stay reserved when the planets and trade goods cover the
+    // two together.
+    @Test
+    void keepsBothReservesWhenTheyFit() {
+        test.sol.addSC(TECHNOLOGY);
+        hacan.addPlanet("lodor");
+        hacan.setTg(8);
+        test.game.getRevealedPublicObjectives().put("amass_wealth", 1);
+        changed();
+
+        assertThat(OpeningHold.awaitsGravityDrive(test.game, hacan)).isTrue();
+        assertThat(ProductionPlanner.reserve(test.game, hacan)).isEqualTo(new SpendCost(7, 3, 3, 0));
     }
 
     // Nobody holds Technology: there is nothing to wait for, and the same seat may spend freely.

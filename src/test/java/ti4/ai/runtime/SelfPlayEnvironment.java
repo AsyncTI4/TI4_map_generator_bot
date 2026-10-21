@@ -111,7 +111,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
     // Sees every decision a seat makes, with the board it made it on; a harness sets it to follow what seats spend.
     volatile java.util.function.BiConsumer<AiTurnContext, AiDecision> decisionListener = (context, decision) -> {};
 
-    record TradeRecord(int round, String from, String to, List<String> items) {}
+    record TradeRecord(int round, String from, String to, List<String> items, String label) {}
 
     // The strategy card (by initiative) a seat overruled, the round it did so in, and the seat's victory points when it
     // did and when its turn ended (-1 while the turn is still running).
@@ -358,7 +358,12 @@ final class SelfPlayEnvironment implements AutoCloseable {
         if (offerer == null || accepter == null) return Optional.empty();
         List<String> items = List.copyOf(offerer.getTransactionItemsWithPlayer(accepter));
         if (items.isEmpty()) return Optional.empty();
-        return Optional.of(new TradeRecord(current.getRound(), offerer.getFaction(), accepter.getFaction(), items));
+        String label;
+        synchronized (tradeLedger) {
+            label = lastOfferLabel.getOrDefault(offerer.getFaction() + ">" + accepter.getFaction(), "");
+        }
+        return Optional.of(
+                new TradeRecord(current.getRound(), offerer.getFaction(), accepter.getFaction(), items, label));
     }
 
     // The engine clears the offerer's items once it carries the offer out; a refused Accept leaves them.
@@ -644,6 +649,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
             case AiDecision.Wait wait -> "wait (" + wait.reason() + ")";
             case AiDecision.Idle idle -> "idle";
             case AiDecision.Announce announce -> "announce (" + announce.text() + ")";
+            case AiDecision.Propose propose -> "propose (" + propose.deal().purpose() + ")";
         };
     }
 

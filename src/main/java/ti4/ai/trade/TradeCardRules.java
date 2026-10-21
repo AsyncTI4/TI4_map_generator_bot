@@ -48,6 +48,7 @@ public class TradeCardRules {
     private static final String UNFOLLOWED_KEY = "tradeUnfollowed|";
     private static final String FOLLOW_PRESSED_KEY = "tradeFollowPressed|";
     private static final String HOLD_SINCE_KEY = "tradeHoldSince|";
+    private static final String PAID_KEY = "tradePaid|";
     private static final String FREE = "free";
     private static final String TOKEN = "token";
     private static final String SENT = "sent";
@@ -135,7 +136,10 @@ public class TradeCardRules {
 
     public static int reservedCommodities(AiTurnContext context) {
         Optional<Player> holder = heldFor(context);
-        return holder.isPresent() ? context.seat().getCommoditiesTotal() : 0;
+        if (holder.isEmpty()) return 0;
+        Player seat = context.seat();
+        int total = seat.getCommoditiesTotal();
+        return TradeTerms.mastersOfTrade(seat) ? Math.min(total, holder.get().getCommodities()) : total;
     }
 
     static boolean holdsFor(AiTurnContext context, Player partner) {
@@ -165,6 +169,18 @@ public class TradeCardRules {
         context.memory().put(honouredKey(context.game(), holder), String.valueOf(context.now()));
     }
 
+    static void stampPaid(Game game, Player follower, Player settler) {
+        follower.setStoredValue(PAID_KEY + game.getRound(), settler.getFaction());
+    }
+
+    static boolean paid(Game game, Player follower) {
+        return !paidTo(game, follower).isEmpty();
+    }
+
+    static String paidTo(Game game, Player follower) {
+        return follower.getStoredValue(PAID_KEY + game.getRound());
+    }
+
     static String settledKey(Game game, Player follower) {
         return SETTLED_KEY + game.getRound() + KEY_SEPARATOR + follower.getFaction();
     }
@@ -191,6 +207,7 @@ public class TradeCardRules {
 
     private static boolean waitsForAnswer(AiTurnContext context, Player follower) {
         return context.memory().has(settledKey(context.game(), follower))
+                || paid(context.game(), follower)
                 || PendingOffers.with(context, follower)
                 || IncomingOffer.liveFrom(context, follower);
     }
@@ -318,7 +335,7 @@ public class TradeCardRules {
                 .filter(holder -> !memory.has(honouredKey(game, holder)));
     }
 
-    private static Optional<Player> tradeHolder(Game game, Player seat) {
+    static Optional<Player> tradeHolder(Game game, Player seat) {
         return Standings.others(game, seat).stream()
                 .filter(other -> playedTrade(game, other).isPresent())
                 .findFirst();
@@ -394,7 +411,7 @@ public class TradeCardRules {
         return Set.of(StringUtils.split(current, ENTRIES));
     }
 
-    private static List<Player> followers(Game game, int card, Player holder) {
+    static List<Player> followers(Game game, int card, Player holder) {
         Set<String> factions = followerFactions(game, card);
         return Standings.others(game, holder).stream()
                 .filter(player -> factions.contains(player.getFaction()))
@@ -414,7 +431,7 @@ public class TradeCardRules {
         return context.memory().get(followKey(context.game(), follower)).orElse(FREE);
     }
 
-    private static OptionalInt playedTrade(Game game, Player holder) {
+    static OptionalInt playedTrade(Game game, Player holder) {
         return holder.getSCs().stream()
                 .filter(card -> game.getPlayedSCs().contains(card))
                 .filter(card -> StrategyCard.of(game, card) == StrategyCard.TRADE)
@@ -422,7 +439,7 @@ public class TradeCardRules {
                 .findFirst();
     }
 
-    private static boolean followed(Game game, int card, Player seat) {
+    static boolean followed(Game game, int card, Player seat) {
         return followerFactions(game, card).contains(seat.getFaction());
     }
 

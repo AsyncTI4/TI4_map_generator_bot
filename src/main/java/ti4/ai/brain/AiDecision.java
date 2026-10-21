@@ -1,5 +1,6 @@
 package ti4.ai.brain;
 
+import ti4.ai.deal.HumanAiDeal;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 
@@ -14,6 +15,8 @@ public sealed interface AiDecision {
     record Idle() implements AiDecision {}
 
     record Announce(String text) implements AiDecision {}
+
+    record Propose(HumanAiDeal deal) implements AiDecision {}
 
     static AiDecision press(AiPrompt prompt, PromptButton button, String reason) {
         return new Press(prompt, button, reason);
