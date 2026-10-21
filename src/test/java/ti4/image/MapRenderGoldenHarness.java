@@ -82,7 +82,8 @@ class MapRenderGoldenHarness extends BaseTi4Test {
         SEGMENTS,
         BOARDS,
         HIDE_FLIP,
-        DISTANCES
+        DISTANCES,
+        PLAYER_AREA_VARIETY
     }
 
     private record Spec(
@@ -311,6 +312,7 @@ class MapRenderGoldenHarness extends BaseTi4Test {
             case HIDE_FLIP ->
                 game.setFowOption(FOWOption.HIDE_PLAYER_INFOS, !game.getFowOption(FOWOption.HIDE_PLAYER_INFOS));
             case DISTANCES -> applyDistances(game);
+            case PLAYER_AREA_VARIETY -> PlayerAreaVariety.apply(game);
         }
     }
 
@@ -385,6 +387,10 @@ class MapRenderGoldenHarness extends BaseTi4Test {
         if (distances) {
             specs.add(new Spec("dist-all", DisplayType.all, false, null, Mutation.DISTANCES, false));
             specs.add(new Spec("dist-map", DisplayType.map, false, null, Mutation.DISTANCES, false));
+            for (DisplayType type : List.of(DisplayType.all, DisplayType.landscape, DisplayType.stats)) {
+                specs.add(
+                        new Spec("variety-pub-" + type.name(), type, false, null, Mutation.PLAYER_AREA_VARIETY, false));
+            }
         }
         if (eager) {
             for (DisplayType type : List.of(DisplayType.all, DisplayType.landscape, DisplayType.stats)) {
