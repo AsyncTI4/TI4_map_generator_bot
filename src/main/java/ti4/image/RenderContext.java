@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.game.Game;
 import ti4.helpers.DisplayType;
+import ti4.image.playerarea.PlayerAreaWarnings;
 
 final class RenderContext {
 
@@ -21,6 +22,7 @@ final class RenderContext {
     private final int scoreTokenSpacing;
     private final BoardLayout board;
     private final MapCanvasLayout canvas;
+    private PlayerAreaWarnings playerAreaWarnings = PlayerAreaWarnings.none();
 
     private RenderContext(
             Game game,
@@ -148,5 +150,13 @@ final class RenderContext {
 
     MapCanvasLayout canvas() {
         return canvas;
+    }
+
+    PlayerAreaWarnings playerAreaWarnings() {
+        return playerAreaWarnings;
+    }
+
+    void replacePlayerAreaWarnings(PlayerAreaWarnings warnings) {
+        playerAreaWarnings = warnings;
     }
 }

@@ -5,7 +5,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.image.ImageHelper;
-import ti4.message.MessageHelper;
 
 final class CrimsonRebellionTokens {
 
@@ -29,7 +28,7 @@ final class CrimsonRebellionTokens {
         String breachFile = ResourceHelper.getInstance().getTokenFile(Constants.TOKEN_BREACH_ACTIVE);
         int totalBreaches = countBreaches(ctx.game());
         if (totalBreaches > BREACH_TOKENS) {
-            warnTooMany(player, "Breach tokens");
+            warnTooMany(ctx, player, "breach", totalBreaches, "Breach tokens");
         }
         return TokenSupply.drawRemaining(
                 ctx,
@@ -49,7 +48,7 @@ final class CrimsonRebellionTokens {
                 .filter(unitHolder -> unitHolder.getTokenList().contains(Constants.TOKEN_SEVERED))
                 .count();
         if (severTokens > SEVER_TOKENS) {
-            warnTooMany(player, "Sever tokens");
+            warnTooMany(ctx, player, "sever", severTokens, "Sever tokens");
         }
         return TokenSupply.drawRemaining(
                 ctx,
@@ -70,9 +69,9 @@ final class CrimsonRebellionTokens {
                 .count();
     }
 
-    private static void warnTooMany(Player player, String tokens) {
+    private static void warnTooMany(PlayerAreaContext ctx, Player player, String kind, int count, String tokens) {
         String message = player.getRepresentation() + ", there are too many " + tokens
                 + " on the board. Please review and resolve manually.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        ctx.warnings().warn(player, kind, count, message);
     }
 }

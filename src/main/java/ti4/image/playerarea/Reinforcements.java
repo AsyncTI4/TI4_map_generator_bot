@@ -22,9 +22,7 @@ import ti4.image.PositionMapper;
 import ti4.image.UnitTokenPosition;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
-import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
-import ti4.service.fow.GMService;
 
 final class Reinforcements {
 
@@ -104,7 +102,7 @@ final class Reinforcements {
         }
 
         if (!game.isHasEnded() && numInReinforcements < 0 && game.isCcNPlasticLimit()) {
-            warnOverLimit(game, player, unitKey);
+            warnOverLimit(ctx, player, unitKey, numInReinforcements);
         }
 
         int offset = 0;
@@ -138,15 +136,17 @@ final class Reinforcements {
         return numInReinforcements;
     }
 
-    private static void warnOverLimit(Game game, Player player, UnitKey unitKey) {
+    private static void warnOverLimit(PlayerAreaContext ctx, Player player, UnitKey unitKey, int inReinforcements) {
+        Game game = ctx.game();
         String unitName = unitKey.unitType().humanReadableName();
         String warningMessage = player.getRepresentation()
                 + " is exceeding unit plastic or cardboard limits for " + unitName
                 + ". Use buttons to remove (note that you cannot remove plastic pieces from systems with your command token in them).";
         List<Button> removeButtons =
                 ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, unitKey.asyncID());
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), warningMessage, removeButtons);
-        GMService.logPlayerActivity(game, player, warningMessage);
+        ctx.warnings()
+                .warnWithButtons(
+                        player, "plastic_" + unitKey.asyncID(), inReinforcements, warningMessage, removeButtons);
     }
 
     private static void drawCommandTokens(PlayerAreaContext ctx, Player player, int x, int y) {

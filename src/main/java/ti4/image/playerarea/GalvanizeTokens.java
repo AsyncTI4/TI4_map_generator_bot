@@ -5,7 +5,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.UnitHolder;
 import ti4.image.ImageHelper;
-import ti4.message.MessageHelper;
 
 final class GalvanizeTokens {
 
@@ -26,7 +25,7 @@ final class GalvanizeTokens {
         if (!game.isFrankenGame() && !hasNonBastionGalvanizeSource(game) && galvanized > GALVANIZE_TOKENS) {
             String message = player.getRepresentation()
                     + ", there are too many Galvanized units on the board. Please review and resolve manually.";
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            ctx.warnings().warn(player, "galvanize", galvanized, message);
         }
         return TokenSupply.drawRemaining(
                 ctx,

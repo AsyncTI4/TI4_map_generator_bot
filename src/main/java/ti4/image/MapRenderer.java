@@ -26,7 +26,8 @@ final class MapRenderer {
         timings.stopDraw();
         boolean eligibleForWebsite =
                 ctx.basicType() == DisplayType.all && !ctx.fog().isPrivate();
-        return new MapRenderResult(canvas, encoded, ctx.overlays().asList(), eligibleForWebsite);
+        return new MapRenderResult(
+                canvas, encoded, ctx.overlays().asList(), eligibleForWebsite, ctx.playerAreaWarnings());
     }
 
     static BufferedImage paint(RenderContext ctx, RenderTimings timings) {

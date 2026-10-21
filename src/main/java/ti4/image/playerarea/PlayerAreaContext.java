@@ -17,6 +17,7 @@ public final class PlayerAreaContext {
     private final WebsiteOverlays overlays;
     private final NeighbourMap neighbours;
     private final ReinforcementCounts reinforcementCounts = new ReinforcementCounts();
+    private final PlayerAreaWarnings warnings = PlayerAreaWarnings.none();
 
     private PlayerAreaContext(
             Graphics2D g2,
@@ -74,6 +75,10 @@ public final class PlayerAreaContext {
 
     ReinforcementCounts reinforcementCounts() {
         return reinforcementCounts;
+    }
+
+    public PlayerAreaWarnings warnings() {
+        return warnings;
     }
 
     boolean hidesStatsOf(Player player) {
