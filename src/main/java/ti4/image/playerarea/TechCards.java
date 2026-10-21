@@ -22,7 +22,6 @@ import ti4.image.io.Fonts;
 import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
-import ti4.service.VeiledHeartService;
 import ti4.service.VeiledHeartService.VeiledCardType;
 
 final class TechCards {
@@ -51,11 +50,11 @@ final class TechCards {
         deltaX = drawGroup(ctx, player, x, y, techsByColour.get(Constants.BIOTIC), exhaustedTechs, deltaX);
 
         if (game.isVeiledHeartMode()) {
-            deltaX = VeiledHeartService.veiledField(g2, x, y, VeiledCardType.ABILITY, deltaX, player);
+            deltaX = VeiledCards.draw(g2, x, y, VeiledCardType.ABILITY, deltaX, player);
         }
         deltaX = UnitUpgradeSheet.draw(ctx, player, techsByColour.get(Constants.UNIT_UPGRADE), x + deltaX, y) - x;
         if (game.isVeiledHeartMode()) {
-            deltaX = VeiledHeartService.veiledField(g2, x, y, VeiledCardType.UNIT, deltaX, player);
+            deltaX = VeiledCards.draw(g2, x, y, VeiledCardType.UNIT, deltaX, player);
         }
 
         List<String> purgedTechs = player.getPurgedTechs();

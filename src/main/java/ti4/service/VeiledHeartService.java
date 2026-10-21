@@ -1,7 +1,5 @@
 package ti4.service;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,8 +23,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTwilightsFallActionCards;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
-import ti4.image.draw.VerticalText;
-import ti4.image.io.Fonts;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.Mapper;
@@ -729,18 +725,5 @@ public class VeiledHeartService {
         if (player.hasTech(card)) {
             game.setStoredValue("TFTelepathicHolder", player.getFaction());
         }
-    }
-
-    public static int veiledField(Graphics2D graphics, int x, int y, VeiledCardType type, int deltaX, Player player) {
-        graphics.setColor(Color.LIGHT_GRAY);
-        graphics.setFont(Fonts.ti(18));
-        String text = "VEILED\n" + type.toString();
-        long cardCount = getVeiledCards(type, player).count();
-        for (long l = 0; l < cardCount; ++l) {
-            VerticalText.drawOneOrTwoLines(graphics, text, x + deltaX + 7, y + 116, 116);
-            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
-            deltaX += 48;
-        }
-        return deltaX;
     }
 }

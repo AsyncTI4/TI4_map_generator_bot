@@ -18,7 +18,6 @@ import ti4.image.draw.VerticalText;
 import ti4.image.io.Fonts;
 import ti4.model.LeaderModel;
 import ti4.model.Mapper;
-import ti4.service.VeiledHeartService;
 import ti4.service.VeiledHeartService.VeiledCardType;
 
 final class LeaderCards {
@@ -45,7 +44,7 @@ final class LeaderCards {
         boolean shouldDrawVeiledGenomes = game.isVeiledHeartMode();
         for (Leader leader : allLeaders) {
             if (shouldDrawVeiledGenomes && !Constants.AGENT.equalsIgnoreCase(leader.getType())) {
-                deltaX = VeiledHeartService.veiledField(g2, x, y, VeiledCardType.GENOME, deltaX, player);
+                deltaX = VeiledCards.draw(g2, x, y, VeiledCardType.GENOME, deltaX, player);
                 shouldDrawVeiledGenomes = false;
             }
             deltaX = drawLeader(ctx, leader, x + deltaX, y) - x;
@@ -53,9 +52,9 @@ final class LeaderCards {
 
         if (game.isVeiledHeartMode()) {
             if (shouldDrawVeiledGenomes) {
-                deltaX = VeiledHeartService.veiledField(g2, x, y, VeiledCardType.GENOME, deltaX, player);
+                deltaX = VeiledCards.draw(g2, x, y, VeiledCardType.GENOME, deltaX, player);
             }
-            deltaX = VeiledHeartService.veiledField(g2, x, y, VeiledCardType.PARADIGM, deltaX, player);
+            deltaX = VeiledCards.draw(g2, x, y, VeiledCardType.PARADIGM, deltaX, player);
         }
 
         if (player.hasAbility("imperia") || player.hasAbility("imperia_y")) {
