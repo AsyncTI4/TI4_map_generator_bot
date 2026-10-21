@@ -44,9 +44,9 @@ final class MapSideStatsSection {
                     continue;
                 }
                 List<String> tiles = layout.playerStatTiles().get(player.getFaction());
-                hexTileStats.paintPlayerInfo(game, player, tiles);
+                hexTileStats.paintPlayerInfo(player, tiles);
             } else {
-                anchorStats.paintPlayerInfoOld(game, player, ringCount);
+                anchorStats.paintPlayerInfoOld(player, ringCount);
             }
         }
     }

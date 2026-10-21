@@ -24,17 +24,19 @@ import ti4.model.PositionMapper;
 
 final class AnchorStats {
 
+    private final Game game;
     private final Graphics2D g2;
     private final FogView fog;
     private final BoardLayout board;
 
     AnchorStats(RenderContext ctx, Graphics2D g2) {
+        this.game = ctx.game();
         this.g2 = g2;
         this.fog = ctx.fog();
         this.board = ctx.board();
     }
 
-    void paintPlayerInfoOld(Game game, Player player, int ringCount) {
+    void paintPlayerInfoOld(Player player, int ringCount) {
         int deltaX, deltaSplitX = 0;
         int deltaY, deltaSplitY = 0;
 

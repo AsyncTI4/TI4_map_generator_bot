@@ -33,6 +33,7 @@ import ti4.model.StrategyCardModel;
 
 final class HexTileStats {
 
+    private final Game game;
     private final RenderContext ctx;
     private final Graphics2D g2;
     private final FogView fog;
@@ -40,6 +41,7 @@ final class HexTileStats {
     private final OffBoardHighlights highlights;
 
     HexTileStats(RenderContext ctx, Graphics2D g2) {
+        this.game = ctx.game();
         this.ctx = ctx;
         this.g2 = g2;
         this.fog = ctx.fog();
@@ -47,7 +49,7 @@ final class HexTileStats {
         this.highlights = OffBoardHighlights.forDisplayType(ctx.displayType());
     }
 
-    void paintPlayerInfo(Game game, Player player, List<String> statTiles) {
+    void paintPlayerInfo(Player player, List<String> statTiles) {
         boolean convertToGeneric = fog.shouldConvertToGeneric(player);
         if (convertToGeneric) {
             return;
@@ -89,17 +91,17 @@ final class HexTileStats {
 
         drawFactionIcon(player, statTileMid);
         HorizontalAlign center = HorizontalAlign.Center;
-        drawUsername(game, player, statTileMid, center);
+        drawUsername(player, statTileMid, center);
         drawFactionNameAndColorStroters(player, statTileMid, center);
-        drawVictoryPoints(game, player, statTileMid, center);
-        drawSecretObjectiveIcons(game, player, statTileMid);
+        drawVictoryPoints(player, statTileMid, center);
+        drawSecretObjectiveIcons(player, statTileMid);
         VerticalAlign bottom = VerticalAlign.Bottom;
-        drawStrategyCardNumbers(game, player, statTileMid, center, bottom);
+        drawStrategyCardNumbers(player, statTileMid, center, bottom);
 
         Point miscTile = drawCommandCounters(player, dir1, statTile1, statTile2, dir2);
         int offBoardHighlighting = highlights.draw(g2, game, player, miscTile);
         drawSpeaker(player, miscTile, offBoardHighlighting);
-        drawPassedActiveOrAfk(game, player, miscTile, center);
+        drawPassedActiveOrAfk(player, miscTile, center);
     }
 
     private void drawFactionIcon(Player player, Point statTileMid) {
@@ -111,7 +113,7 @@ final class HexTileStats {
         FactionIcons.drawFaded(g2, player, point.x, point.y, size, size, 0.40f);
     }
 
-    private void drawUsername(Game game, Player player, Point statTileMid, HorizontalAlign center) {
+    private void drawUsername(Player player, Point statTileMid, HorizontalAlign center) {
         Point point;
         g2.setFont(Storage.getFont32());
         String userName = player.getUserName();
@@ -145,7 +147,7 @@ final class HexTileStats {
         OutlinedText.draw(g2, factionText, point.x, point.y, Color.WHITE, center, null, Strokes.STROKE_5, Color.BLACK);
     }
 
-    private void drawVictoryPoints(Game game, Player player, Point statTileMid, HorizontalAlign center) {
+    private void drawVictoryPoints(Player player, Point statTileMid, HorizontalAlign center) {
         Point point;
         g2.setFont(Storage.getFont32());
         String vpCount = "VP: " + player.getTotalVictoryPoints() + " / " + game.getVp();
@@ -154,7 +156,7 @@ final class HexTileStats {
         OutlinedText.draw(g2, vpCount, point.x, point.y, Color.WHITE, center, null, Strokes.STROKE_5, Color.BLACK);
     }
 
-    private void drawSecretObjectiveIcons(Game game, Player player, Point statTileMid) {
+    private void drawSecretObjectiveIcons(Player player, Point statTileMid) {
         Point point;
         List<String> soToPoList = game.getSoToPoList();
         int unscoredSOs = player.getSecrets().size();
@@ -234,7 +236,7 @@ final class HexTileStats {
     }
 
     private void drawStrategyCardNumbers(
-            Game game, Player player, Point statTileMid, HorizontalAlign center, VerticalAlign bottom) {
+            Player player, Point statTileMid, HorizontalAlign center, VerticalAlign bottom) {
         Point point;
         g2.setFont(Storage.getFont80());
         int scsize = 96;
@@ -277,7 +279,7 @@ final class HexTileStats {
         g2.setFont(Storage.getFont32());
     }
 
-    private void drawPassedActiveOrAfk(Game game, Player player, Point miscTile, HorizontalAlign center) {
+    private void drawPassedActiveOrAfk(Player player, Point miscTile, HorizontalAlign center) {
         Point point;
         String activePlayerID = game.getActivePlayerID();
         String phase = game.getPhaseOfGame();
