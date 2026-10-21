@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,6 +36,11 @@ public class Units {
      * </p>
      */
     public record UnitKey(UnitType unitType, String colorID) {
+
+        @Override
+        public int hashCode() {
+            return 31 * Objects.hashCode(unitType == null ? null : unitType.name()) + Objects.hashCode(colorID);
+        }
 
         @JsonIgnore
         public String getColor() {

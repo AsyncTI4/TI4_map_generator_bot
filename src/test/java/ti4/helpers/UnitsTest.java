@@ -36,6 +36,14 @@ class UnitsTest extends BaseTi4Test {
             return Units.getUnitKey(expectedUnitType, expectedColorId);
         }
 
+        // Enum identity hashes change between JVM runs, which reordered HashMap iteration and unit draw order.
+        @Test
+        void testUnitKeyHashCodeDoesNotDependOnEnumIdentity() {
+            assertEquals(
+                    31 * "Carrier".hashCode() + expectedColorId.hashCode(),
+                    buildUnitKey().hashCode());
+        }
+
         @Test
         void testUnitKeyHasNoUnexpectedProperties() {
             // Given
