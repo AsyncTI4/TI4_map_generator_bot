@@ -14,7 +14,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.TransactionHelper;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
@@ -40,6 +39,7 @@ public final class TransactionGenerator {
     private static final BasicStroke TEXT_OUTLINE = Strokes.STROKE_2;
     private static final BasicStroke COUNT_OUTLINE = Strokes.STROKE_5;
     private static final double NINETY_DEGREES_RADIANS = 1.570_796_326_794_896_6;
+    private static final String DEFAULT_NOTHING_MESSAGE = "Nothing";
     private static final int SHEET_WIDTH = 500;
     private static final int SHEET_HEIGHT = 160;
     private static final int SHEET_MARGIN = 5;
@@ -327,13 +327,8 @@ public final class TransactionGenerator {
     }
 
     private static String nothingMessage(Game game, Player sender) {
-        String key = sender.getFaction() + "NothingMessage";
-        String nothing = game.getStoredValue(key);
-        if (nothing.isEmpty()) {
-            nothing = TransactionHelper.getNothingMessage();
-            game.setStoredValue(key, nothing);
-        }
-        return nothing;
+        String stored = game.getStoredValue(sender.getFaction() + "NothingMessage");
+        return stored.isEmpty() ? DEFAULT_NOTHING_MESSAGE : stored;
     }
 
     private static int drawMemeText(Graphics2D g2, String text, int x, int y, HorizontalAlign align) {
