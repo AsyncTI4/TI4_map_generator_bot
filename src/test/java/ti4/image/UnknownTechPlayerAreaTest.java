@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.HashSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,7 +55,7 @@ class UnknownTechPlayerAreaTest extends BaseTi4Test {
         int width = 3000;
         BufferedImage image = new BufferedImage(width, 450, BufferedImage.TYPE_INT_ARGB);
         Graphics graphics = image.getGraphics();
-        new PlayerAreaGenerator(graphics, game, false, null, new ArrayList<>(), width, 54)
+        new PlayerAreaGenerator(graphics, game, false, null, new WebsiteOverlays(), width, 54)
                 .drawPlayerAreaOLD(player, new Point(5, 5));
     }
 }
