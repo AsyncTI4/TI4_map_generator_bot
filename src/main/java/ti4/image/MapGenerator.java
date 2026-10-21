@@ -953,7 +953,16 @@ public class MapGenerator implements AutoCloseable {
         graphics.setClip(previousClip);
     }
 
-    private void drawGame() {
+    BufferedImage drawCanvas() {
+        paintCanvas();
+        return mainImage;
+    }
+
+    List<WebsiteOverlay> overlays() {
+        return websiteOverlays;
+    }
+
+    private void paintCanvas() {
         if (debug) debugTileTime = StopWatch.createStarted();
         drawMapTilesInsideFrame();
         drawConnectionStrip();
@@ -961,6 +970,10 @@ public class MapGenerator implements AutoCloseable {
 
         if (debug) debugImageGraphicsTime = StopWatch.createStarted();
         drawImage();
+    }
+
+    private void drawGame() {
+        paintCanvas();
         if (mainImage.getWidth() > WEBP_MAX_DIMENSION || mainImage.getHeight() > WEBP_MAX_DIMENSION) {
             mainImageBytes = ImageHelper.writeJpg(mainImage);
             imageFormat = "jpg";
