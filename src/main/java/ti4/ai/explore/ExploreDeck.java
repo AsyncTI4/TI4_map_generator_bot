@@ -13,14 +13,25 @@ public class ExploreDeck {
 
     public record TraitValue(String trait, double value) {}
 
+    private static final ThreadLocal<Integer> ESTIMATING = ThreadLocal.withInitial(() -> 0);
+
+    static boolean estimating() {
+        return ESTIMATING.get() > 0;
+    }
+
     public static double expectedValue(ExploreSite site, String trait) {
         List<String> deck = site.game().getExploreDeck(trait);
         if (deck.isEmpty()) deck = site.game().getExploreDiscard(trait);
         if (deck.isEmpty()) return 0;
         Map<String, Double> valueByKind = new HashMap<>();
         double total = 0;
-        for (String card : deck) {
-            total += valueByKind.computeIfAbsent(CardValue.kind(card), kind -> CardValue.of(card, site));
+        ESTIMATING.set(ESTIMATING.get() + 1);
+        try {
+            for (String card : deck) {
+                total += valueByKind.computeIfAbsent(CardValue.kind(card), kind -> CardValue.of(card, site));
+            }
+        } finally {
+            ESTIMATING.set(ESTIMATING.get() - 1);
         }
         return total / deck.size();
     }

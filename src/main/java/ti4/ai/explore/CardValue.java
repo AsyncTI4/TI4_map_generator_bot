@@ -69,9 +69,17 @@ public class CardValue {
         boolean alreadyReady = seat.getPlanets().contains(planet)
                 && !seat.getExhaustedPlanets().contains(planet);
         if (seat.hasTech(PRE_FAB_ARCOLOGIES) || alreadyReady) return 0;
+        if (ExploreDeck.estimating()) return estimatedReadyValue(site);
         return ReadyingValue.bestSingle(site.game(), seat, List.of(planet))
                 .map(ReadyingValue.Pick::value)
                 .orElse(0.0);
+    }
+
+    private static double estimatedReadyValue(ExploreSite site) {
+        return ExploreValues.ESTIMATED_READY_SHARE
+                * Math.max(
+                        BoardView.planetResources(site.game(), site.planet()),
+                        BoardView.planetInfluence(site.game(), site.planet()));
     }
 
     public static boolean canPlaceMech(ExploreSite site) {

@@ -18,6 +18,7 @@ class ExploreGains {
 
     static double commandToken(Game game, Player seat) {
         if (StrategyCardRules.reinforcements(game, seat) <= 0) return 0;
+        if (ExploreDeck.estimating()) return ExploreValues.COMMAND_TOKEN;
         return ExploreValues.COMMAND_TOKEN + visibleUse(game, seat);
     }
 
