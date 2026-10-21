@@ -25,7 +25,7 @@ import ti4.image.io.ImageResources;
 import ti4.image.tile.UnitPlacement.ImagePosition;
 import ti4.image.tile.UnitPlacement.UnitShape;
 import ti4.logging.BotLogger;
-import ti4.message.MessageHelper;
+import ti4.logging.LogOrigin;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.fow.FogViewer;
@@ -51,6 +51,7 @@ final class UnitHolderRenderer {
     private final int radius;
 
     private final FogViewer fogViewer;
+    private final RenderWarnings warnings;
 
     @Nullable
     private final Player viewer;
@@ -65,7 +66,8 @@ final class UnitHolderRenderer {
             int degreeChange,
             UnitHolder unitHolder,
             int radius,
-            FogViewer fogViewer) {
+            FogViewer fogViewer,
+            RenderWarnings warnings) {
         this.game = game;
         this.tile = tile;
         this.displayType = displayType;
@@ -76,6 +78,7 @@ final class UnitHolderRenderer {
         this.unitHolder = unitHolder;
         this.radius = radius;
         this.fogViewer = fogViewer;
+        this.warnings = warnings;
         this.viewer = fogViewer.player();
     }
 
@@ -101,9 +104,11 @@ final class UnitHolderRenderer {
 
             Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
             if (player == null) {
-                MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(),
-                        "Could not find owner for " + unitKey + " in tile " + tile.getRepresentation() + ".");
+                warnings.warnOnce(
+                        "missing-unit-owner",
+                        new LogOrigin(game),
+                        "Could not find owner for " + unitKey + " in tile " + tile.getRepresentation()
+                                + " while rendering.");
                 continue;
             }
             if (displayType == DisplayType.unlocked && isHiddenWhenUnlocked(unitKey, player)) continue;
@@ -127,11 +132,11 @@ final class UnitHolderRenderer {
             BufferedImage overlay = UnitImages.overlay(unitKey, player);
             UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
             if (unitModel == null) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + ", a unit model could not be found for the unit with an async ID of "
-                                + unitKey.asyncID() + ".");
+                warnings.warnOnce(
+                        "missing-unit-model",
+                        new LogOrigin(player),
+                        "No unit model found for async ID " + unitKey.asyncID() + " of " + player.getFaction() + " ("
+                                + player.getColor() + ") in tile " + tile.getRepresentation() + " while rendering.");
                 continue;
             }
 

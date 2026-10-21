@@ -7,7 +7,7 @@ import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.service.fow.FogViewer;
 
-record TileScene(Game game, @Nullable DisplayType displayType, FogViewer viewer) {
+record TileScene(Game game, @Nullable DisplayType displayType, FogViewer viewer, RenderWarnings warnings) {
 
     boolean isPrivateView() {
         return viewer.privateView();

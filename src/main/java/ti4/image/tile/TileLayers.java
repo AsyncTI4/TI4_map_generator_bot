@@ -48,7 +48,7 @@ public final class TileLayers {
     }
 
     public static TileLayers forPreparedViewer(Game game, FogViewer viewer, @Nullable DisplayType displayType) {
-        return new TileLayers(new TileScene(game, displayType, viewer));
+        return new TileLayers(new TileScene(game, displayType, viewer, new RenderWarnings()));
     }
 
     private static Map<TileStep, TileStepPainter> painters() {
