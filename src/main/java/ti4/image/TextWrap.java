@@ -65,6 +65,9 @@ public final class TextWrap {
                     if (split == -1) {
                         split = lastCharacterWithin(line, metrics, maxWidth);
                     }
+                    if (split <= 0) {
+                        throw new IllegalArgumentException("no prefix of \"" + line + "\" fits");
+                    }
                     lines.add(line.substring(0, split).trim());
                     line = line.substring(split).trim();
                 }
