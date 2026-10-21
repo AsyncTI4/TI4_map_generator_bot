@@ -3,11 +3,10 @@ package ti4;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import ti4.helpers.Constants;
-import ti4.helpers.RandomHelper;
+import ti4.helpers.RenderRandom;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 
@@ -56,7 +55,7 @@ public final class ResourceHelper {
     // @Deprecated
     @Nullable
     public String getUnitFile(String name) {
-        if (name.endsWith(Constants.UNIT_DD) && RandomHelper.isOneInX(Constants.EYE_CHANCE)) {
+        if (name.endsWith(Constants.UNIT_DD) && RenderRandom.oneIn("unit.destroyerEye", Constants.EYE_CHANCE)) {
             name = UNIT_DD_PATTERN.matcher(name).replaceFirst(Constants.UNIT_DD_EYE);
         }
         return getCachedResource(unitCache, "units/", name);
@@ -82,7 +81,7 @@ public final class ResourceHelper {
     @Nullable
     public String getSpoopyFile() {
         // overlay_jackolantern_1
-        int face = ThreadLocalRandom.current().nextInt(1, 4);
+        int face = RenderRandom.nextInt("unit.spoopyFace", 1, 4);
         String name = "overlay_jackolantern_" + face + ".png";
         return getCachedResource(spoopyCache, "decals/", name);
     }

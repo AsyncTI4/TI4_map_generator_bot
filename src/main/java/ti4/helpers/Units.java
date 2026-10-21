@@ -66,7 +66,7 @@ public class Units {
             if (JdaService.testingMode) {
                 return getFileName(false);
             }
-            return getFileName(RandomHelper.isOneInX(Constants.EYE_CHANCE));
+            return getFileName(RenderRandom.oneIn("unit.destroyerEye", Constants.EYE_CHANCE));
         }
 
         public String getFileName(boolean eyes) {

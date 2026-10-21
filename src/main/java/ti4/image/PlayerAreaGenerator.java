@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -67,8 +66,8 @@ import ti4.helpers.CalendarHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
+import ti4.helpers.RenderRandom;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -2438,7 +2437,7 @@ public class PlayerAreaGenerator {
                 BufferedImage spoopy = null;
                 if (unitKey.unitType() == UnitType.Warsun) {
                     int chanceToSeeSpoop = CalendarHelper.isNearHalloween() ? 10 : 1000;
-                    if (ThreadLocalRandom.current().nextInt(chanceToSeeSpoop) == 0) {
+                    if (RenderRandom.oneIn("playerArea.spoopyWarsun", chanceToSeeSpoop)) {
                         String spoopyPath = ResourceHelper.getInstance().getSpoopyFile();
                         spoopy = ImageHelper.read(spoopyPath);
                     }
@@ -2535,7 +2534,7 @@ public class PlayerAreaGenerator {
                 || player.hasLeaderUnlocked("xxchahero")) { // XXCHA WITH UNLOCKED HERO
             int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, game);
             int totalPlayerResources = Helper.getPlayerResourcesTotal(player, game);
-            if (Constants.gedsDeadId.equals(player.getUserID()) || RandomHelper.isOneInX(100)) {
+            if (Constants.gedsDeadId.equals(player.getUserID()) || RenderRandom.oneIn("playerArea.gedsDead", 100)) {
                 drawPAImageOpaque(x + deltaX - 2, y - 2, "pa_resinf_info_xxcha_gedsdead.png", 0.9f);
             } else {
                 drawPAImageOpaque(x + deltaX - 2, y - 2, "pa_resinf_info_xxcha.png", 0.9f);
@@ -2623,7 +2622,7 @@ public class PlayerAreaGenerator {
 
         boolean randomizeList = player != frogPlayer && isFoWPrivate;
         if (randomizeList) {
-            Collections.shuffle(planets);
+            RenderRandom.shuffle("playerArea.planetShuffle", planets);
         }
 
         List<String> realPlanets = new ArrayList<>();

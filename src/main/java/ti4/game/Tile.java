@@ -32,7 +32,7 @@ import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.RandomHelper;
+import ti4.helpers.RenderRandom;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
@@ -358,12 +358,13 @@ public class Tile {
     @JsonIgnore
     public String getTilePath() {
         String tileName = Mapper.getTileID(tileID);
-        if (("44".equals(tileID) || ("45".equals(tileID))) && (RandomHelper.isOneInX(Constants.EYE_CHANCE))) {
+        if (("44".equals(tileID) || ("45".equals(tileID)))
+                && (RenderRandom.oneIn("tile.eyeCucumber", Constants.EYE_CHANCE))) {
             tileName = "S15_Cucumber.png";
         }
         if (("43".equals(tileID) || "80".equals(tileID))) {
             int baubleChance = CalendarHelper.isNearChristmas() ? 5 : 10_000;
-            if (RandomHelper.isOneInX(baubleChance)) {
+            if (RenderRandom.oneIn("tile.xmasBauble", baubleChance)) {
                 tileName = tileName.replace(".png", "_xmas.png");
             }
         }

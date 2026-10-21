@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
@@ -30,7 +29,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.RandomHelper;
+import ti4.helpers.RenderRandom;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
@@ -349,18 +348,18 @@ class UnitRenderGenerator {
 
         if ("minis".equals(style)) {
             BufferedImage unitImage = ImageHelper.readScaled(getUnitPath(unitKey, game), 0.5f);
-            double angle = 2 * Math.PI * ThreadLocalRandom.current().nextDouble();
+            double angle = 2 * Math.PI * RenderRandom.nextDouble("unit.voltronMinis.angle");
             for (int i = 0; i < 3; i++) {
-                double radius = 12 * ThreadLocalRandom.current().nextDouble() + 22;
+                double radius = 12 * RenderRandom.nextDouble("unit.voltronMinis.radius") + 22;
                 graphics.drawImage(
                         unitImage,
                         (int) (imageX + radius * Math.cos(angle) + 11.5),
                         (int) (imageY + radius * Math.sin(angle) + 11.5),
                         null);
                 angle += (4 * Math.PI / 9)
-                        * (ThreadLocalRandom.current().nextDouble()
-                                + ThreadLocalRandom.current().nextDouble()
-                                + ThreadLocalRandom.current().nextDouble());
+                        * (RenderRandom.nextDouble("unit.voltronMinis.step")
+                                + RenderRandom.nextDouble("unit.voltronMinis.step")
+                                + RenderRandom.nextDouble("unit.voltronMinis.step"));
             }
             return;
         }
@@ -369,7 +368,7 @@ class UnitRenderGenerator {
         switch (style) {
             case "arms":
                 imagePath = "voltron_arms.png";
-                if (RandomHelper.isOneInX(20)) {
+                if (RenderRandom.oneIn("unit.voltronArmsPose", 20)) {
                     imagePath = "voltron_arms_pose.png";
                 }
                 break;
@@ -739,7 +738,7 @@ class UnitRenderGenerator {
 
         // Random spoopy warsun
         int spoopyChance = CalendarHelper.isNearHalloween() ? 10 : 1000;
-        if (unitKey.unitType() == UnitType.Warsun && RandomHelper.isOneInX(spoopyChance)) {
+        if (unitKey.unitType() == UnitType.Warsun && RenderRandom.oneIn("unit.spoopyWarsun", spoopyChance)) {
             String spoopypath = resourceHelper.getSpoopyFile();
             spoopy = ImageHelper.read(spoopypath);
         }

@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -48,6 +47,7 @@ import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.PlayerStatsHelper;
+import ti4.helpers.RenderRandom;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
@@ -991,7 +991,7 @@ public class MapGenerator implements AutoCloseable {
         if (label == null) {
             return;
         }
-        if (isSectorTitle(label) && isEasterEggRoll(ThreadLocalRandom.current().nextInt(EASTER_EGG_ODDS))) {
+        if (isSectorTitle(label) && isEasterEggRoll(RenderRandom.nextInt("segmentTitle.easterEgg", EASTER_EGG_ODDS))) {
             String text = "Map: " + EASTER_EGG_NAME + "!";
             Font big = Storage.getFont80();
             Font font = graphics.getFontMetrics(big).stringWidth(text) < width - 40 ? big : Storage.getFont64();
@@ -1417,7 +1417,7 @@ public class MapGenerator implements AutoCloseable {
 
         List<Player> players = new ArrayList<>(game.getRealPlayers());
         if (isFoWPrivate) {
-            Collections.shuffle(players);
+            RenderRandom.shuffle("scoreTrack.fogShuffle", players);
         }
 
         int row = 0;
@@ -2002,7 +2002,7 @@ public class MapGenerator implements AutoCloseable {
         List<Player> players = new ArrayList<>(game.getPlayers().values());
         List<Player> statOrder = new ArrayList<>(game.getRealPlayers());
         if (fow) {
-            Collections.shuffle(players);
+            RenderRandom.shuffle("statLayout.fogShuffle", players);
             statOrder.clear();
             // always build fowplayer's stat location first
             statOrder.add(fowPlayer);

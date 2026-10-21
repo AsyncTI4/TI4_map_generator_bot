@@ -48,7 +48,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.PatternHelper;
 import ti4.helpers.PdsCoverage;
 import ti4.helpers.PdsCoverageHelper;
-import ti4.helpers.RandomHelper;
+import ti4.helpers.RenderRandom;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
@@ -858,7 +858,8 @@ public class TileGenerator {
                     x += (isSpiral ? 36 : 0);
                     y += (isSpiral ? 43 : 0);
                     String batFile = ResourceHelper.getInstance()
-                            .getGeneralFile("zobat" + (RandomHelper.isOneInX(4096) ? "_shiny" : "") + ".png");
+                            .getGeneralFile(
+                                    "zobat" + (RenderRandom.oneIn("tile.shinyZobat", 4096) ? "_shiny" : "") + ".png");
                     BufferedImage bufferedImage = ImageHelper.read(batFile);
                     if (bufferedImage != null) {
                         x += (345 - bufferedImage.getWidth()) / 2;

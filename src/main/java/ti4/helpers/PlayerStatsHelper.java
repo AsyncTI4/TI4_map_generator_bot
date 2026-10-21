@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
@@ -62,7 +61,7 @@ public final class PlayerStatsHelper {
             int ring = tileRing(pos);
             Point realPosition = PositionMapper.getScaledTilePosition(game, pos, positionPoint.x, positionPoint.y);
             double distance = realPosition.distance(anchorPt);
-            distance = rand ? ThreadLocalRandom.current().nextInt(0, 200) : distance + ring * 75;
+            distance = rand ? RenderRandom.nextInt("statTiles.randomDistance", 0, 200) : distance + ring * 75;
             return distance;
         }));
         pq.addAll(validPositions);
