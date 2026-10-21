@@ -2,6 +2,7 @@ package ti4.image.playerarea;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -12,9 +13,11 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.Constants;
 import ti4.image.draw.WebsiteOverlays;
 import ti4.image.map.MapFrame;
 import ti4.model.Mapper;
+import ti4.service.transaction.DebtPoolIconService;
 import ti4.testUtils.BaseTi4Test;
 
 class DebtPoolIconTest extends BaseTi4Test {
@@ -44,6 +47,7 @@ class DebtPoolIconTest extends BaseTi4Test {
     }
 
     private void drawDebtorArea() {
+        DebtPoolIconService.assignMissingIcons(game);
         BufferedImage image = new BufferedImage(3000, 450, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = image.createGraphics();
         PlayerAreas.drawSingle(
@@ -70,5 +74,28 @@ class DebtPoolIconTest extends BaseTi4Test {
         setUp();
         drawDebtorArea();
         assertEquals(firstIcon, game.getDebtPoolIcon(POOL));
+    }
+
+    @Test
+    void drawingAPoolWithoutAnIconDoesNotStoreOne() {
+        BufferedImage image = new BufferedImage(3000, 450, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+
+        PlayerAreas.drawSingle(
+                PlayerAreaContext.publicView(graphics, game, new WebsiteOverlays()), debtor, new Point(5, 5), 3000);
+        graphics.dispose();
+
+        assertNull(game.getDebtPoolIcon(POOL));
+    }
+
+    @Test
+    void theDefaultPoolNeverGetsAnIconAssigned() {
+        Player creditor = game.getPlayerFromColorOrFaction("hacan");
+        debtor.addDebtTokens(creditor.getColor(), 1, Constants.DEBT_DEFAULT_POOL);
+
+        DebtPoolIconService.assignMissingIcons(game);
+
+        assertNull(game.getDebtPoolIcon(Constants.DEBT_DEFAULT_POOL));
+        assertNotNull(game.getDebtPoolIcon(POOL));
     }
 }

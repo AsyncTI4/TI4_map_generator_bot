@@ -25,6 +25,7 @@ import ti4.image.io.ImageResources;
 import ti4.image.io.RemoteImages;
 import ti4.model.Mapper;
 import ti4.service.emoji.TI4Emoji;
+import ti4.service.transaction.DebtPoolIconService;
 
 final class DebtPools {
 
@@ -58,13 +59,11 @@ final class DebtPools {
                 bankSource = DEFAULT_BANK_IMAGE;
                 PaImage.draw(g2, x, y, bankSource);
             } else {
-                bankSource = TI4Emoji.getRandomizedEmoji(0, game.getName() + pool.getKey())
-                        .toString();
-                game.setDebtPoolIcon(pool.getKey(), bankSource);
+                bankSource = DebtPoolIconService.defaultIcon(game, pool.getKey());
             }
         }
         if (!DEFAULT_BANK_IMAGE.equals(bankSource)) {
-            g2.drawImage(bankImage(game, pool.getKey(), bankSource), x + 20, y + 15, null);
+            g2.drawImage(bankImage(bankSource), x + 20, y + 15, null);
         }
 
         int deltaX = 24;
@@ -134,7 +133,7 @@ final class DebtPools {
         return tokenDeltaX;
     }
 
-    private static BufferedImage bankImage(Game game, String poolName, String bankSource) {
+    private static BufferedImage bankImage(String bankSource) {
         Emoji bankEmoji = Emoji.fromFormatted(bankSource);
         if (bankEmoji instanceof CustomEmoji customEmoji) {
             BufferedImage bankImage = RemoteImages.readScaled(customEmoji.getImageUrl(), 120, 120);
@@ -143,7 +142,6 @@ final class DebtPools {
             }
             Emoji replacement =
                     TI4Emoji.findEmojiFromJustName(customEmoji.getName()).asEmoji();
-            game.setDebtPoolIcon(poolName, replacement.getFormatted());
             if (replacement instanceof CustomEmoji replacementCustom) {
                 return RemoteImages.readScaled(replacementCustom.getImageUrl(), 120, 120);
             }

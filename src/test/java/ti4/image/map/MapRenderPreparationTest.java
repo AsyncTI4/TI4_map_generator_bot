@@ -11,6 +11,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.model.Mapper;
+import ti4.service.transaction.DebtPoolIconService;
 import ti4.testUtils.BaseTi4Test;
 
 class MapRenderPreparationTest extends BaseTi4Test {
@@ -71,5 +72,18 @@ class MapRenderPreparationTest extends BaseTi4Test {
         MapRenderer.paint(resolve(), RenderTimings.disabled());
 
         assertTrue(holder.getPlanets().contains("nosuchplanet"));
+    }
+
+    @Test
+    void resolvingARenderGivesADebtPoolWithoutAnIconItsDefaultIcon() {
+        Player creditor = game.addPlayer("222", "hacan");
+        creditor.setFaction(game, "hacan");
+        creditor.setColor("yellow");
+        creditor.setUnitsOwned(new HashSet<>(Mapper.getFaction("hacan").getUnits()));
+        holder.addDebtTokens(creditor.getColor(), 2, "favours");
+
+        resolve();
+
+        assertEquals(DebtPoolIconService.defaultIcon(game, "favours"), game.getDebtPoolIcon("favours"));
     }
 }
