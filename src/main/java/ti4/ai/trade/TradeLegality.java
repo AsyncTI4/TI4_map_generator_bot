@@ -39,6 +39,8 @@ class TradeLegality {
             Purpose.SETTLEMENT,
             Purpose.SETTLEMENT_FEE,
             Purpose.EVEN_WASH,
+            Purpose.FACILITATED_WASH,
+            Purpose.FACILITATION_SETTLE,
             Purpose.COUNTER,
             Purpose.CLEANUP,
             Purpose.ADOPTED);

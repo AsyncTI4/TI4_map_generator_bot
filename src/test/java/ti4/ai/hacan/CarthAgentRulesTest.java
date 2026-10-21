@@ -11,6 +11,7 @@ import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
+import ti4.ai.trade.TradeRules;
 import ti4.testUtils.BaseTi4Test;
 
 // The AI seat is given Carth of Golden Sands, the Hacan agent; the rules key on the component, not the faction.
@@ -25,6 +26,7 @@ class CarthAgentRulesTest extends BaseTi4Test {
         test.nekroHome();
         test.nekro.addLeader("hacanagent");
         test.nekro.setCommodities(0);
+        test.sol.setCommodities(test.sol.getCommoditiesTotal());
     }
 
     private static String pressed(Optional<AiDecision> decision) {
@@ -58,6 +60,17 @@ class CarthAgentRulesTest extends BaseTi4Test {
                 .isEqualTo("FFCC_nekro_exhaustAgent_hacanagent");
         assertThat(pressed(CarthAgentRules.chooseTarget(test.context(picker()))))
                 .isEqualTo("hacanAgentRefresh_nekro");
+    }
+
+    // When a partner was picked at the start of the turn, the agent goes on that partner instead of on the seat.
+    @Test
+    void replenishesTheTargetItPickedAtTheStart() {
+        test.sol.setCommodities(0);
+        TradeRules.rememberCarthTarget(test.context(), test.sol);
+        test.memory.put("hacanAgent|" + test.context().turnKey(), String.valueOf(NOW));
+
+        assertThat(pressed(CarthAgentRules.chooseTarget(test.context(picker()))))
+                .isEqualTo("hacanAgentRefresh_sol");
     }
 
     // With its commodities already at their maximum the 2 commodities would be lost, so the agent stays ready.

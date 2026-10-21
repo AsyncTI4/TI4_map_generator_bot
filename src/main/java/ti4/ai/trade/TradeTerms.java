@@ -33,6 +33,7 @@ public class TradeTerms {
     private static final String VALUE = "=";
     private static final String NO_FEE = "-";
     private static final String LIST = ", ";
+    private static final String FACILITATOR = " can wash your commodities on its turn and settle your fee with me.";
     private static final String TERMS = """
             Pressing **Replenish Commodities** accepts these terms: I then send you an offer, your commodities for \
             that many minus k trade goods, paid with my commodities first. If we can't transact right now, I ask for \
@@ -105,9 +106,11 @@ public class TradeTerms {
         List<String> free = new ArrayList<>();
         List<String> excluded = new ArrayList<>();
         List<String> traders = new ArrayList<>();
+        List<String> facilitators = new ArrayList<>();
         terms.forEach((follower, fee) -> {
             if (mastersOfTrade(follower)) {
                 traders.add(name.apply(follower));
+                if (Facilitation.offers(game, holder, follower)) facilitators.add(name.apply(follower));
             } else if (fee.isPresent()) {
                 free.add(name.apply(follower) + " (" + feeLabel(fee.get()) + ")");
             } else {
@@ -127,7 +130,12 @@ public class TradeTerms {
         for (String trader : traders) {
             text.append(' ').append(trader).append(" follows free anyway; I'll offer it an even wash.");
         }
-        if (!free.isEmpty()) text.append('\n').append(TERMS);
+        if (!free.isEmpty()) {
+            for (String facilitator : facilitators) {
+                text.append(' ').append(facilitator).append(FACILITATOR);
+            }
+            text.append('\n').append(TERMS);
+        }
         return text.toString();
     }
 

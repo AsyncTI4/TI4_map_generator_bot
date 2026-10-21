@@ -102,6 +102,7 @@ class OfferResponder {
         if (TradeCardRules.honours(context, offerer, deal) && TradeValue.commitmentOk(context, offerer, deal)) {
             return Verdict.honoured();
         }
+        if (acceptsAgentOrFacilitation(context, offerer, deal)) return Verdict.accepted();
         if (DebtRules.owedCollection(context, offerer, deal)) return collection(context, offerer, deal);
         if (DebtRules.repays(context, offerer, deal) && TradeValue.commitmentOk(context, offerer, deal)) {
             return Verdict.accepted();
@@ -122,6 +123,11 @@ class OfferResponder {
             return Verdict.accepted();
         }
         return nearest(context, offerer, deal);
+    }
+
+    private static boolean acceptsAgentOrFacilitation(AiTurnContext context, Player offerer, Deal deal) {
+        boolean shaped = Facilitation.accepts(context, offerer, deal) || CarthDeals.accepts(context, offerer, deal);
+        return shaped && TradeValue.commitmentOk(context.game(), context.seat(), offerer, deal);
     }
 
     private static Verdict collection(AiTurnContext context, Player creditor, Deal deal) {

@@ -9,11 +9,14 @@ enum Purpose {
     SETTLEMENT("Trade settlement"),
     SETTLEMENT_FEE("Trade settlement"),
     EVEN_WASH("Trade settlement"),
+    FACILITATED_WASH("facilitated wash"),
+    FACILITATION_SETTLE("facilitation settlement"),
     WASH("wash"),
     SELL("sale"),
     NOTE_DEAL("promissory note deal"),
     FRAGMENT_DEAL("relic fragment deal"),
     DESPERATION("purchase"),
+    AGENT_TRADE("Carth of Golden Sands deal"),
     TECHNOLOGY_REQUEST("payment to play Technology soon"),
     TECHNOLOGY_HOLD("payment to hold Technology until later"),
     DEBT_PAYMENT("debt payment"),
@@ -22,7 +25,8 @@ enum Purpose {
     CLEANUP("offer"),
     ADOPTED("offer");
 
-    private static final Set<Purpose> SETTLEMENTS = EnumSet.of(SETTLEMENT, SETTLEMENT_FEE, EVEN_WASH);
+    private static final Set<Purpose> SETTLEMENTS =
+            EnumSet.of(SETTLEMENT, SETTLEMENT_FEE, EVEN_WASH, FACILITATED_WASH, FACILITATION_SETTLE);
     private static final Set<Purpose> PROPOSALS =
             EnumSet.of(WASH, SELL, NOTE_DEAL, FRAGMENT_DEAL, DESPERATION, TECHNOLOGY_REQUEST, TECHNOLOGY_HOLD);
     private static final Set<Purpose> FAVORS = EnumSet.of(TECHNOLOGY_REQUEST, TECHNOLOGY_HOLD);

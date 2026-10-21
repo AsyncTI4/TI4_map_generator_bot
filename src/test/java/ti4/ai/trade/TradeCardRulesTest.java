@@ -105,7 +105,9 @@ class TradeCardRulesTest extends BaseTi4Test {
         Optional<AiDecision> announcement = TradeCardRules.announce(holderAt(table, NOW));
 
         assertThat(announcement.orElseThrow()).isInstanceOfSatisfying(AiDecision.Announce.class, announce -> {
-            assertThat(announce.text()).contains("**Trade**", "(X−2)", "(X−1)", "close to winning", "even wash");
+            assertThat(announce.text())
+                    .contains(
+                            "**Trade**", "(X−2)", "(X−1)", "close to winning", "even wash", "settle your fee with me");
             assertThat(announce.text().length()).isLessThanOrEqualTo(TradeTerms.MAX_ANNOUNCEMENT);
         });
         assertThat(TradeTerms.decode(table.test.memory.get("tradeTerms|3").orElseThrow()))

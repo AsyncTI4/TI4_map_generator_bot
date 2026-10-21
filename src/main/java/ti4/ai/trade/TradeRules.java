@@ -5,6 +5,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.AiSettings;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
+import ti4.game.Player;
 
 @UtilityClass
 public class TradeRules {
@@ -51,5 +52,23 @@ public class TradeRules {
     public static Optional<AiDecision> startDeals(AiTurnContext context) {
         if (!AiSettings.isTradingEnabled()) return Optional.empty();
         return OwnTurnDeals.start(context);
+    }
+
+    public static Optional<Player> carthTarget(AiTurnContext context) {
+        if (!AiSettings.isTradingEnabled()) return Optional.empty();
+        return CarthDeals.bestTarget(context);
+    }
+
+    public static void rememberCarthTarget(AiTurnContext context, Player target) {
+        CarthDeals.remember(context, target);
+    }
+
+    public static Optional<Player> rememberedCarthTarget(AiTurnContext context) {
+        return CarthDeals.remembered(context);
+    }
+
+    public static Optional<AiDecision> carthDeal(AiTurnContext context) {
+        if (!AiSettings.isTradingEnabled()) return Optional.empty();
+        return CarthDeals.followUp(context);
     }
 }

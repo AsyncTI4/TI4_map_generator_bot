@@ -75,7 +75,8 @@ class TradeValue {
             }
         }
         double leak = Stinginess.pillageLeak(game, self, other, deal);
-        double selfGain = components + Desperation.term(game, self, deal.netTradeGoodsTo(faction)) - leak;
+        int net = deal.netTradeGoodsTo(faction);
+        double selfGain = components + Desperation.term(game, self, net) + Stinginess.gilaBonus(self, net) - leak;
         double partnerGain = Stinginess.partnerGain(game, other, self, deal, selfPrivate);
         double rivalry = Stinginess.rivalry(game, self, other);
         double utility = selfGain - rivalry * Math.max(0, partnerGain);

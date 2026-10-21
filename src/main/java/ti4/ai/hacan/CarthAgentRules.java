@@ -13,6 +13,7 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.tactical.Stall;
 import ti4.ai.tactical.TacticalRules;
+import ti4.ai.trade.TradeRules;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -33,12 +34,18 @@ public class CarthAgentRules {
         Game game = context.game();
         Player seat = context.seat();
         if (!seat.hasLeader(AGENT) || !seat.hasUnexhaustedLeader(AGENT) || !onOwnTurn(context)) return Optional.empty();
-        if (context.memory().has(KEY + context.turnKey()) || !worthGaining(game, seat)) return Optional.empty();
+        if (context.memory().has(KEY + context.turnKey())) return Optional.empty();
+        Optional<Player> other = otherTarget(context);
+        if (other.isEmpty() && !worthGaining(game, seat)) return Optional.empty();
         Optional<Match> use = Prompts.owned(Prompts.thisTurn(context), context.faction(), USE_AGENT::equals)
                 .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
         if (use.isEmpty()) return Optional.empty();
         context.memory().put(KEY + context.turnKey(), String.valueOf(context.now()));
-        return Optional.of(use.get().press("use Carth of Golden Sands to gain 2 commodities to trade away"));
+        other.ifPresent(target -> TradeRules.rememberCarthTarget(context, target));
+        String reason = other.isPresent()
+                ? "use Carth of Golden Sands to replenish a partner who trades the commodities to me"
+                : "use Carth of Golden Sands to gain 2 commodities to trade away";
+        return Optional.of(use.get().press(reason));
     }
 
     public static Optional<AiDecision> chooseTarget(AiTurnContext context) {
@@ -47,16 +54,16 @@ public class CarthAgentRules {
                 context.memory().get(key).filter(StringUtils::isNumeric).map(Long::parseLong);
         if (since.isEmpty()) return Optional.empty();
         Player seat = context.seat();
-        List<String> self = List.of(TARGET_PREFIX + seat.getFaction(), TARGET_PREFIX + seat.getColor());
+        Player chosen = TradeRules.rememberedCarthTarget(context).orElse(seat);
+        List<String> wanted = List.of(TARGET_PREFIX + chosen.getFaction(), TARGET_PREFIX + chosen.getColor());
         for (AiPrompt prompt : Prompts.newestFirst(context.prompts())) {
             if (prompt.isHidden() || prompt.createdAtMillis() < since.get() - CLOCK_SKEW_MILLIS) continue;
             if (!prompt.content().contains(AGENT_NAME)) continue;
             Optional<PromptButton> target =
-                    prompt.firstEnabled(button -> button.isUnowned() && self.contains(button.handlerId()));
+                    prompt.firstEnabled(button -> button.isUnowned() && wanted.contains(button.handlerId()));
             if (target.isPresent() && !context.alreadyPressed(prompt, target.get())) {
                 context.memory().put(key, DONE);
-                return Optional.of(
-                        AiDecision.press(prompt, target.get(), "gain 2 commodities with Carth of Golden Sands"));
+                return Optional.of(AiDecision.press(prompt, target.get(), reason(chosen, seat)));
             }
         }
         if (context.now() < since.get() + STEP_WAIT_MILLIS) {
@@ -64,6 +71,17 @@ public class CarthAgentRules {
         }
         context.memory().put(key, DONE);
         return Optional.empty();
+    }
+
+    private static Optional<Player> otherTarget(AiTurnContext context) {
+        if (tradeStillToReplenish(context.game())) return Optional.empty();
+        return TradeRules.carthTarget(context);
+    }
+
+    private static String reason(Player chosen, Player seat) {
+        return chosen == seat
+                ? "gain 2 commodities with Carth of Golden Sands"
+                : "replenish " + chosen.getFaction() + " with Carth of Golden Sands";
     }
 
     static boolean worthGaining(Game game, Player seat) {

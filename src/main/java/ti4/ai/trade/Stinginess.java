@@ -78,6 +78,16 @@ class Stinginess {
         return Math.min(MAX_RIVALRY_TENTHS, tenths) / TENTHS;
     }
 
+    static boolean feedsRival(Game game, Player self, Player other) {
+        return rivalry(game, self, other) >= FEEDS_LEADER;
+    }
+
+    static double gilaBonus(Player player, int net) {
+        return lockedHacanCommander(player) && crosses(player.getTg(), net, HACAN_COMMANDER_TRADE_GOODS)
+                ? HACAN_COMMANDER_BONUS
+                : 0;
+    }
+
     static double partnerGain(Game game, Player partner, Player seat, Deal deal) {
         return partnerGain(game, partner, seat, deal, false);
     }
@@ -199,14 +209,11 @@ class Stinginess {
 
     private static double thresholdBonus(Player partner, int net) {
         int tradeGoods = partner.getTg();
-        double bonus = 0;
+        double bonus = gilaBonus(partner, net);
         if (partner.hasTechReady(DATAHUB)
                 && partner.getStrategicCC() >= 1
                 && crosses(tradeGoods, net, DATAHUB_TRADE_GOODS)) {
             bonus += DATAHUB_BONUS;
-        }
-        if (lockedHacanCommander(partner) && crosses(tradeGoods, net, HACAN_COMMANDER_TRADE_GOODS)) {
-            bonus += HACAN_COMMANDER_BONUS;
         }
         return bonus;
     }
