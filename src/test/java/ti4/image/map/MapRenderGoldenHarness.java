@@ -32,6 +32,7 @@ import javax.imageio.ImageIO;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
@@ -63,7 +64,7 @@ import ti4.website.model.WebsiteOverlay;
  * <pre>
  * mvn -o test -Dtest=MapRenderGoldenHarness -Dgolden.saves=DIR -Dgolden.out=DIR -Dgolden.mode=baseline|compare
  *     [-Dgolden.baseline=DIR] [-Dgolden.only=game1,game2] [-Dgolden.ids=REGEX] [-Dgolden.eager=game1,game2]
- *     [-Dgolden.pngs=REGEX over game/renderId] [-DargLine=-Xmx10g]
+ *     [-Dgolden.pngs=REGEX over game/renderId] [-Dgolden.inventory=true] [-DargLine=-Xmx10g]
  * </pre>
  *
  * Every render reloads the save from disk, because rendering mutates the game (fog filtering, tile distances, debt
@@ -187,6 +188,14 @@ class MapRenderGoldenHarness extends BaseTi4Test {
 
     private static int connectionStripRenders;
     private static final AtomicInteger MESSAGES = new AtomicInteger();
+    private static final boolean INVENTORY = Boolean.getBoolean("golden.inventory");
+    private static final List<String> MESSAGE_LOG = new ArrayList<>();
+    private static final Map<String, List<String>> INVENTORY_BY_GAME = new TreeMap<>();
+    private static final Map<String, Integer> INVENTORY_TALLY = new TreeMap<>();
+    private static final int MESSAGE_SNIPPET = 90;
+    private static final int ENTRY_SNIPPET = 70;
+    private static final int CATEGORY_SNIPPET = 120;
+    private static final int MAX_DIFF_ENTRIES = 6;
 
     private record LayerDigest(int tiles, String sha, String perTile) {}
 
@@ -305,6 +314,7 @@ class MapRenderGoldenHarness extends BaseTi4Test {
                 FakeImageNetwork network = FakeImageNetwork.notFound();
                 MockedStatic<MessageHelper> messages = mockStatic(MessageHelper.class, invocation -> {
                     MESSAGES.incrementAndGet();
+                    if (INVENTORY) MESSAGE_LOG.add(describeMessage(invocation));
                     return invocation.callRealMethod();
                 })) {
             dateTime.when(DateTimeHelper::getFormattedTimestamp).thenReturn("2000.01.01 - 00.00.00");
@@ -367,6 +377,7 @@ class MapRenderGoldenHarness extends BaseTi4Test {
                     }
                 }
                 writeRecords(resultDir.resolve(gameName + ".txt"), records);
+                if (INVENTORY) writeInventory(resultDir, gameName);
                 summary.append(String.format(
                         "%s renders=%d constructorMs=%d drawMs=%d%n",
                         gameName,
@@ -388,6 +399,7 @@ class MapRenderGoldenHarness extends BaseTi4Test {
                 totals.drawMs));
         summary.append("connectionStripRenders=").append(connectionStripRenders).append('\n');
         Files.writeString(resultDir.resolve("summary.txt"), summary.toString());
+        if (INVENTORY) writeInventoryTally(resultDir);
         System.out.println(summary);
         if (compare) {
             Assertions.assertEquals(0, totals.mismatches, "renders differing from the baseline, see summary.txt");
@@ -742,10 +754,13 @@ class MapRenderGoldenHarness extends BaseTi4Test {
             return failed(spec, "load returned null");
         }
         apply(spec.mutation(), game);
+        Snapshot before = INVENTORY ? snapshotOf(game) : null;
         MESSAGES.set(0);
+        MESSAGE_LOG.clear();
         try (AutoCloseable mode = spec.eager() ? RenderRandom.eager() : RenderRandom.neutral();
                 RenderedCanvas rendered = produce(game, spec)) {
             int messages = MESSAGES.get();
+            if (INVENTORY) recordInventory(save, spec, game, before);
             String state = gameStateDigest(game);
             long hashStart = System.nanoTime();
             if (rendered.layers() != null) {
@@ -797,31 +812,224 @@ class MapRenderGoldenHarness extends BaseTi4Test {
     // Renders mutate the live game (fog filtering, tile distances, and anything a tile helper writes back), so the
     // save text after the render is part of the outcome. The last-modified stamp is the wall clock and is dropped.
     private static String gameStateDigest(Game game) throws Exception {
+        List<String> kept = stateLines(game);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        for (String line : kept) {
+            digest.update((line + "\n").getBytes(StandardCharsets.UTF_8));
+        }
+        String state = HexFormat.of().formatHex(digest.digest()).substring(0, 16);
+        String dumpDir = System.getProperty("golden.statedump");
+        if (dumpDir != null) {
+            Path dump = Path.of(dumpDir, game.getName() + "-" + state + ".txt");
+            Files.createDirectories(dump.getParent());
+            Files.write(dump, kept, StandardCharsets.UTF_8);
+        }
+        return state;
+    }
+
+    private static List<String> stateLines(Game game) throws Exception {
         Path file = Files.createTempFile("golden-state", ".txt");
         try {
             Class<?> saver = Class.forName("ti4.game.persistence.GameSaveService");
             Method saveGame = saver.getDeclaredMethod("saveGame", Game.class, Path.class);
             saveGame.setAccessible(true);
             saveGame.invoke(null, game, file);
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
             List<String> kept = new ArrayList<>();
             for (String line : Files.readAllLines(file, StandardCharsets.UTF_8)) {
                 if (line.startsWith(Constants.LAST_MODIFIED_DATE + " ")) continue;
-                line = sortedEnumKeyedLine(line);
-                kept.add(line);
-                digest.update((line + "\n").getBytes(StandardCharsets.UTF_8));
+                kept.add(sortedEnumKeyedLine(line));
             }
-            String state = HexFormat.of().formatHex(digest.digest()).substring(0, 16);
-            String dumpDir = System.getProperty("golden.statedump");
-            if (dumpDir != null) {
-                Path dump = Path.of(dumpDir, game.getName() + "-" + state + ".txt");
-                Files.createDirectories(dump.getParent());
-                Files.write(dump, kept, StandardCharsets.UTF_8);
-            }
-            return state;
+            return kept;
         } finally {
             Files.deleteIfExists(file);
         }
+    }
+
+    private record Snapshot(List<String> stateLines, String fogFlags) {}
+
+    private static Snapshot snapshotOf(Game game) {
+        try {
+            return new Snapshot(stateLines(game), fogFlags(game));
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    // One chunk per real player: faction, whether fog is initialised, one 0/1 per sorted tile (hasFog), seen-tile
+    // count.
+    private static String fogFlags(Game game) {
+        StringBuilder flags = new StringBuilder();
+        for (Player player : game.getPlayers().values()) {
+            if (!player.isRealPlayer()) continue;
+            flags.append(player.getFaction())
+                    .append(player.isFogInitialized() ? "+" : "-")
+                    .append(':');
+            for (Tile tile : new TreeMap<>(game.getTileMap()).values()) {
+                flags.append(tile.hasFog(player) ? '1' : '0');
+            }
+            flags.append('#').append(player.getFogTiles().size()).append(';');
+        }
+        return flags.toString();
+    }
+
+    private static String describeMessage(org.mockito.invocation.InvocationOnMock invocation) {
+        StringBuilder text = new StringBuilder(invocation.getMethod().getName());
+        for (Object argument : invocation.getArguments()) {
+            if (argument instanceof String string) {
+                String line = oneLine(string);
+                text.append(" | ").append(line, 0, Math.min(MESSAGE_SNIPPET, line.length()));
+                break;
+            }
+        }
+        return text.toString();
+    }
+
+    private static void recordInventory(Path save, Spec spec, Game game, Snapshot before) {
+        Snapshot after = snapshotOf(game);
+        List<String> entries = new ArrayList<>(changedEntries(before.stateLines(), after.stateLines()));
+        if (!before.fogFlags().equals(after.fogFlags())) entries.add("fogflags " + fogFlagChange(before, after));
+        for (String message : MESSAGE_LOG) entries.add("message " + message);
+        if (entries.isEmpty()) return;
+        List<String> lines = INVENTORY_BY_GAME.computeIfAbsent(gameNameOf(save), name -> new ArrayList<>());
+        for (String entry : entries) {
+            lines.add(spec.id() + " " + entry);
+            INVENTORY_TALLY.merge(tallyKey(spec, entry), 1, Integer::sum);
+        }
+    }
+
+    private static String tallyKey(Spec spec, String entry) {
+        if (entry.startsWith("message ") || entry.startsWith("fogflags")) {
+            return spec.kind() + " " + StringUtils.abbreviate(entry, CATEGORY_SNIPPET);
+        }
+        String[] parts = entry.split(" ", 3);
+        String[] path = parts[0].split(":");
+        String kind = path[0];
+        if (parts.length > 1 && parts[1].startsWith("SECTION")) {
+            return spec.kind() + " " + kind + " " + parts[1];
+        }
+        String field = path[path.length - 1].replaceAll("#\\d+$", "");
+        String detail = field.contains("stored") && parts.length > 2 ? " " + parts[2].split(" ")[0] : "";
+        return spec.kind() + " " + kind + ":" + StringUtils.abbreviate(field + detail, CATEGORY_SNIPPET);
+    }
+
+    private static String fogFlagChange(Snapshot before, Snapshot after) {
+        String[] was = before.fogFlags().split(";");
+        String[] now = after.fogFlags().split(";");
+        List<String> changed = new ArrayList<>();
+        for (int i = 0; i < Math.min(was.length, now.length); i++) {
+            if (was[i].equals(now[i])) continue;
+            int colon = now[i].indexOf(':');
+            String faction = now[i].substring(0, colon - 1);
+            String initialised = was[i].charAt(colon - 1) + ">" + now[i].charAt(colon - 1);
+            int flipped = 0;
+            for (int c = colon + 1; c < Math.min(was[i].length(), now[i].length()); c++) {
+                if (was[i].charAt(c) == '#') break;
+                if (was[i].charAt(c) != now[i].charAt(c)) flipped++;
+            }
+            String seen = was[i].substring(was[i].indexOf('#') + 1) + ">" + now[i].substring(now[i].indexOf('#') + 1);
+            changed.add(faction + " init" + initialised + " tilesFlipped=" + flipped + " seen" + seen);
+        }
+        return String.join(", ", changed);
+    }
+
+    private static List<String> changedEntries(List<String> before, List<String> after) {
+        Map<String, String> was = keyedLines(before);
+        Map<String, String> now = keyedLines(after);
+        Set<String> contextsWas = contextsOf(was);
+        Set<String> contextsNow = contextsOf(now);
+        List<String> changed = new ArrayList<>();
+        for (String context : contextsNow) {
+            if (!contextsWas.contains(context) && !"game".equals(context)) changed.add(context + " SECTION-ADDED");
+        }
+        for (String context : contextsWas) {
+            if (!contextsNow.contains(context) && !"game".equals(context)) changed.add(context + " SECTION-REMOVED");
+        }
+        Set<String> keys = new java.util.TreeSet<>(was.keySet());
+        keys.addAll(now.keySet());
+        for (String key : keys) {
+            String context = contextOf(key);
+            if (!contextsWas.contains(context) || !contextsNow.contains(context)) continue;
+            String old = was.get(key);
+            String current = now.get(key);
+            if (java.util.Objects.equals(old, current)) continue;
+            changed.add(key + " " + entryDiff(old, current));
+        }
+        return changed;
+    }
+
+    private static String contextOf(String key) {
+        if (key.startsWith("game:")) return "game";
+        return key.substring(0, key.indexOf(':', key.indexOf(':') + 1));
+    }
+
+    private static Set<String> contextsOf(Map<String, String> keyed) {
+        Set<String> contexts = new java.util.TreeSet<>();
+        for (String key : keyed.keySet()) {
+            contexts.add(contextOf(key));
+        }
+        return contexts;
+    }
+
+    private static Map<String, String> keyedLines(List<String> lines) {
+        Map<String, String> keyed = new LinkedHashMap<>();
+        String context = "game";
+        String headerKind = null;
+        Map<String, Integer> occurrences = new HashMap<>();
+        for (String line : lines) {
+            int space = line.indexOf(' ');
+            String key = space < 0 ? line : line.substring(0, space);
+            if (headerKind != null) {
+                context = headerKind + ":" + key;
+                headerKind = null;
+                occurrences.clear();
+            } else if ("-player-".equals(line) || "-tile-".equals(line)) {
+                headerKind = line.substring(1, line.length() - 1);
+            } else if (line.startsWith("-end") && ("-endplayer-".equals(line) || "-endtile-".equals(line))) {
+                context = "game";
+                occurrences.clear();
+            }
+            int occurrence = occurrences.merge(key, 1, Integer::sum);
+            keyed.put(context + ":" + key + "#" + occurrence, line);
+        }
+        return keyed;
+    }
+
+    private static String entryDiff(String old, String current) {
+        if (old == null) return "ADDED";
+        if (current == null) return "REMOVED";
+        Set<String> was = Set.of(valueOf(old).split("[;,]"));
+        Set<String> now = Set.of(valueOf(current).split("[;,]"));
+        List<String> parts = new ArrayList<>();
+        for (String entry : now) {
+            if (!was.contains(entry)) parts.add("+" + StringUtils.abbreviate(entry, ENTRY_SNIPPET));
+        }
+        for (String entry : was) {
+            if (!now.contains(entry)) parts.add("-" + StringUtils.abbreviate(entry, ENTRY_SNIPPET));
+        }
+        java.util.Collections.sort(parts);
+        return parts.isEmpty()
+                ? "REORDERED"
+                : String.join(" ", parts.subList(0, Math.min(MAX_DIFF_ENTRIES, parts.size())));
+    }
+
+    private static String valueOf(String line) {
+        int space = line.indexOf(' ');
+        return space < 0 ? "" : line.substring(space + 1);
+    }
+
+    private static void writeInventory(Path resultDir, String gameName) throws IOException {
+        List<String> lines = INVENTORY_BY_GAME.get(gameName);
+        if (lines == null) return;
+        Path file = resultDir.resolve("inventory").resolve(gameName + ".txt");
+        Files.createDirectories(file.getParent());
+        Files.write(file, lines, StandardCharsets.UTF_8);
+    }
+
+    private static void writeInventoryTally(Path resultDir) throws IOException {
+        List<String> lines = new ArrayList<>();
+        INVENTORY_TALLY.forEach((key, count) -> lines.add(count + "\t" + key));
+        Files.createDirectories(resultDir.resolve("inventory"));
+        Files.write(resultDir.resolve("inventory").resolve("TALLY.txt"), lines, StandardCharsets.UTF_8);
     }
 
     // fow_options is written from a HashMap keyed by an enum, whose identity hash codes change between JVMs.
