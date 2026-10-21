@@ -1,0 +1,136 @@
+package ti4.image;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.util.List;
+import ti4.game.Game;
+import ti4.game.Tile;
+import ti4.helpers.Storage;
+import ti4.image.MapGenerator.HorizontalAlign;
+import ti4.image.MapGenerator.VerticalAlign;
+import ti4.logging.BotLogger;
+
+final class ConnectionStripSection {
+
+    private static final int HEADER_HEIGHT = 60;
+    private static final int LABEL_HEIGHT = 40;
+    private static final int CELL_WIDTH = 320;
+    private static final int ROW_HEIGHT = 230;
+    private static final int MAX_ROWS = 3;
+    private static final int SIDE_MARGIN = 40;
+    private static final int BOTTOM_CLEARANCE = 240;
+    private static final double TILE_SCALE = 0.5;
+
+    private ConnectionStripSection() {}
+
+    static int height(List<SectorConnections.Connection> connections, int stripWidth) {
+        if (connections.isEmpty()) {
+            return 0;
+        }
+        int rows = Math.min(MAX_ROWS, Math.ceilDiv(connections.size(), connectionsPerRow(stripWidth)));
+        return HEADER_HEIGHT + rows * ROW_HEIGHT + BOTTOM_CLEARANCE;
+    }
+
+    static void draw(RenderContext ctx, Graphics2D g2) {
+        List<SectorConnections.Connection> connections = ctx.board().connections();
+        if (connections.isEmpty()) {
+            return;
+        }
+        int width = ctx.canvas().width();
+        int stripTop = ctx.board().connectionStripTop();
+        int perRow = connectionsPerRow(width);
+        int capacity = perRow * MAX_ROWS;
+        boolean overflow = connections.size() > capacity;
+        List<SectorConnections.Connection> drawn = overflow ? connections.subList(0, capacity - 1) : connections;
+        int cells = drawn.size() + (overflow ? 1 : 0);
+
+        g2.setColor(Color.BLACK);
+        g2.fillRect(0, stripTop, width, height(connections, width));
+        g2.setFont(Storage.getFont32());
+        DrawingUtil.superDrawString(
+                g2,
+                "Connections to other maps",
+                width / 2,
+                stripTop + HEADER_HEIGHT / 2,
+                Color.WHITE,
+                HorizontalAlign.Center,
+                VerticalAlign.Center,
+                Strokes.STROKE_4,
+                Color.BLACK);
+        for (int index = 0; index < cells; index++) {
+            Point cell = cellOrigin(index, perRow, cells, width, stripTop);
+            if (index < drawn.size()) {
+                drawConnection(ctx, g2, drawn.get(index), cell);
+            } else {
+                String more = "+" + (connections.size() - drawn.size()) + " more";
+                drawLabel(g2, more, cell, ROW_HEIGHT / 2, Storage.getFont28());
+            }
+        }
+        g2.setFont(Storage.getFont32());
+    }
+
+    private static int connectionsPerRow(int stripWidth) {
+        return Math.max(1, (stripWidth - 2 * SIDE_MARGIN) / CELL_WIDTH);
+    }
+
+    private static Point cellOrigin(int index, int perRow, int cells, int width, int stripTop) {
+        int row = index / perRow;
+        int column = index % perRow;
+        int cellsInRow = Math.min(perRow, cells - row * perRow);
+        int rowLeft = (width - cellsInRow * CELL_WIDTH) / 2;
+        return new Point(rowLeft + column * CELL_WIDTH, stripTop + HEADER_HEIGHT + row * ROW_HEIGHT);
+    }
+
+    private static void drawConnection(
+            RenderContext ctx, Graphics2D g2, SectorConnections.Connection connection, Point cell) {
+        Tile tile = ctx.fog().tiles().get(connection.position());
+        if (tile == null) {
+            return;
+        }
+        drawLabel(g2, connection.sectorName(), cell, LABEL_HEIGHT / 2, Storage.getFont28());
+        int size = (int) (600 * TILE_SCALE);
+        int padding = (int) (BoardLayout.TILE_PADDING * TILE_SCALE);
+        int hexHeight = (int) (TileGenerator.TILE_HEIGHT * TILE_SCALE);
+        BufferedImage tileImage;
+        try {
+            tileImage = tileImage(ctx, tile);
+        } catch (Exception e) {
+            Game game = ctx.game();
+            BotLogger.error("Connection strip error in `" + game.getName() + "`, tile: " + tile.getTileID(), e);
+            return;
+        }
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.drawImage(tileImage, cell.x + (CELL_WIDTH - size) / 2, cell.y + LABEL_HEIGHT - padding, size, size, null);
+        drawLabel(g2, connection.position(), cell, LABEL_HEIGHT + hexHeight + 18, Storage.getFont24());
+    }
+
+    private static void drawLabel(Graphics2D g2, String text, Point cell, int centreY, Font font) {
+        g2.setFont(font);
+        DrawingUtil.superDrawString(
+                g2,
+                text,
+                cell.x + CELL_WIDTH / 2,
+                cell.y + centreY,
+                Color.WHITE,
+                HorizontalAlign.Center,
+                VerticalAlign.Center,
+                Strokes.STROKE_3,
+                Color.BLACK);
+    }
+
+    private static BufferedImage tileImage(RenderContext ctx, Tile tile) {
+        BufferedImage image = new BufferedImage(600, 600, BufferedImage.TYPE_INT_ARGB);
+        Graphics tileGraphics = image.getGraphics();
+        TileGenerator tileGenerator = new TileGenerator(ctx.game(), ctx.event(), ctx.displayType());
+        for (TileStep step : List.of(TileStep.Tile, TileStep.Units)) {
+            tileGraphics.drawImage(tileGenerator.draw(tile, step), 0, 0, null);
+        }
+        tileGraphics.dispose();
+        return image;
+    }
+}

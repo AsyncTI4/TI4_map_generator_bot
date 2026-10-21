@@ -103,7 +103,7 @@ class MegaGamePlayerAreasTest extends BaseTi4Test {
     void megaGameMapGetsNoExtraColumnForMapSidePlayerAreas() {
         seatPlayers(10);
 
-        assertEquals(MapGenerator.smallestRegularPlayerAreaWidth() + 10, MapGenerator.getMapWidth(game, 3));
+        assertEquals(BoardLayout.smallestRegularPlayerAreaWidth() + 10, BoardLayout.getMapWidth(game, 3));
     }
 
     @Test
@@ -111,7 +111,7 @@ class MegaGamePlayerAreasTest extends BaseTi4Test {
         seatPlayers(10);
 
         try (MapGenerator generator = new MapGenerator(game, DisplayType.stats, null, null)) {
-            int twoColumns = 10 + 2 * MapGenerator.smallestRegularPlayerAreaWidth() + PlayerAreaGenerator.COLUMN_GAP;
+            int twoColumns = 10 + 2 * BoardLayout.smallestRegularPlayerAreaWidth() + PlayerAreaGenerator.COLUMN_GAP;
             assertTrue(generator.imageWidth() >= twoColumns, "both columns fit side by side");
             assertTrue(generator.imageHeight() < 10 * 340, "five areas per column, not ten stacked");
             generator.draw();

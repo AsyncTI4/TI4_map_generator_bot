@@ -96,6 +96,16 @@ final class FogView {
         return privateView && !FoWHelper.canSeeStatsOfPlayer(game, player, viewer);
     }
 
+    Set<String> seenPositions() {
+        Set<String> positions = new HashSet<>();
+        tiles.forEach((position, tile) -> {
+            if (!isUnseenBlankFogTile(tile)) {
+                positions.add(position);
+            }
+        });
+        return positions;
+    }
+
     boolean isUnseenBlankFogTile(Tile tile) {
         return privateView && "0b".equals(tile.getTileID()) && StringUtils.isBlank(tile.getFogLabel(viewer));
     }

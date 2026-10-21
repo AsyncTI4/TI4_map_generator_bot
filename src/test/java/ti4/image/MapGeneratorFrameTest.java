@@ -60,8 +60,8 @@ class MapGeneratorFrameTest extends BaseTi4Test {
     @Test
     void nonFogMapKeepsTheClassicRingBasedCanvas() {
         try (MapGenerator generator = render(game, DisplayType.map, null)) {
-            assertEquals(Math.max(1000, MapGenerator.getMapWidth(game)), generator.imageWidth());
-            assertEquals(MapGenerator.getMapHeight(game) + STRIP, generator.imageHeight());
+            assertEquals(Math.max(1000, BoardLayout.getMapWidth(game)), generator.imageWidth());
+            assertEquals(BoardLayout.getMapHeight(game) + STRIP, generator.imageHeight());
         }
     }
 
@@ -75,7 +75,7 @@ class MapGeneratorFrameTest extends BaseTi4Test {
         game.setFowMode(true);
         try (MapGenerator generator = render(game, DisplayType.map, null)) {
             assertTrue(generator.imageHeight() < classicHeight, "empty outer rings are dropped");
-            assertTrue(generator.imageWidth() < Math.max(1000, MapGenerator.getMapWidth(game)), "narrower too");
+            assertTrue(generator.imageWidth() < Math.max(1000, BoardLayout.getMapWidth(game)), "narrower too");
             assertTrue(generator.imageWidth() >= 11 * 150, "the 10-point score track still fits");
             generator.draw();
         }
@@ -87,8 +87,8 @@ class MapGeneratorFrameTest extends BaseTi4Test {
         game.setFowOption(FOWOption.CLASSIC_MAP_LAYOUT, true);
         MapSegment.put(game, new MapSegment("core", "000", 1));
         try (MapGenerator generator = render(game, DisplayType.map, "core")) {
-            assertEquals(Math.max(1000, MapGenerator.getMapWidth(game)), generator.imageWidth());
-            assertEquals(MapGenerator.getMapHeight(game) + STRIP, generator.imageHeight());
+            assertEquals(Math.max(1000, BoardLayout.getMapWidth(game)), generator.imageWidth());
+            assertEquals(BoardLayout.getMapHeight(game) + STRIP, generator.imageHeight());
             assertNull(generator.shownSegmentName(), "sectors are ignored");
         }
     }
@@ -97,14 +97,14 @@ class MapGeneratorFrameTest extends BaseTi4Test {
     void combinedViewUsesTheClassicWidthMatchingTheFramedMapSize() {
         game.setFowMode(true);
         try (MapGenerator generator = render(game, DisplayType.all, null)) {
-            assertEquals(MapGenerator.getMapWidth(game, 3), generator.imageWidth());
+            assertEquals(BoardLayout.getMapWidth(game, 3), generator.imageWidth());
         }
 
         // A small far-away sector gets the same normal width, not the width of a "12-ring" map.
         Game twoMaps = twoFarApartClusters();
         MapSegment.put(twoMaps, new MapSegment("south", "1237", 1));
         try (MapGenerator generator = render(twoMaps, DisplayType.all, "south")) {
-            assertEquals(MapGenerator.getMapWidth(twoMaps, 3), generator.imageWidth());
+            assertEquals(BoardLayout.getMapWidth(twoMaps, 3), generator.imageWidth());
             generator.draw();
         }
     }

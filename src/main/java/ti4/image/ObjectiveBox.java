@@ -38,6 +38,12 @@ class ObjectiveBox {
         spaceForTokens = boxWidth - (maxTextWidth + bufferBetweenTextAndTokens * 2);
     }
 
+    static int scoreTokenSpacing() {
+        String controlID = Mapper.getControlID("red");
+        BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), 0.45f);
+        return bufferedImage != null ? bufferedImage.getWidth() + 6 : 30;
+    }
+
     public void display(Game game, Graphics graphics, FogView fog, WebsiteOverlays overlays, Objective objective) {
         setColor(graphics, objective);
 
@@ -74,7 +80,7 @@ class ObjectiveBox {
         return Math.clamp(
                 getMaxLengthOfTokens(game, maxTextWidth, scoreTokenSpacing),
                 getMinimumBoxWidth(game),
-                MapGenerator.getMaxObjectiveWidth(game));
+                BoardLayout.getMaxObjectiveWidth(game));
     }
 
     public static Integer getVerticalSpacing() {
