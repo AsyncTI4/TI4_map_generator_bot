@@ -1,19 +1,21 @@
 package ti4.discord.interactions.commands.developer;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
-import ti4.game.persistence.ManagedGame;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
 class ReloadCorruptedSaves extends Subcommand {
 
     ReloadCorruptedSaves() {
-        super("reload_corrupted_saves", "Runs this custom code against all games.");
+        super("reload_corrupted_saves", "Reloads every game whose save file is corrupt from its latest undo.");
     }
 
     @Override
@@ -21,26 +23,24 @@ class ReloadCorruptedSaves extends Subcommand {
         MessageHelper.sendMessageToChannel(
                 event.getChannel(), "Reloading all corrupted saves. This will take a while.");
 
-        int successCount = 0;
-        var reloadedGames = new HashSet<String>();
-        var failedReloadedGames = new HashSet<String>();
-        var managedGames = GameManager.getManagedGames();
-        for (ManagedGame managedGame : managedGames) {
-            try {
-                managedGame.getGame();
-                successCount++;
-            } catch (Exception e) {
-                if (tryReload(managedGame.getName())) reloadedGames.add(managedGame.getName());
-                else failedReloadedGames.add(managedGame.getName());
-            }
+        List<String> corruptGameNames = corruptGameNames(GameManager.getGameNames());
+        var reloadedGames = new ArrayList<String>();
+        var failedReloadedGames = new ArrayList<String>();
+        for (String gameName : corruptGameNames) {
+            if (tryReload(gameName)) reloadedGames.add(gameName);
+            else failedReloadedGames.add(gameName);
         }
 
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
                 "Finished reloading games."
-                        + "\nSuccessfully loaded: " + successCount + " games"
+                        + "\nFound " + StringHelper.pluralize(corruptGameNames.size(), "corrupted save")
                         + "\nReloaded: " + reloadedGames
                         + "\nFailed to reload: " + failedReloadedGames);
+    }
+
+    static List<String> corruptGameNames(Collection<String> gameNames) {
+        return gameNames.stream().filter(GameManager::isCorrupt).sorted().toList();
     }
 
     private static boolean tryReload(String name) {
