@@ -60,14 +60,15 @@ final class MapCanvasLayout {
                         game, fog, neighbours, playerAreasLeft, playerAreasWidth)
                 .heightOfPlayerAreasSection();
 
+        int badgeRoom = GameModeBadges.isShown(game) ? GameModeBadges.ROOM_ABOVE_HEADER : 0;
         int heightForGameInfo;
         int height;
         int width;
         int minimumHeight;
         switch (basicType) {
             case stats:
-                heightForGameInfo = STATS_ONLY_GAME_INFO_HEIGHT;
-                height = heightOfPlayerAreasSection;
+                heightForGameInfo = STATS_ONLY_GAME_INFO_HEIGHT + badgeRoom;
+                height = heightOfPlayerAreasSection + badgeRoom;
                 minimumHeight = 0;
                 width = playerAreasWidth;
                 break;
@@ -79,8 +80,8 @@ final class MapCanvasLayout {
                 break;
             default:
                 if (landscape) {
-                    heightForGameInfo = STATS_ONLY_GAME_INFO_HEIGHT;
-                    height = Math.max(heightOfPlayerAreasSection, mapHeight);
+                    heightForGameInfo = STATS_ONLY_GAME_INFO_HEIGHT + badgeRoom;
+                    height = Math.max(heightOfPlayerAreasSection + badgeRoom, mapHeight);
                     minimumHeight = mapHeight;
                     width = landscapeWidth(mapWidth);
                 } else {

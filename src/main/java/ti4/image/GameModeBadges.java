@@ -9,9 +9,19 @@ import ti4.helpers.TIGLHelper.TIGLRank;
 
 final class GameModeBadges {
 
+    static final int ROOM_ABOVE_HEADER = 95;
+
     private static final int BADGE_ABOVE_NAME = -150;
 
     private GameModeBadges() {}
+
+    static boolean isShown(Game game) {
+        return game.isCompetitiveTIGLGame()
+                || game.isAbsolMode()
+                || game.isNoSwapMode()
+                || game.isMiltyModMode()
+                || game.isDiscordantStarsMode();
+    }
 
     static void draw(RenderContext ctx, Graphics2D g2, int x, int y) {
         Game game = ctx.game();

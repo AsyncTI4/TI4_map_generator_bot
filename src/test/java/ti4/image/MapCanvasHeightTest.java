@@ -215,4 +215,31 @@ class MapCanvasHeightTest extends BaseTi4Test {
 
         assertTrue(image.getHeight() > withoutSpectators, "the wrapped spectator lines extend the canvas");
     }
+
+    private int heightForGameInfo(DisplayType type) {
+        return MapRenderer.resolve(new MapRenderRequest(game, type, null, null))
+                .canvas()
+                .heightForGameInfo();
+    }
+
+    @Test
+    void gameModeBadgesGetRoomBelowTheTimestampInStatsAndLandscapeRenders() {
+        int statsWithoutBadges = heightForGameInfo(DisplayType.stats);
+        int landscapeWithoutBadges = heightForGameInfo(DisplayType.landscape);
+
+        game.setAbsolMode(true);
+
+        assertEquals(statsWithoutBadges + GameModeBadges.ROOM_ABOVE_HEADER, heightForGameInfo(DisplayType.stats));
+        assertEquals(
+                landscapeWithoutBadges + GameModeBadges.ROOM_ABOVE_HEADER, heightForGameInfo(DisplayType.landscape));
+    }
+
+    @Test
+    void gameModeBadgesDoNotMoveTheHeaderOfRendersThatDrawTheMapAboveIt() {
+        int withoutBadges = heightForGameInfo(DisplayType.all);
+
+        game.setAbsolMode(true);
+
+        assertEquals(withoutBadges, heightForGameInfo(DisplayType.all));
+    }
 }
