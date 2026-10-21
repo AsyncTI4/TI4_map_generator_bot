@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Data;
 import lombok.Getter;
-import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -381,13 +380,6 @@ public abstract class UnitHolder {
 
     public Point getHolderCenterPosition() {
         return new Point(holderCenterPosition);
-    }
-
-    public Point getHolderCenterPosition(Tile tile) {
-        if (Constants.TOKEN_PLANETS.contains(name)) {
-            return Helper.getTokenPlanetCenterPosition(tile, name);
-        }
-        return getHolderCenterPosition();
     }
 
     public Map<UnitKey, List<Integer>> getUnitsByStateForPlayer(Player p) {

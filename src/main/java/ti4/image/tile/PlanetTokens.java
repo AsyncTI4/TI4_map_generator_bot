@@ -33,7 +33,7 @@ final class PlanetTokens {
             LegacyTokenStack.draw(tile, g, unitHolder, tokenList);
             return;
         }
-        Point centerPosition = unitHolder.getHolderCenterPosition(tile);
+        Point centerPosition = TokenPlanetPlacement.holderCenter(unitHolder, tile);
         int xDelta = 0;
         for (String tokenID : tokenList) {
             if (HolderTokens.isGroundToken(tokenID) || HolderTokens.isCustodianToken(tokenID)) {

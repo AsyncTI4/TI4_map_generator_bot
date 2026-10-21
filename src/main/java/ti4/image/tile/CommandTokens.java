@@ -31,7 +31,7 @@ final class CommandTokens {
             BufferedImage image = null;
             try {
                 image = ImageHelper.read(ccPath);
-                Point centerPosition = spaceHolder.getHolderCenterPosition(tile);
+                Point centerPosition = TokenPlanetPlacement.holderCenter(spaceHolder, tile);
                 Player player =
                         PlayerTokens.ownerOfToken(scene.game().getPlayers().values(), ccID);
                 boolean convertToGeneric = scene.showsGeneric(player);

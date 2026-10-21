@@ -65,7 +65,7 @@ final class AttachmentsStep implements TileStepPainter {
         int w = icon.getWidth();
         int h = icon.getHeight();
 
-        Point position = planet.getHolderCenterPosition(layer.tile());
+        Point position = TokenPlanetPlacement.holderCenter(planet, layer.tile());
         position = new Point(position.x - w / 2 + TILE_PADDING, position.y - h / 2 + TILE_PADDING);
         Graphics2D g = layer.g();
         if (number == 1) {

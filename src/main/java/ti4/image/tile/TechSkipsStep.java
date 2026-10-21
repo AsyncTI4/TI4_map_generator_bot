@@ -58,7 +58,7 @@ final class TechSkipsStep implements TileStepPainter {
         int w = icon.getWidth();
         int h = icon.getHeight();
 
-        Point position = planet.getHolderCenterPosition(layer.tile());
+        Point position = TokenPlanetPlacement.holderCenter(planet, layer.tile());
         if (number > 1) {
             int offset = -20 + index * 40 / (number - 1);
             position.translate(offset, offset);

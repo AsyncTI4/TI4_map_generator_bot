@@ -133,7 +133,7 @@ final class UnitHolderRenderer {
             }
 
             UnitShape shape = new UnitShape(
-                    unitHolder.getHolderCenterPosition(tile), unitKey.asyncID(), unitImage, isBulk(unitKey));
+                    TokenPlanetPlacement.holderCenter(unitHolder, tile), unitKey.asyncID(), unitImage, isBulk(unitKey));
 
             List<Integer> unitStates = unitHolder.getUnitStates(unitKey);
             List<UnitState> states = UnitState.unitRenderOrder().stream()

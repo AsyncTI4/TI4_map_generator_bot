@@ -20,7 +20,7 @@ final class LegacyTokenStack {
     private LegacyTokenStack() {}
 
     static void draw(Tile tile, Graphics2D g, UnitHolder unitHolder, List<String> tokenList) {
-        Point centerPosition = unitHolder.getHolderCenterPosition(tile);
+        Point centerPosition = TokenPlanetPlacement.holderCenter(unitHolder, tile);
         int x = centerPosition.x;
         int y = centerPosition.y - (tokenList.size() > 1 ? STACK_LIFT : 0);
         for (String tokenID : tokenList) {

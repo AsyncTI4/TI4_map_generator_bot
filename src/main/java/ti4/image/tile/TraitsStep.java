@@ -82,7 +82,7 @@ final class TraitsStep implements TileStepPainter {
         int w = icon.getWidth();
         int h = icon.getHeight();
 
-        Point position = planet.getHolderCenterPosition(layer.tile());
+        Point position = TokenPlanetPlacement.holderCenter(planet, layer.tile());
         position = new Point(position.x - w / 2 + TILE_PADDING, position.y - h / 2 + TILE_PADDING);
         halo.drawBehind(layer.g(), position.x, position.y);
         layer.g().drawImage(icon, position.x, position.y, null);

@@ -33,7 +33,7 @@ final class ControlMarkers {
             LegacyTokenStack.draw(tile, g, unitHolder, controlList);
             return;
         }
-        Point centerPosition = unitHolder.getHolderCenterPosition(tile);
+        Point centerPosition = TokenPlanetPlacement.holderCenter(unitHolder, tile);
         int xDelta = 0;
         for (String controlID : controlList) {
             if (controlID.contains(Constants.SLEEPER)) {

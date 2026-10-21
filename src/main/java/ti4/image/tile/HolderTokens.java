@@ -40,7 +40,7 @@ final class HolderTokens {
     }
 
     static void draw(Tile tile, Graphics2D g, UnitHolder unitHolder, Predicate<String> isDrawn, Game game) {
-        Point centerPosition = unitHolder.getHolderCenterPosition(tile);
+        Point centerPosition = TokenPlanetPlacement.holderCenter(unitHolder, tile);
         List<String> tokenList = sortedTokens(unitHolder);
         if (game.isShowBubbles()
                 && unitHolder instanceof Planet planetHolder

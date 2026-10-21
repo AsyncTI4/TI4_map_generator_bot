@@ -18,7 +18,6 @@ import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.Strokes;
@@ -48,7 +47,7 @@ final class SpaceTokens {
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         tokenList.sort(Comparator.comparing(token -> !Constants.TOKEN_PLANETS.contains(Mapper.getTokenKey(token))));
 
-        Point centerPosition = unitHolder.getHolderCenterPosition(tile);
+        Point centerPosition = TokenPlanetPlacement.holderCenter(unitHolder, tile);
         int x = 0;
         int y = 0;
         int deltaX = 80;
@@ -83,7 +82,7 @@ final class SpaceTokens {
             if (tokenImage == null) return;
 
             if (Constants.TOKEN_PLANETS.contains(tokenName)) {
-                Point tokenCenter = Helper.getTokenPlanetCenterOfImage(tile, tokenName);
+                Point tokenCenter = TokenPlanetPlacement.getTokenPlanetCenterOfImage(tile, tokenName);
                 int tokenX = tokenCenter.x - (tokenImage.getWidth() / 2);
                 int tokenY = tokenCenter.y - (tokenImage.getHeight() / 2);
                 g.drawImage(tokenImage, TILE_PADDING + tokenX, TILE_PADDING + tokenY, null);

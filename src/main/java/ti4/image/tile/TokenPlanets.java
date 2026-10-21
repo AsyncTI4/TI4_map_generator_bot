@@ -17,7 +17,7 @@ final class TokenPlanets {
     static Point offset(@Nullable Point position, UnitHolder planet, Tile tile) {
         if (position == null) return null;
         if (Constants.TOKEN_PLANETS.contains(planet.getName())) {
-            Point centerPosition = planet.getHolderCenterPosition(tile);
+            Point centerPosition = TokenPlanetPlacement.holderCenter(planet, tile);
             int radius = DEFAULT_RADIUS;
             if (planet instanceof Planet p) {
                 radius = (int) p.getRadius();
