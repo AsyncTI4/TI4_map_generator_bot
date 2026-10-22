@@ -52,9 +52,9 @@ import ti4.helpers.SortHelper;
 import ti4.helpers.URLReaderHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.model.PlanetModel;
-import ti4.model.PositionMapper;
 
 public final class LoreService {
 
@@ -531,7 +531,7 @@ public final class LoreService {
             String emoji;
             boolean isValidLore = true;
 
-            if (PositionMapper.isTilePositionValid(key.base())) {
+            if (MapPositionMapper.isTilePositionValid(key.base())) {
                 // System Lore — the full stored key (base + tag, e.g. "522#MovedR4to6") is already
                 // self-descriptive, so it's used as-is for the label.
                 Tile tile = game.getTileByPosition(key.base());
@@ -935,7 +935,7 @@ public final class LoreService {
         }
 
         String canonicalBase;
-        if (PositionMapper.isTilePositionValid(typed.base())) {
+        if (MapPositionMapper.isTilePositionValid(typed.base())) {
             if (game.getTileByPosition(typed.base()) == null) {
                 return null;
             }

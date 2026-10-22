@@ -15,7 +15,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.image.tile.TileGeometry;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 
 public record MapFrame(int offsetX, int offsetY, int width, int height) {
 
@@ -47,9 +47,9 @@ public record MapFrame(int offsetX, int offsetY, int width, int height) {
     @Nullable
     static Rectangle hexBounds(Game game, @Nullable String position, int fractureYbump, int padX, int padY) {
         if (position == null || BoardLayout.CORNER_POSITIONS.contains(position.toLowerCase())) return null;
-        Point raw = PositionMapper.getTilePosition(position);
+        Point raw = MapPositionMapper.getTilePosition(position);
         if (raw == null) return null;
-        Point scaled = PositionMapper.getScaledTilePosition(game, position, raw.x, raw.y, fractureYbump);
+        Point scaled = MapPositionMapper.getScaledTilePosition(game, position, raw.x, raw.y, fractureYbump);
         return new Rectangle(scaled.x + padX, scaled.y + padY, TileGeometry.TILE_WIDTH, TileGeometry.TILE_HEIGHT);
     }
 
@@ -137,8 +137,8 @@ public record MapFrame(int offsetX, int offsetY, int width, int height) {
         for (int step = 0; step < radius; step++) {
             Deque<String> next = new ArrayDeque<>();
             for (String position : frontier) {
-                for (String adjacent : PositionMapper.getAdjacentTilePositions(position)) {
-                    if (PositionMapper.getTilePosition(adjacent) != null && reached.add(adjacent)) {
+                for (String adjacent : MapPositionMapper.getAdjacentTilePositions(position)) {
+                    if (MapPositionMapper.getTilePosition(adjacent) != null && reached.add(adjacent)) {
                         next.add(adjacent);
                     }
                 }

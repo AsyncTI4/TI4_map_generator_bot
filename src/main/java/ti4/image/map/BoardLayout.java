@@ -10,7 +10,7 @@ import ti4.helpers.DisplayType;
 import ti4.image.playerarea.PlayerAreaColumns;
 import ti4.image.tile.TileGeometry;
 import ti4.model.BoardPosition;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.service.map.FractureService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
@@ -232,7 +232,7 @@ final class BoardLayout {
 
     @Nullable
     Point tileOrigin(String position, Point projected) {
-        Point scaled = PositionMapper.getScaledTilePosition(game, position, projected.x, projected.y, fractureYbump);
+        Point scaled = MapPositionMapper.getScaledTilePosition(game, position, projected.x, projected.y, fractureYbump);
         int tileX = scaled.x + EXTRA_X - TileGeometry.TILE_PADDING - frameOffsetX();
         int tileY = scaled.y + EXTRA_Y - TileGeometry.TILE_PADDING - frameOffsetY();
         if (mapFrame != null && framing.pinnedCorners().contains(position)) {
@@ -273,7 +273,7 @@ final class BoardLayout {
     }
 
     static int getRingCount(Game game) {
-        return Math.clamp(PositionMapper.layoutRingCount(game), RING_MIN_COUNT, RING_MAX_COUNT);
+        return Math.clamp(MapPositionMapper.layoutRingCount(game), RING_MIN_COUNT, RING_MAX_COUNT);
     }
 
     static int getMapHeight(Game game) {
@@ -320,7 +320,7 @@ final class BoardLayout {
                 .mapToInt(BoardPosition.BOARDS::indexOf)
                 .max()
                 .orElse(-1);
-        return (highestBoard + 1) * PositionMapper.boardWidth(PositionMapper.boardLayoutRingCount(game));
+        return (highestBoard + 1) * MapPositionMapper.boardWidth(MapPositionMapper.boardLayoutRingCount(game));
     }
 
     static int getMaxObjectiveWidth(Game game) {

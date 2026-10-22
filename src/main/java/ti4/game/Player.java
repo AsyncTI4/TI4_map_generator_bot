@@ -97,10 +97,10 @@ import ti4.model.EmbeddableModel;
 import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
 import ti4.model.LeaderModel;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
-import ti4.model.PositionMapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
@@ -879,8 +879,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public int getUnitCap(String unit) {
         if (unitCaps.get(unit) == null) {
             if ("monument".equals(unit)) return 1;
-            if (PositionMapper.getReinforcementsPosition(unit) == null) return 0;
-            return PositionMapper.getReinforcementsPosition(unit).getPositionCount(unit);
+            if (MapPositionMapper.getReinforcementsPosition(unit) == null) return 0;
+            return MapPositionMapper.getReinforcementsPosition(unit).getPositionCount(unit);
             // return 0;
         }
         return unitCaps.get(unit);

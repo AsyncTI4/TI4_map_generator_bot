@@ -53,9 +53,9 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.ExploreModel;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.model.NamedCombatModifierModel;
-import ti4.model.PositionMapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
@@ -4881,7 +4881,7 @@ public final class ButtonHelperFactionSpecific {
         String origMessageId = modalId[2];
         String position = event.getValue(Constants.POSITION).getAsString().trim();
 
-        if (!PositionMapper.isTilePositionValid(position)) {
+        if (!MapPositionMapper.isTilePositionValid(position)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Position " + position + " is invalid.");
             return;
         }

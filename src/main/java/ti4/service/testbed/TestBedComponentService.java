@@ -16,8 +16,8 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.model.DeckModel;
 import ti4.model.DeckModel.DeckType;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.Seat;
 import ti4.service.fow.FOWPlusService;
@@ -179,7 +179,7 @@ public class TestBedComponentService {
     static String placeToken(Game game, String where, String token) {
         Tile tile;
         String holder;
-        if (PositionMapper.isTilePositionValid(where)) {
+        if (MapPositionMapper.isTilePositionValid(where)) {
             tile = game.getTileByPosition(where);
             holder = Constants.SPACE;
         } else {

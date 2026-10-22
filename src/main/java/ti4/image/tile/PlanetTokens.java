@@ -15,7 +15,7 @@ import ti4.helpers.Constants;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.model.UnitTokenPosition;
 
 final class PlanetTokens {
@@ -28,7 +28,7 @@ final class PlanetTokens {
 
     static void draw(Tile tile, Graphics2D g, UnitHolder unitHolder, List<Rectangle> occupied) {
         List<String> tokenList = sortedTokens(unitHolder);
-        UnitTokenPosition unitTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
+        UnitTokenPosition unitTokenPosition = MapPositionMapper.getPlanetTokenPosition(unitHolder.getName());
         if (unitTokenPosition == null) {
             LegacyTokenStack.draw(tile, g, unitHolder, tokenList);
             return;

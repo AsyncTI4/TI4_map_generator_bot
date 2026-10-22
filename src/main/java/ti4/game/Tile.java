@@ -34,8 +34,8 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.logging.BotLogger;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
@@ -107,7 +107,7 @@ public class Tile {
     private void initPlanetsAndSpace(String tileID) {
         Space space = new Space(Constants.SPACE, Constants.SPACE_CENTER_POSITION);
         unitHolders.put(Constants.SPACE, space);
-        Map<String, Point> tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
+        Map<String, Point> tilePlanetPositions = MapPositionMapper.getTilePlanetPositions(tileID);
 
         if (tilePlanetPositions != null)
             tilePlanetPositions.forEach(
@@ -731,7 +731,7 @@ public class Tile {
 
     @JsonIgnore
     public boolean isEdgeOfBoard(Game game) {
-        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(position);
+        List<String> directlyAdjacentTiles = MapPositionMapper.getAdjacentTilePositions(position);
         if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {
             // adjacency file for this tile is not filled in
             return true;

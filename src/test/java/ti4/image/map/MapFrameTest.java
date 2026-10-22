@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.image.tile.TileGeometry;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 class MapFrameTest extends BaseTi4Test {
@@ -46,8 +46,8 @@ class MapFrameTest extends BaseTi4Test {
         assertEquals(2000, frame.width());
 
         // The hex's left edge after the offset is applied, as BoardLayout.tileOrigin places it.
-        Point raw = PositionMapper.getTilePosition("000");
-        Point scaled = PositionMapper.getScaledTilePosition(game, "000", raw.x, raw.y, 0);
+        Point raw = MapPositionMapper.getTilePosition("000");
+        Point scaled = MapPositionMapper.getScaledTilePosition(game, "000", raw.x, raw.y, 0);
         assertEquals((frame.width() - TileGeometry.TILE_WIDTH) / 2, scaled.x + PAD_X - frame.offsetX());
         assertEquals(PAD_Y, scaled.y + PAD_Y - frame.offsetY());
     }

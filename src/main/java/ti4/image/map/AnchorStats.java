@@ -19,8 +19,8 @@ import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.image.tile.TileGeometry;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 
 final class AnchorStats {
 
@@ -42,16 +42,16 @@ final class AnchorStats {
 
         String playerStatsAnchor = player.getPlayerStatsAnchorPosition();
         if (playerStatsAnchor != null) {
-            Point anchorProjectedPoint = PositionMapper.getTilePosition(playerStatsAnchor);
+            Point anchorProjectedPoint = MapPositionMapper.getTilePosition(playerStatsAnchor);
             if (anchorProjectedPoint != null) {
-                Point playerStatsAnchorPoint = PositionMapper.getScaledTilePosition(
+                Point playerStatsAnchorPoint = MapPositionMapper.getScaledTilePosition(
                         game, playerStatsAnchor, anchorProjectedPoint.x, anchorProjectedPoint.y, board.fractureYbump());
                 playerStatsAnchorPoint.translate(-board.frameOffsetX(), -board.frameOffsetY());
                 Integer anchorLocationIndex =
-                        PositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition());
+                        MapPositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition());
                 anchorLocationIndex = anchorLocationIndex == null ? 0 : anchorLocationIndex - 1;
                 boolean isCorner = playerStatsAnchor.equals(
-                        PositionMapper.getTileIDAtCornerPositionOfRing(ringCount, anchorLocationIndex + 1));
+                        MapPositionMapper.getTileIDAtCornerPositionOfRing(ringCount, anchorLocationIndex + 1));
                 if (anchorLocationIndex == 0 && isCorner) {
                     deltaX = playerStatsAnchorPoint.x + BoardLayout.EXTRA_X + 80;
                     deltaY = playerStatsAnchorPoint.y - 80;
@@ -98,23 +98,23 @@ final class AnchorStats {
             return;
         }
 
-        Point point = PositionMapper.getPlayerStats(Constants.STATS_USERNAME);
+        Point point = MapPositionMapper.getPlayerStats(Constants.STATS_USERNAME);
         if (!game.hideUserNames()) {
             g2.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX, point.y + deltaY);
         }
 
-        point = PositionMapper.getPlayerStats(Constants.STATS_FACTION);
+        point = MapPositionMapper.getPlayerStats(Constants.STATS_FACTION);
         String factionText = player.getFaction();
         if (player.getDisplayName() != null && !"null".equals(player.getDisplayName())) {
             factionText = player.getDisplayName();
         }
         g2.drawString(StringUtils.capitalize(factionText), point.x + deltaX, point.y + deltaY);
 
-        point = PositionMapper.getPlayerStats(Constants.STATS_COLOR);
+        point = MapPositionMapper.getPlayerStats(Constants.STATS_COLOR);
         g2.drawString(player.getColor(), point.x + deltaX, point.y + deltaY);
 
         int vpCount = player.getTotalVictoryPoints();
-        point = PositionMapper.getPlayerStats(Constants.STATS_VP);
+        point = MapPositionMapper.getPlayerStats(Constants.STATS_VP);
         g2.drawString("VP: " + vpCount, point.x + deltaX, point.y + deltaY);
 
         int totalSecrets = player.getSecrets().size();
@@ -122,7 +122,7 @@ final class AnchorStats {
         int soOffset = 0;
         String soHand = "pa_so-icon_hand.png";
         String soScored = "pa_so-icon_scored.png";
-        point = PositionMapper.getPlayerStats(Constants.STATS_SO);
+        point = MapPositionMapper.getPlayerStats(Constants.STATS_SO);
         for (int i = 0; i < totalSecrets; i++) {
             drawPAImage((point.x + deltaX + soOffset), point.y + deltaY, soHand);
             soOffset += 25;
@@ -143,7 +143,7 @@ final class AnchorStats {
             scText = Game.getSCNumberIfNaaluInPlay(player, scText);
             g2.setColor(ColorUtil.getSCColor(sc, game));
             g2.setFont(Fonts.ti(64));
-            point = PositionMapper.getPlayerStats(Constants.STATS_SC);
+            point = MapPositionMapper.getPlayerStats(Constants.STATS_SC);
             if (sc != 0) {
                 g2.drawString(scText, point.x + deltaX + 64 * count, point.y + deltaY);
             }
@@ -154,7 +154,7 @@ final class AnchorStats {
         g2.setFont(Fonts.ti(32));
         String ccID = Mapper.getCCID(player.getColor());
         String fleetCCID = Mapper.getFleetCCID(player.getColor());
-        point = PositionMapper.getPlayerStats(Constants.STATS_CC);
+        point = MapPositionMapper.getPlayerStats(Constants.STATS_CC);
         int x = point.x + deltaX;
         int y = point.y + deltaY;
         if (deltaSplitX != 0) {
@@ -172,7 +172,7 @@ final class AnchorStats {
             String speakerFile = ImageResources.token(speakerID);
             if (speakerFile != null) {
                 BufferedImage bufferedImage = ImageHelper.read(speakerFile);
-                point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
+                point = MapPositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
                 int negativeDelta = 0;
                 g2.drawImage(
                         bufferedImage,
@@ -186,7 +186,7 @@ final class AnchorStats {
             String speakerFile = ImageResources.token(Mapper.getTokenID("tyrant"));
             if (speakerFile != null) {
                 BufferedImage bufferedImage = ImageHelper.read(speakerFile);
-                point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
+                point = MapPositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
                 int negativeDelta = 0;
                 g2.drawImage(
                         bufferedImage,
@@ -199,12 +199,12 @@ final class AnchorStats {
         String activePlayerID = game.getActivePlayerID();
         String phase = game.getPhaseOfGame();
         if (player.isPassed()) {
-            point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
+            point = MapPositionMapper.getPlayerStats(Constants.STATS_PASSED);
             g2.setColor(ColorUtil.PassedColor);
             g2.drawString("PASSED", point.x + deltaX, point.y + deltaY);
             g2.setColor(Color.WHITE);
         } else if (player.getUserID().equals(activePlayerID) && "action".equals(phase)) {
-            point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
+            point = MapPositionMapper.getPlayerStats(Constants.STATS_PASSED);
             g2.setColor(ColorUtil.ActiveColor);
             g2.drawString("ACTIVE", point.x + deltaX + 4, point.y + deltaY);
 
@@ -214,7 +214,7 @@ final class AnchorStats {
             }
             g2.setColor(Color.WHITE);
         } else if (player.isAFK()) {
-            point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
+            point = MapPositionMapper.getPlayerStats(Constants.STATS_PASSED);
             g2.setColor(Color.GRAY);
             g2.drawString("AFK", point.x + deltaX + 4, point.y + deltaY);
             g2.setColor(Color.WHITE);

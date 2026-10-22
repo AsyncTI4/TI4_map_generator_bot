@@ -121,10 +121,10 @@ import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetModel;
-import ti4.model.PositionMapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source.ComponentSource;
@@ -5339,7 +5339,7 @@ public class ButtonHelper {
         deleteMessage(event);
         String newTileID = buttonID.split("_")[1];
         String pos = buttonID.split("_")[2];
-        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(pos);
+        List<String> directlyAdjacentTiles = MapPositionMapper.getAdjacentTilePositions(pos);
         List<String> usedPos = new ArrayList<>();
 
         List<String> redTilesToPullFrom = new ArrayList<>(List.of(
@@ -5484,7 +5484,7 @@ public class ButtonHelper {
             }
 
             if (tile == null || "silver_flame".equals(tile.getTileID())) {
-                for (String pos3 : PositionMapper.getAdjacentTilePositions(pos2)) {
+                for (String pos3 : MapPositionMapper.getAdjacentTilePositions(pos2)) {
                     Tile tile2 = game.getTileByPosition(pos3);
                     if (tile2 != null
                             && tile2.isEdgeOfBoard(game)
@@ -5571,8 +5571,8 @@ public class ButtonHelper {
         String newTileID = buttonID.split("_")[1];
         String pos = buttonID.split("_")[2];
         String pos2 = buttonID.split("_")[3];
-        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(pos);
-        List<String> directlyAdjacentTiles2 = PositionMapper.getAdjacentTilePositions(pos2);
+        List<String> directlyAdjacentTiles = MapPositionMapper.getAdjacentTilePositions(pos);
+        List<String> directlyAdjacentTiles2 = MapPositionMapper.getAdjacentTilePositions(pos2);
         String inBoth = "";
         for (String pos3 : directlyAdjacentTiles) {
             Tile tile3 = game.getTileByPosition(pos3);
@@ -7121,7 +7121,7 @@ public class ButtonHelper {
             String position = tile.getPosition();
             game.removeTile(position);
             String planetTileName = AliasHandler.resolveTile("82a");
-            if (!PositionMapper.isTilePositionValid(position)) {
+            if (!MapPositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Position tile not allowed");
                 return;
             }

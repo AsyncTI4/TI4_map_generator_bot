@@ -26,8 +26,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 
 /*
  * Flow of Blind Selection:
@@ -210,7 +210,7 @@ public class BlindSelectionService {
         if (UNIT_HOLDER.equals(type)) {
             // A system can hold a dock in space and one on each planet, so the target has to say which.
             // A position means "the one in space"; a planet name means "the one on that planet".
-            if (PositionMapper.isTilePositionValid(raw)) return raw + "_" + Constants.SPACE;
+            if (MapPositionMapper.isTilePositionValid(raw)) return raw + "_" + Constants.SPACE;
             String planetID = AliasHandler.resolvePlanet(raw);
             if (!Mapper.isValidPlanet(planetID)) return null;
             Tile tile = game.getTileFromPlanet(planetID);
@@ -219,7 +219,7 @@ public class BlindSelectionService {
             return (tile == null ? planetID : tile.getPosition()) + "_" + planetID;
         }
         if (POSITION.equals(type)) {
-            if (PositionMapper.isTilePositionValid(raw)) return raw;
+            if (MapPositionMapper.isTilePositionValid(raw)) return raw;
             String planetID = AliasHandler.resolvePlanet(raw);
             if (!Mapper.isValidPlanet(planetID)) return null;
             Tile tile = game.getTileFromPlanet(planetID);

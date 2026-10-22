@@ -20,10 +20,10 @@ import ti4.image.draw.OutlinedText;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.Strokes;
 import ti4.image.io.Fonts;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
-import ti4.model.PositionMapper;
 
 final class PlanetRow {
 
@@ -110,7 +110,7 @@ final class PlanetRow {
 
     private static Comparator<String> byDistanceFromHome(Game game, Tile homeTile) {
         String homePos = homeTile.getPosition();
-        Point homePosition = PositionMapper.getTilePosition(homePos);
+        Point homePosition = MapPositionMapper.getTilePosition(homePos);
         return (planet1, planet2) -> {
             if (homePosition == null) return 0;
 
@@ -119,8 +119,8 @@ final class PlanetRow {
             if (tile1 == null || tile2 == null)
                 return Comparator.nullsLast(null).compare(tile1, tile2);
 
-            Point p1 = PositionMapper.getTilePosition(tile1.getPosition());
-            Point p2 = PositionMapper.getTilePosition(tile2.getPosition());
+            Point p1 = MapPositionMapper.getTilePosition(tile1.getPosition());
+            Point p2 = MapPositionMapper.getTilePosition(tile2.getPosition());
             if (p1 == null || p2 == null) return Comparator.nullsLast(null).compare(p1, p2);
 
             int distance1 = distanceFromHome(homePos, homePosition, tile1, p1, planet1);

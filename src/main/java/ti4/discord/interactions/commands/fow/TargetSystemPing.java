@@ -9,7 +9,7 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.service.fow.PlanetTargetService;
 
 class TargetSystemPing extends GameStateSubcommand {
@@ -31,7 +31,7 @@ class TargetSystemPing extends GameStateSubcommand {
             return;
         }
         String position = event.getOption(Constants.POSITION).getAsString().toLowerCase();
-        if (!PositionMapper.isTilePositionValid(position)) {
+        if (!MapPositionMapper.isTilePositionValid(position)) {
             MessageHelper.replyToMessage(event, "Tile position is not allowed");
             return;
         }

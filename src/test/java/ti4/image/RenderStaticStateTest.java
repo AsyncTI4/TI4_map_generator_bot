@@ -26,7 +26,7 @@ class RenderStaticStateTest extends BaseTi4Test {
     private static final List<String> SCANNED_CLASSES = List.of(
             "ti4.model.Mapper",
             "ti4.model.TileHelper",
-            "ti4.model.PositionMapper",
+            "ti4.model.MapPositionMapper",
             "ti4.helpers.RenderRandom",
             "ti4.ResourceHelper");
 

@@ -27,8 +27,8 @@ import ti4.image.io.Fonts;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.model.ColorModel;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 import ti4.model.StrategyCardModel;
 
 final class HexTileStats {
@@ -58,9 +58,9 @@ final class HexTileStats {
         if (statTiles == null || statTiles.size() < 3) return;
         Map<String, Point> points = new HashMap<>();
         for (String pos : statTiles) {
-            Point p = PositionMapper.getTilePosition(pos);
+            Point p = MapPositionMapper.getTilePosition(pos);
             if (p == null) return;
-            p = PositionMapper.getScaledTilePosition(game, pos, p.x, p.y, board.fractureYbump());
+            p = MapPositionMapper.getScaledTilePosition(game, pos, p.x, p.y, board.fractureYbump());
             p.translate(BoardLayout.EXTRA_X - board.frameOffsetX(), BoardLayout.EXTRA_Y - board.frameOffsetY());
             points.put(pos, p);
         }
@@ -69,7 +69,7 @@ final class HexTileStats {
         Point statTile2 = points.get(statTiles.get(2));
 
         int dir1 = 0, dir2 = 0, j = 0;
-        for (String p : PositionMapper.getAdjacentTilePositions(statTiles.get(0))) {
+        for (String p : MapPositionMapper.getAdjacentTilePositions(statTiles.get(0))) {
             if (p.equals(statTiles.get(1))) dir1 = j;
             if (p.equals(statTiles.get(2))) dir2 = j;
             j++;
@@ -82,7 +82,7 @@ final class HexTileStats {
         for (String pos : statTiles) {
             Point p = points.get(pos);
             List<Integer> adjDir = new ArrayList<>();
-            List<String> adjPos = PositionMapper.getAdjacentTilePositions(pos);
+            List<String> adjPos = MapPositionMapper.getAdjacentTilePositions(pos);
             for (int i = 0; i < 6; i++) if (statTiles.contains(adjPos.get(i))) adjDir.add(i);
             BufferedImage hex = HexOverlays.border(game.getHexBorderStyle(), playerColor, adjDir);
             g2.drawImage(tint, p.x, p.y, null);
@@ -106,7 +106,7 @@ final class HexTileStats {
 
     private void drawFactionIcon(Player player, Point statTileMid) {
         Point point;
-        point = PositionMapper.getPlayerStats("factionicon");
+        point = MapPositionMapper.getPlayerStats("factionicon");
         int size = 275;
         point.translate(statTileMid.x - (size / 2), statTileMid.y - (size / 2));
         FactionIcons.drawUnderlay(g2, player, point.x, point.y, size, size);
@@ -117,7 +117,7 @@ final class HexTileStats {
         Point point;
         g2.setFont(Fonts.ti(32));
         String userName = player.getUserName();
-        point = PositionMapper.getPlayerStats("newuserName");
+        point = MapPositionMapper.getPlayerStats("newuserName");
         if (!game.hideUserNames()) {
             String name = userName.substring(0, Math.min(userName.length(), 15));
             OutlinedText.draw(
@@ -136,7 +136,7 @@ final class HexTileStats {
     private void drawFactionNameAndColorStroters(Player player, Point statTileMid, HorizontalAlign center) {
         Point point;
         g2.setFont(Fonts.ti(32));
-        point = PositionMapper.getPlayerStats("newfaction");
+        point = MapPositionMapper.getPlayerStats("newfaction");
         point.translate(statTileMid.x, statTileMid.y);
         String factionText = player.getFactionModel() == null
                 ? StringUtils.capitalize(player.getFaction())
@@ -151,7 +151,7 @@ final class HexTileStats {
         Point point;
         g2.setFont(Fonts.ti(32));
         String vpCount = "VP: " + player.getTotalVictoryPoints() + " / " + game.getVp();
-        point = PositionMapper.getPlayerStats("newvp");
+        point = MapPositionMapper.getPlayerStats("newvp");
         point.translate(statTileMid.x, statTileMid.y);
         OutlinedText.draw(g2, vpCount, point.x, point.y, Color.WHITE, center, null, Strokes.STROKE_5, Color.BLACK);
     }
@@ -169,7 +169,7 @@ final class HexTileStats {
         String soHand = "pa_so-icon_hand.png";
         String soScored = "pa_so-icon_scored.png";
         String soEmpty = "pa_so-icon_empty.png";
-        point = PositionMapper.getPlayerStats("newso");
+        point = MapPositionMapper.getPlayerStats("newso");
         for (int i = 0; i < secretsEmpty; i++) {
             drawPAImage((point.x + statTileMid.x + soOffset), point.y + statTileMid.y, soEmpty);
             soOffset -= 35;
@@ -190,7 +190,7 @@ final class HexTileStats {
         g2.setFont(Fonts.ti(32));
         String ccID = Mapper.getCCID(player.getColor());
         String fleetCCID = Mapper.getFleetCCID(player.getColor());
-        point = PositionMapper.getPlayerStats("newcc");
+        point = MapPositionMapper.getPlayerStats("newcc");
         int dir = dir1;
         if (dir1 == 1 || dir1 == 2 || dir1 == 4 || dir1 == 5) {
             point.translate(statTile1.x, statTile1.y);
@@ -247,7 +247,7 @@ final class HexTileStats {
         }
         Collections.sort(playerSCs);
 
-        point = PositionMapper.getPlayerStats("newsc");
+        point = MapPositionMapper.getPlayerStats("newsc");
         point.translate(statTileMid.x, statTileMid.y);
         point.translate(-1 * (scsize / 2) * (playerSCs.size() - 1), -1 * (scsize / 2));
 
@@ -284,18 +284,18 @@ final class HexTileStats {
         String activePlayerID = game.getActivePlayerID();
         String phase = game.getPhaseOfGame();
         if (player.isPassed()) {
-            point = PositionMapper.getPlayerStats("newpassed");
+            point = MapPositionMapper.getPlayerStats("newpassed");
             point.translate(miscTile.x, miscTile.y);
             OutlinedText.draw(
                     g2, "PASSED", point.x, point.y, ColorUtil.PassedColor, center, null, Strokes.STROKE_4, Color.BLACK);
         } else if (player.getUserID().equals(activePlayerID) && "action".equals(phase)) {
-            point = PositionMapper.getPlayerStats("newpassed");
+            point = MapPositionMapper.getPlayerStats("newpassed");
             point.translate(miscTile.x, miscTile.y);
             OutlinedText.draw(
                     g2, "ACTIVE", point.x, point.y, ColorUtil.ActiveColor, center, null, Strokes.STROKE_4, Color.BLACK);
         }
         if (player.isAFK()) {
-            point = PositionMapper.getPlayerStats("newafk");
+            point = MapPositionMapper.getPlayerStats("newafk");
             point.translate(miscTile.x, miscTile.y);
             OutlinedText.draw(g2, "AFK", point.x, point.y, Color.gray, center, null, Strokes.STROKE_4, Color.BLACK);
         }
@@ -309,7 +309,7 @@ final class HexTileStats {
             String speakerFile = ImageResources.token(speakerID);
             BufferedImage img = ImageHelper.read(speakerFile);
             if (img != null) {
-                point = PositionMapper.getPlayerStats("newspeaker");
+                point = MapPositionMapper.getPlayerStats("newspeaker");
                 point.translate(miscTile.x - (img.getWidth() / 2), miscTile.y - (img.getHeight() / 2));
                 g2.drawImage(img, point.x, point.y - (offBoardHighlighting > 0 ? 30 : 0), null);
             }
@@ -318,7 +318,7 @@ final class HexTileStats {
             String speakerFile = ImageResources.token(Mapper.getTokenID("tyrant"));
             BufferedImage img = ImageHelper.read(speakerFile);
             if (img != null) {
-                point = PositionMapper.getPlayerStats("newspeaker");
+                point = MapPositionMapper.getPlayerStats("newspeaker");
                 point.translate(miscTile.x - (img.getWidth() / 2), miscTile.y - (img.getHeight() / 2));
                 g2.drawImage(img, point.x, point.y - (offBoardHighlighting > 0 ? 30 : 0), null);
             }

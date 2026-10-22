@@ -133,7 +133,7 @@ public void handleMyButton(ButtonInteractionEvent event, Game game, Player playe
 
 - Map images are generated via `MapRenderPipeline` using Java AWT.
 - Tile images, player area images, and other visuals are composed from PNG assets under `src/main/resources/`.
-- `PositionMapper` maps tile positions to pixel coordinates.
+- `MapPositionMapper` maps tile positions to pixel coordinates.
 
 ### 6. Emojis
 
@@ -192,7 +192,7 @@ Scheduled tasks live in `ti4.cron.*`. They are started by `JdaService` after bot
 
 ## Testing
 
-- Tests extend `BaseTi4Test` which calls `globalBeforeAll()` once to initialize `Mapper`, `TileHelper`, `AliasHandler`, `PositionMapper`, `SelectionManager`, and spoof emojis.
+- Tests extend `BaseTi4Test` which calls `globalBeforeAll()` once to initialize `Mapper`, `TileHelper`, `AliasHandler`, `MapPositionMapper`, `SelectionManager`, and spoof emojis.
 - JUnit 5; run with `mvn test`.
 - No Discord connection is made during tests (`JdaService.testingMode = true`).
 

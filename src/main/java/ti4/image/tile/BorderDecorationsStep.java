@@ -14,7 +14,7 @@ import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 
 final class BorderDecorationsStep implements TileStepPainter {
 
@@ -47,7 +47,7 @@ final class BorderDecorationsStep implements TileStepPainter {
     private static void drawBorderAnomalies(TileScene scene, TileLayer layer) {
         Game game = scene.game();
         Tile tile = layer.tile();
-        List<String> orderedAdjacentPositions = PositionMapper.getAdjacentTilePositions(tile.getPosition());
+        List<String> orderedAdjacentPositions = MapPositionMapper.getAdjacentTilePositions(tile.getPosition());
         game.getBorderAnomalies().forEach(borderAnomalyHolder -> {
             BorderAnomalyModel anomalyModel = borderAnomalyHolder.getModel();
             if (anomalyModel != null

@@ -43,8 +43,8 @@ import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
 import ti4.service.fow.GMService;
@@ -524,7 +524,7 @@ public class FrankenDraftBagService {
             }
             String faction = "franken" + (index <= 24 ? emojiNum.get(index - 1) : index);
             String tempHomeSystemLocation = String.valueOf(500 + index);
-            if (!Mapper.isValidFaction(faction) || !PositionMapper.isTilePositionValid(tempHomeSystemLocation)) {
+            if (!Mapper.isValidFaction(faction) || !MapPositionMapper.isTilePositionValid(tempHomeSystemLocation)) {
                 continue;
             }
 

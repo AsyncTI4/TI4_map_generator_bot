@@ -13,8 +13,8 @@ import ti4.game.Player;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.model.BoardPosition;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 import ti4.model.TileHelper;
 import ti4.service.fow.FOWPlusService;
 
@@ -173,7 +173,7 @@ public class RegexHelper {
 
     /** @return group matching any legal tile position in the bot */
     public static String posRegex(String group) {
-        List<String> positions = new ArrayList<>(PositionMapper.getTilePositions());
+        List<String> positions = new ArrayList<>(MapPositionMapper.getTilePositions());
         positions.add(BoardPosition.REGEX);
         return regexBuilder(group, positions);
     }

@@ -22,7 +22,7 @@ import ti4.image.io.Fonts;
 import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.service.fow.FogMemoryService;
 import ti4.service.fow.FogViewer;
 
@@ -149,12 +149,12 @@ public final class SystemContextImage {
             return;
         }
         try {
-            Point positionPoint = PositionMapper.getTilePosition(tile.getPosition());
+            Point positionPoint = MapPositionMapper.getTilePosition(tile.getPosition());
             if (positionPoint == null) {
                 throw new Exception("Could not map tile to a position on the map: " + game.getName());
             }
 
-            Point focusPoint = PositionMapper.getTilePosition(focus);
+            Point focusPoint = MapPositionMapper.getTilePosition(focus);
             int offsetY =
                     focusPoint == null ? 0 : -1 * focusPoint.y + (MARGIN_Y / 2) + (rings * TileGeometry.TILE_HEIGHT);
             int offsetX = focusPoint == null ? 0 : -1 * focusPoint.x + (MARGIN_X / 2) + (rings * RING_WIDTH);

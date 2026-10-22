@@ -16,7 +16,7 @@ import ti4.helpers.Constants;
 import ti4.image.draw.PlayerTokens;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.model.UnitTokenPosition;
 
 final class ControlMarkers {
@@ -28,7 +28,7 @@ final class ControlMarkers {
 
     static void draw(TileScene scene, Tile tile, Graphics2D g, UnitHolder unitHolder, List<Rectangle> occupied) {
         List<String> controlList = new ArrayList<>(unitHolder.getControlList());
-        UnitTokenPosition unitTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
+        UnitTokenPosition unitTokenPosition = MapPositionMapper.getPlanetTokenPosition(unitHolder.getName());
         if (unitTokenPosition == null) {
             LegacyTokenStack.draw(tile, g, unitHolder, controlList);
             return;

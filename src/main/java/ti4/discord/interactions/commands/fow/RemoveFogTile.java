@@ -13,7 +13,7 @@ import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 
 class RemoveFogTile extends GameStateSubcommand {
 
@@ -44,7 +44,7 @@ class RemoveFogTile extends GameStateSubcommand {
                     ? new HashSet<>(targetPlayer.getFogTiles().keySet())
                     : positions;
             for (String position : positionsToRemove) {
-                if (!PositionMapper.isTilePositionValid(position)) {
+                if (!MapPositionMapper.isTilePositionValid(position)) {
                     MessageHelper.replyToMessage(event, "Tile position '" + position + "' is invalid");
                     continue;
                 }

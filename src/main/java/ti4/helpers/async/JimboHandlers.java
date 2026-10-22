@@ -17,7 +17,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.RegexHelper;
 import ti4.message.MessageHelper;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.service.map.AddTileService;
@@ -142,7 +142,7 @@ public final class JimboHandlers {
             List<Button> bonus = new ArrayList<>(List.of(JimboButtons.MAIN_PAGE));
             bonus.add(Buttons.gray(JimboConst.tileAdd + "_" + model.getAlias(), "Pick a different ring"));
             bonus.add(Buttons.gray("showGameEphemeral", "Show map"));
-            List<String> locations = PositionMapper.getPositionsInRing(matcher.group("ring"), null);
+            List<String> locations = MapPositionMapper.getPositionsInRing(matcher.group("ring"), null);
             String buttonatorPrefix = JimboConst.tileAdd + "_" + model.getAlias() + "_ring" + matcher.group("ring");
             Function<String, Button> buttonator = pos -> JimboButtons.positionToButton(pos, buttonatorPrefix, game);
             JimboButtons.jimboPagination(event, msg, locations, buttonator, null, bonus, 15, buttonID);
@@ -154,7 +154,7 @@ public final class JimboHandlers {
             List<Button> bonus = new ArrayList<>(List.of(JimboButtons.MAIN_PAGE));
             bonus.add(Buttons.gray(JimboConst.tileAdd + "_" + model.getAlias(), "Pick a different ring"));
             bonus.add(Buttons.gray("showGameEphemeral", "Show map"));
-            List<String> locations = PositionMapper.getPositionsInRing(matcher.group("ring"), null);
+            List<String> locations = MapPositionMapper.getPositionsInRing(matcher.group("ring"), null);
             String buttonatorPrefix = JimboConst.tileAdd + "_" + model.getAlias() + "_ring" + matcher.group("ring");
             Function<String, Button> buttonator = pos -> JimboButtons.positionToButton(pos, buttonatorPrefix, game);
             JimboButtons.jimboPagination(event, msg, locations, buttonator, null, bonus, 15, buttonID);
@@ -192,7 +192,7 @@ public final class JimboHandlers {
             String ring = matcher.group("ring");
             List<Button> bonus = new ArrayList<>(
                     List.of(JimboButtons.MAIN_PAGE, Buttons.gray(JimboConst.tileMove, "Pick a different ring")));
-            List<String> locations = PositionMapper.getPositionsInRing(ring, null);
+            List<String> locations = MapPositionMapper.getPositionsInRing(ring, null);
             Function<String, Button> buttonator = pos -> JimboButtons.positionToButton(pos, JimboConst.tileMove, game);
             JimboButtons.jimboPagination(event, msg, locations, buttonator, null, bonus, 15, buttonID);
 
@@ -210,7 +210,7 @@ public final class JimboHandlers {
             String ring = matcher.group("ring");
             List<Button> bonus = new ArrayList<>(
                     List.of(JimboButtons.MAIN_PAGE, Buttons.gray(JimboConst.tileMove, "Pick a different ring")));
-            List<String> locations = PositionMapper.getPositionsInRing(ring, null);
+            List<String> locations = MapPositionMapper.getPositionsInRing(ring, null);
             Function<String, Button> buttonator = pos -> JimboButtons.positionToButton(pos, JimboConst.tileMove, game);
             JimboButtons.jimboPagination(event, msg, locations, buttonator, null, bonus, 15, buttonID);
 
@@ -253,7 +253,7 @@ public final class JimboHandlers {
             String ring = matcher.group("ring");
             List<Button> bonus = new ArrayList<>(
                     List.of(JimboButtons.MAIN_PAGE, Buttons.gray(JimboConst.tileRemove, "Pick a different ring")));
-            List<String> locations = PositionMapper.getPositionsInRing(ring, null);
+            List<String> locations = MapPositionMapper.getPositionsInRing(ring, null);
             Function<String, Button> buttonator =
                     pos -> JimboButtons.positionToButton(pos, JimboConst.tileRemove, game);
             JimboButtons.jimboPagination(event, msg, locations, buttonator, null, bonus, 15, buttonID);
@@ -280,14 +280,14 @@ public final class JimboHandlers {
         List<Button> rings = new ArrayList<>(goBack);
         for (int ring = 0; ring <= 13; ++ring) {
             String extra = ring == 0 ? " (Mecatol)" : "";
-            List<String> positions = PositionMapper.getPositionsInRing(Integer.toString(ring), game);
+            List<String> positions = MapPositionMapper.getPositionsInRing(Integer.toString(ring), game);
             if (positions.size() == 1) {
                 rings.add(Buttons.green(buttonPrefix + "_tile" + positions.getFirst(), "Tile " + positions.getFirst()));
             } else if (!positions.isEmpty()) {
                 rings.add(Buttons.green(buttonPrefix + "_ring" + ring + "_page0", "Ring " + ring + extra));
             }
         }
-        if (!PositionMapper.getPositionsInRing("corners", game).isEmpty()) {
+        if (!MapPositionMapper.getPositionsInRing("corners", game).isEmpty()) {
             rings.add(Buttons.green(buttonPrefix + "_ringcorners_page0", "Corners"));
         }
         MessageHelper.editMessageWithButtons(event, msg, rings);

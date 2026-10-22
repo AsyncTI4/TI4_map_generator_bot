@@ -6,7 +6,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Tile;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 
 public record DraftBoard(int extraX, int extraY) {
 
@@ -24,7 +24,7 @@ public record DraftBoard(int extraX, int extraY) {
         tiles.remove("br");
         tiles.entrySet().removeIf(e -> e.getValue() == null || e.getValue().getTileID() == null);
         tiles.entrySet()
-                .removeIf(e -> PositionMapper.getTilePosition(e.getValue().getPosition()) == null);
+                .removeIf(e -> MapPositionMapper.getTilePosition(e.getValue().getPosition()) == null);
         return tiles;
     }
 
@@ -40,9 +40,9 @@ public record DraftBoard(int extraX, int extraY) {
 
     @Nullable
     Point tilePosition(Game game, String position) {
-        Point raw = PositionMapper.getTilePosition(position);
+        Point raw = MapPositionMapper.getTilePosition(position);
         if (raw == null) return null;
-        Point scaled = PositionMapper.getScaledTilePosition(game, position, raw.x, raw.y);
+        Point scaled = MapPositionMapper.getScaledTilePosition(game, position, raw.x, raw.y);
         return new Point(scaled.x + extraX - TILE_PADDING, scaled.y + extraY - TILE_PADDING);
     }
 

@@ -54,8 +54,8 @@ import ti4.json.UnitKeyMapKeySerializer;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.BorderAnomalyHolder;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -1205,7 +1205,7 @@ class GameLoadService {
         StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
         String tileID = AliasHandler.resolveTile(tokenizer.nextToken());
         String position = tokenizer.nextToken();
-        if (!PositionMapper.isTilePositionValid(position)) return null;
+        if (!MapPositionMapper.isTilePositionValid(position)) return null;
         return new Tile(tileID, position);
     }
 

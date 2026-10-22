@@ -17,8 +17,8 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.model.ColorModel;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 class PlayerNeighbouringPlayersTest extends BaseTi4Test {
@@ -185,7 +185,7 @@ class PlayerNeighbouringPlayersTest extends BaseTi4Test {
         for (int ring = 1; ring <= rings; ring++) {
             for (int index = 1; index <= ring * 6; index++) {
                 String position = String.valueOf(ring * 100 + index);
-                if (PositionMapper.isTilePositionValid(position)) {
+                if (MapPositionMapper.isTilePositionValid(position)) {
                     positions.add(position);
                 }
             }

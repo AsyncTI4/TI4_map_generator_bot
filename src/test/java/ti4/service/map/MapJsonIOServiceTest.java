@@ -258,7 +258,7 @@ class MapJsonIOServiceTest extends BaseTi4Test {
 
     @Test
     void oneBadTileIsSkippedInsteadOfAbortingTheRestOfTheImport() {
-        // A null position throws inside handleTile itself (PositionMapper/Properties reject a null
+        // A null position throws inside handleTile itself (MapPositionMapper/Properties reject a null
         // key) before any lore code runs — listed first, on purpose, so a pre-fix importer would
         // have aborted before ever reaching the second (valid) tile or the phaseLore below it.
         String json = """

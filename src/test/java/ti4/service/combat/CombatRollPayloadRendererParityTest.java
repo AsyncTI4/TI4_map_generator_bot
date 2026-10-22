@@ -39,9 +39,9 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.model.NamedCombatModifierModel;
-import ti4.model.PositionMapper;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.MiscEmojis;
@@ -460,7 +460,7 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
         }
 
         private String getNextPosition() {
-            for (String position : PositionMapper.getTilePositions()) {
+            for (String position : MapPositionMapper.getTilePositions()) {
                 if (game.getTileByPosition(position) == null) return position;
             }
             return null;

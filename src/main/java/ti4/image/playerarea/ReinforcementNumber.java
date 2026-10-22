@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import ti4.image.io.Fonts;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 import ti4.model.UnitTokenPosition;
 
 final class ReinforcementNumber {
@@ -14,7 +14,7 @@ final class ReinforcementNumber {
 
     static void paint(Graphics2D g2, String unitID, int x, int y, int reinforcementsCount, String color) {
         String id = "number_" + unitID;
-        UnitTokenPosition textPosition = PositionMapper.getReinforcementsPosition(id);
+        UnitTokenPosition textPosition = MapPositionMapper.getReinforcementsPosition(id);
         if (textPosition == null) {
             return;
         }

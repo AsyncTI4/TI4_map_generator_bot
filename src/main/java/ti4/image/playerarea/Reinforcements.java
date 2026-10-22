@@ -19,8 +19,8 @@ import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 import ti4.model.UnitModel;
 import ti4.model.UnitTokenPosition;
 
@@ -61,7 +61,7 @@ final class Reinforcements {
             count += unitsOnBoard.getOrDefault(Mapper.getUnitKey("csd", playerColor), 0);
         }
 
-        UnitTokenPosition reinforcementsPosition = PositionMapper.getReinforcementsPosition(unitID);
+        UnitTokenPosition reinforcementsPosition = MapPositionMapper.getReinforcementsPosition(unitID);
         if (reinforcementsPosition == null) {
             return;
         }
@@ -108,7 +108,7 @@ final class Reinforcements {
         if ("ws".equals(unitID) && player.ownsUnit("tf-dragonfreed")) {
             offset = 16;
             Point position =
-                    PositionMapper.getReinforcementsPosition("number_ws").getPosition("number_ws");
+                    MapPositionMapper.getReinforcementsPosition("number_ws").getPosition("number_ws");
             PaImage.draw(
                     g2,
                     x + position.x - offset,
@@ -151,7 +151,7 @@ final class Reinforcements {
     private static void drawCommandTokens(PlayerAreaContext ctx, Player player, int x, int y) {
         String playerColor = player.getColor();
         int ccCount = Helper.getCCCount(ctx.game(), playerColor);
-        UnitTokenPosition reinforcementsPosition = PositionMapper.getReinforcementsPosition(CC_TAG);
+        UnitTokenPosition reinforcementsPosition = MapPositionMapper.getReinforcementsPosition(CC_TAG);
         if (reinforcementsPosition == null || playerColor == null) {
             return;
         }

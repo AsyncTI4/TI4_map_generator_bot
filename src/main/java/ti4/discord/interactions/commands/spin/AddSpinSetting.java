@@ -11,7 +11,7 @@ import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.service.map.SpinService;
 import ti4.service.map.SpinService.AutoTrigger;
 import ti4.service.map.SpinService.Direction;
@@ -61,8 +61,8 @@ class AddSpinSetting extends GameStateSubcommand {
         }
         Set<String> stepsInput = Helper.getSetFromCSV(event.getOption(STEPS).getAsString());
         String position = event.getOption(Constants.POSITION, "000", OptionMapping::getAsString);
-        if (PositionMapper.getPositionsInRing("corners", game).contains(position)
-                || !PositionMapper.isTilePositionValid(getGame(), position)) {
+        if (MapPositionMapper.getPositionsInRing("corners", game).contains(position)
+                || !MapPositionMapper.isTilePositionValid(getGame(), position)) {
             MessageHelper.replyToMessage(event, "Invalid position");
             return;
         }

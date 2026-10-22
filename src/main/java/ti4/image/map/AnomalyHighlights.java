@@ -11,8 +11,8 @@ import ti4.helpers.Units.UnitKey;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.image.tile.TileGeometry;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 
 final class AnomalyHighlights implements OffBoardHighlights {
 
@@ -24,7 +24,9 @@ final class AnomalyHighlights implements OffBoardHighlights {
         int offBoardHighlighting = 0;
         UnitKey unitKey = Mapper.getUnitKey("sd", player.getColor());
         int unitNum = player.getUnitCap("sd") + player.getUnitCap("csd");
-        unitNum = (unitNum == 0 ? PositionMapper.getReinforcementsPosition("sd").getPositionCount("sd") : unitNum);
+        unitNum = (unitNum == 0
+                ? MapPositionMapper.getReinforcementsPosition("sd").getPositionCount("sd")
+                : unitNum);
         for (Tile tile2 : game.getTileMap().values()) {
             for (UnitHolder unitHolder : tile2.getUnitHolders().values()) {
                 unitNum -= unitHolder.getUnitCount(unitKey);

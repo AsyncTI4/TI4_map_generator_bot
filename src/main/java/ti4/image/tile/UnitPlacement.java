@@ -14,8 +14,8 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 import ti4.model.UnitTokenPosition;
 
 final class UnitPlacement {
@@ -65,13 +65,13 @@ final class UnitPlacement {
         hasTokenPlanet =
                 unitHolder.getTokenList().stream().map(Mapper::getTokenKey).anyMatch(Constants.TOKEN_PLANETS::contains);
         Point unitOffset =
-                game.isAllianceMode() ? PositionMapper.getAllianceUnitOffset() : PositionMapper.getUnitOffset();
+                game.isAllianceMode() ? MapPositionMapper.getAllianceUnitOffset() : MapPositionMapper.getUnitOffset();
         spaceUnitXOffset = unitOffset != null ? unitOffset.x : DEFAULT_SPACE_STEP_X;
         spaceUnitYOffset = unitOffset != null ? unitOffset.y : DEFAULT_SPACE_STEP_Y;
-        UnitTokenPosition planetPositions = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
+        UnitTokenPosition planetPositions = MapPositionMapper.getPlanetTokenPosition(unitHolder.getName());
         unitTokenPosition = planetPositions != null
                 ? planetPositions
-                : PositionMapper.getSpaceUnitPosition(unitHolder.getName(), tile.getTileID());
+                : MapPositionMapper.getSpaceUnitPosition(unitHolder.getName(), tile.getTileID());
     }
 
     boolean isSpace() {

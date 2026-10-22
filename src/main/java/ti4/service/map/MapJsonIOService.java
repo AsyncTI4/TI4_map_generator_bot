@@ -31,8 +31,8 @@ import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 import ti4.service.fow.LoreService;
 import ti4.service.fow.LoreService.LoreEntry;
 import tools.jackson.databind.json.JsonMapper;
@@ -260,7 +260,7 @@ public class MapJsonIOService {
     }
 
     private static boolean handleTile(TileIO tileIO, Game game, StringBuilder sb) {
-        if (!PositionMapper.isTilePositionValid(game, tileIO.getPosition())) {
+        if (!MapPositionMapper.isTilePositionValid(game, tileIO.getPosition())) {
             appendError(sb, tileIO, "Invalid tile position: " + tileIO.getPosition());
             return false;
         }

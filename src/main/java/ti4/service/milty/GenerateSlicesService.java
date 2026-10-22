@@ -18,8 +18,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.model.MapPositionMapper;
 import ti4.model.MapTemplateModel;
-import ti4.model.PositionMapper;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass
@@ -269,7 +269,7 @@ class GenerateSlicesService {
         List<String> tilePositions = template.emulatedTiles();
         for (String pos1 : tilePositions) {
             List<Boolean> row = new ArrayList<>();
-            List<String> adj = PositionMapper.getAdjacentTilePositions(pos1);
+            List<String> adj = MapPositionMapper.getAdjacentTilePositions(pos1);
             for (String pos2 : tilePositions) row.add(adj.contains(pos2));
             adjMatrix.add(row);
         }

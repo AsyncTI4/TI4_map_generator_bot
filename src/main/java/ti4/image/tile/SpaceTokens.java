@@ -27,8 +27,8 @@ import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 
 final class SpaceTokens {
 
@@ -56,7 +56,7 @@ final class SpaceTokens {
         boolean hasTripleTokenPlanet =
                 tokenList.stream().anyMatch(tok -> Constants.TOKEN_PLANETS.contains(Mapper.getTokenKey(tok)))
                         && (tile.getPlanetUnitHolders().size() >= 4);
-        List<Point> spaceTokenPositions = PositionMapper.getSpaceTokenPositions(tile.getTileID());
+        List<Point> spaceTokenPositions = MapPositionMapper.getSpaceTokenPositions(tile.getTileID());
         if (spaceTokenPositions.isEmpty()) {
             x = centerPosition.x;
             y = centerPosition.y;

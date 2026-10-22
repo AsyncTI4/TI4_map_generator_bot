@@ -36,7 +36,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.combat.StartCombatService;
@@ -184,7 +184,7 @@ public final class FOWPlusService {
         String origMessageId = event.getModalId().replace("blindActivation_", "");
         String position = event.getValue(Constants.POSITION).getAsString().trim();
 
-        if (!PositionMapper.isTilePositionValid(position)) {
+        if (!MapPositionMapper.isTilePositionValid(position)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Position " + position + " is invalid.");
             return;
         }

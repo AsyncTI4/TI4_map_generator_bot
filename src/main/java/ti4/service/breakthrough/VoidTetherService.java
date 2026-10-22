@@ -19,8 +19,8 @@ import ti4.helpers.RegexHelper;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyIds;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.regex.RegexService;
 
@@ -119,7 +119,7 @@ public class VoidTetherService {
         List<Button> buttons = new ArrayList<>();
         String prefix = player.factionButtonChecker() + "placeVoidTether_" + pos + "_";
 
-        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(pos);
+        List<String> directlyAdjacentTiles = MapPositionMapper.getAdjacentTilePositions(pos);
         if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {
             return buttons; // this tile doesn't have anything map-adjacent
         }
@@ -148,7 +148,7 @@ public class VoidTetherService {
     private String getVoidTetherBetweenText(Game game, Player player, String position, int direction) throws Exception {
         Tile t1 = game.getTileByPosition(position);
         Tile t2 = game.getTileByPosition(
-                PositionMapper.getAdjacentTilePositions(position).get(direction));
+                MapPositionMapper.getAdjacentTilePositions(position).get(direction));
         if (t1 == null || t2 == null) {
             RegexService.throwFailure();
             return null;

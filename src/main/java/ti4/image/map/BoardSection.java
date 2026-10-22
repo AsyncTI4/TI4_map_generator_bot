@@ -17,7 +17,7 @@ import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
 import ti4.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.service.map.FractureService;
 
 final class BoardSection {
@@ -91,7 +91,7 @@ final class BoardSection {
     private void drawSetupTiles(Map<String, Tile> tileMap) {
         boolean showFracture = FractureService.isFractureRegionOnMap(game);
         int ringCount = Math.clamp(game.getRingCount(), BoardLayout.RING_MIN_COUNT, BoardLayout.RING_MAX_COUNT);
-        for (String position : PositionMapper.getTilePositions()) {
+        for (String position : MapPositionMapper.getTilePositions()) {
             String tileRing = "0";
             if (position.startsWith("frac") && !showFracture) continue;
             if (position.length() == 3) {
@@ -142,7 +142,7 @@ final class BoardSection {
         }
         try {
             String position = tile.getPosition();
-            Point positionPoint = PositionMapper.getTilePosition(position);
+            Point positionPoint = MapPositionMapper.getTilePosition(position);
             if (positionPoint == null) {
                 if ("-1".equalsIgnoreCase(tile.getTileID())) {
                     return;

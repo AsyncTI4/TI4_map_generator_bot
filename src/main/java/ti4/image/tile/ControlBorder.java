@@ -10,8 +10,8 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.image.draw.HexOverlays;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 
 final class ControlBorder {
 
@@ -36,7 +36,7 @@ final class ControlBorder {
     private static List<Integer> sidesSharedWith(Game game, Tile tile, Player controllingPlayer) {
         int sideNum = 0;
         List<Integer> openSides = new ArrayList<>();
-        for (String adj : PositionMapper.getAdjacentTilePositions(tile.getPosition())) {
+        for (String adj : MapPositionMapper.getAdjacentTilePositions(tile.getPosition())) {
             if (game.getPlayerThatControlsTile(adj) == controllingPlayer) {
                 openSides.add(sideNum);
             }

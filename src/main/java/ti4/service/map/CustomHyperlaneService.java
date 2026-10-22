@@ -31,8 +31,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.SortHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 
 @UtilityClass
 public class CustomHyperlaneService {
@@ -161,7 +161,7 @@ public class CustomHyperlaneService {
             }
 
             String position = data[0];
-            if (!PositionMapper.isTilePositionValid(game, position)) {
+            if (!MapPositionMapper.isTilePositionValid(game, position)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid position: `" + position + "`");
                 return;
             }

@@ -21,7 +21,7 @@ import ti4.game.Player;
 import ti4.helpers.FoWHelper;
 import ti4.model.BoardPosition;
 import ti4.model.GalaxyNames;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.model.SegmentNames;
 import ti4.service.option.FOWOptionService.FOWOption;
 
@@ -82,7 +82,7 @@ public record MapSegment(
         Set<String> positions = Arrays.stream(
                         StringUtils.substringAfter(entry, "=").split(","))
                 .map(String::trim)
-                .filter(position -> PositionMapper.getTilePosition(position) != null)
+                .filter(position -> MapPositionMapper.getTilePosition(position) != null)
                 .collect(Collectors.toSet());
         if (!SegmentNames.isValid(name) || SegmentNames.isReserved(name) || positions.isEmpty()) {
             return Optional.empty();
@@ -285,7 +285,7 @@ public record MapSegment(
     public static boolean canJoinSector(String position) {
         return !isFracturePosition(position)
                 && !BoardLayout.CORNER_POSITIONS.contains(position.toLowerCase())
-                && PositionMapper.getTilePosition(position) != null;
+                && MapPositionMapper.getTilePosition(position) != null;
     }
 
     public static boolean isPinned(Game game, String name) {
@@ -329,7 +329,7 @@ public record MapSegment(
         if (radius != null && (radius < 0 || radius > MAX_RADIUS)) {
             return "Radius must be between 0 and " + MAX_RADIUS + ".";
         }
-        if (!PositionMapper.isTilePositionValid(centre)) {
+        if (!MapPositionMapper.isTilePositionValid(centre)) {
             return "Tile position `" + centre + "` is invalid.";
         }
         if (cluster && game.getTileByPosition(centre) == null) {
@@ -347,7 +347,7 @@ public record MapSegment(
         return game.getTileMap().keySet().stream()
                 .filter(position -> !isFracturePosition(position))
                 .filter(position -> !BoardLayout.CORNER_POSITIONS.contains(position.toLowerCase()))
-                .filter(position -> PositionMapper.getTilePosition(position) != null)
+                .filter(position -> MapPositionMapper.getTilePosition(position) != null)
                 .collect(Collectors.toSet());
     }
 
@@ -616,7 +616,7 @@ public record MapSegment(
         if (!SegmentNames.isValid(name)
                 || SegmentNames.isReserved(name)
                 || centre == null
-                || PositionMapper.getTilePosition(centre) == null) {
+                || MapPositionMapper.getTilePosition(centre) == null) {
             return Optional.empty();
         }
         boolean cluster = extent.startsWith(CLUSTER_TOKEN);

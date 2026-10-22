@@ -13,8 +13,8 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.CommandCounterHelper;
 import ti4.image.io.ImageResources;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 
 @UtilityClass
 public class FlipTileService {
@@ -56,7 +56,7 @@ public class FlipTileService {
             String position = tile.getPosition();
             game.removeTile(position);
             String planetTileName = AliasHandler.resolveTile("82b");
-            if (!PositionMapper.isTilePositionValid(position)) {
+            if (!MapPositionMapper.isTilePositionValid(position)) {
                 if (event == null) throw new IllegalStateException("Position tile not allowed");
                 MessageHelper.replyToMessage(event, "Position tile not allowed");
                 return null;
@@ -76,7 +76,7 @@ public class FlipTileService {
             String position = tile.getPosition();
             game.removeTile(position);
             String planetTileName = AliasHandler.resolveTile("82bh");
-            if (!PositionMapper.isTilePositionValid(position)) {
+            if (!MapPositionMapper.isTilePositionValid(position)) {
                 if (event == null) throw new IllegalStateException("Position tile not allowed");
                 MessageHelper.replyToMessage(event, "Position tile not allowed");
                 return null;

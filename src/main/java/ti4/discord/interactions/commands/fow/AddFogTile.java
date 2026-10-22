@@ -13,8 +13,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.io.ImageResources;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 
 class AddFogTile extends GameStateSubcommand {
 
@@ -51,7 +51,7 @@ class AddFogTile extends GameStateSubcommand {
         String label = labelMapping == null ? "" : labelMapping.getAsString();
         StringBuilder sb = new StringBuilder();
         for (String position : positions) {
-            if (!PositionMapper.isTilePositionValid(position)) {
+            if (!MapPositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Tile position '" + position + "' is invalid");
                 continue;
             }

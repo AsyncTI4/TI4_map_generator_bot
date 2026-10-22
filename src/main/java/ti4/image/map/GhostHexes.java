@@ -16,7 +16,7 @@ import ti4.image.draw.Strokes;
 import ti4.image.draw.VerticalAlign;
 import ti4.image.io.Fonts;
 import ti4.image.tile.TileGeometry;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 final class GhostHexes {
@@ -41,8 +41,8 @@ final class GhostHexes {
     static Set<String> frontier(Collection<String> sources, Set<String> known) {
         Set<String> frontier = new HashSet<>();
         for (String source : sources) {
-            for (String neighbour : PositionMapper.getAdjacentTilePositions(source)) {
-                if (!known.contains(neighbour) && PositionMapper.isTilePositionValid(neighbour)) {
+            for (String neighbour : MapPositionMapper.getAdjacentTilePositions(source)) {
+                if (!known.contains(neighbour) && MapPositionMapper.isTilePositionValid(neighbour)) {
                     frontier.add(neighbour);
                 }
             }

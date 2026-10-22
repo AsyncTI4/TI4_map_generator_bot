@@ -37,8 +37,8 @@ import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 import ti4.service.ShowGameService;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.emoji.CardEmojis;
@@ -344,7 +344,7 @@ public final class GMService {
     @ModalHandler("gmWhoCanSeeResolve")
     public static void resolveWhoCanSeePosition(ModalInteractionEvent event, Game game) {
         String position = event.getValue(Constants.POSITION).getAsString();
-        if (!PositionMapper.isTilePositionValid(position)) {
+        if (!MapPositionMapper.isTilePositionValid(position)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Position '" + position + "' is invalid.");
             return;
         }

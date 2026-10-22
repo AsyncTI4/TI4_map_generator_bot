@@ -13,7 +13,7 @@ import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.image.tile.TileGeometry;
 import ti4.model.BoardPosition;
-import ti4.model.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 final class FrameResolver {
@@ -175,7 +175,7 @@ final class FrameResolver {
         for (Map.Entry<String, List<String>> statBlock :
                 layout.playerStatTiles().entrySet()) {
             boolean touchesSegment = statBlock.getValue().stream()
-                    .flatMap(statTile -> PositionMapper.getAdjacentTilePositions(statTile).stream())
+                    .flatMap(statTile -> MapPositionMapper.getAdjacentTilePositions(statTile).stream())
                     .anyMatch(positions::contains);
             if (touchesSegment) {
                 withStats.addAll(statBlock.getValue());

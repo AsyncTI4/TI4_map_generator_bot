@@ -14,9 +14,9 @@ import ti4.image.draw.TextWrap;
 import ti4.image.io.Fonts;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
+import ti4.model.MapPositionMapper;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
-import ti4.model.PositionMapper;
 
 public final class TemplatePreview {
 
@@ -32,12 +32,12 @@ public final class TemplatePreview {
         BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = image.createGraphics();
 
-        Point mecatol = PositionMapper.getTilePosition("000");
+        Point mecatol = MapPositionMapper.getTilePosition("000");
         if (mecatol == null) mecatol = new Point(0, 0);
         Point center = new Point(size / 2 - 173 - mecatol.x, size / 2 - 150 - mecatol.y);
 
         for (MapTemplateTile templateTile : model.getTemplateTiles()) {
-            Point position = PositionMapper.getTilePosition(templateTile.getPos());
+            Point position = MapPositionMapper.getTilePosition(templateTile.getPos());
             if (position == null) continue;
 
             Tile tile = MapTemplateHelper.getTileFromTemplateTile(templateTile);

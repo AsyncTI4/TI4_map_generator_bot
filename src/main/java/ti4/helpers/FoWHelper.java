@@ -34,8 +34,8 @@ import ti4.helpers.Units.UnitType;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.PositionMapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TileModel;
 import ti4.model.WormholeModel;
@@ -871,7 +871,7 @@ public final class FoWHelper {
             return tiles;
         }
 
-        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(position);
+        List<String> directlyAdjacentTiles = MapPositionMapper.getAdjacentTilePositions(position);
         if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {
             // adjacency file for this tile is not filled in
             return tiles;
