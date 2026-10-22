@@ -28,6 +28,7 @@ public final class PositionMapper {
     private static final int RING_MAX_COUNT = 8;
     private static final int RING_MIN_COUNT = 3;
     private static final int HORIZONTAL_TILE_SPACING = 260;
+    private static final int EXTRA_BOARD_STRIDE = boardWidth(BoardPosition.MAX_RING);
     private static final int SPACE_FOR_TILE_HEIGHT = 300; // space to calculate tile image height with
 
     private static final Properties tileImageCoordinates = new Properties();
@@ -123,6 +124,18 @@ public final class PositionMapper {
         return boardLayoutRingCount(layoutRingCount(game));
     }
 
+    public static int boardWidth(int ringCount) {
+        return (2 * ringCount + 2) * HORIZONTAL_TILE_SPACING;
+    }
+
+    private static int extraBoardOffsetX(int boardIndex) {
+        return (boardIndex + 1) * EXTRA_BOARD_STRIDE;
+    }
+
+    private static int extraBoardCompression(int boardIndex, int ringCount) {
+        return (boardIndex + 1) * (BoardPosition.MAX_RING - ringCount) * 2 * HORIZONTAL_TILE_SPACING;
+    }
+
     private static int boardLayoutRingCount(int layoutRings) {
         return Math.clamp(layoutRings, RING_MIN_COUNT, BoardPosition.MAX_RING);
     }
@@ -132,7 +145,7 @@ public final class PositionMapper {
         int ringCount = Math.clamp(layoutRings, RING_MIN_COUNT, RING_MAX_COUNT);
         Optional<BoardPosition> board = BoardPosition.parse(position);
         if (board.isPresent()) {
-            x -= BoardPosition.ringCompression(board.get().index(), boardLayoutRingCount(layoutRings));
+            x -= extraBoardCompression(board.get().index(), boardLayoutRingCount(layoutRings));
         }
         if (ringCount == RING_MIN_COUNT) {
             x += HORIZONTAL_TILE_SPACING;
@@ -177,7 +190,7 @@ public final class PositionMapper {
         }
         Point local = getPosition(board.get().local(), tileImageCoordinates);
         if (local != null) {
-            local.translate(BoardPosition.rawOffsetX(board.get().index()), 0);
+            local.translate(extraBoardOffsetX(board.get().index()), 0);
         }
         return local;
     }

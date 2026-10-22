@@ -14,8 +14,6 @@ public record BoardPosition(char board, String local) {
     public static final int MAX_RING = 16;
     public static final char MAIN_BOARD = '0';
     private static final Pattern PATTERN = Pattern.compile(REGEX);
-    private static final int HORIZONTAL_TILE_SPACING = 260;
-    static final int RAW_STRIDE = (2 * MAX_RING + 2) * HORIZONTAL_TILE_SPACING;
 
     public static Optional<BoardPosition> parse(String position) {
         if (position == null || !PATTERN.matcher(position).matches()) {
@@ -50,17 +48,5 @@ public record BoardPosition(char board, String local) {
 
     public String withLocal(String otherLocal) {
         return board + otherLocal;
-    }
-
-    static int rawOffsetX(int boardIndex) {
-        return (boardIndex + 1) * RAW_STRIDE;
-    }
-
-    static int ringCompression(int boardIndex, int ringCount) {
-        return (boardIndex + 1) * (MAX_RING - ringCount) * 2 * HORIZONTAL_TILE_SPACING;
-    }
-
-    public static int boardWidth(int ringCount) {
-        return (2 * ringCount + 2) * HORIZONTAL_TILE_SPACING;
     }
 }

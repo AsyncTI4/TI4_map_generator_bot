@@ -320,7 +320,7 @@ final class BoardLayout {
                 .mapToInt(BoardPosition.BOARDS::indexOf)
                 .max()
                 .orElse(-1);
-        return (highestBoard + 1) * BoardPosition.boardWidth(PositionMapper.boardLayoutRingCount(game));
+        return (highestBoard + 1) * PositionMapper.boardWidth(PositionMapper.boardLayoutRingCount(game));
     }
 
     static int getMaxObjectiveWidth(Game game) {
