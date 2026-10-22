@@ -227,8 +227,7 @@ public final class CustodiansRace {
         private boolean canPayNow(Player player) {
             return payable.computeIfAbsent(player.getFaction(), faction -> {
                 if (player == seat) {
-                    return ScoringReserve.planAfterReserve(game, seat, SpendCost.influence(COST))
-                                    .isPresent()
+                    return ScoringReserve.planForCustodians(game, seat).isPresent()
                             || IconStake.behindCustodians(game, seat)
                                     && Wallet.of(game, seat).canPay(SpendCost.influence(COST));
                 }

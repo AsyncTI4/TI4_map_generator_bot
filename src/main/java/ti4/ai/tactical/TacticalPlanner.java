@@ -3548,10 +3548,9 @@ public class TacticalPlanner {
         boolean canPayCustodians() {
             if (canPayCustodians == null) {
                 SpendCost cost = SpendCost.influence(CUSTODIANS_COST);
-                canPayCustodians =
-                        ScoringReserve.planAfterReserve(game, seat, cost).isPresent()
-                                || IconStake.behindCustodians(game, seat)
-                                        && Wallet.of(game, seat).plan(cost).isPresent();
+                canPayCustodians = ScoringReserve.planForCustodians(game, seat).isPresent()
+                        || IconStake.behindCustodians(game, seat)
+                                && Wallet.of(game, seat).plan(cost).isPresent();
             }
             return canPayCustodians;
         }

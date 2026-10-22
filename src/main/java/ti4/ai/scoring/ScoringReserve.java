@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.eval.CustodiansRace;
 import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -14,13 +15,15 @@ import ti4.helpers.Helper;
 @UtilityClass
 public class ScoringReserve {
 
+    private static final double CUSTODIANS_RACE_CHANCE = 0.5;
+
     public record Reserved(String objectiveId, SpendCost cost, int expectedTradeGoods) {}
 
     public static SpendCost of(Game game, Player seat) {
         if (!isActionPhase(game)) return SpendCost.NONE;
         try (Thinking.Span ignored = Thinking.enter("scoring.reserve")) {
             SpendCost reserve = reserved(game, seat).map(Reserved::cost).orElse(SpendCost.NONE);
-            return reserve.plus(SpendCost.tradeGoods(PromisedTradeGoods.of(seat)));
+            return custodiansReserve(game, seat).plus(reserve).plus(SpendCost.tradeGoods(PromisedTradeGoods.of(seat)));
         }
     }
 
@@ -28,7 +31,8 @@ public class ScoringReserve {
         if (!isActionPhase(game) || !Helper.canPlayerScorePOs(game, seat)) {
             return Optional.empty();
         }
-        Wallet wallet = Wallet.of(game, seat);
+        Wallet wallet =
+                custodiansClaim(game, seat).map(Wallet.of(game, seat)::without).orElseGet(() -> Wallet.of(game, seat));
         Optional<Reserved> spend =
                 bestAffordableSpend(game, seat, wallet).or(() -> bestProjectedSpend(game, seat, wallet));
         if (spend.isEmpty()) return Optional.empty();
@@ -38,6 +42,29 @@ public class ScoringReserve {
                 .filter(id -> ObjectivePolicy.victoryPoints(id) >= spendPoints)
                 .count();
         return freeScoresWorthAsMuch >= scoringChances(game, seat) ? Optional.empty() : spend;
+    }
+
+    public static SpendCost custodiansReserve(Game game, Player seat) {
+        return custodiansClaim(game, seat).isPresent() ? SpendCost.influence(CustodiansRace.COST) : SpendCost.NONE;
+    }
+
+    public static Optional<Wallet.Payment> custodiansClaim(Game game, Player seat) {
+        if (!isActionPhase(game) || !CustodiansRace.open(game)) return Optional.empty();
+        CustodiansRace.Snapshot race = CustodiansRace.of(game, seat);
+        if (!race.canLandThisRound(seat)) return Optional.empty();
+        if (!holdsUnplayedImperial(game, seat) && !winsTheCustodiansRace(race, seat)) return Optional.empty();
+        return planForCustodians(game, seat);
+    }
+
+    public static Optional<Wallet.Payment> planForCustodians(Game game, Player seat) {
+        SpendCost promised = SpendCost.tradeGoods(PromisedTradeGoods.of(seat));
+        return planAfterReserve(Wallet.of(game, seat), promised, SpendCost.influence(CustodiansRace.COST));
+    }
+
+    private static boolean winsTheCustodiansRace(CustodiansRace.Snapshot race, Player seat) {
+        return race.arrival(seat).stream()
+                .anyMatch(
+                        arrival -> race.winChance(seat, arrival, CustodiansRace.Order.KNOWN) >= CUSTODIANS_RACE_CHANCE);
     }
 
     public static Optional<Wallet.Payment> planAfterReserve(Game game, Player seat, SpendCost cost) {
@@ -52,10 +79,13 @@ public class ScoringReserve {
     }
 
     public static int scoringChances(Game game, Player seat) {
-        boolean holdsUnplayedImperial = seat.getSCs().stream()
+        return holdsUnplayedImperial(game, seat) ? 2 : 1;
+    }
+
+    private static boolean holdsUnplayedImperial(Game game, Player seat) {
+        return seat.getSCs().stream()
                 .anyMatch(card -> StrategyCard.of(game, card) == StrategyCard.IMPERIAL
                         && !game.getPlayedSCs().contains(card));
-        return holdsUnplayedImperial ? 2 : 1;
     }
 
     private static Optional<Reserved> bestAffordableSpend(Game game, Player seat, Wallet wallet) {

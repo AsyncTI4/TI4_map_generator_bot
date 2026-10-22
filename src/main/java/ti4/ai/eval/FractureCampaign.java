@@ -13,7 +13,7 @@ import ti4.helpers.Units.UnitType;
 public class FractureCampaign {
 
     public static final int DOCK_RANGE = 2;
-    public static final int FLEET_SHIPS = 4;
+    public static final int FLEET_SHIPS = 3;
     public static final int DREADNOUGHTS = 3;
     public static final int CARRIERS = 1;
     public static final int INFANTRY = 6;

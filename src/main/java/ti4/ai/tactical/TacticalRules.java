@@ -522,7 +522,7 @@ public class TacticalRules {
 
     private static Optional<Wallet.Payment> custodiansPayment(AiTurnContext context) {
         SpendCost cost = SpendCost.influence(CUSTODIANS_COST);
-        return ScoringReserve.planAfterReserve(context.game(), context.seat(), cost)
+        return ScoringReserve.planForCustodians(context.game(), context.seat())
                 .or(() -> Wallet.of(context.game(), context.seat()).plan(cost));
     }
 

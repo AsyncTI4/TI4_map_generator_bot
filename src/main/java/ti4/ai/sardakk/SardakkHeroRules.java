@@ -14,7 +14,6 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringReserve;
-import ti4.ai.scoring.SpendCost;
 import ti4.ai.tactical.CombatForecast;
 import ti4.ai.tactical.CombatForecast.SpaceOutlook;
 import ti4.ai.tactical.TacticalPlan;
@@ -136,8 +135,7 @@ public class SardakkHeroRules {
     }
 
     private static boolean canPayCustodians(Game game, Player seat) {
-        return ScoringReserve.planAfterReserve(game, seat, SpendCost.influence(CUSTODIANS_COST))
-                .isPresent();
+        return ScoringReserve.planForCustodians(game, seat).isPresent();
     }
 
     private static boolean isAnotherPlayersHome(Game game, Player seat, Tile tile) {

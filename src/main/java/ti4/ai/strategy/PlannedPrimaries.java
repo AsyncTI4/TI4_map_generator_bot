@@ -119,7 +119,8 @@ class PlannedPrimaries {
                 .filter(position -> DiplomacyUses.isLockable(game, seat, position))
                 .filter(position -> DiplomacyUses.protections(in).stream()
                         .anyMatch(protection -> protection.target().equals(position)));
-        return planned.or(() -> DiplomacyUses.bestProtection(in).map(Benefit::target));
+        return planned.or(() -> DiplomacyUses.bestProtection(in).map(Benefit::target))
+                .or(() -> DiplomacyUses.mostValuableOpenSystem(game, seat));
     }
 
     private static boolean inTile(Game game, String planet, String position) {

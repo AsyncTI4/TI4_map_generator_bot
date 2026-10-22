@@ -55,6 +55,22 @@ class DiplomacyUses {
         return benefits;
     }
 
+    static Optional<String> mostValuableOpenSystem(Game game, Player seat) {
+        return lockableTiles(game, seat).stream()
+                .filter(tile -> tile != game.getMecatolTile())
+                .filter(tile ->
+                        game.getRealPlayers().stream().anyMatch(other -> other != seat && !tile.hasPlayerCC(other)))
+                .max(Comparator.comparingDouble(tile -> ownedPlanetValue(seat, tile)))
+                .map(Tile::getPosition);
+    }
+
+    private static double ownedPlanetValue(Player seat, Tile tile) {
+        return tile.getPlanetUnitHolders().stream()
+                .filter(planet -> seat.getPlanets().contains(planet.getName()))
+                .mapToDouble(BoardView::planetValue)
+                .sum();
+    }
+
     static boolean isLockable(Game game, Player seat, String position) {
         Tile tile = game.getTileByPosition(position);
         return tile != null

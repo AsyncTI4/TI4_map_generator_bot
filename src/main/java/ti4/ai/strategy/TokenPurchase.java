@@ -69,6 +69,7 @@ public class TokenPurchase {
     }
 
     private static SpendCost custodiansReserve(Game game, Player seat) {
+        if (!ScoringReserve.custodiansReserve(game, seat).isNone()) return SpendCost.NONE;
         return custodiansWithinReach(game, seat) ? SpendCost.influence(CUSTODIANS_COST) : SpendCost.NONE;
     }
 

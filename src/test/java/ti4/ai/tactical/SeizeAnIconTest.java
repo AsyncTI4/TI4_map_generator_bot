@@ -220,14 +220,14 @@ class SeizeAnIconTest extends BaseTi4Test {
     }
 
     @Test
-    void keepsTheReserveFromTheCustodiansWithoutTheSecret() {
+    void takesTheCustodiansBeforeAnObjectiveReserveWithoutTheSecret() {
         board(false);
         test.game.setPhaseOfGame("action");
         test.game.getRevealedPublicObjectives().put("trade_routes", 1);
         test.nekro.setTg(10);
         legendaryMecatolWithCustodiansAndAnOutpost();
 
-        assertThat(expansionToMecatol()).isEmpty();
+        assertThat(expansionToMecatol()).isPresent();
     }
 
     @Test

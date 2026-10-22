@@ -1156,7 +1156,7 @@ to build one by hand:
     the strike from there still scores 4.
     All of this is worth half as much (`FractureCampaign.routeShare`) for a seat with no ingress in its own home, lane or
     slice: it can only go in through Mecatol Rex or a neighbour's slice, so it values the march, the march it would
-    give up and the fleet it builds for Styx at half, and does not take the fourth fleet token for it.
+    give up and the fleet it builds for Styx at half, and does not take the third fleet ship for it.
     Three things cover two steps of the march in one round. A seat holding _Flank Speed_ also plans its moves into
     the Fracture with one more move for every ship (`MoveBoost`), keeps such a plan only when it needs the extra move,
     at 1.5 less for the card, and plays the card right after activating the system, before it moves

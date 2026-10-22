@@ -178,11 +178,11 @@ public class CommandTokenPolicy {
                     new Level(Pool.FLEET, Math.min(cap, largest) - bonus),
                     new Level(Pool.TACTIC, 1),
                     new Level(Pool.FLEET, Math.min(cap, BASE_FLEET) - bonus),
-                    new Level(Pool.FLEET, Math.min(cap, fractureFleet(game, seat, largest)) - bonus),
                     new Level(Pool.FLEET, Math.min(cap, fleetForAnOpenSlot(game, seat, largest, cap)) - bonus),
+                    new Level(Pool.FLEET, Math.min(cap, objectiveFleet(game, seat, largest, cap)) - bonus),
+                    new Level(Pool.FLEET, Math.min(cap, fractureFleet(game, seat, largest)) - bonus),
                     new Level(Pool.STRATEGY, plan.strategy()),
                     new Level(Pool.TACTIC, plan.tactic()),
-                    new Level(Pool.FLEET, Math.min(cap, objectiveFleet(game, seat, largest, cap)) - bonus),
                     new Level(Pool.FLEET, Math.min(cap, stackingFleet(game, seat, largest)) - bonus));
         }
         return List.of(

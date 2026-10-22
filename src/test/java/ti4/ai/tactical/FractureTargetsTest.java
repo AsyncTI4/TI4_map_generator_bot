@@ -420,18 +420,15 @@ class FractureTargetsTest extends BaseTi4Test {
     }
 
     @Test
-    void aDockNearAnIngressWantsAFourthFleetToken() {
+    void aDockNearAnIngressWantsNoMoreFleetTokensThanTheStartingPool() {
         fracture.ships(fracture.board.home, UnitType.Dreadnought, 2);
         fracture.nekro().setTacticalCC(3);
         fracture.nekro().setFleetCC(3);
         fracture.nekro().setStrategicCC(0);
-        String near = ti4.ai.nekro.CommandTokenPolicy.poolToGrow(fracture.board.test.game, fracture.nekro());
 
-        fracture.ingress.getSpaceUnitHolder().removeToken(Constants.TOKEN_INGRESS);
-        String far = ti4.ai.nekro.CommandTokenPolicy.poolToGrow(fracture.board.test.game, fracture.nekro());
+        String grown = ti4.ai.nekro.CommandTokenPolicy.poolToGrow(fracture.board.test.game, fracture.nekro());
 
-        assertThat(near).isEqualTo("increase_fleet_cc");
-        assertThat(far).isNotEqualTo("increase_fleet_cc");
+        assertThat(grown).isNotEqualTo("increase_fleet_cc");
     }
 
     @Test

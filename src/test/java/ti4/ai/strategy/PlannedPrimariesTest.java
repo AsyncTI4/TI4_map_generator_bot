@@ -140,9 +140,9 @@ class PlannedPrimariesTest extends BaseTi4Test {
         assertThat(resolve(card, systems)).isEqualTo("FFCC_nekro_diplo_mordaiii_diploP");
     }
 
-    // Nothing threatens Nekro: Diplomacy skips the lock and goes straight to readying planets.
+    // Nothing threatens Nekro: Diplomacy still locks its most valuable system, then readies planets.
     @Test
-    void skipsTheDiplomacyLockWithoutAThreat() {
+    void locksTheDiplomacySystemEvenWithoutAThreat() {
         test.nekro.exhaustPlanet("mordaiii");
         AiPrompt card = prompt(
                 "diplomacy",
@@ -154,7 +154,7 @@ class PlannedPrimariesTest extends BaseTi4Test {
                 "sc_no_follow_2");
         play(card, 2);
 
-        assertThat(resolve(card)).isEqualTo("diploRefresh2");
+        assertThat(resolve(card)).isEqualTo("FFCC_nekro_diploSystem");
     }
 
     // With trade goods to spend, Thunder's Edge Construction uses the home dock's production instead of its first

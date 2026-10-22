@@ -80,6 +80,21 @@ class CommandTokenPolicyTest extends BaseTi4Test {
         assertThat(CommandTokenPolicy.poolToGrow(test.game, test.nekro)).isEqualTo("increase_fleet_cc");
     }
 
+    // During the action phase a fleet token for a public objective comes before the strategy and tactic tokens the
+    // coming turns would use.
+    @Test
+    void aFleetTokenForAnObjectiveComesBeforeTheTokensTheTurnsWouldUseDuringTheActionPhase() {
+        test.game.getRevealedPublicObjectives().put("raise_fleet", 1);
+        test.game.setPhaseOfGame("action");
+        test.nekro.setTacticalCC(1);
+        test.nekro.setFleetCC(3);
+        test.nekro.setStrategicCC(0);
+        Tile home = test.nekroHome();
+        test.units(home, "space", test.nekro, UnitType.Carrier, 3);
+
+        assertThat(CommandTokenPolicy.poolToGrow(test.game, test.nekro)).isEqualTo("increase_fleet_cc");
+    }
+
     // Scoring happens before the status phase hands out tokens, so the fifth fleet token has to be in place during the
     // round the stack is built. One tactic token is enough to produce into the stack; the fleet comes before a second.
     @Test
