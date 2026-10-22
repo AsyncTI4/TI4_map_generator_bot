@@ -35,7 +35,10 @@ class SetDeck extends GameStateSubcommand {
         addDefaultOption(Constants.EXPLORATION_DECKS, "Exploration");
         addDefaultOption(Constants.STRATEGY_CARD_SET, "Strategy card");
         addDefaultOption(Constants.TECHNOLOGY_DECK, "Technology");
-        addOptions(new OptionData(OptionType.BOOLEAN, "reset_deck", "True to completely reset deck"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                "reset_deck",
+                "True to reset the deck and clear its cards from hands, discards and play areas"));
     }
 
     @Override
