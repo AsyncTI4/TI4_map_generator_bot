@@ -649,11 +649,12 @@ class AutoCompleteProvider {
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.SOURCE -> {
-                String enteredValue = event.getFocusedOption().getValue();
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 List<Command.Choice> options = Stream.of(ComponentSource.values())
-                        .filter(token -> token.toString().contains(enteredValue))
+                        .filter(token -> token.toString().contains(enteredValue)
+                                || token.prettyName().toLowerCase().contains(enteredValue))
                         .limit(25)
-                        .map(token -> new Command.Choice(token.toString(), token.toString()))
+                        .map(token -> new Command.Choice(token.prettyName(), token.toString()))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
