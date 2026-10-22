@@ -8,8 +8,6 @@ import java.util.stream.Stream;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.image.draw.GraphicsState;
-import ti4.image.io.EncodedImage;
-import ti4.image.io.ImageEncoder;
 import ti4.service.fow.FogViewer;
 import ti4.service.map.MapRenderPreparationService;
 
@@ -43,13 +41,11 @@ final class MapRenderer {
     static MapRenderResult render(RenderContext ctx, RenderTimings timings) {
         timings.startDraw();
         BufferedImage canvas = draw(ctx, timings);
-        EncodedImage encoded = ImageEncoder.forDiscord(canvas);
         timings.stopGraphics();
         timings.stopDraw();
         boolean eligibleForWebsite =
                 ctx.basicType() == DisplayType.all && !ctx.fog().isPrivate();
-        return new MapRenderResult(
-                canvas, encoded, ctx.overlays().asList(), eligibleForWebsite, ctx.playerAreaWarnings());
+        return new MapRenderResult(canvas, ctx.overlays().asList(), eligibleForWebsite, ctx.playerAreaWarnings());
     }
 
     static BufferedImage draw(RenderContext ctx, RenderTimings timings) {

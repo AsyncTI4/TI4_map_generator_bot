@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
+import ti4.image.io.EncodedImage;
 import ti4.testUtils.BaseTi4Test;
 
 class MapRendererTest extends BaseTi4Test {
@@ -25,12 +26,13 @@ class MapRendererTest extends BaseTi4Test {
     }
 
     @Test
-    void renderEncodesTheCanvasAsWebpAndKeepsTheCanvasSize() {
+    void discordEncodingIsWebpAndKeepsTheCanvasSize() {
         MapRenderResult result = MapRenderer.render(
                 new MapRenderRequest(smallGame(), DisplayType.map, null, null), RenderTimings.disabled());
+        EncodedImage encoded = result.encodeForDiscord();
 
-        assertEquals("webp", result.encoded().format());
-        assertEquals("RIFF", new String(Arrays.copyOf(result.encoded().bytes(), 4), StandardCharsets.US_ASCII));
+        assertEquals("webp", encoded.format());
+        assertEquals("RIFF", new String(Arrays.copyOf(encoded.bytes(), 4), StandardCharsets.US_ASCII));
         assertTrue(result.canvas().getWidth() > 0 && result.canvas().getHeight() > 0);
     }
 
