@@ -48,9 +48,6 @@ public class MapRenderPipeline {
                                 new MapRenderRequest(
                                         snapshot, renderEvent.displayType, renderEvent.event, renderEvent.segment),
                                 timings);
-                        // TODO: the sent-warning markers land on the live game from this thread; they persist only if
-                        // the handler saves later.
-                        result.playerAreaWarnings().send(liveGame);
                         uploadToDiscord(snapshot, result, timings, renderEvent.callback());
                         if (renderEvent.uploadToWebsite) {
                             MapUploads.toWebsite(snapshot, result, timings);

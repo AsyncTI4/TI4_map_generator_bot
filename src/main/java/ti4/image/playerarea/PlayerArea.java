@@ -29,7 +29,6 @@ final class PlayerArea {
         if (isSkipped(ctx, player)) {
             return PlayerAreaFrame.unframed(new Rectangle(topLeft));
         }
-        ctx.warnings().drawn(player);
         Graphics2D g2 = ctx.g2();
         int x = topLeft.x;
         int y = topLeft.y;

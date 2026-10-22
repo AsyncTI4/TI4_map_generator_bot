@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
-import ti4.logging.RollbarManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -29,7 +28,6 @@ record CommandGameState(boolean saveGame, boolean playerCommand) {
         }
         Game game = GameManager.getManagedGame(gameName).getGame();
         CommandGameState.game.set(game);
-        RollbarManager.put("game_name", game.getName());
 
         if (!playerCommand) {
             return;
@@ -40,7 +38,6 @@ record CommandGameState(boolean saveGame, boolean playerCommand) {
                     + event.getName() + " in channel " + event.getChannel().getName() + " for game " + gameName);
         }
         CommandGameState.player.set(player);
-        RollbarManager.put("player_id", player.getUserID());
     }
 
     void postExecute(SlashCommandInteractionEvent event) {

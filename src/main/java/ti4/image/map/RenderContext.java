@@ -5,7 +5,6 @@ import ti4.game.Game;
 import ti4.helpers.DisplayType;
 import ti4.image.draw.WebsiteOverlays;
 import ti4.image.playerarea.NeighbourMap;
-import ti4.image.playerarea.PlayerAreaWarnings;
 import ti4.service.fow.FogViewer;
 
 final class RenderContext {
@@ -21,7 +20,6 @@ final class RenderContext {
     private final int scoreTokenSpacing;
     private final BoardLayout board;
     private final MapCanvasLayout canvas;
-    private PlayerAreaWarnings playerAreaWarnings = PlayerAreaWarnings.none();
 
     private RenderContext(
             Game game,
@@ -145,13 +143,5 @@ final class RenderContext {
 
     MapCanvasLayout canvas() {
         return canvas;
-    }
-
-    PlayerAreaWarnings playerAreaWarnings() {
-        return playerAreaWarnings;
-    }
-
-    void replacePlayerAreaWarnings(PlayerAreaWarnings warnings) {
-        playerAreaWarnings = warnings;
     }
 }
