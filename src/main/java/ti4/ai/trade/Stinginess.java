@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.brain.SearchMemo;
 import ti4.ai.scoring.SpendUnlock;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -41,6 +42,8 @@ class Stinginess {
     private static final String MUNITIONS = "munitions";
     private static final String DATAHUB = "qdn";
     private static final String PILLAGE = "pillage";
+    private static final String RIVALRY_MEMO = "stinginess.rivalry";
+    private static final String RATE_MEMO = "stinginess.tradeGoodRate";
     private static final String OWN_PILLAGE_OPT_IN = "willPillageOwnTransactions";
 
     enum Veto {
@@ -68,6 +71,10 @@ class Stinginess {
     }
 
     static double rivalry(Game game, Player self, Player other) {
+        return SearchMemo.remember(() -> computeRivalry(game, self, other), RIVALRY_MEMO, self, other);
+    }
+
+    private static double computeRivalry(Game game, Player self, Player other) {
         if (nearWin(game, other)) return NEAR_WIN_RIVALRY;
         int gap = Standings.vp(other) - Standings.vp(self);
         if (gap <= -HARMLESS_GAP) return 0;
@@ -148,6 +155,10 @@ class Stinginess {
     }
 
     static double tradeGoodRate(Game game, Player partner, Player seat) {
+        return SearchMemo.remember(() -> computeTradeGoodRate(game, partner, seat), RATE_MEMO, partner, seat);
+    }
+
+    private static double computeTradeGoodRate(Game game, Player partner, Player seat) {
         if (partner.hasTech(MIRROR_COMPUTING)) return MIRROR_COMPUTING_RATE;
         boolean votes = game.playerHasLeaderUnlockedOrAlliance(partner, HACAN_COMMANDER) && game.isCustodiansScored();
         if (votes) return VOTES_RATE;

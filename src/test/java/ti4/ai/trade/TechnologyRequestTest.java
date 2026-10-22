@@ -331,6 +331,37 @@ class TechnologyRequestTest extends BaseTi4Test {
         assertThat(TechnologyRequest.plan(contextFor(nekro), List.of(sol))).isEmpty();
     }
 
+    // The memoised plan must be the plan that evaluating every research timing from scratch gives, for either seat.
+    @Test
+    void memoisedPlanMatchesAFreshSearchInEveryState() {
+        List<Optional<TechnologyRequest.Plan>> plans = new ArrayList<>();
+        Runnable[] states = {
+            () -> {},
+            this::solCanFollow,
+            this::solCanFollowLater,
+            () -> {
+                table.stock(arborec, 4, 0);
+                table.changed();
+            },
+            () -> {
+                table.stock(sol, 3, 1);
+                table.changed();
+            }
+        };
+        for (Runnable state : states) {
+            state.run();
+            for (Player seat : List.of(nekro, sol)) {
+                Player partner = seat == nekro ? sol : nekro;
+                List<Player> partners = List.of(partner, arborec);
+                Optional<TechnologyRequest.Plan> fresh = TechnologyRequest.search(contextFor(seat), partners);
+                Optional<TechnologyRequest.Plan> memoised = TechnologyRequest.plan(contextFor(seat), partners);
+                assertThat(memoised).isEqualTo(fresh);
+                plans.add(memoised);
+            }
+        }
+        assertThat(plans).anyMatch(Optional::isPresent).anyMatch(Optional::isEmpty);
+    }
+
     @Test
     void holderHoldsOnceItsAskIsAccepted() {
         solCanFollowLater();

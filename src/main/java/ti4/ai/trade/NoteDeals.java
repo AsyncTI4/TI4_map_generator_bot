@@ -9,13 +9,16 @@ import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.brain.SearchMemo;
 import ti4.ai.promissory.NoteGiving;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 
 @UtilityClass
 class NoteDeals {
 
+    private static final String SPAN = "trade.noteDeals";
     static final int MAX_PER_ROUND = 2;
     static final int MAX_PRICE = 6;
     private static final String ROUND_KEY = "tradeNoteDeals|";
@@ -31,6 +34,12 @@ class NoteDeals {
     record Option(Player partner, Deal deal, double utility) {}
 
     static Optional<AiDecision> propose(AiTurnContext context, List<Player> partners) {
+        try (Thinking.Span ignored = Thinking.enter(SPAN)) {
+            return startBestOption(context, partners);
+        }
+    }
+
+    private static Optional<AiDecision> startBestOption(AiTurnContext context, List<Player> partners) {
         Game game = context.game();
         String roundKey = ROUND_KEY + game.getRound();
         if (TradeMemory.count(context.memory(), roundKey) >= MAX_PER_ROUND) return Optional.empty();
@@ -54,6 +63,12 @@ class NoteDeals {
     }
 
     static List<Option> best(AiTurnContext context, List<Player> partners) {
+        try (SearchMemo.Open ignored = SearchMemo.open()) {
+            return rank(context, partners);
+        }
+    }
+
+    private static List<Option> rank(AiTurnContext context, List<Player> partners) {
         Game game = context.game();
         Player seat = context.seat();
         List<Option> options = new ArrayList<>();
@@ -65,11 +80,8 @@ class NoteDeals {
                     : 1;
             for (Deal deal : candidates(game, seat, partner, spare, floor)) {
                 if (!TradeValue.coverable(game, seat, partner, deal)) continue;
-                if (!TradeValue.proposable(game, seat, partner, deal, trust)) continue;
-                options.add(new Option(
-                        partner,
-                        deal,
-                        TradeValue.of(game, seat, partner, deal, trust).utility()));
+                TradeValue.proposal(game, seat, partner, deal, trust)
+                        .ifPresent(valuation -> options.add(new Option(partner, deal, valuation.utility())));
             }
         }
         options.sort(Comparator.comparingDouble(Option::utility).reversed());

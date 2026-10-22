@@ -1,10 +1,15 @@
 package ti4.ai.trade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.ToIntFunction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.brain.AiTurnContext;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
@@ -42,6 +47,70 @@ class NoteDealsTest extends BaseTi4Test {
 
     private List<NoteDeals.Option> options() {
         return NoteDeals.best(table.context(), List.of(sol));
+    }
+
+    private void moreSeatsWithNotes() {
+        Player hacan = table.aiSeat("hacan", "red");
+        Player letnev = table.humanSeat("letnev", "green");
+        table.presence(hacan, TradeTable.BESIDE_NEKRO);
+        table.presence(letnev, TradeTable.BESIDE_NEKRO);
+        for (Player player : List.of(hacan, letnev)) {
+            String colour = player.getColor();
+            for (int index = 0; index < SUFFIXES.length; index++) {
+                player.addOwnedPromissoryNoteByID(colour + SUFFIXES[index]);
+                player.setPromissoryNote(colour + SUFFIXES[index], index + 21);
+            }
+        }
+        table.stock(hacan, 3, 5);
+        table.stock(letnev, 2, 6);
+        table.stock(nekro, 3, 7);
+        table.stock(sol, 4, 4);
+        table.points(hacan, 2);
+        table.points(letnev, 4);
+    }
+
+    private List<NoteDeals.Option> reference(List<Player> partners) {
+        AiTurnContext context = table.context();
+        List<NoteDeals.Option> options = new ArrayList<>();
+        for (Player partner : partners) {
+            double trust = Trust.of(context, partner);
+            int spare = TradeBudget.spareTradeGoods(table.game, nekro, partner);
+            ToIntFunction<String> floor = alias -> NoteSecrets.chases(table.game, nekro, alias)
+                    ? NoteSecrets.askFloor(context.memory(), table.game, nekro, partner, alias)
+                    : 1;
+            for (Deal deal : NoteDeals.candidates(table.game, nekro, partner, spare, floor)) {
+                if (!TradeValue.coverable(table.game, nekro, partner, deal)) continue;
+                if (!TradeValue.proposable(table.game, nekro, partner, deal, trust)) continue;
+                double utility =
+                        TradeValue.of(table.game, nekro, partner, deal, trust).utility();
+                options.add(new NoteDeals.Option(partner, deal, utility));
+            }
+        }
+        options.sort(Comparator.comparingDouble(NoteDeals.Option::utility).reversed());
+        return options;
+    }
+
+    // The memoised search must rank exactly what evaluating every deal from scratch ranks.
+    @Test
+    void searchMatchesEvaluatingEveryDealFromScratch() {
+        moreSeatsWithNotes();
+        List<Player> partners = table.game.getRealPlayers().stream()
+                .filter(player -> player != nekro)
+                .toList();
+
+        List<NoteDeals.Option> expected = reference(partners);
+        List<NoteDeals.Option> actual = NoteDeals.best(table.context(), partners);
+
+        assertThat(partners).hasSizeGreaterThan(2);
+        assertThat(expected).hasSizeGreaterThan(20);
+        assertThat(actual).hasSameSizeAs(expected);
+        for (int index = 0; index < expected.size(); index++) {
+            assertThat(actual.get(index).partner())
+                    .isEqualTo(expected.get(index).partner());
+            assertThat(actual.get(index).deal()).isEqualTo(expected.get(index).deal());
+            assertThat(actual.get(index).utility())
+                    .isCloseTo(expected.get(index).utility(), within(1e-9));
+        }
     }
 
     private static boolean gives(Deal deal, String sender, String detail) {

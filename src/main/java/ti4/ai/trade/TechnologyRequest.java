@@ -11,15 +11,18 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiSeats;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.brain.SearchMemo;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.strategy.OpeningNeeds;
 import ti4.ai.strategy.TechnologyTiming;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 
 @UtilityClass
 class TechnologyRequest {
 
+    private static final String SPAN = "trade.techRequest";
     private static final int PAYMENT = 1;
     private static final int MAX_READ_PAYMENT = 2;
     private static final int LAST_REQUEST_ROUND = 1;
@@ -52,6 +55,12 @@ class TechnologyRequest {
     }
 
     static Optional<AiDecision> announce(AiTurnContext context, List<Player> partners) {
+        try (Thinking.Span ignored = Thinking.enter(SPAN)) {
+            return announcePlan(context, partners);
+        }
+    }
+
+    private static Optional<AiDecision> announcePlan(AiTurnContext context, List<Player> partners) {
         Game game = context.game();
         if (context.memory().has(announcedKey(game)) || context.memory().has(sentKey(game))) return Optional.empty();
         Optional<Plan> plan = plan(context, partners);
@@ -61,6 +70,12 @@ class TechnologyRequest {
     }
 
     static Optional<AiDecision> start(AiTurnContext context, List<Player> partners) {
+        try (Thinking.Span ignored = Thinking.enter(SPAN)) {
+            return startPlan(context, partners);
+        }
+    }
+
+    private static Optional<AiDecision> startPlan(AiTurnContext context, List<Player> partners) {
         Game game = context.game();
         Optional<String> announced = context.memory().get(announcedKey(game));
         if (announced.isEmpty() || context.memory().has(sentKey(game))) return Optional.empty();
@@ -77,6 +92,12 @@ class TechnologyRequest {
     }
 
     static Optional<Plan> plan(AiTurnContext context, List<Player> partners) {
+        try (SearchMemo.Open ignored = SearchMemo.open()) {
+            return search(context, partners);
+        }
+    }
+
+    static Optional<Plan> search(AiTurnContext context, List<Player> partners) {
         if (!dealRound(context.game())) return Optional.empty();
         return requestEarly(context, partners)
                 .or(() -> offerToWait(context, partners))
@@ -109,9 +130,8 @@ class TechnologyRequest {
     private static Optional<Plan> offerToWait(AiTurnContext context, List<Player> partners) {
         Game game = context.game();
         Player seat = context.seat();
-        if (!TechnologyTiming.deniable(game, seat)) return Optional.empty();
         Optional<Player> holder = OpeningNeeds.technologyHolder(game, seat).filter(partners::contains);
-        if (holder.isEmpty()) return Optional.empty();
+        if (holder.isEmpty() || !TechnologyTiming.deniable(game, seat)) return Optional.empty();
         double trust = Trust.of(context, holder.get());
         return payment(game, seat, holder.get())
                 .filter(payment -> worthPaying(game, seat, holder.get(), payment, trust))

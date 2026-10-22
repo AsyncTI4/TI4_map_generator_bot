@@ -6,6 +6,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.brain.SearchMemo;
 import ti4.ai.tactical.TacticalPlanner;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -20,7 +21,9 @@ class MilitarySupportDeals {
     private record Offer(Player partner, Deal deal, double score) {}
 
     static Optional<AiDecision> propose(AiTurnContext context, List<Player> partners) {
-        return buy(context, partners).or(() -> sell(context, partners));
+        try (SearchMemo.Open ignored = SearchMemo.open()) {
+            return buy(context, partners).or(() -> sell(context, partners));
+        }
     }
 
     static Optional<AiDecision> buy(AiTurnContext context, List<Player> partners) {

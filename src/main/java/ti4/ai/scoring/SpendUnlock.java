@@ -5,12 +5,15 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.ai.brain.SearchMemo;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Helper;
 
 @UtilityClass
 public class SpendUnlock {
+
+    private static final String POINT_DELTA_MEMO = "spend.pointDelta";
 
     public static boolean unlocks(Game game, Player player, Collection<String> readiedPlanets, int extraTradeGoods) {
         return pointsUnlocked(game, player, readiedPlanets, extraTradeGoods) > 0;
@@ -60,6 +63,11 @@ public class SpendUnlock {
     }
 
     public static int pointDelta(Game game, Player player, int tradeGoodDelta) {
+        return SearchMemo.remember(
+                () -> computePointDelta(game, player, tradeGoodDelta), POINT_DELTA_MEMO, player, tradeGoodDelta);
+    }
+
+    private static int computePointDelta(Game game, Player player, int tradeGoodDelta) {
         if (tradeGoodDelta > 0) return pointsGained(game, player, tradeGoodDelta);
         if (tradeGoodDelta < 0) return -pointsLost(game, player, -tradeGoodDelta);
         return 0;

@@ -7,6 +7,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.brain.SearchMemo;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -42,6 +43,12 @@ class FragmentDeals {
     }
 
     static List<Option> best(AiTurnContext context, List<Player> partners) {
+        try (SearchMemo.Open ignored = SearchMemo.open()) {
+            return rank(context, partners);
+        }
+    }
+
+    private static List<Option> rank(AiTurnContext context, List<Player> partners) {
         Game game = context.game();
         Player seat = context.seat();
         List<Option> options = new ArrayList<>();
@@ -49,11 +56,8 @@ class FragmentDeals {
             double trust = Trust.of(context, partner);
             for (Deal deal : candidates(game, seat, partner, TradeBudget.spareTradeGoods(game, seat, partner))) {
                 if (!TradeValue.coverable(game, seat, partner, deal)) continue;
-                if (!TradeValue.proposable(game, seat, partner, deal, trust)) continue;
-                options.add(new Option(
-                        partner,
-                        deal,
-                        TradeValue.of(game, seat, partner, deal, trust).utility()));
+                TradeValue.proposal(game, seat, partner, deal, trust)
+                        .ifPresent(valuation -> options.add(new Option(partner, deal, valuation.utility())));
             }
         }
         options.sort(Comparator.comparingDouble(Option::utility).reversed());
