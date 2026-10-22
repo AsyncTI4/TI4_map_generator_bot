@@ -4,9 +4,11 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.List;
+import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
+import ti4.image.draw.FactionIcons;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.ShapeDrawing;
@@ -20,6 +22,15 @@ final class SupplyBlock {
     static final int OFFSET_FROM_ICON = 120;
     private static final int TWILIGHTS_FALL_SHIFT = 65;
     private static final int FRAGMENT_STEP = 15;
+    private static final Set<String> STONEBORN_FRAGMENTS = Set.of(
+            "stonebornculturalfragment",
+            "stonebornculturalfragment2",
+            "stonebornhazardousfragment",
+            "stonebornhazardousfragment2",
+            "stonebornindustrialfragment",
+            "stonebornindustrialfragment2",
+            "stonebornunknownfragment",
+            "stonebornunknownfragment2");
     private static final int FRAGMENT_PAIR_GAP = 25;
 
     private SupplyBlock() {}
@@ -124,7 +135,12 @@ final class SupplyBlock {
         }
         for (int i = 0; i < fragments.size(); i++) {
             if (!fragments.get(i).startsWith("supermassive")) {
-                PaImage.draw(g2, x + 475 + xDelta + i * FRAGMENT_STEP, y - 25, fragmentImage);
+                int fragmentX = x + 475 + xDelta + i * FRAGMENT_STEP;
+                int fragmentY = y - 25;
+                PaImage.draw(g2, fragmentX, fragmentY, fragmentImage);
+                if (STONEBORN_FRAGMENTS.contains(fragments.get(i))) {
+                    FactionIcons.drawFaction(g2, "stoneborn", fragmentX + 9, fragmentY + 10, 54, 50);
+                }
             }
         }
         return xDelta + fragments.size() * FRAGMENT_STEP;

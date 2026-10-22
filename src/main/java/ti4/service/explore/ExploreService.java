@@ -30,6 +30,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUni
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
@@ -785,6 +787,7 @@ public class ExploreService {
                             }
                             DSHelperBreakthroughs.doLanefirBtCheck(game, player);
                             OblivionUnitHandler.doOblivionMechCheck(game, player);
+                            StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
                         }
                     }
 
@@ -812,6 +815,7 @@ public class ExploreService {
                         }
                         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
                         OblivionUnitHandler.doOblivionMechCheck(game, player);
+                        StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
                     }
                     game.purgeExplore(ogID);
                 }
@@ -831,13 +835,45 @@ public class ExploreService {
 
         // Specific Explore Handling
         switch (cardID) {
-            case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9", "supermassivecultural" ->
+            case "crf1",
+                    "crf2",
+                    "crf3",
+                    "crf4",
+                    "crf5",
+                    "crf6",
+                    "crf7",
+                    "crf8",
+                    "crf9",
+                    "supermassivecultural",
+                    "stonebornculturalfragment",
+                    "stonebornculturalfragment2" ->
                 MessageHelper.sendMessageToEventChannel(event, String.format(fragMessage, ExploreEmojis.CFrag));
-            case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7", "supermassivehazardous" ->
+            case "hrf1",
+                    "hrf2",
+                    "hrf3",
+                    "hrf4",
+                    "hrf5",
+                    "hrf6",
+                    "hrf7",
+                    "supermassivehazardous",
+                    "stonebornhazardousfragment",
+                    "stonebornhazardousfragment2" ->
                 MessageHelper.sendMessageToEventChannel(event, String.format(fragMessage, ExploreEmojis.HFrag));
-            case "irf1", "irf2", "irf3", "irf4", "irf5", "supermassiveindustrial" ->
+            case "irf1",
+                    "irf2",
+                    "irf3",
+                    "irf4",
+                    "irf5",
+                    "supermassiveindustrial",
+                    "stonebornindustrialfragment",
+                    "stonebornindustrialfragment2" ->
                 MessageHelper.sendMessageToEventChannel(event, String.format(fragMessage, ExploreEmojis.IFrag));
-            case "urf1", "urf2", "urf3", "supermassiveunknown" ->
+            case "urf1",
+                    "urf2",
+                    "urf3",
+                    "supermassiveunknown",
+                    "stonebornunknownfragment",
+                    "stonebornunknownfragment2" ->
                 MessageHelper.sendMessageToEventChannel(event, String.format(fragMessage, ExploreEmojis.UFrag));
             case "ed1", "ed2" -> {
                 message = new StringBuilder("_Enigmatic Device_ has been placed in play area.");
@@ -1754,6 +1790,8 @@ public class ExploreService {
             List<Button> buttons = List.of(placeSleeper, declineSleeper);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
         }
+        StonebornTechHandler.offerUnleashedXenolithAfterExplore(
+                event, game, player, tile, planetID, exploreModel.getType());
         if (planetID != null
                 && player.hasUnlockedBreakthrough("pharadnbt")
                 && player.getNomboxTile().getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0) {

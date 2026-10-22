@@ -277,6 +277,10 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 TheodisiLegendaryButtonHandler.offerVespixPlanetSelection(game, player);
                 output = "blank";
             }
+            case "petra", "petraunleashed" -> {
+                output = "Please choose which planet you would like to explore.";
+                buttons.addAll(ButtonHelper.getButtonsToExploreAllPlanets(player, game));
+            }
             default -> {
                 if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null
                         && game.isAbsolMode()

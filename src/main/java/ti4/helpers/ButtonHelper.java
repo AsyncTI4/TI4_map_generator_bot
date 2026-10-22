@@ -70,6 +70,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardUnitHandler;
@@ -6548,6 +6549,7 @@ public class ButtonHelper {
                 String buttonLabel = "Explore " + planetRepresentation
                         + (explorationTraits.size() > 1 ? " As " + StringUtils.capitalize(trait) : "");
                 buttons.add(Buttons.gray(buttonId, buttonLabel, ExploreEmojis.getTraitEmoji(trait)));
+                StonebornTechHandler.addDormantXenolithExploreButton(buttons, player, planetId, trait);
                 if (player.hasUnlockedBreakthrough("kolleccbt") && player.hasReadyBreakthrough("kolleccbt")) {
                     String buttonId2 = player.factionButtonChecker() + "movedNExplored_" + source + planetId + "_"
                             + trait + "kolleccbt";

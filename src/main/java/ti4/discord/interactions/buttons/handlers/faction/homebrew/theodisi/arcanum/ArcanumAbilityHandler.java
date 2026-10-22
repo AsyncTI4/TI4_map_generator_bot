@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -175,7 +176,10 @@ public class ArcanumAbilityHandler {
 
         player.removeFragment(fragmentId);
         game.purgeExplore(fragmentId);
-        game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+        if (!StonebornAbilityHandler.returnPurgedFragment(game, fragmentId)) {
+            game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+        }
+        StonebornAbilityHandler.offerFragmentumTokenPlacement(game, player, event, List.of(fragmentId));
         if (fragmentId.startsWith("supermassive")) {
             ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, fragmentId);
         }

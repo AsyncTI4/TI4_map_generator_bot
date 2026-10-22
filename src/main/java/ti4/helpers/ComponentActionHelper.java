@@ -24,6 +24,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arden
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
@@ -183,6 +184,8 @@ public class ComponentActionHelper {
                                                             .isEmpty());
                                 case "ashenbt" -> AshenBreakthroughHandler.hasEligibleTarget(game, p1);
                                 case "scrapyardbt" -> ScrapyardBreakthroughHandler.hasCapturedUnits(p1);
+                                case "stonebornbt", "stonebornbtunleashed" ->
+                                    !p1.getFragments().isEmpty();
                                 case "saarbt" ->
                                     game.getTileMap().values().stream()
                                             .filter(Tile::isAsteroidField)
@@ -907,7 +910,6 @@ public class ComponentActionHelper {
                     purgeFragButtons.add(transact3);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, purgeFragButtons);
                     DSHelperBreakthroughs.doLanefirBtCheck(game, p1);
-
                 } else if ("stallTactics".equalsIgnoreCase(buttonID)) {
                     List<Button> acButtons = ActionCardHelper.getDiscardActionCardButtons(p1, true);
                     DeepgloomService.spendOneDebt(game, p1, "stall_tactics");
@@ -1436,6 +1438,7 @@ public class ComponentActionHelper {
             if (!discardedArtifact && !"nanoforge".equals(relicID)) {
                 DSHelperBreakthroughs.doLanefirBtCheck(game, player);
                 OblivionUnitHandler.doOblivionMechCheck(game, player);
+                StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
             }
         }
 

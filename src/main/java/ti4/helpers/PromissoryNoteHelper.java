@@ -22,6 +22,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorPromissoryHandler;
@@ -810,6 +811,9 @@ public class PromissoryNoteHelper {
         }
         if ("thpnthurviali".equalsIgnoreCase(id)) {
             ThurvialiPromissoryHandler.resolveRadiantAssembly(event, game, player);
+        }
+        if ("thpnstoneborn".equalsIgnoreCase(id)) {
+            StonebornPromissoryHandler.offerPotentialChoices(player, game);
         }
         // These PNs' text contains "action:" but describe a trigger on another player's action
         List<String> actionTextPNsNotOwnAction = List.of("acq", "bapnconc");

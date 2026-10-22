@@ -37,6 +37,9 @@ public class FrankenStartingTechService {
         if ("thurviali".equalsIgnoreCase(itemID)) {
             LostLegaciesStartingTechsHandler.offerThurvialiStartingTechs(player.getGame(), player);
         }
+        if ("stoneborn".equalsIgnoreCase(itemID)) {
+            LostLegaciesStartingTechsHandler.offerStonebornStartingTechs(player.getGame(), player);
+        }
     }
 
     public void removeStartingTech(GenericInteractionCreateEvent event, Player player, String itemID) {

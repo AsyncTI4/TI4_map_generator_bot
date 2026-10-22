@@ -51,7 +51,6 @@ public class FrankenSettings extends SettingsMenu {
             "qulane",
             "neutral",
             "obsidian",
-            "stoneborn",
             "morpha");
 
     private final ChoiceSetting<String> draftMode;

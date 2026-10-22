@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -96,6 +97,7 @@ public class MutagenService {
         // Purging either kind of Mutagen is a single "purge 1 or more components" event.
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         OblivionUnitHandler.doOblivionMechCheck(game, player);
+        StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
 
         game.setStoredValue(OPTIONS_KEY + player.getFaction(), String.join(",", options));
         game.setStoredValue(REMAINING_KEY + player.getFaction(), volatileMutagenics ? "2" : "1");

@@ -39,6 +39,11 @@ public class CommanderUnlockCheckService {
                     && !player.hasLeaderUnlocked(factionToCheck + "commander")) {
                 checkConditionsAndUnlock(player, factionToCheck, factionToCheck + "commander");
             }
+            if ("stoneborn".equals(factionToCheck)
+                    && player.hasLeader("stoneborncommanderdormant")
+                    && !player.hasLeaderUnlocked("stoneborncommanderdormant")) {
+                checkConditionsAndUnlock(player, "stoneborn", "stoneborncommanderdormant");
+            }
             if ("mahact".equals(factionToCheck)
                     && player.hasLeader("mahactcommander_y")
                     && !player.hasLeaderUnlocked("mahactcommander_y")) {
@@ -350,6 +355,7 @@ public class CommanderUnlockCheckService {
                     "thrones",
                     "ponthous",
                     "scrapyard",
+                    "stoneborn",
                     "morpha",
                     "thurviali" ->
                 shouldBeUnlocked =

@@ -32,6 +32,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponth
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardLeadersHandler;
@@ -109,6 +110,7 @@ public class PlayHeroService {
         if (removed && (reason == LeaderRemovalReason.PURGED || reason == LeaderRemovalReason.STATUS_CLEANUP)) {
             DSHelperBreakthroughs.doLanefirBtCheck(game, player);
             OblivionUnitHandler.doOblivionMechCheck(game, player);
+            StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
         }
         if (removed && reason == LeaderRemovalReason.PURGED) {
             RevenantTechHandler.doLazarusPodsLeaderCheck(game, player);
@@ -137,6 +139,20 @@ public class PlayHeroService {
                     event.getMessageChannel(),
                     player.getRepresentation()
                             + ", Frontiersman Nothi, the Oblivion hero, cannot be played because there are not enough unused red-backed and blue-backed tiles or legal edge positions.");
+            return;
+        }
+        if (("stonebornherodormant".equals(playerLeader.getId())
+                        || "stonebornherounleashed".equals(playerLeader.getId()))
+                && game.getAllRelics().size() < 3) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing()
+                            + " cannot play _"
+                            + playerLeader
+                                    .getLeaderModel()
+                                    .map(LeaderModel::getName)
+                                    .orElse("Meteorime")
+                            + "_ because fewer than 3 relics remain.");
             return;
         }
 
@@ -215,6 +231,15 @@ public class PlayHeroService {
         }
 
         switch (playerLeader.getId()) {
+            case "stonebornherodormant" -> StonebornLeadersHandler.drawThreeRelicsAndOfferOne(game, player);
+            case "stonebornherounleashed" -> {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " drew the following relics with _Meteorime Unleashed_.");
+                RelicHelper.drawRelicAndNotify(player, event, game);
+                RelicHelper.drawRelicAndNotify(player, event, game);
+                RelicHelper.drawRelicAndNotify(player, event, game);
+            }
             case "scrapyardhero" ->
                 ScrapyardLeaderHandler.resolveScrapyardHero(
                         event instanceof ButtonInteractionEvent buttonEvent ? buttonEvent : null, game, player);
