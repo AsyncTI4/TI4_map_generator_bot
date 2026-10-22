@@ -151,13 +151,11 @@ public class DataMigrationManager {
             var game = managedGame.getGame();
             if (game.hasRunMigration(migrationName)) continue;
 
-            var changesMade = migrationMethod.apply(game);
+            if (!migrationMethod.apply(game)) continue;
             game.addMigration(migrationName);
             // TODO: Confirm games aren't able to make changes during this
             GameManager.save(game, "Data Migration - " + migrationName);
-            if (changesMade) {
-                migrationsApplied.add(game.getName());
-            }
+            migrationsApplied.add(game.getName());
         }
         return migrationsApplied;
     }
