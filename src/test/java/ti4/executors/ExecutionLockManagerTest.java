@@ -311,6 +311,176 @@ class ExecutionLockManagerTest {
         assertEquals(0, ExecutionLockManager.holders(lockName));
     }
 
+    // A ReentrantReadWriteLock cannot be upgraded: a blocking write request from a thread that only
+    // holds the read lock would wait on itself forever and pin the lock entry. It must fail fast instead.
+    @Test
+    void aBlockingWriteWhileTheSameThreadHoldsOnlyAReadThrowsWithoutLeakingACount() throws Exception {
+        executor.submit(() -> {
+                    ExecutionLockManager.lock(lockName, ExecutionLockType.READ);
+                    try {
+                        IllegalStateException thrown = assertThrows(
+                                IllegalStateException.class,
+                                () -> ExecutionLockManager.lock(lockName, ExecutionLockType.WRITE));
+                        assertTrue(thrown.getMessage().contains(lockName));
+                        assertEquals(1, ExecutionLockManager.holders(lockName));
+                    } finally {
+                        ExecutionLockManager.unlock(lockName, ExecutionLockType.READ);
+                    }
+                    assertEquals(0, ExecutionLockManager.holders(lockName));
+                })
+                .get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+        assertEquals(0, ExecutionLockManager.holders(lockName));
+    }
+
+    @Test
+    void aReentrantReadUnderAWriteStillAllowsAnotherWrite() {
+        ExecutionLockManager.lock(lockName, ExecutionLockType.WRITE);
+        try {
+            ExecutionLockManager.lock(lockName, ExecutionLockType.READ);
+            try {
+                // Holding write and read together counts as holding write, so this is plain reentrancy.
+                ExecutionLockManager.lock(lockName, ExecutionLockType.WRITE);
+                ExecutionLockManager.unlock(lockName, ExecutionLockType.WRITE);
+            } finally {
+                ExecutionLockManager.unlock(lockName, ExecutionLockType.READ);
+            }
+        } finally {
+            ExecutionLockManager.unlock(lockName, ExecutionLockType.WRITE);
+        }
+        assertEquals(0, ExecutionLockManager.holders(lockName));
+    }
+
+    @Test
+    void aReadMayBeReacquiredByTheSameThread() {
+        ExecutionLockManager.lock(lockName, ExecutionLockType.READ);
+        ExecutionLockManager.lock(lockName, ExecutionLockType.READ);
+        assertEquals(2, ExecutionLockManager.holders(lockName));
+        ExecutionLockManager.unlock(lockName, ExecutionLockType.READ);
+        ExecutionLockManager.unlock(lockName, ExecutionLockType.READ);
+
+        assertEquals(0, ExecutionLockManager.holders(lockName));
+    }
+
+    @Test
+    void aDowngradedWriterThatReleasedItsWriteCannotUpgradeAgain() {
+        ExecutionLockManager.lock(lockName, ExecutionLockType.WRITE);
+        ExecutionLockManager.lock(lockName, ExecutionLockType.READ);
+        ExecutionLockManager.unlock(lockName, ExecutionLockType.WRITE);
+        try {
+            assertThrows(
+                    IllegalStateException.class, () -> ExecutionLockManager.lock(lockName, ExecutionLockType.WRITE));
+            assertEquals(1, ExecutionLockManager.holders(lockName));
+        } finally {
+            ExecutionLockManager.unlock(lockName, ExecutionLockType.READ);
+        }
+        assertEquals(0, ExecutionLockManager.holders(lockName));
+    }
+
+    @Test
+    void afterReleasingTheReadTheSameThreadMayTakeTheWrite() {
+        ExecutionLockManager.lock(lockName, ExecutionLockType.READ);
+        ExecutionLockManager.unlock(lockName, ExecutionLockType.READ);
+
+        // No stale per-thread read hold may survive the release and trigger the upgrade check.
+        ExecutionLockManager.lock(lockName, ExecutionLockType.WRITE);
+        ExecutionLockManager.unlock(lockName, ExecutionLockType.WRITE);
+        assertEquals(0, ExecutionLockManager.holders(lockName));
+    }
+
+    @Test
+    void aWriteFromAnotherThreadStillBlocksBehindAReader() throws Exception {
+        CountDownLatch readerHolding = new CountDownLatch(1);
+        CountDownLatch releaseReader = new CountDownLatch(1);
+        AtomicBoolean writerRan = new AtomicBoolean();
+        Future<?> reader = holdUntil(ExecutionLockType.READ, readerHolding, releaseReader);
+        assertTrue(readerHolding.await(TIMEOUT_SECONDS, TimeUnit.SECONDS));
+
+        // Another thread holding the read lock must not trip the same-thread upgrade check.
+        Future<?> writer = executor.submit(() -> {
+            ExecutionLockManager.lock(lockName, ExecutionLockType.WRITE);
+            writerRan.set(true);
+            ExecutionLockManager.unlock(lockName, ExecutionLockType.WRITE);
+        });
+        awaitQueuedThreads();
+        assertFalse(writerRan.get());
+        assertFalse(writer.isDone());
+
+        releaseReader.countDown();
+        reader.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        writer.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        assertTrue(writerRan.get());
+        assertEquals(0, ExecutionLockManager.holders(lockName));
+    }
+
+    @Test
+    void aFailedWriteTryLockWhileHoldingAReadLeavesTheThreadAbleToReleaseAndWrite() {
+        ExecutionLockManager.lock(lockName, ExecutionLockType.READ);
+        AtomicBoolean ran = new AtomicBoolean();
+        try {
+            ExecutionLockManager.wrapWithTryLockAndRelease(lockName, ExecutionLockType.WRITE, () -> ran.set(true))
+                    .run();
+            assertFalse(ran.get());
+            assertEquals(1, ExecutionLockManager.holders(lockName));
+            // The failed tryLock must not have given this thread a write hold, so this is still an upgrade.
+            assertThrows(
+                    IllegalStateException.class, () -> ExecutionLockManager.lock(lockName, ExecutionLockType.WRITE));
+        } finally {
+            ExecutionLockManager.unlock(lockName, ExecutionLockType.READ);
+        }
+        assertEquals(0, ExecutionLockManager.holders(lockName));
+        ExecutionLockManager.lock(lockName, ExecutionLockType.WRITE);
+        ExecutionLockManager.unlock(lockName, ExecutionLockType.WRITE);
+        assertEquals(0, ExecutionLockManager.holders(lockName));
+    }
+
+    @Test
+    void aPooledThreadReusedAfterARefusedUpgradeIsClean() throws Exception {
+        ExecutorService single = Executors.newSingleThreadExecutor();
+        try {
+            long[] firstThread = new long[1];
+            single.submit(() -> {
+                        firstThread[0] = Thread.currentThread().threadId();
+                        ExecutionLockManager.lock(lockName, ExecutionLockType.READ);
+                        try {
+                            assertThrows(
+                                    IllegalStateException.class,
+                                    () -> ExecutionLockManager.lock(lockName, ExecutionLockType.WRITE));
+                        } finally {
+                            ExecutionLockManager.unlock(lockName, ExecutionLockType.READ);
+                        }
+                    })
+                    .get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+            AtomicBoolean sameThread = new AtomicBoolean();
+            single.submit(() -> {
+                        sameThread.set(Thread.currentThread().threadId() == firstThread[0]);
+                        ExecutionLockManager.wrapWithLockAndRelease(lockName, ExecutionLockType.WRITE, () -> {})
+                                .run();
+                    })
+                    .get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+            assertTrue(sameThread.get(), "the second task should have reused the same pool thread");
+            assertEquals(0, ExecutionLockManager.holders(lockName));
+        } finally {
+            single.shutdownNow();
+        }
+    }
+
+    @Test
+    void unlockingAReadThatIsNotHeldWhileHoldingTheWriteThrowsAndKeepsTheCount() {
+        ExecutionLockManager.lock(lockName, ExecutionLockType.WRITE);
+        try {
+            assertThrows(
+                    IllegalMonitorStateException.class,
+                    () -> ExecutionLockManager.unlock(lockName, ExecutionLockType.READ));
+            assertEquals(1, ExecutionLockManager.holders(lockName));
+        } finally {
+            ExecutionLockManager.unlock(lockName, ExecutionLockType.WRITE);
+        }
+        assertEquals(0, ExecutionLockManager.holders(lockName));
+    }
+
     private static void awaitAfterSignalling(CountDownLatch signal, CountDownLatch until) {
         signal.countDown();
         try {
