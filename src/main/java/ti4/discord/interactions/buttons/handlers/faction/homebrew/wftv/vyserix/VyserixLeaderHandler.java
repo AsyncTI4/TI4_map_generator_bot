@@ -1,7 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -46,7 +45,7 @@ public class VyserixLeaderHandler {
     }
 
     private static int countPlanetsWithSpecialtyOf(Game game, Player player, TechnologyModel tech) {
-        Set<TechnologyType> matchingColors = getMatchingColors(player, tech);
+        Set<TechnologyType> matchingColors = getMatchingColors(tech);
         int count = 0;
         for (String planetID : player.getPlanets()) {
             Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
@@ -57,15 +56,10 @@ public class VyserixLeaderHandler {
         return count;
     }
 
-    private static Set<TechnologyType> getMatchingColors(Player player, TechnologyModel tech) {
+    private static Set<TechnologyType> getMatchingColors(TechnologyModel tech) {
         Set<TechnologyType> colors = EnumSet.noneOf(TechnologyType.class);
         colors.addAll(tech.getTypes());
         colors.retainAll(TechnologyType.mainFour);
-        Set<TechnologyType> synergies = player.getSynergies();
-        if (!Collections.disjoint(colors, synergies)) {
-            colors.addAll(synergies);
-            colors.retainAll(TechnologyType.mainFour);
-        }
         return colors;
     }
 
