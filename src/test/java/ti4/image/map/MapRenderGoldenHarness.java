@@ -36,11 +36,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
+import org.junit.jupiter.api.parallel.Isolated;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.persistence.GameSnapshots;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
@@ -64,7 +66,7 @@ import ti4.website.model.WebsiteOverlay;
  * <pre>
  * mvn -o test -Dtest=MapRenderGoldenHarness -Dgolden.saves=DIR -Dgolden.out=DIR -Dgolden.mode=baseline|compare
  *     [-Dgolden.baseline=DIR] [-Dgolden.only=game1,game2] [-Dgolden.ids=REGEX] [-Dgolden.eager=game1,game2]
- *     [-Dgolden.pngs=REGEX over game/renderId] [-Dgolden.inventory=true] [-Dgolden.statedump=DIR, one file per render] [-DargLine=-Xmx10g]
+ *     [-Dgolden.pngs=REGEX over game/renderId] [-Dgolden.inventory=true] [-Dgolden.statedump=DIR, one file per render] [-Dgolden.snapshot=true] [-DargLine=-Xmx10g]
  * </pre>
  *
  * Every render reloads the save from disk, because rendering mutates the game (fog filtering, tile distances, debt
@@ -80,6 +82,7 @@ import ti4.website.model.WebsiteOverlay;
  * together with a diff picture that paints differing pixels red when the baseline PNG exists.
  */
 @EnabledIfSystemProperty(named = "golden.saves", matches = ".+")
+@Isolated
 class MapRenderGoldenHarness extends BaseTi4Test {
 
     private static final int BLOCK = 128;
@@ -469,7 +472,10 @@ class MapRenderGoldenHarness extends BaseTi4Test {
             Class<?> loader = Class.forName("ti4.game.persistence.GameLoadService");
             Method readGame = loader.getDeclaredMethod("readGame", File.class);
             readGame.setAccessible(true);
-            return (Game) readGame.invoke(null, save.toFile());
+            Game game = (Game) readGame.invoke(null, save.toFile());
+            // golden.snapshot renders the in-memory copy the render pipeline takes at queue time, so a compare
+            // run against the normal baseline proves the copy renders exactly like the loaded game.
+            return Boolean.getBoolean("golden.snapshot") ? GameSnapshots.copy(game) : game;
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException("cannot reach GameLoadService.readGame", e);
         }

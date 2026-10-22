@@ -112,64 +112,67 @@ class GameLoadService {
             return null;
         }
         try {
-            Game game = new Game();
-            Iterator<String> gameFileLines = Files.readAllLines(gameFile.toPath(), Charset.defaultCharset())
-                    .listIterator();
-            game.setOwnerID(gameFileLines.next());
-            game.setOwnerName(gameFileLines.next());
-            game.setName(gameFileLines.next().toLowerCase());
-            while (gameFileLines.hasNext()) {
-                String data = gameFileLines.next();
-                if (MAPINFO.equals(data)) {
-                    continue;
-                }
-                if (ENDMAPINFO.equals(data)) {
-                    break;
-                }
-
-                while (gameFileLines.hasNext()) {
-                    data = gameFileLines.next();
-                    if (GAMEINFO.equals(data)) {
-                        continue;
-                    }
-                    if (ENDGAMEINFO.equals(data)) {
-                        break;
-                    }
-                    readGameInfo(game, data);
-                }
-
-                while (gameFileLines.hasNext()) {
-                    String tmpData = gameFileLines.next();
-                    if (PLAYERINFO.equals(tmpData)) {
-                        continue;
-                    }
-                    if (ENDPLAYERINFO.equals(tmpData)) {
-                        break;
-                    }
-                    Player player = null;
-                    while (gameFileLines.hasNext()) {
-                        data = tmpData != null ? tmpData : gameFileLines.next();
-                        tmpData = null;
-                        if (PLAYER.equals(data)) {
-                            player = game.addPlayer(gameFileLines.next(), gameFileLines.next());
-                            continue;
-                        }
-                        if (ENDPLAYER.equals(data)) {
-                            break;
-                        }
-                        readPlayerInfo(player, data, game);
-                    }
-                }
-            }
-            Map<String, Tile> tileMap = getTileMap(gameFileLines, game);
-            game.setTileMap(tileMap);
-            TransientGameInfoUpdater.update(game);
-            return game;
+            return readGame(Files.readAllLines(gameFile.toPath(), Charset.defaultCharset()));
         } catch (Exception e) {
             BotLogger.critical(
                     "Encountered fatal error loading game file: " + gameFile.getName() + ". Load aborted.", e);
             return null;
         }
+    }
+
+    static Game readGame(List<String> lines) {
+        Game game = new Game();
+        Iterator<String> gameFileLines = lines.iterator();
+        game.setOwnerID(gameFileLines.next());
+        game.setOwnerName(gameFileLines.next());
+        game.setName(gameFileLines.next().toLowerCase());
+        while (gameFileLines.hasNext()) {
+            String data = gameFileLines.next();
+            if (MAPINFO.equals(data)) {
+                continue;
+            }
+            if (ENDMAPINFO.equals(data)) {
+                break;
+            }
+
+            while (gameFileLines.hasNext()) {
+                data = gameFileLines.next();
+                if (GAMEINFO.equals(data)) {
+                    continue;
+                }
+                if (ENDGAMEINFO.equals(data)) {
+                    break;
+                }
+                readGameInfo(game, data);
+            }
+
+            while (gameFileLines.hasNext()) {
+                String tmpData = gameFileLines.next();
+                if (PLAYERINFO.equals(tmpData)) {
+                    continue;
+                }
+                if (ENDPLAYERINFO.equals(tmpData)) {
+                    break;
+                }
+                Player player = null;
+                while (gameFileLines.hasNext()) {
+                    data = tmpData != null ? tmpData : gameFileLines.next();
+                    tmpData = null;
+                    if (PLAYER.equals(data)) {
+                        player = game.addPlayer(gameFileLines.next(), gameFileLines.next());
+                        continue;
+                    }
+                    if (ENDPLAYER.equals(data)) {
+                        break;
+                    }
+                    readPlayerInfo(player, data, game);
+                }
+            }
+        }
+        Map<String, Tile> tileMap = getTileMap(gameFileLines, game);
+        game.setTileMap(tileMap);
+        TransientGameInfoUpdater.update(game);
+        return game;
     }
 
     private static Map<String, Tile> getTileMap(Iterator<String> gameFileLines, Game game) {

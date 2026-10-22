@@ -47,7 +47,7 @@ class MapOverviewCommand extends GameStateSubcommand {
             MapRenderPipeline.queueImage(
                     game,
                     "Map overview",
-                    () -> CompactOverviewGenerator.gmOverview(game),
+                    CompactOverviewGenerator::gmOverview,
                     fileUpload -> MessageHelper.sendFileUploadToChannel(channel, fileUpload));
             return;
         }

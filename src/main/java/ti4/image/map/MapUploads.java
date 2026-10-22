@@ -15,7 +15,6 @@ final class MapUploads {
 
     static FileUpload toDiscord(Game game, MapRenderResult result, RenderTimings timings) {
         timings.startDiscord();
-        game.incrementMapImageGenerationCount();
         EncodedImage encoded = result.encoded();
         FileUpload fileUpload = ImageUploads.createFileUpload(encoded.bytes(), game.getName(), encoded.format());
         timings.stopDiscord();

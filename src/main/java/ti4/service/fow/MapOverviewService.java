@@ -42,9 +42,9 @@ public class MapOverviewService {
         MapRenderPipeline.queueImage(
                 game,
                 "Map overview",
-                () -> view == View.GM
-                        ? CompactOverviewGenerator.gmOverview(game)
-                        : CompactOverviewGenerator.playerOverview(game, viewer, event),
+                snapshot -> view == View.GM
+                        ? CompactOverviewGenerator.gmOverview(snapshot)
+                        : CompactOverviewGenerator.playerOverview(snapshot, sameSeat(snapshot, viewer), event),
                 fileUpload -> {
                     if (replyPrivately) {
                         MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
@@ -52,6 +52,10 @@ public class MapOverviewService {
                         MessageHelper.sendFileUploadToChannel(channel, fileUpload);
                     }
                 });
+    }
+
+    private static Player sameSeat(Game snapshot, Player viewer) {
+        return viewer == null ? null : snapshot.getPlayer(viewer.getUserID());
     }
 
     private static boolean isSharedChannel(Game game, MessageChannel channel) {

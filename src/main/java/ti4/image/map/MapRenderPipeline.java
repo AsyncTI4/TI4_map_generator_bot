@@ -1,11 +1,12 @@
 package ti4.image.map;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -16,6 +17,7 @@ import ti4.executors.ExecutionHistoryManager;
 import ti4.executors.ExecutorUtility;
 import ti4.executors.ShutdownResult;
 import ti4.game.Game;
+import ti4.game.persistence.GameSnapshots;
 import ti4.helpers.DisplayType;
 import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
@@ -35,48 +37,64 @@ public class MapRenderPipeline {
             return;
         }
 
-        String gameName = renderEvent.game.getName();
-        var timedRunnable =
-                new TimedRunnable("Render event task for " + gameName, EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
+        Game liveGame = renderEvent.game;
+        Game snapshot = snapshotOf(liveGame);
+        if (renderEvent.uploadToDiscord) {
+            liveGame.incrementMapImageGenerationCount();
+        }
+        liveGame.setTileDistances(new HashMap<>());
+        var timedRunnable = new TimedRunnable(
+                "Render event task for " + liveGame.getName(), EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
                     RenderTimings timings = RenderTimings.start();
                     try {
                         MapRenderResult result = MapRenderer.render(
                                 new MapRenderRequest(
-                                        renderEvent.game,
-                                        renderEvent.displayType,
-                                        renderEvent.event,
-                                        renderEvent.segment),
+                                        snapshot, renderEvent.displayType, renderEvent.event, renderEvent.segment),
                                 timings);
-                        result.playerAreaWarnings().send(renderEvent.game);
+                        // TODO: the sent-warning markers land on the live game from this thread; they persist only if
+                        // the handler saves later.
+                        result.playerAreaWarnings().send(liveGame);
                         if (renderEvent.uploadToDiscord) {
-                            uploadToDiscord(renderEvent.game, result, timings, renderEvent.callback());
+                            uploadToDiscord(snapshot, result, timings, renderEvent.callback());
                         }
                         if (renderEvent.uploadToWebsite) {
-                            MapUploads.toWebsite(renderEvent.game, result, timings);
+                            MapUploads.toWebsite(snapshot, result, timings);
                         }
                     } catch (Exception e) {
-                        BotLogger.error(new LogOrigin(renderEvent.game), "Failed to render event.", e);
+                        BotLogger.error(new LogOrigin(snapshot), "Failed to render event.", e);
                     } finally {
-                        timings.log(renderEvent.game, renderEvent.event);
+                        timings.log(snapshot, renderEvent.event);
                     }
                 });
 
         ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }
 
-    public static void queueImage(Game game, String label, Supplier<FileUpload> image, Consumer<FileUpload> callback) {
+    public static void queueImage(
+            Game game, String label, Function<Game, FileUpload> image, Consumer<FileUpload> callback) {
         if (CircuitBreaker.isOpen()) {
             return;
         }
+        Game snapshot = snapshotOf(game);
         var timedRunnable =
                 new TimedRunnable(label + " for " + game.getName(), EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
-                    try (FileUpload fileUpload = image.get()) {
+                    try (FileUpload fileUpload = image.apply(snapshot)) {
                         callback.accept(fileUpload);
                     } catch (Exception e) {
                         BotLogger.error(new LogOrigin(game), "Failed to render " + label + ".", e);
                     }
                 });
         ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
+    }
+
+    private static Game snapshotOf(Game game) {
+        try {
+            return GameSnapshots.copy(game);
+        } catch (Exception e) {
+            BotLogger.error(
+                    new LogOrigin(game), "Could not snapshot the game for rendering, rendering the live game.", e);
+            return game;
+        }
     }
 
     private static void uploadToDiscord(

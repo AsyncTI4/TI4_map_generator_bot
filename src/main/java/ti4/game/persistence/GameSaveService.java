@@ -121,19 +121,21 @@ class GameSaveService {
 
     private static void saveGame(Game game, Path path) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-            Map<String, Tile> tileMap = game.getTileMap();
-            writer.write(game.getOwnerID());
-            writer.write(System.lineSeparator());
-            writer.write(game.getOwnerName());
-            writer.write(System.lineSeparator());
-            writer.write(game.getName().toLowerCase());
-            writer.write(System.lineSeparator());
-            saveGameInfo(writer, game);
+            writeGame(game, writer);
+        }
+    }
 
-            for (Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
-                Tile tile = tileEntry.getValue();
-                saveTile(writer, tile);
-            }
+    static void writeGame(Game game, Writer writer) throws IOException {
+        writer.write(game.getOwnerID());
+        writer.write(System.lineSeparator());
+        writer.write(game.getOwnerName());
+        writer.write(System.lineSeparator());
+        writer.write(game.getName().toLowerCase());
+        writer.write(System.lineSeparator());
+        saveGameInfo(writer, game);
+
+        for (Tile tile : game.getTileMap().values()) {
+            saveTile(writer, tile);
         }
     }
 

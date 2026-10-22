@@ -116,7 +116,7 @@ public class FogGameSummaryService {
         MapRenderPipeline.queueImage(
                 game,
                 "Fog settings log overview",
-                () -> CompactOverviewGenerator.gmOverview(game),
+                CompactOverviewGenerator::gmOverview,
                 upload -> MessageHelper.sendFileUploadToChannel(channel, upload));
         MapRenderPipeline.queueUnfoggedWithoutWebsiteUpload(
                 game, DisplayType.all, upload -> MessageHelper.sendFileUploadToChannel(channel, upload));
