@@ -220,11 +220,14 @@ public class ThirtyKAttachmentHandler {
         String outcome = blocked
                 ? "could not place fighters, because another player's ships are in their home system"
                 : "placed 2 fighters in their home system";
+        String chosenName =
+                FoWHelper.identityOrColorIfCanSeeStats(game, chosen, player, chosen.getRepresentationNoPing());
         FoWHelper.notifyPlayerAndAffectedInFog(
                 game,
                 player,
-                FoWHelper.identityOrColorIfCanSeeStats(game, chosen, player, chosen.getRepresentationNoPing()) + " "
-                        + outcome + " (_Production Relay_).",
+                game.isFowMode() && chosen != player
+                        ? chosenName + " receives the _Production Relay_ fighters if their home system is clear."
+                        : chosenName + " " + outcome + " (_Production Relay_).",
                 chosen,
                 chosen.getRepresentationUnfogged() + ", you " + outcome.replace("their", "your")
                         + " (_Production Relay_).");

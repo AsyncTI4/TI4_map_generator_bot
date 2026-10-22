@@ -97,6 +97,8 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
+import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.tile.SystemContextImage;
@@ -291,6 +293,8 @@ public class StartCombatService {
         XinTechHandler.offerAstromanticCloakStarButtons(game, player, unitHolder, unitHolder.getName());
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
         XinCommanderHandler.beginCombat(game, tile, unitHolder.getName());
+        ThirtyKActionCardHooks.onGroundCombatStart(game, unitHolder);
+        ThirtyKSecretHooks.onGroundCombatStart(game, unitHolder);
         String threadName = combatThreadName(game, player, player2, tile, null);
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),

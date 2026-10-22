@@ -15,7 +15,6 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -390,14 +389,5 @@ public class ThirtyKRelics {
     public static boolean sovereignRefugeesUsed(Game game, Player player) {
         return !game.getStoredValue(SOVEREIGN_REFUGEES_USED_KEY + player.getFaction())
                 .isBlank();
-    }
-
-    public static UnitHolder firstHomePlanet(Game game, Player player) {
-        Tile home = player.getHomeSystemTile();
-        if (home == null) return null;
-        return home.getPlanetUnitHolders().stream()
-                .filter(planet -> player.getPlanets().contains(planet.getName()))
-                .findFirst()
-                .orElse(null);
     }
 }

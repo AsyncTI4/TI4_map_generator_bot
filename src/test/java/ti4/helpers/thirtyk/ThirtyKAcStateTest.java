@@ -50,7 +50,7 @@ class ThirtyKAcStateTest extends BaseTi4Test {
         ThirtyKAcState.setExtendedCampaigning(game, sol, hacan);
         // Saves from before the paged target lists still carry one-shot choice keys.
         game.setStoredValue("thkOneShotthkAcFoldingStartsol", "open");
-        ThirtyKAcState.markFinalStandRoll(game, sol, "mr", "1");
+        ThirtyKAcState.setFinalStand(game, sol, "mr");
         assertThat(game.getStoredValueMap().values()).noneMatch(value -> value.contains(",") || value.contains(":"));
 
         ThirtyKTurnState.clearEndOfTurn(game);
@@ -58,7 +58,7 @@ class ThirtyKAcStateTest extends BaseTi4Test {
         assertThat(ThirtyKAcState.warProfiteering(game, sol)).isNull();
         assertThat(ThirtyKAcState.takeExtendedCampaigning(game, sol, hacan)).isFalse();
         assertThat(game.getStoredValue("thkOneShotthkAcFoldingStartsol")).isEmpty();
-        assertThat(ThirtyKAcState.markFinalStandRoll(game, sol, "mr", "1")).isTrue();
+        assertThat(ThirtyKAcState.hasFinalStand(game, sol, "mr")).isFalse();
     }
 
     // Conflagration and Antidisestablishmentarianism are answered by a player who is not active, often after
@@ -78,14 +78,11 @@ class ThirtyKAcStateTest extends BaseTi4Test {
     }
 
     @Test
-    void finalStandRollsOncePerPlanetPerRoundUntilPlayedAgain() {
-        assertThat(ThirtyKAcState.markFinalStandRoll(game, sol, "mr", "1")).isTrue();
-        assertThat(ThirtyKAcState.markFinalStandRoll(game, sol, "mr", "1")).isFalse();
-        assertThat(ThirtyKAcState.markFinalStandRoll(game, sol, "mr", "2")).isTrue();
-
-        // A second ground combat on the same planet starts with a fresh play of the card.
-        ThirtyKAcState.clearFinalStand(game, sol);
-        assertThat(ThirtyKAcState.markFinalStandRoll(game, sol, "mr", "1")).isTrue();
+    void finalStandAppliesOnlyToTheChosenPlanet() {
+        ThirtyKAcState.setFinalStand(game, sol, "mr");
+        assertThat(ThirtyKAcState.hasFinalStand(game, sol, "mr")).isTrue();
+        assertThat(ThirtyKAcState.hasFinalStand(game, sol, "jord")).isFalse();
+        assertThat(ThirtyKAcState.hasFinalStand(game, hacan, "mr")).isFalse();
     }
 
     // Sol plays Dummy Rider on "for" and hedges with Objection Gambit on "against"; Hacan follows on "for".

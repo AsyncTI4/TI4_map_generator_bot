@@ -141,7 +141,7 @@ public class ThirtyKIndustrialExploreHandler {
         revealNextIndustrial(event, game, player, planetID);
     }
 
-    public static void resolveForesightOfIndustryB(
+    public static void resolveEstablishedSurveying(
             GenericInteractionCreateEvent event, Game game, Player player, Tile tile, String planetID) {
         int attachments = 0;
         for (Tile nearby : ThirtyKExploreSupport.tilesInOrAdjacent(game, player, tile)) {
@@ -155,14 +155,14 @@ public class ThirtyKIndustrialExploreHandler {
                     event,
                     "Survey reports pour in from " + attachments + " attachment" + (attachments == 1 ? "" : "s")
                             + " on nearby planets: gain " + attachments + " commodit"
-                            + (attachments == 1 ? "y" : "ies") + " (_Foresight of Industry_).");
+                            + (attachments == 1 ? "y" : "ies") + " (_Established Surveying_).");
             ButtonHelperStats.gainComms(event, game, player, attachments, false);
             return;
         }
         MessageHelper.sendMessageToEventChannel(
                 event,
                 "No nearby industry to report on, so the surveyors dig deeper: the next industrial exploration card is"
-                        + " resolved (_Foresight of Industry_).");
+                        + " resolved (_Established Surveying_).");
         revealNextIndustrial(event, game, player, planetID);
     }
 

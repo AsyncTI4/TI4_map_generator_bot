@@ -537,9 +537,7 @@ public class ActionCardHelper {
                 String ac_name = Mapper.getActionCard(key).getName();
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
-                if (actionCardWindow.contains("combat")
-                        || actionCardWindow.contains("roll")
-                        || actionCardWindow.contains("hit")) {
+                if (isCombatWindow(actionCardWindow)) {
                     acButtons.add(Buttons.red(
                             Constants.AC_PLAY_FROM_HAND + value,
                             "(" + value + ") " + ac_name,
@@ -548,6 +546,13 @@ public class ActionCardHelper {
             }
         }
         return acButtons;
+    }
+
+    public static boolean isCombatWindow(String window) {
+        return window.contains("combat")
+                || window.contains("roll")
+                || window.contains("hit")
+                || window.toLowerCase().contains("sustain damage");
     }
 
     public static List<Button> getCombatActionCardButtons(Player player) {
@@ -560,9 +565,7 @@ public class ActionCardHelper {
                 String acName = Mapper.getActionCard(key).getName();
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
-                if (actionCardWindow.contains("combat")
-                        || actionCardWindow.contains("roll")
-                        || actionCardWindow.contains("hit")) {
+                if (isCombatWindow(actionCardWindow)) {
                     acButtons.add(Buttons.red(
                             Constants.AC_PLAY_FROM_HAND + value,
                             "(" + value + ") " + acName,

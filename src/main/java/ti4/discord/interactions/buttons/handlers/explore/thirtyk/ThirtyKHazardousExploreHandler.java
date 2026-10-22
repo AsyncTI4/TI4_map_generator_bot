@@ -161,12 +161,16 @@ public class ThirtyKHazardousExploreHandler {
         List<Button> buttons = new ArrayList<>();
         for (String discarded : new LinkedHashSet<>(game.getExploreDiscard("hazardous"))) {
             if (ThirtyKCards.baseId(discarded).equals(ThirtyKCards.baseId(cardID))) continue;
-            ExploreModel model = Mapper.getExplore(discarded);
+            ExploreModel model = Mapper.getExplore(withoutDeckCopy(discarded));
             if (model == null) continue;
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + IMITATE + discarded + "_" + planetID, model.getName()));
         }
         return buttons;
+    }
+
+    private static String withoutDeckCopy(String exploreID) {
+        return exploreID.replace("extra1", "").replace("extra2", "");
     }
 
     private static String imitationMessage(Game game, Player player, String planetID) {
@@ -211,7 +215,7 @@ public class ThirtyKHazardousExploreHandler {
         }
         Tile tile = game.getTileFromPlanet(planetID);
         String message = "The factories churn out a perfect copy of _"
-                + Mapper.getExplore(chosen).getName()
+                + Mapper.getExplore(withoutDeckCopy(chosen)).getName()
                 + "_ for " + player.getRepresentationNoPing() + " on " + Helper.getPlanetRepresentation(planetID, game)
                 + " (_Imitation Factories_):";
         ExploreService.resolveExplore(event, chosen, tile, planetID, message, player, game);
@@ -238,6 +242,7 @@ public class ThirtyKHazardousExploreHandler {
                 .append(Helper.getPlanetRepresentation(planetID, game))
                 .append('.');
         if (hits > 0 && tile != null) {
+            // TODO: groundcombat hit buttons fire ground-combat-end hooks (secret objective checks).
             MessageHelper.sendMessageToEventChannelWithButtons(
                     event,
                     message.toString(),

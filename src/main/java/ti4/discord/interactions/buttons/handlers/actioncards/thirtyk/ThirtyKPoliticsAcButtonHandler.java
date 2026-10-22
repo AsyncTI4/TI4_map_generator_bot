@@ -13,6 +13,7 @@ import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.thirtyk.ThirtyKAcState;
@@ -146,23 +147,29 @@ public class ThirtyKPoliticsAcButtonHandler {
             PlanetTargetService.fizzle(event, player);
             return;
         }
-        if (player.getStrategicCC() < 1) {
+        if (tokensInReinforcements(game, player) < 1) {
+            ButtonHelper.deleteMessage(event);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "_Divisive Plot_ needs a command token from your strategy pool, and yours is empty.");
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", _Divisive Plot_ needs a command token from your reinforcements, and you have none"
+                            + " there; the card has no effect.");
             return;
         }
-        player.setStrategicCC(player.getStrategicCC() - 1);
         ButtonHelper.deleteMessage(event);
         List<Button> buttons = new ArrayList<>(StrategyCardSecondaryButtonService.getSecondaryAbilityButtons(game, sc));
         buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Resolving"));
         ThirtyKAcTargets.send(
                 player,
                 player.getRepresentationUnfogged() + ", your agents subvert " + game.getSCName(sc)
-                        + ": 1 command token is spent from your strategy pool; resolve its secondary ability"
-                        + " (_Divisive Plot_)."
+                        + ": resolve its secondary ability with a command token from your reinforcements; your"
+                        + " strategy pool is not touched (_Divisive Plot_)."
                         + (buttons.size() == 1 ? " This card has no secondary buttons; resolve it manually." : ""),
                 buttons);
+    }
+
+    public static int tokensInReinforcements(Game game, Player player) {
+        return Math.max(0, player.getCommandTokenLimit() - Helper.getCCCount(game, player.getColor()));
     }
 
     public static List<Button> extendedCampaigningButtons(Game game, Player player) {
