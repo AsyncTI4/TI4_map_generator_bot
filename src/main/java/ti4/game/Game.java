@@ -2974,6 +2974,23 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
     }
 
+    public List<String> peekExploreTop(String reqType, int count) {
+        List<String> deck = getExplores(reqType, explore);
+        if (deck.size() < count) {
+            List<String> discards = new ArrayList<>(getExplores(reqType, discardExplore));
+            Collections.shuffle(discards);
+            discardExplore.removeAll(discards);
+            explore.addAll(discards);
+            deck = getExplores(reqType, explore);
+        }
+        return deck.stream().limit(count).toList();
+    }
+
+    public void placeExploreOnTop(String id) {
+        explore.remove(id);
+        explore.addFirst(id);
+    }
+
     public void purgeExplore(String id) {
         explore.remove(id);
         discardExplore.remove(id);

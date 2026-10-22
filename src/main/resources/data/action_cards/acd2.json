@@ -147,15 +147,6 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "compounding_interests",
-        "name": "Compounding Interests",
-        "phase": "Action",
-        "window": "At the end of your turn",
-        "text": "For each of your command tokens on the game board, either gain 1 commodity or convert 1 of your commodities to a trade good.",
-        "flavorText": "\"A station over Ordinian? What could we gain from such a venture?\" Carth hissed. \"Nothing,\" Harrugh snapped. \"Everything.\"",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "contingency",
         "name": "Contingency",
         "phase": "Action",
@@ -322,15 +313,6 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "false_flag",
-        "name": "False Flag",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Remove 1 of another player's command tokens from the game board and place it in a system that contains your units.",
-        "flavorText": "The past flooded Ahk-Syl Siven's thoughts upon seeing the Mahact, and the memory of his essence being rewritten on a subatomic level surged involuntarily to the forefront of his consciousness.",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "field_test",
         "name": "Field Test",
         "phase": "Action",
@@ -369,13 +351,12 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "prisoners_of_war",
-        "name": "Prisoners of War",
-        "automationID": "prisoners_of_war",
+        "alias": "hijacked_signal",
+        "name": "Hijacked Signal",
         "phase": "Action",
-        "window": "After you win a combat",
-        "text": "Your opponent must give you 1 promissory note from their hand. Then, place 1 command token from that player's reinforcements in a non-home system that contains your units.",
-        "flavorText": "As Odlynn read the terms of the agreement, his eyes drifted to the framed photo on his desk.",
+        "window": "ACTION",
+        "text": "Swap the position of 2 command tokens that belong to different players and are in different non-home systems.",
+        "flavorText": "The massive swarm that was devouring Meer ground to a halt as a fevered discorporation, led by trjn.desgn.ALIZARIN, transported its malice far away, to breathe a silent death into the Council's logistics systems.",
         "source": "action_deck_2"
     },
     {
@@ -422,7 +403,7 @@
         "window": "At the end of a turn during which you resolved a transaction with a player",
         "text": "Commit 1 infantry from your reinforcements to a non-home planet that player controls. If that planet contains their ground forces, resolve a ground combat.",
         "notes": "This does not trigger PDS.",
-        "flavorText": "Unlenn had rarely felt so smug after extorting his enemy. However, as he turned to the Mahact emissary, he grew cold—she was smiling.",
+        "flavorText": "Unlenn reveled in humiliation and extortion. However, as he turned to the Mahact emissary, he grew cold at the sight of her twisted grin.",
         "source": "action_deck_2"
     },
     {
@@ -540,6 +521,15 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "oracle",
+        "name": "Oracle",
+        "phase": "Any",
+        "window": "When you draw a card",
+        "text": "Draw 2 additional cards. Then, purge all but 1 of those cards.",
+        "flavorText": "The Memoria loomed above Mecatol Rex, as it must. \"It is wrong,\" the Nomad said softly. \"Infinity before me, yet every choice I make collapses it.\"",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "outgun1",
         "name": "Outgun",
         "phase": "Action",
@@ -617,7 +607,7 @@
         "phase": "Action",
         "window": "At the end of your turn",
         "text": "Spend 3 trade goods to ready up to 2 of your components, other than strategy cards.",
-        "flavorText": "Captain Agerro sighed. The work was not what he had expected, not what he had wanted, but it had to be done. Fighting would come later.",
+        "flavorText": "Captain Aggero sighed. The work was not what he had expected, not what he had wanted, but it had to be done. Fighting would come later.",
         "source": "action_deck_2"
     },
     {
@@ -627,6 +617,16 @@
         "window": "At the start of your turn",
         "text": "Discard up to 3 action cards to draw an equal number of action cards. Then, you may discard 1 secret objective to draw 1 secret objective.",
         "flavorText": "\"We must not become stagnant. Stagnation is what broke this galaxy,\" I48S said, barely hesitating at his patient's screams. \"Pain? Let's remove that.\"",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "prisoners_of_war",
+        "name": "Prisoners of War",
+        "automationID": "prisoners_of_war",
+        "phase": "Action",
+        "window": "After you win a combat",
+        "text": "Place 1 command token from your opponent's reinforcements in a non-home system that contains your units.",
+        "flavorText": "The past flooded Ahk-Syl Siven's thoughts upon seeing the Mahact, and the memory of his essence being rewritten on a subatomic level surged involuntarily to the forefront of his consciousness.",
         "source": "action_deck_2"
     },
     {
@@ -727,8 +727,8 @@
         "alias": "rendezvous",
         "name": "Rendezvous",
         "phase": "Action",
-        "window": "When 1 of your units moves",
-        "text": "During this movement, that unit can transport units from systems that are adjacent to systems it moves out of, into, or through.",
+        "window": "When your ships move",
+        "text": "During this movement, your ships can transport units from systems that are adjacent to systems they move out of, into, or through.",
         "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair and finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
         "source": "action_deck_2"
     },
@@ -973,8 +973,8 @@
         "alias": "artifact_research",
         "name": "Artifact Research",
         "phase": "Action",
-        "window": "When you research a technology",
-        "text": "Discard 1 of your relic fragments to ignore 1 of that technology's prerequisites and gain 3 trade goods.",
+        "window": "When a player researches a technology",
+        "text": "That player ignores a number of prerequisites equal to the number of different types of relic fragments you own.",
         "notes" : "Nekro can use this card.",
         "flavorText": "\"I don't feel any different,\" Dart said, his eyes blazing with the fire of a thousand dying worlds. \"What do you mean 'oh god your eyes'?\"",
         "source": "action_deck_2"
@@ -1011,7 +1011,7 @@
         "name": "Derelict Station",
         "phase": "Action",
         "window": "After your ships move out of, into, or through a system that does not contain planets",
-        "text": "Explore a frontier token in that system or gain 2 commodities.",
+        "text": "Explore 1 frontier token in that system or gain 2 commodities.",
         "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, betrayed what they once were.",
         "source": "action_deck_2"
     },
@@ -1030,7 +1030,7 @@
         "name": "Frontier Rider",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, replenish your commodities and explore a frontier token on the game board.",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, replenish your commodities and explore 1 frontier token on the game board.",
         "playTiming": "AGENDA_AFTER",
         "flavorText": "Acamar held up the partial transcription of a legendary Lazax war treatise. With the return of their ancient enemy, finding the full document was imperative.",
         "source": "action_deck_2"
@@ -1078,7 +1078,7 @@
         "name": "Side Project",
         "phase": "Action",
         "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites.",
+        "text": "Gain 1 technology that has no prerequisites.",
         "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
         "automationID": "side_project",
         "flavorText": "As the council meeting drew to a close, Xander stood up. \"Before we adjourn, I'd like to announce that our neural enhancement project has entered the final phase of clinical trials.\"",
@@ -1089,7 +1089,7 @@
         "name": "Side Project",
         "phase": "Action",
         "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites.",
+        "text": "Gain 1 technology that has no prerequisites.",
         "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
         "automationID": "side_project",
         "flavorText": "A projection showed four individuals competing in a task, with one participant fiercely outpacing the others as she interfaced with the device through thought alone. The council murmured approvingly.",
@@ -1100,7 +1100,7 @@
         "name": "Side Project",
         "phase": "Action",
         "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites.",
+        "text": "Gain 1 technology that has no prerequisites.",
         "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
         "automationID": "side_project",
         "flavorText": "After the meeting, Maeve wore a look of endearment. \"I swear, Xander, where did you even find the time to organize this project?\"",
@@ -1111,7 +1111,7 @@
         "name": "Side Project",
         "phase": "Action",
         "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites.",
+        "text": "Gain 1 technology that has no prerequisites.",
         "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
         "automationID": "side_project",
         "flavorText": "Xander parted his hair, revealing a small metal plate indicative of a neural implant. Maeve gasped, realizing he must have had the surgery long ago. \"You did this before the trials were completed?\" Xander shrugged. \"Before the trials even began.\"",
@@ -1170,12 +1170,31 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "concord",
+        "name": "Concord",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Each other player must give you 1 promissory note from their hand. Then, give each other player 1 card from your hand or promissory note from your play area.",
+        "automationID": "concord",
+        "flavorText": "Maeve weaved through the symposium, binding old wounds into new alliances. A web of promises, each strengthening the rest into a shield against the galaxy's multitude of dooms.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "flawless_strategy",
         "name": "Flawless Strategy",
         "phase": "Action",
         "window": "After you exhaust your strategy card",
         "text": "Resolve the secondary ability of that strategy card without spending a command token.",
         "flavorText": "PROTOCOL SUCCESSFUL<< [ID:NULL] DEFEAT INEVITABLE<< PEERLESS MANY<< INFINITE ONE<< [ID:NIITAKA]<< QUEUED1<< QUEUED2<< QUEUED3...",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "misallocated_funding",
+        "name": "Misallocated Funding",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Choose 1 non-faction, non-unit upgrade technology that another player owns. That player must return that technology to their technology deck and research a technology of a different color.",
+        "flavorText": "\"At last, functioning neural implants, linking both of you!\" Dart facepalmed Tai in confusion as a multitude of mingling memories flooded his mind. \"Wait... didn't we order gravity drives?\"",
         "source": "action_deck_2"
     },
     {
@@ -1258,26 +1277,6 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "concord",
-        "name": "Concord",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Each other player must give you 1 promissory note from their hand. Then, give each other player 1 card from your hand or promissory note from your play area.",
-        "automationID": "concord",
-        "flavorText": "Maeve weaved through the symposium, binding old wounds into new alliances. A web of promises, each strengthening the rest into a shield against the galaxy's multitude of dooms.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "fractured_reality",
-        "name": "Fractured Reality",
-        "phase": "Action",
-        "window": "When you would roll a die",
-        "text": "Roll 2 dice instead; you may cancel 1 of those results.",
-        "automationID": "fractured_reality",
-        "flavorText": "\"Shen're Ix Ianovar,\" Ahk-Syl Siven murmured, seeming afraid to invoke the name. \"Al'Raith Ix Ianovar,\" he continued, his voice barely a whisper.",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "sacrifice",
         "name": "Sacrifice",
         "phase": "Action",
@@ -1301,8 +1300,8 @@
         "alias": "seized_research",
         "name": "Seized Research",
         "phase": "Any",
-        "window": "After you gain control of a planet that has a technology speciality",
-        "text": "Either research 1 technology that matches that speciality or gain your breakthrough.",
+        "window": "After you gain control of a planet that has a technology specialty",
+        "text": "Either research 1 technology that matches that specialty or gain your breakthrough.",
         "automationID": "seized_research",
         "flavorText": "\"So, Doc,\" Connor said, playfully pointing his blaster at the Hylar as she cringed away. \"How about we start with a little tour of R&D?\"",
         "source": "action_deck_2"
@@ -1323,7 +1322,7 @@
         "name": "Settlers",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 non-home planet that contains another player's units. That player may allow you to place 2 infantry from your reinforcements into coexistence on that planet. If they do not, exhaust that planet and destroy up to 2 units on it.",
+        "text": "Choose another player and 1 non-home planet that contains their units. That player may allow you to place 2 infantry from your reinforcements into coexistence on that planet. If they do not, exhaust that planet and destroy up to 2 units on it.",
         "flavorText": "Willard grumbled as another frigate shuttled toward the ocean-cities. They would soon be outnumbered.",
         "source": "action_deck_2"
     },
@@ -1334,7 +1333,7 @@
         "window": "After you pass",
         "text": "Resolve the secondary ability of 1 readied or unchosen strategy card without spending a command token.",
         "automationID": "strategic_focus",
-        "flavorText": "\"With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Rinn sighed. \"We must remain focused. Steady.\"",
+        "flavorText": "\"A station over Ordinian? What could we gain from such a venture?\" Carth hissed. \"Nothing,\" Harrugh snapped. \"Everything.\"",
         "source": "action_deck_2"
     },
     {

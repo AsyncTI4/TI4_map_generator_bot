@@ -63,6 +63,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.actioncard.OracleDrawService;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.DeepgloomService;
@@ -712,23 +713,31 @@ public class ActionCardHelper {
             return;
         }
 
-        String message = player.getRepresentation() + " drew " + StringHelper.pluralize(count, "action card") + ".";
-        if (scheming && player.hasAbility("scheming")) {
+        boolean schemingApplied = scheming && player.hasAbility("scheming");
+        if (schemingApplied) {
             count++;
-            message = player.getRepresentation() + " drew " + StringHelper.pluralize(count, "action card")
-                    + " (including one extra because of **Scheming**).";
+        }
+        if (OracleDrawService.shouldSplitDraw(player, count)) {
+            OracleDrawService.drawOneAtATime(game, player, count, schemingApplied, silent);
+            return;
         }
         game.drawActionCard(player.getUserID(), count);
+        finishActionCardDraw(game, player, count, schemingApplied, silent);
+    }
 
+    public static void finishActionCardDraw(
+            Game game, Player player, int count, boolean schemingApplied, boolean silent) {
         sendActionCardInfo(game, player);
         ButtonHelper.checkACLimit(game, player);
-        if (scheming && player.hasAbility("scheming")) {
+        if (schemingApplied) {
             DeepgloomService.spendOneDebt(game, player, "scheming");
             sendSchemingDiscardButtons(player);
         }
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
 
         if (!silent) {
+            String message = player.getRepresentation() + " drew " + StringHelper.pluralize(count, "action card")
+                    + (schemingApplied ? " (including one extra because of **Scheming**)" : "") + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
     }
@@ -1563,9 +1572,14 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
 
-            if ("compounding_interests".equals(automationID)) {
+            if ("hijacked_signal".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveHijackedSignal", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("misallocated_funding".equals(automationID)) {
                 codedButtons.add(
-                        Buttons.green(player.factionButtonChecker() + "resolveCompoundingInterests", buttonLabel));
+                        Buttons.green(player.factionButtonChecker() + "resolveMisallocatedFunding", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -1593,11 +1607,6 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveScorchedEarth", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
-            }
-
-            if ("fractured_reality".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFracturedReality", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
             if ("propaganda_te".equals(automationID)) {
@@ -1642,11 +1651,6 @@ public class ActionCardHelper {
 
             if ("joint_research".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveJointResearch", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
-            }
-
-            if ("false_flag".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFalseFlag", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
