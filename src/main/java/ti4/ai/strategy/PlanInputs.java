@@ -12,6 +12,7 @@ import ti4.ai.eval.Threats;
 import ti4.ai.tactical.DefenseOutlook;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -49,21 +50,27 @@ record PlanInputs(
             Cached cached = CACHE.get(key);
             if (cached != null && cached.isFor(game)) return cached.inputs();
         }
-        PlanInputs inputs = new PlanInputs(
-                game,
-                seat,
-                moment,
-                TacticalPlanner.ranked(game, seat),
-                Threats.reachableByEnemies(game, seat),
-                StrategyCardRules.reinforcements(game, seat),
-                new ConcurrentHashMap<>(),
-                new ConcurrentHashMap<>(),
-                new ConcurrentHashMap<>(),
-                CustodiansRace.of(game, seat));
+        PlanInputs inputs = compute(game, seat, moment);
         synchronized (CACHE) {
             CACHE.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), inputs));
         }
         return inputs;
+    }
+
+    private static PlanInputs compute(Game game, Player seat, PlanMoment moment) {
+        try (Thinking.Span ignored = Thinking.enter("strategy.planInputs")) {
+            return new PlanInputs(
+                    game,
+                    seat,
+                    moment,
+                    TacticalPlanner.ranked(game, seat),
+                    Threats.reachableByEnemies(game, seat),
+                    StrategyCardRules.reinforcements(game, seat),
+                    new ConcurrentHashMap<>(),
+                    new ConcurrentHashMap<>(),
+                    new ConcurrentHashMap<>(),
+                    CustodiansRace.of(game, seat));
+        }
     }
 
     int round() {

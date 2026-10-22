@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.SequencedMap;
 import lombok.experimental.UtilityClass;
+import ti4.ai.trace.ThinkingLimits;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.image.Mapper;
@@ -28,6 +29,13 @@ public class AiSettings {
     public static final Duration STALL_THRESHOLD = Duration.ofMinutes(3);
     public static final Duration REFEREE_DELAY = Duration.ofSeconds(20);
     public static final Duration DECIDE_TIMEOUT = Duration.ofSeconds(20);
+    public static final Duration SLOW_DECISION = Duration.ofSeconds(2);
+    public static final Duration SLOW_WARNING_GAP = Duration.ofMinutes(1);
+    public static final Duration THINKING_RETRY = Duration.ofMinutes(5);
+    public static final int THINKING_REENTRY_LIMIT = 8;
+    public static final int THINKING_DEPTH_LIMIT = 60;
+    public static final int THINKING_CALL_CAP = 200_000;
+    public static final String THINKING_BUDGET_PROPERTY = "ai.thinking.budget.seconds";
     public static final int MAX_ATTEMPTS_PER_PROMPT = 2;
     public static final int MAX_ACTIONS_PER_HOUR = 150;
     public static final int MAX_DELEGATIONS_PER_ROUND = 30;
@@ -89,6 +97,17 @@ public class AiSettings {
 
     public static boolean isSecretHoldEnabled() {
         return !"false".equalsIgnoreCase(System.getProperty(SECRET_HOLD_PROPERTY, "true"));
+    }
+
+    public static Duration thinkingBudget() {
+        String configured = System.getProperty(THINKING_BUDGET_PROPERTY);
+        if (configured == null || !configured.trim().matches("\\d+")) return DECIDE_TIMEOUT;
+        return Duration.ofSeconds(Long.parseLong(configured.trim()));
+    }
+
+    public static ThinkingLimits thinkingLimits() {
+        return new ThinkingLimits(
+                thinkingBudget().toNanos(), THINKING_REENTRY_LIMIT, THINKING_DEPTH_LIMIT, THINKING_CALL_CAP);
     }
 
     public static boolean isFastPace(Game game) {

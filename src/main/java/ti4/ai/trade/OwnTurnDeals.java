@@ -18,6 +18,7 @@ import ti4.ai.scoring.PaymentRules;
 import ti4.ai.scoring.SpendUnlock;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.tactical.TacticalRules;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -44,10 +45,12 @@ class OwnTurnDeals {
 
     static Optional<AiDecision> start(AiTurnContext context) {
         if (!mayStart(context)) return Optional.empty();
-        Game game = context.game();
-        if (TradeLegality.isActionPhase(game)) return ownTurn(context);
-        if (TradeLegality.isAgendaPhase(game)) return agenda(context);
-        return Optional.empty();
+        try (Thinking.Span ignored = Thinking.enter("trade.startDeals")) {
+            Game game = context.game();
+            if (TradeLegality.isActionPhase(game)) return ownTurn(context);
+            if (TradeLegality.isAgendaPhase(game)) return agenda(context);
+            return Optional.empty();
+        }
     }
 
     private static boolean mayStart(AiTurnContext context) {

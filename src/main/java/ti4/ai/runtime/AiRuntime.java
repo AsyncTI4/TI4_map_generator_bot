@@ -1,6 +1,7 @@
 package ti4.ai.runtime;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,6 +14,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.ai.AiSeats;
 import ti4.ai.AiSettings;
 import ti4.ai.fallback.DelegatedPress;
+import ti4.ai.trace.ThinkingStats;
 import ti4.cron.CronManager;
 import ti4.discord.JdaService;
 import ti4.executors.CircuitBreaker;
@@ -67,6 +69,10 @@ public class AiRuntime {
 
     static void forget(AiLane lane) {
         LANES.remove(lane.getGameName(), lane);
+    }
+
+    public static Optional<ThinkingStats> thinkingStats(String gameName) {
+        return Optional.ofNullable(LANES.get(gameName)).map(AiLane::thinking);
     }
 
     public static boolean isTracked(String gameName) {

@@ -16,7 +16,8 @@ public class AiCommand implements ParentCommand {
                     new AiDelegate(),
                     new AiRemove(),
                     new AiWatch(),
-                    new AiFallbacks())
+                    new AiFallbacks(),
+                    new AiThinkingProfile())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

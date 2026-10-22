@@ -38,6 +38,10 @@ import ti4.ai.seat.AiSeatService;
 import ti4.ai.selfplay.RefereeRules;
 import ti4.ai.selfplay.RefereeRules.RefereePress;
 import ti4.ai.tactical.CombatRules;
+import ti4.ai.trace.Thinking;
+import ti4.ai.trace.ThinkingAborted;
+import ti4.ai.trace.ThinkingProfile;
+import ti4.ai.trace.ThinkingStats;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -60,10 +64,15 @@ class AiTickRunner {
     private static final String NO_PROGRESS = "NO_PROGRESS";
     private static final String TIMEOUT = "TIMEOUT";
     private static final String REQUESTED = "REQUESTED";
+    private static final String THINKING_ABORTED = "THINKING_ABORTED";
+    private static final String CUT_SHORT = "cut short";
+    private static final String PERCEIVE_SPAN = "ai.perceive";
+    private static final String ACTUATE_SPAN = "ai.actuate";
+    private static final int TRAIL_SPANS_RECORDED = 4;
 
     private record Cause(String kind, String reason, String pending) {}
 
-    private record SeatTick(
+    record SeatTick(
             AiLane lane,
             AiSeatState state,
             Game game,
@@ -74,7 +83,7 @@ class AiTickRunner {
             boolean selfPlay,
             long now) {}
 
-    private record SeatResult(boolean acted, long wakeAt) {
+    record SeatResult(boolean acted, long wakeAt) {
         static SeatResult act() {
             return new SeatResult(true, 0);
         }
@@ -123,7 +132,9 @@ class AiTickRunner {
             return;
         }
 
+        long perceiveStart = System.nanoTime();
         Snapshot snapshot = AiPerception.read(game, seats);
+        lane.thinking().recordOutside(PERCEIVE_SPAN, System.nanoTime() - perceiveStart);
         List<AiPrompt> refereePrompts =
                 snapshot.publicPrompts(RefereeRules.anyStep().or(RefereeRules.endsGame()));
         if (selfPlay && RefereeRules.trackExhausted(game) && RefereeRules.offersGameEnd(refereePrompts)) {
@@ -183,6 +194,7 @@ class AiTickRunner {
         if (canAct) AiSeatService.ensureTradePreferences(seat.getUserID());
         AiDecision decision = canAct
                 ? decide(
+                        tick,
                         brain.get(),
                         new AiTurnContext(
                                 game,
@@ -243,16 +255,78 @@ class AiTickRunner {
         return state.actionsInLastHour(now) < AiSettings.maxActionsPerHour(game);
     }
 
-    private static AiDecision decide(FactionBrain brain, AiTurnContext context) {
+    static AiDecision decide(SeatTick tick, FactionBrain brain, AiTurnContext context) {
+        if (thinkingHeld(tick)) return AiDecision.idle();
+        AiDecision decision = AiDecision.idle();
+        ThinkingAborted aborted = null;
+        Thinking.Decision thinking = Thinking.open(AiSettings.thinkingLimits());
         try {
-            return brain.decide(context);
+            decision = brain.decide(context);
+        } catch (ThinkingAborted e) {
+            aborted = e;
+        } catch (StackOverflowError e) {
+            aborted = ThinkingAborted.stackOverflow(e);
         } catch (RuntimeException e) {
             BotLogger.error(
                     "AI brain failed for " + context.faction() + " in "
                             + context.game().getName(),
                     e);
-            return AiDecision.idle();
+        } finally {
+            thinking.close();
         }
+        noteThinking(tick, thinking.profile(), decision, aborted);
+        return decision;
+    }
+
+    private static boolean thinkingHeld(SeatTick tick) {
+        return tick.state().thinkingHeld(tick.now(), AiSettings.THINKING_RETRY.toMillis(), () -> progressOf(tick));
+    }
+
+    private static int progressOf(SeatTick tick) {
+        return AiProgress.fingerprint(tick.game(), tick.seat());
+    }
+
+    private static void noteThinking(
+            SeatTick tick, ThinkingProfile profile, AiDecision decision, ThinkingAborted aborted) {
+        tick.lane()
+                .thinking()
+                .record(profile, tick.seat().getFaction(), outcomeName(decision, aborted), aborted != null);
+        if (aborted != null) {
+            cutShort(tick, profile, aborted);
+            return;
+        }
+        boolean slow = profile.totalNanos() >= AiSettings.SLOW_DECISION.toNanos();
+        if (slow && tick.lane().slowWarningDue(tick.now(), AiSettings.SLOW_WARNING_GAP.toMillis())) {
+            BotLogger.warning("AI thinking was slow game=" + tick.game().getName() + " seat="
+                    + tick.seat().getFaction() + " took=" + ThinkingStats.millis(profile.totalNanos())
+                    + " outcome=" + outcomeName(decision, null) + " spans=[" + ThinkingStats.summary(profile) + "]");
+        }
+    }
+
+    private static void cutShort(SeatTick tick, ThinkingProfile profile, ThinkingAborted aborted) {
+        tick.state().holdThinking(tick.now(), progressOf(tick));
+        BotLogger.warning("AI thinking cut short game=" + tick.game().getName() + " round="
+                + tick.game().getRound() + " seat=" + tick.seat().getFaction() + " after="
+                + ThinkingStats.millis(profile.totalNanos()) + " reason=\"" + aborted.reason() + "\" trail=["
+                + aborted.trail() + "] spans=[" + ThinkingStats.summary(profile) + "]");
+        recorded(
+                tick,
+                null,
+                new Cause(THINKING_ABORTED, aborted.reason(), aborted.innermost(TRAIL_SPANS_RECORDED)),
+                "gave up thinking until the game changes",
+                SeatResult.act());
+    }
+
+    private static String outcomeName(AiDecision decision, ThinkingAborted aborted) {
+        if (aborted != null) return CUT_SHORT;
+        return switch (decision) {
+            case AiDecision.Press press -> "press";
+            case AiDecision.Unsure unsure -> "unsure";
+            case AiDecision.Wait wait -> "wait";
+            case AiDecision.Idle idle -> "idle";
+            case AiDecision.Announce announce -> "announce";
+            case AiDecision.Propose propose -> "propose";
+        };
     }
 
     private static SeatResult handlePress(SeatTick tick, AiDecision.Press press) {
@@ -283,7 +357,9 @@ class AiTickRunner {
     private static boolean pressAsSeat(SeatTick tick, AiPrompt prompt, PromptButton button) {
         if (!AiRuntime.mayMutate()) return true;
         tick.lane().recordAction(tick.seat().getUserID(), tick.now());
+        long actuateStart = System.nanoTime();
         AiActuator.Result result = AiActuator.press(tick.identity(), target(prompt, button));
+        tick.lane().thinking().recordOutside(ACTUATE_SPAN, System.nanoTime() - actuateStart);
         switch (result.outcome()) {
             case PRESSED -> {
                 tick.state().recordPressed(AiTurnContext.pressKey(prompt, button), tick.now());

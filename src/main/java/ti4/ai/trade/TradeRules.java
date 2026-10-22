@@ -5,6 +5,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.AiSettings;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -13,13 +14,15 @@ public class TradeRules {
 
     public static Optional<AiDecision> observe(AiTurnContext context) {
         if (!AiSettings.isTradingEnabled()) return Optional.empty();
-        Trust.refresh(context);
-        TradeEntry.observe(context);
-        OfferRejections.observe(context);
-        PendingOffers.observe(context);
-        TradeCardRules.observe(context);
-        HumanDealWatch.observe(context);
-        return Optional.empty();
+        try (Thinking.Span ignored = Thinking.enter("trade.observe")) {
+            Trust.refresh(context);
+            TradeEntry.observe(context);
+            OfferRejections.observe(context);
+            PendingOffers.observe(context);
+            TradeCardRules.observe(context);
+            HumanDealWatch.observe(context);
+            return Optional.empty();
+        }
     }
 
     public static Optional<AiDecision> rescindStale(AiTurnContext context) {

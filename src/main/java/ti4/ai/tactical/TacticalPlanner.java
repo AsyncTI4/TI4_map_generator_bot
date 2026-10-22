@@ -53,6 +53,7 @@ import ti4.ai.tactical.DefenseOutlook.Blend;
 import ti4.ai.tactical.IncomingForces.Exclusion;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -167,6 +168,12 @@ public class TacticalPlanner {
     }
 
     public static Optional<TacticalPlan> best(Game game, Player seat, List<SetupHint> hints) {
+        try (Thinking.Span ignored = Thinking.enter("tactical.best")) {
+            return bestAffordable(game, seat, hints);
+        }
+    }
+
+    private static Optional<TacticalPlan> bestAffordable(Game game, Player seat, List<SetupHint> hints) {
         if (seat.getTacticalCC() <= 0) return Optional.empty();
         int reservedTokens = ScoringReserve.of(game, seat).tokens();
         if (!coversReserve(seat, reservedTokens)) return Optional.empty();
@@ -338,6 +345,12 @@ public class TacticalPlanner {
     }
 
     private static List<TacticalPlan> candidates(Context context, Predicate<Tile> activatable, double minScore) {
+        try (Thinking.Span ignored = Thinking.enter("tactical.candidates")) {
+            return rankedCandidates(context, activatable, minScore);
+        }
+    }
+
+    private static List<TacticalPlan> rankedCandidates(Context context, Predicate<Tile> activatable, double minScore) {
         List<TacticalPlan> plans = new ArrayList<>(context.game.getTileMap().values().stream()
                 .filter(activatable)
                 .map(tile -> bestFor(context, tile))
@@ -353,6 +366,12 @@ public class TacticalPlanner {
     }
 
     public static Optional<TacticalPlan> bestForWarfare(Game game, Player seat) {
+        try (Thinking.Span ignored = Thinking.enter("tactical.warfare")) {
+            return bestTokenFree(game, seat);
+        }
+    }
+
+    private static Optional<TacticalPlan> bestTokenFree(Game game, Player seat) {
         Context context = Context.tokenFree(game, seat);
         Predicate<Tile> activatable = tile -> tile.hasPlayerCC(seat) || ButtonHelper.canActivateTile(game, seat, tile);
         Stream<TacticalPlan> marches =
@@ -565,8 +584,10 @@ public class TacticalPlanner {
     }
 
     public static Optional<TacticalPlan> forTarget(Game game, Player seat, String target) {
-        Tile tile = game.getTileByPosition(target);
-        return tile == null ? Optional.empty() : bestFor(new Context(game, seat), tile);
+        try (Thinking.Span ignored = Thinking.enter("tactical.target")) {
+            Tile tile = game.getTileByPosition(target);
+            return tile == null ? Optional.empty() : bestFor(new Context(game, seat), tile);
+        }
     }
 
     private static Optional<TacticalPlan> bestFor(Context context, Tile tile) {

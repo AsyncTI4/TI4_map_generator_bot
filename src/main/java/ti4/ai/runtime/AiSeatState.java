@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.IntSupplier;
 import ti4.ai.brain.AiMemory;
 
 final class AiSeatState {
@@ -48,6 +49,8 @@ final class AiSeatState {
     private int delegationsThisRound;
     private String fallbackKey = "";
     private int repeatedFallbacks;
+    private long thinkingHeldAt;
+    private int thinkingHeldFingerprint;
 
     void requestDelegation(boolean explicit) {
         DelegationRequest requested = explicit ? DelegationRequest.EXPLICIT : DelegationRequest.GAME_WIDE;
@@ -102,6 +105,7 @@ final class AiSeatState {
         pressedKeys.clear();
         pressedOrder.clear();
         decisions.clear();
+        thinkingHeldAt = 0;
         attempts.clear();
         delegatedPrompts.clear();
         stallSince = 0;
@@ -176,6 +180,16 @@ final class AiSeatState {
         repeatedFallbacks = Math.min(repeatedFallbacks + 1, limit + 2);
         if (repeatedFallbacks <= limit) return FallbackVerdict.CHOOSE;
         return repeatedFallbacks == limit + 1 ? FallbackVerdict.STOP_AND_ANNOUNCE : FallbackVerdict.STOPPED;
+    }
+
+    void holdThinking(long now, int fingerprint) {
+        thinkingHeldAt = now;
+        thinkingHeldFingerprint = fingerprint;
+    }
+
+    boolean thinkingHeld(long now, long retryMillis, IntSupplier fingerprint) {
+        if (thinkingHeldAt == 0 || now - thinkingHeldAt >= retryMillis) return false;
+        return fingerprint.getAsInt() == thinkingHeldFingerprint;
     }
 
     void clearFallbacks() {

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.ai.trace.Thinking;
 
 @UtilityClass
 public class ExploreDeck {
@@ -20,6 +21,12 @@ public class ExploreDeck {
     }
 
     public static double expectedValue(ExploreSite site, String trait) {
+        try (Thinking.Span ignored = Thinking.enter("explore.expectedValue")) {
+            return averageOverDeck(site, trait);
+        }
+    }
+
+    private static double averageOverDeck(ExploreSite site, String trait) {
         List<String> deck = site.game().getExploreDeck(trait);
         if (deck.isEmpty()) deck = site.game().getExploreDiscard(trait);
         if (deck.isEmpty()) return 0;
