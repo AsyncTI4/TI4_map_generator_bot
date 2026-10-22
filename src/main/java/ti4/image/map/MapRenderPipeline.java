@@ -22,7 +22,6 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
-import ti4.settings.GlobalSettings;
 
 @UtilityClass
 public class MapRenderPipeline {
@@ -39,9 +38,7 @@ public class MapRenderPipeline {
 
         Game liveGame = renderEvent.game;
         Game snapshot = snapshotOf(liveGame);
-        if (renderEvent.uploadToDiscord) {
-            liveGame.incrementMapImageGenerationCount();
-        }
+        liveGame.incrementMapImageGenerationCount();
         liveGame.setTileDistances(new HashMap<>());
         var timedRunnable = new TimedRunnable(
                 "Render event task for " + liveGame.getName(), EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
@@ -54,9 +51,7 @@ public class MapRenderPipeline {
                         // TODO: the sent-warning markers land on the live game from this thread; they persist only if
                         // the handler saves later.
                         result.playerAreaWarnings().send(liveGame);
-                        if (renderEvent.uploadToDiscord) {
-                            uploadToDiscord(snapshot, result, timings, renderEvent.callback());
-                        }
+                        uploadToDiscord(snapshot, result, timings, renderEvent.callback());
                         if (renderEvent.uploadToWebsite) {
                             MapUploads.toWebsite(snapshot, result, timings);
                         }
@@ -108,18 +103,9 @@ public class MapRenderPipeline {
         }
     }
 
-    static void renderToWebsiteOnly(Game game, @Nullable GenericInteractionCreateEvent event) {
-        if (GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(),
-                Boolean.class,
-                Boolean.FALSE)) {
-            queue(game, event, null, null, false, true);
-        }
-    }
-
     public static void queue(
             Game game, @Nullable SlashCommandInteractionEvent event, @Nullable Consumer<FileUpload> callback) {
-        queue(game, event, null, callback, true, true);
+        queue(game, event, null, null, callback, true);
     }
 
     public static void queue(
@@ -127,7 +113,7 @@ public class MapRenderPipeline {
             @Nullable GenericInteractionCreateEvent event,
             @Nullable DisplayType displayType,
             @Nullable Consumer<FileUpload> callback) {
-        queue(game, event, displayType, callback, true, true);
+        queue(game, event, displayType, null, callback, true);
     }
 
     public static void queue(
@@ -136,22 +122,12 @@ public class MapRenderPipeline {
             @Nullable DisplayType displayType,
             @Nullable String segment,
             @Nullable Consumer<FileUpload> callback) {
-        queue(game, event, displayType, segment, callback, true, true);
+        queue(game, event, displayType, segment, callback, true);
     }
 
     public static void queueUnfoggedWithoutWebsiteUpload(
             Game game, @Nullable DisplayType displayType, Consumer<FileUpload> callback) {
-        queue(game, null, displayType, null, callback, true, false);
-    }
-
-    private static void queue(
-            Game game,
-            @Nullable GenericInteractionCreateEvent event,
-            @Nullable DisplayType displayType,
-            @Nullable Consumer<FileUpload> callback,
-            boolean uploadToDiscord,
-            boolean uploadToWebsite) {
-        queue(game, event, displayType, null, callback, uploadToDiscord, uploadToWebsite);
+        queue(game, null, displayType, null, callback, false);
     }
 
     private static void queue(
@@ -160,12 +136,11 @@ public class MapRenderPipeline {
             @Nullable DisplayType displayType,
             @Nullable String segment,
             @Nullable Consumer<FileUpload> callback,
-            boolean uploadToDiscord,
             boolean uploadToWebsite) {
         if (game == null) {
             throw new IllegalArgumentException("game cannot be null in render pipeline");
         }
-        render(new RenderEvent(game, event, displayType, segment, callback, uploadToDiscord, uploadToWebsite));
+        render(new RenderEvent(game, event, displayType, segment, callback, uploadToWebsite));
     }
 
     public static ShutdownResult shutdown() {
@@ -179,6 +154,5 @@ public class MapRenderPipeline {
             DisplayType displayType,
             String segment,
             Consumer<FileUpload> callback,
-            boolean uploadToDiscord,
             boolean uploadToWebsite) {}
 }
