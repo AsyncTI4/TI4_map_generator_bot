@@ -44,10 +44,16 @@ class TradeValue {
     }
 
     static boolean proposable(Game game, Player seat, Player partner, Deal deal, double trust) {
+        return proposal(game, seat, partner, deal, trust).isPresent();
+    }
+
+    static Optional<Valuation> proposal(Game game, Player seat, Player partner, Deal deal, double trust) {
         Valuation valuation = of(game, seat, partner, deal, trust);
-        if (!valuation.clears(PROPOSE_MIN)) return false;
-        if (AiSeats.isAiSeat(partner)) return predictedFor(game, partner, seat, deal) >= PREDICTED_MIN;
-        return valuation.partnerGain() >= HUMAN_GAIN_MIN;
+        if (!valuation.clears(PROPOSE_MIN)) return Optional.empty();
+        boolean partnerWants = AiSeats.isAiSeat(partner)
+                ? predictedFor(game, partner, seat, deal) >= PREDICTED_MIN
+                : valuation.partnerGain() >= HUMAN_GAIN_MIN;
+        return partnerWants ? Optional.of(valuation) : Optional.empty();
     }
 
     static boolean commitmentOk(Game game, Player seat, Player partner, Deal deal) {

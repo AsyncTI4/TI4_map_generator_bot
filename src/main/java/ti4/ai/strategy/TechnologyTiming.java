@@ -81,7 +81,7 @@ public class TechnologyTiming {
     }
 
     public static boolean deniable(Game game, Player seat) {
-        return wantsToResearch(game, seat) && !followsNow(game, seat) && followsLaterAfterPaying(game, seat, 0);
+        return !followsNow(game, seat) && followsLaterAfterPaying(game, seat, 0) && wantsToResearch(game, seat);
     }
 
     public static boolean followsLaterAfterPaying(Game game, Player seat, int tradeGoods) {

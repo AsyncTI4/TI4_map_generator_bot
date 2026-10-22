@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.brain.SearchMemo;
 import ti4.ai.promissory.NoteGiving;
 import ti4.ai.strategy.CardFacade;
 import ti4.game.Game;
@@ -14,6 +15,9 @@ import ti4.game.Player;
 @UtilityClass
 class NotesForTrade {
 
+    private static final String RECEIVE_MEMO = "notes.receiveValue";
+    private static final String GIVE_MEMO = "notes.giveCost";
+    private static final String LEAST_HARMFUL_MEMO = "notes.leastHarmful";
     static final double OTHER_NOTE = 0.3;
     static final double UNKNOWN_NOTE_COST = 1.0;
     static final double INFINITE = Double.POSITIVE_INFINITY;
@@ -56,7 +60,11 @@ class NotesForTrade {
     }
 
     static double receiveValue(Game game, Player seat, String alias) {
-        return baseReceiveValue(game, seat, alias) + NoteSecrets.value(game, seat, alias);
+        return SearchMemo.remember(
+                () -> baseReceiveValue(game, seat, alias) + NoteSecrets.value(game, seat, alias),
+                RECEIVE_MEMO,
+                seat,
+                alias);
     }
 
     private static double baseReceiveValue(Game game, Player seat, String alias) {
@@ -79,6 +87,11 @@ class NotesForTrade {
     }
 
     static double giveCost(Game game, Player seat, Player receiver, String alias) {
+        return SearchMemo.remember(
+                () -> computeGiveCost(game, seat, receiver, alias), GIVE_MEMO, seat, receiver, alias);
+    }
+
+    private static double computeGiveCost(Game game, Player seat, Player receiver, String alias) {
         Player owner = game.getPNOwner(alias);
         if (!Standings.same(owner, seat)) {
             double value = receiveValue(game, seat, alias);
@@ -98,6 +111,10 @@ class NotesForTrade {
     }
 
     static Optional<String> leastHarmful(Game game, Player seat, Player receiver) {
+        return SearchMemo.remember(() -> pickLeastHarmful(game, seat, receiver), LEAST_HARMFUL_MEMO, seat, receiver);
+    }
+
+    private static Optional<String> pickLeastHarmful(Game game, Player seat, Player receiver) {
         List<String> inPlayArea = seat.getPromissoryNotesInPlayArea();
         return seat.getPromissoryNotes().keySet().stream()
                 .filter(alias -> !inPlayArea.contains(alias))

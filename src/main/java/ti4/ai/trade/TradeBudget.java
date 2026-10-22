@@ -2,6 +2,7 @@ package ti4.ai.trade;
 
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.brain.SearchMemo;
 import ti4.ai.scoring.PromisedTradeGoods;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
@@ -12,6 +13,8 @@ import ti4.game.Player;
 
 @UtilityClass
 class TradeBudget {
+
+    private static final String RESERVED_MEMO = "budget.reservedTradeGoods";
 
     static int promisedCommodities(Player seat) {
         return PromisedTradeGoods.sent(seat, ItemType.COMMODITIES.token(), null);
@@ -48,6 +51,10 @@ class TradeBudget {
     }
 
     static int reservedTradeGoods(Game game, Player seat) {
+        return SearchMemo.remember(() -> computeReservedTradeGoods(game, seat), RESERVED_MEMO, seat);
+    }
+
+    private static int computeReservedTradeGoods(Game game, Player seat) {
         SpendCost reserve = ScoringReserve.reserved(game, seat)
                 .map(ScoringReserve.Reserved::cost)
                 .orElse(SpendCost.NONE)

@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.ai.brain.SearchMemo;
 import ti4.ai.endurance.Endurance;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.FractureCampaign;
@@ -32,6 +33,7 @@ import ti4.service.tech.ListTechService;
 @UtilityClass
 public class ResearchPolicy {
 
+    private static final String BEST_RESEARCHABLE_MEMO = "research.bestResearchable";
     public static final double WORTH_PAYING_FOR = 4.0;
     public static final double WORTH_FOLLOWING_FOR = 3.0;
     public static final double TECH_TEMPO =
@@ -186,6 +188,10 @@ public class ResearchPolicy {
     }
 
     public static Optional<String> bestResearchable(Game game, Player seat) {
+        return SearchMemo.remember(() -> pickBestResearchable(game, seat), BEST_RESEARCHABLE_MEMO, seat);
+    }
+
+    private static Optional<String> pickBestResearchable(Game game, Player seat) {
         List<String> researchable = new ArrayList<>();
         for (TechnologyType type : TechnologyType.values()) {
             for (TechnologyModel tech :
