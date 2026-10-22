@@ -102,6 +102,7 @@ public class NeuraloopService {
         player.removeExhaustedRelic(relic);
         RelicHelper.resolveRelicLossEffects(game, player, relic);
         game.removeRevealedObjective(poID);
+        RevealPublicObjectiveService.unpinRevealedObjective(game, poID);
         String msg = "## " + game.getPing() + " " + player.getRepresentation() + " is using _Neuraloop_, purging "
                 + ("neuraloop".equals(relic) ? "itself" : Mapper.getRelic(relic).getName())
                 + ", to replace the recently revealed objective with a random " + deck + ".";

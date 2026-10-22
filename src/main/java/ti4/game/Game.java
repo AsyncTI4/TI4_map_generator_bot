@@ -1932,10 +1932,26 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void removeRevealedObjective(String id) {
-        revealedPublicObjectives.remove(id);
-        soToPoList.remove(id);
-        customPublicVP.remove(id);
-        scoredPublicObjectives.remove(id);
+        soToPoList.stream()
+                .filter(soId -> soId.equals(id) || id.equals(convertedSecretObjectiveName(soId)))
+                .findFirst()
+                .ifPresent(soId -> {
+                    soToPoList.remove(soId);
+                    forgetRevealedObjective(convertedSecretObjectiveName(soId));
+                });
+        forgetRevealedObjective(id);
+    }
+
+    private void forgetRevealedObjective(String key) {
+        if (key == null) return;
+        revealedPublicObjectives.remove(key);
+        customPublicVP.remove(key);
+        scoredPublicObjectives.remove(key);
+    }
+
+    private static String convertedSecretObjectiveName(String secretObjectiveId) {
+        SecretObjectiveModel secretObjective = Mapper.getSecretObjective(secretObjectiveId);
+        return secretObjective == null ? null : secretObjective.getName();
     }
 
     public String getCustodiansTaker() {

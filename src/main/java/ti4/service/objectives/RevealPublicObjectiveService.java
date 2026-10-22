@@ -45,6 +45,25 @@ public class RevealPublicObjectiveService {
 
     private static final int WHITE_COLOR = 0xFFFFFF;
 
+    public static void unpinRevealedObjective(Game game, String objectiveKey) {
+        String embedTitleName = "__**" + revealedObjectiveName(objectiveKey) + "**__";
+        game.getActionsChannel()
+                .retrievePinnedMessages()
+                .queue(
+                        pins -> pins.stream()
+                                .map(pin -> pin.getMessage())
+                                .filter(message -> message.getEmbeds().stream()
+                                        .anyMatch(embed -> embed.getTitle() != null
+                                                && embed.getTitle().contains(embedTitleName)))
+                                .forEach(message -> message.unpin().queue(Consumers.nop(), BotLogger::catchRestError)),
+                        BotLogger::catchRestError);
+    }
+
+    private static String revealedObjectiveName(String objectiveKey) {
+        PublicObjectiveModel publicObjective = Mapper.getPublicObjective(objectiveKey);
+        return publicObjective == null ? objectiveKey : publicObjective.getName();
+    }
+
     public static void revealS2(Game game, GenericInteractionCreateEvent event) {
         revealS2(game, event, false);
     }
