@@ -32,9 +32,9 @@ import ti4.draft.items.TechDraftItem;
 import ti4.draft.items.UnitDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.Mapper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.TI4Emoji;
 
 @Getter

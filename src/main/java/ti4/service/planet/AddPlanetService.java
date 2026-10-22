@@ -35,10 +35,11 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
-import ti4.image.Mapper;
+import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
@@ -162,7 +163,7 @@ public class AddPlanetService {
         String color = player.getColor();
         if (color != null && !"null".equals(color)) {
             String ccID = Mapper.getControlID(color);
-            String ccPath = Mapper.getCCPath(ccID);
+            String ccPath = ImageResources.commandToken(ccID);
             if (ccPath != null) {
                 unitHolder.addControl(ccID);
             }

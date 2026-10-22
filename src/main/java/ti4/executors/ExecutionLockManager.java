@@ -19,6 +19,7 @@ public class ExecutionLockManager {
     private static final Cache<String, ReentrantReadWriteLock> locks;
 
     static {
+        // TODO: a lock held longer than the expiry can be evicted and replaced, letting a second writer in.
         locks = Caffeine.newBuilder()
                 .expireAfterAccess(LOCK_EXPIRE_AFTER_ACCESS_TIME_MINUTES, TimeUnit.MINUTES)
                 .recordStats()

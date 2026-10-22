@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ti4.image.Mapper;
 import ti4.model.DeckModel;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 /**

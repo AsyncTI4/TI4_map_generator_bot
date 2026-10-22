@@ -144,7 +144,7 @@ public class SarcosaBreakthroughHandler {
     }
 
     public static boolean canControlNeutralStructure(Game game, Player player, UnitHolder holder, UnitKey unitKey) {
-        Player neutral = game.getNeutral();
+        Player neutral = game.findNeutral().orElse(null);
         if (!hasGraveholdUnlocked(game)
                 || game.getActivePlayer() != player
                 || neutral == null

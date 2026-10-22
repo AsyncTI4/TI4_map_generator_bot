@@ -11,8 +11,8 @@ import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.leader.UnlockLeaderService;
 
 @UtilityClass

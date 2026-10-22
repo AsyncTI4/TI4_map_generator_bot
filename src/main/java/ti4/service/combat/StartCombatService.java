@@ -99,11 +99,11 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.helpers.twilight_kart.TkHelperGenomes;
-import ti4.image.Mapper;
-import ti4.image.TileGenerator;
+import ti4.image.tile.SystemContextImage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -455,8 +455,7 @@ public class StartCombatService {
         }
 
         int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);
-        FileUpload systemWithContext =
-                new TileGenerator(game, event, null, context, tile.getPosition(), player1).createFileUpload();
+        FileUpload systemWithContext = SystemContextImage.upload(game, event, context, tile.getPosition(), player1);
 
         // Create the thread
         String finalThreadName = threadName;
@@ -529,7 +528,7 @@ public class StartCombatService {
             context = 0;
         }
         if (file == null) {
-            file = new TileGenerator(game, event, null, context, tile.getPosition(), player1).createFileUpload();
+            file = SystemContextImage.upload(game, event, context, tile.getPosition(), player1);
         }
 
         message.append("\nImage of System:");
@@ -922,8 +921,7 @@ public class StartCombatService {
             Tile tile,
             GenericInteractionCreateEvent event,
             String spaceOrGround) {
-        FileUpload systemWithContext =
-                new TileGenerator(game, event, null, 0, tile.getPosition(), player).createFileUpload();
+        FileUpload systemWithContext = SystemContextImage.upload(game, event, 0, tile.getPosition(), player);
 
         // Use existing thread, if it exists
         TextChannel textChannel = player.getPrivateChannel();

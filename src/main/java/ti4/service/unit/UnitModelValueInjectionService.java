@@ -14,7 +14,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurv
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.franken.FrankenUnitService;
 import ti4.service.game.MonumentsService;

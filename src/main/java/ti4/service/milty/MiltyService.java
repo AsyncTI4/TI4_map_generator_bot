@@ -23,10 +23,10 @@ import ti4.game.persistence.GameManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.rules.ThundersEdgeRulesService;
 
@@ -412,11 +412,11 @@ public class MiltyService {
         String pos = "tr";
         for (List<String> positions : CollectionUtils.permutations(List.of("tl", "tr", "bl", "br"))) {
             boolean acceptable = true;
-            Point center = PositionMapper.getTilePosition("000");
+            Point center = MapPositionMapper.getTilePosition("000");
             for (int x = 0; x < tilesWithAnchors.size(); x++) {
                 String xAnchorPos = tilesWithAnchors.get(x).pos();
                 if (xAnchorPos != null) {
-                    Point anchor = PositionMapper.getTilePosition(xAnchorPos);
+                    Point anchor = MapPositionMapper.getTilePosition(xAnchorPos);
                     String corner = positions.get(x);
                     acceptable &= switch (corner) {
                         case "tl" -> anchor.x <= center.x && anchor.y <= center.y;

@@ -71,12 +71,12 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
-import ti4.image.MapRenderPipeline;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
-import ti4.image.TileHelper;
+import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.logging.LogBufferManager;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
+import ti4.model.TileHelper;
 import ti4.service.draft.SliceGenerationPipeline;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.persistence.GameDatabaseSyncPipeline;
@@ -312,7 +312,7 @@ public class JdaService {
         // load all /resources/planets/ and /resources/systems/ .json files, into 3 HashMaps (not 2)
         TileHelper.init();
         // load all /resources/positions/ .properties files, each into 1 Properties
-        PositionMapper.init();
+        MapPositionMapper.init();
         // load all /resources/data/ .json and .properties files, except logging.properties, each into 1 HashMap or
         // Properties
         Mapper.init();

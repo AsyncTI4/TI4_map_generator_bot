@@ -25,12 +25,12 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
+import ti4.model.TileHelper;
 import ti4.service.draft.MantisMapBuildContext.PlayerTiles;
 import ti4.service.explore.AddFrontierTokensService;
 

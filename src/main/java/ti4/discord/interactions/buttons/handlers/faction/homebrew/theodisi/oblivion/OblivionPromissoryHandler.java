@@ -17,8 +17,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
-import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
+import ti4.model.TileHelper;
 
 @UtilityClass
 public class OblivionPromissoryHandler {

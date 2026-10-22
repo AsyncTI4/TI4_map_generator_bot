@@ -10,6 +10,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -77,14 +78,12 @@ import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.PlayerNeighbourGraph;
 import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKRelicHooks;
-import ti4.image.DrawingUtil;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.GameMessage;
@@ -98,6 +97,8 @@ import ti4.model.EmbeddableModel;
 import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
 import ti4.model.LeaderModel;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
@@ -216,7 +217,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             setDecalSet(null);
             return null;
         }
-        return String.format("%s_%s%s", getDecalSet(), unitType, DrawingUtil.getBlackWhiteFileSuffix(getColorID()));
+        return String.format(
+                "%s_%s%s",
+                getDecalSet(), unitType, Mapper.getColor(getColorID()).blackWhiteFileSuffix());
     }
 
     public boolean hasSpaceStation() {
@@ -883,8 +886,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public int getUnitCap(String unit) {
         if (unitCaps.get(unit) == null) {
             if ("monument".equals(unit)) return 1;
-            if (PositionMapper.getReinforcementsPosition(unit) == null) return 0;
-            return PositionMapper.getReinforcementsPosition(unit).getPositionCount(unit);
+            if (MapPositionMapper.getReinforcementsPosition(unit) == null) return 0;
+            return MapPositionMapper.getReinforcementsPosition(unit).getPositionCount(unit);
             // return 0;
         }
         return unitCaps.get(unit);
@@ -1859,6 +1862,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return emoji != null
                 ? emoji
                 : FactionEmojis.getFactionIcon(getFaction()).toString();
+    }
+
+    public void normalizeFactionEmoji() {
+        normalizeCustomFactionEmoji();
     }
 
     @Nullable
@@ -3321,32 +3328,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public Set<Player> getNeighbouringPlayers(boolean checkEquiv) {
-        Game game = this.game;
-        Set<Player> adjacentPlayers = new HashSet<>();
-        Set<Player> realPlayers = new HashSet<>(
-                game.getPlayers().values().stream().filter(Player::isRealPlayer).toList());
-
-        Set<Tile> playersTiles = new HashSet<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (FoWHelper.playerIsInSystem(game, tile, this, true)) {
-                playersTiles.add(tile);
-            }
-        }
-
-        for (Tile tile : playersTiles) {
-            adjacentPlayers.addAll(FoWHelper.getAdjacentPlayers(game, tile.getPosition(), false));
-            if (realPlayers.size() == adjacentPlayers.size()) break;
-        }
-        adjacentPlayers.remove(this);
-        if (checkEquiv && realPlayers.size() < 30) {
-            for (Player p2 : realPlayers) {
-                if (!adjacentPlayers.contains(p2)
-                        && p2.getNeighbouringPlayers(false).contains(this)) {
-                    adjacentPlayers.add(p2);
-                }
-            }
-        }
-        return adjacentPlayers;
+        PlayerNeighbourGraph graph = new PlayerNeighbourGraph(game);
+        if (checkEquiv) return graph.neighboursOf(this);
+        return new LinkedHashSet<>(graph.directNeighboursOf(this));
     }
 
     public boolean isNeighboursWith(Player player) {

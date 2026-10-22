@@ -113,17 +113,17 @@ import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.helpers.twilight_kart.TkHelperGenomes;
-import ti4.image.MapRenderPipeline;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
-import ti4.image.TileGenerator;
-import ti4.image.TileHelper;
+import ti4.image.io.ImageResources;
+import ti4.image.map.MapRenderPipeline;
+import ti4.image.tile.SystemContextImage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetModel;
 import ti4.model.PromissoryNoteModel;
@@ -131,6 +131,7 @@ import ti4.model.PublicObjectiveModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 import ti4.model.UnitModel;
@@ -3700,7 +3701,7 @@ public class ButtonHelper {
             Player ogPlayer,
             GenericInteractionCreateEvent event,
             @Nullable CombatSummaryContext combatSummaryContext) {
-        String tileName = tile.getTilePath();
+        String tileName = ImageResources.tilePath(tile);
         tileName = tileName.substring(tileName.indexOf('_') + 1);
         tileName = tileName.substring(0, tileName.indexOf(".png"));
         tileName = " - " + tileName + "[" + tile.getTileID() + "]";
@@ -4333,26 +4334,103 @@ public class ButtonHelper {
 
     public static int[] checkFleetAndCapacity(
             Player player, Game game, Tile tile, boolean ignoreFighters, boolean issuePing) {
+        FleetAssessment assessment = assessFleetAndCapacity(player, game, tile, ignoreFighters);
+        if (!assessment.wasAssessed()) {
+            return assessment.counts();
+        }
+        if (assessment.unlocksLetnevCommander()) {
+            CommanderUnlockCheckService.checkPlayer(player, "letnev");
+        }
+        if (issuePing) {
+            remindAboutFlotilla(player, game, tile, assessment);
+            reportViolations(player, game, tile, assessment);
+        }
+        return assessment.counts();
+    }
+
+    public static int[] fleetAndCapacity(Player player, Game game, Tile tile, boolean ignoreFighters) {
+        return assessFleetAndCapacity(player, game, tile, ignoreFighters).counts();
+    }
+
+    private static void remindAboutFlotilla(Player player, Game game, Tile tile, FleetAssessment assessment) {
+        if (!player.hasAbility("flotilla")) {
+            return;
+        }
+        UnitHolder space = tile.getUnitHolders().get("space");
+        int infantry = space.getUnitCount(UnitType.Infantry, player.getColor());
+        int destroyers = space.getUnitCount(UnitType.Destroyer, player.getColor());
+        if (infantry <= (assessment.capitalShips() + destroyers) / 2) {
+            return;
+        }
+        String msg = player.getRepresentation()
+                + ", reminder that your **Flotilla** ability says you can't have more infantry than non-fighter ships in the space area of a system. "
+                + "You seem to be violating this in "
+                + tile.getRepresentationForButtons(game, player)
+                + ".";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        GMService.logPlayerActivity(game, player, msg);
+    }
+
+    private static void reportViolations(Player player, Game game, Tile tile, FleetAssessment assessment) {
+        if (!assessment.violated() || game.getStoredValue("violatedSystems").contains(tile.getPosition())) {
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.blue(
+                "getDamageButtons_" + tile.getPosition() + "_remove",
+                "Remove Units in " + tile.getRepresentationForButtons(game, player)));
+        buttons.add(Buttons.red("deleteButtons", "Dismiss These Buttons"));
+
+        FileUpload systemWithContext = SystemContextImage.upload(game, null, 0, tile.getPosition(), player);
+        MessageHelper.sendFileToChannelWithButtonsAfter(
+                player.getCorrectChannel(), systemWithContext, assessment.message(), buttons);
+        game.setStoredValue("violatedSystems", game.getStoredValue("violatedSystems") + tile.getPosition() + "_");
+        GMService.logPlayerActivity(game, player, assessment.message());
+    }
+
+    private record FleetAssessment(
+            int[] counts,
+            boolean wasAssessed,
+            int capitalShips,
+            boolean fleetSupplyViolated,
+            boolean violated,
+            String message) {
+
+        static FleetAssessment unassessed(int[] counts) {
+            return new FleetAssessment(counts, false, 0, false, false, "");
+        }
+
+        static FleetAssessment assessed(
+                int[] counts, int capitalShips, boolean fleetSupplyViolated, boolean violated, String message) {
+            return new FleetAssessment(counts, true, capitalShips, fleetSupplyViolated, violated, message);
+        }
+
+        boolean unlocksLetnevCommander() {
+            return capitalShips > 8 && !fleetSupplyViolated;
+        }
+    }
+
+    private static FleetAssessment assessFleetAndCapacity(Player player, Game game, Tile tile, boolean ignoreFighters) {
         String tileRepresentation = tile.getRepresentation();
         int[] values = {0, 0, 0, 0};
         if (tileRepresentation == null || "null".equalsIgnoreCase(tileRepresentation)) {
-            return values;
+            return FleetAssessment.unassessed(values);
         }
         if (tileRepresentation.toLowerCase().contains("nombox")) {
-            return values;
+            return FleetAssessment.unassessed(values);
         }
         if (!game.isCcNPlasticLimit()) {
-            return values;
+            return FleetAssessment.unassessed(values);
         }
         int armadaValue = 0;
         if (player == null) {
-            return values;
+            return FleetAssessment.unassessed(values);
         }
         if (player.isNpc() && player.isDummy()) {
-            return values;
+            return FleetAssessment.unassessed(values);
         }
         if ("neutral".equals(player.getFaction()) && Constants.dicecordId.equals(player.getUserID())) {
-            return values;
+            return FleetAssessment.unassessed(values);
         }
         if (player.hasAbility("armada")) {
             armadaValue = 2;
@@ -4657,28 +4735,6 @@ public class ButtonHelper {
                 }
             }
         }
-        if (numOfCapitalShips > 8 && !fleetSupplyViolated) {
-            CommanderUnlockCheckService.checkPlayer(player, "letnev");
-        }
-        if (player.hasAbility("flotilla")) {
-            int numInf = tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player.getColor());
-            if (numInf
-                    > ((numOfCapitalShips
-                                    + tile.getUnitHolders()
-                                            .get("space")
-                                            .getUnitCount(UnitType.Destroyer, player.getColor()))
-                            / 2)) {
-                if (issuePing) {
-                    String msg = player.getRepresentation()
-                            + ", reminder that your **Flotilla** ability says you can't have more infantry than non-fighter ships in the space area of a system. "
-                            + "You seem to be violating this in "
-                            + tile.getRepresentationForButtons(game, player)
-                            + ".";
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-                    GMService.logPlayerActivity(game, player, msg);
-                }
-            }
-        }
         String message = "";
         boolean structuresViolated = false;
 
@@ -4737,29 +4793,6 @@ public class ButtonHelper {
             message += player.getRepresentationUnfogged() + ", you have too many PDS on " + tooManyPDS + ".\n";
         }
 
-        if (issuePing) {
-            if (!game.getStoredValue("violatedSystems").contains(tile.getPosition())) {
-                if (capacityViolated
-                        || fleetSupplyViolated
-                        || structuresViolated
-                        || !tooManyDocks.isEmpty()
-                        || !tooManyPDS.isEmpty()) {
-                    List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.blue(
-                            "getDamageButtons_" + tile.getPosition() + "_remove",
-                            "Remove Units in " + tile.getRepresentationForButtons(game, player)));
-                    buttons.add(Buttons.red("deleteButtons", "Dismiss These Buttons"));
-
-                    FileUpload systemWithContext =
-                            new TileGenerator(game, null, null, 0, tile.getPosition(), player).createFileUpload();
-                    MessageHelper.sendFileToChannelWithButtonsAfter(
-                            player.getCorrectChannel(), systemWithContext, message, buttons);
-                    game.setStoredValue(
-                            "violatedSystems", game.getStoredValue("violatedSystems") + tile.getPosition() + "_");
-                    GMService.logPlayerActivity(game, player, message);
-                }
-            }
-        }
         if (numInfNFightersNMechs <= capacity) {
             numFighter2s = 0;
         }
@@ -4771,7 +4804,16 @@ public class ButtonHelper {
                 fightersIgnored
             };
 
-            return capNCap;
+            return FleetAssessment.assessed(
+                    capNCap,
+                    numOfCapitalShips,
+                    fleetSupplyViolated,
+                    capacityViolated
+                            || fleetSupplyViolated
+                            || structuresViolated
+                            || !tooManyDocks.isEmpty()
+                            || !tooManyPDS.isEmpty(),
+                    message);
         }
         int[] capNCap2 = {
             ((numFighter2sFleet + numOfCapitalShips + 1) / 2),
@@ -4780,7 +4822,16 @@ public class ButtonHelper {
             fightersIgnored,
             numFighter2s
         };
-        return capNCap2;
+        return FleetAssessment.assessed(
+                capNCap2,
+                numOfCapitalShips,
+                fleetSupplyViolated,
+                capacityViolated
+                        || fleetSupplyViolated
+                        || structuresViolated
+                        || !tooManyDocks.isEmpty()
+                        || !tooManyPDS.isEmpty(),
+                message);
     }
 
     private static List<String> getAllPlanetsAdjacentToTileNotOwnedByPlayer(Tile tile, Game game, Player player) {
@@ -4860,7 +4911,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (tile.getPlanetUnitHolders().isEmpty()
-                    && !tile.getTilePath().toLowerCase().contains("hyperlane")) {
+                    && !ImageResources.tilePath(tile).toLowerCase().contains("hyperlane")) {
                 buttons.add(Buttons.green(
                         "echoPlaceFrontier_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
             }
@@ -4916,7 +4967,7 @@ public class ButtonHelper {
         // has to be re-checked here too.
         if (tile == null
                 || !tile.getPlanetUnitHolders().isEmpty()
-                || tile.getTilePath().toLowerCase().contains("hyperlane")) {
+                || ImageResources.tilePath(tile).toLowerCase().contains("hyperlane")) {
             PlanetTargetService.fizzle(event, player);
             return;
         }
@@ -5289,7 +5340,7 @@ public class ButtonHelper {
         deleteMessage(event);
         String newTileID = buttonID.split("_")[1];
         String pos = buttonID.split("_")[2];
-        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(pos);
+        List<String> directlyAdjacentTiles = MapPositionMapper.getAdjacentTilePositions(pos);
         List<String> usedPos = new ArrayList<>();
 
         List<String> redTilesToPullFrom = new ArrayList<>(List.of(
@@ -5434,7 +5485,7 @@ public class ButtonHelper {
             }
 
             if (tile == null || "silver_flame".equals(tile.getTileID())) {
-                for (String pos3 : PositionMapper.getAdjacentTilePositions(pos2)) {
+                for (String pos3 : MapPositionMapper.getAdjacentTilePositions(pos2)) {
                     Tile tile2 = game.getTileByPosition(pos3);
                     if (tile2 != null
                             && tile2.isEdgeOfBoard(game)
@@ -5521,8 +5572,8 @@ public class ButtonHelper {
         String newTileID = buttonID.split("_")[1];
         String pos = buttonID.split("_")[2];
         String pos2 = buttonID.split("_")[3];
-        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(pos);
-        List<String> directlyAdjacentTiles2 = PositionMapper.getAdjacentTilePositions(pos2);
+        List<String> directlyAdjacentTiles = MapPositionMapper.getAdjacentTilePositions(pos);
+        List<String> directlyAdjacentTiles2 = MapPositionMapper.getAdjacentTilePositions(pos2);
         String inBoth = "";
         for (String pos3 : directlyAdjacentTiles) {
             Tile tile3 = game.getTileByPosition(pos3);
@@ -7072,13 +7123,13 @@ public class ButtonHelper {
             String position = tile.getPosition();
             game.removeTile(position);
             String planetTileName = AliasHandler.resolveTile("82a");
-            if (!PositionMapper.isTilePositionValid(position)) {
+            if (!MapPositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Position tile not allowed");
                 return;
             }
 
             String tileName = Mapper.getTileID(planetTileName);
-            String tilePath = ResourceHelper.getTileFile(tileName);
+            String tilePath = ImageResources.tile(tileName);
             if (tilePath == null) {
                 MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
                 return;

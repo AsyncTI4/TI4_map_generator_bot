@@ -26,10 +26,10 @@ import ti4.game.Player;
 import ti4.helpers.thirtyk.ThirtyKRelics;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperUnits;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.service.emoji.ExploreEmojis;
@@ -428,7 +428,7 @@ public class RelicHelper {
     public static String sillySpelling() {
         StringBuilder empelar = new StringBuilder("Scepter of E");
         List<Character> letters = Arrays.asList('m', 'e', 'l', 'p', 'a');
-        Collections.shuffle(letters);
+        RenderRandom.shuffle("relic.sillySpelling", letters);
         for (Character c : letters) {
             empelar.append(c);
         }

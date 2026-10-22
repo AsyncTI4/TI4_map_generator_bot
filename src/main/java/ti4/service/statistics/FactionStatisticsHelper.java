@@ -3,8 +3,8 @@ package ti4.service.statistics;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
-import ti4.image.Mapper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass

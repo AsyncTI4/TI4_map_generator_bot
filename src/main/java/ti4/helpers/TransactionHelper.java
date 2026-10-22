@@ -43,10 +43,11 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKRelicHooks;
 import ti4.helpers.thirtyk.ThirtyKTransactions;
-import ti4.image.Mapper;
-import ti4.image.TransactionGenerator;
+import ti4.image.card.TransactionGenerator;
+import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -57,7 +58,6 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.FowCommunicationThreadService;
-import ti4.service.image.FileUploadService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.info.LeaderInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
@@ -1732,7 +1732,7 @@ public class TransactionHelper {
             if (sendMemeInsteadOfText(event, game)) {
                 BufferedImage tradeOfferMeme = TransactionGenerator.drawTradeOfferMeme(game, player, p2);
                 if (tradeOfferMeme != null) {
-                    FileUpload upload = FileUploadService.createFileUpload(tradeOfferMeme, "trade_offer");
+                    FileUpload upload = ImageUploads.createFileUpload(tradeOfferMeme, "trade_offer");
                     upload.setDescription(publicOfferText);
                     MessageHelper.sendFileUploadToChannel(tableTalkChannel, upload);
                     sentMeme = true;
@@ -3021,7 +3021,7 @@ public class TransactionHelper {
                 buttons = getStuffToTransButtonsNew(game, player, player, p2);
                 if (player.getUserSettings().isShowTransactables() && buttonID.startsWith("transactWith_")) {
                     BufferedImage image = TransactionGenerator.drawTransactableStuffImage(player, p2, player);
-                    FileUpload upload = FileUploadService.createFileUpload(image, "transactable_items");
+                    FileUpload upload = ImageUploads.createFileUpload(image, "transactable_items");
                     MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), upload);
                 }
             }

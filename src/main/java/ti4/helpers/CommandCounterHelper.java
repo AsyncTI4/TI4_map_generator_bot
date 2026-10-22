@@ -15,8 +15,9 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.thundersedge.TeHelperAgents;
-import ti4.image.Mapper;
+import ti4.image.io.ImageResources;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 
@@ -76,7 +77,7 @@ public final class CommandCounterHelper {
         if (useTactic) {
             player.setTacticalCC(player.getTacticalCC() - 1);
         }
-        String ccPath = Tile.getCCPath(ccID);
+        String ccPath = ImageResources.commandToken(ccID);
         if (ccPath == null) {
             if (event != null) {
                 MessageHelper.sendMessageToChannel(
@@ -131,7 +132,7 @@ public final class CommandCounterHelper {
 
     public static boolean hasCC(@Nullable GenericInteractionCreateEvent event, String color, Tile tile) {
         String ccID = Mapper.getCCID(color);
-        String ccPath = Tile.getCCPath(ccID);
+        String ccPath = ImageResources.commandToken(ccID);
         if (ccPath == null && event != null) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");

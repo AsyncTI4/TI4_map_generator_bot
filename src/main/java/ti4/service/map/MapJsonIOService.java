@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
-import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
@@ -25,14 +24,15 @@ import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.URLReaderHelper;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
+import ti4.image.io.ImageResources;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.service.fow.LoreService;
 import ti4.service.fow.LoreService.LoreEntry;
 import tools.jackson.databind.json.JsonMapper;
@@ -260,7 +260,7 @@ public class MapJsonIOService {
     }
 
     private static boolean handleTile(TileIO tileIO, Game game, StringBuilder sb) {
-        if (!PositionMapper.isTilePositionValid(game, tileIO.getPosition())) {
+        if (!MapPositionMapper.isTilePositionValid(game, tileIO.getPosition())) {
             appendError(sb, tileIO, "Invalid tile position: " + tileIO.getPosition());
             return false;
         }
@@ -272,7 +272,7 @@ public class MapJsonIOService {
             appendError(sb, tileIO, "Could not find tile: " + tileID);
             return false;
         }
-        String tilePath = ResourceHelper.getTileFile(tileName);
+        String tilePath = ImageResources.tile(tileName);
         if (tilePath == null) {
             appendError(sb, tileIO, "Could not find tile: " + tileID);
             return false;
@@ -290,10 +290,10 @@ public class MapJsonIOService {
         for (String token : tileIO.getTokens()) {
             Tile tile = game.getTileByPosition(tileIO.getPosition());
             String tokenFileName = token;
-            String tokenPath = Tile.getTokenPath(tokenFileName);
+            String tokenPath = ImageResources.tokenOrAttachment(tokenFileName);
             if (tokenPath == null) {
                 tokenFileName = Mapper.getTokenID(token);
-                tokenPath = Tile.getTokenPath(tokenFileName);
+                tokenPath = ImageResources.tokenOrAttachment(tokenFileName);
                 if (tokenPath == null) {
                     appendError(sb, tileIO, "Token not found: " + token);
                     continue;
@@ -350,10 +350,10 @@ public class MapJsonIOService {
             for (String attachment : planetIO.getAttachments()) {
                 String attachmentFileName = attachment;
                 Tile tile = game.getTileByPosition(tileIO.getPosition());
-                String attachmentPath = Tile.getAttachmentPath(attachmentFileName);
+                String attachmentPath = ImageResources.attachment(attachmentFileName);
                 if (attachmentPath == null) {
                     attachmentFileName = Mapper.getAttachmentImagePath(attachment);
-                    attachmentPath = Tile.getAttachmentPath(attachmentFileName);
+                    attachmentPath = ImageResources.attachment(attachmentFileName);
                     if (attachmentPath == null) {
                         appendError(sb, tileIO, "Attachment not found: " + attachment);
                         continue;

@@ -25,11 +25,11 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.image.BoardPosition;
-import ti4.image.GalaxyNames;
-import ti4.image.MapSegment;
-import ti4.image.PositionMapper;
+import ti4.image.map.MapSegment;
 import ti4.message.MessageHelper;
+import ti4.model.BoardPosition;
+import ti4.model.GalaxyNames;
+import ti4.model.MapPositionMapper;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
@@ -201,8 +201,8 @@ public class SystemPickerService {
     }
 
     private static Point offsetFrom(String centre, String position) {
-        Point from = PositionMapper.getTilePosition(centre);
-        Point to = PositionMapper.getTilePosition(position);
+        Point from = MapPositionMapper.getTilePosition(centre);
+        Point to = MapPositionMapper.getTilePosition(position);
         if (from == null || to == null) {
             return new Point(0, 0);
         }

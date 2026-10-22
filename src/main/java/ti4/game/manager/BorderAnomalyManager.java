@@ -2,10 +2,10 @@ package ti4.game.manager;
 
 import java.util.ArrayList;
 import java.util.List;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.Mapper;
 
 public class BorderAnomalyManager {
 

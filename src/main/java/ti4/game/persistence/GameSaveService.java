@@ -38,13 +38,13 @@ import ti4.helpers.settingsFramework.menus.BaseGameMiniMiltySettings;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.FrankenSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
-import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
 import ti4.json.UnitKeyMapKeyDeserializer;
 import ti4.json.UnitKeyMapKeySerializer;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftSaveService;
@@ -102,7 +102,7 @@ class GameSaveService {
         TransientGameInfoUpdater.update(game);
 
         // Ugly fix to update seen tiles data for fog since doing it in
-        // MapGenerator/TileGenerator won't save changes anymore
+        // the map renderer won't save changes anymore
         if (game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 FoWHelper.updateFog(game, player);
@@ -121,19 +121,21 @@ class GameSaveService {
 
     private static void saveGame(Game game, Path path) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-            Map<String, Tile> tileMap = game.getTileMap();
-            writer.write(game.getOwnerID());
-            writer.write(System.lineSeparator());
-            writer.write(game.getOwnerName());
-            writer.write(System.lineSeparator());
-            writer.write(game.getName().toLowerCase());
-            writer.write(System.lineSeparator());
-            saveGameInfo(writer, game);
+            writeGame(game, writer);
+        }
+    }
 
-            for (Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
-                Tile tile = tileEntry.getValue();
-                saveTile(writer, tile);
-            }
+    static void writeGame(Game game, Writer writer) throws IOException {
+        writer.write(game.getOwnerID());
+        writer.write(System.lineSeparator());
+        writer.write(game.getOwnerName());
+        writer.write(System.lineSeparator());
+        writer.write(game.getName().toLowerCase());
+        writer.write(System.lineSeparator());
+        saveGameInfo(writer, game);
+
+        for (Tile tile : game.getTileMap().values()) {
+            saveTile(writer, tile);
         }
     }
 

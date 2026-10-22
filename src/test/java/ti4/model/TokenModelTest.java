@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
-import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class TokenModelTest extends BaseTi4Test {

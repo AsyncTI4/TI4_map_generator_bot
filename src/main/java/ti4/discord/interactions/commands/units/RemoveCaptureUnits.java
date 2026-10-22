@@ -9,7 +9,7 @@ import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.service.unit.ParseUnitService;
 import ti4.service.unit.ParsedUnit;
 

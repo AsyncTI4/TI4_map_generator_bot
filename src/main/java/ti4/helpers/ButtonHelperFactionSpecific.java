@@ -49,12 +49,12 @@ import ti4.game.UnitHolder;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.ExploreModel;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.SecretObjectiveModel;
@@ -4881,7 +4881,7 @@ public final class ButtonHelperFactionSpecific {
         String origMessageId = modalId[2];
         String position = event.getValue(Constants.POSITION).getAsString().trim();
 
-        if (!PositionMapper.isTilePositionValid(position)) {
+        if (!MapPositionMapper.isTilePositionValid(position)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Position " + position + " is invalid.");
             return;
         }

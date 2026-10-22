@@ -8,9 +8,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.FoWHelper;
-import ti4.image.CompactOverviewGenerator;
-import ti4.image.MapOverviewGenerator;
-import ti4.image.MapRenderPipeline;
+import ti4.image.map.CompactOverviewGenerator;
+import ti4.image.map.MapOverviewGenerator;
+import ti4.image.map.MapRenderPipeline;
 import ti4.message.MessageHelper;
 
 class MapOverviewCommand extends GameStateSubcommand {
@@ -47,7 +47,7 @@ class MapOverviewCommand extends GameStateSubcommand {
             MapRenderPipeline.queueImage(
                     game,
                     "Map overview",
-                    () -> CompactOverviewGenerator.gmOverview(game),
+                    CompactOverviewGenerator::gmOverview,
                     fileUpload -> MessageHelper.sendFileUploadToChannel(channel, fileUpload));
             return;
         }

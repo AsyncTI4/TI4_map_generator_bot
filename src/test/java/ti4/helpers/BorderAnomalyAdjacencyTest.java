@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.persistence.TestGameHarness;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 class BorderAnomalyAdjacencyTest extends BaseTi4Test {
@@ -74,7 +74,7 @@ class BorderAnomalyAdjacencyTest extends BaseTi4Test {
 
     private static Edge findEdge(Game game) {
         assertThat(game.getTileByPosition(HOLDER_TILE)).isNotNull();
-        List<String> adjacent = PositionMapper.getAdjacentTilePositions(HOLDER_TILE);
+        List<String> adjacent = MapPositionMapper.getAdjacentTilePositions(HOLDER_TILE);
         for (int direction = 0; direction < adjacent.size(); direction++) {
             String neighbour = adjacent.get(direction);
             if (game.getTileByPosition(neighbour) != null

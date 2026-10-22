@@ -37,10 +37,10 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.TitlesHelper;
 import ti4.helpers.Units;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.model.Source;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -139,7 +139,7 @@ public class PlayerSetupService {
         }
 
         // HOME SYSTEM
-        if (!PositionMapper.isTilePositionValid(game, positionHS)) {
+        if (!MapPositionMapper.isTilePositionValid(game, positionHS)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Tile position: `" + positionHS + "` is not valid. Stopping Setup.");
             return;
@@ -151,7 +151,7 @@ public class PlayerSetupService {
             game.setTile(tile);
         }
 
-        // String statsAnchor = PositionMapper.getEquivalentPositionAtRing(game.getRingCount(), positionHS);
+        // String statsAnchor = MapPositionMapper.getEquivalentPositionAtRing(game.getRingCount(), positionHS);
         player.setPlayerStatsAnchorPosition(positionHS);
 
         // GHOST AND CRIMSON EXTRA HS TILES

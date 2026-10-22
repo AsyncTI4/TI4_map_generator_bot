@@ -35,10 +35,10 @@ import ti4.game.Player;
 import ti4.game.helper.GameHelper;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.ActionCardHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.DeckModel;
+import ti4.model.Mapper;
 import ti4.spring.service.statistics.overrule.OverruleStatsService;
 
 @UtilityClass

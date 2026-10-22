@@ -17,10 +17,10 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
 import ti4.model.GenericCardModel;
+import ti4.model.Mapper;
 
 @UtilityClass
 public class FrankenAbilityService {

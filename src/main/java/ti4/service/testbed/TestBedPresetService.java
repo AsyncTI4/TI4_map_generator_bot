@@ -19,15 +19,15 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
-import ti4.image.BoardPosition;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
-import ti4.image.TileHelper;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
+import ti4.model.BoardPosition;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.CardPick;
 import ti4.model.TestBedPreset.Seat;
+import ti4.model.TileHelper;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import tools.jackson.core.JacksonException;
@@ -185,7 +185,7 @@ public class TestBedPresetService {
         }
         validateMapString(preset.getMapString(), errors);
         for (String position : preset.getCombat()) {
-            if (!PositionMapper.isTilePositionValid(position)) {
+            if (!MapPositionMapper.isTilePositionValid(position)) {
                 errors.add("Unknown `combat` position `" + position + "`.");
             }
         }
@@ -240,7 +240,7 @@ public class TestBedPresetService {
             if (seat.getHome() == null) {
                 seatsWithoutHome++;
             } else {
-                if (!PositionMapper.isTilePositionValid(seat.getHome())) {
+                if (!MapPositionMapper.isTilePositionValid(seat.getHome())) {
                     errors.add("Unknown home position `" + seat.getHome() + "`.");
                 }
                 if (!homes.add(seat.getHome())) errors.add("Home position `" + seat.getHome() + "` is used twice.");
@@ -277,7 +277,7 @@ public class TestBedPresetService {
             errors.add(label + ": `ccs` must look like `3/3/2` (tactic/fleet/strategy).");
         }
         for (String location : seat.getUnits().keySet()) {
-            if (!HOME_UNIT_LOCATION.equalsIgnoreCase(location) && !PositionMapper.isTilePositionValid(location)) {
+            if (!HOME_UNIT_LOCATION.equalsIgnoreCase(location) && !MapPositionMapper.isTilePositionValid(location)) {
                 errors.add(label + ": unknown unit position `" + location + "` (use a tile position or `home`).");
             }
         }
@@ -311,14 +311,14 @@ public class TestBedPresetService {
                 errors);
         for (Map.Entry<String, List<String>> entry : preset.getTokens().entrySet()) {
             String where = entry.getKey();
-            if (!PositionMapper.isTilePositionValid(where)
+            if (!MapPositionMapper.isTilePositionValid(where)
                     && !Mapper.isValidPlanet(AliasHandler.resolvePlanet(where.toLowerCase()))) {
                 errors.add("preset: `tokens` target `" + where + "` is neither a tile position nor a planet.");
             }
             validateIds(entry.getValue(), TestBedPresetService::isKnownToken, "preset", "token", errors);
         }
         preset.getBorderAnomalies().forEach((position, borders) -> {
-            if (!PositionMapper.isTilePositionValid(position.toLowerCase())) {
+            if (!MapPositionMapper.isTilePositionValid(position.toLowerCase())) {
                 errors.add("preset: `borderAnomalies` position `" + position + "` is not a tile position.");
             }
             for (String border : borders) {
@@ -330,7 +330,7 @@ public class TestBedPresetService {
             }
         });
         preset.getTiles().forEach((position, tileId) -> {
-            if (!PositionMapper.isTilePositionValid(position.toLowerCase())) {
+            if (!MapPositionMapper.isTilePositionValid(position.toLowerCase())) {
                 errors.add("preset: `tiles` position `" + position + "` is not a tile position.");
             }
             if (!TileHelper.isValidTile(tileId.toLowerCase())) {
@@ -348,7 +348,7 @@ public class TestBedPresetService {
             }
         }
         preset.getCustomHyperlanes().forEach((position, matrix) -> {
-            if (!PositionMapper.isTilePositionValid(position.toLowerCase())) {
+            if (!MapPositionMapper.isTilePositionValid(position.toLowerCase())) {
                 errors.add("preset: `customHyperlanes` position `" + position + "` is not a tile position.");
             }
             if (!CustomHyperlaneService.isValidConnectionMatrix(matrix)) {

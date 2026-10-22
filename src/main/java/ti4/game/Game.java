@@ -85,18 +85,18 @@ import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.GameSetupSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
-import ti4.image.BoardPosition;
-import ti4.image.GalaxyNames;
-import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.BoardPosition;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
+import ti4.model.GalaxyNames;
+import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.Source.ComponentSource;
@@ -435,6 +435,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (neutral == null) return setupNeutralPlayer();
         neutral.addTech("dn2");
         return neutral;
+    }
+
+    public Optional<Player> findNeutral() {
+        return Optional.ofNullable(getPlayerFromColorOrFaction("neutral"));
     }
 
     @NotNull

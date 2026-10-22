@@ -14,11 +14,11 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import lombok.Getter;
 import ti4.ResourceHelper;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.model.ColorModel;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 
 public final class AliasHandler {

@@ -19,8 +19,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
-import ti4.image.DrawingUtil;
-import ti4.image.Mapper;
+import ti4.image.draw.FactionIcons;
+import ti4.model.Mapper;
 
 @Data
 public class WebPlayerArea {
@@ -582,14 +582,14 @@ public class WebPlayerArea {
 
     /**
      * Gets the appropriate faction image path and type for web interface.
-     * Reuses logic from DrawingUtil.getPlayerFactionIconImageScaled to maintain consistency.
+     * Reuses logic from FactionIcons.scaled to maintain consistency.
      */
     private static FactionImageResult getFactionImagePathAndType(Player player) {
         if (player == null) {
             return new FactionImageResult(null, FactionImageType.IMAGE);
         }
 
-        // Reuse the same logic as DrawingUtil.getPlayerFactionIconImageScaled
+        // Reuse the same logic as FactionIcons.scaled
         Emoji factionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
 
         // 1) Discord custom emoji - return Discord URL and DISCORD type
@@ -601,8 +601,8 @@ public class WebPlayerArea {
             return new FactionImageResult(uni.getFormatted(), FactionImageType.EMOJI);
         }
 
-        // 3) Local faction image - use DrawingUtil.getFactionIconPath directly
-        String factionFile = DrawingUtil.getFactionIconPath(player.getFaction());
+        // 3) Local faction image - use FactionIcons.path directly
+        String factionFile = FactionIcons.path(player.getFaction());
         if (factionFile != null) {
             // Convert absolute path to relative path from resources
             String resourcePath = Storage.getResourcePath();

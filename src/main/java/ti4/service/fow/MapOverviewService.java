@@ -12,8 +12,8 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.FoWHelper;
-import ti4.image.CompactOverviewGenerator;
-import ti4.image.MapRenderPipeline;
+import ti4.image.map.CompactOverviewGenerator;
+import ti4.image.map.MapRenderPipeline;
 import ti4.message.MessageHelper;
 import ti4.service.option.FOWOptionService.FOWOption;
 
@@ -42,9 +42,9 @@ public class MapOverviewService {
         MapRenderPipeline.queueImage(
                 game,
                 "Map overview",
-                () -> view == View.GM
-                        ? CompactOverviewGenerator.gmOverview(game)
-                        : CompactOverviewGenerator.playerOverview(game, viewer, event),
+                snapshot -> view == View.GM
+                        ? CompactOverviewGenerator.gmOverview(snapshot)
+                        : CompactOverviewGenerator.playerOverview(snapshot, sameSeat(snapshot, viewer), event),
                 fileUpload -> {
                     if (replyPrivately) {
                         MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
@@ -52,6 +52,10 @@ public class MapOverviewService {
                         MessageHelper.sendFileUploadToChannel(channel, fileUpload);
                     }
                 });
+    }
+
+    private static Player sameSeat(Game snapshot, Player viewer) {
+        return viewer == null ? null : snapshot.getPlayer(viewer.getUserID());
     }
 
     private static boolean isSharedChannel(Game game, MessageChannel channel) {

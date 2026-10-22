@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import ti4.image.Mapper;
 import ti4.model.ColorModel;
+import ti4.model.Mapper;
 import ti4.service.fow.CommsColorMarker.Hue;
 import ti4.testUtils.BaseTi4Test;
 
