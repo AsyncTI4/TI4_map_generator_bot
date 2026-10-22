@@ -142,6 +142,20 @@ public final class ButtonHelperTacticalAction {
         XytherisAbilityHandler.clearStingOfTheHiveRollState(game);
         OblivionAbilityHandler.offerReflectionExplore(event, game);
         TheodisiLegendaryButtonHandler.offerEndOfTacticalActionAbilities(game, player);
+        if (player.getPlanets().contains("petraunleashed")
+                && !player.getExhaustedPlanetsAbilities().contains("petraunleashed")) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "planetAbilityExhaust_petraunleashed",
+                    "Use " + Mapper.getPlanet("petraunleashed").getLegendaryAbilityName(),
+                    FactionEmojis.stoneborn));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", you may exhaust _Petra Unleashed_ to explore 1 planet you control.",
+                    buttons);
+        }
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
             if (player.hasUnit("lunarium_carrier2")) {
                 LunariumAbilityHandler.resolveCrypticHaulerIIFighters(

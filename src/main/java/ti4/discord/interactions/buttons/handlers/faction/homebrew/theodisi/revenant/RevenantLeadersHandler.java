@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -1871,6 +1872,7 @@ public class RevenantLeadersHandler {
         // Each unchosen hero was purged as part of the effect.
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         OblivionUnitHandler.doOblivionMechCheck(game, player);
+        StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
     }
 
     // Green Revenant Leader Set

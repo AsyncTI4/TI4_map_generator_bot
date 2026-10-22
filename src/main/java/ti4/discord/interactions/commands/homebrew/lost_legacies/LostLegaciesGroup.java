@@ -8,7 +8,8 @@ import ti4.discord.interactions.commands.SubcommandGroup;
 
 public class LostLegaciesGroup extends SubcommandGroup {
 
-    private static final Map<String, Subcommand> subcommands = Stream.of(new RevLeaderFix(), new RelicTradingHub())
+    private static final Map<String, Subcommand> subcommands = Stream.of(
+                    new RevLeaderFix(), new RelicTradingHub(), new ViewStonebornFragments())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     public LostLegaciesGroup() {

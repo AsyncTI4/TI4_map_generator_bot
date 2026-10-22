@@ -33,7 +33,6 @@ class FrankenDrazFactionPrioritySettings extends SettingsMenu {
             "qulane",
             "neutral",
             "obsidian",
-            "stoneborn",
             "morpha");
 
     private final ListSetting<FactionModel> prioritizedFactions;

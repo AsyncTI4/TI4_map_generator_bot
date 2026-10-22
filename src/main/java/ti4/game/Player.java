@@ -559,6 +559,13 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                     TechnologyType.PROPULSION,
                     TechnologyType.CYBERNETIC));
         }
+        if (hasUnlockedBreakthrough("stonebornbtunleashed")) {
+            synergies.addAll(List.of(
+                    TechnologyType.BIOTIC,
+                    TechnologyType.WARFARE,
+                    TechnologyType.PROPULSION,
+                    TechnologyType.CYBERNETIC));
+        }
         return Collections.unmodifiableSet(synergies);
     }
 

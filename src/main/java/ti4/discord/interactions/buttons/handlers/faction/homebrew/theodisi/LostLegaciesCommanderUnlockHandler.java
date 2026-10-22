@@ -2,8 +2,10 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi;
 
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -269,6 +271,13 @@ public class LostLegaciesCommanderUnlockHandler {
                     }
                 }
                 yield shipTypes.size() >= 5;
+            }
+            case "stoneborn" -> {
+                int fragmentumTokens = List.of("cultural", "hazardous", "industrial", "frontier").stream()
+                        .mapToInt(trait -> StonebornAbilityHandler.getFragmentumTokenCount(game, player, trait))
+                        .sum();
+
+                yield fragmentumTokens >= 1;
             }
             case "morpha" ->
                 game.getDiscardActionCards().keySet().stream()
