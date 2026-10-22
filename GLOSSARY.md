@@ -356,7 +356,7 @@ A developer-only harness for driving a Game through scripted actions on a develo
 ### Rules concepts
 
 **Exhausted / Readied**:
-A card or planet is exhausted once its use is spent and readied when refreshed, typically in the Status phase.
+A card or planet is exhausted once its use is spent and readied again, typically in the Status phase.
 _Avoid_: Tapped / untapped, used / refreshed
 
 **Resources**:
@@ -451,7 +451,7 @@ To play a Strategy card's primary ability, as in "popping Trade".
 _Avoid_: Cast, fire
 
 **Wash**:
-To convert another Player's refreshed Commodities into Trade goods, usually as a favor requested of the Trade card's holder.
+To convert another Player's replenished Commodities into Trade goods, usually as a favor requested of the Trade card's holder.
 _Avoid_: Launder, flip
 
 **X-1 / X-2**:
@@ -477,6 +477,13 @@ _Avoid_: Clog, blocker
 **Locked down**:
 Describes a System containing a Player's Command token, whose units cannot move out of it. Players saying "that System is locked down" mean either that the units in it cannot be moved out, or that other units can be moved in.
 _Avoid_: Frozen, pinned
+
+**Flip**:
+Players' word for readying an exhausted card or planet.
+_Avoid_: Untap
+
+**Refresh**:
+Players' word for replenishing Commodities, not for readying a card or planet.
 
 **Tech skip**:
 A Planet with a Technology specialty, also called a tech spec or skip. Also applies to other sources of a specialty, such as the Yin Alliance.
