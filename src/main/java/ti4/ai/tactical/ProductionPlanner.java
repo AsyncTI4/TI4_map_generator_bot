@@ -26,6 +26,7 @@ import ti4.ai.scoring.Wallet;
 import ti4.ai.strategy.OpeningHold;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.strategy.TokenPurchase;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -232,6 +233,13 @@ public class ProductionPlanner {
     }
 
     public static BuildPlan plan(
+            Game game, Player seat, Tile tile, int extraResources, DefenseOutlook defense, int overSupplyCarriers) {
+        try (Thinking.Span ignored = Thinking.enter("production.plan")) {
+            return buildPlan(game, seat, tile, extraResources, defense, overSupplyCarriers);
+        }
+    }
+
+    private static BuildPlan buildPlan(
             Game game, Player seat, Tile tile, int extraResources, DefenseOutlook defense, int overSupplyCarriers) {
         if (BoardView.hasEnemyShips(game, seat, tile)) return new BuildPlan(List.of());
         Budget budget = new Budget(

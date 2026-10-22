@@ -8,6 +8,7 @@ import static org.mockito.Mockito.withSettings;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -202,6 +203,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
         runtime.when(AiRuntime::isProcessReady).thenReturn(true);
         MockedStatic<AiSettings> settings = open(mockStatic(AiSettings.class, quiet(CALLS_REAL_METHODS)));
         settings.when(AiSettings::isEnabled).thenReturn(true);
+        settings.when(AiSettings::thinkingBudget).thenReturn(Duration.ZERO);
 
         open(mockStatic(CircuitBreaker.class, quiet(this::circuitBreaker)));
         open(mockStatic(BotLogger.class, quiet(this::botLogger)));

@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.strategy.CardPlan.Benefit;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -36,7 +37,9 @@ public class StrategyCardPlanner {
     }
 
     static List<CardPlan> planAll(Game game, Player seat, Collection<Integer> initiatives, PlanMoment moment) {
-        PlanInputs in = PlanInputs.of(game, seat, moment);
-        return initiatives.stream().map(initiative -> plan(in, initiative)).toList();
+        try (Thinking.Span ignored = Thinking.enter("strategy.planAll")) {
+            PlanInputs in = PlanInputs.of(game, seat, moment);
+            return initiatives.stream().map(initiative -> plan(in, initiative)).toList();
+        }
     }
 }

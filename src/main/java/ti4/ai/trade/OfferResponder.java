@@ -9,6 +9,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.promissory.NoteGiving;
 import ti4.ai.scoring.PaymentRules;
+import ti4.ai.trace.Thinking;
 import ti4.ai.trade.Stinginess.Veto;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -46,6 +47,12 @@ class OfferResponder {
     }
 
     static Optional<AiDecision> answer(AiTurnContext context) {
+        try (Thinking.Span ignored = Thinking.enter("trade.answer")) {
+            return answerVisibleOffers(context);
+        }
+    }
+
+    private static Optional<AiDecision> answerVisibleOffers(AiTurnContext context) {
         if (PaymentRules.isPending(context)) return Optional.empty();
         Game game = context.game();
         Player seat = context.seat();

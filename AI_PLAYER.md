@@ -1407,6 +1407,19 @@ to build one by hand:
     seat=faction/color kind=… reason=… prompt=… text=… buttons=[…] recent=[…] pending=… outcome=…`, and the last 10 in
     the game stored values `aiFallbackLog|slot0` to `slot9` (base64) with `aiFallbackLog|next`, so they survive a
     restart. `/ai fallbacks` lists them and the self-play report prints an "AI fallbacks" section.
+- **Thinking visibility.** Each seat decision runs inside a `Thinking` context (`ti4.ai.trace`, one ThreadLocal per worker
+  thread). Planner entry points open spans (`tactical.best`, `tactical.candidates`, `tactical.warfare`, `tactical.target`,
+  `production.plan`, `explore.expectedValue`, `strategy.tokenPlan`, `strategy.planInputs`, `strategy.planAll`,
+  `strategy.bestPick`, `scoring.reserve`, `trade.observe`, `trade.answer`, `trade.startDeals`); `ai.perceive` and
+  `ai.actuate` are timed around the tick's Discord reads and presses. A span that would re-enter itself 8 deep, nest 60
+  deep, run 200,000 times in one decision, or start after the 20 second budget (`AiSettings.DECIDE_TIMEOUT`, or
+  `-Dai.thinking.budget.seconds=N`, 0 for none) throws `ThinkingAborted`; a `StackOverflowError` is treated the same way.
+  The seat then idles (the stall timeout asks the table to choose), one `AI thinking cut short game=… trail=[…]` warning
+  is logged, and a `THINKING_ABORTED` fallback is recorded (visible in `/ai fallbacks`). The same decision is not tried
+  again until the game changes or 5 minutes pass. Decisions over 2 seconds log one `AI thinking was slow` warning a
+  minute per game. `/ai profile` shows the per-game table (self and total time per span, the slowest decisions); it is
+  hidden in Fog of War games except for developers. Self-play turns the time budget off (virtual time) and prints a
+  "Thinking" section in its report.
 - **Guards.**
   - At most 2 attempts per prompt and state (staged movement and unit positions count as progress).
   - At least 1.5 s between actions in a game, and at most 150 actions an hour per seat.

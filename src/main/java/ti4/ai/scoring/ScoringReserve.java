@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Helper;
@@ -17,8 +18,10 @@ public class ScoringReserve {
 
     public static SpendCost of(Game game, Player seat) {
         if (!isActionPhase(game)) return SpendCost.NONE;
-        SpendCost reserve = reserved(game, seat).map(Reserved::cost).orElse(SpendCost.NONE);
-        return reserve.plus(SpendCost.tradeGoods(PromisedTradeGoods.of(seat)));
+        try (Thinking.Span ignored = Thinking.enter("scoring.reserve")) {
+            SpendCost reserve = reserved(game, seat).map(Reserved::cost).orElse(SpendCost.NONE);
+            return reserve.plus(SpendCost.tradeGoods(PromisedTradeGoods.of(seat)));
+        }
     }
 
     public static Optional<Reserved> reserved(Game game, Player seat) {

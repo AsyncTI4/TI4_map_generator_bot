@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import ti4.ai.fallback.DelegatedPress;
 import ti4.ai.strategy.SecondaryQueue;
+import ti4.ai.trace.ThinkingStats;
 import ti4.game.Player;
 
 final class AiLane {
@@ -28,6 +29,7 @@ final class AiLane {
     private final Queue<DelegatedPress> delegatedPresses = new ConcurrentLinkedQueue<>();
     private final Map<String, AiSeatState> seats = new ConcurrentHashMap<>();
     private final Deque<Long> failures = new ArrayDeque<>();
+    private final ThinkingStats thinking = new ThinkingStats();
 
     private final AtomicLong dueAt = new AtomicLong();
     private final Map<String, Integer> refereeAttempts = new ConcurrentHashMap<>();
@@ -39,9 +41,20 @@ final class AiLane {
     private boolean gameOverAnnounced;
     private int delegationRound = -1;
     private int delegationsThisRound;
+    private long lastSlowWarning = Long.MIN_VALUE;
 
     AiLane(String gameName) {
         this.gameName = gameName;
+    }
+
+    ThinkingStats thinking() {
+        return thinking;
+    }
+
+    boolean slowWarningDue(long now, long gapMillis) {
+        if (lastSlowWarning != Long.MIN_VALUE && now - lastSlowWarning < gapMillis) return false;
+        lastSlowWarning = now;
+        return true;
     }
 
     void markDirty(long at) {

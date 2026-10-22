@@ -6,6 +6,7 @@ import ti4.ai.brain.StrategyCard;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -14,7 +15,9 @@ public record TokenPlan(int strategy, int tactic) {
     private static final int MAX_PLANNED_ACTIVATIONS = 4;
 
     public static TokenPlan of(Game game, Player seat) {
-        return new TokenPlan(expectedFollows(game, seat), expectedActivations(game, seat));
+        try (Thinking.Span ignored = Thinking.enter("strategy.tokenPlan")) {
+            return new TokenPlan(expectedFollows(game, seat), expectedActivations(game, seat));
+        }
     }
 
     static int expectedFollows(Game game, Player seat) {

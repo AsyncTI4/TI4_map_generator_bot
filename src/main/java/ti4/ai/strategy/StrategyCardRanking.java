@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.scoring.ObjectivePolicy;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.service.strategycard.PickStrategyCardService;
@@ -22,6 +23,12 @@ public class StrategyCardRanking {
     }
 
     public static Optional<Pick> bestPick(Game game, Player seat, List<PromptButton> pickButtons) {
+        try (Thinking.Span ignored = Thinking.enter("strategy.bestPick")) {
+            return pickBest(game, seat, pickButtons);
+        }
+    }
+
+    private static Optional<Pick> pickBest(Game game, Player seat, List<PromptButton> pickButtons) {
         List<PromptButton> offered =
                 pickButtons.stream().filter(button -> initiative(button) > 0).toList();
         if (offered.isEmpty()) return Optional.empty();
