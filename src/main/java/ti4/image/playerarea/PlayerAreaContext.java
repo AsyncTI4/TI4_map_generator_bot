@@ -1,11 +1,14 @@
 package ti4.image.playerarea;
 
 import java.awt.Graphics2D;
+import java.util.Map;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.Units.UnitKey;
 import ti4.image.draw.WebsiteOverlays;
 import ti4.service.fow.FogViewer;
+import ti4.service.map.PlayerAreaSupplies;
 
 public final class PlayerAreaContext {
 
@@ -14,8 +17,7 @@ public final class PlayerAreaContext {
     private final FogViewer fogViewer;
     private final WebsiteOverlays overlays;
     private final NeighbourMap neighbours;
-    private final ReinforcementCounts reinforcementCounts = new ReinforcementCounts();
-    private final PlayerAreaWarnings warnings = PlayerAreaWarnings.none();
+    private Map<UnitKey, Integer> unitsOnBoard;
 
     private PlayerAreaContext(
             Graphics2D g2, Game game, FogViewer fogViewer, WebsiteOverlays overlays, NeighbourMap neighbours) {
@@ -60,12 +62,11 @@ public final class PlayerAreaContext {
         return neighbours;
     }
 
-    ReinforcementCounts reinforcementCounts() {
-        return reinforcementCounts;
-    }
-
-    public PlayerAreaWarnings warnings() {
-        return warnings;
+    Map<UnitKey, Integer> unitsOnBoard() {
+        if (unitsOnBoard == null) {
+            unitsOnBoard = PlayerAreaSupplies.unitsOnBoard(game);
+        }
+        return unitsOnBoard;
     }
 
     boolean hidesStatsOf(Player player) {
