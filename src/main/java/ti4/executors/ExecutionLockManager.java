@@ -24,9 +24,16 @@ public class ExecutionLockManager {
         private Lock lockOf(ExecutionLockType lockType) {
             return lockType == ExecutionLockType.READ ? lock.readLock() : lock.writeLock();
         }
+
+        private boolean currentThreadHoldsOnlyRead() {
+            return lock.getReadHoldCount() > 0 && !lock.isWriteLockedByCurrentThread();
+        }
     }
 
     public static void lock(String lockName, ExecutionLockType lockType) {
+        if (lockType == ExecutionLockType.WRITE) {
+            refuseUpgradeFromRead(lockName);
+        }
         Entry entry = acquire(lockName);
         long lockStartTime = System.currentTimeMillis();
         entry.lockOf(lockType).lock();
@@ -34,6 +41,20 @@ public class ExecutionLockManager {
         if (timeToGetLock >= 1000) {
             warnSlowLockIgnoringLoggingFailures(lockName, timeToGetLock);
         }
+    }
+
+    private static void refuseUpgradeFromRead(String lockName) {
+        Entry entry = locks.get(lockName);
+        if (entry == null || !entry.currentThreadHoldsOnlyRead()) {
+            return;
+        }
+        IllegalStateException refuseUpgradeException = new IllegalStateException("Cannot take the write lock \""
+                + lockName + "\" while this thread holds its read lock; a read lock cannot be upgraded.");
+        try {
+            BotLogger.error(refuseUpgradeException.getMessage(), refuseUpgradeException);
+        } catch (RuntimeException e) {
+        }
+        throw refuseUpgradeException;
     }
 
     private static void warnSlowLockIgnoringLoggingFailures(String lockName, long timeToGetLock) {
