@@ -99,6 +99,7 @@ class GameSaveService {
     }
 
     private static void updateBeforeSave(Game game) {
+        TransientGameInfoUpdater.removePlanetsMissingFromTheGame(game);
         TransientGameInfoUpdater.update(game);
 
         // Ugly fix to update seen tiles data for fog since doing it in

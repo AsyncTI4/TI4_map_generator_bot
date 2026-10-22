@@ -22,7 +22,6 @@ class TransientGameInfoUpdater {
 
     static void update(Game game) {
         try {
-            removePlanetsMissingFromTheGame(game);
             ButtonHelperFactionSpecific.checkIihqAttachment(game);
             DiscordantStarsHelper.checkGardenWorlds(game);
             DiscordantStarsHelper.checkTFTerraform(game);
@@ -46,7 +45,7 @@ class TransientGameInfoUpdater {
         }
     }
 
-    private static void removePlanetsMissingFromTheGame(Game game) {
+    static void removePlanetsMissingFromTheGame(Game game) {
         Set<String> knownPlanets = game.getPlanetsInfo().keySet();
         for (Player player : game.getPlayers().values()) {
             for (String planet : new ArrayList<>(player.getPlanets())) {
