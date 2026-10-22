@@ -86,6 +86,7 @@ import ti4.service.fow.LoreService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.ListTurnOrderService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.map.PlayerAreaWarningService;
 import ti4.service.map.SpinService;
 import ti4.service.planet.PlanetService;
 import ti4.service.strategycard.PickStrategyCardService;
@@ -107,6 +108,7 @@ public class StartPhaseService {
                 LoreService.showPhaseLore(game, "agenda"); // before setPhaseOfGame: END lore reads the old phase
                 game.setPhaseOfGame("agenda");
                 GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "agenda"));
+                PlayerAreaWarningService.warnAllPlayers(game);
                 RelitigateLLButtonHandler.clearAgendaPhaseState(game);
                 if (RelitigateLLButtonHandler.offerPreassignedRelitigate(event, game, event.getMessageChannel())) {
                     MessageHelper.sendMessageToChannel(
@@ -629,6 +631,7 @@ public class StartPhaseService {
         game.updateActivePlayer(firstSCPicker);
         game.setPhaseOfGame("strategy");
         GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "strategy"));
+        PlayerAreaWarningService.warnAllPlayers(game);
         GMService.logActivity(game, "**Strategy** Phase for Round " + game.getRound() + " started.", true);
         LoreService.showPhaseStartLore(game, "strategy");
         FowCommunicationThreadService.checkAllCommThreads(game);
@@ -1292,6 +1295,7 @@ public class StartPhaseService {
         if (nextPlayer == null) {
             return;
         }
+        PlayerAreaWarningService.warnAllPlayersExcept(game, nextPlayer);
         Set<Integer> scPickedList = new HashSet<>();
         for (Player player_ : game.getRealPlayers()) {
             scPickedList.addAll(player_.getSCs());

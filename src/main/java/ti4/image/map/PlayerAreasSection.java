@@ -19,7 +19,6 @@ final class PlayerAreasSection {
         PlayerAreaContext areaContext =
                 PlayerAreaContext.of(g2, ctx.game(), ctx.fog().fogViewer(), ctx.overlays(), ctx.neighbours());
         int bottom = PlayerAreas.drawAll(areaContext, topLeft, ctx.canvas().playerAreasWidth());
-        ctx.replacePlayerAreaWarnings(areaContext.warnings());
         return bottom;
     }
 }

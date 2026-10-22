@@ -95,6 +95,7 @@ import ti4.service.fow.WhisperService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.map.PlayerAreaWarningService;
 import ti4.service.relic.QuantumEntanglerService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.strategycard.StrategyCardMessageService;
@@ -203,6 +204,7 @@ public class StartTurnService {
 
         game.updateActivePlayer(player);
         game.setPhaseOfGame("action");
+        PlayerAreaWarningService.warnPlayer(game, player);
         AeternaPromissoryHandler.offerStasisFighterPlacement(event, game, player);
         ThirtyKSecretHooks.onTurnStart(game, player);
         ThirtyKRelicHooks.onTurnStart(game, player);
