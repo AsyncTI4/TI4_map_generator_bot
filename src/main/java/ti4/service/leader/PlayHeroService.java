@@ -25,6 +25,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
@@ -134,6 +135,11 @@ public class PlayHeroService {
     }
 
     public static void playHero(GenericInteractionCreateEvent event, Game game, Player player, Leader playerLeader) {
+        if ("morphahero".equals(playerLeader.getId())
+                && !"resolve".equals(player.getStoredValue("morphaHeroPending"))) {
+            MorphaLeadersHandler.startMorphaHero(game, player);
+            return;
+        }
         if ("oblivionhero".equals(playerLeader.getId()) && !OblivionLeadersHandler.canStartOblivionHero(game)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),

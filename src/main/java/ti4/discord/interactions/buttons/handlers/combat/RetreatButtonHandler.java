@@ -38,10 +38,15 @@ class RetreatButtonHandler {
         String pos = buttonID.split("_")[1];
         boolean skilled = false;
         boolean feint = false;
+        boolean ebbingFlow = buttonID.contains("hydromorphicEbbing");
         if (buttonID.contains("skilled")) {
             if (game.isTwilightsFallMode()) {
                 feint = true;
             }
+            skilled = true;
+            ButtonHelper.deleteMessage(event);
+        }
+        if (ebbingFlow) {
             skilled = true;
             ButtonHelper.deleteMessage(event);
         }
@@ -71,6 +76,11 @@ class RetreatButtonHandler {
         String message = player.getRepresentationUnfogged() + ", please choose a system to move to.";
         List<Button> retreatButtons =
                 ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, pos, skilled, feint);
+        if (ebbingFlow) {
+            retreatButtons = retreatButtons.stream()
+                    .map(button -> button.withCustomId(button.getCustomId() + "_hydromorphicEbbing"))
+                    .toList();
+        }
         if (retreatButtons.isEmpty()) {
             message = player.getRepresentationUnfogged() + ", there are no valid systems to retreat to.";
         }

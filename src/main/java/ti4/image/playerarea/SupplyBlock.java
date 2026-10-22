@@ -8,6 +8,7 @@ import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
+import ti4.helpers.HydromorphicHelper;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.PaImage;
@@ -82,15 +83,25 @@ final class SupplyBlock {
         Graphics2D g2 = ctx.g2();
         String acImage = game.isTwilightsFallMode() ? "pa_cardbacks_ac_tf.png" : "pa_cardbacks_ac.png";
         String tradeGoodImage = game.isNomadCoin() ? "pa_cardbacks_nomadcoin.png" : "pa_cardbacks_tradegoods.png";
+        boolean showHydromorphicCards = HydromorphicHelper.shouldShowInPlayerArea(player);
         g2.setStroke(Strokes.STROKE_1);
         drawCardCount(g2, x + 150, y, "pa_cardbacks_so.png", Integer.toString(player.getSo()), true);
         drawCardCount(g2, x + 215, y, acImage, Integer.toString(player.getAcCount()), true);
+        if (showHydromorphicCards) {
+            drawCardCount(
+                    g2,
+                    x + 280,
+                    y,
+                    "pa_cardbacks_hc.png",
+                    Integer.toString(player.getHydromorphicCards().size()),
+                    true);
+        }
 
-        int xOffset = 0;
+        int xOffset = showHydromorphicCards ? -65 : 0;
         if (game.isTwilightsFallMode()) {
-            xOffset = TWILIGHTS_FALL_SHIFT;
+            xOffset += TWILIGHTS_FALL_SHIFT;
         } else {
-            drawCardCount(g2, x + 280, y, "pa_cardbacks_pn.png", Integer.toString(player.getPnCount()), true);
+            drawCardCount(g2, x + 280 - xOffset, y, "pa_cardbacks_pn.png", Integer.toString(player.getPnCount()), true);
         }
         drawCardCount(g2, x + 345 - xOffset, y, tradeGoodImage, Integer.toString(player.getTg()), false);
         String comms = player.getCommodities() + "/" + player.getCommoditiesTotal();

@@ -19,6 +19,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.HydromorphicHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -109,6 +110,7 @@ class ActionCardHandButtonHandler {
         boolean drawReplacement = false;
         boolean retainButtons = false;
         boolean arvaxiCommander = false;
+        boolean drawHydromorphic = false;
         if (acIndex.contains("stall")) {
             acIndex = acIndex.replace("stall", "");
             stalling = true;
@@ -124,6 +126,14 @@ class ActionCardHandButtonHandler {
         if (acIndex.endsWith("arvaxicommander")) {
             acIndex = acIndex.replace("arvaxicommander", "");
             arvaxiCommander = true;
+        }
+        if (acIndex.endsWith("hydromorphic")) {
+            acIndex = acIndex.replace("hydromorphic", "");
+            drawHydromorphic = true;
+        }
+        if (drawHydromorphic && !player.hasTech("thmorphag")) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "You do not have Synaptic Relays.");
+            return;
         }
 
         MessageChannel channel = game.getMainGameChannel() != null ? game.getMainGameChannel() : actionsChannel;
@@ -174,6 +184,13 @@ class ActionCardHandButtonHandler {
             if (drawReplacement) {
                 ActionCardHelper.drawActionCards(player, 1);
             }
+            if (drawHydromorphic) {
+                HydromorphicHelper.draw(game, player, 1);
+                ActionCardHelper.drawActionCards(player, 1);
+                List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, "Please choose an action or end your turn.", systemButtons);
+            }
             ButtonHelper.checkACLimit(game, player);
             if (!retainButtons) {
                 ButtonHelper.deleteMessage(event);
@@ -211,6 +228,11 @@ class ActionCardHandButtonHandler {
     // TODO: bake this into /ac play
     @ButtonHandler(Constants.AC_PLAY_FROM_HAND)
     static void acPlayFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        if (player.hasAbility("hydromorphic")) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "You cannot use Action Card effects while you have Hydromorphic.");
+            return;
+        }
         String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
         MessageChannel channel = game.getMainGameChannel();
         if (ActionCardHelper.isSabotageOrShatter(acID)) {

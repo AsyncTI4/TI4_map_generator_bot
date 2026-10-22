@@ -95,6 +95,7 @@ public class PlayerProperties {
     // Firmament Plots
     private final Map<String, Integer> plotCards = new LinkedHashMap<>();
     private final Map<String, List<String>> plotCardsFactions = new LinkedHashMap<>();
+    private final Map<String, Integer> hydromorphicCards = new LinkedHashMap<>();
 
     // Stat tracking
     private int sarweenCounter;

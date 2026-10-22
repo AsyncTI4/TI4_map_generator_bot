@@ -213,7 +213,7 @@ public class CombatButtonHandler {
             return;
         }
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
-        String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability.";
+        String msg = cancellationMessage(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String factionChecker = player.factionButtonChecker();
@@ -243,7 +243,7 @@ public class CombatButtonHandler {
             return;
         }
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
-        String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability.";
+        String msg = cancellationMessage(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String factionChecker = player.factionButtonChecker();
@@ -282,7 +282,7 @@ public class CombatButtonHandler {
             MirrorShieldingLLButtonHandler.recordCancelledHits(game, player, tile, 1);
         }
 
-        String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability";
+        String msg = cancellationMessage(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String factionChecker = player.factionButtonChecker();
@@ -319,7 +319,7 @@ public class CombatButtonHandler {
         if (originalHits > 0) {
             MirrorShieldingLLButtonHandler.recordCancelledHits(game, player, tile, 1);
         }
-        String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability";
+        String msg = cancellationMessage(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String factionChecker = player.factionButtonChecker();
@@ -396,5 +396,9 @@ public class CombatButtonHandler {
             return;
         }
         ButtonHelperModifyUnits.autoAssignGroundCombatHits(player, game, hits.planetName(), hits.hits(), event);
+    }
+
+    private static String cancellationMessage(Game game, Player player) {
+        return "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability.";
     }
 }

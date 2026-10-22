@@ -38,6 +38,7 @@ import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
@@ -250,6 +251,12 @@ public class TransactionHelper {
                         shortfalls.add(new Shortfall(sender, "an action card no longer held"));
                     }
                 }
+                case "Hydromorphic" -> {
+                    if (!detail.startsWith("generic")
+                            && !sender.getHydromorphicCards().containsValue(Integer.parseInt(detail))) {
+                        shortfalls.add(new Shortfall(sender, "a Hydromorphic card no longer held"));
+                    }
+                }
                 case "SOs" -> {
                     tradesSecrets = true;
                     if (detail.startsWith("generic")) {
@@ -376,7 +383,8 @@ public class TransactionHelper {
                             item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
                     int amountToTransact = 1;
                     boolean isGeneralized =
-                            List.of("PNs", "ACs", "SOs").contains(thingToTransact) && furtherDetail.contains("generic");
+                            List.of("PNs", "ACs", "SOs", "Hydromorphic").contains(thingToTransact)
+                                    && furtherDetail.contains("generic");
                     if (isGeneralized) {
                         amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
                         furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
@@ -396,6 +404,14 @@ public class TransactionHelper {
                                     }
                                 }
                                 default -> resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
+                            }
+                        }
+                        case "Hydromorphic" -> {
+                            if ("generic".equals(furtherDetail)) {
+                                resolveSpecificTransButtonsOld(
+                                        game, sender, "transact_Hydromorphic_" + receiver.getFaction(), event);
+                            } else {
+                                resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
                             }
                         }
                         case "PNs" -> {
@@ -586,6 +602,7 @@ public class TransactionHelper {
             case "Comms" -> "commodities";
             case "SendDebt", "ClearDebt" -> "debt tokens";
             case "ACs" -> "action cards";
+            case "Hydromorphic" -> "Hydromorphic cards";
             case "PNs" -> "promissory notes";
             case "SOs" -> "secret objectives";
             case "Frags" -> "relic fragments";
@@ -603,7 +620,7 @@ public class TransactionHelper {
             return switch (thingToTransact) {
                 case "TGs", "Comms", "SendDebt", "ClearDebt" -> Integer.parseInt(detail);
                 case "Frags" -> detail.startsWith("supermassive") ? 1 : Integer.parseInt(detail.substring(3));
-                case "ACs", "SOs", "PNs" ->
+                case "ACs", "SOs", "PNs", "Hydromorphic" ->
                     detail.startsWith("generic") ? Integer.parseInt(detail.substring("generic".length())) : 1;
                 default -> 1;
             };
@@ -640,7 +657,8 @@ public class TransactionHelper {
                         item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
                 int amountToTransact = 1;
                 boolean isGeneralized =
-                        List.of("PNs", "ACs", "SOs").contains(thingToTransact) && furtherDetail.contains("generic");
+                        List.of("PNs", "ACs", "SOs", "Hydromorphic").contains(thingToTransact)
+                                && furtherDetail.contains("generic");
                 boolean isSupermassiveFragment =
                         "frags".equalsIgnoreCase(thingToTransact) && furtherDetail.startsWith("supermassive");
                 if (("frags".equalsIgnoreCase(thingToTransact) && !isSupermassiveFragment) || isGeneralized) {
@@ -695,12 +713,23 @@ public class TransactionHelper {
                                 int acNum = Integer.parseInt(furtherDetail);
                                 String acID = null;
                                 if (!player.getActionCards().containsValue(acNum)) {
-                                    continue;
+                                    acID = game.getDiscardActionCards().entrySet().stream()
+                                            .filter(entry -> entry.getValue().equals(acNum))
+                                            .filter(entry ->
+                                                    game.getDiscardACStatus().get(entry.getKey()) == ACStatus.morphabt)
+                                            .map(Map.Entry::getKey)
+                                            .findFirst()
+                                            .orElse(null);
+                                    if (acID == null) {
+                                        continue;
+                                    }
                                 }
-                                for (Map.Entry<String, Integer> ac :
-                                        player.getActionCards().entrySet()) {
-                                    if (ac.getValue().equals(acNum)) {
-                                        acID = ac.getKey();
+                                if (acID == null) {
+                                    for (Map.Entry<String, Integer> ac :
+                                            player.getActionCards().entrySet()) {
+                                        if (ac.getValue().equals(acNum)) {
+                                            acID = ac.getKey();
+                                        }
                                     }
                                 }
                                 trans.append(CardEmojis.getACEmoji(game));
@@ -710,6 +739,24 @@ public class TransactionHelper {
                                             .append("_");
                                 }
                             }
+                        }
+                    }
+                    case "Hydromorphic" -> {
+                        if ("generic".equals(furtherDetail)) {
+                            trans.append("Hydromorphic card to be specified by player");
+                        } else if (!hidePrivateCardText) {
+                            int cardNumber = Integer.parseInt(furtherDetail);
+                            String cardId = player.getHydromorphicCards().entrySet().stream()
+                                    .filter(entry -> entry.getValue().equals(cardNumber))
+                                    .map(Map.Entry::getKey)
+                                    .findFirst()
+                                    .orElse(null);
+                            trans.append(
+                                    cardId == null
+                                            ? "Hydromorphic card"
+                                            : Mapper.getHydromorphicCard(cardId).getName());
+                        } else {
+                            trans.append("Hydromorphic card");
                         }
                     }
                     case "PNs" -> {
@@ -1283,7 +1330,9 @@ public class TransactionHelper {
                             + " Please choose the number of action cards you wish to request."
                             + " Since action cards are private info, you will have to discuss with other other player to explain which action cards you wish to transact;"
                             + " these buttons will just make sure that the player is offered buttons to send them.";
-                    int limit = seeP1 ? Math.min(BLIND_CARD_BUTTONS, p1.getAcCount()) : BLIND_CARD_BUTTONS;
+                    int limit = seeP1
+                            ? Math.min(BLIND_CARD_BUTTONS, p1.getAcCount() + getMetamorphicActionCardCount(game, p1))
+                            : BLIND_CARD_BUTTONS;
                     for (int x = 1; x < limit + 1; x++) {
                         Button transact = Buttons.green(
                                 "offerToTransact_ACs_" + p1.getColor() + "_" + p2.getColor() + "_generic" + x,
@@ -1300,6 +1349,33 @@ public class TransactionHelper {
                                         + p1.getActionCards().get(acShortHand),
                                 Mapper.getActionCard(acShortHand).getName());
                         stuffToTransButtons.add(transact);
+                    }
+                    if (p1.hasUnlockedBreakthrough("morphabt")) {
+                        for (Map.Entry<String, Integer> actionCard :
+                                game.getDiscardActionCards().entrySet()) {
+                            if (game.getDiscardACStatus().get(actionCard.getKey()) != ACStatus.morphabt) continue;
+                            stuffToTransButtons.add(Buttons.green(
+                                    "offerToTransact_ACs_" + p1.getColor() + "_" + p2.getColor() + "_"
+                                            + actionCard.getValue(),
+                                    Mapper.getActionCard(actionCard.getKey()).getName()));
+                        }
+                    }
+                }
+            }
+            case "Hydromorphic" -> {
+                message += player.getRepresentation(false, false) + " Please choose the Hydromorphic card you wish to "
+                        + requestOrOffer + ".";
+                if (requesting && !seeP1) {
+                    stuffToTransButtons.add(Buttons.green(
+                            "offerToTransact_Hydromorphic_" + p1.getColor() + "_" + p2.getColor() + "_generic1",
+                            "Hydromorphic Card"));
+                } else {
+                    for (Map.Entry<String, Integer> card :
+                            p1.getHydromorphicCards().entrySet()) {
+                        stuffToTransButtons.add(Buttons.green(
+                                "offerToTransact_Hydromorphic_" + p1.getColor() + "_" + p2.getColor() + "_"
+                                        + card.getValue(),
+                                Mapper.getHydromorphicCard(card.getKey()).getName()));
                     }
                 }
             }
@@ -1992,6 +2068,25 @@ public class TransactionHelper {
                             Mapper.getActionCard(acShortHand).getName());
                     stuffToTransButtons.add(transact);
                 }
+                if (p1.hasUnlockedBreakthrough("morphabt")) {
+                    for (Map.Entry<String, Integer> actionCard :
+                            game.getDiscardActionCards().entrySet()) {
+                        if (game.getDiscardACStatus().get(actionCard.getKey()) != ACStatus.morphabt) continue;
+                        stuffToTransButtons.add(Buttons.green(
+                                factionChecker + "send_ACs_" + p2.getFaction() + "_" + actionCard.getValue(),
+                                Mapper.getActionCard(actionCard.getKey()).getName()));
+                    }
+                }
+                MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
+            }
+            case "Hydromorphic" -> {
+                String message =
+                        p1.getRepresentationUnfogged() + ", please choose the Hydromorphic card you wish to send.";
+                for (Map.Entry<String, Integer> card : p1.getHydromorphicCards().entrySet()) {
+                    stuffToTransButtons.add(Buttons.green(
+                            factionChecker + "send_Hydromorphic_" + p2.getFaction() + "_" + card.getValue(),
+                            Mapper.getHydromorphicCard(card.getKey()).getName()));
+                }
                 MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
             }
             case "PNs" -> {
@@ -2270,7 +2365,11 @@ public class TransactionHelper {
                 message2 = ident + " sent action card #" + amountToTrans + " to " + ident2 + ".";
                 int acNum = Integer.parseInt(amountToTrans);
                 String acID = null;
-                if (!p1.getActionCards().containsValue(acNum)) {
+                boolean fromMetamorphic = p1.hasUnlockedBreakthrough("morphabt")
+                        && game.getDiscardActionCards().entrySet().stream()
+                                .anyMatch(actionCard -> actionCard.getValue().equals(acNum)
+                                        && game.getDiscardACStatus().get(actionCard.getKey()) == ACStatus.morphabt);
+                if (!p1.getActionCards().containsValue(acNum) && !fromMetamorphic) {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             "Could not find that action card, and so no action card was sent.");
@@ -2281,8 +2380,17 @@ public class TransactionHelper {
                         acID = ac.getKey();
                     }
                 }
-                p1.removeActionCard(acNum);
-                p2.setActionCard(acID);
+                if (fromMetamorphic) {
+                    if (!game.pickActionCard(p2.getUserID(), acNum)) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getMessageChannel(),
+                                "Could not find that action card, and so no action card was sent.");
+                        return;
+                    }
+                } else {
+                    p1.removeActionCard(acNum);
+                    p2.setActionCard(acID);
+                }
                 ButtonHelper.checkACLimit(game, p2);
                 ActionCardHelper.sendActionCardInfo(game, p2);
                 ActionCardHelper.sendActionCardInfo(game, p1);
@@ -2299,6 +2407,19 @@ public class TransactionHelper {
                     }
                     return;
                 }
+            }
+            case "Hydromorphic" -> {
+                int cardNumber = Integer.parseInt(amountToTrans);
+                String cardId = p1.removeHydromorphicCard(cardNumber);
+                if (cardId == null) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(), "Could not find that Hydromorphic card.");
+                    return;
+                }
+                p2.setHydromorphicCard(cardId);
+                message2 = ident + " sent a Hydromorphic card to " + ident2 + ".";
+                ActionCardHelper.sendActionCardInfo(game, p1);
+                ActionCardHelper.sendActionCardInfo(game, p2);
             }
             case "PNs" -> {
                 String id = null;
@@ -2601,10 +2722,17 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_starCharts_" + p1.getColor() + "_" + p2.getColor(), "Star Charts"));
         }
-        boolean canTradeACs = otherPartyHidden || canTradeActionCards(p1, p2, blackMarket);
-        if (canTradeACs && (!seeP1 || p1.getAcCount() > 0)) {
+        boolean canTradeACs = otherPartyHidden
+                || canTradeActionCards(p1, p2, blackMarket)
+                || p1.hasUnlockedBreakthrough("morphabt")
+                || p2.hasUnlockedBreakthrough("morphabt");
+        if (canTradeACs && (!seeP1 || p1.getAcCount() + getMetamorphicActionCardCount(game, p1) > 0)) {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_ACs_" + p1.getColor() + "_" + p2.getColor(), "Action Cards"));
+        }
+        if (!seeP1 || !p1.getHydromorphicCards().isEmpty()) {
+            stuffToTransButtons.add(Buttons.green(
+                    "newTransact_Hydromorphic_" + p1.getColor() + "_" + p2.getColor(), "Hydromorphic Cards"));
         }
         if (!seeP1 || p1.getPnCount() > 0) {
             stuffToTransButtons.add(
@@ -2702,6 +2830,13 @@ public class TransactionHelper {
                 Buttons.red("endTransaction_" + p1.getColor() + "_" + p2.getColor(), "Delete This Transaction"));
 
         return stuffToTransButtons;
+    }
+
+    private static int getMetamorphicActionCardCount(Game game, Player player) {
+        if (!player.hasUnlockedBreakthrough("morphabt")) return 0;
+        return (int) game.getDiscardACStatus().values().stream()
+                .filter(status -> status == ACStatus.morphabt)
+                .count();
     }
 
     @ButtonHandler("send_")
@@ -2806,9 +2941,15 @@ public class TransactionHelper {
         if ((p1.hasAbility("arbiters")
                         || (!game.isFowMode() && p2.hasAbility("arbiters"))
                         || p1.hasTech("tf-guildships")
-                        || (!game.isFowMode() && p2.hasTech("tf-guildships")))
-                && p1.getAcCount() > 0) {
+                        || (!game.isFowMode() && p2.hasTech("tf-guildships"))
+                        || p1.hasUnlockedBreakthrough("morphabt")
+                        || p2.hasUnlockedBreakthrough("morphabt"))
+                && p1.getAcCount() + getMetamorphicActionCardCount(game, p1) > 0) {
             stuffToTransButtons.add(Buttons.green(factionChecker + "transact_ACs_" + p2.getFaction(), "Action Cards"));
+        }
+        if (!p1.getHydromorphicCards().isEmpty()) {
+            stuffToTransButtons.add(
+                    Buttons.green(factionChecker + "transact_Hydromorphic_" + p2.getFaction(), "Hydromorphic Cards"));
         }
         if (p1.getPnCount() > 0) {
             stuffToTransButtons.add(

@@ -803,7 +803,7 @@
     "title": "Formless Force",
     "abilityName": "Perfect Adaptation - Strategic Chances",
     "abilityWindow": "ACTION:",
-    "abilityText": "Discard any number of action cards to perform the primary ability of a readied strategy card with an initiative up to the number of cards you discarded. Then, other players may give you an action card to perform the secondary ability of that card without spending a command token. Then, purge this card.",
+    "abilityText": "Discard any number of action cards to perform the primary ability of a readied or unchosen strategy card with an initiative up to the number of cards you discarded. Then, other players may give you an action card to perform the secondary ability of that card without spending a command token. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },

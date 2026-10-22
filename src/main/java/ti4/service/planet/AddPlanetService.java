@@ -387,6 +387,23 @@ public class AddPlanetService {
         if (!alreadyOwned && player.hasLeader("tacommander")) {
             CommanderUnlockCheckService.checkPlayer(player, "ta");
         }
+        if (!alreadyOwned
+                && !setup
+                && !"setup".equalsIgnoreCase(game.getPhaseOfGame())
+                && player.hasAbility("hydrospheric_extraction")
+                && !"used".equals(game.getStoredValue("hydroExtractUsed_" + player.getFaction()))) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "useHydroExtract_" + planet,
+                    "Use Hydrospheric Extraction",
+                    FactionEmojis.morpha));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", you may use _Hydrospheric Extraction_ and destroy 1 unit on this planet to draw 1 Action Card.",
+                    buttons);
+        }
         if (game.isMinorFactionsMode()
                 && tile != null
                 && unitHolder.getTokenList().contains("attachment_threetraits.png")

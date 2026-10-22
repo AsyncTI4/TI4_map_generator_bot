@@ -41,6 +41,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.StolenF
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.UnconventionalDiplomacyBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
@@ -102,6 +103,7 @@ public class ActionCardHelper {
 
     public enum ACStatus {
         ralnelbt,
+        morphabt,
         garbozia,
         purged
     }
@@ -149,6 +151,8 @@ public class ActionCardHelper {
         sendTrapCardInfo(player);
         sendPlotCardInfo(game, player);
         sendGarboziaInfo(game, player);
+        sendMetamorphicInfo(game, player);
+        HydromorphicHelper.sendHydromorphicInfo(game, player);
     }
 
     private static void sendGarboziaInfo(Game game, Player player) {
@@ -156,6 +160,33 @@ public class ActionCardHelper {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(), getGarboziaInfo(game), getPurgeGarboziaActionCardButtons(game));
         }
+    }
+
+    private static void sendMetamorphicInfo(Game game, Player player) {
+        if (!player.hasUnlockedBreakthrough("morphabt")) {
+            return;
+        }
+        Map<String, Integer> actionCards = game.getDiscardActionCards();
+        List<Entry<String, Integer>> metamorphicCards = actionCards.entrySet().stream()
+                .filter(entry -> game.getDiscardACStatus().get(entry.getKey()) == ACStatus.morphabt)
+                .toList();
+        if (metamorphicCards.isEmpty()) {
+            return;
+        }
+        StringBuilder message =
+                new StringBuilder("### ").append(FactionEmojis.morpha).append(" _Metamorphic_ Action Cards:\n");
+        for (Entry<String, Integer> entry : metamorphicCards) {
+            ActionCardModel actionCard = Mapper.getActionCard(entry.getKey());
+            message.append(CardEmojis.getACEmoji(game))
+                    .append(" _")
+                    .append(actionCard.getName())
+                    .append("_ `(")
+                    .append(Helper.leftpad("" + entry.getValue(), 3))
+                    .append(")`\n> ")
+                    .append(actionCard.getRepresentationJustText(game))
+                    .append('\n');
+        }
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, message.toString());
     }
 
     private static String getGarboziaInfo(Game game) {
@@ -428,6 +459,7 @@ public class ActionCardHelper {
 
         if (actionCards != null
                 && !actionCards.isEmpty()
+                && !player.hasAbility("hydromorphic")
                 && !IsPlayerElectedService.isPlayerElected(game, player, "censure")
                 && !IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
@@ -664,6 +696,7 @@ public class ActionCardHelper {
         if (count < 1) {
             return;
         }
+        int discardedCount = 0;
         StringBuilder message = new StringBuilder(player.getRepresentationNoPing() + " discarded "
                 + StringHelper.pluralize(count, "random action card") + ".\n");
         while (count > 0 && !player.getActionCards().isEmpty()) {
@@ -678,8 +711,10 @@ public class ActionCardHelper {
                 return;
             }
             message.append(Mapper.getActionCard(acID).getRepresentation(game));
+            discardedCount++;
             count--;
         }
+        MorphaUnitHandler.recordCytoplasmicTransportDiscards(game, player, discardedCount);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
         sendActionCardInfo(game, player);
     }
@@ -749,6 +784,9 @@ public class ActionCardHelper {
             String acID,
             int acIndex,
             MessageChannel channel) {
+        if (player.hasAbility("hydromorphic")) {
+            return "You cannot use Action Card effects while you have Hydromorphic.";
+        }
         MessageChannel mainGameChannel = game.getMainGameChannel() == null ? channel : game.getMainGameChannel();
         ActionCardModel actionCard = Mapper.getActionCard(acID);
         String actionCardTitle = actionCard.getName();
@@ -2569,6 +2607,9 @@ public class ActionCardHelper {
 
     public static String playAC(
             GenericInteractionCreateEvent event, Game game, Player player, String value, MessageChannel channel) {
+        if (player.hasAbility("hydromorphic")) {
+            return "You cannot use Action Card effects while you have Hydromorphic.";
+        }
         String acID = null;
         int acIndex = -1;
         try {

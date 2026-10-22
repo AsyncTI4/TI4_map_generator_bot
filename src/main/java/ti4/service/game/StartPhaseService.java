@@ -51,6 +51,7 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.HydromorphicHelper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.StatusHelper;
@@ -672,6 +673,10 @@ public class StartPhaseService {
         }
 
         for (Player player2 : game.getRealPlayers()) {
+            if (player2.hasAbility("hydromorphic")) {
+                HydromorphicHelper.draw(game, player2, 2);
+                ActionCardHelper.drawActionCards(player2, 2);
+            }
             KairnBreakthroughHandler.refreshRelics(game, player2);
             ArcanumPromissoryHandler.offerScrollOfAscension(game, player2);
             if (player2.getActionCards() != null

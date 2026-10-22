@@ -10,6 +10,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.HydromorphicHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
@@ -48,6 +49,9 @@ class PlayerPromissoryButtonHandler {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
         PromissoryNoteHelper.resolvePNPlay(pnID, player, game, event);
+        if ("thpnmorpha".equals(pnID)) {
+            HydromorphicHelper.draw(game, player, 2);
+        }
         if (!"bmfNotHand".equalsIgnoreCase(pnID)) {
             ButtonHelper.deleteMessage(event);
         }

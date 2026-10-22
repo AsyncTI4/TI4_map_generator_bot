@@ -57,6 +57,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Sa
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.HydromorphicCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
@@ -1459,6 +1460,7 @@ public final class Helper {
                     && !thing.contains("tg_")
                     && !thing.contains("boon")
                     && !thing.contains("warmachine")
+                    && !thing.contains("hydromorphicTidesOfCreation")
                     && !thing.contains("manifest")
                     && !thing.contains("ghostbt")
                     && !thing.contains("tyrisbt")
@@ -1615,6 +1617,12 @@ public final class Helper {
                     if (game.isWildWildGalaxyMode()) {
                         res += 4;
                     }
+                }
+                if (thing.startsWith("hydromorphicTidesOfCreation_")) {
+                    int discount = HydromorphicCardHandler.getTidesOfCreationCostDiscount(player);
+                    msg.append("> Used _Tides of Creation_ for +2 PRODUCTION and a ")
+                            .append(discount)
+                            .append(" resource cost discount\n");
                 }
                 if (thing.contains("manifest")) {
                     msg.append("> Used _Manifest_ for 3 resources")
@@ -2582,6 +2590,9 @@ public final class Helper {
         if (productionValueTotal > 0 && player.hasAbility("policy_the_environment_plunder")) {
             productionValueTotal -= 2;
         }
+        if (productionValueTotal > 0) {
+            productionValueTotal += HydromorphicCardHandler.getTidesOfCreationProductionBonus(player);
+        }
         if (player.hasUnlockedBreakthrough("myrrbt")
                 && player.isBreakthroughExhausted("myrrbt")
                 && tile.getPosition()
@@ -2715,6 +2726,7 @@ public final class Helper {
                     && ThurvialiLeadersHandler.hasThurvialiHeroProductionDiscount(game, player)) {
                 cost = Math.max(0, cost - 4);
             }
+            cost = Math.max(0, cost - HydromorphicCardHandler.getTidesOfCreationCostDiscount(player));
             return cost;
         } else {
             return totalUnits;
