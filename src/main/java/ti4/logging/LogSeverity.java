@@ -1,22 +1,18 @@
 package ti4.logging;
 
-import com.rollbar.api.payload.data.Level;
-
 enum LogSeverity {
-    Info("bot-log-info", "### INFO\n", Level.INFO),
-    Warning("bot-log-warning", "## WARNING\n", Level.WARNING),
-    Error("bot-log-error", "## ERROR\n", Level.ERROR),
-    SpammyError("spammy-bot-log-error", "## ERROR\n", Level.ERROR),
-    Critical("bot-log-critical", "## CRITICAL\n", Level.CRITICAL);
+    Info("bot-log-info", "### INFO\n"),
+    Warning("bot-log-warning", "## WARNING\n"),
+    Error("bot-log-error", "## ERROR\n"),
+    SpammyError("spammy-bot-log-error", "## ERROR\n"),
+    Critical("bot-log-critical", "## CRITICAL\n");
 
     final String channelName;
     final String headerText;
-    final Level rollbarLevel;
 
-    LogSeverity(String channelName, String headerText, Level rollbarLevel) {
+    LogSeverity(String channelName, String headerText) {
         this.channelName = channelName;
         this.headerText = headerText;
-        this.rollbarLevel = rollbarLevel;
     }
 
     boolean isErrorOrHigher() {
