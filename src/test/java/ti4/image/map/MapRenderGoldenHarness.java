@@ -64,7 +64,7 @@ import ti4.website.model.WebsiteOverlay;
  * <pre>
  * mvn -o test -Dtest=MapRenderGoldenHarness -Dgolden.saves=DIR -Dgolden.out=DIR -Dgolden.mode=baseline|compare
  *     [-Dgolden.baseline=DIR] [-Dgolden.only=game1,game2] [-Dgolden.ids=REGEX] [-Dgolden.eager=game1,game2]
- *     [-Dgolden.pngs=REGEX over game/renderId] [-Dgolden.inventory=true] [-DargLine=-Xmx10g]
+ *     [-Dgolden.pngs=REGEX over game/renderId] [-Dgolden.inventory=true] [-Dgolden.statedump=DIR, one file per render] [-DargLine=-Xmx10g]
  * </pre>
  *
  * Every render reloads the save from disk, because rendering mutates the game (fog filtering, tile distances, debt
@@ -748,7 +748,10 @@ class MapRenderGoldenHarness extends BaseTi4Test {
         return value.toLowerCase().replaceAll("[^a-z0-9_-]", "_");
     }
 
+    private static String currentRenderId = "";
+
     private static RenderOutcome render(Path save, Spec spec) {
+        currentRenderId = spec.id();
         Game game = loadFresh(save);
         if (game == null) {
             return failed(spec, "load returned null");
@@ -820,7 +823,7 @@ class MapRenderGoldenHarness extends BaseTi4Test {
         String state = HexFormat.of().formatHex(digest.digest()).substring(0, 16);
         String dumpDir = System.getProperty("golden.statedump");
         if (dumpDir != null) {
-            Path dump = Path.of(dumpDir, game.getName() + "-" + state + ".txt");
+            Path dump = Path.of(dumpDir, game.getName(), currentRenderId + ".txt");
             Files.createDirectories(dump.getParent());
             Files.write(dump, kept, StandardCharsets.UTF_8);
         }
