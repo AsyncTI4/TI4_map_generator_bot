@@ -48,13 +48,13 @@ public class ExecutionLockManager {
         if (entry == null || !entry.currentThreadHoldsOnlyRead()) {
             return;
         }
-        IllegalStateException upgrade = new IllegalStateException("Cannot take the write lock \"" + lockName
-                + "\" while this thread holds its read lock; a read lock cannot be upgraded.");
+        IllegalStateException refuseUpgradeException = new IllegalStateException("Cannot take the write lock \""
+                + lockName + "\" while this thread holds its read lock; a read lock cannot be upgraded.");
         try {
-            BotLogger.error(upgrade.getMessage(), upgrade);
+            BotLogger.error(refuseUpgradeException.getMessage(), refuseUpgradeException);
         } catch (RuntimeException e) {
         }
-        throw upgrade;
+        throw refuseUpgradeException;
     }
 
     private static void warnSlowLockIgnoringLoggingFailures(String lockName, long timeToGetLock) {
