@@ -52,54 +52,54 @@ import tools.jackson.databind.module.SimpleModule;
 @UtilityClass
 public class Mapper {
 
-    private static final Properties decals = new Properties();
-    private static final Properties general = new Properties();
-    private static final Properties hyperlaneAdjacencies = new Properties();
-    private static final Properties specialCase = new Properties();
-    private static final Properties tokensFromProperties = new Properties();
+    private static volatile Properties decals = new Properties();
+    private static volatile Properties general = new Properties();
+    private static volatile Properties hyperlaneAdjacencies = new Properties();
+    private static volatile Properties specialCase = new Properties();
+    private static volatile Properties tokensFromProperties = new Properties();
 
     // TODO: Finish moving all files over from properties to json
-    private static final Map<String, AbilityModel> abilities = new HashMap<>();
-    private static final Map<String, RuleModel> rules = new HashMap<>();
-    private static final Map<String, ActionCardModel> actionCards = new HashMap<>();
-    private static final Map<String, AgendaModel> agendas = new HashMap<>();
-    private static final Map<String, AttachmentModel> attachments = new HashMap<>();
-    private static final Map<String, BorderAnomalyModel> borderAnomalies = new HashMap<>();
-    private static final Map<String, ColorModel> colors = new HashMap<>();
-    private static final Map<String, CombatModifierModel> combatModifiers = new HashMap<>();
-    private static final Map<String, DeckModel> decks = new HashMap<>();
-    private static final Map<String, EventModel> events = new HashMap<>();
-    private static final Map<String, ExploreModel> explores = new HashMap<>();
-    private static final Map<String, FactionModel> factions = new HashMap<>();
+    private static volatile Map<String, AbilityModel> abilities = new HashMap<>();
+    private static volatile Map<String, RuleModel> rules = new HashMap<>();
+    private static volatile Map<String, ActionCardModel> actionCards = new HashMap<>();
+    private static volatile Map<String, AgendaModel> agendas = new HashMap<>();
+    private static volatile Map<String, AttachmentModel> attachments = new HashMap<>();
+    private static volatile Map<String, BorderAnomalyModel> borderAnomalies = new HashMap<>();
+    private static volatile Map<String, ColorModel> colors = new HashMap<>();
+    private static volatile Map<String, CombatModifierModel> combatModifiers = new HashMap<>();
+    private static volatile Map<String, DeckModel> decks = new HashMap<>();
+    private static volatile Map<String, EventModel> events = new HashMap<>();
+    private static volatile Map<String, ExploreModel> explores = new HashMap<>();
+    private static volatile Map<String, FactionModel> factions = new HashMap<>();
 
     @Getter
-    private static final Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
+    private static volatile Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
 
-    private static final Map<String, GenericCardModel> genericCards = new HashMap<>();
-    private static final Map<String, LeaderModel> leaders = new HashMap<>();
-    private static final Map<String, MapTemplateModel> mapTemplates = new HashMap<>();
+    private static volatile Map<String, GenericCardModel> genericCards = new HashMap<>();
+    private static volatile Map<String, LeaderModel> leaders = new HashMap<>();
+    private static volatile Map<String, MapTemplateModel> mapTemplates = new HashMap<>();
 
     @Getter
-    private static final Map<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
+    private static volatile Map<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
 
-    private static final Map<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
-    private static final Map<String, RelicModel> relics = new HashMap<>();
-    private static final Map<String, SpaceTokenModel> spaceTokens = new HashMap<>();
-    private static final Map<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
-    private static final Map<String, SourceModel> sources = new HashMap<>();
-    private static final Map<String, StrategyCardSetModel> strategyCardSets = new HashMap<>();
-    private static final Map<String, StrategyCardModel> strategyCards = new HashMap<>();
-    private static final Map<String, TechnologyModel> technologies = new HashMap<>();
-    private static final Map<String, TokenModel> tokens = new HashMap<>();
+    private static volatile Map<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
+    private static volatile Map<String, RelicModel> relics = new HashMap<>();
+    private static volatile Map<String, SpaceTokenModel> spaceTokens = new HashMap<>();
+    private static volatile Map<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
+    private static volatile Map<String, SourceModel> sources = new HashMap<>();
+    private static volatile Map<String, StrategyCardSetModel> strategyCardSets = new HashMap<>();
+    private static volatile Map<String, StrategyCardModel> strategyCards = new HashMap<>();
+    private static volatile Map<String, TechnologyModel> technologies = new HashMap<>();
+    private static volatile Map<String, TokenModel> tokens = new HashMap<>();
     // ids + image paths of tokens flagged isFowVision; precomputed so per-tile fog checks avoid getTokenKey's scan
-    private static final Set<String> fowVisionTokenIds = new HashSet<>();
-    private static final Map<String, GalacticEventModel> galacticevents = new HashMap<>();
+    private static volatile Set<String> fowVisionTokenIds = new HashSet<>();
+    private static volatile Map<String, GalacticEventModel> galacticevents = new HashMap<>();
 
     @Getter
-    private static final Map<String, UnitModel> units = new HashMap<>();
+    private static volatile Map<String, UnitModel> units = new HashMap<>();
 
     @Getter
-    private static final Map<String, BreakthroughModel> breakthroughs = new HashMap<>();
+    private static volatile Map<String, BreakthroughModel> breakthroughs = new HashMap<>();
 
     private static final Cache<String, ColorModel> colorToColorModelCache =
             Caffeine.newBuilder().maximumSize(1000).build();
@@ -119,50 +119,51 @@ public class Mapper {
 
     static void loadData() throws Exception {
         // must be first for validating later models
-        importJsonObjectsFromFolder("factions", factions, FactionModel.class);
+        factions = importJsonObjectsFromFolder("factions", FactionModel.class);
 
-        importJsonObjectsFromFolder("abilities", abilities, AbilityModel.class);
-        importJsonObjectsFromFolder("action_cards", actionCards, ActionCardModel.class);
-        importJsonObjectsFromFolder("agendas", agendas, AgendaModel.class);
-        importJsonObjectsFromFolder("attachments", attachments, AttachmentModel.class);
-        importJsonObjectsFromFolder("border_anomalies", borderAnomalies, BorderAnomalyModel.class);
-        importJsonObjectsFromFolder("breakthroughs", breakthroughs, BreakthroughModel.class);
-        importJsonObjectsFromFolder("colors", colors, ColorModel.class);
-        importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class);
-        importJsonObjectsFromFolder("decks", decks, DeckModel.class);
-        importJsonObjectsFromFolder("events", events, EventModel.class);
-        importJsonObjectsFromFolder("explores", explores, ExploreModel.class);
-        importJsonObjectsFromFolder("genericcards", genericCards, GenericCardModel.class);
-        importJsonObjectsFromFolder("leaders", leaders, LeaderModel.class);
-        importJsonObjectsFromFolder("map_templates", mapTemplates, MapTemplateModel.class);
-        importJsonObjectsFromFolder("promissory_notes", promissoryNotes, PromissoryNoteModel.class);
-        importJsonObjectsFromFolder("public_objectives", publicObjectives, PublicObjectiveModel.class);
-        importJsonObjectsFromFolder("relics", relics, RelicModel.class);
-        importJsonObjectsFromFolder("rules", rules, RuleModel.class);
-        importJsonObjectsFromFolder("secret_objectives", secretObjectives, SecretObjectiveModel.class);
-        importJsonObjectsFromFolder("sources", sources, SourceModel.class);
-        importJsonObjectsFromFolder("strategy_card_sets", strategyCardSets, StrategyCardSetModel.class);
-        importJsonObjectsFromFolder("strategy_cards", strategyCards, StrategyCardModel.class);
-        importJsonObjectsFromFolder("technologies", technologies, TechnologyModel.class);
-        importJsonObjectsFromFolder("galactic_events", galacticevents, GalacticEventModel.class);
+        abilities = importJsonObjectsFromFolder("abilities", AbilityModel.class);
+        actionCards = importJsonObjectsFromFolder("action_cards", ActionCardModel.class);
+        agendas = importJsonObjectsFromFolder("agendas", AgendaModel.class);
+        attachments = importJsonObjectsFromFolder("attachments", AttachmentModel.class);
+        borderAnomalies = importJsonObjectsFromFolder("border_anomalies", BorderAnomalyModel.class);
+        breakthroughs = importJsonObjectsFromFolder("breakthroughs", BreakthroughModel.class);
+        colors = importJsonObjectsFromFolder("colors", ColorModel.class);
+        combatModifiers = importJsonObjectsFromFolder("combat_modifiers", CombatModifierModel.class);
+        decks = importJsonObjectsFromFolder("decks", DeckModel.class);
+        events = importJsonObjectsFromFolder("events", EventModel.class);
+        explores = importJsonObjectsFromFolder("explores", ExploreModel.class);
+        genericCards = importJsonObjectsFromFolder("genericcards", GenericCardModel.class);
+        leaders = importJsonObjectsFromFolder("leaders", LeaderModel.class);
+        mapTemplates = importJsonObjectsFromFolder("map_templates", MapTemplateModel.class);
+        promissoryNotes =
+                withCopiesForAllColors(importJsonObjectsFromFolder("promissory_notes", PromissoryNoteModel.class));
+        publicObjectives = importJsonObjectsFromFolder("public_objectives", PublicObjectiveModel.class);
+        relics = importJsonObjectsFromFolder("relics", RelicModel.class);
+        rules = importJsonObjectsFromFolder("rules", RuleModel.class);
+        secretObjectives =
+                withCopiesForAllColors(importJsonObjectsFromFolder("secret_objectives", SecretObjectiveModel.class));
+        sources = importJsonObjectsFromFolder("sources", SourceModel.class);
+        strategyCardSets = importJsonObjectsFromFolder("strategy_card_sets", StrategyCardSetModel.class);
+        strategyCards = importJsonObjectsFromFolder("strategy_cards", StrategyCardModel.class);
+        technologies = importJsonObjectsFromFolder("technologies", TechnologyModel.class);
+        galacticevents = importJsonObjectsFromFolder("galactic_events", GalacticEventModel.class);
 
-        importJsonObjectsFromFolder("tokens", tokens, TokenModel.class);
+        tokens = importJsonObjectsFromFolder("tokens", TokenModel.class);
         indexFowVisionTokens();
-        importJsonObjectsFromFolder("tokens", spaceTokens, SpaceTokenModel.class);
-        importJsonObjectsFromFolder("units", units, UnitModel.class);
-        importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
-        readData("decals.properties", decals);
-        readData("general.properties", general);
-        readData("hyperlanes.properties", hyperlaneAdjacencies);
-        readData("special_case.properties", specialCase);
-        readData("tokens.properties", tokensFromProperties);
+        spaceTokens = importJsonObjectsFromFolder("tokens", SpaceTokenModel.class);
+        units = importJsonObjectsFromFolder("units", UnitModel.class);
+        frankenErrata = importJsonObjectsFromFolder("franken_errata", DraftErrataModel.class);
+        decals = readData("decals.properties");
+        general = readData("general.properties");
+        hyperlaneAdjacencies = readData("hyperlanes.properties");
+        specialCase = readData("special_case.properties");
+        tokensFromProperties = readData("tokens.properties");
 
-        duplicateObjectsForAllColors(promissoryNotes);
-        duplicateObjectsForAllColors(secretObjectives);
+        colorToColorModelCache.invalidateAll();
     }
 
-    private static void readData(String propertyFileName, Properties properties) throws IOException {
-        properties.clear();
+    private static Properties readData(String propertyFileName) throws IOException {
+        Properties properties = new Properties();
         String propFile = ResourceHelper.getDataFile(propertyFileName);
         if (propFile != null) {
             try (InputStream input = new FileInputStream(propFile)) {
@@ -172,13 +173,13 @@ public class Mapper {
                 throw e;
             }
         }
+        return properties;
     }
 
-    private static <T extends ModelInterface> void importJsonObjectsFromFolder(
-            String jsonFolderName, Map<String, T> objectMap, Class<T> target) {
+    private static <T extends ModelInterface> Map<String, T> importJsonObjectsFromFolder(
+            String jsonFolderName, Class<T> target) {
         String folderPath = ResourceHelper.getDataFolder(jsonFolderName);
-        // Added to prevent duplicates when running Mapper.init() over and over with ModelTest classes
-        objectMap.clear();
+        Map<String, T> objectMap = new HashMap<>();
 
         File folder = new File(folderPath);
         File[] listOfFiles = folder.listFiles();
@@ -192,6 +193,7 @@ public class Mapper {
                 BotLogger.error("Could not import JSON Objects from file: " + jsonFolderName + "/" + file.getName(), e);
             }
         }
+        return objectMap;
     }
 
     public static List<SpaceTokenModel> getSpaceTokens() {
@@ -254,7 +256,8 @@ public class Mapper {
                     + String.join("\n> ", badObjects));
     }
 
-    private static <T extends ColorableModelInterface<T>> void duplicateObjectsForAllColors(Map<String, T> objectMap) {
+    private static <T extends ColorableModelInterface<T>> Map<String, T> withCopiesForAllColors(Map<String, T> loaded) {
+        Map<String, T> objectMap = new HashMap<>(loaded);
         String mostRecentObject = "none";
         try {
             List<ColorModel> colorsToCreate = getColors();
@@ -274,6 +277,7 @@ public class Mapper {
         } catch (Exception e) {
             BotLogger.error("Failed duplicating colors: " + mostRecentObject, e);
         }
+        return objectMap;
     }
 
     // End of initializers and file readers
@@ -1250,12 +1254,13 @@ public class Mapper {
     }
 
     private static void indexFowVisionTokens() {
-        fowVisionTokenIds.clear();
+        Set<String> visionTokenIds = new HashSet<>();
         for (TokenModel token : tokens.values()) {
             if (!Boolean.TRUE.equals(token.getIsFowVision())) continue;
-            fowVisionTokenIds.add(token.getId());
-            if (token.getImagePath() != null) fowVisionTokenIds.add(token.getImagePath());
+            visionTokenIds.add(token.getId());
+            if (token.getImagePath() != null) visionTokenIds.add(token.getImagePath());
         }
+        fowVisionTokenIds = visionTokenIds;
     }
 
     /** True if the id or image path belongs to a token flagged {@code isFowVision}. */

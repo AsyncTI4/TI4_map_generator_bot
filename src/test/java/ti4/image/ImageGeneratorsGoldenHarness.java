@@ -34,6 +34,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
+import org.junit.jupiter.api.parallel.Isolated;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import ti4.game.Game;
@@ -87,6 +88,7 @@ import ti4.testUtils.BaseTi4Test;
  * every mismatching case is written next to the report (and in any mode for ids matching golden.gen.pngs).
  */
 @EnabledIfSystemProperty(named = "golden.gen.saves", matches = ".+")
+@Isolated
 class ImageGeneratorsGoldenHarness extends BaseTi4Test {
 
     private static final int PAIRS_PER_GAME = 2;

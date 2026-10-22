@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -20,7 +21,7 @@ import ti4.service.fow.FogViewer;
 
 public final class TileLayers {
 
-    private static final Map<TileStep, TileStepPainter> PAINTERS = painters();
+    private static final Map<TileStep, TileStepPainter> PAINTERS = Collections.unmodifiableMap(painters());
 
     private static final Rectangle FULL_LAYER = new Rectangle(0, 0, LAYER_SIZE, LAYER_SIZE);
 

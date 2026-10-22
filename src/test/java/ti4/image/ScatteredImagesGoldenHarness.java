@@ -41,6 +41,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
+import org.junit.jupiter.api.parallel.Isolated;
 import org.mockito.ArgumentMatchers;
 import org.mockito.MockSettings;
 import org.mockito.MockedStatic;
@@ -105,6 +106,7 @@ import ti4.testUtils.BaseTi4Test;
  * description.
  */
 @EnabledIfSystemProperty(named = "golden.scattered.saves", matches = ".+")
+@Isolated
 class ScatteredImagesGoldenHarness extends BaseTi4Test {
 
     private static final List<String> USER_IDS = List.of(

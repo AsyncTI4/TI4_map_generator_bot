@@ -38,7 +38,7 @@ final class WormholeIconSpots {
                     new TileSpots(List.of("m05"), List.of(new Spot('a', 185, 180))),
                     new TileSpots(List.of("m32"), List.of(new Spot('b', 49, 147))))
             .flatMap(entry -> entry.tileIds().stream().map(id -> Map.entry(id, entry.spots())))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
 
     private static final int DEFAULT_X = 86;
     private static final int DEFAULT_Y = 260;
