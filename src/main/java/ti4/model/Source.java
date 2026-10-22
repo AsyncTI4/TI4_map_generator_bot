@@ -248,7 +248,7 @@ public class Source {
                 case addiction -> "TI Addiction [Homebrew]";
                 case oplusplus -> "O++ [Homebrew]";
                 case goose -> "Homebrew from Goose [Homebrew]";
-                case thirtyk -> "30k Content Lab [Homebrew]";
+                case thirtyk -> "30k Content Lab / JMSC [Homebrew]";
                 default -> toString();
             };
         }

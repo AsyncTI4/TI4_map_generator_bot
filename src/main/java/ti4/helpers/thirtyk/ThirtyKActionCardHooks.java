@@ -11,8 +11,10 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.thirtyk.ThirtyKPoliticsAcButtonHandler;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
@@ -20,7 +22,10 @@ import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.CombatModifierModel;
 import ti4.model.Mapper;
+import ti4.model.NamedCombatModifierModel;
+import ti4.service.combat.CombatRollType;
 import ti4.service.objectives.DrawSecretService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
@@ -190,6 +195,37 @@ public class ThirtyKActionCardHooks {
                             + " goods.");
             ButtonHelperStats.gainTGs(null, game, profiteer, 4, false);
         }
+    }
+
+    public static void onGroundCombatStart(Game game, UnitHolder planet) {
+        if (!ThirtyKCards.inUse(game) || planet == null) return;
+        ThirtyKAcState.clearFinalStandOn(game, planet.getName());
+    }
+
+    public static List<NamedCombatModifierModel> finalStandExtraRolls(
+            Game game, Player player, UnitHolder combatOnHolder, CombatRollType rollType) {
+        if (!ThirtyKCards.inUse(game)) return List.of();
+        if (rollType != CombatRollType.combatround || !(combatOnHolder instanceof Planet planet)) return List.of();
+        if (!holdsFinalStand(game, player, planet)) return List.of();
+        int dice = Math.max(0, planet.getInfluence());
+        if (dice == 0) return List.of();
+        CombatModifierModel modifier = new CombatModifierModel();
+        modifier.setAlias("thirtyk_final_stand");
+        modifier.setType(Constants.COMBAT_EXTRA_ROLLS);
+        modifier.setValue(dice);
+        modifier.setPersistenceType("ALWAYS");
+        modifier.setScope("gf");
+        modifier.setRelated(List.of());
+        modifier.setForCombatAbility(CombatRollType.combatround);
+        return List.of(new NamedCombatModifierModel(
+                modifier, "_Final Stand_: +" + dice + " dice from the influence of the planet"));
+    }
+
+    static boolean holdsFinalStand(Game game, Player player, Planet planet) {
+        if (!ThirtyKAcState.hasFinalStand(game, player, planet.getName())) return false;
+        if (!player.getPlanets().contains(planet.getName())) return false;
+        return planet.getUnitCount(UnitType.Infantry, player) == 1
+                && ButtonHelper.getNumberOfGroundForces(player, planet) == 1;
     }
 
     public static void onFragmentsPurged(Game game, Player purger, List<String> fragments) {

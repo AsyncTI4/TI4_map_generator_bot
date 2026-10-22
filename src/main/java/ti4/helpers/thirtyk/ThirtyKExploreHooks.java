@@ -30,12 +30,13 @@ public class ThirtyKExploreHooks {
         return ThirtyKPlayAreaExploreHandler.getStartOfTurnButtons(player);
     }
 
-    public static void afterPublicObjectiveScored(Game game, Player player, String objectiveID) {
+    public static void afterPublicObjectiveScored(Game game, Player player, String objectiveID, int tgBefore) {
         if (!ThirtyKCards.inUse(game)) return;
-        ThirtyKPlayAreaExploreHandler.offerRichHostages(game, player, objectiveID);
+        ThirtyKPlayAreaExploreHandler.offerRichHostages(game, player, objectiveID, player.getTg() < tgBefore);
     }
 
-    public static int spaceCannonRollBonus(CombatRollType rollType, UnitModel unit, UnitHolder holder) {
+    public static int spaceCannonRollBonus(Game game, CombatRollType rollType, UnitModel unit, UnitHolder holder) {
+        if (!ThirtyKCards.inUse(game)) return 0;
         if (rollType != CombatRollType.SpaceCannonOffence && rollType != CombatRollType.SpaceCannonDefence) return 0;
         return ThirtyKAttachmentHandler.spaceCannonBonus(unit, holder);
     }
@@ -46,7 +47,8 @@ public class ThirtyKExploreHooks {
                 + " rolls (_Overcharged Targeting System_).\n";
     }
 
-    public static int extraPlanetProduction(UnitHolder holder, int unitProduction) {
+    public static int extraPlanetProduction(Game game, UnitHolder holder, int unitProduction) {
+        if (!ThirtyKCards.inUse(game)) return 0;
         return ThirtyKAttachmentHandler.extraPlanetProduction(holder, unitProduction);
     }
 

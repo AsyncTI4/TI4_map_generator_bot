@@ -118,6 +118,7 @@ class AssignHitsButtonHandlers {
                             DestroyUnitService.destroyAllPlayerUnitsInSystem(event, game, player, tile, combat);
                             IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, null, assignHitsType);
                             ThirtyKSecretHooks.afterCombatHits(game, player, tile, null, assignHitsType);
+                            ThirtyKExploreHooks.afterSpaceCombatHits(event, game, player, tile, assignHitsType);
                             ThirtyKActionCardHooks.afterCombatHitsAssigned(game, tile, assignHitsType);
                             msg += tile.getRepresentationForButtons(game, player);
                         }

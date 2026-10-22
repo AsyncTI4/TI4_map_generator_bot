@@ -2166,7 +2166,7 @@ public final class Helper {
         if (unitsOnly) {
             return productionValueTotal;
         }
-        productionValueTotal += ThirtyKExploreHooks.extraPlanetProduction(uH, productionValueTotal);
+        productionValueTotal += ThirtyKExploreHooks.extraPlanetProduction(game, uH, productionValueTotal);
         if (uH instanceof Planet planet) {
             if (TaPromissoryHandler.planetHasAdvancedStructuralEngineering(planet)
                     && player.getPlanets().contains(planet.getName())) {

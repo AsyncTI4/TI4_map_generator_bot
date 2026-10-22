@@ -218,20 +218,18 @@ public class ThirtyKAcState {
         return true;
     }
 
-    public static boolean markFinalStandRoll(Game game, Player player, String planet, String round) {
-        String key = finalStandPrefix(player) + planet;
-        String marker = game.getRound() + SEPARATOR + round;
-        if (marker.equals(game.getStoredValue(key))) return false;
-        game.setStoredValue(key, marker);
-        return true;
+    public static void setFinalStand(Game game, Player player, String planet) {
+        game.setStoredValue(FINAL_STAND + player.getFaction(), planet);
     }
 
-    public static void clearFinalStand(Game game, Player player) {
-        ThirtyKTurnState.removeKeysStartingWith(game, finalStandPrefix(player));
+    public static void clearFinalStandOn(Game game, String planet) {
+        game.getStoredValueMap()
+                .entrySet()
+                .removeIf(entry -> entry.getKey().startsWith(FINAL_STAND) && planet.equals(entry.getValue()));
     }
 
-    private static String finalStandPrefix(Player player) {
-        return FINAL_STAND + player.getFaction() + SEPARATOR;
+    public static boolean hasFinalStand(Game game, Player player, String planet) {
+        return planet.equals(game.getStoredValue(FINAL_STAND + player.getFaction()));
     }
 
     public static void markRiderCard(Game game, Player player, String rider) {

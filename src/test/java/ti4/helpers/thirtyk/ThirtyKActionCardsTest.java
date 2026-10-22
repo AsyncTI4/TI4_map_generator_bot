@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.ActionCardHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
@@ -77,6 +78,23 @@ class ThirtyKActionCardsTest extends BaseTi4Test {
         // 3 trade goods: 0, 1, 2 or 3 may be placed on Compound Interest, never 4.
         assertThat(ThirtyKActionCards.resolveButtons(Mapper.getActionCard("compoundinterest30k"), sol))
                 .hasSize(4);
+    }
+
+    // Matching SUSTAIN DAMAGE windows must only add Ultimate Trickshot to the combat card list; every other
+    // sustain-damage card in any set was already listed through "hit".
+    @Test
+    void sustainDamageWindowOnlyAddsUltimateTrickshotToCombatCards() {
+        List<String> newlyListed = Mapper.getActionCards().values().stream()
+                .filter(card -> card.getWindow() != null)
+                .filter(card -> ActionCardHelper.isCombatWindow(card.getWindow()))
+                .filter(card -> !isPreviousCombatWindow(card.getWindow()))
+                .map(ActionCardModel::getAlias)
+                .toList();
+        assertThat(newlyListed).containsExactlyInAnyOrder("ultimatetrickshotjmsc1", "ultimatetrickshotjmsc2");
+    }
+
+    private static boolean isPreviousCombatWindow(String window) {
+        return window.contains("combat") || window.contains("roll") || window.contains("hit");
     }
 
     private Player addPlayer(String userId, String faction, String color) {

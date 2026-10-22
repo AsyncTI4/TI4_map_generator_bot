@@ -12,7 +12,6 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -66,7 +65,8 @@ class ThirtyKRelicBoardButtonHandler {
         String planetRep = Helper.getPlanetRepresentation(planetName, game);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " froze 1 infantry of " + owner.getColorIfCanSeeStats(player)
+                player.getRepresentationNoPing() + " froze 1 infantry of "
+                        + FoWHelper.identityOrColorIfCanSeeStats(game, owner, player, owner.getRepresentationNoPing())
                         + " on " + planetRep
                         + " out of time: _Chrono Stasis_ removes it until the start of its owner's next turn.");
         if (owner != player) {
@@ -247,7 +247,10 @@ class ThirtyKRelicBoardButtonHandler {
                 buttons.add(Buttons.red(
                         player.factionButtonChecker() + "thirtyKDefiantKill_" + amount + "_" + owner.getFaction() + "_"
                                 + planetName,
-                        "Destroy " + amount + " " + owner.getColorIfCanSeeStats(player) + " Infantry"));
+                        "Destroy " + amount + " "
+                                + FoWHelper.identityOrColorIfCanSeeStats(
+                                        game, owner, player, owner.getFactionNameOrColor())
+                                + " Infantry"));
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(
@@ -277,13 +280,31 @@ class ThirtyKRelicBoardButtonHandler {
         String result = "The leaflets did their work: " + player.getRepresentationNoPing() + " destroyed " + amount
                 + " infantry on "
                 + Helper.getPlanetRepresentation(planetName, game) + " with _Defiant Propaganda_";
-        UnitHolder home = ThirtyKRelics.firstHomePlanet(game, player);
         Tile homeTile = player.getHomeSystemTile();
-        if (home != null && homeTile != null) {
-            AddUnitService.addUnits(event, homeTile, game, player.getColor(), amount + " inf " + home.getName());
-            result += " and placed " + amount + " infantry on " + Helper.getPlanetRepresentation(home.getName(), game);
+        List<Planet> homePlanets = homeTile == null
+                ? List.of()
+                : homeTile.getPlanetUnitHolders().stream()
+                        .filter(home -> player.getPlanets().contains(home.getName()))
+                        .toList();
+        if (homePlanets.size() == 1) {
+            String home = homePlanets.getFirst().getName();
+            AddUnitService.addUnits(event, homeTile, game, player.getColor(), amount + " inf " + home);
+            result += " and placed " + amount + " infantry on " + Helper.getPlanetRepresentation(home, game);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), result + ".");
+        if (homePlanets.size() > 1) {
+            List<Button> buttons = new ArrayList<>();
+            for (Planet home : homePlanets) {
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + "thirtyKDefiantPlace_" + amount + "_" + home.getName(),
+                        Helper.getPlanetRepresentation(home.getName(), game)));
+            }
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(),
+                    player.getRepresentationUnfogged() + ", choose the planet in your home system for the " + amount
+                            + " infantry from _Defiant Propaganda_.",
+                    buttons);
+        }
         if (owner != player) {
             String actor =
                     FoWHelper.identityOrColorIfCanSeeStats(game, player, owner, player.getRepresentationNoPing());
@@ -293,6 +314,23 @@ class ThirtyKRelicBoardButtonHandler {
                             + " destroyed " + amount + " of your infantry on "
                             + Helper.getPlanetRepresentation(planetName, game) + " with _Defiant Propaganda_.");
         }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("thirtyKDefiantPlace_")
+    public static void defiantPlace(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] parts = buttonID.replace("thirtyKDefiantPlace_", "").split("_", 2);
+        Tile homeTile = player.getHomeSystemTile();
+        if (parts.length != 2
+                || homeTile == null
+                || homeTile.getUnitHolderFromPlanet(parts[1]) == null
+                || !player.getPlanets().contains(parts[1])) return;
+        int amount = Integer.parseInt(parts[0]);
+        AddUnitService.addUnits(event, homeTile, game, player.getColor(), amount + " inf " + parts[1]);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " placed " + amount + " infantry on "
+                        + Helper.getPlanetRepresentation(parts[1], game) + " (_Defiant Propaganda_).");
         ButtonHelper.deleteMessage(event);
     }
 }

@@ -7,7 +7,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -19,7 +18,6 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.CheckDistanceHelper;
-import ti4.helpers.DiceHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
@@ -31,7 +29,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
 import ti4.model.Mapper;
-import ti4.model.UnitModel;
+import ti4.service.combat.StartCombatService;
 import ti4.service.fow.BlindSelectionService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
@@ -62,7 +60,7 @@ public class ThirtyKBoardAcButtonHandler {
     private static final String CORRUPT_PLANETS = "thkAcCorruptPlanets";
     private static final String CORRUPT_PLACE = "thkAcCorruptPlace_";
     private static final String RENEWAL_ACCEPT = "thkAcRenewalAccept_";
-    private static final String FINAL_STAND_ROLL = "thkAcFinalStandRoll_";
+    private static final String FINAL_STAND_PLANET = "thkAcFinalStandPlanet_";
     private static final String FOLDING_STAY = "thkAcFoldingStay";
     private static final List<String> EXPLORE_TRAITS = List.of("cultural", "industrial", "hazardous");
 
@@ -226,10 +224,11 @@ public class ThirtyKBoardAcButtonHandler {
 
     private static List<Button> cumulativeButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
+        Map<String, Integer> distances = homeDistances(game, player);
         for (Tile tile : ThirtyKCards.visibleTiles(game, player)) {
             for (Planet holder : tile.getPlanetUnitHolders()) {
                 String planet = holder.getName();
-                int infantry = cumulativeInfantry(game, player, planet);
+                int infantry = cumulativeInfantry(game, player, planet, distances);
                 if (infantry < 1) continue;
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + CUMULATIVE_PLACE + planet,
@@ -240,16 +239,29 @@ public class ThirtyKBoardAcButtonHandler {
     }
 
     private static String cumulativeMessage(Player player) {
-        return player.getRepresentationUnfogged() + ", choose a planet. You place infantry on it equal"
-                + " to its distance from your home system, up to 4.";
+        return player.getRepresentationUnfogged() + ", choose a planet with no other player's units, at most 4"
+                + " systems from your home system. You place infantry on it equal to that distance.";
     }
 
-    private static int cumulativeInfantry(Game game, Player player, String planet) {
-        Tile home = player.getHomeSystemTile();
+    public static int cumulativeInfantry(Game game, Player player, String planet) {
+        return cumulativeInfantry(game, player, planet, homeDistances(game, player));
+    }
+
+    private static int cumulativeInfantry(Game game, Player player, String planet, Map<String, Integer> distances) {
         Tile tile = game.getTileFromPlanet(planet);
-        if (home == null || tile == null) return 0;
-        Map<String, Integer> distances = CheckDistanceHelper.getTileDistances(game, null, home.getPosition(), 4, true);
-        return Math.min(4, distances.getOrDefault(tile.getPosition(), 4));
+        Planet holder = game.getUnitHolderFromPlanet(planet);
+        if (tile == null || holder == null) return 0;
+        boolean othersThere = game.getRealPlayersNNeutral().stream()
+                .anyMatch(other -> other != player && FoWHelper.playerHasUnitsOnPlanet(other, holder));
+        if (othersThere) return 0;
+        Integer distance = distances.get(tile.getPosition());
+        return distance == null || distance > 4 ? 0 : distance;
+    }
+
+    private static Map<String, Integer> homeDistances(Game game, Player player) {
+        Tile home = player.getHomeSystemTile();
+        if (home == null) return Map.of();
+        return CheckDistanceHelper.getTileDistances(game, null, home.getPosition(), 4, true);
     }
 
     @ButtonHandler(CUMULATIVE_PLACE)
@@ -631,6 +643,10 @@ public class ThirtyKBoardAcButtonHandler {
 
     @ButtonHandler(CORRUPT)
     public static void corruptManifestation(ButtonInteractionEvent event, Game game, Player player) {
+        if (corruptPlanetButtons(game, player).isEmpty()) {
+            ThirtyKAcTargets.noTarget(event, player, "Corrupt Manifestation");
+            return;
+        }
         List<Button> buttons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, player, "inf"));
         buttons.add(Buttons.green(player.factionButtonChecker() + CORRUPT_PLANETS, "Done Paying 2 Influence"));
         ButtonHelper.deleteMessage(event);
@@ -642,15 +658,7 @@ public class ThirtyKBoardAcButtonHandler {
 
     @ButtonHandler(CORRUPT_PLANETS)
     public static void corruptPlanets(ButtonInteractionEvent event, Game game, Player player) {
-        List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (!tile.isFracture()) continue;
-            for (Planet planet : tile.getPlanetUnitHolders()) {
-                buttons.add(Buttons.gray(
-                        player.factionButtonChecker() + CORRUPT_PLACE + planet.getName(),
-                        Helper.getPlanetRepresentation(planet.getName(), game)));
-            }
-        }
+        List<Button> buttons = corruptPlanetButtons(game, player);
         if (buttons.isEmpty()) {
             ThirtyKAcTargets.noTarget(event, player, "Corrupt Manifestation");
             return;
@@ -663,27 +671,67 @@ public class ThirtyKBoardAcButtonHandler {
                 buttons);
     }
 
+    private static List<Button> corruptPlanetButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : ThirtyKCards.visibleTiles(game, player)) {
+            if (!tile.isFracture()) continue;
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                buttons.add(Buttons.gray(
+                        player.factionButtonChecker() + CORRUPT_PLACE + planet.getName(),
+                        Helper.getPlanetRepresentation(planet.getName(), game)));
+            }
+        }
+        return buttons;
+    }
+
     @ButtonHandler(CORRUPT_PLACE)
     public static void corruptPlace(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String planet = buttonID.substring(CORRUPT_PLACE.length());
-        Tile tile = game.getTileFromPlanet(planet);
+        String planetName = buttonID.substring(CORRUPT_PLACE.length());
+        Tile tile = game.getTileFromPlanet(planetName);
         if (tile == null || !tile.isFracture()) return;
-        UnitHolder holder = tile.getUnitHolders().get(planet);
-        boolean contested = false;
-        for (Player other : game.getRealPlayers()) {
-            if (holder != null && FoWHelper.playerHasUnitsOnPlanet(other, holder)) contested = true;
-        }
-        AddUnitService.addUnits(event, tile, game, game.getNeutral().getColor(), "2 inf " + planet);
+        Planet planet = game.getUnitHolderFromPlanet(planetName);
+        if (planet == null) return;
+        List<Player> defenders = corruptDefenders(game, player, planet);
+        boolean onlyStructures = defenders.isEmpty()
+                && game.getRealPlayers().stream().anyMatch(other -> FoWHelper.playerHasUnitsOnPlanet(other, planet));
+        AddUnitService.addUnits(event, tile, game, game.getNeutralColor(), "2 inf " + planetName);
         ButtonHelper.deleteMessage(event);
-        String planetName = Helper.getPlanetRepresentation(planet, game);
+        String planetRepresentation = Helper.getPlanetRepresentation(planetName, game);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", 2 neutral infantry claw their way out of the Fracture onto "
-                        + planetName + " (_Corrupt Manifestation_)."
-                        + (contested
-                                ? " Another player has units there: the neutral infantry invade and resolve ground"
-                                        + " combat. Start that combat manually."
-                                : ""));
+                        + planetRepresentation + " (_Corrupt Manifestation_).");
+        if (onlyStructures) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Only structures stand on " + planetRepresentation
+                            + ". Resolve the neutral invasion by hand; use `/combat start_combat` if a combat is"
+                            + " needed.");
+            return;
+        }
+        if (defenders.isEmpty()) return;
+        StartCombatService.startGroundCombat(defenders.getFirst(), game.getNeutral(), game, event, planet, tile);
+        if (defenders.size() > 1) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "More players have ground forces on " + planetRepresentation
+                            + ". After this combat, the surviving neutral infantry fight each of them in turn; start"
+                            + " those combats with `/combat start_combat`.");
+        }
+    }
+
+    public static List<Player> corruptDefenders(Game game, Player cardPlayer, Planet planet) {
+        List<Player> defenders = new ArrayList<>();
+        Player owner = game.getPlayerThatControlsPlanet(planet.getName());
+        if (owner != null && ButtonHelper.getNumberOfGroundForces(owner, planet) > 0) defenders.add(owner);
+        for (Player other : game.getRealPlayers()) {
+            if (other == cardPlayer || defenders.contains(other)) continue;
+            if (ButtonHelper.getNumberOfGroundForces(other, planet) > 0) defenders.add(other);
+        }
+        if (!defenders.contains(cardPlayer) && ButtonHelper.getNumberOfGroundForces(cardPlayer, planet) > 0) {
+            defenders.add(cardPlayer);
+        }
+        return defenders;
     }
 
     public static List<Button> renewalButtons(Game game, Player player) {
@@ -748,71 +796,35 @@ public class ThirtyKBoardAcButtonHandler {
 
     @ButtonHandler(FINAL_STAND)
     public static void finalStand(ButtonInteractionEvent event, Game game, Player player) {
-        ThirtyKAcState.clearFinalStand(game, player);
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             Planet holder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            if (holder == null || holder.getUnitCount(UnitType.Infantry, player.getColor()) != 1) continue;
+            if (holder == null || holder.getUnitCount(UnitType.Infantry, player.getColor()) < 1) continue;
             buttons.add(Buttons.red(
-                    player.factionButtonChecker() + FINAL_STAND_ROLL + planet,
-                    "Roll Final Stand On " + Helper.getPlanetRepresentation(planet, game)));
+                    player.factionButtonChecker() + FINAL_STAND_PLANET + planet,
+                    Helper.getPlanetRepresentation(planet, game)));
         }
         if (buttons.isEmpty()) {
             ThirtyKAcTargets.noTarget(event, player, "Final Stand");
             return;
         }
-        buttons.add(Buttons.gray(player.factionButtonChecker() + "deleteButtons", "Done"));
         ButtonHelper.deleteMessage(event);
         ThirtyKAcTargets.send(
                 player,
-                player.getRepresentationUnfogged() + ", for each round of this ground combat, press the button to"
-                        + " roll the extra dice from _Final Stand_ while you have exactly 1 infantry there.",
+                player.getRepresentationUnfogged() + ", choose the planet of this ground combat for _Final Stand_.",
                 buttons);
     }
 
-    @ButtonHandler(FINAL_STAND_ROLL)
-    public static void finalStandRoll(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String planet = buttonID.substring(FINAL_STAND_ROLL.length());
-        Planet holder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        UnitModel infantry = player.getUnitByBaseType("infantry");
-        if (holder == null
-                || infantry == null
-                || !player.getPlanets().contains(planet)
-                || holder.getUnitCount(UnitType.Infantry, player.getColor()) != 1) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "You no longer have exactly 1 infantry on a planet you control there.");
-            return;
-        }
-        if (!ThirtyKAcState.markFinalStandRoll(game, player, planet, groundCombatRound(game, planet))) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "You already rolled _Final Stand_ on that planet this round of ground combat.");
-            return;
-        }
-        ButtonHelper.deleteTheOneButton(event);
-        int dice = Math.max(0, holder.getInfluence());
-        List<DiceHelper.Die> rolls = DiceHelper.rollDice(infantry.getCombatHitsOn(), dice);
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                player.getRepresentationNoPing() + "'s last infantry on "
-                        + Helper.getPlanetRepresentation(planet, game) + " makes a _Final Stand_, rolling " + dice
-                        + " dice: " + DiceHelper.formatDiceOutput(rolls)
-                        + " (" + DiceHelper.countSuccesses(rolls) + " hit(s)).",
-                List.of(Buttons.red(
-                        player.factionButtonChecker() + FINAL_STAND_ROLL + planet,
-                        "Roll Final Stand Next Round On " + Helper.getPlanetRepresentation(planet, game))));
-    }
-
-    private static String groundCombatRound(Game game, String planet) {
-        Tile tile = game.getTileFromPlanet(planet);
-        if (tile == null) return "0";
-        int round = 0;
-        for (Player combatant : game.getRealPlayersNNeutral()) {
-            round = Math.max(
-                    round,
-                    NumberUtils.toInt(game.getStoredValue(
-                            "combatRoundTracker" + combatant.getFaction() + tile.getPosition() + planet)));
-        }
-        return String.valueOf(round);
+    @ButtonHandler(FINAL_STAND_PLANET)
+    public static void finalStandPlanet(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String planet = buttonID.substring(FINAL_STAND_PLANET.length());
+        ThirtyKAcState.setFinalStand(game, player, planet);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " makes a _Final Stand_ on "
+                        + Helper.getPlanetRepresentation(planet, game)
+                        + ". For the rest of this ground combat, each combat roll there gets extra dice equal to the"
+                        + " planet's influence while you have exactly 1 infantry and no other ground forces there.");
     }
 }

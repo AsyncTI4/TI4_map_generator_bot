@@ -87,6 +87,7 @@ public class ThirtyKFrontierExploreHandler {
                 .append(" hit")
                 .append(hits == 1 ? "" : "s")
                 .append(" to your ships in this system; you gain 1 trade good for each hit you can assign.");
+        // TODO: spacecombat hit buttons fire combat-end hooks (War Profiteering, MacGuffin Outpost, secret checks).
         MessageHelper.sendMessageToEventChannelWithButtons(
                 event,
                 message.toString(),
@@ -377,7 +378,8 @@ public class ThirtyKFrontierExploreHandler {
     private static void rewardSympathies(
             GenericInteractionCreateEvent event, Game game, Player explorer, Player player, double cost) {
         if (cost >= SYMPATHIES_VICTORY_POINT_COST) {
-            Integer objective = game.addCustomPO(SYMPATHIES_OBJECTIVE, 1);
+            String objectiveName = sympathiesObjectiveFor(game, player);
+            Integer objective = game.addCustomPO(objectiveName, 1);
             game.scorePublicObjective(player.getUserID(), objective);
             FoWHelper.notifyPlayerAndAffectedInFog(
                     game,
@@ -385,11 +387,19 @@ public class ThirtyKFrontierExploreHandler {
                     player,
                     FoWHelper.actorOrAnon(game, player, "A player") + " lost ships worth " + formatCost(cost)
                             + " resources; the galaxy remembers the sacrifice, and they permanently gain 1"
-                            + " victory point (_" + SYMPATHIES_OBJECTIVE + "_).");
+                            + " victory point (_" + objectiveName + "_).");
             Helper.checkEndGame(game, player);
             return;
         }
         ButtonHelperStats.gainTGs(event, game, player, 1, false);
+    }
+
+    static String sympathiesObjectiveFor(Game game, Player player) {
+        String name = SYMPATHIES_OBJECTIVE;
+        for (int copy = 2; game.didPlayerScoreThisAlready(player.getUserID(), name); copy++) {
+            name = SYMPATHIES_OBJECTIVE + " " + copy;
+        }
+        return name;
     }
 
     private static String formatCost(double cost) {
@@ -533,6 +543,7 @@ public class ThirtyKFrontierExploreHandler {
         }
         Tile target = game.getTileByPosition(choice);
         ButtonHelper.deleteMessage(event);
+        // TODO: fog leak - a blind pick rejected here tells the speaker that system holds planets or ships.
         if (target == null || !isLostCaptainTarget(game, explorer, origin, target)) {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),

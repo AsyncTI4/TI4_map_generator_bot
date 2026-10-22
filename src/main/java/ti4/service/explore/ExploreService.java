@@ -1755,7 +1755,7 @@ public class ExploreService {
         }
         RiftSetModeService.resolveExplore(ogID, player, game);
         FOWPlusService.resolveExplore(event, ogID, tile, planetID, player, game);
-        ThirtyKExplores.resolveExplore(event, cardID, tile, planetID, player, game);
+        ThirtyKExplores.resolveExplore(event, ogID, cardID, tile, planetID, player, game);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
 
         if (player.hasAbility("fortune_seekers")

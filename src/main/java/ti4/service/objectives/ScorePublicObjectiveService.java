@@ -72,8 +72,9 @@ public class ScorePublicObjectiveService {
                     player.getFactionEmoji() + ", no such public objective ID found, or already scored, please retry.");
         } else {
             StatusHelper.recordObjectiveScored(game, player, id, "PUBLIC");
+            int tgBefore = player.getTg();
             informAboutScoring(event, channel, game, player, poID);
-            ThirtyKExploreHooks.afterPublicObjectiveScored(game, player, id);
+            ThirtyKExploreHooks.afterPublicObjectiveScored(game, player, id, tgBefore);
             if (player.hasAbility("primordial")) {
                 KaloraAbilityHandler.primordial(player, game);
             }
