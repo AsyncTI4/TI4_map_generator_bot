@@ -55,12 +55,7 @@ final class PlanetCard {
         List<String> exhaustedPlanetsAbilities = player.getExhaustedPlanetsAbilities();
         try {
             Planet planet = game.getPlanetsInfo().get(planetName);
-            if (planet == null) {
-                BotLogger.warning(
-                        new LogOrigin(player),
-                        "Planet " + planetName + " not found in game " + game.getName() + ". Skipping its card.");
-                return deltaX;
-            }
+            if (planet == null) return deltaX;
             PlanetModel planetModel = planet.getPlanetModel();
             if (planetModel == null) return deltaX;
 
