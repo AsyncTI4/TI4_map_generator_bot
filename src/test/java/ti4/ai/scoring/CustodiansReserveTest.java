@@ -94,4 +94,13 @@ class CustodiansReserveTest extends BaseTi4Test {
 
         assertThat(ScoringReserve.custodiansReserve(test.game, test.nekro)).isEqualTo(SpendCost.influence(6));
     }
+
+    @Test
+    void holdingTheImperialReservesNoInfluenceOnceTheCustodiansAreGone() {
+        test.game.getTileByPosition(MECATOL).removeToken(Constants.CUSTODIAN_TOKEN_PNG, "mr");
+        test.nekro.addSC(IMPERIAL);
+
+        assertThat(ScoringReserve.custodiansReserve(test.game, test.nekro)).isEqualTo(SpendCost.NONE);
+        assertThat(ScoringReserve.reserved(test.game, test.nekro)).isPresent();
+    }
 }

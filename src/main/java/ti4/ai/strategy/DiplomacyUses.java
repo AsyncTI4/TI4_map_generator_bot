@@ -55,12 +55,13 @@ class DiplomacyUses {
         return benefits;
     }
 
-    static Optional<String> mostValuableOpenSystem(Game game, Player seat) {
+    static Optional<String> bestLockTarget(PlanInputs in) {
+        Game game = in.game();
+        Player seat = in.seat();
         return lockableTiles(game, seat).stream()
                 .filter(tile -> tile != game.getMecatolTile())
-                .filter(tile ->
-                        game.getRealPlayers().stream().anyMatch(other -> other != seat && !tile.hasPlayerCC(other)))
-                .max(Comparator.comparingDouble(tile -> ownedPlanetValue(seat, tile)))
+                .max(Comparator.comparingDouble(in::lockExposure)
+                        .thenComparingDouble(tile -> ownedPlanetValue(seat, tile)))
                 .map(Tile::getPosition);
     }
 
