@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 class ExecutionLockManagerTest {
 
     private static final int TIMEOUT_SECONDS = 10;
-    private static final int SETTLE_MILLIS = 200;
+    private static final int SETTLE_MILLIS = 100;
 
     private ExecutorService executor;
     private String lockName;
@@ -37,8 +37,26 @@ class ExecutionLockManagerTest {
         executor.shutdownNow();
     }
 
-    private static void settle() throws InterruptedException {
+    private void awaitQueuedThreads() throws InterruptedException {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(TIMEOUT_SECONDS);
+        while (!ExecutionLockManager.hasQueuedThreads(lockName)) {
+            assertTrue(System.nanoTime() < deadline, "no thread queued on the lock");
+            Thread.sleep(5);
+        }
         Thread.sleep(SETTLE_MILLIS);
+    }
+
+    private void awaitHolders(int expected) throws InterruptedException {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(TIMEOUT_SECONDS);
+        while (ExecutionLockManager.holders(lockName) != expected) {
+            assertTrue(System.nanoTime() < deadline, "lock never reached " + expected + " holders");
+            Thread.sleep(5);
+        }
+    }
+
+    private Future<?> holdUntil(ExecutionLockType type, CountDownLatch holding, CountDownLatch release) {
+        return executor.submit(ExecutionLockManager.wrapWithLockAndRelease(
+                lockName, type, () -> awaitAfterSignalling(holding, release)));
     }
 
     @Test
@@ -64,6 +82,7 @@ class ExecutionLockManagerTest {
         }
 
         assertEquals(1, maxInside.get());
+        assertEquals(0, ExecutionLockManager.holders(lockName));
     }
 
     @Test
@@ -83,6 +102,7 @@ class ExecutionLockManagerTest {
 
         first.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         second.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        assertEquals(0, ExecutionLockManager.holders(lockName));
     }
 
     @Test
@@ -90,19 +110,19 @@ class ExecutionLockManagerTest {
         CountDownLatch readerHolding = new CountDownLatch(1);
         CountDownLatch releaseReader = new CountDownLatch(1);
         AtomicBoolean writerRan = new AtomicBoolean();
-        Future<?> reader = executor.submit(ExecutionLockManager.wrapWithLockAndRelease(
-                lockName, ExecutionLockType.READ, () -> awaitAfterSignalling(readerHolding, releaseReader)));
+        Future<?> reader = holdUntil(ExecutionLockType.READ, readerHolding, releaseReader);
         assertTrue(readerHolding.await(TIMEOUT_SECONDS, TimeUnit.SECONDS));
 
         Future<?> writer = executor.submit(ExecutionLockManager.wrapWithLockAndRelease(
                 lockName, ExecutionLockType.WRITE, () -> writerRan.set(true)));
-        settle();
+        awaitQueuedThreads();
         assertFalse(writerRan.get());
 
         releaseReader.countDown();
         reader.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         writer.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         assertTrue(writerRan.get());
+        assertEquals(0, ExecutionLockManager.holders(lockName));
     }
 
     @Test
@@ -110,24 +130,23 @@ class ExecutionLockManagerTest {
         CountDownLatch writerHolding = new CountDownLatch(1);
         CountDownLatch releaseWriter = new CountDownLatch(1);
         AtomicBoolean readerRan = new AtomicBoolean();
-        Future<?> writer = executor.submit(ExecutionLockManager.wrapWithLockAndRelease(
-                lockName, ExecutionLockType.WRITE, () -> awaitAfterSignalling(writerHolding, releaseWriter)));
+        Future<?> writer = holdUntil(ExecutionLockType.WRITE, writerHolding, releaseWriter);
         assertTrue(writerHolding.await(TIMEOUT_SECONDS, TimeUnit.SECONDS));
 
         Future<?> reader = executor.submit(ExecutionLockManager.wrapWithLockAndRelease(
                 lockName, ExecutionLockType.READ, () -> readerRan.set(true)));
-        settle();
+        awaitQueuedThreads();
         assertFalse(readerRan.get());
 
         releaseWriter.countDown();
         writer.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         reader.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         assertTrue(readerRan.get());
+        assertEquals(0, ExecutionLockManager.holders(lockName));
     }
 
     @Test
     void noLocksAreTrackedOnceEverythingIsReleased() throws Exception {
-        int before = ExecutionLockManager.trackedLockCount();
         List<Future<?>> futures = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
             ExecutionLockType type = i % 3 == 0 ? ExecutionLockType.WRITE : ExecutionLockType.READ;
@@ -138,12 +157,13 @@ class ExecutionLockManagerTest {
             future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         }
 
-        assertEquals(before, ExecutionLockManager.trackedLockCount());
+        for (int i = 0; i < 4; i++) {
+            assertEquals(0, ExecutionLockManager.holders(lockName + i));
+        }
     }
 
     @Test
     void aLockHeldWhileOthersWaitIsNeverReplaced() throws Exception {
-        int before = ExecutionLockManager.trackedLockCount();
         CountDownLatch holding = new CountDownLatch(1);
         CountDownLatch release = new CountDownLatch(1);
         AtomicInteger inside = new AtomicInteger();
@@ -158,13 +178,15 @@ class ExecutionLockManagerTest {
 
         List<Future<?>> waiters = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            waiters.add(executor.submit(ExecutionLockManager.wrapWithLockAndRelease(
-                    lockName,
-                    ExecutionLockType.WRITE,
-                    () -> maxInside.accumulateAndGet(inside.incrementAndGet(), Math::max))));
+            waiters.add(executor.submit(
+                    ExecutionLockManager.wrapWithLockAndRelease(lockName, ExecutionLockType.WRITE, () -> {
+                        maxInside.accumulateAndGet(inside.incrementAndGet(), Math::max);
+                        inside.decrementAndGet();
+                    })));
         }
-        settle();
-        assertEquals(before + 1, ExecutionLockManager.trackedLockCount());
+        awaitHolders(4);
+        awaitQueuedThreads();
+        assertEquals(4, ExecutionLockManager.holders(lockName));
         assertEquals(1, inside.get());
 
         release.countDown();
@@ -172,16 +194,15 @@ class ExecutionLockManagerTest {
         for (Future<?> waiter : waiters) {
             waiter.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         }
-        assertEquals(before, ExecutionLockManager.trackedLockCount());
+        assertEquals(1, maxInside.get());
+        assertEquals(0, ExecutionLockManager.holders(lockName));
     }
 
     @Test
-    void aFailedTryLockLeavesNoEntryBehind() throws Exception {
-        int before = ExecutionLockManager.trackedLockCount();
+    void aFailedTryLockLeavesNoCountBehind() throws Exception {
         CountDownLatch holding = new CountDownLatch(1);
         CountDownLatch release = new CountDownLatch(1);
-        Future<?> holder = executor.submit(ExecutionLockManager.wrapWithLockAndRelease(
-                lockName, ExecutionLockType.WRITE, () -> awaitAfterSignalling(holding, release)));
+        Future<?> holder = holdUntil(ExecutionLockType.WRITE, holding, release);
         assertTrue(holding.await(TIMEOUT_SECONDS, TimeUnit.SECONDS));
         AtomicBoolean ran = new AtomicBoolean();
 
@@ -191,16 +212,29 @@ class ExecutionLockManagerTest {
                     .get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         }
         assertFalse(ran.get());
-        assertEquals(before + 1, ExecutionLockManager.trackedLockCount());
+        assertEquals(1, ExecutionLockManager.holders(lockName));
 
         release.countDown();
         holder.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        assertEquals(before, ExecutionLockManager.trackedLockCount());
+        assertEquals(0, ExecutionLockManager.holders(lockName));
+    }
+
+    @Test
+    void aFailedWriteTryLockWhileTheSameThreadHoldsAReadKeepsItsCount() {
+        ExecutionLockManager.lock(lockName, ExecutionLockType.READ);
+        AtomicBoolean ran = new AtomicBoolean();
+
+        ExecutionLockManager.wrapWithTryLockAndRelease(lockName, ExecutionLockType.WRITE, () -> ran.set(true))
+                .run();
+
+        assertFalse(ran.get());
+        assertEquals(1, ExecutionLockManager.holders(lockName));
+        ExecutionLockManager.unlock(lockName, ExecutionLockType.READ);
+        assertEquals(0, ExecutionLockManager.holders(lockName));
     }
 
     @Test
     void aSuccessfulTryLockRunsTheTaskAndReleases() throws Exception {
-        int before = ExecutionLockManager.trackedLockCount();
         AtomicBoolean ran = new AtomicBoolean();
 
         executor.submit(ExecutionLockManager.wrapWithTryLockAndRelease(
@@ -208,45 +242,73 @@ class ExecutionLockManagerTest {
                 .get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
         assertTrue(ran.get());
-        assertEquals(before, ExecutionLockManager.trackedLockCount());
+        assertEquals(0, ExecutionLockManager.holders(lockName));
     }
 
     @Test
     void aThrowingTaskStillReleasesTheLock() throws Exception {
-        int before = ExecutionLockManager.trackedLockCount();
         Runnable failing = ExecutionLockManager.wrapWithLockAndRelease(lockName, ExecutionLockType.WRITE, () -> {
             throw new IllegalStateException("boom");
         });
 
         assertThrows(IllegalStateException.class, failing::run);
 
-        assertEquals(before, ExecutionLockManager.trackedLockCount());
+        assertEquals(0, ExecutionLockManager.holders(lockName));
         executor.submit(ExecutionLockManager.wrapWithLockAndRelease(lockName, ExecutionLockType.WRITE, () -> {}))
                 .get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
     @Test
     void unlockingALockThatIsNotHeldThrowsAndTracksNothing() {
-        int before = ExecutionLockManager.trackedLockCount();
-
         assertThrows(
                 IllegalMonitorStateException.class,
                 () -> ExecutionLockManager.unlock(lockName, ExecutionLockType.WRITE));
 
-        assertEquals(before, ExecutionLockManager.trackedLockCount());
+        assertEquals(0, ExecutionLockManager.holders(lockName));
+    }
+
+    @Test
+    void unlockingAnotherThreadsLockThrowsAndKeepsItsCount() throws Exception {
+        CountDownLatch holding = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        Future<?> holder = holdUntil(ExecutionLockType.WRITE, holding, release);
+        assertTrue(holding.await(TIMEOUT_SECONDS, TimeUnit.SECONDS));
+
+        assertThrows(
+                IllegalMonitorStateException.class,
+                () -> ExecutionLockManager.unlock(lockName, ExecutionLockType.WRITE));
+        assertThrows(
+                IllegalMonitorStateException.class,
+                () -> ExecutionLockManager.unlock(lockName, ExecutionLockType.READ));
+        assertEquals(1, ExecutionLockManager.holders(lockName));
+
+        release.countDown();
+        holder.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        assertEquals(0, ExecutionLockManager.holders(lockName));
     }
 
     @Test
     void theSameThreadMayReacquireAndMustReleaseEachTime() {
-        int before = ExecutionLockManager.trackedLockCount();
-
         ExecutionLockManager.lock(lockName, ExecutionLockType.WRITE);
         ExecutionLockManager.lock(lockName, ExecutionLockType.WRITE);
         ExecutionLockManager.unlock(lockName, ExecutionLockType.WRITE);
-        assertEquals(before + 1, ExecutionLockManager.trackedLockCount());
+        assertEquals(1, ExecutionLockManager.holders(lockName));
         ExecutionLockManager.unlock(lockName, ExecutionLockType.WRITE);
 
-        assertEquals(before, ExecutionLockManager.trackedLockCount());
+        assertEquals(0, ExecutionLockManager.holders(lockName));
+    }
+
+    @Test
+    void aWriterMayTakeAReadLockAndReleaseBothInAnyOrder() {
+        ExecutionLockManager.lock(lockName, ExecutionLockType.WRITE);
+        ExecutionLockManager.lock(lockName, ExecutionLockType.READ);
+        assertEquals(2, ExecutionLockManager.holders(lockName));
+
+        ExecutionLockManager.unlock(lockName, ExecutionLockType.WRITE);
+        assertEquals(1, ExecutionLockManager.holders(lockName));
+        ExecutionLockManager.unlock(lockName, ExecutionLockType.READ);
+
+        assertEquals(0, ExecutionLockManager.holders(lockName));
     }
 
     private static void awaitAfterSignalling(CountDownLatch signal, CountDownLatch until) {

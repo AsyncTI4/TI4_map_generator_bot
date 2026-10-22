@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lombok.experimental.UtilityClass;
@@ -28,29 +29,27 @@ public class ExecutionLockManager {
     public static void lock(String lockName, ExecutionLockType lockType) {
         Entry entry = acquire(lockName);
         long lockStartTime = System.currentTimeMillis();
-        try {
-            entry.lockOf(lockType).lock();
-        } catch (RuntimeException | Error e) {
-            release(lockName);
-            throw e;
-        }
+        entry.lockOf(lockType).lock();
         long timeToGetLock = System.currentTimeMillis() - lockStartTime;
         if (timeToGetLock >= 1000) {
+            warnSlowLockIgnoringLoggingFailures(lockName, timeToGetLock);
+        }
+    }
+
+    private static void warnSlowLockIgnoringLoggingFailures(String lockName, long timeToGetLock) {
+        try {
             BotLogger.warning("Took " + timeToGetLock + " ms to get lock \"" + lockName + "\"");
+        } catch (RuntimeException e) {
         }
     }
 
     private static boolean tryLock(String lockName, ExecutionLockType lockType) {
         Entry entry = acquire(lockName);
-        boolean gotLock = false;
-        try {
-            gotLock = entry.lockOf(lockType).tryLock();
-            return gotLock;
-        } finally {
-            if (!gotLock) {
-                release(lockName);
-            }
+        boolean gotLock = entry.lockOf(lockType).tryLock();
+        if (!gotLock) {
+            release(lockName);
         }
+        return gotLock;
     }
 
     public static void unlock(String lockName, ExecutionLockType lockType) {
@@ -62,8 +61,14 @@ public class ExecutionLockManager {
         release(lockName);
     }
 
-    static int trackedLockCount() {
-        return locks.size();
+    static int holders(String lockName) {
+        Entry entry = locks.get(lockName);
+        return entry == null ? 0 : entry.holders;
+    }
+
+    static boolean hasQueuedThreads(String lockName) {
+        Entry entry = locks.get(lockName);
+        return entry != null && entry.lock.hasQueuedThreads();
     }
 
     private static Entry acquire(String lockName) {
@@ -75,13 +80,18 @@ public class ExecutionLockManager {
     }
 
     private static void release(String lockName) {
+        AtomicBoolean wasTracked = new AtomicBoolean(true);
         locks.compute(lockName, (_, entry) -> {
             if (entry == null) {
+                wasTracked.set(false);
                 return null;
             }
             entry.holders--;
             return entry.holders > 0 ? entry : null;
         });
+        if (!wasTracked.get()) {
+            BotLogger.error("Released lock \"" + lockName + "\" that was not tracked.", new IllegalStateException());
+        }
     }
 
     public static Runnable wrapWithTryLockAndRelease(String lockName, ExecutionLockType lockType, Runnable task) {
