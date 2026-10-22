@@ -3706,6 +3706,63 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
     }
 
+    public void resetSecretObjectiveDeck(DeckModel deck) {
+        setSoDeckID(deck.getAlias());
+        setSecretObjectives(deck.getNewShuffledDeck());
+        new ArrayList<>(soToPoList).forEach(this::removeRevealedObjective);
+        for (Player player : players.values()) {
+            player.getSecrets().clear();
+            player.getSecretsScored().clear();
+        }
+    }
+
+    public void resetRelicDeck(DeckModel deck) {
+        setRelicDeckID(deck.getAlias());
+        setRelics(deck.getNewShuffledDeck());
+        for (Player player : players.values()) {
+            List<String> deckRelics = player.getRelics().stream()
+                    .filter(relic -> !Mapper.isValidRelic(relic)
+                            || !Mapper.getRelic(relic).isFakeRelic())
+                    .distinct()
+                    .toList();
+            for (String relic : deckRelics) {
+                player.removeRelic(relic);
+                player.getRelics().removeIf(relic::equals);
+                player.getExhaustedRelics().removeIf(relic::equals);
+            }
+        }
+    }
+
+    public void resetAgendaDeck(DeckModel deck) {
+        for (String lawID : new ArrayList<>(laws.keySet())) {
+            if (!Constants.VOICE_OF_THE_COUNCIL_ID.equalsIgnoreCase(lawID)) {
+                removeLaw(lawID);
+            }
+        }
+        discardAgendas.clear();
+        sentAgendas.clear();
+        installAgendaDeck(deck);
+    }
+
+    public void resetEventDeck(DeckModel deck) {
+        setEventDeckID(deck.getAlias());
+        setEvents(deck.getNewShuffledDeck());
+        eventsInEffect.clear();
+        discardedEvents.clear();
+        for (Player player : players.values()) {
+            player.getEvents().clear();
+        }
+    }
+
+    public void resetExplorationDeck(DeckModel deck) {
+        setExplorationDeckID(deck.getAlias());
+        explore = new ArrayList<>(deck.getNewShuffledDeck());
+        discardExplore.clear();
+        for (Player player : players.values()) {
+            player.setFragments(new ArrayList<>());
+        }
+    }
+
     public boolean validateAndSetActionCardDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getAcDeckID().equals(deck.getAlias())) return true;
 
@@ -3824,6 +3881,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                             + "** while there are agendas in the discard pile.");
             return false;
         }
+        installAgendaDeck(deck);
+        return true;
+    }
+
+    private void installAgendaDeck(DeckModel deck) {
         setAgendaDeckID(deck.getAlias());
         setAgendas(deck.getNewShuffledDeck());
         if ("agendas_br".equalsIgnoreCase(deck.getAlias())) {
@@ -3894,7 +3956,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             Collections.shuffle(list);
             setMandates(list);
         }
-        return true;
     }
 
     private boolean validateAndSetTechnologyDeck(DeckModel deck) {
