@@ -2,8 +2,6 @@ package ti4.model;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -101,8 +100,8 @@ public class Mapper {
     @Getter
     private static volatile Map<String, BreakthroughModel> breakthroughs = new HashMap<>();
 
-    private static final Cache<String, ColorModel> colorToColorModelCache =
-            Caffeine.newBuilder().maximumSize(1000).build();
+    private static volatile Map<String, ColorModel> colorsByAnyName = new HashMap<>();
+    private static volatile Set<String> unitAsyncIds = Set.of();
 
     private static final JsonMapper jsonMapper = JsonMapperManager.basic()
             .rebuild()
@@ -159,7 +158,9 @@ public class Mapper {
         specialCase = readData("special_case.properties");
         tokensFromProperties = readData("tokens.properties");
 
-        colorToColorModelCache.invalidateAll();
+        colorsByAnyName = indexColorsByAnyName(colors);
+        unitAsyncIds = Collections.unmodifiableSet(
+                units.values().stream().map(UnitModel::getAsyncId).collect(Collectors.toSet()));
     }
 
     private static Properties readData(String propertyFileName) throws IOException {
@@ -561,14 +562,17 @@ public class Mapper {
 
     public static ColorModel getColor(String color) {
         if (color == null || "null".equals(color)) return null;
-        return colorToColorModelCache.get(color, c -> {
-            for (ColorModel col : colors.values()) {
-                if (col.getAlias().equals(color)) return col;
-                if (col.getName().equals(color)) return col;
-                if (col.getAliases().contains(color)) return col;
-            }
-            return null;
-        });
+        return colorsByAnyName.get(color);
+    }
+
+    private static Map<String, ColorModel> indexColorsByAnyName(Map<String, ColorModel> colorsByAlias) {
+        Map<String, ColorModel> index = new HashMap<>();
+        for (ColorModel color : colorsByAlias.values()) {
+            index.putIfAbsent(color.getAlias(), color);
+            index.putIfAbsent(color.getName(), color);
+            for (String alias : color.getAliases()) index.putIfAbsent(alias, color);
+        }
+        return index;
     }
 
     public static boolean isValidColor(String color) {
@@ -1378,7 +1382,7 @@ public class Mapper {
     }
 
     public static Set<String> getUnitIDList() {
-        return units.values().stream().map(UnitModel::getAsyncId).collect(Collectors.toSet());
+        return unitAsyncIds;
     }
 
     public static String getUnitBaseTypeFromAsyncID(String asyncID) {
