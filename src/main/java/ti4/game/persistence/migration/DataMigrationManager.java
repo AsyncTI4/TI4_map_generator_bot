@@ -48,9 +48,6 @@ public class DataMigrationManager {
 
     static {
         migrations = new HashMap<>();
-        migrations.put(
-                "replaceRemovedBaldrickUnitUpgrades_221026_withEnded",
-                DataMigrationManager::replaceRemovedBaldrickUnitUpgrades_221026_withEnded);
     }
 
     public static void runMigrations() {
@@ -148,32 +145,5 @@ public class DataMigrationManager {
             migrationsApplied.add(game.getName());
         }
         return migrationsApplied;
-    }
-
-    static Boolean replaceRemovedBaldrickUnitUpgrades_221026_withEnded(Game game) {
-        Map<String, String> techReplacements = Map.of(
-                "baldrick_ac2", "ac2",
-                "baldrick_cv2", "cv2",
-                "baldrick_dn2", "dn2",
-                "baldrick_exo2", "exo2",
-                "baldrick_ff2", "ff2",
-                "baldrick_hcf2", "hcf2",
-                "baldrick_ht2", "ht2",
-                "baldrick_pds2", "pds2",
-                "baldrick_sdn2", "sdn2");
-        Map<String, String> unitReplacements = Map.of(
-                "baldrick_carrier2", "carrier2",
-                "baldrick_sol_carrier2", "sol_carrier2",
-                "baldrick_dreadnought2", "dreadnought2",
-                "baldrick_sardakk_dreadnought2", "sardakk_dreadnought2",
-                "baldrick_l1z1x_dreadnought2", "l1z1x_dreadnought2",
-                "baldrick_fighter2", "fighter2",
-                "baldrick_naalu_fighter2", "naalu_fighter2",
-                "baldrick_pds2", "pds2",
-                "baldrick_titans_pds2", "titans_pds2");
-
-        boolean techsReplaced = MigrationHelper.replaceTechs(game, techReplacements);
-        boolean unitsReplaced = MigrationHelper.replaceUnitsOwned(game, unitReplacements);
-        return techsReplaced || unitsReplaced;
     }
 }

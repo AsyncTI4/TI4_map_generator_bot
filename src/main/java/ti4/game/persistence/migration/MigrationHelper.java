@@ -91,31 +91,6 @@ class MigrationHelper {
         return mapNeededMigrating;
     }
 
-    static boolean replaceTechs(Game game, Map<String, String> replacements) {
-        boolean found = false;
-        for (Player player : game.getPlayers().values()) {
-            for (Map.Entry<String, String> entry : replacements.entrySet()) {
-                String toReplace = entry.getKey();
-                String replacement = entry.getValue();
-                found |= replaceWithoutDuplicating(player.getTechs(), toReplace, replacement);
-                found |= replaceWithoutDuplicating(player.getExhaustedTechs(), toReplace, replacement);
-                found |= replaceWithoutDuplicating(player.getPurgedTechs(), toReplace, replacement);
-                found |= replaceWithoutDuplicating(player.getFactionTechs(), toReplace, replacement);
-            }
-        }
-        return found;
-    }
-
-    static boolean replaceUnitsOwned(Game game, Map<String, String> replacements) {
-        boolean found = false;
-        for (Player player : game.getPlayers().values()) {
-            for (Map.Entry<String, String> entry : replacements.entrySet()) {
-                found |= replace(player.getUnitsOwned(), entry.getKey(), entry.getValue());
-            }
-        }
-        return found;
-    }
-
     private static <K, V> boolean replaceKey(Map<K, V> map, K toReplace, K replacement) {
         if (map.containsKey(toReplace)) {
             V value = map.get(toReplace);
@@ -143,18 +118,6 @@ class MigrationHelper {
             index = list.indexOf(toReplace);
         }
         return replaced;
-    }
-
-    private static <K> boolean replaceWithoutDuplicating(List<K> list, K toReplace, K replacement) {
-        int index = list.indexOf(toReplace);
-        if (index < 0) {
-            return false;
-        }
-        list.removeIf(toReplace::equals);
-        if (!list.contains(replacement)) {
-            list.add(Math.min(index, list.size()), replacement);
-        }
-        return true;
     }
 
     public static void swapBagItem(DraftBag bag, int index, DraftItem newItem) {
