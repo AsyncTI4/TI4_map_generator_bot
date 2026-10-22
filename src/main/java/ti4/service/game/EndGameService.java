@@ -205,10 +205,26 @@ public class EndGameService {
         if (game.isRedTapeMode() || game.isCivilizedSocietyMode()) {
             return false;
         }
-        var endGameDeck =
-                game.isOmegaPhaseMode() ? game.getPublicObjectives1Peekable() : game.getPublicObjectives2Peekable();
-        var endGameRound = game.isOmegaPhaseMode() ? 9 : 7;
-        return game.getRound() > endGameRound || endGameDeck.isEmpty();
+        return finalObjectiveWasRevealedBefore(game) || endGameDeckIsEmpty(game);
+    }
+
+    private static boolean finalObjectiveWasRevealedBefore(Game game) {
+        if (game.isOmegaPhaseMode()) {
+            return game.getRound() > 9;
+        }
+        return game.getRound() > 9 || (game.getRound() == 9 && hasReachedStatusPhase(game));
+    }
+
+    private static boolean hasReachedStatusPhase(Game game) {
+        String phase = game.getPhaseOfGame();
+        return phase.contains("status") || phase.contains("agenda");
+    }
+
+    private static boolean endGameDeckIsEmpty(Game game) {
+        if (game.isOmegaPhaseMode()) {
+            return game.getPublicObjectives1Peekable().isEmpty() && game.getPublicObjectives1DeckSize() == 0;
+        }
+        return game.getPublicObjectives2Peekable().isEmpty() && game.getPublicObjectives2DeckSize() == 0;
     }
 
     public static void recordMostPointsWinner(Game game, MessageChannel channel) {
