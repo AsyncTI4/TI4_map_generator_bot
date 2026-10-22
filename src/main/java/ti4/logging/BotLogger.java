@@ -233,8 +233,6 @@ public class BotLogger {
             @Nullable Throwable err,
             @Nonnull LogSeverity severity,
             @Nullable String threadName) {
-        reportToRollbar(origin, message, err, severity);
-
         // Count Error-severity logs once per entry
         if (severity.isErrorOrHigher()) {
             SREStats.incrementErrorCount();
@@ -319,17 +317,6 @@ public class BotLogger {
                 }
             }
         }
-    }
-
-    private static void reportToRollbar(
-            @Nullable LogOrigin origin,
-            @Nonnull String message,
-            @Nullable Throwable err,
-            @Nonnull LogSeverity severity) {
-        if (err == null) {
-            return;
-        }
-        RollbarManager.report(severity.rollbarLevel, err, message, origin);
     }
 
     private static void sendMessageToThread(

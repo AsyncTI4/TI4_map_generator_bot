@@ -18,7 +18,6 @@ import ti4.helpers.settingsFramework.menus.BaseGameMiniMiltySettings;
 import ti4.helpers.settingsFramework.menus.FrankenSettings;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
-import ti4.logging.RollbarManager;
 import ti4.message.MessageHelper;
 import ti4.service.game.GameNameService;
 import ti4.spring.context.SpringContext;
@@ -77,10 +76,6 @@ public final class ModalListener extends ListenerAdapter {
             return;
         }
         try {
-            RollbarManager.putInteractionMetadata("modal", event);
-            RollbarManager.put("modal_id", event.getModalId());
-            RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
-
             CombatReplayService combatReplayService =
                     CombatContestSettings.isEnabledStatic() ? SpringContext.getBean(CombatReplayService.class) : null;
             if (combatReplayService != null) {
@@ -99,8 +94,6 @@ public final class ModalListener extends ListenerAdapter {
             String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: "
                     + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
             BotLogger.error(new LogOrigin(event), message, e);
-        } finally {
-            RollbarManager.clear();
         }
     }
 
