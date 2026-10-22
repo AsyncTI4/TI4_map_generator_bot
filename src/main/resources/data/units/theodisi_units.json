@@ -749,7 +749,7 @@
     "source": "theodisi",
     "faction": "scrapyard",
     "moveValue": 1,
-    "capacityValue": 0,
+    "capacityValue": 2,
     "capacityUsed": 1,
     "cost": 6,
     "combatHitsOn": 7,
@@ -837,7 +837,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "At the end of the status phase, you may remove 3 of your mechs from the same planet to draw 1 random Stoneborn relic fragment.\nUNLEASH: Return 2 red fragmentum tokens from your player sheet."
+    "ability": "At the end of the status phase, you may remove 3 of your mechs from the same planet to draw 1 random Stoneborn relic fragment.\n\n**UNLEASH**: Return 2 red fragmentum tokens from your player sheet."
   },
   {
     "id": "stoneborn_mechunleashed",
@@ -901,6 +901,8 @@
     "id": "stoneborn_dreadnought2unleashed",
     "baseType": "dreadnought",
     "asyncId": "dn",
+    "upgradesFromUnitId": "stoneborn_dreadnought",
+    "requiredTechId": "thstoneborndnu",
     "name": "Stalactium II Unleashed",
     "source": "theodisi",
     "faction": "stoneborn",

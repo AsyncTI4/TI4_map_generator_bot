@@ -1657,7 +1657,6 @@ public final class ButtonHelperAgents {
             }
             return;
         }
-
         TkHelperGenomes.onExhaust(event, game, player, agent, ssruuClever, rest);
 
         if (event instanceof ButtonInteractionEvent buttonEvent) {

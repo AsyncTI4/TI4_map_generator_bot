@@ -26,6 +26,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
@@ -312,6 +314,9 @@ public class StartPhaseService {
         // callers all already fire from the main channel, so event.getMessageChannel() stays unchanged.
         MessageHelper.sendMessageToChannel(
                 game.isFowMode() ? game.getMainGameChannel() : event.getMessageChannel(), "Started Round " + round);
+        for (Player player : game.getRealPlayers()) {
+            StonebornAbilityHandler.drawTrovantousFragment(game, player);
+        }
         for (Player player : game.getRealPlayers()) {
             if (!player.hasAbility("allure_of_darkness")) {
                 continue;
@@ -839,6 +844,7 @@ public class StartPhaseService {
                 }
             }
         }
+        StonebornUnitHandler.offerGolemStatusPhase(game, player);
         if (player.getRelics() != null && player.hasRelic("twilight_mirror") && game.isCustodiansScored()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),

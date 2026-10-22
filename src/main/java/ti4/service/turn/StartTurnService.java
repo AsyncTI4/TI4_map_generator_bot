@@ -33,6 +33,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardPromissoryHandler;
@@ -111,6 +114,7 @@ public class StartTurnService {
             return;
         }
         game.removeStoredValue("currentActionSummary" + player.getFaction());
+        game.removeStoredValue("stonebornTempusUsedAction_" + player.getFaction());
 
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         Map<String, String> maps = new HashMap<>(game.getStoredValueMap());
@@ -560,6 +564,20 @@ public class StartTurnService {
         List<Button> startButtons = new ArrayList<>();
         Button economicBoonButton = LostLegaciesRelicHandler.getEconomicBoonStartTurnButton(game, player);
         if (economicBoonButton != null) startButtons.add(economicBoonButton);
+        if (!doneActionThisTurn) {
+            Button hazorusButton = StonebornLeadersHandler.getHazorusStartTurnButton(player);
+            if (hazorusButton != null) {
+                startButtons.add(hazorusButton);
+            }
+            Button adaptiveButton = StonebornAbilityHandler.getAdaptiveStartTurnButton(game, player);
+            if (adaptiveButton != null) {
+                startButtons.add(adaptiveButton);
+            }
+            Button stalactiumButton = StonebornUnitHandler.getStalactiumStartTurnButton(game, player);
+            if (stalactiumButton != null) {
+                startButtons.add(stalactiumButton);
+            }
+        }
         if (!doneActionThisTurn) startButtons.addAll(ThirtyKExploreHooks.getStartOfTurnButtons(player));
         if (!doneActionThisTurn
                 && player.hasRelicReady("waxing_moonphase")

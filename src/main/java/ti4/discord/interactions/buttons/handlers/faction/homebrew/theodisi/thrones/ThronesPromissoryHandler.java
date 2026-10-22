@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -100,6 +101,7 @@ public class ThronesPromissoryHandler {
         }
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         OblivionUnitHandler.doOblivionMechCheck(game, player);
+        StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         if (owner != null && owner != player) {
             PromissoryNoteHelper.sendPromissoryNoteInfo(game, owner, false);

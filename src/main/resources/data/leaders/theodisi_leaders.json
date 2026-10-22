@@ -711,8 +711,8 @@
     "type": "agent",
     "name": "Hazorus Dormant",
     "title": "Nature's Bounty",
-    "abilityWindow": "ACTION:",
-    "abilityText": "Choose 1 player and exhaust this card; that player may purge 1 relic fragment to replenish their commodities.\nUNLEASH: Return 1 fragmentum token of any color.",
+    "abilityWindow": "At the start of a player's turn:",
+    "abilityText": "You may exhaust this card to allow that player to purge 1 relic fragment to replenish their commodities.\n\n**UNLEASH**: Return 1 fragmentum token of any color.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -722,8 +722,8 @@
     "type": "agent",
     "name": "Hazorus Unleashed",
     "title": "Nature's Wrath",
-    "abilityWindow": "ACTION:",
-    "abilityText": "Choose 1 player and exhaust this card; that player may purge 1 relic fragment to replenish their commodities. Then, you gain half as many (rounded down) trade goods.",
+    "abilityWindow": "At the start of a player's turn:",
+    "abilityText": "You may exhaust this card to allow that player to purge 1 relic fragment to replenish their commodities. Then, you gain half as many trade goods (rounded down).",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -734,7 +734,7 @@
     "name": "Tempus Dormant",
     "title": "Slumbering Storm",
     "abilityWindow": "Once per action, when you purge a non-action card component:",
-    "abilityText": "Gain 1 commodity.\nUNLEASH: Return 2 fragmentum tokens of different colors form your player sheet.",
+    "abilityText": "Gain 1 commodity.\n\n**UNLEASH**: Return 2 fragmentum tokens of different colors from your player sheet.",
     "unlockCondition": "Have a fragmentum token on your player sheet.",
     "source": "theodisi"
   },
@@ -757,7 +757,7 @@
     "title": "The First Stoneborn",
     "abilityName": "Destiny Denied - Limited Potential",
     "abilityWindow": "ACTION:",
-    "abilityText": "Draw 3 relics and choose 1 to gain. Shuffle the rest into the deck and purge this card.\nUNLEASH: Remove 3 fragmentum tokens from your player sheet.",
+    "abilityText": "Draw 3 relics and choose 1 to gain. Shuffle the rest into the deck and purge this card.\n\n**UNLEASH**: Remove 3 fragmentum tokens of different colors from your player sheet.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },

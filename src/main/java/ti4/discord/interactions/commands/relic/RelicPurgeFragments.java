@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -83,24 +85,58 @@ class RelicPurgeFragments extends GameStateSubcommand {
         if (fragmentsToPurge.size() == 1) {
             String fragid = fragmentsToPurge.getFirst();
             activePlayer.removeFragment(fragid);
-            game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+            if (!StonebornAbilityHandler.returnPurgedFragment(game, fragid)) {
+                game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+            }
             switch (fragid) {
-                case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9", "supermassivecultural" ->
+                case "crf1",
+                        "crf2",
+                        "crf3",
+                        "crf4",
+                        "crf5",
+                        "crf6",
+                        "crf7",
+                        "crf8",
+                        "crf9",
+                        "supermassivecultural",
+                        "stonebornculturalfragment",
+                        "stonebornculturalfragment2" ->
                     message.append(" a ")
                             .append(fragid.contains("supermassive") ? "supermassive " : "")
                             .append(ExploreEmojis.CFrag)
                             .append("cultural");
-                case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7", "supermassivehazardous" ->
+                case "hrf1",
+                        "hrf2",
+                        "hrf3",
+                        "hrf4",
+                        "hrf5",
+                        "hrf6",
+                        "hrf7",
+                        "supermassivehazardous",
+                        "stonebornhazardousfragment",
+                        "stonebornhazardousfragment2" ->
                     message.append(" a ")
                             .append(fragid.contains("supermassive") ? "supermassive " : "")
                             .append(ExploreEmojis.HFrag)
                             .append("hazardous");
-                case "irf1", "irf2", "irf3", "irf4", "irf5", "supermassiveindustrial" ->
+                case "irf1",
+                        "irf2",
+                        "irf3",
+                        "irf4",
+                        "irf5",
+                        "supermassiveindustrial",
+                        "stonebornindustrialfragment",
+                        "stonebornindustrialfragment2" ->
                     message.append(" an ")
                             .append(fragid.contains("supermassive") ? "supermassive " : "")
                             .append(ExploreEmojis.IFrag)
                             .append("industrial");
-                case "urf1", "urf2", "urf3", "supermassiveunknown" ->
+                case "urf1",
+                        "urf2",
+                        "urf3",
+                        "supermassiveunknown",
+                        "stonebornunknownfragment",
+                        "stonebornunknownfragment2" ->
                     message.append(" an ")
                             .append(fragid.contains("supermassive") ? "supermassive " : "")
                             .append(ExploreEmojis.UFrag)
@@ -111,7 +147,9 @@ class RelicPurgeFragments extends GameStateSubcommand {
         } else {
             for (String fragid : fragmentsToPurge) {
                 activePlayer.removeFragment(fragid);
-                game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+                if (!StonebornAbilityHandler.returnPurgedFragment(game, fragid)) {
+                    game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+                }
                 switch (fragid) {
                     case "crf1",
                             "crf2",
@@ -122,18 +160,41 @@ class RelicPurgeFragments extends GameStateSubcommand {
                             "crf7",
                             "crf8",
                             "crf9",
-                            "supermassivecultural" -> message.append(ExploreEmojis.CFrag);
-                    case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7", "supermassivehazardous" ->
-                        message.append(ExploreEmojis.HFrag);
-                    case "irf1", "irf2", "irf3", "irf4", "irf5", "supermassiveindustrial" ->
-                        message.append(ExploreEmojis.IFrag);
-                    case "urf1", "urf2", "urf3", "supermassiveunknown" -> message.append(ExploreEmojis.UFrag);
+                            "supermassivecultural",
+                            "stonebornculturalfragment",
+                            "stonebornculturalfragment2" -> message.append(ExploreEmojis.CFrag);
+                    case "hrf1",
+                            "hrf2",
+                            "hrf3",
+                            "hrf4",
+                            "hrf5",
+                            "hrf6",
+                            "hrf7",
+                            "supermassivehazardous",
+                            "stonebornhazardousfragment",
+                            "stonebornhazardousfragment2" -> message.append(ExploreEmojis.HFrag);
+                    case "irf1",
+                            "irf2",
+                            "irf3",
+                            "irf4",
+                            "irf5",
+                            "supermassiveindustrial",
+                            "stonebornindustrialfragment",
+                            "stonebornindustrialfragment2" -> message.append(ExploreEmojis.IFrag);
+                    case "urf1",
+                            "urf2",
+                            "urf3",
+                            "supermassiveunknown",
+                            "stonebornunknownfragment",
+                            "stonebornunknownfragment2" -> message.append(ExploreEmojis.UFrag);
                     default -> message.append(' ').append(fragid);
                 }
             }
             message.append(" relic fragments.");
         }
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
+        StonebornAbilityHandler.offerFragmentumTokenPlacement(game, activePlayer, event, fragmentsToPurge);
+        StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, activePlayer);
         MessageHelper.sendMessageToEventChannel(event, message.toString());
         ArcanumLeadersHandler.offerArcanumCommanderTechPurge(game, activePlayer, event, fragmentsToPurge.size());
 

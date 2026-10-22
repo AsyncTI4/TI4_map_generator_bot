@@ -47,6 +47,7 @@ import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
@@ -476,6 +477,7 @@ public class PlayerAreaGenerator {
         xDeltaBottom = crimsonRebellionTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = galvanizeTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = theodisiTokenSupplies(player, xDeltaBottom, yPlayAreaSecondRow);
+        xDeltaBottom = fragmentumTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = dreamNexusTokenSupply(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = sleeperTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = creussWormholeTokens(player, xDeltaBottom, yPlayAreaSecondRow);
@@ -1072,6 +1074,36 @@ public class PlayerAreaGenerator {
         return xDeltaFromRightSide;
     }
 
+    private int fragmentumTokens(Player player, int xDeltaFromRightSide, int yDelta) {
+        if (!player.hasAbility("fragmentum_unleashed")) {
+            return xDeltaFromRightSide;
+        }
+        xDeltaFromRightSide = displayTheodisiTokenSupply(
+                "token_theodisi_fragmentumblue.png",
+                3,
+                StonebornAbilityHandler.getFragmentumTokenCount(game, player, "cultural"),
+                xDeltaFromRightSide,
+                yDelta);
+        xDeltaFromRightSide = displayTheodisiTokenSupply(
+                "token_theodisi_fragmentumred.png",
+                3,
+                StonebornAbilityHandler.getFragmentumTokenCount(game, player, "hazardous"),
+                xDeltaFromRightSide,
+                yDelta);
+        xDeltaFromRightSide = displayTheodisiTokenSupply(
+                "token_theodisi_fragmentumgreen.png",
+                3,
+                StonebornAbilityHandler.getFragmentumTokenCount(game, player, "industrial"),
+                xDeltaFromRightSide,
+                yDelta);
+        return displayTheodisiTokenSupply(
+                "token_theodisi_fragmentumgray.png",
+                3,
+                StonebornAbilityHandler.getFragmentumTokenCount(game, player, "frontier"),
+                xDeltaFromRightSide,
+                yDelta);
+    }
+
     private int dreamNexusTokenSupply(Player player, int xDeltaFromRightSide, int yDelta) {
         if (!player.hasAbility("dream_nexus")) {
             return xDeltaFromRightSide;
@@ -1466,10 +1498,29 @@ public class PlayerAreaGenerator {
         }
         for (int i = 0; i < fragments.size(); i++) {
             if (!fragments.get(i).startsWith("supermassive")) {
-                drawPAImage(x + 475 + xDelta + i * 15, y + yDelta - 25, fragmentImage);
+                int fragmentX = x + 475 + xDelta + i * 15;
+                int fragmentY = y + yDelta - 25;
+                drawPAImage(fragmentX, fragmentY, fragmentImage);
+                if (isStonebornFragment(fragments.get(i))) {
+                    drawFactionIconImage(graphics, "stoneborn", fragmentX + 9, fragmentY + 10, 54, 50);
+                }
             }
         }
         return xDelta + fragments.size() * 15;
+    }
+
+    private boolean isStonebornFragment(String fragmentId) {
+        return switch (fragmentId) {
+            case "stonebornculturalfragment",
+                    "stonebornculturalfragment2",
+                    "stonebornhazardousfragment",
+                    "stonebornhazardousfragment2",
+                    "stonebornindustrialfragment",
+                    "stonebornindustrialfragment2",
+                    "stonebornunknownfragment",
+                    "stonebornunknownfragment2" -> true;
+            default -> false;
+        };
     }
 
     private int relicInfo(Player player, int x, int y) {

@@ -26,6 +26,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesUnitHandler;
@@ -528,6 +530,13 @@ public class CardsInfoService {
         }
         if (player.hasAbility("reflections_of_the_void") && OblivionAbilityHandler.hasReflections(game)) {
             buttons.add(OblivionAbilityHandler.getReflectionLedgerButton(player));
+        }
+        if (player.hasAbility("fragmentum_unleashed")) {
+            buttons.add(StonebornAbilityHandler.getFragmentumTokensInfoButton(player));
+        }
+        if (player.hasUnexhaustedLeader("stonebornagentdormant")
+                || player.hasUnexhaustedLeader("stonebornagentunleashed")) {
+            buttons.add(StonebornLeadersHandler.getHazorusCardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("thronesagent")) {
             buttons.add(ThronesLeadersHandler.getThronesAgentButton(player));

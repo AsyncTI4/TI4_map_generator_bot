@@ -409,7 +409,7 @@
     "requirements": "G",
     "faction": "stoneborn",
     "source": "theodisi",
-    "text": "UNLEASH: Return 2 Green Fragmentum Tokens from your player sheet.\nWhen you would explore a planet you control or the frontier deck, you may exhaust this card and instead reveal cards from that deck until you reveal a relic fragment. Resolve that exploration and shuffle the remaining revealed cards back into that exploration deck."
+    "text": "**UNLEASH**: Return 2 Green Fragmentum Tokens from your player sheet.\nWhen you would explore a planet you control or the frontier deck, you may exhaust this card and instead reveal cards from that deck until you reveal a relic fragment. Resolve that exploration and shuffle the remaining revealed cards back into that exploration deck."
   },
   {
     "alias": "thstoneborngu",
@@ -432,7 +432,19 @@
     "requirements": "BBY",
     "faction": "stoneborn",
     "source": "theodisi",
-    "text": "UNLEASH: Return 2 Blue Fragmentum Tokens from your player sheet.\nDEPLOY: At the start of your turn, you may purge 1 relic fragment to place 1 dreadnought in a system containing your ships. This unit cannot be destroyed by \"Direct Hit\" Action Cards."
+    "text": "**UNLEASH**: Return 2 Blue Fragmentum Tokens from your player sheet.\nDEPLOY: At the start of your turn, you may purge 1 relic fragment to place 1 dreadnought in a system containing your ships. This unit cannot be destroyed by \"Direct Hit\" Action Cards."
+  },
+  {
+    "alias": "thstoneborndnu",
+    "name": "Stalactium II Unleashed",
+    "types": [
+        "UNITUPGRADE"
+    ],
+    "baseUpgrade": "dn2",
+    "requirements": "null",
+    "faction": "stoneborn",
+    "source": "theodisi",
+    "text": "DEPLOY: At the start of your turn, you may purge 1 relic fragment to place 1 dreadnought in a system containing your ships. This unit cannot be destroyed by \"Direct Hit\" Action Cards."
   },
   {
     "alias": "thmorphag",

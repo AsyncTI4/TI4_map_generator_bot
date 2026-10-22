@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -127,6 +128,7 @@ public class OblivionTechHandler {
         player.setUnitCap(unitKey.asyncID(), Math.max(0, player.getUnitCap(unitKey.asyncID()) - 1));
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         OblivionUnitHandler.doOblivionMechCheck(game, player);
+        StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
 
         ButtonHelper.deleteMessage(event);
         String message = player.getRepresentationNoPing() + " purged 1 " + unitKey.humanReadableName()
@@ -242,6 +244,7 @@ public class OblivionTechHandler {
         } else {
             DSHelperBreakthroughs.doLanefirBtCheck(game, player);
             OblivionUnitHandler.doOblivionMechCheck(game, player);
+            StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
         }
         ButtonHelper.deleteMessage(event);
     }
