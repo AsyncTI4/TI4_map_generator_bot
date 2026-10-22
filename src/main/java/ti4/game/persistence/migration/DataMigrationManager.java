@@ -14,8 +14,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
-import ti4.game.Player;
-import ti4.game.Tile;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.logging.BotLogger;
@@ -50,17 +48,9 @@ public class DataMigrationManager {
 
     static {
         migrations = new HashMap<>();
-        // migrations.put(
-        //         "renameGarboziaToBozgarbia_201025_withEnded",
-        //         DataMigrationManager::renameGarboziaToBozgarbia_201025_withEnded);
-        // migrations.put("fixMisspelledAgendaIds_200226", DataMigrationManager::fixMisspelledAgendaIds_200226);
-        // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
-        // migrations.put(
-        //         "unlockLockedAgentsBySetupState_120526",
-        //         DataMigrationManager::unlockLockedAgentsBySetupState_120526);
         migrations.put(
-                "replaceRemovedBaldrickUnitUpgrades_230125_withEnded",
-                DataMigrationManager::replaceRemovedBaldrickUnitUpgrades_230125_withEnded);
+                "replaceRemovedBaldrickUnitUpgrades_221026_withEnded",
+                DataMigrationManager::replaceRemovedBaldrickUnitUpgrades_221026_withEnded);
     }
 
     public static void runMigrations() {
@@ -160,54 +150,7 @@ public class DataMigrationManager {
         return migrationsApplied;
     }
 
-    private static Boolean renameGarboziaToBozgarbia_201025_withEnded(Game game) {
-        Tile old = null;
-        for (Tile t : game.getTileMap().values()) {
-            if ("sig01".equals(t.getTileID())) {
-                old = t;
-                break;
-            }
-        }
-        if (old == null) return false;
-
-        Player p = game.getPlanetOwner("garbozia");
-        if (p == null) return false;
-
-        p.getPlanets().remove("garbozia");
-        p.getExhaustedPlanets().remove("garbozia");
-        p.getExhaustedPlanetsAbilities().remove("garbozia");
-
-        p.getPlanets().add("bozgarbia");
-        p.getExhaustedPlanets().add("bozgarbia");
-        p.getExhaustedPlanetsAbilities().add("bozgarbia");
-        return true;
-    }
-
-    private static Boolean fixMisspelledAgendaIds_200226(Game game) {
-        Map<String, String> replacements = Map.of(
-                "disarmamament", "disarmament",
-                "absol_disarmamament", "absol_disarmament",
-                "cryypter_disarmamament", "cryypter_disarmament",
-                "minister_commrece", "minister_commerce",
-                "senate_sancuary", "senate_sanctuary");
-
-        return MigrationHelper.replaceAgendaCards(game, List.of(game.getAgendaDeckID()), replacements);
-    }
-
-    public static Boolean unlockLockedAgentsBySetupState_120526(Game game) {
-        boolean changed = false;
-        for (Player player : game.getPlayers().values()) {
-            for (var leader : player.getLeaders()) {
-                if (leader.isLocked() && "agent".equals(leader.getType())) {
-                    leader.setLocked(false);
-                    changed = true;
-                }
-            }
-        }
-        return changed;
-    }
-
-    static Boolean replaceRemovedBaldrickUnitUpgrades_230125_withEnded(Game game) {
+    static Boolean replaceRemovedBaldrickUnitUpgrades_221026_withEnded(Game game) {
         Map<String, String> techReplacements = Map.of(
                 "baldrick_ac2", "ac2",
                 "baldrick_cv2", "cv2",

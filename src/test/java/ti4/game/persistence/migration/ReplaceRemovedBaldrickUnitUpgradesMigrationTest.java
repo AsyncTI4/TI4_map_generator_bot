@@ -38,7 +38,7 @@ class ReplaceRemovedBaldrickUnitUpgradesMigrationTest extends BaseTi4Test {
         player.getPurgedTechs().add("baldrick_dn2");
         player.getFactionTechs().add("baldrick_exo2");
 
-        assertTrue(DataMigrationManager.replaceRemovedBaldrickUnitUpgrades_230125_withEnded(game));
+        assertTrue(DataMigrationManager.replaceRemovedBaldrickUnitUpgrades_221026_withEnded(game));
 
         assertEquals(List.of("gd", "ff2", "ac2"), player.getTechs());
         assertEquals(List.of("ff2"), player.getExhaustedTechs());
@@ -51,7 +51,7 @@ class ReplaceRemovedBaldrickUnitUpgradesMigrationTest extends BaseTi4Test {
     void replacesRemovedUnitsOwned() {
         player.setUnitsOwned(new HashSet<>(Set.of("carrier", "baldrick_sol_carrier2", "baldrick_fighter2")));
 
-        assertTrue(DataMigrationManager.replaceRemovedBaldrickUnitUpgrades_230125_withEnded(game));
+        assertTrue(DataMigrationManager.replaceRemovedBaldrickUnitUpgrades_221026_withEnded(game));
 
         assertEquals(Set.of("carrier", "sol_carrier2", "fighter2"), player.getUnitsOwned());
         player.getUnitsOwned().forEach(unit -> assertNotNull(Mapper.getUnit(unit), unit));
@@ -62,7 +62,7 @@ class ReplaceRemovedBaldrickUnitUpgradesMigrationTest extends BaseTi4Test {
     void doesNotDuplicateATechAlreadyHeld() {
         player.getTechs().addAll(List.of("ff2", "baldrick_ff2"));
 
-        DataMigrationManager.replaceRemovedBaldrickUnitUpgrades_230125_withEnded(game);
+        DataMigrationManager.replaceRemovedBaldrickUnitUpgrades_221026_withEnded(game);
 
         assertEquals(List.of("ff2"), player.getTechs());
     }
@@ -71,6 +71,6 @@ class ReplaceRemovedBaldrickUnitUpgradesMigrationTest extends BaseTi4Test {
     void reportsNoChangeForGamesWithoutRemovedIds() {
         player.getTechs().add("ff2");
 
-        assertFalse(DataMigrationManager.replaceRemovedBaldrickUnitUpgrades_230125_withEnded(game));
+        assertFalse(DataMigrationManager.replaceRemovedBaldrickUnitUpgrades_221026_withEnded(game));
     }
 }
