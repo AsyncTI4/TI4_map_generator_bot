@@ -1,5 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.actioncards.acd2;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
@@ -25,18 +26,20 @@ class TombRaidersAcd2ButtonHandler {
 
     @ButtonHandler("resolveTombRaiders")
     public static void resolveTombRaiders(Player player, Game game, ButtonInteractionEvent event) {
-        List<Button> buttons = getPlanetButtons(player, game);
-        ButtonHelper.deleteMessage(event);
+        List<String> activeSystemPlanets = getActiveSystemPlanets(player, game);
+        List<Button> buttons = new ArrayList<>(getPlanetButtons(player, game, activeSystemPlanets));
         if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " has no planets to target with _Tomb Raiders_.");
-            return;
+            buttons.addAll(getPlanetButtons(player, game, player.getPlanets()));
+        } else if (!getOtherPlanets(player, activeSystemPlanets).isEmpty()) {
+            buttons.add(Buttons.gray(player.factionButtonChecker() + "resolveTombRaidersOther", "Other"));
         }
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentation() + ", choose the planet you just gained for _Tomb Raiders_.",
-                buttons);
+        offerPlanets(player, game, event, buttons);
+    }
+
+    @ButtonHandler("resolveTombRaidersOther")
+    public static void resolveTombRaidersOther(Player player, Game game, ButtonInteractionEvent event) {
+        List<String> otherPlanets = getOtherPlanets(player, getActiveSystemPlanets(player, game));
+        offerPlanets(player, game, event, getPlanetButtons(player, game, otherPlanets));
     }
 
     @ButtonHandler("resolveTombRaidersStep2_")
@@ -72,16 +75,32 @@ class TombRaidersAcd2ButtonHandler {
         return planet.getHigherofInfluenceOrResource();
     }
 
-    private static List<Button> getPlanetButtons(Player player, Game game) {
-        List<String> planets = getActiveSystemPlanets(player, game);
-        if (planets.isEmpty()) {
-            planets = player.getPlanets();
+    private static void offerPlanets(Player player, Game game, ButtonInteractionEvent event, List<Button> buttons) {
+        ButtonHelper.deleteMessage(event);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has no planets to target with _Tomb Raiders_.");
+            return;
         }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose the planet you just gained for _Tomb Raiders_.",
+                buttons);
+    }
+
+    private static List<Button> getPlanetButtons(Player player, Game game, List<String> planets) {
         return planets.stream()
                 .limit(MAX_PLANET_BUTTONS)
                 .map(planet -> Buttons.green(
                         player.factionButtonChecker() + "resolveTombRaidersStep2_" + planet,
                         Helper.getPlanetRepresentation(planet, game)))
+                .toList();
+    }
+
+    private static List<String> getOtherPlanets(Player player, List<String> activeSystemPlanets) {
+        return player.getPlanets().stream()
+                .filter(planet -> !activeSystemPlanets.contains(planet))
                 .toList();
     }
 

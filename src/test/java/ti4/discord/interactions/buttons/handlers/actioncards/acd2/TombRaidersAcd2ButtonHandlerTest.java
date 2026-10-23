@@ -1,5 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.actioncards.acd2;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -13,6 +14,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -22,6 +24,7 @@ import org.mockito.MockedStatic;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.Helper;
@@ -44,6 +47,84 @@ class TombRaidersAcd2ButtonHandlerTest {
         String message = resolve(Set.of(), 2, 3, new ArrayDeque<>(List.of(9, 9, 9, 9, 9)), false);
 
         assertTrue(message.contains("rolled 5 dice"), message);
+    }
+
+    @Test
+    void offersOnlyActiveSystemPlanetsAndAnOtherButtonWhenThereIsAnActiveSystem() {
+        List<String> ids =
+                offeredButtonIds("resolveTombRaiders", "101", List.of("inactive", "active"), List.of("active"));
+
+        assertEquals(List.of("fcresolveTombRaidersStep2_active", "fcresolveTombRaidersOther"), ids);
+    }
+
+    @Test
+    void offersAllPlanetsWhenNoControlledPlanetIsInTheActiveSystem() {
+        List<String> ids = offeredButtonIds("resolveTombRaiders", "101", List.of("one", "two"), List.of());
+
+        assertEquals(List.of("fcresolveTombRaidersStep2_one", "fcresolveTombRaidersStep2_two"), ids);
+    }
+
+    @Test
+    void offersAllPlanetsWhenThereIsNoActiveSystem() {
+        List<String> ids = offeredButtonIds("resolveTombRaiders", null, List.of("one", "two"), List.of());
+
+        assertEquals(List.of("fcresolveTombRaidersStep2_one", "fcresolveTombRaidersStep2_two"), ids);
+    }
+
+    @Test
+    void omitsOtherButtonWhenEveryPlanetIsInTheActiveSystem() {
+        List<String> ids = offeredButtonIds("resolveTombRaiders", "101", List.of("active"), List.of("active"));
+
+        assertEquals(List.of("fcresolveTombRaidersStep2_active"), ids);
+    }
+
+    @Test
+    void otherButtonOffersThePlanetsOutsideTheActiveSystem() {
+        List<String> ids =
+                offeredButtonIds("resolveTombRaidersOther", "101", List.of("inactive", "active"), List.of("active"));
+
+        assertEquals(List.of("fcresolveTombRaidersStep2_inactive"), ids);
+    }
+
+    private static List<String> offeredButtonIds(
+            String handler, String activeSystem, List<String> playerPlanets, List<String> activeSystemPlanets) {
+        Game game = mock(Game.class);
+        Player player = mock(Player.class);
+        Tile tile = mock(Tile.class);
+        ButtonInteractionEvent event = mock(ButtonInteractionEvent.class);
+        List<Planet> tilePlanets = activeSystemPlanets.stream()
+                .map(name -> {
+                    Planet planet = mock(Planet.class);
+                    when(planet.getName()).thenReturn(name);
+                    return planet;
+                })
+                .toList();
+        when(game.getCurrentActiveSystem()).thenReturn(activeSystem);
+        when(game.getTileByPosition(activeSystem)).thenReturn(activeSystem == null ? null : tile);
+        when(tile.getPlanetUnitHolders()).thenReturn(tilePlanets);
+        when(player.getPlanets()).thenReturn(playerPlanets);
+        playerPlanets.forEach(name -> when(player.hasPlanet(name)).thenReturn(true));
+        when(player.factionButtonChecker()).thenReturn("fc");
+        when(player.getRepresentation()).thenReturn("player");
+        when(player.getCorrectChannel()).thenReturn(mock(TextChannel.class));
+
+        try (MockedStatic<MessageHelper> messages = mockStatic(MessageHelper.class);
+                MockedStatic<ButtonHelper> buttons = mockStatic(ButtonHelper.class);
+                MockedStatic<Helper> helper = mockStatic(Helper.class)) {
+            helper.when(() -> Helper.getPlanetRepresentation(anyString(), any()))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+
+            if ("resolveTombRaidersOther".equals(handler)) {
+                TombRaidersAcd2ButtonHandler.resolveTombRaidersOther(player, game, event);
+            } else {
+                TombRaidersAcd2ButtonHandler.resolveTombRaiders(player, game, event);
+            }
+
+            ArgumentCaptor<List<Button>> captor = ArgumentCaptor.captor();
+            messages.verify(() -> MessageHelper.sendMessageToChannelWithButtons(
+                    any(MessageChannel.class), anyString(), captor.capture()));
+            return captor.getValue().stream().map(Button::getCustomId).toList();
+        }
     }
 
     private static String resolve(
