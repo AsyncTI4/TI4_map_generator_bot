@@ -34,7 +34,10 @@ class CardSales {
     }
 
     static List<Deal> candidates(Game game, Player seat, Player partner) {
-        Optional<String> spare = spareCard(game, seat);
+        return candidates(game, seat, partner, ActionCardValue.spareCard(game, seat));
+    }
+
+    private static List<Deal> candidates(Game game, Player seat, Player partner, Optional<String> spare) {
         if (spare.isEmpty() || !TradeActionCards.tradable(seat, partner)) return List.of();
         DealItem card = TradeActionCards.item(seat, partner, spare.get());
         List<Deal> deals = new ArrayList<>();
@@ -49,12 +52,17 @@ class CardSales {
         Game game = context.game();
         Player seat = context.seat();
         List<Offer> offers = new ArrayList<>();
+        Optional<String> spare;
+        try (Thinking.Span ignored = Thinking.enter("cardSales.spareCard")) {
+            spare = ActionCardValue.spareCard(game, seat);
+        }
+        if (spare.isEmpty()) return offers;
         for (Player partner : partners) {
             if (!OwnTurnDeals.mayApproach(context, partner)) continue;
             double trust = Trust.of(context, partner);
             List<Deal> deals;
             try (Thinking.Span ignored = Thinking.enter("cardSales.candidates")) {
-                deals = candidates(game, seat, partner);
+                deals = candidates(game, seat, partner, spare);
             }
             for (Deal deal : deals) {
                 boolean coverable;
@@ -76,10 +84,5 @@ class CardSales {
         }
         offers.sort(Comparator.comparingDouble(Offer::utility).reversed());
         return offers;
-    }
-
-    private static Optional<String> spareCard(Game game, Player seat) {
-        if (!ActionCardValue.hasSpareCard(game, seat)) return Optional.empty();
-        return ActionCardValue.discardOrder(game, seat).stream().findFirst();
     }
 }

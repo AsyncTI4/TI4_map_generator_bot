@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.DoubleSupplier;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiSettings;
@@ -169,27 +170,56 @@ public class ActionCardValue {
         return Math.max(prior, SabotagePolicy.reserve(game, seat, ""));
     }
 
-    private record DiscardKey(String alias, double keep, double prior, double play) {}
+    private static final class DiscardKey {
+        private final String alias;
+        private final double keep;
+        private final double prior;
+        private final DoubleSupplier playValue;
+        private Double play;
 
-    public static List<String> discardOrder(Game game, Player seat) {
-        try (Thinking.Span ignored = Thinking.enter("cards.discardOrder")) {
-            return discardOrderOf(game, seat);
+        private DiscardKey(String alias, double keep, double prior, DoubleSupplier playValue) {
+            this.alias = alias;
+            this.keep = keep;
+            this.prior = prior;
+            this.playValue = playValue;
+        }
+
+        private String alias() {
+            return alias;
+        }
+
+        private double keep() {
+            return keep;
+        }
+
+        private double prior() {
+            return prior;
+        }
+
+        private double play() {
+            if (play == null) play = playValue.getAsDouble();
+            return play;
         }
     }
 
-    private static List<String> discardOrderOf(Game game, Player seat) {
-        return seat.getActionCards().keySet().stream()
-                .map(alias -> new DiscardKey(
-                        alias,
-                        timedKeep(game, seat, alias),
-                        ActionCardPrior.keepPrior(alias),
-                        timedPlay(game, seat, alias)))
-                .sorted(Comparator.comparingDouble(DiscardKey::keep)
-                        .thenComparingDouble(DiscardKey::prior)
-                        .thenComparingDouble(DiscardKey::play)
-                        .thenComparing(DiscardKey::alias))
-                .map(DiscardKey::alias)
-                .toList();
+    public static List<String> discardOrder(Game game, Player seat) {
+        return discardKeys(game, seat).stream().map(DiscardKey::alias).toList();
+    }
+
+    private static List<DiscardKey> discardKeys(Game game, Player seat) {
+        try (Thinking.Span ignored = Thinking.enter("cards.discardOrder")) {
+            return seat.getActionCards().keySet().stream()
+                    .map(alias -> new DiscardKey(
+                            alias,
+                            timedKeep(game, seat, alias),
+                            ActionCardPrior.keepPrior(alias),
+                            () -> timedPlay(game, seat, alias)))
+                    .sorted(Comparator.comparingDouble(DiscardKey::keep)
+                            .thenComparingDouble(DiscardKey::prior)
+                            .thenComparingDouble(DiscardKey::play)
+                            .thenComparing(DiscardKey::alias))
+                    .toList();
+        }
     }
 
     private static double timedKeep(Game game, Player seat, String alias) {
@@ -204,18 +234,25 @@ public class ActionCardValue {
         }
     }
 
+    public static Optional<String> spareCard(Game game, Player seat) {
+        List<DiscardKey> keys = discardKeys(game, seat);
+        if (keys.isEmpty()) return Optional.empty();
+        DiscardKey worst = keys.getFirst();
+        if (worst.keep() >= SPARE_BELOW || wouldPlayComponent(game, seat, worst.alias())) return Optional.empty();
+        return Optional.of(worst.alias());
+    }
+
     public static boolean hasSpareCard(Game game, Player seat) {
-        List<String> order = discardOrder(game, seat);
-        if (order.isEmpty()) return false;
-        String worst = order.getFirst();
-        boolean wouldPlay;
+        return spareCard(game, seat).isPresent();
+    }
+
+    private static boolean wouldPlayComponent(Game game, Player seat, String alias) {
         try (Thinking.Span ignored = Thinking.enter("cards.bestComponentPlay")) {
-            wouldPlay = bestComponentPlay(game, seat)
+            return bestComponentPlay(game, seat)
                     .map(Candidate::alias)
-                    .filter(worst::equals)
+                    .filter(alias::equals)
                     .isPresent();
         }
-        return keepValue(game, seat, worst) < SPARE_BELOW && !wouldPlay;
     }
 
     public static Optional<PromptButton> worstDiscard(
