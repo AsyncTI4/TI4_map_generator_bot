@@ -218,6 +218,14 @@ public class ActionCardRules {
         return !(seat.isPassed() && active != null && active.hasTech("tp"));
     }
 
+    public static boolean holdsPlayableStrategize(Game game, Player seat) {
+        return StrategizeCard.playable(game, seat);
+    }
+
+    public static boolean strategizeSecondaryWorthAToken(Game game, Player seat) {
+        return StrategizeCard.secondaryWorthAToken(game, seat);
+    }
+
     public static double frontlineValue(Game game, Player seat, String planetName) {
         return EconomyTargets.frontlineValue(game, seat, planetName);
     }

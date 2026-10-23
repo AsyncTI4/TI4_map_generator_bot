@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.ai.actioncards.ActionCardRules;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.FractureCampaign;
@@ -205,7 +206,8 @@ public class CommandTokenPolicy {
                                 .orElse(0)
                         > 0
                 && TechPath.reachable(game, seat, TechPath.ADAPT_NEW_STRATEGIES);
-        return onARoute ? STRATEGY_TARGET + 1 : STRATEGY_TARGET;
+        int target = onARoute ? STRATEGY_TARGET + 1 : STRATEGY_TARGET;
+        return ActionCardRules.holdsPlayableStrategize(game, seat) ? target + 1 : target;
     }
 
     private static int fleetForAnOpenSlot(Game game, Player seat, int largest, int cap) {

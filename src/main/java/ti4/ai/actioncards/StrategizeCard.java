@@ -43,6 +43,22 @@ class StrategizeCard {
 
     private record Secondary(StrategyCard card, double value) {}
 
+    static boolean playable(Game game, Player seat) {
+        return held(seat) && !game.isFowMode() && ActionCardRules.mayPlayNow(game, seat);
+    }
+
+    static boolean secondaryWorthAToken(Game game, Player seat) {
+        return playable(game, seat)
+                && ranked(game, seat).stream()
+                        .findFirst()
+                        .filter(best -> best.value() > CardFacade.strategyToken())
+                        .isPresent();
+    }
+
+    private static boolean held(Player seat) {
+        return seat.getActionCards().keySet().stream().anyMatch(alias -> alias.startsWith(COPY_PREFIX));
+    }
+
     static Optional<Plan> plan(Game game, Player seat) {
         if (game.isFowMode() || seat.getStrategicCC() < 1) return Optional.empty();
         List<Secondary> ranked = ranked(game, seat);
