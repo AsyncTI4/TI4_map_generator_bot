@@ -1140,9 +1140,9 @@
     {
         "alias": "tomb_raiders",
         "name": "Tomb Raiders",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Gain 2 commodities. Then, reveal the top card of each exploration deck; gain any relic fragments that you reveal and discard the rest.",
+        "phase": "Any",
+        "window": "After you gain control of a planet",
+        "text": "Roll a number of dice equal to that planet's resource or influence value; if that planet has no trait, combine those values instead. On 1 or more results of 10, gain 1 relic.",
         "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "action_deck_2"
     },
