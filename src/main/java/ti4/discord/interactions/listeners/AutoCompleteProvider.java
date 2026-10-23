@@ -782,7 +782,7 @@ class AutoCompleteProvider {
                 event.replyChoice(latestCommand, Constants.LATEST_COMMAND)
                         .queue(Consumers.nop(), BotLogger::catchRestError);
             }
-            case Constants.UNDO_TO_COMMAND -> {
+            case Constants.UNDO_OPTION -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 if (game.isFowMode() && !FoWHelper.isGameMaster(event.getUser().getId(), game)) {
