@@ -1,10 +1,12 @@
 package ti4.discord.interactions.buttons.handlers.actioncards.acd2;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -15,14 +17,39 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.RelicHelper;
 import ti4.message.MessageHelper;
+import ti4.service.async.DieRollSequenceService;
+import ti4.service.emoji.ExploreEmojis;
 
 @UtilityClass
 class TombRaidersAcd2ButtonHandler {
 
     private static final int RELIC_THRESHOLD = 10;
     private static final int MAX_PLANET_BUTTONS = 25;
+    private static final List<String> ACTIVITIES = List.of(
+            "🧗 Climbing...",
+            "🏊 Swimming...",
+            "🚣 Rowing...",
+            "🚵 Biking...",
+            "🏇 Racing...",
+            "🤺 Fencing...",
+            "🤸 Yippee?...",
+            "🪂 Parachuting...",
+            "⛷️ Skiing...",
+            "🗿 Sight-seeing...",
+            "🛖 Consulting natives...",
+            "🏚️ Breaking in...",
+            "🏔️ Ascending...",
+            "🌋 Krakatoa...",
+            "🏜️ Investigating a mirage...",
+            "🏝️ Shipwrecked...",
+            "🏰 Courting...",
+            "🗺️ X marks the spot?...",
+            "🐉 Slaying...",
+            "🏃 Running away...",
+            "🥷 Stealthing...",
+            "🧞 Wishing...",
+            "🕵️ Sleuthing...");
 
     @ButtonHandler("resolveTombRaiders")
     public static void resolveTombRaiders(Player player, Game game, ButtonInteractionEvent event) {
@@ -56,16 +83,38 @@ class TombRaidersAcd2ButtonHandler {
 
         int diceCount = getDiceCount(planet);
         List<DiceHelper.Die> rolls = DiceHelper.rollDice(RELIC_THRESHOLD, diceCount);
-        boolean foundRelic = DiceHelper.countSuccesses(rolls) > 0;
-        String message = player.getRepresentation() + " rolled " + diceCount + " "
+        MessageChannel channel = player.getCorrectChannel();
+        String header = player.getRepresentation() + " is rolling " + diceCount + " "
                 + (diceCount == 1 ? "die" : "dice") + " for _Tomb Raiders_ on "
-                + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + ".\n"
-                + DiceHelper.formatDiceOutput(rolls) + "\n" + getTombRaidersLoreQuip(foundRelic);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + ".";
+        String relicButtonId = player.factionButtonChecker() + "drawRelic";
+        DieRollSequenceService.play(
+                channel,
+                header,
+                pickActivities(diceCount),
+                rolls,
+                () -> announceOutcome(channel, rolls, relicButtonId));
+    }
 
+    private static void announceOutcome(MessageChannel channel, List<DiceHelper.Die> rolls, String relicButtonId) {
+        boolean foundRelic = DiceHelper.countSuccesses(rolls) > 0;
+        String message = DiceHelper.formatDiceOutput(rolls) + "\n" + getTombRaidersLoreQuip(foundRelic);
         if (foundRelic) {
-            RelicHelper.drawRelicAndNotify(player, event, game);
+            MessageHelper.sendMessageToChannelWithButton(
+                    channel, message, Buttons.green(relicButtonId, "Draw Relic", ExploreEmojis.Relic));
+            return;
         }
+        MessageHelper.sendMessageToChannel(channel, message);
+    }
+
+    private static List<String> pickActivities(int count) {
+        List<String> activities = new ArrayList<>();
+        while (activities.size() < count) {
+            List<String> shuffled = new ArrayList<>(ACTIVITIES);
+            Collections.shuffle(shuffled);
+            activities.addAll(shuffled);
+        }
+        return activities.subList(0, count);
     }
 
     private static int getDiceCount(Planet planet) {

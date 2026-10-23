@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayDeque;
@@ -28,25 +28,38 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.RelicHelper;
 import ti4.message.MessageHelper;
+import ti4.service.async.DieRollSequenceService;
 
 class TombRaidersAcd2ButtonHandlerTest {
 
     private static final String PLANET = "testplanet";
 
     @Test
-    void rollsHigherValueForPlanetWithTraitAndDrawsRelicOnATen() {
-        String message = resolve(Set.of("cultural"), 2, 3, new ArrayDeque<>(List.of(4, 10, 1)), true);
+    void rollsHigherValueForPlanetWithTraitAndOffersRelicButtonOnATen() {
+        Outcome outcome = resolve(Set.of("cultural"), 2, 3, new ArrayDeque<>(List.of(4, 10, 1)));
 
-        assertTrue(message.contains("rolled 3 dice"), message);
+        assertEquals(3, outcome.rolls().size());
+        assertTrue(outcome.header().contains("rolling 3 dice"), outcome.header());
+        assertEquals(List.of("fcdrawRelic"), outcome.relicButtonIds());
     }
 
     @Test
-    void rollsCombinedValueForPlanetWithoutTraitAndSkipsRelicWithoutATen() {
-        String message = resolve(Set.of(), 2, 3, new ArrayDeque<>(List.of(9, 9, 9, 9, 9)), false);
+    void rollsCombinedValueForPlanetWithoutTraitAndOffersNoRelicWithoutATen() {
+        Outcome outcome = resolve(Set.of(), 2, 3, new ArrayDeque<>(List.of(9, 9, 9, 9, 9)));
 
-        assertTrue(message.contains("rolled 5 dice"), message);
+        assertEquals(5, outcome.rolls().size());
+        assertTrue(outcome.header().contains("rolling 5 dice"), outcome.header());
+        assertTrue(outcome.relicButtonIds().isEmpty());
+        assertEquals(5, outcome.activities().size());
+        assertEquals(5, Set.copyOf(outcome.activities()).size());
+    }
+
+    @Test
+    void neverRunsOutOfActivitiesForLargeRolls() {
+        Outcome outcome = resolve(Set.of("cultural"), 30, 0, new ArrayDeque<>());
+
+        assertEquals(30, outcome.activities().size());
     }
 
     @Test
@@ -127,8 +140,10 @@ class TombRaidersAcd2ButtonHandlerTest {
         }
     }
 
-    private static String resolve(
-            Set<String> traits, int resources, int influence, Deque<Integer> rolls, boolean expectRelic) {
+    private record Outcome(
+            String header, List<DiceHelper.Die> rolls, List<String> activities, List<String> relicButtonIds) {}
+
+    private static Outcome resolve(Set<String> traits, int resources, int influence, Deque<Integer> rolls) {
         Game game = mock(Game.class);
         Player player = mock(Player.class);
         Planet planet = mock(Planet.class);
@@ -136,6 +151,7 @@ class TombRaidersAcd2ButtonHandlerTest {
         when(game.getPlanetsInfo()).thenReturn(Map.of(PLANET, planet));
         when(player.hasPlanet(PLANET)).thenReturn(true);
         when(player.getRepresentation()).thenReturn("player");
+        when(player.factionButtonChecker()).thenReturn("fc");
         when(player.getCorrectChannel()).thenReturn(mock(TextChannel.class));
         when(planet.getPlanetTypes()).thenReturn(traits);
         when(planet.getSumResourcesInfluence()).thenReturn(resources + influence);
@@ -144,7 +160,7 @@ class TombRaidersAcd2ButtonHandlerTest {
         try (MockedStatic<MessageHelper> messages = mockStatic(MessageHelper.class);
                 MockedStatic<ButtonHelper> buttons = mockStatic(ButtonHelper.class);
                 MockedStatic<Helper> helper = mockStatic(Helper.class);
-                MockedStatic<RelicHelper> relics = mockStatic(RelicHelper.class)) {
+                MockedStatic<DieRollSequenceService> sequence = mockStatic(DieRollSequenceService.class)) {
             helper.when(() -> Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(anyString(), any()))
                     .thenReturn("planet");
 
@@ -153,14 +169,29 @@ class TombRaidersAcd2ButtonHandlerTest {
                     () -> TombRaidersAcd2ButtonHandler.resolveTombRaidersStep2(
                             player, game, event, "resolveTombRaidersStep2_" + PLANET));
 
-            ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
-            messages.verify(() -> MessageHelper.sendMessageToChannel(any(MessageChannel.class), captor.capture()));
-            if (expectRelic) {
-                relics.verify(() -> RelicHelper.drawRelicAndNotify(player, event, game));
-            } else {
-                relics.verify(() -> RelicHelper.drawRelicAndNotify(any(), any(), any()), never());
-            }
-            return captor.getValue();
+            ArgumentCaptor<String> header = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<List<String>> activities = ArgumentCaptor.captor();
+            ArgumentCaptor<List<DiceHelper.Die>> dice = ArgumentCaptor.captor();
+            ArgumentCaptor<Runnable> completion = ArgumentCaptor.forClass(Runnable.class);
+            sequence.verify(() -> DieRollSequenceService.play(
+                    any(MessageChannel.class),
+                    header.capture(),
+                    activities.capture(),
+                    dice.capture(),
+                    completion.capture()));
+
+            completion.getValue().run();
+
+            ArgumentCaptor<Button> relicButton = ArgumentCaptor.forClass(Button.class);
+            messages.verify(
+                    () -> MessageHelper.sendMessageToChannelWithButton(
+                            any(MessageChannel.class), anyString(), relicButton.capture()),
+                    atLeast(0));
+            return new Outcome(
+                    header.getValue(),
+                    dice.getValue(),
+                    activities.getValue(),
+                    relicButton.getAllValues().stream().map(Button::getCustomId).toList());
         }
     }
 }
