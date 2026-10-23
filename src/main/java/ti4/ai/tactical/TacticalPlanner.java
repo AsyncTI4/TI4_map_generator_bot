@@ -366,7 +366,8 @@ public class TacticalPlanner {
     }
 
     private static List<TacticalPlan> rankedCandidates(Context context, Predicate<Tile> activatable) {
-        try (Thinking.Span ignored = Thinking.enter("tactical.rank")) {
+        String kind = !context.freed.isEmpty() ? "freeing" : !context.hints.isEmpty() ? "hinted" : "base";
+        try (Thinking.Span ignored = Thinking.enter("tactical.rank." + kind)) {
             return computeRanking(context, activatable);
         }
     }
