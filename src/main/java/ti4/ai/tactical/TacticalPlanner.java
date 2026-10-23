@@ -620,22 +620,40 @@ public class TacticalPlanner {
     private static Optional<TacticalPlan> bestFor(Context context, Tile tile) {
         if (!MovementGraph.canEnter(context.game, context.seat, tile)) return Optional.empty();
         List<TacticalPlan> plans = new ArrayList<>();
-        timed("tactical.for.expansion", () -> context.expansionPlan(tile)).ifPresent(plans::add);
-        timed("tactical.for.attack", () -> attack(context, tile)).ifPresent(plans::add);
+        moving(context, tile, "tactical.for.expansion", () -> context.expansionPlan(tile))
+                .ifPresent(plans::add);
+        moving(context, tile, "tactical.for.attack", () -> attack(context, tile))
+                .ifPresent(plans::add);
         timed("tactical.for.cannonRaid", () -> cannonRaid(context, tile)).ifPresent(plans::add);
         timed("tactical.for.produce", () -> produce(context, tile)).ifPresent(plans::add);
-        timed("tactical.for.position", () -> position(context, tile)).ifPresent(plans::add);
-        timed("tactical.for.screen", () -> screen(context, tile)).ifPresent(plans::add);
-        timed("tactical.for.advance", () -> advance(context, tile)).ifPresent(plans::add);
-        timed("tactical.for.pickup", () -> pickup(context, tile)).ifPresent(plans::add);
-        timed("tactical.for.defend", () -> defend(context, tile)).ifPresent(plans::add);
-        timed("tactical.for.garrison", () -> garrison(context, tile)).ifPresent(plans::add);
+        moving(context, tile, "tactical.for.position", () -> position(context, tile))
+                .ifPresent(plans::add);
+        moving(context, tile, "tactical.for.screen", () -> screen(context, tile))
+                .ifPresent(plans::add);
+        moving(context, tile, "tactical.for.advance", () -> advance(context, tile))
+                .ifPresent(plans::add);
+        moving(context, tile, "tactical.for.pickup", () -> pickup(context, tile))
+                .ifPresent(plans::add);
+        moving(context, tile, "tactical.for.defend", () -> defend(context, tile))
+                .ifPresent(plans::add);
+        moving(context, tile, "tactical.for.garrison", () -> garrison(context, tile))
+                .ifPresent(plans::add);
         return plans.stream()
                 .map(plan -> plan.withScore(PlayAreaNotes.adjustedScore(context.game, context.seat, tile, plan)
                         + SetupHint.bonusFor(context.hints, plan)))
                 .max(Comparator.comparingDouble(TacticalPlan::score))
                 .map(plan -> timed("tactical.for.fighters", () -> Optional.of(withFighters(context, tile, plan)))
                         .orElse(plan));
+    }
+
+    private static Optional<TacticalPlan> moving(
+            Context context, Tile tile, String span, Supplier<Optional<TacticalPlan>> plan) {
+        if (context.unreachable(tile)) {
+            try (Thinking.Span ignored = Thinking.enter("tactical.for.skipped")) {
+                return Optional.empty();
+            }
+        }
+        return timed(span, plan);
     }
 
     private static Optional<TacticalPlan> timed(String span, Supplier<Optional<TacticalPlan>> plan) {
@@ -2387,7 +2405,7 @@ public class TacticalPlanner {
         Player seat = context.seat;
         if (!hasDock(seat, tile)) return Optional.empty();
         ProductionPlanner.BuildPlan build = ProductionPlanner.freeBuild(context.game, seat, tile, context.defense())
-                .orElseGet(() -> ProductionPlanner.plan(context.game, seat, tile, 0, context.defense()));
+                .orElseGet(() -> context.buildPlan(tile));
         if (build.isEmpty()) return Optional.empty();
         double objectiveGain = context.builtGain(tile, build);
         boolean forScoring = build.scoring() || objectiveGain > 0;
@@ -2928,9 +2946,7 @@ public class TacticalPlanner {
         Defenders now = Defenders.of(seat, tile);
         double costNow = defense.cost(tile, now);
         if (costNow <= 0) return Optional.empty();
-        double buildBonus = hasDock(seat, tile)
-                ? ProductionPlanner.plan(game, seat, tile, 0, defense).nonDefenseValue()
-                : 0;
+        double buildBonus = hasDock(seat, tile) ? context.buildPlan(tile).nonDefenseValue() : 0;
         TacticalPlan best = null;
         for (Tile origin : context.origins()) {
             if (origin == tile) continue;
@@ -3374,6 +3390,8 @@ public class TacticalPlanner {
         private Exposure exposure;
         private final Map<String, List<CommanderReach.Pull>> commanderPulls = new HashMap<>();
         private final Map<String, Optional<TacticalPlan>> attacks = new HashMap<>();
+        private final Map<String, Boolean> unreachable = new HashMap<>();
+        private final Map<String, ProductionPlanner.BuildPlan> builds = new HashMap<>();
         private final Map<String, Double> futureScores = new HashMap<>();
         private final Map<String, Double> marchValues = new HashMap<>();
         private Optional<FractureMarch> march;
@@ -3637,6 +3655,29 @@ public class TacticalPlanner {
                         .toList();
             }
             return origins;
+        }
+
+        boolean unreachable(Tile tile) {
+            return unreachable.computeIfAbsent(tile.getPosition(), position -> noShipCanReach(tile));
+        }
+
+        private boolean noShipCanReach(Tile tile) {
+            if (BoardView.hasOwnShips(seat, tile) || !commanderPulls(tile).isEmpty()) return false;
+            for (Tile origin : origins()) {
+                if (origin == tile) continue;
+                for (UnitType type : BoardView.MOVING_SHIPS) {
+                    if (BoardView.count(BoardView.space(origin), seat, type) > 0
+                            && reachesWithGravityDrive(origin, tile, type)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        ProductionPlanner.BuildPlan buildPlan(Tile tile) {
+            return builds.computeIfAbsent(
+                    tile.getPosition(), position -> ProductionPlanner.plan(game, seat, tile, 0, defense()));
         }
 
         boolean reaches(Tile origin, Tile target, UnitType type) {
