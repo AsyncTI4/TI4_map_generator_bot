@@ -79,6 +79,19 @@ class FlankSpeedPlanTest extends BaseTi4Test {
         assertThat(boosted).isEqualTo(unboosted - 1.5, org.assertj.core.data.Offset.offset(0.001));
     }
 
+    @Test
+    void theSharedRankingOfADecisionKeepsTheBoostedWorldApart() {
+        test.nekro.setActionCard("fs1", 401);
+
+        try (ti4.ai.brain.DecisionMemo.Open ignored = ti4.ai.brain.DecisionMemo.open()) {
+            double normal = planFor(farTarget).orElseThrow().score();
+            double faster = ti4.ai.eval.MoveBoost.withOneMore(
+                    test.nekro, () -> planFor(farTarget).orElseThrow().score());
+
+            assertThat(faster).isEqualTo(normal + 1.5, org.assertj.core.data.Offset.offset(0.001));
+        }
+    }
+
     private Optional<TacticalPlan> planFor(String position) {
         return TacticalPlanner.ranked(test.game, test.nekro).stream()
                 .filter(plan -> plan.target().equals(position))

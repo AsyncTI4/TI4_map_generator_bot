@@ -362,7 +362,8 @@ public class TacticalPlanner {
                 context.freed,
                 context.hints,
                 context.tokenFree,
-                FleetLimit.ships(context.seat));
+                FleetLimit.ships(context.seat),
+                MoveBoost.extra(context.seat));
     }
 
     private static List<TacticalPlan> rankedCandidates(Context context, Predicate<Tile> activatable) {
@@ -1915,7 +1916,7 @@ public class TacticalPlanner {
     }
 
     private static List<TacticalPlan> flankSpeedPlans(Context context, Predicate<Tile> activatable) {
-        if (MoveBoost.flankSpeedCard(context.seat).isEmpty()) return List.of();
+        if (MoveBoost.flankSpeedCard(context.seat).isEmpty() || MoveBoost.active(context.seat)) return List.of();
         List<TacticalPlan> boosted = MoveBoost.withOneMore(context.seat, () -> {
             Context faster = new Context(context.game, context.seat, context.freed, context.hints);
             List<TacticalPlan> plans = new ArrayList<>();
