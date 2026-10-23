@@ -76,21 +76,20 @@ class TombRaidersAcd2ButtonHandler {
         if (buttons.isEmpty()) {
             buttons.addAll(getPlanetButtons(player, game, player.getPlanets()));
         } else if (!getOtherPlanets(player, activeSystemPlanets).isEmpty()) {
-            buttons.add(Buttons.gray(player.factionButtonChecker() + "resolveTombRaidersOther", "Other"));
+            buttons.add(Buttons.gray(player.factionButtonChecker() + "tombRaidersOther", "Other"));
         }
         offerPlanets(player, game, event, buttons);
     }
 
-    @ButtonHandler("resolveTombRaidersOther")
-    public static void resolveTombRaidersOther(Player player, Game game, ButtonInteractionEvent event) {
+    @ButtonHandler("tombRaidersOther")
+    public static void tombRaidersOther(Player player, Game game, ButtonInteractionEvent event) {
         List<String> otherPlanets = getOtherPlanets(player, getActiveSystemPlanets(player, game));
         offerPlanets(player, game, event, getPlanetButtons(player, game, otherPlanets));
     }
 
-    @ButtonHandler("resolveTombRaidersStep2_")
-    public static void resolveTombRaidersStep2(
-            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String planetName = buttonID.replace("resolveTombRaidersStep2_", "");
+    @ButtonHandler("tombRaidersPlanet_")
+    public static void tombRaidersPlanet(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String planetName = buttonID.replace("tombRaidersPlanet_", "");
         Planet planet = game.getPlanetsInfo().get(planetName);
         ButtonHelper.deleteMessage(event);
         if (planet == null || !player.hasPlanet(planetName)) {
@@ -199,7 +198,7 @@ class TombRaidersAcd2ButtonHandler {
         return planets.stream()
                 .limit(MAX_PLANET_BUTTONS)
                 .map(planet -> Buttons.green(
-                        player.factionButtonChecker() + "resolveTombRaidersStep2_" + planet,
+                        player.factionButtonChecker() + "tombRaidersPlanet_" + planet,
                         Helper.getPlanetRepresentation(planet, game)))
                 .toList();
     }
