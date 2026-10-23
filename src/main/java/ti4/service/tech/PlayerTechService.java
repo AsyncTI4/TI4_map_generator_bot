@@ -16,10 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
@@ -100,8 +96,6 @@ public class PlayerTechService {
         if (gainedTech) {
             WhiteTfUnitHandler.offerMechRemoval(event, game, player, techID);
         }
-        NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
-        NetrunnersUnitsHandler.offerLegionDeploy(game, player);
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
         String message = player.getRepresentation() + " added technology: "
                 + Mapper.getTech(techID).getRepresentation(false) + ".";
@@ -128,7 +122,7 @@ public class PlayerTechService {
             message += "\nAdded _Fabricate Station_ and its planet cards to your play area.";
         }
         CommanderUnlockCheckService.checkPlayer(
-                player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum", "netrunners", "revenantvanguard");
+                player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum", "revenantvanguard");
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 
@@ -287,7 +281,6 @@ public class PlayerTechService {
         }
 
         player.exhaustTech(tech);
-        NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
         if (!GameEventDraft.stage(game, new GameSubEvent.TechExhausted(player.getFaction(), tech))) {
             GameEventService.commit(game, GameEventType.CARD_PLAY_TECH_EXHAUST, player, Map.of("cardId", tech));
         }
@@ -848,8 +841,6 @@ public class PlayerTechService {
         }
         player.addTech(techID);
         BlueReverieHelper.checkXinHarmony(game, player);
-        NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
-        NetrunnersUnitsHandler.offerLegionDeploy(game, player);
         if (isResearch) {
             MonumentsTEButtonHandler.offerEpiphanyResearchButtons(game, player, techM);
             VyserixLeaderHandler.resolveCommanderOnResearch(game, player, techM);
@@ -1014,8 +1005,7 @@ public class PlayerTechService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), buttonText, buttons);
         }
-        CommanderUnlockCheckService.checkPlayer(
-                player, "jolnar", "nekro", "mirveda", "kryxos", "arcanum", "netrunners");
+        CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda", "kryxos", "arcanum");
 
         if (game.isTwilightsFallMode()
                 && game.getRound() == 1
@@ -1079,14 +1069,6 @@ public class PlayerTechService {
                     new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2, buttons2);
         }
-        if (NatauDoctrineHandler.canUseKnowledgeExhaust(player)
-                && !NatauDoctrineHandler.eligibleKnowledgePlanets(player).isEmpty()) {
-            MessageHelper.sendMessageToChannelWithButton(
-                    player.getCorrectChannel(),
-                    player.getRepresentationUnfogged()
-                            + ", after researching a technology, you may exhaust _Knowledge_ and 1 planet you control that has a technology specialty to research a technology of that color.",
-                    NatauDoctrineHandler.getUseKnowledgeButton(player));
-        }
 
         ButtonHelper.deleteMessage(event);
     }
@@ -1127,10 +1109,6 @@ public class PlayerTechService {
         buttons.addAll(ArcanumUnitHandler.getRuneboundPrerequisiteSkipButtons(game, player, tech, payType));
         if ("res".equals(payType)) {
             buttons.addAll(dwsCommanders);
-        }
-        Button netrunnersAgentDiscount = NetrunnersLeadersHandler.getAgentDiscountButton(game, player, tech, payType);
-        if (netrunnersAgentDiscount != null) {
-            buttons.add(netrunnersAgentDiscount);
         }
         if (!techM.isUnitUpgrade() && player.hasAbility("iconoclasm")) {
             int culturalFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.CULTURAL);

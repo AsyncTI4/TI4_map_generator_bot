@@ -31,13 +31,11 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionT
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.base.yin.YinImpulseCoreButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaPnHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.ToldarTechHandler;
@@ -599,8 +597,6 @@ public class StartCombatService {
         // General Space Combat
         sendGeneralCombatButtonsToThread(
                 threadChannel, game, player1, player2, tile, spaceOrGround, unitHolderName, event);
-        NetrunnersAbilitiesHandler.announceMimeticOverride(player1, player2, threadChannel);
-        NetrunnersAbilitiesHandler.announceMimeticOverride(player2, player1, threadChannel);
         boolean hasTwoMechsInSystem = tile.getUnitHolders().values().stream()
                         .mapToInt(holder -> holder.getUnitCount(UnitType.Mech, player1.getColor()))
                         .sum()
@@ -1901,14 +1897,6 @@ public class StartCombatService {
                         p2.factionButtonChecker() + "applytempcombatmod__" + "tech" + "__" + "sc",
                         "Use Supercharge",
                         FactionEmojis.Naaz));
-            }
-        }
-        if (p1.hasTechReady("beironats") || (!game.isFowMode() && p2.hasTechReady("beironats"))) {
-            if (p1.hasTechReady("beironats")) {
-                IronFactionTechsHandler.addAdvancedTargetingSystemsButton(buttons, game, p1, p2, pos, groundOrSpace);
-            }
-            if (!game.isFowMode() && p2.hasTechReady("beironats")) {
-                IronFactionTechsHandler.addAdvancedTargetingSystemsButton(buttons, game, p2, p1, pos, groundOrSpace);
             }
         }
         checkAndAddSubatomicButton(game, p1, isSpaceCombat, tile, buttons);

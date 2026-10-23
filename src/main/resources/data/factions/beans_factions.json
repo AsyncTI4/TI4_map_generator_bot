@@ -48,7 +48,7 @@
         "alias": "crystellum",
         "factionName": "The Crystellum",
         "homeSystem": "be2",
-        "startingFleet": "1 cv, 1 dn, 1 cr, 4 ff, 2 inf p, 2 inf s, sd p",
+        "startingFleet": "1 cv, 1 dn, 1 cr, 6 ff, 2 inf p, 2 inf s, sd p",
         "commodities": 2,
         "factionTech": [
             "becrystrd",
@@ -144,21 +144,23 @@
         "factionName": "The Iron Tide",
         "homeSystem": "be4",
         "startingFleet": "1 cv, 1 dd, 1 dn, 2 ff, 2 inf k, 2 mf k, sd k",
-        "commodities": 2,
+        "commodities": 3,
         "factionTech": [
-            "beironmf",
-            "beironats"
+            "beironsd",
+            "beironmf"
         ],
-        "startingTech": [
-            "sar"
+        "startingTechOptions": [
+            "sar",
+            "st",
+            "sr"
         ],
+        "startingTechAmount": 1,
         "homePlanets": [
             "kymore"
         ],
         "abilities": [
-            "mechanized_military",
-            "exo-atmospheric",
-            "iron_resilience"
+            "salvage_collectors",
+            "trade_secrets"
         ],
         "leaders": [
             "ironagent",
@@ -178,7 +180,7 @@
             "infantry",
             "iron_mech",
             "pds",
-            "spacedock"
+            "iron_spacedock"
         ],
         "complexity": "Medium",
         "source": "beans"
@@ -279,8 +281,8 @@
         "startingFleet": "1 cv, 2 cr, 3 ff, 1 inf decay, 1 inf demise, 1 inf disorder, sd disorder",
         "commodities": 3,
         "factionTech": [
-            "benataudo",
-            "benataure"
+            "benataudm",
+            "benatauct"
         ],
         "startingTechOptions": [
             "aida",
@@ -295,9 +297,9 @@
             "disorder"
         ],
         "abilities": [
-            "doctrine",
-            "paradigm",
-            "dark_power"
+            "cataclysm",
+            "sacred_passage",
+            "amaluuns_strength"
         ],
         "leaders": [
             "natauagent",

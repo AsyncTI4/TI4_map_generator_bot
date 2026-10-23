@@ -213,7 +213,6 @@ public class ThronesUnitHandler {
         CombatRollPayload.RollSegmentType segment = unitRoll.segmentType();
         if (segment == CombatRollPayload.RollSegmentType.JOL_NAR_COMMANDER_REROLL_MISSES
                 || segment == CombatRollPayload.RollSegmentType.JOL_NAR_COMMANDER_REROLL_HITS
-                || segment == CombatRollPayload.RollSegmentType.IRON_COMMANDER_REROLL_MISSES
                 || segment == CombatRollPayload.RollSegmentType.KALTRIM_COMMANDER_REROLL_ONES
                 || segment == CombatRollPayload.RollSegmentType.MUNITIONS_RESERVES_REROLL) {
             return true;
@@ -229,9 +228,8 @@ public class ThronesUnitHandler {
                         && other != CombatRollPayload.RollSegmentType.GRAVLEASH_REST)
                 .toList();
         boolean rerollsAllDice = rerolls.contains(CombatRollPayload.RollSegmentType.MUNITIONS_RESERVES_REROLL);
-        boolean rerollsThisMiss = !die.success()
-                && (rerolls.contains(CombatRollPayload.RollSegmentType.JOL_NAR_COMMANDER_REROLL_MISSES)
-                        || rerolls.contains(CombatRollPayload.RollSegmentType.IRON_COMMANDER_REROLL_MISSES));
+        boolean rerollsThisMiss =
+                !die.success() && rerolls.contains(CombatRollPayload.RollSegmentType.JOL_NAR_COMMANDER_REROLL_MISSES);
         boolean rerollsThisHit =
                 die.success() && rerolls.contains(CombatRollPayload.RollSegmentType.JOL_NAR_COMMANDER_REROLL_HITS);
         boolean rerollsThisOne =

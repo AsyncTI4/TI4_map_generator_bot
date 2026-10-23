@@ -21,8 +21,6 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionTargetingLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.EdynAgentHandler;
@@ -582,7 +580,6 @@ public final class ButtonHelperModifyUnits {
                 }
             }
         }
-        IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "groundcombat");
         ThirtyKSecretHooks.afterCombatHits(game, player, tile, unitHolder, "groundcombat");
         LostLegaciesRelicHandler.finishNeutralReplacementBatch(event, game);
         event.getMessage();
@@ -906,14 +903,6 @@ public final class ButtonHelperModifyUnits {
                 }
             }
         }
-        if (IronAbilitiesHandler.hasExoAtmospheric(player) && Constants.SPACE.equals(unitHolder.getName())) {
-            int dreadnoughtIndex = assignHitOrder.indexOf("dreadnought");
-            if (dreadnoughtIndex >= 0) {
-                assignHitOrder.add(dreadnoughtIndex, "mech");
-            } else {
-                assignHitOrder.add("mech");
-            }
-        }
         List<String> precisionTargetTypes = PrecisionTargetingLLButtonHandler.getTargetUnitTypes(game, player, tile);
         if (!precisionTargetTypes.isEmpty()) {
             assignHitOrder.removeAll(precisionTargetTypes);
@@ -1047,9 +1036,7 @@ public final class ButtonHelperModifyUnits {
                         && !((ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)
                                         || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)
                                         || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile))
-                                || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0
-                                || IronAbilitiesHandler.isExoAtmosphericMechInSpace(
-                                        player, unitKey.unitType(), unitHolder))) {
+                                || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
 
                     int min = unitEntry.getValue();
                     if (!justSummarizing) {
@@ -1126,7 +1113,6 @@ public final class ButtonHelperModifyUnits {
             LostLegaciesRelicHandler.finishNeutralReplacementBatch(event, game);
         }
         if (!justSummarizing && event instanceof ButtonInteractionEvent bevent) {
-            IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "spacecombat");
             ThirtyKSecretHooks.afterCombatHits(game, player, tile, unitHolder, "spacecombat");
             ThirtyKExploreHooks.afterSpaceCombatHits(event, game, player, tile, "spacecombat");
             ThirtyKActionCardHooks.afterCombatHitsAssigned(game, tile, "spacecombat");
@@ -1579,6 +1565,10 @@ public final class ButtonHelperModifyUnits {
                             || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())
                             || MonumentsService.canUseNaaluMonumentCoexistence(game, player, unitHolder.getName())
                             || XinUnitHandler.canUseStarSentinelCoexistence(player, unitHolder)) {
+                        if (TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())) {
+                            buttons.add(
+                                    TaBreakthroughHandler.getSafeHavensCoexistenceButton(player, unitHolder.getName()));
+                        }
                         buttons.add(Buttons.green(
                                 player.factionButtonChecker() + "enterCoexistence_" + unitHolder.getName(),
                                 "Enter Into Coexistence"));
@@ -1597,6 +1587,10 @@ public final class ButtonHelperModifyUnits {
                                     || TaBreakthroughHandler.canUseSafeHavensCoexistence(
                                             game, player2, unitHolder.getName()))) {
                         buttons = new ArrayList<>();
+                        if (TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player2, unitHolder.getName())) {
+                            buttons.add(TaBreakthroughHandler.getSafeHavensCoexistenceButton(
+                                    player2, unitHolder.getName()));
+                        }
                         buttons.add(Buttons.green(
                                 player2.factionButtonChecker() + "enterCoexistence_" + unitHolder.getName(),
                                 "Enter Into Coexistence"));

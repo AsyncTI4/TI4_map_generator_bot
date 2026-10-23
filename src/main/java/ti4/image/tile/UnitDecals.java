@@ -3,7 +3,6 @@ package ti4.image.tile;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import ti4.ResourceHelper;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -39,12 +38,8 @@ final class UnitDecals {
     static boolean isMisplaced(
             boolean holderHasDmz, boolean isSpace, UnitModel unitModel, Player player, UnitKey unitKey) {
         boolean wrongPlace = holderHasDmz;
-        wrongPlace |= isSpace
-                && unitModel.getIsPlanetOnly()
-                && !IronAbilitiesHandler.isExoAtmosphericMech(player, unitKey.unitType());
-        wrongPlace |= !isSpace
-                && unitModel.getIsSpaceOnly()
-                && !IronAbilitiesHandler.isExoAtmosphericMech(player, unitKey.unitType());
+        wrongPlace |= isSpace && unitModel.getIsPlanetOnly();
+        wrongPlace |= !isSpace && unitModel.getIsSpaceOnly();
         wrongPlace &= !unitModel.getIsStructure() || !player.hasAbility("miniaturization");
         return wrongPlace;
     }

@@ -14,8 +14,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithPromissoryHandler;
@@ -189,9 +187,6 @@ public final class StatusHelper {
         for (Player player : game.getRealPlayers()) {
             if (player.getTotalVictoryPoints() > maxVP) {
                 maxVP = player.getTotalVictoryPoints();
-            }
-            if (player.hasAbility("paradigm")) {
-                NatauAbilityHandler.resolveParadigmStartOfStatus(event, game, player);
             }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "vadencommander")) {
                 int numScoredSOs = player.getSoScored();
@@ -515,9 +510,6 @@ public final class StatusHelper {
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
-        }
-        if (game.getRealPlayers().stream().anyMatch(player -> player.hasTech("benetrunnersdm"))) {
-            NetrunnersFactionTechsHandler.resolveDataMining(game);
         }
         MonumentsPoKButtonHandler.sendSpireOfIxthButtons(game);
 

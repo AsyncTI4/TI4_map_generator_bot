@@ -12,9 +12,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PirateHordeBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.CombatInitiativeLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
@@ -255,7 +253,6 @@ public class TacticalActionService {
         if (tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
-        NetrunnersUnitsHandler.offerTrojan(game, player, ctx.tile);
         if (!game.isL1Hero() && !ctx.playersWithPds2.isEmpty()) {
             ButtonHelperTacticalAction.tacticalActionSpaceCannonOffenceStep(
                     game, player, ctx.playersWithPds2, ctx.tile);
@@ -271,9 +268,6 @@ public class TacticalActionService {
             ButtonInteractionEvent event, Game game, Player player, Tile tile) {
         List<Player> playersWithPds2 = ButtonHelper.getPlayersWithPds2Cover(player, game, tile.getPosition());
 
-        if (player.hasLeader("ironhero")) {
-            IronLeadersHandler.updateIronHeroEligibility(game, player, tile);
-        }
         ArcanumBreakthroughHandler.movePowerWordWishUnitsToActiveSystem(game, player, tile);
         XytherisLeadersHandler.moveMyrixAgentShipToActiveSystem(game, player, tile);
         boolean unitsWereMoved = moveUnitsIntoActiveSystem(event, game, tile);

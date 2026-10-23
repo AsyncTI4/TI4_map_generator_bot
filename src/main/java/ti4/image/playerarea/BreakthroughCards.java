@@ -3,7 +3,6 @@ package ti4.image.playerarea;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.image.draw.FactionIcons;
@@ -57,11 +56,7 @@ final class BreakthroughCards {
             g2.setStroke(Strokes.STROKE_2);
 
             FactionIcons.drawFaction(g2, model.getFaction().orElse(null), x - 1, y + 108, 42, 42);
-            BreakthroughModel copiedDataBreach = "netrunnersbt".equals(bt)
-                    ? NetrunnersBreakthroughHandler.getCopiedDataBreachBreakthrough(game, player)
-                    : null;
-            BreakthroughModel background = copiedDataBreach == null ? model : copiedDataBreach;
-            PaImage.draw(g2, x, y, background.getBackgroundResource(unlocked && !exhausted));
+            PaImage.draw(g2, x, y, model.getBackgroundResource(unlocked && !exhausted));
             if (model.getShrinkName()) {
                 g2.setFont(Fonts.ti(16));
                 VerticalText.drawOneOrTwoLines(g2, model.getShortName(), x + 11, y + 144, 120);
@@ -73,12 +68,6 @@ final class BreakthroughCards {
             if (!unlocked) textColor = Color.red;
             g2.setColor(textColor);
             CardRect.draw(ctx, x, y - 2, CardRect.WIDTH, CardRect.HEIGHT, model);
-            if (copiedDataBreach != null) {
-                String copiedFaction = NetrunnersBreakthroughHandler.getDataBreachTargetFaction(game, player);
-                if (copiedFaction != null) {
-                    FactionIcons.drawFaction(g2, copiedFaction, x + 20, y + 2, 20, 20);
-                }
-            }
             if (player.getBreakthroughTGs(bt) > 0) {
                 drawTradeGoods(g2, player.getBreakthroughTGs(bt), x, y);
             }

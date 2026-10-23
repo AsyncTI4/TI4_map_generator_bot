@@ -13,7 +13,6 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
@@ -299,14 +298,6 @@ public class DestroyUnitService {
                 handleSelfAssemblyRoutines(event, player, totalAmount, game, combat, unit);
                 if (player != null && player.hasUnit("ashen_mech")) {
                     AshenUnitHandler.resolveAshenMechDestroy(game, player, unit);
-                }
-                if (player.hasUnit("iron_mech") || player.hasUnit("iron_mech2")) {
-                    IronUnitsHandler.resolveRiptideDestroy(event, game, player, unit);
-                }
-                if (combat
-                        && player.getPromissoryNotes().containsKey("bepniron")
-                        && !player.getPromissoryNotesOwned().contains("bepniron")) {
-                    IronUnitsHandler.resolveEjectionDestroy(event, game, player, unit, killers);
                 }
                 if (player.hasUnit("dream_mech")) {
                     DreamUnitsHandler.offerRecurringMechButtons(

@@ -23,7 +23,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
@@ -231,14 +230,6 @@ public final class ButtonHelperTacticalAction {
                 if (buttons.size() > 2) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                 }
-            }
-            if (player.hasAbility("doctrine_discovery")
-                    && !player.getExhaustedAbilities().contains("doctrine_discovery")) {
-                MessageHelper.sendMessageToChannelWithButton(
-                        player.getCorrectChannel(),
-                        player.getRepresentationUnfogged()
-                                + ", you may exhaust _Discovery_ to explore a frontier token in a planetless system containing your ships.",
-                        NatauDoctrineHandler.getUseDiscoveryButton(player));
             }
             if (player.hasTech("thkairny")
                     && player.hasTechReady("thkairny")

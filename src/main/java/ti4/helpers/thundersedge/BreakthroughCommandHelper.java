@@ -16,7 +16,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionBreakthroughHandler;
@@ -301,9 +300,6 @@ public final class BreakthroughCommandHelper {
             }
             if ("oblivionbt".equalsIgnoreCase(bt.getID())) {
                 OblivionBreakthroughHandler.startCallOfTheVoid(game, player);
-            }
-            if ("netrunnersbt".equalsIgnoreCase(bt.getID())) {
-                NetrunnersBreakthroughHandler.offerDataBreachPlacement(game, player);
             }
             if ("toldarbt".equalsIgnoreCase(bt.getID())
                     || "toldarbthonor".equalsIgnoreCase(bt.getID())

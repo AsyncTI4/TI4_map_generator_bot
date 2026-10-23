@@ -23,7 +23,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaPromissoryHandler;
@@ -592,12 +591,6 @@ public class StartTurnService {
             Button veylaButton = ArcanumLeadersHandler.getVeylaStartTurnButton(game, player);
             if (veylaButton != null) {
                 startButtons.add(veylaButton);
-            }
-        }
-        if (!doneActionThisTurn && player.hasAbility("proxy_network")) {
-            Button proxyNetworkButton = NetrunnersAbilitiesHandler.getProxyNetworkButton(game, player);
-            if (proxyNetworkButton != null) {
-                startButtons.add(proxyNetworkButton);
             }
         }
         if (!doneActionThisTurn && player.hasUnit("crystellum_fighter3")) {

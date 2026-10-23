@@ -18,7 +18,6 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
-import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
@@ -323,9 +322,6 @@ public class CommanderUnlockCheckService {
 
                 shouldBeUnlocked = eligiblePlanets >= 4;
             }
-            case "netrunners" ->
-                shouldBeUnlocked = TechnologyType.mainFour.stream()
-                        .anyMatch(type -> ButtonHelper.getNumberOfCertainTypeOfTech(player, type) >= 3);
             case "natau" -> {
                 int qualifyingSystems = 0;
                 for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player)) {

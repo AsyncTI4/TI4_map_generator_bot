@@ -16,8 +16,6 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.TnelisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
@@ -92,7 +90,6 @@ public class EndTurnService {
         WarGamesBrActionCardHandler.clear(game);
         KaltrimUnitHandler.clearShrineInfantryRemovalState(game);
         UydaiUnitHandler.offerDeathCommandosPlacement(event, game, player);
-        if (NetrunnersBreakthroughHandler.offerDataBreachTechnology(game, player)) return;
         if (StringUtils.isNotEmpty(game.getCurrentActiveSystem())
                 && game.getStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED)
                         .isEmpty()) {
@@ -158,14 +155,6 @@ public class EndTurnService {
                     player.getCorrectChannel(),
                     player.getRepresentationNoPing()
                             + " lost temporary access to their _Field Test_ technology at the end of their turn.");
-        }
-        String proxyTech = game.getStoredValue("netrunnersProxyTech" + player.getFaction());
-        if (!proxyTech.isEmpty()) {
-            NetrunnersAbilitiesHandler.clearProxyNetwork(game, player);
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationNoPing()
-                            + " lost temporary access to their **Proxy Network** copied technology.");
         }
         game.setActiveSystem("");
     }
