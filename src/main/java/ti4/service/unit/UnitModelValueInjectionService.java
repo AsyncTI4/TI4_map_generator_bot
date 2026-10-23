@@ -277,7 +277,7 @@ public class UnitModelValueInjectionService {
         combined.setCapacityUsed(
                 units.stream().mapToInt(UnitModel::getCapacityUsed).max().orElse(combined.getCapacityUsed()));
         combined.setCost(
-                units.stream().map(UnitModel::getCost).max(Float::compare).orElse(combined.getCost()));
+                units.stream().map(UnitModel::getCost).min(Float::compare).orElse(combined.getCost()));
         combined.setCombatDieCount(
                 units.stream().mapToInt(UnitModel::getCombatDieCount).max().orElse(combined.getCombatDieCount()));
         combined.setCombatHitsOn(getBestHitsOn(

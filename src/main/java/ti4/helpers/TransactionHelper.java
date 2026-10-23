@@ -461,7 +461,7 @@ public class TransactionHelper {
                             receiver.addTech(furtherDetail);
 
                             ButtonHelperCommanders.resolveNekroCommanderCheck(receiver, furtherDetail, game);
-                            CommanderUnlockCheckService.checkPlayer(receiver, "nekro");
+                            CommanderUnlockCheckService.checkPlayer(receiver, "nekro", "netrunners");
                         }
                         case "EntanglementAgent", "EntanglementCommander" ->
                             transferEntanglementLeader(sender, receiver, furtherDetail, game);
@@ -536,7 +536,7 @@ public class TransactionHelper {
         sender.removeTech(techID);
         receiver.addTech(techID);
         ButtonHelperCommanders.resolveNekroCommanderCheck(receiver, techID, game);
-        CommanderUnlockCheckService.checkPlayer(receiver, "nekro");
+        CommanderUnlockCheckService.checkPlayer(receiver, "nekro", "netrunners");
         TechInfoService.sendTechInfo(sender);
         TechInfoService.sendTechInfo(receiver);
         return true;

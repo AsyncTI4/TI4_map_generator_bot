@@ -10,9 +10,6 @@
         "avarin"
     ],
     "shipPositionsType": "TYPE04",
-    "wormholes": [
-        "GAMMA"
-    ],
     "tileBack": "red",
     "isSupernova": true,
     "source": "theodisi"

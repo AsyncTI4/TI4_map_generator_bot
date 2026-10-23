@@ -129,10 +129,10 @@
         "types": [
             "WARFARE"
         ],
-        "requirements": "RRR",
+        "requirements": "RR",
         "faction": "netrunners",
         "source": "beans",
-        "text": "At the start of a round of combat, you may exhaust this card and choose 1 technology owned by both you and your opponent. During this round of combat, apply +1 to the result of each of 1 of your unit's combat rolls for each prerequisite on that technology."
+        "text": "At the start of a round of combat, you may exhaust this card and choose 1 technology owned by both you and your opponent. During this round of combat, apply +1 to the result of a number of dice up to the number of prerequisites on that technology."
     },
     {
         "alias": "benataudm",

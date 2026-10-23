@@ -1865,6 +1865,10 @@ public final class ButtonHelperSCs {
             return msgStart + " You are elected for _Endorse_, so you do not spend a token.";
         }
 
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "netrunnerscommander") && scNum == 7) {
+            return msgStart + " No command token was spent due to **Tek Mir-un**, the Net-Runners commander.";
+        }
+
         int strategicCC = player.getStrategicCC();
         if (strategicCC == 0) {
             String msg = " have 0 command tokens in strategy pool, **can't follow.**";

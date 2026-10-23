@@ -3,6 +3,7 @@ package ti4.service.franken;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DeepReachesStartingTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesStartingTechsHandler;
 import ti4.game.Player;
 import ti4.message.MessageHelper;
@@ -40,6 +41,9 @@ public class FrankenStartingTechService {
         if ("stoneborn".equalsIgnoreCase(itemID)) {
             LostLegaciesStartingTechsHandler.offerStonebornStartingTechs(player.getGame(), player);
         }
+        if ("netrunners".equalsIgnoreCase(itemID)) {
+            DeepReachesStartingTechHandler.offerNetrunnersStartingTechs(player.getGame(), player);
+        }
     }
 
     public void removeStartingTech(GenericInteractionCreateEvent event, Player player, String itemID) {
@@ -48,6 +52,9 @@ public class FrankenStartingTechService {
         if (startingTech == null) return;
         for (String tech : startingTech) {
             removeTech(event, player, tech);
+        }
+        if ("netrunners".equalsIgnoreCase(itemID)) {
+            DeepReachesStartingTechHandler.clearNetrunnersStartingTechs(player.getGame(), player);
         }
     }
 

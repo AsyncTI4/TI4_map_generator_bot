@@ -34,6 +34,7 @@ public class CombatModifierModel implements ModelInterface {
     private Boolean applyEachForQuantity = false;
     private Boolean applyToOpponent = false;
     private Integer maxDice;
+    private String maxDiceScalingType;
 
     public boolean isValid() {
         return type != null

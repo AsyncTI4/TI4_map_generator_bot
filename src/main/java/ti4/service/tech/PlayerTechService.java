@@ -16,6 +16,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
@@ -97,6 +102,8 @@ public class PlayerTechService {
             WhiteTfUnitHandler.offerMechRemoval(event, game, player, techID);
         }
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
+        NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
+        NetrunnersTechHandler.resolveDataMining(event, game, player, techID);
         String message = player.getRepresentation() + " added technology: "
                 + Mapper.getTech(techID).getRepresentation(false) + ".";
         if ("iihq".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
@@ -124,6 +131,10 @@ public class PlayerTechService {
         CommanderUnlockCheckService.checkPlayer(
                 player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum", "revenantvanguard");
         MessageHelper.sendMessageToEventChannel(event, message);
+        if (gainedTech) {
+            NetrunnersLeadersHandler.offerZorNoAhnForOwner(event, game, player, techID);
+            NetrunnersUnitHandler.offerNimdaDeploy(game, player);
+        }
     }
 
     @ButtonHandler("removeSingularity")
@@ -285,6 +296,8 @@ public class PlayerTechService {
             GameEventService.commit(game, GameEventType.CARD_PLAY_TECH_EXHAUST, player, Map.of("cardId", tech));
         }
 
+        NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
+
         // Handle Ignis Aurora Techs
         if (tech.startsWith("baldrick_")) {
             IgnisAuroraHelperTechs.handleExhaustIgnisAuroraTech(event, game, player, tech);
@@ -305,6 +318,7 @@ public class PlayerTechService {
                         buttons);
                 deleteTheOneButtonIfButtonEvent(event);
             }
+            case "benetrunnersmo" -> NetrunnersTechHandler.resolveMimeticOverride(event, game, player);
             case "ththurvialib" -> {
                 ThurvialiTechHandler.resolveMutualism(game, player);
                 deleteTheOneButtonIfButtonEvent(event);
@@ -841,6 +855,10 @@ public class PlayerTechService {
         }
         player.addTech(techID);
         BlueReverieHelper.checkXinHarmony(game, player);
+        NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
+        NetrunnersTechHandler.resolveDataMining(event, game, player, techID);
+        NetrunnersLeadersHandler.offerZorNoAhnForOwner(event, game, player, techID);
+        NetrunnersUnitHandler.offerNimdaDeploy(game, player);
         if (isResearch) {
             MonumentsTEButtonHandler.offerEpiphanyResearchButtons(game, player, techM);
             VyserixLeaderHandler.resolveCommanderOnResearch(game, player, techM);
@@ -1105,6 +1123,10 @@ public class PlayerTechService {
             }
             Button aiDEVButton = Buttons.red("exhaustTech_absol_aida" + inf, "Exhaust AI Development Algorithm");
             buttons.add(aiDEVButton);
+        }
+        if (NetrunnersPromissoryHandler.canUseSharedNetworkAccess(player, techM)) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "useSharedNetworkAccess_" + tech, "Use Shared Network Access"));
         }
         buttons.addAll(ArcanumUnitHandler.getRuneboundPrerequisiteSkipButtons(game, player, tech, payType));
         if ("res".equals(payType)) {

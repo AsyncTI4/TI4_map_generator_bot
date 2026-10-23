@@ -14,6 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EscapeClauseActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinPnHandler;
@@ -539,6 +541,8 @@ public class PromissoryNoteHelper {
         }
         if ("fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
+            NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
+            NetrunnersTechHandler.resolveDataMining(event, game, player, "ws");
             ButtonHelperCommanders.resolveNekroCommanderCheck(player, "ws", game);
             CommanderUnlockCheckService.checkPlayer(player, "mirveda");
             MessageHelper.sendMessageToChannel(
