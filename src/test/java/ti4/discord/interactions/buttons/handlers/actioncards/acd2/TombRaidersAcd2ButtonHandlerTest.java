@@ -75,9 +75,9 @@ class TombRaidersAcd2ButtonHandlerTest {
 
     @Test
     void neverRunsOutOfActivitiesForLargeRolls() {
-        Outcome outcome = resolve(Set.of("cultural"), 30, 0, new ArrayDeque<>(java.util.Collections.nCopies(30, 1)));
+        Outcome outcome = resolve(Set.of("cultural"), 50, 0, new ArrayDeque<>(java.util.Collections.nCopies(50, 1)));
 
-        assertEquals(30, outcome.activities().size());
+        assertEquals(50, outcome.activities().size());
     }
 
     @Test

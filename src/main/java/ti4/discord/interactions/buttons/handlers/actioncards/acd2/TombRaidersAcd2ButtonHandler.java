@@ -49,7 +49,25 @@ class TombRaidersAcd2ButtonHandler {
             "🏃 Running away...",
             "🥷 Stealthing...",
             "🧞 Wishing...",
-            "🕵️ Sleuthing...");
+            "🕵️ Sleuthing...",
+            "🪤 Springing traps...",
+            "🐍 Snakes. Why'd it have to be snakes?...",
+            "🪨 Outrunning a boulder...",
+            "🔥 Dodging fireballs...",
+            "🧟 Waking the mummy...",
+            "🏺 Dusting off pottery...",
+            "📜 Deciphering hieroglyphs...",
+            "⛏️ Digging...",
+            "🧭 Navigating...",
+            "🕯️ Lighting a torch...",
+            "🗝️ Picking a lock...",
+            "🕸️ Brushing off cobwebs...",
+            "🪦 Disturbing a grave...",
+            "🐊 Crocodiles...",
+            "🛕 Entering the temple...",
+            "⚖️ Swapping the idol for a sandbag...",
+            "🐪 Camel riding...",
+            "💎 Pocketing the gem...");
 
     @ButtonHandler("resolveTombRaiders")
     public static void resolveTombRaiders(Player player, Game game, ButtonInteractionEvent event) {
