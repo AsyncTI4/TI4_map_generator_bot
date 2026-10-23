@@ -12,6 +12,7 @@ public final class ThinkingStats {
 
     private static final int SLOWEST_KEPT = 5;
     private static final int TOP_SPANS_PER_DECISION = 3;
+    private static final int DETAIL_SPANS_PER_DECISION = 10;
     private static final long NANOS_PER_MILLI = 1_000_000L;
 
     private static final class Total {
@@ -97,6 +98,15 @@ public final class ThinkingStats {
                 profile.spans().stream()
                         .limit(TOP_SPANS_PER_DECISION)
                         .map(span -> span.name() + " " + millis(span.selfNanos()))
+                        .toList());
+    }
+
+    public static String detail(ThinkingProfile profile) {
+        return String.join(
+                ", ",
+                profile.spans().stream()
+                        .limit(DETAIL_SPANS_PER_DECISION)
+                        .map(span -> span.name() + " " + millis(span.selfNanos()) + " x" + span.calls())
                         .toList());
     }
 

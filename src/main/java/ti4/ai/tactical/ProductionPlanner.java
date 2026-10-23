@@ -225,7 +225,11 @@ public class ProductionPlanner {
     }
 
     public static BuildPlan plan(Game game, Player seat, Tile tile, int extraResources) {
-        return plan(game, seat, tile, extraResources, new DefenseOutlook(game, seat));
+        DefenseOutlook defense;
+        try (Thinking.Span ignored = Thinking.enter("production.defenseOutlook")) {
+            defense = new DefenseOutlook(game, seat);
+        }
+        return plan(game, seat, tile, extraResources, defense);
     }
 
     public static BuildPlan plan(Game game, Player seat, Tile tile, int extraResources, DefenseOutlook defense) {
@@ -242,22 +246,31 @@ public class ProductionPlanner {
     private static BuildPlan buildPlan(
             Game game, Player seat, Tile tile, int extraResources, DefenseOutlook defense, int overSupplyCarriers) {
         if (BoardView.hasEnemyShips(game, seat, tile)) return new BuildPlan(List.of());
-        Budget budget = new Budget(
-                Helper.getProductionValue(seat, game, tile, false),
-                spendableResources(game, seat) + extraResources + (seat.hasTech("st") ? 1 : 0) + aidaDiscount(seat),
-                FleetLimit.ships(seat) - BoardView.nonFighterShips(BoardView.space(tile), seat),
-                seat.hasUnlockedBreakthrough(BELLUM_GLORIOSUM));
+        Budget budget;
+        try (Thinking.Span ignored = Thinking.enter("production.budget")) {
+            budget = new Budget(
+                    Helper.getProductionValue(seat, game, tile, false),
+                    spendableResources(game, seat) + extraResources + (seat.hasTech("st") ? 1 : 0) + aidaDiscount(seat),
+                    FleetLimit.ships(seat) - BoardView.nonFighterShips(BoardView.space(tile), seat),
+                    seat.hasUnlockedBreakthrough(BELLUM_GLORIOSUM));
+        }
         budget.overSupply = Math.max(0, overSupplyCarriers);
         Builder builder = new Builder(game, seat, tile, budget, defense);
-        planScoringUnits(builder);
-        planDefensiveUnits(builder);
-        planCoreUnits(builder);
-        planFractureFleet(builder);
-        planSurplusShips(builder);
-        planFractureFighters(builder);
-        planAutoFactories(builder);
-        fillProduction(builder);
+        phase("production.scoringUnits", () -> planScoringUnits(builder));
+        phase("production.defensiveUnits", () -> planDefensiveUnits(builder));
+        phase("production.coreUnits", () -> planCoreUnits(builder));
+        phase("production.fractureFleet", () -> planFractureFleet(builder));
+        phase("production.surplusShips", () -> planSurplusShips(builder));
+        phase("production.fractureFighters", () -> planFractureFighters(builder));
+        phase("production.autoFactories", () -> planAutoFactories(builder));
+        phase("production.fill", () -> fillProduction(builder));
         return new BuildPlan(builder.orders);
+    }
+
+    private static void phase(String span, Runnable step) {
+        try (Thinking.Span ignored = Thinking.enter(span)) {
+            step.run();
+        }
     }
 
     public static BuildPlan bellumGloriosum(

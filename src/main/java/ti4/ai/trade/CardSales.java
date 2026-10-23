@@ -8,6 +8,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.ActionCardValue;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -51,13 +52,26 @@ class CardSales {
         for (Player partner : partners) {
             if (!OwnTurnDeals.mayApproach(context, partner)) continue;
             double trust = Trust.of(context, partner);
-            for (Deal deal : candidates(game, seat, partner)) {
-                if (!TradeValue.coverable(game, seat, partner, deal)) continue;
-                if (!TradeValue.proposable(game, seat, partner, deal, trust)) continue;
-                offers.add(new Offer(
-                        partner,
-                        deal,
-                        TradeValue.of(game, seat, partner, deal, trust).utility()));
+            List<Deal> deals;
+            try (Thinking.Span ignored = Thinking.enter("cardSales.candidates")) {
+                deals = candidates(game, seat, partner);
+            }
+            for (Deal deal : deals) {
+                boolean coverable;
+                try (Thinking.Span ignored = Thinking.enter("cardSales.coverable")) {
+                    coverable = TradeValue.coverable(game, seat, partner, deal);
+                }
+                if (!coverable) continue;
+                boolean proposable;
+                try (Thinking.Span ignored = Thinking.enter("cardSales.proposable")) {
+                    proposable = TradeValue.proposable(game, seat, partner, deal, trust);
+                }
+                if (!proposable) continue;
+                double utility;
+                try (Thinking.Span ignored = Thinking.enter("cardSales.value")) {
+                    utility = TradeValue.of(game, seat, partner, deal, trust).utility();
+                }
+                offers.add(new Offer(partner, deal, utility));
             }
         }
         offers.sort(Comparator.comparingDouble(Offer::utility).reversed());

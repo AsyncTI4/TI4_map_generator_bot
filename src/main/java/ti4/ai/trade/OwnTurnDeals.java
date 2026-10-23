@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiSeats;
 import ti4.ai.AiSettings;
@@ -62,30 +63,37 @@ class OwnTurnDeals {
 
     private static Optional<AiDecision> ownTurn(AiTurnContext context) {
         if (!startOfOwnTurn(context)) return Optional.empty();
-        List<Player> partners = partners(context);
+        List<Player> partners = timed("trade.partners", () -> partners(context));
         if (partners.isEmpty()) return Optional.empty();
-        Optional<AiDecision> payment = payDebt(context, partners);
+        Optional<AiDecision> payment = timed("trade.payDebt", () -> payDebt(context, partners));
         if (payment.isPresent()) return payment;
-        Optional<AiDecision> facilitation = Facilitation.start(context, partners);
+        Optional<AiDecision> facilitation = timed("trade.facilitation", () -> Facilitation.start(context, partners));
         if (facilitation.isPresent()) return facilitation;
         if (TradeMemory.count(context.memory(), turnDraftsKey(context)) >= OWN_TURN_DRAFTS) return Optional.empty();
-        Optional<AiDecision> announced = TechnologyRequest.announce(context, partners);
+        Optional<AiDecision> announced =
+                timed("trade.techAnnounce", () -> TechnologyRequest.announce(context, partners));
         if (announced.isPresent()) return announced;
-        Optional<AiDecision> started = TechnologyRequest.start(context, partners)
-                .or(() -> desperation(context, partners))
-                .or(() -> wash(context, partners, partner -> true))
-                .or(() -> NoteDeals.propose(context, partners))
-                .or(() -> FragmentDeals.propose(context, partners))
-                .or(() -> MilitarySupportDeals.propose(context, partners))
-                .or(() -> sell(context, partners))
-                .or(() -> CardSales.propose(context, partners))
-                .or(() -> collect(context, partners));
+        Optional<AiDecision> started = timed("trade.techRequest", () -> TechnologyRequest.start(context, partners))
+                .or(() -> timed("trade.desperation", () -> desperation(context, partners)))
+                .or(() -> timed("trade.wash", () -> wash(context, partners, partner -> true)))
+                .or(() -> timed("trade.noteProposals", () -> NoteDeals.propose(context, partners)))
+                .or(() -> timed("trade.fragments", () -> FragmentDeals.propose(context, partners)))
+                .or(() -> timed("trade.militarySupport", () -> MilitarySupportDeals.propose(context, partners)))
+                .or(() -> timed("trade.sell", () -> sell(context, partners)))
+                .or(() -> timed("trade.cardSales", () -> CardSales.propose(context, partners)))
+                .or(() -> timed("trade.collect", () -> collect(context, partners)));
         started.ifPresent(ignored -> TradeMemory.increment(context.memory(), turnDraftsKey(context)));
         return started;
     }
 
+    private static <T> T timed(String span, Supplier<T> work) {
+        try (Thinking.Span ignored = Thinking.enter(span)) {
+            return work.get();
+        }
+    }
+
     private static Optional<AiDecision> agenda(AiTurnContext context) {
-        List<Player> partners = partners(context);
+        List<Player> partners = timed("trade.partners", () -> partners(context));
         if (partners.isEmpty()) return Optional.empty();
         String ours = context.faction();
         List<Player> creditors = partners.stream()

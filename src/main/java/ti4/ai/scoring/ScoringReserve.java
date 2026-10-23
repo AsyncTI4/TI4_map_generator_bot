@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.CustodiansRace;
@@ -23,7 +24,15 @@ public class ScoringReserve {
         if (!isActionPhase(game)) return SpendCost.NONE;
         try (Thinking.Span ignored = Thinking.enter("scoring.reserve")) {
             SpendCost reserve = reserved(game, seat).map(Reserved::cost).orElse(SpendCost.NONE);
-            return custodiansReserve(game, seat).plus(reserve).plus(SpendCost.tradeGoods(PromisedTradeGoods.of(seat)));
+            SpendCost custodians = timed("scoring.custodians", () -> custodiansReserve(game, seat));
+            SpendCost promised = timed("scoring.promised", () -> SpendCost.tradeGoods(PromisedTradeGoods.of(seat)));
+            return custodians.plus(reserve).plus(promised);
+        }
+    }
+
+    private static <T> T timed(String span, Supplier<T> work) {
+        try (Thinking.Span ignored = Thinking.enter(span)) {
+            return work.get();
         }
     }
 
@@ -31,16 +40,21 @@ public class ScoringReserve {
         if (!isActionPhase(game) || !Helper.canPlayerScorePOs(game, seat)) {
             return Optional.empty();
         }
-        Wallet wallet =
-                custodiansClaim(game, seat).map(Wallet.of(game, seat)::without).orElseGet(() -> Wallet.of(game, seat));
-        Optional<Reserved> spend =
-                bestAffordableSpend(game, seat, wallet).or(() -> bestProjectedSpend(game, seat, wallet));
+        Wallet wallet = timed(
+                "scoring.wallet",
+                () -> custodiansClaim(game, seat)
+                        .map(Wallet.of(game, seat)::without)
+                        .orElseGet(() -> Wallet.of(game, seat)));
+        Optional<Reserved> spend = timed("scoring.affordable", () -> bestAffordableSpend(game, seat, wallet))
+                .or(() -> timed("scoring.projected", () -> bestProjectedSpend(game, seat, wallet)));
         if (spend.isEmpty()) return Optional.empty();
         int spendPoints = ObjectivePolicy.victoryPoints(spend.get().objectiveId());
-        long freeScoresWorthAsMuch = ObjectivePolicy.scorablePublics(game, seat).stream()
-                .filter(id -> !ObjectiveCatalog.isSpend(id))
-                .filter(id -> ObjectivePolicy.victoryPoints(id) >= spendPoints)
-                .count();
+        long freeScoresWorthAsMuch = timed(
+                "scoring.scorable",
+                () -> ObjectivePolicy.scorablePublics(game, seat).stream()
+                        .filter(id -> !ObjectiveCatalog.isSpend(id))
+                        .filter(id -> ObjectivePolicy.victoryPoints(id) >= spendPoints)
+                        .count());
         return freeScoresWorthAsMuch >= scoringChances(game, seat) ? Optional.empty() : spend;
     }
 
@@ -104,8 +118,9 @@ public class ScoringReserve {
     }
 
     private static Optional<Reserved> bestProjectedSpend(Game game, Player seat, Wallet wallet) {
-        int expected = ExpectedTradeGoods.beforeStatus(game, seat);
-        List<Wallet.PlanetValue> readied = ExpectedReadying.beforeStatus(game, seat);
+        int expected = timed("scoring.expectedTradeGoods", () -> ExpectedTradeGoods.beforeStatus(game, seat));
+        List<Wallet.PlanetValue> readied =
+                timed("scoring.expectedReadying", () -> ExpectedReadying.beforeStatus(game, seat));
         if (expected <= 0 && readied.isEmpty()) return Optional.empty();
         Wallet projected = new Wallet(
                 concat(wallet.planets(), readied),

@@ -15,6 +15,7 @@ import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -356,8 +357,12 @@ public class TacticalPlanner {
                 .map(tile -> bestFor(context, tile))
                 .flatMap(Optional::stream)
                 .toList());
-        plans.addAll(stage(context, activatable));
-        plans.addAll(flankSpeedPlans(context, activatable));
+        try (Thinking.Span ignored = Thinking.enter("tactical.for.stage")) {
+            plans.addAll(stage(context, activatable));
+        }
+        try (Thinking.Span ignored = Thinking.enter("tactical.for.flank")) {
+            plans.addAll(flankSpeedPlans(context, activatable));
+        }
         return plans.stream()
                 .map(plan -> plan.withScore(plan.score() - marchForfeit(context, plan)))
                 .filter(plan -> plan.score() >= minScore)
@@ -417,8 +422,10 @@ public class TacticalPlanner {
     private record Followers(List<UnitMove> moves, double value) {}
 
     private static TacticalPlan withFollowers(Context context, Tile target, TacticalPlan plan) {
-        Followers followers =
-                followers(context, target, plan.moves(), plan.landings().keySet());
+        Followers followers;
+        try (Thinking.Span ignored = Thinking.enter("tactical.for.followers")) {
+            followers = followers(context, target, plan.moves(), plan.landings().keySet());
+        }
         if (followers.moves().isEmpty()) return plan;
         List<UnitMove> moves = new ArrayList<>(plan.moves());
         int landed =
@@ -593,21 +600,28 @@ public class TacticalPlanner {
     private static Optional<TacticalPlan> bestFor(Context context, Tile tile) {
         if (!MovementGraph.canEnter(context.game, context.seat, tile)) return Optional.empty();
         List<TacticalPlan> plans = new ArrayList<>();
-        context.expansionPlan(tile).ifPresent(plans::add);
-        attack(context, tile).ifPresent(plans::add);
-        cannonRaid(context, tile).ifPresent(plans::add);
-        produce(context, tile).ifPresent(plans::add);
-        position(context, tile).ifPresent(plans::add);
-        screen(context, tile).ifPresent(plans::add);
-        advance(context, tile).ifPresent(plans::add);
-        pickup(context, tile).ifPresent(plans::add);
-        defend(context, tile).ifPresent(plans::add);
-        garrison(context, tile).ifPresent(plans::add);
+        timed("tactical.for.expansion", () -> context.expansionPlan(tile)).ifPresent(plans::add);
+        timed("tactical.for.attack", () -> attack(context, tile)).ifPresent(plans::add);
+        timed("tactical.for.cannonRaid", () -> cannonRaid(context, tile)).ifPresent(plans::add);
+        timed("tactical.for.produce", () -> produce(context, tile)).ifPresent(plans::add);
+        timed("tactical.for.position", () -> position(context, tile)).ifPresent(plans::add);
+        timed("tactical.for.screen", () -> screen(context, tile)).ifPresent(plans::add);
+        timed("tactical.for.advance", () -> advance(context, tile)).ifPresent(plans::add);
+        timed("tactical.for.pickup", () -> pickup(context, tile)).ifPresent(plans::add);
+        timed("tactical.for.defend", () -> defend(context, tile)).ifPresent(plans::add);
+        timed("tactical.for.garrison", () -> garrison(context, tile)).ifPresent(plans::add);
         return plans.stream()
                 .map(plan -> plan.withScore(PlayAreaNotes.adjustedScore(context.game, context.seat, tile, plan)
                         + SetupHint.bonusFor(context.hints, plan)))
                 .max(Comparator.comparingDouble(TacticalPlan::score))
-                .map(plan -> withFighters(context, tile, plan));
+                .map(plan -> timed("tactical.for.fighters", () -> Optional.of(withFighters(context, tile, plan)))
+                        .orElse(plan));
+    }
+
+    private static Optional<TacticalPlan> timed(String span, Supplier<Optional<TacticalPlan>> plan) {
+        try (Thinking.Span ignored = Thinking.enter(span)) {
+            return plan.get();
+        }
     }
 
     private static Optional<TacticalPlan> garrison(Context context, Tile tile) {
@@ -1897,6 +1911,12 @@ public class TacticalPlanner {
     }
 
     private static double marchForfeit(Context context, TacticalPlan plan) {
+        try (Thinking.Span ignored = Thinking.enter("tactical.for.marchForfeit")) {
+            return marchForfeitOf(context, plan);
+        }
+    }
+
+    private static double marchForfeitOf(Context context, TacticalPlan plan) {
         Optional<Tile> styx = styxToTake(context);
         if (styx.isEmpty() || plan.target().equals(styx.get().getPosition())) return 0;
         Tile target = context.game.getTileByPosition(plan.target());

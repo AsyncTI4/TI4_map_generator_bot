@@ -16,6 +16,7 @@ import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendUnlock;
 import ti4.ai.strategy.ReadyingValue;
 import ti4.ai.tactical.Stall;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -171,12 +172,18 @@ public class ActionCardValue {
     private record DiscardKey(String alias, double keep, double prior, double play) {}
 
     public static List<String> discardOrder(Game game, Player seat) {
+        try (Thinking.Span ignored = Thinking.enter("cards.discardOrder")) {
+            return discardOrderOf(game, seat);
+        }
+    }
+
+    private static List<String> discardOrderOf(Game game, Player seat) {
         return seat.getActionCards().keySet().stream()
                 .map(alias -> new DiscardKey(
                         alias,
-                        keepValue(game, seat, alias),
+                        timedKeep(game, seat, alias),
                         ActionCardPrior.keepPrior(alias),
-                        playValue(game, seat, alias)))
+                        timedPlay(game, seat, alias)))
                 .sorted(Comparator.comparingDouble(DiscardKey::keep)
                         .thenComparingDouble(DiscardKey::prior)
                         .thenComparingDouble(DiscardKey::play)
@@ -185,14 +192,29 @@ public class ActionCardValue {
                 .toList();
     }
 
+    private static double timedKeep(Game game, Player seat, String alias) {
+        try (Thinking.Span ignored = Thinking.enter("cards.keepValue")) {
+            return keepValue(game, seat, alias);
+        }
+    }
+
+    private static double timedPlay(Game game, Player seat, String alias) {
+        try (Thinking.Span ignored = Thinking.enter("cards.playValue")) {
+            return playValue(game, seat, alias);
+        }
+    }
+
     public static boolean hasSpareCard(Game game, Player seat) {
         List<String> order = discardOrder(game, seat);
         if (order.isEmpty()) return false;
         String worst = order.getFirst();
-        boolean wouldPlay = bestComponentPlay(game, seat)
-                .map(Candidate::alias)
-                .filter(worst::equals)
-                .isPresent();
+        boolean wouldPlay;
+        try (Thinking.Span ignored = Thinking.enter("cards.bestComponentPlay")) {
+            wouldPlay = bestComponentPlay(game, seat)
+                    .map(Candidate::alias)
+                    .filter(worst::equals)
+                    .isPresent();
+        }
         return keepValue(game, seat, worst) < SPARE_BELOW && !wouldPlay;
     }
 

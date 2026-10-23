@@ -299,7 +299,8 @@ class AiTickRunner {
         if (slow && tick.lane().slowWarningDue(tick.now(), AiSettings.SLOW_WARNING_GAP.toMillis())) {
             BotLogger.warning("AI thinking was slow game=" + tick.game().getName() + " seat="
                     + tick.seat().getFaction() + " took=" + ThinkingStats.millis(profile.totalNanos())
-                    + " outcome=" + outcomeName(decision, null) + " spans=[" + ThinkingStats.summary(profile) + "]");
+                    + " round=" + tick.game().getRound() + " outcome=" + outcomeName(decision, null) + " spans=["
+                    + ThinkingStats.detail(profile) + "]");
         }
     }
 
