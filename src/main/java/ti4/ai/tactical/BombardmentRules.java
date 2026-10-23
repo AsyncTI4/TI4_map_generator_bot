@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiSeats;
@@ -42,8 +44,14 @@ public class BombardmentRules {
     public record Target(String planet, Player defender) {}
 
     public static Optional<Target> target(Game game, Player seat, Tile tile, Map<UnitType, Integer> ships) {
+        return target(game, seat, tile, ships, name -> true);
+    }
+
+    private static Optional<Target> target(
+            Game game, Player seat, Tile tile, Map<UnitType, Integer> ships, Predicate<String> allowed) {
         if (dice(seat, ships) == 0) return Optional.empty();
         for (String name : BombardmentService.getBombardablePlanets(seat, game, tile)) {
+            if (!allowed.test(name)) continue;
             if (!(tile.getUnitHolders().get(name) instanceof Planet planet)) continue;
             Optional<Player> defender = game.getRealPlayers().stream()
                     .filter(other -> other != seat && BoardView.groundForces(planet, other) > 0)
@@ -72,12 +80,16 @@ public class BombardmentRules {
         return DiceOdds.atLeast(dieChances(seat, ships), needed);
     }
 
-    public static Optional<AiDecision> beforeLanding(AiTurnContext context, List<AiPrompt> turn, Tile tile) {
+    public static Optional<AiDecision> beforeLanding(
+            AiTurnContext context, List<AiPrompt> turn, Tile tile, Set<String> plannedLandings) {
         String key = BOMBARD_KEY + TacticalRules.actionKey(context) + "|" + tile.getPosition();
         Optional<String> state = context.memory().get(key);
         if (state.isPresent()) return afterPress(context, tile, key, state.get());
         Player seat = context.seat();
-        Optional<Target> target = target(context.game(), seat, tile, BoardView.ships(BoardView.space(tile), seat));
+        Predicate<String> allowed =
+                defendedBySeveral(context.game(), seat, tile) ? plannedLandings::contains : name -> true;
+        Optional<Target> target =
+                target(context.game(), seat, tile, BoardView.ships(BoardView.space(tile), seat), allowed);
         if (target.isEmpty()) return Optional.empty();
         String position = tile.getPosition();
         Optional<Match> roll = Prompts.first(
@@ -101,6 +113,15 @@ public class BombardmentRules {
         ActionSecretRules.watchBombardment(
                 context, position, target.get().planet(), target.get().defender());
         return Optional.of(roll.get().press("bombard " + target.get().planet()));
+    }
+
+    private static boolean defendedBySeveral(Game game, Player seat, Tile tile) {
+        return game.getRealPlayersNNeutral().stream()
+                        .filter(other -> other != seat)
+                        .filter(other -> tile.getPlanetUnitHolders().stream()
+                                .anyMatch(planet -> BoardView.groundForces(planet, other) > 0))
+                        .count()
+                > 1;
     }
 
     private static Optional<AiDecision> afterPress(AiTurnContext context, Tile tile, String key, String state) {

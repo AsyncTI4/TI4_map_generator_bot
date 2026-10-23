@@ -1236,7 +1236,7 @@ public class TacticalPlanner {
 
     private static Optional<TacticalPlan> bestAttack(Context context, Tile tile) {
         Player opponent = singleOpponent(context.game, context.seat, tile);
-        if (opponent == null) return Optional.empty();
+        if (opponent == null) return SharedSystemAttack.best(context, tile);
         return finalPlan(context, tile, candidatePool(context, tile, opponent));
     }
 
@@ -1491,7 +1491,7 @@ public class TacticalPlanner {
         return Optional.of(new Candidate(parts, executed, estimate, terms, quick, heldBack, blend));
     }
 
-    private static StrikeRules rules(Context context, Tile tile, Player opponent, boolean homeLandings) {
+    static StrikeRules rules(Context context, Tile tile, Player opponent, boolean homeLandings) {
         Game game = context.game;
         double threat = context.defense().standings().winThreat(opponent);
         boolean conquering = tile.isHomeSystem(game) && wantsToConquer(game, context.seat);
@@ -1504,7 +1504,7 @@ public class TacticalPlanner {
         return new StrikeRules(conquering, minWin, structures, homeLandings, context.canPayCustodians());
     }
 
-    private static Optional<List<UnitMove>> executedMoves(
+    static Optional<List<UnitMove>> executedMoves(
             Context context, List<Part> parts, Tile tile, StrikeEstimate estimate) {
         Player seat = context.seat;
         int landedTotal = estimate.groundSent().values().stream()
@@ -1567,7 +1567,7 @@ public class TacticalPlanner {
                 context.seatStake(tile, estimate));
     }
 
-    private static Map<String, Double> territoryValues(Context context, Tile tile) {
+    static Map<String, Double> territoryValues(Context context, Tile tile) {
         double bonus = ownAreaBonus(context.territory().zone(tile));
         if (bonus == 0) return Map.of();
         Map<String, Double> values = new HashMap<>();
@@ -1576,6 +1576,10 @@ public class TacticalPlanner {
     }
 
     private static Optional<TacticalPlan> finalPlan(Context context, Tile tile, List<Candidate> pool) {
+        return finalPlan(pool, finalist -> fullPlan(context, tile, finalist));
+    }
+
+    static Optional<TacticalPlan> finalPlan(List<Candidate> pool, Function<Candidate, Optional<TacticalPlan>> planner) {
         if (pool.isEmpty()) return Optional.empty();
         List<Candidate> ranked = pool.stream()
                 .sorted(Comparator.comparingDouble(
@@ -1590,7 +1594,7 @@ public class TacticalPlanner {
                 .ifPresent(found -> addDistinct(finalists, found));
         TacticalPlan best = null;
         for (Candidate finalist : finalists) {
-            Optional<TacticalPlan> plan = fullPlan(context, tile, finalist);
+            Optional<TacticalPlan> plan = planner.apply(finalist);
             if (plan.isPresent() && (best == null || plan.get().score() > best.score())) best = plan.get();
         }
         return Optional.ofNullable(best);
@@ -3208,16 +3212,28 @@ public class TacticalPlanner {
 
     @Nullable
     static Player singleOpponent(Game game, Player seat, Tile tile) {
-        List<Player> others = game.getPlayers().values().stream()
+        List<Player> others = othersIn(game, seat, tile);
+        if (others.size() != 1
+                || !(others.getFirst().isRealPlayer() || others.getFirst().isNeutral())) return null;
+        return others.getFirst();
+    }
+
+    static List<Player> othersIn(Game game, Player seat, Tile tile) {
+        return game.getPlayers().values().stream()
                 .filter(other -> other != seat)
                 .filter(other -> other.getColor() != null)
                 .filter(other -> tile.containsPlayersUnits(other)
                         || tile.getPlanetUnitHolders().stream()
                                 .anyMatch(planet -> other.getPlanets().contains(planet.getName())))
                 .toList();
-        if (others.size() != 1
-                || !(others.getFirst().isRealPlayer() || others.getFirst().isNeutral())) return null;
-        return others.getFirst();
+    }
+
+    static boolean heldOnlyBy(Game game, Player seat, Planet planet, Player opponent) {
+        Player controller = BoardView.controller(game, planet.getName());
+        if (controller != null && controller != opponent) return false;
+        return game.getRealPlayersNNeutral().stream()
+                .filter(other -> other != seat && other != opponent)
+                .noneMatch(other -> BoardView.groundForces(planet, other) > 0);
     }
 
     static List<Planet> enemyPlanets(Game game, Player seat, Tile tile) {
