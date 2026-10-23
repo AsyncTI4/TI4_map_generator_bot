@@ -52,6 +52,22 @@ public class CombatModHelper {
     private static final Set<String> CODE_CARD_ABILITIES =
             Set.of("bestow", "reflect", "ascend", "thwart", "deceive", "scourge");
 
+    public static int getMaxDice(CombatModifierModel modifier, Player player, Player opponent) {
+        if (modifier.getMaxDice() == null) {
+            return 0;
+        }
+        if (!"shared_tech_max_prerequisites".equals(modifier.getMaxDiceScalingType()) || opponent == null) {
+            return modifier.getMaxDice();
+        }
+        return player.getTechs().stream()
+                .filter(opponent::hasTech)
+                .map(Mapper::getTech)
+                .filter(Objects::nonNull)
+                .mapToInt(technology -> technology.getRequirements().orElse("").length())
+                .max()
+                .orElse(0);
+    }
+
     private static Boolean IsModInScopeForUnits(
             List<UnitModel> units, CombatModifierModel modifier, CombatRollType rollType, Game game, Player player) {
         for (UnitModel unit : units) {
@@ -969,6 +985,13 @@ public class CombatModHelper {
                     scalingCount =
                             getGalvanizedScalingCount(game, unitHolder, origUnit, player, activeSystem, rollType);
                 case "unique_ships" -> scalingCount = getUniqueNonFighterShipCount(activeSystem, player);
+                case "opponent_warfare_tech" ->
+                    scalingCount = opponent == null
+                            ? 0
+                            : opponent.getTechs().stream()
+                                    .map(Mapper::getTech)
+                                    .filter(tech -> tech != null && tech.isType("warfare"))
+                                    .count();
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
                         scalingCount = opponent.getTechs().stream()

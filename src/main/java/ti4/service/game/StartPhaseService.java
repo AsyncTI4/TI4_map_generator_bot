@@ -21,6 +21,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
@@ -145,6 +146,7 @@ public class StartPhaseService {
             }
             case "statusScoring" -> {
                 StatusHelper.announceStatusPhase(game);
+                NetrunnersPromissoryHandler.returnSharedNetworkAccess(game);
                 StatusHelper.beginScoring(event, game, event.getMessageChannel());
                 StatusHelper.handleStatusPhaseMiddle(game);
                 game.updateActivePlayer(null);

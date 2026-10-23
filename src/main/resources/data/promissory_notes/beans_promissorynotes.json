@@ -51,7 +51,7 @@
         "name": "Shared Network Access",
         "faction": "netrunners",
         "color": "",
-        "playArea": false,
+        "playArea": true,
         "source": "beans",
         "text": "When you research a non-unit upgrade, non-faction technology: You may place this card face up in your play area to ignore 1 prerequisite on that technology. At the start of the status phase, return this card to the Net-Runners player."
     },

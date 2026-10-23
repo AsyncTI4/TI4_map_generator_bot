@@ -1532,7 +1532,7 @@ public class CombatRollService {
                 .toList();
         Map<NamedCombatModifierModel, Integer> cappedDiceRemaining = new IdentityHashMap<>();
         for (NamedCombatModifierModel modifier : cappedDiceModifiers) {
-            cappedDiceRemaining.put(modifier, modifier.getModifier().getMaxDice());
+            cappedDiceRemaining.put(modifier, CombatModHelper.getMaxDice(modifier.getModifier(), player, opponent));
         }
 
         // Actually roll for each unit

@@ -2,6 +2,10 @@ package ti4.discord.interactions.buttons.handlers.promissory;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -43,9 +47,13 @@ class PlayerPromissoryButtonHandler {
             String message = player.getRepresentationNoPing() + " acquired the technology "
                     + techModel.getRepresentation(false) + " via _Research Agreement_.";
             player.addTech(tech);
+            NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
+            NetrunnersTechHandler.resolveDataMining(event, game, player, tech);
+            NetrunnersLeadersHandler.offerZorNoAhnForOwner(event, game, player, tech);
+            NetrunnersUnitHandler.offerNimdaDeploy(game, player);
             TechSummariesMetadataManager.addTech(game, player, tech, true);
             ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
-            CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda");
+            CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "netrunners", "mirveda");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
         PromissoryNoteHelper.resolvePNPlay(pnID, player, game, event);

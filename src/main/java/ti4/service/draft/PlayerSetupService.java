@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DeepReachesStartingTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.luminous.opa.OpaAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesStartingTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
@@ -327,7 +328,9 @@ public class PlayerSetupService {
         UnitInfoService.sendUnitInfo(game, player, event, false);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false, event);
 
-        if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
+        if (!DeepReachesStartingTechHandler.offerStartingTechButtons(game, player)
+                && player.getTechs().isEmpty()
+                && !player.getFaction().contains("sardakk")) {
             if (LostLegaciesStartingTechsHandler.offerStartingTechButtons(game, player, null)) {
                 // Lost Legacies starting-tech restrictions are handled by their faction handler.
             } else if (player.getFaction().contains("keleres")) {

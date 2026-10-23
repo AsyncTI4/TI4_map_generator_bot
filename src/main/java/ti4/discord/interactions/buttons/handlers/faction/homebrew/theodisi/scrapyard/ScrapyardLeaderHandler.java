@@ -9,6 +9,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -269,6 +271,8 @@ public class ScrapyardLeaderHandler {
         UnitModel warSun = player.getPriorityUnitByAsyncID("ws", null);
         String warSunTech = warSun == null ? "ws" : warSun.getRequiredTechId().orElse("ws");
         player.addTech(warSunTech);
+        NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
+        NetrunnersTechHandler.resolveDataMining(event, game, player, warSunTech);
         game.removeStoredValue(heroCostKey(player));
         game.setStoredValue(heroWarsunKey(player), "2");
         ButtonHelper.deleteMessage(event);

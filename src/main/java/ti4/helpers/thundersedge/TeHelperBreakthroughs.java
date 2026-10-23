@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornBreakthroughHandler;
@@ -56,6 +57,7 @@ public class TeHelperBreakthroughs {
             case "cheiranbt" -> DSHelperBreakthroughs.cheiranBTExhaust(game, player);
             case "ashenbt" -> AshenBreakthroughHandler.postInitialButtons(event, game, player);
             case "dreambt" -> DreamBreakthroughHandler.postDreamBtMoveNexusButtons(event, game, player);
+            case "netrunnersbt" -> NetrunnersBreakthroughHandler.offerEmotetTargetButtons(event, game, player);
             case "ardentiabt" -> ArdentiaBreakthroughHandler.startSubjugate(event, game, player);
             case "verydithbt" -> VerydithBreakthroughHandler.verydithBTExhaust(event, game, player);
             case "scrapyardbt" -> ScrapyardBreakthroughHandler.resolveCompactorAction(event, game, player);

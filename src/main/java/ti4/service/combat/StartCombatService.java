@@ -36,6 +36,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaPnHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.ToldarTechHandler;
@@ -1845,6 +1846,10 @@ public class StartCombatService {
         MorphaBreakthroughHandler.addMetamorphicCombatButton(buttons, game, p1);
         if (!game.isFowMode() && p2 != p1) {
             MorphaBreakthroughHandler.addMetamorphicCombatButton(buttons, game, p2);
+        }
+        NetrunnersTechHandler.addMimeticOverrideCombatButton(buttons, p1);
+        if (!game.isFowMode() && p2 != p1) {
+            NetrunnersTechHandler.addMimeticOverrideCombatButton(buttons, p2);
         }
         if ("justPicture".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Buttons.blue(

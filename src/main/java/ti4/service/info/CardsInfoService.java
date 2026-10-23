@@ -11,6 +11,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.BelkoseaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimBreakthroughHandler;
@@ -184,6 +185,9 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("ashenagent")) {
             buttons.add(AshenLeadersHandler.getAshTenderCardsInfoButton(player));
+        }
+        if (player.hasUnexhaustedLeader("netrunnersagent")) {
+            buttons.add(NetrunnersLeadersHandler.getNetrunnersAgentCardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("dreamagent")
                 && !DreamLeadersHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {

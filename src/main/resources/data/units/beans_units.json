@@ -345,7 +345,7 @@
     "id": "netrunners_mech",
     "baseType": "mech",
     "asyncId": "mf",
-    "name": "Legion",
+    "name": "Nimda",
     "source": "beans",
     "faction": "netrunners",
     "capacityUsed": 1,
