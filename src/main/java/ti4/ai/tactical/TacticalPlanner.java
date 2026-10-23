@@ -1915,13 +1915,11 @@ public class TacticalPlanner {
     }
 
     private static List<TacticalPlan> flankSpeedPlans(Context context, Predicate<Tile> activatable) {
-        if (MoveBoost.flankSpeedCard(context.seat).isEmpty()
-                || styxToTake(context).isEmpty()) return List.of();
+        if (MoveBoost.flankSpeedCard(context.seat).isEmpty()) return List.of();
         List<TacticalPlan> boosted = MoveBoost.withOneMore(context.seat, () -> {
             Context faster = new Context(context.game, context.seat, context.freed, context.hints);
             List<TacticalPlan> plans = new ArrayList<>();
             context.game.getTileMap().values().stream()
-                    .filter(Tile::isFracture)
                     .filter(activatable)
                     .forEach(tile -> bestFor(faster, tile).ifPresent(plans::add));
             stage(faster, activatable).stream()
