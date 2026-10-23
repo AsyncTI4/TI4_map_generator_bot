@@ -81,30 +81,69 @@ class TombRaidersAcd2ButtonHandler {
             return;
         }
 
-        int diceCount = getDiceCount(planet);
-        List<DiceHelper.Die> rolls = DiceHelper.rollDice(RELIC_THRESHOLD, diceCount);
+        rollUntilTen(player, game, planetName, getDiceCount(planet), "is rolling");
+    }
+
+    @ButtonHandler("tombRaidersKeepRolling_")
+    public static void tombRaidersKeepRolling(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String payload = buttonID.replace("tombRaidersKeepRolling_", "");
+        int separator = payload.indexOf('_');
+        ButtonHelper.deleteMessage(event);
+        if (separator < 0) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resume _Tomb Raiders_.");
+            return;
+        }
+        int remainingDice = Integer.parseInt(payload.substring(0, separator));
+        rollUntilTen(player, game, payload.substring(separator + 1), remainingDice, "keeps rolling");
+    }
+
+    private static void rollUntilTen(Player player, Game game, String planetName, int diceCount, String verb) {
+        List<DiceHelper.Die> shownRolls = untilFirstSuccess(DiceHelper.rollDice(RELIC_THRESHOLD, diceCount));
         MessageChannel channel = player.getCorrectChannel();
-        String header = player.getRepresentation() + " is rolling " + diceCount + " "
+        String header = player.getRepresentation() + " " + verb + " up to " + diceCount + " "
                 + (diceCount == 1 ? "die" : "dice") + " for _Tomb Raiders_ on "
                 + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + ".";
         String relicButtonId = player.factionButtonChecker() + "drawRelic";
+        String keepRollingButtonId = player.factionButtonChecker() + "tombRaidersKeepRolling_"
+                + (diceCount - shownRolls.size()) + "_" + planetName;
         DieRollSequenceService.play(
                 channel,
                 header,
-                pickActivities(diceCount),
-                rolls,
-                () -> announceOutcome(channel, rolls, relicButtonId));
+                pickActivities(shownRolls.size()),
+                shownRolls,
+                () -> announceOutcome(channel, shownRolls, diceCount, relicButtonId, keepRollingButtonId));
     }
 
-    private static void announceOutcome(MessageChannel channel, List<DiceHelper.Die> rolls, String relicButtonId) {
-        boolean foundRelic = DiceHelper.countSuccesses(rolls) > 0;
-        String message = DiceHelper.formatDiceOutput(rolls) + "\n" + getTombRaidersLoreQuip(foundRelic);
-        if (foundRelic) {
-            MessageHelper.sendMessageToChannelWithButton(
-                    channel, message, Buttons.green(relicButtonId, "Draw Relic", ExploreEmojis.Relic));
+    private static List<DiceHelper.Die> untilFirstSuccess(List<DiceHelper.Die> rolls) {
+        for (int i = 0; i < rolls.size(); i++) {
+            if (rolls.get(i).isSuccess()) {
+                return rolls.subList(0, i + 1);
+            }
+        }
+        return rolls;
+    }
+
+    private static void announceOutcome(
+            MessageChannel channel,
+            List<DiceHelper.Die> shownRolls,
+            int diceCount,
+            String relicButtonId,
+            String keepRollingButtonId) {
+        boolean foundRelic = DiceHelper.countSuccesses(shownRolls) > 0;
+        String message = getTombRaidersLoreQuip(foundRelic);
+        if (!foundRelic) {
+            MessageHelper.sendMessageToChannel(channel, message);
             return;
         }
-        MessageHelper.sendMessageToChannel(channel, message);
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green(relicButtonId, "Draw Relic", ExploreEmojis.Relic));
+        int remainingDice = diceCount - shownRolls.size();
+        if (remainingDice > 0) {
+            message += "\nIf that 10 gets changed, use the other button to keep rolling the remaining " + remainingDice
+                    + (remainingDice == 1 ? " die." : " dice.");
+            buttons.add(Buttons.gray(keepRollingButtonId, "Keep Rolling (" + remainingDice + " left)"));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
     }
 
     private static List<String> pickActivities(int count) {

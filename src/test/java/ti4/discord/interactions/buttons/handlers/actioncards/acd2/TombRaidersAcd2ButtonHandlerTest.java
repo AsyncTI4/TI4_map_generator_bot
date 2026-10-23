@@ -36,28 +36,46 @@ class TombRaidersAcd2ButtonHandlerTest {
     private static final String PLANET = "testplanet";
 
     @Test
-    void rollsHigherValueForPlanetWithTraitAndOffersRelicButtonOnATen() {
+    void stopsAtTheFirstTenAndOffersRelicAndKeepRollingButtons() {
         Outcome outcome = resolve(Set.of("cultural"), 2, 3, new ArrayDeque<>(List.of(4, 10, 1)));
 
-        assertEquals(3, outcome.rolls().size());
-        assertTrue(outcome.header().contains("rolling 3 dice"), outcome.header());
-        assertEquals(List.of("fcdrawRelic"), outcome.relicButtonIds());
+        assertEquals(2, outcome.rolls().size());
+        assertEquals(2, outcome.activities().size());
+        assertTrue(outcome.header().contains("up to 3 dice"), outcome.header());
+        assertEquals(List.of("fcdrawRelic", "fctombRaidersKeepRolling_1_testplanet"), outcome.buttonIds());
     }
 
     @Test
-    void rollsCombinedValueForPlanetWithoutTraitAndOffersNoRelicWithoutATen() {
+    void omitsKeepRollingWhenTheTenIsTheLastDie() {
+        Outcome outcome = resolve(Set.of("cultural"), 2, 3, new ArrayDeque<>(List.of(4, 5, 10)));
+
+        assertEquals(3, outcome.rolls().size());
+        assertEquals(List.of("fcdrawRelic"), outcome.buttonIds());
+    }
+
+    @Test
+    void rollsCombinedValueForPlanetWithoutTraitAndOffersNoButtonsWithoutATen() {
         Outcome outcome = resolve(Set.of(), 2, 3, new ArrayDeque<>(List.of(9, 9, 9, 9, 9)));
 
         assertEquals(5, outcome.rolls().size());
-        assertTrue(outcome.header().contains("rolling 5 dice"), outcome.header());
-        assertTrue(outcome.relicButtonIds().isEmpty());
-        assertEquals(5, outcome.activities().size());
+        assertTrue(outcome.header().contains("up to 5 dice"), outcome.header());
+        assertTrue(outcome.buttonIds().isEmpty());
         assertEquals(5, Set.copyOf(outcome.activities()).size());
     }
 
     @Test
+    void keepRollingResumesWithTheRemainingDice() {
+        Outcome outcome =
+                resolve(Set.of(), 0, 0, new ArrayDeque<>(List.of(1, 10, 1)), "tombRaidersKeepRolling_3_" + PLANET);
+
+        assertEquals(2, outcome.rolls().size());
+        assertTrue(outcome.header().contains("keeps rolling up to 3 dice"), outcome.header());
+        assertEquals(List.of("fcdrawRelic", "fctombRaidersKeepRolling_1_testplanet"), outcome.buttonIds());
+    }
+
+    @Test
     void neverRunsOutOfActivitiesForLargeRolls() {
-        Outcome outcome = resolve(Set.of("cultural"), 30, 0, new ArrayDeque<>());
+        Outcome outcome = resolve(Set.of("cultural"), 30, 0, new ArrayDeque<>(java.util.Collections.nCopies(30, 1)));
 
         assertEquals(30, outcome.activities().size());
     }
@@ -141,9 +159,14 @@ class TombRaidersAcd2ButtonHandlerTest {
     }
 
     private record Outcome(
-            String header, List<DiceHelper.Die> rolls, List<String> activities, List<String> relicButtonIds) {}
+            String header, List<DiceHelper.Die> rolls, List<String> activities, List<String> buttonIds) {}
 
     private static Outcome resolve(Set<String> traits, int resources, int influence, Deque<Integer> rolls) {
+        return resolve(traits, resources, influence, rolls, "resolveTombRaidersStep2_" + PLANET);
+    }
+
+    private static Outcome resolve(
+            Set<String> traits, int resources, int influence, Deque<Integer> rolls, String buttonId) {
         Game game = mock(Game.class);
         Player player = mock(Player.class);
         Planet planet = mock(Planet.class);
@@ -164,10 +187,13 @@ class TombRaidersAcd2ButtonHandlerTest {
             helper.when(() -> Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(anyString(), any()))
                     .thenReturn("planet");
 
-            DiceHelper.withForcedResults(
-                    rolls,
-                    () -> TombRaidersAcd2ButtonHandler.resolveTombRaidersStep2(
-                            player, game, event, "resolveTombRaidersStep2_" + PLANET));
+            DiceHelper.withForcedResults(rolls, () -> {
+                if (buttonId.startsWith("tombRaidersKeepRolling_")) {
+                    TombRaidersAcd2ButtonHandler.tombRaidersKeepRolling(player, game, event, buttonId);
+                } else {
+                    TombRaidersAcd2ButtonHandler.resolveTombRaidersStep2(player, game, event, buttonId);
+                }
+            });
 
             ArgumentCaptor<String> header = ArgumentCaptor.forClass(String.class);
             ArgumentCaptor<List<String>> activities = ArgumentCaptor.captor();
@@ -182,16 +208,16 @@ class TombRaidersAcd2ButtonHandlerTest {
 
             completion.getValue().run();
 
-            ArgumentCaptor<Button> relicButton = ArgumentCaptor.forClass(Button.class);
+            ArgumentCaptor<List<Button>> offered = ArgumentCaptor.captor();
             messages.verify(
-                    () -> MessageHelper.sendMessageToChannelWithButton(
-                            any(MessageChannel.class), anyString(), relicButton.capture()),
+                    () -> MessageHelper.sendMessageToChannelWithButtons(
+                            any(MessageChannel.class), anyString(), offered.capture()),
                     atLeast(0));
-            return new Outcome(
-                    header.getValue(),
-                    dice.getValue(),
-                    activities.getValue(),
-                    relicButton.getAllValues().stream().map(Button::getCustomId).toList());
+            List<String> buttonIds = offered.getAllValues().stream()
+                    .flatMap(List::stream)
+                    .map(Button::getCustomId)
+                    .toList();
+            return new Outcome(header.getValue(), dice.getValue(), activities.getValue(), buttonIds);
         }
     }
 }
