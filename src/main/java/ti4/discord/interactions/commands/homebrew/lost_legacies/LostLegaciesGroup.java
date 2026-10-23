@@ -9,7 +9,13 @@ import ti4.discord.interactions.commands.SubcommandGroup;
 public class LostLegaciesGroup extends SubcommandGroup {
 
     private static final Map<String, Subcommand> subcommands = Stream.of(
-                    new RevLeaderFix(), new RelicTradingHub(), new ViewStonebornFragments())
+                    new RevLeaderFix(),
+                    new RelicTradingHub(),
+                    new ViewStonebornFragments(),
+                    new HydromorphicDraw(),
+                    new HydromorphicDiscard(),
+                    new HydromorphicSend(),
+                    new HydromorphicDrawSpecific())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     public LostLegaciesGroup() {

@@ -41,17 +41,8 @@ public class FrankenSettings extends SettingsMenu {
 
     private static final String MENU_ID = "franken";
     static final String STANDARD_DRAFT = "standard";
-    private static final Set<String> ALWAYS_DISABLED_FACTIONS = Set.of(
-            "lazax",
-            "admins",
-            "franken",
-            "keleresm",
-            "keleresx",
-            "miltymod",
-            "qulane",
-            "neutral",
-            "obsidian",
-            "morpha");
+    private static final Set<String> ALWAYS_DISABLED_FACTIONS =
+            Set.of("lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "obsidian");
 
     private final ChoiceSetting<String> draftMode;
     private final BooleanSetting force;

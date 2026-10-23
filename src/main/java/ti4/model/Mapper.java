@@ -75,6 +75,7 @@ public class Mapper {
     private static volatile Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
 
     private static volatile Map<String, GenericCardModel> genericCards = new HashMap<>();
+    private static volatile Map<String, HydromorphicCardModel> hydromorphicCards = new HashMap<>();
     private static volatile Map<String, LeaderModel> leaders = new HashMap<>();
     private static volatile Map<String, MapTemplateModel> mapTemplates = new HashMap<>();
 
@@ -132,6 +133,7 @@ public class Mapper {
         events = importJsonObjectsFromFolder("events", EventModel.class);
         explores = importJsonObjectsFromFolder("explores", ExploreModel.class);
         genericCards = importJsonObjectsFromFolder("genericcards", GenericCardModel.class);
+        hydromorphicCards = importJsonObjectsFromFolder("hydromorphic_cards", HydromorphicCardModel.class);
         leaders = importJsonObjectsFromFolder("leaders", LeaderModel.class);
         mapTemplates = importJsonObjectsFromFolder("map_templates", MapTemplateModel.class);
         promissoryNotes =
@@ -408,6 +410,14 @@ public class Mapper {
             id = id.replace("extra2", "");
         }
         return actionCards.containsKey(id);
+    }
+
+    public static Map<String, HydromorphicCardModel> getHydromorphicCards() {
+        return new HashMap<>(hydromorphicCards);
+    }
+
+    public static HydromorphicCardModel getHydromorphicCard(String id) {
+        return hydromorphicCards.get(id);
     }
 
     public static List<String> getActionCardsSources(ComponentSource compSource) {

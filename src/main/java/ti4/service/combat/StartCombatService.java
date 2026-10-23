@@ -51,6 +51,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousLeadersHandler;
@@ -600,6 +601,14 @@ public class StartCombatService {
                 threadChannel, game, player1, player2, tile, spaceOrGround, unitHolderName, event);
         NetrunnersAbilitiesHandler.announceMimeticOverride(player1, player2, threadChannel);
         NetrunnersAbilitiesHandler.announceMimeticOverride(player2, player1, threadChannel);
+        boolean hasTwoMechsInSystem = tile.getUnitHolders().values().stream()
+                        .mapToInt(holder -> holder.getUnitCount(UnitType.Mech, player1.getColor()))
+                        .sum()
+                >= 2;
+        boolean opponentHasTwoMechsInSystem = tile.getUnitHolders().values().stream()
+                        .mapToInt(holder -> holder.getUnitCount(UnitType.Mech, player2.getColor()))
+                        .sum()
+                >= 2;
         if (!game.isFowMode()) {
             if (player1.getPlayableActionCards().isEmpty()) {
                 MessageHelper.sendMessageToChannel(
@@ -698,6 +707,18 @@ public class StartCombatService {
                             player2.getRepresentation()
                                     + ", a reminder that your opponent has the Man O’ War here, and so you (and all other players) cannot play action cards during this space combat.");
                 }
+                if (ButtonHelper.doesPlayerHaveMechHere("morpha_mech", player2, tile) && opponentHasTwoMechsInSystem) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player1.getRepresentation()
+                                    + ", a reminder that your opponent has 2 _Vacuole_ in this system, and so you (and all other players) cannot play action cards during this combat.");
+                }
+                if (ButtonHelper.doesPlayerHaveMechHere("morpha_mech", player1, tile) && hasTwoMechsInSystem) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player2.getRepresentation()
+                                    + ", a reminder that your opponent has 2 _Vacuole_ in this system, and so you (and all other players) cannot play action cards during this combat.");
+                }
             }
         }
 
@@ -718,6 +739,18 @@ public class StartCombatService {
                             .map(player2::getUnitFromUnitKey)
                             .anyMatch(unit -> unit != null && "ponthous_mech".equals(unit.getId()))) {
                 PonthousUnitHandler.offerDragoonsReminder(threadChannel, player2);
+            }
+            if (ButtonHelper.doesPlayerHaveMechHere("morpha_mech", player2, tile) && opponentHasTwoMechsInSystem) {
+                MessageHelper.sendMessageToChannel(
+                        threadChannel,
+                        player1.getRepresentation()
+                                + ", a reminder that your opponent has 2 _Vacuole_ in this system, and so you (and all other players) cannot play action cards during this combat.");
+            }
+            if (ButtonHelper.doesPlayerHaveMechHere("morpha_mech", player1, tile) && hasTwoMechsInSystem) {
+                MessageHelper.sendMessageToChannel(
+                        threadChannel,
+                        player2.getRepresentation()
+                                + ", a reminder that your opponent has 2 _Vacuole_ in this system, and so you (and all other players) cannot play action cards during this combat.");
             }
         }
 
@@ -1813,6 +1846,10 @@ public class StartCombatService {
         }
         BlueReverieTechHelper.addStasisFieldGeneratorsButton(buttons, p1);
         BlueReverieTechHelper.addStasisFieldGeneratorsButton(buttons, p2);
+        MorphaBreakthroughHandler.addMetamorphicCombatButton(buttons, game, p1);
+        if (!game.isFowMode() && p2 != p1) {
+            MorphaBreakthroughHandler.addMetamorphicCombatButton(buttons, game, p2);
+        }
         if ("justPicture".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Buttons.blue(
                     "refreshViewOfSystem_" + pos + "_" + p1.getFaction() + "_" + p2.getFaction() + "_" + groundOrSpace,

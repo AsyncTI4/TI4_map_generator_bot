@@ -967,6 +967,7 @@
     "combatHitsOn": 9,
     "combatDieCount": 1,
     "isShip": true,
+    "notes": "Will only trigger off discards of 2 or more that happen at once. Anytime you discard more than 1 manually it won't trigger.",
     "ability": "Once per action, when you discard 2 or more action cards, you may either produce 1 carrier in a system containing your ships, or move 1 carrier you control to a system that contains 1 of your space docks (it may transport units)."
   },
   {

@@ -272,6 +272,7 @@ class GameLoadService {
                 case Constants.PHASE_OF_GAME -> game.setPhaseOfGame(info);
                 case Constants.SO -> game.setSecretObjectives(getCardList(info));
                 case Constants.AC -> game.setActionCards(getCardList(info));
+                case Constants.HYDROMORPHIC_CARDS -> game.setHydromorphicCards(getCardList(info));
                 case Constants.PO1 -> game.setPublicObjectives1(getCardList(info));
                 case Constants.PO2 -> game.setPublicObjectives2(getCardList(info));
                 case Constants.PO1PEAKABLE -> game.setPublicObjectives1Peekable(getCardList(info));
@@ -823,6 +824,7 @@ class GameLoadService {
                     switch (cardInfo.nextToken()) {
                         case "garbozia" -> ACStatus.garbozia;
                         case "ralnelbt" -> ACStatus.ralnelbt;
+                        case "morphabt" -> ACStatus.morphabt;
                         case "purged" -> ACStatus.purged;
                         default -> null;
                     };
@@ -967,6 +969,15 @@ class GameLoadService {
                         String id = actionCardInfo.nextToken();
                         Integer index = Integer.parseInt(actionCardInfo.nextToken());
                         player.setActionCard(id, index);
+                    }
+                }
+                case Constants.HYDROMORPHIC_CARDS -> {
+                    StringTokenizer hydromorphicCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (hydromorphicCardToken.hasMoreTokens()) {
+                        StringTokenizer hydromorphicCardInfo =
+                                new StringTokenizer(hydromorphicCardToken.nextToken(), ",");
+                        player.setHydromorphicCard(
+                                hydromorphicCardInfo.nextToken(), Integer.parseInt(hydromorphicCardInfo.nextToken()));
                     }
                 }
                 case Constants.EVENTS -> {

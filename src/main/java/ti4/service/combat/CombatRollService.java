@@ -55,6 +55,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.HydromorphicCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardLeaderHandler;
@@ -198,6 +199,28 @@ public class CombatRollService {
             int hits,
             GenericInteractionCreateEvent event,
             String source) {
+        sendGroundCombatHitAssignment(
+                game,
+                player,
+                opponent,
+                tile,
+                combatPlanet,
+                hits,
+                event,
+                source,
+                game.isFowMode() ? opponent.getCorrectChannel() : event.getMessageChannel());
+    }
+
+    public void sendGroundCombatHitAssignment(
+            Game game,
+            Player player,
+            Player opponent,
+            Tile tile,
+            Planet combatPlanet,
+            int hits,
+            GenericInteractionCreateEvent event,
+            String source,
+            MessageChannel channel) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
                 opponent.factionButtonChecker() + AutoAssignGroundHitsButtonIds.format(combatPlanet.getName(), hits),
@@ -220,7 +243,7 @@ public class CombatRollService {
         }
         ToldarTechHandler.addExhaustVirTrainingButton(buttons, opponent, player, tile, combatPlanet, hits);
         MessageHelper.sendMessageToChannelWithButtons(
-                game.isFowMode() ? opponent.getCorrectChannel() : event.getMessageChannel(),
+                channel,
                 opponent.getRepresentationUnfogged()
                         + ", please assign "
                         + (hits == 1 ? "the hit" : "the hits")
@@ -656,6 +679,7 @@ public class CombatRollService {
                 rollType,
                 combatOnHolder,
                 Constants.COMBAT_MODIFIERS);
+        HydromorphicCardHandler.addRisingTideCombatModifier(modifiers, game, player, tile, rollType);
         TheodisiLegendaryButtonHandler.addAvarinCombatModifier(modifiers, game, player, tile, rollType);
 
         List<NamedCombatModifierModel> extraRolls = CombatModHelper.getModifiers(
@@ -1369,6 +1393,22 @@ public class CombatRollService {
 
     public static void sendSpaceAssignHitsButtons(
             GenericInteractionCreateEvent event, Game game, Player opponent, Tile tile, int hits) {
+        sendSpaceAssignHitsButtons(
+                event,
+                game,
+                opponent,
+                tile,
+                hits,
+                game.isFowMode() ? opponent.getCorrectChannel() : event.getMessageChannel());
+    }
+
+    public static void sendSpaceAssignHitsButtons(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player opponent,
+            Tile tile,
+            int hits,
+            MessageChannel channel) {
         List<Button> buttons = new ArrayList<>();
 
         String plural = "hit" + (hits == 1 ? "" : "s");
@@ -1399,8 +1439,7 @@ public class CombatRollService {
             msg2 += "\nReminder: You have the _" + relicModel.getName() + "_ relic,";
             msg2 += " you may SUSTAIN DAMAGE on one of your non-fighter ships instead of taking a hit.";
         }
-        MessageHelper.sendMessageToChannelWithButtons(
-                game.isFowMode() ? opponent.getCorrectChannel() : event.getMessageChannel(), msg2, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(channel, msg2, buttons);
     }
 
     private static void offerDuraniumRepairWithoutHits(

@@ -915,7 +915,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @NotNull
     public List<String> getPlayableActionCards() {
-        if (IsPlayerElectedService.isPlayerElected(game, this, "censure")
+        if (hasAbility("hydromorphic")
+                || IsPlayerElectedService.isPlayerElected(game, this, "censure")
                 || IsPlayerElectedService.isPlayerElected(game, this, "absol_censure")) {
             return Collections.emptyList();
         }
@@ -937,6 +938,44 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public Map<String, Integer> getPlotCardsRaw() {
         return super.getPlotCards();
+    }
+
+    public Map<String, Integer> getHydromorphicCardsRaw() {
+        return super.getHydromorphicCards();
+    }
+
+    @Override
+    public Map<String, Integer> getHydromorphicCards() {
+        return MapUtils.unmodifiableMap(new LinkedHashMap<>(getHydromorphicCardsRaw()));
+    }
+
+    public void setHydromorphicCard(String id) {
+        if (Mapper.getHydromorphicCard(id) == null || getHydromorphicCardsRaw().containsKey(id)) {
+            return;
+        }
+        Collection<Integer> values = getHydromorphicCardsRaw().values();
+        int identifier = ThreadLocalRandom.current().nextInt(1000);
+        while (values.contains(identifier)) {
+            identifier = ThreadLocalRandom.current().nextInt(1000);
+        }
+        getHydromorphicCardsRaw().put(id, identifier);
+    }
+
+    public void setHydromorphicCard(String id, Integer identifier) {
+        getHydromorphicCardsRaw().put(id, identifier);
+    }
+
+    @Nullable
+    public String removeHydromorphicCard(Integer identifier) {
+        String id = getHydromorphicCardsRaw().entrySet().stream()
+                .filter(entry -> entry.getValue().equals(identifier))
+                .map(Entry::getKey)
+                .findFirst()
+                .orElse(null);
+        if (id != null) {
+            getHydromorphicCardsRaw().remove(id);
+        }
+        return id;
     }
 
     @Override
@@ -1312,7 +1351,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         Set<Integer> values = new HashSet<>(actionCards.values());
         Map<String, Integer> discardCards = game.getDiscardActionCards();
         game.getDiscardACStatus().entrySet().stream()
-                .filter(entry -> entry.getValue() == ActionCardHelper.ACStatus.garbozia)
+                .filter(entry -> entry.getValue() == ActionCardHelper.ACStatus.garbozia
+                        || entry.getValue() == ActionCardHelper.ACStatus.morphabt)
                 .map(Map.Entry::getKey)
                 .map(discardCards::get)
                 .forEach(values::add);

@@ -74,6 +74,7 @@ public final class AgendaWhensAftersHelper {
             game.removeStoredValue("queuedWhensFor" + player.getFaction());
             game.removeStoredValue("queuedAftersFor" + player.getFaction());
             game.removeStoredValue("queuedAftersLockedFor" + player.getFaction());
+            game.removeStoredValue(hydromorphicWhenKey(player));
             List<String> whens = getPossibleWhenNames(player);
             List<String> afters = getPossibleAfterNames(player);
             if (!game.getStoredValue("executiveOrder").isEmpty() && whens.isEmpty() && afters.isEmpty()) {
@@ -203,6 +204,13 @@ public final class AgendaWhensAftersHelper {
                 names.add(actionCard.getName());
             }
         }
+        for (var hydromorphicCard : player.getHydromorphicCards().entrySet()) {
+            if (Mapper.getHydromorphicCard(hydromorphicCard.getKey())
+                    .getWindow()
+                    .contains("When an agenda is revealed")) {
+                names.add(Mapper.getHydromorphicCard(hydromorphicCard.getKey()).getName());
+            }
+        }
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId)
                     && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || "favor".equals(pnId))) {
@@ -234,6 +242,15 @@ public final class AgendaWhensAftersHelper {
             String actionCardWindow = actionCard.getWindow();
             if (actionCardWindow.contains("When an agenda is revealed")) {
                 buttons.add(Buttons.green("queueWhen_ac_" + acId, actionCard.getName()));
+            }
+        }
+        for (var hydromorphicCard : player.getHydromorphicCards().entrySet()) {
+            if (Mapper.getHydromorphicCard(hydromorphicCard.getKey())
+                    .getWindow()
+                    .contains("When an agenda is revealed")) {
+                buttons.add(Buttons.green(
+                        "queueWhen_hydromorphic_" + hydromorphicCard.getValue(),
+                        Mapper.getHydromorphicCard(hydromorphicCard.getKey()).getName()));
             }
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
@@ -531,6 +548,20 @@ public final class AgendaWhensAftersHelper {
                                     offerEveryoneWhensQueue(game);
                                 }
                             }
+                            case "hydromorphic" -> {
+                                try {
+                                    if (HydromorphicHelper.beginCardResolution(game, player, Integer.parseInt(when))) {
+                                        game.setStoredValue(hydromorphicWhenKey(player), "pending");
+                                        return;
+                                    }
+                                } catch (NumberFormatException e) {
+                                    MessageHelper.sendMessageToChannel(
+                                            player.getCardsInfoThread(),
+                                            "That Hydromorphic card is no longer available.");
+                                }
+                                resolveWhenQueue(event, game);
+                                offerEveryoneWhensQueue(game);
+                            }
                             case "relic" ->
                                 BlueReverieArtifactRelicHandler.resolveCulturalArtifact(event, game, player);
                         }
@@ -542,6 +573,19 @@ public final class AgendaWhensAftersHelper {
             game.setStoredValue("whensResolved", "Yes");
             resolveAfterQueue(event, game);
         }
+    }
+
+    public static void resumeHydromorphicWhen(ButtonInteractionEvent event, Game game, Player player) {
+        if (!"pending".equals(game.getStoredValue(hydromorphicWhenKey(player)))) {
+            return;
+        }
+        game.removeStoredValue(hydromorphicWhenKey(player));
+        resolveWhenQueue(event, game);
+        offerEveryoneWhensQueue(game);
+    }
+
+    private static String hydromorphicWhenKey(Player player) {
+        return "hydromorphicWhen_" + player.getFaction();
     }
 
     private static void resolveAfterQueue(ButtonInteractionEvent event, Game game) {

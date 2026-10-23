@@ -303,6 +303,15 @@ public class PlayerTechService {
                 ThurvialiTechHandler.resolveRestructuring(game, player);
                 deleteTheOneButtonIfButtonEvent(event);
             }
+            case "thmorphag" -> {
+                List<Button> buttons = ActionCardHelper.getDiscardActionCardButtonsWithSuffix(player, "hydromorphic");
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentationUnfogged()
+                                + ", discard 1 Action Card to draw 1 Action Card and 1 Hydromorphic card.",
+                        buttons);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
             case "ththurvialib" -> {
                 ThurvialiTechHandler.resolveMutualism(game, player);
                 deleteTheOneButtonIfButtonEvent(event);

@@ -1371,7 +1371,7 @@ public class ButtonHelper {
     }
 
     @ButtonHandler(value = "offerDeckButtons", save = false)
-    public static void offerDeckButtons(ButtonInteractionEvent event) {
+    public static void offerDeckButtons(ButtonInteractionEvent event, Game game) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("showDeck_frontier", "Frontier", ExploreEmojis.Frontier));
         buttons.add(Buttons.blue("showDeck_cultural", "Cultural", ExploreEmojis.Cultural));
@@ -1385,6 +1385,10 @@ public class ButtonHelper {
         buttons.add(Buttons.green("showDeck_unitupgrade", "Unit Upgrade Technologies", TechEmojis.UnitUpgradeTech));
         buttons.add(Buttons.gray("showDeck_ac", "Action Card Discards", CardEmojis.ActionCard));
         buttons.add(Buttons.gray("showDeck_unplayedAC", "Unplayed Action Cards", CardEmojis.ActionCard));
+        if (!game.isFowMode() && HydromorphicHelper.isDeckAvailable(game)) {
+            buttons.add(
+                    Buttons.gray("showDeck_hydromorphic", "Hydromorphic Unplayed Cards", CardEmojis.HydromorphicCard));
+        }
         buttons.add(Buttons.gray("showDeck_agenda", "Agenda Discards", CardEmojis.Agenda));
         buttons.add(Buttons.gray("showDeck_relic", "Relics", ExploreEmojis.Relic));
         buttons.add(Buttons.gray("showDeck_unscoredSO", "Unscored Secret Objectives", CardEmojis.SecretObjective));
@@ -1409,6 +1413,7 @@ public class ButtonHelper {
         String deck = buttonID.replace("showDeck_", "");
         switch (deck) {
             case "ac" -> ShowActionCardsService.showDiscard(game, event, false);
+            case "hydromorphic" -> HydromorphicHelper.showUnplayedDeck(game, event);
             case "agenda" -> AgendaHelper.showDiscards(game, event);
             case "relic" -> RelicHelper.showRemaining(event.getMessageChannel(), false, game, player);
             case "unscoredSO" -> SecretObjectiveHelper.showUnscored(game, event);
@@ -1494,6 +1499,10 @@ public class ButtonHelper {
 
         if (player.hasTech("nm")) {
             modifiers.add(TechEmojis.BioticTech + " _Neural Motivator_ (+1 action card)");
+            amount++;
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "morphacommander")) {
+            modifiers.add(FactionEmojis.morpha + "_Pyra, the Morpha Commander_ (+1 action card)");
             amount++;
         }
         if (player.hasTech("tf-inheritancesystems")) {

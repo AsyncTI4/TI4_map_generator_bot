@@ -91,6 +91,7 @@ sc_follow_ -> sc_follow_trade
 sc_refresh -> sc_refresh_and_wash
 setupBaseGameMode -> setupBaseGameMode_confirm
 showDeck_ -> showDeck_unplayedAC
+showDeck_ -> showDeck_hydromorphic
 showMap -> showMapSegment_
 tacticalAction -> tacticalActionBuild_
 transaction -> transaction_BMD

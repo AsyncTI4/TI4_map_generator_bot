@@ -2034,7 +2034,11 @@ public final class ButtonHelperModifyUnits {
                             + " did not place a command token in system they retreated to due to Kado S'mah-Qar, the Kollecc commander.");
         } else {
             if (!player.hasAbility("eusociality") || !KaloraAbilityHandler.eusocialityRetreat(player, event, tile1)) {
-                if (game.isTwilightsFallMode() && buttonID.contains("skilled") && buttonID.contains("feint")) {
+                if (buttonID.contains("hydromorphicEbbing")) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            player.getFactionEmoji() + " did not place a command token due to _Ebbing Flow_.");
+                } else if (game.isTwilightsFallMode() && buttonID.contains("skilled") && buttonID.contains("feint")) {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             player.getFactionEmoji()

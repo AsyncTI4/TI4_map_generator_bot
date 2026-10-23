@@ -23,17 +23,8 @@ import tools.jackson.databind.JsonNode;
 @JsonIgnoreProperties("messageId")
 class FrankenDrazFactionPrioritySettings extends SettingsMenu {
     private static final String MENU_ID = "drazFactionPriorities";
-    private static final Set<String> EXCLUDED_FACTIONS = Set.of(
-            "lazax",
-            "admins",
-            "franken",
-            "keleresm",
-            "keleresx",
-            "miltymod",
-            "qulane",
-            "neutral",
-            "obsidian",
-            "morpha");
+    private static final Set<String> EXCLUDED_FACTIONS =
+            Set.of("lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "obsidian");
 
     private final ListSetting<FactionModel> prioritizedFactions;
     private final IntegerRangeSetting discordantStarsFactionLimits;

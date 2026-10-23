@@ -23,6 +23,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
@@ -157,6 +158,9 @@ public class CardsInfoService {
         }
         if (player.hasLeader("myrragent")) {
             buttons.add(MyrrLeadersHandler.getMyrrAgentCardsInfoButton(player));
+        }
+        if (player.hasUnexhaustedLeader("morphaagent")) {
+            buttons.add(MorphaLeadersHandler.getGolgiCardsInfoButton(player));
         }
         if (KairnAbilityHandler.canOfferSharedDiscoveriesCardsInfoButton(game, player)) {
             buttons.add(KairnAbilityHandler.getSharedDiscoveriesButton(player));

@@ -45,6 +45,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.HydromorphicCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrUnitsHandler;
@@ -520,6 +523,24 @@ public final class ButtonHelperTacticalAction {
         if (unitsWereMoved && player.hasUnit("ta_flagship")) {
             TaUnitHandler.resolveWorldshaperOnMove(event, game, player, tile);
         }
+        if (FoWHelper.playerHasShipsInSystem(player, tile)
+                && player.hasUnit("morpha_flagship")
+                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "fs", true) < player.getUnitCap("fs")
+                && player.getActionCards().size() >= 1
+                && game.getStoredValue("oozeDeployed_" + player.getFaction()).isBlank()) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "deployOoze_" + tile.getPosition(),
+                    "Deploy The Ooze",
+                    FactionEmojis.morpha));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", _The Ooze_ is not on the board. You may discard 1 Action Card to place it in the active system."
+                            + "\n-# It will be returned to reinforcements at the end of this tactical action.",
+                    buttons);
+        }
         EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
         if (unitsWereMoved && player.hasUnexhaustedLeader("myrragent")) {
             MyrrLeadersHandler.offerMyrrAgent(game, player, tile);
@@ -730,6 +751,10 @@ public final class ButtonHelperTacticalAction {
         RevenantLeadersHandler.clearRedLeaderTacticalWindow(game);
         RevenantTechHandler.clearLazarusProduction(game);
         ThronesTechHandler.clearRiftTouchedBastion(game);
+        MorphaUnitHandler.clearOozeDeploy(game);
+        MorphaUnitHandler.clearCytoplasmicTransports(game);
+        MorphaAbilityHandler.clearHydrosphericExtraction(game);
+        HydromorphicCardHandler.clearTacticalActionEffects(game);
         GameEventDraft.clear(game);
 
         game.getTacticalActionDisplacement().clear();

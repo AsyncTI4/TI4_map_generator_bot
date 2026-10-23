@@ -8,6 +8,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.helpers.Constants;
+import ti4.helpers.HydromorphicHelper;
 import ti4.image.draw.HorizontalAlign;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.PaImage;
@@ -74,6 +75,7 @@ final class CardDeckRow {
     }
 
     private static List<DeckBadge> badges(Game game) {
+        game.initializeHydromorphicDeck();
         boolean twilightsFall = game.isTwilightsFallMode();
         List<DeckBadge> badges = new ArrayList<>();
         badges.add(new DeckBadge(
@@ -87,6 +89,14 @@ final class CardDeckRow {
                 Integer.toString(game.getActionCards().size()),
                 "Action Card Deck",
                 game.getActionCards().size() + "/" + game.getActionCardFullDeckSize() + " cards in the deck"));
+        if (HydromorphicHelper.isDeckAvailable(game)) {
+            badges.add(new DeckBadge(
+                    "cardback_hydromorphic.jpg",
+                    Integer.toString(game.getHydromorphicCards().size()),
+                    "Hydromorphic Deck",
+                    game.getHydromorphicCards().size() + "/" + game.getHydromorphicCardFullDeckSize()
+                            + " cards in the deck"));
+        }
         badges.add(new DeckBadge(
                 "cardback_cultural.jpg",
                 Integer.toString(game.getExploreDeck("cultural").size()),

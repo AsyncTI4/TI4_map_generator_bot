@@ -160,6 +160,9 @@ class GameSaveService {
         writer.write(Constants.AC + " " + String.join(",", game.getActionCards()));
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.HYDROMORPHIC_CARDS + " " + String.join(",", game.getHydromorphicCards()));
+        writer.write(System.lineSeparator());
+
         writeCards(game.getDiscardActionCards(), writer, Constants.AC_DISCARDED);
         Map<String, String> discardStatus = new LinkedHashMap<>(game.getDiscardACStatus().entrySet().stream()
                 .collect(Collectors.toMap(Entry::getKey, e -> e.getValue().toString())));
@@ -899,6 +902,7 @@ class GameSaveService {
             writer.write(System.lineSeparator());
 
             writeCards(player.getActionCards(), writer, Constants.AC);
+            writeCards(player.getHydromorphicCards(), writer, Constants.HYDROMORPHIC_CARDS);
             writeCards(player.getEvents(), writer, Constants.EVENTS);
             writeCards(player.getPromissoryNotes(), writer, Constants.PROMISSORY_NOTES);
 

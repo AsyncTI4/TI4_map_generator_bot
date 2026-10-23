@@ -217,8 +217,8 @@
   },
   {
     "alias": "morphabt",
-    "name": "Metamorphic Transference",
-    "shortName": "Meta\nTransfer",
+    "name": "Metamorphic",
+    "shortName": "Meta\nmorphic",
     "faction": "morpha",
     "synergy": [
       "BIOTIC",
