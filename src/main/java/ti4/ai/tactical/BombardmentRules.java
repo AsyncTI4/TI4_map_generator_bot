@@ -49,7 +49,7 @@ public class BombardmentRules {
                     .filter(other -> other != seat && BoardView.groundForces(planet, other) > 0)
                     .findFirst();
             if (defender.isEmpty()) continue;
-            if (shielded(game, seat, planet, ships)) return Optional.empty();
+            if (shielded(game, seat, planet, ships)) continue;
             return Optional.of(new Target(name, defender.get()));
         }
         return Optional.empty();

@@ -27,7 +27,6 @@ public class TraitRaid {
         NOT_ACTIVATABLE,
         SHARED_SYSTEM,
         NO_FLEET,
-        STRUCTURES,
         NO_CARGO,
         WIN_CHANCE,
         SCORE,
@@ -51,13 +50,6 @@ public class TraitRaid {
         boolean oneShort =
                 TraitNeeds.of(game, seat).stream().anyMatch(need -> need.missing() == 1 && need.wants(planet));
         return oneShort ? DefenseOutlook.SCORING_CRITICAL : 0;
-    }
-
-    static boolean allowsStructures(Context context, Tile tile, Player opponent) {
-        List<Need> needs = raidable(context.game, context.seat);
-        if (needs.isEmpty() || opponent.isNeutral()) return false;
-        return heldBy(context.game, tile, opponent, needs)
-                && permitted(context.game, context.seat, context.defense(), opponent);
     }
 
     static double exposedObjective(Context context, Tile tile, Strike strike, StrikeEstimate estimate) {
@@ -132,9 +124,6 @@ public class TraitRaid {
                 .max(Comparator.comparingDouble(found -> found.quick().score()));
         if (best.isEmpty()) return RaidGate.NO_FLEET;
         Candidate candidate = best.get();
-        boolean forbidden = BoardView.enemyStructuresOn(game, seat, planet)
-                && !candidate.strike().rules().structuresAllowed();
-        if (forbidden) return RaidGate.STRUCTURES;
         StrikeEstimate estimate = candidate.estimate();
         if (estimate.groundSent().isEmpty()) return RaidGate.NO_CARGO;
         if (!estimate.landings().containsKey(planet.getName())) return RaidGate.WIN_CHANCE;

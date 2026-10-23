@@ -22,7 +22,7 @@ final class FractureScreen {
     private static final double SCREEN_SHARE = 0.5;
     private static final double PARTNER_SHARE = 0.5;
     private static final double MIN_THREAT = 0.3;
-    private static final StrikeRules RULES = new StrikeRules(false, 0.5, false, true, true);
+    private static final StrikeRules RULES = new StrikeRules(false, 0.5, true, true);
 
     private final Game game;
     private final Player seat;

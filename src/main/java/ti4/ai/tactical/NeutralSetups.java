@@ -42,7 +42,7 @@ public class NeutralSetups {
     private static final double SETUP_SHARE = 0.6;
     private static final double ATTACK_TOKEN_COST = 0.75;
     private static final double FWP_MIN_CHANCE = 0.6;
-    private static final StrikeRules RULES = new StrikeRules(false, 0.5, false, true, true);
+    private static final StrikeRules RULES = new StrikeRules(false, 0.5, true, true);
 
     public static double value(Game game, Player seat, Tile tile, Pirates pirates) {
         List<String> secrets = seat.getSecretsUnscored().keySet().stream()

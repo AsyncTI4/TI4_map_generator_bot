@@ -306,6 +306,35 @@ class OffenseTest extends BaseTi4Test {
         assertThat(attackOn(target)).isEmpty();
     }
 
+    // An enemy PDS alone is not a reason to stay away: a strong fleet with a landing party takes the planet it guards,
+    // and the space cannon is only a cost in the strike.
+    @Test
+    void attacksAPdsPlanetWithAStrongFleet() {
+        String target = lodorTargetHeldByTheOpponent();
+        board.test.units(board.test.game.getTileByPosition(target), "lodor", sardakk(), UnitType.Pds, 1);
+        fleetAtHome(2, 2, 4);
+
+        Optional<TacticalPlan> plan = attackOn(target);
+
+        assertThat(plan).isPresent();
+        assertThat(plan.get().landings()).containsKey("lodor");
+    }
+
+    // The same weak fleet attacks the planet when nothing covers it, and stays home when four PDS II would destroy it.
+    @Test
+    void theSameWeakFleetIsKeptAwayByTheSpaceCannonAlone() {
+        String target = lodorTargetHeldByTheOpponent();
+        board.test.units(board.home, "space", nekro(), UnitType.Carrier, 1);
+        board.test.units(board.home, "space", nekro(), UnitType.Cruiser, 1);
+        assertThat(attackOn(target)).isPresent();
+
+        sardakk().removeOwnedUnitByID("pds");
+        sardakk().addOwnedUnitByID("pds2");
+        board.test.units(board.test.game.getTileByPosition(target), "lodor", sardakk(), UnitType.Pds, 4);
+
+        assertThat(attackOn(target)).isEmpty();
+    }
+
     private Player naaluAt(String target, UnitType type, int ships) {
         Player naalu = board.test.addSeat("200000000000000005", "naalu", "yellow");
         naalu.setStrategicCC(2);
