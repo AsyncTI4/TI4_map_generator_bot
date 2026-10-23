@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.ai.brain.DecisionMemo;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CombatModifiers.Side;
 import ti4.ai.eval.CustodiansRace;
@@ -347,11 +348,30 @@ public class TacticalPlanner {
 
     private static List<TacticalPlan> candidates(Context context, Predicate<Tile> activatable, double minScore) {
         try (Thinking.Span ignored = Thinking.enter("tactical.candidates")) {
-            return rankedCandidates(context, activatable, minScore);
+            return sharedRanking(context, activatable).stream()
+                    .filter(plan -> plan.score() >= minScore)
+                    .toList();
         }
     }
 
-    private static List<TacticalPlan> rankedCandidates(Context context, Predicate<Tile> activatable, double minScore) {
+    private static List<TacticalPlan> sharedRanking(Context context, Predicate<Tile> activatable) {
+        return DecisionMemo.remember(
+                () -> rankedCandidates(context, activatable),
+                "tactical.ranking",
+                context.seat,
+                context.freed,
+                context.hints,
+                context.tokenFree,
+                FleetLimit.ships(context.seat));
+    }
+
+    private static List<TacticalPlan> rankedCandidates(Context context, Predicate<Tile> activatable) {
+        try (Thinking.Span ignored = Thinking.enter("tactical.rank")) {
+            return computeRanking(context, activatable);
+        }
+    }
+
+    private static List<TacticalPlan> computeRanking(Context context, Predicate<Tile> activatable) {
         List<TacticalPlan> plans = new ArrayList<>(context.game.getTileMap().values().stream()
                 .filter(activatable)
                 .map(tile -> bestFor(context, tile))
@@ -365,7 +385,6 @@ public class TacticalPlanner {
         }
         return plans.stream()
                 .map(plan -> plan.withScore(plan.score() - marchForfeit(context, plan)))
-                .filter(plan -> plan.score() >= minScore)
                 .sorted(Comparator.comparingDouble(TacticalPlan::score).reversed())
                 .toList();
     }

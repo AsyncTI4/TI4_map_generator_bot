@@ -19,6 +19,7 @@ import ti4.ai.actuation.AiActuator.PressTarget;
 import ti4.ai.actuation.AiActuator.SeatIdentity;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.brain.DecisionMemo;
 import ti4.ai.brain.FactionBrain;
 import ti4.ai.brain.FactionBrainRegistry;
 import ti4.ai.deal.HumanAiDealMessage;
@@ -260,6 +261,7 @@ class AiTickRunner {
         AiDecision decision = AiDecision.idle();
         ThinkingAborted aborted = null;
         Thinking.Decision thinking = Thinking.open(AiSettings.thinkingLimits());
+        DecisionMemo.Open memo = DecisionMemo.open();
         try {
             decision = brain.decide(context);
         } catch (ThinkingAborted e) {
@@ -272,6 +274,7 @@ class AiTickRunner {
                             + context.game().getName(),
                     e);
         } finally {
+            memo.close();
             thinking.close();
         }
         noteThinking(tick, thinking.profile(), decision, aborted);
