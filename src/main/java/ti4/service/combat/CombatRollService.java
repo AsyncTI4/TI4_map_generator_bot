@@ -1544,6 +1544,12 @@ public class CombatRollService {
 
         List<UnitModel> playerUnitsList =
                 playerUnits.keySet().stream().map(Pair::getLeft).collect(Collectors.toList());
+        boolean toldarCommanderCanReroll = rollType == CombatRollType.combatround
+                && game.playerHasLeaderUnlockedOrAlliance(player, "toldarcommander")
+                && playerUnits.values().stream().mapToInt(Integer::intValue).sum()
+                        > getUnitsInCombat(activeSystem, unitHolder, opponent, event, rollType, game).values().stream()
+                                .mapToInt(Integer::intValue)
+                                .sum();
         List<UnitType> playerUnitTypes =
                 playerUnitsList.stream().map(UnitModel::getUnitType).toList();
         boolean hacanFlagship = player.hasUnit("hacan_flagship") && playerUnitTypes.contains(UnitType.Flagship);
@@ -2449,8 +2455,7 @@ public class CombatRollService {
                 }
 
                 boolean hasMiss = resultRolls.stream().anyMatch(Predicate.not(Die::isSuccess));
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "toldarcommander")
-                        && rollType == CombatRollType.combatround
+                if (toldarCommanderCanReroll
                         && !isThalnosReroll
                         && hasMiss
                         && (toldarRerollUnit == null

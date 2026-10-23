@@ -1201,7 +1201,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButton(
                         player.getCardsInfoThread(),
                         player.getRepresentation()
-                                + ", a reminder that if you win this combat, you may give _Plunderers_ to your opponent to take up to 2 trade goods or commodities from them.",
+                                + ", a reminder that if you win this combat, you must give _Plunderers_ to your opponent to take up to 2 trade goods or commodities from them.",
                         SarcosaPnHandler.offerPlunderersButton(player, otherPlayer));
             }
             if ((player.hasAbility("primacy")

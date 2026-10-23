@@ -625,7 +625,7 @@ public class CombatModHelper {
                     for (Integer i : opponentUnitsByQuantity.values()) {
                         opponentUnits += i;
                     }
-                    meetsCondition = ownUnits < opponentUnits;
+                    meetsCondition = ownUnits <= opponentUnits;
                 }
             }
             case "toldar_mech_owner" -> meetsCondition = player.ownsUnit("toldar_mech");
