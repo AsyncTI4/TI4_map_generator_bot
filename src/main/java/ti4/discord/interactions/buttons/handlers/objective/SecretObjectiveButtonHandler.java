@@ -156,7 +156,7 @@ class SecretObjectiveButtonHandler {
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     message,
-                    List.of(Buttons.red("deal2SOToAllAnyway_" + event.getMessageId(), "Deal Anyway")));
+                    List.of(Buttons.red("forceDealSecretsToAll_" + event.getMessageId(), "Deal Anyway")));
             return;
         }
 
@@ -164,7 +164,7 @@ class SecretObjectiveButtonHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("deal2SOToAllAnyway_")
+    @ButtonHandler("forceDealSecretsToAll_")
     public static void deal2SOToAllAnyway(ButtonInteractionEvent event, Game game, String buttonID) {
         if (findUnsetKeleres(game) != null) {
             MessageHelper.sendMessageToChannel(
@@ -172,7 +172,7 @@ class SecretObjectiveButtonHandler {
                     "🛑 Keleres still needs to set up, so secret objectives cannot be dealt.");
             return;
         }
-        String dealButtonMessageId = buttonID.replace("deal2SOToAllAnyway_", "");
+        String dealButtonMessageId = buttonID.replace("forceDealSecretsToAll_", "");
         event.getMessageChannel()
                 .deleteMessageById(dealButtonMessageId)
                 .queue(Consumers.nop(), BotLogger::catchRestError);
