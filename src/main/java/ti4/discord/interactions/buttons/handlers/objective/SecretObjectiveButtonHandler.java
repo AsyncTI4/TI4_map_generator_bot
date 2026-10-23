@@ -19,6 +19,7 @@ import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.map.FractureService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.objectives.DiscardSecretService;
 import ti4.service.objectives.DrawSecretService;
@@ -130,39 +131,67 @@ class SecretObjectiveButtonHandler {
     }
 
     @ButtonHandler("deal2SOToAll")
-    public static void deal2SOToAll(ButtonInteractionEvent event, Game game, Player player) {
-        MiltyDraftManager manager = game.getMiltyDraftManager();
-        if (manager.isFinished()
-                && manager.isFactionTaken("keleresm")
-                && game.getPlayerFromColorOrFaction("keleres") == null) {
-            Player keleres = null;
-            for (String playerID : manager.getPlayers())
-                if ("keleresm".equals(manager.getPlayerDraft(playerID).getFaction()))
-                    keleres = game.getPlayer(playerID);
-            if (keleres != null) {
-                MessageHelper.sendMessageToChannel(
-                        keleres.getCorrectChannel(),
-                        "Keleres is not set up yet!!! " + keleres.getPing()
-                                + ", the game is waiting for you to set up :).");
-                return;
-            }
+    public static void deal2SOToAll(ButtonInteractionEvent event, Game game) {
+        Player unsetKeleres = findUnsetKeleres(game);
+        List<String> waitingOn = new ArrayList<>();
+        if (unsetKeleres != null) {
+            waitingOn.add(unsetKeleres.getRepresentationNoPing() + " still needs to set up as Keleres");
         }
-        boolean allPlayersSetup = true;
-        StringBuilder message = new StringBuilder(
-                "🛑 Cannot deal secret objectives yet as some players still need to pick their starting technologies. If you wish to proceed anyways, just press the button again.");
         for (Player p : game.getRealPlayers()) {
             if (p.getTechs().size() < p.getFactionModel().finalStartingTechAmount()) {
-                message.append("\n> ").append(p.getRepresentation());
-                allPlayersSetup = false;
+                waitingOn.add(p.getRepresentation() + " still needs to choose their starting technologies");
             }
         }
-        if (!allPlayersSetup && !game.getStoredValue("overrideSORes").contains(player.getFaction())) {
-            game.setStoredValue("overrideSORes", game.getStoredValue("overrideSORes") + player.getFaction());
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
+        for (Player p : FractureService.playersWithPendingRoll(game)) {
+            waitingOn.add(p.getRepresentation() + " still needs to roll for The Fracture");
+        }
+
+        if (!waitingOn.isEmpty()) {
+            String message = "🛑 Cannot deal secret objectives yet as some players have not finished setting up.\n> "
+                    + String.join("\n> ", waitingOn);
+            if (unsetKeleres != null) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                return;
+            }
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(),
+                    message,
+                    List.of(Buttons.red("deal2SOToAllAnyway_" + event.getMessageId(), "Deal Anyway")));
             return;
         }
 
         DrawSecretService.dealSOToAll(event, 2, game);
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("deal2SOToAllAnyway_")
+    public static void deal2SOToAllAnyway(ButtonInteractionEvent event, Game game, String buttonID) {
+        if (findUnsetKeleres(game) != null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "🛑 Keleres still needs to set up, so secret objectives cannot be dealt.");
+            return;
+        }
+        String dealButtonMessageId = buttonID.replace("deal2SOToAllAnyway_", "");
+        event.getMessageChannel()
+                .deleteMessageById(dealButtonMessageId)
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+        DrawSecretService.dealSOToAll(event, 2, game);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static Player findUnsetKeleres(Game game) {
+        MiltyDraftManager manager = game.getMiltyDraftManager();
+        if (!manager.isFinished()
+                || !manager.isFactionTaken("keleresm")
+                || game.getPlayerFromColorOrFaction("keleres") != null) {
+            return null;
+        }
+        for (String playerID : manager.getPlayers()) {
+            if ("keleresm".equals(manager.getPlayerDraft(playerID).getFaction())) {
+                return game.getPlayer(playerID);
+            }
+        }
+        return null;
     }
 }
