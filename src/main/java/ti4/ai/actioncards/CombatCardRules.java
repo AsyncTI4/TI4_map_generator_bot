@@ -90,7 +90,16 @@ public class CombatCardRules {
                 .map(alias -> new Candidate(alias, CombatCards.valueAtRoundStart(game, seat, moment, alias)))
                 .filter(candidate -> candidate.value() > 0 && candidate.margin() >= 0)
                 .max(Comparator.comparingDouble(Candidate::margin))
-                .map(Candidate::alias);
+                .map(Candidate::alias)
+                .or(() -> moraleBoostForCloseOdds(game, seat, moment));
+    }
+
+    private static Optional<String> moraleBoostForCloseOdds(Game game, Player seat, CombatMoment moment) {
+        return seat.getActionCards().keySet().stream()
+                .sorted()
+                .filter(CombatCards.MORALE_BOOSTS::contains)
+                .findFirst()
+                .filter(alias -> CombatCards.closeEnoughForMoraleBoost(game, seat, moment));
     }
 
     private static boolean awaitsModifier(AiTurnContext context, CardPlay play) {
