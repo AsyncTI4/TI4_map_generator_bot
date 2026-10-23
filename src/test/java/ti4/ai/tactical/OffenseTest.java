@@ -220,10 +220,14 @@ class OffenseTest extends BaseTi4Test {
     }
 
     // Test 7: completing a point of our own beats denying a non-winning sole leader two points and a planet, because
-    // what stopping a player that is not about to win can add is capped below one point of our own.
+    // what stopping a player that is not about to win can add is capped below one point of our own, and the neighbour
+    // keeps a fleet at home to answer with. With no fleet left to retaliate the two are about level (7.79 vs 7.75).
     @Test
     void ourOwnPointOutranksDenyingAPlayerWhoIsNotWinning() {
         denialBoard(4);
+        Tile sardakkHome = board.test.game.getTileByPosition(DefenseScenario.SARDAKK_HOME_POSITION);
+        board.test.units(sardakkHome, "space", sardakk(), UnitType.Cruiser, 2);
+        sardakk().setTacticalCC(3);
         String target = board.otherNeighbourOfHome();
 
         StrikeValue attack = breakdown(target);
