@@ -213,7 +213,7 @@ class Stinginess {
     }
 
     private static double valueToRival(Game game, Player partner, String note) {
-        double value = NotesForTrade.receiveValue(game, partner, note);
+        double value = NotesForTrade.receiveValue(game, partner, note, true);
         return MilitarySupport.ALIAS.equals(note) ? MilitarySupport.rivalGain(value) : value;
     }
 

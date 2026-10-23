@@ -153,9 +153,10 @@ class NoteDealsTest extends BaseTi4Test {
         assertThat(options()).noneMatch(option -> gives(option.deal(), "nekro", "5"));
     }
 
-    // An unlocked commander makes Nekro's Alliance worth a trade good to Sol.
+    // Early on, Nekro's unlocked Alliance is worth 2 to Sol by the table: it sells for a trade good.
     @Test
     void sellsAnUnlockedAllianceForATradeGood() {
+        table.game.setRound(2);
         nekro.unsafeGetLeader("nekrocommander").setLocked(false);
         table.stock(sol, 4, 1);
 

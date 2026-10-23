@@ -19,6 +19,7 @@ class NotesForTrade {
     private static final String GIVE_MEMO = "notes.giveCost";
     private static final String LEAST_HARMFUL_MEMO = "notes.leastHarmful";
     static final double OTHER_NOTE = 0.3;
+    static final double MIN_NOTE_WORTH = 0.25;
     static final double UNKNOWN_NOTE_COST = 1.0;
     static final double INFINITE = Double.POSITIVE_INFINITY;
     static final String TRADE_AGREEMENT = "_ta";
@@ -60,21 +61,31 @@ class NotesForTrade {
     }
 
     static double receiveValue(Game game, Player seat, String alias) {
-        return SearchMemo.remember(
-                () -> baseReceiveValue(game, seat, alias) + NoteSecrets.value(game, seat, alias),
-                RECEIVE_MEMO,
-                seat,
-                alias);
+        return receiveValue(game, seat, alias, false);
     }
 
-    private static double baseReceiveValue(Game game, Player seat, String alias) {
+    static double receiveValue(Game game, Player seat, String alias, boolean seatPrivate) {
+        return SearchMemo.remember(
+                () -> baseReceiveValue(game, seat, alias, seatPrivate) + NoteSecrets.value(game, seat, alias),
+                RECEIVE_MEMO,
+                seat,
+                alias,
+                seatPrivate);
+    }
+
+    private static double baseReceiveValue(Game game, Player seat, String alias, boolean seatPrivate) {
         Player owner = game.getPNOwner(alias);
         boolean own = Standings.same(owner, seat);
         if (alias.endsWith(NoteGiving.THRONE)) {
             return own ? ownThroneBack(game, seat, alias) : ThroneValue.received(game, seat, owner);
         }
+        return Math.max(MIN_NOTE_WORTH, floorlessReceiveValue(game, seat, alias, owner, own, seatPrivate));
+    }
+
+    private static double floorlessReceiveValue(
+            Game game, Player seat, String alias, Player owner, boolean own, boolean seatPrivate) {
         if (alias.endsWith(NoteGiving.ALLIANCE)) {
-            return own ? AllianceValue.ownBack() : AllianceValue.received(game, seat, owner);
+            return own ? AllianceValue.ownBack() : AllianceValue.received(game, seat, owner, seatPrivate);
         }
         if (alias.endsWith(TRADE_AGREEMENT)) return agreementValue(owner);
         if (alias.endsWith(CEASEFIRE)) {
@@ -88,7 +99,11 @@ class NotesForTrade {
 
     static double giveCost(Game game, Player seat, Player receiver, String alias) {
         return SearchMemo.remember(
-                () -> computeGiveCost(game, seat, receiver, alias), GIVE_MEMO, seat, receiver, alias);
+                () -> Math.max(MIN_NOTE_WORTH, computeGiveCost(game, seat, receiver, alias)),
+                GIVE_MEMO,
+                seat,
+                receiver,
+                alias);
     }
 
     private static double computeGiveCost(Game game, Player seat, Player receiver, String alias) {

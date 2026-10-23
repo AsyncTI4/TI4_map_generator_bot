@@ -32,7 +32,7 @@ public class ComponentValues {
             case SEND_DEBT -> debtReceivable(game, seat, from, amount, trustInFrom);
             case CLEAR_DEBT -> DEBT_LIABILITY * amount;
             case FRAGMENTS -> fragmentsReceived(seat, item, seatPrivate);
-            case PROMISSORY -> receivedNote(game, seat, from, item);
+            case PROMISSORY -> receivedNote(game, seat, from, item, seatPrivate);
             case ACTION_CARDS -> TradeActionCards.receiveValue(game, seat, from, item, seatPrivate);
             case PLANETS -> TradePlanets.receiveValue(game, item);
             case UNSUPPORTED -> 0;
@@ -86,10 +86,10 @@ public class ComponentValues {
         return Desperation.contenderExists(game) ? ENDGAME : NOT_ENDGAME;
     }
 
-    private static double receivedNote(Game game, Player seat, Player from, DealItem item) {
+    private static double receivedNote(Game game, Player seat, Player from, DealItem item, boolean seatPrivate) {
         if (item.isGenericNote()) return NotesForTrade.OTHER_NOTE * item.amount();
         return NotesForTrade.aliasOf(from, item.detail())
-                .map(alias -> NotesForTrade.receiveValue(game, seat, alias))
+                .map(alias -> NotesForTrade.receiveValue(game, seat, alias, seatPrivate))
                 .orElse(NotesForTrade.OTHER_NOTE);
     }
 
