@@ -3579,9 +3579,10 @@ public final class Helper {
         long permission = Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
         for (Player player : game.getPlayers().values()) {
             TextChannel channel = player.getPrivateChannel();
-            if (channel != null) {
+            Member member = player.getMember();
+            if (channel != null && member != null) {
                 channel.getManager()
-                        .putMemberPermissionOverride(player.getMember().getIdLong(), permission, 0)
+                        .putMemberPermissionOverride(member.getIdLong(), permission, 0)
                         .queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
