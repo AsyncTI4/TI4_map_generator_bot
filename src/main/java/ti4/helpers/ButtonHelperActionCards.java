@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -257,6 +258,97 @@ public final class ButtonHelperActionCards {
                 + " was removed via the _Lucky Shot_ action card. How lucky!";
         FoWHelper.notifyPlayerAndAffectedInFog(game, player, p2, msg);
         ButtonHelper.deleteMessage(event);
+    }
+
+    private static List<Button> directHitTargetButtons(Player player, Game game, Tile tile) {
+        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        if (space == null) return List.of();
+        List<Button> buttons = new ArrayList<>();
+        space.getUnits().keySet().stream()
+                .sorted(Comparator.comparing(UnitKey::getColor).thenComparing(UnitKey::asyncID))
+                .forEach(unitKey -> {
+                    Player owner = game.getPlayerFromColorOrFaction(unitKey.getColor());
+                    if (owner == null || space.getDamagedUnitCount(unitKey) < 1) return;
+                    if (owner == player || player.getAllianceMembers().contains(owner.getFaction())) return;
+                    UnitModel model = owner.getUnitFromUnitKey(unitKey);
+                    if (model == null || !model.getIsShip() || !model.getCanBeDirectHit()) return;
+                    String who = FoWHelper.identityOrColorIfCanSeeStats(
+                            game, owner, player, owner.getFactionModel().getShortName());
+                    buttons.add(Buttons.red(
+                            player.factionButtonChecker() + "directHitOn_" + tile.getPosition() + "_"
+                                    + unitKey.unitName() + "_" + unitKey.getColor(),
+                            "Destroy " + who + "'s damaged " + model.getName(),
+                            unitKey.unitEmoji()));
+                });
+        return buttons;
+    }
+
+    @ButtonHandler("resolveDirectHit")
+    public static void resolveDirectHit(Player player, Game game, ButtonInteractionEvent event) {
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        List<Button> buttons = tile == null ? List.of() : directHitTargetButtons(player, game, tile);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", there is no damaged ship in the active system that _Direct Hit_ can destroy.");
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getChannel(),
+                player.getRepresentationUnfogged()
+                        + ", please choose the ship that just used Sustain Damage and that you wish to destroy with _Direct Hit_.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("directHitOn_")
+    public static void resolveDirectHitDestruction(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String[] parts = buttonID.split("_");
+        Tile tile = parts.length < 4 ? null : game.getTileByPosition(parts[1]);
+        Player owner = parts.length < 4 ? null : game.getPlayerFromColorOrFaction(parts[3]);
+        UnitKey unitKey =
+                owner == null ? null : Mapper.getUnitKey(AliasHandler.resolveUnit(parts[2]), owner.getColor());
+        UnitModel model = unitKey == null ? null : owner.getUnitFromUnitKey(unitKey);
+        UnitHolder space = tile == null ? null : tile.getUnitHolders().get(Constants.SPACE);
+        boolean valid = space != null
+                && model != null
+                && owner != player
+                && model.getCanBeDirectHit()
+                && space.getDamagedUnitCount(unitKey) > 0;
+        if (!valid) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    player.getRepresentationUnfogged() + ", that ship can no longer be destroyed by _Direct Hit_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        DestroyUnitService.destroyUnit(
+                event, tile, game, new ParsedUnit(unitKey, 1, Constants.SPACE), isSpaceCombatUnderway(game, tile));
+        ButtonHelper.checkFleetAndCapacity(owner, game, tile);
+        String where = tile.getRepresentation();
+        FoWHelper.notifyActorAndAffectedElsePublic(
+                game,
+                player,
+                player.getRepresentationUnfogged() + ", you destroyed the damaged " + unitKey.unitEmoji() + " in "
+                        + where + " with _Direct Hit_.",
+                owner,
+                owner.getRepresentationUnfogged() + ", your damaged " + unitKey.unitEmoji() + " in " + where
+                        + " was destroyed by _Direct Hit_.",
+                owner.getFactionEmoji() + "'s damaged " + unitKey.unitEmoji() + " in " + where
+                        + " was destroyed by _Direct Hit_.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static boolean isSpaceCombatUnderway(Game game, Tile tile) {
+        return game.getRealPlayersNDummies().stream().anyMatch(p -> combatRoundsFought(game, p, tile) > 0);
+    }
+
+    private static int combatRoundsFought(Game game, Player player, Tile tile) {
+        String rounds =
+                game.getStoredValue("combatRoundTracker" + player.getFaction() + tile.getPosition() + Constants.SPACE);
+        return StringUtils.isNumeric(rounds) ? Integer.parseInt(rounds) : 0;
     }
 
     @ButtonHandler("endScuttle_")
@@ -2854,6 +2946,7 @@ public final class ButtonHelperActionCards {
                     List.of(Buttons.GET_A_TECH));
         } else {
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            buttons.add(Buttons.red(player.factionButtonChecker() + "nekroTechExhaust", "Exhaust Planets"));
             String message2 = player.getRepresentation()
                     + ", you would research a technology, but because of **Propagation**, you instead gain 3 command tokens."
                     + " Your current command tokens are " + player.getCCRepresentation()

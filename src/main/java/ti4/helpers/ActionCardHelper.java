@@ -2160,7 +2160,13 @@ public class ActionCardHelper {
                         channel2, String.format(targetMsg, "system"), codedButtons);
             }
 
-            if ("direct_hit".equals(automationID) || "courageous".equals(automationID)) {
+            if ("direct_hit".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveDirectHit", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, String.format(targetMsg, "ship (if multiple)"), codedButtons);
+            }
+
+            if ("courageous".equals(automationID)) {
                 MessageHelper.sendMessageToChannel(channel2, String.format(targetMsg, "ship (if multiple)"));
             }
 

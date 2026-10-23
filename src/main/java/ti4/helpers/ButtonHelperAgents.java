@@ -495,6 +495,12 @@ public final class ButtonHelperAgents {
                     player.getCorrectChannel(), "Could not find player, please resolve manually.");
             return;
         }
+        replenishWithHacanAgent(event, game, player, p2);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static void replenishWithHacanAgent(
+            GenericInteractionCreateEvent event, Game game, Player player, Player p2) {
         String message;
         if (p2 == player) {
             message = player.getRepresentationUnfogged() + " increased your commodities by two";
@@ -512,7 +518,6 @@ public final class ButtonHelperAgents {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("mercerMove_")
@@ -989,6 +994,11 @@ public final class ButtonHelperAgents {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
                     + "Carth of Golden Sands, the Hacan" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
+            Player refreshed = rest.contains("_") ? game.getPlayerFromColorOrFaction(rest.split("_")[1]) : null;
+            if (refreshed != null) {
+                replenishWithHacanAgent(event, game, player, refreshed);
+                return;
+            }
             message = trueIdentity + ", please choose the faction on which you wish to use " + ssruuClever
                     + "Carth of Golden Sands, the Hacan" + ssruuSlash + " agent.";
             List<Button> buttons = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "hacanAgentRefresh", null);
@@ -1301,8 +1311,7 @@ public final class ButtonHelperAgents {
                 if (!posNPlanet.isEmpty()) {
                     p2 = game.getPlayerFromColorOrFaction(posNPlanet);
                 }
-                List<Button> buttons =
-                        new ArrayList<>(Helper.getPlanetPlaceUnitButtons(p2, game, "2gf", "placeOneNDone_skipbuild"));
+                List<Button> buttons = sardakkAgentPlacementButtons(game, p2);
                 String message2 = p2.getRepresentationUnfogged() + ", use buttons to resolve " + ssruuClever
                         + "T'ro An, the N'orr" + ssruuSlash + " agent.";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message2, buttons);
@@ -2748,6 +2757,18 @@ public final class ButtonHelperAgents {
             }
         }
         return gloryTiles;
+    }
+
+    public static List<Button> sardakkAgentPlacementButtons(Game game, Player player) {
+        List<Button> everyPlanet =
+                new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
+        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+        if (activeSystem == null) return everyPlanet;
+        List<Button> inActiveSystem = everyPlanet.stream()
+                .filter(button -> activeSystem.getPlanetUnitHolders().stream()
+                        .anyMatch(planet -> button.getCustomId().endsWith("_" + planet.getName())))
+                .toList();
+        return inActiveSystem.isEmpty() ? everyPlanet : new ArrayList<>(inActiveSystem);
     }
 
     public static List<Button> getSardakkAgentButtons(Game game, Player player) {
