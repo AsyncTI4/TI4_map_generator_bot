@@ -55,7 +55,6 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
@@ -4455,8 +4454,6 @@ public class ButtonHelper {
         int totalPdsInSystem = 0;
         int numFighter2s = 0;
         int numFighter2sFleet = 0;
-        int numRiptide2s = 0;
-        int numRiptide2sFleet = 0;
         int evolvedWarformsMechsInSpace = 0;
         Set<String> testingYardShipTypes = new HashSet<>();
         boolean capacityViolated = false;
@@ -4613,9 +4610,6 @@ public class ButtonHelper {
                             numFighter2s = 0;
                         }
                     }
-                    if ("iron_mech2".equals(unit.getId())) {
-                        numRiptide2s += entry.getValue();
-                    }
                     if ("naaz_voltron".equalsIgnoreCase(unit.getId())) {
                         numFighter2s++;
                     }
@@ -4713,12 +4707,6 @@ public class ButtonHelper {
                 overflow -= fighter2Overflow;
             }
 
-            int riptide2Overflow = Math.min(overflow, numRiptide2s);
-            if (riptide2Overflow > 0) {
-                numRiptide2sFleet += riptide2Overflow * 2;
-                overflow -= riptide2Overflow;
-            }
-
             if (overflow > 0 && player.hasAbility("evolved_warforms")) {
                 int mechOverflow = Math.min(overflow, evolvedWarformsMechsInSpace);
                 if (mechOverflow > 0) {
@@ -4739,7 +4727,7 @@ public class ButtonHelper {
             if (overflow > 0) {
                 capacityViolated = true;
             } else {
-                if (numFighter2sFleet + numRiptide2sFleet + numOfCapitalShips > fleetCap) {
+                if (numFighter2sFleet + numOfCapitalShips > fleetCap) {
                     fleetSupplyViolated = true;
                 }
             }
@@ -7359,14 +7347,12 @@ public class ButtonHelper {
                 }
                 if ("assaultcannoncombat".equalsIgnoreCase(type)
                         && List.of(UnitType.Fighter, UnitType.Spacedock, UnitType.Mech, UnitType.Infantry)
-                                .contains(unitKey.unitType())
-                        && !IronAbilitiesHandler.isExoAtmosphericMechInSpace(player, unitKey.unitType(), unitHolder)) {
+                                .contains(unitKey.unitType())) {
                     continue;
                 }
                 if ("courageouscombat".equalsIgnoreCase(type)
                         && List.of(UnitType.Spacedock, UnitType.Mech, UnitType.Infantry)
-                                .contains(unitKey.unitType())
-                        && !IronAbilitiesHandler.isExoAtmosphericMechInSpace(player, unitKey.unitType(), unitHolder)) {
+                                .contains(unitKey.unitType())) {
                     continue;
                 }
 

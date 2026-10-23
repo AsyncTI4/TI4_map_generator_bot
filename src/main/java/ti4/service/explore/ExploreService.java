@@ -23,7 +23,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.explore.bluereverie.BlueReverieExploreHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
@@ -1174,9 +1173,6 @@ public class ExploreService {
                 }
                 buttons.add(decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
-                if (player.hasUnlockedBreakthrough("ironbt")) {
-                    IronBreakthroughHandler.sendIronBtMessage(player, game);
-                }
             }
             case "folderspace", "folderspace2" -> {
                 player.setFleetCC(player.getFleetCC() + 1);
@@ -1239,9 +1235,6 @@ public class ExploreService {
                 }
                 buttons.add(decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
-                if (player.hasUnlockedBreakthrough("ironbt")) {
-                    IronBreakthroughHandler.sendIronBtMessage(player, game);
-                }
             }
             case "vfs1", "vfs2", "vfs3" -> {
                 message = new StringBuilder(player.getRepresentation()
@@ -1265,9 +1258,6 @@ public class ExploreService {
                 }
                 buttons.add(decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
-                if (player.hasUnlockedBreakthrough("ironbt")) {
-                    IronBreakthroughHandler.sendIronBtMessage(player, game);
-                }
             }
             case "warforgeruins" -> {
                 message = new StringBuilder(
@@ -1297,9 +1287,6 @@ public class ExploreService {
                 }
                 buttons.add(decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
-                if (player.hasUnlockedBreakthrough("ironbt")) {
-                    IronBreakthroughHandler.sendIronBtMessage(player, game);
-                }
             }
             case "seedyspaceport" -> {
                 message = new StringBuilder(player.getRepresentation()
@@ -1340,9 +1327,6 @@ public class ExploreService {
                 buttons.add(decline);
 
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
-                if (player.hasUnlockedBreakthrough("ironbt")) {
-                    IronBreakthroughHandler.sendIronBtMessage(player, game);
-                }
             }
             case "hiddenlaboratory" -> {
                 MessageHelper.sendMessageToEventChannel(

@@ -35,9 +35,6 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnosisLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.combat.CancelGroundHitsButtonId;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenPromissoryHandler;
@@ -741,10 +738,6 @@ public class CombatRollService {
         ScrapyardLeaderHandler.addCommanderModifier(tempMods, game, player, tile, combatOnHolder, rollType);
         XytherisPromissoryHandler.addSwarmSpawnModifier(tempMods, game, player, rollType);
         TwilightsFallMonumentsButtonHandler.addOrangeTfMonumentModifier(tempMods, game, player, tile, rollType);
-        if (player.hasTech("beironats")) {
-            extraRolls.addAll(IronFactionTechsHandler.getAdvancedTargetingSystemsExtraRollModifier(
-                    game, player, opponent, tile, combatOnHolder, rollType));
-        }
         if (player.ownsUnit("arcanum_flagship")) {
             extraRolls.addAll(
                     ArcanumUnitHandler.getAstralCodexExtraRollModifier(player, tile, combatOnHolder, rollType));
@@ -1279,7 +1272,7 @@ public class CombatRollService {
 
         if (rollType == CombatRollType.bombardment) {
             AshenLeadersHandler.offerCommanderBombardmentButtons(event, game, player, h);
-            if (h >= 3) {
+            if (h >= 1) {
                 CommanderUnlockCheckService.checkPlayer(player, "ashen");
             }
             if (AshenBreakthroughHandler.offerHitReplacement(event, game, player, tile, bombardPlanet, h)) {
@@ -2268,42 +2261,6 @@ public class CombatRollService {
                         }
                     }
                 }
-                if (IronLeadersHandler.shouldAutoRerollCommanderMechMisses(game, player, unitModel, rollType)
-                        && numMisses > 0) {
-                    resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);
-                    // Very important to remove the rerolled dice from the original dice pool
-                    resultRolls.removeIf(Predicate.not(Die::isSuccess));
-                    player.setExpectedHitsTimes10(
-                            player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
-                    chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numMisses);
-                    chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numMisses);
-                    maximumHits += numRolls * mult;
-                    int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
-                    totalHits += hitRolls2;
-                    String unitRoll2 = CombatMessageHelper.displayUnitRoll(
-                            unitModel, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
-                    payloadBuilder.addUnitRoll(
-                            unitModel,
-                            toHit,
-                            modifierToHit,
-                            numOfUnit,
-                            numRollsPerUnit,
-                            0,
-                            RollSegmentType.IRON_COMMANDER_REROLL_MISSES,
-                            resultRolls2,
-                            hitRolls2,
-                            DieRollSource.REROLL_MISS);
-                    resultBuilder
-                            .append("Rerolling ")
-                            .append(numMisses)
-                            .append(" miss")
-                            .append(numMisses == 1 ? "" : "es")
-                            .append(" due to Captain Vakros, the Iron Tide Commander:\n")
-                            .append(unitRoll2);
-                    resultRolls.addAll(resultRolls2);
-                    numMisses -= hitRolls2;
-                    resultRolls2 = new ArrayList<>();
-                }
                 if (rollType == CombatRollType.SpaceCannonOffence || rollType == CombatRollType.SpaceCannonDefence) {
                     if (player.ownsUnit("gledge_pds2") && totalHits > 0) {
                         String msg = player.getRepresentation()
@@ -3012,10 +2969,6 @@ public class CombatRollService {
         }
         XytherisAbilityHandler.getBestHiveEchoUnit(tile, player, CombatRollType.AFB)
                 .ifPresent(unit -> output.putIfAbsent(unit, 1));
-        if (player.hasUnit("iron_flagship")) {
-            IronUnitsHandler.getIronFlagshipAfbUnits(player, tile)
-                    .forEach((model, count) -> output.put(new ImmutablePair<>(model, spaceHolder), count));
-        }
         if (player.hasUnit("vyserix_flagship")) {
             VyserixUnitHandler.getVyserixFlagshipAfbUnits(player, tile)
                     .forEach((model, count) -> output.put(new ImmutablePair<>(model, spaceHolder), count));

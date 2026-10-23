@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.luminous.opa.OpaAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesStartingTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
@@ -523,9 +522,6 @@ public class PlayerSetupService {
                     player.getCorrectChannel(),
                     "Set mech unit maximum to 6 for " + player.getRepresentation()
                             + ", due to their **Mechanized Military** ability.");
-        }
-        if (player.hasAbility("doctrine") && player.hasAbility("paradigm") && player.hasAbility("natau_decree")) {
-            NatauAbilityHandler.offerDoctrineSetupButtons(event, game, player);
         }
         if (player.hasAbility("primordial_secrets")) {
             ArcanumAbilityHandler.offerPrimordialSecretsButtons(game, player);

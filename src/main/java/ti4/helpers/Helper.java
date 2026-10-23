@@ -46,8 +46,6 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRe
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
@@ -1465,7 +1463,6 @@ public final class Helper {
                     && !thing.contains("ghostbt")
                     && !thing.contains("tyrisbt")
                     && !thing.contains("dwsDiscount")
-                    && !thing.contains("netrunnersAgentDiscount")
                     && !thing.contains("aida")
                     && !thing.contains("arcanumRunebound")
                     && !thing.contains("commander")
@@ -1594,17 +1591,6 @@ public final class Helper {
                             .append('\n');
                     res += 1;
                 }
-                if (thing.startsWith("netrunnersAgentDiscount_")) {
-                    int discount = Integer.parseInt(thing.substring("netrunnersAgentDiscount_".length()));
-                    msg.append("> Used Zor No-ahn, the Netrunners agent, for a ")
-                            .append(discount)
-                            .append(" cost discount.\n");
-                    if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
-                        inf += discount;
-                    } else {
-                        res += discount;
-                    }
-                }
                 if ("boon".equals(thing)) {
                     msg.append("> Used Boon Relic ").append(ExploreEmojis.Relic).append('\n');
                     res += 1;
@@ -1665,9 +1651,7 @@ public final class Helper {
                 if (thing.contains("arcanumRunebound")) {
                     msg.append("> Damaged _Rune-Bound Sentinel_ to ignore a prerequisite on a technology.\n");
                 }
-                if (thing.startsWith("netrunnersAgentDiscount_")) {
-                    // Already included above as a cost discount.
-                } else if (thing.contains("commander") || thing.contains("Gledge Agent")) {
+                if (thing.contains("commander") || thing.contains("Gledge Agent")) {
                     msg.append("> ").append(thing).append('\n');
                 } else if (thing.contains("winnuagent")) {
                     msg.append("> Used Winnu agent for 2 resources").append('\n');
@@ -2957,7 +2941,6 @@ public final class Helper {
             unitButtons.add(ff2Button);
         }
         boolean greenMechd = false;
-        boolean ironMechSpaceAdded = false;
         if ((player.hasTech("tf-desperados") || player.hasAbility("desperados_br"))
                 && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)) {
             unitButtons.add(Buttons.blue(
@@ -3144,20 +3127,6 @@ public final class Helper {
                 if (resourcelimit > 1 && !greenMechd && !game.isBaseGameMode()) {
                     unitButtons.add(mfButton);
                 }
-                if (resourcelimit > 1 && !ironMechSpaceAdded && IronAbilitiesHandler.hasExoAtmospheric(player)) {
-                    Button spaceMechButton = Buttons.green(
-                            player.factionButtonChecker() + placePrefix + "_mech_space" + tile.getPosition(),
-                            "Produce Mech in space",
-                            UnitEmojis.mech);
-                    if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
-                        spaceMechButton = Buttons.gray(
-                                player.factionButtonChecker() + placePrefix + "_mech_space" + tile.getPosition(),
-                                "Produce Mech in space",
-                                UnitEmojis.mech);
-                    }
-                    unitButtons.add(spaceMechButton);
-                    ironMechSpaceAdded = true;
-                }
 
             } else if (ButtonHelper.canIBuildGFInSpace(player, tile, warfareNOtherstuff)
                     && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
@@ -3203,9 +3172,6 @@ public final class Helper {
                 unitButtons.addAll(
                         CrystellumLeadersHandler.getCrystellumCommanderFighterButtons(player, tile, game, placePrefix));
             }
-        }
-        if (!"sling".equalsIgnoreCase(warfareNOtherstuff)) {
-            unitButtons.addAll(IronBreakthroughHandler.getPlaceUnitButtonsForIronBt(player, tile, game, placePrefix));
         }
         if ("place".equalsIgnoreCase(placePrefix)) {
             Button DoneProducingUnits = Buttons.red(
@@ -4030,9 +3996,6 @@ public final class Helper {
     public static boolean mechCheck(String planetName, Game game, Player player) {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
-        if (player.hasUnlockedBreakthrough("ironbt")) {
-            return true;
-        }
         return unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0;
     }
 

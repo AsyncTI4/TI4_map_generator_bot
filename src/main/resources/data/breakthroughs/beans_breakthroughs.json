@@ -8,7 +8,7 @@
             "PROPULSION",
             "BIOTIC"
         ],
-        "text": "ACTION: At the start of your turn, you may exhaust this card to move 1 nexus token into a system that contains a planet you control. \n\nWhen you win a combat as the defender in a system that contains a nexus token, you may remove your command token from that system and return it to your reinforcements.",
+        "text": "ACTION: Exhaust this card to move 1 nexus token into a system that contains a planet you control. \n\nWhen you win a combat as the defender in a system that contains a nexus token, you may exhaust this card to remove your command token from that system and return it to your reinforcements.",
         "source": "beans"
     },
     {
@@ -32,19 +32,19 @@
             "WARFARE",
             "PROPULSION"
         ],
-        "text": "ACTION: You may exhaust this card to roll 1 of your non-flagship units BOMBARDMENT against a planet in an adjacent system. When you do, you may choose to cancel all of those hits to place infantry into coexistence on that planet up to the number of hits produced.",
+        "text": "ACTION: Exhaust this card to roll 1 of your units' BOMBARDMENT against a planet in an adjacent system. When you do, you may choose to cancel all of those hits to place infantry into coexistence on that planet up to the number of hits produced.",
         "source": "beans"
     },
     {
         "alias": "ironbt",
-        "name": "Foundry Network",
-        "shortName": "Foundry\nNetwork",
+        "name": "Hyperstatic Relays",
+        "shortName": "Hyperstatic\nRelays",
         "faction": "iron",
         "synergy": [
             "WARFARE",
             "BIOTIC"
         ],
-        "text": "When you produce 1 or more mechs, you may place those units with any of your space docks. \n\nWhen you explore a planet, you may treat that planet as containing 1 of your mechs.",
+        "text": "ACTION: Exhaust this card to choose a system that contains 1 or more of your command tokens and your units; resolve those units' PRODUCTION abilities in that system. You may reduce the combined cost of the produced units by the number of your units with PRODUCTION in that system.",
         "source": "beans"
     },
     {
@@ -56,16 +56,19 @@
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "Once per action, when you exhaust a planet that has an attachment, you may place 1 infantry from your reinforcements on that planet. During invasion on a planet you control, if that planet has an attachment, you may force your ground forces into coexistence on that planet.",
+        "text": "Once per action, when you exhaust a planet that has an attachment, you may place 1 infantry from your reinforcements on that planet. When another player commits units to a planet you control, if that planet has an attachment, you may exhaust this card to force your ground forces into coexistence on that planet. That combat ends in a draw.",
         "source": "beans"
     },
     {
         "alias": "netrunnersbt",
-        "name": "Data Breach",
-        "shortName": "Data\nBreach",
+        "name": "Emotet",
+        "shortName": "Emotet",
         "faction": "netrunners",
-        "synergy": ["NONE"],
-        "text": "When you unlock this breakthrough, place one of your control tokens on another player's breakthrough. Your breakthrough has synergy in the colors on the breakthrough your control token is on. At the end of your turn you may exhaust this card and spend a token from your strategy pool to gain the technology affected by your Proxy Network ability.",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "ACTION: Exhaust this card to allow another player to spend 2 trade goods to research 1 non-faction technology. If they do, you may return that player's control token from your faction sheet to gain that technology and place 1 infantry into coexistence on a non-home planet they control.",
         "source": "beans"
     },
     {
@@ -77,7 +80,7 @@
             "PROPULSION",
             "BIOTIC"
         ],
-        "text": "You may retreat to any system that contains one of your command tokens and no other player's ships. \n\nYou may exhaust this card at any time to use the exhaust effect of 1 doctrine in your reinforcements.",
+        "text": "After another player activates an anomaly that contains your command token and 1 or more of your units, you may exhaust this card to remove your command token from that system. Then, you may remove 1 of your non-fighter ships from another system that contains an anomaly and place it in the active system.",
         "source": "beans"
     }
 ]
