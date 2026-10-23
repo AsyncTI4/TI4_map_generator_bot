@@ -2787,7 +2787,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         boolean noHydromorphicCardsExist = getHydromorphicCards().isEmpty()
                 && getPlayers().values().stream()
                         .allMatch(player -> player.getHydromorphicCards().isEmpty());
-        if (!"initialized".equals(getStoredValue("hydromorphicDeck")) || noHydromorphicCardsExist) {
+        if (noHydromorphicCardsExist) {
             setHydromorphicCards(new ArrayList<>(Mapper.getHydromorphicCards().keySet()));
             Collections.shuffle(getHydromorphicCards());
             setStoredValue("hydromorphicDeck", "initialized");
@@ -2801,7 +2801,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                     .addAll(Mapper.getHydromorphicCards().keySet().stream()
                             .filter(card -> !existingCards.contains(card))
                             .toList());
-            Collections.shuffle(getHydromorphicCards());
             setStoredValue("hydromorphicDeckVersion", "2");
         }
     }

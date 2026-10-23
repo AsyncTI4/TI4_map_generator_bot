@@ -171,7 +171,6 @@ class GameLoadService {
         }
         Map<String, Tile> tileMap = getTileMap(gameFileLines, game);
         game.setTileMap(tileMap);
-        game.initializeHydromorphicDeck();
         TransientGameInfoUpdater.update(game);
         return game;
     }

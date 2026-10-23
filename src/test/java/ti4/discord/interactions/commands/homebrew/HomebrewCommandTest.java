@@ -31,7 +31,14 @@ class HomebrewCommandTest {
     void everyOldTopLevelCommandIsNowAGroup() {
         assertThat(command.getSubcommandGroups()).containsOnlyKeys("lost_legacies", "monument", "omegaphase");
         assertThat(command.getSubcommandGroups().get("lost_legacies").getGroupSubcommands())
-                .containsOnlyKeys("relic_trading_hub", "rev_leader_fix", "view_stoneborn_frags");
+                .containsOnlyKeys(
+                        "hc_discard",
+                        "hc_draw",
+                        "hc_draw_specific",
+                        "hc_send",
+                        "relic_trading_hub",
+                        "rev_leader_fix",
+                        "view_stoneborn_frags");
         assertThat(command.getSubcommandGroups().get("monument").getGroupSubcommands())
                 .containsOnlyKeys(
                         "ready", "exhaust", "belkosea_token_add", "belkosea_token_remove", "belkosea_token_move");
