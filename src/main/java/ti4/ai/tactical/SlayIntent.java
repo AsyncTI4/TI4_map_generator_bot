@@ -2,7 +2,9 @@ package ti4.ai.tactical;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
@@ -15,7 +17,8 @@ import ti4.game.Player;
 @UtilityClass
 public class SlayIntent {
 
-    static final String KEY = "aiSlay|";
+    private static final Map<String, String> DECLARED = new ConcurrentHashMap<>();
+    private static final String KEY_SEPARATOR = "|";
     private static final String ROUND = "@";
     private static final String SEPARATOR = ",";
 
@@ -26,7 +29,7 @@ public class SlayIntent {
         List<Player> winners = WinRace.winnersBefore(game, seat);
         String targets = winners.stream().map(Player::getFaction).sorted().collect(Collectors.joining(SEPARATOR));
         if (targets.equals(declared(game, seat))) return Optional.empty();
-        game.setStoredValue(KEY + seat.getFaction(), game.getRound() + ROUND + targets);
+        DECLARED.put(key(game, seat), game.getRound() + ROUND + targets);
         if (winners.isEmpty()) return Optional.empty();
         return Optional.of(new AiDecision.Announce(message(seat, winners)));
     }
@@ -50,8 +53,16 @@ public class SlayIntent {
         return !targets.isEmpty() && !targets.contains(seat.getFaction());
     }
 
+    public static void forget(String gameName) {
+        DECLARED.keySet().removeIf(key -> key.startsWith(gameName + KEY_SEPARATOR));
+    }
+
+    private static String key(Game game, Player seat) {
+        return game.getName() + KEY_SEPARATOR + seat.getFaction();
+    }
+
     private static String declared(Game game, Player seat) {
-        String stored = game.getStoredValue(KEY + seat.getFaction());
+        String stored = DECLARED.getOrDefault(key(game, seat), "");
         if (!stored.startsWith(game.getRound() + ROUND)) return "";
         return StringUtils.substringAfter(stored, ROUND);
     }

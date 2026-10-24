@@ -50,6 +50,7 @@ public final class AiTestGame {
         game = new Game();
         game.setName("ai-test-game");
         SecondaryQueue.forget(game.getName());
+        ti4.ai.tactical.SlayIntent.forget(game.getName());
         game.setRound(2);
         game.setExploreDeck(Mapper.getShuffledDeck("explores_pok"));
         game.setActiveSystem("");

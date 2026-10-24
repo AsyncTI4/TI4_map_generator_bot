@@ -10,7 +10,9 @@ import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
 // A seat that sees, on public information, another seat winning before it can score announces "We must slay X." once,
-// and stores the targets in game state so other AI seats can read its intent.
+// and keeps the targets in a per-game register so other AI seats can read its intent. The register lives in memory
+// because the runtime reloads the game from disk every tick: a stored value set while deciding was lost, and the seat
+// re-announced on every tick in self-play until the game stalled.
 class SlayIntentTest extends BaseTi4Test {
 
     private static final int LEADERSHIP = 1;
