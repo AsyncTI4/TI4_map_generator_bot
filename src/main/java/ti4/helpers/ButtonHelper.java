@@ -7064,7 +7064,7 @@ public class ButtonHelper {
                 actionRows.add(ActionRow.of(buttonRow));
                 buttonRow = new ArrayList<>();
             }
-            if (buttons.size() < 26 || !button.getCustomId().contains("_2")) {
+            if (buttons.size() < 26 || !isCountTwoVariant(button.getCustomId())) {
                 buttonRow.add(button);
             }
         }
@@ -7073,6 +7073,15 @@ public class ButtonHelper {
         }
 
         return actionRows;
+    }
+
+    static boolean isCountTwoVariant(String customId) {
+        if (customId == null) return false;
+        for (String token : customId.split("_")) {
+            if ("2".equals(token)) return true;
+            if (token.length() > 1 && token.charAt(0) == '2' && Character.isLetter(token.charAt(1))) return true;
+        }
+        return false;
     }
 
     @ButtonHandler("addLegendaryMecatol")

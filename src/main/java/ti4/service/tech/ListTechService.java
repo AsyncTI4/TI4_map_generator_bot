@@ -105,6 +105,22 @@ public class ListTechService {
         acquireATech(event, game, player, sc, false, TechnologyType.mainFive, first);
     }
 
+    @ButtonHandler("acquireAUnitUpgrade")
+    public void acquireAUnitUpgrade(ButtonInteractionEvent event, Game game, Player player) {
+        game.setComponentAction(true);
+        List<Button> buttons = unitUpgradeButtons(game, player);
+        String message = buttons.isEmpty()
+                ? player.getRepresentation() + ", there is no unit upgrade technology you can research right now."
+                : player.getRepresentation() + ", please choose which unit upgrade technology you wish to research.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+    }
+
+    public static List<Button> unitUpgradeButtons(Game game, Player player) {
+        List<TechnologyModel> upgrades =
+                getAllTechOfAType(game, TechnologyType.UNITUPGRADE.toString(), player, false, true);
+        return getTechButtons(upgrades, player);
+    }
+
     @ButtonHandler("acquireAUnitTechWithInf")
     public void acquireAUnitTechWithInf(ButtonInteractionEvent event, Game game, Player player) {
         boolean sc = false;

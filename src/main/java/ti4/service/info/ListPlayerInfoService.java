@@ -27,6 +27,7 @@ import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source;
+import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ExploreEmojis;
@@ -478,6 +479,22 @@ public class ListPlayerInfoService {
 
     public static int getPlayerProgressOnObjective(String objID, Game game, Player player) {
         return getPlayerProgressOnObjective(objID, game, player, false);
+    }
+
+    public static int countAdaptNewStrategiesTechnologies(Player player, boolean twilightsFall) {
+        int count = 0;
+        for (String alias : player.getTechs()) {
+            if (countsForAdaptNewStrategies(alias, twilightsFall)) count++;
+        }
+        return count;
+    }
+
+    public static boolean countsForAdaptNewStrategies(String techAlias, boolean twilightsFall) {
+        if ("vax".equalsIgnoreCase(techAlias) || "vay".equalsIgnoreCase(techAlias)) return false;
+        TechnologyModel tech = Mapper.getTech(techAlias);
+        if (tech == null) return false;
+        boolean factionTech = !tech.getFaction().orElse("").isEmpty();
+        return factionTech != twilightsFall;
     }
 
     public static int getPlayerProgressOnObjective(String objID, Game game, Player player, boolean plausibleD) {
@@ -975,20 +992,7 @@ public class ListPlayerInfoService {
                 return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false); // 5 dreads
             }
             case "ans" -> {
-                int count = 0;
-                for (String nekroTech : player.getTechs()) {
-                    if ("vax".equalsIgnoreCase(nekroTech) || "vay".equalsIgnoreCase(nekroTech)) {
-                        continue;
-                    }
-                    if (!Mapper.getTech(nekroTech).getFaction().orElse("").isEmpty() && !game.isTwilightsFallMode()) {
-                        count += 1;
-                    }
-                    if (game.isTwilightsFallMode()
-                            && Mapper.getTech(nekroTech).getFaction().orElse("").isEmpty()) {
-                        count += 1;
-                    }
-                }
-                return count;
+                return countAdaptNewStrategiesTechnologies(player, game.isTwilightsFallMode());
             }
             case "btgk" -> {
                 int alpha = 0;

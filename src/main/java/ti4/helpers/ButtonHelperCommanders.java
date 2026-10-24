@@ -1031,9 +1031,24 @@ public class ButtonHelperCommanders {
         RemoveUnitService.removeUnits(event, origin, game, player.getColor(), "1 " + mechorInf + " " + planet2);
         AddUnitService.addUnits(event, destination, game, player.getColor(), "1 " + mechorInf + " " + planet1);
 
+        rememberSardakkCommanderSource(game, player, planet2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    private static String sardakkCommanderMarker(String planet) {
+        return " Sardakk commander used " + planet + ".";
+    }
+
+    static void rememberSardakkCommanderSource(Game game, Player player, String planet) {
+        String key = "currentActionSummary" + player.getFaction();
+        game.setStoredValue(key, game.getStoredValue(key) + sardakkCommanderMarker(planet));
+    }
+
+    static boolean sardakkCommanderUsedThisActivation(Game game, Player player, String planet) {
+        String summary = game.getStoredValue("currentActionSummary" + player.getFaction());
+        return StringUtils.substringAfterLast(summary, " Activated ").contains(sardakkCommanderMarker(planet));
     }
 
     @ButtonHandler("ralnelMechPull_")
@@ -1087,6 +1102,7 @@ public class ButtonHelperCommanders {
                     }
                     String planetId2 = planetReal2.getName();
                     String planetName2 = Helper.getPlanetName(planetId2);
+                    if (sardakkCommanderUsedThisActivation(game, player, planetId2)) continue;
                     if (numInf > 0 && !planetId.equalsIgnoreCase(planetId2)) {
                         String id = "sardakkcommander_infantry_" + planetId + "_" + planetId2;
                         String label = "1 Inf From " + planetName2 + " To " + planetName + " With Commander";

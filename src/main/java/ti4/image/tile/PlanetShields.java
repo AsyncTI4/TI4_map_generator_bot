@@ -6,12 +6,14 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeter
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.model.UnitModel;
+import ti4.service.actioncard.DisableService;
 
 public final class PlanetShields {
 
@@ -46,11 +48,15 @@ public final class PlanetShields {
 
     private static boolean hasShieldingUnit(UnitHolder unitHolder, Game game) {
         Map<Units.UnitKey, Integer> planetUnits = new HashMap<>(unitHolder.getUnits());
+        Tile tile = unitHolder instanceof Planet planet ? game.getTileFromPlanet(planet.getName()) : null;
         for (Player player : game.getRealPlayers()) {
             for (Units.UnitKey unitKey : planetUnits.keySet()) {
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 if (unitModel == null) {
+                    continue;
+                }
+                if (DisableService.losesPdsAbilities(game, tile, player, unitModel)) {
                     continue;
                 }
                 if (unitModel.getPlanetaryShield()) {
