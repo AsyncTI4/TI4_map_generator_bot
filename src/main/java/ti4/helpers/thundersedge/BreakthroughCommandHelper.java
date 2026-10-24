@@ -336,6 +336,7 @@ public final class BreakthroughCommandHelper {
             message = "You can roll for other breakthroughs first and then spawn The Fracture with _Styx and Stones_.";
         }
         MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, rollFracture);
+        FractureService.markRollPending(player.getGame(), player);
     }
 
     public static void lockBreakthroughs(Player player, List<String> btIDs) {
