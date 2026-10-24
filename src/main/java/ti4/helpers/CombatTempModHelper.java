@@ -29,6 +29,21 @@ public class CombatTempModHelper {
         player.clearNewTempCombatModifiers();
     }
 
+    public static void activateQueuedOpponentMods(Player modOwner, TileModel tile, UnitHolder holder) {
+        List<TemporaryCombatModifierModel> queued = modOwner.getNewTempCombatModifiers().stream()
+                .filter(mod -> mod.getUseInTurn() == modOwner.getNumberOfTurns())
+                .filter(mod -> mod.getModifier().getApplyToOpponent())
+                .filter(mod -> Constants.MOD_TEMP_ONE_TACTICAL_ACTION.equals(
+                        mod.getModifier().getPersistenceType()))
+                .toList();
+        for (TemporaryCombatModifierModel mod : queued) {
+            modOwner.getNewTempCombatModifiers().remove(mod);
+            mod.setUseInSystem(tile.getId());
+            mod.setUseInUnitHolder(holder.getName());
+            modOwner.addTempCombatMod(mod);
+        }
+    }
+
     public static void ensureValidTempMods(Player player, TileModel tile, UnitHolder holder) {
         List<TemporaryCombatModifierModel> tempMods = new ArrayList<>(player.getTempCombatModifiers());
 

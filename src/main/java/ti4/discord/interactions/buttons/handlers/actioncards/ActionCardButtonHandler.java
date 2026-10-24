@@ -159,7 +159,7 @@ class ActionCardButtonHandler {
             if (game.getGameStats().markLatestPlayCanceled(acName)) {
                 SabotageService.undoEffectsOfCanceledCard(game, targetPlayer, acName);
                 if (acName.contains("Rider") || acName.contains("Sanction")) {
-                    AgendaRiderHelper.reverseRider("reverse_" + acName, game, player);
+                    AgendaRiderHelper.reverseRider("reverse_" + acName, game, player, targetPlayer);
                 }
                 if ("Veto".equals(acName) && targetPlayer != null) {
                     AgendaWhensAftersHelper.resumeWhenQueueAfterCanceledVeto(event, game, targetPlayer);
