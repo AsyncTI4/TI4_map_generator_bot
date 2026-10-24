@@ -57,6 +57,21 @@ class SlayIntentTest extends BaseTi4Test {
         assertThat(SlayIntent.huntsOthers(test.game, test.nekro, test.sol)).isFalse();
     }
 
+    // Self-play: a projection that blinked empty and back within the round made seats repeat the same line. The
+    // declaration stands for the round, so only a different set of targets is announced again.
+    @Test
+    void aProjectionThatBlinksDoesNotRepeatTheLine() {
+        assertThat(SlayIntent.announce(test.context())).isPresent();
+        test.game.setSCPlayed(LEADERSHIP, true);
+
+        assertThat(SlayIntent.announce(test.context())).isEmpty();
+        assertThat(SlayIntent.targetsOf(test.game, test.nekro)).containsExactly("sol");
+
+        test.game.setSCPlayed(LEADERSHIP, false);
+
+        assertThat(SlayIntent.announce(test.context())).isEmpty();
+    }
+
     // Intent is per round: last round's declaration no longer counts.
     @Test
     void aDeclarationLapsesWithTheRound() {

@@ -28,9 +28,8 @@ public class SlayIntent {
         if (game.isFowMode()) return Optional.empty();
         List<Player> winners = WinRace.winnersBefore(game, seat);
         String targets = winners.stream().map(Player::getFaction).sorted().collect(Collectors.joining(SEPARATOR));
-        if (targets.equals(declared(game, seat))) return Optional.empty();
+        if (winners.isEmpty() || targets.equals(declared(game, seat))) return Optional.empty();
         DECLARED.put(key(game, seat), game.getRound() + ROUND + targets);
-        if (winners.isEmpty()) return Optional.empty();
         return Optional.of(new AiDecision.Announce(message(seat, winners)));
     }
 
