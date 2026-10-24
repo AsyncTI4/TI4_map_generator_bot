@@ -209,8 +209,8 @@ public class ScorePublicObjectiveService {
                     && (poName.toLowerCase().contains("amass wealth")
                             || poName.toLowerCase().contains("hold vast reserves"))) {
                 message2 +=
-                        "\n-# NB: Xxekir Grom , the Xxcha hero, will allow you to use the combined values of each planet for"
-                                + " __either__ the resource or influence requirement of this objective, but __not__ both.";
+                        "\n-# NB: Xxekir Grom, the Xxcha hero, treats the combined value of each planet you exhaust as"
+                                + " __both__ its resources and its influence, so one planet can count toward the resource and the influence requirement of this objective.";
             }
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
             List<Integer> unfollowedSCs = player.getUnfollowedSCs();

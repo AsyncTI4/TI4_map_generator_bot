@@ -459,8 +459,19 @@ The outcome of the standard Trade deal: the Trade holder washes a Player's Commo
 _Avoid_: Wash tax
 
 **Plastic**:
-Military strength measured in physical unit pieces; fighters and infantry may be stood in for by tokens, but every such stand-in needs at least one plastic piece, and each color has only so many.
+Ships and ground forces, i.e. military strength measured in physical unit pieces; fighters and infantry may be stood in for by tokens, but every such stand-in needs at least one plastic piece, and each color has only so many.
 _Avoid_: Fleet size, army size
+
+**Tokens / tokes**:
+Command tokens, as in "I'm out of tokens" or "spend a toke".
+_Avoid_: Counters
+
+**TGs / money**:
+Trade goods.
+_Avoid_: Coins, gold
+
+**Comms**:
+Commodities.
 
 **Guac**:
 Victory points gained outside public and secret objectives, such as Support for the Throne.

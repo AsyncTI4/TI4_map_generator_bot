@@ -112,6 +112,7 @@ import ti4.model.RelicModel;
 import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
+import ti4.service.actioncard.DisableService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -728,6 +729,9 @@ public class CombatRollService {
         // Check for temp mods
         CombatTempModHelper.ensureValidTempMods(player, tileModel, combatOnHolder);
         CombatTempModHelper.initializeNewTempMods(player, tileModel, combatOnHolder);
+        if (opponent != player) {
+            CombatTempModHelper.activateQueuedOpponentMods(opponent, tileModel, combatOnHolder);
+        }
         List<NamedCombatModifierModel> tempMods =
                 new ArrayList<>(CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
                         player, tileModel, combatOnHolder, false, rollType));
@@ -1292,7 +1296,12 @@ public class CombatRollService {
                         if (!bombardPlanet.isEmpty()
                                 && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(bombardPlanet))) {
                             if (p2.isRealPlayer()) {
-                                List<Button> targetButtons = new ArrayList<>(buttons);
+                                List<Button> targetButtons = new ArrayList<>();
+                                targetButtons.add(Buttons.green(
+                                        p2.factionButtonChecker()
+                                                + AutoAssignGroundHitsButtonIds.format(bombardPlanet, h),
+                                        "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                                targetButtons.addAll(buttons);
                                 BlueReverieTechHelper.registerStasisFieldGeneratorsUnitAbilityHits(
                                         game, player, p2, tile, rollType, h);
                                 List<Button> stingOfTheHiveButtons =
@@ -2917,6 +2926,22 @@ public class CombatRollService {
     }
 
     public static Map<Pair<UnitModel, UnitHolder>, Integer> getUnitsInCombatByHolder(
+            Tile tile,
+            UnitHolder unitHolder,
+            Player player,
+            GenericInteractionCreateEvent event,
+            CombatRollType roleType,
+            Game game) {
+        Map<Pair<UnitModel, UnitHolder>, Integer> units =
+                unitsBeforeDisable(tile, unitHolder, player, event, roleType, game);
+        if (roleType == CombatRollType.SpaceCannonOffence || roleType == CombatRollType.SpaceCannonDefence) {
+            units = new HashMap<>(units);
+            units.keySet().removeIf(entry -> DisableService.losesPdsAbilities(game, tile, player, entry.getLeft()));
+        }
+        return units;
+    }
+
+    private static Map<Pair<UnitModel, UnitHolder>, Integer> unitsBeforeDisable(
             Tile tile,
             UnitHolder unitHolder,
             Player player,

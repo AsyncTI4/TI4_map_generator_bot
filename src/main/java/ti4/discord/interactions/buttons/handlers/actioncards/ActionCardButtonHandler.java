@@ -11,6 +11,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaRiderHelper;
+import ti4.helpers.AgendaWhensAftersHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
@@ -92,6 +93,14 @@ class ActionCardButtonHandler {
             return;
         }
 
+        if ("ac".equalsIgnoreCase(type) && SabotageService.wasWindowCanceled(game, event.getMessageId())) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentation() + ", _" + acName
+                            + "_ has already been canceled. Your _Sabotage_ was not played.");
+            return;
+        }
+
         String message = game.getPing() + ", the action card _" + acName + "_ played by " + target
                 + " has been canceled by " + player.getRepresentationUnfogged() + " with ";
         GameMessageManager.remove(game.getName(), event.getMessageId());
@@ -157,6 +166,7 @@ class ActionCardButtonHandler {
             }
             if (hasSabo) {
                 ActionCardHelper.playAC(event, game, player, saboID, game.getActionsChannel());
+                SabotageService.rememberCanceledWindow(game, event.getMessageId());
             } else {
                 message = "Tried to play a _Sabotage_ but found none in hand.";
                 sendReact = false;
@@ -167,12 +177,17 @@ class ActionCardButtonHandler {
             }
         }
 
-        if (acName.contains("Rider") || acName.contains("Sanction")) {
-            AgendaRiderHelper.reverseRider("reverse_" + acName, game, player);
-        }
         if (sendReact) {
-            game.getGameStats().markLatestPlayCanceled(acName);
             recordCanceled(game, player, targetPlayer, acName, type);
+            if (game.getGameStats().markLatestPlayCanceled(acName)) {
+                SabotageService.undoEffectsOfCanceledCard(game, targetPlayer, acName);
+                if (acName.contains("Rider") || acName.contains("Sanction")) {
+                    AgendaRiderHelper.reverseRider("reverse_" + acName, game, player, targetPlayer);
+                }
+                if ("Veto".equals(acName) && targetPlayer != null) {
+                    AgendaWhensAftersHelper.resumeWhenQueueAfterCanceledVeto(event, game, targetPlayer);
+                }
+            }
             if ("Relitigate".equals(acName) && targetPlayer != null) {
                 RelitigateLLButtonHandler.onRelitigateSabotaged(game, targetPlayer);
             }

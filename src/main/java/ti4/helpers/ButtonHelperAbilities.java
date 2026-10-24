@@ -2650,6 +2650,13 @@ public final class ButtonHelperAbilities {
 
     @ButtonHandler("munitionsReserves")
     public static void munitionsReserves(ButtonInteractionEvent event, Game game, Player player) {
+        if (player.getFaction().equalsIgnoreCase(game.getStoredValue("munitionsReserves"))) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentation()
+                            + ", **Munitions Reserves** is already active for your next roll, so no trade goods were spent.");
+            return;
+        }
         if (player.getTg() < 2) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),

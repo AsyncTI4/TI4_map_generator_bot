@@ -975,7 +975,6 @@
         "phase": "Action",
         "window": "When a player researches a technology",
         "text": "That player ignores a number of prerequisites equal to the number of different types of relic fragments you own.",
-        "notes" : "Nekro can use this card.",
         "flavorText": "\"I don't feel any different,\" Dart said, his eyes blazing with the fire of a thousand dying worlds. \"What do you mean 'oh god your eyes'?\"",
         "source": "action_deck_2"
     },
