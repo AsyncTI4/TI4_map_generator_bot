@@ -269,16 +269,18 @@ class DeleteButtonsButtonHandler {
                 // Only tactical-action builds belong to the tactical draft; the draft is game-global, so an
                 // unscoped stage would swallow other players' warfare/construction builds into the active
                 // player's tactical action.
-                if (buttonID.contains("tacticalAction")) {
-                    GameSubEvent.Production produced =
-                            new GameSubEvent.Production(tile == null ? null : tile.getPosition(), unitsMap, cost);
-                    if (!GameEventDraft.stage(game, produced)) {
+                boolean tacticalBuild = buttonID.contains("tacticalAction");
+                if (tacticalBuild || !unitsMap.isEmpty()) {
+                    GameSubEvent.Production produced = new GameSubEvent.Production(
+                            tile == null ? null : tile.getPosition(), unitsMap, cost, buttonID);
+                    if (!tacticalBuild || !GameEventDraft.stage(game, produced)) {
                         Map<String, Object> payload = new HashMap<>();
                         if (produced.tile() != null) {
                             payload.put("tile", produced.tile());
                         }
                         payload.put("units", produced.units());
                         payload.put("cost", produced.cost());
+                        payload.put("source", produced.source());
                         GameEventService.commit(game, GameEventType.PRODUCTION, player, payload);
                     }
                 }

@@ -90,6 +90,7 @@ import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
 import ti4.spring.service.gameevent.GameSubEvent;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 @UtilityClass
 public class PlayerTechService {
@@ -292,6 +293,9 @@ public class PlayerTechService {
         }
 
         player.exhaustTech(tech);
+        if (isComponentActionTech(game, player, techModel)) {
+            TurnActionLog.recordComponent(game, "tech");
+        }
         if (!GameEventDraft.stage(game, new GameSubEvent.TechExhausted(player.getFaction(), tech))) {
             GameEventService.commit(game, GameEventType.CARD_PLAY_TECH_EXHAUST, player, Map.of("cardId", tech));
         }
@@ -767,6 +771,12 @@ public class PlayerTechService {
         return buttons;
     }
 
+    private static boolean isComponentActionTech(Game game, Player player, TechnologyModel techModel) {
+        return "action".equalsIgnoreCase(game.getPhaseOfGame())
+                && player.isActivePlayer()
+                && techModel.getText().contains("ACTION");
+    }
+
     public static void checkAndApplyCombatMods(GenericInteractionCreateEvent event, Player player, String techID) {
         TemporaryCombatModifierModel possibleCombatMod =
                 CombatTempModHelper.getPossibleTempModifier(Constants.TECH, techID, player.getNumberOfTurns());
@@ -869,8 +879,22 @@ public class PlayerTechService {
                     player.getCorrectChannel(),
                     player.getRepresentation() + " gained a technology, and so has readied _Daxcive Animators_.");
         }
+        String researchSource = shareKnowledge
+                ? "SHARE_KNOWLEDGE"
+                : dwsBreakthrough ? "BREAKTHROUGH" : !isResearch ? "COMPONENT" : "RESEARCH";
         GameEventService.commit(
-                game, GameEventType.TECH_RESEARCHED, player, Map.of("techId", techID, "paymentType", paymentType));
+                game,
+                GameEventType.TECH_RESEARCHED,
+                player,
+                Map.of(
+                        "techId",
+                        techID,
+                        "paymentType",
+                        paymentType,
+                        "paymentRequired",
+                        paymentRequired,
+                        "source",
+                        researchSource));
         if (buttonIDComponents.contains("scrollOfAscension")) {
             ArcanumPromissoryHandler.offerScrollOwnerTechGain(game, player, techID);
         }

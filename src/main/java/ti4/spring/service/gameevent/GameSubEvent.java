@@ -21,22 +21,38 @@ import java.util.Map;
     @JsonSubTypes.Type(value = GameSubEvent.ObjectiveScored.class, name = "OBJECTIVE_SCORED"),
     @JsonSubTypes.Type(value = GameSubEvent.Production.class, name = "PRODUCTION"),
     @JsonSubTypes.Type(value = GameSubEvent.Retreat.class, name = "RETREAT"),
-    @JsonSubTypes.Type(value = GameSubEvent.ManualCommand.class, name = "MANUAL_COMMAND")
+    @JsonSubTypes.Type(value = GameSubEvent.ManualCommand.class, name = "MANUAL_COMMAND"),
+    @JsonSubTypes.Type(value = GameSubEvent.CombatRoll.class, name = "COMBAT_ROLL"),
+    @JsonSubTypes.Type(value = GameSubEvent.CombatOutcome.class, name = "COMBAT_OUTCOME"),
+    @JsonSubTypes.Type(value = GameSubEvent.InvasionCommitted.class, name = "INVASION_COMMITTED"),
+    @JsonSubTypes.Type(value = GameSubEvent.CardCanceled.class, name = "CARD_CANCELED")
 })
 public sealed interface GameSubEvent {
     record Combat(String kind, String tile, String planet, String vsFaction) implements GameSubEvent {}
 
-    record ControlEstablished(String planet) implements GameSubEvent {}
+    record ControlEstablished(String planet, String faction, String previousOwner) implements GameSubEvent {
+        public ControlEstablished(String planet) {
+            this(planet, null, null);
+        }
+    }
 
     record ActionCardPlayed(String faction, String cardId, String cardName) implements GameSubEvent {}
 
-    record LeaderPlayed(String faction, String leaderType, String leaderId) implements GameSubEvent {}
+    record LeaderPlayed(String faction, String leaderType, String leaderId, String target) implements GameSubEvent {
+        public LeaderPlayed(String faction, String leaderType, String leaderId) {
+            this(faction, leaderType, leaderId, null);
+        }
+    }
 
     record TechExhausted(String faction, String techId) implements GameSubEvent {}
 
     record ObjectiveScored(String faction, String objectiveId, String category) implements GameSubEvent {}
 
-    record Production(String tile, Map<String, Integer> units, Integer cost) implements GameSubEvent {}
+    record Production(String tile, Map<String, Integer> units, Integer cost, String source) implements GameSubEvent {
+        public Production(String tile, Map<String, Integer> units, Integer cost) {
+            this(tile, units, cost, null);
+        }
+    }
 
     record Retreat(
             String faction,
@@ -48,4 +64,24 @@ public sealed interface GameSubEvent {
             implements GameSubEvent {}
 
     record ManualCommand(String user, String command) implements GameSubEvent {}
+
+    record CombatRoll(
+            String kind,
+            String tile,
+            String planet,
+            String faction,
+            String vsFaction,
+            int hits,
+            int expectedHitsTimes10,
+            Map<String, Integer> units)
+            implements GameSubEvent {}
+
+    record CombatOutcome(
+            String kind, String tile, String planet, String winner, Map<String, Map<String, Integer>> survivors)
+            implements GameSubEvent {}
+
+    record InvasionCommitted(String faction, String tile, Map<String, Map<String, Integer>> groundForces)
+            implements GameSubEvent {}
+
+    record CardCanceled(String faction, String cardName, String canceledBy, String method) implements GameSubEvent {}
 }

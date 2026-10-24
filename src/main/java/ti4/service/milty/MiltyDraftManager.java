@@ -364,6 +364,8 @@ public class MiltyDraftManager {
             return false;
         }
 
+        MiltyDraftEventRecorder.recordPick(game, player, category, item, pickSource(auto, force, queue));
+
         // Send success message
         String middle = " drafted ";
         if (auto) middle = " only had one option available to draft, so they were given ";
@@ -439,6 +441,13 @@ public class MiltyDraftManager {
             game.updateActivePlayer(null);
         }
         return mapChanged;
+    }
+
+    private static String pickSource(boolean auto, boolean force, boolean queue) {
+        if (auto) return "AUTO";
+        if (force) return "FORCE";
+        if (queue) return "QUEUE";
+        return "BUTTON";
     }
 
     private String getQueuedPick(Player player, Game game) {

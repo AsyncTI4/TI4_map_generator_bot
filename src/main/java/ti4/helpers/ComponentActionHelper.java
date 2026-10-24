@@ -76,6 +76,7 @@ import ti4.service.unit.DestroyUnitService;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 @UtilityClass
 public class ComponentActionHelper {
@@ -669,6 +670,7 @@ public class ComponentActionHelper {
 
         String firstPart = buttonID.substring(0, buttonID.indexOf('_'));
         buttonID = buttonID.replace(firstPart + "_", "");
+        TurnActionLog.recordComponent(game, firstPart);
 
         switch (firstPart) {
             case "tech" -> {

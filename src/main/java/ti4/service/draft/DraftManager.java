@@ -90,6 +90,7 @@ public class DraftManager extends DraftPlayerManager {
     public void resetForNewDraft() {
         orchestrator = null;
         draftables.clear();
+        DraftEventRecorder.reset(game);
         super.resetForNewDraft();
     }
 
@@ -140,6 +141,7 @@ public class DraftManager extends DraftPlayerManager {
                         if (DraftButtonService.isError(status)) {
                             return status;
                         }
+                        DraftEventRecorder.recordPick(this, player, d, choice, commandSource);
                         // Side effects, if any
                         d.postApplyDraftPick(event, this, player.getUserID(), choice);
 
@@ -177,6 +179,7 @@ public class DraftManager extends DraftPlayerManager {
             return;
         }
 
+        DraftEventRecorder.recordStarted(this);
         orchestrator.sendDraftButtons(this);
     }
 
@@ -240,6 +243,7 @@ public class DraftManager extends DraftPlayerManager {
                     event.getMessageChannel(), "WARNING: Forcing the draft to end despite: " + blockingReason);
         }
 
+        DraftEventRecorder.recordEnded(this);
         // Clear active player
         game.updateActivePlayer(null);
 

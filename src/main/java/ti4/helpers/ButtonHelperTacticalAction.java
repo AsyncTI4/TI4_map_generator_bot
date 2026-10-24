@@ -100,6 +100,7 @@ import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.breakthrough.VoidTetherService;
+import ti4.service.combat.CombatEventRecorder;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -122,6 +123,7 @@ import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
 import ti4.spring.service.gameevent.GameSubEvent;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 public final class ButtonHelperTacticalAction {
 
@@ -760,11 +762,12 @@ public final class ButtonHelperTacticalAction {
         addIfNotEmpty(payload, "planetsTaken", game.getStoredValue("planetsTakenThisRound"));
         addIfNotEmpty(payload, "combat", game.getStoredValue("factionsInCombat"));
         addIfNotEmpty(payload, "summary", game.getStoredValue("currentActionSummary" + player.getFaction()));
-        List<GameSubEvent> subEvents = GameEventDraft.drain(game);
+        List<GameSubEvent> subEvents = CombatEventRecorder.withOutcomes(game, player, GameEventDraft.drain(game));
         if (!subEvents.isEmpty()) {
             payload.put("subEvents", GameEventDraft.toJsonNode(subEvents));
         }
         String movementState = GameEventDraft.drainMovement(game);
+        TurnActionLog.record(game, TurnActionLog.TACTICAL);
         GameEventService.commit(game, GameEventType.TACTICAL_ACTION, player, payload, movementState);
     }
 

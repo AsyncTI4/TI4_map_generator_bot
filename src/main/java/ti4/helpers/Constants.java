@@ -173,6 +173,7 @@ public final class Constants {
     public static final String BUTTON_PRESS_COUNT = "button_press_count";
     public static final String EVENT_SEQUENCE_COUNTER = "event_sequence_counter";
     public static final String PENDING_SUB_EVENTS_JSON = "pending_sub_events_json";
+    public static final String LAST_PLAYER_STATE_JSON = "last_player_state_json";
     public static final String PENDING_MOVEMENT_STATE = "pending_movement_state";
     public static final String JUST_UNITS = "just_units";
     public static final String THUNDERSEDGE = "thundersedge";

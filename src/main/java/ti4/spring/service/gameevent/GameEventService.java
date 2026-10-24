@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.game.Game;
@@ -37,7 +38,7 @@ public class GameEventService {
             Map<String, Object> payload,
             @Nullable String movementState) {
         try {
-            if (DatabasePersistenceGate.isDisabled()) return;
+            if (DatabasePersistenceGate.isDisabled() || !SpringContext.isInitialized()) return;
             getBean().commitEvent(game, archetype, player, payload, movementState);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to commit game event.", e);
@@ -58,13 +59,12 @@ public class GameEventService {
         String faction = player == null ? null : player.getFaction();
         String serializedPayload = JsonMapperManager.basic().writeValueAsString(payload);
         String serializedMapState = CompactMapState.serialize(game);
-        String previousMapState = gameEventRepository
-                .findFirstByGameNameAndSeqLessThanEqualAndMapStateIsNotNullOrderBySeqDesc(game.getName(), counter)
-                .map(GameEventEntity::getMapState)
-                .orElse(null);
+        String previousMapState =
+                firstOrNull(gameEventRepository.findLatestMapStates(game.getName(), counter, PageRequest.of(0, 1)));
         if (serializedMapState.equals(previousMapState)) {
             serializedMapState = null;
         }
+        CompactPlayerState.Snapshot playerState = CompactPlayerState.snapshot(game);
         var record = new GameEventEntity(
                 null,
                 game.getName(),
@@ -76,9 +76,15 @@ public class GameEventService {
                 System.currentTimeMillis(),
                 serializedPayload,
                 serializedMapState,
-                movementState);
+                movementState,
+                playerState.delta());
         gameEventRepository.save(record);
         game.setEventSequenceCounter(seq);
+        game.setLastPlayerStateJson(playerState.full());
+    }
+
+    private static String firstOrNull(List<String> values) {
+        return values.isEmpty() ? null : values.getFirst();
     }
 
     public List<GameEventDto> getEvents(Game game) {
@@ -93,7 +99,8 @@ public class GameEventService {
                         event.getTimestampEpochMillis(),
                         JsonMapperManager.basic().readTree(event.getPayload()),
                         event.getMapState(),
-                        event.getMovementState()))
+                        event.getMovementState(),
+                        event.getPlayerState()))
                 .toList();
     }
 
@@ -124,6 +131,9 @@ public class GameEventService {
             }
             if (includeMapState && event.getMapState() != null) {
                 text.append("\n  mapState: ").append(event.getMapState());
+            }
+            if (includeMapState && event.getPlayerState() != null) {
+                text.append("\n  playerState: ").append(event.getPlayerState());
             }
             text.append("\n");
         }
