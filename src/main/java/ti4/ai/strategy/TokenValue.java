@@ -20,4 +20,15 @@ class TokenValue {
         }
         return value;
     }
+
+    static double plannedActions(PlanInputs in, int gained) {
+        int usable = Math.min(gained, in.reinforcements());
+        int start = Math.max(0, in.seat().getTacticalCC());
+        List<TacticalPlan> ranked = in.ranked();
+        double value = 0;
+        for (int index = start; index < Math.min(ranked.size(), start + usable); index++) {
+            value += Math.max(0, ranked.get(index).score()) * CardValueScale.TOKEN_ACTION_SHARE;
+        }
+        return value;
+    }
 }

@@ -2,6 +2,7 @@ package ti4.ai.strategy;
 
 import java.util.HashSet;
 import java.util.Set;
+import ti4.ai.actioncards.ActionCardRules;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.tactical.TacticalPlan;
@@ -16,7 +17,8 @@ public record TokenPlan(int strategy, int tactic) {
 
     public static TokenPlan of(Game game, Player seat) {
         try (Thinking.Span ignored = Thinking.enter("strategy.tokenPlan")) {
-            return new TokenPlan(expectedFollows(game, seat), expectedActivations(game, seat));
+            return new TokenPlan(
+                    expectedFollows(game, seat) + strategizeTokens(game, seat), expectedActivations(game, seat));
         }
     }
 
@@ -30,6 +32,10 @@ public record TokenPlan(int strategy, int tactic) {
             }
         }
         return follows;
+    }
+
+    static int strategizeTokens(Game game, Player seat) {
+        return ActionCardRules.strategizeSecondaryWorthAToken(game, seat) ? 1 : 0;
     }
 
     static int expectedActivations(Game game, Player seat) {

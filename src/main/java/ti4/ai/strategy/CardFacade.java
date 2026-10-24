@@ -18,6 +18,10 @@ public class CardFacade {
         return Math.max(CardValueScale.TOKEN_FLOOR, plan);
     }
 
+    public static Optional<Double> stalledLeadershipValue(Game game, Player seat) {
+        return LeadershipStall.value(game, seat);
+    }
+
     public static double strategyToken() {
         return CardValueScale.STRATEGY_TOKEN;
     }

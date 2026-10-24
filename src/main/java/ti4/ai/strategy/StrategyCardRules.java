@@ -974,6 +974,19 @@ public class StrategyCardRules {
         return Optional.of(AiDecision.press(card, button.get(), "follow Leadership to buy command tokens"));
     }
 
+    public static Optional<AiDecision> startLeadershipSecondary(
+            AiTurnContext context, AiPrompt prompt, boolean strategyTokenSpent) {
+        Optional<PromptButton> button = prompt.enabledHandler(LEADERSHIP_BUTTON);
+        if (button.isEmpty() || context.alreadyPressed(prompt, button.get())) return Optional.empty();
+        Optional<TokenPurchase.Purchase> purchase =
+                TokenPurchase.best(context.game(), context.seat(), reinforcements(context));
+        if (purchase.isEmpty()) return Optional.empty();
+        requestTokens(context, strategyTokenSpent ? 1 : 0, purchase.get().tokens());
+        PaymentRules.expect(context, "Leadership", purchase.get().payment(), PaymentRules.LEADERSHIP_DONE);
+        return Optional.of(AiDecision.press(
+                prompt, button.get(), "perform the secondary of leadership with Strategize to buy command tokens"));
+    }
+
     private static Optional<AiDecision> politics(AiTurnContext context, Optional<AiPrompt> card) {
         if (!CardMessages.done(context, "speaker")) {
             Optional<AiPrompt> speakerPrompt = Prompts.thisTurn(context).stream()

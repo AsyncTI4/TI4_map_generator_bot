@@ -3,6 +3,7 @@ package ti4.ai.strategy;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.ai.actioncards.ActionCardRules;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.scoring.Pooling;
@@ -52,13 +53,19 @@ public class TokenPurchase {
         Wallet influencePlanets = new Wallet(
                 influenceLeaning(wallet), wallet.tradeGoods(), 0, 0, wallet.tradeGoodValue(), wallet.pooling());
         SpendCost keep = ScoringReserve.of(game, seat).plus(custodiansReserve(game, seat));
-        for (int tokens = Math.min(MAX_TOKENS, reinforcements); tokens > 0; tokens--) {
+        for (int tokens = Math.min(maxTokens(game, seat), reinforcements); tokens > 0; tokens--) {
             Optional<Wallet.Payment> payment = influencePlanets
                     .plan(SpendCost.influence(INFLUENCE_PER_TOKEN * tokens))
                     .filter(plan -> wallet.without(plan).canPay(keep));
             if (payment.isPresent()) return Optional.of(new Purchase(tokens, payment.get()));
         }
         return Optional.empty();
+    }
+
+    private static int maxTokens(Game game, Player seat) {
+        boolean strategizeLacksAToken =
+                ActionCardRules.holdsPlayableStrategize(game, seat) && seat.getStrategicCC() < 1;
+        return strategizeLacksAToken ? MAX_TOKENS + 1 : MAX_TOKENS;
     }
 
     private static List<Wallet.PlanetValue> influenceLeaning(Wallet wallet) {

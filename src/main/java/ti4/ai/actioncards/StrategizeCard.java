@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.CardPlay.Stage;
 import ti4.ai.brain.AiDecision;
@@ -21,6 +22,7 @@ class StrategizeCard {
 
     static final String STRATEGIZE = "strategize1";
     private static final String COPY_PREFIX = "strategize";
+    private static final String STRATEGY_TOKEN_SPENT = "+";
     private static final List<String> SECONDARY_BUTTONS = List.of(
             "non_sc_draw_so",
             "diploRefresh2",
@@ -29,13 +31,14 @@ class StrategizeCard {
             "construction_pds",
             "sc_refresh",
             "warfareBuild",
-            "warfareTeBuild");
+            "warfareTeBuild",
+            "leadershipGenerateCCButtons");
 
     static AiCard strategize() {
         return AiActionCards.componentOfCopies(
                 STRATEGIZE,
                 alias -> alias.startsWith(COPY_PREFIX),
-                StrategizeCard::plan,
+                Evaluator.atMoment(StrategizeCard::plan),
                 "strategize",
                 SECONDARY_BUTTONS,
                 StrategizeCard::step);
@@ -43,8 +46,39 @@ class StrategizeCard {
 
     private record Secondary(StrategyCard card, double value) {}
 
-    static Optional<Plan> plan(Game game, Player seat) {
-        if (game.isFowMode() || seat.getStrategicCC() < 1) return Optional.empty();
+    static boolean playable(Game game, Player seat) {
+        return held(seat) && !game.isFowMode() && ActionCardRules.mayPlayNow(game, seat);
+    }
+
+    static boolean secondaryWorthAToken(Game game, Player seat) {
+        return playable(game, seat)
+                && ranked(game, seat).stream()
+                        .findFirst()
+                        .filter(best -> best.value() > CardFacade.strategyToken())
+                        .isPresent();
+    }
+
+    private static boolean held(Player seat) {
+        return seat.getActionCards().keySet().stream().anyMatch(alias -> alias.startsWith(COPY_PREFIX));
+    }
+
+    static Optional<Plan> plan(Game game, Player seat, PlayMoment moment) {
+        if (game.isFowMode()) return Optional.empty();
+        Optional<Plan> ordinary = ordinaryPlan(game, seat);
+        Optional<Plan> stalled = moment == PlayMoment.BEFORE_PASSING ? stalledPlan(game, seat) : Optional.empty();
+        return Stream.of(ordinary, stalled).flatMap(Optional::stream).max(Comparator.comparingDouble(Plan::value));
+    }
+
+    private static Optional<Plan> stalledPlan(Game game, Player seat) {
+        return CardFacade.stalledLeadershipValue(game, seat)
+                .map(value -> Plan.aimedAt(
+                        value,
+                        StrategyCard.LEADERSHIP.name() + (seat.getStrategicCC() > 0 ? STRATEGY_TOKEN_SPENT : ""),
+                        "to perform the secondary of leadership."));
+    }
+
+    private static Optional<Plan> ordinaryPlan(Game game, Player seat) {
+        if (seat.getStrategicCC() < 1) return Optional.empty();
         List<Secondary> ranked = ranked(game, seat);
         if (ranked.isEmpty()) return Optional.empty();
         Secondary best = ranked.getFirst();
@@ -87,6 +121,11 @@ class StrategizeCard {
                     || !Prompts.mentions(prompt, seat)) {
                 continue;
             }
+            Optional<AiDecision> leadership = leadershipStep(context, prompt, play.extra());
+            if (leadership.isPresent()) {
+                PlayMemory.moveTo(context, key, play, Stage.DONE);
+                return leadership;
+            }
             for (StrategyCard card : order) {
                 Optional<AiDecision> decision = StrategyCardRules.startSecondary(context, prompt, card);
                 if (decision.isPresent()) {
@@ -96,6 +135,11 @@ class StrategizeCard {
             }
         }
         return Optional.empty();
+    }
+
+    private static Optional<AiDecision> leadershipStep(AiTurnContext context, AiPrompt prompt, String planned) {
+        if (!planned.startsWith(StrategyCard.LEADERSHIP.name())) return Optional.empty();
+        return StrategyCardRules.startLeadershipSecondary(context, prompt, planned.endsWith(STRATEGY_TOKEN_SPENT));
     }
 
     private static List<StrategyCard> order(Game game, Player seat, String planned) {
