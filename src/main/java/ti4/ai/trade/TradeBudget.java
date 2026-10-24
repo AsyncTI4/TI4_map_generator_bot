@@ -8,6 +8,7 @@ import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.strategy.OpeningHold;
+import ti4.ai.strategy.TechnologyFollowReserve;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -58,7 +59,8 @@ class TradeBudget {
         SpendCost reserve = ScoringReserve.reserved(game, seat)
                 .map(ScoringReserve.Reserved::cost)
                 .orElse(SpendCost.NONE)
-                .plus(OpeningHold.gravityDriveReserve(game, seat));
+                .plus(OpeningHold.gravityDriveReserve(game, seat))
+                .plus(TechnologyFollowReserve.of(game, seat));
         if (reserve.isNone()) return 0;
         return Wallet.of(game, seat)
                 .plan(reserve)
