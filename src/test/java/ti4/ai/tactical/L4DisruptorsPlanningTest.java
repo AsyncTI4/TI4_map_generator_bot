@@ -43,7 +43,7 @@ class L4DisruptorsPlanningTest extends BaseTi4Test {
                 board.sardakk,
                 List.of(board.home),
                 moves,
-                new StrikeRules(false, 0.5, true, true, false));
+                new StrikeRules(false, 0.5, true, false));
         return StrikeEvaluator.estimate(board.test.game, board.test.nekro, strike);
     }
 

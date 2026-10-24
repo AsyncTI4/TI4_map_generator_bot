@@ -1497,12 +1497,7 @@ public class TacticalPlanner {
         double threat = context.defense().standings().winThreat(opponent);
         boolean conquering = tile.isHomeSystem(game) && wantsToConquer(game, context.seat);
         double minWin = threat >= DESPERATE_THREAT ? DESPERATE_MIN_WIN : MIN_WIN;
-        boolean structures = conquering
-                || tile == opponent.getHomeSystemTile()
-                || threat >= DESPERATE_THREAT
-                || IconStake.marks(game, context.seat, tile)
-                || TraitRaid.allowsStructures(context, tile, opponent);
-        return new StrikeRules(conquering, minWin, structures, homeLandings, context.canPayCustodians());
+        return new StrikeRules(conquering, minWin, homeLandings, context.canPayCustodians());
     }
 
     private static Optional<List<UnitMove>> executedMoves(

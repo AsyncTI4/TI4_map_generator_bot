@@ -18,6 +18,7 @@ import ti4.game.Planet;
 import ti4.game.Tile;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.image.PositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Bombardment comes before ground forces are committed: the bot offers "Roll BOMBARDMENT" next to the landing
@@ -82,6 +83,26 @@ class BombardmentRulesTest extends BaseTi4Test {
 
         assertThat(pressedId(TacticalRules.continueAction(test.context(landing)).orElseThrow()))
                 .isNotEqualTo("combatRoll_" + target + "_space_bombardment");
+    }
+
+    // The shield on one planet does not stop the bombardment of another planet in the same system (planetary shield
+    // note I).
+    @Test
+    void bombardsTheUnshieldedPlanetOfASystemWithAShieldedOne() {
+        String twoPlanets = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+                .filter(position -> !"x".equals(position) && !position.equals(target))
+                .findFirst()
+                .orElseThrow();
+        Tile system = test.place("27", twoPlanets);
+        test.sol.addPlanet("newalbion");
+        test.sol.addPlanet("starpoint");
+        test.units(system, "starpoint", test.sol, UnitType.Pds, 1);
+        test.units(system, "starpoint", test.sol, UnitType.Infantry, 1);
+        test.units(system, "newalbion", test.sol, UnitType.Infantry, 1);
+
+        assertThat(BombardmentRules.target(test.game, test.nekro, system, Map.of(UnitType.Dreadnought, 1)))
+                .map(BombardmentRules.Target::planet)
+                .contains("newalbion");
     }
 
     // Arc Secundus, the Letnev flagship, takes the Planetary Shield away from the other players' units in its system.

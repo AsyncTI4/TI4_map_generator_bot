@@ -46,8 +46,8 @@ class StrikeEvaluatorTest extends BaseTi4Test {
         board.test.units(tile, holder, player, type, count);
     }
 
-    private static StrikeRules rules(boolean structures, boolean homeLandings, boolean custodians) {
-        return new StrikeRules(false, 0.5, structures, homeLandings, custodians);
+    private static StrikeRules rules(boolean homeLandings, boolean custodians) {
+        return new StrikeRules(false, 0.5, homeLandings, custodians);
     }
 
     private StrikeEstimate estimate(StrikeRules rules, Object... fleet) {
@@ -68,7 +68,7 @@ class StrikeEvaluatorTest extends BaseTi4Test {
     void anUndefendedPlanetWithAPdsGetsMoreThanOneLander() {
         owns(sardakk(), target, "lodor", UnitType.Pds, 1);
 
-        StrikeEstimate estimate = estimate(rules(true, true, false), UnitType.Carrier, 2, UnitType.Infantry, 4);
+        StrikeEstimate estimate = estimate(rules(true, false), UnitType.Carrier, 2, UnitType.Infantry, 4);
 
         assertThat(estimate.groundSent().get("lodor")).isGreaterThanOrEqualTo(2);
         assertThat(estimate.landings()).containsKey("lodor");
@@ -80,34 +80,126 @@ class StrikeEvaluatorTest extends BaseTi4Test {
     @Test
     void aPdsOnTheDefendedPlanetShootsTheLandingBeforeTheGroundCombat() {
         owns(sardakk(), target, "lodor", UnitType.Infantry, 1);
-        double bare = estimate(rules(true, true, false), UnitType.Carrier, 2, UnitType.Infantry, 3)
+        double bare = estimate(rules(true, false), UnitType.Carrier, 2, UnitType.Infantry, 3)
                 .groundWins()
                 .get("lodor");
 
         owns(sardakk(), target, "lodor", UnitType.Pds, 1);
-        StrikeEstimate guarded = estimate(rules(true, true, false), UnitType.Carrier, 2, UnitType.Infantry, 3);
+        StrikeEstimate guarded = estimate(rules(true, false), UnitType.Carrier, 2, UnitType.Infantry, 3);
 
         assertThat(guarded.groundWins().get("lodor")).isLessThan(bare);
         assertThat(guarded.ourExpectedLoss()).isPositive();
     }
 
+    // An enemy structure is no reason by itself to stay off a planet: a space dock does nothing to a landing.
     @Test
-    void aPlanetWithStructuresIsLeftAloneUnlessTheRulesAllowIt() {
+    void aPlanetWithOnlyASpaceDockIsLandedOn() {
+        owns(sardakk(), target, "lodor", UnitType.Spacedock, 1);
+
+        StrikeEstimate estimate = estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Infantry, 4);
+
+        assertThat(estimate.landings()).containsKey("lodor");
+        assertThat(estimate.groundWins().get("lodor")).isEqualTo(1.0);
+        assertThat(estimate.ourExpectedLoss()).isZero();
+    }
+
+    @Test
+    void aPlanetWithoutStructuresIsPricedAsBefore() {
+        owns(sardakk(), target, "lodor", UnitType.Infantry, 2);
+
+        StrikeEstimate estimate = estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Infantry, 4);
+
+        assertThat(estimate.spaceWin()).isEqualTo(1.0);
+        assertThat(estimate.groundSent().get("lodor")).isEqualTo(4);
+        assertThat(estimate.groundWins().get("lodor")).isGreaterThan(0.5);
+    }
+
+    // The PDS is a defence, not a wall: a strong fleet shrugs off its space cannon offense and the landing still wins.
+    @Test
+    void aPdsPlanetIsTakenByAStrongFleet() {
+        owns(sardakk(), target, "lodor", UnitType.Pds, 1);
+        owns(sardakk(), target, "lodor", UnitType.Infantry, 1);
+
+        StrikeEstimate estimate =
+                estimate(rules(true, false), UnitType.Carrier, 2, UnitType.Dreadnought, 2, UnitType.Infantry, 6);
+
+        assertThat(estimate.spaceWin()).isEqualTo(1.0);
+        assertThat(estimate.landings()).containsKey("lodor");
+        assertThat(estimate.groundWins().get("lodor")).isGreaterThan(0.8);
+    }
+
+    // The same planet, but the space cannon is enough to wipe out a small fleet: the loss is the space cannon's doing.
+    @Test
+    void aSmallFleetIsKeptOffAPdsPlanetBySpaceCannonLosses() {
+        sardakk().removeOwnedUnitByID("pds");
+        sardakk().addOwnedUnitByID("pds2");
+        owns(sardakk(), target, "lodor", UnitType.Pds, 4);
+        owns(sardakk(), target, "lodor", UnitType.Infantry, 1);
+
+        StrikeEstimate weak =
+                estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Cruiser, 1, UnitType.Infantry, 3);
+
+        assertThat(weak.spaceWin()).isZero();
+        assertThat(weak.landings()).isEmpty();
+        assertThat(weak.ourExpectedLoss()).isGreaterThanOrEqualTo(5.0);
+    }
+
+    // A PDS has a Planetary Shield (LRR 65), so bombardment cannot be used on its planet (LRR 15.1f): dreadnoughts help
+    // against the bare planet and not against the shielded one.
+    @Test
+    void aPlanetaryShieldKeepsBombardmentOutOfTheLanding() {
+        owns(sardakk(), target, "lodor", UnitType.Infantry, 3);
+        double bombarded = groundWin(UnitType.Dreadnought);
+        double plain = groundWin(UnitType.Cruiser);
         owns(sardakk(), target, "lodor", UnitType.Pds, 1);
 
-        StrikeEstimate estimate = estimate(rules(false, true, false), UnitType.Carrier, 1, UnitType.Infantry, 4);
+        double shieldedWithDreadnoughts = groundWin(UnitType.Dreadnought);
+        double shieldedWithCruisers = groundWin(UnitType.Cruiser);
 
-        assertThat(estimate.landings()).isEmpty();
+        assertThat(bombarded).isGreaterThan(plain);
+        assertThat(shieldedWithDreadnoughts).isEqualTo(shieldedWithCruisers);
+    }
+
+    private double groundWin(UnitType escort) {
+        return estimate(rules(true, false), UnitType.Carrier, 2, escort, 2, UnitType.Infantry, 6)
+                .groundWins()
+                .get("lodor");
+    }
+
+    // Magen Defense Grid Omega: one hit on the invading ground forces at the start of a ground combat on a planet with
+    // its owner's structure.
+    @Test
+    void magenDefenseGridHitsTheLandingBeforeTheGroundCombat() {
+        owns(sardakk(), target, "lodor", UnitType.Infantry, 3);
+        owns(sardakk(), target, "lodor", UnitType.Spacedock, 1);
+        double without = groundWin(UnitType.Cruiser);
+
+        sardakk().addTech("md_c1");
+
+        assertThat(groundWin(UnitType.Cruiser)).isLessThan(without);
+    }
+
+    // Magen Defense Grid OmegaOmega also puts an infantry beside each structure when the system is activated, so a
+    // dock-only planet is defended.
+    @Test
+    void magenDefenseGridInfantryDefendAnOtherwiseEmptyDockPlanet() {
+        owns(sardakk(), target, "lodor", UnitType.Spacedock, 1);
+        sardakk().addTech("md");
+
+        StrikeEstimate estimate = estimate(rules(true, false), UnitType.Carrier, 2, UnitType.Infantry, 6);
+
+        assertThat(estimate.groundCombat()).isTrue();
+        assertThat(estimate.groundWins().get("lodor")).isLessThan(1.0);
     }
 
     @Test
     void takingAPlanetDestroysItsStructures() {
         owns(sardakk(), target, "lodor", UnitType.Infantry, 1);
-        double without = estimate(rules(true, true, false), UnitType.Carrier, 1, UnitType.Infantry, 4)
+        double without = estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Infantry, 4)
                 .theirExpectedLoss();
 
         owns(sardakk(), target, "lodor", UnitType.Spacedock, 1);
-        double with = estimate(rules(true, true, false), UnitType.Carrier, 1, UnitType.Infantry, 4)
+        double with = estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Infantry, 4)
                 .theirExpectedLoss();
 
         assertThat(with - without).isBetween(3.0, 4.01);
@@ -119,8 +211,8 @@ class StrikeEvaluatorTest extends BaseTi4Test {
         owns(sardakk(), sardakkHome, "quinarra", UnitType.Infantry, 1);
         target = sardakkHome;
 
-        StrikeEstimate on = estimate(rules(true, true, false), UnitType.Carrier, 1, UnitType.Infantry, 4);
-        StrikeEstimate off = estimate(rules(true, false, false), UnitType.Carrier, 1, UnitType.Infantry, 4);
+        StrikeEstimate on = estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Infantry, 4);
+        StrikeEstimate off = estimate(rules(false, false), UnitType.Carrier, 1, UnitType.Infantry, 4);
 
         assertThat(on.landings()).isNotEmpty();
         assertThat(off.landings()).isEmpty();
@@ -136,8 +228,8 @@ class StrikeEvaluatorTest extends BaseTi4Test {
         owns(sardakk(), rex, "space", UnitType.Destroyer, 1);
         target = rex;
 
-        StrikeEstimate unpaid = estimate(rules(false, true, false), UnitType.Carrier, 1, UnitType.Infantry, 2);
-        StrikeEstimate paid = estimate(rules(false, true, true), UnitType.Carrier, 1, UnitType.Infantry, 2);
+        StrikeEstimate unpaid = estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Infantry, 2);
+        StrikeEstimate paid = estimate(rules(true, true), UnitType.Carrier, 1, UnitType.Infantry, 2);
 
         assertThat(unpaid.landings()).isEmpty();
         assertThat(paid.landings()).containsKey(mecatol.getName());
@@ -148,7 +240,7 @@ class StrikeEvaluatorTest extends BaseTi4Test {
         owns(sardakk(), target, "space", UnitType.Destroyer, 1);
         sardakk().removePlanet("lodor");
 
-        StrikeEstimate estimate = estimate(rules(false, true, false), UnitType.Carrier, 1, UnitType.Infantry, 2);
+        StrikeEstimate estimate = estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Infantry, 2);
 
         assertThat(estimate.landings()).containsKey("lodor");
         assertThat(estimate.groundWins().get("lodor")).isEqualTo(1.0);
@@ -158,7 +250,7 @@ class StrikeEvaluatorTest extends BaseTi4Test {
     void landingsAreTotalsThatIncludeForcesAlreadyOnThePlanet() {
         owns(nekro(), target, "lodor", UnitType.Infantry, 1);
 
-        StrikeEstimate estimate = estimate(rules(false, true, false), UnitType.Carrier, 1, UnitType.Infantry, 2);
+        StrikeEstimate estimate = estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Infantry, 2);
 
         assertThat(estimate.landings().get("lodor"))
                 .isEqualTo(1 + estimate.groundSent().get("lodor"));
@@ -171,7 +263,7 @@ class StrikeEvaluatorTest extends BaseTi4Test {
         sardakk().addOwnedUnitByID("pds2");
         owns(sardakk(), target, "lodor", UnitType.Pds, 4);
 
-        StrikeEstimate estimate = estimate(rules(true, true, false), UnitType.Carrier, 1, UnitType.Cruiser, 1);
+        StrikeEstimate estimate = estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Cruiser, 1);
 
         assertThat(estimate.spaceWin()).isZero();
         assertThat(estimate.ourLossChance()).isEqualTo(1.0);
@@ -186,7 +278,7 @@ class StrikeEvaluatorTest extends BaseTi4Test {
         owns(sardakk(), target, "lodor", UnitType.Infantry, 1);
         owns(sardakk(), target, "lodor", UnitType.Pds, 1);
 
-        StrikeEstimate estimate = estimate(rules(true, true, false), UnitType.Carrier, 2, UnitType.Infantry, 8);
+        StrikeEstimate estimate = estimate(rules(true, false), UnitType.Carrier, 2, UnitType.Infantry, 8);
 
         assertThat(estimate.survivors().get(UnitType.Carrier)).isEqualTo(1);
         assertThat(estimate.groundSent().get("lodor")).isLessThanOrEqualTo(4);
@@ -197,7 +289,7 @@ class StrikeEvaluatorTest extends BaseTi4Test {
     void anOutgunnedFleetLosesItsCargoToo() {
         owns(sardakk(), target, "space", UnitType.Dreadnought, 3);
 
-        StrikeEstimate estimate = estimate(rules(false, true, false), UnitType.Carrier, 1, UnitType.Infantry, 3);
+        StrikeEstimate estimate = estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Infantry, 3);
 
         assertThat(estimate.spaceWin()).isLessThan(0.1);
         assertThat(estimate.landings()).isEmpty();
@@ -228,8 +320,7 @@ class StrikeEvaluatorTest extends BaseTi4Test {
     void foresightMovesAStackThatWouldLoseBeforeTheCombat() {
         Player naalu = naaluStack(UnitType.Cruiser, 3);
 
-        StrikeEstimate estimate =
-                against(naalu, rules(false, true, false), UnitType.Dreadnought, 2, UnitType.Carrier, 1);
+        StrikeEstimate estimate = against(naalu, rules(true, false), UnitType.Dreadnought, 2, UnitType.Carrier, 1);
 
         assertThat(estimate.escaped()).isTrue();
         assertThat(estimate.spaceCombat()).isFalse();
@@ -243,8 +334,7 @@ class StrikeEvaluatorTest extends BaseTi4Test {
         Player naalu = naaluStack(UnitType.Cruiser, 3);
         naalu.setStrategicCC(0);
 
-        StrikeEstimate withoutToken =
-                against(naalu, rules(false, true, false), UnitType.Dreadnought, 2, UnitType.Carrier, 1);
+        StrikeEstimate withoutToken = against(naalu, rules(true, false), UnitType.Dreadnought, 2, UnitType.Carrier, 1);
 
         assertThat(withoutToken.escaped()).isFalse();
         assertThat(withoutToken.spaceCombat()).isTrue();
@@ -256,7 +346,7 @@ class StrikeEvaluatorTest extends BaseTi4Test {
     void foresightIsNotUsedByAStackThatWouldWin() {
         Player naalu = naaluStack(UnitType.Dreadnought, 3);
 
-        StrikeEstimate estimate = against(naalu, rules(false, true, false), UnitType.Carrier, 1, UnitType.Destroyer, 1);
+        StrikeEstimate estimate = against(naalu, rules(true, false), UnitType.Carrier, 1, UnitType.Destroyer, 1);
 
         assertThat(estimate.escaped()).isFalse();
         assertThat(estimate.spaceWin()).isLessThan(0.3);

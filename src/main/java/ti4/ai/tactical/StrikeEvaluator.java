@@ -54,7 +54,7 @@ class StrikeEvaluator {
             double noKill,
             Map<UnitType, Integer> dropped) {}
 
-    // TODO: Magen Defense Grid, Mentak Ambush, L4 Disruptors and Titans' planetary PDS are not in the odds
+    // TODO: Mentak Ambush, L4 Disruptors and Titans' planetary PDS are not in the odds
     static StrikeEstimate estimate(Game game, Player seat, Strike strike) {
         Tile target = strike.target();
         Player opponent = strike.opponent();
@@ -233,12 +233,14 @@ class StrikeEvaluator {
         extraGround.putAll(strike.extraDefenderGround());
         for (Planet planet : planets) {
             int ground = count(remaining);
-            if (ground == 0 || structuresForbid(game, seat, planet, rules)) continue;
+            if (ground == 0) continue;
             Map<UnitType, Integer> defenderGround = groundOn(planet, opponent);
             if (BoardView.controller(game, planet.getName()) == opponent || !defenderGround.isEmpty()) {
                 extraGround.forEach((type, count) -> defenderGround.merge(type, count, Integer::sum));
                 extraGround.clear();
             }
+            int magenInfantry = MagenDefenseGrid.placedInfantry(opponent, planet);
+            if (magenInfantry > 0) defenderGround.merge(UnitType.Infantry, magenInfantry, Integer::sum);
             int defenders = count(defenderGround);
             int hits = L4Disruptors.shieldsInvaders(seat)
                     ? 0
@@ -271,11 +273,6 @@ class StrikeEvaluator {
             noKill *= 1 - spaceWin * detailed.defenderLosesUnit();
         }
         return new Ground(landings, wins, sentTo, fought, ourLoss, theirLoss, noKill, dropped);
-    }
-
-    private static boolean structuresForbid(Game game, Player seat, Planet planet, StrikeRules rules) {
-        if (!BoardView.enemyStructuresOn(game, seat, planet)) return false;
-        return !rules.structuresAllowed() && !game.mecatols().contains(planet.getName());
     }
 
     private static List<Planet> freePlanets(
@@ -348,6 +345,7 @@ class StrikeEvaluator {
             Map<UnitType, Integer> sent,
             Map<UnitType, Integer> defenderGround,
             int bombardmentHits) {
+        int magenHits = MagenDefenseGrid.startOfCombatHits(opponent, planet);
         Side attacking = new Side(seat, sent);
         Side defending = new Side(opponent, defenderGround);
         Map<UnitType, Integer> defendersDamaged = BattleMath.damagedAmong(planet, opponent, defending.units());
@@ -362,7 +360,10 @@ class StrikeEvaluator {
                 seat,
                 opponent,
                 CombatForces.force(
-                        seat, CombatForces.combatants(game, tile, planet, attacking, defending, Map.of()), true),
+                        seat,
+                        BattleMath.afterCannonFire(
+                                CombatForces.combatants(game, tile, planet, attacking, defending, Map.of()), magenHits),
+                        true),
                 defence,
                 true,
                 true);

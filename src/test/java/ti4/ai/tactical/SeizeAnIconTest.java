@@ -156,7 +156,7 @@ class SeizeAnIconTest extends BaseTi4Test {
         assertThat(planOfKind(Kind.STAGE)).isEmpty();
     }
 
-    // A rival's planet with a PDS is left alone outside its home system, unless the planet is the icon.
+    // A rival's PDS is priced as a defence, not a wall, so the legendary planet behind it is attacked.
     @Test
     void attacksALegendaryPlanetThroughTheRivalsStructures() {
         board(true);
@@ -169,11 +169,11 @@ class SeizeAnIconTest extends BaseTi4Test {
     }
 
     @Test
-    void leavesTheRivalsStructuresAloneWithoutTheSecret() {
+    void theRivalsStructuresAreNotAWallWithoutTheSecretEither() {
         board(false);
         rivalHoldsPrimorBehindAPds();
 
-        assertThat(planOfKind(Kind.ATTACK)).isEmpty();
+        assertThat(planOfKind(Kind.ATTACK).orElseThrow().landings()).containsKey("primor");
     }
 
     @Test
