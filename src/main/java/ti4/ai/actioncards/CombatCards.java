@@ -19,6 +19,8 @@ class CombatCards {
     private static final String MODIFIER_HANDLER = "applytempcombatmod__action_cards__";
     private static final int MORALE_BOOST_BONUS = 1;
     private static final int FIGHTER_PROTOTYPE_BONUS = 2;
+    private static final double MORALE_BOOST_MIN_LOSS = 0.2;
+    private static final double MORALE_BOOST_MAX_LOSS = 0.8;
 
     static List<AiCard> all() {
         return Stream.of(
@@ -43,6 +45,15 @@ class CombatCards {
                     game, seat, position, holder, RoundModifier.fighters(FIGHTER_PROTOTYPE_BONUS));
         }
         return 0;
+    }
+
+    static boolean closeEnoughForMoraleBoost(Game game, Player seat, CombatMoment moment) {
+        return CombatForecast.lossChance(game, seat, moment.position(), moment.holder()).stream()
+                .anyMatch(CombatCards::lossWorthAMoraleBoost);
+    }
+
+    static boolean lossWorthAMoraleBoost(double lossChance) {
+        return lossChance >= MORALE_BOOST_MIN_LOSS && lossChance <= MORALE_BOOST_MAX_LOSS;
     }
 
     static boolean addsRoundModifier(String alias) {

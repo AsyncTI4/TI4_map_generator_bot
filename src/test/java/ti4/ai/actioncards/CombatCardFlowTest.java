@@ -20,6 +20,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.tactical.CombatCardHook;
+import ti4.ai.tactical.CombatForecast;
 import ti4.ai.tactical.CombatMoment;
 import ti4.ai.tactical.CombatRules;
 import ti4.game.Tile;
@@ -347,6 +348,129 @@ class CombatCardFlowTest extends BaseTi4Test {
         assertThat(pressedId(atRoundStart(new CombatMoment(position, "lodor", true, 0))
                         .orElseThrow()))
                 .isEqualTo("ac_play_from_hand_" + HAND_INDEX);
+    }
+
+    private void fighterFight(int nekroFighters, int solFighters) {
+        table.ships(table.nekro, tile, UnitType.Fighter, nekroFighters);
+        table.ships(table.sol, tile, UnitType.Fighter, solFighters);
+    }
+
+    private void assertTooCheapForTheValueRule() {
+        double value = CombatCards.valueAtRoundStart(table.game, table.nekro, moment(), "mb1");
+        assertThat(value).isLessThan(ActionCardPrior.keepPrior("mb1"));
+    }
+
+    // Four fighters each is about a 51% chance to lose; the stake is too small for the value rule to spend the card.
+    @Test
+    void moraleBoostIsPlayedInACheapFightThatIsAboutEven() {
+        fighterFight(4, 4);
+        table.nekro.setActionCard("mb1", HAND_INDEX);
+
+        assertTooCheapForTheValueRule();
+        assertThat(pressedId(atRoundStart().orElseThrow())).isEqualTo("ac_play_from_hand_" + HAND_INDEX);
+    }
+
+    // Three against four is about a 78% chance to lose, inside the band.
+    @Test
+    void moraleBoostIsPlayedInACheapFightThatIsLikelyLost() {
+        fighterFight(3, 4);
+        table.nekro.setActionCard("mb1", HAND_INDEX);
+
+        assertTooCheapForTheValueRule();
+        assertThat(pressedId(atRoundStart().orElseThrow())).isEqualTo("ac_play_from_hand_" + HAND_INDEX);
+    }
+
+    // Four infantry against three is about a 36% chance to lose.
+    @Test
+    void moraleBoostIsPlayedInACheapGroundFightInsideTheBand() {
+        table.test.units(tile, "lodor", table.nekro, UnitType.Infantry, 4);
+        table.test.units(tile, "lodor", table.sol, UnitType.Infantry, 3);
+        table.nekro.setActionCard("mb1", HAND_INDEX);
+        CombatMoment ground = new CombatMoment(position, "lodor", true, 0);
+
+        assertThat(CombatCards.valueAtRoundStart(table.game, table.nekro, ground, "mb1"))
+                .isLessThan(ActionCardPrior.keepPrior("mb1"));
+        assertThat(pressedId(atRoundStart(ground).orElseThrow())).isEqualTo("ac_play_from_hand_" + HAND_INDEX);
+    }
+
+    // Five fighters against three is about an 8% chance to lose.
+    @Test
+    void moraleBoostIsKeptInACheapFightThatIsAlmostWon() {
+        fighterFight(5, 3);
+        table.nekro.setActionCard("mb1", HAND_INDEX);
+
+        assertThat(atRoundStart()).isEmpty();
+    }
+
+    // Two fighters against four is about a 95% chance to lose.
+    @Test
+    void moraleBoostIsKeptInACheapFightThatIsAlmostLost() {
+        fighterFight(2, 4);
+        table.nekro.setActionCard("mb1", HAND_INDEX);
+
+        assertThat(atRoundStart()).isEmpty();
+    }
+
+    @Test
+    void theLossChanceBandIncludesItsEdges() {
+        assertThat(CombatCards.lossWorthAMoraleBoost(0.2)).isTrue();
+        assertThat(CombatCards.lossWorthAMoraleBoost(0.8)).isTrue();
+        assertThat(CombatCards.lossWorthAMoraleBoost(0.1999)).isFalse();
+        assertThat(CombatCards.lossWorthAMoraleBoost(0.8001)).isFalse();
+        assertThat(CombatCards.lossWorthAMoraleBoost(0.5)).isTrue();
+    }
+
+    @Test
+    void noMoraleBoostIsPlayedInACloseFightWhenNoneIsHeld() {
+        fighterFight(4, 4);
+        table.nekro.setActionCard("emergency", HAND_INDEX);
+
+        assertThat(atRoundStart()).isEmpty();
+    }
+
+    @Test
+    void moraleBoostIsPlayedAtMostOncePerRoundInACloseFight() {
+        fighterFight(4, 4);
+        table.nekro.setActionCard("mb1", HAND_INDEX);
+        table.nekro.setActionCard("mb2", HAND_INDEX + 1);
+
+        assertThat(atRoundStart()).isPresent();
+        assertThat(atRoundStart()).isEmpty();
+    }
+
+    @Test
+    void moraleBoostIsNotPlayedInACloseFightOnceTheOpponentHasRolled() {
+        fighterFight(4, 4);
+        table.nekro.setActionCard("mb1", HAND_INDEX);
+        table.game.setStoredValue("combatRoundTrackersol" + position + SPACE, "1");
+
+        Optional<AiDecision> decision =
+                CombatRules.next(table.test.contextAt(AFTER_GRACE, rolls(), hand()), CombatCardRules::atRoundStart);
+
+        assertThat(pressedId(decision.orElseThrow())).isEqualTo("combatRoll_" + position + "_" + SPACE);
+    }
+
+    @Test
+    void noMoraleBoostIsPlayedInACloseFightWhileAModifierIsAlreadyWaiting() {
+        fighterFight(4, 4);
+        table.nekro.setActionCard("mb1", HAND_INDEX);
+        table.nekro.addNewTempCombatMod(
+                CombatTempModHelper.getPossibleTempModifier(Constants.AC, "mb2", table.nekro.getNumberOfTurns()));
+
+        assertThat(atRoundStart()).isEmpty();
+    }
+
+    // Mutual destruction is a loss for both seats, so the two chances to lose add up to more than one.
+    @Test
+    void theDefenderMeasuresItsOwnChanceToLose() {
+        fighterFight(4, 4);
+        double attackerLoss = CombatForecast.lossChance(table.game, table.nekro, position, SPACE)
+                .orElseThrow();
+        double defenderLoss = CombatForecast.lossChance(table.game, table.sol, position, SPACE)
+                .orElseThrow();
+
+        assertThat(defenderLoss).isBetween(0.2, 0.8);
+        assertThat(attackerLoss + defenderLoss).isGreaterThan(1.0);
     }
 
     @Test

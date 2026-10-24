@@ -5,6 +5,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
@@ -49,6 +50,13 @@ public class CombatForecast {
         return duel(game, seat, position, holderName)
                 .map(duel -> duel.firstRoundSwing(modifier))
                 .orElse(0.0);
+    }
+
+    public static OptionalDouble lossChance(Game game, Player seat, String position, String holderName) {
+        return duel(game, seat, position, holderName)
+                .map(Duel::lossChance)
+                .map(OptionalDouble::of)
+                .orElse(OptionalDouble.empty());
     }
 
     public static double repairSwing(Game game, Player seat, String position, String holderName) {
@@ -230,6 +238,10 @@ public class CombatForecast {
             double before = CombatForces.win(own, enemy, attacks());
             double after = CombatForces.win(own, enemy.withUnits(remaining), attacks());
             return Optional.of(new ShipLoss(before, after, stake(own, enemy)));
+        }
+
+        double lossChance() {
+            return 1 - CombatForces.win(own(), enemy(), attacks());
         }
 
         double repairSwing() {
