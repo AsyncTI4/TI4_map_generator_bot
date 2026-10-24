@@ -309,10 +309,9 @@ class AiTickRunner {
 
     private static void cutShort(SeatTick tick, ThinkingProfile profile, ThinkingAborted aborted) {
         tick.state().holdThinking(tick.now(), progressOf(tick));
-        BotLogger.warning("AI thinking cut short game=" + tick.game().getName() + " round="
-                + tick.game().getRound() + " seat=" + tick.seat().getFaction() + " after="
-                + ThinkingStats.millis(profile.totalNanos()) + " reason=\"" + aborted.reason() + "\" trail=["
-                + aborted.trail() + "] spans=[" + ThinkingStats.summary(profile) + "]");
+        String summary = AbortReport.line(tick.game(), tick.seat(), profile, aborted);
+        tick.lane().noteAbort(summary);
+        if (tick.state().firstAbortInRound(tick.game().getRound())) BotLogger.warning(summary);
         recorded(
                 tick,
                 null,

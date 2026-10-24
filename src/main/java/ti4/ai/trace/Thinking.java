@@ -3,9 +3,12 @@ package ti4.ai.trace;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.LongSupplier;
+import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
 import ti4.ai.trace.ThinkingProfile.SpanTotal;
 
@@ -14,6 +17,7 @@ public class Thinking {
 
     private static final ThreadLocal<Session> CURRENT = new ThreadLocal<>();
     private static final Span NO_SPAN = () -> {};
+    private static final int MAX_KEYS = 12;
 
     public interface Span extends AutoCloseable {
         @Override
@@ -38,8 +42,12 @@ public class Thinking {
     }
 
     public static Span enter(String name) {
+        return enter(name, null);
+    }
+
+    public static Span enter(String name, Supplier<String> key) {
         Session session = CURRENT.get();
-        return session == null ? NO_SPAN : session.enter(name);
+        return session == null ? NO_SPAN : session.enter(name, key);
     }
 
     private static final class Stat {
@@ -72,16 +80,16 @@ public class Thinking {
             this.start = clock.getAsLong();
         }
 
-        private Span enter(String name) {
+        private Span enter(String name, Supplier<String> key) {
             if (aborted != null) throw aborted;
             long now = clock.getAsLong();
             Stat stat = stats.computeIfAbsent(name, Stat::new);
             stat.calls++;
             String reason = violation(stat, now);
-            if (reason != null) throw abort(name, reason);
+            if (reason != null) throw abort(name, key, reason);
             stat.active++;
             stat.maxActive = Math.max(stat.maxActive, stat.active);
-            Frame frame = new Frame(this, stat, now);
+            Frame frame = new Frame(this, stat, key, now);
             stack.add(frame);
             return frame;
         }
@@ -100,12 +108,21 @@ public class Thinking {
             return null;
         }
 
-        private ThinkingAborted abort(String entering, String reason) {
+        private ThinkingAborted abort(String entering, Supplier<String> enteringKey, String reason) {
             List<String> names = new ArrayList<>(stack.size() + 1);
-            for (Frame frame : stack) names.add(frame.stat.name);
+            Set<String> keys = new LinkedHashSet<>();
+            for (Frame frame : stack) {
+                names.add(frame.stat.name);
+                addKey(keys, frame.stat.name, frame.key);
+            }
             names.add(entering);
-            aborted = new ThinkingAborted(reason, names);
+            addKey(keys, entering, enteringKey);
+            aborted = new ThinkingAborted(reason, names, List.copyOf(keys));
             return aborted;
+        }
+
+        private static void addKey(Set<String> keys, String name, Supplier<String> key) {
+            if (key != null && keys.size() < MAX_KEYS) keys.add(name + " " + key.get());
         }
 
         private void exit(Frame frame) {
@@ -142,12 +159,14 @@ public class Thinking {
     private static final class Frame implements Span {
         private final Session session;
         private final Stat stat;
+        private final Supplier<String> key;
         private final long start;
         private long childNanos;
 
-        private Frame(Session session, Stat stat, long start) {
+        private Frame(Session session, Stat stat, Supplier<String> key, long start) {
             this.session = session;
             this.stat = stat;
+            this.key = key;
             this.start = start;
         }
 

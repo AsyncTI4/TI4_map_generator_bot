@@ -51,6 +51,7 @@ final class AiSeatState {
     private int repeatedFallbacks;
     private long thinkingHeldAt;
     private int thinkingHeldFingerprint;
+    private int abortLoggedRound = -1;
 
     void requestDelegation(boolean explicit) {
         DelegationRequest requested = explicit ? DelegationRequest.EXPLICIT : DelegationRequest.GAME_WIDE;
@@ -180,6 +181,12 @@ final class AiSeatState {
         repeatedFallbacks = Math.min(repeatedFallbacks + 1, limit + 2);
         if (repeatedFallbacks <= limit) return FallbackVerdict.CHOOSE;
         return repeatedFallbacks == limit + 1 ? FallbackVerdict.STOP_AND_ANNOUNCE : FallbackVerdict.STOPPED;
+    }
+
+    boolean firstAbortInRound(int round) {
+        if (abortLoggedRound == round) return false;
+        abortLoggedRound = round;
+        return true;
     }
 
     void holdThinking(long now, int fingerprint) {

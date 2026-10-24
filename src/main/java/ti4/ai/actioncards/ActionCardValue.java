@@ -223,7 +223,7 @@ public class ActionCardValue {
     }
 
     private static double timedKeep(Game game, Player seat, String alias) {
-        try (Thinking.Span ignored = Thinking.enter("cards.keepValue")) {
+        try (Thinking.Span ignored = Thinking.enter("cards.keepValue", () -> alias)) {
             return keepValue(game, seat, alias);
         }
     }

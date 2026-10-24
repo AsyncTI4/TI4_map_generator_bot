@@ -1,6 +1,7 @@
 package ti4.ai.strategy;
 
 import java.lang.ref.WeakReference;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +28,11 @@ record PlanInputs(
         Map<String, List<TacticalPlan>> freeing,
         Map<Integer, CardPlan> plans,
         Map<String, Double> lockExposures,
-        CustodiansRace.Snapshot race) {
+        CustodiansRace.Snapshot race,
+        boolean planless) {
 
     private static final int MAX_CACHED = 32;
+    private static final ThreadLocal<Set<String>> COMPUTING = ThreadLocal.withInitial(HashSet::new);
     private static final Map<String, Cached> CACHE = new LinkedHashMap<>(16, 0.75f, true) {
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, Cached> eldest) {
@@ -50,7 +53,13 @@ record PlanInputs(
             Cached cached = CACHE.get(key);
             if (cached != null && cached.isFor(game)) return cached.inputs();
         }
-        PlanInputs inputs = compute(game, seat, moment);
+        if (!COMPUTING.get().add(key)) return withoutPlans(game, seat, moment);
+        PlanInputs inputs;
+        try {
+            inputs = compute(game, seat, moment);
+        } finally {
+            COMPUTING.get().remove(key);
+        }
         synchronized (CACHE) {
             CACHE.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), inputs));
         }
@@ -58,19 +67,31 @@ record PlanInputs(
     }
 
     private static PlanInputs compute(Game game, Player seat, PlanMoment moment) {
-        try (Thinking.Span ignored = Thinking.enter("strategy.planInputs")) {
-            return new PlanInputs(
-                    game,
-                    seat,
-                    moment,
-                    TacticalPlanner.ranked(game, seat),
-                    Threats.reachableByEnemies(game, seat),
-                    StrategyCardRules.reinforcements(game, seat),
-                    new ConcurrentHashMap<>(),
-                    new ConcurrentHashMap<>(),
-                    new ConcurrentHashMap<>(),
-                    CustodiansRace.of(game, seat));
+        try (Thinking.Span ignored = Thinking.enter("strategy.planInputs", () -> seat.getFaction() + " " + moment)) {
+            return assemble(game, seat, moment, TacticalPlanner.ranked(game, seat), false);
         }
+    }
+
+    private static PlanInputs withoutPlans(Game game, Player seat, PlanMoment moment) {
+        try (Thinking.Span ignored = Thinking.enter("strategy.planInputs.reentered")) {
+            return assemble(game, seat, moment, List.of(), true);
+        }
+    }
+
+    private static PlanInputs assemble(
+            Game game, Player seat, PlanMoment moment, List<TacticalPlan> ranked, boolean planless) {
+        return new PlanInputs(
+                game,
+                seat,
+                moment,
+                ranked,
+                Threats.reachableByEnemies(game, seat),
+                StrategyCardRules.reinforcements(game, seat),
+                new ConcurrentHashMap<>(),
+                new ConcurrentHashMap<>(),
+                new ConcurrentHashMap<>(),
+                CustodiansRace.of(game, seat),
+                planless);
     }
 
     int round() {
@@ -103,6 +124,7 @@ record PlanInputs(
     }
 
     List<TacticalPlan> rankedFreeing(String position) {
+        if (planless) return List.of();
         return freeing.computeIfAbsent(position, freed -> TacticalPlanner.rankedFreeing(game, seat, freed));
     }
 

@@ -347,7 +347,7 @@ public class TacticalPlanner {
     }
 
     private static List<TacticalPlan> candidates(Context context, Predicate<Tile> activatable, double minScore) {
-        try (Thinking.Span ignored = Thinking.enter("tactical.candidates")) {
+        try (Thinking.Span ignored = Thinking.enter("tactical.candidates", context::rankingKey)) {
             return sharedRanking(context, activatable).stream()
                     .filter(plan -> plan.score() >= minScore)
                     .toList();
@@ -3673,6 +3673,11 @@ public class TacticalPlanner {
                 }
             }
             return true;
+        }
+
+        String rankingKey() {
+            return seat.getFaction() + " freed " + freed + " hints " + hints.size() + (tokenFree ? " token-free" : "")
+                    + " ships " + FleetLimit.ships(seat);
         }
 
         ProductionPlanner.BuildPlan buildPlan(Tile tile) {

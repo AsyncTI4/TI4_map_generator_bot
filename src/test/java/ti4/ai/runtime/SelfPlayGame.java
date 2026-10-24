@@ -944,6 +944,9 @@ final class SelfPlayGame {
         appendTail(report, "Trade invariants", invariantLines(ending, game), 20);
         appendTail(report, "Promissory note moves", promissoryLines(game), 30);
         if (lane != null) appendTail(report, "Thinking", lane.thinking().lines(60, 5), 70);
+        if (lane != null && !lane.lastAbort().isEmpty()) {
+            appendTail(report, "Last thinking abort", List.of(lane.lastAbort()), 1);
+        }
         report.append("Press outcomes: ").append(env.pressOutcomes).append('\n');
         report.append("Pressed handlers: ").append(env.pressedHandlers).append('\n');
         appendTail(

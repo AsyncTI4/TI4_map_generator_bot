@@ -21,7 +21,7 @@ public class ExploreDeck {
     }
 
     public static double expectedValue(ExploreSite site, String trait) {
-        try (Thinking.Span ignored = Thinking.enter("explore.expectedValue")) {
+        try (Thinking.Span ignored = Thinking.enter("explore.expectedValue", () -> site.planet() + " " + trait)) {
             return averageOverDeck(site, trait);
         }
     }

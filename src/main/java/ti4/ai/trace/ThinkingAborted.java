@@ -13,11 +13,17 @@ public final class ThinkingAborted extends RuntimeException {
 
     private final String reason;
     private final List<String> spans;
+    private final List<String> keys;
 
     ThinkingAborted(String reason, List<String> spans) {
+        this(reason, spans, List.of());
+    }
+
+    ThinkingAborted(String reason, List<String> spans, List<String> keys) {
         super(reason, null, false, false);
         this.reason = reason;
         this.spans = List.copyOf(spans);
+        this.keys = List.copyOf(keys);
     }
 
     public static ThinkingAborted stackOverflow(StackOverflowError overflow) {
@@ -40,6 +46,39 @@ public final class ThinkingAborted extends RuntimeException {
 
     public List<String> spans() {
         return spans;
+    }
+
+    public List<String> keys() {
+        return keys;
+    }
+
+    public String compactTrail() {
+        int bestPeriod = 0;
+        int bestRepeats = 1;
+        for (int period = 1; period <= spans.size() / 2; period++) {
+            int repeats = repeatsAtEnd(period);
+            if (repeats > 1 && repeats * period > bestRepeats * bestPeriod) {
+                bestPeriod = period;
+                bestRepeats = repeats;
+            }
+        }
+        if (bestPeriod == 0) return trail();
+        int cycleStart = spans.size() - bestRepeats * bestPeriod;
+        List<String> parts = new ArrayList<>(spans.subList(0, cycleStart));
+        parts.add("(" + String.join(SEPARATOR, spans.subList(spans.size() - bestPeriod, spans.size())) + ") x"
+                + bestRepeats);
+        return String.join(SEPARATOR, parts);
+    }
+
+    private int repeatsAtEnd(int period) {
+        List<String> unit = spans.subList(spans.size() - period, spans.size());
+        int repeats = 1;
+        while (spans.size() - (repeats + 1) * period >= 0
+                && spans.subList(spans.size() - (repeats + 1) * period, spans.size() - repeats * period)
+                        .equals(unit)) {
+            repeats++;
+        }
+        return repeats;
     }
 
     public String trail() {
