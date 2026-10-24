@@ -50,6 +50,7 @@ class AgendaWhensAftersHelperTest extends BaseTi4Test {
         game.setSpeakerUserID(owner.getUserID());
         game.setPhaseOfGame("agendawaiting");
         game.setStoredValue("lastPlayerToPlayAWhen", holder.getFaction());
+        game.setStoredValue("whenQueueHeldByVeto", holder.getFaction());
     }
 
     // The queue halts at a Veto. If the Veto is cancelled the next player in the queue is asked again.
@@ -73,9 +74,40 @@ class AgendaWhensAftersHelperTest extends BaseTi4Test {
     @Test
     void doesNotResumeAQueueThatAnotherPlayerHolds() {
         vetoPlayedByTheHolder();
-        game.setStoredValue("lastPlayerToPlayAWhen", owner.getFaction());
+        game.setStoredValue("whenQueueHeldByVeto", owner.getFaction());
 
         assertThatNothingIsAskedOf(() -> {});
+    }
+
+    // While the Veto stands (its _Sabotage_ window is open) a later pass must not advance the queue.
+    @Test
+    void aPassWhileTheVetoStandsDoesNotMoveTheQueue() {
+        vetoPlayedByTheHolder();
+        game.setStoredValue("declinedWhens", holder.getFaction() + "_");
+        ButtonInteractionEvent passing = Mockito.mock(ButtonInteractionEvent.class, Mockito.RETURNS_DEEP_STUBS);
+
+        try (MockedStatic<MessageHelper> messages = Mockito.mockStatic(MessageHelper.class)) {
+            AgendaWhensAftersHelper.declineToQueueAWhen(game, passing, owner);
+
+            messages.verify(
+                    () -> MessageHelper.sendMessageToChannel(
+                            ArgumentMatchers.<MessageChannel>any(), contains("All players have passed")),
+                    Mockito.never());
+        }
+        assertThat(game.getStoredValue("whensResolved")).isEmpty();
+    }
+
+    @Test
+    void aPassAfterTheVetoWasCanceledResolvesTheQueue() {
+        vetoPlayedByTheHolder();
+        game.setStoredValue("declinedWhens", holder.getFaction() + "_");
+        ButtonInteractionEvent passing = Mockito.mock(ButtonInteractionEvent.class, Mockito.RETURNS_DEEP_STUBS);
+
+        try (MockedStatic<MessageHelper> messages = Mockito.mockStatic(MessageHelper.class)) {
+            AgendaWhensAftersHelper.resumeWhenQueueAfterCanceledVeto(passing, game, holder);
+            AgendaWhensAftersHelper.declineToQueueAWhen(game, passing, owner);
+        }
+        assertThat(game.getStoredValue("whensResolved")).isEqualTo("Yes");
     }
 
     @Test

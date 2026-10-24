@@ -164,6 +164,7 @@ class ActionCardButtonHandlerSabotageTest extends BaseTi4Test {
         game.setSpeakerUserID(nekro.getUserID());
         game.setPhaseOfGame("agendawaiting");
         game.setStoredValue("lastPlayerToPlayAWhen", "sol");
+        game.setStoredValue("whenQueueHeldByVeto", "sol");
         game.getGameStats().recordAcPlay("Veto", sol);
 
         sabotage("Veto");

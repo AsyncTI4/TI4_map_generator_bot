@@ -35,6 +35,8 @@ import ti4.service.fow.GMService;
 
 public final class AgendaWhensAftersHelper {
 
+    private static final String WHEN_QUEUE_HELD_BY_VETO = "whenQueueHeldByVeto";
+
     private AgendaWhensAftersHelper() {}
 
     static void offerEveryonePrepassOnShenanigans(Game game) {
@@ -65,6 +67,7 @@ public final class AgendaWhensAftersHelper {
         game.removeStoredValue("whensResolved");
         game.removeStoredValue("lastPlayerToPlayAnAfter");
         game.removeStoredValue("lastPlayerToPlayAWhen");
+        game.removeStoredValue(WHEN_QUEUE_HELD_BY_VETO);
         game.removeStoredValue("declinedWhens");
         game.removeStoredValue("declinedAfters");
         game.removeStoredValue("queuedWhens");
@@ -498,13 +501,15 @@ public final class AgendaWhensAftersHelper {
     public static void resumeWhenQueueAfterCanceledVeto(ButtonInteractionEvent event, Game game, Player vetoPlayer) {
         boolean waiting = "agendawaiting".equalsIgnoreCase(game.getPhaseOfGame());
         boolean whensOpen = game.getStoredValue("whensResolved").isEmpty();
-        boolean vetoHeldTheQueue = vetoPlayer.getFaction().equals(game.getStoredValue("lastPlayerToPlayAWhen"));
+        boolean vetoHeldTheQueue = vetoPlayer.getFaction().equals(game.getStoredValue(WHEN_QUEUE_HELD_BY_VETO));
         if (!waiting || !whensOpen || !vetoHeldTheQueue) return;
+        game.removeStoredValue(WHEN_QUEUE_HELD_BY_VETO);
         resolveWhenQueue(event, game);
         offerEveryoneWhensQueue(game);
     }
 
     private static void resolveWhenQueue(ButtonInteractionEvent event, Game game) {
+        if (!game.getStoredValue(WHEN_QUEUE_HELD_BY_VETO).isEmpty()) return;
         String alreadyResolved = game.getStoredValue("whensResolved");
         if (alreadyResolved.isEmpty()) {
             String lastPlayerToPlayAWhen = game.getStoredValue("lastPlayerToPlayAWhen");
@@ -552,9 +557,9 @@ public final class AgendaWhensAftersHelper {
                             }
                             case "ac" -> {
                                 ActionCardHelper.playAC(event, game, player, when, game.getMainGameChannel());
-                                // TODO: the halt for Veto does not hold: any later declineToQueueAWhen press resumes
-                                // the queue
-                                if (!when.contains("veto")) {
+                                if (when.contains("veto")) {
+                                    game.setStoredValue(WHEN_QUEUE_HELD_BY_VETO, player.getFaction());
+                                } else {
                                     resolveWhenQueue(event, game);
                                     offerEveryoneWhensQueue(game);
                                 }
