@@ -6,9 +6,10 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.brain.AiTurnContext;
-import ti4.ai.scoring.ObjectiveValue;
+import ti4.ai.scoring.ThronePoint;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalRules;
+import ti4.ai.trade.AllianceValue;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -61,9 +62,15 @@ public class PlayAreaNotes {
             Player owner = game.getPNOwner(note);
             if (owner == null || owner == seat || !returnsOnActivation(note)) continue;
             if (!FoWHelper.playerHasUnitsInSystem(owner, tile)) continue;
-            cost += note.endsWith(SUPPORT_FOR_THE_THRONE) ? ObjectiveValue.VICTORY_POINT_VALUE : OTHER_NOTE_VALUE;
+            cost += lossOf(game, seat, owner, note);
         }
         return cost;
+    }
+
+    static double lossOf(Game game, Player seat, Player owner, String note) {
+        if (note.endsWith(SUPPORT_FOR_THE_THRONE)) return ThronePoint.kept(game, seat, owner);
+        if (note.endsWith(NoteGiving.ALLIANCE)) return AllianceValue.lost(game, seat, owner);
+        return OTHER_NOTE_VALUE;
     }
 
     private static boolean returnsOnActivation(String note) {

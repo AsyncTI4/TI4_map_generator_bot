@@ -221,13 +221,14 @@ class ComponentValuesTest extends BaseTi4Test {
                 .isCloseTo(2, within(EXACT));
     }
 
-    // Someone else's Support for the Throne is a point (worth 6 at 0 points), discounted by the chance of losing it
-    // over the 5 rounds the game has left; the AI's own back is worth what it denies the holder.
+    // Someone else's Support for the Throne is a point (worth 6 at 0 points), of which half counts while nobody is
+    // near the goal, discounted by the chance of losing it over the 5 rounds the game has left; the AI's own back is
+    // worth what it denies the holder.
     @Test
     void supportForTheThrone() {
         table.game.setRound(4);
         double fit = ThroneValue.fit(table.game, nekro, sol);
-        assertThat(receiveValue("blue_sftt")).isCloseTo(6 * Math.pow(0.98, 5) + fit, within(EXACT));
+        assertThat(receiveValue("blue_sftt")).isCloseTo(0.5 * 6 * Math.pow(0.98, 5) + fit, within(EXACT));
         assertThat(receiveValue("black_sftt")).isCloseTo(1.0, within(EXACT));
 
         // Sol holds it face up, which is one of its 4 points; the two are level, so Sol is a peer (rivalry 0.1).
@@ -270,19 +271,20 @@ class ComponentValuesTest extends BaseTi4Test {
         assertThat(giveCost("black_sftt")).isLessThan(early);
     }
 
-    // An Alliance is worth its owner's commander (Sol's is rated 2): half its rating while locked, all of it once
-    // unlocked. Giving the AI's own is cheap.
+    // Sol's Alliance is worth 1 by the table, reduced by 1 (to the 0.25 floor) while its commander is locked. Giving
+    // the
+    // AI's own to Sol forgoes 60% of what Letnev would pay for it (Nekro's is worth 2 early).
     @Test
     void allianceFollowsTheCommander() {
-        assertThat(receiveValue("blue_an")).isCloseTo(0.5 * 2.0, within(EXACT));
+        assertThat(receiveValue("blue_an")).isCloseTo(0.25, within(EXACT));
 
         sol.unsafeGetLeader("solcommander").setLocked(false);
-        assertThat(receiveValue("blue_an")).isCloseTo(2.0, within(EXACT));
-        assertThat(giveCost("black_an")).isCloseTo(0.3, within(EXACT));
+        assertThat(receiveValue("blue_an")).isCloseTo(1.0, within(EXACT));
+        assertThat(giveCost("black_an")).isCloseTo(0.6 * 2, within(EXACT));
     }
 
     // Military Support costs its owner a strategy token whenever it is played, so Sol never gives its own away while it
-    // holds one; with none it comes straight back at no cost beyond the risk of tokens arriving first.
+    // holds one; with none it comes straight back, but no note is ever given for less than 0.25.
     @Test
     void militarySupportIsNeverGivenWhileItsOwnerHoldsAStrategyToken() {
         sol.setStrategicCC(1);
@@ -290,7 +292,7 @@ class ComponentValuesTest extends BaseTi4Test {
 
         sol.setStrategicCC(0);
         assertThat(NotesForTrade.giveCost(table.game, sol, nekro, "ms"))
-                .isCloseTo(MilitarySupport.RETURN_RISK, within(EXACT));
+                .isCloseTo(Math.max(0.25, MilitarySupport.RETURN_RISK), within(EXACT));
     }
 
     // A Trade Agreement is worth its owner's commodities less 1, given or received.
@@ -301,10 +303,11 @@ class ComponentValuesTest extends BaseTi4Test {
         assertThat(giveCost("black_ta")).isCloseTo(3 - 1, within(EXACT));
     }
 
-    // A Ceasefire is not given away lightly; without a threat, receiving one is worth little.
+    // A Ceasefire is not given away lightly; without a threat, receiving one is worth only the 0.25 every note is
+    // worth.
     @Test
     void ceasefire() {
-        assertThat(receiveValue("blue_cf")).isCloseTo(0.2, within(EXACT));
+        assertThat(receiveValue("blue_cf")).isCloseTo(0.25, within(EXACT));
         assertThat(giveCost("black_cf")).isCloseTo(2.5, within(EXACT));
         assertThat(receiveValue("black_cf")).isCloseTo(1.0, within(EXACT));
 
@@ -313,7 +316,7 @@ class ComponentValuesTest extends BaseTi4Test {
     }
 
     // Political Secret is worth 1 per agenda phase still to come, through round 5: in round 3, rounds 4 and 5 before
-    // the custodians are taken, rounds 3 to 5 after.
+    // the custodians are taken, rounds 3 to 5 after; afterwards only the 0.25 floor every note keeps.
     @Test
     void politicalSecret() {
         assertThat(receiveValue("blue_ps")).isCloseTo(2, within(EXACT));
@@ -323,7 +326,7 @@ class ComponentValuesTest extends BaseTi4Test {
         assertThat(receiveValue("blue_ps")).isCloseTo(3, within(EXACT));
 
         table.game.setRound(6);
-        assertThat(receiveValue("blue_ps")).isZero();
+        assertThat(receiveValue("blue_ps")).isCloseTo(0.25, within(EXACT));
     }
 
     // The AI keeps its own faction note unless paid.
@@ -351,7 +354,8 @@ class ComponentValuesTest extends BaseTi4Test {
         assertThat(NotesForTrade.giveCost(table.game, nekro, letnev, "red_ta")).isCloseTo(2 - 1 - 0.3, within(EXACT));
     }
 
-    // A "TBD" note requested from the AI costs its least harmful note, never Support for the Throne.
+    // A "TBD" note requested from the AI costs its least harmful note, never Support for the Throne. Its Alliance costs
+    // 60% of the 2 Letnev would pay for it.
     @Test
     void genericNoteCostsTheLeastHarmfulNote() {
         nekro.setPromissoryNote("black_sftt", 11);
@@ -361,7 +365,7 @@ class ComponentValuesTest extends BaseTi4Test {
         nekro.setPromissoryNote("black_ps", 13);
         nekro.setPromissoryNote("black_an", 12);
         assertThat(NotesForTrade.leastHarmful(table.game, nekro, sol)).contains("black_an");
-        assertThat(ComponentValues.give(table.game, nekro, sol, generic, 0.8)).isCloseTo(0.3, within(EXACT));
+        assertThat(ComponentValues.give(table.game, nekro, sol, generic, 0.8)).isCloseTo(0.6 * 2, within(EXACT));
     }
 
     // A note in a deal is named by its owner's hand id: the value comes from the note it names.

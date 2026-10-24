@@ -8,9 +8,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.scoring.ObjectiveValue;
+import ti4.ai.scoring.ThronePoint;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
+import ti4.ai.trade.AllianceValue;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
@@ -40,14 +42,29 @@ class PlayAreaNotesTest extends BaseTi4Test {
         test.nekro.addPromissoryNoteToPlayArea(note);
     }
 
-    // Activating a system with Sol's units would hand Sol's Support for the Throne back: a victory point lost.
+    // Activating a system with Sol's units would hand Sol's Support for the Throne back: a victory point lost, priced
+    // by what it is worth to Nekro now. Early on, with nobody near the goal, that is well under a full point.
     @Test
-    void chargesAVictoryPointForReturningSupportForTheThrone() {
+    void chargesWhatTheThronePointIsWorthForReturningSupportForTheThrone() {
         aiHoldsInPlayArea("blue_sftt");
+        test.units(tile, "space", test.sol, UnitType.Destroyer, 1);
+        double point = ThronePoint.kept(test.game, test.nekro, test.sol);
+
+        assertThat(point).isPositive().isLessThan(ObjectiveValue.VICTORY_POINT_VALUE);
+        assertThat(PlayAreaNotes.adjustedScore(test.game, test.nekro, tile, plan(false, 10.0)))
+                .isEqualTo(10.0 - point);
+    }
+
+    // Losing Sol's Alliance costs its table value to Nekro: 1, reduced by 1 while Sol's commander is locked, so only
+    // the 0.25 floor.
+    @Test
+    void chargesTheAllianceValueForReturningAnAlliance() {
+        aiHoldsInPlayArea("blue_an");
         test.units(tile, "space", test.sol, UnitType.Destroyer, 1);
 
         assertThat(PlayAreaNotes.adjustedScore(test.game, test.nekro, tile, plan(false, 10.0)))
-                .isEqualTo(10.0 - ObjectiveValue.VICTORY_POINT_VALUE);
+                .isEqualTo(10.0 - AllianceValue.lost(test.game, test.nekro, test.sol));
+        assertThat(AllianceValue.lost(test.game, test.nekro, test.sol)).isEqualTo(0.25);
     }
 
     @Test

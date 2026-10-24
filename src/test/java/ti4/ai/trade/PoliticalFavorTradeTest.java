@@ -36,10 +36,10 @@ class PoliticalFavorTradeTest extends BaseTi4Test {
     }
 
     @Test
-    void costsNothingOnceNoAgendaPhaseIsLeft() {
+    void costsOnlyTheMinimumOnceNoAgendaPhaseIsLeft() {
         test.game.setRound(6);
 
-        assertThat(giveCost()).isZero();
+        assertThat(giveCost()).isCloseTo(0.25, within(EXACT));
     }
 
     @Test

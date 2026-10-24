@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FactionAggression;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.scoring.ThronePoint;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -47,7 +48,7 @@ class ThroneValue {
         if (owner == null) return NotesForTrade.OTHER_NOTE;
         int shared = sharedSystems(game, seat, owner);
         boolean neighbours = TradeLegality.neighbours(game, seat, owner);
-        double points = Desperation.scoreValue(game, seat, 1) * keepChance(game, neighbours, shared, weights);
+        double points = ThronePoint.gained(game, seat, owner) * keepChance(game, neighbours, shared, weights);
         return points
                 - restriction(game, seat, owner, neighbours, shared, weights)
                 - earlyCost(game, seat, owner)
