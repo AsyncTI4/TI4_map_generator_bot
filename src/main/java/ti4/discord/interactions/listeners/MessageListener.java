@@ -108,6 +108,9 @@ class MessageListener extends ListenerAdapter {
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         try {
             String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
+            if ("pbd30k".equalsIgnoreCase(gameName)) {
+                gameName = "pbd100threetythousand";
+            }
             boolean isValidGameMessage = GameManager.isValid(gameName);
             if (isValidGameMessage) {
                 SavedBotMessagesService.getBean().cache(message);
@@ -429,7 +432,9 @@ class MessageListener extends ListenerAdapter {
     }
 
     private static boolean addFactionEmojiReactionsToMessages(MessageReceivedEvent event, String gameName) {
+
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
+
         if (managedGame.getGame().isHiddenAgendaMode()
                 && managedGame.getGame().getStoredValue("executiveOrder").isEmpty()
                 && managedGame.getGame().getPhaseOfGame().toLowerCase().contains("agenda")) {
