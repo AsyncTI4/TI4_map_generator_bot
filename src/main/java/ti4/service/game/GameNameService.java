@@ -38,15 +38,27 @@ public class GameNameService {
         return getGameNameFromChannel(event.getChannel());
     }
 
+    // TODO:  In the future, we should allow specifying alternate game names
+    // Then make this a more generic, "getCanonicalGameName" or some such 
+    @Nullable
+    private static string pbd30kHackFix(String gameName) {
+        if ("pbd30k".equalsIgnoreCase(gameName)) {
+            return "pbd100threetythousand";
+        }
+        return gameName;
+    }
+
     @Nullable
     public static String getGameNameFromChannel(@NotNull Channel channel) {
         String gameName = getGameNameFromChannelName(channel.getName());
+        gameName = pbd30kHackFix(gameName); // FIXME
         if (GameManager.isValid(gameName)) {
             return gameName;
         }
         if (channel instanceof ThreadChannel) {
             IThreadContainerUnion parentChannel = ((ThreadChannel) channel).getParentChannel();
             gameName = getGameNameFromChannelName(parentChannel.getName());
+            gameName = pbd30kHackFix(gameName);  // FIXME
         }
         if (GameManager.isValid(gameName)) {
             return gameName;
