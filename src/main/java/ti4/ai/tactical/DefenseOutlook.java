@@ -177,7 +177,7 @@ public final class DefenseOutlook {
 
     Standings standings() {
         if (root != null) return root.standings();
-        if (standings == null) standings = new Standings(game, incoming);
+        if (standings == null) standings = new Standings(game, seat, incoming);
         return standings;
     }
 
@@ -669,7 +669,14 @@ public final class DefenseOutlook {
     private double aggression(Player enemy) {
         double tech = TECH_PER_STEP * Math.min(TECH_STEPS, militaryTech(enemy));
         double ratio = fleetCostTotal(enemy) / Math.max(1, fleetCostTotal(seat));
-        return FactionAggression.of(enemy).factor() + tech + NAVY_WEIGHT * clamp(ratio - 1, 0, 1);
+        return temper(enemy) + tech + NAVY_WEIGHT * clamp(ratio - 1, 0, 1);
+    }
+
+    private double temper(Player enemy) {
+        double factor = FactionAggression.of(enemy).factor();
+        if (SlayIntent.hunts(game, enemy, seat)) return Math.max(factor, FactionAggression.AGGRESSIVE.factor());
+        if (SlayIntent.huntsOthers(game, enemy, seat)) return Math.min(factor, FactionAggression.PASSIVE.factor());
+        return factor;
     }
 
     private static int militaryTech(Player enemy) {

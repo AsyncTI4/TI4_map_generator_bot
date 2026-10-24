@@ -36,6 +36,34 @@ class TacticalPlannerTest extends BaseTi4Test {
         neighbour = AiTestGame.neighbourOf(AiTestGame.HOME);
     }
 
+    // Self-play: seats passed holding exactly the 6 tokens of Galvanize the People while another seat was sure to reach
+    // 10 first on public information. A plain expansion does not outweigh the 2-point reserve, so the seat keeps its
+    // tokens; once Sol (Leadership, 3 tokens, 8 points) is projected to win before Nekro can score, the reserve is
+    // dropped and the expansion goes ahead.
+    @Test
+    void dropsTheTokenReserveWhenAnotherSeatWinsFirst() {
+        test.game.setVp(10);
+        test.aiIsActive("action");
+        for (int card = 1; card <= 8; card++) test.game.setScTradeGood(card, 0);
+        test.game.getRevealedPublicObjectives().put("galvanize", 1);
+        test.nekro.setTacticalCC(3);
+        test.nekro.setStrategicCC(3);
+        test.nekro.addSC(5);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
+        test.place("26", neighbour);
+        test.solHomeBeside(neighbour);
+        test.sol.addSC(1);
+        test.sol.setTacticalCC(2);
+        test.sol.setStrategicCC(1);
+
+        assertThat(TacticalPlanner.best(test.game, test.nekro)).isEmpty();
+
+        test.points(test.sol, 8);
+
+        assertThat(TacticalPlanner.best(test.game, test.nekro)).isPresent();
+    }
+
     // A carrier already sits in the system with its infantry aboard: activating that system lands them without
     // moving anything in.
     @Test

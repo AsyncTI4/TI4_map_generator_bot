@@ -36,10 +36,17 @@ public class ScoringReserve {
         }
     }
 
+    public static double reservedWorth(Game game, Player seat) {
+        return reserved(game, seat)
+                .map(spend -> ScoringStakes.scoreValue(game, seat, ObjectivePolicy.victoryPoints(spend.objectiveId())))
+                .orElse(0.0);
+    }
+
     public static Optional<Reserved> reserved(Game game, Player seat) {
         if (!isActionPhase(game) || !Helper.canPlayerScorePOs(game, seat)) {
             return Optional.empty();
         }
+        if (!timed("scoring.winRace", () -> WinRace.winnersBefore(game, seat)).isEmpty()) return Optional.empty();
         Wallet wallet = timed(
                 "scoring.wallet",
                 () -> custodiansClaim(game, seat)
