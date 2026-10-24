@@ -46,7 +46,8 @@ class CommandTokenPolicyTest extends BaseTi4Test {
     }
 
     // With few tokens, tactics come first: two of them, then the starting fleet pool of three, then two strategy
-    // tokens for follows; past that, tactics again.
+    // tokens for follows; past that, tactics again. A held Strategize puts one strategy token ahead of the second
+    // tactic token (see StrategizeTokensTest).
     @Test
     void growsTwoTacticsThenTwoStrategyTokensThenTactics() {
         test.nekro.setTacticalCC(0);

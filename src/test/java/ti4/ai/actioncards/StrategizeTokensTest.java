@@ -79,11 +79,25 @@ class StrategizeTokensTest extends BaseTi4Test {
     }
 
     @Test
-    void theTokenNeverComesBeforeTheTwoTacticTokensTheExistingPrioritiesKeep() {
+    void theStrategyTokenComesAfterTheFirstTacticTokenButBeforeTheSecond() {
+        table.game.setPhaseOfGame("status");
+        table.nekro.setStrategicCC(0);
+        holdStrategize();
+        table.nekro.setTacticalCC(0);
+        assertThat(nextToken()).isEqualTo(GROW_TACTIC);
+
+        table.nekro.setTacticalCC(1);
+        assertThat(nextToken()).isEqualTo(GROW_STRATEGY);
+
+        table.nekro.setStrategicCC(1);
+        assertThat(nextToken()).isEqualTo(GROW_TACTIC);
+    }
+
+    @Test
+    void withoutStrategizeTheSecondTacticTokenStillComesFirst() {
         table.game.setPhaseOfGame("status");
         table.nekro.setTacticalCC(1);
         table.nekro.setStrategicCC(0);
-        holdStrategize();
 
         assertThat(nextToken()).isEqualTo(GROW_TACTIC);
     }
