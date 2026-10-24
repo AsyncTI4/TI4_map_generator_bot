@@ -100,14 +100,14 @@ class GrievanceTest extends BaseTi4Test {
     @Test
     void stoppingAPlayerScoringAngersThemUnlessTheyLeadHeavily() {
         Player sardakk = sixPlayerMapWithSardakkAt307();
-        Standings standings = new Standings(test.game, null);
+        Standings standings = new Standings(test.game, null, null);
         test.points(test.sol, 4);
         test.points(sardakk, 2);
         double trailingLead = standings.leadOverField(sardakk);
         double trailing = Grievance.scoringDenial(trailingLead);
 
         test.points(sardakk, 5);
-        Standings later = new Standings(test.game, null);
+        Standings later = new Standings(test.game, null, null);
         double leadingLead = later.leadOverField(sardakk);
         double leading = Grievance.scoringDenial(leadingLead);
 
