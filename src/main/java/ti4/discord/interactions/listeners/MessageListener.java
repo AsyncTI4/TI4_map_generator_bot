@@ -108,7 +108,7 @@ class MessageListener extends ListenerAdapter {
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         try {
             String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
-            if ("pbd30k".equalsIgnoreCase(gameName)) {
+            if (event.getChannel().getName().contains("pbd30k")) {
                 gameName = "pbd100threetythousand";
             }
             boolean isValidGameMessage = GameManager.isValid(gameName);
