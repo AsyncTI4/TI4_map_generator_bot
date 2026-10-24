@@ -1,13 +1,17 @@
 package ti4.ai.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import ti4.ai.AiSettings;
 import ti4.ai.AiTestGame;
 import ti4.ai.actuation.AiActuator.SeatIdentity;
@@ -19,6 +23,7 @@ import ti4.ai.fallback.FallbackRecord;
 import ti4.ai.profile.AiProfile;
 import ti4.ai.runtime.AiTickRunner.SeatTick;
 import ti4.ai.trace.Thinking;
+import ti4.logging.BotLogger;
 import ti4.testUtils.BaseTi4Test;
 
 // A decision that never settles is cut short instead of hanging the tick: the seat idles, the table is told why, and
@@ -65,6 +70,36 @@ class AiTickRunnerThinkingTest extends BaseTi4Test {
         assertThat(records.getFirst().pendingDecision()).startsWith("...").contains("planner.b > planner.a");
         assertThat(lane.thinking().cutShort()).isEqualTo(1);
         assertThat(calls.get()).isLessThan(30);
+    }
+
+    // A seat that keeps hitting the same cycle would log it on every retry (130 lines in aiselfplay737459). The full
+    // report is logged once per seat and round; the lane keeps the latest one and the count for the stall report.
+    @Test
+    void anAbortIsLoggedOncePerRoundWithItsPathKeysAndInputs() {
+        test.nekro.setActionCard("overrule", 412);
+        FactionBrain stuck = brain(ctx -> recurse(new AtomicInteger(), 0));
+        List<String> warnings = new ArrayList<>();
+        try (MockedStatic<BotLogger> logger = Mockito.mockStatic(BotLogger.class)) {
+            logger.when(() -> BotLogger.warning(anyString())).thenAnswer(call -> warnings.add(call.getArgument(0)));
+
+            AiTickRunner.decide(tick, stuck, context);
+            test.nekro.setTg(test.nekro.getTg() + 1);
+            AiTickRunner.decide(tick, stuck, context);
+            test.game.setRound(test.game.getRound() + 1);
+            test.nekro.setTg(test.nekro.getTg() + 1);
+            AiTickRunner.decide(tick, stuck, context);
+        }
+
+        assertThat(warnings).hasSize(2);
+        assertThat(warnings.getFirst())
+                .startsWith("AI thinking aborted game=" + test.game.getName() + " round=2 phase=action seat=nekro")
+                .contains("path=[planner.a > (planner.b > planner.a) x")
+                .contains("calls=[planner.a x")
+                .contains("cards [overrule]")
+                .contains("explore cultural ");
+        assertThat(lane.lastAbort())
+                .startsWith("3 aborts, last: AI thinking aborted")
+                .contains("round=3");
     }
 
     @Test

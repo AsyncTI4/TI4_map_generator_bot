@@ -34,6 +34,31 @@ class ThinkingTest {
         }
     }
 
+    // The abort names the memo keys of the open spans, so a cycle that re-enters the same key is told apart from one
+    // that walks different seats or tiles; the trail folds the repeating cycle into one group.
+    @Test
+    void anAbortCarriesTheKeysOfItsOpenSpansAndFoldsTheCycle() {
+        try (Thinking.Decision decision = Thinking.open(LIMITS, clock::get)) {
+            assertThatThrownBy(() -> {
+                        try (Thinking.Span outer = Thinking.enter("deal")) {
+                            keyedPing(0);
+                        }
+                    })
+                    .isInstanceOfSatisfying(ThinkingAborted.class, aborted -> {
+                        assertThat(aborted.keys()).containsExactly("ping sol", "pong tile 28");
+                        assertThat(aborted.compactTrail()).isEqualTo("deal > ping > (pong > ping) x3");
+                    });
+        }
+    }
+
+    @Test
+    void aTrailWithoutARepeatIsLeftAsItIs() {
+        ThinkingAborted aborted = new ThinkingAborted("budget", java.util.List.of("a", "b", "c"));
+
+        assertThat(aborted.compactTrail()).isEqualTo("a > b > c");
+        assertThat(aborted.keys()).isEmpty();
+    }
+
     @Test
     void nestingDeeperThanTheDepthLimitIsCut() {
         try (Thinking.Decision decision = Thinking.open(LIMITS, clock::get)) {
@@ -154,6 +179,14 @@ class ThinkingTest {
     private void pong(int depth) {
         try (Thinking.Span span = Thinking.enter("pong")) {
             ping(depth + 1);
+        }
+    }
+
+    private void keyedPing(int depth) {
+        try (Thinking.Span span = Thinking.enter("ping", () -> "sol")) {
+            try (Thinking.Span inner = Thinking.enter("pong", () -> "tile 28")) {
+                keyedPing(depth + 1);
+            }
         }
     }
 

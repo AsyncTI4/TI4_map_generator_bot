@@ -42,6 +42,8 @@ final class AiLane {
     private int delegationRound = -1;
     private int delegationsThisRound;
     private long lastSlowWarning = Long.MIN_VALUE;
+    private int thinkingAborts;
+    private String lastAbort = "";
 
     AiLane(String gameName) {
         this.gameName = gameName;
@@ -49,6 +51,15 @@ final class AiLane {
 
     ThinkingStats thinking() {
         return thinking;
+    }
+
+    synchronized void noteAbort(String summary) {
+        thinkingAborts++;
+        lastAbort = summary;
+    }
+
+    synchronized String lastAbort() {
+        return thinkingAborts == 0 ? "" : thinkingAborts + " aborts, last: " + lastAbort;
     }
 
     boolean slowWarningDue(long now, long gapMillis) {

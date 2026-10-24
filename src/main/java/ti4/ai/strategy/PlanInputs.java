@@ -67,7 +67,7 @@ record PlanInputs(
     }
 
     private static PlanInputs compute(Game game, Player seat, PlanMoment moment) {
-        try (Thinking.Span ignored = Thinking.enter("strategy.planInputs")) {
+        try (Thinking.Span ignored = Thinking.enter("strategy.planInputs", () -> seat.getFaction() + " " + moment)) {
             return assemble(game, seat, moment, TacticalPlanner.ranked(game, seat), false);
         }
     }
