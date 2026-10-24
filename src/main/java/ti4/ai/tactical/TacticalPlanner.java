@@ -2283,7 +2283,7 @@ public class TacticalPlanner {
         return bonuses[0] + bonuses[1];
     }
 
-    private static double[] secretBonuses(Game game, Player seat, Tile tile, Strike strike, StrikeEstimate estimate) {
+    static double[] secretBonuses(Game game, Player seat, Tile tile, Strike strike, StrikeEstimate estimate) {
         return secretBonuses(
                 game, seat, tile, strike.opponent(), strike.ships(), estimate.spaceCombat(), estimate.groundCombat());
     }

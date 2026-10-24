@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiSeats;
@@ -44,14 +43,8 @@ public class BombardmentRules {
     public record Target(String planet, Player defender) {}
 
     public static Optional<Target> target(Game game, Player seat, Tile tile, Map<UnitType, Integer> ships) {
-        return target(game, seat, tile, ships, name -> true);
-    }
-
-    private static Optional<Target> target(
-            Game game, Player seat, Tile tile, Map<UnitType, Integer> ships, Predicate<String> allowed) {
         if (dice(seat, ships) == 0) return Optional.empty();
         for (String name : BombardmentService.getBombardablePlanets(seat, game, tile)) {
-            if (!allowed.test(name)) continue;
             if (!(tile.getUnitHolders().get(name) instanceof Planet planet)) continue;
             Optional<Player> defender = game.getRealPlayers().stream()
                     .filter(other -> other != seat && BoardView.groundForces(planet, other) > 0)
@@ -86,10 +79,7 @@ public class BombardmentRules {
         Optional<String> state = context.memory().get(key);
         if (state.isPresent()) return afterPress(context, tile, key, state.get());
         Player seat = context.seat();
-        Predicate<String> allowed =
-                defendedBySeveral(context.game(), seat, tile) ? plannedLandings::contains : name -> true;
-        Optional<Target> target =
-                target(context.game(), seat, tile, BoardView.ships(BoardView.space(tile), seat), allowed);
+        Optional<Target> target = landingTarget(context.game(), seat, tile, plannedLandings);
         if (target.isEmpty()) return Optional.empty();
         String position = tile.getPosition();
         Optional<Match> roll = Prompts.first(
@@ -113,6 +103,12 @@ public class BombardmentRules {
         ActionSecretRules.watchBombardment(
                 context, position, target.get().planet(), target.get().defender());
         return Optional.of(roll.get().press("bombard " + target.get().planet()));
+    }
+
+    static Optional<Target> landingTarget(Game game, Player seat, Tile tile, Set<String> plannedLandings) {
+        Optional<Target> target = target(game, seat, tile, BoardView.ships(BoardView.space(tile), seat));
+        if (!defendedBySeveral(game, seat, tile)) return target;
+        return target.filter(found -> plannedLandings.contains(found.planet()));
     }
 
     private static boolean defendedBySeveral(Game game, Player seat, Tile tile) {

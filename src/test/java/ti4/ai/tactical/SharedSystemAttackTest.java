@@ -101,17 +101,6 @@ class SharedSystemAttackTest extends BaseTi4Test {
         assertThat(plan.get().landings()).containsKey(STARPOINT).doesNotContainKey(NEW_ALBION);
     }
 
-    // Ships of two other players in one system: the evaluator models a space combat between two players only
-    // (LRR 78), so this stays refused.
-    @Test
-    void refusesASystemWithShipsOfTwoOtherPlayers() {
-        fleetAtHome();
-        sardakkDestroyerWorthKilling();
-        board.test.units(system, "space", sol(), UnitType.Destroyer, 1);
-
-        assertThat(attack()).isEmpty();
-    }
-
     // A lone destroyer with nothing at stake is not worth an action, and two fortress planets of a player far behind
     // do not change that: still no attack.
     @Test

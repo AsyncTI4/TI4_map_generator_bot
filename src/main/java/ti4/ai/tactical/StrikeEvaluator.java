@@ -56,13 +56,21 @@ class StrikeEvaluator {
 
     // TODO: Magen Defense Grid, Mentak Ambush, L4 Disruptors and Titans' planetary PDS are not in the odds
     static StrikeEstimate estimate(Game game, Player seat, Strike strike) {
+        return estimate(game, seat, strike, true);
+    }
+
+    static StrikeEstimate laterSpaceCombat(Game game, Player seat, Strike strike) {
+        return estimate(game, seat, strike, false);
+    }
+
+    private static StrikeEstimate estimate(Game game, Player seat, Strike strike, boolean openingFire) {
         Tile target = strike.target();
         Player opponent = strike.opponent();
         UnitHolder space = BoardView.space(target);
         Side attacking = new Side(seat, strike.ships());
         Map<UnitType, Integer> defenderShips = merged(BoardView.ships(space, opponent), strike.extraDefenderShips());
         boolean spaceCombat = !defenderShips.isEmpty();
-        int theirCannon = BattleMath.expectedCannonHits(game, seat, target);
+        int theirCannon = openingFire ? BattleMath.expectedCannonHits(game, seat, target) : 0;
         List<Combatant> arriving =
                 CombatForces.combatants(game, target, space, attacking, new Side(opponent, Map.of()), strike.damaged());
         List<Combatant> survivingCannon = BattleMath.afterCannonFire(arriving, theirCannon);
@@ -72,7 +80,8 @@ class StrikeEvaluator {
         double cannonLoss = costOf(arriving) - costOf(survivingCannon);
         Space cannonOnly = new Space(1, cannonLoss, cannonLoss, 0, 0, cannonLoss > 0 ? 1 : 0);
         Space fight = spaceCombat
-                ? spaceCombat(game, seat, strike, attacking, new Side(opponent, defenderShips), theirCannon)
+                ? spaceCombat(
+                        game, seat, strike, attacking, new Side(opponent, defenderShips), theirCannon, openingFire)
                 : cannonOnly;
         boolean escaped = spaceCombat && escapes(game, strike, fight);
         if (escaped) fight = cannonOnly;
@@ -141,7 +150,13 @@ class StrikeEvaluator {
     }
 
     private static Space spaceCombat(
-            Game game, Player seat, Strike strike, Side attacking, Side defending, int theirCannon) {
+            Game game,
+            Player seat,
+            Strike strike,
+            Side attacking,
+            Side defending,
+            int theirCannon,
+            boolean openingFire) {
         Tile target = strike.target();
         Player opponent = strike.opponent();
         UnitHolder space = BoardView.space(target);
@@ -157,7 +172,7 @@ class StrikeEvaluator {
         List<Combatant> defendersBefore =
                 CombatForces.combatants(game, target, space, barragedDefenders, barragedAttackers, defendersDamaged);
         List<Combatant> defenders = BattleMath.afterCannonFire(
-                defendersBefore, BattleMath.ownCannonHits(game, seat, target, strike.origins()));
+                defendersBefore, openingFire ? BattleMath.ownCannonHits(game, seat, target, strike.origins()) : 0);
         List<Combatant> attackersBefore =
                 CombatForces.combatants(game, target, space, barragedAttackers, barragedDefenders, strike.damaged());
         List<Combatant> attackers = BattleMath.afterCannonFire(attackersBefore, theirCannon);
