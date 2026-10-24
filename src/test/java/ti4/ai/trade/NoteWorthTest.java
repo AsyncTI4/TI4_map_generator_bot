@@ -71,7 +71,7 @@ class NoteWorthTest extends BaseTi4Test {
         assertThat(ThronePoint.gained(table.game, nekro, sol)).isEqualTo(ScoringStakes.WIN_VALUE);
     }
 
-    // Muaat's Alliance: 4 early, 1 from round 4, 1 less while Muaat's commander is locked.
+    // Muaat's Alliance: 4 early, 1 from round 4; while Muaat's commander is locked its modifier (-1) reduces it by 1.
     @Test
     void allianceBuyValueFollowsTheTableByRound() {
         Player muaat = table.aiSeat("muaat", "yellow");
@@ -85,6 +85,20 @@ class NoteWorthTest extends BaseTi4Test {
         muaat.unsafeGetLeader("muaatcommander").setLocked(true);
         table.game.setRound(2);
         assertThat(AllianceValue.buyValue(table.game, nekro, muaat, false)).isCloseTo(3, within(EXACT));
+        table.game.setRound(4);
+        assertThat(AllianceValue.buyValue(table.game, nekro, muaat, false)).isCloseTo(0.25, within(EXACT));
+    }
+
+    // A locked commander never makes an Alliance worth more, whatever the sign of the table's modifier.
+    @Test
+    void lockedIsNeverWorthMoreThanUnlocked() {
+        for (AllianceValue.Row row : AllianceValue.rows()) {
+            for (boolean late : new boolean[] {false, true}) {
+                assertThat(AllianceValue.tableValue(row, late, true))
+                        .as(row + (late ? " late" : " early"))
+                        .isLessThanOrEqualTo(AllianceValue.tableValue(row, late, false));
+            }
+        }
     }
 
     // The faction-specific bonus: Xxcha's Alliance is worth 2 more to Nekro than to Sol.
@@ -98,13 +112,13 @@ class NoteWorthTest extends BaseTi4Test {
         assertThat(AllianceValue.buyValue(table.game, sol, xxcha, true)).isCloseTo(1, within(EXACT));
     }
 
-    // Hacan's late, locked Alliance is worth 0 - 1 by the table, but no note is worth less than 0.25.
+    // Saar's locked Alliance is worth 0.5 - 0.5 = 0 by the table, but no note is worth less than 0.25.
     @Test
     void noAllianceIsWorthLessThanAQuarter() {
-        Player hacan = table.aiSeat("hacan", "yellow");
-        hacan.addOwnedPromissoryNoteByID("yellow_an");
+        Player saar = table.aiSeat("saar", "yellow");
+        saar.addOwnedPromissoryNoteByID("yellow_an");
 
-        assertThat(AllianceValue.buyValue(table.game, nekro, hacan, false)).isCloseTo(0.25, within(EXACT));
+        assertThat(AllianceValue.buyValue(table.game, nekro, saar, false)).isCloseTo(0.25, within(EXACT));
         assertThat(NotesForTrade.receiveValue(table.game, nekro, "yellow_an")).isCloseTo(0.25, within(EXACT));
     }
 

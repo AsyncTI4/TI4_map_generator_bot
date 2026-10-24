@@ -55,7 +55,8 @@ class PlayAreaNotesTest extends BaseTi4Test {
                 .isEqualTo(10.0 - point);
     }
 
-    // Losing Sol's Alliance costs its table value to Nekro; Sol's commander is locked, so only the 0.25 floor.
+    // Losing Sol's Alliance costs its table value to Nekro: 1, reduced by 1 while Sol's commander is locked, so only
+    // the 0.25 floor.
     @Test
     void chargesTheAllianceValueForReturningAnAlliance() {
         aiHoldsInPlayArea("blue_an");

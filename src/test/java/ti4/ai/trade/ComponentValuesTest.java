@@ -271,7 +271,8 @@ class ComponentValuesTest extends BaseTi4Test {
         assertThat(giveCost("black_sftt")).isLessThan(early);
     }
 
-    // Sol's Alliance is worth 1 by the table, 1 less while its commander is locked (floored at 0.25). Giving the
+    // Sol's Alliance is worth 1 by the table, reduced by 1 (to the 0.25 floor) while its commander is locked. Giving
+    // the
     // AI's own to Sol forgoes 60% of what Letnev would pay for it (Nekro's is worth 2 early).
     @Test
     void allianceFollowsTheCommander() {

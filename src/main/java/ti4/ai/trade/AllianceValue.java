@@ -1,8 +1,10 @@
 package ti4.ai.trade;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FlagshipRating;
@@ -45,25 +47,25 @@ public class AllianceValue {
             Map.entry("yin", new Row(3, 2, -1)),
             Map.entry("nekro", new Row(2, 1, 0)),
             Map.entry("sardakk", new Row(1, 1, -1)),
-            Map.entry("saar", new Row(0.5, 0.5, 0)),
+            Map.entry("saar", new Row(0.5, 0.5, 0.5)),
             Map.entry("cabal", new Row(2, 1, -1)),
-            Map.entry("mentak", new Row(0.5, 0.5, 0)),
+            Map.entry("mentak", new Row(0.5, 0.5, 0.5)),
             Map.entry("argent", new Row(1, 1, -1)),
             Map.entry("sol", new Row(1, 1, -1)),
             Map.entry("letnev", new Row(1, 1, -1)),
             Map.entry("deepwrought", new Row(3, 2, 0)),
             Map.entry("empyrean", new Row(1, 1, -1)),
-            Map.entry("ralnel", new Row(0.5, 0.5, 0)),
-            Map.entry("l1z1x", new Row(0.5, 0.5, 0)),
-            Map.entry("firmament", new Row(0.5, 0.5, 0)),
-            Map.entry("obsidian", new Row(0.5, 0.5, 0)),
+            Map.entry("ralnel", new Row(0.5, 0.5, 0.5)),
+            Map.entry("l1z1x", new Row(0.5, 0.5, 0.5)),
+            Map.entry("firmament", new Row(0.5, 0.5, 0.5)),
+            Map.entry("obsidian", new Row(0.5, 0.5, 0.5)),
             Map.entry("jolnar", new Row(1, 1, 0)),
-            Map.entry("naalu", new Row(0.5, 0.5, 0)),
+            Map.entry("naalu", new Row(0.5, 0.5, 0.5)),
             Map.entry("bastion", new Row(2, 2, 0)),
             Map.entry("naaz", new Row(1, 1, -1)),
-            Map.entry("ghost", new Row(0.5, 0.5, 0)),
+            Map.entry("ghost", new Row(0.5, 0.5, 0.5)),
             Map.entry("yssaril", new Row(1, 1, -1)),
-            Map.entry("arborec", new Row(0.5, 0.5, 0)));
+            Map.entry("arborec", new Row(0.5, 0.5, 0.5)));
 
     static double received(Game game, Player seat, Player owner) {
         return received(game, seat, owner, false);
@@ -83,11 +85,19 @@ public class AllianceValue {
         Optional<String> commander = commanderId(owner);
         if (commander.isEmpty()) return NotesForTrade.MIN_NOTE_WORTH;
         Row row = row(owner);
-        double value = game.getRound() >= LATE_ROUND ? row.late() : row.early();
-        if (!owner.hasLeaderUnlocked(commander.get())) value += row.locked();
+        double value = tableValue(row, game.getRound() >= LATE_ROUND, !owner.hasLeaderUnlocked(commander.get()));
         value += publicBonus(game, buyer, owner);
         if (!buyerPrivate) value += privateBonus(buyer, owner);
         return Math.max(NotesForTrade.MIN_NOTE_WORTH, value);
+    }
+
+    static double tableValue(Row row, boolean late, boolean locked) {
+        double value = late ? row.late() : row.early();
+        return locked ? value - Math.abs(row.locked()) : value;
+    }
+
+    static List<Row> rows() {
+        return Stream.concat(ROWS.values().stream(), Stream.of(DEFAULT_ROW)).toList();
     }
 
     static double givenCost(Game game, Player seat, Player receiver) {
