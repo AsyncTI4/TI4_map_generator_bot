@@ -16,7 +16,10 @@ class Undo extends GameStateSubcommand {
 
     public Undo() {
         super(Constants.UNDO, "Undo the last action", false, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.UNDO_TO_COMMAND, "Command to undo back to")
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.UNDO_OPTION,
+                        "This command and every command after it will be undone")
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
@@ -46,7 +49,7 @@ class Undo extends GameStateSubcommand {
             return;
         }
 
-        String gameToUndoBackTo = event.getOption(Constants.UNDO_TO_COMMAND, null, OptionMapping::getAsString);
+        String gameToUndoBackTo = event.getOption(Constants.UNDO_OPTION, null, OptionMapping::getAsString);
         if (gameToUndoBackTo == null || gameToUndoBackTo.isEmpty()) {
             MessageHelper.replyToMessage(event, "Must specify command to undo back to");
             return;
