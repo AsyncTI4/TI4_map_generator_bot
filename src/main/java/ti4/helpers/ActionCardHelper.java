@@ -2120,6 +2120,10 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "courageousStarter", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
+            if ("disable".equals(automationID) || "disable2".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveDisable", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
             if ("veto".equals(automationID)) {
                 codedButtons.add(Buttons.blue(player.factionButtonChecker() + "resolveVeto", "Reveal next Agenda"));
                 sendResolveMsgToMainChannel(introBody, codedButtons, player, game);

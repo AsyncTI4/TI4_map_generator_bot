@@ -45,6 +45,7 @@ import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.service.actioncard.DisableService;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
 import ti4.service.game.EndPhaseService;
@@ -88,6 +89,7 @@ public class EndTurnService {
 
     public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
         WarGamesBrActionCardHandler.clear(game);
+        DisableService.clear(game);
         KaltrimUnitHandler.clearShrineInfantryRemovalState(game);
         UydaiUnitHandler.offerDeathCommandosPlacement(event, game, player);
         if (StringUtils.isNotEmpty(game.getCurrentActiveSystem())

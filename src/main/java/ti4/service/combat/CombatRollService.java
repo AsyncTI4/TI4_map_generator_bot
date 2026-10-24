@@ -112,6 +112,7 @@ import ti4.model.RelicModel;
 import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
+import ti4.service.actioncard.DisableService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -2914,6 +2915,22 @@ public class CombatRollService {
     }
 
     public static Map<Pair<UnitModel, UnitHolder>, Integer> getUnitsInCombatByHolder(
+            Tile tile,
+            UnitHolder unitHolder,
+            Player player,
+            GenericInteractionCreateEvent event,
+            CombatRollType roleType,
+            Game game) {
+        Map<Pair<UnitModel, UnitHolder>, Integer> units =
+                unitsBeforeDisable(tile, unitHolder, player, event, roleType, game);
+        if (roleType == CombatRollType.SpaceCannonOffence || roleType == CombatRollType.SpaceCannonDefence) {
+            units = new HashMap<>(units);
+            units.keySet().removeIf(entry -> DisableService.losesPdsAbilities(game, tile, player, entry.getLeft()));
+        }
+        return units;
+    }
+
+    private static Map<Pair<UnitModel, UnitHolder>, Integer> unitsBeforeDisable(
             Tile tile,
             UnitHolder unitHolder,
             Player player,

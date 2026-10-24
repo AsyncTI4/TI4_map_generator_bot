@@ -27,6 +27,7 @@ public class SabotageService {
 
     private static final String WAR_MACHINE_TITLE = "War Machine";
     private static final String WAR_MACHINE_SPENT = "warmachine";
+    private static final String DISABLE_TITLE = "Disable";
     private static final String FLANK_SPEED_TITLE = "Flank Speed";
     private static final String FLANK_SPEED_BOOST = "flankspeedBoost";
     private static final String CANCELED_WINDOWS = "canceledActionCardWindows";
@@ -178,6 +179,7 @@ public class SabotageService {
     public static void undoEffectsOfCanceledCard(Game game, @Nullable Player cardPlayer, String title) {
         if (WAR_MACHINE_TITLE.equals(title) && cardPlayer != null) cardPlayer.removeSpentThing(WAR_MACHINE_SPENT);
         if (FLANK_SPEED_TITLE.equals(title)) game.removeStoredValue(FLANK_SPEED_BOOST);
+        if (DISABLE_TITLE.equals(title)) DisableService.clear(game);
     }
 
     public static boolean isShameixBaneCancellationBlocked(Player canceller, Player actionCardPlayer) {
