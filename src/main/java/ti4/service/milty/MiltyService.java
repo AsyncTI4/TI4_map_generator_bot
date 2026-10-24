@@ -194,6 +194,7 @@ public class MiltyService {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "### You are using preset slices!! Starting the draft right away!");
             specs.presetSlices.forEach(draftManager::addSlice);
+            MiltyDraftEventRecorder.recordStarted(game, draftManager);
             MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), startMsg);
@@ -208,6 +209,7 @@ public class MiltyService {
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             } else {
+                MiltyDraftEventRecorder.recordStarted(game, draftManager);
                 MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
 
                 game.setPhaseOfGame("miltydraft");

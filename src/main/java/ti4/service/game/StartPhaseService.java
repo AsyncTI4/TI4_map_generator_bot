@@ -96,6 +96,8 @@ import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameStartedRecorder;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 @UtilityClass
 public class StartPhaseService {
@@ -633,6 +635,9 @@ public class StartPhaseService {
         String message = firstSCPicker.getRepresentationUnfogged() + " is up to pick a strategy card.";
         game.updateActivePlayer(firstSCPicker);
         game.setPhaseOfGame("strategy");
+        if (game.getRound() == 1) {
+            GameStartedRecorder.recordOnce(game);
+        }
         GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "strategy"));
         PlayerAreaWarningService.warnAllPlayers(game);
         GMService.logActivity(game, "**Strategy** Phase for Round " + game.getRound() + " started.", true);
@@ -1271,6 +1276,7 @@ public class StartPhaseService {
         playPreassignedGiftOfPrescience(event, game);
         LoreService.showPhaseLore(game, "action"); // before setPhaseOfGame: END lore reads the old phase
         game.setPhaseOfGame("action");
+        TurnActionLog.drain(game);
         for (Player player : game.getRealPlayers()) {
             MonumentsBRButtonHandler.offerArmageddonProject(game, player);
         }

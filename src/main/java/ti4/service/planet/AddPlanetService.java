@@ -1,6 +1,7 @@
 package ti4.service.planet;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -65,8 +66,25 @@ public class AddPlanetService {
         addPlanet(player, planet, game, null, false);
     }
 
+    private static void recordControlEstablished(
+            Game game, Player player, String planet, Player previousOwner, boolean setup) {
+        String previousFaction = previousOwner == null ? null : previousOwner.getFaction();
+        GameSubEvent.ControlEstablished controlEstablished =
+                new GameSubEvent.ControlEstablished(planet, player.getFaction(), previousFaction);
+        if (GameEventDraft.stage(game, controlEstablished) || setup) {
+            return;
+        }
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("planet", planet);
+        if (previousFaction != null) {
+            payload.put("previousOwner", previousFaction);
+        }
+        GameEventService.commit(game, GameEventType.CONTROL_ESTABLISHED, player, payload);
+    }
+
     public static void addPlanet(
             Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setup) {
+        boolean setupRequested = setup;
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
         DiscordantStarsHelper.checkBRTaranisCrest(game);
@@ -490,7 +508,7 @@ public class AddPlanetService {
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Established control of "
                         + Helper.getPlanetRepresentation(planet, game) + ".");
-        GameEventDraft.stage(game, new GameSubEvent.ControlEstablished(planet));
+        recordControlEstablished(game, player, planet, previousOwner, setupRequested);
         if ((game.getPhaseOfGame().contains("agenda")
                         || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
                 && player.hasAbility("scavenge")

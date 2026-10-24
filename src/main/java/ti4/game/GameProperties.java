@@ -74,6 +74,7 @@ public class GameProperties {
     private String pendingSubEventsJson = "";
     // Undo-safe compact movement captured when tactical displacement is committed.
     private String pendingMovementState = "";
+    private String lastPlayerStateJson = "";
     private String latestCommand = "";
     private String latestOutcomeVotedFor = "";
     private String playersWhoHitPersistentNoAfter = "";

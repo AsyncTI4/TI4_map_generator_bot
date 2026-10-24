@@ -1515,6 +1515,7 @@ public class CombatRollService {
             Tile activeSystem,
             UnitHolder unitHolder) {
         String result = "";
+        int expectedHitsBeforeRoll = player.getExpectedHitsTimes10();
         RollPayloadBuilder payloadBuilder = new RollPayloadBuilder();
         List<CombatRollPayload.CombatRollNote> delayedAfterTotalNotes = new ArrayList<>();
 
@@ -2564,6 +2565,16 @@ public class CombatRollService {
         }
         result = resultBuilder.toString();
         player.setActualHits(player.getActualHits() + totalHits);
+        CombatEventRecorder.recordRoll(
+                game,
+                player,
+                opponent,
+                rollType,
+                activeSystem,
+                unitHolder,
+                playerUnitsFlat,
+                totalHits,
+                player.getExpectedHitsTimes10() - expectedHitsBeforeRoll);
         if ((chanceOfAllHits <= 2.0) && (totalHits == maximumHits)) {
             game.setStoredValue("surprisingDiceRoll", "hits");
         } else if ((chanceOfAllMiss <= 2.0) && (totalHits == 0)) {

@@ -636,8 +636,13 @@ public final class ButtonHelperAgents {
         if (playerLeader == null) {
             return;
         }
-        if (!GameEventDraft.stage(game, new GameSubEvent.LeaderPlayed(player.getFaction(), "AGENT", agent))) {
-            GameEventService.commit(game, GameEventType.CARD_PLAY_AGENT, player, Map.of("cardId", agent));
+        String agentTarget = rest.contains("_") ? rest.substring(rest.indexOf('_') + 1) : null;
+        if (!GameEventDraft.stage(
+                game, new GameSubEvent.LeaderPlayed(player.getFaction(), "AGENT", agent, agentTarget))) {
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("cardId", agent);
+            payload.put("target", agentTarget);
+            GameEventService.commit(game, GameEventType.CARD_PLAY_AGENT, player, payload);
         }
 
         ExhaustLeaderService.exhaustLeader(game, player, playerLeader);

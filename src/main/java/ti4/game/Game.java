@@ -118,6 +118,8 @@ import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -3378,6 +3380,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             player.removeActionCard(acIDNumber);
             ACStatus status = shouldPutCardOnRalnel(player) ? ACStatus.ralnelbt : null;
             setDiscardActionCard(acID, status, played);
+            if (!played) {
+                GameEventService.commit(
+                        this, GameEventType.CARD_DISCARDED, player, Map.of("cardType", "ACTION_CARD", "cardId", acID));
+            }
             if (!played && !HydromorphicHelper.hasPendingCard(this, player)) {
                 MorphaUnitHandler.recordCytoplasmicTransportDiscards(this, player, 1);
             }

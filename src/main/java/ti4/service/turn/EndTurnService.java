@@ -3,7 +3,6 @@ package ti4.service.turn;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
@@ -58,6 +57,7 @@ import ti4.service.tactical.postmovement.AtokeraHeroButton;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 @UtilityClass
 public class EndTurnService {
@@ -102,7 +102,7 @@ public class EndTurnService {
         for (Tile tile : game.getTileMap().values()) {
             TeHelperGeneral.addStationsToPlayArea(event, game, tile);
         }
-        GameEventService.commit(game, GameEventType.TURN, player, Map.of("passed", false));
+        GameEventService.commit(game, GameEventType.TURN, player, TurnActionLog.turnPayload(game, false));
         pingNextPlayer(event, game, player);
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
         if (!game.isFowMode()) {

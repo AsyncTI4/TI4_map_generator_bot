@@ -90,6 +90,8 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 public final class ButtonHelperFactionSpecific {
     private static final String DEATH_BINDING = "dspnphar";
@@ -4410,6 +4412,11 @@ public final class ButtonHelperFactionSpecific {
         }
         player2.removeActionCard(acNum);
         player.setActionCard(acID);
+        GameEventService.commit(
+                game,
+                GameEventType.CARD_STOLEN,
+                player,
+                Map.of("cardType", "ACTION_CARD", "from", player2.getFaction()));
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(), player.getRepresentationUnfogged() + "Acquired " + acID);
         MessageHelper.sendMessageToChannel(

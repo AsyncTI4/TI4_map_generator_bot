@@ -66,6 +66,7 @@ import ti4.service.unit.CheckUnitContainmentService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 @UtilityClass
 public class PlayStrategyCardService {
@@ -192,6 +193,9 @@ public class PlayStrategyCardService {
                 }
 
                 game.setSCPlayed(scToPlay, Boolean.TRUE);
+                if (game.getPhaseOfGame().contains("action")) {
+                    TurnActionLog.record(game, TurnActionLog.STRATEGIC);
+                }
                 GameEventService.commit(
                         game, GameEventType.SC_PLAYED, player, Map.of("scNumber", scToPlay, "scName", stratCardName));
                 // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST

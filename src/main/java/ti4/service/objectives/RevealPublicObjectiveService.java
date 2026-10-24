@@ -25,6 +25,8 @@ import ti4.service.StatusCleanupService;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.relic.NeuraloopService;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class RevealPublicObjectiveService {
@@ -44,6 +46,14 @@ public class RevealPublicObjectiveService {
     }
 
     private static final int WHITE_COLOR = 0xFFFFFF;
+
+    private static void recordRevealed(Game game, Map.Entry<String, Integer> objective, int stage) {
+        GameEventService.commit(
+                game,
+                GameEventType.PUBLIC_OBJECTIVE_REVEALED,
+                null,
+                Map.of("objectiveId", objective.getKey(), "stage", stage));
+    }
 
     public static void unpinRevealedObjective(Game game, String objectiveKey) {
         String embedTitleName = "__**" + revealedObjectiveName(objectiveKey) + "**__";
@@ -86,6 +96,7 @@ public class RevealPublicObjectiveService {
             return;
         }
 
+        recordRevealed(game, objective, 2);
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         NeuraloopService.offerInitialNeuraloopChoice(game, objective.getKey());
         for (Player player : game.getRealPlayers()) {
@@ -164,6 +175,8 @@ public class RevealPublicObjectiveService {
     public static void revealTwoStage2(Game game, MessageChannel channel) {
         Map.Entry<String, Integer> objective1 = game.revealStage2();
         Map.Entry<String, Integer> objective2 = game.revealStage2();
+        recordRevealed(game, objective1, 2);
+        recordRevealed(game, objective2, 2);
 
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
@@ -237,6 +250,7 @@ public class RevealPublicObjectiveService {
             return null;
         }
 
+        recordRevealed(game, objective, 1);
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         var channel = game.getActionsChannel();
         MessageHelper.sendMessageToChannel(
@@ -294,6 +308,8 @@ public class RevealPublicObjectiveService {
     public static void revealTwoStage1(Game game) {
         Map.Entry<String, Integer> objective1 = game.revealStage1();
         Map.Entry<String, Integer> objective2 = game.revealStage1();
+        recordRevealed(game, objective1, 1);
+        recordRevealed(game, objective2, 1);
 
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());

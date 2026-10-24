@@ -1,5 +1,7 @@
 package ti4.discord.interactions.buttons.handlers.actioncards;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EscapeClauseActionCardHandler;
@@ -19,6 +21,10 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
+import ti4.spring.service.gameevent.GameEventDraft;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 @UtilityClass
 class ActionCardButtonHandler {
@@ -39,6 +45,22 @@ class ActionCardButtonHandler {
                 event.getMessageChannel(),
                 "Added 1 trade good to **" + Helper.getSCName(scNum, game) + "**. There " + (useSingular ? "is" : "are")
                         + " now " + newTradeGoodCount + " trade good" + (useSingular ? "" : "s") + " on it.");
+    }
+
+    private static void recordCanceled(Game game, Player canceler, Player target, String cardName, String method) {
+        String targetFaction = target == null ? null : target.getFaction();
+        GameSubEvent.CardCanceled canceled =
+                new GameSubEvent.CardCanceled(targetFaction, cardName, canceler.getFaction(), method);
+        if (GameEventDraft.stage(game, canceled)) {
+            return;
+        }
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("cardName", cardName);
+        payload.put("method", method);
+        if (targetFaction != null) {
+            payload.put("targetFaction", targetFaction);
+        }
+        GameEventService.commit(game, GameEventType.CARD_CANCELED, canceler, payload);
     }
 
     @ButtonHandler("sabotage_")
@@ -156,6 +178,7 @@ class ActionCardButtonHandler {
         }
 
         if (sendReact) {
+            recordCanceled(game, player, targetPlayer, acName, type);
             if (game.getGameStats().markLatestPlayCanceled(acName)) {
                 SabotageService.undoEffectsOfCanceledCard(game, targetPlayer, acName);
                 if (acName.contains("Rider") || acName.contains("Sanction")) {

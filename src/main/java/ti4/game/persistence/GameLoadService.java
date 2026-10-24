@@ -689,6 +689,11 @@ class GameLoadService {
                         game.setPendingMovementState(info);
                     }
                 }
+                case Constants.LAST_PLAYER_STATE_JSON -> {
+                    if (isNotBlank(info)) {
+                        game.setLastPlayerStateJson(info);
+                    }
+                }
                 case Constants.STARTED_DATE -> {
                     if (isNotBlank(info)) {
                         game.setStartedDate(Long.parseLong(info));

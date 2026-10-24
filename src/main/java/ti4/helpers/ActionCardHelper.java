@@ -84,6 +84,7 @@ import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
 import ti4.spring.service.gameevent.GameSubEvent;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 @UtilityClass
 public class ActionCardHelper {
@@ -533,6 +534,12 @@ public class ActionCardHelper {
         return acButtons;
     }
 
+    private static boolean isPlayedAsComponentAction(Game game, Player player, ActionCardModel actionCard) {
+        return "action".equalsIgnoreCase(actionCard.getWindow())
+                && "action".equalsIgnoreCase(game.getPhaseOfGame())
+                && player.isActivePlayer();
+    }
+
     public static List<Button> getActionPlayActionCardButtons(Player player) {
         List<Button> acButtons = new ArrayList<>();
         if (IsPlayerElectedService.isPlayerElected(player.getGame(), player, "censure")
@@ -864,6 +871,9 @@ public class ActionCardHelper {
             }
         }
         recordTrackedActionCardPlay(game, player, actionCardTitle);
+        if (isPlayedAsComponentAction(game, player, actionCard)) {
+            TurnActionLog.recordComponent(game, "actionCard");
+        }
         if (!GameEventDraft.stage(
                 game, new GameSubEvent.ActionCardPlayed(player.getFaction(), acID, actionCardTitle))) {
             GameEventService.commit(

@@ -4,6 +4,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +90,8 @@ import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.PlanetService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class ExploreService {
@@ -548,6 +551,17 @@ public class ExploreService {
         }
     }
 
+    private static void recordExploreResolved(
+            Game game, Player player, ExploreModel exploreModel, Tile tile, String planetID) {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("cardId", exploreModel.getId());
+        payload.put("cardName", exploreModel.getName());
+        payload.put("exploreType", exploreModel.getType());
+        payload.put("planet", planetID);
+        payload.put("tile", tile == null ? null : tile.getPosition());
+        GameEventService.commit(game, GameEventType.EXPLORE_RESOLVED, player, payload);
+    }
+
     public static void resolveExplore(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String bID = buttonID.replace("resolve_explore_", "");
         String[] info = bID.split("_");
@@ -600,6 +614,7 @@ public class ExploreService {
             return;
         }
 
+        recordExploreResolved(game, player, exploreModel, tile, planetID);
         MessageEmbed exploreEmbed = exploreModel.getRepresentationEmbed(false, true);
         MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), messageText, exploreEmbed);
 

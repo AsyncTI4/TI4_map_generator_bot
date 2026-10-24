@@ -36,6 +36,7 @@ import ti4.service.game.MonumentsService;
 import ti4.service.unit.AddUnitService;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 @UtilityClass
 public class PassService {
@@ -52,7 +53,7 @@ public class PassService {
 
         player.setPassed(true);
         ThirtyKSecretHooks.onPassed(game, player);
-        GameEventService.commit(game, GameEventType.TURN, player, Map.of("passed", true));
+        GameEventService.commit(game, GameEventType.TURN, player, TurnActionLog.turnPayload(game, true));
         ButtonHelperFactionSpecific.offerDeathBinding(game, player);
         SarcosaHeroHandler.offerPassAbility(game, player);
         NiflheimLegendaryButtonHandler.offerHvergelmirsHaze(event, game, player);
