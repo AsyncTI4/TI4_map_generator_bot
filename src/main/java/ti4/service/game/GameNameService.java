@@ -38,6 +38,22 @@ public class GameNameService {
         return getGameNameFromChannel(event.getChannel());
     }
 
+    @Nullable
+    public static String getGameNameFromChannel(@NotNull Channel channel) {
+        String gameName = getGameNameFromChannelName(channel.getName());
+        if (GameManager.isValid(gameName)) {
+            return gameName;
+        }
+        if (channel instanceof ThreadChannel) {
+            IThreadContainerUnion parentChannel = ((ThreadChannel) channel).getParentChannel();
+            gameName = getGameNameFromChannelName(parentChannel.getName());
+        }
+        if (GameManager.isValid(gameName)) {
+            return gameName;
+        }
+        return null;
+    }
+
     // TODO:  In the future, we should allow specifying alternate game names
     // Then make this a more generic, "getCanonicalGameName" or some such 
     @Nullable
@@ -48,28 +64,11 @@ public class GameNameService {
         return gameName;
     }
 
-    @Nullable
-    public static String getGameNameFromChannel(@NotNull Channel channel) {
-        String gameName = getGameNameFromChannelName(channel.getName());
-        gameName = pbd30kHackFix(gameName); // FIXME
-        if (GameManager.isValid(gameName)) {
-            return gameName;
-        }
-        if (channel instanceof ThreadChannel) {
-            IThreadContainerUnion parentChannel = ((ThreadChannel) channel).getParentChannel();
-            gameName = getGameNameFromChannelName(parentChannel.getName());
-            gameName = pbd30kHackFix(gameName);  // FIXME
-        }
-        if (GameManager.isValid(gameName)) {
-            return gameName;
-        }
-        return null;
-    }
-
     private static String getGameNameFromChannelName(String channelName) {
         String gameName = channelName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
         gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
         gameName = StringUtils.substringBefore(gameName, "-");
+        gameName = pbd30kHackFix(gameName);  // FIXME
         return gameName;
     }
 }
