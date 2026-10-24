@@ -10,6 +10,7 @@ import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.BoardView;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.Wallet;
+import ti4.ai.scoring.WinRace;
 import ti4.ai.tactical.IncomingForces.Horizon;
 import ti4.ai.tactical.IncomingForces.IncomingForce;
 import ti4.game.Game;
@@ -30,12 +31,15 @@ final class Standings {
     private static final int CUSTODIANS_INFLUENCE = 6;
 
     private final Game game;
+    private final Player seat;
     private final IncomingForces incoming;
     private final Map<String, List<String>> ready = new HashMap<>();
     private final Map<String, Double> projections = new HashMap<>();
+    private List<Player> winnersBefore;
 
-    Standings(Game game, IncomingForces incoming) {
+    Standings(Game game, Player seat, IncomingForces incoming) {
         this.game = game;
+        this.seat = seat;
         this.incoming = incoming;
     }
 
@@ -120,7 +124,13 @@ final class Standings {
     }
 
     double winThreat(Player player) {
+        if (winsBeforeTheSeat(player)) return 1;
         return clamp((projected(player) - (goal() - WIN_WINDOW)) / WIN_WINDOW, 0, 1);
+    }
+
+    boolean winsBeforeTheSeat(Player player) {
+        if (winnersBefore == null) winnersBefore = WinRace.winnersBefore(game, seat);
+        return winnersBefore.contains(player);
     }
 
     double hurtWeight(Player target) {

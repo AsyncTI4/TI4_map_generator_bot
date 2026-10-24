@@ -178,9 +178,11 @@ public class TacticalPlanner {
     private static Optional<TacticalPlan> bestAffordable(Game game, Player seat, List<SetupHint> hints) {
         if (seat.getTacticalCC() <= 0) return Optional.empty();
         int reservedTokens = ScoringReserve.of(game, seat).tokens();
-        if (!coversReserve(seat, reservedTokens)) return Optional.empty();
         Context context = new Context(game, seat, Set.of(), hints);
-        List<TacticalPlan> all = candidates(context, tile -> activatable(game, seat, tile), STALL_MIN_SCORE);
+        List<TacticalPlan> ranked = candidates(context, tile -> activatable(game, seat, tile), STALL_MIN_SCORE);
+        boolean keepsReserve = coversReserve(seat, reservedTokens);
+        if (!keepsReserve) reservedTokens = 0;
+        List<TacticalPlan> all = keepsReserve ? ranked : outweighingTheReserve(game, seat, ranked);
         Optional<TacticalPlan> hold = holdForWarfareBuild(context, all).or(() -> holdForGravityDrive(context, all));
         if (hold.isPresent()) return hold;
         if (stallsWithAStrategyCard(context, all)) return Optional.empty();
@@ -196,6 +198,11 @@ public class TacticalPlanner {
                         plan.moves().stream().anyMatch(move -> move.origin().equals(top.target())))
                 .findFirst()
                 .or(() -> Optional.of(top));
+    }
+
+    private static List<TacticalPlan> outweighingTheReserve(Game game, Player seat, List<TacticalPlan> plans) {
+        double worth = ScoringReserve.reservedWorth(game, seat);
+        return plans.stream().filter(plan -> plan.score() > worth).toList();
     }
 
     private static List<TacticalPlan> withinTokenBudget(List<TacticalPlan> plans, int spareTokens) {

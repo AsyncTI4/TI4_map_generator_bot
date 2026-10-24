@@ -71,6 +71,7 @@ import ti4.ai.tactical.CombatRules;
 import ti4.ai.tactical.FleetSupplyRules;
 import ti4.ai.tactical.IntegratedEconomyRules;
 import ti4.ai.tactical.SingularityRules;
+import ti4.ai.tactical.SlayIntent;
 import ti4.ai.tactical.SlingRelayRules;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
@@ -520,6 +521,8 @@ public class NekroBrain implements FactionBrain {
             return Optional.empty();
         }
         if (TacticalRules.inProgress(context)) return TacticalRules.continueAction(context);
+        Optional<AiDecision> slay = SlayIntent.announce(context);
+        if (slay.isPresent()) return slay;
         Optional<AiDecision> primary = StrategyCardRules.resolvePrimary(context);
         if (primary.isPresent()) return primary;
         if (StrategyCardRules.awaitingSecondaries(context)) return Optional.empty();
