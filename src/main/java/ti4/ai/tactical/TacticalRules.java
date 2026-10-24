@@ -461,7 +461,11 @@ public class TacticalRules {
         String target = tile.getPosition();
         Optional<Match> done = Prompts.owned(turn, context.faction(), ("doneLanding_" + target)::equals);
         if (done.isEmpty()) return Optional.empty();
-        Optional<AiDecision> bombardment = BombardmentRules.beforeLanding(context, turn, tile);
+        Optional<AiDecision> bombardment = BombardmentRules.beforeLanding(
+                context,
+                turn,
+                tile,
+                plan.map(found -> found.landings().keySet()).orElse(Set.of()));
         if (bombardment.isPresent()) return bombardment;
         Player seat = context.seat();
         if (BoardView.groundForces(BoardView.space(tile), seat) > 0) {

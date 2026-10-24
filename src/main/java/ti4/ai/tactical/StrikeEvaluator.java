@@ -56,13 +56,21 @@ class StrikeEvaluator {
 
     // TODO: Mentak Ambush, L4 Disruptors and Titans' planetary PDS are not in the odds
     static StrikeEstimate estimate(Game game, Player seat, Strike strike) {
+        return estimate(game, seat, strike, true);
+    }
+
+    static StrikeEstimate laterSpaceCombat(Game game, Player seat, Strike strike) {
+        return estimate(game, seat, strike, false);
+    }
+
+    private static StrikeEstimate estimate(Game game, Player seat, Strike strike, boolean openingFire) {
         Tile target = strike.target();
         Player opponent = strike.opponent();
         UnitHolder space = BoardView.space(target);
         Side attacking = new Side(seat, strike.ships());
         Map<UnitType, Integer> defenderShips = merged(BoardView.ships(space, opponent), strike.extraDefenderShips());
         boolean spaceCombat = !defenderShips.isEmpty();
-        int theirCannon = BattleMath.expectedCannonHits(game, seat, target);
+        int theirCannon = openingFire ? BattleMath.expectedCannonHits(game, seat, target) : 0;
         List<Combatant> arriving =
                 CombatForces.combatants(game, target, space, attacking, new Side(opponent, Map.of()), strike.damaged());
         List<Combatant> survivingCannon = BattleMath.afterCannonFire(arriving, theirCannon);
@@ -72,7 +80,8 @@ class StrikeEvaluator {
         double cannonLoss = costOf(arriving) - costOf(survivingCannon);
         Space cannonOnly = new Space(1, cannonLoss, cannonLoss, 0, 0, cannonLoss > 0 ? 1 : 0);
         Space fight = spaceCombat
-                ? spaceCombat(game, seat, strike, attacking, new Side(opponent, defenderShips), theirCannon)
+                ? spaceCombat(
+                        game, seat, strike, attacking, new Side(opponent, defenderShips), theirCannon, openingFire)
                 : cannonOnly;
         boolean escaped = spaceCombat && escapes(game, strike, fight);
         if (escaped) fight = cannonOnly;
@@ -141,7 +150,13 @@ class StrikeEvaluator {
     }
 
     private static Space spaceCombat(
-            Game game, Player seat, Strike strike, Side attacking, Side defending, int theirCannon) {
+            Game game,
+            Player seat,
+            Strike strike,
+            Side attacking,
+            Side defending,
+            int theirCannon,
+            boolean openingFire) {
         Tile target = strike.target();
         Player opponent = strike.opponent();
         UnitHolder space = BoardView.space(target);
@@ -157,7 +172,7 @@ class StrikeEvaluator {
         List<Combatant> defendersBefore =
                 CombatForces.combatants(game, target, space, barragedDefenders, barragedAttackers, defendersDamaged);
         List<Combatant> defenders = BattleMath.afterCannonFire(
-                defendersBefore, BattleMath.ownCannonHits(game, seat, target, strike.origins()));
+                defendersBefore, openingFire ? BattleMath.ownCannonHits(game, seat, target, strike.origins()) : 0);
         List<Combatant> attackersBefore =
                 CombatForces.combatants(game, target, space, barragedAttackers, barragedDefenders, strike.damaged());
         List<Combatant> attackers = BattleMath.afterCannonFire(attackersBefore, theirCannon);
@@ -226,8 +241,11 @@ class StrikeEvaluator {
         boolean fought = false;
         List<Planet> planets = new ArrayList<>();
         if (!TacticalPlanner.isAnotherPlayersHome(game, seat, target) || rules.homeLandings()) {
-            planets.addAll(TacticalPlanner.enemyPlanets(game, seat, target));
-            planets.addAll(freePlanets(game, seat, target, rules, planets));
+            List<Planet> contested = TacticalPlanner.enemyPlanets(game, seat, target);
+            contested.stream()
+                    .filter(planet -> TacticalPlanner.heldOnlyBy(game, seat, planet, opponent))
+                    .forEach(planets::add);
+            planets.addAll(freePlanets(game, seat, target, rules, contested));
         }
         Map<UnitType, Integer> extraGround = new EnumMap<>(UnitType.class);
         extraGround.putAll(strike.extraDefenderGround());
@@ -412,6 +430,58 @@ class StrikeEvaluator {
 
     private static double unitCost(Player player, UnitType type) {
         return BoardView.model(player, type).map(UnitModel::getCost).orElse(0f);
+    }
+
+    static StrikeEstimate afterSpaceWon(Game game, Player seat, Strike strike, double spaceWin) {
+        Space won = new Space(spaceWin, 0, 0, 0, 0, 0);
+        UnitHolder space = BoardView.space(strike.target());
+        Ground ground = ground(
+                game, seat, strike, won, strike.ships(), bombardingShips(seat, space, new Side(seat, strike.ships())));
+        Map<String, Integer> landings = new LinkedHashMap<>();
+        Map<String, Double> wins = new LinkedHashMap<>();
+        Map<String, Integer> sent = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> landing : ground.landings().entrySet()) {
+            if (!(strike.target().getUnitHolders().get(landing.getKey()) instanceof Planet planet)
+                    || !heldBy(game, planet, strike.opponent())) {
+                continue;
+            }
+            landings.put(landing.getKey(), landing.getValue());
+            wins.put(landing.getKey(), ground.wins().get(landing.getKey()));
+            sent.put(landing.getKey(), ground.sent().get(landing.getKey()));
+        }
+        return new StrikeEstimate(
+                spaceWin,
+                false,
+                false,
+                ground.fought(),
+                landings,
+                wins,
+                sent,
+                ground.ourLoss(),
+                0,
+                ground.theirLoss(),
+                0,
+                1 - ground.noKill(),
+                0,
+                strike.ships());
+    }
+
+    private static boolean heldBy(Game game, Planet planet, Player opponent) {
+        return BoardView.controller(game, planet.getName()) == opponent || BoardView.groundForces(planet, opponent) > 0;
+    }
+
+    static Map<UnitType, Integer> cargoLeft(Player seat, Strike strike, StrikeEstimate estimate) {
+        Map<UnitType, Integer> left = new EnumMap<>(UnitType.class);
+        left.putAll(strike.cargo());
+        dropExcessCargo(seat, left, estimate.survivors());
+        strike.pulled().forEach((type, count) -> left.merge(type, count, Integer::sum));
+        takeUnits(
+                left,
+                estimate.groundSent().values().stream()
+                        .mapToInt(Integer::intValue)
+                        .sum());
+        left.values().removeIf(count -> count <= 0);
+        return left;
     }
 
     static double shipCost(Player player, Map<UnitType, Integer> units) {

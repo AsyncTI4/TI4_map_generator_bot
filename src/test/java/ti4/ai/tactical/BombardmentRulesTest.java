@@ -178,6 +178,50 @@ class BombardmentRulesTest extends BaseTi4Test {
         assertThat(ActionSecretRules.next(test.context(buttons))).isEmpty();
     }
 
+    // With ground forces of two other players in the system, the engine auto-assigns the dice to the first defended
+    // planet. The seat only rolls when that planet is one it plans to land on, so a bystander it chose to leave alone
+    // is not bombarded (LRR 15.1: bombardment is the active player's choice).
+    @Test
+    void bombardsOnlyAPlannedPlanetWhenTwoPlayersDefendTheSystem() {
+        Tile shared = sharedSystem();
+        String first = BombardmentRules.target(test.game, test.nekro, shared, Map.of(UnitType.Dreadnought, 1))
+                .orElseThrow()
+                .planet();
+        String other = "newalbion".equals(first) ? "starpoint" : "newalbion";
+
+        assertThat(BombardmentRules.landingTarget(test.game, test.nekro, shared, java.util.Set.of(first)))
+                .map(BombardmentRules.Target::planet)
+                .contains(first);
+        assertThat(BombardmentRules.landingTarget(test.game, test.nekro, shared, java.util.Set.of(other)))
+                .isEmpty();
+        assertThat(BombardmentRules.landingTarget(test.game, test.nekro, shared, java.util.Set.of()))
+                .isEmpty();
+    }
+
+    // With a single defender nothing changes: the seat may bombard without a planned landing there (for example
+    // for Make an Example).
+    @Test
+    void bombardsASingleDefenderWithoutAPlannedLanding() {
+        assertThat(BombardmentRules.landingTarget(test.game, test.nekro, tile, java.util.Set.of()))
+                .map(BombardmentRules.Target::planet)
+                .contains("lodor");
+    }
+
+    private Tile sharedSystem() {
+        String position = ti4.image.PositionMapper.getAdjacentTilePositions(target).stream()
+                .filter(candidate -> !"x".equals(candidate) && test.game.getTileByPosition(candidate) == null)
+                .findFirst()
+                .orElseThrow();
+        Tile shared = test.place("27", position);
+        ti4.game.Player sardakk = test.addSeat("200000000000000002", "sardakk", "red");
+        test.sol.addPlanet("starpoint");
+        test.units(shared, "starpoint", test.sol, UnitType.Infantry, 1);
+        sardakk.addPlanet("newalbion");
+        test.units(shared, "newalbion", sardakk, UnitType.Infantry, 1);
+        test.units(shared, "space", test.nekro, UnitType.Dreadnought, 1);
+        return shared;
+    }
+
     private AiPrompt landingPrompt(String bombardButton) {
         test.game.setStoredValue("currentActionSummarynekro", " Activated " + target + " (Lodor).");
         TacticalRules.remember(

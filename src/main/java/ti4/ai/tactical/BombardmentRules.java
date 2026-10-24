@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiSeats;
@@ -72,12 +73,13 @@ public class BombardmentRules {
         return DiceOdds.atLeast(dieChances(seat, ships), needed);
     }
 
-    public static Optional<AiDecision> beforeLanding(AiTurnContext context, List<AiPrompt> turn, Tile tile) {
+    public static Optional<AiDecision> beforeLanding(
+            AiTurnContext context, List<AiPrompt> turn, Tile tile, Set<String> plannedLandings) {
         String key = BOMBARD_KEY + TacticalRules.actionKey(context) + "|" + tile.getPosition();
         Optional<String> state = context.memory().get(key);
         if (state.isPresent()) return afterPress(context, tile, key, state.get());
         Player seat = context.seat();
-        Optional<Target> target = target(context.game(), seat, tile, BoardView.ships(BoardView.space(tile), seat));
+        Optional<Target> target = landingTarget(context.game(), seat, tile, plannedLandings);
         if (target.isEmpty()) return Optional.empty();
         String position = tile.getPosition();
         Optional<Match> roll = Prompts.first(
@@ -101,6 +103,21 @@ public class BombardmentRules {
         ActionSecretRules.watchBombardment(
                 context, position, target.get().planet(), target.get().defender());
         return Optional.of(roll.get().press("bombard " + target.get().planet()));
+    }
+
+    static Optional<Target> landingTarget(Game game, Player seat, Tile tile, Set<String> plannedLandings) {
+        Optional<Target> target = target(game, seat, tile, BoardView.ships(BoardView.space(tile), seat));
+        if (!defendedBySeveral(game, seat, tile)) return target;
+        return target.filter(found -> plannedLandings.contains(found.planet()));
+    }
+
+    private static boolean defendedBySeveral(Game game, Player seat, Tile tile) {
+        return game.getRealPlayersNNeutral().stream()
+                        .filter(other -> other != seat)
+                        .filter(other -> tile.getPlanetUnitHolders().stream()
+                                .anyMatch(planet -> BoardView.groundForces(planet, other) > 0))
+                        .count()
+                > 1;
     }
 
     private static Optional<AiDecision> afterPress(AiTurnContext context, Tile tile, String key, String state) {
