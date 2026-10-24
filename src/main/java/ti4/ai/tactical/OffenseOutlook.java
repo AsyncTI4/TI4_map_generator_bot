@@ -12,6 +12,7 @@ import ti4.ai.eval.FactionAggression;
 import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.ShardPrize;
+import ti4.ai.eval.Territory;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.SpendCost;
@@ -37,8 +38,7 @@ final class OffenseOutlook {
     private static final double HARM_CAP_BASE = 0.9;
     private static final double HARM_CAP_PER_THREAT = 2.0;
     private static final double ANGER_SHARE = 0.15;
-    private static final double SENSITIVE_ANGER_FACTOR = 3.0;
-    private static final double MECATOL_ANGER_FACTOR = 1.5;
+    private static final double LOCKED_FLEET_SHARE = 0.5;
     private static final double RETALIATION_NORM = 1.2;
     private static final double LIMITED_REACH_RETALIATION = 0.5;
     private static final double NULLIFICATION_CHANCE = 0.8;
@@ -65,6 +65,7 @@ final class OffenseOutlook {
     private final Map<String, Double> readyDenials = new HashMap<>();
     private final Map<String, Double> progressLosses = new HashMap<>();
     private final Map<String, Boolean> reachesGuarded = new HashMap<>();
+    private final Map<String, Territory> territories = new HashMap<>();
 
     OffenseOutlook(Game game, Player seat, DefenseOutlook defense) {
         this.game = game;
@@ -152,8 +153,8 @@ final class OffenseOutlook {
         double cancel = 0;
         double extraOrigins = EXTRA_ORIGIN_COST * Math.max(0, strike.origins().size() - 1);
         if (full && value - losses - extraOrigins >= floor) {
-            double harm = estimate.theirExpectedLoss() + heldPlanetValue + denial.harmPoints();
-            anger = anger(strike, harm);
+            double plastic = estimate.theirExpectedLoss() + heldPlanetValue;
+            anger = anger(strike, estimate, plastic, denial.harmPoints(), ownObjective);
             counter = w * counterstrike(strike, estimate, after, planetsAfter, landed, terms.seatStake());
             nekroFeed = nekroFeed(opponent, estimate);
             capture = VUIL_RAITH.equals(opponent.getFaction()) ? CAPTURE_VALUE * estimate.ourLossChance() * hurt : 0;
@@ -467,25 +468,51 @@ final class OffenseOutlook {
         return total;
     }
 
-    private double anger(Strike strike, double harm) {
+    private double anger(
+            Strike strike, StrikeEstimate estimate, double plastic, double scoringDenial, double ownObjective) {
         Player opponent = strike.opponent();
         if (opponent.isNeutral()) return 0;
-        double ratio =
-                Math.clamp(defense.fleetCostTotal(opponent) / Math.max(1, defense.fleetCostTotal(seat)), 0.0, 1.0);
-        double reach = threatensGuardedSystems(opponent) ? 1 : LIMITED_REACH_RETALIATION;
-        double retaliation = ratio * FactionAggression.of(opponent).factor() / RETALIATION_NORM * reach;
-        return ANGER_SHARE
-                * harm
-                * retaliation
-                * angerSensitivity(game, strike.target(), opponent)
-                * (1 - standings.winThreat(opponent));
+        double grievance = plastic * angerSensitivity(strike.target(), opponent)
+                + scoringDenial * Grievance.scoringDenial(standings.leadOverField(opponent));
+        double relief = Grievance.relief(standings.winThreat(opponent), standings.winThreat(seat), ownObjective / VP);
+        return ANGER_SHARE * grievance * retaliation(strike, estimate) * relief;
     }
 
-    static double angerSensitivity(Game game, Tile target, Player opponent) {
-        if (target == opponent.getHomeSystemTile()) return SENSITIVE_ANGER_FACTOR;
-        boolean holdsMecatol = target.getPlanetUnitHolders().stream()
-                .anyMatch(planet -> game.mecatols().contains(planet.getName()));
-        return holdsMecatol ? MECATOL_ANGER_FACTOR : 1;
+    private double retaliation(Strike strike, StrikeEstimate estimate) {
+        Player opponent = strike.opponent();
+        double free = retaliatingFleet(opponent, strike.target(), estimate);
+        double ratio = Math.clamp(free / Math.max(1, defense.fleetCostTotal(seat)), 0.0, 1.0);
+        double reach = threatensGuardedSystems(opponent) ? 1 : LIMITED_REACH_RETALIATION;
+        return ratio * FactionAggression.of(opponent).factor() / RETALIATION_NORM * reach;
+    }
+
+    private double retaliatingFleet(Player opponent, Tile target, StrikeEstimate estimate) {
+        boolean idle = opponent.isPassed() || opponent.getTacticalCC() <= 0;
+        double kept = estimate.escaped() ? 1 : 1 - estimate.spaceWin();
+        double total = 0;
+        for (Tile tile : game.getTileMap().values()) {
+            double cost = shipCost(opponent, tile);
+            if (cost <= 0) continue;
+            double survives = tile == target ? kept : 1;
+            double unlocked = idle || tile.hasPlayerCC(opponent) ? LOCKED_FLEET_SHARE : 1;
+            total += cost * survives * unlocked;
+        }
+        return total;
+    }
+
+    private static double shipCost(Player player, Tile tile) {
+        double cost = 0;
+        for (Map.Entry<UnitType, Integer> ship :
+                BoardView.ships(BoardView.space(tile), player).entrySet()) {
+            if (ship.getKey() != UnitType.Fighter) cost += ship.getValue() * IncomingForces.cost(player, ship.getKey());
+        }
+        return cost;
+    }
+
+    private double angerSensitivity(Tile target, Player opponent) {
+        Territory territory =
+                territories.computeIfAbsent(opponent.getFaction(), faction -> Territory.of(game, opponent));
+        return Grievance.location(territory.zone(target));
     }
 
     private boolean isMecatol(Planet planet) {

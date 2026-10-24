@@ -16,7 +16,7 @@ import ti4.testUtils.BaseTi4Test;
 
 // Holding Mecatol Rex is worth the Imperial points of the rounds ahead (MecatolStake.holdValue): to the seat that
 // takes it, to the one it is taken from, in what a Mecatol Rex the seat holds is worth defending, and in what a
-// counterstrike on it would cost. Taking it is less of an insult than raiding a home system.
+// counterstrike on it would cost. Taking it is contested ground, not an insult.
 class MecatolHoldTest extends BaseTi4Test {
 
     private DefenseScenario board;
@@ -114,16 +114,14 @@ class MecatolHoldTest extends BaseTi4Test {
         assertThat(stake - lateStake).isCloseTo(4.0, within(1e-9));
     }
 
+    // Mecatol Rex is contested ground: taking it costs its holder no more goodwill than any other loss of plastic and
+    // planets, while raiding their home system makes them really angry.
     @Test
-    void takingMecatolIsLessOfAnInsultThanRaidingAHome() {
+    void takingMecatolIsContestedGroundNotAnInsult() {
         Tile rex = board.test.place("18", "000");
         Tile home = board.test.game.getTileByPosition(DefenseScenario.SARDAKK_HOME_POSITION);
 
-        assertThat(OffenseOutlook.angerSensitivity(board.test.game, rex, sardakk()))
-                .isEqualTo(1.5);
-        assertThat(OffenseOutlook.angerSensitivity(board.test.game, home, sardakk()))
-                .isEqualTo(3.0);
-        assertThat(OffenseOutlook.angerSensitivity(board.test.game, board.test.place("26", nextTo("000")), sardakk()))
-                .isEqualTo(1.0);
+        assertThat(Grievance.location(board.test.game, rex, sardakk())).isEqualTo(Grievance.CONTESTED_FACTOR);
+        assertThat(Grievance.location(board.test.game, home, sardakk())).isEqualTo(Grievance.HOME_FACTOR);
     }
 }

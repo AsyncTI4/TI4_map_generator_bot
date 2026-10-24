@@ -134,6 +134,16 @@ final class Standings {
         return clamp(weight, MIN_HURT, MAX_HURT);
     }
 
+    double leadOverField(Player target) {
+        if (target.isNeutral()) return 0;
+        int best = game.getRealPlayers().stream()
+                .filter(player -> player != target)
+                .mapToInt(this::vp)
+                .max()
+                .orElse(vp(target));
+        return vp(target) - best;
+    }
+
     double denialWeight(Player target) {
         double threat = winThreat(target);
         return CALM_DENIAL * hurtWeight(target) * (1 - threat) + WINNING_DENIAL * threat;
