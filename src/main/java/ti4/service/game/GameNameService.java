@@ -41,7 +41,7 @@ public class GameNameService {
     // TODO:  In the future, we should allow specifying alternate game names
     // Then make this a more generic, "getCanonicalGameName" or some such 
     @Nullable
-    private static string pbd30kHackFix(String gameName) {
+    private static String pbd30kHackFix(String gameName) {
         if ("pbd30k".equalsIgnoreCase(gameName)) {
             return "pbd100threetythousand";
         }
