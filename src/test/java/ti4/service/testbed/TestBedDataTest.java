@@ -264,6 +264,16 @@ class TestBedDataTest extends BaseTi4Test {
         assertTrue(
                 scriptErrors.stream().noneMatch(error -> error.contains("tourismbureau30k")),
                 String.join("\n", scriptErrors));
+
+        // removeToken needs both the location (key) and the token (value).
+        List<String> removeTokenErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
+                { "preset": "30k-2p",
+                  "steps": [
+                    { "do": "removeToken", "value": "frontier" },
+                    { "do": "removeToken", "key": "318", "value": "frontier" }
+                  ] }"""));
+        assertContains(removeTokenErrors, "needs `key`");
+        assertEquals(1, removeTokenErrors.size(), String.join("\n", removeTokenErrors));
     }
 
     // Short forms parse, typos in field names are rejected, steps survive the JSON round trip the runner uses, and

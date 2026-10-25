@@ -16,6 +16,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -89,6 +90,7 @@ public class AddPlanetService {
         player.addPlanet(planet);
         DiscordantStarsHelper.checkBRTaranisCrest(game);
         EronousPlanetService.resolveCantrisPO(game, planet, player);
+        IxthLegendaryButtonHandler.onPlanetGained(game, player, planet);
         if (setup && "ponthous".equalsIgnoreCase(planet)) {
             // Setup exhausts Ponthous without opening its optional ready-planet window.
             player.getExhaustedPlanets().add(planet);

@@ -16,6 +16,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePr
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -101,6 +102,7 @@ class SpendingButtonHandler {
         PlanetExhaust.doAction(player, planetName, game);
         player.addSpentThing(planetName);
         ThirtyKExploreHooks.onPlanetExhausted(event, game, player, planetName);
+        IxthLegendaryButtonHandler.onPlanetSpent(game, player, planetName, whatIsItFor);
 
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
         if (uH != null) {
