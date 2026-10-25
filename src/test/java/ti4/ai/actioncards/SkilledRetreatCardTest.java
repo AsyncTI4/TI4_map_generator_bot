@@ -8,6 +8,7 @@ import static ti4.ai.AiTestGame.prompt;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +23,9 @@ import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.tactical.CombatForecast;
 import ti4.ai.tactical.CombatMoment;
 import ti4.ai.tactical.CombatRules;
+import ti4.ai.tactical.TacticalPlan;
+import ti4.ai.tactical.TacticalPlan.UnitMove;
+import ti4.ai.tactical.TacticalRules;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
 import ti4.message.GameMessage;
@@ -41,6 +45,7 @@ class SkilledRetreatCardTest extends BaseTi4Test {
     private static final int HAND_INDEX = 616;
     private static final String SPACE = "space";
     private static final String TITLE = "Skilled Retreat";
+    private static final double BIG_PLAN = 40.0;
 
     private CardTable table;
     private MockedStatic<GameMessageManager> messages;
@@ -107,7 +112,7 @@ class SkilledRetreatCardTest extends BaseTi4Test {
         hopelessFight();
         emptyNeighbour();
 
-        assertThat(SkilledRetreatCard.value(table.game, table.nekro, moment()))
+        assertThat(SkilledRetreatCard.value(table.test.context(), moment()))
                 .isGreaterThan(ActionCardPrior.keepPrior("s_retreat1"));
         assertThat(pressedId(atRoundStart().orElseThrow())).isEqualTo("ac_play_from_hand_" + HAND_INDEX);
     }
@@ -142,7 +147,7 @@ class SkilledRetreatCardTest extends BaseTi4Test {
         table.system("19", AiTestGame.neighbourOf(AiTestGame.HOME));
         CombatMoment atHome = new CombatMoment(AiTestGame.HOME, SPACE, false, 0);
 
-        assertThat(SkilledRetreatCard.value(table.game, table.nekro, atHome)).isZero();
+        assertThat(SkilledRetreatCard.value(table.test.context(), atHome)).isZero();
         assertThat(CombatCardRules.atRoundStart(table.test.context(hand()), atHome))
                 .isEmpty();
     }
@@ -165,28 +170,62 @@ class SkilledRetreatCardTest extends BaseTi4Test {
         table.test.units(tile, "lodor", table.sol, UnitType.Infantry, 4);
         CombatMoment ground = new CombatMoment(position, "lodor", true, 0);
 
-        assertThat(SkilledRetreatCard.value(table.game, table.nekro, ground)).isZero();
+        assertThat(SkilledRetreatCard.value(table.test.context(), ground)).isZero();
     }
 
-    // The token placed by the card would lock the seat out of its own dock for the rest of the round.
+    private void remember(TacticalPlan plan) {
+        TacticalRules.remember(table.test.context(), plan);
+    }
+
+    private static TacticalPlan planInto(Tile target, double score) {
+        return new TacticalPlan(TacticalPlan.Kind.EXPAND, target.getPosition(), List.of(), Map.of(), score);
+    }
+
+    // The seat plans to get to the only destination: the card's token would lock that action out for the round,
+    // which costs more than the ships the retreat saves.
     @Test
-    void theCardIsKeptWhenTheOnlyDestinationIsAnImportantSystem() {
+    void theCardIsKeptWhenTheOnlyDestinationIsWhereTheSeatsPlanGoes() {
         hopelessFight();
-        Tile dock = table.system("19", neighbours.getFirst());
-        table.test.units(dock, "wellon", table.nekro, UnitType.Spacedock, 1);
-        table.nekro.addPlanet("wellon");
+        Tile wanted = emptyNeighbour();
+        remember(planInto(wanted, BIG_PLAN));
 
         assertThat(atRoundStart()).isEmpty();
     }
 
+    // The seat's plan moves the carrier out of the only destination: the token would lock it in.
+    @Test
+    void theCardIsKeptWhenTheOnlyDestinationHoldsUnitsThePlanMustMoveOut() {
+        hopelessFight();
+        Tile staging = emptyNeighbour();
+        table.ships(table.nekro, staging, UnitType.Carrier, 1);
+        Tile elsewhere = table.system("27", AiTestGame.neighbourOf(AiTestGame.HOME));
+        remember(new TacticalPlan(
+                TacticalPlan.Kind.EXPAND,
+                elsewhere.getPosition(),
+                List.of(new UnitMove(staging.getPosition(), SPACE, UnitType.Carrier, 1)),
+                Map.of(),
+                BIG_PLAN));
+
+        assertThat(atRoundStart()).isEmpty();
+    }
+
+    // A small plan into the destination costs less than the eight resources of ships the retreat saves.
+    @Test
+    void aMinorPlanDoesNotStopTheRetreat() {
+        hopelessFight();
+        Tile wanted = emptyNeighbour();
+        remember(planInto(wanted, 1.0));
+
+        assertThat(pressedId(atRoundStart().orElseThrow())).isEqualTo("ac_play_from_hand_" + HAND_INDEX);
+    }
+
     // Ruling VI: no token is placed where the seat already has one, so nothing new is locked.
     @Test
-    void anImportantSystemThatAlreadyHoldsTheSeatsTokenIsAFineDestination() {
+    void aPlannedSystemThatAlreadyHoldsTheSeatsTokenIsAFineDestination() {
         hopelessFight();
-        Tile dock = table.system("19", neighbours.getFirst());
-        table.test.units(dock, "wellon", table.nekro, UnitType.Spacedock, 1);
-        table.nekro.addPlanet("wellon");
-        dock.addCC(Mapper.getCCID(table.nekro.getColor()));
+        Tile wanted = emptyNeighbour();
+        remember(planInto(wanted, BIG_PLAN));
+        wanted.addCC(Mapper.getCCID(table.nekro.getColor()));
 
         assertThat(pressedId(atRoundStart().orElseThrow())).isEqualTo("ac_play_from_hand_" + HAND_INDEX);
     }
@@ -232,7 +271,7 @@ class SkilledRetreatCardTest extends BaseTi4Test {
                 .orElseThrow();
 
         assertThat(loss).isBetween(SkilledRetreatCard.SECRET_WORRY_LOSS, 0.65);
-        assertThat(SkilledRetreatCard.value(table.game, table.nekro, moment())).isZero();
+        assertThat(SkilledRetreatCard.value(table.test.context(), moment())).isZero();
         assertThat(pressedId(atRoundStart().orElseThrow())).isEqualTo("ac_play_from_hand_" + HAND_INDEX);
     }
 
@@ -262,12 +301,11 @@ class SkilledRetreatCardTest extends BaseTi4Test {
     }
 
     @Test
-    void theRetreatResolvesAfterItsWindowAndAvoidsLockingTheSeatsDock() {
+    void theRetreatResolvesAfterItsWindowAndAvoidsThePlannedSystem() {
         hopelessFight();
         Tile empty = table.system("19", neighbours.get(0));
         Tile dock = table.system("27", neighbours.get(1));
-        table.test.units(dock, "newalbion", table.nekro, UnitType.Spacedock, 1);
-        table.nekro.addPlanet("newalbion");
+        remember(planInto(dock, BIG_PLAN));
         assertThat(pressedId(atRoundStart().orElseThrow())).isEqualTo("ac_play_from_hand_" + HAND_INDEX);
         table.nekro.getActionCards().clear();
         table.game.getGameStats().recordAcPlay(TITLE, table.nekro);

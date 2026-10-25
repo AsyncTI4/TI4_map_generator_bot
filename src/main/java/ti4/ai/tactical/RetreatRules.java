@@ -16,14 +16,13 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.scoring.ObjectiveValue;
+import ti4.ai.strategy.CommandTokenValue;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
@@ -49,6 +48,7 @@ public class RetreatRules {
     private static final double HOME_VALUE = 10;
     private static final double PLANET_VALUE = 2;
     private static final double THREAT_PENALTY = 3;
+    private static final double DESTINATION_PREFERENCE = 0.1;
 
     static Optional<AiDecision> next(AiTurnContext context, List<AiPrompt> prompts) {
         return chooseDestination(context, prompts)
@@ -223,17 +223,12 @@ public class RetreatRules {
                 .toList();
     }
 
-    public static boolean locksImportantSystem(Game game, Player seat, Tile destination) {
-        if (CommandCounterHelper.hasCC(seat, destination)) return false;
-        return destination == seat.getHomeSystemTile() || Helper.getProductionValue(seat, game, destination, false) > 0;
-    }
-
-    public static double skilledDestinationValue(Game game, Player seat, String position) {
+    public static double skilledDestinationValue(
+            Game game, Player seat, String position, List<TacticalPlan> remembered) {
         Tile tile = game.getTileByPosition(position);
-        if (tile == null || !canSkilledRetreatTo(game, seat, tile) || locksImportantSystem(game, seat, tile)) {
-            return Double.NEGATIVE_INFINITY;
-        }
-        return destinationValue(game, seat, position);
+        if (tile == null || !canSkilledRetreatTo(game, seat, tile)) return Double.NEGATIVE_INFINITY;
+        return DESTINATION_PREFERENCE * destinationValue(game, seat, position)
+                - CommandTokenValue.lockLoss(game, seat, tile, remembered);
     }
 
     private static boolean canSkilledRetreatTo(Game game, Player seat, Tile destination) {

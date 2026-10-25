@@ -91,20 +91,25 @@ public class CombatCardRules {
         Player seat = context.seat();
         return seat.getActionCards().keySet().stream()
                 .sorted()
-                .map(alias -> new Candidate(alias, CombatCards.valueAtRoundStart(game, seat, moment, alias)))
+                .map(alias -> new Candidate(alias, valueAtRoundStart(context, moment, alias)))
                 .filter(candidate -> candidate.value() > 0 && candidate.margin() >= 0)
                 .max(Comparator.comparingDouble(Candidate::margin))
                 .map(Candidate::alias)
                 .or(() -> moraleBoostForCloseOdds(game, seat, moment))
-                .or(() -> skilledRetreatAgainstASecret(game, seat, moment));
+                .or(() -> skilledRetreatAgainstASecret(context, moment));
     }
 
-    private static Optional<String> skilledRetreatAgainstASecret(Game game, Player seat, CombatMoment moment) {
-        return seat.getActionCards().keySet().stream()
+    private static double valueAtRoundStart(AiTurnContext context, CombatMoment moment, String alias) {
+        if (SkilledRetreatCard.ALIASES.contains(alias)) return SkilledRetreatCard.value(context, moment);
+        return CombatCards.valueAtRoundStart(context.game(), context.seat(), moment, alias);
+    }
+
+    private static Optional<String> skilledRetreatAgainstASecret(AiTurnContext context, CombatMoment moment) {
+        return context.seat().getActionCards().keySet().stream()
                 .sorted()
                 .filter(SkilledRetreatCard.ALIASES::contains)
                 .findFirst()
-                .filter(alias -> SkilledRetreatCard.deniesASecret(game, seat, moment));
+                .filter(alias -> SkilledRetreatCard.deniesASecret(context, moment));
     }
 
     private static Optional<String> moraleBoostForCloseOdds(Game game, Player seat, CombatMoment moment) {

@@ -45,7 +45,6 @@ class CombatCards {
             return CombatForecast.firstRoundSwing(
                     game, seat, position, holder, RoundModifier.fighters(FIGHTER_PROTOTYPE_BONUS));
         }
-        if (SkilledRetreatCard.ALIASES.contains(alias)) return SkilledRetreatCard.value(game, seat, moment);
         return 0;
     }
 

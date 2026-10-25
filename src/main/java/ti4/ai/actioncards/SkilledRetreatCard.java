@@ -4,12 +4,17 @@ import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.CardChains.Source;
+import ti4.ai.brain.AiTurnContext;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.GameHorizon;
 import ti4.ai.eval.PlanetStake;
+import ti4.ai.scoring.ScoringStakes;
+import ti4.ai.strategy.CommandTokenValue;
 import ti4.ai.tactical.CombatForecast;
 import ti4.ai.tactical.CombatMoment;
 import ti4.ai.tactical.RetreatRules;
+import ti4.ai.tactical.TacticalPlan;
+import ti4.ai.tactical.TacticalRules;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -21,12 +26,13 @@ class SkilledRetreatCard {
 
     static final List<String> ALIASES = List.of("s_retreat1", "s_retreat2", "s_retreat3", "s_retreat4");
     static final double SECRET_WORRY_LOSS = 0.5;
+    private static final double SECRET_POINTS = 1;
     private static final String RESOLVE_HANDLER = "retreat_";
     private static final String DESTINATION_PREFIX = "retreatUnitsFrom_";
     private static final String SKILLED_SUFFIX = "_skilled";
     private static final String SEPARATOR = "_";
 
-    record Retreat(Tile tile, Player opponent, double lossChance) {}
+    record Retreat(Tile tile, Player opponent, double lossChance, List<TacticalPlan> remembered) {}
 
     static List<AiCard> all() {
         return ALIASES.stream()
@@ -34,41 +40,64 @@ class SkilledRetreatCard {
                 .toList();
     }
 
-    static double value(Game game, Player seat, CombatMoment moment) {
-        return retreat(game, seat, moment)
+    static double value(AiTurnContext context, CombatMoment moment) {
+        Game game = context.game();
+        Player seat = context.seat();
+        return retreat(context, moment)
                 .filter(retreat -> 1 - retreat.lossChance() < RetreatRules.retreatBelow(game, seat, retreat.tile()))
-                .map(retreat -> savedFleet(seat, retreat) - stakeLeftBehind(game, seat, retreat))
+                .map(retreat -> savings(game, seat, retreat) - leastDisruption(game, seat, retreat))
                 .orElse(0.0);
     }
 
-    static boolean deniesASecret(Game game, Player seat, CombatMoment moment) {
-        return retreat(game, seat, moment)
+    static boolean deniesASecret(AiTurnContext context, CombatMoment moment) {
+        Game game = context.game();
+        Player seat = context.seat();
+        return retreat(context, moment)
                 .filter(retreat -> retreat.lossChance() >= SECRET_WORRY_LOSS)
                 .filter(retreat -> opponentMayScoreASecret(game, seat, retreat.tile(), retreat.opponent()))
+                .filter(retreat ->
+                        savings(game, seat, retreat) + ScoringStakes.rivalStake(game, retreat.opponent(), SECRET_POINTS)
+                                > leastDisruption(game, seat, retreat))
                 .isPresent();
     }
 
-    private static Optional<Retreat> retreat(Game game, Player seat, CombatMoment moment) {
+    private static Optional<Retreat> retreat(AiTurnContext context, CombatMoment moment) {
+        Game game = context.game();
+        Player seat = context.seat();
         if (moment.ground()) return Optional.empty();
         Tile tile = game.getTileByPosition(moment.position());
         if (tile == null
                 || tile == seat.getHomeSystemTile()
                 || BoardView.nonFighterShips(BoardView.space(tile), seat) == 0
-                || !hasUsableDestination(game, seat, tile)) {
+                || RetreatRules.skilledRetreatDestinations(game, seat, tile).isEmpty()) {
             return Optional.empty();
         }
         Optional<Player> opponent = game.getRealPlayers().stream()
                 .filter(other -> other != seat && BoardView.hasOwnShips(other, tile))
                 .findFirst();
         if (opponent.isEmpty()) return Optional.empty();
+        List<TacticalPlan> remembered = rememberedElsewhere(context, moment.position());
         return CombatForecast.lossChance(game, seat, moment.position(), BoardView.SPACE).stream()
-                .mapToObj(loss -> new Retreat(tile, opponent.get(), loss))
+                .mapToObj(loss -> new Retreat(tile, opponent.get(), loss, remembered))
                 .findFirst();
     }
 
-    private static boolean hasUsableDestination(Game game, Player seat, Tile tile) {
-        return RetreatRules.skilledRetreatDestinations(game, seat, tile).stream()
-                .anyMatch(destination -> !RetreatRules.locksImportantSystem(game, seat, destination));
+    private static List<TacticalPlan> rememberedElsewhere(AiTurnContext context, String position) {
+        return TacticalRules.rememberedPlan(context)
+                .filter(plan -> !plan.target().equals(position))
+                .stream()
+                .toList();
+    }
+
+    private static double leastDisruption(Game game, Player seat, Retreat retreat) {
+        return RetreatRules.skilledRetreatDestinations(game, seat, retreat.tile()).stream()
+                .mapToDouble(destination -> CommandTokenValue.lockLoss(game, seat, destination, retreat.remembered()))
+                .min()
+                .orElse(0);
+    }
+
+    private static double savings(Game game, Player seat, Retreat retreat) {
+        return savedFleet(seat, retreat) - stakeLeftBehind(game, seat, retreat);
     }
 
     private static double savedFleet(Player seat, Retreat retreat) {
@@ -108,13 +137,14 @@ class SkilledRetreatCard {
         return CardChains.chain(CardChains.last(
                 DESTINATION_PREFIX,
                 Source.OWNED,
-                (context, suffix) -> destinationValue(context.game(), context.seat(), suffix),
+                SkilledRetreatCard::destinationValue,
                 "retreat with Skilled Retreat to"));
     }
 
-    private static double destinationValue(Game game, Player seat, String suffix) {
+    private static double destinationValue(AiTurnContext context, String suffix) {
         String[] parts = suffix.split(SEPARATOR);
         if (!suffix.endsWith(SKILLED_SUFFIX) || parts.length < 2) return Double.NEGATIVE_INFINITY;
-        return RetreatRules.skilledDestinationValue(game, seat, parts[1]);
+        return RetreatRules.skilledDestinationValue(
+                context.game(), context.seat(), parts[1], rememberedElsewhere(context, parts[0]));
     }
 }
