@@ -286,6 +286,15 @@ A homebrew content mode that substitutes revised cards, technologies and leaders
 **Discordant Stars**:
 A homebrew content mode that adds additional Factions and components.
 
+**Base**:
+The original Twilight Imperium 4th Edition game before any expansion; a Game in base game mode uses only base content, and statistics filters name it `base`.
+
+**PoK**:
+Prophecy of Kings, the first Twilight Imperium 4th Edition expansion, whose content Games use by default; statistics filters name it `pok`.
+
+**TE**:
+Thunder's Edge, the Twilight Imperium 4th Edition expansion that follows PoK and adds Breakthroughs, Expeditions and the Fracture; statistics filters name it `te`.
+
 **Alliance mode**:
 A team mode in which Players are paired and share some benefits.
 

@@ -74,14 +74,16 @@ class ExpeditionWinRateStatisticsService {
                         .append(" expeditions: ")
                         .append(entry.getValue())
                         .append('\n'));
-        int expeditionCountGameCount = expeditionCountStats.values().stream()
+        int expeditionCountPlayerCount = expeditionCountStats.values().stream()
                 .mapToInt(count -> count.total)
                 .sum();
         double averageExpeditionsCompleted = expeditionCountStats.entrySet().stream()
                         .mapToInt(entry -> entry.getKey() * entry.getValue().total)
                         .sum()
-                / (double) expeditionCountGameCount;
-        sb.append("- Game count: ").append(expeditionCountGameCount).append('\n');
+                / (double) expeditionCountPlayerCount;
+        sb.append("- Game count: ")
+                .append(gamesThatDidNotFinishExpeditionsVersusDid[1])
+                .append('\n');
         sb.append("- Average: ")
                 .append(String.format("%.2f", averageExpeditionsCompleted))
                 .append('\n');
