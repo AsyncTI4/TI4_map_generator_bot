@@ -28,7 +28,7 @@ class UndoButtonHandler {
 
     @ButtonHandler(value = "ultimateUndo_", save = false)
     public static void ultimateUndo_(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!MegagameUndoService.mayUndo(game, event.getMember())) {
+        if (!MegagameUndoService.mayUndoLatestStep(game, player, event.getMember())) {
             MegagameUndoService.pingGmsForUndo(event, game);
             return;
         }
