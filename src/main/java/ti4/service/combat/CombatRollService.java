@@ -35,6 +35,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnosisLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.combat.CancelGroundHitsButtonId;
+import ti4.discord.interactions.buttons.handlers.combat.SpaceCannonDefenceHitButtons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenPromissoryHandler;
@@ -174,6 +175,16 @@ public class CombatRollService {
                     + " to decide whether to cancel hits and place mine tokens before assigning hits.";
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, assignmentMessage, buttons);
+    }
+
+    public void sendSpaceCannonDefenceHitAssignment(
+            Game game, Player player, Player opponent, Tile tile, Planet planet, int hits, MessageChannel channel) {
+        String message = opponent.getRepresentationNoPing() + ", assign the SPACE CANNON DEFENCE hit"
+                + (hits == 1 ? "" : "s") + "."
+                + BlueReverieTechHelper.getStasisFieldGeneratorsHitAssignmentReminder(
+                        game, player, CombatRollType.SpaceCannonDefence);
+        MessageHelper.sendMessageToChannelWithButtons(
+                channel, message, SpaceCannonDefenceHitButtons.beforeACancel(opponent, tile, planet.getName(), hits));
     }
 
     public void sendGroundCombatHitAssignment(
@@ -1229,22 +1240,9 @@ public class CombatRollService {
         }
 
         if (rollType == CombatRollType.SpaceCannonDefence && h > 0 && opponent != player) {
-            if (player.hasTech("sfg") && combatOnHolder instanceof Planet planet) {
-                List<Button> buttons = List.of(
-                        Buttons.green(
-                                opponent.factionButtonChecker()
-                                        + AutoAssignGroundHitsButtonIds.format(planet.getName(), h),
-                                "Auto-assign Hit" + (h == 1 ? "" : "s")),
-                        Buttons.red(
-                                "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
-                                "Manually Assign Hit" + (h == 1 ? "" : "s")));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        game.isFowMode() ? opponent.getCorrectChannel() : event.getMessageChannel(),
-                        opponent.getRepresentationNoPing() + ", assign the SPACE CANNON DEFENCE hit"
-                                + (h == 1 ? "" : "s") + "."
-                                + BlueReverieTechHelper.getStasisFieldGeneratorsHitAssignmentReminder(
-                                        game, player, rollType),
-                        buttons);
+            if (combatOnHolder instanceof Planet planet) {
+                MessageChannel channel = game.isFowMode() ? opponent.getCorrectChannel() : event.getMessageChannel();
+                sendSpaceCannonDefenceHitAssignment(game, player, opponent, tile, planet, h, channel);
             }
             List<Button> stingOfTheHiveButtons = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
                     game, player, tile, CombatRollType.SpaceCannonDefence, opponent, h);

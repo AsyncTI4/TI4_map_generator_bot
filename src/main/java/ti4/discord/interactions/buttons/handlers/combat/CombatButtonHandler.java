@@ -266,6 +266,22 @@ public class CombatButtonHandler {
                 .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
+    @ButtonHandler(CancelSpaceCannonDefenceHitsButtonId.PREFIX)
+    public static void cancelSpaceCannonDefenceHits(
+            ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        CancelSpaceCannonDefenceHitsButtonId cancelId = CancelSpaceCannonDefenceHitsButtonId.parse(buttonID);
+        Tile tile = game.getTileByPosition(cancelId.tilePosition());
+        int h = cancelId.hits() - 1;
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), cancellationMessage(game, player));
+        List<Button> buttons = SpaceCannonDefenceHitButtons.afterACancel(player, tile, cancelId.planet(), h);
+        String msg2 = player.getRepresentationNoPing() + ", you may automatically assign "
+                + (h == 1 ? "the hit" : "hits") + ".";
+        event.getMessage()
+                .editMessage(msg2)
+                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
     @ButtonHandler("cancelGroundHits_")
     public static void cancelGroundHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         CancelGroundHitsButtonId cancelId = CancelGroundHitsButtonId.parse(buttonID);
