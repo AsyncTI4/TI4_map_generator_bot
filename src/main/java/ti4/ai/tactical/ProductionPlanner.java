@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
+import java.util.Set;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
@@ -42,13 +43,15 @@ import ti4.model.UnitModel;
 public class ProductionPlanner {
 
     static final int MIN_UNITS = 4;
+    static final double MIN_BUILD_RESOURCES = 6;
+    private static final Set<String> UNCAPPED_UNITS = Set.of("ff", "gf");
     private static final int OPENING_ROUND = 1;
     private static final int DEFENSE_FIELD = 7;
     private static final int BONUS_FIELD = 8;
     private static final String BELLUM_GLORIOSUM = "solbt";
     public static final String BELLUM_SOURCE = "solBtBuild";
     private static final int WANTED_CARRIERS = 2;
-    private static final int WANTED_DREADNOUGHTS = 3;
+    private static final int WANTED_DREADNOUGHTS = 4;
     private static final double FRONTLINE_BONUS = 0.5;
     private static final int FRONTLINE_RANGE = 2;
     private static final int FRACTURE_RANGE = 2;
@@ -60,6 +63,7 @@ public class ProductionPlanner {
     private static final int WANTED_CRUISERS = 2;
     private static final int WANTED_MECHS = 2;
     private static final int WANTED_SPARE_INFANTRY = 4;
+    private static final int MIN_SPARE_INFANTRY = 2;
     private static final int INFANTRY_ROOM_PER_CARRIER = 2;
     private static final int ENABLING_SHIPS = 2;
     private static final int MIGHTY_FLEET_DREADNOUGHTS = 5;
@@ -259,9 +263,10 @@ public class ProductionPlanner {
         Builder builder = new Builder(game, seat, tile, budget, defense);
         phase("production.scoringUnits", () -> planScoringUnits(builder));
         phase("production.defensiveUnits", () -> planDefensiveUnits(builder));
-        phase("production.coreUnits", () -> planCoreUnits(builder));
+        phase("production.coreShips", () -> planCoreShips(builder));
         phase("production.fractureFleet", () -> planFractureFleet(builder));
         phase("production.surplusShips", () -> planSurplusShips(builder));
+        phase("production.coreGround", () -> planCoreGround(builder));
         phase("production.fractureFighters", () -> planFractureFighters(builder));
         phase("production.autoFactories", () -> planAutoFactories(builder));
         phase("production.fill", () -> fillProduction(builder));
@@ -484,16 +489,21 @@ public class ProductionPlanner {
                 .min();
     }
 
-    private static void planCoreUnits(Builder builder) {
+    private static void planCoreShips(Builder builder) {
         builder.shipsUpTo(UnitType.Carrier, wantedCarriers(builder.seat), carrierValue(builder.seat), false);
         builder.overSuppliedCarriersUpTo(wantedCarriers(builder.seat));
         int spare = TacticalPlanner.movableGroundForces(builder.game, builder.seat, builder.tile, builder.defense);
-        builder.infantry(WANTED_SPARE_INFANTRY - spare, NEEDED_INFANTRY_VALUE);
+        builder.infantry(MIN_SPARE_INFANTRY - spare, NEEDED_INFANTRY_VALUE);
         int wantedMechs = builder.campaign().mechsWanted(WANTED_MECHS);
         if (firesFromAdjacentSystems(builder.seat) && frontlineInterest(builder) > 0) wantedMechs++;
         while (builder.count(UnitType.Mech) < wantedMechs && builder.leavesRoomToFill(builder.cost(UnitType.Mech))) {
             if (!builder.ground(UnitType.Mech, 1, builder.fillerValue(UnitType.Mech))) return;
         }
+    }
+
+    private static void planCoreGround(Builder builder) {
+        int spare = TacticalPlanner.movableGroundForces(builder.game, builder.seat, builder.tile, builder.defense);
+        builder.infantry(WANTED_SPARE_INFANTRY - spare - builder.planned(UnitType.Infantry), NEEDED_INFANTRY_VALUE);
     }
 
     private static boolean firesFromAdjacentSystems(Player seat) {
@@ -906,11 +916,18 @@ public class ProductionPlanner {
                 shipCapacity += ships * BoardView.capacity(seat, type);
                 if (type == UnitType.Carrier) carriers = ships;
             }
-            int keptForGroundForces =
-                    Math.max(INFANTRY_ROOM_PER_CARRIER * carriers, BoardView.groundForces(space, seat));
+            int boardable = groundOnPlanets() + planned(UnitType.Infantry) + planned(UnitType.Mech);
+            int keptForGroundForces = Math.max(
+                    Math.min(INFANTRY_ROOM_PER_CARRIER * carriers, boardable), BoardView.groundForces(space, seat));
             int allowance = dockPlanet().isPresent() ? BoardView.DOCK_FIGHTER_ALLOWANCE : 0;
             int fighters = BoardView.count(space, seat, UnitType.Fighter) + planned(UnitType.Fighter);
             return Math.max(0, allowance + Math.max(0, shipCapacity - keptForGroundForces) - fighters);
+        }
+
+        private int groundOnPlanets() {
+            return tile.getPlanetUnitHolders().stream()
+                    .mapToInt(planet -> BoardView.groundForces(planet, seat))
+                    .sum();
         }
 
         Defenders plannedDefenders() {
@@ -1038,6 +1055,7 @@ public class ProductionPlanner {
         }
 
         private boolean underCap(String asyncId, int adding) {
+            if (UNCAPPED_UNITS.contains(asyncId)) return true;
             int cap = seat.getUnitCap(asyncId);
             return cap <= 0 || ButtonHelper.getNumberOfUnitsOnTheBoard(game, seat, asyncId) + adding <= cap;
         }

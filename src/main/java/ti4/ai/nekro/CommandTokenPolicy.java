@@ -31,6 +31,8 @@ public class CommandTokenPolicy {
     private static final int TACTIC_PLENTY = 5;
     private static final int STRATEGY_MAX = 3;
     private static final int STACKING_FLEET_CAP = 5;
+    private static final int BUILD_FLEET_MIN_CAPACITY = 4;
+    private static final int BUILD_FLEET_MIN_RESOURCES = 6;
     private static final String RAISE_A_FLEET = "raise_fleet";
     private static final int RAISE_A_FLEET_SHIPS = 5;
     private static final String COMMAND_AN_ARMADA = "command_armada";
@@ -192,6 +194,7 @@ public class CommandTokenPolicy {
                 new Level(Pool.FLEET, Math.min(cap, fleetForAnOpenSlot(game, seat, largest, cap)) - bonus),
                 new Level(Pool.STRATEGY, strategizeHeld(game, seat) ? 1 : 0),
                 new Level(Pool.TACTIC, TACTIC_FIRST),
+                new Level(Pool.FLEET, Math.min(cap, buildFleet(game, seat, largest)) - bonus),
                 new Level(Pool.FLEET, Math.min(cap, objectiveFleet(game, seat, largest, cap)) - bonus),
                 new Level(Pool.FLEET, Math.min(cap, BASE_FLEET) - bonus),
                 new Level(Pool.FLEET, Math.min(cap, fractureFleet(game, seat, largest)) - bonus),
@@ -243,6 +246,16 @@ public class CommandTokenPolicy {
                         && FractureCampaign.dock(game, seat).isPresent()
                 ? FractureCampaign.FLEET_SHIPS
                 : 0;
+    }
+
+    private static int buildFleet(Game game, Player seat, int largest) {
+        Tile home = seat.getHomeSystemTile();
+        if (home == null) return 0;
+        Integer resources = Helper.getPlayerResourcesAvailable(seat, game);
+        boolean canBuildBig = Helper.getProductionValue(seat, game, home, false) >= BUILD_FLEET_MIN_CAPACITY
+                && resources != null
+                && resources >= BUILD_FLEET_MIN_RESOURCES;
+        return canBuildBig ? Math.min(STACKING_FLEET_CAP, Math.max(BASE_FLEET, largest) + 1) : 0;
     }
 
     private static int stackingFleet(Game game, Player seat, int largest) {

@@ -32,6 +32,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class NekroBrainTest extends BaseTi4Test {
@@ -48,6 +49,7 @@ class NekroBrainTest extends BaseTi4Test {
     void setUp() {
         game = new Game();
         game.setName("nekro-brain-test");
+        game.setExploreDeck(Mapper.getShuffledDeck("explores_pok"));
         game.setRound(1);
         nekro = game.addPlayer(AI_ID, "Nekro AI");
         nekro.setFaction("nekro");
@@ -59,13 +61,13 @@ class NekroBrainTest extends BaseTi4Test {
 
     // ---- strategy phase ---------------------------------------------------------------------
 
-    // Construction is only worth two PDS on this empty board, but the 3 trade goods on it lift it above every other
-    // card. Nekro's commodities are already full, so Trade is worth no more than its own 3 trade goods.
+    // Construction is only worth two PDS on this empty board, but the 5 trade goods on it lift it above every other
+    // card. Nekro's commodities are already full, so Trade is worth no more than its own 5 trade goods.
     @Test
     void picksTheHighestValueStrategyCardIncludingTradeGoods() {
         becomeActive("strategy");
         nekro.setCommodities(nekro.getCommoditiesTotal());
-        game.setScTradeGood(4, 3);
+        game.setScTradeGood(4, 5);
         AiPrompt picks = publicPrompt("picks", NOW, scPickButtons());
 
         AiDecision decision = decide(picks);
@@ -78,7 +80,7 @@ class NekroBrainTest extends BaseTi4Test {
     void explainsAndRemembersThePlanBehindAPick() {
         becomeActive("strategy");
         nekro.setCommodities(nekro.getCommoditiesTotal());
-        game.setScTradeGood(4, 3);
+        game.setScTradeGood(4, 5);
         AiPrompt picks = publicPrompt("picks", NOW, scPickButtons());
 
         AiDecision decision = decide(picks);

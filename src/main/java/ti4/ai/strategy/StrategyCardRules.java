@@ -29,6 +29,7 @@ import ti4.ai.scoring.Wallet;
 import ti4.ai.secrets.SecretDrawValue;
 import ti4.ai.secrets.SecretDraws;
 import ti4.ai.secrets.SpyNetwork;
+import ti4.ai.tactical.IdleTradeGoods;
 import ti4.ai.tactical.PeaceAccords;
 import ti4.ai.tactical.ProductionPlanner;
 import ti4.ai.tactical.ProductionPlanner.BuildPlan;
@@ -1157,7 +1158,8 @@ public class StrategyCardRules {
     public static boolean worthPayingForResearch(Game game, Player seat, int cost, double worth, Wallet wallet) {
         if (ScoringReserve.planAfterReserve(wallet, ScoringReserve.of(game, seat), SpendCost.resources(cost))
                 .isEmpty()) return false;
-        return worthResearching(game, seat, worth);
+        boolean idleCoversIt = IdleTradeGoods.surplus(game, seat) * Wallet.tradeGoodValue(seat) >= cost;
+        return worthResearching(game, seat, idleCoversIt ? worth * ResearchPolicy.IDLE_WORTH_SHARE : worth);
     }
 
     static boolean worthResearching(Game game, Player seat, double worth) {

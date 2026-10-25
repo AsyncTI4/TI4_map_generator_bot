@@ -2415,7 +2415,10 @@ public class TacticalPlanner {
         double objectiveGain = context.builtGain(tile, build);
         boolean forScoring = build.scoring() || objectiveGain > 0;
         Optional<GroundShift> shift = groundShift(context, tile);
-        boolean worthBuilding = build.units() >= ProductionPlanner.MIN_UNITS || forScoring || build.defense();
+        boolean worthBuilding = build.units() >= ProductionPlanner.MIN_UNITS
+                || build.totalCost() >= ProductionPlanner.MIN_BUILD_RESOURCES
+                || forScoring
+                || build.defense();
         if (!worthBuilding && shift.isEmpty()) return Optional.empty();
         TacticalPlan plan =
                 new TacticalPlan(Kind.PRODUCE, tile.getPosition(), List.of(), Map.of(), build.value() + objectiveGain);

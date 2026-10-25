@@ -222,7 +222,7 @@ class ProductionPlannerTest extends BaseTi4Test {
     void fillsOutTheFleetWithUpgradedDestroyersOnly() {
         test.nekro.setFleetCC(10);
         test.units(home, "space", test.nekro, UnitType.Carrier, 2);
-        test.units(home, "space", test.nekro, UnitType.Dreadnought, 3);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 4);
         test.units(home, "space", test.nekro, UnitType.Cruiser, 2);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
         test.units(home, "mordaiii", test.nekro, UnitType.Mech, 2);
@@ -338,5 +338,16 @@ class ProductionPlannerTest extends BaseTi4Test {
 
     private void reveal(String objective) {
         test.game.getRevealedPublicObjectives().put(objective, 1);
+    }
+
+    // Fighters are not limited by the plastic in the box (LRR 23.4): a dock with room for more keeps building them.
+    @Test
+    void buildsFightersPastTheTenOnTheBoard() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 3);
+        test.units(home, "space", test.nekro, UnitType.Fighter, 10);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
+        test.nekro.setTg(10);
+
+        assertThat(plan().units(UnitType.Fighter)).isPositive();
     }
 }
