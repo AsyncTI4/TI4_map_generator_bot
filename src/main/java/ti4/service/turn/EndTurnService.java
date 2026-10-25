@@ -24,6 +24,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
@@ -100,6 +101,7 @@ public class EndTurnService {
         }
         game.removeStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED);
         LostLegciesExploreHandler.resolveBattleworldEndOfTurn(event, game, player);
+        IxthLegendaryButtonHandler.resolveEthanAtEndOfTurn(event, game, player);
         for (Tile tile : game.getTileMap().values()) {
             TeHelperGeneral.addStationsToPlayArea(event, game, tile);
         }

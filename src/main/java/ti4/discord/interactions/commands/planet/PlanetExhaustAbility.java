@@ -9,6 +9,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.planet.AlfheimLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.VanaheimLegendaryButtonHandler;
 import ti4.game.Game;
@@ -256,7 +257,22 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = "Please choose the system that the ship you wish to move is in.";
                 buttons.addAll(ButtonHelper.getDomnaStepOneTiles(player, game));
             }
-            case "eko" -> output = "blank";
+            case "horace" -> {
+                IxthLegendaryButtonHandler.offerHoraceAnomalies(game, player);
+                output = "blank";
+            }
+            case "lapidus" -> {
+                IxthLegendaryButtonHandler.offerLapidusExplore(game, player);
+                output = "blank";
+            }
+            case "eko" -> {
+                IxthLegendaryButtonHandler.offerEkoSystems(game, player);
+                output = "blank";
+            }
+            case "lloyd" -> {
+                IxthLegendaryButtonHandler.offerLloydInitiatives(game, player);
+                output = "blank";
+            }
             case "avarin" -> {
                 TheodisiLegendaryButtonHandler.offerAvarinUnitUpgradeResearch(game, player);
                 output = "blank";

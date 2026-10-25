@@ -71,6 +71,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
@@ -354,6 +355,7 @@ public final class ButtonHelperTacticalAction {
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
         CrystellumTechHandler.clearResonanceDrive(game);
         ArcanumPrimordialTechHandler.clearPowerWordPlaneShift(game);
+        IxthLegendaryButtonHandler.clearHoraceAnomalies(game);
         ArcanumTechHandler.clearSigilOfTransmutation(game);
         AeternaLeadersHandler.clearAeternaCommanderActionState(game);
         AeternaUnitsHandler.clearCryptActionState(game);
@@ -368,6 +370,7 @@ public final class ButtonHelperTacticalAction {
         PirateHordeBrActionCardHandler.completeTacticalAction(event, game, player);
         game.removeStoredValue("vanguardReinforce" + player.getFaction());
         TheodisiLegendaryButtonHandler.clearRemoteFactory(game, player);
+        IxthLegendaryButtonHandler.clearHoraceAnomaly(game, player);
         game.removeStoredValue("safeHarborUsed");
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
         SarcosaHeroHandler.completeNeutralTacticalAction(game, player);
@@ -740,6 +743,7 @@ public final class ButtonHelperTacticalAction {
         PonthousUnitHandler.clearOldGlorySustain(game);
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
         ArcanumPrimordialTechHandler.clearPowerWordPlaneShift(game);
+        IxthLegendaryButtonHandler.clearHoraceAnomalies(game);
         ArcanumTechHandler.clearSigilOfTransmutation(game);
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         KairnUnitHandler.clearExcavatorMechExplore(game);
@@ -915,6 +919,7 @@ public final class ButtonHelperTacticalAction {
         BlueReverieTechHelper.offerNetworkedConstructors(game, tile);
         BlueReverieArtifactRelicHandler.offerUnknownArtifact(game, player);
         TheodisiLegendaryButtonHandler.offerActivationAbility(game, player);
+        IxthLegendaryButtonHandler.onSystemActivated(game, player);
         BlueReverieHelper.offerShameixBanePrompts(game, player, tile);
         BlueReverieRelicHandler.offerAendsTorch(game, player, tile);
         SarcosaCommanderHandler.offerAdjacencySelection(game, player);

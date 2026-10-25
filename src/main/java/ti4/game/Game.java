@@ -53,6 +53,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morph
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousTechHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
@@ -4512,6 +4513,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public boolean playerHasLeaderUnlockedOrAlliance(Player player, String leaderID) {
         if (player.hasLeaderUnlocked(leaderID)) return true;
         if (!leaderID.contains("commander")) return false;
+        if (IxthLegendaryButtonHandler.hasKwonCommander(this, player, leaderID)) return true;
 
         if (leaderIsFake(leaderID) && !"gateteen".equalsIgnoreCase(getName())) {
             if (!player.getAllianceMembers().isEmpty()) {

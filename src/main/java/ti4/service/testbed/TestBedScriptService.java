@@ -300,6 +300,10 @@ public class TestBedScriptService {
                     errors.add(label + ": unknown explore card `" + step.getValue() + "`.");
                 }
             }
+            case "removeToken" -> {
+                requireValue(step.getKey(), "key", label, errors);
+                requireValue(step.getValue(), "value", label, errors);
+            }
             case "setActivePlayer" -> requireSeat(step, label, errors);
             case "sendAnonComms" -> {
                 requireSeat(step, label, errors);

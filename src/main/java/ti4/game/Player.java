@@ -60,6 +60,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.discord.utility.DiscordChannelUtility;
@@ -1637,6 +1638,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             bonus += 2;
         }
         for (String planet : getPlanets()) {
+            bonus += IxthLegendaryButtonHandler.getCommoditiesModifier(planet);
             if (Mapper.getPlanet(planet) != null
                     && (Mapper.getPlanet(planet).isSpaceStation()
                             || (game.getUnitHolderFromPlanet(planet) != null
@@ -2807,7 +2809,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void clearExhaustedPlanets(boolean cleanAbilities) {
+        List<String> readied = new ArrayList<>(getExhaustedPlanets());
         getExhaustedPlanets().clear();
+        readied.forEach(planet -> IxthLegendaryButtonHandler.onPlanetReadied(game, this, planet));
         if (cleanAbilities) {
             getExhaustedPlanetsAbilities().clear();
         }
@@ -3084,6 +3088,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             TheodisiOutpostActionCardHandler.offerOutpostEffects(game, this, planet);
             TaBreakthroughHandler.offerSafeHavensInfantry(game, this, planet);
             ThirtyKRelicHooks.onPlanetExhausted(game, this, planet);
+            IxthLegendaryButtonHandler.onPlanetExhausted(game, this, planet);
         }
         Game game = this.game;
         if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null
@@ -3117,8 +3122,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void refreshPlanet(String planet) {
-        boolean isRemoved = getExhaustedPlanets().remove(planet);
-        if (isRemoved) refreshPlanet(planet);
+        if (getExhaustedPlanets().removeIf(planet::equals)) {
+            IxthLegendaryButtonHandler.onPlanetReadied(game, this, planet);
+        }
     }
 
     public void refreshPlanetAbility(String planet) {

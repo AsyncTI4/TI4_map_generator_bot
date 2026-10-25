@@ -176,6 +176,19 @@ public class TestBedComponentService {
     }
 
     @Nullable
+    static String removeToken(Game game, String where, String token) {
+        boolean space = MapPositionMapper.isTilePositionValid(where);
+        String holder = space ? Constants.SPACE : AliasHandler.resolvePlanet(where.toLowerCase());
+        Tile tile = space ? game.getTileByPosition(where) : game.getTileFromPlanet(holder);
+        if (tile == null) return "No tile at `" + where + "` for token `" + token + "`.";
+        String file = Mapper.getAttachmentImagePath(token);
+        if (file == null) file = Mapper.getTokenID(AliasHandler.resolveToken(token));
+        if (file == null) return "Unknown token `" + token + "`.";
+        if (!tile.removeToken(file, holder)) return "No token `" + token + "` at `" + where + "`.";
+        return null;
+    }
+
+    @Nullable
     static String placeToken(Game game, String where, String token) {
         Tile tile;
         String holder;

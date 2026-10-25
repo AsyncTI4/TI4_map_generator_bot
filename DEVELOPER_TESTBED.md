@@ -76,7 +76,7 @@ To test a component, get it into play with the preset (or mid-script with `do: h
 | Promissory note in hand | seat `pns`: an id, or `<short id>:<owner>` for colour notes | `"pns": ["gift", "sftt:hacan"]` |
 | Public objective | game `revealedObjectives`, seat `scoredObjectives` | `"revealedObjectives": ["corner"]` |
 | Law in play | game `laws` (`id` or `id:elected`) | `"laws": ["arms_reduction"]` |
-| Token or attachment | game `tokens`: tile position or planet | `"tokens": { "101": ["frontier"], "mecatolrex": ["dmz"] }` |
+| Token or attachment | game `tokens`: tile position or planet; remove one mid-script with `do: removeToken` | `"tokens": { "101": ["frontier"], "mecatolrex": ["dmz"] }`, `{ "do": "removeToken", "key": "318", "value": "frontier" }` |
 | Border anomaly | game `borderAnomalies`: tile position to `<n\|ne\|se\|s\|sw\|nw>:<type>` | `"borderAnomalies": { "202": ["n:spatial_tear"] }` |
 | Relic fragment | seat `fragments` | `"fragments": ["crf1"]` |
 | Tile outside the map string (maps A-G, corners, Fracture) | game `tiles`: position to tile id | `"tiles": { "a000": "39", "tl": "82" }` |
@@ -298,7 +298,7 @@ and ids fail with every error listed at once; problems that only show while appl
 | `note` | `{ "note": "round 2 starts" }` |
 | `press` | `{ "as": "sol", "press": "strategicAction_3", "in": "main" }` |
 | `pressId` | `{ "as": "nekro", "pressId": "sc_follow_3" }` |
-| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields; when it gives cards the seat's cards info is re-sent so the new hand buttons appear), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck) |
+| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields; when it gives cards the seat's cards info is re-sent so the new hand buttons appear), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck), `removeToken` (key: tile position or planet, value: token or attachment as in the preset `tokens` field; fails if it is not there) |
 | `wait` | `{ "wait": 5 }` (seconds) |
 | `expect` | one of the checks below |
 
@@ -320,7 +320,8 @@ Every step may also have a `label` for the report.
 - **State paths:** `<seat>.` + `tg`, `commodities`, `ccs`, `tacticalCcs`, `fleetCcs`, `strategyCcs`, `vp`,
   `debt`, `scs`, `passed`, `followed`, `acs` (count), `acIds`, `sos` (count), `soIds`, `pns`, `pnsInPlay`,
   `sosScored`, `posScored`, `fragments`, `breakthroughs`, `leaders`, `techs`, `exhaustedTechs`, `purgedTechs`,
-  `relics`, `exhaustedRelics`, `planets`, `exhaustedPlanets`;
+  `relics`, `exhaustedRelics`, `planets`, `exhaustedPlanets`, `exhaustedPlanetAbilities`, `commodityValue`
+  (commodity value, not the commodities held);
   `game.` + `activeSystem`, `phase`, `round`, `activePlayer`, `speaker`, `playedScs`, `acDiscard`, `agendaDiscard`,
   `laws`, `revealedPos`, `purgedPns`, `exploreDiscard`, `exploreDeck`, `relicDeck`,
   `decks` (`ac:<id>,so:<id>,relic:<id>,explore:<id>,agenda:<id>`), `borderAnomalies` (`<tile>:<direction>:<type>`);

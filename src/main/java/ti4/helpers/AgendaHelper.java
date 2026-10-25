@@ -44,6 +44,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylo
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.xan.XanAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
@@ -2798,6 +2799,9 @@ public final class AgendaHelper {
             return;
         }
         game.setStoredValue("agendaCount", aCount + "");
+        if (aCount == 1) {
+            IxthLegendaryButtonHandler.offerWidmoreBack(game);
+        }
         if (aCount == 1 && game.isShowBanners() && !game.isOmegaPhaseMode()) {
             BannerGenerator.drawPhaseBanner("agenda", game.getRound(), game.getActionsChannel());
         }

@@ -69,6 +69,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
@@ -1408,6 +1409,11 @@ public final class Helper {
                     res += 1;
                     found = true;
                 }
+                case IxthLegendaryButtonHandler.IMPERIAL_SHIPYARD_SPENT_THING -> {
+                    msg.append("> Used _Imperial Shipyard_\n");
+                    res += 1;
+                    found = true;
+                }
                 case "sledfactories" -> {
                     msg.append("> Used Sled Factories " + TechEmojis.CyberneticTech + "\n");
                     res += 2;
@@ -2462,6 +2468,9 @@ public final class Helper {
             if (TheodisiLegendaryButtonHandler.hasRemoteFactoryProduction(game, player, tile)) {
                 productionValueTotal += 3;
             }
+            if (IxthLegendaryButtonHandler.ownsPlanetInTile(player, tile, IxthLegendaryButtonHandler.ALPERT)) {
+                productionValueTotal += 2;
+            }
             if (tile.getUnitHolders().size() == 1
                     && player.hasTech("dsmorty")
                     && FoWHelper.playerHasShipsInSystem(player, tile)) {
@@ -3047,6 +3056,7 @@ public final class Helper {
                 if (("tacticalAction".equalsIgnoreCase(warfareNOtherstuff)
                                 || "warfare".equalsIgnoreCase(warfareNOtherstuff))
                         && getProductionValueOfUnitHolder(player, game, tile, unitHolder) == 0
+                        && !IxthLegendaryButtonHandler.producesOnAlpert(player, unitHolder)
                         && getProductionValueOfUnitHolder(
                                         player,
                                         game,

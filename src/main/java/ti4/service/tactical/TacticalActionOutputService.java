@@ -25,6 +25,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.HydromorphicCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -369,6 +370,7 @@ public class TacticalActionOutputService {
                     game.setStoredValue("possiblyUsedRift", "yes");
                 }
             }
+            output.append(IxthLegendaryButtonHandler.getOrbitalSlingshotReminder(player, tile));
             if (player.hasTech("bedreamneg") && DreamFactionTechHandler.getsNonEuclideanMoveBonus(game, player, tile)) {
                 output.append(" (+1 move from a nexus token source with _Non-Euclidean Geometries_)");
             }
@@ -437,7 +439,8 @@ public class TacticalActionOutputService {
                 && !(unit.unitType() == UnitType.Flagship
                         && AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile))
                 && !IronSalvageRelicHandler.carrierIgnoresAnomalies(game, player, unit.unitType())
-                && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)) {
+                && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
+                && !IxthLegendaryButtonHandler.ignoresHoraceAnomaly(game, player, tile)) {
             baseMoveValue = 1;
         }
         if (model.getIsShip() && PirateHordeBrActionCardHandler.isActive(game, player)) {

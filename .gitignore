@@ -38,6 +38,7 @@ scripts/**/__pycache__/
 /.claude/settings.local.json
 /.claude/workfiles/
 /.claude/ideas/
+/src/main/resources/data/testbed/scripts/
 
 # Developer test bed: personal presets, scripts and test buttons stay local (see DEVELOPER_TESTBED.md)
 src/main/resources/data/testbed/local/*

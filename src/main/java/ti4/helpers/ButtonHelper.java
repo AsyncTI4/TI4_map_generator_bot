@@ -83,6 +83,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
@@ -5132,7 +5133,10 @@ public class ButtonHelper {
                 "echo",
                 "domna",
                 "illusion", // Other
-                "phantasm");
+                "phantasm",
+                "eko", // Ixth
+                "lapidus",
+                "lloyd");
         for (String planet : implementedLegendaryPlanets) {
             String label = "Use " + Mapper.getPlanet(planet).getName() + " Ability";
 
@@ -5140,6 +5144,9 @@ public class ButtonHelper {
                     && !player.getExhaustedPlanetsAbilities().contains(planet)) {
                 if ("mrte".equalsIgnoreCase(planet)
                         && player.getSecretsUnscored().isEmpty()) {
+                    continue;
+                }
+                if (!IxthLegendaryButtonHandler.isEndOfTurnAbilityUsable(game, player, planet)) {
                     continue;
                 }
                 String id = player.factionButtonChecker() + "planetAbilityExhaust_" + planet;
