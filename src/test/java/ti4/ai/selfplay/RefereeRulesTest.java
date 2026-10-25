@@ -119,6 +119,7 @@ class RefereeRulesTest extends BaseTi4Test {
     @Test
     void recognisesTheEndGameButtonTheBotOffersOnceTheObjectivesRunOut() {
         test.game.setRound(9);
+        test.game.setPublicObjectives2(new ArrayList<>());
         AiPrompt allScored = allHaveScoredPrompt();
 
         assertThat(RefereeRules.trackExhausted(test.game)).isTrue();
