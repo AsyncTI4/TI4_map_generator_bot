@@ -3,6 +3,7 @@ package ti4.ai.strategy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,10 +14,13 @@ import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.SearchMemo;
 import ti4.ai.endurance.Endurance;
+import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.eval.Territory;
 import ti4.ai.eval.ValueScale;
+import ti4.ai.explore.ExploreValues;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringStakes;
@@ -25,6 +29,8 @@ import ti4.ai.tactical.PrecisionRules;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
@@ -40,6 +46,10 @@ public class ResearchPolicy {
     public static final double TECH_TEMPO =
             (ValueScale.RESOURCE * StrategyCardRules.FOLLOW_TECH_COST + CardValueScale.STRATEGY_TOKEN)
                     / WORTH_FOLLOWING_FOR;
+    private static final String DARK_ENERGY_TAP = "det";
+    private static final double FRONTIER_EXPLORES_PER_ROUND = 0.3;
+    private static final Set<Territory.Zone> FRONTIER_ZONES =
+            EnumSet.of(Territory.Zone.HOME, Territory.Zone.SLICE, Territory.Zone.LANE, Territory.Zone.BORDER);
     private static final double FACTION_TECH_VALUE = 2.0;
     private static final double DEFAULT_VALUE = 1.5;
     private static final Map<String, Double> FACTION_VALUE = Map.ofEntries(
@@ -130,7 +140,7 @@ public class ResearchPolicy {
             Map.entry("inf2", 2.0),
             Map.entry("pa", 2.0),
             Map.entry("pi", 2.0),
-            Map.entry("det", 2.0),
+            Map.entry("det", 1.5),
             Map.entry("pds2", 2.0),
             Map.entry("cr2", 2.0),
             Map.entry("sdn", 2.0),
@@ -213,9 +223,29 @@ public class ResearchPolicy {
                 + custodiansRaceValue(game, seat, alias)
                 + openingReachValue(game, seat, alias)
                 + fractureMarchValue(game, seat, alias)
+                + frontierTapValue(game, seat, alias)
                 + groundSecretValue(game, seat, tech)
                 + barrageSecretValue(game, seat, tech)
                 + Endurance.researchValue(seat, alias);
+    }
+
+    static double frontierTapValue(Game game, Player seat, String alias) {
+        if (!DARK_ENERGY_TAP.equals(alias)) return 0;
+        double explores = Math.min(
+                reachableFrontierTokens(game, seat), GameHorizon.roundsLeft(game) * FRONTIER_EXPLORES_PER_ROUND);
+        return explores * ExploreValues.frontierCard(game, seat) / TECH_TEMPO;
+    }
+
+    private static long reachableFrontierTokens(Game game, Player seat) {
+        Territory territory = Territory.of(game, seat);
+        Set<String> visible = game.isFowMode() ? FoWHelper.getTilePositionsToShow(game, seat) : null;
+        String frontier = Mapper.getTokenID(Constants.FRONTIER);
+        return game.getTileMap().values().stream()
+                .filter(tile -> visible == null || visible.contains(tile.getPosition()))
+                .filter(tile -> FRONTIER_ZONES.contains(territory.zone(tile)))
+                .filter(tile -> BoardView.space(tile).getTokenList().contains(frontier))
+                .filter(tile -> !BoardView.hasEnemyUnits(game, seat, tile))
+                .count();
     }
 
     static double fractureMarchValue(Game game, Player seat, String alias) {

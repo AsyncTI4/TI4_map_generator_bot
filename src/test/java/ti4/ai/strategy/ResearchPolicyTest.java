@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.scoring.ScoringStakes;
+import ti4.game.Tile;
+import ti4.helpers.Constants;
 import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
@@ -138,5 +140,39 @@ class ResearchPolicyTest extends BaseTi4Test {
         test.nekro.setSecret("pem");
 
         assertThat(ResearchPolicy.value(test.game, test.nekro, "sd2")).isGreaterThan(without);
+    }
+
+    private void frontierTokenNextToHome() {
+        test.nekroHome();
+        Tile neighbour = test.place("28", AiTestGame.neighbourOf(AiTestGame.HOME));
+        neighbour.addToken(Mapper.getTokenID(Constants.FRONTIER), "space");
+    }
+
+    // Dark Energy Tap explores the frontier tokens a seat's ships can reach, so it is worth something only when
+    // there are some nearby.
+    @Test
+    void valuesDarkEnergyTapByTheFrontierTokensNearby() {
+        test.nekroHome();
+        assertThat(ResearchPolicy.frontierTapValue(test.game, test.nekro, "det"))
+                .isZero();
+
+        frontierTokenNextToHome();
+
+        assertThat(ResearchPolicy.frontierTapValue(test.game, test.nekro, "det"))
+                .isPositive();
+        assertThat(ResearchPolicy.frontierTapValue(test.game, test.nekro, "amd"))
+                .isZero();
+    }
+
+    // Late in the game there are fewer rounds in which to explore.
+    @Test
+    void valuesDarkEnergyTapLessWhenTheGameIsAboutToEnd() {
+        frontierTokenNextToHome();
+        double early = ResearchPolicy.frontierTapValue(test.game, test.nekro, "det");
+
+        test.points(test.nekro, 9);
+
+        assertThat(ResearchPolicy.frontierTapValue(test.game, test.nekro, "det"))
+                .isLessThan(early);
     }
 }
