@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
@@ -29,22 +30,17 @@ public class ScoringStatisticsService {
                     .reversed()
                     .thenComparing(entry -> WinningPathHelper.describe(entry.getKey()));
 
-    private static final ScoreType STAGE_1S = new ScoreType(
-            "Stage 1 objectives",
-            WinningPathBreakdown::stage1s,
-            count -> count + (count == 1 ? " stage 1" : " stage 1s"));
-    private static final ScoreType STAGE_2S = new ScoreType(
-            "Stage 2 objectives",
-            WinningPathBreakdown::stage2s,
-            count -> count + (count == 1 ? " stage 2" : " stage 2s"));
-    private static final ScoreType SECRETS = new ScoreType(
-            "Secret objectives",
-            WinningPathBreakdown::secrets,
-            count -> count + (count == 1 ? " secret objective" : " secret objectives"));
+    private static final ScoreType STAGE_1S =
+            new ScoreType("Stage 1 objectives", WinningPathBreakdown::stage1s, "stage 1", "stage 1s");
+    private static final ScoreType STAGE_2S =
+            new ScoreType("Stage 2 objectives", WinningPathBreakdown::stage2s, "stage 2", "stage 2s");
+    private static final ScoreType SECRETS =
+            new ScoreType("Secret objectives", WinningPathBreakdown::secrets, "secret objective", "secret objectives");
     private static final ScoreType SUPPORTS = new ScoreType(
             "Support for the Throne",
             WinningPathBreakdown::supports,
-            count -> count + (count == 1 ? " _Support for the Throne_" : " _Supports for the Thrones_"));
+            "_Support for the Throne_",
+            "_Supports for the Thrones_");
     private static final List<ScoreType> CORE_SCORE_TYPES = List.of(STAGE_1S, STAGE_2S, SECRETS, SUPPORTS);
 
     public static void queueReply(SlashCommandInteractionEvent event) {
@@ -124,7 +120,7 @@ public class ScoringStatisticsService {
 
     private static void appendScoreTypeBreakdown(
             StringBuilder report, ScoreType scoreType, List<WinningPathBreakdown> winningPaths) {
-        Map<Integer, Long> winnersByCount = winningPaths.stream()
+        NavigableMap<Integer, Long> winnersByCount = winningPaths.stream()
                 .map(scoreType::countIn)
                 .filter(count -> count > 0)
                 .collect(Collectors.groupingBy(Function.identity(), TreeMap::new, Collectors.counting()));
@@ -133,18 +129,30 @@ public class ScoringStatisticsService {
             report.append("- No winner scored any\n");
             return;
         }
-        winnersByCount.forEach((count, winners) -> report.append("- ")
-                .append(scoreType.label(count))
+        winnersByCount.forEach(
+                (count, winners) -> appendShareLine(report, scoreType.label(count), winners, winningPaths.size()));
+        for (int count = 1; count <= winnersByCount.lastKey(); count++) {
+            int minimumCount = count;
+            long winnersWithAtLeast = winningPaths.stream()
+                    .filter(path -> scoreType.countIn(path) >= minimumCount)
+                    .count();
+            appendShareLine(report, scoreType.atLeastLabel(count), winnersWithAtLeast, winningPaths.size());
+        }
+    }
+
+    private static void appendShareLine(StringBuilder report, String label, long winners, int totalWinners) {
+        report.append("- ")
+                .append(label)
                 .append(": ")
-                .append(ActionCardStatsService.formatPercent(winners / (double) winningPaths.size()))
-                .append('\n'));
+                .append(ActionCardStatsService.formatPercent(winners / (double) totalWinners))
+                .append('\n');
     }
 
     private record ScoreType(
-            String heading, ToIntFunction<WinningPathBreakdown> counter, Function<Integer, String> labeler) {
+            String heading, ToIntFunction<WinningPathBreakdown> counter, String singular, String plural) {
 
         static ScoreType otherSource(String source) {
-            return new ScoreType(source, path -> path.pointsFrom(source), count -> count + " " + source);
+            return new ScoreType(source, path -> path.pointsFrom(source), source, source);
         }
 
         int countIn(WinningPathBreakdown path) {
@@ -152,7 +160,11 @@ public class ScoringStatisticsService {
         }
 
         String label(int count) {
-            return labeler.apply(count);
+            return count + " " + (count == 1 ? singular : plural);
+        }
+
+        String atLeastLabel(int count) {
+            return ">= " + count + " " + plural;
         }
     }
 }

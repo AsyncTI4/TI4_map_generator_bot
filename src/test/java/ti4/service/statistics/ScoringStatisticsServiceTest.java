@@ -64,6 +64,23 @@ class ScoringStatisticsServiceTest {
     }
 
     @Test
+    void addsCumulativeAtLeastRowsUpToTheMostAnyWinnerScored() {
+        List<WinningPathBreakdown> winners = new ArrayList<>();
+        addWinners(winners, path(3, 3, 1, 0), 5);
+        addWinners(winners, path(2, 3, 1, 1), 3);
+        addWinners(winners, path(1, 3, 0, 0), 2);
+
+        String report = ScoringStatisticsService.buildReport(winners);
+
+        assertTrue(report.contains("- >= 1 stage 1s: 100%"));
+        assertTrue(report.contains("- >= 2 stage 1s: 80%"));
+        assertTrue(report.contains("- >= 3 stage 1s: 50%"));
+        assertFalse(report.contains(">= 4 stage 1s"));
+        assertTrue(report.contains("- >= 1 secret objectives: 80%"));
+        assertTrue(report.contains("- >= 1 _Supports for the Thrones_: 30%"));
+    }
+
+    @Test
     void omitsTypesThatNoTopPathScoredFrom() {
         List<WinningPathBreakdown> winners = new ArrayList<>();
         addWinners(winners, path(5, 5, 0, 0), 6);
