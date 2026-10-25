@@ -717,8 +717,8 @@ public class Tile {
 
     @JsonIgnore
     public boolean isMecatol(Game game) {
-        return game.getMecatolTile() != null
-                && game.getMecatolTile().getPosition().equals(getPosition());
+        Tile mecatol = game.getMecatolTile();
+        return mecatol != null && mecatol.getPosition().equals(getPosition());
     }
 
     @JsonIgnore

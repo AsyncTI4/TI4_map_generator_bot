@@ -54,7 +54,7 @@ public class MovementGraph {
             Tile tile = game.getTileByPosition(position);
             if (!position.equals(origin) && (screened.contains(position) || blocksPassage(game, player, tile)))
                 continue;
-            for (String next : FoWHelper.getAdjacentTiles(game, position, player, false, false, true)) {
+            for (String next : Adjacency.forMovement(game, player, position)) {
                 if (distances.containsKey(next) || !canEnter(game, player, game.getTileByPosition(next))) continue;
                 distances.put(next, distance + 1);
                 queue.addLast(next);

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.ai.eval.Adjacency;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CombatModifiers.Side;
 import ti4.ai.eval.CombatOdds.Combatant;
@@ -17,7 +18,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
@@ -59,7 +59,7 @@ class BattleMath {
 
     static List<CannonDice> cannonDice(Game game, Tile tile, Player shooter, Collection<UnitHolder> leaving) {
         List<CannonDice> stacks = new ArrayList<>();
-        for (String position : FoWHelper.getAdjacentTiles(game, tile.getPosition(), shooter, false, true)) {
+        for (String position : Adjacency.withSystem(game, shooter, tile.getPosition())) {
             Tile nearby = game.getTileByPosition(position);
             if (nearby == null) continue;
             boolean inSystem = nearby == tile;

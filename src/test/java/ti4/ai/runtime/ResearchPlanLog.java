@@ -9,7 +9,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 
 /**
- * Self-play research plan log (on by default, -Dai.selfplay.researchplan=false turns it off): each seat's plan is
+ * Self-play research plan log (off by default, -Dai.selfplay.researchplan=true turns it on): each seat's plan is
  * printed at the first observation of every round, and again only when its text changes, with the inputs that changed.
  */
 final class ResearchPlanLog {
@@ -24,7 +24,7 @@ final class ResearchPlanLog {
     }
 
     static boolean enabled() {
-        return !"false".equalsIgnoreCase(System.getProperty(PROPERTY));
+        return Boolean.getBoolean(PROPERTY);
     }
 
     void observe(Game game) {

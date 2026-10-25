@@ -850,11 +850,19 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if ("cloaked_fleets".equalsIgnoreCase(ability) && getTechs().contains("tf-shroudoflith")) {
             return true;
         }
-        if (getTechs().contains("tf-" + ability.replace("_", ""))) {
+        if (hasTwilightsFallTechFor(ability)) {
             return true;
         }
 
         return DeepgloomService.playerHasAccessToAbility(this, ability);
+    }
+
+    private boolean hasTwilightsFallTechFor(String ability) {
+        List<String> techs = getTechs();
+        for (String tech : techs) {
+            if (tech.startsWith("tf-")) return techs.contains("tf-" + ability.replace("_", ""));
+        }
+        return false;
     }
 
     public boolean addExhaustedAbility(String ability) {

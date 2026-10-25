@@ -25,7 +25,7 @@ public class SearchMemo {
     @SuppressWarnings("unchecked")
     public static <T> T remember(Supplier<T> compute, Object... key) {
         Scope scope = CURRENT.get();
-        if (scope == null) return compute.get();
+        if (scope == null) return DecisionMemo.remember(compute, key);
         Object cacheKey = Arrays.asList(key);
         Object cached = scope.values.get(cacheKey);
         if (cached != null) return (T) cached;

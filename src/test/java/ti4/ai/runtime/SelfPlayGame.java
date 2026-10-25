@@ -204,6 +204,8 @@ final class SelfPlayGame {
     private boolean relicsHandedOut;
     private final FractureTracker fracture;
     private String probedTurn = "";
+    private ManagedGame observedManaged;
+    private Game observedGame;
     private int fleetLogRound;
     private final ResearchPlanLog researchPlans =
             ResearchPlanLog.enabled() ? new ResearchPlanLog(System.out::println) : null;
@@ -392,7 +394,7 @@ final class SelfPlayGame {
         while (true) {
             long now = env.now();
             ManagedGame managed = GameManager.getManagedGame(name);
-            Game game = managed == null ? null : managed.getGame();
+            Game game = observed(managed);
             if (game == null) return outcome(Ending.LOST_GAME, null, ticks);
             recordVictoryPoints(game);
             recordPlayRounds(game);
@@ -485,7 +487,23 @@ final class SelfPlayGame {
             game.setLastActivePlayerChange(new Date(env.now()));
             issuedTurnStamp = env.now();
         }
-        GameManager.save(game, "AI self-play scenario");
+        saveObserved(game, "AI self-play scenario");
+    }
+
+    // Every save replaces the managed game, so while it is the same instance the file is unchanged and the game
+    // loaded for it is still current; this spares the harness a full reload of the save file at every check.
+    private Game observed(ManagedGame managed) {
+        if (managed == null) return null;
+        if (managed != observedManaged || observedGame == null) {
+            observedGame = managed.getGame();
+            observedManaged = observedGame == null ? null : managed;
+        }
+        return observedGame;
+    }
+
+    private void saveObserved(Game game, String reason) {
+        GameManager.save(game, reason);
+        if (game == observedGame) observedManaged = GameManager.getManagedGame(name);
     }
 
     // An interaction from the game's owner in the actions channel, for engine calls a scenario makes itself.
@@ -496,15 +514,14 @@ final class SelfPlayGame {
     // The engine stamps a new turn with the wall clock; the AI compares it with message times from the virtual
     // clock, so every turn change is re-stamped with the virtual time of the tick that caused it.
     private void stampTurnStart(long tickTime) {
-        ManagedGame managed = GameManager.getManagedGame(name);
-        Game game = managed == null ? null : managed.getGame();
+        Game game = observed(GameManager.getManagedGame(name));
         if (game == null) return;
         Date changed = game.getLastActivePlayerChange();
         long stamp = changed == null ? -1 : changed.getTime();
         if (stamp == issuedTurnStamp) return;
         game.setLastActivePlayerChange(new Date(tickTime));
         issuedTurnStamp = tickTime;
-        GameManager.save(game, "AI self-play clock");
+        saveObserved(game, "AI self-play clock");
     }
 
     // One line per round, taken when the next round starts, so the report shows how fast each seat scores.
@@ -609,15 +626,14 @@ final class SelfPlayGame {
     // seconds of game time, which the virtual clock covers in a few real milliseconds, so the stamp is aged here to
     // keep the guard's meaning: in game time, the previous flip was long ago.
     private void ageAgendaFlipGuard() {
-        ManagedGame managed = GameManager.getManagedGame(name);
-        Game game = managed == null ? null : managed.getGame();
+        Game game = observed(GameManager.getManagedGame(name));
         if (game == null) return;
         String flippedAt = game.getStoredValue(AGENDA_FLIP_STAMP);
         if (flippedAt.isEmpty() || !flippedAt.chars().allMatch(Character::isDigit)) return;
         long aged = System.currentTimeMillis() - AGENDA_FLIP_AGE_MILLIS;
         if (Long.parseLong(flippedAt) <= aged) return;
         game.setStoredValue(AGENDA_FLIP_STAMP, String.valueOf(aged));
-        GameManager.save(game, "AI self-play clock");
+        saveObserved(game, "AI self-play clock");
     }
 
     private static String progressOf(Game game, ManagedGame managed) {
