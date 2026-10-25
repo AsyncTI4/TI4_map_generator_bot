@@ -126,6 +126,7 @@ import tools.jackson.databind.json.JsonMapper;
 public class Game extends GameProperties implements StoredValueHelper, TwilightFallDeckFuncs {
     private static final JsonMapper mapper = JsonMapperManager.basic();
     private static final String RECORDED_WINNER_KEY = "recordedWinner";
+    private static final String STYX_PLANET = "styx";
 
     // TODO (Jazz): Sort through these and add to GameProperties
     @Getter
@@ -5211,6 +5212,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isTkNovaCup()
                 || isTfBr()
                 || isTwilightDS()
+                || isProphecyOfKingsGameWithStyx()
                 || isMuaatManiaMode()
                 || isCosmicConvergenceMode()
                 || isLiberationC4Mode()
@@ -5236,6 +5238,18 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                         .map(Mapper::getLeader)
                         .filter(Objects::nonNull)
                         .anyMatch(leader -> !leader.getSource().isOfficial());
+    }
+
+    private boolean isProphecyOfKingsGameWithStyx() {
+        return isProphecyOfKings() && !isThundersEdge() && includesStyx();
+    }
+
+    private boolean includesStyx() {
+        return getTileMap().values().stream()
+                        .flatMap(tile -> tile.getPlanetUnitHolders().stream())
+                        .anyMatch(planet -> STYX_PLANET.equals(planet.getName()))
+                || getRealAndEliminatedPlayers().stream()
+                        .anyMatch(player -> player.getPlanets().contains(STYX_PLANET));
     }
 
     private boolean checkAllDecksAreOfficial() {
