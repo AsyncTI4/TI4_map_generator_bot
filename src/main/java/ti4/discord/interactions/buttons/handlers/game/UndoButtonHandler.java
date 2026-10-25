@@ -21,12 +21,17 @@ import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.service.game.MegagameUndoService;
 
 @UtilityClass
 class UndoButtonHandler {
 
     @ButtonHandler(value = "ultimateUndo_", save = false)
     public static void ultimateUndo_(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!MegagameUndoService.mayUndo(game, event.getMember())) {
+            MegagameUndoService.pingGmsForUndo(event, game);
+            return;
+        }
         if (!game.getSavedButtons().isEmpty()) {
             String buttonString = game.getSavedButtons().getFirst();
             String colorOrFaction = buttonString.split(";")[0];
