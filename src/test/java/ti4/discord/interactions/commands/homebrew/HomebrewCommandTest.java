@@ -32,12 +32,15 @@ class HomebrewCommandTest {
         assertThat(command.getSubcommandGroups()).containsOnlyKeys("lost_legacies", "monument", "omegaphase");
         assertThat(command.getSubcommandGroups().get("lost_legacies").getGroupSubcommands())
                 .containsOnlyKeys(
+                        "add_fragmentum_token",
                         "hc_discard",
                         "hc_draw",
                         "hc_draw_specific",
                         "hc_send",
+                        "remove_fragmentum_token",
                         "relic_trading_hub",
                         "rev_leader_fix",
+                        "unleash",
                         "view_stoneborn_frags");
         assertThat(command.getSubcommandGroups().get("monument").getGroupSubcommands())
                 .containsOnlyKeys(

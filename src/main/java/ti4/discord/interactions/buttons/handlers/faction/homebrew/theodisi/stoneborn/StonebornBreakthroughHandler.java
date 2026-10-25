@@ -29,6 +29,7 @@ public class StonebornBreakthroughHandler {
     private static final String DORMANT = "stonebornbt";
     private static final String UNLEASHED = "stonebornbtunleashed";
     private static final String SELECT_FRAGMENT = "refragmentFragment_";
+    private static final String SELECT_TRAIT = "refragmentTrait_";
     private static final String EXPLORE_PLANET = "refragmentExplore_";
     private static final String SKIP_EXPLORE = "refragmentSkipExplore";
     private static final String GAIN_FRAGMENT = "refragmentGain_";
@@ -74,16 +75,36 @@ public class StonebornBreakthroughHandler {
         ExploreModel model = Mapper.getExplore(fragment);
         if (!player.getFragments().contains(fragment)
                 || model == null
-                || !Constants.FRAGMENT.equalsIgnoreCase(model.getResolution())
-                || Constants.FRONTIER.equalsIgnoreCase(model.getType())) {
+                || !Constants.FRAGMENT.equalsIgnoreCase(model.getResolution())) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
         ButtonHelperExplore.resolvePurgedFragments(game, player, event, List.of(fragment));
+        if (isUnknownFragment(model)) {
+            game.setStoredValue(stateKey(player), state.breakthrough() + "||" + gainCount(state.breakthrough()));
+            offerTraitSelection(event, game, player);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         String trait = model.getType().toLowerCase();
         game.setStoredValue(
                 stateKey(player), state.breakthrough() + "|" + trait + "|" + gainCount(state.breakthrough()));
+        offerExploration(event, game, player, trait);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(SELECT_TRAIT)
+    public static void selectTrait(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        RefragmentState state = getState(game, player);
+        String trait = buttonID.substring(SELECT_TRAIT.length());
+        if (state == null
+                || !state.trait().isEmpty()
+                || !List.of("cultural", "hazardous", "industrial").contains(trait)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        game.setStoredValue(stateKey(player), state.breakthrough() + "|" + trait + "|" + state.remainingGains());
         offerExploration(event, game, player, trait);
         ButtonHelper.deleteMessage(event);
     }
@@ -193,6 +214,19 @@ public class StonebornBreakthroughHandler {
                 paginate(buttons, pinned, player.factionButtonChecker() + EXPLORE_PLANET));
     }
 
+    private static void offerTraitSelection(GenericInteractionCreateEvent event, Game game, Player player) {
+        List<Button> buttons = List.of("cultural", "hazardous", "industrial").stream()
+                .map(trait -> Buttons.gray(
+                        player.factionButtonChecker() + SELECT_TRAIT + trait,
+                        "Choose " + trait.substring(0, 1).toUpperCase() + trait.substring(1) + " Planet",
+                        ExploreEmojis.getTraitEmoji(trait)))
+                .toList();
+        MessageHelper.sendMessageToChannelWithButtons(
+                getOutputChannel(game, player, event),
+                player.getRepresentation() + ", choose a planet trait to explore for _Refragment_.",
+                buttons);
+    }
+
     private static List<Button> explorationButtons(Game game, Player player, String trait) {
         return game.getTileMap().values().stream()
                 .flatMap(tile -> tile.getPlanetUnitHolders().stream())
@@ -247,7 +281,6 @@ public class StonebornBreakthroughHandler {
                 .map(Mapper::getExplore)
                 .filter(Objects::nonNull)
                 .filter(model -> Constants.FRAGMENT.equalsIgnoreCase(model.getResolution()))
-                .filter(model -> !Constants.FRONTIER.equalsIgnoreCase(model.getType()))
                 .map(model -> Buttons.gray(
                         player.factionButtonChecker() + SELECT_FRAGMENT + model.getAlias(),
                         "Purge " + model.getName(),
@@ -272,6 +305,11 @@ public class StonebornBreakthroughHandler {
         return model != null
                 && !Constants.FRONTIER.equalsIgnoreCase(model.getType())
                 && !model.getType().equalsIgnoreCase(excludedTrait);
+    }
+
+    private static boolean isUnknownFragment(ExploreModel fragment) {
+        return fragment.getAlias().contains("unknown")
+                || fragment.getName().toLowerCase().contains("unknown");
     }
 
     private static String fragmentPromptMessage(Player player) {
