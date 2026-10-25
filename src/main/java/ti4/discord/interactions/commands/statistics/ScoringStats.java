@@ -9,7 +9,6 @@ class ScoringStats extends Subcommand {
 
     ScoringStats() {
         super(Constants.SCORING, "The most common winning paths and how often winners scored each type of point");
-        addOptions(GameStatisticsFilterer.gameStatsFiltersExcept(GameStatisticsFilterer.HAS_WINNER_FILTER));
     }
 
     @Override

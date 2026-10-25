@@ -50,7 +50,7 @@ public class ScoringStatisticsService {
     private static void showScoring(SlashCommandInteractionEvent event) {
         List<WinningPathBreakdown> winningPaths = new ArrayList<>();
         ConsumeGameUtility.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilterForWonGame(event),
+                GameStatisticsFilterer.getStandardCompetitiveGamesFilter(),
                 game -> game.getWinner()
                         .ifPresent(winner -> winningPaths.add(WinningPathHelper.breakDownWinningPath(game, winner))),
                 ExecutionLockType.READ);
@@ -60,8 +60,10 @@ public class ScoringStatisticsService {
 
     static String buildReport(List<WinningPathBreakdown> winningPaths) {
         StringBuilder report = new StringBuilder("## __**Scoring statistics**__\n");
+        report.append("_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario games with"
+                + " winners._\n");
         if (winningPaths.isEmpty()) {
-            return report.append("No games match the selected filters.\n").toString();
+            return report.append("No games matched.\n").toString();
         }
         report.append("Winners analyzed: ").append(winningPaths.size()).append('\n');
 

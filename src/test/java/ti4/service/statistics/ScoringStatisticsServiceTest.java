@@ -26,7 +26,7 @@ class ScoringStatisticsServiceTest {
     void reportsNoGamesWhenThereAreNoWinners() {
         String report = ScoringStatisticsService.buildReport(List.of());
 
-        assertTrue(report.contains("No games match the selected filters."));
+        assertTrue(report.contains("No games matched."));
     }
 
     @Test
