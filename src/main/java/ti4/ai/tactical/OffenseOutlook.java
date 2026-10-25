@@ -101,7 +101,7 @@ final class OffenseOutlook {
                     * (base
                             + explore
                             + custodians
-                            + FracturePrize.gain(game, planet)
+                            + FracturePrize.gain(game, seat, planet)
                             + ShardPrize.gain(game, seat, planet));
             territory += w * g * terms.territoryValues().getOrDefault(planet.getName(), 0.0);
             if (isMecatol(planet)) {

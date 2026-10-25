@@ -51,7 +51,7 @@ public class CardValue {
             case "ms" -> Math.max(convertedMerchants(game, seat), replenishedMerchants(game, seat));
             case "lc" -> ExploreValues.actionCardsFromLostCrew(game, seat);
             case "dv" -> SecretDrawValue.of(seat.getGame(), seat);
-            case "dw" -> RelicValue.draw(game);
+            case "dw" -> RelicValue.draw(game, seat);
             case "ed" -> ExploreValues.ENIGMATIC_DEVICE;
             case "mirage" -> mirage();
             case "dmz" -> ExploreValues.DEMILITARIZED_ZONE - PlanetStake.structures(site.holder(), seat);

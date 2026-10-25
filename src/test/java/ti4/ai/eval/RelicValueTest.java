@@ -22,30 +22,96 @@ class RelicValueTest extends BaseTi4Test {
     void setUp() {
         test = new AiTestGame();
         test.nekroHome();
-        test.game.setRelics(new ArrayList<>(List.of("shard", "circlet")));
+        test.game.setRound(1);
+    }
+
+    private void deck(String... cards) {
+        test.game.setRelics(new ArrayList<>(List.of(cards)));
+    }
+
+    private double of(String relic) {
+        return RelicValue.of(test.game, test.nekro, relic);
     }
 
     // Drawing from an empty relic deck gives nothing (LRR 73.2a).
     @Test
     void anEmptyDeckIsWorthNothing() {
-        test.game.setRelics(new ArrayList<>());
+        deck();
 
-        assertThat(RelicValue.draw(test.game)).isZero();
+        assertThat(RelicValue.draw(test.game, test.nekro)).isZero();
     }
 
     @Test
-    void aRelicIsWorthItsBaseWithRoundsToUseIt() {
-        test.game.setRound(1);
+    void aDrawIsWorthTheAverageOfTheRelicsLeftInTheDeck() {
+        deck("codex", "obsidian", "silverflame");
 
-        assertThat(RelicValue.draw(test.game)).isCloseTo(RelicValue.BASE, within(EXACT));
+        assertThat(RelicValue.draw(test.game, test.nekro)).isCloseTo((7 + 8 + 0) / 3.0, within(EXACT));
     }
 
-    // A leader one point from winning has little time to use a relic.
     @Test
-    void aRelicShrinksWhenTheGameIsAboutToEnd() {
-        test.points(test.nekro, 9);
+    void fixedRelicsAreWorthTheirListedValue() {
+        assertThat(of("codex")).isEqualTo(7);
+        assertThat(of("obsidian")).isEqualTo(8);
+        assertThat(of("bookoflatvinia")).isEqualTo(8);
+        assertThat(of("dominusorb")).isEqualTo(4);
+        assertThat(of("stellarconverter")).isEqualTo(1);
+        assertThat(of("thesilverflame")).isZero();
+        assertThat(of("heartofixth")).isZero();
+    }
 
-        assertThat(RelicValue.draw(test.game)).isCloseTo(RelicValue.BASE * 0.4, within(EXACT));
+    @Test
+    void decayingRelicsLoseHalfAPointARound() {
+        assertThat(of("dynamiscore")).isEqualTo(4.5);
+        assertThat(of("neuraloop")).isEqualTo(1.5);
+
+        test.game.setRound(5);
+
+        assertThat(of("dynamiscore")).isEqualTo(2.5);
+        assertThat(of("quantumcore")).isZero();
+    }
+
+    @Test
+    void theScepterLosesAPointARoundAndNeverGoesBelowZero() {
+        assertThat(of("emelpar")).isEqualTo(5);
+
+        test.game.setRound(7);
+
+        assertThat(of("emelpar")).isZero();
+    }
+
+    @Test
+    void theMawIsWorthNothingFromRoundFive() {
+        test.game.setRound(4);
+        assertThat(of("mawofworlds")).isEqualTo(4);
+
+        test.game.setRound(5);
+        assertThat(of("mawofworlds")).isZero();
+    }
+
+    @Test
+    void theNanoForgeIsWorthLessToTheHolderOfTheShard() {
+        double alone = of("nanoforge");
+        test.nekro.addRelic("shard");
+
+        assertThat(of("nanoforge")).isCloseTo(Math.max(0, alone - 4), within(EXACT));
+    }
+
+    @Test
+    void theCrownOfThalnosNeedsWarSunsOrNaazRokha() {
+        assertThat(of("thalnos")).isZero();
+
+        test.nekro.setFaction("naaz");
+
+        assertThat(of("thalnos")).isEqualTo(1);
+    }
+
+    @Test
+    void theTriadGrowsWithEachKindOfFragment() {
+        double none = of("thetriad");
+        test.nekro.setCrf(1);
+        test.nekro.setHrf(2);
+
+        assertThat(of("thetriad")).isCloseTo(none + 2, within(EXACT));
     }
 
     // Fragments get worth more the closer they bring a relic: three of a kind are worth exactly one relic.

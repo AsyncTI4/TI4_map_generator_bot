@@ -32,16 +32,16 @@ public class FracturePrize {
                 .anyMatch(planet -> isStyx(planet) && owner.getPlanets().contains(planet.getName()));
     }
 
-    public static double relic(Game game, Planet planet) {
-        return planet.getTokenList().contains(RELIC_TOKEN) ? RelicValue.draw(game) : 0;
+    public static double relic(Game game, Player seat, Planet planet) {
+        return planet.getTokenList().contains(RELIC_TOKEN) ? RelicValue.draw(game, seat) : 0;
     }
 
     public static double point(Planet planet) {
         return isStyx(planet) ? ObjectiveValue.VICTORY_POINT_VALUE : 0;
     }
 
-    public static double gain(Game game, Planet planet) {
-        return relic(game, planet) + point(planet);
+    public static double gain(Game game, Player seat, Planet planet) {
+        return relic(game, seat, planet) + point(planet);
     }
 
     public static boolean hasIngress(Tile tile) {

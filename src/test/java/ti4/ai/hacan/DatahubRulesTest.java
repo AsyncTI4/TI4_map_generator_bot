@@ -56,13 +56,13 @@ class DatahubRulesTest extends BaseTi4Test {
     // Sol holding several cards first asks whose cards to look at; the seat names Sol, then takes the planned pair.
     @Test
     void picksThePlayerThenThePairWhenTheOtherPlayerHoldsTwoCards() {
-        test.sol.addSC(7);
+        test.sol.addSC(6);
         assertThat(pressed(DatahubRules.next(test.context(offer())))).isEqualTo("startQDN");
 
         AiPrompt players = prompt("players", PromptSource.PUBLIC, NOW + 10, "selectBeforeSwapSCs_sol_qdn");
         assertThat(pressed(DatahubRules.next(test.context(players)))).isEqualTo("selectBeforeSwapSCs_sol_qdn");
 
-        AiPrompt pairs = prompt("pairs", PromptSource.PUBLIC, NOW + 20, "swapSCs_sol_qdn_5_2", "swapSCs_sol_qdn_7_2");
+        AiPrompt pairs = prompt("pairs", PromptSource.PUBLIC, NOW + 20, "swapSCs_sol_qdn_5_2", "swapSCs_sol_qdn_6_2");
         assertThat(pressed(DatahubRules.next(test.context(pairs)))).isEqualTo("swapSCs_sol_qdn_5_2");
     }
 

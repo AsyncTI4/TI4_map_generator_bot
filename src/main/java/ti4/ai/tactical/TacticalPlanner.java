@@ -1809,7 +1809,7 @@ public class TacticalPlanner {
         Player seat = context.seat;
         double prize = tile.getPlanetUnitHolders().stream()
                 .filter(planet -> !seat.getPlanets().contains(planet.getName()))
-                .mapToDouble(planet -> BoardView.planetValue(planet) + FracturePrize.gain(game, planet))
+                .mapToDouble(planet -> BoardView.planetValue(planet) + FracturePrize.gain(game, seat, planet))
                 .sum();
         if (tile == opponent.getHomeSystemTile()) {
             prize += ObjectiveValue.VICTORY_POINT_VALUE
