@@ -15,6 +15,7 @@ import org.apache.commons.collections4.ListUtils;
 import ti4.discord.JdaService;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -89,7 +90,7 @@ class GenerateSlicesService {
 
             // Reset the draft, shuffle the tiers
             draftManager.clearSlices();
-            for (List<MiltyDraftTile> tier : partitionedTiles) Collections.shuffle(tier);
+            for (List<MiltyDraftTile> tier : partitionedTiles) Collections.shuffle(tier, RandomHelper.current());
 
             String nextSliceName = "A";
             for (int sliceIndex = 0; sliceIndex < possibleSlices; sliceIndex++) {
@@ -193,7 +194,7 @@ class GenerateSlicesService {
             boolean anomaliesCanTouch) {
         List<MiltyDraftTile> tiles = new ArrayList<>();
         for (List<MiltyDraftTile> tier : partition) tiles.add(tier.get(sliceNum));
-        Collections.shuffle(tiles);
+        Collections.shuffle(tiles, RandomHelper.current());
 
         List<Integer> ints = new ArrayList<>();
         for (int k = 0; k < tiles.size(); k++) if (tiles.get(k).getTierList() == TierList.anomaly) ints.add(k + 1);
@@ -210,7 +211,7 @@ class GenerateSlicesService {
                         }
                 if (tryagain) {
                     Collections.rotate(tiles, 1);
-                    if (turns == 0) Collections.shuffle(tiles);
+                    if (turns == 0) Collections.shuffle(tiles, RandomHelper.current());
                     ints.clear();
                     for (int k = 0; k < tiles.size(); k++)
                         if (tiles.get(k).getTierList() == TierList.anomaly) ints.add(k + 1);

@@ -108,6 +108,18 @@ public final class FakeChannel {
                 .toList();
     }
 
+    record State(List<FakeMessage> messages, boolean archived) {}
+
+    synchronized State state() {
+        return new State(List.copyOf(messages), archived);
+    }
+
+    synchronized void restore(State state) {
+        messages.clear();
+        messages.addAll(state.messages());
+        archived = state.archived();
+    }
+
     synchronized FakeMessage post(MessageCreateData data) {
         FakeMessage message = new FakeMessage(discord, this, discord.nextSnowflake(), data);
         messages.add(message);

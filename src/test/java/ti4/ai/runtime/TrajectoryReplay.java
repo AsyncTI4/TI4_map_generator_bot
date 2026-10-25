@@ -23,7 +23,7 @@ import ti4.ai.brain.FactionBrainRegistry;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.profile.AiProfile;
-import ti4.ai.strategy.SecondaryQueue;
+import ti4.ai.tactical.FractureMarch;
 import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -44,7 +44,7 @@ final class TrajectoryReplay {
             AiTurnContext context,
             FactionBrain brain,
             List<GameMessage> gameMessages,
-            Map<String, Long> secondaryQueue) {}
+            AiGameState.Snapshot aiGameState) {}
 
     private TrajectoryReplay() {}
 
@@ -85,11 +85,7 @@ final class TrajectoryReplay {
                     memory,
                     rest.get("now").asLong());
             return new Recorded(
-                    game,
-                    context,
-                    brain,
-                    gameMessages(rest.get("gameMessages")),
-                    secondaryQueue(rest.get("secondaryQueue")));
+                    game, context, brain, gameMessages(rest.get("gameMessages")), aiGameState(rest.get("aiGameState")));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -97,7 +93,7 @@ final class TrajectoryReplay {
 
     static AiDecision decide(SelfPlayEnvironment env, Recorded recorded) {
         env.gameMessages.restore(recorded.game().getName(), recorded.gameMessages());
-        SecondaryQueue.restore(recorded.game().getName(), recorded.secondaryQueue());
+        AiGameState.restore(recorded.game().getName(), recorded.aiGameState());
         try (Thinking.Decision ignored = Thinking.open(AiSettings.thinkingLimits());
                 DecisionMemo.Open memo = DecisionMemo.open()) {
             return recorded.brain().decide(recorded.context());
@@ -118,11 +114,26 @@ final class TrajectoryReplay {
         }
     }
 
-    private static Map<String, Long> secondaryQueue(JsonNode node) {
-        Map<String, Long> open = new LinkedHashMap<>();
-        node.properties()
-                .forEach(entry -> open.put(entry.getKey(), entry.getValue().asLong()));
-        return open;
+    private static AiGameState.Snapshot aiGameState(JsonNode node) {
+        Map<String, Long> openFollows = new LinkedHashMap<>();
+        node.get("openFollows")
+                .properties()
+                .forEach(entry ->
+                        openFollows.put(entry.getKey(), entry.getValue().asLong()));
+        Map<String, String> slayIntents = new LinkedHashMap<>();
+        node.get("slayIntents")
+                .properties()
+                .forEach(entry ->
+                        slayIntents.put(entry.getKey(), entry.getValue().asString()));
+        Map<String, FractureMarch> marches = new LinkedHashMap<>();
+        node.get("marches")
+                .properties()
+                .forEach(entry -> marches.put(
+                        entry.getKey(),
+                        new FractureMarch(
+                                entry.getValue().get(0).asInt(),
+                                entry.getValue().get(1).asString())));
+        return new AiGameState.Snapshot(openFollows, slayIntents, marches);
     }
 
     private static List<GameMessage> gameMessages(JsonNode node) {

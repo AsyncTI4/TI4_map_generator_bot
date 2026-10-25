@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -49,6 +48,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
@@ -359,7 +359,7 @@ public class DestroyUnitService {
                     for (Player player_ : game.getPlayers().values()) {
                         destroyAllPlayerNonStructureUnits(event, game, player_, unit.tile(), uh, combat);
                     }
-                    int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 3);
+                    int randomJokeChance = RandomHelper.current().nextInt(1, 3);
                     File audioFile = ResourceHelper.getFile("voices/yin/", "Bomb" + randomJokeChance + ".mp3");
                     if (audioFile.exists()) {
                         MessageHelper.sendFileToChannel(event.getMessageChannel(), audioFile);

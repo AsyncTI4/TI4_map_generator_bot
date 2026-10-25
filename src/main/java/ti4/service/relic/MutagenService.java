@@ -17,6 +17,7 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -233,7 +234,7 @@ public class MutagenService {
         }
 
         factions.removeIf(faction -> game.getFactions().contains(faction.getAlias()));
-        Collections.shuffle(factions);
+        Collections.shuffle(factions, RandomHelper.current());
         for (FactionModel faction : factions) {
             List<String> options = new ArrayList<>();
             String factionTech = getRandom(faction.getFactionTech().stream()
@@ -333,7 +334,7 @@ public class MutagenService {
             return null;
         }
         List<String> shuffledChoices = new ArrayList<>(choices);
-        Collections.shuffle(shuffledChoices);
+        Collections.shuffle(shuffledChoices, RandomHelper.current());
         return shuffledChoices.getFirst();
     }
 }

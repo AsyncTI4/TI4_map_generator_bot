@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -1730,7 +1729,7 @@ public class ButtonHelper {
         if (!game.isFowMode()
                 && activeSystem.isAsteroidField()
                 && !activeSystem.isZelianAsteroidField()
-                && ThreadLocalRandom.current().nextInt(1, 11) == 10) {
+                && RandomHelper.current().nextInt(1, 11) == 10) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "-# " + player.getRepresentationNoPing()
@@ -5436,7 +5435,7 @@ public class ButtonHelper {
                         .toList());
 
                 List<MiltyDraftTile> tileToPullFromUnshuffled = new ArrayList<>(unusedBlueTiles);
-                Collections.shuffle(unusedBlueTiles);
+                Collections.shuffle(unusedBlueTiles, RandomHelper.current());
 
                 if (unusedBlueTiles.isEmpty()) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from.");
@@ -5468,7 +5467,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
 
                 List<String> tileToPullFromUnshuffled = new ArrayList<>(redTilesToPullFrom);
-                Collections.shuffle(redTilesToPullFrom);
+                Collections.shuffle(redTilesToPullFrom, RandomHelper.current());
 
                 if (redTilesToPullFrom.isEmpty()) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from.");
@@ -6063,9 +6062,9 @@ public class ButtonHelper {
                             player.getRepresentationUnfogged()
                                     + ", due to your **Reclamation** ability, 1 PDS and 1 space dock have been added to Mecatol Rex. This is optional though.");
                     CommanderUnlockCheckService.checkPlayer(player, "titans", "saar", "rohdhna", "cheiran", "celdauri");
-                    int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 6);
+                    int randomJokeChance = RandomHelper.current().nextInt(1, 6);
                     if (randomJokeChance == 5) {
-                        randomJokeChance = ThreadLocalRandom.current().nextInt(1, 3);
+                        randomJokeChance = RandomHelper.current().nextInt(1, 3);
                         File audioFile =
                                 ResourceHelper.getFile("voices/winnu/", "reclmation" + randomJokeChance + ".mp3");
                         if (audioFile.exists()) {
@@ -9675,7 +9674,7 @@ public class ButtonHelper {
         List<Button> assignSpeakerButtons = new ArrayList<>();
         List<Player> players = new ArrayList<>(game.getRealPlayers());
         if (game.isFowMode()) {
-            Collections.shuffle(players);
+            Collections.shuffle(players, RandomHelper.current());
         }
         for (Player player : players) {
             if (game.isFowMode() || !player.getUserID().equals(game.getSpeakerUserID())) {

@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
+import ti4.helpers.RandomHelper;
 import ti4.settings.users.UserSettings;
 
 @UtilityClass
@@ -95,7 +96,7 @@ class MatchmakingGrouper {
     private static List<GameConfig> getRandomizedKeysThenSortByPlayerCount(
             Map<GameConfig, List<QueuedParty>> partiesByConfig) {
         List<GameConfig> configsToTry = new ArrayList<>(partiesByConfig.keySet());
-        Collections.shuffle(configsToTry);
+        Collections.shuffle(configsToTry, RandomHelper.current());
         configsToTry.sort(Comparator.comparingInt(GameConfig::playerCountValue).reversed());
         return configsToTry;
     }

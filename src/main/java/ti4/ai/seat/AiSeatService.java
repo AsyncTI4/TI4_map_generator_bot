@@ -1,6 +1,5 @@
 package ti4.ai.seat;
 
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,6 +14,7 @@ import ti4.ai.profile.AiProfile;
 import ti4.ai.runtime.AiRuntime;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.RandomHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.MapPositionMapper;
@@ -26,7 +26,6 @@ import ti4.settings.users.UserSettingsManager;
 @UtilityClass
 public class AiSeatService {
 
-    private static final SecureRandom RANDOM = new SecureRandom();
     private static final Set<String> TRADE_PREFERENCES_CHECKED = ConcurrentHashMap.newKeySet();
 
     public record AddResult(@Nullable Player seat, String message) {}
@@ -68,7 +67,8 @@ public class AiSeatService {
         }
 
         writeSeatPreferences(seatId);
-        AiProfile.createHidden(AiSettings.brainFor(faction), RANDOM).writeTo(seat);
+        AiProfile.createHidden(AiSettings.brainFor(faction), RandomHelper.current())
+                .writeTo(seat);
         game.setNewTransactionMethod(true);
         game.setHomebrew(true);
         AiRuntime.register(game.getName());

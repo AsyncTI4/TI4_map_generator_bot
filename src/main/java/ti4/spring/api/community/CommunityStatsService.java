@@ -15,6 +15,7 @@ import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.game.persistence.ManagedPlayer;
+import ti4.helpers.RandomHelper;
 
 @RequiredArgsConstructor
 @Service
@@ -68,7 +69,7 @@ class CommunityStatsService {
 
     private static List<CommunityGameSample> sampleGamesInProgress(List<ManagedGame> activeGameList) {
         List<ManagedGame> shuffled = new ArrayList<>(activeGameList);
-        Collections.shuffle(shuffled);
+        Collections.shuffle(shuffled, RandomHelper.current());
 
         return shuffled.stream()
                 .limit(SAMPLE_SIZE)

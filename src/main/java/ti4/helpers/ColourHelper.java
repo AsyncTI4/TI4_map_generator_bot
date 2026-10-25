@@ -17,7 +17,7 @@ final class ColourHelper {
         // for each "page" of colours, randomise
         // this process means widows and orphans will never cross page boundaries
         for (int x = 0; x < newColours.size(); x += 22) {
-            Collections.shuffle(newColours.subList(x, Math.min(x + 22, newColours.size())));
+            Collections.shuffle(newColours.subList(x, Math.min(x + 22, newColours.size())), RandomHelper.current());
         }
         // resort by colour
         newColours.sort((c1, c2) -> colourValue(factionId, c2) - colourValue(factionId, c1));

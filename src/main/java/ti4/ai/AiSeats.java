@@ -1,6 +1,5 @@
 package ti4.ai;
 
-import java.security.SecureRandom;
 import java.util.List;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
@@ -8,6 +7,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
+import ti4.helpers.RandomHelper;
 
 @UtilityClass
 public class AiSeats {
@@ -15,7 +15,6 @@ public class AiSeats {
     public static final String ID_PREFIX = "7100000";
     private static final int ID_LENGTH = 16;
     private static final int RANDOM_DIGITS = ID_LENGTH - ID_PREFIX.length();
-    private static final SecureRandom RANDOM = new SecureRandom();
 
     public static boolean isAiSeatId(@Nullable String userId) {
         return userId != null
@@ -67,7 +66,8 @@ public class AiSeats {
 
     private static String randomDigits() {
         StringBuilder digits = new StringBuilder(RANDOM_DIGITS);
-        for (int i = 0; i < RANDOM_DIGITS; i++) digits.append(RANDOM.nextInt(10));
+        for (int i = 0; i < RANDOM_DIGITS; i++)
+            digits.append(RandomHelper.current().nextInt(10));
         return digits.toString();
     }
 }

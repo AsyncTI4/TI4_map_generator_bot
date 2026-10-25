@@ -16,6 +16,7 @@ import ti4.game.Planet;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileHelper;
 import ti4.model.TileModel;
@@ -84,7 +85,7 @@ public class AddTileService {
                         () -> findBlueTiles(sources, existingTileModels, drawnTiles),
                         () -> findRedTiles(sources, existingTileModels, drawnTiles)));
 
-                Collections.shuffle(tileFinders);
+                Collections.shuffle(tileFinders, RandomHelper.current());
 
                 for (Supplier<List<TileModel>> tileFinder : tileFinders) {
                     availableTiles = tileFinder.get();

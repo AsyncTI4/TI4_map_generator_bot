@@ -53,6 +53,30 @@ final class AiSeatState {
     private int thinkingHeldFingerprint;
     private int abortLoggedRound = -1;
 
+    synchronized AiSeatState copy() {
+        AiSeatState copy = new AiSeatState();
+        copy.attempts.putAll(attempts);
+        copy.actionTimes.addAll(actionTimes);
+        copy.pressedOrder.addAll(pressedOrder);
+        copy.pressedKeys.addAll(pressedKeys);
+        copy.delegatedPrompts.addAll(delegatedPrompts);
+        copy.decisions.addAll(decisions);
+        copy.memory = new AiMemory();
+        copy.memory.restore(memory.snapshot());
+        copy.delegationRequest = delegationRequest;
+        copy.stallSince = stallSince;
+        copy.stallReasons = stallReasons;
+        copy.stuckAnnounced = stuckAnnounced;
+        copy.delegationRound = delegationRound;
+        copy.delegationsThisRound = delegationsThisRound;
+        copy.fallbackKey = fallbackKey;
+        copy.repeatedFallbacks = repeatedFallbacks;
+        copy.thinkingHeldAt = thinkingHeldAt;
+        copy.thinkingHeldFingerprint = thinkingHeldFingerprint;
+        copy.abortLoggedRound = abortLoggedRound;
+        return copy;
+    }
+
     void requestDelegation(boolean explicit) {
         DelegationRequest requested = explicit ? DelegationRequest.EXPLICIT : DelegationRequest.GAME_WIDE;
         if (delegationRequest != DelegationRequest.EXPLICIT) delegationRequest = requested;

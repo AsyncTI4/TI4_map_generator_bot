@@ -22,7 +22,6 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
-import ti4.ai.strategy.SecondaryQueue;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.SaveText;
@@ -136,11 +135,12 @@ final class TrajectoryLog implements AutoCloseable {
         write(line);
     }
 
-    synchronized void finish(String ending, @Nullable Game board) {
+    synchronized void finish(String ending, long seed, @Nullable Game board) {
         Map<String, Object> line = new LinkedHashMap<>();
         line.put("type", "outcome");
         line.put("game", game);
         line.put("ending", ending);
+        line.put("seed", seed);
         line.put("decisions", decisions);
         if (board != null) {
             line.put("round", board.getRound());
@@ -172,7 +172,7 @@ final class TrajectoryLog implements AutoCloseable {
         rest.put(
                 "gameMessages",
                 gameMessages.get().stream().map(TrajectoryLog::gameMessage).toList());
-        rest.put("secondaryQueue", SecondaryQueue.snapshot(context.game().getName()));
+        rest.put("aiGameState", aiGameState(AiGameState.snapshot(context.game().getName())));
         try {
             entry(String.format("%06d%s", index, SAVE_SUFFIX), SaveText.of(context.game()));
             entry(String.format("%06d%s", index, CONTEXT_SUFFIX), JSON.writeValueAsString(rest));
@@ -231,6 +231,16 @@ final class TrajectoryLog implements AutoCloseable {
             choices.add(group);
         }
         return choices;
+    }
+
+    private static Map<String, Object> aiGameState(AiGameState.Snapshot state) {
+        Map<String, Object> entry = new LinkedHashMap<>();
+        entry.put("openFollows", state.openFollows());
+        entry.put("slayIntents", state.slayIntents());
+        Map<String, Object> marches = new LinkedHashMap<>();
+        state.marches().forEach((faction, march) -> marches.put(faction, List.of(march.round(), march.position())));
+        entry.put("marches", marches);
+        return entry;
     }
 
     private static Map<String, Object> gameMessage(GameMessage message) {

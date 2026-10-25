@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
@@ -54,6 +55,20 @@ public class SlayIntent {
 
     public static void forget(String gameName) {
         DECLARED.keySet().removeIf(key -> key.startsWith(gameName + KEY_SEPARATOR));
+    }
+
+    public static Map<String, String> snapshot(String gameName) {
+        String prefix = gameName + KEY_SEPARATOR;
+        Map<String, String> declared = new TreeMap<>();
+        DECLARED.forEach((key, value) -> {
+            if (key.startsWith(prefix)) declared.put(key.substring(prefix.length()), value);
+        });
+        return declared;
+    }
+
+    public static void restore(String gameName, Map<String, String> declared) {
+        forget(gameName);
+        declared.forEach((faction, value) -> DECLARED.put(gameName + KEY_SEPARATOR + faction, value));
     }
 
     private static String key(Game game, Player seat) {

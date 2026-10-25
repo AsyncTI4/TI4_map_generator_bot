@@ -13,6 +13,7 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 import ti4.model.MapPositionMapper;
 import ti4.model.Source.ComponentSource;
@@ -70,7 +71,7 @@ class AddTileRandom extends GameStateSubcommand {
                 msg.append("No available tiles found.");
                 break;
             }
-            Collections.shuffle(availableTiles);
+            Collections.shuffle(availableTiles, RandomHelper.current());
             TileModel randomTile = availableTiles.getFirst();
             drawnTiles.add(randomTile.getId());
             if (!drawOnly) {

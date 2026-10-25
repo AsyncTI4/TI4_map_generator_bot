@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -24,6 +23,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
@@ -411,7 +411,7 @@ public class PlanetTargetService {
 
     /** A random line from the shared pool. Use for fizzles AND for legal-but-no-effect outcomes alike. */
     public static String fizzleMessage() {
-        return FIZZLE_MESSAGES.get(ThreadLocalRandom.current().nextInt(0, FIZZLE_MESSAGES.size()));
+        return FIZZLE_MESSAGES.get(RandomHelper.current().nextInt(0, FIZZLE_MESSAGES.size()));
     }
 
     /** Unmodifiable view of the shared pool, for tests asserting both paths draw from it. */

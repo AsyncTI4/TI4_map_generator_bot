@@ -712,7 +712,7 @@ public class ActionCardHelper {
         while (count > 0 && !player.getActionCards().isEmpty()) {
             Map<String, Integer> actionCards_ = player.getActionCards();
             List<String> cards_ = new ArrayList<>(actionCards_.keySet());
-            Collections.shuffle(cards_);
+            Collections.shuffle(cards_, RandomHelper.current());
             String acID = cards_.getFirst();
             boolean removed = game.discardActionCard(player.getUserID(), actionCards_.get(acID));
             if (!removed) {
@@ -2727,7 +2727,7 @@ public class ActionCardHelper {
                             + " had no action cards to send you.");
             return;
         }
-        Collections.shuffle(actionCards);
+        Collections.shuffle(actionCards, RandomHelper.current());
         String acID = actionCards.getFirst();
         // FoW specific pinging
         if (game.isFowMode()) {
@@ -2773,7 +2773,7 @@ public class ActionCardHelper {
                         "Showed Action Cards, they were also presented the cards in the order you see them so you may reference the number when talking to them:")
                 .append('\n');
         List<String> actionCards = new ArrayList<>(player.getActionCards().keySet());
-        Collections.shuffle(actionCards);
+        Collections.shuffle(actionCards, RandomHelper.current());
         int index = 1;
         for (String id : actionCards) {
             sa.append(index)

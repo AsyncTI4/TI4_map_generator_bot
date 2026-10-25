@@ -202,7 +202,7 @@ public class FractureService {
                             .map(Tile::getTileID)
                             .toList());
                     List<String> tileToPullFromUnshuffled = new ArrayList<>(redTilesToPullFrom);
-                    Collections.shuffle(redTilesToPullFrom);
+                    Collections.shuffle(redTilesToPullFrom, RandomHelper.current());
                     List<MessageEmbed> tileEmbeds = new ArrayList<>();
                     List<String> ids = new ArrayList<>();
 

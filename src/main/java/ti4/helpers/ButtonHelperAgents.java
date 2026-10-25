@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
@@ -683,7 +682,7 @@ public final class ButtonHelperAgents {
             String messageText = player.getRepresentation() + " placed " + StringHelper.pluralize(tgCount, "trade good")
                     + " on top of " + ssruuClever + "Artuno the Betrayer, a Nomad" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, messageText);
-            int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 11);
+            int randomJokeChance = RandomHelper.current().nextInt(1, 11);
             if (randomJokeChance == 10) {
                 File audioFile = ResourceHelper.getFile("voices/nomad/", "Artuno.mp3");
                 if (audioFile.exists()) {
@@ -780,7 +779,7 @@ public final class ButtonHelperAgents {
                         event.getMessageChannel(),
                         player.getFactionEmoji()
                                 + " there were no **Glory** tokens on the game board to move. Go win some battles and earn some, or your ancestors will laugh at ya when "
-                                + (ThreadLocalRandom.current().nextInt(20) == 0 ? "(if) " : "")
+                                + (RandomHelper.current().nextInt(20) == 0 ? "(if) " : "")
                                 + "you reach Valhalla.");
             }
         }
@@ -2328,7 +2327,7 @@ public final class ButtonHelperAgents {
             return;
         }
         int size = player.getFragments().size();
-        int rand = ThreadLocalRandom.current().nextInt(size);
+        int rand = RandomHelper.current().nextInt(size);
         String frag = player.getFragments().get(rand);
         player.removeFragment(frag);
         bentor.addFragment(frag);

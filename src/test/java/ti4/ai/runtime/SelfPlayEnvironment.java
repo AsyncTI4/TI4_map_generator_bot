@@ -112,8 +112,13 @@ final class SelfPlayEnvironment implements AutoCloseable {
     Supplier<Game> game = () -> null;
     // Sees every decision a seat makes, with the board it made it on; a harness sets it to follow what seats spend.
     volatile java.util.function.BiConsumer<AiTurnContext, AiDecision> decisionListener = (context, decision) -> {};
+    // Replaces one seat decision, for rollouts that try another choice at a decision point; it clears itself once it
+    // returns a decision other than the one it was given.
+    volatile java.util.function.BiFunction<AiTurnContext, AiDecision, AiDecision> decisionOverride;
     // Set by the game when -Dai.selfplay.trajectories names a folder; null otherwise.
     volatile TrajectoryLog trajectory;
+    // Set once a game seeds this thread's random source; closing the environment hands the thread back unseeded.
+    boolean seeded;
 
     record TradeRecord(int round, String from, String to, List<String> items, String label) {}
 
@@ -425,6 +430,14 @@ final class SelfPlayEnvironment implements AutoCloseable {
         return ((Optional<FactionBrain>) result).map(this::recording);
     }
 
+    private AiDecision overridden(AiTurnContext context, AiDecision decision) {
+        java.util.function.BiFunction<AiTurnContext, AiDecision, AiDecision> override = decisionOverride;
+        if (override == null) return decision;
+        AiDecision replaced = override.apply(context, decision);
+        if (replaced != decision) decisionOverride = null;
+        return replaced;
+    }
+
     private FactionBrain recording(FactionBrain brain) {
         return new FactionBrain() {
             @Override
@@ -442,7 +455,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
                 TrajectoryLog log = trajectory;
                 Map<String, String> memoryBefore =
                         log == null ? null : context.memory().snapshot();
-                AiDecision decision = brain.decide(context);
+                AiDecision decision = overridden(context, brain.decide(context));
                 if (log != null) log.decided(context, memoryBefore, decision);
                 decisionListener.accept(context, decision);
                 if (!(decision instanceof AiDecision.Idle))
@@ -723,6 +736,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
     @Override
     public void close() {
         if (trajectory != null) trajectory.close();
+        if (seeded) ti4.helpers.RandomHelper.unseedThisThread();
         for (int i = mocks.size() - 1; i >= 0; i--) {
             try {
                 mocks.get(i).close();

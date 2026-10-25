@@ -14,6 +14,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.RandomHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
@@ -71,7 +72,7 @@ class HiddenInitiativesAcd2ButtonHandler {
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
                             + ", you have no unscored secret objectives to replace. The deck will be shuffled.");
-            Collections.shuffle(game.getSecretObjectives());
+            Collections.shuffle(game.getSecretObjectives(), RandomHelper.current());
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -132,7 +133,7 @@ class HiddenInitiativesAcd2ButtonHandler {
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
                             + ", could not find that secret objective in your hand. The deck will be shuffled.");
-            Collections.shuffle(game.getSecretObjectives());
+            Collections.shuffle(game.getSecretObjectives(), RandomHelper.current());
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -144,7 +145,7 @@ class HiddenInitiativesAcd2ButtonHandler {
         player.removeSecret(playerSONum);
         game.addSOToGame(playerSOId);
         game.drawSpecificSecretObjective(deckSOId, player.getUserID());
-        Collections.shuffle(game.getSecretObjectives());
+        Collections.shuffle(game.getSecretObjectives(), RandomHelper.current());
 
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
@@ -159,7 +160,7 @@ class HiddenInitiativesAcd2ButtonHandler {
 
     @ButtonHandler("resolveHiddenInitiativesNoSwap")
     public static void resolveHiddenInitiativesNoSwap(Player player, Game game, ButtonInteractionEvent event) {
-        Collections.shuffle(game.getSecretObjectives());
+        Collections.shuffle(game.getSecretObjectives(), RandomHelper.current());
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 game.getActionsChannel(),
