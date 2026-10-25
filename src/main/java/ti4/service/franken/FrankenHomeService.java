@@ -28,6 +28,7 @@ public class FrankenHomeService {
 
     private String getPlayerHsRingPosition(Player player) {
         String faction = getPlayerHsFaction(player);
+        if (faction == null) return null;
         String hs = Mapper.getFaction(faction).getHomeSystem();
         return player.getGame().getTile(hs).getPosition();
     }
