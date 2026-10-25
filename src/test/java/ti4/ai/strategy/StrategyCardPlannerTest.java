@@ -207,6 +207,20 @@ class StrategyCardPlannerTest extends BaseTi4Test {
         assertThat(plan(LEADERSHIP).value()).isGreaterThan(plenty);
     }
 
+    // Tokens that no plan needs this round still carry over to later rounds, so each is worth a held token.
+    @Test
+    void valuesLeadershipTokensAtLeastAHeldTokenEachWithoutPlannedActions() {
+        test.nekro.setTacticalCC(5);
+        changed();
+
+        double tokens = plan(LEADERSHIP).benefits().stream()
+                .filter(benefit -> benefit.use() == CardUse.LEADERSHIP_TOKENS)
+                .mapToDouble(CardPlan.Benefit::value)
+                .sum();
+
+        assertThat(tokens).isGreaterThanOrEqualTo(StrategyCardRules.LEADERSHIP_TOKENS * CardValueScale.HELD_TOKEN);
+    }
+
     // A lone dreadnought in reach cannot land on anything, so locking home is not worth a card. A landing party with
     // ground forces next to the empty home is.
     @Test

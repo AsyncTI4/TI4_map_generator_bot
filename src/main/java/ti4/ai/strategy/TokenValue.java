@@ -8,6 +8,14 @@ import ti4.ai.tactical.TacticalPlan;
 class TokenValue {
 
     static double tacticTokens(PlanInputs in, int gained) {
+        return tokens(in, gained, CardValueScale.TOKEN_FLOOR);
+    }
+
+    static double carriedTokens(PlanInputs in, int gained) {
+        return tokens(in, gained, CardValueScale.HELD_TOKEN);
+    }
+
+    private static double tokens(PlanInputs in, int gained, double floor) {
         int usable = Math.min(gained, in.reinforcements());
         int start = Math.max(0, in.seat().getTacticalCC());
         List<TacticalPlan> ranked = in.ranked();
@@ -16,7 +24,7 @@ class TokenValue {
             int index = start + i;
             double planValue =
                     index < ranked.size() ? ranked.get(index).score() * CardValueScale.TOKEN_ACTION_SHARE : 0;
-            value += Math.max(CardValueScale.TOKEN_FLOOR, planValue);
+            value += Math.max(floor, planValue);
         }
         return value;
     }

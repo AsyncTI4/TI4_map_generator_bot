@@ -71,7 +71,7 @@ public class TokenPurchase {
     private static List<Wallet.PlanetValue> influenceLeaning(Wallet wallet) {
         if (wallet.pooling() != Pooling.SEPARATE) return wallet.planets();
         return wallet.planets().stream()
-                .filter(planet -> planet.influence() > planet.resources())
+                .filter(planet -> planet.influence() >= planet.resources())
                 .toList();
     }
 

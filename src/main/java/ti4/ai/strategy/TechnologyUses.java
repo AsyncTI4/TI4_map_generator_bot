@@ -17,7 +17,7 @@ class TechnologyUses {
         Player seat = in.seat();
         if (StrategyCardRules.cannotResearch(seat)) {
             return List.of(
-                    new Benefit(CardUse.TECHNOLOGY_PROPAGATION, TokenValue.tacticTokens(in, PROPAGATION_TOKENS)));
+                    new Benefit(CardUse.TECHNOLOGY_PROPAGATION, TokenValue.carriedTokens(in, PROPAGATION_TOKENS)));
         }
         double research = in.moment() == PlanMoment.PICK
                 ? ResearchPolicy.bestValueAsTechnologyHolder(game, seat)

@@ -16,7 +16,7 @@ class LeadershipUses {
     static List<Benefit> benefits(PlanInputs in, int initiative) {
         return List.of(
                 new Benefit(
-                        CardUse.LEADERSHIP_TOKENS, TokenValue.tacticTokens(in, StrategyCardRules.LEADERSHIP_TOKENS)),
+                        CardUse.LEADERSHIP_TOKENS, TokenValue.carriedTokens(in, StrategyCardRules.LEADERSHIP_TOKENS)),
                 new Benefit(CardUse.LEADERSHIP_TEMPO, firstInTheRace(in)),
                 new Benefit(
                         CardUse.LEADERSHIP_EXPEDITION,
