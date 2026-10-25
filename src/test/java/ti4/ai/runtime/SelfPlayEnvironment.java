@@ -112,6 +112,8 @@ final class SelfPlayEnvironment implements AutoCloseable {
     Supplier<Game> game = () -> null;
     // Sees every decision a seat makes, with the board it made it on; a harness sets it to follow what seats spend.
     volatile java.util.function.BiConsumer<AiTurnContext, AiDecision> decisionListener = (context, decision) -> {};
+    // Set by the game when -Dai.selfplay.trajectories names a folder; null otherwise.
+    volatile TrajectoryLog trajectory;
 
     record TradeRecord(int round, String from, String to, List<String> items, String label) {}
 
@@ -334,6 +336,9 @@ final class SelfPlayEnvironment implements AutoCloseable {
             }
             record(seat.faction() + " pressed " + target.customId() + " -> " + outcome.outcome() + " ("
                     + outcome.detail() + ")");
+            TrajectoryLog log = trajectory;
+            if (log != null)
+                log.pressed(seat.faction(), target.customId(), outcome.outcome().name(), outcome.detail());
         }
         return result;
     }
@@ -434,7 +439,11 @@ final class SelfPlayEnvironment implements AutoCloseable {
 
             @Override
             public AiDecision decide(AiTurnContext context) {
+                TrajectoryLog log = trajectory;
+                Map<String, String> memoryBefore =
+                        log == null ? null : context.memory().snapshot();
                 AiDecision decision = brain.decide(context);
+                if (log != null) log.decided(context, memoryBefore, decision);
                 decisionListener.accept(context, decision);
                 if (!(decision instanceof AiDecision.Idle))
                     record(context.faction() + " decided " + describe(decision));
@@ -713,6 +722,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
 
     @Override
     public void close() {
+        if (trajectory != null) trajectory.close();
         for (int i = mocks.size() - 1; i >= 0; i--) {
             try {
                 mocks.get(i).close();

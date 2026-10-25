@@ -237,6 +237,7 @@ final class SelfPlayGame {
                 false,
                 setupEvent());
         AiRuntime.forget(name);
+        env.trajectory = TrajectoryLog.openIfEnabled(name, () -> env.gameMessages.messages(name));
         env.game = () -> {
             ManagedGame managed = GameManager.getManagedGame(name);
             return managed == null ? null : managed.getGame();
@@ -642,6 +643,7 @@ final class SelfPlayGame {
     }
 
     private Outcome outcome(Ending ending, Game game, int ticks) {
+        if (env.trajectory != null) env.trajectory.finish(ending.name(), game);
         return new Outcome(
                 ending,
                 game == null ? 0 : game.getRound(),

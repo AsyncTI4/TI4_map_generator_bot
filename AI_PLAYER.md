@@ -1526,6 +1526,19 @@ Seven small generic changes don't reference `ti4.ai`:
     feasibility, `attackExists`, `noGathering`, `future` for a future strike under 4, or `ok` with the plan's score,
     the biggest gathering and the future strike, counterstrike and leave cost of the best one), next to the seat's
     top-ranked plan.
+  - `-Dai.selfplay.researchplan=true` prints each seat's research plan at the start of every round and whenever it
+    changes (`ResearchPlanLog`). It is off by default: rebuilding every plan at each harness step cost about a fifth
+    of a game's CPU.
+  - `-Dai.selfplay.trajectories=DIR` writes a trajectory log per game, `DIR/GAME.jsonl.gz` (`TrajectoryLog`): one JSON
+    line per seat decision that does something (presses, unsure fallbacks, announcements, proposals; idles and waits
+    are left out) with the round, phase, active seat, a board summary per seat, the enabled buttons the seat could see
+    grouped by prompt, and the chosen button with its reason; then a `press` line with each press outcome and a closing
+    `outcome` line with the ending, final points and leaders. A full game is about 1 MB.
+    `-Dai.selfplay.trajectories.snapshots=true` also keeps `DIR/GAME.snapshots.zip` (about 40 MB per game): for every
+    decision the save file of the board and the rest of the turn context (prompts, pressed keys, the seat's memory
+    before deciding, the virtual time, the game's message reactions and open strategy card follows).
+    `TrajectoryReplay` loads one and asks the brain again; `TrajectoryReplayTest` (`-Dai.selfplay.replay=true`) plays
+    round 1 that way and checks every press replays to the same choice.
   - Every action card play carries the round it was first seen in, and the batch summary prints the plays by round
     for the whole batch and each card's average round. `Overrule` gets its own block: its plays by round, the strategy
     cards its picks chose, how many of those picks raised the seat's points before its turn ended, and how many seats
