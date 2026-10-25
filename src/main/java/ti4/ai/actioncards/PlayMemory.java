@@ -16,6 +16,7 @@ class PlayMemory {
     static final String SUMMIT_SCOPE = "summit";
     static final String MASTER_PLAN_SCOPE = "plan:";
     static final String AGENDA_SCOPE = "agenda:";
+    static final String PRODUCTION_SCOPE = "build:";
     static final String COMBAT_PREFIX = PLAY_KEY + "combat:";
     private static final String START_SUFFIX = ":start";
     private static final String ANNOUNCE_KEY = "acAnnounce|";
@@ -36,6 +37,10 @@ class PlayMemory {
         return PLAY_KEY + AGENDA_SCOPE + context.game().getCurrentAgendaInfo();
     }
 
+    static String productionKey(String scope) {
+        return PLAY_KEY + PRODUCTION_SCOPE + scope;
+    }
+
     static String reactionKey(AiTurnContext context) {
         return PLAY_KEY + MESSAGE_SCOPE + context.turnKey() + "@"
                 + context.game().getActiveSystem();
@@ -54,6 +59,7 @@ class PlayMemory {
         List<String> keys =
                 new ArrayList<>(List.of(turnKey(context), masterPlanKey(context), summitKey(), agendaKey(context)));
         keys.addAll(context.memory().keysStartingWith(PLAY_KEY + MESSAGE_SCOPE));
+        keys.addAll(context.memory().keysStartingWith(PLAY_KEY + PRODUCTION_SCOPE));
         keys.addAll(context.memory().keysStartingWith(COMBAT_PREFIX));
         return keys;
     }

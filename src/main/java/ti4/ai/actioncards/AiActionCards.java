@@ -86,6 +86,7 @@ public class AiActionCards {
                             AgendaCards.rider(RiderPayoff.LEADERSHIP),
                             ExtraActionCard.masterPlan(),
                             ExtraActionCard.counterstroke(),
+                            ProductionCards.warMachine(),
                             new AiCard(
                                     MoveBoost.FLANK_SPEED,
                                     MoveBoost::isFlankSpeed,
@@ -176,6 +177,10 @@ public class AiActionCards {
             String key, KeepFloor keepFloor, String resolveHandler, List<String> targetPrefixes, TargetStep target) {
         return new AiCard(
                 key, key::equals, Window.COMBAT_ROUND, NEVER, keepFloor, resolveHandler, targetPrefixes, target);
+    }
+
+    static AiCard production(String key, Predicate<String> matches) {
+        return new AiCard(key, matches, Window.PRODUCTION, NEVER, PRIOR, null, List.of(), null);
     }
 
     static AiCard afterAction(String key, Predicate<String> matches, TargetStep target) {

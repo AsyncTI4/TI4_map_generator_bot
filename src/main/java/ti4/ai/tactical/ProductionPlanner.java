@@ -108,6 +108,8 @@ public class ProductionPlanner {
     private static final double FLEET_TOKEN_VALUE = 1.0;
     private static final String FLEET_REGULATIONS = "regulations";
     private static final int REGULATED_FLEET = 4;
+    private static final int WAR_MACHINE_PRODUCTION = 4;
+    private static final int WAR_MACHINE_DISCOUNT = 1;
 
     public record BuildOrder(
             String unitId,
@@ -243,18 +245,44 @@ public class ProductionPlanner {
 
     public static BuildPlan plan(
             Game game, Player seat, Tile tile, int extraResources, DefenseOutlook defense, int overSupplyCarriers) {
+        return plan(game, seat, tile, extraResources, defense, overSupplyCarriers, 0);
+    }
+
+    public static BuildPlan plan(
+            Game game,
+            Player seat,
+            Tile tile,
+            int extraResources,
+            DefenseOutlook defense,
+            int overSupplyCarriers,
+            int extraProduction) {
         try (Thinking.Span ignored = Thinking.enter("production.plan")) {
-            return buildPlan(game, seat, tile, extraResources, defense, overSupplyCarriers);
+            return buildPlan(game, seat, tile, extraResources, defense, overSupplyCarriers, extraProduction);
         }
     }
 
+    public static Optional<BuildPlan> warMachinePlan(
+            Game game, Player seat, Tile tile, BuildPlan base, DefenseOutlook defense) {
+        int production = Helper.getProductionValue(seat, game, tile, false);
+        if (production <= 0) return Optional.empty();
+        BuildPlan boosted = plan(game, seat, tile, WAR_MACHINE_DISCOUNT, defense, 0, WAR_MACHINE_PRODUCTION);
+        boolean usesExtraProduction = boosted.withoutBonus().units() > production;
+        return usesExtraProduction && boosted.value() > base.value() ? Optional.of(boosted) : Optional.empty();
+    }
+
     private static BuildPlan buildPlan(
-            Game game, Player seat, Tile tile, int extraResources, DefenseOutlook defense, int overSupplyCarriers) {
+            Game game,
+            Player seat,
+            Tile tile,
+            int extraResources,
+            DefenseOutlook defense,
+            int overSupplyCarriers,
+            int extraProduction) {
         if (BoardView.hasEnemyShips(game, seat, tile)) return new BuildPlan(List.of());
         Budget budget;
         try (Thinking.Span ignored = Thinking.enter("production.budget")) {
             budget = new Budget(
-                    Helper.getProductionValue(seat, game, tile, false),
+                    Helper.getProductionValue(seat, game, tile, false) + extraProduction,
                     spendableResources(game, seat) + extraResources + (seat.hasTech("st") ? 1 : 0) + aidaDiscount(seat),
                     FleetLimit.ships(seat) - BoardView.nonFighterShips(BoardView.space(tile), seat),
                     seat.hasUnlockedBreakthrough(BELLUM_GLORIOSUM));

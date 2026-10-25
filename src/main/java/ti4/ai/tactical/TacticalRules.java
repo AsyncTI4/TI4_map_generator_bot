@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.actioncards.ProductionCards;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
@@ -46,6 +47,7 @@ public class TacticalRules {
 
     static final String PLAN_KEY = "tacticalPlan|";
     static final String BUILD_KEY = "buildPlan|";
+    static final String WAR_MACHINE_KEY = "warMachineBase|";
     static final String PICKER_PRESSES_KEY = "pickerPresses|";
     static final String EXHAUSTED_ORIGIN_KEY = "exhaustedOrigin|";
     static final String COMBAT_EXPECTED_KEY = "combatExpectedSince|";
@@ -72,6 +74,8 @@ public class TacticalRules {
     private static final String DONE_EXHAUSTING = "Done Exhausting Planets";
     private static final int IGNORED_FIGHTERS_INDEX = 3;
     private static final String SARWEEN = "sarween";
+    private static final String WAR_MACHINE_SPENT = "warmachine";
+    private static final long WAR_MACHINE_WAIT_MILLIS = 10_000L;
     private static final String AIDA_EXHAUST = "exhaustTech_aida";
     private static final String AIDA_DISCOUNT = "aida_";
     private static final int CUSTODIANS_COST = 6;
@@ -260,6 +264,8 @@ public class TacticalRules {
         if (relic.isPresent()) return Optional.of(relic.get().press("draw a relic"));
         Optional<AiDecision> pay = payForUnits(context, turn, TACTICAL_SOURCE);
         if (pay.isPresent()) return pay;
+        Optional<AiDecision> warMachine = warMachine(context, turn, target);
+        if (warMachine.isPresent()) return warMachine;
         Optional<BuildPlan> buildPlan =
                 context.memory().get(BUILD_KEY + actionKey(context)).flatMap(BuildPlan::decode);
         Optional<AiDecision> place = placeUnits(context, turn, TACTICAL_SOURCE, target, buildPlan);
@@ -584,9 +590,9 @@ public class TacticalRules {
         Optional<Match> build = Prompts.owned(turn, faction, ("tacticalActionBuild_" + tile.getPosition())::equals);
         Optional<Match> conclude = Prompts.owned(turn, faction, "doneWithTacticalAction"::equals);
         if (build.isPresent()) {
-            Optional<BuildPlan> free = ProductionPlanner.freeBuild(
-                    context.game(), context.seat(), tile, new DefenseOutlook(context.game(), context.seat()));
-            BuildPlan plan = free.orElseGet(() -> ProductionPlanner.plan(context.game(), context.seat(), tile));
+            DefenseOutlook defense = new DefenseOutlook(context.game(), context.seat());
+            Optional<BuildPlan> free = ProductionPlanner.freeBuild(context.game(), context.seat(), tile, defense);
+            BuildPlan plan = free.orElseGet(() -> plannedBuild(context, tile, defense));
             if (!plan.isEmpty()) {
                 context.memory().put(BUILD_KEY + actionKey(context), plan.encode());
                 if (free.isPresent()) {
@@ -599,13 +605,56 @@ public class TacticalRules {
         return conclude.map(match -> match.press("conclude the tactical action"));
     }
 
-    public static Optional<AiDecision> placeUnits(
-            AiTurnContext context, List<AiPrompt> prompts, String source, String target, Optional<BuildPlan> plan) {
-        Optional<Match> done = Prompts.first(
+    private static BuildPlan plannedBuild(AiTurnContext context, Tile tile, DefenseOutlook defense) {
+        Game game = context.game();
+        Player seat = context.seat();
+        BuildPlan base = ProductionPlanner.plan(game, seat, tile, 0, defense);
+        if (!ProductionCards.holdsWarMachine(game, seat)) return base;
+        Optional<BuildPlan> boosted = ProductionPlanner.warMachinePlan(game, seat, tile, base, defense);
+        boosted.ifPresent(found -> context.memory().put(WAR_MACHINE_KEY + actionKey(context), base.encode()));
+        return boosted.orElse(base);
+    }
+
+    private static Optional<AiDecision> warMachine(AiTurnContext context, List<AiPrompt> turn, String target) {
+        String scope = actionKey(context);
+        Optional<BuildPlan> base = context.memory().get(WAR_MACHINE_KEY + scope).flatMap(BuildPlan::decode);
+        if (base.isEmpty()
+                || doneProducing(context, turn, TACTICAL_SOURCE, target).isEmpty()) {
+            return Optional.empty();
+        }
+        return switch (ProductionCards.warMachine(context, scope)) {
+            case UNPLAYED -> ProductionCards.playWarMachine(context, scope).or(() -> buildWithout(context, base.get()));
+            case PENDING ->
+                Optional.of(
+                        new AiDecision.Wait(context.now() + WAR_MACHINE_WAIT_MILLIS, "its War Machine action card"));
+            case SETTLED -> settleWarMachine(context, base.get());
+        };
+    }
+
+    private static Optional<AiDecision> settleWarMachine(AiTurnContext context, BuildPlan base) {
+        if (!context.seat().getSpentThingsThisWindow().contains(WAR_MACHINE_SPENT)) return buildWithout(context, base);
+        context.memory().remove(WAR_MACHINE_KEY + actionKey(context));
+        return Optional.empty();
+    }
+
+    private static Optional<AiDecision> buildWithout(AiTurnContext context, BuildPlan base) {
+        context.memory().put(BUILD_KEY + actionKey(context), base.encode());
+        context.memory().remove(WAR_MACHINE_KEY + actionKey(context));
+        return Optional.empty();
+    }
+
+    private static Optional<Match> doneProducing(
+            AiTurnContext context, List<AiPrompt> prompts, String source, String target) {
+        return Prompts.first(
                 prompts,
                 button -> button.isOwnedBy(context.faction())
                         && button.handlerId().equals(DONE_PREFIX + source + "_" + target)
                         && DONE_PRODUCING.equals(button.label()));
+    }
+
+    public static Optional<AiDecision> placeUnits(
+            AiTurnContext context, List<AiPrompt> prompts, String source, String target, Optional<BuildPlan> plan) {
+        Optional<Match> done = doneProducing(context, prompts, source, target);
         if (done.isEmpty()) return Optional.empty();
         if (plan.isPresent()) {
             BuildPlan placing = ProductionPlanner.BELLUM_SOURCE.equals(source)
@@ -660,7 +709,9 @@ public class TacticalRules {
     static boolean breaksReserve(Game game, Player seat, double addedCost) {
         SpendCost reserve = ProductionPlanner.reserve(game, seat);
         if (reserve.isNone()) return false;
-        int discounts = (seat.hasTech("st") ? 1 : 0) + ProductionPlanner.aidaDiscount(seat);
+        int discounts = (seat.hasTech("st") ? 1 : 0)
+                + ProductionPlanner.aidaDiscount(seat)
+                + (seat.getSpentThingsThisWindow().contains(WAR_MACHINE_SPENT) ? 1 : 0);
         int owed = (int) Math.ceil(producedCost(seat) + addedCost - discounts);
         if (owed <= 0) return false;
         return ScoringReserve.planAfterReserve(Wallet.of(game, seat), reserve, SpendCost.resources(owed))
@@ -756,7 +807,7 @@ public class TacticalRules {
         Pooling pooling = Pooling.of(seat);
         double spent = 0;
         for (String thing : seat.getSpentThingsThisWindow()) {
-            if (SARWEEN.equals(thing)) {
+            if (SARWEEN.equals(thing) || WAR_MACHINE_SPENT.equals(thing)) {
                 spent += 1;
             } else if (AIDA_DISCOUNT.equals(thing)) {
                 spent += ButtonHelper.getNumberOfUnitUpgrades(seat);

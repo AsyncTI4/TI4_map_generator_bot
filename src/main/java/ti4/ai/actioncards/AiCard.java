@@ -61,7 +61,8 @@ record AiCard(
         REACTION,
         AGENDA_WHEN,
         AGENDA_AFTER,
-        COMBAT_ROUND
+        COMBAT_ROUND,
+        PRODUCTION
     }
 
     boolean readyToResolve(AiTurnContext context) {
