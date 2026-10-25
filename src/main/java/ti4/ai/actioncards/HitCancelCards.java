@@ -68,7 +68,7 @@ class HitCancelCards {
         }
     }
 
-    record Assignment(Canceller canceller, AiPrompt prompt, String position, int hits) {}
+    record Assignment(Canceller canceller, String position, int hits) {}
 
     static List<AiCard> all() {
         return Arrays.stream(Canceller.values())
@@ -112,7 +112,7 @@ class HitCancelCards {
             if (parts.length != 2 || !StringUtils.isNumeric(parts[1])) continue;
             int hits = Integer.parseInt(parts[1]);
             if (hits > 0 && cancelButton(context, prompt, canceller, parts[0]).isPresent()) {
-                return Optional.of(new Assignment(canceller, prompt, parts[0], hits));
+                return Optional.of(new Assignment(canceller, parts[0], hits));
             }
         }
         return Optional.empty();
