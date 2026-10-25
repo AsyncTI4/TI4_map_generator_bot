@@ -84,7 +84,6 @@ class ExpeditionWinRateStatisticsService {
         sb.append("- Game count: ")
                 .append(gamesThatDidNotFinishExpeditionsVersusDid[1])
                 .append('\n');
-        sb.append("- Player count: ").append(expeditionCountPlayerCount).append('\n');
         sb.append("- Average: ")
                 .append(String.format("%.2f", averageExpeditionsCompleted))
                 .append('\n');
