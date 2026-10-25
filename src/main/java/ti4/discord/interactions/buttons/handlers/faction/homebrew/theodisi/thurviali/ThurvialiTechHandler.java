@@ -13,6 +13,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
@@ -252,6 +253,7 @@ public class ThurvialiTechHandler {
                         + " with _Mutualism_ and gains 1 command token.",
                 ButtonHelper.getGainCCButtons(player));
         ButtonHelper.deleteMessage(event);
+        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
     }
 
     @ButtonHandler(SELECT_RESTRUCTURING_STRUCTURE)

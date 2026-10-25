@@ -21,6 +21,7 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaAgentHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
@@ -1563,6 +1564,13 @@ public final class ButtonHelperAgents {
                     + " agent, in.";
             List<Button> buttons = getTilesToArboAgent(p2, game);
             MessageHelper.sendMessageToChannelWithButtons(channel, p2.getRepresentationUnfogged() + message, buttons);
+        }
+        if ("ironagent".equalsIgnoreCase(agent)) {
+            String faction = rest.replace("ironagent_", "");
+            Player p2 = game.getPlayerFromColorOrFaction(faction);
+            if (p2 != null) {
+                IronLeadersHandler.offerShipwrightKastelProduction(game, p2);
+            }
         }
         if ("kolumeagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever

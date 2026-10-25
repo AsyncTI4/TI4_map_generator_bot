@@ -123,10 +123,12 @@ public class ScrapyardUnitHandler {
                 || !player.hasAnyUnit("scrapyard_fighter", "scrapyard_fighter2")
                 || getFuelCellFighterCount(game, player) < 1) return;
         String fuelCell = player.hasUnit("scrapyard_fighter2") ? "Fuel Cell II" : "Fuel Cell I";
-        MessageHelper.sendMessageToChannelWithButton(
-                player.getCorrectChannel(),
-                player.getRepresentation() + ", you may use _" + fuelCell + "_.",
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(
                 Buttons.green(player.factionButtonChecker() + USE_FUEL_CELL, "Use " + fuelCell, UnitEmojis.fighter));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(), player.getRepresentation() + ", you may use _" + fuelCell + "_.", buttons);
     }
 
     public static void clearFuelCell(Game game, Player player) {

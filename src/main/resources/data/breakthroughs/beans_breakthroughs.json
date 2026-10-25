@@ -44,7 +44,7 @@
             "WARFARE",
             "BIOTIC"
         ],
-        "text": "ACTION: Exhaust this card to choose a system that contains 1 or more of your command tokens and your units; resolve those units' PRODUCTION abilities in that system. You may reduce the combined cost of the produced units by the number of your units with PRODUCTION in that system.",
+        "text": "ACTION: Exhaust this card to choose a system that contains 1 or more of your command tokens and your units; resolve those units' PRODUCTION abilities in that system. You may reduce the combined cost of the produced units by the number of your units with PRODUCTION in that system, up to a maximum of 3.",
         "source": "beans"
     },
     {

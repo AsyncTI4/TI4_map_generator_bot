@@ -15,6 +15,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.TnelisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
@@ -121,6 +122,7 @@ public class EndTurnService {
     }
 
     private static void resetStoredValuesEndOfTurn(GenericInteractionCreateEvent event, Game game, Player player) {
+        IronSalvageRelicHandler.clearTacticalActionState(game, player);
         AtokeraHeroButton.returnCommittedShips(event, game, player);
         AeternaAbilityHandler.clearCycleOfReclamationActionCaptures(game);
         AeternaLeadersHandler.clearAeternaCommanderActionState(game);

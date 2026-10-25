@@ -17,6 +17,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
@@ -187,8 +189,20 @@ public class DestroyUnitService {
         }
         if (combat) {
             AeternaTechHandler.offerThanatocyteLattice(event, game, units);
+
+            for (Player player : game.getRealPlayers()) {
+                Tile tile = units.getFirst().tile();
+                if (IronUnitHandler.canOfferDominionRepair(game, player, tile, units)) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
+                            player.getRepresentation()
+                                    + ", you may repair a unit using the Iron Dominion. This may happen once per round.",
+                            IronUnitHandler.getDominionButton(player, tile));
+                }
+            }
         }
         ScrapyardAbilitiesHandler.offerRepurposedParts(event, game, units, combat);
+        IronSalvageRelicHandler.offerSalvageCollectors(event, game, units, combat);
         ScrapyardBreakthroughHandler.offerCompactorCapture(event, game, units);
         AeternaAbilityHandler.offerCycleOfReclamationCapture(event, game, units, combat);
         AeternaUnitsHandler.addCryptControlTokenForDestroyedFighters(game, units);

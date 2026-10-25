@@ -56,6 +56,7 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
@@ -1726,6 +1727,11 @@ public class ButtonHelper {
                     player.getCorrectChannel(),
                     "## " + player.getRepresentationNoPing()
                             + ", this is a __friendly__ reminder that you do not own _Antimass Deflectors_.");
+            if (player.getFakeRelics().contains("salvage_carrier")) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "### However, they have the _Carrier_ salvage card and so their carriers may ignore anomalies.");
+            }
         }
         if (!game.isFowMode()
                 && activeSystem.isAsteroidField()
@@ -2584,7 +2590,8 @@ public class ButtonHelper {
                 || player.hasAbility("desperados_br")
                 || player.hasTech("tf-fraactalspikedrives")
                 || !game.getStoredValue("phantomEnergy").isEmpty()
-                || player.hasTech("fsd")) {
+                || player.hasTech("fsd")
+                || IronSalvageRelicHandler.carrierCanTransportOutOfLockedSystem(game, player)) {
             return true;
         }
         return player.getLeader("nomadhero").map(Leader::isActive).orElse(false);
@@ -4522,6 +4529,10 @@ public class ButtonHelper {
                         fightersIgnored += 8;
                     } else if (player.ownsUnit("aeterna_spacedock")) {
                         fightersIgnored += 4;
+                    } else if (player.ownsUnit("iron_spacedock")) {
+                        fightersIgnored += 4;
+                    } else if (player.ownsUnit("iron_spacedock2")) {
+                        fightersIgnored += 8;
                     } else if (!player.hasUnit("mykomentori_spacedock") && !player.hasUnit("mykomentori_spacedock2")) {
                         fightersIgnored += 3;
                     }
@@ -4590,6 +4601,11 @@ public class ButtonHelper {
         UnitHolder spaceHolder = tile.getSpaceUnitHolder();
         List<String> unitTypesCounted = new ArrayList<>();
         Map<UnitModel, Integer> unitsByQuantity = getAllUnits(spaceHolder, player);
+        boolean ironCommanderMechExemption = game.playerHasLeaderUnlockedOrAlliance(player, "ironcommander")
+                && unitsByQuantity.entrySet().stream()
+                        .anyMatch(entry -> entry.getValue() > 0
+                                && entry.getKey().getIsShip()
+                                && entry.getKey().getCapacityValue() > 0);
         for (Map.Entry<UnitModel, Integer> entry : unitsByQuantity.entrySet()) {
             UnitModel unit = entry.getKey();
             if (entry.getValue() <= 0) continue;
@@ -4628,6 +4644,9 @@ public class ButtonHelper {
                         numInfNFightersNMechs += numCountedFighters;
                     } else {
                         int capUsed = unit.getCapacityUsed();
+                        if (ironCommanderMechExemption && unit.getUnitType() == UnitType.Mech) {
+                            capUsed = 0;
+                        }
                         if (player.hasUnit("tk-boundsentinel") && unit.getUnitType() == UnitType.Mech) capUsed = 0;
                         if ("tyris_infantry".equals(unit.getId()) || "tyris_infantry2".equals(unit.getId())) {
                             numInfNFightersNMechs += entry.getValue() / 2;

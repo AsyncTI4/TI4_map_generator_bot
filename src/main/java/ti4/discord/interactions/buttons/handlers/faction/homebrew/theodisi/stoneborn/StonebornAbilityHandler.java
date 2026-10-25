@@ -368,7 +368,10 @@ public class StonebornAbilityHandler {
             case AGENT, COMMANDER, HERO -> replaceLeader(player, component.dormant, component.unleashed);
             case XENOLITH, STALACTIUM -> replaceTech(player, component.dormant, component.unleashed);
             case GOLEM -> replaceUnit(player, component.dormant, component.unleashed);
-            case REFRAGMENT -> player.changeBreakthrough(component.dormant, component.unleashed);
+            case REFRAGMENT -> {
+                player.changeBreakthrough(component.dormant, component.unleashed);
+                player.setBreakthroughExhausted(component.unleashed, false);
+            }
             case PETRA -> unleashPetra(game, player);
         }
     }

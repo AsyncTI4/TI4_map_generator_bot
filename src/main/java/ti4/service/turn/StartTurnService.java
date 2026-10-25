@@ -638,6 +638,10 @@ public class StartTurnService {
                 startButtons.add(thurvialiAgentButton);
             }
         }
+        if (!doneActionThisTurn && player.hasTech("beironmf")) {
+            startButtons.add(Buttons.gray(
+                    player.factionButtonChecker() + "ironUseModularFleet", "Use Modular Fleet", FactionEmojis.iron));
+        }
         if (player.hasAbility("sting_of_the_hive") && XytherisAbilityHandler.hasStingOfTheHiveMines(game)) {
             startButtons.add(XytherisAbilityHandler.getStingOfTheHiveMineLedgerButton(player));
         }

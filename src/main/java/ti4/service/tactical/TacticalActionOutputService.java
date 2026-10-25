@@ -19,6 +19,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.HydromorphicCardHandler;
@@ -294,6 +295,7 @@ public class TacticalActionOutputService {
         int maxBonus = 0;
         boolean ignoresAnomalies = ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                 || AsgardLegendaryService.isBifrostBridgeActive(game, player)
+                || IronSalvageRelicHandler.carrierIgnoresAnomalies(game, player, unit.unitType())
                 || (unit.unitType() == UnitType.Flagship
                         && AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile));
         if (distance > moveValue && distance < 90 && !game.isL1Hero()) {
@@ -376,7 +378,8 @@ public class TacticalActionOutputService {
                 output.append("May add +1 move to up to 1 ship being moved from each system containing their ships.");
             }
         }
-        if (player.hasUnit("scrapyard_flagship")) {
+        if (player.hasUnit("scrapyard_flagship")
+                && ButtonHelper.doesPlayerHaveFSHere("scrapyard_flagship", player, tile)) {
             output.append(" (May apply +1 to the MOVE value of units in this system if _Jumpstarter_ does not move.)");
         }
         UnitModel unitModel = player.getUnitFromUnitKey(unit);
@@ -433,6 +436,7 @@ public class TacticalActionOutputService {
                 && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
                 && !(unit.unitType() == UnitType.Flagship
                         && AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile))
+                && !IronSalvageRelicHandler.carrierIgnoresAnomalies(game, player, unit.unitType())
                 && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)) {
             baseMoveValue = 1;
         }
@@ -441,6 +445,10 @@ public class TacticalActionOutputService {
         }
         if (model.getIsShip() && HydromorphicCardHandler.hasRiptideRush(game, player)) {
             baseMoveValue++;
+        }
+        if (model.getUnitType() == UnitType.Dreadnought
+                && IronSalvageRelicHandler.hasDreadnoughtMoveBonus(game, player)) {
+            baseMoveValue += 2;
         }
         if (skipBonus) return baseMoveValue;
 

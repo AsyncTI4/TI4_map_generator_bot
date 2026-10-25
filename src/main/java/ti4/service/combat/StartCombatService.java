@@ -36,6 +36,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaPnHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
@@ -239,6 +242,8 @@ public class StartCombatService {
             WarGamesBrActionCardHandler.clear(game);
         }
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
+        IronSalvageRelicHandler.clearCombatState(game);
+        IronUnitHandler.clearDominionState(game);
         XinCommanderHandler.beginCombat(game, tile, Constants.SPACE);
         if (CombatContestSettings.isEnabledStatic()) {
             SpringContext.getBean(CombatReplayService.class).onSpaceCombatStarted(game, player, player2, tile);
@@ -292,6 +297,8 @@ public class StartCombatService {
         WarGamesBrActionCardHandler.clear(game);
         XinTechHandler.offerAstromanticCloakStarButtons(game, player, unitHolder, unitHolder.getName());
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
+        IronSalvageRelicHandler.clearCombatState(game);
+        IronUnitHandler.clearDominionState(game);
         XinCommanderHandler.beginCombat(game, tile, unitHolder.getName());
         ThirtyKActionCardHooks.onGroundCombatStart(game, unitHolder);
         ThirtyKSecretHooks.onGroundCombatStart(game, unitHolder);
@@ -400,8 +407,11 @@ public class StartCombatService {
         PonthousTechHandler.clearThunderbirdProtocol(game);
         VanguardLeadersHandler.clearCommanderState(game);
         game.setStoredValue("factionsInCombat", player1.getFaction() + "_" + player2.getFaction());
-
         sendStartOfCombatSecretMessages(game, player1, player2, tile, spaceOrGround, unitHolderName);
+        if ("space".equalsIgnoreCase(spaceOrGround)) {
+            IronSalvageRelicHandler.offerDreadnoughtCombatButton(game, player1, tile);
+            IronSalvageRelicHandler.offerDreadnoughtCombatButton(game, player2, tile);
+        }
         String combatName2 = COMBAT_ROUND_TRACKER + player1.getFaction() + tile.getPosition() + unitHolderName;
         game.setStoredValue(combatName2, "");
         combatName2 = COMBAT_ROUND_TRACKER + player2.getFaction() + tile.getPosition() + unitHolderName;
@@ -1093,6 +1103,11 @@ public class StartCombatService {
                 otherPlayer = p2;
             }
             String msg = player.getRepresentation();
+            IronPromissoryHandler.sendRetrofittingCombatButton(
+                    game, player, otherPlayer, tile, "space".equalsIgnoreCase(type));
+            if (game.isFowMode()) {
+                IronSalvageRelicHandler.offerFlagshipCombatButton(game, player, tile);
+            }
             if (ButtonHelper.doesPlayerHaveFSHere("cymiae_flagship", player, tile)) {
                 buttons.add(Buttons.green("resolveSpyStep1", "Resolve Cymiae Flagship"));
                 buttons.add(Buttons.red("deleteButtons", "Delete These"));
@@ -1748,6 +1763,11 @@ public class StartCombatService {
             CrystellumAbilityHandler.addPiecesOfAWholeButton(buttons, p2, tile);
         }
 
+        if (!game.isFowMode()) {
+            IronSalvageRelicHandler.addDreadnoughtCombatButton(buttons, p1, tile);
+            IronSalvageRelicHandler.addDreadnoughtCombatButton(buttons, p2, tile);
+        }
+
         return buttons;
     }
 
@@ -1850,6 +1870,12 @@ public class StartCombatService {
         NetrunnersTechHandler.addMimeticOverrideCombatButton(buttons, p1);
         if (!game.isFowMode() && p2 != p1) {
             NetrunnersTechHandler.addMimeticOverrideCombatButton(buttons, p2);
+        }
+        if (!game.isFowMode()) {
+            IronSalvageRelicHandler.addFlagshipCombatButton(buttons, game, p1, tile);
+            if (p2 != p1) {
+                IronSalvageRelicHandler.addFlagshipCombatButton(buttons, game, p2, tile);
+            }
         }
         if ("justPicture".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Buttons.blue(

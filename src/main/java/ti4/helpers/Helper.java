@@ -2022,6 +2022,14 @@ public final class Helper {
                     continue;
                 }
                 int productionValue = unitModel.getProductionValue();
+                if ("iron_mech".equals(unitModel.getId()) && uH instanceof Planet planet) {
+                    productionValue = (planet.getResources() + 1) / 2;
+                }
+                if (game.playerHasLeaderUnlockedOrAlliance(player, "ironcommander")
+                        && unitModel.getUnitType() == UnitType.Mech
+                        && "space".equals(uH.getName())) {
+                    productionValue = 1;
+                }
                 if ("monument".equals(unitModel.getAsyncId())) {
                     if (MonumentsService.isMonumentOnBoard(game, player, "cheiran_monument")
                             && tile == MonumentsService.getPlayerMonumentTile(game, player)

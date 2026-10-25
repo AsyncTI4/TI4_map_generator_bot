@@ -110,6 +110,7 @@ public class ScrapyardAbilitiesHandler {
                         "Use " + Mapper.getAbility(rig).getName()))
                 .toList();
         if (!buttons.isEmpty()) {
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", you may exhaust one or more Custom Rigs for this tactical action:",
