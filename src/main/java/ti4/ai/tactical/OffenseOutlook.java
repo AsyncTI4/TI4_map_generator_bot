@@ -98,7 +98,11 @@ final class OffenseOutlook {
             double custodians = BoardView.hasCustodians(planet) ? VP : 0;
             planets += w
                     * g
-                    * (base + explore + custodians + FracturePrize.gain(planet) + ShardPrize.gain(game, seat, planet));
+                    * (base
+                            + explore
+                            + custodians
+                            + FracturePrize.gain(game, planet)
+                            + ShardPrize.gain(game, seat, planet));
             territory += w * g * terms.territoryValues().getOrDefault(planet.getName(), 0.0);
             if (isMecatol(planet)) {
                 mecatolHold += w * g * MecatolStake.ownHoldValue(game, seat);

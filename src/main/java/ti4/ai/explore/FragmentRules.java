@@ -9,6 +9,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
+import ti4.ai.eval.RelicValue;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.tactical.Stall;
 import ti4.game.Player;
@@ -17,7 +18,7 @@ import ti4.helpers.ButtonHelperExplore;
 @UtilityClass
 class FragmentRules {
 
-    static final double EARLY_RELIC_VALUE = 1.0;
+    static final double EARLY_USE_SHARE = 0.3;
     private static final String FLOW = "fragments";
     private static final String MENU = "menu";
     private static final String PURGE = "purge";
@@ -36,7 +37,8 @@ class FragmentRules {
     static Optional<AiDecision> insteadOfTacticalAction(AiTurnContext context, List<AiPrompt> thisTurn) {
         if (!canMakeRelic(context.seat())) return Optional.empty();
         if (ComponentFlow.tacticalActionBeats(
-                context, EARLY_RELIC_VALUE + Stall.value(context.game(), context.seat()))) {
+                context,
+                RelicValue.draw(context.game()) * EARLY_USE_SHARE + Stall.value(context.game(), context.seat()))) {
             return Optional.empty();
         }
         return open(context, thisTurn, "purge relic fragments instead of a weak tactical action");

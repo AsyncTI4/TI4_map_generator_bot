@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.PlanetStake;
+import ti4.ai.eval.RelicValue;
 import ti4.ai.eval.ValueScale;
 import ti4.ai.legendary.LegendaryPlanets;
 import ti4.ai.secrets.SecretDrawValue;
@@ -50,6 +51,7 @@ public class CardValue {
             case "ms" -> Math.max(convertedMerchants(game, seat), replenishedMerchants(game, seat));
             case "lc" -> ExploreValues.actionCardsFromLostCrew(game, seat);
             case "dv" -> SecretDrawValue.of(seat.getGame(), seat);
+            case "dw" -> RelicValue.draw(game);
             case "ed" -> ExploreValues.ENIGMATIC_DEVICE;
             case "mirage" -> mirage();
             case "dmz" -> ExploreValues.DEMILITARIZED_ZONE - PlanetStake.structures(site.holder(), seat);

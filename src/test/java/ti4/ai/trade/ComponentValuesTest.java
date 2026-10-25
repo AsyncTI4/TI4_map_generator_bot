@@ -5,12 +5,16 @@ import static org.assertj.core.api.Assertions.within;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.eval.RelicValue;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
 class ComponentValuesTest extends BaseTi4Test {
 
     private static final double EXACT = 1e-9;
+    private static final double SINGLE = RelicValue.BASE * FragmentValue.SINGLE_SHARE;
+    private static final double PAIR = RelicValue.BASE * FragmentValue.PAIR_SHARE;
+    private static final double COMPLETING = RelicValue.BASE - PAIR;
 
     private TradeTable table;
     private Player nekro;
@@ -135,39 +139,40 @@ class ComponentValuesTest extends BaseTi4Test {
                 .isCloseTo(0.8, within(EXACT));
     }
 
-    // A relic fragment is worth 2 trade goods, and 3 for the one that makes three of a kind (unknown fragments
-    // count as any kind). A fragment that completes a set is worth 1 more in a trade, as the relic comes a turn sooner.
+    // A relic fragment is worth a fifth of a relic, a pair 45% of one, and the one that makes three of a kind the
+    // rest (unknown fragments count as any kind). A fragment that completes a set is worth 1 more in a trade, as the
+    // relic comes a turn sooner.
     @Test
     void theFragmentThatCompletesASetIsWorthMore() {
         nekro.setCrf(1);
         nekro.setUrf(1);
         assertThat(ComponentValues.receive(table.game, nekro, sol, item("sendingsol_receivingnekro_Frags_CRF1"), 0.8))
-                .isCloseTo(4, within(EXACT));
+                .isCloseTo(COMPLETING + 1, within(EXACT));
         assertThat(ComponentValues.receive(table.game, nekro, sol, item("sendingsol_receivingnekro_Frags_IRF1"), 0.8))
-                .isCloseTo(2, within(EXACT));
+                .isCloseTo(SINGLE, within(EXACT));
 
         nekro.setCrf(0);
         nekro.setUrf(0);
         nekro.setHrf(2);
         assertThat(ComponentValues.receive(table.game, nekro, sol, item("sendingsol_receivingnekro_Frags_URF1"), 0.8))
-                .isCloseTo(4, within(EXACT));
+                .isCloseTo(COMPLETING + 1, within(EXACT));
         assertThat(ComponentValues.receive(table.game, nekro, sol, item("sendingsol_receivingnekro_Frags_CRF3"), 0.8))
-                .isCloseTo(8, within(EXACT));
+                .isCloseTo(RelicValue.BASE + 1, within(EXACT));
     }
 
-    // A fragment found by exploring is valued like one received: 2, and 3 when it makes three of a kind.
+    // A fragment found by exploring is valued like one received.
     @Test
     void aFragmentFoundByExploringIsValuedLikeAReceivedOne() {
         nekro.setCrf(1);
         nekro.setUrf(1);
 
-        assertThat(ComponentValues.gainedFragment(nekro, "CRF")).isCloseTo(3, within(EXACT));
-        assertThat(ComponentValues.gainedFragment(nekro, "IRF")).isCloseTo(2, within(EXACT));
+        assertThat(ComponentValues.gainedFragment(nekro, "CRF")).isCloseTo(COMPLETING, within(EXACT));
+        assertThat(ComponentValues.gainedFragment(nekro, "IRF")).isCloseTo(SINGLE, within(EXACT));
 
         nekro.setSecret("dhw");
         nekro.setCrf(0);
         nekro.setUrf(0);
-        assertThat(ComponentValues.gainedFragment(nekro, "HRF")).isCloseTo(4, within(EXACT));
+        assertThat(ComponentValues.gainedFragment(nekro, "HRF")).isCloseTo(SINGLE + 2, within(EXACT));
     }
 
     // Without a partner to leave out, an own commodity is worth 0.3 until someone else could wash it.
@@ -183,31 +188,31 @@ class ComponentValuesTest extends BaseTi4Test {
         nekro.setSecret("dhw");
 
         assertThat(ComponentValues.receive(table.game, nekro, sol, item("sendingsol_receivingnekro_Frags_IRF3"), 0.8))
-                .isCloseTo(4 + 4 + 3 + 1, within(EXACT));
+                .isCloseTo(RelicValue.BASE + 4 + 1, within(EXACT));
 
         nekro.setCrf(2);
         assertThat(ComponentValues.receive(table.game, nekro, sol, item("sendingsol_receivingnekro_Frags_IRF1"), 0.8))
-                .isCloseTo(2, within(EXACT));
+                .isCloseTo(SINGLE, within(EXACT));
     }
 
-    // Giving a fragment costs what holding it was worth: 2, and 3 for one of a set of three. Unknown fragments can
-    // stand in, so a lone cultural fragment next to an unknown one is still 2 but the unknown one is not spare.
+    // Giving a fragment costs what holding it was worth: a fifth of a relic alone, the rest of it for one of a set
+    // of three, and a fifth again for the odd fragment of four.
     @Test
     void givingAFragmentCostsWhatItWasWorth() {
         nekro.setCrf(1);
         assertThat(ComponentValues.give(table.game, nekro, sol, item("sendingnekro_receivingsol_Frags_CRF1"), 0.8))
-                .isCloseTo(2, within(EXACT));
+                .isCloseTo(SINGLE, within(EXACT));
 
         nekro.setCrf(3);
         assertThat(ComponentValues.give(table.game, nekro, sol, item("sendingnekro_receivingsol_Frags_CRF1"), 0.8))
-                .isCloseTo(3, within(EXACT));
+                .isCloseTo(COMPLETING, within(EXACT));
 
         nekro.setCrf(4);
         assertThat(ComponentValues.give(table.game, nekro, sol, item("sendingnekro_receivingsol_Frags_CRF1"), 0.8))
-                .isCloseTo(2, within(EXACT));
+                .isCloseTo(SINGLE, within(EXACT));
     }
 
-    // Holding Destroy Heretical Works, the first two fragments are worth 4 each, so the AI will not part with them
+    // Holding Destroy Heretical Works, the first two fragments are worth 2 more each, so the AI will not part with them
     // cheaply — but only if it is not asked to judge from the other side of the table.
     @Test
     void hereticalWorksKeepsTwoFragmentsAtHome() {
@@ -215,10 +220,10 @@ class ComponentValuesTest extends BaseTi4Test {
         nekro.setSecret("dhw");
 
         assertThat(ComponentValues.give(table.game, nekro, sol, item("sendingnekro_receivingsol_Frags_CRF1"), 0.8))
-                .isCloseTo(4, within(EXACT));
+                .isCloseTo(PAIR - SINGLE + 2, within(EXACT));
         assertThat(ComponentValues.give(
                         table.game, nekro, sol, item("sendingnekro_receivingsol_Frags_CRF1"), 0.8, true))
-                .isCloseTo(2, within(EXACT));
+                .isCloseTo(PAIR - SINGLE, within(EXACT));
     }
 
     // Someone else's Support for the Throne is a point (worth 6 at 0 points), of which half counts while nobody is

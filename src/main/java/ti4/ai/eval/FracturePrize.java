@@ -14,7 +14,6 @@ import ti4.helpers.Constants;
 public class FracturePrize {
 
     public static final String STYX = "styx";
-    public static final double RELIC_VALUE = 4.0;
     private static final double STYX_INTEREST = 1.0;
     private static final double PLANET_INTEREST = 0.5;
     private static final String RELIC_TOKEN = "token_relictoken.png";
@@ -33,16 +32,16 @@ public class FracturePrize {
                 .anyMatch(planet -> isStyx(planet) && owner.getPlanets().contains(planet.getName()));
     }
 
-    public static double relic(Planet planet) {
-        return planet.getTokenList().contains(RELIC_TOKEN) ? RELIC_VALUE : 0;
+    public static double relic(Game game, Planet planet) {
+        return planet.getTokenList().contains(RELIC_TOKEN) ? RelicValue.draw(game) : 0;
     }
 
     public static double point(Planet planet) {
         return isStyx(planet) ? ObjectiveValue.VICTORY_POINT_VALUE : 0;
     }
 
-    public static double gain(Planet planet) {
-        return relic(planet) + point(planet);
+    public static double gain(Game game, Planet planet) {
+        return relic(game, planet) + point(planet);
     }
 
     public static boolean hasIngress(Tile tile) {

@@ -3,6 +3,7 @@ package ti4.ai.trade;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.experimental.UtilityClass;
+import ti4.ai.eval.RelicValue;
 import ti4.game.Player;
 
 @UtilityClass
@@ -14,8 +15,8 @@ public class FragmentValue {
     public static final String UNKNOWN = "URF";
     public static final List<String> KINDS = List.of(CULTURAL, INDUSTRIAL, HAZARDOUS, UNKNOWN);
     public static final int PER_RELIC = 3;
-    public static final double PER_FRAGMENT = 2.0;
-    public static final double COMPLETING_BONUS = 1.0;
+    public static final double SINGLE_SHARE = 0.2;
+    public static final double PAIR_SHARE = 0.45;
     public static final double TRADE_TEMPO = 1.0;
     public static final double HERETICAL_WORKS_BONUS = 2.0;
     static final int HERETICAL_WORKS_FRAGMENTS = 2;
@@ -52,6 +53,10 @@ public class FragmentValue {
         }
 
         public int relics() {
+            return progress().relics();
+        }
+
+        Progress progress() {
             int relics = cultural / PER_RELIC + industrial / PER_RELIC + hazardous / PER_RELIC;
             int[] leftovers = IntStream.of(cultural % PER_RELIC, industrial % PER_RELIC, hazardous % PER_RELIC)
                     .filter(left -> left > 0)
@@ -60,22 +65,41 @@ public class FragmentValue {
                     .mapToInt(Integer::intValue)
                     .toArray();
             int fillers = unknown;
+            int pairs = 0;
+            int singles = 0;
             for (int left : leftovers) {
                 int missing = PER_RELIC - left;
-                if (fillers < missing) continue;
-                fillers -= missing;
-                relics++;
+                if (fillers >= missing) {
+                    fillers -= missing;
+                    relics++;
+                } else if (left == 2) {
+                    pairs++;
+                } else {
+                    singles++;
+                }
             }
-            return relics + fillers / PER_RELIC;
+            relics += fillers / PER_RELIC;
+            int looseFillers = fillers % PER_RELIC;
+            int joined = Math.min(looseFillers, singles);
+            pairs += joined;
+            singles -= joined;
+            looseFillers -= joined;
+            pairs += looseFillers / 2;
+            singles += looseFillers % 2;
+            return new Progress(relics, pairs, singles);
         }
     }
+
+    record Progress(int relics, int pairs, int singles) {}
 
     public static boolean holdsHereticalWorks(Player player) {
         return player.getSecretsUnscored().containsKey(HERETICAL_WORKS);
     }
 
     public static double worth(Holdings holdings, boolean hereticalWorks) {
-        double value = PER_FRAGMENT * holdings.total() + COMPLETING_BONUS * holdings.relics();
+        Progress progress = holdings.progress();
+        double value = RelicValue.BASE
+                * (progress.relics() + PAIR_SHARE * progress.pairs() + SINGLE_SHARE * progress.singles());
         if (hereticalWorks) value += HERETICAL_WORKS_BONUS * Math.min(holdings.total(), HERETICAL_WORKS_FRAGMENTS);
         return value;
     }

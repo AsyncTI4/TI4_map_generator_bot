@@ -8,8 +8,10 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
+import ti4.ai.eval.RelicValue;
 import ti4.ai.eval.ValueScale;
 import ti4.ai.secrets.SecretDrawValue;
+import ti4.ai.trade.FragmentValue;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
 import ti4.model.Mapper;
@@ -68,15 +70,15 @@ class ExploreDeckTest extends BaseTi4Test {
         assertThat(value("hazardous")).isCloseTo(ValueScale.spendable(2 + 1, 0) / 2, within(EXACT));
     }
 
-    // A first fragment is worth 2; the one that completes a set of three, 3.
+    // A first fragment is worth a fifth of a relic; the one that completes a set of three, the rest of it.
     @Test
     void aFragmentIsWorthMoreWhenItCompletesASet() {
         deck("crf1");
-        assertThat(value("cultural")).isCloseTo(2.0, within(EXACT));
+        assertThat(value("cultural")).isCloseTo(RelicValue.BASE * FragmentValue.SINGLE_SHARE, within(EXACT));
 
         test.nekro.addFragment("crf2");
         test.nekro.addFragment("crf3");
-        assertThat(value("cultural")).isCloseTo(3.0, within(EXACT));
+        assertThat(value("cultural")).isCloseTo(RelicValue.BASE * (1 - FragmentValue.PAIR_SHARE), within(EXACT));
     }
 
     // The Demilitarized Zone costs at least 1.5, and the structures it returns to reinforcements on top.

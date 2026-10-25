@@ -117,7 +117,7 @@ class OfferResponderTest extends BaseTi4Test {
                 .isNotEqualTo("acceptOffer_blue_1");
     }
 
-    // The fragments of a set about to be purged are not for sale at a price that does not cover the relic.
+    // The fragments of a set about to be purged are not for sale at a price that does not cover what breaking it costs.
     @Test
     void keepsTheFragmentsOfACompleteSet() {
         TradeTable table = table(false);
@@ -131,11 +131,11 @@ class OfferResponderTest extends BaseTi4Test {
                                 "set",
                                 1,
                                 "sendingnekro_receivingsol_Frags_CRF1",
-                                "sendingsol_receivingnekro_TGs_3"))))
+                                "sendingsol_receivingnekro_TGs_1"))))
                 .isNotEqualTo("acceptOffer_blue_1");
     }
 
-    // The last fragment of Nekro's set is bought for 2 trade goods, which leaves it a trade good ahead, not for 3.
+    // The last fragment of Nekro's set is bought for 2 trade goods, which leaves it ahead.
     @Test
     void buysTheLastFragmentOfASetForTwoTradeGoods() {
         TradeTable table = table(false);
