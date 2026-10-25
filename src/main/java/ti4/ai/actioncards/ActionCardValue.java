@@ -49,7 +49,6 @@ public class ActionCardValue {
     private static final double NOT_USABLE = 0.0;
     static final double EXTRA_SABOTAGE_SHARE = 0.6;
     private static final double SPARE_BELOW = 2.0;
-    private static final double NEAR_LIMIT_PRIOR_SHARE = 0.5;
 
     record Candidate(String alias, double value, boolean urgent) {
 
@@ -91,11 +90,12 @@ public class ActionCardValue {
 
     private static Optional<Candidate> bestPlay(Game game, Player seat, PlayMoment moment, Window... windows) {
         if (AiSettings.usesLegacyActionCards(seat)) return Optional.empty();
-        double share = seat.getAcCount() >= ButtonHelper.getACLimit(game, seat) - 1 ? NEAR_LIMIT_PRIOR_SHARE : 1.0;
         return seat.getActionCards().keySet().stream()
                 .map(alias -> candidate(game, seat, alias, List.of(windows), moment))
                 .flatMap(Optional::stream)
-                .filter(candidate -> candidate.value() >= share * ActionCardPrior.keepPrior(candidate.alias()))
+                .filter(candidate -> candidate.value()
+                        >= HandPressure.share(game, seat, moment, candidate.alias())
+                                * ActionCardPrior.keepPrior(candidate.alias()))
                 .max(Comparator.comparingDouble(Candidate::margin)
                         .thenComparingDouble(Candidate::value)
                         .thenComparing(Candidate::alias, Comparator.reverseOrder()));
