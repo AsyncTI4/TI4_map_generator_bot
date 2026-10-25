@@ -1,7 +1,6 @@
 package ti4.ai.runtime;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,13 +23,15 @@ import ti4.testUtils.BaseTi4Test;
 // Branch-and-compare on one decision: the first strategy card pick of a round. Each game plays to that pick, takes a
 // snapshot, and for each of the picking seat's top options (by its own card values) restores the snapshot, forces the
 // pick, and plays on to the start of round R + 2, several times with different continuation seeds. Before each
-// continuation the decks the seat cannot see (action cards, secret objectives, unrevealed public objectives, agendas,
-// explores, relics) are shuffled again, a determinized rollout in the spirit of information-set Monte Carlo; other
-// seats' hands are still the real ones. The same continuation seeds are used for every option, so options are compared
-// on common random numbers. Score: the seat's victory points minus the best other seat's at the horizon.
+// continuation, everything the seat cannot see is resampled (Determinizer): other seats' action cards and unscored
+// secrets are dealt again from their decks and the hidden decks are shuffled, so the seat cannot plan around, say, a
+// Sabotage it could not know about. That is a determinized rollout in the spirit of information-set Monte Carlo. The
+// same continuation seeds are used for every option, so options are compared on common random numbers. Score: the
+// seat's victory points minus the best other seat's at the horizon. A rollout takes about 80 seconds; in an async game
+// that budget is affordable per decision, so the default runs 12 continuations per option.
 // mvn -o test -Dtest=RolloutExperimentTest -Dai.selfplay.rollouts=true
 //     [-Dai.selfplay.rollouts.games=6 -Dai.selfplay.rollouts.threads=6 -Dai.selfplay.rollouts.round=2
-//      -Dai.selfplay.rollouts.options=3 -Dai.selfplay.rollouts.seeds=4 -Dai.selfplay.rollouts.seed=5000]
+//      -Dai.selfplay.rollouts.options=3 -Dai.selfplay.rollouts.seeds=12 -Dai.selfplay.rollouts.seed=5000]
 @EnabledIfSystemProperty(named = "ai.selfplay.rollouts", matches = "true")
 class RolloutExperimentTest extends BaseTi4Test {
 
@@ -40,7 +41,7 @@ class RolloutExperimentTest extends BaseTi4Test {
     private static final int THREADS = Integer.getInteger("ai.selfplay.rollouts.threads", 6);
     private static final int ROUND = Integer.getInteger("ai.selfplay.rollouts.round", 2);
     private static final int OPTIONS = Integer.getInteger("ai.selfplay.rollouts.options", 3);
-    private static final int SEEDS = Integer.getInteger("ai.selfplay.rollouts.seeds", 4);
+    private static final int SEEDS = Integer.getInteger("ai.selfplay.rollouts.seeds", 12);
     private static final long BASE_SEED = Long.getLong("ai.selfplay.rollouts.seed", 5000L);
     private static final String PICK = "scPick_";
 
@@ -99,7 +100,7 @@ class RolloutExperimentTest extends BaseTi4Test {
                     List<Integer> points = new ArrayList<>();
                     for (int k = 0; k < SEEDS; k++) {
                         selfPlay.restore(snapshot);
-                        determinize(selfPlay, seed * 1000 + k);
+                        determinize(selfPlay, faction, seed * 1000 + k);
                         env.decisionOverride = (context, decision) -> {
                             if (!context.faction().equals(faction)) return decision;
                             if (!(decision instanceof AiDecision.Press press)
@@ -157,15 +158,12 @@ class RolloutExperimentTest extends BaseTi4Test {
         return press;
     }
 
-    // Reshuffles what the deciding seat cannot see, then reseeds the game thread for the continuation.
-    private static void determinize(SelfPlayGame selfPlay, long continuationSeed) {
+    // Resamples what the deciding seat cannot see, then leaves the game thread seeded for the continuation.
+    private static void determinize(SelfPlayGame selfPlay, String faction, long continuationSeed) {
         Random random = new Random(continuationSeed);
         RandomHelper.useForThisThread(random);
         Game game = GameManager.getManagedGame(selfPlay.name).getGame();
-        game.shuffleDecks();
-        game.shuffleAgendas();
-        if (game.getPublicObjectives1() != null) Collections.shuffle(game.getPublicObjectives1(), random);
-        if (game.getPublicObjectives2() != null) Collections.shuffle(game.getPublicObjectives2(), random);
+        Determinizer.resample(game, game.getPlayerFromColorOrFaction(faction), random);
         GameManager.save(game, "AI rollout determinization");
         selfPlay.forgetObservedGame();
     }
