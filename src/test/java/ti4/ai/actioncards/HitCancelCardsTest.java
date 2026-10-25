@@ -97,6 +97,27 @@ class HitCancelCardsTest extends BaseTi4Test {
                 "FFCC_nekro_cancelPdsOffenseHits_" + position + "_" + hits);
     }
 
+    // What CombatRollService.sendSpaceCannonDefenceHitAssignment posts for hits on ground forces landing on Lodor.
+    private AiPrompt defenceHits(int hits) {
+        return prompt(
+                HITS_MESSAGE,
+                PromptSource.PUBLIC,
+                NOW,
+                "FFCC_nekro_autoAssignGroundHits_lodor_" + hits,
+                "getDamageButtons_" + position + "deleteThis_groundcombat",
+                "FFCC_nekro_cancelPdsDefenceHits_" + position + "_" + hits + "_lodor");
+    }
+
+    private AiPrompt groundCombatHits(int hits) {
+        return prompt(
+                HITS_MESSAGE,
+                PromptSource.COMBAT_THREAD,
+                NOW,
+                "FFCC_nekro_autoAssignGroundHits_lodor_" + hits,
+                "getDamageButtons_" + position + "_groundcombat",
+                "cancelGroundHits_" + position + "_" + hits + "_lodor");
+    }
+
     private static AiPrompt hand() {
         return prompt("hand", PromptSource.AI_THREAD, NOW, "ac_play_from_hand_" + HAND_INDEX, "cardsInfo");
     }
@@ -316,10 +337,62 @@ class HitCancelCardsTest extends BaseTi4Test {
     }
 
     @Test
+    void maneuveringJetsIsPlayedOnASpaceCannonDefenceHitAgainstLandingGroundForces() {
+        table.test.units(tile, "lodor", table.nekro, UnitType.Infantry, 2);
+        table.nekro.setActionCard("mjets1", HAND_INDEX);
+
+        assertThat(pressedId(cancelHits(defenceHits(1)).orElseThrow())).isEqualTo("ac_play_from_hand_" + HAND_INDEX);
+    }
+
+    // The only copy is kept back from the shot at the ships, then spent on the shot at the landing ground forces.
+    @Test
+    void theOnlyCopyKeptForTheInvasionIsSpentOnTheInvasionsShot() {
+        invasionUnderSolsPds();
+        table.test.units(tile, "lodor", table.nekro, UnitType.Infantry, 2);
+        table.nekro.setActionCard("mjets1", HAND_INDEX);
+
+        assertThat(cancelHits(cannonHits(1))).isEmpty();
+        assertThat(pressedId(cancelHits(defenceHits(1)).orElseThrow())).isEqualTo("ac_play_from_hand_" + HAND_INDEX);
+    }
+
+    @Test
+    void maneuveringJetsIsNeverPlayedOnGroundCombatHits() {
+        table.test.units(tile, "lodor", table.nekro, UnitType.Infantry, 2);
+        table.nekro.setActionCard("mjets1", HAND_INDEX);
+
+        assertThat(cancelHits(groundCombatHits(2))).isEmpty();
+    }
+
+    @Test
+    void shieldsHoldingIsNeverPlayedOnSpaceCannonDefenceHits() {
+        evenSpaceFight();
+        table.nekro.setActionCard("sh1", HAND_INDEX);
+
+        assertThat(cancelHits(defenceHits(2))).isEmpty();
+    }
+
+    @Test
+    void maneuveringJetsCancelsOneSpaceCannonDefenceHit() {
+        table.test.units(tile, "lodor", table.nekro, UnitType.Infantry, 2);
+        table.nekro.setActionCard("mjets2", HAND_INDEX);
+        cancelHits(defenceHits(2));
+        played("Maneuvering Jets");
+        AiPrompt announce = announcement("Maneuvering Jets");
+
+        assertThat(ActionCardRules.continuePlay(table.test.contextAt(NOW + 1_000L, announce, defenceHits(2))))
+                .isEmpty();
+        assertThat(pressedId(ActionCardRules.continuePlay(table.test.contextAt(SETTLED, announce, defenceHits(2)))
+                        .orElseThrow()))
+                .isEqualTo("FFCC_nekro_cancelPdsDefenceHits_" + position + "_2_lodor");
+        assertThat(stage()).contains(Stage.DONE);
+    }
+
+    @Test
     void theFourCardsHaveRules() {
         for (String alias : List.of("sh1", "sh4", "mjets1", "mjets4", "war_machine1", "war_machine4")) {
             assertThat(AiActionCards.usable(alias)).as(alias).isTrue();
         }
-        assertThat(AiActionCards.targetPrefixes()).contains("cancelSpaceHits_", "cancelPdsOffenseHits_");
+        assertThat(AiActionCards.targetPrefixes())
+                .contains("cancelSpaceHits_", "cancelPdsOffenseHits_", "cancelPdsDefenceHits_");
     }
 }

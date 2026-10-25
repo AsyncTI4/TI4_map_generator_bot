@@ -25,16 +25,17 @@ class HitCancelCards {
     static final double SHIELDS_MIN_WIN = 0.4;
     static final double SHIELDS_MAX_WIN = 0.8;
     static final int SHIELDS_MIN_HITS = 2;
+    private static final List<String> SHIELDS_HOLDING_ALIASES = List.of("sh1", "sh2", "sh3", "sh4");
+    private static final List<String> MANEUVERING_JETS_ALIASES = List.of("mjets1", "mjets2", "mjets3", "mjets4");
     private static final String HOLDER = "hits";
     private static final String SEPARATOR = "_";
+    private static final String INTERLOCKING_SUFFIX = "_interlocking";
+    private static final String PLAN_PARTS = "[" + CardChains.PARTS + "]";
 
     enum Canceller {
-        SHIELDS_HOLDING(List.of("sh1", "sh2", "sh3", "sh4"), "autoAssignSpaceHits_", "cancelSpaceHits_", 2),
-        MANEUVERING_JETS(
-                List.of("mjets1", "mjets2", "mjets3", "mjets4"),
-                "autoAssignSpaceCannonOffenceHits_",
-                "cancelPdsOffenseHits_",
-                1);
+        SHIELDS_HOLDING(SHIELDS_HOLDING_ALIASES, "autoAssignSpaceHits_", "cancelSpaceHits_", 2),
+        JETS_AGAINST_SHIPS(MANEUVERING_JETS_ALIASES, "autoAssignSpaceCannonOffenceHits_", "cancelPdsOffenseHits_", 1),
+        JETS_AGAINST_GROUND_FORCES(MANEUVERING_JETS_ALIASES, "autoAssignGroundHits_", "cancelPdsDefenceHits_", 1);
 
         final List<String> aliases;
         final String assignPrefix;
@@ -46,12 +47,6 @@ class HitCancelCards {
             this.assignPrefix = assignPrefix;
             this.cancelPrefix = cancelPrefix;
             this.cancels = cancels;
-        }
-
-        static Optional<Canceller> of(String alias) {
-            return Arrays.stream(values())
-                    .filter(canceller -> canceller.aliases.contains(alias))
-                    .findFirst();
         }
 
         Optional<String> heldBy(Player seat) {
@@ -70,11 +65,27 @@ class HitCancelCards {
 
     record Assignment(Canceller canceller, String position, int hits) {}
 
+    private record CancelOffer(PromptButton button, String position, int hits) {
+
+        static Optional<CancelOffer> of(PromptButton button, String prefix) {
+            String[] parts = StringUtils.removeStart(button.handlerId(), prefix).split(SEPARATOR);
+            if (parts.length < 2 || !StringUtils.isNumeric(parts[1])) return Optional.empty();
+            return Optional.of(new CancelOffer(button, parts[0], Integer.parseInt(parts[1])));
+        }
+    }
+
     static List<AiCard> all() {
         return Arrays.stream(Canceller.values())
-                .flatMap(canceller -> canceller.aliases.stream()
-                        .map(alias -> AiActionCards.hitAssignment(
-                                alias, List.of(canceller.cancelPrefix), HitCancelCards::cancelStep)))
+                .flatMap(canceller -> canceller.aliases.stream())
+                .distinct()
+                .map(alias -> AiActionCards.hitAssignment(alias, cancelPrefixesOf(alias), HitCancelCards::cancelStep))
+                .toList();
+    }
+
+    private static List<String> cancelPrefixesOf(String alias) {
+        return Arrays.stream(Canceller.values())
+                .filter(canceller -> canceller.aliases.contains(alias))
+                .map(canceller -> canceller.cancelPrefix)
                 .toList();
     }
 
@@ -94,8 +105,12 @@ class HitCancelCards {
                     pending.get().canceller().heldBy(seat).filter(held -> worthCancelling(context, pending.get()));
             if (alias.isEmpty()) continue;
             int cancels = Math.min(pending.get().hits(), pending.get().canceller().cancels);
-            Plan plan = Plan.aimedAt(0, CardChains.target(prompt.messageId(), String.valueOf(cancels)), "");
-            Optional<AiDecision> play = ActionCardRules.startPlay(context, key, alias.get(), plan);
+            String target = CardChains.target(
+                    prompt.messageId(),
+                    String.valueOf(cancels),
+                    pending.get().canceller().name());
+            Optional<AiDecision> play =
+                    ActionCardRules.startPlay(context, key, alias.get(), Plan.aimedAt(0, target, ""));
             if (play.isPresent()) return play;
         }
         return Optional.empty();
@@ -103,16 +118,15 @@ class HitCancelCards {
 
     static Optional<Assignment> assignment(AiTurnContext context, AiPrompt prompt) {
         for (Canceller canceller : Canceller.values()) {
-            Optional<PromptButton> assign = prompt.firstEnabled(button -> button.isOwnedBy(context.faction())
-                    && button.handlerId().startsWith(canceller.assignPrefix)
-                    && !context.alreadyPressed(prompt, button));
-            if (assign.isEmpty()) continue;
-            String[] parts = StringUtils.removeStart(assign.get().handlerId(), canceller.assignPrefix)
-                    .split(SEPARATOR);
-            if (parts.length != 2 || !StringUtils.isNumeric(parts[1])) continue;
-            int hits = Integer.parseInt(parts[1]);
-            if (hits > 0 && cancelButton(context, prompt, canceller, parts[0]).isPresent()) {
-                return Optional.of(new Assignment(canceller, parts[0], hits));
+            boolean assignable = prompt.firstEnabled(button -> button.isOwnedBy(context.faction())
+                            && button.handlerId().startsWith(canceller.assignPrefix)
+                            && !context.alreadyPressed(prompt, button))
+                    .isPresent();
+            if (!assignable) continue;
+            Optional<CancelOffer> cancel = cancelOffer(context, prompt, canceller);
+            if (cancel.isPresent()) {
+                return Optional.of(new Assignment(
+                        canceller, cancel.get().position(), cancel.get().hits()));
             }
         }
         return Optional.empty();
@@ -121,7 +135,8 @@ class HitCancelCards {
     static boolean worthCancelling(AiTurnContext context, Assignment assignment) {
         return switch (assignment.canceller()) {
             case SHIELDS_HOLDING -> assignment.hits() >= SHIELDS_MIN_HITS && closeFight(context, assignment.position());
-            case MANEUVERING_JETS -> !savedForTheInvasion(context, assignment.position());
+            case JETS_AGAINST_SHIPS -> !savedForTheInvasion(context, assignment.position());
+            case JETS_AGAINST_GROUND_FORCES -> true;
         };
     }
 
@@ -133,7 +148,7 @@ class HitCancelCards {
 
     private static boolean savedForTheInvasion(AiTurnContext context, String position) {
         Player seat = context.seat();
-        if (!context.isActivePlayer() || Canceller.MANEUVERING_JETS.copiesHeldBy(seat) > 1) return false;
+        if (!context.isActivePlayer() || Canceller.JETS_AGAINST_SHIPS.copiesHeldBy(seat) > 1) return false;
         return TacticalRules.rememberedPlan(context)
                 .filter(plan -> plan.target().equals(position))
                 .filter(plan -> CombatForecast.landingFacesSpaceCannon(
@@ -141,32 +156,40 @@ class HitCancelCards {
                 .isPresent();
     }
 
-    private static Optional<PromptButton> cancelButton(
-            AiTurnContext context, AiPrompt prompt, Canceller canceller, String position) {
-        String prefix = canceller.cancelPrefix + position + SEPARATOR;
-        return prompt.firstEnabled(button -> (button.isUnowned() || button.isOwnedBy(context.faction()))
-                && button.handlerId().startsWith(prefix)
-                && StringUtils.isNumeric(StringUtils.removeStart(button.handlerId(), prefix))
-                && Integer.parseInt(StringUtils.removeStart(button.handlerId(), prefix)) > 0
-                && !context.alreadyPressed(prompt, button));
+    private static Optional<CancelOffer> cancelOffer(AiTurnContext context, AiPrompt prompt, Canceller canceller) {
+        return prompt.enabledButtons().stream()
+                .filter(button -> button.isUnowned() || button.isOwnedBy(context.faction()))
+                .filter(button -> button.handlerId().startsWith(canceller.cancelPrefix)
+                        && !button.handlerId().endsWith(INTERLOCKING_SUFFIX)
+                        && !context.alreadyPressed(prompt, button))
+                .map(button -> CancelOffer.of(button, canceller.cancelPrefix))
+                .flatMap(Optional::stream)
+                .filter(offer -> offer.hits() > 0)
+                .findFirst();
     }
 
     private static Optional<AiDecision> cancelStep(AiTurnContext context, String key, CardPlay play) {
-        Optional<Canceller> canceller = Canceller.of(play.alias());
-        String[] planned = play.extra().split("[" + CardChains.PARTS + "]", -1);
-        if (canceller.isEmpty() || planned.length != 2 || !StringUtils.isNumeric(planned[1])) {
+        String[] planned = play.extra().split(PLAN_PARTS, -1);
+        Optional<Canceller> canceller = planned.length == 3
+                ? Arrays.stream(Canceller.values())
+                        .filter(candidate -> candidate.name().equals(planned[2]))
+                        .findFirst()
+                : Optional.empty();
+        if (canceller.isEmpty() || !StringUtils.isNumeric(planned[1])) {
             PlayMemory.moveTo(context, key, play, Stage.DONE);
             return Optional.empty();
         }
         String position = PlayMemory.combatPosition(key);
         Optional<Match> cancel = Prompts.newestFirst(context.prompts()).stream()
                 .filter(prompt -> !prompt.isHidden() && prompt.messageId().equals(planned[0]))
-                .flatMap(prompt -> cancelButton(context, prompt, canceller.get(), position).stream()
-                        .map(button -> new Match(prompt, button)))
+                .flatMap(prompt -> cancelOffer(context, prompt, canceller.get())
+                        .filter(offer -> offer.position().equals(position))
+                        .map(offer -> new Match(prompt, offer.button()))
+                        .stream())
                 .findFirst();
         if (cancel.isEmpty()) return Optional.empty();
         int left = Integer.parseInt(planned[1]) - 1;
-        CardPlay next = play.withExtra(CardChains.target(planned[0], String.valueOf(left)));
+        CardPlay next = play.withExtra(CardChains.target(planned[0], String.valueOf(left), planned[2]));
         PlayMemory.moveTo(context, key, next, left > 0 ? Stage.TARGET : Stage.DONE);
         return Optional.of(cancel.get().press("cancel a hit with " + SabotageWindow.title(play.alias())));
     }
