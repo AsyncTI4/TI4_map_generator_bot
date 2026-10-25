@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ston
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -35,6 +36,7 @@ public class StonebornAbilityHandler {
     private static final String USE_ADAPTIVE = "useAdaptive";
     private static final String ADAPTIVE_COMPONENT = "adaptiveComponent_";
     private static final String ADAPTIVE_COST = "adaptiveCost_";
+    private static final List<String> FRAGMENTUM_TRAITS = List.of("cultural", "hazardous", "industrial", "frontier");
     private static final List<String> FRAGMENTS = List.of(
             "stonebornculturalfragment",
             "stonebornculturalfragment2",
@@ -105,8 +107,8 @@ public class StonebornAbilityHandler {
 
         List<String> traits = fragments.stream()
                 .map(Mapper::getExplore)
-                .filter(fragment -> fragment != null)
-                .map(fragment -> fragment.getType().toLowerCase())
+                .filter(Objects::nonNull)
+                .flatMap(fragment -> getFragmentumTraits(fragment).stream())
                 .distinct()
                 .filter(trait -> getFragmentumTokenCount(game, player, trait) < 3)
                 .toList();
@@ -129,16 +131,10 @@ public class StonebornAbilityHandler {
     @ButtonHandler(PLACE_FRAGMENTUM)
     public static void placeFragmentumToken(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String trait = buttonID.substring(PLACE_FRAGMENTUM.length());
-        if (!player.hasAbility(FRAGMENTUM_UNLEASHED)
-                || !List.of("cultural", "hazardous", "industrial", "frontier").contains(trait)
-                || getFragmentumTokenCount(game, player, trait) >= 3) {
+        if (!player.hasAbility(FRAGMENTUM_UNLEASHED) || !addFragmentumToken(game, player, trait)) {
             return;
         }
 
-        List<String> tokens = getFragmentumTokens(game, player);
-        tokens.add(trait);
-        game.setStoredValue(getFragmentumTokensKey(player), String.join(",", tokens));
-        CommanderUnlockCheckService.checkPlayer(player, "stoneborn");
         MessageHelper.sendMessageToChannel(
                 getOutputChannel(game, player, event),
                 player.getRepresentationNoPing() + " placed 1 " + getFragmentumTokenColor(trait)
@@ -152,6 +148,29 @@ public class StonebornAbilityHandler {
                 getFragmentumTokens(game, player).stream()
                         .filter(trait::equalsIgnoreCase)
                         .count());
+    }
+
+    public static boolean addFragmentumToken(Game game, Player player, String trait) {
+        if (!FRAGMENTUM_TRAITS.contains(trait) || getFragmentumTokenCount(game, player, trait) >= 3) {
+            return false;
+        }
+        List<String> tokens = getFragmentumTokens(game, player);
+        tokens.add(trait);
+        game.setStoredValue(getFragmentumTokensKey(player), String.join(",", tokens));
+        CommanderUnlockCheckService.checkPlayer(player, "stoneborn");
+        return true;
+    }
+
+    public static boolean removeFragmentumToken(Game game, Player player, String trait) {
+        if (!FRAGMENTUM_TRAITS.contains(trait)) {
+            return false;
+        }
+        List<String> tokens = getFragmentumTokens(game, player);
+        if (!tokens.remove(trait)) {
+            return false;
+        }
+        game.setStoredValue(getFragmentumTokensKey(player), String.join(",", tokens));
+        return true;
     }
 
     public static Button getFragmentumTokensInfoButton(Player player) {
@@ -194,18 +213,26 @@ public class StonebornAbilityHandler {
 
     @ButtonHandler(USE_ADAPTIVE)
     public static void useAdaptive(Game game, Player player, ButtonInteractionEvent event) {
+        if (!offerAdaptiveComponentButtons(game, player, getOutputChannel(game, player, event))) {
+            return;
+        }
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    public static boolean offerAdaptiveComponentButtons(Game game, Player player, MessageChannel channel) {
+        if (!player.hasAbility(ADAPTIVE)) {
+            return false;
+        }
         List<Button> buttons = getAdaptiveComponents(game, player).stream()
                 .map(component -> Buttons.green(
                         player.factionButtonChecker() + ADAPTIVE_COMPONENT + component.id, "UNLEASH " + component.name))
                 .toList();
         if (buttons.isEmpty()) {
-            return;
+            return false;
         }
         MessageHelper.sendMessageToChannelWithButtons(
-                getOutputChannel(game, player, event),
-                player.getRepresentation() + ", choose a Dormant component to UNLEASH.",
-                buttons);
-        ButtonHelper.deleteTheOneButton(event);
+                channel, player.getRepresentation() + ", choose a Dormant component to UNLEASH.", buttons);
+        return true;
     }
 
     @ButtonHandler(ADAPTIVE_COMPONENT)
@@ -319,10 +346,7 @@ public class StonebornAbilityHandler {
     }
 
     private static boolean isValidCost(AdaptiveCost expected, List<String> cost) {
-        if (cost.size() != expected.count
-                || cost.stream()
-                        .anyMatch(trait -> !List.of("cultural", "hazardous", "industrial", "frontier")
-                                .contains(trait))) {
+        if (cost.size() != expected.count || cost.stream().anyMatch(trait -> !FRAGMENTUM_TRAITS.contains(trait))) {
             return false;
         }
         return (expected.requiredTrait == null || cost.stream().allMatch(expected.requiredTrait::equals))
@@ -478,6 +502,14 @@ public class StonebornAbilityHandler {
                 List.of(game.getStoredValue(getFragmentumTokensKey(player)).split(",")));
         tokens.removeIf(String::isEmpty);
         return tokens;
+    }
+
+    private static List<String> getFragmentumTraits(ExploreModel fragment) {
+        if (fragment.getAlias().contains("unknown")
+                || fragment.getName().toLowerCase().contains("unknown")) {
+            return FRAGMENTUM_TRAITS;
+        }
+        return List.of(fragment.getType().toLowerCase());
     }
 
     private static String getFragmentumTokensKey(Player player) {

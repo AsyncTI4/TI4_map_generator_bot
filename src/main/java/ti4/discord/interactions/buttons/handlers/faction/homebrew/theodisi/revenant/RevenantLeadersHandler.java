@@ -595,9 +595,9 @@ public class RevenantLeadersHandler {
                     Buttons.red(agentOwner.factionButtonChecker() + "deleteButtons", "No Thanks"));
             MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
                     agentOwner.getCardsInfoThread(),
-                    agentOwner.getRepresentation() + ", " + tokenOwner.getRepresentationNoPing()
+                    agentOwner.getRepresentationNoPing() + ", " + tokenOwner.getRepresentationNoPing()
                             + " placed a command token in " + sourceTile.getRepresentationForButtons(game, agentOwner)
-                            + ". You may exhaust **Kruth Torrious** to move it.",
+                            + ". You may exhaust **Kruth Torrious, the Revenant agent** to move it.",
                     buttons);
         }
     }
