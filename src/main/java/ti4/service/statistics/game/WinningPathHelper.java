@@ -27,7 +27,7 @@ public class WinningPathHelper {
                 otherVictoryPoints(game, winner.getUserID()));
     }
 
-    private static String describe(WinningPathBreakdown path) {
+    public static String describe(WinningPathBreakdown path) {
         String otherPoints = summarizeOtherVictoryPoints(path.otherPoints());
         return String.format(
                 "%d stage 1 objectives, %d stage 2 objectives, %d secret objectives, %d %s%s",
