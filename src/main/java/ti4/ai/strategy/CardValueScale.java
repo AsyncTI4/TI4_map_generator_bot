@@ -2,14 +2,15 @@ package ti4.ai.strategy;
 
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.ActionCardPrior;
+import ti4.ai.eval.ValueScale;
 import ti4.ai.scoring.ObjectiveValue;
 
 @UtilityClass
 public class CardValueScale {
 
     public static final double VICTORY_POINT = ObjectiveValue.VICTORY_POINT_VALUE;
-    public static final double TRADE_GOOD = 1.0;
-    static final double COMMODITY = 0.5;
+    public static final double TRADE_GOOD = ValueScale.TRADE_GOOD;
+    static final double COMMODITY = ValueScale.COMMODITY;
     public static final double TOKEN_FLOOR = 1.5;
     static final double TOKEN_ACTION_SHARE = 0.6;
     static final double STRATEGY_TOKEN = 1.0;

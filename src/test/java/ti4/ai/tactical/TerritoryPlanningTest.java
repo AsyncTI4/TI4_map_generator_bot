@@ -92,7 +92,7 @@ class TerritoryPlanningTest extends BaseTi4Test {
         assertThat(late).isGreaterThan(early);
     }
 
-    // The lane towards Mecatol Rex outweighs a border planet worth about three quarters of a point more.
+    // The lane towards Mecatol Rex outweighs a border planet worth about half a point more.
     @Test
     void aFreePlanetOnTheLaneBeatsABorderPlanetWorthMore() {
         test.place("18", "000");
@@ -102,7 +102,7 @@ class TerritoryPlanningTest extends BaseTi4Test {
         Territory territory = Territory.of(test.game, test.nekro);
         assertThat(territory.zone(lane)).isEqualTo(Territory.Zone.LANE);
         assertThat(territory.zone(border)).isEqualTo(Territory.Zone.BORDER);
-        assertThat(planetValueIn(border) - planetValueIn(lane)).isBetween(0.6, 1.0);
+        assertThat(planetValueIn(border) - planetValueIn(lane)).isBetween(0.4, 0.8);
 
         assertThat(expansionTo("101").orElseThrow().score())
                 .isGreaterThan(expansionTo("202").orElseThrow().score());

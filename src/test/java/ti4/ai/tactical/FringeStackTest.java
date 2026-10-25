@@ -355,7 +355,7 @@ class FringeStackTest extends BaseTi4Test {
         test.nekro.setSecret(OCCUPY);
         test.units(tarmann, "tarmann", test.nekro, UnitType.Infantry, 5);
         String free = AiTestGame.neighbourOf(AiTestGame.HOME).equals(neighbour) ? otherNeighbourOfHome() : neighbour;
-        test.place("29", free);
+        test.place("26", free);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 6);
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
 

@@ -6,8 +6,8 @@ import java.util.Optional;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts.Match;
-import ti4.ai.eval.BoardView;
 import ti4.ai.eval.Threats;
+import ti4.ai.eval.ValueScale;
 import ti4.ai.legendary.LegendaryPlanets;
 import ti4.ai.perception.AiPrompt;
 import ti4.game.Game;
@@ -79,7 +79,7 @@ class NanoforgeFlow implements RelicFlow {
     }
 
     private static double worth(Game game, Player seat, String name) {
-        double gained = BONUS + BoardView.INFLUENCE_WEIGHT * BONUS + LegendaryPlanets.holdingValue(null);
+        double gained = ValueScale.spendable(BONUS, BONUS) + LegendaryPlanets.holdingValue(null);
         Tile tile = game.getTileFromPlanet(name);
         boolean exposed = tile != null && Threats.anyEnemyCanReach(game, seat, tile);
         return exposed ? gained * EXPOSED_SHARE : gained;

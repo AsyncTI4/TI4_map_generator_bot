@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.PlanetStake;
+import ti4.ai.eval.ValueScale;
 import ti4.ai.legendary.LegendaryPlanets;
 import ti4.ai.secrets.SecretDrawValue;
 import ti4.ai.strategy.ReadyingValue;
@@ -115,7 +116,7 @@ public class CardValue {
     private static double mirage() {
         PlanetModel model = Mapper.getPlanet(MIRAGE);
         if (model == null) return 0;
-        double value = model.getResources() + BoardView.INFLUENCE_WEIGHT * model.getInfluence();
+        double value = ValueScale.spendable(model.getResources(), model.getInfluence());
         return model.isLegendary() ? value + LegendaryPlanets.holdingValue(MIRAGE) : value;
     }
 
@@ -124,7 +125,7 @@ public class CardValue {
     }
 
     private static double attachment(int resources, int influence) {
-        return resources + BoardView.INFLUENCE_WEIGHT * influence;
+        return ValueScale.spendable(resources, influence);
     }
 
     private static double researchFacility(ExploreSite site) {

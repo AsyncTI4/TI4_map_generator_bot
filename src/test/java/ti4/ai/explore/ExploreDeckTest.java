@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
+import ti4.ai.eval.ValueScale;
 import ti4.ai.secrets.SecretDrawValue;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
@@ -43,12 +44,13 @@ class ExploreDeckTest extends BaseTi4Test {
         test.game.setExploreDeck(new ArrayList<>(List.of(cards)));
     }
 
-    // A Dyson Sphere adds 2 resources and 1 influence (2.6), a Paradise World 2 influence (1.2).
+    // A Dyson Sphere adds 2 resources and 1 influence, a Paradise World 2 influence.
     @Test
     void averagesTheCardsLeftInTheDeck() {
         deck("ds", "pw");
 
-        assertThat(value("cultural")).isCloseTo((2 + 0.6 + 1.2) / 2, within(EXACT));
+        assertThat(value("cultural"))
+                .isCloseTo((ValueScale.spendable(2, 1) + ValueScale.spendable(0, 2)) / 2, within(EXACT));
     }
 
     @Test
@@ -63,7 +65,7 @@ class ExploreDeckTest extends BaseTi4Test {
     void countsOnlyTheCardsOfTheTrait() {
         deck("mw", "ds", "rw");
 
-        assertThat(value("hazardous")).isCloseTo((2 + 1) / 2.0, within(EXACT));
+        assertThat(value("hazardous")).isCloseTo(ValueScale.spendable(2 + 1, 0) / 2, within(EXACT));
     }
 
     // A first fragment is worth 2; the one that completes a set of three, 3.

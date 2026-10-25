@@ -16,6 +16,7 @@ import ti4.ai.endurance.Endurance;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.eval.ValueScale;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringStakes;
@@ -37,7 +38,8 @@ public class ResearchPolicy {
     public static final double WORTH_PAYING_FOR = 4.0;
     public static final double WORTH_FOLLOWING_FOR = 3.0;
     public static final double TECH_TEMPO =
-            (StrategyCardRules.FOLLOW_TECH_COST + CardValueScale.STRATEGY_TOKEN) / WORTH_FOLLOWING_FOR;
+            (ValueScale.RESOURCE * StrategyCardRules.FOLLOW_TECH_COST + CardValueScale.STRATEGY_TOKEN)
+                    / WORTH_FOLLOWING_FOR;
     private static final double FACTION_TECH_VALUE = 2.0;
     private static final double DEFAULT_VALUE = 1.5;
     private static final Map<String, Double> FACTION_VALUE = Map.ofEntries(

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.ValueScale;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.strategy.MecatolCash;
 import ti4.ai.tactical.TacticalPlan.Kind;
@@ -814,7 +815,8 @@ class TacticalPlannerTest extends BaseTi4Test {
         test.game.setExploreDeck(new ArrayList<>(List.of("ds")));
         double explored = expansionTo(neighbour).orElseThrow().score();
 
-        assertThat(explored - unexplored).isCloseTo(2.6, org.assertj.core.data.Offset.offset(1e-9));
+        assertThat(explored - unexplored)
+                .isCloseTo(ValueScale.spendable(2, 1), org.assertj.core.data.Offset.offset(1e-9));
     }
 
     // A planet that someone holds is not explored when it is invaded, so the same deck changes nothing.

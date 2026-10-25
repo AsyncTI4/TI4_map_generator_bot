@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.ValueScale;
 import ti4.ai.tactical.ProductionPlanner;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -17,7 +18,7 @@ import ti4.model.TechnologyModel.TechnologyType;
 @UtilityClass
 public class PrerequisiteSkips {
 
-    static final double VALUE_PER_RESOURCE = 0.7;
+    static final double VALUE_PER_RESOURCE = 0.7 * ValueScale.RESOURCE;
     private static final String PSYCHOARCHAEOLOGY = "pa";
     private static final String AI_DEVELOPMENT = "aida";
     private static final String PROPHETS_TEARS = "prophetstears";

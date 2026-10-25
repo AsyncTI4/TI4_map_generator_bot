@@ -2,14 +2,15 @@ package ti4.ai.trade;
 
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import ti4.ai.eval.ValueScale;
 import ti4.game.Game;
 import ti4.game.Player;
 
 @UtilityClass
 public class ComponentValues {
 
-    private static final double TRADE_GOOD = 1.0;
-    private static final double COMMODITY_RECEIVED = 1.0;
+    private static final double TRADE_GOOD = ValueScale.TRADE_GOOD;
+    private static final double COMMODITY_RECEIVED = ValueScale.TRADE_GOOD;
     private static final double OWN_COMMODITY_WITH_OUTLET = 0.6;
     private static final double OWN_COMMODITY_WITHOUT_OUTLET = 0.3;
     static final double DEBT_LIABILITY = 0.8;

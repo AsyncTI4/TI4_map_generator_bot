@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.ValueScale;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
 import ti4.model.MapPositionMapper;
@@ -69,7 +70,7 @@ class ExploreOutlookTest extends BaseTi4Test {
         return outlook().expansionNeed(site.getUnitHolderFromPlanet("tequran"));
     }
 
-    // Half the value of the best planet left to claim (Lodor, 3.6) is the price of an infantry that is needed to take
+    // Half the value of the best planet left to claim (Lodor, 3.2) is the price of an infantry that is needed to take
     // it, but only if a ship of the seat can reach it: without ships nothing can.
     @Test
     void anInfantryIsNeededOnlyForAPlanetAShipCanReach() {
@@ -77,7 +78,7 @@ class ExploreOutlookTest extends BaseTi4Test {
         assertThat(need()).isZero();
 
         carrierAtSite();
-        assertThat(need()).isCloseTo(0.5 * 3.6, within(EXACT));
+        assertThat(need()).isCloseTo(0.5 * ValueScale.spendable(3, 1), within(EXACT));
     }
 
     // A transport that can pick up other ground forces (here at home) leaves the infantry free.

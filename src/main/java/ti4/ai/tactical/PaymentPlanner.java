@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.eval.ValueScale;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.scoring.Pooling;
@@ -21,7 +22,7 @@ class PaymentPlanner {
     private static final String SPEND_PREFIX = "spend_";
     private static final String RESOURCE_SUFFIX = "_res";
     private static final String ONE_TRADE_GOOD = "reduceTG_1_res";
-    private static final double RESOURCES_PER_INFLUENCE = 2.0 / 3;
+    private static final double RESOURCES_PER_INFLUENCE = ValueScale.INFLUENCE / ValueScale.RESOURCE;
 
     static Optional<PromptButton> choosePlanet(Game game, AiPrompt payment, double owed) {
         return choosePlanet(game, Pooling.SEPARATE, payment, owed);

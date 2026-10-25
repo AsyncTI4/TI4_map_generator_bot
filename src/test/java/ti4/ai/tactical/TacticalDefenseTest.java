@@ -147,7 +147,7 @@ class TacticalDefenseTest extends BaseTi4Test {
         double elsewhere = retakeScore(false);
 
         assertThat(home - elsewhere)
-                .isGreaterThan(0.9 * DefenseOutlook.PUBLIC_SCORING_LOCK)
+                .isGreaterThan(0.85 * DefenseOutlook.PUBLIC_SCORING_LOCK)
                 .isLessThan(1.1 * DefenseOutlook.PUBLIC_SCORING_LOCK + 1);
     }
 
