@@ -96,6 +96,7 @@ public class TacticalPlanner {
     private static final int STAGING_CANDIDATES = 4;
     private static final int STAGING_TILES_PER_TARGET = 2;
     static final double ATTACK_MIN_SCORE = 4.0;
+    static final double NEUTRAL_ATTACK_MIN_SCORE = 2.5;
     private static final double DISTANCE_COST = 0.2;
     private static final double PLANET_TEMPO_VALUE = 0.8;
     private static final double APPROACH_SHARE = 0.5;
@@ -1603,16 +1604,21 @@ public class TacticalPlanner {
         return Optional.ofNullable(best);
     }
 
+    static double attackMinScore(Player opponent) {
+        return opponent.isNeutral() ? NEUTRAL_ATTACK_MIN_SCORE : ATTACK_MIN_SCORE;
+    }
+
     private static void addDistinct(List<Candidate> finalists, Candidate candidate) {
         if (finalists.stream().noneMatch(found -> found == candidate)) finalists.add(candidate);
     }
 
     static Optional<TacticalPlan> fullPlan(Context context, Tile tile, Candidate candidate) {
         if (candidate.estimate().spaceWin() < candidate.strike().rules().landMinWin()) return Optional.empty();
-        StrikeValue value = context.offense()
-                .evaluate(candidate.strike(), candidate.estimate(), candidate.terms(), true, ATTACK_MIN_SCORE);
+        double minimum = attackMinScore(candidate.strike().opponent());
+        StrikeValue value =
+                context.offense().evaluate(candidate.strike(), candidate.estimate(), candidate.terms(), true, minimum);
         double score = value.score() - CapacityUse.loneHaulerPenalty(context.seat, candidate.moves());
-        if (score < ATTACK_MIN_SCORE) return Optional.empty();
+        if (score < minimum) return Optional.empty();
         return Optional.of(new TacticalPlan(
                 Kind.ATTACK,
                 tile.getPosition(),
@@ -2026,7 +2032,7 @@ public class TacticalPlanner {
                             new UnitMove(position, BoardView.SPACE, type, BoardView.count(space, context.seat, type)))
                     .toList();
             double future = futureScore(context, styx, opponent, origin, List.of(), cargo);
-            if (future < ATTACK_MIN_SCORE) return 0.0;
+            if (future < attackMinScore(opponent)) return 0.0;
             int steps = context.stageGroup(origin).stream()
                     .mapToInt(move -> stepsToTarget(context, origin, styx, move.type(), FRACTURE_STAGE_LEAD))
                     .max()
@@ -2071,7 +2077,7 @@ public class TacticalPlanner {
             Context context, Tile target, Tile staging, Tile origin, int lead) {
         Game game = context.game;
         Player seat = context.seat;
-        List<UnitMove> ships = context.stageGroup(origin).stream()
+        List<UnitMove> slow = context.stageGroup(origin).stream()
                 .filter(move -> context.reaches(origin, staging, move.type()))
                 .filter(move -> context.reach(staging, lead * BoardView.moveValue(seat, move.type()))
                         .containsKey(target.getPosition()))
@@ -2080,9 +2086,12 @@ public class TacticalPlanner {
                         || stepsToTarget(context, staging, target, move.type(), lead)
                                 < stepsToTarget(context, origin, target, move.type(), lead + 1))
                 .toList();
-        if (ships.isEmpty()) return Optional.empty();
+        if (slow.isEmpty()) return Optional.empty();
+        List<UnitMove> ships = new ArrayList<>(slow);
+        if (lead > 1) ships.addAll(escorts(context, origin, staging, target, slow, lead));
         boolean planetsToTake = !enemyPlanets(game, seat, target).isEmpty()
-                || !freePlanetsIn(context, target).isEmpty();
+                || !freePlanetsIn(context, target).isEmpty()
+                || entersTheFractureToStrike(context, target);
         int capacity = capacityOf(seat, ships);
         int groundRoom = lead > 1 ? Math.min(capacity, FractureCampaign.INFANTRY) : capacity;
         List<UnitMove> cargo = planetsToTake
@@ -2094,6 +2103,24 @@ public class TacticalPlanner {
         departing.addAll(cargo);
         return legalMoves(context, origin, staging, departing)
                 .map(moves -> new Contribution(origin, group, cargo, moves));
+    }
+
+    private static List<UnitMove> escorts(
+            Context context, Tile origin, Tile staging, Tile target, List<UnitMove> slow, int lead) {
+        return context.stageGroup(origin).stream()
+                .filter(move -> !slow.contains(move))
+                .filter(move -> move.type() != UnitType.Fighter)
+                .filter(move -> context.reaches(origin, staging, move.type()))
+                .filter(move -> context.reach(
+                                staging, FRACTURE_STAGE_LEAD * BoardView.moveValue(context.seat, move.type()))
+                        .containsKey(target.getPosition()))
+                .toList();
+    }
+
+    private static boolean entersTheFractureToStrike(Context context, Tile target) {
+        return target.isFracture()
+                && target.getPlanetUnitHolders().isEmpty()
+                && FracturePrize.interest(context.game, context.seat) > 0;
     }
 
     private static List<UnitMove> fightersAboard(Context context, Tile origin, int room) {
@@ -2117,7 +2144,7 @@ public class TacticalPlanner {
         Player seat = context.seat;
         Tile staging = gathering.staging();
         double future = futureScore(context, target, opponent, staging, gathering.ships(), gathering.cargo());
-        if (future < ATTACK_MIN_SCORE) return Optional.empty();
+        if (future < attackMinScore(opponent)) return Optional.empty();
         boolean diplomacy = context.defense().standings().holdsUnplayedDiplomacy(opponent)
                 && target.getPlanetUnitHolders().stream()
                         .anyMatch(planet -> BoardView.controller(context.game, planet.getName()) == opponent

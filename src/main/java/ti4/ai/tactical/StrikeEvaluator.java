@@ -263,7 +263,9 @@ class StrikeEvaluator {
             int hits = L4Disruptors.shieldsInvaders(seat)
                     ? 0
                     : (int) Math.round(BattleMath.spaceCannonHits(opponent, planet));
-            int sent = defenders == 0 ? Math.min(ground, hits + 1) : ground;
+            int sent = defenders == 0
+                    ? Math.min(ground, hits + 1)
+                    : Math.min(ground, Math.max(defenders + 1, ground - laterLandingNeed(planets, planet, opponent)));
             Map<UnitType, Integer> landing = new EnumMap<>(UnitType.class);
             landing.putAll(remaining);
             trim(landing, sent);
@@ -409,6 +411,15 @@ class StrikeEvaluator {
         second.forEach((type, count) -> merged.merge(type, count, Integer::sum));
         merged.values().removeIf(count -> count <= 0);
         return merged;
+    }
+
+    private static int laterLandingNeed(List<Planet> planets, Planet planet, Player opponent) {
+        int need = 0;
+        for (Planet later : planets.subList(planets.indexOf(planet) + 1, planets.size())) {
+            int defenders = count(groundOn(later, opponent));
+            if (defenders > 0) need += defenders + 1;
+        }
+        return need;
     }
 
     private static int count(Map<UnitType, Integer> units) {
