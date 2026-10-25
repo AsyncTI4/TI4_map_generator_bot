@@ -535,6 +535,8 @@ public final class Constants {
     public static final String PLANET_WIN_RATES = "planet_win_rates";
     public static final String SUPPORT_WIN_RATES = "support_win_rates";
     public static final String SCORING = "scoring";
+    public static final String POK_ONLY = "pok_only";
+    public static final String POK_COMPARE = "pok_compare";
     public static final String SEND_DEBT = "send_debt";
     public static final String DEBT_COUNT = "debt_count";
     public static final String REMOVE_DEBT = "remove_debt";
