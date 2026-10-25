@@ -62,6 +62,10 @@ public class CombatCardRules {
         return DirectHitRules.afterCannon(context);
     }
 
+    public static Optional<AiDecision> cancelHits(AiTurnContext context) {
+        return HitCancelCards.cancelHits(context);
+    }
+
     static boolean outdated(AiTurnContext context, String key) {
         Game game = context.game();
         return !"action".equalsIgnoreCase(game.getPhaseOfGame())

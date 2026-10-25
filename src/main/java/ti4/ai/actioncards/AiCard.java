@@ -62,6 +62,7 @@ record AiCard(
         AGENDA_WHEN,
         AGENDA_AFTER,
         COMBAT_ROUND,
+        HIT_ASSIGNMENT,
         PRODUCTION
     }
 

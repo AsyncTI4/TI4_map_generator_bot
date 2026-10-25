@@ -105,7 +105,7 @@ public class AiActionCards {
                                     null,
                                     List.of(),
                                     null)),
-                    CombatCards.all().stream())
+                    Stream.concat(CombatCards.all().stream(), HitCancelCards.all().stream()))
             .toList();
 
     public static boolean usable(String alias) {
@@ -177,6 +177,10 @@ public class AiActionCards {
             String key, KeepFloor keepFloor, String resolveHandler, List<String> targetPrefixes, TargetStep target) {
         return new AiCard(
                 key, key::equals, Window.COMBAT_ROUND, NEVER, keepFloor, resolveHandler, targetPrefixes, target);
+    }
+
+    static AiCard hitAssignment(String key, List<String> targetPrefixes, TargetStep target) {
+        return new AiCard(key, key::equals, Window.HIT_ASSIGNMENT, NEVER, PRIOR, null, targetPrefixes, target);
     }
 
     static AiCard production(String key, Predicate<String> matches) {

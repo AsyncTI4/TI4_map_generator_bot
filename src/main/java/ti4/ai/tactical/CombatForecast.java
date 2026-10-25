@@ -1,9 +1,11 @@
 package ti4.ai.tactical;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -129,6 +131,16 @@ public class CombatForecast {
         Force attack = CombatForces.force(
                 seat, CombatForces.combatants(game, tile, planet, attacking, defending, Map.of()), true);
         return CombatOdds.resolve(attack, defence).attackerWins();
+    }
+
+    public static boolean landingFacesSpaceCannon(Game game, Player seat, String position, Collection<String> planets) {
+        Tile tile = game.getTileByPosition(position);
+        if (tile == null) return false;
+        return planets.stream()
+                .map(tile.getUnitHolders()::get)
+                .filter(Objects::nonNull)
+                .anyMatch(planet -> game.getRealPlayers().stream()
+                        .anyMatch(other -> other != seat && BattleMath.spaceCannonHits(other, planet) > 0));
     }
 
     public record FirstRoundGain(double gain, double winChance) {
