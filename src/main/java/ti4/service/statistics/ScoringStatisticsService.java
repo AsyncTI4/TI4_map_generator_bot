@@ -15,6 +15,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
+import ti4.game.Game;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.game.WinningPathBreakdown;
@@ -50,7 +51,7 @@ public class ScoringStatisticsService {
     private static void showScoring(SlashCommandInteractionEvent event) {
         List<WinningPathBreakdown> winningPaths = new ArrayList<>();
         ConsumeGameUtility.consumeAllGames(
-                GameStatisticsFilterer.getStandardCompetitiveGamesFilter(),
+                GameStatisticsFilterer.getStandardCompetitiveGamesFilter().and(Game::isThundersEdge),
                 game -> game.getWinner()
                         .ifPresent(winner -> winningPaths.add(WinningPathHelper.breakDownWinningPath(game, winner))),
                 ExecutionLockType.READ);
@@ -60,8 +61,8 @@ public class ScoringStatisticsService {
 
     static String buildReport(List<WinningPathBreakdown> winningPaths) {
         StringBuilder report = new StringBuilder("## __**Scoring statistics**__\n");
-        report.append("_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario games with"
-                + " winners._\n");
+        report.append("_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario Thunder's Edge"
+                + " games with winners._\n");
         if (winningPaths.isEmpty()) {
             return report.append("No games matched.\n").toString();
         }
