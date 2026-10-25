@@ -22,8 +22,8 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.fow.FowScoringStatusService;
 import ti4.service.game.EndedGameScoringGuardService;
@@ -72,8 +72,9 @@ public class ScorePublicObjectiveService {
                     player.getFactionEmoji() + ", no such public objective ID found, or already scored, please retry.");
         } else {
             StatusHelper.recordObjectiveScored(game, player, id, "PUBLIC");
+            int tgBefore = player.getTg();
             informAboutScoring(event, channel, game, player, poID);
-            ThirtyKExploreHooks.afterPublicObjectiveScored(game, player, id);
+            ThirtyKExploreHooks.afterPublicObjectiveScored(game, player, id, tgBefore);
             if (player.hasAbility("primordial")) {
                 KaloraAbilityHandler.primordial(player, game);
             }

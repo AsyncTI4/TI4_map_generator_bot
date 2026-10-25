@@ -6,7 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import lombok.experimental.UtilityClass;
 import org.junit.jupiter.api.Assertions;
-import ti4.image.ImageHelper;
+import ti4.image.io.ImageEncoder;
 
 @UtilityClass
 public class ImageTestHelper {
@@ -35,7 +35,7 @@ public class ImageTestHelper {
         Assertions.assertNotNull(img);
         try (FileOutputStream fileOutputStream = new FileOutputStream(path)) {
             long before = new File(path).lastModified();
-            byte[] imageBytes = ImageHelper.writePng(img);
+            byte[] imageBytes = ImageEncoder.png(img);
             fileOutputStream.write(imageBytes);
             long after = new File(path).lastModified();
             Assertions.assertNotEquals(before, after);

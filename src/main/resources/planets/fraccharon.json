@@ -1,0 +1,30 @@
+{
+    "id": "charon",
+    "tileId": null,
+    "name": "Charon",
+    "aliases": [
+        "charon",
+        "char"
+    ],
+    "positionInTile": null,
+    "resources": 1,
+    "influence": 2,
+    "factionHomeworld": null,
+    "planetType": "LIGHTNING",
+    "cardImagePath": null,
+    "techSpecialties": ["CYBERNETIC"],
+    "legendaryAbilityName": "Shades in Heat and Frost",
+    "legendaryAbilityText": "After you move 1 of your ships out of Charon's system and into a non-home system, you may move the Charon token with it. During space combat, if this planet is not exhausted, it may particpate as if it were a ship. When you would assign a hit to this planet, exhaust it instead.",
+    "planetLayout": {
+        "unitHolderName": "charon",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 72,
+            "y": 58
+        },
+        "planetRadius": 52
+    },
+    "contrastColor": "orange",
+    "flavourText": "*A shattered world of extreme thermal violence, floating through the dark like a jagged, burning eye.*",
+    "source": "merford"
+}

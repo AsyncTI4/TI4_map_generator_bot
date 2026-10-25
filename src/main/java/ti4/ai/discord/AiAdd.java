@@ -10,8 +10,8 @@ import ti4.ai.seat.AiSeatService;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 class AiAdd extends GameStateSubcommand {
 

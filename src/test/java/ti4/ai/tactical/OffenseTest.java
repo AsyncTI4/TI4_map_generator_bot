@@ -14,7 +14,7 @@ import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // The offensive planner on whole boards: which strikes it plans, and what each term of the strike's value says.
@@ -64,7 +64,7 @@ class OffenseTest extends BaseTi4Test {
     }
 
     private static List<String> neighbours(String position) {
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate))
                 .toList();
     }

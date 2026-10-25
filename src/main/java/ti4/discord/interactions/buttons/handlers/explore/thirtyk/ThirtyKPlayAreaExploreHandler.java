@@ -16,8 +16,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.thirtyk.ThirtyKCards;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
@@ -35,6 +35,8 @@ public class ThirtyKPlayAreaExploreHandler {
     private static final String RESEARCH = "thirtyKPlayAreaResearch_";
     private static final String GAIN_TECH = "thirtyKPlayAreaGainTech_";
     private static final String RICH_HOSTAGES_PURGE = "thirtyKRichHostagesPurge_";
+    private static final String REFUND = "r";
+    private static final String NO_REFUND = "n";
 
     private static final Map<String, PlayAreaCard> START_OF_TURN_CARDS = Map.of(
             "subjectivityequasion30k", PlayAreaCard.research(TechnologyType.PROPULSION),
@@ -54,9 +56,9 @@ public class ThirtyKPlayAreaExploreHandler {
         }
     }
 
-    public static void moveToPlayArea(GenericInteractionCreateEvent event, Game game, Player player, String cardID) {
-        game.purgeExplore(cardID);
-        String baseId = ThirtyKCards.baseId(cardID);
+    public static void moveToPlayArea(GenericInteractionCreateEvent event, Game game, Player player, String drawnID) {
+        game.purgeExplore(drawnID);
+        String baseId = ThirtyKCards.baseId(drawnID);
         player.addRelic(baseId);
         MessageHelper.sendMessageToEventChannel(
                 event,
@@ -184,7 +186,7 @@ public class ThirtyKPlayAreaExploreHandler {
                 buttons);
     }
 
-    public static void offerRichHostages(Game game, Player player, String objectiveID) {
+    public static void offerRichHostages(Game game, Player player, String objectiveID, boolean tradeGoodsSpent) {
         if (!player.hasRelic(RICH_HOSTAGES)) return;
         PublicObjectiveModel objective = Mapper.getPublicObjective(objectiveID);
         if (objective == null || objective.getPoints() == null || objective.getPoints() != 1) return;
@@ -195,7 +197,10 @@ public class ThirtyKPlayAreaExploreHandler {
                         + objective.getName() + "_ by 3.",
                 List.of(
                         Buttons.green(
-                                player.factionButtonChecker() + RICH_HOSTAGES_PURGE + objectiveID,
+                                player.factionButtonChecker()
+                                        + RICH_HOSTAGES_PURGE
+                                        + (tradeGoodsSpent ? REFUND : NO_REFUND)
+                                        + objectiveID,
                                 "Purge Rich Hostages (-3 Cost)"),
                         ThirtyKExploreSupport.decline(player)));
     }
@@ -203,11 +208,15 @@ public class ThirtyKPlayAreaExploreHandler {
     @ButtonHandler(RICH_HOSTAGES_PURGE)
     public static void richHostagesPurge(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (!player.hasRelic(RICH_HOSTAGES)) return;
-        String objectiveID = buttonID.substring(RICH_HOSTAGES_PURGE.length());
+        String payload = buttonID.substring(RICH_HOSTAGES_PURGE.length());
+        boolean encoded = (payload.startsWith(REFUND) || payload.startsWith(NO_REFUND))
+                && Mapper.getPublicObjective(payload.substring(1)) != null;
+        boolean refund = encoded && payload.startsWith(REFUND);
+        String objectiveID = encoded ? payload.substring(1) : payload;
         player.removeRelic(RICH_HOSTAGES);
         PublicObjectiveModel objective = Mapper.getPublicObjective(objectiveID);
         String name = objective == null ? objectiveID : objective.getName();
-        if (name.contains("Negotiate Trade Routes")) {
+        if (refund) {
             ButtonHelperStats.gainTGs(event, game, player, 3, false);
         }
         MessageHelper.sendMessageToChannel(
@@ -232,6 +241,14 @@ public class ThirtyKPlayAreaExploreHandler {
         game.setStoredValue(key, marker);
         Player winner = remaining.getFirst();
         ButtonHelperStats.gainTGs(event, game, loser, 2, false);
+        if (winner.isNeutral()) {
+            MessageHelper.sendMessageToChannel(
+                    loser.getCorrectChannel(),
+                    "Your crews salvage the wreckage of the _MacGuffin Outpost_ convoy: "
+                            + loser.getRepresentationNoPing() + " gains 2 trade goods. The neutral victors gain"
+                            + " nothing.");
+            return;
+        }
         ButtonHelperStats.gainTGs(event, game, winner, 2, false);
         FoWHelper.notifyPlayerAndAffectedInFog(
                 game,

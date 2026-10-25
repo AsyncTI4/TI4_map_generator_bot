@@ -17,11 +17,11 @@ import ti4.ai.AiTestGame;
 import ti4.ai.eval.MovementGraph;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
-import ti4.image.TileHelper;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.TileHelper;
 import ti4.service.tech.ListTechService;
 import ti4.testUtils.BaseTi4Test;
 
@@ -350,9 +350,9 @@ class ResearchPlanTest extends BaseTi4Test {
         String asteroids = asteroidSystem();
         test.place("01", AiTestGame.HOME);
         String middle = AiTestGame.neighbourOf(AiTestGame.HOME);
-        String beyond = PositionMapper.getAdjacentTilePositions(middle).stream()
+        String beyond = MapPositionMapper.getAdjacentTilePositions(middle).stream()
                 .filter(position -> !"x".equals(position) && !AiTestGame.HOME.equals(position))
-                .filter(position -> !PositionMapper.getAdjacentTilePositions(AiTestGame.HOME)
+                .filter(position -> !MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME)
                         .contains(position))
                 .findFirst()
                 .orElseThrow();

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -18,11 +19,11 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
+import ti4.model.Mapper;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.service.emoji.CardEmojis;
@@ -36,13 +37,25 @@ public class AgendaRiderHelper {
 
     @ButtonHandler("reverse_")
     public static void reverseRider(String buttonID, Game game, Player player) {
+        reverseRider(buttonID, game, player, player);
+    }
+
+    public static void reverseRider(String buttonID, Game game, Player announcer, @Nullable Player riderOwner) {
         String choice = buttonID.substring(buttonID.indexOf('_') + 1);
-        String voteMessage = player.getFactionEmojiOrColor() + " Chose to reverse the " + choice + ".";
+        Player reversing = riderOwner == null ? announcer : riderOwner;
+        String voteMessage = reversing.getFactionEmojiOrColor() + " Chose to reverse the " + choice + ".";
 
-        // TODO: removes this rider for every faction, not only the cancelled player's (matters with two copies in play)
-        rewriteVotes(game, piece -> !piece.contains(choice), null);
+        rewriteVotes(game, piece -> !isRiderOf(piece, riderOwner, choice), null);
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), voteMessage);
+        MessageHelper.sendMessageToChannel(reversing.getCorrectChannel(), voteMessage);
+    }
+
+    private static boolean isRiderOf(String piece, @Nullable Player riderOwner, String rider) {
+        if (!piece.contains(rider)) return false;
+        if (riderOwner == null) return true;
+        String identifier = piece.split("_")[0];
+        return identifier.equalsIgnoreCase(riderOwner.getFaction())
+                || identifier.equalsIgnoreCase(riderOwner.getColor());
     }
 
     @ButtonHandler("eraseMyRiders")

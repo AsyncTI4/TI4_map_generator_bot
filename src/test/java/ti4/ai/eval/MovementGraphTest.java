@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 class MovementGraphTest extends BaseTi4Test {
@@ -21,9 +21,9 @@ class MovementGraphTest extends BaseTi4Test {
         test = new AiTestGame();
         test.nekroHome();
         middle = AiTestGame.neighbourOf(AiTestGame.HOME);
-        beyond = PositionMapper.getAdjacentTilePositions(middle).stream()
+        beyond = MapPositionMapper.getAdjacentTilePositions(middle).stream()
                 .filter(position -> !"x".equals(position) && !AiTestGame.HOME.equals(position))
-                .filter(position -> !PositionMapper.getAdjacentTilePositions(AiTestGame.HOME)
+                .filter(position -> !MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME)
                         .contains(position))
                 .findFirst()
                 .orElseThrow();

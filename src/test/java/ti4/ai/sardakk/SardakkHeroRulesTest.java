@@ -145,7 +145,7 @@ class SardakkHeroRulesTest extends BaseTi4Test {
     }
 
     private String otherNeighbourOfHome() {
-        return ti4.image.PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        return ti4.model.MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position) && test.game.getTileByPosition(position) == null)
                 .findFirst()
                 .orElseThrow();

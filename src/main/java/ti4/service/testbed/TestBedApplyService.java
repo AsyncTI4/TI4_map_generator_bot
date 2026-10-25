@@ -12,16 +12,17 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Helper;
-import ti4.image.BoardPosition;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
+import ti4.model.BoardPosition;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.CardPick;
@@ -61,6 +62,10 @@ public class TestBedApplyService {
         if (game.isFowMode()) prepareFog(game, plans, event.getMember(), warnings);
         for (SeatPlan plan : plans) {
             setUpSeat(game, plan, event, warnings);
+            if (plan.seat().isTeamMateYou()) {
+                plan.player().addTeamMateID(event.getUser().getId());
+                game.setCommunityMode(true);
+            }
         }
         AddTileListService.finishSetup(game, event);
         Helper.setOrder(game);
@@ -169,7 +174,9 @@ public class TestBedApplyService {
         for (int i = 0; i < seats.size(); i++) {
             Seat seat = seats.get(i);
             boolean isDeveloperSeat = i == 0 && preset.getYou() != null;
-            Player player = isDeveloperSeat ? developerPlayer(game, developer) : addVirtualSeat(game);
+            Player player = isDeveloperSeat
+                    ? developerPlayer(game, developer)
+                    : seat.isBotAccount() ? botAccountPlayer(game) : addVirtualSeat(game);
             String faction = seat.hasRandomFaction() ? randomFactions.removeFirst() : seat.getFaction();
             String home = seat.getHome() != null ? seat.getHome() : freeHomes.removeFirst();
             boolean speaker = seat.isSpeaker() || (!anySpeaker && i == 0);
@@ -202,6 +209,13 @@ public class TestBedApplyService {
     private static Player developerPlayer(Game game, User developer) {
         Player existing = game.getPlayer(developer.getId());
         return existing != null ? existing : game.addPlayer(developer.getId(), developer.getName());
+    }
+
+    private static Player botAccountPlayer(Game game) {
+        if (JdaService.jda == null) return addVirtualSeat(game);
+        User bot = JdaService.jda.getSelfUser();
+        Player existing = game.getPlayer(bot.getId());
+        return existing != null ? existing : game.addPlayer(bot.getId(), bot.getName());
     }
 
     private static Player addVirtualSeat(Game game) {

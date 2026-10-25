@@ -11,7 +11,7 @@ import ti4.ai.AiTestGame;
 import ti4.ai.secrets.SecretDrawValue;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 // A deck is worth the average of its cards still to be drawn, each valued in resources: attachments by the resources

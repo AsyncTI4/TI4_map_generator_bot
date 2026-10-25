@@ -198,7 +198,7 @@ final class ScoringDiagnostic {
                 Map<String, Integer> bySeat = new HashMap<>();
                 for (String objective : game.getRevealedPublicObjectives().keySet()) {
                     if (ObjectivePolicy.hasScored(game, seat, objective)) continue;
-                    if (ti4.image.Mapper.getPublicObjective(objective) == null) continue;
+                    if (ti4.model.Mapper.getPublicObjective(objective) == null) continue;
                     bySeat.put(
                             objective,
                             publicStanding(game, seat, wallet, objective).shortBy());
@@ -271,7 +271,7 @@ final class ScoringDiagnostic {
             List<String> crowdedList = new ArrayList<>();
             for (String objective : game.getRevealedPublicObjectives().keySet()) {
                 if (ObjectivePolicy.hasScored(game, seat, objective)) continue;
-                if (ti4.image.Mapper.getPublicObjective(objective) == null) continue;
+                if (ti4.model.Mapper.getPublicObjective(objective) == null) continue;
                 Standing standing = publicStanding(game, seat, wallet, objective);
                 list.add(standing);
                 Optional<SpendCost> cost = ObjectiveCatalog.spendCost(objective);
@@ -310,7 +310,7 @@ final class ScoringDiagnostic {
         ti4.ai.scoring.Footprint before = value.before();
         Wallet wallet = Wallet.of(game, seat);
         List<String> open = game.getRevealedPublicObjectives().keySet().stream()
-                .filter(id -> ti4.image.Mapper.getPublicObjective(id) != null)
+                .filter(id -> ti4.model.Mapper.getPublicObjective(id) != null)
                 .filter(id -> !ObjectivePolicy.hasScored(game, seat, id))
                 .filter(id -> !ObjectivePolicy.qualifies(game, seat, wallet, id))
                 .filter(id -> ListPlayerInfoService.getObjectiveThreshold(id, game) > 0)

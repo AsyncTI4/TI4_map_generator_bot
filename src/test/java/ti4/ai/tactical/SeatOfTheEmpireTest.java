@@ -11,7 +11,7 @@ import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Occupy the Seat of the Empire needs the Mecatol Rex holder to have 3 ships in its system. Fighters are ships, so a
@@ -34,7 +34,7 @@ class SeatOfTheEmpireTest extends BaseTi4Test {
         test.nekro.setTacticalCC(3);
         rex = test.place("18", MECATOL);
         test.nekro.addPlanet("mr");
-        ring = PositionMapper.getAdjacentTilePositions(MECATOL).stream()
+        ring = MapPositionMapper.getAdjacentTilePositions(MECATOL).stream()
                 .filter(position -> !"x".equals(position))
                 .toList();
     }

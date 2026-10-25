@@ -18,7 +18,7 @@ import ti4.game.Tile;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.service.turn.StartTurnService;
 import ti4.testUtils.BaseTi4Test;
 
@@ -153,7 +153,7 @@ class TradeFlowSelfPlayTest extends BaseTi4Test {
         /** A ship of {@code visitor} in a system next to {@code host}'s home makes them neighbours. */
         static void beside(Game game, Player host, Player visitor) {
             Tile home = host.getHomeSystemTile();
-            Tile next = PositionMapper.getAdjacentTilePositions(home.getPosition()).stream()
+            Tile next = MapPositionMapper.getAdjacentTilePositions(home.getPosition()).stream()
                     .map(game::getTileByPosition)
                     .filter(tile -> tile != null && tile != home)
                     .findFirst()

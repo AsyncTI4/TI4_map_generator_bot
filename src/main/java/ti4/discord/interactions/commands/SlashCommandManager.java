@@ -11,6 +11,7 @@ import ti4.discord.interactions.commands.admin.AdminCommand;
 import ti4.discord.interactions.commands.agenda.AgendaCommand;
 import ti4.discord.interactions.commands.async.AsyncCommand;
 import ti4.discord.interactions.commands.bothelper.BothelperCommand;
+import ti4.discord.interactions.commands.bothelper.BothelperCommand2;
 import ti4.discord.interactions.commands.breakthrough.BreakthroughCommand;
 import ti4.discord.interactions.commands.button.GenericButtonCommand;
 import ti4.discord.interactions.commands.cardsac.ACCardsCommand;
@@ -28,14 +29,11 @@ import ti4.discord.interactions.commands.franken.FrankenCommand;
 import ti4.discord.interactions.commands.frankendraz.FrankenDrazCommand;
 import ti4.discord.interactions.commands.game.GameCommand;
 import ti4.discord.interactions.commands.help.HelpCommand;
-import ti4.discord.interactions.commands.installation.InstallationCommand;
+import ti4.discord.interactions.commands.homebrew.HomebrewCommand;
 import ti4.discord.interactions.commands.lazax.LazaxCommand;
 import ti4.discord.interactions.commands.leaders.LeaderCommand;
-import ti4.discord.interactions.commands.ll.LostLegaciesCommand;
 import ti4.discord.interactions.commands.map.MapCommand;
 import ti4.discord.interactions.commands.milty.MiltyCommand;
-import ti4.discord.interactions.commands.monuments.MonumentsCommand;
-import ti4.discord.interactions.commands.omega_phase.OmegaPhaseCommand;
 import ti4.discord.interactions.commands.planet.PlanetCommand;
 import ti4.discord.interactions.commands.player.PlayerCommand;
 import ti4.discord.interactions.commands.plot.FrankenCommand2;
@@ -63,7 +61,6 @@ import ti4.discord.interactions.commands.tokens.RemoveTokenCommand;
 import ti4.discord.interactions.commands.transaction.TransactionCommand;
 import ti4.discord.interactions.commands.uncategorized.AllInfoCommand;
 import ti4.discord.interactions.commands.uncategorized.CardsInfoCommand;
-import ti4.discord.interactions.commands.uncategorized.SelectionBoxDemoCommand;
 import ti4.discord.interactions.commands.uncategorized.ShowDistancesCommand;
 import ti4.discord.interactions.commands.uncategorized.ShowGameCommand;
 import ti4.discord.interactions.commands.units.AddUnitDamage;
@@ -115,6 +112,7 @@ public class SlashCommandManager {
                     new TestBedCommand(),
                     new AiCommand(),
                     new BothelperCommand(),
+                    new BothelperCommand2(),
                     new PlayerCommand(),
                     new GameCommand(),
                     new ACCardsCommand(),
@@ -126,13 +124,11 @@ public class SlashCommandManager {
                     new SpecialCommand(),
                     new Special2Command(),
                     new LeaderCommand(),
-                    new LostLegaciesCommand(),
+                    new HomebrewCommand(),
                     new CombatCommand(),
                     new CustomCommand(),
                     new FOWCommand(),
-                    new InstallationCommand(),
                     new MiltyCommand(),
-                    new MonumentsCommand(),
                     new FrankenCommand(),
                     new FrankenDrazCommand(),
                     new CaptureCommand(),
@@ -145,12 +141,10 @@ public class SlashCommandManager {
                     new BreakthroughCommand(),
                     new FrankenCommand2(),
                     new PlanetCommand(),
-                    new SelectionBoxDemoCommand(),
                     new UserCommand(),
                     new LazaxCommand(),
                     new TiglCommand(),
                     new AsyncCommand(),
-                    new OmegaPhaseCommand(),
                     new DraftCommand(),
                     new SpinCommand())
             .collect(Collectors.toMap(ParentCommand::getName, command -> command));

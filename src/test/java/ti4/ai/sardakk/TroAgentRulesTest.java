@@ -16,7 +16,7 @@ import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // T'ro An (the N'orr agent) refreshes every round, so an unused agent is a waste; the bot spends it at the end of its
@@ -78,7 +78,7 @@ class TroAgentRulesTest extends BaseTi4Test {
 
     @Test
     void reinforcesAPlanetAnEnemyFleetCanReach() {
-        String adjacent = PositionMapper.getAdjacentTilePositions(position).stream()
+        String adjacent = MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate) && test.game.getTileByPosition(candidate) == null)
                 .findFirst()
                 .orElseThrow();

@@ -13,7 +13,7 @@ import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // An advance parks a carrier and its infantry in an empty system to reach planets next activation. Instead of refusing
@@ -236,8 +236,8 @@ class AdvanceExposureTest extends BaseTi4Test {
             test.game.setRound(3);
             String originPosition = AiTestGame.HOME;
             String targetPosition = AiTestGame.neighbourOf(originPosition);
-            List<String> nearOrigin = PositionMapper.getAdjacentTilePositions(originPosition);
-            List<String> nearTarget = PositionMapper.getAdjacentTilePositions(targetPosition);
+            List<String> nearOrigin = MapPositionMapper.getAdjacentTilePositions(originPosition);
+            List<String> nearTarget = MapPositionMapper.getAdjacentTilePositions(targetPosition);
             String enemyPosition = nearTarget.stream()
                     .filter(position ->
                             !"x".equals(position) && !originPosition.equals(position) && !nearOrigin.contains(position))
@@ -315,8 +315,8 @@ class AdvanceExposureTest extends BaseTi4Test {
     }
 
     private String twoSystemsFromHome() {
-        List<String> nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
-        return PositionMapper.getAdjacentTilePositions(neighbour).stream()
+        List<String> nearHome = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        return MapPositionMapper.getAdjacentTilePositions(neighbour).stream()
                 .filter(position ->
                         !"x".equals(position) && !AiTestGame.HOME.equals(position) && !nearHome.contains(position))
                 .findFirst()
@@ -324,9 +324,9 @@ class AdvanceExposureTest extends BaseTi4Test {
     }
 
     private String besideNeighbourAwayFromHome() {
-        List<String> nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        List<String> nearHome = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
         String goal = twoSystemsFromHome();
-        return PositionMapper.getAdjacentTilePositions(neighbour).stream()
+        return MapPositionMapper.getAdjacentTilePositions(neighbour).stream()
                 .filter(position -> !"x".equals(position)
                         && !AiTestGame.HOME.equals(position)
                         && !nearHome.contains(position)

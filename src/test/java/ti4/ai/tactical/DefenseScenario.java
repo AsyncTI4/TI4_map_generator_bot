@@ -6,7 +6,7 @@ import ti4.ai.eval.BoardView;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 
 /**
  * The board most defence tests share: Nekro's home (Mordai II, one planet, a space dock) in round 4 with three tactical
@@ -60,8 +60,8 @@ final class DefenseScenario {
     }
 
     String beyondStaging() {
-        var nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
-        return PositionMapper.getAdjacentTilePositions(stagingPosition).stream()
+        var nearHome = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        return MapPositionMapper.getAdjacentTilePositions(stagingPosition).stream()
                 .filter(candidate -> !"x".equals(candidate)
                         && !AiTestGame.HOME.equals(candidate)
                         && !nearHome.contains(candidate)
@@ -71,7 +71,7 @@ final class DefenseScenario {
     }
 
     String otherNeighbourOfHome() {
-        return PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        return MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(candidate -> !"x".equals(candidate) && !stagingPosition.equals(candidate))
                 .findFirst()
                 .orElseThrow();

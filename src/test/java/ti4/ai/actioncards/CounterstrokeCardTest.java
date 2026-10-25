@@ -21,10 +21,10 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class CounterstrokeCardTest extends BaseTi4Test {
@@ -66,10 +66,10 @@ class CounterstrokeCardTest extends BaseTi4Test {
         table.ships(table.nekro, stranded, UnitType.Carrier, 1);
         table.test.units(stranded, "space", table.nekro, UnitType.Infantry, 2);
         stranded.addCC(ccId());
-        String beyond = ti4.image.PositionMapper.getAdjacentTilePositions(stranded.getPosition()).stream()
+        String beyond = ti4.model.MapPositionMapper.getAdjacentTilePositions(stranded.getPosition()).stream()
                 .filter(candidate -> !"x".equals(candidate))
                 .filter(candidate -> !AiTestGame.HOME.equals(candidate))
-                .filter(candidate -> !ti4.image.PositionMapper.getAdjacentTilePositions(AiTestGame.HOME)
+                .filter(candidate -> !ti4.model.MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME)
                         .contains(candidate))
                 .findFirst()
                 .orElseThrow();

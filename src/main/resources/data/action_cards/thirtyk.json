@@ -8,7 +8,7 @@
         "flavorText": "Gurno Aggero never cared which fleet burned. He only cared that the right one was still flying when the smoke cleared.",
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "Offered in the space combat card list. Pick a player with ships in the active system; if they are the only one with ships left after hits are assigned, you gain 4 trade goods. Check the both-flagships condition yourself. Wins by retreat are not detected and the bet ends with the turn. If both fleets die, the bot may pay out before the last hits are assigned; correct that by hand."
+        "automationNotes": "Offered in the space combat card list. Pick a player with ships in the active system; you may back yourself or the neutral player. If no system is active, pick the combat system first. If your pick is the only one with ships left after hits are assigned, you gain 4 trade goods. Check the both-flagships condition yourself. Wins by retreat are not detected and the bet ends with the turn. If both fleets die, the bot may pay out before the last hits are assigned; correct that by hand."
     },
     {
         "alias": "extendedcampaigning30k",
@@ -37,11 +37,11 @@
         "name": "Final Stand",
         "phase": "Action",
         "window": "At the start of a round of ground combat",
-        "text": "For the rest of this ground combat, if it is on a planet you control and you have exactly 1 infantry there, roll additional dice equal to that planet's influence.",
+        "text": "For the rest of ground combat on a planet you control, if you have exactly 1 infantry on a planet and no other ground forces, you roll additional dice equal to the planet's influence.",
         "flavorText": "The last Letnev trooper on the ridge primed every charge she had left, and waited for the Sol marines to learn how expensive one soldier could be.",
         "source": "thirtyk",
-        "automation": "PARTIAL",
-        "automationNotes": "Gives a roll button per planet where you have exactly 1 infantry; press it once each ground combat round to roll extra dice equal to the influence (each roll posts the button for the next round). Assign those hits yourself."
+        "automation": "FULL",
+        "automationNotes": "Pick the planet of the ground combat. While you have exactly 1 infantry and no other ground forces there, the extra dice are added to your normal ground combat rolls."
     },
     {
         "alias": "publicreprimand30k",
@@ -73,7 +73,7 @@
         "flavorText": "The Jol-Nar archivists filed a formal protest, then quietly dispatched a retrieval team before the fragments could be lost forever.",
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "Players who are not neighbors of a player purging fragments get a play prompt; you then gain up to 2 of the purged fragments. The purging player's own effect still resolves."
+        "automationNotes": "Players who are not neighbors of a player purging fragments get a play prompt; you then gain up to 2 of the purged fragments. The purging player's own effect still resolves. Only purges made with the explore fragment buttons are seen; /relic purge_fragments and other purges need a manual fix."
     },
     {
         "alias": "devisiveplot30k",
@@ -81,11 +81,10 @@
         "phase": "Action",
         "window": "When you win a ground combat against a player who has an unplayed strategy card",
         "text": "You may perform the secondary ability of that strategy card, using a strategy token from your reinforcements.",
-        "notes": "The token is spent from your strategy pool, not taken from your reinforcements.",
         "flavorText": "While the defenders counted their dead, Yssaril agents were already reading the orders on their war council's table.",
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "Pick the player and their unplayed strategy card; 1 token leaves your strategy pool and you get that card's secondary buttons. Check the ground combat win yourself; cards without secondary buttons resolve manually."
+        "automationNotes": "Pick the player and their unplayed strategy card. If you have a command token in your reinforcements, you get that card's secondary buttons and your strategy pool is not touched; with none, the card has no effect. Check the ground combat win yourself. Homebrew strategy cards without secondary buttons are resolved by hand."
     },
     {
         "alias": "conflagration30k1",
@@ -93,7 +92,6 @@
         "phase": "Action",
         "window": "After another player gains control of a planet you control",
         "text": "Destroy all but 1 of that player's infantry on that planet.",
-        "notes": "Mechs are not affected.",
         "flavorText": "\"Leave them nothing but ash,\" Adjudicator Ba'al ordered, and the last shuttles lifted off through a wall of flame.",
         "source": "thirtyk",
         "automation": "FULL"
@@ -104,8 +102,7 @@
         "phase": "Action",
         "window": "After another player gains control of a planet you control",
         "text": "Destroy all but 1 of that player's infantry on that planet.",
-        "notes": "Mechs are not affected.",
-        "flavorText": "The Barony did not retreat from Arc Prime. It simply made sure there was nothing left worth taking.",
+        "flavorText": "The invaders took the capital by nightfall. By dawn, the fuel depots beneath their new barracks had done the rest.",
         "source": "thirtyk",
         "automation": "FULL"
     },
@@ -260,7 +257,7 @@
         "name": "Folding of Spacetime",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 system on the edge of the game board. Each player who has ships in that system may move those ships to another system on the edge of the game board that does not contain other players' ships.",
+        "text": "Target a system on the edge of the game board. Each player with ships in this system may move these ships to any other system on the edge of the game board not containing another player's ships.",
         "flavorText": "The Creuss call it a shortcut. Everyone who has ever been dragged through one calls it something else.",
         "source": "thirtyk",
         "automation": "PARTIAL",
@@ -286,7 +283,8 @@
         "notes": "On a planet with more than one trait, you choose which exploration deck to reveal.",
         "flavorText": "The Empyrean charts showed worlds no Council delegate had ever visited, and, for a price, the way there.",
         "source": "thirtyk",
-        "automation": "FULL"
+        "automation": "FULL",
+        "automationNotes": "Uncontrolled planets and your own planets are not offered."
     },
     {
         "alias": "distantmapsjmsc2",
@@ -297,7 +295,8 @@
         "notes": "On a planet with more than one trait, you choose which exploration deck to reveal.",
         "flavorText": "Old Lazax cartographers left their charts unfinished. The blank spaces sold for more than the rest.",
         "source": "thirtyk",
-        "automation": "FULL"
+        "automation": "FULL",
+        "automationNotes": "Uncontrolled planets and your own planets are not offered."
     },
     {
         "alias": "unverifiedforgeriesjmsc",
@@ -305,7 +304,6 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose 1 player whose home system is more than 5 hexes away from yours. That player may spend 2 trade goods. If they are able to and do not, you may take up to 2 of their relic fragments.",
-        "notes": "If the player has fewer than 2 trade goods, they are not able to spend them and this card has no effect.",
         "flavorText": "The Jol-Nar appraiser declared the fragment authentic. The Yin forger who had made it was quietly relieved.",
         "source": "thirtyk",
         "automation": "FULL"
@@ -316,6 +314,7 @@
         "phase": "Agenda",
         "window": "After a player whose home system is more than 5 hexes away from yours casts votes during the agenda phase",
         "text": "Cast 5 additional votes for the outcome that player voted for.",
+        "notes": "You cast these 5 votes yourself, in the same window as that player's vote.",
         "flavorText": "Justice, the Xxcha say, is a matter of perspective. From far enough away, any verdict looks fair.",
         "source": "thirtyk",
         "automation": "PARTIAL",
@@ -327,6 +326,7 @@
         "phase": "Agenda",
         "window": "After a player whose home system is more than 5 hexes away from yours casts votes during the agenda phase",
         "text": "Cast 5 additional votes for the outcome that player voted for.",
+        "notes": "You cast these 5 votes yourself, in the same window as that player's vote.",
         "flavorText": "The Winnu magistrate ruled from a world so distant that the verdict arrived after the war it settled.",
         "source": "thirtyk",
         "automation": "PARTIAL",
@@ -347,31 +347,30 @@
         "alias": "ultimatetrickshotjmsc1",
         "name": "Ultimate Trickshot",
         "phase": "Action",
-        "window": "When a player uses Sustain Damage in the active system, if that system is more than 5 hexes away from your home system and does not contain your units",
+        "window": "When a player uses SUSTAIN DAMAGE in the active system, if that system is more than 5 hexes away from your home system and does not contain your units",
         "text": "Destroy that unit.",
         "flavorText": "From four systems away, a lone gunship took the shot. The dreadnought's shields had been holding. Then they weren't.",
         "source": "thirtyk",
         "automation": "MANUAL",
-        "automationNotes": "Not automated. Destroy the unit yourself when the window applies."
+        "automationNotes": "Listed under Check Combat Action Cards. The window also opens outside combat, for example against space cannon hits during movement; play it from your hand then. Destroy the unit yourself."
     },
     {
         "alias": "ultimatetrickshotjmsc2",
         "name": "Ultimate Trickshot",
         "phase": "Action",
-        "window": "When a player uses Sustain Damage in the active system, if that system is more than 5 hexes away from your home system and does not contain your units",
+        "window": "When a player uses SUSTAIN DAMAGE in the active system, if that system is more than 5 hexes away from your home system and does not contain your units",
         "text": "Destroy that unit.",
         "flavorText": "The Mentak gunner never confirmed the kill. She was already pouring the drinks before the debris finished drifting.",
         "source": "thirtyk",
         "automation": "MANUAL",
-        "automationNotes": "Not automated. Destroy the unit yourself when the window applies."
+        "automationNotes": "Listed under Check Combat Action Cards. The window also opens outside combat, for example against space cannon hits during movement; play it from your hand then. Destroy the unit yourself."
     },
     {
         "alias": "cumulativesupportjmsc",
         "name": "Cumulative Support",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 planet. Place infantry on that planet equal to its distance from your home system, to a maximum of 4.",
-        "notes": "Any planet can be chosen, not only planets you control.",
+        "text": "Place infantry on a planet containing no other player's units equal to its distance from your home system, up to a maximum distance of 4.",
         "flavorText": "Every world the Sol fleet passed added a few more volunteers. By the end of the journey, they were an army.",
         "source": "thirtyk",
         "automation": "FULL"
@@ -407,7 +406,7 @@
         "flavorText": "Something stirred on the Fracture's broken worlds: shapes that wore the faces of soldiers, marching under no banner at all.",
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "Pay 2 influence with the payment buttons, then pick a Fracture planet for 2 neutral infantry. If another player has units there, start the invasion and ground combat yourself."
+        "automationNotes": "Pay 2 influence with the payment buttons, then pick a Fracture planet for 2 neutral infantry. If players have ground forces there, the bot starts the ground combat against the planet's controller first; fight any other player there afterwards with /combat start_combat. If only structures are there, resolve the invasion by hand."
     },
     {
         "alias": "creationofgloryjmsc",
@@ -418,7 +417,8 @@
         "notes": "You gain exactly the revealed relic; abilities that change how you draw relics do not apply.",
         "flavorText": "The Titans of Ul raised a monument to their own legend, and in its foundations unearthed something older still.",
         "source": "thirtyk",
-        "automation": "FULL"
+        "automation": "FULL",
+        "automationNotes": "Pay with the payment buttons; the bot does not check the amount."
     },
     {
         "alias": "propheticdeclarationjmsc",
@@ -429,7 +429,8 @@
         "notes": "You gain exactly the revealed relic; abilities that change how you draw relics do not apply.",
         "flavorText": "\"It was foretold,\" the Yin Brotherhood proclaimed as their acolytes carried the relic from the vault. Few dared ask who had written the prophecy.",
         "source": "thirtyk",
-        "automation": "FULL"
+        "automation": "FULL",
+        "automationNotes": "Pay with the payment buttons; the bot does not check the amount."
     },
     {
         "alias": "resourcecondensationjmsc",
@@ -440,6 +441,7 @@
         "notes": "You gain exactly the revealed relic; abilities that change how you draw relics do not apply.",
         "flavorText": "The L1Z1X recalled two entire battle groups to fund the excavation. The Harrow's arithmetic, as always, was flawless.",
         "source": "thirtyk",
-        "automation": "FULL"
+        "automation": "FULL",
+        "automationNotes": "The relic is gained first; then remove the 2 command tokens with the buttons."
     }
 ]

@@ -1,5 +1,6 @@
 package ti4.service.turn;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,10 +31,12 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.game.MonumentsService;
 import ti4.service.unit.AddUnitService;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 @UtilityClass
 public class PassService {
@@ -50,7 +53,7 @@ public class PassService {
 
         player.setPassed(true);
         ThirtyKSecretHooks.onPassed(game, player);
-        GameEventService.commit(game, GameEventType.TURN, player, Map.of("passed", true));
+        GameEventService.commit(game, GameEventType.TURN, player, TurnActionLog.turnPayload(game, true));
         ButtonHelperFactionSpecific.offerDeathBinding(game, player);
         SarcosaHeroHandler.offerPassAbility(game, player);
         NiflheimLegendaryButtonHandler.offerHvergelmirsHaze(event, game, player);
@@ -61,6 +64,19 @@ public class PassService {
         }
         ButtonHelperActionCards.checkForPlayingBountyContracts(game, player);
         ButtonHelperActionCards.checkForPlayingStrategicFocus(game, player);
+        if (player.getPlanets().contains("petra")
+                && !player.getExhaustedPlanetsAbilities().contains("petra")) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "planetAbilityExhaust_petra",
+                    "Use " + Mapper.getPlanet("petra").getLegendaryAbilityName()));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", you may exhaust _Petra_ to explore 1 planet you control.",
+                    buttons);
+        }
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Passed.");

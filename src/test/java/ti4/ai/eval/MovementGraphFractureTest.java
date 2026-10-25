@@ -9,7 +9,7 @@ import ti4.ai.AiTestGame;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.service.map.FractureService;
 import ti4.testUtils.BaseTi4Test;
 
@@ -58,8 +58,8 @@ class MovementGraphFractureTest extends BaseTi4Test {
 
     @Test
     void ingressSystemsAreOnlyJoinedThroughAnEgressSystem() {
-        Tile other =
-                test.place("28", PositionMapper.getAdjacentTilePositions("000").getFirst());
+        Tile other = test.place(
+                "28", MapPositionMapper.getAdjacentTilePositions("000").getFirst());
         other.addToken(Constants.TOKEN_INGRESS, "space");
 
         assertThat(reach(ingress, 1)).doesNotContainKey(other.getPosition());

@@ -3,7 +3,6 @@ package ti4.service.turn;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
@@ -14,10 +13,9 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.actioncards.acd2.FracturedRealityAcd2ButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.TnelisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
@@ -46,6 +44,7 @@ import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.service.actioncard.DisableService;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
 import ti4.service.game.EndPhaseService;
@@ -58,6 +57,7 @@ import ti4.service.tactical.postmovement.AtokeraHeroButton;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 @UtilityClass
 public class EndTurnService {
@@ -88,8 +88,10 @@ public class EndTurnService {
     }
 
     public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
+        WarGamesBrActionCardHandler.clear(game);
+        DisableService.clear(game);
+        KaltrimUnitHandler.clearShrineInfantryRemovalState(game);
         UydaiUnitHandler.offerDeathCommandosPlacement(event, game, player);
-        if (NetrunnersBreakthroughHandler.offerDataBreachTechnology(game, player)) return;
         if (StringUtils.isNotEmpty(game.getCurrentActiveSystem())
                 && game.getStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED)
                         .isEmpty()) {
@@ -100,7 +102,7 @@ public class EndTurnService {
         for (Tile tile : game.getTileMap().values()) {
             TeHelperGeneral.addStationsToPlayArea(event, game, tile);
         }
-        GameEventService.commit(game, GameEventType.TURN, player, Map.of("passed", false));
+        GameEventService.commit(game, GameEventType.TURN, player, TurnActionLog.turnPayload(game, false));
         pingNextPlayer(event, game, player);
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
         if (!game.isFowMode()) {
@@ -145,7 +147,6 @@ public class EndTurnService {
         JotunheimLegendaryService.clear(game, player);
         game.removeStoredValue("safeHarborUsed");
         game.removeStoredValue("heartWarnedThisTurn");
-        FracturedRealityAcd2ButtonHandler.clearPendingRolls(game);
         ThirtyKTurnState.clearEndOfTurn(game);
         game.removeStoredValue(LostLegciesExploreHandler.IMMEDIATE_ASSEMBLY_PRODUCTION + player.getFaction());
         String fieldTestTech = game.getStoredValue("fieldTestTech" + player.getFaction());
@@ -156,14 +157,6 @@ public class EndTurnService {
                     player.getCorrectChannel(),
                     player.getRepresentationNoPing()
                             + " lost temporary access to their _Field Test_ technology at the end of their turn.");
-        }
-        String proxyTech = game.getStoredValue("netrunnersProxyTech" + player.getFaction());
-        if (!proxyTech.isEmpty()) {
-            NetrunnersAbilitiesHandler.clearProxyNetwork(game, player);
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationNoPing()
-                            + " lost temporary access to their **Proxy Network** copied technology.");
         }
         game.setActiveSystem("");
     }

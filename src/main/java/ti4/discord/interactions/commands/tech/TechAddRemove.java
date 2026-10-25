@@ -11,8 +11,8 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.service.leader.CommanderUnlockCheckService;
 
@@ -39,7 +39,7 @@ abstract class TechAddRemove extends GameStateSubcommand {
         parseParameter(event, player, event.getOption(Constants.TECH3));
         parseParameter(event, player, event.getOption(Constants.TECH4));
 
-        CommanderUnlockCheckService.checkPlayer(player, "nekro", "jolnar");
+        CommanderUnlockCheckService.checkPlayer(player, "nekro", "netrunners", "jolnar");
     }
 
     private void parseParameter(SlashCommandInteractionEvent event, Player player, OptionMapping techOption) {

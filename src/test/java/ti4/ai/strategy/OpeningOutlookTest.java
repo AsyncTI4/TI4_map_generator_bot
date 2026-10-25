@@ -9,7 +9,7 @@ import ti4.ai.AiTestGame;
 import ti4.ai.strategy.OpeningOutlook.Boost;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Round 1 is about taking as much of the slice as possible. The opening outlook plays the round's expansions out from
@@ -197,23 +197,23 @@ class OpeningOutlookTest extends BaseTi4Test {
     }
 
     private static List<String> allBeyond(String position) {
-        List<String> nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        List<String> nearHome = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate ->
                         !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate) && !nearHome.contains(candidate))
                 .toList();
     }
 
     private String otherNeighbour() {
-        return PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        return MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position) && !position.equals(neighbour))
                 .findFirst()
                 .orElseThrow();
     }
 
     private static String beyond(String position) {
-        List<String> nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        List<String> nearHome = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate ->
                         !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate) && !nearHome.contains(candidate))
                 .findFirst()

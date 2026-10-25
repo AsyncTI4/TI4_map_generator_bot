@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
@@ -260,6 +261,9 @@ public class AddUnitService {
         }
         if (unitKey.unitType() == UnitType.Aurelion) {
             ThronesUnitHandler.syncAurelionStation(game, player);
+        }
+        if (player.hasUnit("stoneborn_flagship") && unitKey.unitType() == UnitType.Flagship) {
+            StonebornUnitHandler.syncMobileMountain(game, player);
         }
         if (player.ownsUnit("veylor_mech")) {
             VeylorUnitHandler.checkVeylorMech(game);

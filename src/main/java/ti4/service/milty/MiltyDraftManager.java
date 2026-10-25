@@ -25,13 +25,13 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiltyDraftEmojis;
@@ -364,6 +364,8 @@ public class MiltyDraftManager {
             return false;
         }
 
+        MiltyDraftEventRecorder.recordPick(game, player, category, item, pickSource(auto, force, queue));
+
         // Send success message
         String middle = " drafted ";
         if (auto) middle = " only had one option available to draft, so they were given ";
@@ -439,6 +441,13 @@ public class MiltyDraftManager {
             game.updateActivePlayer(null);
         }
         return mapChanged;
+    }
+
+    private static String pickSource(boolean auto, boolean force, boolean queue) {
+        if (auto) return "AUTO";
+        if (force) return "FORCE";
+        if (queue) return "QUEUE";
+        return "BUTTON";
     }
 
     private String getQueuedPick(Player player, Game game) {
@@ -703,7 +712,7 @@ public class MiltyDraftManager {
             MiltyDraftHelper.addDraftTile(this, tileId);
             TileModel tileRequested = TileHelper.getTileById(tileId);
             if (tileRequested == null) {
-                throw new Exception("Could not find tile for tile ID [" + id + "]");
+                throw unknownTile(id);
             }
             Set<ComponentSource> currentsources = all.stream()
                     .map(t -> t.getTile().getTileModel().getSource())
@@ -718,9 +727,15 @@ public class MiltyDraftManager {
                     .findFirst()
                     .orElse(null);
             if (result == null) {
-                throw new Exception("Could not find tile for tile ID [" + id + "]");
+                throw unknownTile(id);
             }
         }
         return result;
+    }
+
+    private static Exception unknownTile(String id) {
+        String shown = id.length() > 40 ? id.substring(0, 40) + "..." : id;
+        return new Exception("Could not find tile `" + shown
+                + "`. Separate tiles within a slice with commas and slices with `;` or `|`.");
     }
 }

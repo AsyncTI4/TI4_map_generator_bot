@@ -21,8 +21,8 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
 
 @UtilityClass
 class PlanetTargetCards {

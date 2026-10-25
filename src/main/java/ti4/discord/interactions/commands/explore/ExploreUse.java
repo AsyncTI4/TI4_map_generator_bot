@@ -14,8 +14,8 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.explore.ExploreService;
 
 class ExploreUse extends GameStateSubcommand {

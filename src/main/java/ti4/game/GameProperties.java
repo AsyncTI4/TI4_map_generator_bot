@@ -74,6 +74,7 @@ public class GameProperties {
     private String pendingSubEventsJson = "";
     // Undo-safe compact movement captured when tactical displacement is committed.
     private String pendingMovementState = "";
+    private String lastPlayerStateJson = "";
     private String latestCommand = "";
     private String latestOutcomeVotedFor = "";
     private String playersWhoHitPersistentNoAfter = "";
@@ -211,6 +212,7 @@ public class GameProperties {
     // Decks
     private List<String> secretObjectives;
     private List<String> actionCards;
+    private List<String> hydromorphicCards = new ArrayList<>();
     private List<String> agendas;
     private List<String> mandates;
     private List<String> events; // ignis_aurora

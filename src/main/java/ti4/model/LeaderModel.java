@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;

@@ -16,9 +16,9 @@ import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -62,6 +62,11 @@ public class ShowActionCardsService {
 
         String actionCardText = getActionCardDiscardPileText(game, viewer, showFullText);
         sb.append(actionCardText);
+
+        String metamorphicText = getMetamorphicDiscardText(game, showFullText);
+        if (metamorphicText != null) {
+            sb.append("\n\n").append(metamorphicText);
+        }
 
         // Cards on Data Skimmer or Garbozia are private to the player holding them.
         if (!hideUnplayed) {
@@ -121,6 +126,17 @@ public class ShowActionCardsService {
         if (!dataSkimmer.isEmpty()) {
             String title = "Action cards on " + FactionEmojis.Ralnel + " _Data Skimmer_";
             return acDiscardText(showFullText, dataSkimmer, title, game);
+        }
+        return null;
+    }
+
+    public static String getMetamorphicDiscardText(Game game, boolean showFullText) {
+        List<Entry<String, Integer>> metamorphic = game.getDiscardActionCards().entrySet().stream()
+                .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.morphabt)
+                .toList();
+        if (!metamorphic.isEmpty()) {
+            String title = "Action cards on " + FactionEmojis.morpha + " _Metamorphic_";
+            return acDiscardText(showFullText, metamorphic, title, game);
         }
         return null;
     }

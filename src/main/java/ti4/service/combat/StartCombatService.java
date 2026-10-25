@@ -25,18 +25,18 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnosisLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionTargetingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.base.yin.YinImpulseCoreButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaPnHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.ToldarTechHandler;
@@ -50,6 +50,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousLeadersHandler;
@@ -70,6 +71,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.Ka
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -94,13 +96,16 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
+import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.helpers.twilight_kart.TkHelperGenomes;
-import ti4.image.Mapper;
-import ti4.image.TileGenerator;
+import ti4.image.tile.SystemContextImage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -228,6 +233,11 @@ public class StartCombatService {
             Tile tile,
             GenericInteractionCreateEvent event,
             String specialCombatTitle) {
+        if ("-war-games".equals(specialCombatTitle)) {
+            WarGamesBrActionCardHandler.beginCombat(game, player, tile);
+        } else {
+            WarGamesBrActionCardHandler.clear(game);
+        }
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
         XinCommanderHandler.beginCombat(game, tile, Constants.SPACE);
         if (CombatContestSettings.isEnabledStatic()) {
@@ -279,9 +289,12 @@ public class StartCombatService {
             GenericInteractionCreateEvent event,
             UnitHolder unitHolder,
             Tile tile) {
+        WarGamesBrActionCardHandler.clear(game);
         XinTechHandler.offerAstromanticCloakStarButtons(game, player, unitHolder, unitHolder.getName());
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
         XinCommanderHandler.beginCombat(game, tile, unitHolder.getName());
+        ThirtyKActionCardHooks.onGroundCombatStart(game, unitHolder);
+        ThirtyKSecretHooks.onGroundCombatStart(game, unitHolder);
         String threadName = combatThreadName(game, player, player2, tile, null);
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
@@ -446,8 +459,7 @@ public class StartCombatService {
         }
 
         int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);
-        FileUpload systemWithContext =
-                new TileGenerator(game, event, null, context, tile.getPosition(), player1).createFileUpload();
+        FileUpload systemWithContext = SystemContextImage.upload(game, event, context, tile.getPosition(), player1);
 
         // Create the thread
         String finalThreadName = threadName;
@@ -520,7 +532,7 @@ public class StartCombatService {
             context = 0;
         }
         if (file == null) {
-            file = new TileGenerator(game, event, null, context, tile.getPosition(), player1).createFileUpload();
+            file = SystemContextImage.upload(game, event, context, tile.getPosition(), player1);
         }
 
         message.append("\nImage of System:");
@@ -586,8 +598,14 @@ public class StartCombatService {
         // General Space Combat
         sendGeneralCombatButtonsToThread(
                 threadChannel, game, player1, player2, tile, spaceOrGround, unitHolderName, event);
-        NetrunnersAbilitiesHandler.announceMimeticOverride(player1, player2, threadChannel);
-        NetrunnersAbilitiesHandler.announceMimeticOverride(player2, player1, threadChannel);
+        boolean hasTwoMechsInSystem = tile.getUnitHolders().values().stream()
+                        .mapToInt(holder -> holder.getUnitCount(UnitType.Mech, player1.getColor()))
+                        .sum()
+                >= 2;
+        boolean opponentHasTwoMechsInSystem = tile.getUnitHolders().values().stream()
+                        .mapToInt(holder -> holder.getUnitCount(UnitType.Mech, player2.getColor()))
+                        .sum()
+                >= 2;
         if (!game.isFowMode()) {
             if (player1.getPlayableActionCards().isEmpty()) {
                 MessageHelper.sendMessageToChannel(
@@ -624,6 +642,12 @@ public class StartCombatService {
                                     + " your opponent has _Ado Citadel_ on this planet and thus is the only player to make combat rolls during the first round of combat."
                                     + "\n-# This is not automated.");
                 }
+            }
+            if (player1.hasTech("nfc")) {
+                BlueReverieTechHelper.sendNearFieldCloakingCombatMessages(threadChannel, game, player1, player2);
+            }
+            if (player2.hasTech("nfc")) {
+                BlueReverieTechHelper.sendNearFieldCloakingCombatMessages(threadChannel, game, player2, player1);
             }
             String ms2 = StartTurnService.getMissedSCFollowsText(game, player1);
             if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
@@ -680,6 +704,18 @@ public class StartCombatService {
                             player2.getRepresentation()
                                     + ", a reminder that your opponent has the Man O’ War here, and so you (and all other players) cannot play action cards during this space combat.");
                 }
+                if (ButtonHelper.doesPlayerHaveMechHere("morpha_mech", player2, tile) && opponentHasTwoMechsInSystem) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player1.getRepresentation()
+                                    + ", a reminder that your opponent has 2 _Vacuole_ in this system, and so you (and all other players) cannot play action cards during this combat.");
+                }
+                if (ButtonHelper.doesPlayerHaveMechHere("morpha_mech", player1, tile) && hasTwoMechsInSystem) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player2.getRepresentation()
+                                    + ", a reminder that your opponent has 2 _Vacuole_ in this system, and so you (and all other players) cannot play action cards during this combat.");
+                }
             }
         }
 
@@ -701,11 +737,24 @@ public class StartCombatService {
                             .anyMatch(unit -> unit != null && "ponthous_mech".equals(unit.getId()))) {
                 PonthousUnitHandler.offerDragoonsReminder(threadChannel, player2);
             }
+            if (ButtonHelper.doesPlayerHaveMechHere("morpha_mech", player2, tile) && opponentHasTwoMechsInSystem) {
+                MessageHelper.sendMessageToChannel(
+                        threadChannel,
+                        player1.getRepresentation()
+                                + ", a reminder that your opponent has 2 _Vacuole_ in this system, and so you (and all other players) cannot play action cards during this combat.");
+            }
+            if (ButtonHelper.doesPlayerHaveMechHere("morpha_mech", player1, tile) && hasTwoMechsInSystem) {
+                MessageHelper.sendMessageToChannel(
+                        threadChannel,
+                        player2.getRepresentation()
+                                + ", a reminder that your opponent has 2 _Vacuole_ in this system, and so you (and all other players) cannot play action cards during this combat.");
+            }
         }
 
         if (isGroundCombat && !game.isFowMode()) {
             List<Button> autoButtons = new ArrayList<>();
             boolean thalnos = false;
+            List<Player> playersWithX89 = new ArrayList<>();
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                 if (!uH.getName().equalsIgnoreCase(unitHolderName)) {
                     continue;
@@ -747,6 +796,9 @@ public class StartCombatService {
                     if (player.hasRelic("thalnos")) {
                         thalnos = true;
                     }
+                    if (!playersWithX89.contains(player) && player.hasTech("x89c4")) {
+                        playersWithX89.add(player);
+                    }
 
                     String magenFmt = "%s, a reminder to use _%s_. The button should be above, ";
                     magenFmt += "but it (and SPACE CANNON) are not part of automated ground combat.";
@@ -776,6 +828,12 @@ public class StartCombatService {
                             " One of you may have __The Crown of Thalnos__, and thus not wish to automate the combat.";
                 }
                 MessageHelper.sendMessageToChannelWithButtons(threadChannel, automMessage, autoButtons);
+                for (Player p : playersWithX89) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            "This is a reminder that " + p.getRepresentationNoPing()
+                                    + " has X89 and thus their ground forces' hits will be doubled.");
+                }
             }
         }
         // DS Lanefir ATS Armaments
@@ -897,8 +955,7 @@ public class StartCombatService {
             Tile tile,
             GenericInteractionCreateEvent event,
             String spaceOrGround) {
-        FileUpload systemWithContext =
-                new TileGenerator(game, event, null, 0, tile.getPosition(), player).createFileUpload();
+        FileUpload systemWithContext = SystemContextImage.upload(game, event, 0, tile.getPosition(), player);
 
         // Use existing thread, if it exists
         TextChannel textChannel = player.getPrivateChannel();
@@ -1145,7 +1202,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButton(
                         player.getCardsInfoThread(),
                         player.getRepresentation()
-                                + ", a reminder that if you win this combat, you may give _Plunderers_ to your opponent to take up to 2 trade goods or commodities from them.",
+                                + ", a reminder that if you win this combat, you must give _Plunderers_ to your opponent to take up to 2 trade goods or commodities from them.",
                         SarcosaPnHandler.offerPlunderersButton(player, otherPlayer));
             }
             if ((player.hasAbility("primacy")
@@ -1773,10 +1830,26 @@ public class StartCombatService {
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p2, tile);
             XinUnitHandler.addSentinelRepairButton(buttons, p1, tile, combatHolder);
             XinUnitHandler.addSentinelRepairButton(buttons, p2, tile, combatHolder);
+            BlueReverieTechHelper.addAtmanWeaveSuppressorsButton(buttons, p1, tile);
+            BlueReverieTechHelper.addAtmanWeaveSuppressorsButton(buttons, p2, tile);
         }
         if (isGroundCombat) {
             ThurvialiBreakthroughHandler.addNeurograftingReadyButtons(buttons, p1);
             ThurvialiBreakthroughHandler.addNeurograftingReadyButtons(buttons, p2);
+        }
+        BlueReverieArtifactRelicHandler.addHazardousArtifactCombatButton(buttons, p1, pos);
+        if (p2 != p1) {
+            BlueReverieArtifactRelicHandler.addHazardousArtifactCombatButton(buttons, p2, pos);
+        }
+        BlueReverieTechHelper.addStasisFieldGeneratorsButton(buttons, p1);
+        BlueReverieTechHelper.addStasisFieldGeneratorsButton(buttons, p2);
+        MorphaBreakthroughHandler.addMetamorphicCombatButton(buttons, game, p1);
+        if (!game.isFowMode() && p2 != p1) {
+            MorphaBreakthroughHandler.addMetamorphicCombatButton(buttons, game, p2);
+        }
+        NetrunnersTechHandler.addMimeticOverrideCombatButton(buttons, p1);
+        if (!game.isFowMode() && p2 != p1) {
+            NetrunnersTechHandler.addMimeticOverrideCombatButton(buttons, p2);
         }
         if ("justPicture".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Buttons.blue(
@@ -1829,14 +1902,6 @@ public class StartCombatService {
                         p2.factionButtonChecker() + "applytempcombatmod__" + "tech" + "__" + "sc",
                         "Use Supercharge",
                         FactionEmojis.Naaz));
-            }
-        }
-        if (p1.hasTechReady("beironats") || (!game.isFowMode() && p2.hasTechReady("beironats"))) {
-            if (p1.hasTechReady("beironats")) {
-                IronFactionTechsHandler.addAdvancedTargetingSystemsButton(buttons, game, p1, p2, pos, groundOrSpace);
-            }
-            if (!game.isFowMode() && p2.hasTechReady("beironats")) {
-                IronFactionTechsHandler.addAdvancedTargetingSystemsButton(buttons, game, p2, p1, pos, groundOrSpace);
             }
         }
         checkAndAddSubatomicButton(game, p1, isSpaceCombat, tile, buttons);

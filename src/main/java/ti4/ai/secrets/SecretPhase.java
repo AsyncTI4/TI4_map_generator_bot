@@ -1,6 +1,6 @@
 package ti4.ai.secrets;
 
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.SecretObjectiveModel;
 
 public enum SecretPhase {

@@ -5,7 +5,7 @@
     "type": "agent",
     "name": "Xal'thuun",
     "title": "Dream-Seeker",
-    "abilityWindow": "During the \"Movement\" step of any players tactical action:",
+    "abilityWindow": "During the \"Movement\" step of any players tactical action",
     "abilityText": "You may exhaust this card to allow that player to choose 1 non-home system that contains an anomaly. That player ignores any movement effects of that anomaly in that system during this tactical action.",
     "unlockCondition": "Always Unlocked",
     "source": "beans"
@@ -16,9 +16,9 @@
     "type": "commander",
     "name": "Thul'morah",
     "title": "The Awakened One",
-    "abilityWindow": "When you cast votes on an agenda:",
+    "abilityWindow": "When you cast votes on an agenda",
     "abilityText": "Cast an additional number of votes equal to the number of planets in systems that contain 1 or more of your nexus tokens.",
-    "unlockCondition": "Have ships in 2 different, non-nebula systems that contain an anomaly.",
+    "unlockCondition": "Have ships in 2 different non-nebula anomalies.",
     "source": "beans"
   },
   {
@@ -29,7 +29,7 @@
     "title": "The Nightmare Made Flesh",
     "abilityName": "Reality Unbound - Unknown Geometries",
     "abilityWindow": "ACTION:",
-    "abilityText": "Place or move up to 3 of your nexus tokens into any non-home system other than the Mecatol Rex system. Then, you may place your flagship and up to 3 destroyers in any system that contains a planet you control. If that system contains another player's ships, resolve combat. Then, purge this card.",
+    "abilityText": "Place or move up to 3 nexus tokens into any non-home systems. Then, you may place your flagship and up to 3 destroyers in any system that contains a planet you control. If that system contains another player's ships, resolve combat. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans"
   },
@@ -39,7 +39,7 @@
     "type": "agent",
     "name": "Shardwright Veyla",
     "title": "Fleet Control",
-    "abilityWindow": "At the end of a player's turn:",
+    "abilityWindow": "At the end of a player's tactical action",
     "abilityText": "You may exhaust this card to allow that player to place a number of fighters from their reinforcements in the active system up to the number of non-fighter ships in that system. If that player was another player, capture that many fighters from the supply.",
     "unlockCondition": "Always Unlocked",
     "source": "beans"
@@ -50,8 +50,8 @@
     "type": "commander",
     "name": "High Architect Lumina",
     "title": "Lightkeeper",
-    "abilityWindow": "When you produce fighters:",
-    "abilityText": "You may place them in any system that contains your command tokens and no other players ships.",
+    "abilityWindow": "When you produce fighters",
+    "abilityText": "You may place them in any system that contains 1 or more of your ships, your command token, and no other players ships.",
     "unlockCondition": "Have 12 fighters on the game board.",
     "source": "beans"
   },
@@ -63,7 +63,7 @@
     "title": "Hive Mind Nexus",
     "abilityName": "Mirror - Infinite Reflections",
     "abilityWindow": "ACTION:",
-    "abilityText": "You may return any number of captured fighters from your faction sheet to place any number of units in any systems that contain at least 1 of your ships with a total cost of no more than twice the amount of fighters returned. Then, purge this card.",
+    "abilityText": "You may return any number of captured fighters from your faction sheet to place any number of units in any systems that contain at least 1 of your ships with a total cost of up to twice the amount of fighters returned. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans"
   },
@@ -73,8 +73,8 @@
     "type": "agent",
     "name": "Orrun",
     "title": "Ash-Tender",
-    "abilityWindow": "After a player's ship is destroyed during combat:",
-    "abilityText": "You may exhaust this card to allow that player to place 1 of that unit from their reinforcements in a different system that contains at least 1 of their ships and 1 of their command tokens.",
+    "abilityWindow": "After a player's ship is destroyed during combat",
+    "abilityText": "You may exhaust this card to allow that player to place 1 unit of that type from their reinforcements in a different system that contains at least 1 of their ships.",
     "unlockCondition": "Always Unlocked",
     "source": "beans"
   },
@@ -84,9 +84,9 @@
     "type": "commander",
     "name": "Karos",
     "title": "Ember-Guide",
-    "abilityWindow": "When you use your units BOMBARDMENT ability:",
-    "abilityText": "For each hit, before applying modifiers, you may either gain 1 commodity, or convert 1 of your commodities to a trade good.",
-    "unlockCondition": "Produce at least 3 hits during a BOMBARDMENT roll.",
+    "abilityWindow": "When you roll for a units' BOMBARDMENT ability",
+    "abilityText": "For each hit produced, before applying modifiers, either gain 1 commodity or convert 1 commodity to a trade good.",
+    "unlockCondition": "Produce at least 1 hit during a BOMBARDMENT roll.",
     "source": "beans"
   },
   {
@@ -97,8 +97,7 @@
     "title": "Flame-Warden",
     "abilityName": "Ashfall Effigy - Hell From Above",
     "abilityWindow": "ACTION:",
-    "abilityText": "Choose 1 system. Roll all your units BOMBARDMENT that you own against each planet in that system. Then, purge this card.",
-    "notes": "This will not automate the flagship's \"commit one captured infantry per infantry destroyed\" ability. Use `/capture remove_units` and `/add_units` to manually resolve The Pyre's ability.",
+    "abilityText": "Choose 1 system. Each of your units on the game board may use its BOMBARDMENT against each planet in that system. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans"
   },
@@ -107,9 +106,9 @@
     "faction": "iron",
     "type": "agent",
     "name": "Shipwright Kastel",
-    "title": "Master of Defense",
-    "abilityWindow": "When a non-combat game effect would instruct a player to remove or destroy one of their units:",
-    "abilityText": "You may instead exhaust this card.",
+    "title": "Master of Supply",
+    "abilityWindow": "ACTION:",
+    "abilityText": "Choose a player and exhaust this card to allow that player to resolve PRODUCTION with 1 of their units in a system that contains one of their units with PRODUCTION. Reduce the combined cost of the produced units by 1.",
     "unlockCondition": "Always Unlocked",
     "source": "beans"
   },
@@ -118,10 +117,10 @@
     "faction": "iron",
     "type": "commander",
     "name": "Captain Vakros",
-    "title": "Fleetmaster",
-    "abilityWindow": "During each combat round:",
-    "abilityText": "You may reroll your mech's combat dice.",
-    "unlockCondition": "Win a combat in which one of your mechs participated.",
+    "title": "Master of Logistics",
+    "abilityWindow": "Ongoing",
+    "abilityText": "Your mechs do not count against capacity when being transported or when in a space area that contains 1 or more of your ships with capacity. While your mechs are in the space area of a system they have PRODUCTION 1.",
+    "unlockCondition": "Have all of your mechs on the game board.",
     "source": "beans"
   },
   {
@@ -129,10 +128,10 @@
     "faction": "iron",
     "type": "hero",
     "name": "Admiral Thalen",
-    "title": "Ironborn",
+    "title": "Master of Iron",
     "abilityName": "Apex Frame - Mecha Prime",
-    "abilityWindow": "After moving 1 or more mechs and no other ships into the active system:",
-    "abilityText": "You may immediately commit each of your mechs in the active system to any number of planets in that system and resolve ground combat, if able. Then, purge this card.",
+    "abilityWindow": "ACTION:",
+    "abilityText": "Ready each planet that contains 1 of your units with PRODUCTION. Then, resolve PRODUCTION in one of those systems. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans"
   },
@@ -153,7 +152,7 @@
     "type": "commander",
     "name": "Zul",
     "title": "Grand Architect",
-    "abilityWindow": "When you explore a planet:",
+    "abilityWindow": "When you explore a planet",
     "abilityText": "Gain 1 commodity. If the explored planet has an attachment, you may convert that commodity to a trade good.",
     "unlockCondition": "Control 4 planets that have an attachment.",
     "source": "beans"
@@ -176,9 +175,8 @@
     "type": "agent",
     "name": "Zor No-ahn",
     "title": "Systems Specialist",
-    "abilityWindow": "When a player spends resources to research a technology:",
-    "abilityText": "You may exhaust this card to reduce the cost by 1 for each other player who owns that technology.",
-    "notes": "This is best used when the receiving player is actually paying for their tech, it will update once they press a button during payment after the agent has been applied.",
+    "abilityWindow": "When any player gains a technology",
+    "abilityText": "You may exhaust this card to allow that player to return that technology to their technology deck and gain 1 technology of a different color with the same number of prerequisites.",
     "unlockCondition": "Always Unlocked",
     "source": "beans"
   },
@@ -188,10 +186,9 @@
     "type": "commander",
     "name": "Tek Mir-un",
     "title": "Tech Junkie",
-    "abilityWindow": "When you perform the secondary ability of the \"Technology\" strategy card:",
-    "abilityText": "You may choose to not spend a command token. If you do spend a command token, you may exhaust a planet with a technology specialty to research a technology of the same color as the exhausted planet without spending resources.",
-    "notes": "When this is unlocked, make sure to not press \"Spend a strategy token\". Press \"Get a Technology\" instead. Then, it will offer your options for following.",
-    "unlockCondition": "Own 3 technologies in the same color.",
+    "abilityWindow": "When you perform the secondary ability of the \"Technology\" strategy card",
+    "abilityText": "You do not spend a command token.",
+    "unlockCondition": "Own 1 technology in each color owned by at least 1 other player.",
     "source": "beans"
   },
   {
@@ -202,7 +199,7 @@
     "title": "The Technocrat",
     "abilityName": "Power Surge - Network Overload",
     "abilityWindow": "ACTION:",
-    "abilityText": "Choose 1 technology you own that is owned by at least 1 other player. All other players that own that technology return that technology to their technology deck. Then, for each player's control token on your faction sheet, you may return it to gain 1 command token and 1 non-faction technology that player owns. Then, purge this card.",
+    "abilityText": "For each player that has a token on your faction sheet, you may remove it to either gain 1 of that player’s technologies, or force that player to return 1 technology of your choice to their technology deck.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans"
   },
@@ -211,10 +208,10 @@
     "faction": "natau",
     "type": "agent",
     "name": "Serael",
-    "title": "The Interperator",
+    "title": "The Shepherd",
     "unlockCondition": "Always Unlocked",
-    "abilityWindow": "At any time:",
-    "abilityText": "You may exhaust this card to allow a player to resolve the exhaust effect of 1 doctrine in your reinforcements.",
+    "abilityWindow": "After a player activates a system",
+    "abilityText": "You may exhaust this card to allow that player to choose 1 system that contains a non-home anomaly. That player may treat that system as adjacent to the active system during this tactical action.",
     "source": "beans"
   },
   {
@@ -223,9 +220,9 @@
     "type": "commander",
     "name": "Kaethos",
     "title": "The Unyielding",
-    "abilityWindow": "During the status phase:",
-    "abilityText": "You may score an additional secret objective.",
-    "unlockCondition": "Have units in or adjacent to 3 different systems that contain anomalies.",
+    "abilityWindow": "You may treat anomalies as if they contained an ingress token.",
+    "abilityText": "Ongoing",
+    "unlockCondition": "Take control of a planet in The Fracture.",
     "source": "beans"
   },
   {
@@ -234,10 +231,10 @@
     "type": "hero",
     "name": "Naethu",
     "title": "The First Voice",
-    "abilityName": "The Grand Convocation - Awakening",
+    "abilityName": "The Grand Convocation - Rebirth",
     "abilityWindow": "ACTION:",
-    "abilityText": "Place this card and all of your doctrines in your play area. During this action phase, when you exhaust one of your doctrines, ready 1 other doctrine. At the end of the status phase, return all but 2 of your doctrines to your reinforcements and purge this card.",
-    "unlockCondition": "Have 3 scored objectives:",
+    "abilityText": "Place this card near the game board. During this game round, your ships may move out of anomalies that contain your command tokens. At the end of this game round, purge this card.",
+    "unlockCondition": "Have 3 scored objectives.",
     "source": "beans"
   }
 ]

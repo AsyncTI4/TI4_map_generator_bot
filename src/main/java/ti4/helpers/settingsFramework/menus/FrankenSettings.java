@@ -26,8 +26,8 @@ import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.image.Mapper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.franken.FrankenBanList;
 import ti4.service.franken.FrankenDraftMode;
@@ -41,18 +41,8 @@ public class FrankenSettings extends SettingsMenu {
 
     private static final String MENU_ID = "franken";
     static final String STANDARD_DRAFT = "standard";
-    private static final Set<String> ALWAYS_DISABLED_FACTIONS = Set.of(
-            "lazax",
-            "admins",
-            "franken",
-            "keleresm",
-            "keleresx",
-            "miltymod",
-            "qulane",
-            "neutral",
-            "obsidian",
-            "stoneborn",
-            "morpha");
+    private static final Set<String> ALWAYS_DISABLED_FACTIONS =
+            Set.of("lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "obsidian");
 
     private final ChoiceSetting<String> draftMode;
     private final BooleanSetting force;

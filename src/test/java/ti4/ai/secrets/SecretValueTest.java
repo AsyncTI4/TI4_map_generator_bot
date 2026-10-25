@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.testUtils.BaseTi4Test;
 
@@ -325,7 +325,7 @@ class SecretValueTest extends BaseTi4Test {
     }
 
     private List<String> placeBeside(String center, String... tileIds) {
-        List<String> positions = PositionMapper.getAdjacentTilePositions(center).stream()
+        List<String> positions = MapPositionMapper.getAdjacentTilePositions(center).stream()
                 .filter(candidate -> !"x".equals(candidate) && test.game.getTileByPosition(candidate) == null)
                 .limit(tileIds.length)
                 .toList();
@@ -416,7 +416,7 @@ class SecretValueTest extends BaseTi4Test {
     }
 
     private String otherNeighbourOf(String position) {
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate))
                 .findFirst()
                 .orElseThrow();

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,7 +15,7 @@ import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.jspecify.annotations.NonNull;
 import ti4.discord.JdaService;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -35,6 +36,11 @@ public class Units {
      * </p>
      */
     public record UnitKey(UnitType unitType, String colorID) {
+
+        @Override
+        public int hashCode() {
+            return 31 * Objects.hashCode(unitType == null ? null : unitType.name()) + Objects.hashCode(colorID);
+        }
 
         @JsonIgnore
         public String getColor() {
@@ -66,7 +72,7 @@ public class Units {
             if (JdaService.testingMode) {
                 return getFileName(false);
             }
-            return getFileName(RandomHelper.isOneInX(Constants.EYE_CHANCE));
+            return getFileName(RenderRandom.oneIn("unit.destroyerEye", Constants.EYE_CHANCE));
         }
 
         public String getFileName(boolean eyes) {

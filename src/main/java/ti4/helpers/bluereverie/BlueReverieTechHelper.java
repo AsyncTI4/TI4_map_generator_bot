@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.UUID;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
+import ti4.contest.replay.core.CombatRollPayload;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -15,27 +17,748 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ActionCardHelper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.service.combat.CombatRollService;
+import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.planet.AddPlanetService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
 public class BlueReverieTechHelper {
     private static final String GRAVITY_DRIVE_STATE = "gdBrGravityDrive_";
     private static final String PRODUCTION_BIOMES_PENDING = "pmBrPending_";
+    private static final String NETWORKED_CONSTRUCTORS_PENDING = "ncBrPending_";
+    private static final String VIRAL_ENTANGLEMENT_INFANTRY_REMAINING = "veBrInfantryRemaining_";
+    private static final String STASIS_FIELD_GENERATORS_HITS = "sfgBrHits_";
+    private static final String STASIS_FIELD_GENERATORS_RELEASE = "sfgBrRelease_";
+    private static final String EE_RES_TOKEN = "attachment_positiveres.png";
+    private static final String EE_INF_TOKEN = "attachment_positiveinf.png";
+
+    public static boolean hasEcologicalEngineeringShield(Game game, Planet planet) {
+        return game.getRealPlayers().stream()
+                .anyMatch(player -> player.hasTech("ee")
+                        && player.getPlanets().contains(planet.getName())
+                        && !planet.getTechSpecialities().isEmpty());
+    }
+
+    public static void syncEcologicalEngineeringAttachments(Game game) {
+        for (Planet planet : game.getPlanetsInfo().values()) {
+            planet.removeToken(EE_RES_TOKEN);
+            planet.removeToken(EE_INF_TOKEN);
+        }
+
+        for (Player player : game.getRealPlayers()) {
+            if (!player.hasTech("ee")) {
+                continue;
+            }
+
+            for (String planetId : player.getPlanets()) {
+                Planet planet = game.getPlanetsInfo().get(planetId);
+                if (planet == null) {
+                    continue;
+                }
+
+                if (planet.getResources() == 0) {
+                    planet.addToken(EE_RES_TOKEN);
+                }
+                if (planet.getInfluence() == 0) {
+                    planet.addToken(EE_INF_TOKEN);
+                }
+            }
+        }
+    }
+
+    public static void sendNearFieldCloakingCombatMessages(
+            ThreadChannel threadChannel, Game game, Player player, Player opponent) {
+        if (!player.hasTech("nfc")) {
+            return;
+        }
+
+        List<Button> buttons = List.of(Buttons.green(
+                player.factionButtonChecker() + "nfcResolve_" + opponent.getFaction(),
+                "Resolve Near-Field Cloaking (Upon Combat Win)",
+                TechEmojis.WarfareTech));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentation()
+                        + ", if you win this combat, you may exhaust _Near-Field Cloaking_ to take 1 of your opponent's action cards at random, or ready _Near-Field Cloaking_. Press this button after the combat to resolve it.",
+                buttons);
+        MessageHelper.sendMessageToChannel(
+                threadChannel,
+                opponent.getRepresentation()
+                        + ", your opponent has _Near-Field Cloaking_. Their units cannot be destroyed by your action cards or hits produced by them.");
+    }
+
+    public static Button getViralEntanglementButton(Player player) {
+        return player.hasTechReady("ve")
+                ? Buttons.green(
+                        player.factionButtonChecker() + "veBrStart", "Use Viral Entanglement", TechEmojis.BioticTech)
+                : null;
+    }
+
+    @ButtonHandler("veBrStart")
+    public static void startViralEntanglement(ButtonInteractionEvent event, Game game, Player player) {
+        if (!player.hasTechReady("ve")
+                || player.getStrategicCC() < 1
+                || getViralEntanglementInfantryCount(game, player) < 2) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        int strategicCC = player.getStrategicCC();
+        player.exhaustTech("ve");
+        player.setStrategicCC(strategicCC - 1);
+        game.setStoredValue(VIRAL_ENTANGLEMENT_INFANTRY_REMAINING + player.getFaction(), "2");
+        sendViralEntanglementInfantryButtons(game, player);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("veBrDestroyInfantry_")
+    public static void destroyViralEntanglementInfantry(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String remainingValue = game.getStoredValue(VIRAL_ENTANGLEMENT_INFANTRY_REMAINING + player.getFaction());
+        String message = player.getRepresentationNoPing() + ", destroy " + remainingValue
+                + " infantry for _Viral Entanglement_.";
+        String prefix = player.factionButtonChecker() + "veBrDestroyInfantry_";
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event,
+                event.getMessageChannel(),
+                getViralEntanglementInfantryButtons(game, player),
+                message,
+                prefix,
+                buttonID)) {
+            return;
+        }
+        String[] parts =
+                StringUtils.substringAfter(buttonID, "veBrDestroyInfantry_").split("~", 2);
+        Tile tile = parts.length == 2 ? game.getTileByPosition(parts[0]) : null;
+        UnitHolder unitHolder = tile == null ? null : tile.getUnitHolders().get(parts[1]);
+        int remaining = StringUtils.isNumeric(remainingValue) ? Integer.parseInt(remainingValue) : 0;
+        if (remaining < 1 || unitHolder == null || unitHolder.getUnitCount(UnitType.Infantry, player) < 1) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        DestroyUnitService.destroyUnits(
+                event, tile, game, player.getColor(), "1 infantry " + unitHolder.getName(), false);
+        ButtonHelper.deleteMessage(event);
+        if (remaining > 1) {
+            game.setStoredValue(
+                    VIRAL_ENTANGLEMENT_INFANTRY_REMAINING + player.getFaction(), Integer.toString(remaining - 1));
+            sendViralEntanglementInfantryButtons(game, player);
+            return;
+        }
+
+        game.removeStoredValue(VIRAL_ENTANGLEMENT_INFANTRY_REMAINING + player.getFaction());
+        List<Button> buttons = TeHelperActionCards.getReadiedStrategyCardSecondaryButtons(game, player);
+        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing()
+                        + ", choose a strategy-card secondary ability to resolve with _Viral Entanglement_. A strategy token has already been spent. You cannot perform that strategy card's primary ability during this effect.",
+                buttons);
+    }
+
+    private static void sendViralEntanglementInfantryButtons(Game game, Player player) {
+        String remaining = game.getStoredValue(VIRAL_ENTANGLEMENT_INFANTRY_REMAINING + player.getFaction());
+        List<Button> buttons = getViralEntanglementInfantryButtons(game, player);
+        String prefix = player.factionButtonChecker() + "veBrDestroyInfantry_";
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationNoPing() + ", destroy " + remaining + " infantry for _Viral Entanglement_.",
+                NewStuffHelper.buttonPagination(buttons, prefix, 0));
+    }
+
+    private static List<Button> getViralEntanglementInfantryButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                if (unitHolder.getUnitCount(UnitType.Infantry, player) < 1) {
+                    continue;
+                }
+                buttons.add(Buttons.red(
+                        player.factionButtonChecker() + "veBrDestroyInfantry_" + tile.getPosition() + "~"
+                                + unitHolder.getName(),
+                        "Destroy 1 Infantry from " + ButtonHelper.getUnitHolderRep(unitHolder, tile, game)));
+            }
+        }
+        return buttons;
+    }
+
+    private static int getViralEntanglementInfantryCount(Game game, Player player) {
+        return game.getTileMap().values().stream()
+                .flatMap(tile -> tile.getUnitHolders().values().stream())
+                .mapToInt(unitHolder -> unitHolder.getUnitCount(UnitType.Infantry, player))
+                .sum();
+    }
+
+    @ButtonHandler("nfcResolve_")
+    public static void resolveNearFieldCloaking(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Player opponent = game.getPlayerFromColorOrFaction(StringUtils.substringAfter(buttonID, "nfcResolve_"));
+        if (!player.hasTech("nfc") || opponent == null) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (!player.hasTechReady("nfc")) {
+            player.refreshTech("nfc");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), player.getRepresentationNoPing() + " readied _Near-Field Cloaking_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> buttons = List.of(Buttons.green(
+                player.factionButtonChecker() + "nfcTakeActionCard_" + opponent.getFaction(),
+                "Take 1 Random Action Card from " + opponent.getFactionNameOrColor()));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentation() + ", choose a target for _Near-Field Cloaking_:",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("nfcTakeActionCard_")
+    public static void takeNearFieldCloakingActionCard(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Player opponent = game.getPlayerFromColorOrFaction(StringUtils.substringAfter(buttonID, "nfcTakeActionCard_"));
+        if (!player.hasTechReady("nfc") || opponent == null) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        player.exhaustTech("nfc");
+        ActionCardHelper.sendRandomACPart2(event, game, opponent, player);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void offerNetworkedConstructors(Game game, Tile tile) {
+        for (Player player : game.getRealPlayers()) {
+            if (!player.hasTechReady("nc")
+                    || getControlledPlanets(tile, player).isEmpty()
+                    || !hasStructureReinforcement(game, player)) {
+                continue;
+            }
+            List<Button> buttons = List.of(
+                    Buttons.green(
+                            player.factionButtonChecker() + "ncBrUse_" + tile.getPosition(),
+                            "Exhaust Networked Constructors",
+                            TechEmojis.CyberneticTech),
+                    Buttons.gray(player.factionButtonChecker() + "ncBrDecline", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", a system was activated containing a planet you control. You may exhaust _Networked Constructors_ to place 1 structure from your reinforcements on one of those planets.",
+                    buttons);
+        }
+    }
+
+    @ButtonHandler("ncBrUse_")
+    public static void useNetworkedConstructors(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String tilePosition = StringUtils.substringAfter(buttonID, "ncBrUse_");
+        Tile tile = game.getTileByPosition(tilePosition);
+        if (tile == null
+                || !tilePosition.equals(game.getActiveSystem())
+                || !player.hasTechReady("nc")
+                || getControlledPlanets(tile, player).isEmpty()
+                || !hasStructureReinforcement(game, player)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        player.exhaustTech("nc");
+        game.setStoredValue(NETWORKED_CONSTRUCTORS_PENDING + player.getFaction(), tilePosition);
+        List<Button> buttons = new ArrayList<>();
+        for (Planet planet : getControlledPlanets(tile, player)) {
+            if (hasReinforcement(game, player, UnitType.Pds)) {
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + "ncBrPlace_" + tilePosition + "~" + planet.getName() + "~pds",
+                        "Place 1 PDS on " + Helper.getPlanetRepresentation(planet.getName(), game)));
+            }
+            if (hasReinforcement(game, player, UnitType.Spacedock)) {
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + "ncBrPlace_" + tilePosition + "~" + planet.getName() + "~sd",
+                        "Place 1 Space Dock on " + Helper.getPlanetRepresentation(planet.getName(), game)));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + ", choose a structure to place with _Networked Constructors_:",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("ncBrPlace_")
+    public static void placeNetworkedConstructorsStructure(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] parts = StringUtils.substringAfter(buttonID, "ncBrPlace_").split("~", 3);
+        if (parts.length != 3
+                || !parts[0].equals(game.getActiveSystem())
+                || !parts[0].equals(game.getStoredValue(NETWORKED_CONSTRUCTORS_PENDING + player.getFaction()))) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        Tile tile = game.getTileByPosition(parts[0]);
+        Planet planet = tile == null
+                ? null
+                : tile.getUnitHolders().get(parts[1]) instanceof Planet candidate ? candidate : null;
+        UnitType unitType = "pds".equals(parts[2]) ? UnitType.Pds : "sd".equals(parts[2]) ? UnitType.Spacedock : null;
+        if (planet == null
+                || unitType == null
+                || !player.getPlanets().contains(planet.getName())
+                || !hasReinforcement(game, player, unitType)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + parts[2] + " " + planet.getName());
+        game.removeStoredValue(NETWORKED_CONSTRUCTORS_PENDING + player.getFaction());
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " placed 1 " + (unitType == UnitType.Pds ? "PDS" : "space dock")
+                        + " on " + Helper.getPlanetRepresentation(planet.getName(), game)
+                        + " with _Networked Constructors_.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("ncBrDecline")
+    public static void declineNetworkedConstructors(ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static List<Planet> getControlledPlanets(Tile tile, Player player) {
+        return tile.getPlanetUnitHolders().stream()
+                .filter(planet -> player.getPlanets().contains(planet.getName()))
+                .toList();
+    }
+
+    private static boolean hasStructureReinforcement(Game game, Player player) {
+        return hasReinforcement(game, player, UnitType.Pds) || hasReinforcement(game, player, UnitType.Spacedock);
+    }
+
+    private static boolean hasReinforcement(Game game, Player player, UnitType unitType) {
+        return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, unitType.value, true)
+                < player.getUnitCap(unitType.value);
+    }
+
+    public static void addAtmanWeaveSuppressorsButton(List<Button> buttons, Player player, Tile tile) {
+        if (!player.hasTechReady("aws")) {
+            return;
+        }
+        buttons.add(Buttons.green(
+                player.factionButtonChecker() + "exhaustTech_aws_" + tile.getPosition(),
+                "Use Atman-Weave Suppressors",
+                TechEmojis.BioticTech));
+    }
+
+    public static void addStasisFieldGeneratorsButton(List<Button> buttons, Player player) {
+        if (player.hasTech("sfg")) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "getReleaseButtons",
+                    "Release Captured Units",
+                    TechEmojis.WarfareTech));
+        }
+    }
+
+    public static void registerStasisFieldGeneratorsUnitAbilityHits(
+            Game game, Player player, Player target, Tile tile, CombatRollType rollType, int hits) {
+        if (rollType == CombatRollType.combatround
+                || !player.hasTech("sfg")
+                || target == null
+                || target == player
+                || hits < 1) {
+            return;
+        }
+
+        game.setStoredValue(getStasisFieldGeneratorsHitsKey(tile, target), player.getFaction() + "|" + hits);
+    }
+
+    public static Player consumeStasisFieldGeneratorsCapture(Game game, RemoveUnitService.RemovedUnit unit) {
+        Player destroyedUnitOwner = unit.getPlayer(game);
+        if (destroyedUnitOwner == null) {
+            return null;
+        }
+
+        String key = getStasisFieldGeneratorsHitsKey(unit.tile(), destroyedUnitOwner);
+        String[] state = game.getStoredValue(key).split("\\|", 2);
+        if (state.length != 2) {
+            return null;
+        }
+
+        Player capturer = game.getPlayerFromColorOrFaction(state[0]);
+        int remainingHits;
+        try {
+            remainingHits = Integer.parseInt(state[1]);
+        } catch (NumberFormatException e) {
+            game.removeStoredValue(key);
+            return null;
+        }
+        if (capturer == null || !capturer.hasTech("sfg") || remainingHits < 1) {
+            game.removeStoredValue(key);
+            return null;
+        }
+
+        int remainingAfterCapture = remainingHits - unit.getTotalRemoved();
+        if (remainingAfterCapture > 0) {
+            game.setStoredValue(key, capturer.getFaction() + "|" + remainingAfterCapture);
+        } else {
+            game.removeStoredValue(key);
+        }
+        return capturer;
+    }
+
+    public static void captureWithStasisFieldGenerators(
+            GenericInteractionCreateEvent event, Game game, Player capturer, RemoveUnitService.RemovedUnit unit) {
+        Player destroyedUnitOwner = unit.getPlayer(game);
+        if (destroyedUnitOwner == null || capturer == destroyedUnitOwner) {
+            return;
+        }
+
+        int amount = unit.getTotalRemoved();
+        AddUnitService.addUnits(
+                event,
+                capturer.getNomboxTile(),
+                game,
+                destroyedUnitOwner.getColor(),
+                amount + " " + unit.unitKey().unitName());
+        MessageHelper.sendMessageToChannel(
+                capturer.getCorrectChannel(),
+                capturer.getRepresentationNoPing() + " captured " + amount + " "
+                        + unit.unitKey().unitName() + (amount == 1 ? "" : "s") + " with _Stasis Field Generators_.");
+    }
+
+    public static String getStasisFieldGeneratorsHitAssignmentReminder(
+            Game game, Player player, CombatRollType rollType) {
+        if (rollType == CombatRollType.combatround || !player.hasTech("sfg")) {
+            return "";
+        }
+        String owner = game.isFowMode() ? "The player who rolled these hits" : player.getRepresentationNoPing();
+        return "\n-# " + owner + " has _Stasis Field Generators_; these hits cannot be canceled.";
+    }
+
+    private static String getStasisFieldGeneratorsHitsKey(Tile tile, Player target) {
+        return STASIS_FIELD_GENERATORS_HITS + tile.getPosition() + "_" + target.getFaction();
+    }
+
+    public static void offerStasisFieldGeneratorsReleasePrompt(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player player,
+            Player opponent,
+            Tile tile,
+            UnitHolder combatOnHolder,
+            CombatRollType rollType,
+            String bombardPlanet,
+            CombatRollPayload payload) {
+        int nearMisses = getStasisFieldGeneratorsNearMissCount(payload);
+        int potentialHits = Math.min(nearMisses, getStasisFieldGeneratorsCapturedUnitCount(player));
+        if (!player.hasTech("sfg") || opponent == null || tile == null || combatOnHolder == null || potentialHits < 1) {
+            return;
+        }
+        String resolutionId = UUID.randomUUID().toString().substring(0, 12);
+        game.setStoredValue(
+                STASIS_FIELD_GENERATORS_RELEASE + resolutionId,
+                String.join(
+                        "~",
+                        tile.getPosition(),
+                        combatOnHolder.getName(),
+                        opponent.getFaction(),
+                        rollType.name(),
+                        bombardPlanet,
+                        Integer.toString(potentialHits)));
+
+        MessageHelper.sendMessageToChannelWithButton(
+                game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
+                player.getRepresentationNoPing()
+                        + ", up to " + potentialHits + " die" + (potentialHits == 1 ? " could" : "s could")
+                        + " hit with +1. You may return 1 captured unit for each die you choose to increase with _Stasis Field Generators_.",
+                Buttons.gray(
+                        player.factionButtonChecker() + "sfgReturnCaptured_" + resolutionId,
+                        "Return Captured Units (+1 to up to " + potentialHits + " Dice)",
+                        TechEmojis.WarfareTech));
+    }
+
+    private static int getStasisFieldGeneratorsNearMissCount(CombatRollPayload payload) {
+        return payload.unitRolls().stream()
+                .flatMap(unitRoll -> unitRoll.dice().stream())
+                .mapToInt(die -> !die.success() && die.result() + 1 >= die.threshold() ? 1 : 0)
+                .sum();
+    }
+
+    @ButtonHandler("sfgReturnCaptured_")
+    public static void chooseStasisFieldGeneratorsReturnCount(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String resolutionId = StringUtils.substringAfter(buttonID, "sfgReturnCaptured_");
+        int maxReturns = getStasisFieldGeneratorsPotentialHits(game, player, resolutionId);
+        if (maxReturns < 1) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        for (int count = 1; count <= maxReturns; count++) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "sfgChooseReturnCount_" + resolutionId + "~" + count,
+                    "Return " + count + " Captured Unit"
+                            + (count == 1 ? " (+1 to 1 Die)" : "s (+1 to " + count + " Dice)"),
+                    TechEmojis.WarfareTech));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing()
+                        + ", choose how many captured units to return for _Stasis Field Generators_:",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("sfgChooseReturnCount_")
+    public static void chooseStasisFieldGeneratorsCapturedUnits(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] parts =
+                StringUtils.substringAfter(buttonID, "sfgChooseReturnCount_").split("~", 2);
+        String resolutionId = parts.length == 2 ? parts[0] : "";
+        int count = parts.length == 2 ? parseStasisFieldGeneratorsCount(parts[1]) : 0;
+        if (count < 1 || count > getStasisFieldGeneratorsPotentialHits(game, player, resolutionId)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        sendStasisFieldGeneratorsCapturedUnitButtons(event, game, player, resolutionId, count, count);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("sfgReturnUnit_")
+    public static void returnStasisFieldGeneratorsCapturedUnit(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] parts = StringUtils.substringAfter(buttonID, "sfgReturnUnit_").split("~", 5);
+        if (parts.length != 5) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        String resolutionId = parts[0];
+        int remaining = parseStasisFieldGeneratorsCount(parts[1]);
+        int total = parseStasisFieldGeneratorsCount(parts[2]);
+        Player capturedUnitOwner = game.getPlayerFromColorOrFaction(parts[3]);
+        String unitName = parts[4];
+        UnitKey unitKey = capturedUnitOwner == null
+                ? null
+                : Mapper.getUnitKey(AliasHandler.resolveUnit(unitName), capturedUnitOwner.getColor());
+        if (remaining < 1
+                || total < remaining
+                || !player.hasTech("sfg")
+                || capturedUnitOwner == null
+                || unitKey == null
+                || total > getStasisFieldGeneratorsMaximumHits(game, resolutionId)
+                || player.getNomboxTile().getSpaceUnitHolder().getUnitCount(unitKey) < 1) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        RemoveUnitService.removeUnits(
+                event, player.getNomboxTile(), game, capturedUnitOwner.getColor(), "1 " + unitName);
+        int remainingAfterReturn = remaining - 1;
+        if (remainingAfterReturn > 0) {
+            sendStasisFieldGeneratorsCapturedUnitButtons(
+                    event, game, player, resolutionId, remainingAfterReturn, total);
+        } else {
+            resolveStasisFieldGeneratorsReturnedHits(event, game, player, resolutionId, total);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static void sendStasisFieldGeneratorsCapturedUnitButtons(
+            ButtonInteractionEvent event, Game game, Player player, String resolutionId, int remaining, int total) {
+        List<Button> buttons = new ArrayList<>();
+        for (UnitKey unitKey :
+                player.getNomboxTile().getUnitHolders().get("space").getUnits().keySet()) {
+            for (Player capturedUnitOwner : game.getRealPlayersNNeutral()) {
+                if (capturedUnitOwner.unitBelongsToPlayer(unitKey)) {
+                    buttons.add(Buttons.gray(
+                            player.factionButtonChecker() + "sfgReturnUnit_" + resolutionId + "~" + remaining + "~"
+                                    + total + "~" + capturedUnitOwner.getFaction() + "~" + unitKey.unitName(),
+                            "Return 1 " + unitKey.unitName() + " (" + remaining + " remaining)"));
+                }
+            }
+        }
+        if (buttons.isEmpty()) {
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + ", select a captured unit to return for _Stasis Field Generators_:",
+                buttons);
+    }
+
+    private static int getStasisFieldGeneratorsCapturedUnitCount(Player player) {
+        return player.getNomboxTile().getUnitHolders().get("space").getUnits().values().stream()
+                .mapToInt(Integer::intValue)
+                .sum();
+    }
+
+    private static int getStasisFieldGeneratorsPotentialHits(Game game, Player player, String resolutionId) {
+        if (!player.hasTech("sfg")) {
+            return 0;
+        }
+        return Math.min(
+                getStasisFieldGeneratorsMaximumHits(game, resolutionId),
+                getStasisFieldGeneratorsCapturedUnitCount(player));
+    }
+
+    private static int getStasisFieldGeneratorsMaximumHits(Game game, String resolutionId) {
+        String[] context = game.getStoredValue(STASIS_FIELD_GENERATORS_RELEASE + resolutionId)
+                .split("~", 6);
+        return context.length == 6 ? parseStasisFieldGeneratorsCount(context[5]) : 0;
+    }
+
+    private static void resolveStasisFieldGeneratorsReturnedHits(
+            ButtonInteractionEvent event, Game game, Player player, String resolutionId, int hits) {
+        String[] context = game.getStoredValue(STASIS_FIELD_GENERATORS_RELEASE + resolutionId)
+                .split("~", 6);
+        game.removeStoredValue(STASIS_FIELD_GENERATORS_RELEASE + resolutionId);
+        if (context.length != 6) {
+            return;
+        }
+        Tile tile = game.getTileByPosition(context[0]);
+        UnitHolder combatOnHolder = tile == null ? null : tile.getUnitHolders().get(context[1]);
+        Player opponent = game.getPlayerFromColorOrFaction(context[2]);
+        CombatRollType rollType;
+        try {
+            rollType = CombatRollType.valueOf(context[3]);
+        } catch (IllegalArgumentException e) {
+            return;
+        }
+        Planet groundCombatPlanet = rollType == CombatRollType.bombardment
+                ? game.getUnitHolderFromPlanet(context[4])
+                : rollType == CombatRollType.combatround && combatOnHolder instanceof Planet planet ? planet : null;
+        if (tile == null || opponent == null) {
+            return;
+        }
+        if (groundCombatPlanet != null) {
+            CombatRollService.sendGroundCombatHitAssignment(
+                    game, player, opponent, tile, groundCombatPlanet, hits, event, "_Stasis Field Generators_");
+        } else {
+            CombatRollService.sendSpaceAssignHitsButtons(event, game, opponent, tile, hits);
+        }
+    }
+
+    private static int parseStasisFieldGeneratorsCount(String buttonID, String prefix) {
+        return parseStasisFieldGeneratorsCount(StringUtils.substringAfter(buttonID, prefix));
+    }
+
+    private static int parseStasisFieldGeneratorsCount(String value) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    public static void offerAtmanWeaveSuppressorsPlanets(
+            GenericInteractionCreateEvent event, Game game, Player player, String tilePosition) {
+        if (!player.hasTech("aws")) {
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        StartCombatService.CurrentCombat combat = StartCombatService.getCurrentCombat(game);
+        Tile tile = game.getTileByPosition(tilePosition);
+        if (tile == null && combat != null) {
+            tile = game.getTileByPosition(combat.tilePosition());
+        }
+        if (tile == null) {
+            tile = game.getTileByPosition(game.getActiveSystem());
+        }
+        if (tile == null) {
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        List<Planet> planets = tile.getPlanetUnitHolders();
+        if (planets.size() == 1) {
+            resolveAtmanWeaveSuppressorsOnPlanet(
+                    event, game, player, planets.getFirst().getName(), false);
+            return;
+        }
+        List<Button> buttons = planets.stream()
+                .map(planet -> Buttons.green(
+                        player.factionButtonChecker() + "awsBrResolvePlanet_" + planet.getName(),
+                        "Use Atman-Weave Suppressors on " + Helper.getPlanetRepresentation(planet.getName(), game),
+                        TechEmojis.BioticTech))
+                .toList();
+        if (!buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(),
+                    player.getRepresentation() + ", choose a planet for _Atman-Weave Suppressors_.",
+                    buttons);
+        }
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("awsBrResolvePlanet_")
+    public static void resolveAtmanWeaveSuppressorsPlanet(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        resolveAtmanWeaveSuppressorsOnPlanet(
+                event, game, player, StringUtils.substringAfter(buttonID, "awsBrResolvePlanet_"), true);
+    }
+
+    private static void resolveAtmanWeaveSuppressorsOnPlanet(
+            GenericInteractionCreateEvent event, Game game, Player player, String planetName, boolean deleteMessage) {
+        Planet planet = game.getUnitHolderFromPlanet(planetName);
+        if (!player.hasTech("aws") || planet == null) {
+            deleteAtmanWeaveSuppressorsButton(event, deleteMessage);
+            return;
+        }
+        String previousCoexistenceFlag = game.getStoredValue("coexistFlag");
+        game.setStoredValue("coexistFlag", "yes");
+        try {
+            ButtonHelper.getPlayersWithUnitsOnAPlanet(game, planet).stream()
+                    .filter(otherPlayer -> otherPlayer != player)
+                    .findFirst()
+                    .ifPresent(otherPlayer -> {
+                        if (player.getPlanets().contains(planetName)) {
+                            AddPlanetService.addPlanet(otherPlayer, planetName, game);
+                        }
+                    });
+        } finally {
+            if (previousCoexistenceFlag.isEmpty()) {
+                game.removeStoredValue("coexistFlag");
+            } else {
+                game.setStoredValue("coexistFlag", previousCoexistenceFlag);
+            }
+        }
+        ButtonHelperAbilities.oceanBoundCheck(game);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " used _Atman-Weave Suppressors_ on "
+                        + Helper.getPlanetRepresentation(planetName, game) + "; units are now coexisting.");
+        deleteAtmanWeaveSuppressorsButton(event, deleteMessage);
+    }
+
+    private static void deleteAtmanWeaveSuppressorsButton(GenericInteractionCreateEvent event, boolean deleteMessage) {
+        if (deleteMessage) {
+            ButtonHelper.deleteMessage(event);
+        } else {
+            ButtonHelper.deleteTheOneButton(event);
+        }
+    }
 
     @ButtonHandler("repairUnitsL4")
     public static void repairAllUnitsWithL4(ButtonInteractionEvent event, Game game, Player player) {

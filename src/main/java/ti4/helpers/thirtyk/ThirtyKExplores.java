@@ -27,11 +27,17 @@ public class ThirtyKExplores {
             "macguffianoutpostjmsc");
 
     public static void resolveExplore(
-            GenericInteractionCreateEvent event, String cardID, Tile tile, String planetID, Player player, Game game) {
-        if (!ThirtyKCards.isExplore(cardID)) return;
+            GenericInteractionCreateEvent event,
+            String drawnID,
+            String cardID,
+            Tile tile,
+            String planetID,
+            Player player,
+            Game game) {
+        if (!ThirtyKCards.inUse(game) || !ThirtyKCards.isExplore(cardID)) return;
         String baseId = ThirtyKCards.baseId(cardID);
         if (PLAY_AREA_CARDS.contains(baseId)) {
-            ThirtyKPlayAreaExploreHandler.moveToPlayArea(event, game, player, cardID);
+            ThirtyKPlayAreaExploreHandler.moveToPlayArea(event, game, player, drawnID);
             return;
         }
         switch (baseId) {
@@ -72,7 +78,7 @@ public class ThirtyKExplores {
                 ThirtyKHazardousExploreHandler.resolvePilotRecovery(event, game, player, planetID);
             case "lostandfound30k" -> ThirtyKHazardousExploreHandler.resolveLostAndFound(event, game, player, planetID);
             case "imitationfactories30k" ->
-                ThirtyKHazardousExploreHandler.resolveImitationFactories(event, game, player, cardID, planetID);
+                ThirtyKHazardousExploreHandler.resolveImitationFactories(event, game, player, drawnID, planetID);
             case "corrosivediscovery30k" ->
                 ThirtyKHazardousExploreHandler.resolveCorrosiveDiscovery(event, game, player, tile, planetID);
             case "repurposedfacilities30k" ->
@@ -82,7 +88,7 @@ public class ThirtyKExplores {
             case "foresightofindustry30k" ->
                 ThirtyKIndustrialExploreHandler.resolveForesightOfIndustry(event, game, player, planetID);
             case "foresightofindustryb30k" ->
-                ThirtyKIndustrialExploreHandler.resolveForesightOfIndustryB(event, game, player, tile, planetID);
+                ThirtyKIndustrialExploreHandler.resolveEstablishedSurveying(event, game, player, tile, planetID);
             default -> {}
         }
     }

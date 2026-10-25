@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import ti4.ai.AiSettings;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 
 class AiCommandTest {
 

@@ -22,10 +22,10 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKRelicHooks;
 import ti4.helpers.thirtyk.ThirtyKRelics;
 import ti4.helpers.thirtyk.ThirtyKTransactions;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
 import ti4.model.RelicModel;
 import ti4.service.explore.ExploreService;
 import ti4.service.unit.DestroyUnitService;
@@ -138,7 +138,8 @@ class ThirtyKRelicButtonHandler {
                 buttons);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " has the flagship of " + target.getColorIfCanSeeStats(player)
+                player.getRepresentationNoPing() + " has the flagship of "
+                        + FoWHelper.identityOrColorIfCanSeeStats(game, target, player, target.getRepresentationNoPing())
                         + " in the sights of the _Ransom Cannon_: they must pay 1 promissory note or lose the ship.");
         ButtonHelper.deleteMessage(event);
     }
@@ -150,9 +151,15 @@ class ThirtyKRelicButtonHandler {
                 .filter(tile -> tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, player) > 0)
                 .findFirst()
                 .orElse(null);
-        if (flagshipTile != null) {
-            DestroyUnitService.destroyUnits(event, flagshipTile, game, player.getColor(), "fs", false);
+        if (flagshipTile == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationNoPing()
+                            + ", the bot found no flagship of yours on the game board, so nothing was destroyed and"
+                            + " _Ransom Cannon_ stays. Give 1 promissory note instead, or fix the board first.");
+            return;
         }
+        DestroyUnitService.destroyUnits(event, flagshipTile, game, player.getColor(), "fs", false);
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 player.getRepresentationNoPing()
@@ -180,7 +187,7 @@ class ThirtyKRelicButtonHandler {
         if (target.getTacticalCC() < 1) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    target.getColorIfCanSeeStats(player)
+                    FoWHelper.identityOrColorIfCanSeeStats(game, target, player, target.getRepresentationNoPing())
                             + " has no command tokens in their tactic pool to hand over, so the _Deadline Documentation_ has no effect.");
             ButtonHelper.deleteMessage(event);
             return;
@@ -196,7 +203,8 @@ class ThirtyKRelicButtonHandler {
                         Buttons.blue(prefix + "strategy", "Tactic to Strategy Pool")));
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " buried " + target.getColorIfCanSeeStats(player)
+                player.getRepresentationNoPing() + " buried "
+                        + FoWHelper.identityOrColorIfCanSeeStats(game, target, player, target.getRepresentationNoPing())
                         + " in _Deadline Documentation_: they must move 1 command token out of their tactic pool.");
         ButtonHelper.deleteMessage(event);
     }
@@ -241,7 +249,8 @@ class ThirtyKRelicButtonHandler {
                         + " is on the line from the _Tech Support Hotline_: you may transact with them this turn, and once a deal is made you may research 1 technology with no prerequisites.");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " patched a call through to " + target.getColorIfCanSeeStats(player)
+                player.getRepresentationNoPing() + " patched a call through to "
+                        + FoWHelper.identityOrColorIfCanSeeStats(game, target, player, target.getRepresentationNoPing())
                         + " on the _Tech Support Hotline_: the two may transact this turn.");
         ButtonHelper.deleteMessage(event);
     }
@@ -258,9 +267,14 @@ class ThirtyKRelicButtonHandler {
         List<String> cards = new ArrayList<>(target.getActionCards().keySet());
         Collections.shuffle(cards);
         List<String> shown = cards.subList(0, Math.min(2, cards.size()));
+        String targetName =
+                FoWHelper.identityOrColorIfCanSeeStats(game, target, player, target.getRepresentationNoPing());
+        String count = spyCount(shown.size());
         StringBuilder report = new StringBuilder(player.getRepresentationUnfogged())
-                .append(", your agents return with stolen dispatches. _Spy Reports_ shows you these action cards of ")
-                .append(target.getColorIfCanSeeStats(player))
+                .append(", your agents return with stolen dispatches. _Spy Reports_ shows you ")
+                .append(count)
+                .append(" of ")
+                .append(targetName)
                 .append(":");
         List<String> names = new ArrayList<>();
         for (String card : shown) {
@@ -274,8 +288,15 @@ class ThirtyKRelicButtonHandler {
         MessageHelper.sendMessageToChannel(
                 target.getCardsInfoThread(),
                 target.getRepresentationUnfogged() + ", there is a leak in your court: " + actor
-                        + " used _Spy Reports_ and saw: "
-                        + String.join(", ", names) + ".");
+                        + " used _Spy Reports_ and saw " + count
+                        + (names.isEmpty() ? "." : ": " + String.join(", ", names) + "."));
+        FoWHelper.announcePublicOrLocal(
+                game,
+                event,
+                player.getRepresentationNoPing() + " used _Spy Reports_ on " + target.getRepresentationNoPing()
+                        + ", who showed them " + count + ".",
+                player.getRepresentationNoPing() + " used _Spy Reports_ on " + targetName + ", who showed " + count
+                        + "; see your cards info thread.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -291,9 +312,15 @@ class ThirtyKRelicButtonHandler {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " welcomed the refugees of "
-                        + eliminated.getColorIfCanSeeStats(player)
+                        + FoWHelper.identityOrColorIfCanSeeStats(
+                                game, eliminated, player, eliminated.getRepresentationNoPing())
                         + " aboard: _Sovereign Refugees_ grants access to their flagship. Track and use it manually.");
         ButtonHelper.deleteMessage(event);
+    }
+
+    private static String spyCount(int shown) {
+        String cards = shown + " random action card" + (shown == 1 ? "" : "s");
+        return shown < 2 ? cards + " (their whole hand)" : cards;
     }
 
     private static void noLongerValid(ButtonInteractionEvent event, String relicID) {

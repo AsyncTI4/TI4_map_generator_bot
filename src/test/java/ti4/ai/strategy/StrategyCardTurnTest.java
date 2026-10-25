@@ -20,7 +20,7 @@ import ti4.ai.tactical.TacticalPlanner;
 import ti4.game.Tile;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 // During the action phase the AI re-plans each held strategy card from the live board every turn, plays a card early
@@ -277,15 +277,15 @@ class StrategyCardTurnTest extends BaseTi4Test {
 
     private static String otherNeighbour() {
         String neighbour = AiTestGame.neighbourOf(AiTestGame.HOME);
-        return ti4.image.PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        return ti4.model.MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position) && !position.equals(neighbour))
                 .findFirst()
                 .orElseThrow();
     }
 
     private static String beyond(String position) {
-        List<String> nearHome = ti4.image.PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
-        return ti4.image.PositionMapper.getAdjacentTilePositions(position).stream()
+        List<String> nearHome = ti4.model.MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        return ti4.model.MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate ->
                         !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate) && !nearHome.contains(candidate))
                 .findFirst()

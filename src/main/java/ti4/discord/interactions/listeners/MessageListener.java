@@ -29,9 +29,9 @@ import ti4.game.persistence.ManagedGame;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.async.RoundSummaryHelper;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.async.BanCleanupService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
@@ -429,7 +429,9 @@ class MessageListener extends ListenerAdapter {
     }
 
     private static boolean addFactionEmojiReactionsToMessages(MessageReceivedEvent event, String gameName) {
+
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
+
         if (managedGame.getGame().isHiddenAgendaMode()
                 && managedGame.getGame().getStoredValue("executiveOrder").isEmpty()
                 && managedGame.getGame().getPhaseOfGame().toLowerCase().contains("agenda")) {

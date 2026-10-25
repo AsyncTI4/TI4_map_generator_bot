@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.FoWHelper;
-import ti4.image.GalaxyNames;
 import ti4.message.MessageHelper;
+import ti4.model.GalaxyNames;
 
 class GalaxyCommand extends GameStateSubcommand {
 

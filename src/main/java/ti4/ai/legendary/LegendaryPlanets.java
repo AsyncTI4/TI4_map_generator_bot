@@ -9,7 +9,7 @@ import ti4.ai.eval.BoardView;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 
 @UtilityClass

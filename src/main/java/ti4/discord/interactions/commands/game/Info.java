@@ -14,8 +14,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper.TIGLRank;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.TechEmojis;
@@ -30,7 +30,7 @@ class Info extends GameStateSubcommand {
     private static final String MODERN = "modern";
 
     public Info() {
-        super(Constants.INFO, "Game information:", false, false);
+        super(Constants.INFO, "Show game information", false, false);
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, MODERN, "Readable embed layout (default false: classic text)"));
     }
@@ -331,16 +331,16 @@ class Info extends GameStateSubcommand {
                 .append('\n');
         sb.append("SCs per player: ").append(game.getStrategyCardsPerPlayer()).append('\n');
         sb.append("TopMostTileOffset: `")
-                .append(PositionMapper.getTopMostTileOffsetInGame(game))
+                .append(MapPositionMapper.getTopMostTileOffsetInGame(game))
                 .append("`\n");
         sb.append("BottomMostTileOffset: `")
-                .append(PositionMapper.getBottomMostTileOffsetInGame(game))
+                .append(MapPositionMapper.getBottomMostTileOffsetInGame(game))
                 .append("`\n");
         sb.append("LeftMostTileOffset: `")
-                .append(PositionMapper.getLeftMostTileOffsetInGame(game))
+                .append(MapPositionMapper.getLeftMostTileOffsetInGame(game))
                 .append("`\n");
         sb.append("RightMostTileOffset: `")
-                .append(PositionMapper.getRightMostTileOffsetInGame(game))
+                .append(MapPositionMapper.getRightMostTileOffsetInGame(game))
                 .append("`\n");
         sb.append("Map Images Generated: ")
                 .append(game.getMapImageGenerationCount())

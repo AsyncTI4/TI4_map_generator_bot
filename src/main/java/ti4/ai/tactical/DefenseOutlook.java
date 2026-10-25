@@ -31,7 +31,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 

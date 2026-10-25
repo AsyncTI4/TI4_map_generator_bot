@@ -1,0 +1,34 @@
+[
+    {
+        "alias": "midum_additional_die",
+        "type": "extrarolls",
+        "value": "1",
+        "valueScalingType": "opponent_warfare_tech",
+        "valueScalingMultiplier": 1.0,
+        "persistenceType": "ALWAYS",
+        "scope": "fs",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "netrunners_flagship"
+            }
+        ]
+    },
+    {
+        "alias": "mimetic_override",
+        "type": "mods",
+        "value": "1",
+        "persistenceType": "ONE_ROUND",
+        "scope": "all",
+        "maxDice": 1,
+        "maxDiceScalingType": "shared_tech_max_prerequisites",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "mimetic_override"
+            }
+        ]
+    }
+]

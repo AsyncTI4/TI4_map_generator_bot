@@ -21,12 +21,9 @@ public class SpecialCommand implements ParentCommand {
                     new IonFlip(),
                     new SystemInfo(),
                     new StellarConverter(),
-                    new RiseOfMessiah(),
                     new Rematch(),
-                    new CloneGame(),
                     // new SwordsToPlowsharesTGGain(),
                     // new WormholeResearchFor(),
-                    new FighterConscription(),
                     new SwapSC(),
                     new MoveAllUnits(),
                     new NovaSeed(),
@@ -46,7 +43,7 @@ public class SpecialCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "Special";
+        return "Faction abilities, special cards and one-off game fixes";
     }
 
     @Override

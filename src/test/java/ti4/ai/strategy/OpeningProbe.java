@@ -9,7 +9,7 @@ import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 
 // Test-only diagnostics for the opening: the pick values a seat sees and why Gravity Drive is or is not credited.
 public final class OpeningProbe {

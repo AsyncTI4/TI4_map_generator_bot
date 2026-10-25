@@ -6,7 +6,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Lodor (3 resources) sits alone in its system; Sakulag (2) shares one with Lazar. A forward dock on Lodor is richer,
@@ -20,7 +20,7 @@ class MechanizeDockSiteTest extends BaseTi4Test {
     void setUp() {
         test = new AiTestGame();
         test.nekroHome();
-        List<String> around = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        List<String> around = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position))
                 .toList();
         test.place("26", around.get(0));

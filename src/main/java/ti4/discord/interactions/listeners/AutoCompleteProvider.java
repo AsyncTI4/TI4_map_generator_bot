@@ -39,8 +39,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.AbilityModel;
@@ -51,6 +49,7 @@ import ti4.model.EmbeddableModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
+import ti4.model.Mapper;
 import ti4.model.ModelInterface;
 import ti4.model.PlanetTypeModel;
 import ti4.model.PromissoryNoteModel;
@@ -62,6 +61,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechSpecialtyModel;
 import ti4.model.TechnologyModel;
+import ti4.model.TileHelper;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.UnitDecalService;
@@ -649,11 +649,12 @@ class AutoCompleteProvider {
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.SOURCE -> {
-                String enteredValue = event.getFocusedOption().getValue();
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 List<Command.Choice> options = Stream.of(ComponentSource.values())
-                        .filter(token -> token.toString().contains(enteredValue))
+                        .filter(token -> token.toString().contains(enteredValue)
+                                || token.prettyName().toLowerCase().contains(enteredValue))
                         .limit(25)
-                        .map(token -> new Command.Choice(token.toString(), token.toString()))
+                        .map(token -> new Command.Choice(token.prettyName(), token.toString()))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
@@ -775,7 +776,7 @@ class AutoCompleteProvider {
                 event.replyChoice(latestCommand, Constants.LATEST_COMMAND)
                         .queue(Consumers.nop(), BotLogger::catchRestError);
             }
-            case Constants.UNDO_TO_COMMAND -> {
+            case Constants.UNDO_OPTION -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 if (game.isFowMode() && !FoWHelper.isGameMaster(event.getUser().getId(), game)) {
@@ -1290,7 +1291,7 @@ class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Predicate<MiltyDraftTile> matchesEnteredText = tile -> {
                     String representation =
-                            Mapper.getTileRepresentations().get(tile.getTile().getTileID());
+                            Mapper.getTileRepresentation(tile.getTile().getTileID());
                     return representation != null
                             && representation.toLowerCase().contains(enteredValue);
                 };
@@ -1301,8 +1302,7 @@ class AutoCompleteProvider {
                         .toList();
                 event.replyChoices(tiles.stream()
                                 .map(t -> new Command.Choice(
-                                        Mapper.getTileRepresentations()
-                                                        .get(t.getTile().getTileID()) + " ("
+                                        Mapper.getTileRepresentation(t.getTile().getTileID()) + " ("
                                                 + t.getTile().getTileID() + ")",
                                         t.getTile().getTileID()))
                                 .toList())

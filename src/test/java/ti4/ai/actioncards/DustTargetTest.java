@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Pirate Contract for Turn Their Fleets to Dust: post the neutral destroyer where our space cannon covers it, so that a
@@ -24,7 +24,7 @@ class DustTargetTest extends BaseTi4Test {
     @BeforeEach
     void setUp() {
         table = new CardTable();
-        neighbours = PositionMapper.getAdjacentTilePositions("301").stream()
+        neighbours = MapPositionMapper.getAdjacentTilePositions("301").stream()
                 .filter(position -> !"x".equals(position))
                 .toList();
     }

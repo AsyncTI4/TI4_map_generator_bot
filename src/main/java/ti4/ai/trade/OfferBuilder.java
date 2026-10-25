@@ -22,7 +22,7 @@ import ti4.ai.trade.BuilderPrompts.Pick;
 import ti4.ai.trade.BuilderPrompts.Step;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 
 @UtilityClass

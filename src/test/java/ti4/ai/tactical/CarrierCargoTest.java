@@ -11,8 +11,8 @@ import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 // A carrier that moves into a system holding a planet nobody controls should bring along the ground forces the
@@ -35,7 +35,7 @@ class CarrierCargoTest extends BaseTi4Test {
         test.place("18", "000");
         test.place("46", "101");
         test.units(test.game.getTileByPosition("101"), "space", test.nekro, UnitType.Destroyer, 1);
-        departurePosition = PositionMapper.getAdjacentTilePositions(DESTINATION).stream()
+        departurePosition = MapPositionMapper.getAdjacentTilePositions(DESTINATION).stream()
                 .filter(position -> position.startsWith("2"))
                 .findFirst()
                 .orElseThrow();

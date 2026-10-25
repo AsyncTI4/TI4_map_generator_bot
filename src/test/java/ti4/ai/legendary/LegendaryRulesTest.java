@@ -380,7 +380,7 @@ class LegendaryRulesTest extends BaseTi4Test {
     }
 
     private static String otherNeighbour(String position) {
-        return ti4.image.PositionMapper.getAdjacentTilePositions(position).stream()
+        return ti4.model.MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate))
                 .findFirst()
                 .orElseThrow();

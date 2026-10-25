@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 class SwapStage1 extends GameStateSubcommand {
 
     SwapStage1() {
-        super(Constants.SWAP_STAGE1, "Swap the place of 1 Objective With Another", true, true);
+        super(Constants.SWAP_STAGE1, "Swap the positions of two stage 1 public objectives", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.LOCATION1, "Location 1").setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.LOCATION2, "Location 2").setRequired(true));
     }

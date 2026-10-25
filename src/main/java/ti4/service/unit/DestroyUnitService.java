@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
@@ -201,6 +201,9 @@ public class DestroyUnitService {
         MonumentsDSButtonHandler.offerKyroReliquaryRelocation(event, game, units);
         if (combat) {
             LostLegaciesRelicHandler.offerNeutralReplacement(event, game, units);
+            if (WarGamesBrActionCardHandler.isCombatActive(game)) {
+                WarGamesBrActionCardHandler.replaceDestroyedNeutralUnits(event, game, units, true);
+            }
         }
         MidgardLegendaryButtonHandler.offerMusterManheim(event, game, units, combat);
         TeHelperAbilities.offerStrandedStructureRemoval(event, game, units);
@@ -250,6 +253,7 @@ public class DestroyUnitService {
 
         List<Player> capturing = CaptureUnitService.listCapturingFlagshipPlayers(game, allUnits, unit);
         List<Player> devours = CaptureUnitService.listCapturingCombatPlayers(game, unit);
+        Player stasisFieldGeneratorsCapturer = BlueReverieTechHelper.consumeStasisFieldGeneratorsCapture(game, unit);
         if (combat) {
             capturing.addAll(devours);
         }
@@ -294,14 +298,6 @@ public class DestroyUnitService {
                 handleSelfAssemblyRoutines(event, player, totalAmount, game, combat, unit);
                 if (player != null && player.hasUnit("ashen_mech")) {
                     AshenUnitHandler.resolveAshenMechDestroy(game, player, unit);
-                }
-                if (player.hasUnit("iron_mech") || player.hasUnit("iron_mech2")) {
-                    IronUnitsHandler.resolveRiptideDestroy(event, game, player, unit);
-                }
-                if (combat
-                        && player.getPromissoryNotes().containsKey("bepniron")
-                        && !player.getPromissoryNotesOwned().contains("bepniron")) {
-                    IronUnitsHandler.resolveEjectionDestroy(event, game, player, unit, killers);
                 }
                 if (player.hasUnit("dream_mech")) {
                     DreamUnitsHandler.offerRecurringMechButtons(
@@ -375,10 +371,16 @@ public class DestroyUnitService {
             default -> Consumers.nop();
         }
 
+        if (stasisFieldGeneratorsCapturer != null) {
+            capturing.removeIf(capturer -> capturer == stasisFieldGeneratorsCapturer);
+        }
         Set<String> counted = new HashSet<>();
         for (Player cabal : capturing) {
             if (!counted.add(cabal.getColorID())) continue;
             CaptureUnitService.executeCapture(event, game, cabal, unit);
+        }
+        if (stasisFieldGeneratorsCapturer != null) {
+            BlueReverieTechHelper.captureWithStasisFieldGenerators(event, game, stasisFieldGeneratorsCapturer, unit);
         }
         if (player != null
                 && combat

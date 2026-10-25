@@ -257,13 +257,13 @@ class StructurePolicyTest extends BaseTi4Test {
         String near = AiTestGame.neighbourOf(AiTestGame.HOME);
         test.place("26", near);
         test.nekro.addPlanet("lodor");
-        String far = ti4.image.PositionMapper.getAdjacentTilePositions(near).stream()
+        String far = ti4.model.MapPositionMapper.getAdjacentTilePositions(near).stream()
                 .filter(p -> !"x".equals(p) && !AiTestGame.HOME.equals(p) && test.game.getTileByPosition(p) == null)
                 .findFirst()
                 .orElseThrow();
         test.place("25", far);
         test.nekro.addPlanet("quann");
-        String watcher = ti4.image.PositionMapper.getAdjacentTilePositions(far).stream()
+        String watcher = ti4.model.MapPositionMapper.getAdjacentTilePositions(far).stream()
                 .filter(p -> !"x".equals(p)
                         && !near.equals(p)
                         && !AiTestGame.HOME.equals(p)

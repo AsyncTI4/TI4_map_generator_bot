@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 
 public final class Territory {
 
@@ -90,7 +90,7 @@ public final class Territory {
 
     private static Map<String, Integer> distancesFrom(@Nullable String start) {
         Map<String, Integer> distances = new HashMap<>();
-        if (start == null || PositionMapper.getAdjacentTilePositions(start).isEmpty()) return distances;
+        if (start == null || MapPositionMapper.getAdjacentTilePositions(start).isEmpty()) return distances;
         distances.put(start, 0);
         ArrayDeque<String> queue = new ArrayDeque<>();
         queue.add(start);
@@ -98,7 +98,7 @@ public final class Territory {
             String position = queue.removeFirst();
             int distance = distances.get(position);
             if (distance >= RADIUS) continue;
-            for (String next : PositionMapper.getAdjacentTilePositions(position)) {
+            for (String next : MapPositionMapper.getAdjacentTilePositions(position)) {
                 if (OFF_MAP.equals(next) || next.isBlank() || distances.containsKey(next)) continue;
                 distances.put(next, distance + 1);
                 queue.addLast(next);

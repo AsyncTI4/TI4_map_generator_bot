@@ -115,7 +115,7 @@ class GamePhaseButtonHandler {
             if (PriorityTrackHelper.getPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        "Failed to fill the Priority Track with the default seating order. Use `/omegaphase assign_player_priority` to fill the track before proceeding.");
+                        "Failed to fill the Priority Track with the default seating order. Use `/homebrew omegaphase assign_player_priority` to fill the track before proceeding.");
                 PriorityTrackHelper.PrintPriorityTrack(game);
                 return;
             }

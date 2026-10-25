@@ -14,7 +14,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.FoWHelper;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 
 @UtilityClass

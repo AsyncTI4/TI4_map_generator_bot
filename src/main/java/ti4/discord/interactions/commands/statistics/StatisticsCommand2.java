@@ -32,7 +32,7 @@ public class StatisticsCommand2 implements ParentCommand {
     }
 
     public String getDescription() {
-        return "Statistics";
+        return "Faction and component statistics: win rates, tech, strategy cards, colors";
     }
 
     @Override

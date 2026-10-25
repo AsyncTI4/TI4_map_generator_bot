@@ -353,7 +353,7 @@ class StrikeEvaluatorTest extends BaseTi4Test {
     }
 
     private String freeNeighbour(Tile tile) {
-        return ti4.image.PositionMapper.getAdjacentTilePositions(tile.getPosition()).stream()
+        return ti4.model.MapPositionMapper.getAdjacentTilePositions(tile.getPosition()).stream()
                 .filter(position -> !"x".equals(position) && board.test.game.getTileByPosition(position) == null)
                 .findFirst()
                 .orElseThrow();

@@ -11,10 +11,10 @@ import ti4.game.Game;
 import ti4.game.GameStats;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
-import ti4.image.Mapper;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.model.ActionCardModel;
+import ti4.model.Mapper;
 import ti4.service.actioncard.SabotageService;
 
 @UtilityClass

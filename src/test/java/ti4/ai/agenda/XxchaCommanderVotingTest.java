@@ -13,7 +13,7 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Elder Qanoj: each planet exhausted to cast votes provides one additional vote, and game effects cannot stop the
@@ -32,7 +32,7 @@ class XxchaCommanderVotingTest extends BaseTi4Test {
         sol = test.sol;
         test.place("01", "304");
         sol.addPlanet("jord");
-        String neighbour = PositionMapper.getAdjacentTilePositions("304").stream()
+        String neighbour = MapPositionMapper.getAdjacentTilePositions("304").stream()
                 .filter(position -> !"x".equals(position))
                 .filter(position -> test.game.getTileByPosition(position) == null)
                 .findFirst()

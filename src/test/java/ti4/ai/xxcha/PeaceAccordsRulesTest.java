@@ -12,7 +12,7 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.nekro.NekroBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // The engine offers Peace Accords as a public message with one green button per claimable planet, owned by the Xxcha
@@ -28,7 +28,7 @@ class PeaceAccordsRulesTest extends BaseTi4Test {
         test.aiIsActive("action");
         test.nekroHome();
         test.nekro.addAbility("peace_accords");
-        String neighbour = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        String neighbour = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position))
                 .findFirst()
                 .orElseThrow();

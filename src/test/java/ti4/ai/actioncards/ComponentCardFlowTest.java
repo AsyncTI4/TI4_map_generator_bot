@@ -235,7 +235,7 @@ class ComponentCardFlowTest extends BaseTi4Test {
     void explorationProbePicksTheFrontierSystemItDeclared() {
         String near = AiTestGame.neighbourOf(AiTestGame.HOME);
         Tile frontier = table.system("41", near);
-        frontier.addToken(ti4.image.Mapper.getTokenID(ti4.helpers.Constants.FRONTIER), "space");
+        frontier.addToken(ti4.model.Mapper.getTokenID(ti4.helpers.Constants.FRONTIER), "space");
         table.ships(table.nekro, table.game.getTileByPosition(AiTestGame.HOME), UnitType.Cruiser, 1);
 
         oneChoiceCard(

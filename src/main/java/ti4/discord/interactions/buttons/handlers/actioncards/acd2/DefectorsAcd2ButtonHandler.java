@@ -20,9 +20,9 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
@@ -438,7 +438,7 @@ class DefectorsAcd2ButtonHandler {
         }
 
         for (int ring = 1; ring <= game.getRingCount(); ring++) {
-            List<String> ringPositions = PositionMapper.getPositionsInRing(Integer.toString(ring), game);
+            List<String> ringPositions = MapPositionMapper.getPositionsInRing(Integer.toString(ring), game);
             if (ringPositions.stream().anyMatch(eligiblePositions::contains)) {
                 buttons.add(
                         Buttons.green(player.factionButtonChecker() + "defectorsPlaceRing_" + ring, "Ring #" + ring));
@@ -502,13 +502,13 @@ class DefectorsAcd2ButtonHandler {
             positions = getDefectorsCornerPositions(game);
         } else if (ringSelector.endsWith("_left") || ringSelector.endsWith("_right")) {
             String baseRing = ringSelector.substring(0, ringSelector.indexOf('_'));
-            List<String> ringPositions = PositionMapper.getPositionsInRing(baseRing, game);
+            List<String> ringPositions = MapPositionMapper.getPositionsInRing(baseRing, game);
             int midpoint = ringPositions.size() / 2;
             positions = ringSelector.endsWith("_left")
                     ? ringPositions.subList(midpoint, ringPositions.size())
                     : ringPositions.subList(0, midpoint);
         } else {
-            positions = PositionMapper.getPositionsInRing(ringSelector, game);
+            positions = MapPositionMapper.getPositionsInRing(ringSelector, game);
         }
 
         return positions.stream().filter(eligiblePositions::contains).toList();

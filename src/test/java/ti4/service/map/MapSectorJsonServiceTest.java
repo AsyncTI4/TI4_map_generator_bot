@@ -14,8 +14,9 @@ import org.junit.jupiter.api.Test;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Tile;
-import ti4.image.GalaxyNames;
-import ti4.image.MapSegment;
+import ti4.image.map.MapSegment;
+import ti4.model.GalaxyNames;
+import ti4.model.SegmentNames;
 import ti4.service.map.MapJsonIOService.MapDataIO;
 import ti4.service.map.MapJsonIOService.SectorIO;
 import ti4.service.map.MapJsonIOService.TileIO;
@@ -160,7 +161,7 @@ class MapSectorJsonServiceTest extends BaseTi4Test {
         MapSectorJsonService.importSectors(game, data, errors);
 
         assertThat(MapSegment.stored(game)).hasSize(1);
-        assertThat(MapSegment.isValidName(MapSegment.stored(game).getFirst().name()))
+        assertThat(SegmentNames.isValid(MapSegment.stored(game).getFirst().name()))
                 .isTrue();
         assertThat(errors).isEmpty();
     }

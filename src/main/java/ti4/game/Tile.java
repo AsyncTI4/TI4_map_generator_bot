@@ -22,25 +22,21 @@ import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.CalendarHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.RandomHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
-import ti4.logging.LogOrigin;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 import ti4.model.TokenModel;
@@ -111,7 +107,7 @@ public class Tile {
     private void initPlanetsAndSpace(String tileID) {
         Space space = new Space(Constants.SPACE, Constants.SPACE_CENTER_POSITION);
         unitHolders.put(Constants.SPACE, space);
-        Map<String, Point> tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
+        Map<String, Point> tilePlanetPositions = MapPositionMapper.getTilePlanetPositions(tileID);
 
         if (tilePlanetPositions != null)
             tilePlanetPositions.forEach(
@@ -148,21 +144,6 @@ public class Tile {
     public void inheritFogData(Tile t) {
         fog.putAll(t.getFog());
         fogLabel.putAll(t.getFogLabel());
-    }
-
-    @Nullable
-    public static String getCCPath(String ccID) {
-        return Mapper.getCCPath(ccID);
-    }
-
-    @Nullable
-    public static String getAttachmentPath(String tokenID) {
-        return ResourceHelper.getInstance().getAttachmentFile(tokenID);
-    }
-
-    @Nullable
-    public static String getTokenPath(String tokenID) {
-        return Mapper.getTokenPath(tokenID);
     }
 
     public static Predicate<Tile> tileHasPlayersInfAndCC(Player player) {
@@ -355,25 +336,6 @@ public class Tile {
         return position != null ? position.toLowerCase() : null;
     }
 
-    @JsonIgnore
-    public String getTilePath() {
-        String tileName = Mapper.getTileID(tileID);
-        if (("44".equals(tileID) || ("45".equals(tileID))) && (RandomHelper.isOneInX(Constants.EYE_CHANCE))) {
-            tileName = "S15_Cucumber.png";
-        }
-        if (("43".equals(tileID) || "80".equals(tileID))) {
-            int baubleChance = CalendarHelper.isNearChristmas() ? 5 : 10_000;
-            if (RandomHelper.isOneInX(baubleChance)) {
-                tileName = tileName.replace(".png", "_xmas.png");
-            }
-        }
-        String tilePath = ResourceHelper.getTileFile(tileName);
-        if (tilePath == null) {
-            BotLogger.warning("Could not find tile: " + tileID);
-        }
-        return tilePath;
-    }
-
     public void swapFogData(Player player1, Player player2) {
         if (player1 == null || player2 == null) return;
 
@@ -428,27 +390,6 @@ public class Tile {
         fogLabel.put(player.getUserID(), fogLabel_);
     }
 
-    @JsonIgnore
-    public String getFowTilePath(Player player) {
-        String fogTileColor = player == null ? "default" : player.getFogFilter();
-        String fogTileColorSuffix = "_" + fogTileColor;
-        String fowTileID = "fow" + fogTileColorSuffix;
-
-        if ("82b".equals(tileID) || "51".equals(tileID)) { // mallice || creuss
-            fowTileID = "fowb" + fogTileColorSuffix;
-        }
-        if ("82a".equals(tileID)) { // mallicelocked
-            fowTileID = "fowc" + fogTileColorSuffix;
-        }
-
-        String tileName = Mapper.getTileID(fowTileID);
-        String tilePath = ResourceHelper.getTileFile(tileName);
-        if (tilePath == null) {
-            BotLogger.warning(new LogOrigin(player), "Could not find tile: " + fowTileID);
-        }
-        return tilePath;
-    }
-
     public List<Planet> getSpaceStations(Game game) {
         List<Planet> planets = new ArrayList<>();
         for (UnitHolder uH : unitHolders.values()) {
@@ -500,15 +441,8 @@ public class Tile {
 
     @JsonIgnore
     public String getRepresentation() {
-        try {
-            if (Mapper.getTileRepresentations().get(tileID) == null) {
-                return tileID + "(" + getPosition() + ")";
-            }
-            return Mapper.getTileRepresentations().get(tileID);
-        } catch (Exception e) {
-            // DO NOTHING
-        }
-        return null;
+        String representation = Mapper.getTileRepresentation(tileID);
+        return representation == null ? tileID + "(" + getPosition() + ")" : representation;
     }
 
     @JsonIgnore
@@ -641,7 +575,7 @@ public class Tile {
     public boolean isGravityRift(Game game, Player player) {
         if (hasAnyToken("token_gravityrift.png", "token_ds_wound.png", "token_vortex.png")) return true;
         if (player != null
-                && player.hasTech("tf-fraactalspikedrives")
+                && (player.hasTech("tf-fraactalspikedrives") || player.hasTech("fsd"))
                 && !getWormholes(game).isEmpty()) {
             return true;
         }
@@ -797,7 +731,7 @@ public class Tile {
 
     @JsonIgnore
     public boolean isEdgeOfBoard(Game game) {
-        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(position);
+        List<String> directlyAdjacentTiles = MapPositionMapper.getAdjacentTilePositions(position);
         if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {
             // adjacency file for this tile is not filled in
             return true;

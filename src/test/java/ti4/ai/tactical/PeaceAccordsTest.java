@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Peace Accords: after Diplomacy, gain a planet outside Mecatol Rex that holds no units and sits in a system adjacent
@@ -25,7 +25,7 @@ class PeaceAccordsTest extends BaseTi4Test {
         test = new AiTestGame();
         test.nekroHome();
         test.nekro.addAbility("peace_accords");
-        List<String> neighbours = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        List<String> neighbours = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position))
                 .toList();
         firstRing = neighbours.get(0);

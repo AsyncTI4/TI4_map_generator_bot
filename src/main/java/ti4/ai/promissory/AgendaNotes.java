@@ -11,7 +11,7 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 
 @UtilityClass

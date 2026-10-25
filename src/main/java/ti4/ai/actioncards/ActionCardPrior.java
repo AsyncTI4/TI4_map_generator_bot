@@ -6,9 +6,9 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.ActionCardStats.CardStats;
 import ti4.game.Game;
 import ti4.helpers.ActionCardHelper;
-import ti4.image.Mapper;
 import ti4.model.ActionCardModel;
 import ti4.model.DeckModel;
+import ti4.model.Mapper;
 
 @UtilityClass
 public class ActionCardPrior {

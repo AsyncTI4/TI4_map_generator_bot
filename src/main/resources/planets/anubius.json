@@ -1,0 +1,25 @@
+{
+    "id": "anubius",
+    "tileId": "fracture10",
+    "name": "Anubius",
+    "aliases": [
+        "anibus",
+        "anub"
+        
+    ],
+    "resources": 1,
+    "influence": 0,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "planetLayout": {
+        "unitHolderName": "anubius",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+           "x": 86.0,
+           "y": 138.0
+        }
+    },
+    "flavorText": "*A silent wasteland of endless dust storms. Its shifting dunes bury the forgotten ruins of ancient outposts, leaving nothing behind but dry bones and quiet dust.*",
+    "source": "merford"
+}

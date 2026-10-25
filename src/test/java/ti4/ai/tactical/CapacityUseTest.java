@@ -11,7 +11,7 @@ import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Capacity is only worth moving when it carries something. A carrier that arrives empty is wasted unless it goes
@@ -51,7 +51,7 @@ class CapacityUseTest extends BaseTi4Test {
 
     private String emptySystemBeside(String position, String... excluded) {
         List<String> skip = List.of(excluded);
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate)
                         && !skip.contains(candidate)
                         && board.test.game.getTileByPosition(candidate) == null)

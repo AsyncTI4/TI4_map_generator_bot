@@ -28,9 +28,9 @@ import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
+import ti4.model.Mapper;
+import ti4.model.TileHelper;
 import ti4.service.game.GameNameService;
 import ti4.service.testbed.TestBedService;
 

@@ -17,7 +17,7 @@ import ti4.ai.AiTestGame;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.helpers.Constants;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Unlocking a breakthrough offers a roll for The Fracture, and a Fracture that enters offers ingress tokens to place:
@@ -46,7 +46,7 @@ class FractureRulesTest extends BaseTi4Test {
         ArrayDeque<String> queue = new ArrayDeque<>(List.of(origin));
         while (!queue.isEmpty()) {
             String position = queue.removeFirst();
-            for (String next : PositionMapper.getAdjacentTilePositions(position)) {
+            for (String next : MapPositionMapper.getAdjacentTilePositions(position)) {
                 if ("x".equals(next) || distance.containsKey(next)) continue;
                 distance.put(next, distance.get(position) + 1);
                 if (distance.get(next) == steps) return next;
@@ -138,16 +138,16 @@ class FractureRulesTest extends BaseTi4Test {
     }
 
     private String quietNeighbour(String borderPosition) {
-        List<String> nearSol = PositionMapper.getAdjacentTilePositions(
+        List<String> nearSol = MapPositionMapper.getAdjacentTilePositions(
                 test.sol.getHomeSystemTile() == null
                         ? borderPosition
                         : test.sol.getHomeSystemTile().getPosition());
-        return PositionMapper.getAdjacentTilePositions(HOME).stream()
+        return MapPositionMapper.getAdjacentTilePositions(HOME).stream()
                 .filter(position -> !"x".equals(position) && !position.equals(borderPosition))
                 .filter(position -> test.game.getTileByPosition(position) == null)
                 .filter(position -> !nearSol.contains(position))
-                .filter(position ->
-                        !PositionMapper.getAdjacentTilePositions(borderPosition).contains(position))
+                .filter(position -> !MapPositionMapper.getAdjacentTilePositions(borderPosition)
+                        .contains(position))
                 .findFirst()
                 .orElseThrow();
     }

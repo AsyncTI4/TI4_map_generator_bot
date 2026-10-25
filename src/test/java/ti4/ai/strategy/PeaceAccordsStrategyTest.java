@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Peace Accords gives the Xxcha a free planet after Diplomacy, whether it plays the card or follows it, so Diplomacy
@@ -33,7 +33,7 @@ class PeaceAccordsStrategyTest extends BaseTi4Test {
     }
 
     private void emptyPlanetsNextToHome() {
-        String neighbour = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        String neighbour = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position))
                 .findFirst()
                 .orElseThrow();

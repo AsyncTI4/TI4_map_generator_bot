@@ -277,6 +277,7 @@
             "BIOTIC"
         ],
         "requirements": "GG",
+        "initials": "AWS",
         "source": "blue_reverie",
         "text": "At the end of a round of ground combat, if your units participating in that combat did not stop coexisting during this action, you may exhaust this card to have each of those units enter coexistence. That combat ends in a draw."
     },
@@ -287,6 +288,7 @@
             "PROPULSION"
         ],
         "requirements": "BB",
+        "initials": "RGS",
         "source": "blue_reverie",
         "text": "Up to 1 ship in each system that contains 1 of your command tokens does not count against your fleet pool.\n\nYour command tokens in systems that contain your ships have a capacity value of 2 as if they were your units."
     },
@@ -297,6 +299,7 @@
             "CYBERNETIC"
         ],
         "requirements": "YY",
+        "initials": "EE",
         "source": "blue_reverie",
         "text": "The minimum resource and influence values of each planet you control are 1 instead of 0.\n\nPlanets you control that have technology specialties have PLANETARY SHIELD as if they were units."
     },
@@ -307,6 +310,7 @@
             "WARFARE"
         ],
         "requirements": "RR",
+        "initials": "NFC",
         "source": "blue_reverie",
         "text": "When you win a combat you may either exhaust this card to take one of your opponent's action cards, at random, or ready this card."
     },
@@ -317,6 +321,7 @@
             "BIOTIC"
         ],
         "requirements": "GGG",
+        "initials": "VE",
         "source": "blue_reverie",
         "text": "Before you resolve the secondary ability of a strategy card, you may exhaust this card and spend 1 token from your strategy pool and destroy 2 of your infantry on the game board to resolve the secondary ability of another strategy card instead.\n\nYou cannot resolve the primary ability of a strategy card during this ability."
     },
@@ -327,6 +332,7 @@
             "PROPULSION"
         ],
         "requirements": "BBB",
+        "initials": "FSD",
         "source": "blue_reverie",
         "text": "Units your ships transport can be moved out of systems that contain your command tokens. You may treat wormholes as ingress tokens or gravity rifts."
     },
@@ -337,6 +343,7 @@
             "CYBERNETIC"
         ],
         "requirements": "YYY",
+        "initials": "NC",
         "source": "blue_reverie",
         "text": "Your command tokens in systems have PRODUCTION 1 as if they were your units. After a player activates a system, you may exhaust this card to place 1 structure from your reinforcements on a planet you control in that system."
     },
@@ -347,6 +354,7 @@
             "WARFARE"
         ],
         "requirements": "RRR",
+        "initials": "SFG",
         "source": "blue_reverie",
         "text": "Hits you produce with unit abilities cannot be canceled. Capture units destroyed by your unit abilities.\n\nAfter you roll a combat or ability die you may return 1 of your captured units to apply +1 to the result."
     },

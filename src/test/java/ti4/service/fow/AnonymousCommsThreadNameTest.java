@@ -5,14 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
-import ti4.image.Mapper;
 import ti4.model.ColorModel;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class AnonymousCommsThreadNameTest extends BaseTi4Test {
 
     // Sidebars cut long names, so the partner's color leads; "-private" stays last for the fog checks
-    // (TileGenerator, /game info, spin) that look at the thread's own name.
+    // (the tile renderer, /game info, spin) that look at the thread's own name.
     @Test
     void partnerThreadLeadsWithHueAndColor() {
         assertEquals("🔴 Red-comms-private", AnonymousCommsService.partnerThreadName("red"));

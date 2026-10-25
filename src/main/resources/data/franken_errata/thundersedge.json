@@ -63,38 +63,22 @@
     {
         "itemCategory": "ABILITY",
         "itemId": "researchteam",
-        "undraftable": true,
-        "source": "thunders_edge"
-    },
-    {
-        "itemCategory": "FLAGSHIP",
-        "itemId": "deepwrought_flagship",
-        "undraftable": true,
+         "optionalSwaps": [
+            "TECH:hydrothermal",
+            "COMMANDER:deepwroughtcommander",
+            "ABILITY:oceanbound"
+        ],
         "source": "thunders_edge"
     },
     {
         "itemCategory": "ABILITY",
         "itemId": "oceanbound",
-        "additionalComponents": [
-            "ABILITY:researchteam"
-        ],
-        "optionalSwaps": [
-            "TECH:hydrothermal",
-            "FLAGSHIP:deepwrought_flagship",
-            "AGENT:deepwroughtagent",
-            "COMMANDER:deepwroughtcommander"
-        ],
+        "undraftable": true,
         "source": "thunders_edge"
     },
     {
         "itemCategory": "TECH",
         "itemId": "hydrothermal",
-        "undraftable": true,
-        "source": "thunders_edge"
-    },
-    {
-        "itemCategory": "AGENT",
-        "itemId": "deepwroughtagent",
         "undraftable": true,
         "source": "thunders_edge"
     },

@@ -1,0 +1,16 @@
+{
+    "id": "fracture11",
+    "name": "Fracture Astroid",
+    "aliases": [
+        "fracture11",
+        "astroid",
+        "frac11"
+    ],
+    "imagePath": "fracture11.png",
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "isAstroid": true,
+    "isFracture": true,
+    "source": "merford"
+}
+

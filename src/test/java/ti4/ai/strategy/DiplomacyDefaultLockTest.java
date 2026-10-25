@@ -48,11 +48,11 @@ class DiplomacyDefaultLockTest extends BaseTi4Test {
     }
 
     private String remoteFrom(Tile party) {
-        java.util.List<String> nearHome = ti4.image.PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
-        java.util.List<String> nearParty = ti4.image.PositionMapper.getAdjacentTilePositions(party.getPosition());
+        java.util.List<String> nearHome = ti4.model.MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        java.util.List<String> nearParty = ti4.model.MapPositionMapper.getAdjacentTilePositions(party.getPosition());
         return nearHome.stream()
                 .filter(position -> !"x".equals(position) && test.game.getTileByPosition(position) == null)
-                .flatMap(position -> ti4.image.PositionMapper.getAdjacentTilePositions(position).stream())
+                .flatMap(position -> ti4.model.MapPositionMapper.getAdjacentTilePositions(position).stream())
                 .filter(position -> !"x".equals(position) && test.game.getTileByPosition(position) == null)
                 .filter(position -> !nearHome.contains(position) && !nearParty.contains(position))
                 .findFirst()

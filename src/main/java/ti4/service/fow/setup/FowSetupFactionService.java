@@ -31,12 +31,12 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.PatternHelper;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
 import ti4.model.FactionModel;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.service.ShowGameService;
 import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
@@ -637,7 +637,7 @@ final class FowSetupFactionService {
         // Validate up front - PlayerSetupService.setupPlayer already assigns faction/color and clears the
         // player's planets/techs/leaders before it checks position validity, so an invalid position here would
         // leave the player half-configured instead of just failing cleanly.
-        if (!PositionMapper.isTilePositionValid(position)) {
+        if (!MapPositionMapper.isTilePositionValid(position)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Tile position `" + position + "` is not valid. Nothing was changed.");
             return;
@@ -834,7 +834,7 @@ final class FowSetupFactionService {
         if (player == null) return;
         String realHomeTile = gateFactionHomeTile(player);
         if (realHomeTile == null) return;
-        if (!PositionMapper.isTilePositionValid(position)) {
+        if (!MapPositionMapper.isTilePositionValid(position)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Tile position `" + position + "` is not valid. Nothing was changed.");
             return;

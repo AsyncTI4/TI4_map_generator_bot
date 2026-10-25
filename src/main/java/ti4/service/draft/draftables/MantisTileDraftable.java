@@ -23,13 +23,13 @@ import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MantisTileDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.model.DraftErrataModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 import ti4.service.draft.DraftButtonService;
@@ -162,7 +162,7 @@ public class MantisTileDraftable extends Draftable {
     private DraftChoice produceChoice(DraftItem tile) {
         String tileID = tile.getItemId();
         String choiceKey = makeChoiceKey(tileID);
-        String representation = Mapper.getTileRepresentations().get(tileID);
+        String representation = Mapper.getTileRepresentation(tileID);
         if (representation == null) {
             representation = tileID;
         }

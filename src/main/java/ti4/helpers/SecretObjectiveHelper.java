@@ -13,12 +13,13 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
@@ -142,7 +143,9 @@ public class SecretObjectiveHelper {
                     StringBuilder message2 = new StringBuilder(player.getRepresentation() + " purged");
                     for (String fragId : fragmentsToPurge) {
                         player.removeFragment(fragId);
-                        game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+                        if (!StonebornAbilityHandler.returnPurgedFragment(game, fragId)) {
+                            game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+                        }
                         if (fragId.startsWith("supermassive")) {
                             ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, fragId);
                         }
@@ -156,6 +159,7 @@ public class SecretObjectiveHelper {
                             default -> message2.append(' ').append(fragId);
                         }
                     }
+                    StonebornAbilityHandler.offerFragmentumTokenPlacement(game, player, event, fragmentsToPurge);
                     CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
                     message2.append(" relic fragments.");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2.toString());

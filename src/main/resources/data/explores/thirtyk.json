@@ -133,7 +133,7 @@
         "flavorText": "*The ransom note arrived with a portrait of the heir and a very reasonable payment schedule.*",
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "Goes to your play area. When you score a 1 point spend objective you get a purge button; adjust the spending yourself (Negotiate Trade Routes refunds 3 trade goods). The bot's score check does not know the discount."
+        "automationNotes": "Goes to your play area. When you score a 1-point public objective that requires spending, you get a purge button; adjust the spending yourself (if the bot deducted the 5 trade goods for Negotiate Trade Routes, it refunds 3). The bot's score check does not know the discount."
     },
     {
         "id": "subjectivityequasion30k",
@@ -142,7 +142,6 @@
         "resolution": "Instant",
         "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 3 trade goods, or you may purge this card and spend 5 resources to research 1 blue technology.",
         "flavorText": "*Once the navigators accepted that distance was a matter of opinion, the drives began to agree with them.*",
-        "notes": "Either option purges this card.",
         "source": "thirtyk",
         "automation": "FULL",
         "automationNotes": "Goes to your play area with a start-of-turn button: purge it for 3 trade goods, or purge it and spend 5 resources to research a blue technology."
@@ -154,7 +153,6 @@
         "resolution": "Instant",
         "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 3 trade goods, or you may purge this card and spend 5 resources to research 1 red technology.",
         "flavorText": "*The isotopes were unstable, illegal in eleven systems, and exactly what the weapons division had asked for.*",
-        "notes": "Either option purges this card.",
         "source": "thirtyk",
         "automation": "FULL",
         "automationNotes": "Goes to your play area with a start-of-turn button: purge it for 3 trade goods, or purge it and spend 5 resources to research a red technology."
@@ -166,7 +164,6 @@
         "resolution": "Instant",
         "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 3 trade goods, or you may purge this card and spend 5 resources to research 1 green technology.",
         "flavorText": "*Sealed in glass for a hundred thousand years, the samples stirred the moment the laboratory lights came on.*",
-        "notes": "Either option purges this card.",
         "source": "thirtyk",
         "automation": "FULL",
         "automationNotes": "Goes to your play area with a start-of-turn button: purge it for 3 trade goods, or purge it and spend 5 resources to research a green technology."
@@ -178,7 +175,6 @@
         "resolution": "Instant",
         "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 3 trade goods, or you may purge this card and spend 5 resources to research 1 yellow technology.",
         "flavorText": "*The code rewrote itself overnight. By morning it was solving problems no one had thought to ask.*",
-        "notes": "Either option purges this card.",
         "source": "thirtyk",
         "automation": "FULL",
         "automationNotes": "Goes to your play area with a start-of-turn button: purge it for 3 trade goods, or purge it and spend 5 resources to research a yellow technology."
@@ -414,7 +410,6 @@
         "resolution": "Instant",
         "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 1 trade good, or you may purge this card and spend 2 resources to gain the Scanlink Drone Network technology. This card can be traded as part of a transaction.",
         "flavorText": "*The excavators had dug on alone for millennia, mapping every tunnel and waiting for someone to read the results.*",
-        "notes": "Either option purges this card.",
         "source": "thirtyk",
         "automation": "FULL",
         "automationNotes": "Goes to your play area with a start-of-turn button: purge it for 1 trade good, or purge it and spend 2 resources to gain Scanlink Drone Network. Can be traded as a relic in transactions."
@@ -426,7 +421,6 @@
         "resolution": "Instant",
         "text": "Place this card face up in your play area. At the start of your turn, you may purge this card to gain 1 trade good, or you may purge this card and spend 5 resources to gain the Dreadnought II unit upgrade technology. This card can be traded as part of a transaction.",
         "flavorText": "*The blueprints called for a hull so heavy that the shipwrights laughed, and then asked about the budget.*",
-        "notes": "Either option purges this card.",
         "source": "thirtyk",
         "automation": "FULL",
         "automationNotes": "Goes to your play area with a start-of-turn button: purge it for 1 trade good, or purge it and spend 5 resources to gain Dreadnought II. Can be traded as a relic in transactions."
@@ -474,7 +468,7 @@
         "attachmentId": "profitablefactories30k",
         "source": "thirtyk",
         "automation": "FULL",
-        "automationNotes": "Exhausting the planet with spend or vote buttons gives 1 trade good once per round. Exhausting it some other way does not trigger it."
+        "automationNotes": "Exhausting the planet with spend or vote buttons gives 1 trade good, once until this card is readied again. Exhausting it some other way does not trigger it."
     },
     {
         "id": "carbonconsciousness30k",
@@ -486,7 +480,7 @@
         "attachmentId": "carbonconsciousness30k",
         "source": "thirtyk",
         "automation": "FULL",
-        "automationNotes": "Exhausting the planet with spend or vote buttons offers to ready it and place 1 infantry, with influence payment buttons."
+        "automationNotes": "Exhausting the planet with spend or vote buttons offers to ready it and place 1 infantry, with influence payment buttons. The bot offers it once per turn for each planet."
     },
     {
         "id": "efficiencytechniques30k",
@@ -558,7 +552,7 @@
     },
     {
         "id": "foresightofindustryb30k1",
-        "name": "Foresight of Industry",
+        "name": "Established Surveying",
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 1 commodity for each attachment on other planets in or adjacent to this system. If there are none, reveal the top card of the industrial exploration deck and resolve it on this planet.",
@@ -569,7 +563,7 @@
     },
     {
         "id": "foresightofindustryb30k2",
-        "name": "Foresight of Industry",
+        "name": "Established Surveying",
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 1 commodity for each attachment on other planets in or adjacent to this system. If there are none, reveal the top card of the industrial exploration deck and resolve it on this planet.",
@@ -580,7 +574,7 @@
     },
     {
         "id": "foresightofindustryb30k3",
-        "name": "Foresight of Industry",
+        "name": "Established Surveying",
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 1 commodity for each attachment on other planets in or adjacent to this system. If there are none, reveal the top card of the industrial exploration deck and resolve it on this planet.",
@@ -591,7 +585,7 @@
     },
     {
         "id": "foresightofindustryb30k4",
-        "name": "Foresight of Industry",
+        "name": "Established Surveying",
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 1 commodity for each attachment on other planets in or adjacent to this system. If there are none, reveal the top card of the industrial exploration deck and resolve it on this planet.",
@@ -631,7 +625,7 @@
         "resolution": "Instant",
         "text": "Destroy all units in this system. Each player whose destroyed ships have a combined cost of 4 or more gains 1 victory point. Each other player who lost units gains 1 trade good.",
         "flavorText": "*The resonance tore every hull in the system apart, and the galaxy remembered those who lost the most.*",
-        "notes": "Use each ship's production cost; each fighter counts as 0.5. The victory point is permanent and is scored as a custom objective named Systematic Sympathies. Every player who lost units here without gaining the victory point gains 1 trade good.",
+        "notes": "Use each ship's production cost; each fighter counts as 0.5. The victory point is permanent and is scored as a custom objective named Systematic Sympathies (a player's second one is Systematic Sympathies 2, and so on). Every player who lost units here without gaining the victory point gains 1 trade good.",
         "source": "thirtyk",
         "automation": "FULL",
         "automationNotes": "Destroys all units; players who lose ships costing 4 or more score the Systematic Sympathies custom objective (1 point), other players who lost units gain 1 trade good."
@@ -668,7 +662,7 @@
         "flavorText": "*Nobody knew what the outpost actually guarded, only that every warlord in the sector wanted it.*",
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "Goes to your play area. Both players get 2 trade goods when you lose your last ship to the bot's assign-hits buttons. Losing it any other way is not detected."
+        "automationNotes": "Goes to your play area. You and the winner each get 2 trade goods when you lose your last ship to the bot's assign-hits buttons; a neutral winner gains nothing. Retreats and losses outside those buttons are not detected."
     },
     {
         "id": "unseendangerjmsc",

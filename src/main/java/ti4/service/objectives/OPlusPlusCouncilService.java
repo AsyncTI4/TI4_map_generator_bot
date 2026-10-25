@@ -22,10 +22,10 @@ import ti4.discord.interactions.routing.SelectionHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
+import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 

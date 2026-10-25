@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.secrets.SecretValue;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Sol starts with Antimass Deflectors (blue) and Neural Motivator (green). Its faction technologies are Advanced

@@ -11,8 +11,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.RandomHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.testbed.TestBedService;
 import ti4.service.unit.DestroyUnitService;
 

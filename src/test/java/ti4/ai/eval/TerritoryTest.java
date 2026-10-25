@@ -12,7 +12,7 @@ import ti4.ai.AiTestGame;
 import ti4.ai.eval.Territory.Zone;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Territory is pure hex geometry: whose side of the map a system lies on, with the shortest paths to Mecatol Rex as
@@ -138,7 +138,7 @@ class TerritoryTest extends BaseTi4Test {
     }
 
     private List<String> neighboursOfHome() {
-        return ti4.image.PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        return ti4.model.MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position))
                 .toList();
     }

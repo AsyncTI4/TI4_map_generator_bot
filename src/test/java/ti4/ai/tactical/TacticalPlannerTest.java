@@ -18,8 +18,8 @@ import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class TacticalPlannerTest extends BaseTi4Test {
@@ -140,7 +140,7 @@ class TacticalPlannerTest extends BaseTi4Test {
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 4);
         test.place("26", neighbour);
         test.place("27", twoSystemsFromHome());
-        String otherNeighbour = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        String otherNeighbour = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position) && !position.equals(neighbour))
                 .findFirst()
                 .orElseThrow();
@@ -793,8 +793,8 @@ class TacticalPlannerTest extends BaseTi4Test {
     }
 
     private String twoSystemsFromHome() {
-        List<String> nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
-        return PositionMapper.getAdjacentTilePositions(neighbour).stream()
+        List<String> nearHome = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        return MapPositionMapper.getAdjacentTilePositions(neighbour).stream()
                 .filter(position ->
                         !"x".equals(position) && !AiTestGame.HOME.equals(position) && !nearHome.contains(position))
                 .findFirst()
@@ -1039,9 +1039,9 @@ class TacticalPlannerTest extends BaseTi4Test {
     }
 
     private static String stepAwayFrom(String position, String behind) {
-        List<String> behindRing = new ArrayList<>(PositionMapper.getAdjacentTilePositions(behind));
+        List<String> behindRing = new ArrayList<>(MapPositionMapper.getAdjacentTilePositions(behind));
         behindRing.add(behind);
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate) && !behindRing.contains(candidate))
                 .findFirst()
                 .orElseThrow();
@@ -1052,7 +1052,7 @@ class TacticalPlannerTest extends BaseTi4Test {
     }
 
     private String otherNeighbourOfHome() {
-        return PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        return MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(candidate -> !"x".equals(candidate) && !neighbour.equals(candidate))
                 .findFirst()
                 .orElseThrow();

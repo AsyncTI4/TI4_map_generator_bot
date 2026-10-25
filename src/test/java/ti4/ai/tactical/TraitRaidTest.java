@@ -13,7 +13,7 @@ import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.game.Planet;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 class TraitRaidTest extends BaseTi4Test {
@@ -31,7 +31,7 @@ class TraitRaidTest extends BaseTi4Test {
         test.game.setRound(3);
         home = test.nekroHome();
         test.sol.removeTech("amd");
-        ring = new ArrayList<>(PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        ring = new ArrayList<>(MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position))
                 .toList());
         target = ring.get(0);
@@ -74,7 +74,7 @@ class TraitRaidTest extends BaseTi4Test {
     }
 
     private String beyondTarget() {
-        return PositionMapper.getAdjacentTilePositions(target).stream()
+        return MapPositionMapper.getAdjacentTilePositions(target).stream()
                 .filter(position -> !"x".equals(position) && !ring.contains(position))
                 .filter(position -> !AiTestGame.HOME.equals(position))
                 .findFirst()

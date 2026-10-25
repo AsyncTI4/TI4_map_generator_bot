@@ -7,7 +7,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.service.tech.ListTechService;
 

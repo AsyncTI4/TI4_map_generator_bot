@@ -40,13 +40,13 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKRelicHooks;
 import ti4.helpers.thirtyk.ThirtyKSecretHooks;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -1863,6 +1863,10 @@ public final class ButtonHelperSCs {
 
         if (player.isElected("tk-endorse")) {
             return msgStart + " You are elected for _Endorse_, so you do not spend a token.";
+        }
+
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "netrunnerscommander") && scNum == 7) {
+            return msgStart + " No command token was spent due to **Tek Mir-un**, the Net-Runners commander.";
         }
 
         int strategicCC = player.getStrategicCC();

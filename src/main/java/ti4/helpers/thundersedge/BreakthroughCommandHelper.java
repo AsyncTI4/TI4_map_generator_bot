@@ -16,7 +16,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionBreakthroughHandler;
@@ -33,10 +32,10 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
+import ti4.model.Mapper;
 import ti4.service.breakthrough.AlRaithService;
 import ti4.service.breakthrough.DataSkimmerService;
 import ti4.service.breakthrough.SowingReapingService;
@@ -302,9 +301,6 @@ public final class BreakthroughCommandHelper {
             if ("oblivionbt".equalsIgnoreCase(bt.getID())) {
                 OblivionBreakthroughHandler.startCallOfTheVoid(game, player);
             }
-            if ("netrunnersbt".equalsIgnoreCase(bt.getID())) {
-                NetrunnersBreakthroughHandler.offerDataBreachPlacement(game, player);
-            }
             if ("toldarbt".equalsIgnoreCase(bt.getID())
                     || "toldarbthonor".equalsIgnoreCase(bt.getID())
                     || "toldarbtdishonor".equalsIgnoreCase(bt.getID())) {
@@ -340,6 +336,7 @@ public final class BreakthroughCommandHelper {
             message = "You can roll for other breakthroughs first and then spawn The Fracture with _Styx and Stones_.";
         }
         MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, rollFracture);
+        FractureService.markRollPending(player.getGame(), player);
     }
 
     public static void lockBreakthroughs(Player player, List<String> btIDs) {

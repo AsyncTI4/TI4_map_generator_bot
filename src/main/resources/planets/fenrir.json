@@ -1,0 +1,33 @@
+{
+    "id": "fenrir",
+    "tileId": "fracture18",
+    "name": "Fenrir",
+    "aliases": [
+        "fenrir",
+        "fen",
+        "fracture18",
+        "frac18"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "techSpecialties": [
+        "PROPULSION", "PROPULSION"
+    ],
+    "legendaryAbilityName": "Homotopic Engines",
+    "legendaryAbilityText": "After you activate a system, you may exhaust this card to treat all non-home systems at the edge of the game board as adjacent to each other until the end of your tactical action.",
+    "legendaryAbilityFlavourText": "They tried to fold spacetime more than 7 times.",
+    "planetLayout": {
+        "unitHolderName": "fenrir",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170.0,
+            "y": 150.0
+        }
+    },
+    "flavourText": "*Driven drom their overcrowded home worlds by a population crisis, desperate refugees fled too far too fast, plunging deep into the uncharted maw of the Fracture where escape became impossible.*",
+    "contrastColor": "orange",
+    "source": "merford"
+}

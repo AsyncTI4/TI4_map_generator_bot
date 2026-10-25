@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.draft.DraftItem;
-import ti4.image.Mapper;
 
 class DraftErrataModelTest extends ModelTest<DraftErrataModel> {
 

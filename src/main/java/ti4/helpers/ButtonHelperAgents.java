@@ -42,10 +42,10 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperAgents;
 import ti4.helpers.twilight_kart.TkHelperGenomes;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
@@ -636,8 +636,13 @@ public final class ButtonHelperAgents {
         if (playerLeader == null) {
             return;
         }
-        if (!GameEventDraft.stage(game, new GameSubEvent.LeaderPlayed(player.getFaction(), "AGENT", agent))) {
-            GameEventService.commit(game, GameEventType.CARD_PLAY_AGENT, player, Map.of("cardId", agent));
+        String agentTarget = rest.contains("_") ? rest.substring(rest.indexOf('_') + 1) : null;
+        if (!GameEventDraft.stage(
+                game, new GameSubEvent.LeaderPlayed(player.getFaction(), "AGENT", agent, agentTarget))) {
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("cardId", agent);
+            payload.put("target", agentTarget);
+            GameEventService.commit(game, GameEventType.CARD_PLAY_AGENT, player, payload);
         }
 
         ExhaustLeaderService.exhaustLeader(game, player, playerLeader);
@@ -1666,7 +1671,6 @@ public final class ButtonHelperAgents {
             }
             return;
         }
-
         TkHelperGenomes.onExhaust(event, game, player, agent, ssruuClever, rest);
 
         if (event instanceof ButtonInteractionEvent buttonEvent) {

@@ -18,9 +18,9 @@ import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
@@ -38,10 +38,15 @@ class RetreatButtonHandler {
         String pos = buttonID.split("_")[1];
         boolean skilled = false;
         boolean feint = false;
+        boolean ebbingFlow = buttonID.contains("hydromorphicEbbing");
         if (buttonID.contains("skilled")) {
             if (game.isTwilightsFallMode()) {
                 feint = true;
             }
+            skilled = true;
+            ButtonHelper.deleteMessage(event);
+        }
+        if (ebbingFlow) {
             skilled = true;
             ButtonHelper.deleteMessage(event);
         }
@@ -71,6 +76,11 @@ class RetreatButtonHandler {
         String message = player.getRepresentationUnfogged() + ", please choose a system to move to.";
         List<Button> retreatButtons =
                 ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, pos, skilled, feint);
+        if (ebbingFlow) {
+            retreatButtons = retreatButtons.stream()
+                    .map(button -> button.withCustomId(button.getCustomId() + "_hydromorphicEbbing"))
+                    .toList();
+        }
         if (retreatButtons.isEmpty()) {
             message = player.getRepresentationUnfogged() + ", there are no valid systems to retreat to.";
         }

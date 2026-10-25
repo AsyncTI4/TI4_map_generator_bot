@@ -151,7 +151,9 @@ public enum CardEmojis implements TI4Emoji {
     MixedWormhole,
     SadMech,
     TechExplode,
-    ThroughAnomaly;
+    ThroughAnomaly,
+
+    HydromorphicCard;
 
     public static TI4Emoji getObjectiveEmoji(String type) {
         return switch (type.toLowerCase()) {

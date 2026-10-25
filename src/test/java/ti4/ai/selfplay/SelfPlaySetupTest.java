@@ -57,7 +57,7 @@ class SelfPlaySetupTest extends BaseTi4Test {
     private static List<String> neighbours(Map<String, String> positionOf, String tile) {
         Map<String, String> tileAt = new java.util.HashMap<>();
         positionOf.forEach((t, position) -> tileAt.put(position, t));
-        return ti4.image.PositionMapper.getAdjacentTilePositions(positionOf.get(tile)).stream()
+        return ti4.model.MapPositionMapper.getAdjacentTilePositions(positionOf.get(tile)).stream()
                 .map(tileAt::get)
                 .filter(java.util.Objects::nonNull)
                 .toList();

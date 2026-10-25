@@ -24,9 +24,24 @@ import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.ActionCardPingButtonHandler;
-import ti4.discord.interactions.buttons.handlers.actioncards.EscapeClauseActionCardHandler;
-import ti4.discord.interactions.buttons.handlers.actioncards.FreedomFightersDsActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.AuditBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.DubiousOccultistBRActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EntanglementBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EntenteBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EscapeClauseActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.FrameShiftBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.FreedomFightersDsActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.InnovativeOfficerBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PartisansBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PirateHordeBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.ProFormaSessionBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.RepurposeBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.StasisTeamsBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.StolenFilesBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.UnconventionalDiplomacyBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
@@ -40,15 +55,16 @@ import ti4.game.UnitHolder;
 import ti4.helpers.thirtyk.ThirtyKActionCards;
 import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.helpers.twilight_kart.TkHelperActionCards;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.GenericCardModel;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.actioncard.OracleDrawService;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.DeepgloomService;
@@ -68,6 +84,7 @@ import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
 import ti4.spring.service.gameevent.GameSubEvent;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 @UtilityClass
 public class ActionCardHelper {
@@ -87,6 +104,7 @@ public class ActionCardHelper {
 
     public enum ACStatus {
         ralnelbt,
+        morphabt,
         garbozia,
         purged
     }
@@ -134,6 +152,8 @@ public class ActionCardHelper {
         sendTrapCardInfo(player);
         sendPlotCardInfo(game, player);
         sendGarboziaInfo(game, player);
+        sendMetamorphicInfo(game, player);
+        HydromorphicHelper.sendHydromorphicInfo(game, player);
     }
 
     private static void sendGarboziaInfo(Game game, Player player) {
@@ -141,6 +161,33 @@ public class ActionCardHelper {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(), getGarboziaInfo(game), getPurgeGarboziaActionCardButtons(game));
         }
+    }
+
+    private static void sendMetamorphicInfo(Game game, Player player) {
+        if (!player.hasUnlockedBreakthrough("morphabt")) {
+            return;
+        }
+        Map<String, Integer> actionCards = game.getDiscardActionCards();
+        List<Entry<String, Integer>> metamorphicCards = actionCards.entrySet().stream()
+                .filter(entry -> game.getDiscardACStatus().get(entry.getKey()) == ACStatus.morphabt)
+                .toList();
+        if (metamorphicCards.isEmpty()) {
+            return;
+        }
+        StringBuilder message =
+                new StringBuilder("### ").append(FactionEmojis.morpha).append(" _Metamorphic_ Action Cards:\n");
+        for (Entry<String, Integer> entry : metamorphicCards) {
+            ActionCardModel actionCard = Mapper.getActionCard(entry.getKey());
+            message.append(CardEmojis.getACEmoji(game))
+                    .append(" _")
+                    .append(actionCard.getName())
+                    .append("_ `(")
+                    .append(Helper.leftpad("" + entry.getValue(), 3))
+                    .append(")`\n> ")
+                    .append(actionCard.getRepresentationJustText(game))
+                    .append('\n');
+        }
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, message.toString());
     }
 
     private static String getGarboziaInfo(Game game) {
@@ -413,6 +460,7 @@ public class ActionCardHelper {
 
         if (actionCards != null
                 && !actionCards.isEmpty()
+                && !player.hasAbility("hydromorphic")
                 && !IsPlayerElectedService.isPlayerElected(game, player, "censure")
                 && !IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
@@ -486,6 +534,12 @@ public class ActionCardHelper {
         return acButtons;
     }
 
+    private static boolean isPlayedAsComponentAction(Game game, Player player, ActionCardModel actionCard) {
+        return "action".equalsIgnoreCase(actionCard.getWindow())
+                && "action".equalsIgnoreCase(game.getPhaseOfGame())
+                && player.isActivePlayer();
+    }
+
     public static List<Button> getActionPlayActionCardButtons(Player player) {
         List<Button> acButtons = new ArrayList<>();
         if (IsPlayerElectedService.isPlayerElected(player.getGame(), player, "censure")
@@ -522,9 +576,7 @@ public class ActionCardHelper {
                 String ac_name = Mapper.getActionCard(key).getName();
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
-                if (actionCardWindow.contains("combat")
-                        || actionCardWindow.contains("roll")
-                        || actionCardWindow.contains("hit")) {
+                if (isCombatWindow(actionCardWindow)) {
                     acButtons.add(Buttons.red(
                             Constants.AC_PLAY_FROM_HAND + value,
                             "(" + value + ") " + ac_name,
@@ -533,6 +585,13 @@ public class ActionCardHelper {
             }
         }
         return acButtons;
+    }
+
+    public static boolean isCombatWindow(String window) {
+        return window.contains("combat")
+                || window.contains("roll")
+                || window.contains("hit")
+                || window.toLowerCase().contains("sustain damage");
     }
 
     public static List<Button> getCombatActionCardButtons(Player player) {
@@ -545,9 +604,7 @@ public class ActionCardHelper {
                 String acName = Mapper.getActionCard(key).getName();
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
-                if (actionCardWindow.contains("combat")
-                        || actionCardWindow.contains("roll")
-                        || actionCardWindow.contains("hit")) {
+                if (isCombatWindow(actionCardWindow)) {
                     acButtons.add(Buttons.red(
                             Constants.AC_PLAY_FROM_HAND + value,
                             "(" + value + ") " + acName,
@@ -649,6 +706,7 @@ public class ActionCardHelper {
         if (count < 1) {
             return;
         }
+        int discardedCount = 0;
         StringBuilder message = new StringBuilder(player.getRepresentationNoPing() + " discarded "
                 + StringHelper.pluralize(count, "random action card") + ".\n");
         while (count > 0 && !player.getActionCards().isEmpty()) {
@@ -663,8 +721,10 @@ public class ActionCardHelper {
                 return;
             }
             message.append(Mapper.getActionCard(acID).getRepresentation(game));
+            discardedCount++;
             count--;
         }
+        MorphaUnitHandler.recordCytoplasmicTransportDiscards(game, player, discardedCount);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
         sendActionCardInfo(game, player);
     }
@@ -698,23 +758,31 @@ public class ActionCardHelper {
             return;
         }
 
-        String message = player.getRepresentation() + " drew " + StringHelper.pluralize(count, "action card") + ".";
-        if (scheming && player.hasAbility("scheming")) {
+        boolean schemingApplied = scheming && player.hasAbility("scheming");
+        if (schemingApplied) {
             count++;
-            message = player.getRepresentation() + " drew " + StringHelper.pluralize(count, "action card")
-                    + " (including one extra because of **Scheming**).";
+        }
+        if (OracleDrawService.shouldSplitDraw(player, count)) {
+            OracleDrawService.drawOneAtATime(game, player, count, schemingApplied, silent);
+            return;
         }
         game.drawActionCard(player.getUserID(), count);
+        finishActionCardDraw(game, player, count, schemingApplied, silent);
+    }
 
+    public static void finishActionCardDraw(
+            Game game, Player player, int count, boolean schemingApplied, boolean silent) {
         sendActionCardInfo(game, player);
         ButtonHelper.checkACLimit(game, player);
-        if (scheming && player.hasAbility("scheming")) {
+        if (schemingApplied) {
             DeepgloomService.spendOneDebt(game, player, "scheming");
             sendSchemingDiscardButtons(player);
         }
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
 
         if (!silent) {
+            String message = player.getRepresentation() + " drew " + StringHelper.pluralize(count, "action card")
+                    + (schemingApplied ? " (including one extra because of **Scheming**)" : "") + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
     }
@@ -726,6 +794,9 @@ public class ActionCardHelper {
             String acID,
             int acIndex,
             MessageChannel channel) {
+        if (player.hasAbility("hydromorphic")) {
+            return "You cannot use Action Card effects while you have Hydromorphic.";
+        }
         MessageChannel mainGameChannel = game.getMainGameChannel() == null ? channel : game.getMainGameChannel();
         ActionCardModel actionCard = Mapper.getActionCard(acID);
         String actionCardTitle = actionCard.getName();
@@ -800,6 +871,9 @@ public class ActionCardHelper {
             }
         }
         recordTrackedActionCardPlay(game, player, actionCardTitle);
+        if (isPlayedAsComponentAction(game, player, actionCard)) {
+            TurnActionLog.recordComponent(game, "actionCard");
+        }
         if (!GameEventDraft.stage(
                 game, new GameSubEvent.ActionCardPlayed(player.getFaction(), acID, actionCardTitle))) {
             GameEventService.commit(
@@ -824,14 +898,14 @@ public class ActionCardHelper {
         List<Button> buttons = new ArrayList<>();
 
         boolean actionCardIsSabotageOrShatter = isSabotageOrShatter(acID);
-        if (actionCardIsCancelable && !actionCardIsSabotageOrShatter) {
+        boolean actionCardIsImmediateCancellation = actionCardIsSabotageOrShatter;
+        if (actionCardIsCancelable && !actionCardIsImmediateCancellation) {
             Button sabotageButton = Buttons.red(
                     "sabotage_ac_" + actionCardTitle + "_" + player.getFaction(),
                     "Cancel Action Card With Sabotage",
                     MiscEmojis.Sabotage);
             buttons.add(sabotageButton);
         }
-
         MonumentsButtonHandler.gainKVDTradeGoods(game, player, actionCardTitle);
 
         if (actionCardIsCancelable) {
@@ -913,10 +987,10 @@ public class ActionCardHelper {
                         player.getCorrectChannel().getName(),
                         getCombatReplayTrackedEvent(actionCard));
 
-        if (actionCardIsSabotageOrShatter) {
+        if (actionCardIsImmediateCancellation) {
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                     mainGameChannel, message, Collections.singletonList(acEmbed), null, pingPrompt);
-            if (game.isWildWildGalaxyMode()) {
+            if (actionCardIsSabotageOrShatter && game.isWildWildGalaxyMode()) {
                 Button codex1 = Buttons.green("codexCardPick_1", "Card #1");
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
@@ -1034,6 +1108,48 @@ public class ActionCardHelper {
 
             if ("escape_clause".equals(automationID)) {
                 EscapeClauseActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("audit".equals(automationID)) {
+                AuditBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("dubious_occultist".equals(automationID)) {
+                DubiousOccultistBRActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("entanglement".equals(automationID)) {
+                EntanglementBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("entente".equals(automationID)) {
+                EntenteBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("frame_shift".equals(automationID)) {
+                FrameShiftBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("innovative_officer".equals(automationID)) {
+                InnovativeOfficerBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("partisans".equals(automationID)) {
+                PartisansBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("pirate_horde".equals(automationID)) {
+                PirateHordeBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("pro_forma_session".equals(automationID)) {
+                ProFormaSessionBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("repurpose".equals(automationID)) {
+                RepurposeBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("stolen_files".equals(automationID)) {
+                StolenFilesBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("unconventional_diplomacy".equals(automationID)) {
+                UnconventionalDiplomacyBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("stasis_teams".equals(automationID)) {
+                StasisTeamsBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if ("war_games".equals(automationID)) {
+                WarGamesBrActionCardHandler.offerResolution(game, player, introMsg);
             }
 
             List<Button> codedButtons = new ArrayList<>();
@@ -1507,9 +1623,14 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
 
-            if ("compounding_interests".equals(automationID)) {
+            if ("hijacked_signal".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveHijackedSignal", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("misallocated_funding".equals(automationID)) {
                 codedButtons.add(
-                        Buttons.green(player.factionButtonChecker() + "resolveCompoundingInterests", buttonLabel));
+                        Buttons.green(player.factionButtonChecker() + "resolveMisallocatedFunding", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -1537,11 +1658,6 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveScorchedEarth", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
-            }
-
-            if ("fractured_reality".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFracturedReality", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
             if ("propaganda_te".equals(automationID)) {
@@ -1586,11 +1702,6 @@ public class ActionCardHelper {
 
             if ("joint_research".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveJointResearch", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
-            }
-
-            if ("false_flag".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFalseFlag", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -2019,6 +2130,10 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "courageousStarter", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
+            if ("disable".equals(automationID) || "disable2".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveDisable", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
             if ("veto".equals(automationID)) {
                 codedButtons.add(Buttons.blue(player.factionButtonChecker() + "resolveVeto", "Reveal next Agenda"));
                 sendResolveMsgToMainChannel(introBody, codedButtons, player, game);
@@ -2228,6 +2343,11 @@ public class ActionCardHelper {
             if ("prototype_deployment".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.factionButtonChecker() + "resolvePrototypeDeployment", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("realignment".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "willRevolution", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -2510,6 +2630,9 @@ public class ActionCardHelper {
 
     public static String playAC(
             GenericInteractionCreateEvent event, Game game, Player player, String value, MessageChannel channel) {
+        if (player.hasAbility("hydromorphic")) {
+            return "You cannot use Action Card effects while you have Hydromorphic.";
+        }
         String acID = null;
         int acIndex = -1;
         try {

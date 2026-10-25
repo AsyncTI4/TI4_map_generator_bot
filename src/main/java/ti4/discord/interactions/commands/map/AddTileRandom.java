@@ -13,8 +13,8 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 import ti4.service.map.AddTileService;
@@ -49,7 +49,7 @@ class AddTileRandom extends GameStateSubcommand {
         StringTokenizer positionTokenizer = new StringTokenizer(positionString, ",");
         while (positionTokenizer.hasMoreTokens()) {
             String position = positionTokenizer.nextToken().trim();
-            if (!PositionMapper.isTilePositionValid(getGame(), position)) {
+            if (!MapPositionMapper.isTilePositionValid(getGame(), position)) {
                 MessageHelper.replyToMessage(event, "Invalid position: " + position);
                 return;
             }

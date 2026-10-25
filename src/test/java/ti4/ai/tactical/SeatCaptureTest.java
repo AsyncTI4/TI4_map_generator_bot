@@ -14,7 +14,7 @@ import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Occupy the Seat of the Empire against a rival who holds Mecatol Rex: a strike that takes the planet and leaves three
@@ -47,7 +47,7 @@ class SeatCaptureTest extends BaseTi4Test {
 
     private String nextTo(String position, String... excluded) {
         List<String> skip = List.of(excluded);
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate)
                         && !skip.contains(candidate)
                         && board.test.game.getTileByPosition(candidate) == null)
@@ -150,10 +150,10 @@ class SeatCaptureTest extends BaseTi4Test {
     void stagingTowardMecatolIsWorthMoreToAHolder() {
         String staging = nextTo(MECATOL);
         board.test.place("48", staging);
-        String launchSpot = PositionMapper.getAdjacentTilePositions(staging).stream()
+        String launchSpot = MapPositionMapper.getAdjacentTilePositions(staging).stream()
                 .filter(candidate -> !"x".equals(candidate)
                         && !MECATOL.equals(candidate)
-                        && !PositionMapper.getAdjacentTilePositions(MECATOL).contains(candidate)
+                        && !MapPositionMapper.getAdjacentTilePositions(MECATOL).contains(candidate)
                         && board.test.game.getTileByPosition(candidate) == null)
                 .findFirst()
                 .orElseThrow();

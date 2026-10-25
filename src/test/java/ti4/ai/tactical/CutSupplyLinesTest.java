@@ -13,7 +13,7 @@ import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.secrets.SecretValue;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Cut Supply Lines needs one ship in a system that holds another player's space dock. A dock system with a PDS used to
@@ -53,7 +53,7 @@ class CutSupplyLinesTest extends BaseTi4Test {
     }
 
     private void solFleetBesideTheDock() {
-        String beside = PositionMapper.getAdjacentTilePositions(dockPosition).stream()
+        String beside = MapPositionMapper.getAdjacentTilePositions(dockPosition).stream()
                 .filter(position -> !"x".equals(position)
                         && !AiTestGame.HOME.equals(position)
                         && test.game.getTileByPosition(position) == null)

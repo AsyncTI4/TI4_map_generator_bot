@@ -45,7 +45,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Storage;
-import ti4.image.MapRenderPipeline;
+import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.model.metadata.TechSummariesMetadataManager;

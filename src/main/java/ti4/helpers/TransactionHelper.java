@@ -4,10 +4,12 @@ import java.awt.image.BufferedImage;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -32,19 +34,23 @@ import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButt
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
+import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKRelicHooks;
 import ti4.helpers.thirtyk.ThirtyKTransactions;
-import ti4.image.Mapper;
-import ti4.image.TransactionGenerator;
+import ti4.image.card.TransactionGenerator;
+import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.TechnologyModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -53,9 +59,10 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.FowCommunicationThreadService;
-import ti4.service.image.FileUploadService;
 import ti4.service.info.CardsInfoService;
+import ti4.service.info.LeaderInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.info.TechInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.relic.SendRelicService;
@@ -111,6 +118,45 @@ public class TransactionHelper {
 
     public static boolean useNewTransactionModel(Game game) {
         return game.isFowMode() ? game.getFowOption(FOWOption.NEW_TRANSACTIONS) : game.isNewTransactionMethod();
+    }
+
+    public static void activateEntanglement(Game game, Player player) {
+        game.setStoredValue(entanglementKey(player), "active");
+    }
+
+    public static boolean isEntanglementActive(Game game, Player p1, Player p2) {
+        return "active".equals(game.getStoredValue(entanglementKey(p1)))
+                || "active".equals(game.getStoredValue(entanglementKey(p2)));
+    }
+
+    private static void clearEntanglement(Game game, Player p1, Player p2) {
+        game.removeStoredValue(entanglementKey(p1));
+        game.removeStoredValue(entanglementKey(p2));
+    }
+
+    private static String entanglementKey(Player player) {
+        return "entanglement_" + player.getFaction();
+    }
+
+    private static List<Leader> getEntanglementLeaders(Player player) {
+        return player.getLeaders().stream()
+                .filter(leader ->
+                        Constants.AGENT.equals(leader.getType()) || Constants.COMMANDER.equals(leader.getType()))
+                .toList();
+    }
+
+    private static List<Leader> getEntanglementLeaders(Player player, String type) {
+        return getEntanglementLeaders(player).stream()
+                .filter(leader -> type.equals(leader.getType()))
+                .toList();
+    }
+
+    private static List<String> getEntanglementTechs(Player player) {
+        return player.getTechs().stream()
+                .filter(tech -> Mapper.getTech(tech) != null)
+                .filter(tech -> Mapper.getTech(tech).isFactionTech())
+                .filter(tech -> !Mapper.getTech(tech).isUnitUpgrade())
+                .toList();
     }
 
     private static boolean canSeeSheet(Game game, Player target, Player viewer) {
@@ -205,6 +251,12 @@ public class TransactionHelper {
                         shortfalls.add(new Shortfall(sender, "an action card no longer held"));
                     }
                 }
+                case "Hydromorphic" -> {
+                    if (!detail.startsWith("generic")
+                            && !sender.getHydromorphicCards().containsValue(Integer.parseInt(detail))) {
+                        shortfalls.add(new Shortfall(sender, "a Hydromorphic card no longer held"));
+                    }
+                }
                 case "SOs" -> {
                     tradesSecrets = true;
                     if (detail.startsWith("generic")) {
@@ -218,6 +270,17 @@ public class TransactionHelper {
                         genericPnDemand += Integer.parseInt(detail.substring("generic".length()));
                     } else if (!holdsPromissoryNote(sender, detail)) {
                         shortfalls.add(new Shortfall(sender, "a promissory note no longer held"));
+                    }
+                }
+                case "EntanglementAgent", "EntanglementCommander" -> {
+                    if (!getEntanglementLeaders(sender).stream()
+                            .anyMatch(leader -> leader.getId().equals(detail))) {
+                        shortfalls.add(new Shortfall(sender, "an agent or commander no longer held"));
+                    }
+                }
+                case "EntanglementTechnology" -> {
+                    if (!getEntanglementTechs(sender).contains(detail)) {
+                        shortfalls.add(new Shortfall(sender, "a faction technology no longer held"));
                     }
                 }
                 default -> {}
@@ -320,7 +383,8 @@ public class TransactionHelper {
                             item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
                     int amountToTransact = 1;
                     boolean isGeneralized =
-                            List.of("PNs", "ACs", "SOs").contains(thingToTransact) && furtherDetail.contains("generic");
+                            List.of("PNs", "ACs", "SOs", "Hydromorphic").contains(thingToTransact)
+                                    && furtherDetail.contains("generic");
                     if (isGeneralized) {
                         amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
                         furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
@@ -340,6 +404,14 @@ public class TransactionHelper {
                                     }
                                 }
                                 default -> resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
+                            }
+                        }
+                        case "Hydromorphic" -> {
+                            if ("generic".equals(furtherDetail)) {
+                                resolveSpecificTransButtonsOld(
+                                        game, sender, "transact_Hydromorphic_" + receiver.getFaction(), event);
+                            } else {
+                                resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
                             }
                         }
                         case "PNs" -> {
@@ -389,8 +461,12 @@ public class TransactionHelper {
                             receiver.addTech(furtherDetail);
 
                             ButtonHelperCommanders.resolveNekroCommanderCheck(receiver, furtherDetail, game);
-                            CommanderUnlockCheckService.checkPlayer(receiver, "nekro");
+                            CommanderUnlockCheckService.checkPlayer(receiver, "nekro", "netrunners");
                         }
+                        case "EntanglementAgent", "EntanglementCommander" ->
+                            transferEntanglementLeader(sender, receiver, furtherDetail, game);
+                        case "EntanglementTechnology" ->
+                            transferEntanglementTechnology(sender, receiver, furtherDetail, game);
                         case "MonumentUnits" ->
                             MonumentsButtonHandler.resolveHacanMonumentUnitTrade(
                                     event, game, sender, receiver, furtherDetail);
@@ -416,6 +492,7 @@ public class TransactionHelper {
                 p2.getCardsInfoThread(), p2.getRepresentationUnfogged() + " " + privateSummary);
 
         p1.clearTransactionItemsWithPlayer(p2);
+        clearEntanglement(game, p1, p2);
         if (!debtOnly) {
             ButtonHelperActionCards.lieInWaitCheck(p1, p2, game);
             if (!hasOptedOutOfOwnTransactionPillage(game, p1) && !hasOptedOutOfOwnTransactionPillage(game, p2)) {
@@ -432,6 +509,37 @@ public class TransactionHelper {
                 && !game.isTwilightsFallMode()
                 && !game.getStoredValue("willPillageOwnTransactions" + player.getFaction())
                         .isEmpty();
+    }
+
+    private static boolean transferEntanglementLeader(Player sender, Player receiver, String leaderID, Game game) {
+        Leader leader = sender.getLeaders().stream()
+                .filter(candidate -> candidate.getId().equals(leaderID))
+                .filter(candidate ->
+                        Constants.AGENT.equals(candidate.getType()) || Constants.COMMANDER.equals(candidate.getType()))
+                .findFirst()
+                .orElse(null);
+        if (leader == null || receiver.hasLeader(leaderID)) return false;
+        sender.removeLeader(leader);
+        receiver.addLeader(leader);
+        LeaderInfoService.sendLeadersInfo(game, sender);
+        LeaderInfoService.sendLeadersInfo(game, receiver);
+        return true;
+    }
+
+    private static boolean transferEntanglementTechnology(Player sender, Player receiver, String techID, Game game) {
+        TechnologyModel tech = Mapper.getTech(techID);
+        if (tech == null
+                || !sender.hasTech(techID)
+                || receiver.hasTech(techID)
+                || !tech.isFactionTech()
+                || tech.isUnitUpgrade()) return false;
+        sender.removeTech(techID);
+        receiver.addTech(techID);
+        ButtonHelperCommanders.resolveNekroCommanderCheck(receiver, techID, game);
+        CommanderUnlockCheckService.checkPlayer(receiver, "nekro", "netrunners");
+        TechInfoService.sendTechInfo(sender);
+        TechInfoService.sendTechInfo(receiver);
+        return true;
     }
 
     private static void announceFogRatification(Game game, Player p1, Player p2, String publicSummary) {
@@ -494,6 +602,7 @@ public class TransactionHelper {
             case "Comms" -> "commodities";
             case "SendDebt", "ClearDebt" -> "debt tokens";
             case "ACs" -> "action cards";
+            case "Hydromorphic" -> "Hydromorphic cards";
             case "PNs" -> "promissory notes";
             case "SOs" -> "secret objectives";
             case "Frags" -> "relic fragments";
@@ -511,7 +620,7 @@ public class TransactionHelper {
             return switch (thingToTransact) {
                 case "TGs", "Comms", "SendDebt", "ClearDebt" -> Integer.parseInt(detail);
                 case "Frags" -> detail.startsWith("supermassive") ? 1 : Integer.parseInt(detail.substring(3));
-                case "ACs", "SOs", "PNs" ->
+                case "ACs", "SOs", "PNs", "Hydromorphic" ->
                     detail.startsWith("generic") ? Integer.parseInt(detail.substring("generic".length())) : 1;
                 default -> 1;
             };
@@ -548,7 +657,8 @@ public class TransactionHelper {
                         item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
                 int amountToTransact = 1;
                 boolean isGeneralized =
-                        List.of("PNs", "ACs", "SOs").contains(thingToTransact) && furtherDetail.contains("generic");
+                        List.of("PNs", "ACs", "SOs", "Hydromorphic").contains(thingToTransact)
+                                && furtherDetail.contains("generic");
                 boolean isSupermassiveFragment =
                         "frags".equalsIgnoreCase(thingToTransact) && furtherDetail.startsWith("supermassive");
                 if (("frags".equalsIgnoreCase(thingToTransact) && !isSupermassiveFragment) || isGeneralized) {
@@ -603,12 +713,23 @@ public class TransactionHelper {
                                 int acNum = Integer.parseInt(furtherDetail);
                                 String acID = null;
                                 if (!player.getActionCards().containsValue(acNum)) {
-                                    continue;
+                                    acID = game.getDiscardActionCards().entrySet().stream()
+                                            .filter(entry -> entry.getValue().equals(acNum))
+                                            .filter(entry ->
+                                                    game.getDiscardACStatus().get(entry.getKey()) == ACStatus.morphabt)
+                                            .map(Map.Entry::getKey)
+                                            .findFirst()
+                                            .orElse(null);
+                                    if (acID == null) {
+                                        continue;
+                                    }
                                 }
-                                for (Map.Entry<String, Integer> ac :
-                                        player.getActionCards().entrySet()) {
-                                    if (ac.getValue().equals(acNum)) {
-                                        acID = ac.getKey();
+                                if (acID == null) {
+                                    for (Map.Entry<String, Integer> ac :
+                                            player.getActionCards().entrySet()) {
+                                        if (ac.getValue().equals(acNum)) {
+                                            acID = ac.getKey();
+                                        }
                                     }
                                 }
                                 trans.append(CardEmojis.getACEmoji(game));
@@ -618,6 +739,24 @@ public class TransactionHelper {
                                             .append("_");
                                 }
                             }
+                        }
+                    }
+                    case "Hydromorphic" -> {
+                        if ("generic".equals(furtherDetail)) {
+                            trans.append("Hydromorphic card to be specified by player");
+                        } else if (!hidePrivateCardText) {
+                            int cardNumber = Integer.parseInt(furtherDetail);
+                            String cardId = player.getHydromorphicCards().entrySet().stream()
+                                    .filter(entry -> entry.getValue().equals(cardNumber))
+                                    .map(Map.Entry::getKey)
+                                    .findFirst()
+                                    .orElse(null);
+                            trans.append(
+                                    cardId == null
+                                            ? "Hydromorphic card"
+                                            : Mapper.getHydromorphicCard(cardId).getName());
+                        } else {
+                            trans.append("Hydromorphic card");
                         }
                     }
                     case "PNs" -> {
@@ -698,6 +837,10 @@ public class TransactionHelper {
                         }
                     }
                     case "Technology" ->
+                        trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
+                    case "EntanglementAgent", "EntanglementCommander" ->
+                        trans.append(Mapper.getLeader(furtherDetail).getName());
+                    case "EntanglementTechnology" ->
                         trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
                     case "MonumentUnits" -> {
                         String[] unitDetails = furtherDetail.split("\\|", 4);
@@ -1142,6 +1285,25 @@ public class TransactionHelper {
                     }
                 }
             }
+            case "EntanglementAgent", "EntanglementCommander" -> {
+                String leaderType = "EntanglementAgent".equals(thingToTrans) ? Constants.AGENT : Constants.COMMANDER;
+                message += " Please choose the " + leaderType + " you wish to " + requestOrOffer + ".";
+                for (Leader leader : getEntanglementLeaders(p1, leaderType)) {
+                    stuffToTransButtons.add(Buttons.gray(
+                            "offerToTransact_" + thingToTrans + "_" + p1.getColor() + "_" + p2.getColor() + "_"
+                                    + leader.getId(),
+                            leader.getName()));
+                }
+            }
+            case "EntanglementTechnology" -> {
+                message += " Please choose the faction technology you wish to " + requestOrOffer + ".";
+                for (String tech : getEntanglementTechs(p1)) {
+                    stuffToTransButtons.add(Buttons.gray(
+                            "offerToTransact_EntanglementTechnology_" + p1.getColor() + "_" + p2.getColor() + "_"
+                                    + tech,
+                            Mapper.getTech(tech).getName()));
+                }
+            }
             case "AlliancePlanets" -> {
                 message += " Please choose the planet you wish to " + requestOrOffer + ".";
                 for (String planet : p1.getPlanets()) {
@@ -1168,7 +1330,9 @@ public class TransactionHelper {
                             + " Please choose the number of action cards you wish to request."
                             + " Since action cards are private info, you will have to discuss with other other player to explain which action cards you wish to transact;"
                             + " these buttons will just make sure that the player is offered buttons to send them.";
-                    int limit = seeP1 ? Math.min(BLIND_CARD_BUTTONS, p1.getAcCount()) : BLIND_CARD_BUTTONS;
+                    int limit = seeP1
+                            ? Math.min(BLIND_CARD_BUTTONS, p1.getAcCount() + getMetamorphicActionCardCount(game, p1))
+                            : BLIND_CARD_BUTTONS;
                     for (int x = 1; x < limit + 1; x++) {
                         Button transact = Buttons.green(
                                 "offerToTransact_ACs_" + p1.getColor() + "_" + p2.getColor() + "_generic" + x,
@@ -1185,6 +1349,33 @@ public class TransactionHelper {
                                         + p1.getActionCards().get(acShortHand),
                                 Mapper.getActionCard(acShortHand).getName());
                         stuffToTransButtons.add(transact);
+                    }
+                    if (p1.hasUnlockedBreakthrough("morphabt")) {
+                        for (Map.Entry<String, Integer> actionCard :
+                                game.getDiscardActionCards().entrySet()) {
+                            if (game.getDiscardACStatus().get(actionCard.getKey()) != ACStatus.morphabt) continue;
+                            stuffToTransButtons.add(Buttons.green(
+                                    "offerToTransact_ACs_" + p1.getColor() + "_" + p2.getColor() + "_"
+                                            + actionCard.getValue(),
+                                    Mapper.getActionCard(actionCard.getKey()).getName()));
+                        }
+                    }
+                }
+            }
+            case "Hydromorphic" -> {
+                message += player.getRepresentation(false, false) + " Please choose the Hydromorphic card you wish to "
+                        + requestOrOffer + ".";
+                if (requesting && !seeP1) {
+                    stuffToTransButtons.add(Buttons.green(
+                            "offerToTransact_Hydromorphic_" + p1.getColor() + "_" + p2.getColor() + "_generic1",
+                            "Hydromorphic Card"));
+                } else {
+                    for (Map.Entry<String, Integer> card :
+                            p1.getHydromorphicCards().entrySet()) {
+                        stuffToTransButtons.add(Buttons.green(
+                                "offerToTransact_Hydromorphic_" + p1.getColor() + "_" + p2.getColor() + "_"
+                                        + card.getValue(),
+                                Mapper.getHydromorphicCard(card.getKey()).getName()));
                     }
                 }
             }
@@ -1335,7 +1526,11 @@ public class TransactionHelper {
                         List.of(p1.getFaction(), p2.getFaction()).contains(game.getStoredValue("blackmarketdealing"));
                 blackmarket |= p1.hasStoredValue("bmd") || p2.hasStoredValue("bmd");
                 blackmarket |= MonumentsPoKButtonHandler.canTradeRelicsWithNaazMonument(game, p1, p2);
-                for (String relic : (blackmarket ? p1.getActualRelics() : p1.getTradableRelics())) {
+                Set<String> tradableRelics = new HashSet<>(p1.getTradableRelics());
+                if (blackmarket) {
+                    tradableRelics.addAll(p1.getActualRelics());
+                }
+                for (String relic : tradableRelics) {
                     String name = Mapper.getRelic(relic).getName();
                     stuffToTransButtons.add(Buttons.gray(prefix + "_" + relic, name, ExploreEmojis.Relic));
                 }
@@ -1453,7 +1648,12 @@ public class TransactionHelper {
         var userSettings = UserSettingsManager.get(userId);
         userSettings.setTrackRecord(thoughts.replace("\n", ""));
         UserSettingsManager.save(userSettings);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully edited the players track record.");
+        String confirmation = "Successfully edited the players track record.";
+        if (event.getMessage() == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), confirmation);
+            return;
+        }
+        event.getHook().sendMessage(confirmation).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("finishDealDetailsInvert_")
@@ -1481,6 +1681,14 @@ public class TransactionHelper {
         Player p1 = game.getPlayerFromColorOrFaction(sender);
         Player p2 = game.getPlayerFromColorOrFaction(receiver);
         if (p1 == null || p2 == null) return;
+        if (("EntanglementAgent".equals(item)
+                        || "EntanglementCommander".equals(item)
+                        || "EntanglementTechnology".equals(item))
+                && !isEntanglementActive(game, p1, p2)) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "That Entanglement transaction is no longer active.");
+            return;
+        }
         if ("washComms".equalsIgnoreCase(item)) {
             int oldP1Comms = p1.getCommodities();
             int newP1Comms = 0;
@@ -1600,7 +1808,7 @@ public class TransactionHelper {
             if (sendMemeInsteadOfText(event, game)) {
                 BufferedImage tradeOfferMeme = TransactionGenerator.drawTradeOfferMeme(game, player, p2);
                 if (tradeOfferMeme != null) {
-                    FileUpload upload = FileUploadService.createFileUpload(tradeOfferMeme, "trade_offer");
+                    FileUpload upload = ImageUploads.createFileUpload(tradeOfferMeme, "trade_offer");
                     upload.setDescription(publicOfferText);
                     MessageHelper.sendFileUploadToChannel(tableTalkChannel, upload);
                     sentMeme = true;
@@ -1860,6 +2068,25 @@ public class TransactionHelper {
                             Mapper.getActionCard(acShortHand).getName());
                     stuffToTransButtons.add(transact);
                 }
+                if (p1.hasUnlockedBreakthrough("morphabt")) {
+                    for (Map.Entry<String, Integer> actionCard :
+                            game.getDiscardActionCards().entrySet()) {
+                        if (game.getDiscardACStatus().get(actionCard.getKey()) != ACStatus.morphabt) continue;
+                        stuffToTransButtons.add(Buttons.green(
+                                factionChecker + "send_ACs_" + p2.getFaction() + "_" + actionCard.getValue(),
+                                Mapper.getActionCard(actionCard.getKey()).getName()));
+                    }
+                }
+                MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
+            }
+            case "Hydromorphic" -> {
+                String message =
+                        p1.getRepresentationUnfogged() + ", please choose the Hydromorphic card you wish to send.";
+                for (Map.Entry<String, Integer> card : p1.getHydromorphicCards().entrySet()) {
+                    stuffToTransButtons.add(Buttons.green(
+                            factionChecker + "send_Hydromorphic_" + p2.getFaction() + "_" + card.getValue(),
+                            Mapper.getHydromorphicCard(card.getKey()).getName()));
+                }
                 MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
             }
             case "PNs" -> {
@@ -1926,6 +2153,25 @@ public class TransactionHelper {
                 }
                 MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
             }
+            case "EntanglementAgent", "EntanglementCommander" -> {
+                String leaderType = "EntanglementAgent".equals(thingToTrans) ? Constants.AGENT : Constants.COMMANDER;
+                String message = "Please choose the " + leaderType + " you wish to send.";
+                for (Leader leader : getEntanglementLeaders(p1, leaderType)) {
+                    stuffToTransButtons.add(Buttons.gray(
+                            factionChecker + "send_" + thingToTrans + "_" + p2.getFaction() + "_" + leader.getId(),
+                            leader.getName()));
+                }
+                MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
+            }
+            case "EntanglementTechnology" -> {
+                String message = "Please choose the faction technology you wish to send.";
+                for (String tech : getEntanglementTechs(p1)) {
+                    stuffToTransButtons.add(Buttons.gray(
+                            factionChecker + "send_EntanglementTechnology_" + p2.getFaction() + "_" + tech,
+                            Mapper.getTech(tech).getName()));
+                }
+                MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
+            }
             case "Frags" -> {
                 String message = "Please choose the amount of relic fragments you wish to send";
 
@@ -1974,7 +2220,9 @@ public class TransactionHelper {
             case "Relics" -> {
                 String message = " Click the relics you wish to send.";
                 String prefix = "send_Relics_" + p2.getFaction() + "_";
-                for (String relic : p1.getActualRelics()) {
+                Set<String> relics = new HashSet<>(p1.getActualRelics());
+                relics.addAll(p1.getTradableRelics());
+                for (String relic : relics) {
                     String name = Mapper.getRelic(relic).getName();
                     stuffToTransButtons.add(Buttons.gray(prefix + relic, name, ExploreEmojis.Relic));
                 }
@@ -1995,6 +2243,14 @@ public class TransactionHelper {
         String amountToTrans = buttonID.substring(buttonID.indexOf('_') + 1);
         Player p2 = game.getPlayerFromColorOrFaction(factionToTrans);
         if (p2 == null) return;
+        if (("EntanglementAgent".equals(thingToTrans)
+                        || "EntanglementCommander".equals(thingToTrans)
+                        || "EntanglementTechnology".equals(thingToTrans))
+                && !isEntanglementActive(game, p1, p2)) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "That Entanglement transaction is no longer active.");
+            return;
+        }
 
         String message2 = "";
         String ident = p1.getRepresentation();
@@ -2109,7 +2365,11 @@ public class TransactionHelper {
                 message2 = ident + " sent action card #" + amountToTrans + " to " + ident2 + ".";
                 int acNum = Integer.parseInt(amountToTrans);
                 String acID = null;
-                if (!p1.getActionCards().containsValue(acNum)) {
+                boolean fromMetamorphic = p1.hasUnlockedBreakthrough("morphabt")
+                        && game.getDiscardActionCards().entrySet().stream()
+                                .anyMatch(actionCard -> actionCard.getValue().equals(acNum)
+                                        && game.getDiscardACStatus().get(actionCard.getKey()) == ACStatus.morphabt);
+                if (!p1.getActionCards().containsValue(acNum) && !fromMetamorphic) {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             "Could not find that action card, and so no action card was sent.");
@@ -2120,8 +2380,17 @@ public class TransactionHelper {
                         acID = ac.getKey();
                     }
                 }
-                p1.removeActionCard(acNum);
-                p2.setActionCard(acID);
+                if (fromMetamorphic) {
+                    if (!game.pickActionCard(p2.getUserID(), acNum)) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getMessageChannel(),
+                                "Could not find that action card, and so no action card was sent.");
+                        return;
+                    }
+                } else {
+                    p1.removeActionCard(acNum);
+                    p2.setActionCard(acID);
+                }
                 ButtonHelper.checkACLimit(game, p2);
                 ActionCardHelper.sendActionCardInfo(game, p2);
                 ActionCardHelper.sendActionCardInfo(game, p1);
@@ -2138,6 +2407,19 @@ public class TransactionHelper {
                     }
                     return;
                 }
+            }
+            case "Hydromorphic" -> {
+                int cardNumber = Integer.parseInt(amountToTrans);
+                String cardId = p1.removeHydromorphicCard(cardNumber);
+                if (cardId == null) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(), "Could not find that Hydromorphic card.");
+                    return;
+                }
+                p2.setHydromorphicCard(cardId);
+                message2 = ident + " sent a Hydromorphic card to " + ident2 + ".";
+                ActionCardHelper.sendActionCardInfo(game, p1);
+                ActionCardHelper.sendActionCardInfo(game, p2);
             }
             case "PNs" -> {
                 String id = null;
@@ -2244,6 +2526,14 @@ public class TransactionHelper {
                         p2.getCorrectChannel(),
                         p2.getRepresentation() + ", you have received the technology _" + Mapper.getTech(amountToTrans)
                                 + "_ from a transaction.");
+            }
+            case "EntanglementAgent", "EntanglementCommander" -> {
+                if (!transferEntanglementLeader(p1, p2, amountToTrans, game)) return;
+                message2 = ident + " sent " + Mapper.getLeader(amountToTrans).getName() + " to " + ident2 + ".";
+            }
+            case "EntanglementTechnology" -> {
+                if (!transferEntanglementTechnology(p1, p2, amountToTrans, game)) return;
+                message2 = ident + " sent " + Mapper.getTech(amountToTrans).getName() + " to " + ident2 + ".";
             }
             case "Relics" ->
                 SendRelicService.handleSendRelic(
@@ -2432,10 +2722,17 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_starCharts_" + p1.getColor() + "_" + p2.getColor(), "Star Charts"));
         }
-        boolean canTradeACs = otherPartyHidden || canTradeActionCards(p1, p2, blackMarket);
-        if (canTradeACs && (!seeP1 || p1.getAcCount() > 0)) {
+        boolean canTradeACs = otherPartyHidden
+                || canTradeActionCards(p1, p2, blackMarket)
+                || p1.hasUnlockedBreakthrough("morphabt")
+                || p2.hasUnlockedBreakthrough("morphabt");
+        if (canTradeACs && (!seeP1 || p1.getAcCount() + getMetamorphicActionCardCount(game, p1) > 0)) {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_ACs_" + p1.getColor() + "_" + p2.getColor(), "Action Cards"));
+        }
+        if (!seeP1 || !p1.getHydromorphicCards().isEmpty()) {
+            stuffToTransButtons.add(Buttons.green(
+                    "newTransact_Hydromorphic_" + p1.getColor() + "_" + p2.getColor(), "Hydromorphic Cards"));
         }
         if (!seeP1 || p1.getPnCount() > 0) {
             stuffToTransButtons.add(
@@ -2479,6 +2776,21 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_Technology_" + p1.getColor() + "_" + p2.getColor(), "Technology"));
         }
+        if (seeP1 && isEntanglementActive(game, p1, p2)) {
+            if (!getEntanglementLeaders(p1, Constants.AGENT).isEmpty()) {
+                stuffToTransButtons.add(
+                        Buttons.gray("newTransact_EntanglementAgent_" + p1.getColor() + "_" + p2.getColor(), "Agents"));
+            }
+            if (!getEntanglementLeaders(p1, Constants.COMMANDER).isEmpty()) {
+                stuffToTransButtons.add(Buttons.gray(
+                        "newTransact_EntanglementCommander_" + p1.getColor() + "_" + p2.getColor(), "Commanders"));
+            }
+            if (!getEntanglementTechs(p1).isEmpty()) {
+                stuffToTransButtons.add(Buttons.gray(
+                        "newTransact_EntanglementTechnology_" + p1.getColor() + "_" + p2.getColor(),
+                        "Faction Technologies"));
+            }
+        }
         if (!ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game)
                 .isEmpty()) {
             stuffToTransButtons.add(Buttons.green(
@@ -2514,9 +2826,17 @@ public class TransactionHelper {
                     Buttons.red("getNewTransaction_" + p2.getColor() + "_" + p1.getColor(), "Offer More"));
             stuffToTransButtons.add(Buttons.gray("sendOffer_" + p1.getColor(), "Send the Offer"));
         }
-        stuffToTransButtons.add(Buttons.red("deleteButtons", "Delete This Transaction"));
+        stuffToTransButtons.add(
+                Buttons.red("endTransaction_" + p1.getColor() + "_" + p2.getColor(), "Delete This Transaction"));
 
         return stuffToTransButtons;
+    }
+
+    private static int getMetamorphicActionCardCount(Game game, Player player) {
+        if (!player.hasUnlockedBreakthrough("morphabt")) return 0;
+        return (int) game.getDiscardACStatus().values().stream()
+                .filter(status -> status == ACStatus.morphabt)
+                .count();
     }
 
     @ButtonHandler("send_")
@@ -2621,9 +2941,15 @@ public class TransactionHelper {
         if ((p1.hasAbility("arbiters")
                         || (!game.isFowMode() && p2.hasAbility("arbiters"))
                         || p1.hasTech("tf-guildships")
-                        || (!game.isFowMode() && p2.hasTech("tf-guildships")))
-                && p1.getAcCount() > 0) {
+                        || (!game.isFowMode() && p2.hasTech("tf-guildships"))
+                        || p1.hasUnlockedBreakthrough("morphabt")
+                        || p2.hasUnlockedBreakthrough("morphabt"))
+                && p1.getAcCount() + getMetamorphicActionCardCount(game, p1) > 0) {
             stuffToTransButtons.add(Buttons.green(factionChecker + "transact_ACs_" + p2.getFaction(), "Action Cards"));
+        }
+        if (!p1.getHydromorphicCards().isEmpty()) {
+            stuffToTransButtons.add(
+                    Buttons.green(factionChecker + "transact_Hydromorphic_" + p2.getFaction(), "Hydromorphic Cards"));
         }
         if (p1.getPnCount() > 0) {
             stuffToTransButtons.add(
@@ -2640,6 +2966,20 @@ public class TransactionHelper {
         if (game.isAgeOfCommerceMode()) {
             stuffToTransButtons.add(
                     Buttons.green(factionChecker + "transact_Technology_" + p2.getFaction(), "Technology"));
+        }
+        if (isEntanglementActive(game, p1, p2)) {
+            if (!getEntanglementLeaders(p1, Constants.AGENT).isEmpty()) {
+                stuffToTransButtons.add(
+                        Buttons.gray(factionChecker + "transact_EntanglementAgent_" + p2.getFaction(), "Agents"));
+            }
+            if (!getEntanglementLeaders(p1, Constants.COMMANDER).isEmpty()) {
+                stuffToTransButtons.add(Buttons.gray(
+                        factionChecker + "transact_EntanglementCommander_" + p2.getFaction(), "Commanders"));
+            }
+            if (!getEntanglementTechs(p1).isEmpty()) {
+                stuffToTransButtons.add(Buttons.gray(
+                        factionChecker + "transact_EntanglementTechnology_" + p2.getFaction(), "Faction Technologies"));
+            }
         }
         if (!ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game)
                 .isEmpty()) {
@@ -2689,6 +3029,7 @@ public class TransactionHelper {
                     player.getRepresentation() + "you rescinded the latest offer to "
                             + p2.getRepresentation(false, false));
             player.clearTransactionItemsWithPlayer(p2);
+            clearEntanglement(game, player, p2);
             ButtonHelper.deleteMessage(event);
         }
     }
@@ -2702,8 +3043,23 @@ public class TransactionHelper {
                     p1.getCardsInfoThread(),
                     p1.getRepresentation() + " your offer to " + player.getRepresentation(false, false)
                             + " has been rejected.");
+            clearEntanglement(game, p1, player);
             ButtonHelper.deleteMessage(event);
         }
+    }
+
+    @ButtonHandler("endTransaction_")
+    public static void endTransaction(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] parts = buttonID.split("_");
+        Player p1 = parts.length == 3 ? game.getPlayerFromColorOrFaction(parts[1]) : null;
+        Player p2 = parts.length == 3 ? game.getPlayerFromColorOrFaction(parts[2]) : null;
+        if (p1 == null || p2 == null || (player != p1 && player != p2)) {
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        p1.clearTransactionItemsWithPlayer(p2);
+        clearEntanglement(game, p1, p2);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("acceptOffer_")
@@ -2774,6 +3130,7 @@ public class TransactionHelper {
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         CommanderUnlockCheckService.checkPlayer(player2, "hacan");
         ButtonHelperFactionSpecific.checkViabilityTradeConvoys(game, player, player2);
+        if (player2 != null) clearEntanglement(game, player, player2);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -2805,7 +3162,7 @@ public class TransactionHelper {
                 buttons = getStuffToTransButtonsNew(game, player, player, p2);
                 if (player.getUserSettings().isShowTransactables() && buttonID.startsWith("transactWith_")) {
                     BufferedImage image = TransactionGenerator.drawTransactableStuffImage(player, p2, player);
-                    FileUpload upload = FileUploadService.createFileUpload(image, "transactable_items");
+                    FileUpload upload = ImageUploads.createFileUpload(image, "transactable_items");
                     MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), upload);
                 }
             }

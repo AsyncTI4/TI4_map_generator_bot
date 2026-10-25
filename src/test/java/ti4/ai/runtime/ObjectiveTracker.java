@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.statistics.game.WinningPathBreakdown;

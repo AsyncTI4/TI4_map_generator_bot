@@ -503,7 +503,7 @@ class StrategyCardRulesTest extends BaseTi4Test {
     @Test
     void usesWarfareToProduceAgainAtHome() {
         ti4.game.Tile home = test.nekroHome();
-        home.addCC(ti4.image.Mapper.getCCID(test.nekro.getColor()));
+        home.addCC(ti4.model.Mapper.getCCID(test.nekro.getColor()));
         test.nekro.setTg(10);
         AiPrompt card = prompt("warfare", PromptSource.PUBLIC, NOW, "sc_no_follow_6", "primaryOfTeWarfare");
         StrategyCardRules.play(test.context(card), card, card.buttons().getFirst(), 6);
@@ -528,7 +528,7 @@ class StrategyCardRulesTest extends BaseTi4Test {
     @Test
     void rebalancesSpareStrategyTokensIntoTacticsBeforeTheWarfareAction() {
         ti4.game.Tile home = test.nekroHome();
-        home.addCC(ti4.image.Mapper.getCCID(test.nekro.getColor()));
+        home.addCC(ti4.model.Mapper.getCCID(test.nekro.getColor()));
         test.nekro.setTg(10);
         test.nekro.setTacticalCC(1);
         test.nekro.setFleetCC(3);
@@ -610,7 +610,7 @@ class StrategyCardRulesTest extends BaseTi4Test {
     @Test
     void explainsWhyWarfareHasNothingToActivate() {
         Tile home = test.nekroHome();
-        home.addCC(ti4.image.Mapper.getCCID(test.nekro.getColor()));
+        home.addCC(ti4.model.Mapper.getCCID(test.nekro.getColor()));
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
         test.nekro.exhaustPlanet("mordaiii");
         test.nekro.setTg(0);

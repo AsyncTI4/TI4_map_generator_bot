@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -19,12 +18,12 @@ import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.image.ImageHelper;
-import ti4.image.Mapper;
+import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.MiscEmojis;
-import ti4.service.image.FileUploadService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.tigl.TiglSetupService;
 
@@ -50,7 +49,7 @@ public class RoundOneService {
                             .append(player.getFaction())
                             .append(".");
                 } else {
-                    files.add(FileUploadService.createFileUpload(ImageHelper.read(path), player.getFaction() + "_ref"));
+                    files.add(ImageUploads.createFileUpload(ImageHelper.read(path), player.getFaction() + "_ref"));
                 }
             }
             if (!files.isEmpty() && files.size() <= 10) {
@@ -137,10 +136,6 @@ public class RoundOneService {
                     || player.hasAbility("collateralized_loans")
                     || player.hasAbility("binding_debts")) {
                 game.setDebtPoolIcon(Constants.VADEN_DEBT_POOL, MiscEmojis.SharkLoan.toString());
-            }
-
-            if (player.hasAbility("initiation")) {
-                LunariumAbilityHandler.setFactionSheetCCs(game, player, 1);
             }
 
             if (player.hasAbility("questing_prince")) {

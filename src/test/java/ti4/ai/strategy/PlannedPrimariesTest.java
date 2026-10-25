@@ -13,8 +13,8 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Resolving a played strategy card's primary the way its plan intends.
@@ -78,9 +78,9 @@ class PlannedPrimariesTest extends BaseTi4Test {
     }
 
     private static String beyond(String position) {
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate))
-                .filter(candidate -> !PositionMapper.getAdjacentTilePositions(AiTestGame.HOME)
+                .filter(candidate -> !MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME)
                         .contains(candidate))
                 .findFirst()
                 .orElseThrow();
@@ -203,8 +203,8 @@ class PlannedPrimariesTest extends BaseTi4Test {
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
         String neighbour = AiTestGame.neighbourOf(AiTestGame.HOME);
         test.place("27", neighbour);
-        List<String> nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
-        List<String> past = PositionMapper.getAdjacentTilePositions(neighbour).stream()
+        List<String> nearHome = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        List<String> past = MapPositionMapper.getAdjacentTilePositions(neighbour).stream()
                 .filter(candidate ->
                         !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate) && !nearHome.contains(candidate))
                 .toList();

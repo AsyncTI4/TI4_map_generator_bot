@@ -32,12 +32,12 @@ import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.DisplayType;
-import ti4.image.BoardPosition;
-import ti4.image.CompactOverviewGenerator;
-import ti4.image.GalaxyNames;
-import ti4.image.MapRenderPipeline;
-import ti4.image.MapSegment;
+import ti4.image.map.CompactOverviewGenerator;
+import ti4.image.map.MapRenderPipeline;
+import ti4.image.map.MapSegment;
 import ti4.message.MessageHelper;
+import ti4.model.BoardPosition;
+import ti4.model.GalaxyNames;
 import ti4.service.game.GameSummaryService;
 import ti4.service.option.FOWOptionService;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -116,7 +116,7 @@ public class FogGameSummaryService {
         MapRenderPipeline.queueImage(
                 game,
                 "Fog settings log overview",
-                () -> CompactOverviewGenerator.gmOverview(game),
+                CompactOverviewGenerator::gmOverview,
                 upload -> MessageHelper.sendFileUploadToChannel(channel, upload));
         MapRenderPipeline.queueUnfoggedWithoutWebsiteUpload(
                 game, DisplayType.all, upload -> MessageHelper.sendFileUploadToChannel(channel, upload));

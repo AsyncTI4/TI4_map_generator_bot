@@ -17,7 +17,7 @@ import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Relics whose ACTION the AI takes through the component action menu: it opens the menu instead of a weak tactical

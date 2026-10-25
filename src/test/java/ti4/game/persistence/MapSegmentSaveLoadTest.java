@@ -11,8 +11,8 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
-import ti4.image.GalaxyNames;
-import ti4.image.MapSegment;
+import ti4.image.map.MapSegment;
+import ti4.model.GalaxyNames;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 

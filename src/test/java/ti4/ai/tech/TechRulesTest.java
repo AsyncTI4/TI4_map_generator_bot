@@ -18,7 +18,7 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 class TechRulesTest extends BaseTi4Test {
@@ -240,7 +240,7 @@ class TechRulesTest extends BaseTi4Test {
         test.place("01", "304");
         Tile held = test.game.getTileByPosition("102");
         test.units(held, "space", test.sol, UnitType.Destroyer, 1);
-        held.addCC(ti4.image.Mapper.getCCID(test.sol.getColor()));
+        held.addCC(ti4.model.Mapper.getCCID(test.sol.getColor()));
         test.units(test.game.getTileByPosition("201"), "space", test.sol, UnitType.Dreadnought, 2);
 
         assertThat(nullificationAnswer(target)).isEqualTo(nullifyButton(target));
@@ -289,7 +289,7 @@ class TechRulesTest extends BaseTi4Test {
     }
 
     private Tile stagingTile(Tile tile) {
-        String next = PositionMapper.getAdjacentTilePositions(tile.getPosition()).stream()
+        String next = MapPositionMapper.getAdjacentTilePositions(tile.getPosition()).stream()
                 .filter(candidate -> !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate))
                 .findFirst()
                 .orElseThrow();

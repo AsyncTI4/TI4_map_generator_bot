@@ -12,7 +12,7 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Moving a fleet into range of a target it cannot yet reach: the fleet waits one system away, where it can strike next
@@ -42,7 +42,7 @@ class StagingTest extends BaseTi4Test {
     }
 
     private static List<String> neighbours(String position) {
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate))
                 .toList();
     }

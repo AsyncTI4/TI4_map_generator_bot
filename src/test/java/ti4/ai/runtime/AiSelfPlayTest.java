@@ -302,7 +302,7 @@ class AiSelfPlayTest extends BaseTi4Test {
     }
 
     private static String secretName(String id) {
-        ti4.model.SecretObjectiveModel model = ti4.image.Mapper.getSecretObjective(id);
+        ti4.model.SecretObjectiveModel model = ti4.model.Mapper.getSecretObjective(id);
         return model == null ? id : model.getName();
     }
 
@@ -385,7 +385,7 @@ class AiSelfPlayTest extends BaseTi4Test {
     }
 
     private static String objectiveName(String id) {
-        ti4.model.PublicObjectiveModel model = ti4.image.Mapper.getPublicObjective(id);
+        ti4.model.PublicObjectiveModel model = ti4.model.Mapper.getPublicObjective(id);
         return model == null ? id : model.getName();
     }
 

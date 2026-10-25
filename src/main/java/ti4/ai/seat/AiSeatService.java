@@ -15,9 +15,9 @@ import ti4.ai.profile.AiProfile;
 import ti4.ai.runtime.AiRuntime;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
 import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
 import ti4.settings.users.UserSettings;
@@ -42,7 +42,7 @@ public class AiSeatService {
         if (faction == null) return new AddResult(null, "Every faction the AI can play is already taken.");
         String refusal = AiGameSupport.refusalReason(game, faction);
         if (refusal != null) return new AddResult(null, refusal);
-        if (!PositionMapper.isTilePositionValid(homeSystemPosition)) {
+        if (!MapPositionMapper.isTilePositionValid(homeSystemPosition)) {
             return new AddResult(null, "`" + homeSystemPosition + "` is not a valid tile position.");
         }
         if (occupiedHome(game, homeSystemPosition)) {

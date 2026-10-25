@@ -12,8 +12,10 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.actioncards.EscapeClauseActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EscapeClauseActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinPnHandler;
@@ -22,6 +24,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorPromissoryHandler;
@@ -30,10 +33,10 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.thundersedge.TeHelperPromissories;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.abilities.MahactTokenService;
@@ -538,6 +541,8 @@ public class PromissoryNoteHelper {
         }
         if ("fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
+            NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
+            NetrunnersTechHandler.resolveDataMining(event, game, player, "ws");
             ButtonHelperCommanders.resolveNekroCommanderCheck(player, "ws", game);
             CommanderUnlockCheckService.checkPlayer(player, "mirveda");
             MessageHelper.sendMessageToChannel(
@@ -810,6 +815,9 @@ public class PromissoryNoteHelper {
         }
         if ("thpnthurviali".equalsIgnoreCase(id)) {
             ThurvialiPromissoryHandler.resolveRadiantAssembly(event, game, player);
+        }
+        if ("thpnstoneborn".equalsIgnoreCase(id)) {
+            StonebornPromissoryHandler.offerPotentialChoices(player, game);
         }
         // These PNs' text contains "action:" but describe a trigger on another player's action
         List<String> actionTextPNsNotOwnAction = List.of("acq", "bapnconc");

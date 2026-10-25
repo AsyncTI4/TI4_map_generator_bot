@@ -27,17 +27,61 @@ class RunAgainstAllGamesTest extends BaseTi4Test {
     }
 
     @Test
-    void endedGamePastTheFinalRoundWithoutWinnerQualifies() {
-        Game game = endedGame(8);
+    void endedGameInTheStatusPhaseOfRoundNineWithoutWinnerQualifies() {
+        // The 10th and last objective is flipped in round 8's status phase, so round 9's status phase has none left.
+        Game game = endedGame(9);
+        game.setPhaseOfGame("statusScoring");
 
         assertThat(RunAgainstAllGames.ranOutOfObjectivesWithoutWinner(game)).isTrue();
     }
 
     @Test
-    void endedGameWithEmptyStageTwoDeckQualifiesBeforeTheFinalRound() {
-        Game game = endedGame(6);
+    void endedGameInTheAgendaPhaseOfRoundNineWithoutWinnerQualifies() {
+        Game game = endedGame(9);
+        game.setPhaseOfGame("agendaVoting");
 
         assertThat(RunAgainstAllGames.ranOutOfObjectivesWithoutWinner(game)).isTrue();
+    }
+
+    @Test
+    void endedGameThatPlayedPastRoundNineQualifiesInAnyPhase() {
+        Game game = endedGame(10);
+        game.setPhaseOfGame("action");
+
+        assertThat(RunAgainstAllGames.ranOutOfObjectivesWithoutWinner(game)).isTrue();
+    }
+
+    @Test
+    void gameEndedDuringRoundNineBeforeItsStatusPhaseDoesNotQualify() {
+        Game game = endedGame(9);
+        game.setPhaseOfGame("action");
+
+        assertThat(RunAgainstAllGames.ranOutOfObjectivesWithoutWinner(game)).isFalse();
+    }
+
+    @Test
+    void gameEndedInTheStatusPhaseOfRoundEightDoesNotQualify() {
+        Game game = endedGame(8);
+        game.setPhaseOfGame("statusScoring");
+
+        assertThat(RunAgainstAllGames.ranOutOfObjectivesWithoutWinner(game)).isFalse();
+    }
+
+    @Test
+    void endedGameWithEmptyStageTwoDeckQualifiesBeforeTheFinalRound() {
+        Game game = endedGame(6);
+        game.setPublicObjectives2(new ArrayList<>());
+
+        assertThat(RunAgainstAllGames.ranOutOfObjectivesWithoutWinner(game)).isTrue();
+    }
+
+    @Test
+    void gameAbortedEarlyWithUnpeekedStageTwoDeckDoesNotQualify() {
+        // Most games never set up peekable objectives, so every stage 2 card sits in the main deck.
+        Game game = endedGame(3);
+
+        assertThat(game.getPublicObjectives2Peekable()).isEmpty();
+        assertThat(RunAgainstAllGames.ranOutOfObjectivesWithoutWinner(game)).isFalse();
     }
 
     @Test
@@ -50,7 +94,7 @@ class RunAgainstAllGamesTest extends BaseTi4Test {
 
     @Test
     void unfinishedGameDoesNotQualify() {
-        Game game = endedGame(8);
+        Game game = endedGame(10);
         game.setHasEnded(false);
 
         assertThat(RunAgainstAllGames.ranOutOfObjectivesWithoutWinner(game)).isFalse();
@@ -58,7 +102,7 @@ class RunAgainstAllGamesTest extends BaseTi4Test {
 
     @Test
     void fogGameDoesNotQualifyBecauseItsPromptNeverPromisedAWinner() {
-        Game game = endedGame(8);
+        Game game = endedGame(10);
         game.setFowMode(true);
 
         assertThat(RunAgainstAllGames.ranOutOfObjectivesWithoutWinner(game)).isFalse();
@@ -66,7 +110,7 @@ class RunAgainstAllGamesTest extends BaseTi4Test {
 
     @Test
     void redTapeGameDoesNotQualify() {
-        Game game = endedGame(8);
+        Game game = endedGame(10);
         game.setRedTapeMode(true);
 
         assertThat(RunAgainstAllGames.ranOutOfObjectivesWithoutWinner(game)).isFalse();
@@ -74,7 +118,7 @@ class RunAgainstAllGamesTest extends BaseTi4Test {
 
     @Test
     void gameThatAlreadyHasAWinnerDoesNotQualify() {
-        Game game = endedGame(8);
+        Game game = endedGame(10);
         game.setVp(10);
         var player = new Player("winner", "winner", game);
         player.setFaction("arborec");
@@ -91,6 +135,7 @@ class RunAgainstAllGamesTest extends BaseTi4Test {
         var game = new Game();
         game.setRound(round);
         game.setHasEnded(true);
+        game.setPublicObjectives2(new ArrayList<>(List.of("master_science", "subdue")));
         return game;
     }
 

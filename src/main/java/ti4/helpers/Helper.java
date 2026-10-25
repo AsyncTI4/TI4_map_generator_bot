@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import java.awt.Point;
-import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +37,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
@@ -49,8 +46,6 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRe
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
@@ -60,6 +55,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Sa
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.HydromorphicCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
@@ -93,8 +89,6 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.helpers.thundersedge.TeHelperUnits;
-import ti4.image.ImageHelper;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -103,14 +97,12 @@ import ti4.model.AgendaModel;
 import ti4.model.ColorModel;
 import ti4.model.LeaderModel;
 import ti4.model.MapTemplateModel;
-import ti4.model.PlanetLayoutModel;
-import ti4.model.PlanetModel;
+import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechSpecialtyModel.TechSpecialty;
 import ti4.model.TechnologyModel;
-import ti4.model.TokenModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.ApplicationEmojiService;
@@ -136,32 +128,6 @@ import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
 
 public final class Helper {
-    private static final int TRIPLE_SYSTEM_TOKEN_PLANET_GAP_OFFSET = 65;
-
-    private static final List<Point> TOKEN_PLANET_POSITIONS = List.of(
-            new Point(87, 79),
-            new Point(258, 79),
-            new Point(87, 221),
-            new Point(258, 221),
-            new Point(172, 79),
-            new Point(172, 221));
-
-    private static final List<Point> TRIPLE_SYSTEM_TOKEN_PLANET_POSITIONS = List.of(
-            new Point(87, 221),
-            new Point(258, 221),
-            new Point(87, 79),
-            new Point(258, 79),
-            new Point(172, 221),
-            new Point(172, 79));
-
-    private static final List<Point> TWO_PLANET_OR_WORMHOLE_TOKEN_PLANET_POSITIONS = List.of(
-            new Point(Constants.TOKEN_PLANET_POSITION),
-            new Point(78, 178),
-            new Point(258, 221),
-            new Point(87, 221),
-            new Point(172, 79),
-            new Point(172, 221));
-
     public static int getCurrentHour() {
         long currentTime = System.currentTimeMillis();
         currentTime /= 1000;
@@ -276,8 +242,10 @@ public final class Helper {
         List<Player> players = PlayStrategyCardService.getPlayersInFollowOrder(game, imperialHolder);
         for (Player player : players) {
             String message =
-                    player.getRepresentationUnfogged() + " drew their queued secret objective from **Imperial**. ";
+                    player.getRepresentationNoPing() + " drew their queued secret objective from **Imperial**. ";
             if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCardsInfoThread(), player.getRepresentation() + " you drew your queued secret.");
                 game.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
@@ -594,148 +562,6 @@ public final class Helper {
             return null;
         }
         return tokenPath;
-    }
-
-    private static Point getTokenPlanetPosition(Tile tile, String tokenOrPlanetID) {
-        Point defaultPosition = getDefaultTokenPlanetPosition(tile, tokenOrPlanetID);
-        List<String> tokenPlanets = tile.getPlanetUnitHolders().stream()
-                .map(UnitHolder::getName)
-                .filter(Constants.TOKEN_PLANETS::contains)
-                .sorted()
-                .toList();
-
-        if (tokenPlanets.size() <= 1) {
-            return defaultPosition;
-        }
-
-        String tokenPlanetID = getTokenPlanetID(tokenOrPlanetID);
-        if (tokenPlanetID == null) {
-            return defaultPosition;
-        }
-
-        if (Constants.THUNDERSEDGE.equalsIgnoreCase(tokenPlanetID)) {
-            return new Point(Constants.SPACE_CENTER_POSITION);
-        }
-
-        List<String> slottedTokenPlanets = tokenPlanets.stream()
-                .filter(tokenPlanet -> !Constants.THUNDERSEDGE.equalsIgnoreCase(tokenPlanet))
-                .toList();
-
-        int index = slottedTokenPlanets.indexOf(tokenPlanetID);
-        if (index < 0) {
-            return defaultPosition;
-        }
-
-        int printedPlanetCount = tile.getTileModel().getNumPlanets();
-        boolean usesTwoPlanetOrWormholeSlots = printedPlanetCount != 3
-                && (printedPlanetCount == 2
-                        || printedPlanetCount > 0 && tile.getTileModel().hasWormhole());
-        List<Point> positions = printedPlanetCount == 3
-                ? TRIPLE_SYSTEM_TOKEN_PLANET_POSITIONS
-                : usesTwoPlanetOrWormholeSlots ? TWO_PLANET_OR_WORMHOLE_TOKEN_PLANET_POSITIONS : TOKEN_PLANET_POSITIONS;
-        Point position = printedPlanetCount == 3 && index < 3 ? getTripleSystemTokenPlanetPosition(tile, index) : null;
-        if (position == null) {
-            if (index < positions.size()) {
-                position = positions.get(index);
-            } else {
-                double theta = (2 * Math.PI * index) / slottedTokenPlanets.size();
-                int x = Constants.SPACE_CENTER_POSITION.x + (int) Math.round(85 * Math.cos(theta));
-                int y = Constants.SPACE_CENTER_POSITION.y + (int) Math.round(70 * Math.sin(theta));
-                position = new Point(x, y);
-            }
-        }
-
-        return new Point(position);
-    }
-
-    @Nullable
-    private static Point getTripleSystemTokenPlanetPosition(Tile tile, int index) {
-        List<Point> planetPositions = tile.getTileModel().getPlanets().stream()
-                .map(Mapper::getPlanet)
-                .filter(Objects::nonNull)
-                .map(PlanetModel::getPlanetLayout)
-                .filter(Objects::nonNull)
-                .map(PlanetLayoutModel::getCenterPosition)
-                .filter(Objects::nonNull)
-                .toList();
-        if (planetPositions.size() != 3) {
-            return null;
-        }
-
-        double centerX =
-                planetPositions.stream().mapToInt(point -> point.x).average().orElseThrow();
-        double centerY =
-                planetPositions.stream().mapToInt(point -> point.y).average().orElseThrow();
-        Point firstPlanet = planetPositions.get(index);
-        Point secondPlanet = planetPositions.get((index + 1) % planetPositions.size());
-        double midpointX = (firstPlanet.x + secondPlanet.x) / 2.0;
-        double midpointY = (firstPlanet.y + secondPlanet.y) / 2.0;
-        double deltaX = midpointX - centerX;
-        double deltaY = midpointY - centerY;
-        double distance = Math.hypot(deltaX, deltaY);
-        if (distance == 0) {
-            return new Point((int) Math.round(midpointX), (int) Math.round(midpointY));
-        }
-        return new Point((int) Math.round(midpointX + deltaX * TRIPLE_SYSTEM_TOKEN_PLANET_GAP_OFFSET / distance), (int)
-                Math.round(midpointY + deltaY * TRIPLE_SYSTEM_TOKEN_PLANET_GAP_OFFSET / distance));
-    }
-
-    private static Point getDefaultTokenPlanetPosition(Tile tile, String tokenOrPlanetID) {
-        if (Strings.CI.contains(tokenOrPlanetID, Constants.THUNDERSEDGE)) {
-            return new Point(Constants.SPACE_CENTER_POSITION);
-        }
-
-        Point position = new Point(Constants.TOKEN_PLANET_POSITION);
-        if (tile.getTileModel().getNumPlanets() == 3) {
-            position = new Point(Constants.MIRAGE_TRIPLE_POSITION);
-        }
-        return position;
-    }
-
-    private static String getTokenPlanetID(String tokenOrPlanetID) {
-        if (tokenOrPlanetID == null) {
-            return null;
-        }
-
-        TokenModel token = Mapper.getToken(tokenOrPlanetID);
-        if (token != null && token.getTokenPlanetName() != null) {
-            return token.getTokenPlanetName();
-        }
-        return Mapper.getTokenKey(tokenOrPlanetID);
-    }
-
-    public static Point getTokenPlanetCenterPosition(Tile tile, String tokenID) {
-        TokenModel token = Mapper.getToken(tokenID);
-        PlanetModel planet = token == null ? Mapper.getPlanet(tokenID) : Mapper.getPlanet(token.getTokenPlanetName());
-        Integer planetX = null;
-        Integer planetY = null;
-        if (planet != null
-                && planet.getPlanetLayout() != null
-                && planet.getPlanetLayout().getCenterPosition() != null) {
-            planetX = planet.getPlanetLayout().getCenterPosition().x;
-            planetY = planet.getPlanetLayout().getCenterPosition().y;
-        }
-
-        String tokenPath = token == null ? Mapper.getTokenID(tokenID) : token.getImagePath();
-        BufferedImage tokenImage = ImageHelper.read(
-                tokenPath == null ? null : ResourceHelper.getInstance().getAttachmentFile(tokenPath));
-        Integer imageX = null;
-        Integer imageY = null;
-        if (tokenImage != null) {
-            imageX = tokenImage.getWidth() / 2;
-            imageY = tokenImage.getHeight() / 2;
-        }
-
-        Point tokenPlanetPosition = getTokenPlanetPosition(tile, tokenID);
-        if (imageX != null && imageY != null && planetX != null && planetY != null) {
-            return new Point(tokenPlanetPosition.x - imageX + planetX, tokenPlanetPosition.y - imageY + planetY);
-        }
-
-        return tokenPlanetPosition;
-    }
-
-    public static Point getTokenPlanetCenterOfImage(Tile tile, String tokenID) {
-        return getTokenPlanetPosition(tile, tokenID);
     }
 
     public static void addTokenPlanetToTile(Game game, Tile tile, String planetName) {
@@ -1632,11 +1458,11 @@ public final class Helper {
                     && !thing.contains("tg_")
                     && !thing.contains("boon")
                     && !thing.contains("warmachine")
+                    && !thing.contains("hydromorphicTidesOfCreation")
                     && !thing.contains("manifest")
                     && !thing.contains("ghostbt")
                     && !thing.contains("tyrisbt")
                     && !thing.contains("dwsDiscount")
-                    && !thing.contains("netrunnersAgentDiscount")
                     && !thing.contains("aida")
                     && !thing.contains("arcanumRunebound")
                     && !thing.contains("commander")
@@ -1765,17 +1591,6 @@ public final class Helper {
                             .append('\n');
                     res += 1;
                 }
-                if (thing.startsWith("netrunnersAgentDiscount_")) {
-                    int discount = Integer.parseInt(thing.substring("netrunnersAgentDiscount_".length()));
-                    msg.append("> Used Zor No-ahn, the Netrunners agent, for a ")
-                            .append(discount)
-                            .append(" cost discount.\n");
-                    if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
-                        inf += discount;
-                    } else {
-                        res += discount;
-                    }
-                }
                 if ("boon".equals(thing)) {
                     msg.append("> Used Boon Relic ").append(ExploreEmojis.Relic).append('\n');
                     res += 1;
@@ -1788,6 +1603,12 @@ public final class Helper {
                     if (game.isWildWildGalaxyMode()) {
                         res += 4;
                     }
+                }
+                if (thing.startsWith("hydromorphicTidesOfCreation_")) {
+                    int discount = HydromorphicCardHandler.getTidesOfCreationCostDiscount(player);
+                    msg.append("> Used _Tides of Creation_ for +2 PRODUCTION and a ")
+                            .append(discount)
+                            .append(" resource cost discount\n");
                 }
                 if (thing.contains("manifest")) {
                     msg.append("> Used _Manifest_ for 3 resources")
@@ -1830,9 +1651,7 @@ public final class Helper {
                 if (thing.contains("arcanumRunebound")) {
                     msg.append("> Damaged _Rune-Bound Sentinel_ to ignore a prerequisite on a technology.\n");
                 }
-                if (thing.startsWith("netrunnersAgentDiscount_")) {
-                    // Already included above as a cost discount.
-                } else if (thing.contains("commander") || thing.contains("Gledge Agent")) {
+                if (thing.contains("commander") || thing.contains("Gledge Agent")) {
                     msg.append("> ").append(thing).append('\n');
                 } else if (thing.contains("winnuagent")) {
                     msg.append("> Used Winnu agent for 2 resources").append('\n');
@@ -2342,7 +2161,7 @@ public final class Helper {
         if (unitsOnly) {
             return productionValueTotal;
         }
-        productionValueTotal += ThirtyKExploreHooks.extraPlanetProduction(uH, productionValueTotal);
+        productionValueTotal += ThirtyKExploreHooks.extraPlanetProduction(game, uH, productionValueTotal);
         if (uH instanceof Planet planet) {
             if (TaPromissoryHandler.planetHasAdvancedStructuralEngineering(planet)
                     && player.getPlanets().contains(planet.getName())) {
@@ -2369,7 +2188,8 @@ public final class Helper {
                     && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
                 productionValueTotal += tile.getWormholes(game).size();
             }
-            if (player.hasTech("tf-networkeddeployment") && CommandCounterHelper.hasCC(player, tile)) {
+            if ((player.hasTech("tf-networkeddeployment") || player.hasTech("nc"))
+                    && CommandCounterHelper.hasCC(player, tile)) {
                 productionValueTotal++;
             }
         }
@@ -2583,10 +2403,6 @@ public final class Helper {
                 && tile.getPosition().equals(game.getStoredValue("vanguardReinforce" + player.getFaction()))) {
             productionValueTotal += 3;
         }
-        if (TheodisiLegendaryButtonHandler.hasRemoteFactoryProduction(game, player, tile, uH)) {
-            productionValueTotal += 3;
-        }
-
         return productionValueTotal;
     }
 
@@ -2634,6 +2450,9 @@ public final class Helper {
         if (!singleDock) {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
                 productionValueTotal += getProductionValueOfUnitHolder(player, game, tile, uH);
+            }
+            if (TheodisiLegendaryButtonHandler.hasRemoteFactoryProduction(game, player, tile)) {
+                productionValueTotal += 3;
             }
             if (tile.getUnitHolders().size() == 1
                     && player.hasTech("dsmorty")
@@ -2757,6 +2576,9 @@ public final class Helper {
         }
         if (productionValueTotal > 0 && player.hasAbility("policy_the_environment_plunder")) {
             productionValueTotal -= 2;
+        }
+        if (productionValueTotal > 0) {
+            productionValueTotal += HydromorphicCardHandler.getTidesOfCreationProductionBonus(player);
         }
         if (player.hasUnlockedBreakthrough("myrrbt")
                 && player.isBreakthroughExhausted("myrrbt")
@@ -2891,6 +2713,7 @@ public final class Helper {
                     && ThurvialiLeadersHandler.hasThurvialiHeroProductionDiscount(game, player)) {
                 cost = Math.max(0, cost - 4);
             }
+            cost = Math.max(0, cost - HydromorphicCardHandler.getTidesOfCreationCostDiscount(player));
             return cost;
         } else {
             return totalUnits;
@@ -3121,7 +2944,6 @@ public final class Helper {
             unitButtons.add(ff2Button);
         }
         boolean greenMechd = false;
-        boolean ironMechSpaceAdded = false;
         if ((player.hasTech("tf-desperados") || player.hasAbility("desperados_br"))
                 && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)) {
             unitButtons.add(Buttons.blue(
@@ -3308,20 +3130,6 @@ public final class Helper {
                 if (resourcelimit > 1 && !greenMechd && !game.isBaseGameMode()) {
                     unitButtons.add(mfButton);
                 }
-                if (resourcelimit > 1 && !ironMechSpaceAdded && IronAbilitiesHandler.hasExoAtmospheric(player)) {
-                    Button spaceMechButton = Buttons.green(
-                            player.factionButtonChecker() + placePrefix + "_mech_space" + tile.getPosition(),
-                            "Produce Mech in space",
-                            UnitEmojis.mech);
-                    if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
-                        spaceMechButton = Buttons.gray(
-                                player.factionButtonChecker() + placePrefix + "_mech_space" + tile.getPosition(),
-                                "Produce Mech in space",
-                                UnitEmojis.mech);
-                    }
-                    unitButtons.add(spaceMechButton);
-                    ironMechSpaceAdded = true;
-                }
 
             } else if (ButtonHelper.canIBuildGFInSpace(player, tile, warfareNOtherstuff)
                     && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
@@ -3367,9 +3175,6 @@ public final class Helper {
                 unitButtons.addAll(
                         CrystellumLeadersHandler.getCrystellumCommanderFighterButtons(player, tile, game, placePrefix));
             }
-        }
-        if (!"sling".equalsIgnoreCase(warfareNOtherstuff)) {
-            unitButtons.addAll(IronBreakthroughHandler.getPlaceUnitButtonsForIronBt(player, tile, game, placePrefix));
         }
         if ("place".equalsIgnoreCase(placePrefix)) {
             Button DoneProducingUnits = Buttons.red(
@@ -4194,9 +3999,6 @@ public final class Helper {
     public static boolean mechCheck(String planetName, Game game, Player player) {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
-        if (player.hasUnlockedBreakthrough("ironbt")) {
-            return true;
-        }
         return unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0;
     }
 

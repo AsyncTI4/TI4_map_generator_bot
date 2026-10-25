@@ -26,10 +26,10 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
@@ -1729,7 +1729,7 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile1 : game.getTileMap().values()) {
             String pos1 = tile1.getPosition();
-            for (Player p2 : game.getRealPlayers()) {
+            for (Player p2 : game.getRealPlayersNNeutral()) {
                 if (FoWHelper.playerHasShipsInSystem(p2, tile1)) {
                     boolean adjacentPeeps = false;
                     for (String pos2 : FoWHelper.getAdjacentTiles(game, pos1, p2, false)) {

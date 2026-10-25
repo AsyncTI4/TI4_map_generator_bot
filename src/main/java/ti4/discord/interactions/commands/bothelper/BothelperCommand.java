@@ -14,7 +14,6 @@ public class BothelperCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
                     new CreateGameChannels(),
-                    new CreateFOWGameChannels(),
                     new ServerLimitStats(),
                     new ArchiveOldThreads(),
                     new FixGameChannelPermissions(),
@@ -29,15 +28,16 @@ public class BothelperCommand implements ParentCommand {
                     new ListDeadGames(),
                     new RemoveTitle(),
                     new EditTrackRecord(),
+                    new PlayerGames(),
                     new SetGameLimit(),
                     new SetStatsTrackedUser(),
                     new ListStoredValues(),
                     new EditStoredValue(),
                     new ListSlashCommandsUsed(),
                     new ReserveGame(),
-                    new DeleteFOWCommThreads(),
                     new KeepThreadAlive(),
-                    new ManageRoles())
+                    new ManageRoles(),
+                    new CloneGame())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
@@ -52,7 +52,7 @@ public class BothelperCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "BotHelper";
+        return "Bothelper tools: create game channels, manage stats, titles, roles and server limits";
     }
 
     @Override

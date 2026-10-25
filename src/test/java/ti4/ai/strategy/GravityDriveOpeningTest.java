@@ -12,7 +12,7 @@ import ti4.ai.tactical.TacticalPlanner;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // A Hacan-like opening: two carriers at home, one planet system a move away and the rest of the slice two moves out,
@@ -183,7 +183,7 @@ class GravityDriveOpeningTest extends BaseTi4Test {
         Tile neighbour = test.game.getTileByPosition(AiTestGame.neighbourOf(AiTestGame.HOME));
         test.units(neighbour, "space", hacan, UnitType.Carrier, 1);
         test.units(neighbour, "space", hacan, UnitType.Infantry, 2);
-        neighbour.addCC(ti4.image.Mapper.getCCID(hacan.getColor()));
+        neighbour.addCC(ti4.model.Mapper.getCCID(hacan.getColor()));
         changed();
 
         assertThat(OpeningOutlook.gain(test.game, hacan, Boost.GRAVITY_DRIVE)).isGreaterThan(0);
@@ -228,15 +228,15 @@ class GravityDriveOpeningTest extends BaseTi4Test {
 
     private static String otherNeighbour() {
         String neighbour = AiTestGame.neighbourOf(AiTestGame.HOME);
-        return PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        return MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position) && !position.equals(neighbour))
                 .findFirst()
                 .orElseThrow();
     }
 
     private static String beyond(String position) {
-        List<String> nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        List<String> nearHome = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate ->
                         !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate) && !nearHome.contains(candidate))
                 .findFirst()

@@ -7,7 +7,7 @@ import ti4.ai.promissory.NoteGiving;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 
 @UtilityClass

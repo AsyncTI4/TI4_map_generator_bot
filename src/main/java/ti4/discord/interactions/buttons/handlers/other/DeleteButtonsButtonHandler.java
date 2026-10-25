@@ -44,9 +44,9 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.helpers.thirtyk.ThirtyKRelicHooks;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.breakthrough.AutoFactoriesService;
@@ -269,16 +269,18 @@ class DeleteButtonsButtonHandler {
                 // Only tactical-action builds belong to the tactical draft; the draft is game-global, so an
                 // unscoped stage would swallow other players' warfare/construction builds into the active
                 // player's tactical action.
-                if (buttonID.contains("tacticalAction")) {
-                    GameSubEvent.Production produced =
-                            new GameSubEvent.Production(tile == null ? null : tile.getPosition(), unitsMap, cost);
-                    if (!GameEventDraft.stage(game, produced)) {
+                boolean tacticalBuild = buttonID.contains("tacticalAction");
+                if (tacticalBuild || !unitsMap.isEmpty()) {
+                    GameSubEvent.Production produced = new GameSubEvent.Production(
+                            tile == null ? null : tile.getPosition(), unitsMap, cost, buttonID);
+                    if (!tacticalBuild || !GameEventDraft.stage(game, produced)) {
                         Map<String, Object> payload = new HashMap<>();
                         if (produced.tile() != null) {
                             payload.put("tile", produced.tile());
                         }
                         payload.put("units", produced.units());
                         payload.put("cost", produced.cost());
+                        payload.put("source", produced.source());
                         GameEventService.commit(game, GameEventType.PRODUCTION, player, payload);
                     }
                 }

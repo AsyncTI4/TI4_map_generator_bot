@@ -14,9 +14,9 @@ import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
-import ti4.image.MapSegment;
-import ti4.image.Mapper;
+import ti4.image.map.MapSegment;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 

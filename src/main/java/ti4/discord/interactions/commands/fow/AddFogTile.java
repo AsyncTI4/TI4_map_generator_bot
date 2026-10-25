@@ -5,16 +5,16 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.ResourceHelper;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
+import ti4.image.io.ImageResources;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 
 class AddFogTile extends GameStateSubcommand {
 
@@ -41,7 +41,7 @@ class AddFogTile extends GameStateSubcommand {
         String planetTileName = AliasHandler.resolveTile(
                 event.getOption(Constants.TILE_NAME).getAsString().toLowerCase());
         String tileName = Mapper.getTileID(planetTileName);
-        String tilePath = ResourceHelper.getTileFile(tileName);
+        String tilePath = ImageResources.tile(tileName);
         if (tilePath == null) {
             MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
             return;
@@ -51,7 +51,7 @@ class AddFogTile extends GameStateSubcommand {
         String label = labelMapping == null ? "" : labelMapping.getAsString();
         StringBuilder sb = new StringBuilder();
         for (String position : positions) {
-            if (!PositionMapper.isTilePositionValid(position)) {
+            if (!MapPositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Tile position '" + position + "' is invalid");
                 continue;
             }

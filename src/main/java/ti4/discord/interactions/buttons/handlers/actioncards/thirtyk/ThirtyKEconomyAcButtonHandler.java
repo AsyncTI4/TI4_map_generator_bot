@@ -16,10 +16,11 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.thirtyk.ThirtyKAcState;
+import ti4.helpers.thirtyk.ThirtyKCards;
 import ti4.helpers.thirtyk.ThirtyKDistance;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.fow.PlanetTargetService;
 
@@ -32,6 +33,7 @@ public class ThirtyKEconomyAcButtonHandler {
     public static final String PRICE = "thkAcPrice_";
     public static final String REPRIMAND = "thkAcReprimand_";
     public static final String WAR_PROFIT = "thkAcWarProfit_";
+    private static final String WAR_PROFIT_TILE = "thkAcWarProfitTile_";
     public static final String ANTIDIS = "thkAcAntidisStart";
     public static final String PRESERVATION = "thkAcPreservation";
     private static final String SIPHON = "thkAcSiphon_";
@@ -351,9 +353,19 @@ public class ThirtyKEconomyAcButtonHandler {
                         + ThirtyKAcTargets.name(game, player, actor) + " (_Price of Information_):",
                 model.getRepresentationEmbed());
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
+                player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + ", you let _" + model.getName()
                         + "_ slip to your buyer for 2 commodities (_Price of Information_).");
+        FoWHelper.notifyActorAndAffectedElsePublic(
+                game,
+                player,
+                player.getRepresentationNoPing() + " showed " + ThirtyKAcTargets.name(game, actor, player)
+                        + " 1 unscored secret objective and gained 2 commodities (_Price of Information_).",
+                actor,
+                ThirtyKAcTargets.name(game, player, actor) + " showed you 1 unscored secret objective; it is in"
+                        + " your cards info thread (_Price of Information_).",
+                player.getRepresentationNoPing() + " showed " + actor.getRepresentationNoPing()
+                        + " 1 unscored secret objective and gained 2 commodities (_Price of Information_).");
         ButtonHelperStats.gainComms(event, game, player, 2, false);
     }
 
@@ -434,16 +446,53 @@ public class ThirtyKEconomyAcButtonHandler {
 
     public static List<Button> warProfiteeringButtons(Game game, Player player) {
         Tile active = activeSystem(game);
-        if (active == null) return List.of();
-        boolean hidden = game.isFowMode()
-                && !FoWHelper.getTilePositionsToShow(game, player).contains(active.getPosition());
+        if (active != null
+                && ButtonHelper.getPlayersWithShipsInTheSystem(game, active).size() > 1) {
+            return warProfiteeringTargets(game, player, active);
+        }
+        List<Tile> battles = ThirtyKCards.visibleTiles(game, player).stream()
+                .filter(tile ->
+                        ButtonHelper.getPlayersWithShipsInTheSystem(game, tile).size() > 1)
+                .toList();
+        if (battles.size() == 1) return warProfiteeringTargets(game, player, battles.getFirst());
         List<Button> buttons = new ArrayList<>();
-        for (Player combatant : game.getRealPlayers()) {
-            if (!hidden && !FoWHelper.playerHasShipsInSystem(combatant, active)) continue;
-            buttons.add(FoWHelper.fogSafeTargetButton(
-                    player.factionButtonChecker() + WAR_PROFIT + combatant.getColor(), "gray", combatant));
+        for (Tile tile : battles) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + WAR_PROFIT_TILE + tile.getPosition(),
+                    tile.getRepresentationForButtons(game, player)));
         }
         return buttons;
+    }
+
+    private static List<Button> warProfiteeringTargets(Game game, Player player, Tile tile) {
+        boolean hidden = game.isFowMode()
+                && !FoWHelper.getTilePositionsToShow(game, player).contains(tile.getPosition());
+        List<Player> combatants =
+                hidden ? game.getRealPlayers() : ButtonHelper.getPlayersWithShipsInTheSystem(game, tile);
+        List<Button> buttons = new ArrayList<>();
+        for (Player combatant : combatants) {
+            buttons.add(FoWHelper.fogSafeTargetButton(
+                    player.factionButtonChecker() + WAR_PROFIT + combatant.getColor() + "_" + tile.getPosition(),
+                    "gray",
+                    combatant));
+        }
+        return buttons;
+    }
+
+    @ButtonHandler(WAR_PROFIT_TILE)
+    public static void warProfiteeringTile(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Tile tile = game.getTileByPosition(buttonID.substring(WAR_PROFIT_TILE.length()));
+        List<Button> buttons = tile == null ? List.of() : warProfiteeringTargets(game, player, tile);
+        if (buttons.isEmpty()) {
+            ThirtyKAcTargets.noTarget(event, player, "War Profiteering");
+            return;
+        }
+        ButtonHelper.deleteMessage(event);
+        ThirtyKAcTargets.send(
+                player,
+                player.getRepresentationUnfogged()
+                        + ", choose the player you back with _War Profiteering_. You may back yourself.",
+                buttons);
     }
 
     private static Tile activeSystem(Game game) {
@@ -454,17 +503,17 @@ public class ThirtyKEconomyAcButtonHandler {
     @ButtonHandler(WAR_PROFIT)
     public static void warProfiteering(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = ThirtyKAcTargets.target(game, buttonID, WAR_PROFIT);
-        Tile active = activeSystem(game);
-        if (target == null || active == null) {
+        String position = ThirtyKAcTargets.afterTarget(buttonID, WAR_PROFIT);
+        Tile tile = position.isBlank() ? activeSystem(game) : game.getTileByPosition(position);
+        if (target == null || tile == null) {
             ThirtyKAcTargets.noTarget(event, player, "War Profiteering");
             return;
         }
-        if (!FoWHelper.playerHasShipsInSystem(target, active)) {
+        if (!FoWHelper.playerHasShipsInSystem(target, tile)) {
             PlanetTargetService.fizzle(event, player);
             return;
         }
-        String position = active.getPosition();
-        ThirtyKAcState.setWarProfiteering(game, player, target, position);
+        ThirtyKAcState.setWarProfiteering(game, player, target, tile.getPosition());
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),

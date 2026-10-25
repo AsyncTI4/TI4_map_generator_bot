@@ -16,8 +16,8 @@ import ti4.game.Planet;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
-import ti4.image.TileHelper;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 

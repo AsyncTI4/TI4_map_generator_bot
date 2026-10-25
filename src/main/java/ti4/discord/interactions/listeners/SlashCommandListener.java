@@ -19,7 +19,6 @@ import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
-import ti4.logging.RollbarManager;
 import ti4.service.SusSlashCommandService;
 import ti4.service.game.GameNameService;
 import ti4.spring.context.SpringContext;
@@ -33,8 +32,11 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
             Constants.EDIT_TRACK_RECORD,
             Constants.IMPORT_MAP_JSON);
 
-    private static final Set<String> UNECHOED_COMMANDS =
-            Set.of("rules ask", Constants.FOW + " " + Constants.WHISPER, Constants.BOTHELPER + " impersonate");
+    private static final Set<String> UNECHOED_COMMANDS = Set.of(
+            "rules ask",
+            Constants.FOW + " " + Constants.WHISPER,
+            Constants.BOTHELPER + " impersonate",
+            Constants.BOTHELPER + " " + Constants.PLAYER_GAMES);
 
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
@@ -73,9 +75,6 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
 
     private void process(SlashCommandInteractionEvent event) {
         long processStartTime = System.currentTimeMillis();
-        RollbarManager.putInteractionMetadata("slash_command", event);
-        RollbarManager.put("command_name", event.getCommandString());
-        RollbarManager.put("game_name", GameNameService.getGameName(event));
 
         ParentCommand command = SlashCommandManager.getCommand(event.getName());
         Command<SlashCommandInteractionEvent> resolvedCommand = getCommand(event);
@@ -102,7 +101,6 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
             if (combatReplayService != null) {
                 CombatReplayService.clearPreInteractionSnapshot();
             }
-            RollbarManager.clear();
         }
 
         warnForLongRunningCommands(event, processStartTime);

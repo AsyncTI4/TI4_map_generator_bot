@@ -24,6 +24,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arden
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
@@ -40,11 +41,11 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKRelics;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.helpers.thundersedge.TeHelperBreakthroughs;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
@@ -56,6 +57,7 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.explore.BlueReverieArtifactService;
 import ti4.service.fow.BlindSelectionService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
@@ -74,6 +76,7 @@ import ti4.service.unit.DestroyUnitService;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 @UtilityClass
 public class ComponentActionHelper {
@@ -182,6 +185,8 @@ public class ComponentActionHelper {
                                                             .isEmpty());
                                 case "ashenbt" -> AshenBreakthroughHandler.hasEligibleTarget(game, p1);
                                 case "scrapyardbt" -> ScrapyardBreakthroughHandler.hasCapturedUnits(p1);
+                                case "stonebornbt", "stonebornbtunleashed" ->
+                                    !p1.getFragments().isEmpty();
                                 case "saarbt" ->
                                     game.getTileMap().values().stream()
                                             .filter(Tile::isAsteroidField)
@@ -665,6 +670,7 @@ public class ComponentActionHelper {
 
         String firstPart = buttonID.substring(0, buttonID.indexOf('_'));
         buttonID = buttonID.replace(firstPart + "_", "");
+        TurnActionLog.recordComponent(game, firstPart);
 
         switch (firstPart) {
             case "tech" -> {
@@ -906,7 +912,6 @@ public class ComponentActionHelper {
                     purgeFragButtons.add(transact3);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, purgeFragButtons);
                     DSHelperBreakthroughs.doLanefirBtCheck(game, p1);
-
                 } else if ("stallTactics".equalsIgnoreCase(buttonID)) {
                     List<Button> acButtons = ActionCardHelper.getDiscardActionCardButtons(p1, true);
                     DeepgloomService.spendOneDebt(game, p1, "stall_tactics");
@@ -1342,6 +1347,7 @@ public class ComponentActionHelper {
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Used the "
                         + Mapper.getRelic(relicID).getName() + " relic.");
         String purgeOrExhaust = "purged";
+        boolean discardedArtifact = false;
         List<String> juniorRelics = List.of("titanprototype", "absol_jr");
         if (juniorRelics.contains(relicID)) { // EXHAUST THE RELIC
             List<Button> buttons2 = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
@@ -1424,11 +1430,17 @@ public class ComponentActionHelper {
                     event.getMessageChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
 
         } else { // PURGE THE RELIC
-            player.removeRelic(relicID);
-            player.removeExhaustedRelic(relicID);
-            if (!"nanoforge".equals(relicID)) {
+            discardedArtifact = BlueReverieArtifactService.discardArtifact(game, player, relicID);
+            if (!discardedArtifact) {
+                player.removeRelic(relicID);
+                player.removeExhaustedRelic(relicID);
+            } else {
+                purgeOrExhaust = "discarded";
+            }
+            if (!discardedArtifact && !"nanoforge".equals(relicID)) {
                 DSHelperBreakthroughs.doLanefirBtCheck(game, player);
                 OblivionUnitHandler.doOblivionMechCheck(game, player);
+                StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
             }
         }
 

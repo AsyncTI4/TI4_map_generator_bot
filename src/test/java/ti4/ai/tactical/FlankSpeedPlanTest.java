@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Flank Speed is played after the system is activated and gives each of the seat's ships +1 move for that tactical
@@ -99,8 +99,8 @@ class FlankSpeedPlanTest extends BaseTi4Test {
     }
 
     private String twoSystemsFromHome() {
-        List<String> nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
-        return PositionMapper.getAdjacentTilePositions(neighbour).stream()
+        List<String> nearHome = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        return MapPositionMapper.getAdjacentTilePositions(neighbour).stream()
                 .filter(position ->
                         !"x".equals(position) && !AiTestGame.HOME.equals(position) && !nearHome.contains(position))
                 .findFirst()

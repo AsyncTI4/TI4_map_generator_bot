@@ -13,8 +13,8 @@ import ti4.ai.AiTestGame;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.model.ActionCardModel;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class StallCardPlansTest extends BaseTi4Test {

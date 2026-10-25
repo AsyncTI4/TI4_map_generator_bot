@@ -1,0 +1,19 @@
+{
+    "id": "fracture8",
+    "name": "Qilin Station",
+    "aliases": [
+        "fracture8",
+        "qilinstation",
+        "qilin",
+        "frac8"
+    ],
+    "hasEgress": true,
+    "imagePath": "fracture8.png",
+    "planets": [
+        "qilinstation"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

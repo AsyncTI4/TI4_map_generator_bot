@@ -12,7 +12,7 @@ import ti4.ai.AiTestGame;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 class IntegratedEconomyRulesTest extends BaseTi4Test {
@@ -129,7 +129,7 @@ class IntegratedEconomyRulesTest extends BaseTi4Test {
     }
 
     private void solDestroyerNextDoor() {
-        String next = PositionMapper.getAdjacentTilePositions(position).stream()
+        String next = MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate))
                 .findFirst()
                 .orElseThrow();

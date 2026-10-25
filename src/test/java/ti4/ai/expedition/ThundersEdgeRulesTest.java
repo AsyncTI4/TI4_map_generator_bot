@@ -18,7 +18,7 @@ import ti4.ai.AiTestGame;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Player;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // The seat that claims the last slice puts Thunder's Edge on the board and, when several seats tie for the most
@@ -45,7 +45,7 @@ class ThundersEdgeRulesTest extends BaseTi4Test {
         ArrayDeque<String> queue = new ArrayDeque<>(List.of(origin));
         while (!queue.isEmpty()) {
             String position = queue.removeFirst();
-            for (String next : PositionMapper.getAdjacentTilePositions(position)) {
+            for (String next : MapPositionMapper.getAdjacentTilePositions(position)) {
                 if ("x".equals(next) || distance.containsKey(next)) continue;
                 distance.put(next, distance.get(position) + 1);
                 if (distance.get(next) == steps) return next;
@@ -90,7 +90,7 @@ class ThundersEdgeRulesTest extends BaseTi4Test {
     void keepsAwayFromTheRivalsHome() {
         test.solHomeBeside(near);
         String quiet = AiTestGame.neighbourOf(HOME);
-        for (String position : PositionMapper.getAdjacentTilePositions(HOME)) {
+        for (String position : MapPositionMapper.getAdjacentTilePositions(HOME)) {
             if (!"x".equals(position) && !position.equals(near) && test.game.getTileByPosition(position) == null) {
                 quiet = position;
                 break;

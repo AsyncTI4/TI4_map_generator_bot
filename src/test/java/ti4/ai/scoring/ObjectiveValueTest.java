@@ -15,7 +15,7 @@ import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlanner;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 class ObjectiveValueTest extends BaseTi4Test {
@@ -68,7 +68,7 @@ class ObjectiveValueTest extends BaseTi4Test {
         reveal("deep_space");
         Tile parked = test.place(EMPTY_SYSTEM, neighbour);
         test.units(parked, "space", test.nekro, UnitType.Destroyer, 1);
-        String elsewhere = PositionMapper.getAdjacentTilePositions(neighbour).stream()
+        String elsewhere = MapPositionMapper.getAdjacentTilePositions(neighbour).stream()
                 .filter(position -> !"x".equals(position) && !AiTestGame.HOME.equals(position))
                 .findFirst()
                 .orElseThrow();
@@ -229,7 +229,7 @@ class ObjectiveValueTest extends BaseTi4Test {
     }
 
     private String otherNeighbour() {
-        return PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        return MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position) && !neighbour.equals(position))
                 .findFirst()
                 .orElseThrow();
@@ -242,8 +242,8 @@ class ObjectiveValueTest extends BaseTi4Test {
         test.nekro.setSecret("fc");
         test.units(home, "space", test.nekro, UnitType.Destroyer, 1);
         test.place(EMPTY_SYSTEM, neighbour);
-        List<String> nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
-        String beyond = PositionMapper.getAdjacentTilePositions(neighbour).stream()
+        List<String> nearHome = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        String beyond = MapPositionMapper.getAdjacentTilePositions(neighbour).stream()
                 .filter(position -> !"x".equals(position) && !AiTestGame.HOME.equals(position))
                 .filter(position -> !nearHome.contains(position))
                 .findFirst()
@@ -348,7 +348,7 @@ class ObjectiveValueTest extends BaseTi4Test {
         for (int i = 0; i < tiles.length; i++)
             test.place(
                     tiles[i],
-                    PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).get(i));
+                    MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).get(i));
         test.nekro.setSecret(secret);
         for (int i = 0; i < held; i++) test.nekro.addPlanet(planets[i]);
         ObjectiveValue value = new ObjectiveValue(test.game, test.nekro);

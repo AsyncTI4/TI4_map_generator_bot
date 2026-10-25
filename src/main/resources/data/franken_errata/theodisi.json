@@ -208,6 +208,101 @@
 		"source": "theodisi"
 	},
     {
+        "itemCategory": "STARTINGTECH",
+        "itemId": "thurviali",
+        "alternateText": "Gain each of another player's starting technologies.",
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "STARTINGTECH",
+        "itemId": "stoneborn",
+        "alternateText": "Gain 1 of your faction technologies.",
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "thstoneborng",
+        "additionalComponents": [
+            "ABILITY:fragmentum_unleashed",
+            "ABILITY:adaptive"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "thstoneborndn",
+        "additionalComponents": [
+            "ABILITY:fragmentum_unleashed",
+            "ABILITY:adaptive"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "AGENT",
+        "itemId": "stonebornagentdormant",
+        "additionalComponents": [
+            "ABILITY:fragmentum_unleashed",
+            "ABILITY:adaptive"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "stoneborncommanderdormant",
+        "additionalComponents": [
+            "ABILITY:fragmentum_unleashed",
+            "ABILITY:adaptive"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "stonebornherodormant",
+        "additionalComponents": [
+            "ABILITY:fragmentum_unleashed",
+            "ABILITY:adaptive"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "HOMESYSTEM",
+        "itemId": "stoneborn",
+        "additionalComponents": [
+            "ABILITY:fragmentum_unleashed",
+            "ABILITY:adaptive"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "stonebornbtdormant",
+        "additionalComponents": [
+            "ABILITY:fragmentum_unleashed",
+            "ABILITY:adaptive"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "trovantous",
+        "optionalSwaps": [
+            "MECH:stoneborn_mech"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "fragmentum_unleashed",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "adaptive",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "custom_rigs",
         "additionalComponents": [

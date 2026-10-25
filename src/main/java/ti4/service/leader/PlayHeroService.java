@@ -25,6 +25,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
@@ -32,6 +33,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponth
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardLeadersHandler;
@@ -62,13 +64,13 @@ import ti4.helpers.RelicHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
@@ -109,6 +111,7 @@ public class PlayHeroService {
         if (removed && (reason == LeaderRemovalReason.PURGED || reason == LeaderRemovalReason.STATUS_CLEANUP)) {
             DSHelperBreakthroughs.doLanefirBtCheck(game, player);
             OblivionUnitHandler.doOblivionMechCheck(game, player);
+            StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
         }
         if (removed && reason == LeaderRemovalReason.PURGED) {
             RevenantTechHandler.doLazarusPodsLeaderCheck(game, player);
@@ -132,11 +135,30 @@ public class PlayHeroService {
     }
 
     public static void playHero(GenericInteractionCreateEvent event, Game game, Player player, Leader playerLeader) {
+        if ("morphahero".equals(playerLeader.getId())
+                && !"resolve".equals(player.getStoredValue("morphaHeroPending"))) {
+            MorphaLeadersHandler.startMorphaHero(game, player);
+            return;
+        }
         if ("oblivionhero".equals(playerLeader.getId()) && !OblivionLeadersHandler.canStartOblivionHero(game)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     player.getRepresentation()
                             + ", Frontiersman Nothi, the Oblivion hero, cannot be played because there are not enough unused red-backed and blue-backed tiles or legal edge positions.");
+            return;
+        }
+        if (("stonebornherodormant".equals(playerLeader.getId())
+                        || "stonebornherounleashed".equals(playerLeader.getId()))
+                && game.getAllRelics().size() < 3) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing()
+                            + " cannot play _"
+                            + playerLeader
+                                    .getLeaderModel()
+                                    .map(LeaderModel::getName)
+                                    .orElse("Meteorime")
+                            + "_ because fewer than 3 relics remain.");
             return;
         }
 
@@ -215,6 +237,15 @@ public class PlayHeroService {
         }
 
         switch (playerLeader.getId()) {
+            case "stonebornherodormant" -> StonebornLeadersHandler.drawThreeRelicsAndOfferOne(game, player);
+            case "stonebornherounleashed" -> {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " drew the following relics with _Meteorime Unleashed_.");
+                RelicHelper.drawRelicAndNotify(player, event, game);
+                RelicHelper.drawRelicAndNotify(player, event, game);
+                RelicHelper.drawRelicAndNotify(player, event, game);
+            }
             case "scrapyardhero" ->
                 ScrapyardLeaderHandler.resolveScrapyardHero(
                         event instanceof ButtonInteractionEvent buttonEvent ? buttonEvent : null, game, player);
@@ -286,7 +317,7 @@ public class PlayHeroService {
             case "ashenhero" -> AshenLeadersHandler.postHeroButtons(event, game, player);
             case "crystellumhero" -> CrystellumLeadersHandler.startCrystellumHero(event, game, player);
             case "dreamhero" -> DreamLeadersHandler.postDreamHeroButtons(game, player);
-            case "netrunnershero" -> NetrunnersLeadersHandler.offerHeroTechSelection(game, player);
+            case "netrunnershero" -> NetrunnersLeadersHandler.startNetrunnersHero(game, player);
             case "tahero" -> TaLeadersHandler.postHeroButtons(game, player, event);
             case "tyrishero" ->
                 game.setStoredValue("tyrisHeroRound" + game.getRound() + "_" + player.getFaction(), "true");

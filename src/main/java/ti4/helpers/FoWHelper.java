@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.FrameShiftBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.game.Game;
@@ -30,11 +31,11 @@ import ti4.game.UnitHolder;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TileModel;
 import ti4.model.WormholeModel;
@@ -287,15 +288,32 @@ public final class FoWHelper {
     }
 
     public static boolean canSeeStatsOfFaction(Game game, String faction, Player viewingPlayer) {
+        return canSeeStatsOfFaction(game, faction, viewingPlayer, true);
+    }
+
+    public static boolean canSeeStatsOfFactionInCurrentFog(Game game, String faction, Player viewingPlayer) {
+        return canSeeStatsOfFaction(game, faction, viewingPlayer, false);
+    }
+
+    private static boolean canSeeStatsOfFaction(
+            Game game, String faction, Player viewingPlayer, boolean initializeFog) {
         for (Player player : game.getRealPlayers()) {
             if (faction.equalsIgnoreCase(player.getFaction())) {
-                return canSeeStatsOfPlayer(game, player, viewingPlayer);
+                return canSeeStatsOfPlayer(game, player, viewingPlayer, initializeFog);
             }
         }
         return false;
     }
 
     public static boolean canSeeStatsOfPlayer(Game game, Player player, Player viewingPlayer) {
+        return canSeeStatsOfPlayer(game, player, viewingPlayer, true);
+    }
+
+    public static boolean canSeeStatsOfPlayerInCurrentFog(Game game, Player player, Player viewingPlayer) {
+        return canSeeStatsOfPlayer(game, player, viewingPlayer, false);
+    }
+
+    private static boolean canSeeStatsOfPlayer(Game game, Player player, Player viewingPlayer, boolean initializeFog) {
         if (game == null || !player.isRealPlayer() || !viewingPlayer.isRealPlayer()) {
             return false;
         }
@@ -311,7 +329,9 @@ public final class FoWHelper {
                         || hasMahactCCInFleet(game, player, viewingPlayer))) {
             return true;
         }
-        initializeFog(game, viewingPlayer, false);
+        if (initializeFog) {
+            initializeFog(game, viewingPlayer, false);
+        }
         return hasHomeSystemInView(player, viewingPlayer);
     }
 
@@ -322,16 +342,19 @@ public final class FoWHelper {
     public static Set<String> fowFilter(Game game, Player player) {
         if (player != null) {
             updateFog(game, player);
-
-            Set<String> systems = new HashSet<>();
-            for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
-                if (!tileEntry.getValue().hasFog(player)) {
-                    systems.add(tileEntry.getKey());
-                }
-            }
-            return systems;
+            return visibleSystems(game, player);
         }
         return Collections.emptySet();
+    }
+
+    public static Set<String> visibleSystems(Game game, Player player) {
+        Set<String> systems = new HashSet<>();
+        for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
+            if (!tileEntry.getValue().hasFog(player)) {
+                systems.add(tileEntry.getKey());
+            }
+        }
+        return systems;
     }
 
     private static void initializeFog(Game game, @NotNull Player player, boolean forceRecalculate) {
@@ -467,6 +490,10 @@ public final class FoWHelper {
 
     public static void updateFog(Game game, Player player) {
         if (player != null) initializeFog(game, player, true);
+    }
+
+    public static void ensureFogInitialized(Game game, @NotNull Player player) {
+        initializeFog(game, player, false);
     }
 
     private static void updatePlayerFogTiles(Game game, Player player) {
@@ -716,7 +743,14 @@ public final class FoWHelper {
         }
 
         if (game.getActivePlayer() != null
-                && game.getActivePlayer().hasTech("tf-fraactalspikedrives")
+                && (game.getActivePlayer().hasTech("tf-fraactalspikedrives")
+                        || game.getActivePlayer().hasTech("fsd"))
+                && !tile.getWormholes(game).isEmpty()) {
+            adjToFeatures.add(Feature.egress);
+        }
+
+        if (game.getActivePlayer() != null
+                && FrameShiftBrActionCardHandler.isActive(game, game.getActivePlayer())
                 && !tile.getWormholes(game).isEmpty()) {
             adjToFeatures.add(Feature.egress);
         }
@@ -737,6 +771,13 @@ public final class FoWHelper {
                 continue;
             }
             if (adjToFeatures.contains(Feature.ingress) && t.hasIngress()) {
+                adjacentPositions.add(t.getPosition());
+                continue;
+            }
+            if (game.getActivePlayer() != null
+                    && FrameShiftBrActionCardHandler.isActive(game, game.getActivePlayer())
+                    && adjToFeatures.contains(Feature.ingress)
+                    && !t.getWormholes(game).isEmpty()) {
                 adjacentPositions.add(t.getPosition());
                 continue;
             }
@@ -830,7 +871,7 @@ public final class FoWHelper {
             return tiles;
         }
 
-        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(position);
+        List<String> directlyAdjacentTiles = MapPositionMapper.getAdjacentTilePositions(position);
         if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {
             // adjacency file for this tile is not filled in
             return tiles;
@@ -1051,7 +1092,7 @@ public final class FoWHelper {
      * <p>
      * Also takes into account player abilities and agendas
      */
-    private static Set<String> getWormholeAdjacencies(Game game, String position, Player player, boolean neighbors) {
+    static Set<String> getWormholeAdjacencies(Game game, String position, Player player, boolean neighbors) {
         return getWormholeAdjacencies(game, position, player, neighbors, false);
     }
 
@@ -1289,7 +1330,7 @@ public final class FoWHelper {
         }
         if (playerPlanets.stream().anyMatch(unitHolderNames::contains)) {
             return true;
-        } else if (tile.isMecatol(game) && player.hasIIHQ()) {
+        } else if (player.hasIIHQ() && tile.isMecatol(game)) {
             return true;
         } else if ("s11".equals(tile.getTileID()) && canSeeStatsOfFaction(game, "cabal", player)) {
             return true;

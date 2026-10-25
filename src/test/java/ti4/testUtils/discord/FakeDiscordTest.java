@@ -41,7 +41,7 @@ class FakeDiscordTest extends BaseTi4Test {
     // Exhausting a legendary planet posts its embed with the planet sticker; the fake answers the sticker lookup.
     @Test
     void answersPlanetStickerLookups() {
-        assertThat(ti4.image.Mapper.getPlanet("mrte").getLegendaryEmbed()).isNotNull();
+        assertThat(ti4.model.Mapper.getPlanet("mrte").getLegendaryEmbed()).isNotNull();
     }
 
     // The bot's own helper splits, sanitises and sends; the fake must receive the result like Discord would.

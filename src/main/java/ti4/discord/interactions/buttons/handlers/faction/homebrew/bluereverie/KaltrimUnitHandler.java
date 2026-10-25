@@ -18,8 +18,8 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
@@ -31,6 +31,305 @@ public class KaltrimUnitHandler {
     private static final String PLACE_CONSULATE_DEPLOY = "placeConsulateDeploy_";
     private static final String CAPTURE_CONSULATE_INFANTRY = "captureConsulateInfantry_";
     private static final String CAPTURE_CONSULATE_INFANTRY_PAGE = "captureConsulateInfantryPage_";
+    private static final String REMOVE_SHRINE_INFANTRY = "removeKaltrimShrineInfantry_";
+    private static final String REMOVE_SHRINE_INFANTRY_PAGE = "removeKaltrimShrineInfantryPage_";
+    private static final String PLACE_SHRINE_INFANTRY = "placeKaltrimShrineInfantry_";
+    private static final String DECLINE_SHRINE_INFANTRY = "declineKaltrimShrineInfantry_";
+    private static final int SHRINE_INFANTRY_PAGE_SIZE = 21;
+
+    public static void offerShrineInfantryRemoval(Game game, Player activator, Tile activatedSystem) {
+        clearShrineInfantryRemovalState(game);
+        List<Planet> shrinePlanets = new ArrayList<>();
+        for (Planet planet : activatedSystem.getPlanetUnitHolders()) {
+            int shrineCount = (int) planet.getTokenList().stream()
+                    .filter(token -> token.startsWith("token_kaltrimshrine"))
+                    .count();
+            for (int i = 0; i < shrineCount; i++) {
+                shrinePlanets.add(planet);
+            }
+        }
+        if (shrinePlanets.isEmpty()) {
+            return;
+        }
+        for (int shrineIndex = 0; shrineIndex < shrinePlanets.size(); shrineIndex++) {
+            Planet shrinePlanet = shrinePlanets.get(shrineIndex);
+            Player owner = getShrineController(game, shrinePlanet);
+            if (owner == null) {
+                continue;
+            }
+            game.setStoredValue(getShrineStateKey(owner, activator, activatedSystem, shrinePlanet, shrineIndex), "0");
+            MessageHelper.sendMessageToChannelWithButtons(
+                    owner.getCorrectChannel(),
+                    owner.getRepresentationNoPing() + ", " + activator.getRepresentationNoPing()
+                            + " activated a system containing a _Shrine_. Remove up to 2 of their infantry from the game board, then place 1 infantry from your reinforcements on "
+                            + shrinePlanet.getRepresentation(game) + ".",
+                    getShrineInfantryRemovalPage(
+                            game, owner, activator, activatedSystem, shrinePlanet, shrineIndex, 0, 0));
+        }
+    }
+
+    @ButtonHandler(REMOVE_SHRINE_INFANTRY)
+    public static void removeShrineInfantry(ButtonInteractionEvent event, Game game, Player owner, String buttonID) {
+        String[] values = buttonID.substring(REMOVE_SHRINE_INFANTRY.length()).split("\\|", 7);
+        if (values.length != 7) {
+            return;
+        }
+        Player target = game.getPlayerFromColorOrFaction(values[0]);
+        Tile shrineTile = game.getTileByPosition(values[1]);
+        Planet shrinePlanet = shrineTile == null
+                ? null
+                : shrineTile.getPlanetUnitHolders().stream()
+                        .filter(planet -> planet.getName().equals(values[2]))
+                        .findFirst()
+                        .orElse(null);
+        int shrineIndex = parseShrineInfantryCount(values[3]);
+        int removed = parseShrineInfantryCount(values[4]);
+        Tile sourceTile = game.getTileByPosition(values[5]);
+        UnitHolder sourceHolder =
+                sourceTile == null ? null : sourceTile.getUnitHolders().get(values[6]);
+        if (target == null
+                || target != game.getActivePlayer()
+                || !isActiveShrine(game, owner, shrineTile, shrinePlanet)
+                || !hasShrineRemovalState(game, owner, target, shrineTile, shrinePlanet, shrineIndex, removed)
+                || shrineIndex < 0
+                || removed < 0
+                || removed >= 2
+                || sourceHolder == null
+                || sourceHolder.getUnitCount(UnitType.Infantry, target) < 1) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        RemoveUnitService.removeUnit(event, sourceTile, game, target, sourceHolder, UnitType.Infantry, 1);
+        game.setStoredValue(
+                getShrineStateKey(owner, target, shrineTile, shrinePlanet, shrineIndex), Integer.toString(removed + 1));
+        MessageHelper.editMessageWithButtons(
+                event,
+                shrineInfantryMessage(game, owner, target, shrinePlanet, removed + 1),
+                getShrineInfantryRemovalPage(
+                        game, owner, target, shrineTile, shrinePlanet, shrineIndex, removed + 1, 0));
+    }
+
+    @ButtonHandler(REMOVE_SHRINE_INFANTRY_PAGE)
+    public static void changeShrineInfantryRemovalPage(
+            ButtonInteractionEvent event, Game game, Player owner, String buttonID) {
+        String[] values =
+                buttonID.substring(REMOVE_SHRINE_INFANTRY_PAGE.length()).split("\\|", 6);
+        if (values.length != 6) {
+            return;
+        }
+        Player target = game.getPlayerFromColorOrFaction(values[0]);
+        Tile shrineTile = game.getTileByPosition(values[1]);
+        Planet shrinePlanet = shrineTile == null
+                ? null
+                : shrineTile.getPlanetUnitHolders().stream()
+                        .filter(planet -> planet.getName().equals(values[2]))
+                        .findFirst()
+                        .orElse(null);
+        int shrineIndex = parseShrineInfantryCount(values[3]);
+        int removed = parseShrineInfantryCount(values[4]);
+        int page = parseShrineInfantryCount(values[5]);
+        if (target == null
+                || target != game.getActivePlayer()
+                || !isActiveShrine(game, owner, shrineTile, shrinePlanet)
+                || !hasShrineRemovalState(game, owner, target, shrineTile, shrinePlanet, shrineIndex, removed)
+                || shrineIndex < 0
+                || removed < 0
+                || removed > 2
+                || page < 0) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        MessageHelper.editMessageWithButtons(
+                event,
+                shrineInfantryMessage(game, owner, target, shrinePlanet, removed),
+                getShrineInfantryRemovalPage(
+                        game, owner, target, shrineTile, shrinePlanet, shrineIndex, removed, page));
+    }
+
+    @ButtonHandler(PLACE_SHRINE_INFANTRY)
+    public static void placeShrineInfantry(ButtonInteractionEvent event, Game game, Player owner, String buttonID) {
+        String[] values = buttonID.substring(PLACE_SHRINE_INFANTRY.length()).split("\\|", 5);
+        if (values.length != 5) {
+            return;
+        }
+        Player target = game.getPlayerFromColorOrFaction(values[0]);
+        Tile shrineTile = game.getTileByPosition(values[1]);
+        Planet shrinePlanet = shrineTile == null
+                ? null
+                : shrineTile.getPlanetUnitHolders().stream()
+                        .filter(planet -> planet.getName().equals(values[2]))
+                        .findFirst()
+                        .orElse(null);
+        int shrineIndex = parseShrineInfantryCount(values[3]);
+        int removed = parseShrineInfantryCount(values[4]);
+        if (target == null
+                || target != game.getActivePlayer()
+                || !isActiveShrine(game, owner, shrineTile, shrinePlanet)
+                || !hasShrineRemovalState(game, owner, target, shrineTile, shrinePlanet, shrineIndex, removed)
+                || shrineIndex < 0
+                || removed < 0
+                || removed > 2) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        AddUnitService.addUnits(event, shrineTile, game, owner.getColor(), "1 infantry " + shrinePlanet.getName());
+        game.removeStoredValue(getShrineStateKey(owner, target, shrineTile, shrinePlanet, shrineIndex));
+        MessageHelper.sendMessageToChannel(
+                owner.getCorrectChannel(),
+                owner.getRepresentationNoPing() + " placed 1 infantry on " + shrinePlanet.getRepresentation(game)
+                        + " after removing " + removed + " of " + target.getRepresentationNoPing()
+                        + "'s infantry with a Shrine.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(DECLINE_SHRINE_INFANTRY)
+    public static void declineShrineInfantry(ButtonInteractionEvent event, Game game, Player owner, String buttonID) {
+        String[] values = buttonID.substring(DECLINE_SHRINE_INFANTRY.length()).split("\\|", 4);
+        if (values.length == 4) {
+            Player target = game.getPlayerFromColorOrFaction(values[0]);
+            Tile shrineTile = game.getTileByPosition(values[1]);
+            Planet shrinePlanet = shrineTile == null
+                    ? null
+                    : shrineTile.getPlanetUnitHolders().stream()
+                            .filter(planet -> planet.getName().equals(values[2]))
+                            .findFirst()
+                            .orElse(null);
+            int shrineIndex = parseShrineInfantryCount(values[3]);
+            if (target != null && shrineIndex >= 0) {
+                game.removeStoredValue(getShrineStateKey(owner, target, shrineTile, shrinePlanet, shrineIndex));
+            }
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static List<Button> getShrineInfantryRemovalPage(
+            Game game,
+            Player owner,
+            Player target,
+            Tile shrineTile,
+            Planet shrinePlanet,
+            int shrineIndex,
+            int removed,
+            int page) {
+        List<InfantryLocation> locations = getShrineInfantryLocations(game, owner, target);
+        int pageCount = Math.max(1, Math.ceilDiv(locations.size(), SHRINE_INFANTRY_PAGE_SIZE));
+        int currentPage = Math.clamp(page, 0, pageCount - 1);
+        int start = currentPage * SHRINE_INFANTRY_PAGE_SIZE;
+        int end = Math.min(start + SHRINE_INFANTRY_PAGE_SIZE, locations.size());
+        List<Button> buttons = new ArrayList<>();
+        if (removed < 2) {
+            for (InfantryLocation location : locations.subList(start, end)) {
+                buttons.add(Buttons.red(
+                        owner.factionButtonChecker() + REMOVE_SHRINE_INFANTRY + target.getFaction() + "|"
+                                + shrineTile.getPosition() + "|" + shrinePlanet.getName() + "|" + shrineIndex + "|"
+                                + removed + "|" + location.tile().getPosition() + "|"
+                                + location.holder().getName(),
+                        "Remove 1 Infantry from "
+                                + ButtonHelper.getUnitHolderRep(location.holder(), location.tile(), game)));
+            }
+        }
+        if (currentPage > 0) {
+            buttons.add(Buttons.blue(
+                    owner.factionButtonChecker() + REMOVE_SHRINE_INFANTRY_PAGE + target.getFaction() + "|"
+                            + shrineTile.getPosition() + "|" + shrinePlanet.getName() + "|" + shrineIndex + "|"
+                            + removed + "|" + (currentPage - 1),
+                    "Previous Page"));
+        }
+        if (currentPage + 1 < pageCount) {
+            buttons.add(Buttons.blue(
+                    owner.factionButtonChecker() + REMOVE_SHRINE_INFANTRY_PAGE + target.getFaction() + "|"
+                            + shrineTile.getPosition() + "|" + shrinePlanet.getName() + "|" + shrineIndex + "|"
+                            + removed + "|" + (currentPage + 1),
+                    "Next Page"));
+        }
+        buttons.add(Buttons.green(
+                owner.factionButtonChecker() + PLACE_SHRINE_INFANTRY + target.getFaction() + "|"
+                        + shrineTile.getPosition() + "|" + shrinePlanet.getName() + "|" + shrineIndex + "|" + removed,
+                "Place 1 Infantry"));
+        buttons.add(Buttons.red(
+                owner.factionButtonChecker() + DECLINE_SHRINE_INFANTRY + target.getFaction() + "|"
+                        + shrineTile.getPosition() + "|" + shrinePlanet.getName() + "|" + shrineIndex,
+                "Decline"));
+        return buttons;
+    }
+
+    private static List<InfantryLocation> getShrineInfantryLocations(Game game, Player owner, Player target) {
+        List<InfantryLocation> locations = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (game.isFowMode()
+                    && !FoWHelper.getTilePositionsToShow(game, owner).contains(tile.getPosition())) {
+                continue;
+            }
+            for (UnitHolder holder : tile.getUnitHolders().values()) {
+                if (holder.getUnitCount(UnitType.Infantry, target) > 0) {
+                    locations.add(new InfantryLocation(tile, holder));
+                }
+            }
+        }
+        return locations;
+    }
+
+    private static boolean hasShrine(Planet planet) {
+        return planet.getTokenList().stream().anyMatch(token -> token.startsWith("token_kaltrimshrine"));
+    }
+
+    private static boolean isActiveShrine(Game game, Player owner, Tile shrineTile, Planet shrinePlanet) {
+        return shrineTile != null
+                && shrinePlanet != null
+                && owner.getPlanets().contains(shrinePlanet.getName())
+                && shrineTile.getPosition().equals(game.getCurrentActiveSystem())
+                && hasShrine(shrinePlanet);
+    }
+
+    private static Player getShrineController(Game game, Planet shrinePlanet) {
+        return game.getRealPlayers().stream()
+                .filter(player -> player.getPlanets().contains(shrinePlanet.getName()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static boolean hasShrineRemovalState(
+            Game game,
+            Player owner,
+            Player target,
+            Tile shrineTile,
+            Planet shrinePlanet,
+            int shrineIndex,
+            int removed) {
+        return Integer.toString(removed)
+                .equals(game.getStoredValue(getShrineStateKey(owner, target, shrineTile, shrinePlanet, shrineIndex)));
+    }
+
+    public static void clearShrineInfantryRemovalState(Game game) {
+        game.getStoredValueMap().keySet().removeIf(key -> key.startsWith("kaltrimShrine_"));
+    }
+
+    private static String getShrineStateKey(
+            Player owner, Player target, Tile shrineTile, Planet shrinePlanet, int shrineIndex) {
+        if (shrineTile == null || shrinePlanet == null) {
+            return "";
+        }
+        return "kaltrimShrine_" + owner.getFaction() + "_" + target.getFaction() + "_" + shrineTile.getPosition() + "_"
+                + shrinePlanet.getName() + "_" + shrineIndex;
+    }
+
+    private static int parseShrineInfantryCount(String value) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    private static String shrineInfantryMessage(
+            Game game, Player owner, Player target, Planet shrinePlanet, int removed) {
+        return owner.getRepresentationNoPing() + ", remove up to " + (2 - removed) + " more of "
+                + target.getRepresentationNoPing()
+                + "'s infantry from the game board, then place 1 infantry from your reinforcements on "
+                + shrinePlanet.getRepresentation(game) + ".";
+    }
+
+    private record InfantryLocation(Tile tile, UnitHolder holder) {}
 
     public static void offerJewelOfTheRose(Game game, String agendaId) {
         for (Player player : game.getRealPlayers()) {

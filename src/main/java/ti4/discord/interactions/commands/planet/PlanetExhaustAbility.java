@@ -25,8 +25,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
 import ti4.service.planet.AsgardLegendaryService;
@@ -270,12 +270,16 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = "blank";
             }
             case "thren" -> {
-                TheodisiLegendaryButtonHandler.offerThrenPlanetSelection(game, player);
+                TheodisiLegendaryButtonHandler.resolveThrenRemoteFactory(game, player);
                 output = "blank";
             }
             case "vespix" -> {
                 TheodisiLegendaryButtonHandler.offerVespixPlanetSelection(game, player);
                 output = "blank";
+            }
+            case "petra", "petraunleashed" -> {
+                output = "Please choose which planet you would like to explore.";
+                buttons.addAll(ButtonHelper.getButtonsToExploreAllPlanets(player, game));
             }
             default -> {
                 if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null

@@ -21,8 +21,6 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionTargetingLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.EdynAgentHandler;
@@ -34,6 +32,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
@@ -55,13 +54,13 @@ import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.helpers.twilight_kart.TkHelperStarflare;
-import ti4.image.Mapper;
-import ti4.image.TileGenerator;
-import ti4.image.TileHelper;
+import ti4.image.tile.SystemContextImage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.StrategyCardModel;
+import ti4.model.TileHelper;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.agenda.MonumentsAgendaService;
@@ -327,7 +326,7 @@ public final class ButtonHelperModifyUnits {
             LoreService.showPlanetLore(p2, game, planet, LoreService.TRIGGER.GROUND_BATTLE);
         }
         String pos = tile.getPosition();
-        FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload();
+        FileUpload systemWithContext = SystemContextImage.upload(game, event, 0, tile.getPosition());
         MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
         List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, pos, p1, p2, "ground");
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
@@ -581,7 +580,6 @@ public final class ButtonHelperModifyUnits {
                 }
             }
         }
-        IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "groundcombat");
         ThirtyKSecretHooks.afterCombatHits(game, player, tile, unitHolder, "groundcombat");
         LostLegaciesRelicHandler.finishNeutralReplacementBatch(event, game);
         event.getMessage();
@@ -905,14 +903,6 @@ public final class ButtonHelperModifyUnits {
                 }
             }
         }
-        if (IronAbilitiesHandler.hasExoAtmospheric(player) && Constants.SPACE.equals(unitHolder.getName())) {
-            int dreadnoughtIndex = assignHitOrder.indexOf("dreadnought");
-            if (dreadnoughtIndex >= 0) {
-                assignHitOrder.add(dreadnoughtIndex, "mech");
-            } else {
-                assignHitOrder.add("mech");
-            }
-        }
         List<String> precisionTargetTypes = PrecisionTargetingLLButtonHandler.getTargetUnitTypes(game, player, tile);
         if (!precisionTargetTypes.isEmpty()) {
             assignHitOrder.removeAll(precisionTargetTypes);
@@ -1046,9 +1036,7 @@ public final class ButtonHelperModifyUnits {
                         && !((ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)
                                         || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)
                                         || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile))
-                                || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0
-                                || IronAbilitiesHandler.isExoAtmosphericMechInSpace(
-                                        player, unitKey.unitType(), unitHolder))) {
+                                || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
 
                     int min = unitEntry.getValue();
                     if (!justSummarizing) {
@@ -1125,7 +1113,6 @@ public final class ButtonHelperModifyUnits {
             LostLegaciesRelicHandler.finishNeutralReplacementBatch(event, game);
         }
         if (!justSummarizing && event instanceof ButtonInteractionEvent bevent) {
-            IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "spacecombat");
             ThirtyKSecretHooks.afterCombatHits(game, player, tile, unitHolder, "spacecombat");
             ThirtyKExploreHooks.afterSpaceCombatHits(event, game, player, tile, "spacecombat");
             ThirtyKActionCardHooks.afterCombatHitsAssigned(game, tile, "spacecombat");
@@ -1578,6 +1565,10 @@ public final class ButtonHelperModifyUnits {
                             || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())
                             || MonumentsService.canUseNaaluMonumentCoexistence(game, player, unitHolder.getName())
                             || XinUnitHandler.canUseStarSentinelCoexistence(player, unitHolder)) {
+                        if (TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())) {
+                            buttons.add(
+                                    TaBreakthroughHandler.getSafeHavensCoexistenceButton(player, unitHolder.getName()));
+                        }
                         buttons.add(Buttons.green(
                                 player.factionButtonChecker() + "enterCoexistence_" + unitHolder.getName(),
                                 "Enter Into Coexistence"));
@@ -1596,6 +1587,10 @@ public final class ButtonHelperModifyUnits {
                                     || TaBreakthroughHandler.canUseSafeHavensCoexistence(
                                             game, player2, unitHolder.getName()))) {
                         buttons = new ArrayList<>();
+                        if (TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player2, unitHolder.getName())) {
+                            buttons.add(TaBreakthroughHandler.getSafeHavensCoexistenceButton(
+                                    player2, unitHolder.getName()));
+                        }
                         buttons.add(Buttons.green(
                                 player2.factionButtonChecker() + "enterCoexistence_" + unitHolder.getName(),
                                 "Enter Into Coexistence"));
@@ -2033,7 +2028,11 @@ public final class ButtonHelperModifyUnits {
                             + " did not place a command token in system they retreated to due to Kado S'mah-Qar, the Kollecc commander.");
         } else {
             if (!player.hasAbility("eusociality") || !KaloraAbilityHandler.eusocialityRetreat(player, event, tile1)) {
-                if (game.isTwilightsFallMode() && buttonID.contains("skilled") && buttonID.contains("feint")) {
+                if (buttonID.contains("hydromorphicEbbing")) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            player.getFactionEmoji() + " did not place a command token due to _Ebbing Flow_.");
+                } else if (game.isTwilightsFallMode() && buttonID.contains("skilled") && buttonID.contains("feint")) {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             player.getFactionEmoji()
@@ -2462,6 +2461,12 @@ public final class ButtonHelperModifyUnits {
                         });
             }
         }
+        if (unitKey != null) {
+            UnitModel producedUnit = player.getUnitFromUnitKey(unitKey);
+            if (producedUnit != null) {
+                BlueReverieArtifactRelicHandler.offerIndustrialArtifact(game, player, producedUnit);
+            }
+        }
         if ("sd".equalsIgnoreCase(unitID)) {
             tile = game.getTileFromPlanet(planetName);
             if (tile != null) {
@@ -2742,6 +2747,12 @@ public final class ButtonHelperModifyUnits {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
                     }
                 }
+            }
+        }
+        if (!willSkipBuild && unitKey != null) {
+            UnitModel producedUnit = player.getUnitFromUnitKey(unitKey);
+            if (producedUnit != null) {
+                BlueReverieArtifactRelicHandler.offerIndustrialArtifact(game, player, producedUnit);
             }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), playerRep + " " + successMessage);

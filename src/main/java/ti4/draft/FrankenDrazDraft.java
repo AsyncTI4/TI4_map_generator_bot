@@ -31,12 +31,12 @@ import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.PatternHelper;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
 import ti4.message.componentsV2.MessageV2Editor;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.franken.FrankenDraftBagService;
 import ti4.service.milty.MiltyDraftManager;
@@ -50,18 +50,8 @@ public class FrankenDrazDraft extends FrankenDraft {
     public static final String LOST_LEGACIES_FACTION_LIMITS_KEY = "frankenDrazLostLegaciesFactionLimits";
     private static final int DEFAULT_MONUMENT_LIMIT = 2;
     private static final int DEFAULT_FACTION_LIMIT = 6;
-    private static final Set<String> EXCLUDED_FACTIONS = Set.of(
-            "lazax",
-            "admins",
-            "franken",
-            "keleresm",
-            "keleresx",
-            "miltymod",
-            "qulane",
-            "neutral",
-            "obsidian",
-            "stoneborn",
-            "morpha");
+    private static final Set<String> EXCLUDED_FACTIONS =
+            Set.of("lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "obsidian");
     private static final List<DraftCategory> POST_DRAFT_COMPONENT_CATEGORIES = List.of(
             DraftCategory.ABILITY,
             DraftCategory.TECH,

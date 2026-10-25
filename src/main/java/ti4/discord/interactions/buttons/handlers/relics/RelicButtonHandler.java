@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -15,9 +16,9 @@ import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.RelicModel;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.tactical.TacticalActionService;
@@ -89,6 +90,7 @@ class RelicButtonHandler {
     static void drawRelicFromFrag(ButtonInteractionEvent event, Player player, Game game) {
         RelicHelper.drawRelicAndNotify(player, event, game);
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
         ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         ButtonHelper.deleteMessage(event);
     }
@@ -119,6 +121,7 @@ class RelicButtonHandler {
         player.removeRelic(relicId);
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         OblivionUnitHandler.doOblivionMechCheck(game, player);
+        StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
         player.removeExhaustedRelic(relicId);
         String relicName = Mapper.getRelic(relicId).getName();
         MessageHelper.sendMessageToChannel(
@@ -135,6 +138,7 @@ class RelicButtonHandler {
         player.removeRelic(relicId);
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         OblivionUnitHandler.doOblivionMechCheck(game, player);
+        StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
         player.removeExhaustedRelic(relicId);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), player.getRepresentationNoPing() + " has purged the _Eye of Vogul_.");

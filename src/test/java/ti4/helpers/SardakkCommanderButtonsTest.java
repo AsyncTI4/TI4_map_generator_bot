@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // G'hom Sek'kus: "commit up to 1 ground force from each planet" in and beside the active system. The buttons used to
@@ -28,7 +28,7 @@ class SardakkCommanderButtonsTest extends BaseTi4Test {
         test.nekroHome();
         String sourcePosition = AiTestGame.neighbourOf(AiTestGame.HOME);
         source = test.place("27", sourcePosition);
-        String targetPosition = PositionMapper.getAdjacentTilePositions(sourcePosition).stream()
+        String targetPosition = MapPositionMapper.getAdjacentTilePositions(sourcePosition).stream()
                 .filter(position -> !"x".equals(position) && !AiTestGame.HOME.equals(position))
                 .findFirst()
                 .orElseThrow();

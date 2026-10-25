@@ -144,7 +144,7 @@ class StallCardFlowTest extends BaseTi4Test {
 
     @Test
     void unexpectedActionLiftsTheTokenItDeclared() {
-        table.test.nekroHome().addCC(ti4.image.Mapper.getCCID(table.nekro.getColor()));
+        table.test.nekroHome().addCC(ti4.model.Mapper.getCCID(table.nekro.getColor()));
 
         seededPlayResolves("unexpected", "Unexpected Action", "resolveUnexpected");
 

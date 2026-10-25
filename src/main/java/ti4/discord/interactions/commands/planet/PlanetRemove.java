@@ -6,7 +6,8 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
+import ti4.image.io.ImageResources;
+import ti4.model.Mapper;
 
 public class PlanetRemove extends PlanetAddRemove {
 
@@ -32,7 +33,7 @@ public class PlanetRemove extends PlanetAddRemove {
             return;
         }
         String ccID = Mapper.getControlID(color);
-        String ccPath = Mapper.getCCPath(ccID);
+        String ccPath = ImageResources.commandToken(ccID);
         if (ccPath != null) {
             unitHolder.removeControl(ccID);
         }

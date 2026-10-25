@@ -24,9 +24,9 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.CombatModifierModel;
+import ti4.model.Mapper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.TechnologyModel;
 import ti4.service.combat.CombatRollService;
@@ -84,17 +84,13 @@ public class TheodisiLegendaryButtonHandler {
 
     public static void offerActivationAbility(Game game, Player player) {
         Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
-        if (activeSystem == null
-                || activeSystem.isHomeSystem()
-                || !canUse(player, THREN)
-                || activeSystem.getPlanetUnitHolders().stream()
-                        .noneMatch(TheodisiLegendaryButtonHandler::isRealPlanet)) {
+        if (activeSystem == null || activeSystem.isHomeSystem() || !canUse(player, THREN)) {
             return;
         }
         MessageHelper.sendMessageToChannelWithButton(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing()
-                        + ", you may exhaust _Remote Factory_ to give a planet in the active system PRODUCTION 3 for this tactical action.",
+                        + ", you may exhaust _Remote Factory_ to give the active system PRODUCTION 3 for this tactical action.",
                 Buttons.green(player.factionButtonChecker() + "useThrenLegendary", "Use Remote Factory"));
     }
 
@@ -302,40 +298,16 @@ public class TheodisiLegendaryButtonHandler {
                 buttons);
     }
 
-    public static void offerThrenPlanetSelection(Game game, Player player) {
+    public static void resolveThrenRemoteFactory(Game game, Player player) {
         Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
-        if (activeSystem == null) {
+        if (activeSystem == null || activeSystem.isHomeSystem()) {
             return;
         }
-        List<Button> buttons = activeSystem.getPlanetUnitHolders().stream()
-                .filter(TheodisiLegendaryButtonHandler::isRealPlanet)
-                .map(planet -> Buttons.green(
-                        player.factionButtonChecker() + "threnRemoteFactory_" + planet.getName(),
-                        Helper.getPlanetRepresentation(planet.getName(), game)))
-                .toList();
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationNoPing() + ", choose the planet that gains PRODUCTION 3 from _Remote Factory_:",
-                buttons);
-    }
-
-    @ButtonHandler("threnRemoteFactory_")
-    public static void resolveThrenRemoteFactory(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String planetName = buttonID.substring("threnRemoteFactory_".length());
-        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
-        if (activeSystem == null
-                || activeSystem.getPlanetUnitHolders().stream()
-                        .noneMatch(planet -> planet.getName().equals(planetName) && isRealPlanet(planet))) {
-            ButtonHelper.deleteTheOneButton(event);
-            return;
-        }
-        game.setStoredValue(REMOTE_FACTORY + player.getFaction(), activeSystem.getPosition() + "|" + planetName);
-        ButtonHelper.deleteMessage(event);
+        game.setStoredValue(REMOTE_FACTORY + player.getFaction(), activeSystem.getPosition());
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " used _Remote Factory_. "
-                        + Helper.getPlanetRepresentation(planetName, game)
+                        + activeSystem.getRepresentationForButtons(game, player)
                         + " has PRODUCTION 3 for this tactical action.");
     }
 
@@ -475,11 +447,8 @@ public class TheodisiLegendaryButtonHandler {
         modifiers.add(new NamedCombatModifierModel(modifier, "+1 from Forbidden Research Facility"));
     }
 
-    public static boolean hasRemoteFactoryProduction(Game game, Player player, Tile tile, UnitHolder unitHolder) {
-        return tile != null
-                && unitHolder != null
-                && (tile.getPosition() + "|" + unitHolder.getName())
-                        .equals(game.getStoredValue(REMOTE_FACTORY + player.getFaction()));
+    public static boolean hasRemoteFactoryProduction(Game game, Player player, Tile tile) {
+        return tile != null && tile.getPosition().equals(game.getStoredValue(REMOTE_FACTORY + player.getFaction()));
     }
 
     public static void clearRemoteFactory(Game game, Player player) {

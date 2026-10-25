@@ -9,7 +9,7 @@ import ti4.ai.AiTestGame;
 import ti4.ai.eval.BoardView;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // What the AI knows about the rest of its round when it weighs an exploration card: whether a planet is left for its
@@ -40,7 +40,7 @@ class ExploreOutlookTest extends BaseTi4Test {
     }
 
     private String otherNeighbourOfHome() {
-        return PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        return MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(candidate ->
                         !"x".equals(candidate) && !site.getPosition().equals(candidate))
                 .findFirst()
@@ -48,7 +48,7 @@ class ExploreOutlookTest extends BaseTi4Test {
     }
 
     private String besideSite(int skipped) {
-        return PositionMapper.getAdjacentTilePositions(site.getPosition()).stream()
+        return MapPositionMapper.getAdjacentTilePositions(site.getPosition()).stream()
                 .filter(candidate -> !"x".equals(candidate)
                         && !AiTestGame.HOME.equals(candidate)
                         && test.game.getTileByPosition(candidate) == null)
@@ -110,7 +110,7 @@ class ExploreOutlookTest extends BaseTi4Test {
         ExploreSite quiet = ExploreSite.onBoard(test.game, test.nekro, "tequran", outlook());
         assertThat(quiet.infantryCost()).isCloseTo(ExploreValues.INFANTRY_UNIT, within(EXACT));
 
-        String solSpot = PositionMapper.getAdjacentTilePositions(site.getPosition()).stream()
+        String solSpot = MapPositionMapper.getAdjacentTilePositions(site.getPosition()).stream()
                 .filter(candidate -> !"x".equals(candidate) && test.game.getTileByPosition(candidate) == null)
                 .findFirst()
                 .orElseThrow();

@@ -10,7 +10,7 @@ import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 // A transport too far from Mecatol Rex to land this action moves a system closer when that wins a round in the race

@@ -22,9 +22,9 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.model.FactionModel;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 
 /** Small in-memory game with a Nekro AI seat and a human Sol seat, for AI decision tests. */
 public final class AiTestGame {
@@ -84,7 +84,7 @@ public final class AiTestGame {
 
     /** First board position adjacent to {@code position}, in the bot's own adjacency table. */
     public static String neighbourOf(String position) {
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate))
                 .findFirst()
                 .orElseThrow();
@@ -96,8 +96,8 @@ public final class AiTestGame {
      * from the territory zones.
      */
     public Tile solHomeBeside(String position) {
-        List<String> nearHome = PositionMapper.getAdjacentTilePositions(HOME);
-        String spot = PositionMapper.getAdjacentTilePositions(position).stream()
+        List<String> nearHome = MapPositionMapper.getAdjacentTilePositions(HOME);
+        String spot = MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate)
                         && !HOME.equals(candidate)
                         && !nearHome.contains(candidate)

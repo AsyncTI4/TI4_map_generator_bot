@@ -40,10 +40,10 @@ import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units;
 import ti4.helpers.thundersedge.TeHelperTechs;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.StrategyCardModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -63,8 +63,10 @@ import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
+import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 @UtilityClass
 public class PlayStrategyCardService {
@@ -191,6 +193,9 @@ public class PlayStrategyCardService {
                 }
 
                 game.setSCPlayed(scToPlay, Boolean.TRUE);
+                if (game.getPhaseOfGame().contains("action")) {
+                    TurnActionLog.record(game, TurnActionLog.STRATEGIC);
+                }
                 GameEventService.commit(
                         game, GameEventType.SC_PLAYED, player, Map.of("scNumber", scToPlay, "scName", stratCardName));
                 // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
@@ -404,12 +409,6 @@ public class PlayStrategyCardService {
                             player3.getCardsInfoThread(),
                             player3.getRepresentation()
                                     + ", you have been elected as Minister of Sciences, so you do not need to pay resources to research off of technology. ");
-                }
-                if (player3 != player && player3.hasLeaderUnlocked("netrunnerscommander")) {
-                    MessageHelper.sendMessageToChannel(
-                            player3.getCardsInfoThread(),
-                            player3.getRepresentationUnfogged()
-                                    + ", Tek Mir-un, the Netrunners commander, lets you choose to follow **Technology** without spending a command token. Please select Get a Technology rather than Spend A Strategy Token.");
                 }
             }
         }
@@ -635,6 +634,10 @@ public class PlayStrategyCardService {
         }
         for (Player p : Helper.getSpeakerOrFullPriorityOrderFromPlayer(scHolder, game)) {
             String representation = ping ? p.getRepresentation() : p.getRepresentationNoPing();
+            var userSettings = UserSettingsManager.get(p.getUserID());
+            if (!userSettings.isPrefersStrategyThreadJoining()) {
+                representation = p.getRepresentationNoPing();
+            }
             if (p.hasFollowedSC(scID)) {
                 if (p.getSCs().contains(scID)) {
                     followSummary.append(representation).append(" played the SC");

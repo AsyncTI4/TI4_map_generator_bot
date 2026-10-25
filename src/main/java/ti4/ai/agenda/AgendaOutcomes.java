@@ -6,8 +6,8 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.image.Mapper;
 import ti4.model.AgendaModel;
+import ti4.model.Mapper;
 
 @UtilityClass
 public class AgendaOutcomes {

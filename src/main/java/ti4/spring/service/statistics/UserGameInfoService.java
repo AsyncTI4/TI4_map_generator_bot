@@ -63,6 +63,35 @@ public class UserGameInfoService {
         return toResultString(users, statsByUserId);
     }
 
+    @Transactional(readOnly = true)
+    public UserGameRecord getUserGameRecord(String userId) {
+        List<PlayerEntity> players = playerEntityRepository.findAllWithUsersAndGamesByUserIdIn(List.of(userId));
+        List<String> replacedGameNames = players.stream()
+                .filter(PlayerEntity::isReplaced)
+                .map(player -> player.getGame().getGameName())
+                .sorted()
+                .toList();
+        UserGameStatsAccumulator stats = buildUserStats(players).get(userId);
+        if (stats == null) {
+            return new UserGameRecord(0, 0, 0, 0, 0, replacedGameNames);
+        }
+        return new UserGameRecord(
+                stats.completedGames,
+                stats.ongoingGames,
+                stats.replacedCompleted,
+                stats.replacedOngoing,
+                stats.wins,
+                replacedGameNames);
+    }
+
+    public record UserGameRecord(
+            int completedGames,
+            int ongoingGames,
+            int replacedCompleted,
+            int replacedOngoing,
+            int wins,
+            List<String> replacedGameNames) {}
+
     private static Map<String, UserGameStatsAccumulator> buildUserStats(List<PlayerEntity> players) {
         Map<String, UserGameStatsAccumulator> statsByUserId = new HashMap<>();
         for (PlayerEntity player : players) {
@@ -178,6 +207,11 @@ public class UserGameInfoService {
             completedGames += droppedGames;
         }
         return ongoingAmount > completedGames + 2;
+    }
+
+    public static int countDroppedGames(String userId) {
+        String trackRecord = UserSettingsManager.get(userId).getTrackRecord();
+        return StringUtils.countMatches(trackRecord, "replaced") + StringUtils.countMatches(trackRecord, "Dropped");
     }
 
     private static Predicate<Game> isRealPlayerIn3PlusPlayerGame(ManagedPlayer managedPlayer) {

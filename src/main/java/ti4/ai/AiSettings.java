@@ -9,8 +9,8 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.trace.ThinkingLimits;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.Mapper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass

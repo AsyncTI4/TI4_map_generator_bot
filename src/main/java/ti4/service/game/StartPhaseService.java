@@ -18,13 +18,17 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
@@ -48,21 +52,22 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.HydromorphicHelper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
-import ti4.image.BannerGenerator;
-import ti4.image.MapRenderPipeline;
-import ti4.image.Mapper;
+import ti4.image.card.BannerGenerator;
+import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.service.StatusCleanupService;
@@ -83,6 +88,7 @@ import ti4.service.fow.LoreService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.ListTurnOrderService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.map.PlayerAreaWarningService;
 import ti4.service.map.SpinService;
 import ti4.service.planet.PlanetService;
 import ti4.service.strategycard.PickStrategyCardService;
@@ -90,6 +96,8 @@ import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameStartedRecorder;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 @UtilityClass
 public class StartPhaseService {
@@ -104,6 +112,7 @@ public class StartPhaseService {
                 LoreService.showPhaseLore(game, "agenda"); // before setPhaseOfGame: END lore reads the old phase
                 game.setPhaseOfGame("agenda");
                 GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "agenda"));
+                PlayerAreaWarningService.warnAllPlayers(game);
                 RelitigateLLButtonHandler.clearAgendaPhaseState(game);
                 if (RelitigateLLButtonHandler.offerPreassignedRelitigate(event, game, event.getMessageChannel())) {
                     MessageHelper.sendMessageToChannel(
@@ -139,6 +148,7 @@ public class StartPhaseService {
             }
             case "statusScoring" -> {
                 StatusHelper.announceStatusPhase(game);
+                NetrunnersPromissoryHandler.returnSharedNetworkAccess(game);
                 StatusHelper.beginScoring(event, game, event.getMessageChannel());
                 StatusHelper.handleStatusPhaseMiddle(game);
                 game.updateActivePlayer(null);
@@ -311,6 +321,9 @@ public class StartPhaseService {
         // callers all already fire from the main channel, so event.getMessageChannel() stays unchanged.
         MessageHelper.sendMessageToChannel(
                 game.isFowMode() ? game.getMainGameChannel() : event.getMessageChannel(), "Started Round " + round);
+        for (Player player : game.getRealPlayers()) {
+            StonebornAbilityHandler.drawTrovantousFragment(game, player);
+        }
         for (Player player : game.getRealPlayers()) {
             if (!player.hasAbility("allure_of_darkness")) {
                 continue;
@@ -622,7 +635,11 @@ public class StartPhaseService {
         String message = firstSCPicker.getRepresentationUnfogged() + " is up to pick a strategy card.";
         game.updateActivePlayer(firstSCPicker);
         game.setPhaseOfGame("strategy");
+        if (game.getRound() == 1) {
+            GameStartedRecorder.recordOnce(game);
+        }
         GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "strategy"));
+        PlayerAreaWarningService.warnAllPlayers(game);
         GMService.logActivity(game, "**Strategy** Phase for Round " + game.getRound() + " started.", true);
         LoreService.showPhaseStartLore(game, "strategy");
         FowCommunicationThreadService.checkAllCommThreads(game);
@@ -666,6 +683,10 @@ public class StartPhaseService {
         }
 
         for (Player player2 : game.getRealPlayers()) {
+            if (player2.hasAbility("hydromorphic")) {
+                HydromorphicHelper.draw(game, player2, 2);
+                ActionCardHelper.drawActionCards(player2, 2);
+            }
             KairnBreakthroughHandler.refreshRelics(game, player2);
             ArcanumPromissoryHandler.offerScrollOfAscension(game, player2);
             if (player2.getActionCards() != null
@@ -838,6 +859,7 @@ public class StartPhaseService {
                 }
             }
         }
+        StonebornUnitHandler.offerGolemStatusPhase(game, player);
         if (player.getRelics() != null && player.hasRelic("twilight_mirror") && game.isCustodiansScored()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
@@ -1248,11 +1270,13 @@ public class StartPhaseService {
     }
 
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game, boolean incrementTgs) {
+        WarGamesBrActionCardHandler.clear(game);
         boolean isFowPrivateGame = game.isFowMode();
         game.setStoredValue("willRevolution", "");
         playPreassignedGiftOfPrescience(event, game);
         LoreService.showPhaseLore(game, "action"); // before setPhaseOfGame: END lore reads the old phase
         game.setPhaseOfGame("action");
+        TurnActionLog.drain(game);
         for (Player player : game.getRealPlayers()) {
             MonumentsBRButtonHandler.offerArmageddonProject(game, player);
         }
@@ -1284,6 +1308,7 @@ public class StartPhaseService {
         if (nextPlayer == null) {
             return;
         }
+        PlayerAreaWarningService.warnAllPlayersExcept(game, nextPlayer);
         Set<Integer> scPickedList = new HashSet<>();
         for (Player player_ : game.getRealPlayers()) {
             scPickedList.addAll(player_.getSCs());

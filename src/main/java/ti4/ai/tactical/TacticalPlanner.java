@@ -65,7 +65,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 
 @UtilityClass

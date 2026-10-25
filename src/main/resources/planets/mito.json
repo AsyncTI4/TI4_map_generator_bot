@@ -9,8 +9,8 @@
         "x": 130.0,
         "y": 80.0
     },
-    "resources": 2,
-    "influence": 1,
+    "resources": 1,
+    "influence": 2,
     "factionHomeworld": "morpha",
     "planetType": "FACTION",
     "cardImagePath": null,

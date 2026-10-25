@@ -34,7 +34,7 @@ class WarfareTokensTest extends BaseTi4Test {
         test = AiTestGame.withSolAi();
         test.aiIsActive("action");
         Tile home = test.nekroHome();
-        home.addCC(ti4.image.Mapper.getCCID(test.nekro.getColor()));
+        home.addCC(ti4.model.Mapper.getCCID(test.nekro.getColor()));
         test.nekro.setTg(10);
     }
 

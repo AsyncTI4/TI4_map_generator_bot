@@ -21,8 +21,8 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Jace X returns every command token on the board, so a fleet pinned by its own token can move again. It is a game
@@ -60,7 +60,7 @@ class SolHeroRulesTest extends BaseTi4Test {
     }
 
     private static String nextTo(String position) {
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate))
                 .findFirst()
                 .orElseThrow();

@@ -10,7 +10,7 @@ import ti4.ai.AiTestGame;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // A holder of Occupy the Seat of the Empire with three ships on Mecatol Rex keeps them there: moves that do not weigh
@@ -33,7 +33,7 @@ class SeatStackTest extends BaseTi4Test {
         test.nekro.setFleetCC(4);
         rex = test.place("18", MECATOL);
         test.nekro.addPlanet("mr");
-        ring = PositionMapper.getAdjacentTilePositions(MECATOL).stream()
+        ring = MapPositionMapper.getAdjacentTilePositions(MECATOL).stream()
                 .filter(position -> !"x".equals(position))
                 .toList();
         test.units(rex, "space", test.nekro, UnitType.Carrier, 1);

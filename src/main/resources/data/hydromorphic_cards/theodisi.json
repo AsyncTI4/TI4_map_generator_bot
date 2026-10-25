@@ -1,0 +1,178 @@
+[
+    {
+        "alias": "hydraulic_torrent",
+        "name": "Hydraulic Torrent",
+        "window": "During the \"Assign Hits\" step",
+        "text": "You may discard up to 2 Action Cards and produce that many additional hits.",
+        "actionCardDiscardMin": 0,
+        "actionCardDiscardMax": 2,
+        "source": "theodisi"
+    },
+    {
+        "alias": "riptide_rush",
+        "name": "Riptide Rush",
+        "window": "After you activate a system",
+        "text": "You may discard 2 Action Cards; apply +1 to the move value of each of your ships during this tactical action.",
+        "actionCardDiscardMin": 2,
+        "actionCardDiscardMax": 2,
+        "source": "theodisi"
+    },
+    {
+        "alias": "flow_control",
+        "name": "Flow Control",
+        "window": "Before you assign hits produced by another player's unit ability roll",
+        "text": "You may discard 1 Action Card; cancel 1 of those hits.",
+        "actionCardDiscardMin": 1,
+        "actionCardDiscardMax": 1,
+        "source": "theodisi"
+    },
+    {
+        "alias": "rising_tide",
+        "name": "Rising Tide",
+        "window": "At the start of a combat round",
+        "text": "You may discard 1 Action Card; apply +1 to the result of each of your units' combat rolls during this combat round.",
+        "actionCardDiscardMin": 1,
+        "actionCardDiscardMax": 1,
+        "source": "theodisi"
+    },
+    {
+        "alias": "hydrostatic_barrier",
+        "name": "Hydrostatic Barrier",
+        "window": "Before you assign hits to your ships during a space combat",
+        "text": "You may discard 1 Action Card; cancel up to 2 hits.",
+        "actionCardDiscardMin": 1,
+        "actionCardDiscardMax": 1,
+        "source": "theodisi"
+    },
+    {
+        "alias": "ebbing_flow",
+        "name": "Ebbing Flow",
+        "window": "At the start of a combat round",
+        "text": "You may discard 1 Action Card; move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw.",
+        "actionCardDiscardMin": 1,
+        "actionCardDiscardMax": 1,
+        "source": "theodisi"
+    },
+    {
+        "alias": "tides_of_creation",
+        "name": "Tides of Creation",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "You may discard any number of Action Cards. Apply +2 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1 for each Action Card discarded.",
+        "actionCardDiscardMin": 0,
+        "source": "theodisi"
+    },
+    {
+        "alias": "tidal_influence",
+        "name": "Tidal Influence",
+        "window": "When an agenda is revealed",
+        "text": "You may discard 1 Action Card; choose another player. That player must give you 1 Promissory Note from their hand.",
+        "actionCardDiscardMin": 1,
+        "actionCardDiscardMax": 1,
+        "source": "theodisi"
+    },
+    {
+        "alias": "tidal_bounty",
+        "name": "Tidal Bounty",
+        "window": "ACTION",
+        "text": "Discard any number of Action Cards; place 1 neutral unit in a non-home system that contains no non-neutral ships with a cost up to the number of Action Cards discarded.",
+        "actionCardDiscardMin": 0,
+        "source": "theodisi"
+    },
+    {
+        "alias": "charted_currents",
+        "name": "Charted Currents",
+        "window": "ACTION",
+        "text": "Discard 3 Action Cards. Perform the secondary ability of any readied or unchosen strategy card without spending a command token.",
+        "actionCardDiscardMin": 3,
+        "actionCardDiscardMax": 3,
+        "source": "theodisi"
+    },
+    {
+        "alias": "contamination",
+        "name": "Contamination",
+        "window": "When another player plays an Action Card",
+        "text": "You may discard 3 Action Cards; cancel that Action Card.",
+        "actionCardDiscardMin": 3,
+        "actionCardDiscardMax": 3,
+        "source": "theodisi"
+    },
+    {
+        "alias": "hydraulic_torrent2",
+        "name": "Hydraulic Torrent",
+        "window": "During the \"Assign Hits\" step",
+        "text": "You may discard up to 2 Action Cards and produce that many additional hits.",
+        "actionCardDiscardMin": 0,
+        "actionCardDiscardMax": 2,
+        "source": "theodisi"
+    },
+    {
+        "alias": "riptide_rush2",
+        "name": "Riptide Rush",
+        "window": "After you activate a system",
+        "text": "You may discard 2 Action Cards; apply +1 to the move value of each of your ships during this tactical action.",
+        "actionCardDiscardMin": 2,
+        "actionCardDiscardMax": 2,
+        "source": "theodisi"
+    },
+    {
+        "alias": "flow_control2",
+        "name": "Flow Control",
+        "window": "Before you assign hits produced by another player's unit ability roll",
+        "text": "You may discard 1 Action Card; cancel 1 of those hits.",
+        "actionCardDiscardMin": 1,
+        "actionCardDiscardMax": 1,
+        "source": "theodisi"
+    },
+    {
+        "alias": "rising_tide2",
+        "name": "Rising Tide",
+        "window": "At the start of a combat round",
+        "text": "You may discard 1 Action Card; apply +1 to the result of each of your units' combat rolls during this combat round.",
+        "actionCardDiscardMin": 1,
+        "actionCardDiscardMax": 1,
+        "source": "theodisi"
+    },
+    {
+        "alias": "hydrostatic_barrier2",
+        "name": "Hydrostatic Barrier",
+        "window": "Before you assign hits to your ships during a space combat",
+        "text": "You may discard 1 Action Card; cancel up to 2 hits.",
+        "actionCardDiscardMin": 1,
+        "actionCardDiscardMax": 1,
+        "source": "theodisi"
+    },
+    {
+        "alias": "ebbing_flow2",
+        "name": "Ebbing Flow",
+        "window": "At the start of a combat round",
+        "text": "You may discard 1 Action Card; move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw.",
+        "actionCardDiscardMin": 1,
+        "actionCardDiscardMax": 1,
+        "source": "theodisi"
+    },
+    {
+        "alias": "tides_of_creation2",
+        "name": "Tides of Creation",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "You may discard any number of Action Cards. Apply +2 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1 for each Action Card discarded.",
+        "actionCardDiscardMin": 0,
+        "source": "theodisi"
+    },
+    {
+        "alias": "tidal_influence2",
+        "name": "Tidal Influence",
+        "window": "When an agenda is revealed",
+        "text": "You may discard 1 Action Card; choose another player. That player must give you 1 Promissory Note from their hand.",
+        "actionCardDiscardMin": 1,
+        "actionCardDiscardMax": 1,
+        "source": "theodisi"
+    },
+    {
+        "alias": "tidal_bounty2",
+        "name": "Tidal Bounty",
+        "window": "ACTION",
+        "text": "Discard any number of Action Cards; place 1 neutral unit in a non-home system that contains no non-neutral ships with a cost up to the number of Action Cards discarded.",
+        "actionCardDiscardMin": 0,
+        "source": "theodisi"
+    }
+]

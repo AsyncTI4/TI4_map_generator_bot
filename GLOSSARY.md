@@ -463,8 +463,19 @@ The outcome of the standard Trade deal: the Trade holder washes a Player's Commo
 _Avoid_: Wash tax
 
 **Plastic**:
-Military strength measured in physical unit pieces; fighters and infantry may be stood in for by tokens, but every such stand-in needs at least one plastic piece, and each color has only so many.
+Ships and ground forces, i.e. military strength measured in physical unit pieces; fighters and infantry may be stood in for by tokens, but every such stand-in needs at least one plastic piece, and each color has only so many.
 _Avoid_: Fleet size, army size
+
+**Tokens / tokes**:
+Command tokens, as in "I'm out of tokens" or "spend a toke".
+_Avoid_: Counters
+
+**TGs / money**:
+Trade goods.
+_Avoid_: Coins, gold
+
+**Comms**:
+Commodities.
 
 **Guac**:
 Victory points gained outside public and secret objectives, such as Support for the Throne.
@@ -477,6 +488,32 @@ _Avoid_: Cancel card
 **Gum**:
 To park a fighter or other small ship in a System to block opponents from moving through it.
 _Avoid_: Clog, blocker
+
+**Locked down**:
+Describes a System containing a Player's Command token, whose units cannot move out of it. Players saying "that System is locked down" mean either that the units in it cannot be moved out, or that other units can be moved in.
+_Avoid_: Frozen, pinned
+
+**Tech skip**:
+A Planet with a Technology specialty, also called a tech spec or skip. Also applies to other sources of a specialty, such as the Yin Alliance.
+
+**Point blocked**:
+Stopped from scoring, as when a Player is kept from meeting an objective's requirement.
+_Avoid_: Score blocked
+
+**Stall**:
+To take minor actions so as not to reveal major actions and plans to other Players.
+
+**Out stall**:
+To stall long enough that another Player has to Pass first.
+
+**Leadership stall**:
+Stalling while holding the Leadership Strategy card until other Players have to Pass before Leadership is used, so they never gain the tactic and strategy tokens needed for an effective Round.
+
+**Winmaking**:
+Helping another Player win, sometimes deliberately and sometimes unknowingly. Also called kingmaking, winemaking or stooging.
+
+**Winslaying**:
+Stopping a Player from being able to win. Also called kingslaying or slaying.
 
 **Saar ball**:
 The Saar faction's style of keeping its forces moving and reinforcing as it travels.

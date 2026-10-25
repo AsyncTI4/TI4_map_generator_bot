@@ -9,8 +9,9 @@ import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
+import ti4.image.io.ImageResources;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.ColorEmojis;
 
 public class RemoveCCCommand extends AddRemoveTokenCommand {
@@ -28,7 +29,7 @@ public class RemoveCCCommand extends AddRemoveTokenCommand {
     void doAction(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
         for (String color : colors) {
             String ccID = Mapper.getCCID(color);
-            String ccPath = Tile.getCCPath(ccID);
+            String ccPath = ImageResources.commandToken(ccID);
             if (ccPath == null) {
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(), "Command token: " + color + " is not valid and not supported.");

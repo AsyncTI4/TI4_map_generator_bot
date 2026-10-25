@@ -8,7 +8,7 @@ import ti4.ai.tactical.ProductionPlanner.BuildPlan;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // A dock within two moves of a rival that is worth hurting builds its warships with more enthusiasm than the same dock
@@ -34,10 +34,10 @@ class FrontlineProductionTest extends BaseTi4Test {
         String between = AiTestGame.neighbourOf(AiTestGame.HOME);
         test.place("46", between);
         String rivalPosition = rivalNextDoor
-                ? PositionMapper.getAdjacentTilePositions(between).stream()
+                ? MapPositionMapper.getAdjacentTilePositions(between).stream()
                         .filter(position -> !"x".equals(position)
                                 && !AiTestGame.HOME.equals(position)
-                                && !PositionMapper.getAdjacentTilePositions(AiTestGame.HOME)
+                                && !MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME)
                                         .contains(position))
                         .findFirst()
                         .orElseThrow()

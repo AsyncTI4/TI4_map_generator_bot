@@ -12,7 +12,7 @@ import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Occupy the Fringe (9 ground forces on a planet without one of your space docks): a stack of 3 or more on the anchor
@@ -44,8 +44,8 @@ class FringeStackTest extends BaseTi4Test {
     }
 
     private String farFromHome() {
-        List<String> nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
-        return PositionMapper.getAdjacentTilePositions(neighbour).stream()
+        List<String> nearHome = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        return MapPositionMapper.getAdjacentTilePositions(neighbour).stream()
                 .filter(position -> !"x".equals(position)
                         && !AiTestGame.HOME.equals(position)
                         && !nearHome.contains(position)
@@ -368,7 +368,7 @@ class FringeStackTest extends BaseTi4Test {
     }
 
     private String otherNeighbourOfHome() {
-        return PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        return MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position)
                         && !neighbour.equals(position)
                         && test.game.getTileByPosition(position) == null)

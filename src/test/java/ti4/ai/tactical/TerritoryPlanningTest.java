@@ -12,7 +12,7 @@ import ti4.ai.eval.Territory;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Expanding and attacking lean towards the seat's own area: its slice and the lanes towards Mecatol Rex score extra
@@ -157,10 +157,10 @@ class TerritoryPlanningTest extends BaseTi4Test {
 
     private String neighbourOf(String position, String... excluded) {
         List<String> skip = List.of(excluded);
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate)
                         && !skip.contains(candidate)
-                        && !PositionMapper.getAdjacentTilePositions(AiTestGame.HOME)
+                        && !MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME)
                                 .contains(candidate)
                         && test.game.getTileByPosition(candidate) == null)
                 .findFirst()

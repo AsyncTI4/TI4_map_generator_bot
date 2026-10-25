@@ -9,7 +9,7 @@ import ti4.ai.AiSettings;
 import ti4.ai.AiTestGame;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Saving an action secret means not going out of the way to meet its condition early; a combat that has already met it
@@ -46,7 +46,7 @@ class ActionSecretTimingTest extends BaseTi4Test {
     }
 
     private String otherNeighbourOfHome() {
-        return PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        return MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(candidate -> !"x".equals(candidate)
                         && !AiTestGame.neighbourOf(AiTestGame.HOME).equals(candidate))
                 .findFirst()

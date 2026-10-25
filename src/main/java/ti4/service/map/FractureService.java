@@ -3,7 +3,9 @@ package ti4.service.map;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -22,11 +24,11 @@ import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.service.breakthrough.AlRaithService;
 import ti4.service.emoji.DiceEmojis;
@@ -36,6 +38,8 @@ import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class FractureService {
+
+    private static final String PENDING_ROLLS_KEY = "pendingFractureRolls";
 
     /**
      * Is there any Fracture space on the board, whether from a tile or from a
@@ -74,8 +78,35 @@ public class FractureService {
         return "";
     }
 
+    public static void markRollPending(Game game, Player player) {
+        Set<String> pending = pendingRollUserIds(game);
+        pending.add(player.getUserID());
+        game.setStoredValue(PENDING_ROLLS_KEY, String.join(",", pending));
+    }
+
+    private static void clearRollPending(Game game, Player player) {
+        Set<String> pending = pendingRollUserIds(game);
+        pending.remove(player.getUserID());
+        game.setStoredValue(PENDING_ROLLS_KEY, String.join(",", pending));
+    }
+
+    public static List<Player> playersWithPendingRoll(Game game) {
+        if (!canFractureEnterPlay(game)) return List.of();
+        Set<String> pending = pendingRollUserIds(game);
+        return game.getRealPlayers().stream()
+                .filter(player -> pending.contains(player.getUserID()))
+                .toList();
+    }
+
+    private static Set<String> pendingRollUserIds(Game game) {
+        String stored = game.getStoredValue(PENDING_ROLLS_KEY);
+        if (stored.isEmpty()) return new LinkedHashSet<>();
+        return new LinkedHashSet<>(Arrays.asList(stored.split(",")));
+    }
+
     @ButtonHandler("rollFracture")
     private static void resolveFractureRoll(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        clearRollPending(game, player);
         String bt = player.getBreakthroughID();
         if (buttonID.contains("_")) bt = buttonID.split("_")[1];
 

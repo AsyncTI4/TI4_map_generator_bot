@@ -15,7 +15,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 class ActionSecretRulesTest extends BaseTi4Test {
@@ -206,7 +206,7 @@ class ActionSecretRulesTest extends BaseTi4Test {
     }
 
     private void enemyBeyondTheBattlefield() {
-        String position = PositionMapper.getAdjacentTilePositions(battlefield.getPosition()).stream()
+        String position = MapPositionMapper.getAdjacentTilePositions(battlefield.getPosition()).stream()
                 .filter(candidate -> !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate))
                 .findFirst()
                 .orElseThrow();

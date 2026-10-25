@@ -9,8 +9,8 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 public class RearmamentAgendaResolver implements ForAgainstAgendaResolver {
     @Override

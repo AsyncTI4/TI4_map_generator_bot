@@ -13,7 +13,7 @@ import ti4.ai.tactical.TransitDiodesRules.Transfer;
 import ti4.game.Planet;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // The ground campaign plans Occupy the Fringe (9 ground forces on a planet without a dock) and Mechanize the Military
@@ -48,8 +48,8 @@ class GroundCampaignTest extends BaseTi4Test {
     }
 
     private String farFromHome() {
-        List<String> nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
-        return PositionMapper.getAdjacentTilePositions(neighbour).stream()
+        List<String> nearHome = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        return MapPositionMapper.getAdjacentTilePositions(neighbour).stream()
                 .filter(position -> !"x".equals(position)
                         && !AiTestGame.HOME.equals(position)
                         && !nearHome.contains(position)
@@ -269,7 +269,7 @@ class GroundCampaignTest extends BaseTi4Test {
     }
 
     private String other() {
-        return PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        return MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position)
                         && !neighbour.equals(position)
                         && test.game.getTileByPosition(position) == null)

@@ -17,7 +17,7 @@ import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Loncara Ssodu and Indomitus carry a deep space cannon: they fire at ships in the systems next to them, the way a
@@ -48,7 +48,7 @@ class XxchaSpaceCannonTest extends BaseTi4Test {
     }
 
     private static String neighbourBeyond(String position) {
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate))
                 .findFirst()
                 .orElseThrow();
@@ -148,11 +148,11 @@ class XxchaSpaceCannonTest extends BaseTi4Test {
     }
 
     private String farFromTheActivatedSystem() {
-        return PositionMapper.getAdjacentTilePositions(beside.getPosition()).stream()
+        return MapPositionMapper.getAdjacentTilePositions(beside.getPosition()).stream()
                 .filter(candidate -> !"x".equals(candidate)
                         && !AiTestGame.HOME.equals(candidate)
                         && !activated.getPosition().equals(candidate)
-                        && !PositionMapper.getAdjacentTilePositions(activated.getPosition())
+                        && !MapPositionMapper.getAdjacentTilePositions(activated.getPosition())
                                 .contains(candidate))
                 .findFirst()
                 .orElseThrow();
@@ -180,7 +180,7 @@ class XxchaSpaceCannonTest extends BaseTi4Test {
     }
 
     private String otherNeighbourOfTheDefendedSystem() {
-        return PositionMapper.getAdjacentTilePositions(beside.getPosition()).stream()
+        return MapPositionMapper.getAdjacentTilePositions(beside.getPosition()).stream()
                 .filter(candidate -> !"x".equals(candidate)
                         && !AiTestGame.HOME.equals(candidate)
                         && !activated.getPosition().equals(candidate)

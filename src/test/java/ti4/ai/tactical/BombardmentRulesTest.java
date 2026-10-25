@@ -18,7 +18,7 @@ import ti4.game.Planet;
 import ti4.game.Tile;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Bombardment comes before ground forces are committed: the bot offers "Roll BOMBARDMENT" next to the landing
@@ -89,7 +89,7 @@ class BombardmentRulesTest extends BaseTi4Test {
     // note I).
     @Test
     void bombardsTheUnshieldedPlanetOfASystemWithAShieldedOne() {
-        String twoPlanets = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        String twoPlanets = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position) && !position.equals(target))
                 .findFirst()
                 .orElseThrow();
@@ -208,7 +208,7 @@ class BombardmentRulesTest extends BaseTi4Test {
     }
 
     private Tile sharedSystem() {
-        String position = ti4.image.PositionMapper.getAdjacentTilePositions(target).stream()
+        String position = ti4.model.MapPositionMapper.getAdjacentTilePositions(target).stream()
                 .filter(candidate -> !"x".equals(candidate) && test.game.getTileByPosition(candidate) == null)
                 .findFirst()
                 .orElseThrow();

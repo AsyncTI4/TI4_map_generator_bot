@@ -12,11 +12,15 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperStats;
+import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.explore.ExploreService;
 
 @UtilityClass
@@ -79,5 +83,59 @@ public class KaloraUnitHandler {
                             + ", you may explore the frontier deck in a planetless system containing your ships via **Broodwatcher**.",
                     buttons);
         }
+    }
+
+    public static void offerDreadnoughtTradeGoods(
+            Player player, UnitModel unitModel, CombatRollType rollType, List<Die> resultRolls, int numOfUnit) {
+        if (rollType != CombatRollType.bombardment) return;
+        if (!"kalora_dreadnought".equals(unitModel.getId()) && !"kalora_dreadnought2".equals(unitModel.getId())) return;
+        if (numOfUnit < 1 || resultRolls.isEmpty()) return;
+        String trigger = "kalora_dreadnought".equals(unitModel.getId()) ? "rolled a 9 or 10" : "produced a hit";
+        StringBuilder msg = new StringBuilder(player.getRepresentation())
+                .append(", you may gain 1 trade good for each _")
+                .append(unitModel.getName())
+                .append("_ that ")
+                .append(trigger)
+                .append(" for **BOMBARDMENT**.");
+        int lastUnitStart = Math.min(numOfUnit - 1, resultRolls.size());
+        for (int unit = 0; unit < lastUnitStart; unit++) {
+            msg.append("\n- ")
+                    .append(unitModel.getName())
+                    .append(" #")
+                    .append(unit + 1)
+                    .append(": ")
+                    .append(resultRolls.get(unit).getResult());
+        }
+        msg.append("\n- ")
+                .append(unitModel.getName())
+                .append(" #")
+                .append(lastUnitStart + 1)
+                .append(": ");
+        for (int die = lastUnitStart; die < resultRolls.size(); die++) {
+            if (die > lastUnitStart) msg.append(", ");
+            msg.append(resultRolls.get(die).getResult());
+            if (die > lastUnitStart) msg.append(" (_Plasma Scoring_/extra die)");
+        }
+        List<Button> buttons = List.of(
+                Buttons.green(
+                        player.factionButtonChecker() + "kaloraDreadnoughtTG", "Gain 1 Trade Good", MiscEmojis.tg),
+                Buttons.gray(player.factionButtonChecker() + "deleteButtons", "Done"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg.toString(), buttons);
+    }
+
+    @ButtonHandler("kaloraDreadnoughtTG")
+    public static void kaloraDreadnoughtTG(ButtonInteractionEvent event, Game game, Player player) {
+        ButtonHelperStats.gainTGs(event, game, player, 1, false);
+    }
+
+    public static UnitModel preferDreadnoughtForBombardment(
+            UnitModel best, List<UnitModel> units, CombatRollType rollType, Player player) {
+        if (rollType != CombatRollType.bombardment || !"kalora_flagship".equals(best.getId())) return best;
+        int bestHitsOn = best.getCombatDieHitsOnForAbility(rollType, player);
+        return units.stream()
+                .filter(unit -> unit.getId().startsWith("kalora_dreadnought"))
+                .filter(unit -> unit.getCombatDieHitsOnForAbility(rollType, player) == bestHitsOn)
+                .findFirst()
+                .orElse(best);
     }
 }

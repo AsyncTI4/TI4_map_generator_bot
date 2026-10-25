@@ -14,7 +14,7 @@ import ti4.ai.tactical.ProductionPlanner;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // A Hacan-like seat waiting for Gravity Drive from a rival's Technology keeps what the secondary costs: its home
@@ -130,8 +130,8 @@ class GravityDriveReserveTest extends BaseTi4Test {
     }
 
     private static String beyond(String position) {
-        List<String> nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        List<String> nearHome = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate ->
                         !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate) && !nearHome.contains(candidate))
                 .findFirst()

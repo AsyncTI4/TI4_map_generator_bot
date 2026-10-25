@@ -20,7 +20,7 @@ import ti4.ai.strategy.StrategyCardRanking;
 import ti4.ai.tactical.StallPlans;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tech.TechRules;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 // With Prove Endurance in hand a seat that can outlast the others takes its last actions instead of passing, values

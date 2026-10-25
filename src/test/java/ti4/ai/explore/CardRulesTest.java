@@ -18,7 +18,7 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // The instant exploration cards that ask the explorer for a choice. The AI weighs each option in the same currency
@@ -180,7 +180,7 @@ class CardRulesTest extends BaseTi4Test {
     }
 
     private String besideSite(int skipped) {
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate)
                         && !AiTestGame.HOME.equals(candidate)
                         && test.game.getTileByPosition(candidate) == null)
@@ -513,7 +513,7 @@ class CardRulesTest extends BaseTi4Test {
     }
 
     private void solDestroyerNextDoor() {
-        String next = PositionMapper.getAdjacentTilePositions(position).stream()
+        String next = MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate))
                 .findFirst()
                 .orElseThrow();
@@ -521,7 +521,7 @@ class CardRulesTest extends BaseTi4Test {
     }
 
     private String otherNeighbourOfHome() {
-        return PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        return MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(candidate -> !"x".equals(candidate) && !position.equals(candidate))
                 .findFirst()
                 .orElseThrow();

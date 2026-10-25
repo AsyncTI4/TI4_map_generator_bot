@@ -306,7 +306,7 @@ class FractureTargetsTest extends BaseTi4Test {
 
     private Tile planetBesideTheIngress() {
         Game game = fracture.board.test.game;
-        String side = ti4.image.PositionMapper.getAdjacentTilePositions(fracture.ingress.getPosition()).stream()
+        String side = ti4.model.MapPositionMapper.getAdjacentTilePositions(fracture.ingress.getPosition()).stream()
                 .filter(position -> !"x".equals(position) && game.getTileByPosition(position) == null)
                 .findFirst()
                 .orElseThrow();

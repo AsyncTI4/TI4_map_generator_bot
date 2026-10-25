@@ -131,7 +131,6 @@ public final class Constants {
     public static final String REMOVE_ALLIANCE_MEMBER = "remove_alliance_member";
     public static final String ADD_TEAMMATE = "add_teammate";
     public static final String REMOVE_TEAMMATE = "remove_teammate";
-    public static final String SPIN_TILES_IN_RINGS = "spin_tiles_in_rings";
     public static final String SPIN = "spin";
     public static final String SPIN_LIST = "list";
     public static final String SPIN_ADD = "add";
@@ -174,6 +173,7 @@ public final class Constants {
     public static final String BUTTON_PRESS_COUNT = "button_press_count";
     public static final String EVENT_SEQUENCE_COUNTER = "event_sequence_counter";
     public static final String PENDING_SUB_EVENTS_JSON = "pending_sub_events_json";
+    public static final String LAST_PLAYER_STATE_JSON = "last_player_state_json";
     public static final String PENDING_MOVEMENT_STATE = "pending_movement_state";
     public static final String JUST_UNITS = "just_units";
     public static final String THUNDERSEDGE = "thundersedge";
@@ -368,7 +368,6 @@ public final class Constants {
     public static final String UNIT_CAP = "unit_cap";
     public static final String EVERYONE = "everyone";
     public static final String TOKEN = "token";
-    public static final String TILE_LIST = "tile_list";
     public static final String UNIT_NAMES = "unit_names";
     public static final String UNIT_NAME = "unit_name";
     public static final String CHANGE_TO_BASE_GAME = "change_to_base_game";
@@ -411,14 +410,9 @@ public final class Constants {
     public static final String INCLUDE_ECHOES_OF_YGGDRASIL_TILES = "echoes_of_yggdrasil_tiles";
     public static final String DRAW_ONLY = "draw_only";
     public static final String ADD_TILE_LIST_RANDOM = "add_tile_list_random";
-    public static final String GENERATE_PAINBOX_MAP = "generate_painbox_map";
     public static final String IMPORT_MAP_JSON = "import_json";
     public static final String EXPORT_MAP_JSON = "export_json";
     public static final String IMPORT_DECK_CONFIG = "import_deck_config";
-    public static final String BLUE_TILES = "blue_tiles";
-    public static final String RED_TILES = "red_tiles";
-    public static final String HOME_SYSTEMS = "home_systems";
-    public static final String SUPERNOVAS = "supernovas";
     public static final String INTERACTIVE_BUILDER = "interactive_builder";
     public static final String ADD_CC = "add_cc";
     public static final String ADD_CC_FROM_TACTICS = "add_cc_from_tactics";
@@ -525,10 +519,8 @@ public final class Constants {
 
     public static final String NOVA_SEED = "nova_seed";
     public static final String DESTROY_OTHER_UNITS = "destroy_other_units";
-    public static final String RISE_OF_A_MESSIAH = "rise_of_a_messiah";
     public static final String REMATCH = "rematch";
     public static final String CLONE_GAME = "clone_game";
-    public static final String FIGHTER_CONSCRIPTION = "fighter_conscription";
     public static final String SLEEPER_TOKEN = "sleeper_token";
     public static final String LIZHO_TRAP = "lizho_trap";
     public static final String LIZHO_TRAP_CARDS = "lizho_trap_cards";
@@ -549,6 +541,7 @@ public final class Constants {
     public static final String DEBT_POOL = "debt_pool";
     public static final String DEBT_DEFAULT_POOL = "Debt Account";
     public static final String VADEN_DEBT_POOL = "Shark Loans";
+    public static final String NETRUNNERS_DEBT_POOL = "Hacker Man";
     public static final String ION_TOKEN_FLIP = "ion_storm_flip";
     public static final String TOKEN_SLEEPER_PNG = "token_sleeper.png";
     public static final String LIZHO_TRAP_PNG = "attachment_lizhotrap.png";
@@ -821,6 +814,9 @@ public final class Constants {
     public static final String FACTION5 = "faction5";
     public static final String FACTION6 = "faction6";
     public static final String AC = "action_cards";
+    public static final String HYDROMORPHIC_CARDS = "hydromorphic_cards";
+    public static final String HYDROMORPHIC_CARD_ID = "hydromorphic_card_id";
+    public static final String HYDROMORPHIC_CARD = "hydromorphic_card";
     public static final String ACTION_CARD = "action_card";
     public static final String AC_DECK = "ac_deck";
     public static final String STAGE_1_PUBLIC_DECK = "s1_public_deck";
@@ -1340,9 +1336,6 @@ public final class Constants {
     public static final String FOLLOWED_SC = "followed_sc";
 
     // Installation constants
-    public static final String INSTALLATION = "installation";
-    public static final String ADD_SWEEP_TOKEN = "add_sweep_token";
-    public static final String REMOVE_SWEEP_TOKEN = "remove_sweep_token";
 
     public static final String STATS_USERNAME = "userName";
     public static final String STATS_FACTION = "faction";
@@ -1452,7 +1445,6 @@ public final class Constants {
     public static final String GLEDGE_CORE_PNG = "token_ds_gledgecore.png";
     public static final String DS_COMMAND = "ds";
     public static final String TF_COMMAND = "tf";
-    public static final String ZELIAN_HERO = "zelian_hero";
     public static final String NAALU_COMMANDER = "naalu_commander";
     public static final String MOVE_CREUSS_WORMHOLE = "move_creuss_wormhole";
     public static final String MOVE_COATL = "move_coatl";
@@ -1521,6 +1513,9 @@ public final class Constants {
     public static final String AMOUNT = "amount";
     public static final String REMOVE_TITLE = "remove_title";
     public static final String EDIT_TRACK_RECORD = "edit_track_record";
+    public static final String PLAYER_GAMES = "player_games";
+    public static final String IGNORE_ABORTED = "ignore_aborted";
+    public static final String EPHEMERAL = "ephemeral";
     public static final String SET_GAME_LIMIT = "set_game_limit";
     public static final String SET_STATS_TRACKED_USER = "set_stats_tracked_user";
     public static final String TITLE = "title";
@@ -1652,8 +1647,18 @@ public final class Constants {
     public static final String PLAYER_TEMP_MODS = "PLAYER_TEMP_MODS";
     public static final String PLAYER_NEW_TEMP_MODS = "PLAYER_NEW_TEMP_MODS";
     public static final String ARCHIVE_CHANNELS = "archive_channels";
-    public static final String GET_CHANNEL_HTML = "get_channel_html";
+    public static final String CHANNEL_EXPORT = "channel_export";
+    public static final String START_CHANNEL_EXPORT = "start";
+    public static final String CANCEL_CHANNEL_EXPORT = "cancel";
+    public static final String RESUME_CHANNEL_EXPORT = "resume";
+    public static final String EXPORT_ID = "export_id";
+    public static final String EXPORT_MAX_SIZE_MB = "max_size_mb";
     public static final String CHANNEL = "channel";
+    public static final String INCLUDE_THREADS = "include_threads";
+    public static final String INCLUDE_MEDIA = "include_media";
+    public static final String EXPORT_FORMAT = "format";
+    public static final String EXPORT_AFTER = "after";
+    public static final String EXPORT_BEFORE = "before";
     public static final String MILTYMOD_MODE = "miltymod_mode";
     public static final String EVENT_PLAY = "play";
     public static final String INCLUDE_RAW_STRING = "include_raw_string";
@@ -1664,7 +1669,7 @@ public final class Constants {
     public static final String GAME_STATISTIC = "game_statistic";
     public static final String PLAYER_STATISTIC = "player_statistic";
     public static final String COMMUNITY = "community";
-    public static final String UNDO_TO_COMMAND = "undo_to_command";
+    public static final String UNDO_OPTION = "undo";
     public static final String SHOW_GAME_MODES = "show_game_modes";
     public static final String MAX_SO_COUNT = "max_so_count";
     public static final String REFRESH_RELIC_INFO = "refreshRelicInfo";

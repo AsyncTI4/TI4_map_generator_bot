@@ -16,22 +16,26 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.BorrowedTimeLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PoliticalMarriageLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardPromissoryHandler;
@@ -63,15 +67,15 @@ import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.helpers.twilight_kart.TkHelperGenomes;
-import ti4.image.BannerGenerator;
-import ti4.image.MapRenderPipeline;
-import ti4.image.Mapper;
+import ti4.image.card.BannerGenerator;
+import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.actioncard.SabotageService;
@@ -91,6 +95,7 @@ import ti4.service.fow.WhisperService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.map.PlayerAreaWarningService;
 import ti4.service.relic.QuantumEntanglerService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.strategycard.StrategyCardMessageService;
@@ -102,6 +107,8 @@ public class StartTurnService {
     private static final String FOW_FOLLOW_REMINDERS = "fowFollowReminders";
 
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
+        WarGamesBrActionCardHandler.clear(game);
+        MorphaBreakthroughHandler.clearMetamorphicDrawCount(game, player);
         player.setInRoundTurnCount(player.getInRoundTurnCount() + 1);
         VanguardPromissoryHandler.returnGuildCallAtOwnerTurnStart(event, game, player);
         PoliticalMarriageLLButtonHandler.clearExpiredRestriction(game, player);
@@ -109,6 +116,7 @@ public class StartTurnService {
             return;
         }
         game.removeStoredValue("currentActionSummary" + player.getFaction());
+        game.removeStoredValue("stonebornTempusUsedAction_" + player.getFaction());
 
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         Map<String, String> maps = new HashMap<>(game.getStoredValueMap());
@@ -197,6 +205,7 @@ public class StartTurnService {
 
         game.updateActivePlayer(player);
         game.setPhaseOfGame("action");
+        PlayerAreaWarningService.warnPlayer(game, player);
         AeternaPromissoryHandler.offerStasisFighterPlacement(event, game, player);
         ThirtyKSecretHooks.onTurnStart(game, player);
         ThirtyKRelicHooks.onTurnStart(game, player);
@@ -558,6 +567,20 @@ public class StartTurnService {
         List<Button> startButtons = new ArrayList<>();
         Button economicBoonButton = LostLegaciesRelicHandler.getEconomicBoonStartTurnButton(game, player);
         if (economicBoonButton != null) startButtons.add(economicBoonButton);
+        if (!doneActionThisTurn) {
+            Button hazorusButton = StonebornLeadersHandler.getHazorusStartTurnButton(player);
+            if (hazorusButton != null) {
+                startButtons.add(hazorusButton);
+            }
+            Button adaptiveButton = StonebornAbilityHandler.getAdaptiveStartTurnButton(game, player);
+            if (adaptiveButton != null) {
+                startButtons.add(adaptiveButton);
+            }
+            Button stalactiumButton = StonebornUnitHandler.getStalactiumStartTurnButton(game, player);
+            if (stalactiumButton != null) {
+                startButtons.add(stalactiumButton);
+            }
+        }
         if (!doneActionThisTurn) startButtons.addAll(ThirtyKExploreHooks.getStartOfTurnButtons(player));
         if (!doneActionThisTurn
                 && player.hasRelicReady("waxing_moonphase")
@@ -568,12 +591,6 @@ public class StartTurnService {
             Button veylaButton = ArcanumLeadersHandler.getVeylaStartTurnButton(game, player);
             if (veylaButton != null) {
                 startButtons.add(veylaButton);
-            }
-        }
-        if (!doneActionThisTurn && player.hasAbility("proxy_network")) {
-            Button proxyNetworkButton = NetrunnersAbilitiesHandler.getProxyNetworkButton(game, player);
-            if (proxyNetworkButton != null) {
-                startButtons.add(proxyNetworkButton);
             }
         }
         if (!doneActionThisTurn && player.hasUnit("crystellum_fighter3")) {

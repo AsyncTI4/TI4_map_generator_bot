@@ -3,8 +3,8 @@ package ti4.ai.sardakk;
 import ti4.ai.AiTestGame;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 
 // The AI seat plays Sardakk's commander (the seat is the test game's "nekro" seat, which has no faction-specific
 // rules in the way). Layout: the home system, a held two-planet system beside it (Starpoint and New Albion, the
@@ -52,7 +52,7 @@ final class SardakkTestBoard {
     }
 
     private static String targetPosition(String sourcePosition) {
-        return PositionMapper.getAdjacentTilePositions(sourcePosition).stream()
+        return MapPositionMapper.getAdjacentTilePositions(sourcePosition).stream()
                 .filter(position -> !"x".equals(position) && !AiTestGame.HOME.equals(position))
                 .findFirst()
                 .orElseThrow();

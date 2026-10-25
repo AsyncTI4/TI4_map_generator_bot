@@ -1,17 +1,17 @@
 package ti4.image.helpers;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.game.Player;
-import ti4.image.ImageHelper;
-import ti4.image.PlayerAreaGenerator;
-import ti4.image.PlayerAreaImageTest;
-import ti4.website.model.WebsiteOverlay;
+import ti4.image.draw.WebsiteOverlays;
+import ti4.image.io.ImageHelper;
+import ti4.image.playerarea.PlayerAreaContext;
+import ti4.image.playerarea.PlayerAreaImageTest;
+import ti4.image.playerarea.PlayerAreas;
 
 @UtilityClass
 public class PlayerAreaImageTestHelper {
@@ -23,11 +23,10 @@ public class PlayerAreaImageTestHelper {
         int w = 3000;
         int h = 450;
         BufferedImage main = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = main.getGraphics();
-        List<WebsiteOverlay> overlays = new ArrayList<>();
-        PlayerAreaGenerator gen = new PlayerAreaGenerator(g, p.getGame(), false, null, overlays, w, 54);
-        System.out.println(overlays);
-        gen.drawPlayerAreaOLD(p, new Point(5, 5));
+        Graphics2D g = main.createGraphics();
+        WebsiteOverlays overlays = new WebsiteOverlays();
+        System.out.println(overlays.asList());
+        PlayerAreas.drawSingle(PlayerAreaContext.publicView(g, p.getGame(), overlays), p, new Point(5, 5), w);
         return main;
     }
 

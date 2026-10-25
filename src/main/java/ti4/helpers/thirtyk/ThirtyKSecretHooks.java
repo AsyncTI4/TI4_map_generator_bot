@@ -24,9 +24,9 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AttachmentModel;
+import ti4.model.Mapper;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
@@ -46,6 +46,7 @@ public class ThirtyKSecretHooks {
     static final String QUICK_DELIBERATIONS = "quickdeliberationsjmsc";
     static final String AGENDA_VOTERS_KEY = "thirtyKAgendaVoters";
     static final String FLAGSHIP_START_KEY = "thirtyKFlagshipStart";
+    static final String STRUCTURE_AT_COMBAT_KEY = "thirtyKStructureAtCombat";
     private static final String PROMPTED_KEY = "thirtyKSecretPrompts";
 
     public static void offerScore(Player holder, String soID, String reason) {
@@ -78,7 +79,7 @@ public class ThirtyKSecretHooks {
                     RELINQUISH_TECHNOLOGY,
                     "you have handed over " + planetName + ", attachment and all.");
         }
-        if (hasStructure(game, planet)) {
+        if (hasStructure(game, planet) || hadStructureAtCombatStart(game, planet)) {
             offerScore(
                     previousOwner,
                     PLANNED_OBSOLESCENCE,
@@ -90,6 +91,18 @@ public class ThirtyKSecretHooks {
                     "you have abandoned " + planetName
                             + ". No structure stands there now, but you qualify if one stood there when you lost control.");
         }
+    }
+
+    public static void onGroundCombatStart(Game game, UnitHolder planet) {
+        if (!ThirtyKCards.inUse(game)) return;
+        if (planet == null || !hasStructure(game, planet)) return;
+        boolean anyHolder = game.getRealPlayers().stream()
+                .anyMatch(player -> player.getSecretsUnscored().containsKey(PLANNED_OBSOLESCENCE));
+        if (anyHolder) game.setStoredValue(STRUCTURE_AT_COMBAT_KEY + planet.getName(), "yes");
+    }
+
+    static boolean hadStructureAtCombatStart(Game game, UnitHolder planet) {
+        return !game.getStoredValue(STRUCTURE_AT_COMBAT_KEY + planet.getName()).isBlank();
     }
 
     static boolean hasAttachment(UnitHolder planet) {
@@ -322,9 +335,19 @@ public class ThirtyKSecretHooks {
     public static void onTurnStart(Game game, Player player) {
         if (!ThirtyKCards.inUse(game)) return;
         if (game == null || player == null) return;
+        if (!game.getStoredValue(FLAGSHIP_START_KEY + player.getFaction()).isBlank()) return;
+        recordFlagshipStart(game, player);
+    }
+
+    public static void onSystemActivated(Game game, Player player) {
+        if (!ThirtyKCards.inUse(game)) return;
+        if (game == null || player == null) return;
+        recordFlagshipStart(game, player);
+    }
+
+    private static void recordFlagshipStart(Game game, Player player) {
         if (!player.getSecretsUnscored().containsKey(A_GRAND_ENTRANCE)) return;
         String key = FLAGSHIP_START_KEY + player.getFaction();
-        if (!game.getStoredValue(key).isBlank()) return;
         String position = game.getTileMap().values().stream()
                 .filter(tile -> tile.getSpaceUnitHolder() != null
                         && tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, player) > 0)
@@ -336,6 +359,7 @@ public class ThirtyKSecretHooks {
 
     static void clearTurnState(Game game) {
         ThirtyKTurnState.removeKeysStartingWith(game, FLAGSHIP_START_KEY);
+        ThirtyKTurnState.removeKeysStartingWith(game, STRUCTURE_AT_COMBAT_KEY);
         game.removeStoredValue(PROMPTED_KEY);
     }
 

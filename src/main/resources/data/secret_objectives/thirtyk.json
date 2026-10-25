@@ -75,7 +75,7 @@
         "notes": "Any player's structure counts, including one that was on the planet at the end of the combat in which you lost control of it.",
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "When you lose control of a planet, the bot offers a Score button and says whether it still sees a structure there. If the structure was already removed, confirm yourself that it held one."
+        "automationNotes": "When you lose control of a planet, the bot offers a Score button. It says so if a structure is there now, or was there when a ground combat on the planet started this turn; otherwise confirm yourself that it held one."
     },
     {
         "alias": "reclusivenature30k",
@@ -83,7 +83,6 @@
         "phase": "Status",
         "text": "Have no ships outside your home system and the systems adjacent to it.",
         "points": 1,
-        "notes": "Having no ships on the game board at all also qualifies.",
         "source": "thirtyk",
         "automation": "FULL"
     },
@@ -179,7 +178,7 @@
         "points": 1,
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "When a space combat ends during your turn with your flagship still there, the bot offers a Score button if the flagship started your turn more than 5 hexes away (or if it could not tell where it started). Mutual destruction and retreats are not detected; confirm the win yourself."
+        "automationNotes": "When a space combat ends during your turn with your flagship still there, the bot offers a Score button if the flagship was more than 5 hexes away when you activated the system (or if it could not tell where it was). Retreats and wins decided outside the assign-hits buttons (Yin agent, Courageous to the End, the Yin flagship) are not detected; confirm the win yourself."
     },
     {
         "alias": "observingthepossibilitiesjmsc",
@@ -209,7 +208,7 @@
         "notes": "Only the Mecatol Rex victory point from \"Imperial\" counts, not public objectives scored with \"Imperial\".",
         "source": "thirtyk",
         "automation": "PARTIAL",
-        "automationNotes": "When another player scores the Imperial Mecatol Rex point, the bot offers a Score button if you have ships next to Mecatol Rex or their home system."
+        "automationNotes": "When another player scores the Imperial Mecatol Rex point with the Imperial button, the bot offers a Score button if you have ships next to Mecatol Rex or their home system. A point scored another way needs /so score."
     },
     {
         "alias": "policymakerjmsc",
@@ -257,6 +256,7 @@
         "text": "Be the first player to pass during the action phase.",
         "points": 1,
         "source": "thirtyk",
-        "automation": "FULL"
+        "automation": "FULL",
+        "automationNotes": "A pass set with /player stats is not seen; use /so score then."
     }
 ]

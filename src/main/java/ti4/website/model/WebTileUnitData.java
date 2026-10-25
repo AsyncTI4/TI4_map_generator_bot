@@ -17,8 +17,8 @@ import ti4.helpers.PdsCoverage;
 import ti4.helpers.PdsCoverageHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.DrawingUtil;
-import ti4.image.TileGenerator;
+import ti4.image.draw.PlayerTokens;
+import ti4.image.tile.PlanetShields;
 import ti4.website.WebPdsCoverage;
 
 @Data
@@ -74,8 +74,7 @@ public final class WebTileUnitData {
         UnitHolder spaceHolder = tile.getUnitHolders().get(Constants.SPACE);
         if (spaceHolder != null) {
             for (String ccID : spaceHolder.getCcList()) {
-                Player player =
-                        DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), ccID);
+                Player player = PlayerTokens.ownerOfToken(game.getPlayers().values(), ccID);
                 if (player != null) {
                     tileData.ccs.add(player.getFaction());
                 }
@@ -163,7 +162,7 @@ public final class WebTileUnitData {
         }
 
         // Set planetary shield status
-        planetData.setPlanetaryShield(TileGenerator.shouldPlanetHaveShield(planet, game));
+        planetData.setPlanetaryShield(PlanetShields.shouldHaveShield(planet, game));
     }
 
     /**
@@ -175,8 +174,7 @@ public final class WebTileUnitData {
         }
         // Get the first control token (there should only be one)
         String controlToken = planet.getControlList().iterator().next();
-        Player controllingPlayer =
-                DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), controlToken);
+        Player controllingPlayer = PlayerTokens.ownerOfToken(game.getPlayers().values(), controlToken);
         return controllingPlayer != null ? controllingPlayer.getFaction() : null;
     }
 
@@ -262,7 +260,7 @@ public final class WebTileUnitData {
         Map<String, List<WebEntityData>> factionTokens = new HashMap<>();
 
         for (String token : holderTokens) {
-            boolean isAttachment = ti4.image.Mapper.getAttachmentInfo(token) != null;
+            boolean isAttachment = ti4.model.Mapper.getAttachmentInfo(token) != null;
 
             // Skip if we only want attachments and this isn't one
             if (attachmentsOnly && !isAttachment) {
@@ -272,7 +270,7 @@ public final class WebTileUnitData {
             String entityType = isAttachment ? "attachment" : "token";
 
             // For now, we'll treat all tokens as non-faction specific
-            WebEntityData tokenData = new WebEntityData(ti4.image.Mapper.getTokenIDFromTokenPath(token), entityType, 1);
+            WebEntityData tokenData = new WebEntityData(ti4.model.Mapper.getTokenIDFromTokenPath(token), entityType, 1);
             factionTokens.computeIfAbsent("neutral", _ -> new ArrayList<>()).add(tokenData);
         }
 
@@ -367,7 +365,7 @@ public final class WebTileUnitData {
             planetData.setInfluence(planet.getInfluence());
 
             // Set planetary shield status
-            planetData.setPlanetaryShield(TileGenerator.shouldPlanetHaveShield(planet, game));
+            planetData.setPlanetaryShield(PlanetShields.shouldHaveShield(planet, game));
 
             // Add planet to special tile
             specialTileData.planets.put(planetId, planetData);

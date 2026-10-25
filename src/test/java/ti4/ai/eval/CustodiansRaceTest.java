@@ -17,7 +17,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 // The race for the custodians: when each seat could land on Mecatol Rex with a loaded transport, from public state
@@ -303,7 +303,7 @@ class CustodiansRaceTest extends BaseTi4Test {
 
     private static String closerToMecatol(String position) {
         Tile origin = null;
-        for (String neighbour : ti4.image.PositionMapper.getAdjacentTilePositions(position)) {
+        for (String neighbour : ti4.model.MapPositionMapper.getAdjacentTilePositions(position)) {
             if (!"x".equals(neighbour) && ringOf(neighbour) < ringOf(position)) return neighbour;
         }
         throw new IllegalStateException("nothing closer to Mecatol Rex than " + position + origin);

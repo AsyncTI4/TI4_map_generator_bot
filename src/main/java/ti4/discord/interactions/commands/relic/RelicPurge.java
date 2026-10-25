@@ -8,9 +8,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.obliv
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.RelicModel;
+import ti4.service.explore.BlueReverieArtifactService;
 import ti4.service.info.RelicInfoService;
 
 class RelicPurge extends GameStateSubcommand {
@@ -33,14 +34,20 @@ class RelicPurge extends GameStateSubcommand {
                     event, "Invalid relic or player does not have specified relic: " + relicId);
             return;
         }
-        player.removeRelic(relicId);
-        player.removeExhaustedRelic(relicId);
-        OblivionUnitHandler.doOblivionMechCheck(getGame(), player);
+        boolean discardedArtifact = BlueReverieArtifactService.discardArtifact(getGame(), player, relicId);
+        if (!discardedArtifact) {
+            player.removeRelic(relicId);
+            player.removeExhaustedRelic(relicId);
+        }
+        if (!discardedArtifact) {
+            OblivionUnitHandler.doOblivionMechCheck(getGame(), player);
+        }
         RelicModel relicData = Mapper.getRelic(relicId);
         if (relicData != null) {
             MessageHelper.sendMessageToEventChannel(
                     event,
-                    player.getRepresentation() + " purged the relic _" + relicData.getName() + "_.\n> "
+                    player.getRepresentation() + (discardedArtifact ? " discarded _" : " purged the relic _")
+                            + relicData.getName() + "_.\n> "
                             + relicData.getText());
             RelicInfoService.sendRelicInfo(getGame(), player, event);
         } else {

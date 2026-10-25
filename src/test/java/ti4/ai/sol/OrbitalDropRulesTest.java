@@ -22,7 +22,7 @@ import ti4.ai.tactical.TacticalRules;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 // Orbital Drop costs the turn's action and a strategy token for 2 infantry on a planet the seat controls. Sol holds
@@ -113,7 +113,7 @@ class OrbitalDropRulesTest extends BaseTi4Test {
         test.place("13", "310");
         sardakk.addPlanet("trenlak");
         sardakk.addPlanet("quinarra");
-        String beside = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+        String beside = MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(position -> !"x".equals(position) && !lodorPosition.equals(position))
                 .findFirst()
                 .orElseThrow();
