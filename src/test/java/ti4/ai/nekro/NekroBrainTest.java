@@ -61,13 +61,13 @@ class NekroBrainTest extends BaseTi4Test {
 
     // ---- strategy phase ---------------------------------------------------------------------
 
-    // Construction is only worth two PDS on this empty board, but the 5 trade goods on it lift it above every other
-    // card. Nekro's commodities are already full, so Trade is worth no more than its own 5 trade goods.
+    // Construction is only worth two PDS on this empty board, but the 6 trade goods on it lift it above every other
+    // card. Nekro's commodities are already full, so Trade is worth no more than its own 6 trade goods.
     @Test
     void picksTheHighestValueStrategyCardIncludingTradeGoods() {
         becomeActive("strategy");
         nekro.setCommodities(nekro.getCommoditiesTotal());
-        game.setScTradeGood(4, 5);
+        game.setScTradeGood(4, 6);
         AiPrompt picks = publicPrompt("picks", NOW, scPickButtons());
 
         AiDecision decision = decide(picks);
@@ -80,7 +80,7 @@ class NekroBrainTest extends BaseTi4Test {
     void explainsAndRemembersThePlanBehindAPick() {
         becomeActive("strategy");
         nekro.setCommodities(nekro.getCommoditiesTotal());
-        game.setScTradeGood(4, 5);
+        game.setScTradeGood(4, 6);
         AiPrompt picks = publicPrompt("picks", NOW, scPickButtons());
 
         AiDecision decision = decide(picks);
