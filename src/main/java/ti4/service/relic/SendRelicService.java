@@ -2,6 +2,7 @@ package ti4.service.relic;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -34,6 +35,9 @@ public class SendRelicService {
         // Transfer the relic
         player1.removeRelic(relicID);
         player2.addRelic(relicID);
+        if (IronSalvageRelicHandler.isSalvageRelic(relicID)) {
+            IronSalvageRelicHandler.onSalvageGained(player2);
+        }
 
         // Remove points etc from p1, then resolve effects for p2
         RelicHelper.resolveRelicLossEffects(game, player1, relicID);

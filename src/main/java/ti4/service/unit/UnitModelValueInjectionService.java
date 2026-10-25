@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
@@ -50,6 +51,13 @@ public class UnitModelValueInjectionService {
 
         UnitValueInjection values = getPlayerUnitValueInjection(player, unit);
         UnitModel injectedUnit = values.isEmpty() ? unit : injectValues(unit, values);
+        String salvageRules = IronSalvageRelicHandler.getUnitRulesText(player, unit.getUnitType());
+        if (!salvageRules.isBlank()) {
+            if (injectedUnit == unit) injectedUnit = copyUnit(unit);
+            String ability = injectedUnit.getAbility().orElse("");
+            String appended = ability.isBlank() ? salvageRules : ability + "\n\n" + salvageRules;
+            injectedUnit.setAbility(appended.length() <= 1024 ? appended : appended.substring(0, 1021) + "...");
+        }
         if (player.getGame().isMonumentsMode() && "nekro_monument".equals(unit.getId())) {
             if (injectedUnit == unit) {
                 injectedUnit = copyUnit(unit);
@@ -402,6 +410,26 @@ public class UnitModelValueInjectionService {
 
         if (player.hasAbility("destroyer_customrig") && "destroyer".equalsIgnoreCase(unit.getBaseType())) {
             integers.combatHitsOn(-2);
+        }
+
+        if (player.hasRelic("salvage_war_sun") && unit.getUnitType() == UnitType.Warsun) {
+            floats.cost(-2);
+            integers.moveValue(1);
+        }
+        if (player.hasRelic("salvage_flagship") && unit.getUnitType() == UnitType.Flagship) {
+            integers.moveValue(1);
+        }
+        if (player.hasRelic("salvage_dreadnought") && unit.getUnitType() == UnitType.Dreadnought) {
+            integers.capacityValue(1);
+        }
+        if (player.hasRelic("salvage_carrier") && unit.getUnitType() == UnitType.Carrier) {
+            integers.combatHitsOn(-1);
+        }
+        if (player.hasRelic("salvage_cruiser") && unit.getUnitType() == UnitType.Cruiser) {
+            integers.capacityValue(1).spaceCannonDieCount(1).spaceCannonHitsOn(8, true);
+        }
+        if (player.hasRelic("salvage_destroyer") && unit.getUnitType() == UnitType.Destroyer) {
+            integers.combatHitsOn(-1);
         }
 
         if (player.hasAbility("cruiser_customrig") && "cruiser".equalsIgnoreCase(unit.getBaseType())) {

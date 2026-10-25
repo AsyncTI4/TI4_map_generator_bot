@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.promissory;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
@@ -57,6 +58,9 @@ class PlayerPromissoryButtonHandler {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
         PromissoryNoteHelper.resolvePNPlay(pnID, player, game, event);
+        if ("bepniron".equals(pnID)) {
+            IronPromissoryHandler.resolveRetrofittingPlay(event, game, player);
+        }
         if ("thpnmorpha".equals(pnID)) {
             HydromorphicHelper.draw(game, player, 2);
         }

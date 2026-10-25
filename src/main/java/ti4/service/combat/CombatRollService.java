@@ -13,8 +13,10 @@ import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -39,6 +41,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
@@ -781,6 +784,17 @@ public class CombatRollService {
         RiggedExplosivesLLButtonHandler.destroyFailedRiggedExplosives(event, game, player, tile, rollType, payload);
         FOWCombatThreadMirroring.mirrorCombatMessage(event, player, game, message);
         int h = rollResult.totalHits();
+        if (rollType == CombatRollType.AFB) {
+            List<Integer> destroyerMissThresholds = payload.unitRolls().stream()
+                    .filter(unitRoll -> "dd".equalsIgnoreCase(unitRoll.baseType())
+                            || "destroyer".equalsIgnoreCase(unitRoll.baseType()))
+                    .flatMap(unitRoll -> unitRoll.dice().stream())
+                    .filter(die -> !die.success())
+                    .map(CombatRollPayload.DieRoll::threshold)
+                    .toList();
+            IronSalvageRelicHandler.offerDestroyerAfbReroll(
+                    event, game, player, opponent, tile, destroyerMissThresholds);
+        }
         if (rollType == CombatRollType.combatround) {
             TheodisiLegendaryButtonHandler.offerPelorHit(
                     game, player, opponent, tile, combatOnHolder, rollType, h, event);
@@ -1283,6 +1297,24 @@ public class CombatRollService {
                 return h;
             }
             if (h > 0) {
+                int warSunHits = payload.unitRolls().stream()
+                        .filter(unitRoll -> "ws".equalsIgnoreCase(unitRoll.baseType())
+                                || "warsun".equalsIgnoreCase(unitRoll.baseType()))
+                        .mapToInt(CombatRollPayload.UnitRoll::hits)
+                        .sum();
+                if (player.hasTech("x89c4")) {
+                    warSunHits *= 2;
+                }
+                if (game.isConventionsOfWarAbandonedMode()) {
+                    warSunHits *= 3;
+                }
+                if (player.hasStoredValue("RazeFaction")) {
+                    warSunHits *= 2;
+                }
+                if (warSunHits > 0) {
+                    IronSalvageRelicHandler.offerWarSunBombardment(
+                            event, game, player, tile, bombardPlanet, warSunHits);
+                }
                 if (!game.isFowMode()) {
                     List<Button> buttons = new ArrayList<>();
 
@@ -2962,7 +2994,7 @@ public class CombatRollService {
                         .forEach((model, count) -> result.put(new ImmutablePair<>(model, unitHolder), count));
                 yield result;
             }
-            case AFB -> getUnitsInAFB(tile, player, event);
+            case AFB -> getUnitsInAFB(tile, player, event, game);
             case bombardment -> getUnitsInBombardment(tile, player, event);
             case SpaceCannonOffence -> getUnitsInSpaceCannonOffense(tile, player, event, game);
         };
@@ -2991,7 +3023,7 @@ public class CombatRollService {
     }
 
     static Map<Pair<UnitModel, UnitHolder>, Integer> getUnitsInAFB(
-            Tile tile, Player player, GenericInteractionCreateEvent event) {
+            Tile tile, Player player, GenericInteractionCreateEvent event, Game game) {
         String colorID = Mapper.getColorID(player.getColor());
         UnitHolder spaceHolder = tile.getUnitHolders().get("space");
 
@@ -3014,11 +3046,47 @@ public class CombatRollService {
             VyserixUnitHandler.getVyserixFlagshipAfbUnits(player, tile)
                     .forEach((model, count) -> output.put(new ImmutablePair<>(model, spaceHolder), count));
         }
+        addBestAdjacentSalvageDestroyerAfb(game, tile, player, output);
         Map<UnitModel, Integer> flatOutput = new HashMap<>();
         output.forEach((k, v) -> flatOutput.merge(k.getLeft(), v, Integer::sum));
         checkBadUnits(player, event, unitsByAsyncId, flatOutput);
 
         return output;
+    }
+
+    private static void addBestAdjacentSalvageDestroyerAfb(
+            Game game, Tile combatTile, Player player, Map<Pair<UnitModel, UnitHolder>, Integer> output) {
+        if (!player.hasRelic("salvage_destroyer")) {
+            return;
+        }
+        List<Pair<UnitModel, UnitHolder>> candidates =
+                FoWHelper.getAdjacentTiles(game, combatTile.getPosition(), player, false, false).stream()
+                        .map(game::getTileByPosition)
+                        .filter(Objects::nonNull)
+                        .map(Tile::getSpaceUnitHolder)
+                        .flatMap(holder -> holder.getUnitKeysForPlayer(player).stream()
+                                .filter(unit -> unit.unitType() == UnitType.Destroyer)
+                                .<Pair<UnitModel, UnitHolder>>map(
+                                        unit -> new ImmutablePair<>(player.getUnitFromUnitKey(unit), holder)))
+                        .filter(candidate -> candidate.getLeft() != null
+                                && candidate.getLeft().getAfbDieCount(player) > 0)
+                        .toList();
+        if (candidates.isEmpty()) {
+            return;
+        }
+        int bestAfbScore = candidates.stream()
+                .mapToInt(candidate -> candidate.getLeft().getAfbDieCount(player)
+                        * (11 - candidate.getLeft().getAfbHitsOn(player)))
+                .max()
+                .orElseThrow();
+        List<Pair<UnitModel, UnitHolder>> bestCandidates = candidates.stream()
+                .filter(candidate -> candidate.getLeft().getAfbDieCount(player)
+                                * (11 - candidate.getLeft().getAfbHitsOn(player))
+                        == bestAfbScore)
+                .toList();
+        Pair<UnitModel, UnitHolder> selected =
+                bestCandidates.get(ThreadLocalRandom.current().nextInt(bestCandidates.size()));
+        output.merge(selected, 1, Integer::sum);
     }
 
     private static Map<UnitModel, Integer> getUnitsInCombat(Player player, Map<String, Integer> unitsByAsyncId) {

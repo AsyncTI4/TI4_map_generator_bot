@@ -14,6 +14,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.NewStuffHelper;
@@ -141,21 +142,16 @@ public class ArcanumTechHandler {
 
     private static void offerPlanetExplorationButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
-        Button done = Buttons.red(
-                player.factionButtonChecker() + "finishComponentAction_sealOfRevelation",
-                "Done Resolving Seal of Revelation");
         if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannelWithButton(
-                    event.getMessageChannel(),
-                    player.getRepresentation() + " has no eligible planet to explore.",
-                    done);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), player.getRepresentation() + " has no eligible planet to explore.");
             return;
         }
-        buttons.add(done);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", please choose a planet to explore.",
                 buttons);
+        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
     }
 
     // Sigil of Transmutation

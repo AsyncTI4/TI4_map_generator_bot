@@ -269,9 +269,7 @@ public class StonebornBreakthroughHandler {
 
     private static boolean isOtherTrait(String fragment, String excludedTrait) {
         ExploreModel model = Mapper.getExplore(fragment);
-        return model != null
-                && !Constants.FRONTIER.equalsIgnoreCase(model.getType())
-                && !model.getType().equalsIgnoreCase(excludedTrait);
+        return model != null && !model.getType().equalsIgnoreCase(excludedTrait);
     }
 
     private static String fragmentPromptMessage(Player player) {

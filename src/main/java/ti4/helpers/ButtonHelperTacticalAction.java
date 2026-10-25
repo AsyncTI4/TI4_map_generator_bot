@@ -23,6 +23,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
@@ -220,6 +222,13 @@ public final class ButtonHelperTacticalAction {
                 if (!buttons.isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                 }
+            }
+
+            int mechsInSystem = game.getTileByPosition(game.getActiveSystem()).getUnitHolders().values().stream()
+                    .mapToInt(holder -> holder.getUnitCount(UnitType.Mech, player))
+                    .sum();
+            if (player.hasAnyUnit("iron_spacedock", "iron_spacedock2") && mechsInSystem >= 2) {
+                IronUnitHandler.offerTideyardDeploy(game, player, game.getTileByPosition(game.getActiveSystem()));
             }
 
             if (player.hasUnlockedBreakthrough("argentbt")
@@ -539,6 +548,7 @@ public final class ButtonHelperTacticalAction {
             MyrrLeadersHandler.offerMyrrAgent(game, player, tile);
         }
         if (unitsWereMoved) {
+            IronSalvageRelicHandler.offerCruiserSalvageAfterMovement(event, game, tile);
             CommanderUnlockCheckService.checkPlayer(
                     player,
                     "nivyn",
@@ -899,6 +909,7 @@ public final class ButtonHelperTacticalAction {
             return;
         }
         game.setActiveSystem(pos);
+        IronSalvageRelicHandler.offerTacticalActionSalvage(game, player);
         ThirtyKSecretHooks.onSystemActivated(game, player);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
         BlueReverieTechHelper.offerNetworkedConstructors(game, tile);

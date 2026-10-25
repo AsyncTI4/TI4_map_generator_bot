@@ -29,6 +29,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -2347,6 +2348,9 @@ public class TransactionHelper {
                 }
                 p1.removeRelic(amountToTrans);
                 p2.addRelic(amountToTrans);
+                if (IronSalvageRelicHandler.isSalvageRelic(amountToTrans)) {
+                    IronSalvageRelicHandler.onSalvageGained(p2);
+                }
             }
             case "SendDebt" -> {
                 message2 = ident + " sent " + amountToTrans + " debt token"

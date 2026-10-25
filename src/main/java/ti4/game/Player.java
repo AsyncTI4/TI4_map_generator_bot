@@ -2773,6 +2773,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 "hazardousartifact",
                 "industrialartifact",
                 "unknownartifact",
+                "salvage_war_sun",
+                "salvage_flagship",
+                "salvage_dreadnought",
+                "salvage_carrier",
+                "salvage_cruiser",
+                "salvage_destroyer",
                 "ancientexcavators30k",
                 "dauntingweaponsschematics30k",
                 "enhancedmobilitycore30k");
