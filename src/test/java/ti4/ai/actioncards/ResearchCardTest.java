@@ -149,24 +149,26 @@ class ResearchCardTest extends BaseTi4Test {
         return ActionCardRules.playBeforePassing(table.test.context(hand));
     }
 
-    // 3 x 5/3 - 4 + 1.5 = 2.5, which clears the 1.33 the card is worth in hand.
+    // 3 x tempo - 4 trade goods + 1.5 = 1.7, which clears the 1.33 the card is worth in hand.
     @Test
     void focusedResearchIsPlayedForATechnologyWorthFollowingForWhileOthersStillAct() {
         table.nekro.setTg(4);
         bestTechIsWorth(ResearchPolicy.WORTH_FOLLOWING_FOR);
 
-        assertThat(plan("f_researched").orElseThrow().value()).isCloseTo(2.5, within(EXACT));
+        assertThat(plan("f_researched").orElseThrow().value())
+                .isCloseTo(ResearchPolicy.TECH_TEMPO * 3 - 4 + 1.5, within(EXACT));
         assertThat(AiTestGame.pressedId(triesToPlayFocusedResearch().orElseThrow()))
                 .isEqualTo("ac_play_from_hand_" + HAND_INDEX);
     }
 
-    // 2 x 5/3 - 4 + 1.5 = 0.83: the technology is not worth the card.
+    // 2 x tempo - 4 trade goods + 1.5 = 0.3: the technology is not worth the card.
     @Test
     void focusedResearchIsHeldForATechnologyWorthTwo() {
         table.nekro.setTg(4);
         bestTechIsWorth(2.0);
 
-        assertThat(plan("f_researched").orElseThrow().value()).isCloseTo(5.0 / 3 * 2 - 4 + 1.5, within(EXACT));
+        assertThat(plan("f_researched").orElseThrow().value())
+                .isCloseTo(ResearchPolicy.TECH_TEMPO * 2 - 4 + 1.5, within(EXACT));
         assertThat(triesToPlayFocusedResearch()).isEmpty();
     }
 
@@ -177,7 +179,8 @@ class ResearchCardTest extends BaseTi4Test {
         table.sol.setPassed(true);
 
         assertThat(Stall.actionValue(table.game, table.nekro)).isZero();
-        assertThat(plan("f_researched").orElseThrow().value()).isCloseTo(1.0, within(EXACT));
+        assertThat(plan("f_researched").orElseThrow().value())
+                .isCloseTo(ResearchPolicy.TECH_TEMPO * 3 - 4, within(EXACT));
         assertThat(triesToPlayFocusedResearch()).isEmpty();
     }
 
@@ -191,11 +194,11 @@ class ResearchCardTest extends BaseTi4Test {
         assertThat(plan("f_researched").orElseThrow().value()).isPositive();
     }
 
-    // The tempo is what the Technology follow pays (4 resources and a strategy token) for a technology worth 3.
+    // The tempo is what the Technology follow pays (4 resources at 0.8 and a strategy token) for a technology worth 3.
     @Test
     void techTempoAgreesWithWhatTheTechnologyFollowPays() {
         assertThat(ResearchPolicy.TECH_TEMPO * ResearchPolicy.WORTH_FOLLOWING_FOR)
-                .isCloseTo(5.0, within(EXACT));
+                .isCloseTo(0.8 * 4 + 1.0, within(EXACT));
     }
 
     // ---- Divert Funding ----------------------------------------------------------------------
