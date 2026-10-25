@@ -27,7 +27,8 @@ class CombatCards {
                         Stream.of(AiActionCards.combatRound(EMERGENCY_REPAIRS, REPAIRS_HANDLER)),
                         Stream.concat(MORALE_BOOSTS.stream(), Stream.of(FIGHTER_PROTOTYPE))
                                 .map(alias -> AiActionCards.combatRound(alias, MODIFIER_HANDLER + alias)),
-                        DirectHitCards.all().stream())
+                        DirectHitCards.all().stream(),
+                        SkilledRetreatCard.all().stream())
                 .flatMap(cards -> cards)
                 .toList();
     }
@@ -44,6 +45,7 @@ class CombatCards {
             return CombatForecast.firstRoundSwing(
                     game, seat, position, holder, RoundModifier.fighters(FIGHTER_PROTOTYPE_BONUS));
         }
+        if (SkilledRetreatCard.ALIASES.contains(alias)) return SkilledRetreatCard.value(game, seat, moment);
         return 0;
     }
 

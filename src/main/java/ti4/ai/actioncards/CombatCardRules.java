@@ -95,7 +95,16 @@ public class CombatCardRules {
                 .filter(candidate -> candidate.value() > 0 && candidate.margin() >= 0)
                 .max(Comparator.comparingDouble(Candidate::margin))
                 .map(Candidate::alias)
-                .or(() -> moraleBoostForCloseOdds(game, seat, moment));
+                .or(() -> moraleBoostForCloseOdds(game, seat, moment))
+                .or(() -> skilledRetreatAgainstASecret(game, seat, moment));
+    }
+
+    private static Optional<String> skilledRetreatAgainstASecret(Game game, Player seat, CombatMoment moment) {
+        return seat.getActionCards().keySet().stream()
+                .sorted()
+                .filter(SkilledRetreatCard.ALIASES::contains)
+                .findFirst()
+                .filter(alias -> SkilledRetreatCard.deniesASecret(game, seat, moment));
     }
 
     private static Optional<String> moraleBoostForCloseOdds(Game game, Player seat, CombatMoment moment) {

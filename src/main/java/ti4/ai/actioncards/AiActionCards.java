@@ -173,6 +173,10 @@ public class AiActionCards {
         return new AiCard(key, key::equals, Window.COMBAT_ROUND, NEVER, PRIOR, resolveHandler, List.of(), null);
     }
 
+    static AiCard combatRound(String key, String resolveHandler, TargetStep target) {
+        return new AiCard(key, key::equals, Window.COMBAT_ROUND, NEVER, PRIOR, resolveHandler, List.of(), target);
+    }
+
     static AiCard combatRound(
             String key, KeepFloor keepFloor, String resolveHandler, List<String> targetPrefixes, TargetStep target) {
         return new AiCard(

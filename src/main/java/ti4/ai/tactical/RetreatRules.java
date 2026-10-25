@@ -21,12 +21,15 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 
 @UtilityClass
-class RetreatRules {
+public class RetreatRules {
 
     static final String ANNOUNCED_KEY = "retreatAnnounced|";
     static final double SPARE_SYSTEM_RETREAT = 0.35;
@@ -180,7 +183,7 @@ class RetreatRules {
         return CombatForces.spaceWinChance(game, tile, seat, opponent.get()) < retreatBelow(game, seat, tile);
     }
 
-    static double retreatBelow(Game game, Player seat, Tile tile) {
+    public static double retreatBelow(Game game, Player seat, Tile tile) {
         double stake = 0;
         for (Planet planet : BoardView.planets(tile)) {
             if (!seat.getPlanets().contains(planet.getName())) continue;
@@ -210,6 +213,34 @@ class RetreatRules {
         if (BoardView.hasEnemyShips(game, seat, destination)) return false;
         if (held) return true;
         return seat.hasTech(DARK_ENERGY_TAP) && !BoardView.hasEnemyUnits(game, seat, destination);
+    }
+
+    public static List<Tile> skilledRetreatDestinations(Game game, Player seat, Tile tile) {
+        return FoWHelper.getAdjacentTiles(game, tile.getPosition(), seat, false).stream()
+                .map(game::getTileByPosition)
+                .filter(destination -> destination != null && destination != tile)
+                .filter(destination -> canSkilledRetreatTo(game, seat, destination))
+                .toList();
+    }
+
+    public static boolean locksImportantSystem(Game game, Player seat, Tile destination) {
+        if (CommandCounterHelper.hasCC(seat, destination)) return false;
+        return destination == seat.getHomeSystemTile() || Helper.getProductionValue(seat, game, destination, false) > 0;
+    }
+
+    public static double skilledDestinationValue(Game game, Player seat, String position) {
+        Tile tile = game.getTileByPosition(position);
+        if (tile == null || !canSkilledRetreatTo(game, seat, tile) || locksImportantSystem(game, seat, tile)) {
+            return Double.NEGATIVE_INFINITY;
+        }
+        return destinationValue(game, seat, position);
+    }
+
+    private static boolean canSkilledRetreatTo(Game game, Player seat, Tile destination) {
+        boolean offered = Mapper.getFrontierTileIds().contains(destination.getTileID())
+                || !destination.getPlanetUnitHolders().isEmpty()
+                || destination.getUnitHolders().size() == 2;
+        return offered && !destination.isNebula(game) && canRetreatTo(game, seat, destination, true);
     }
 
     private static double destinationValue(Game game, Player seat, String position) {
