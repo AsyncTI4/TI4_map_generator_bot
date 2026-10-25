@@ -56,6 +56,8 @@ class ExpeditionWinRateStatisticsService {
                 ExecutionLockType.READ);
 
         StringBuilder sb = new StringBuilder("__**Thunder's Edge Win Rate Correlations**__\n");
+        sb.append("_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario Thunder's Edge games"
+                + " with winners._\n");
 
         sb.append("\n**By expedition followed**\n");
         expeditionFollowStats.entrySet().stream()
@@ -81,9 +83,6 @@ class ExpeditionWinRateStatisticsService {
                         .mapToInt(entry -> entry.getKey() * entry.getValue().total)
                         .sum()
                 / (double) expeditionCountPlayerCount;
-        sb.append("- Game count: ")
-                .append(gamesThatDidNotFinishExpeditionsVersusDid[1])
-                .append('\n');
         sb.append("- Average: ")
                 .append(String.format("%.2f", averageExpeditionsCompleted))
                 .append('\n');
