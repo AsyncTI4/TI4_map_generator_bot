@@ -186,7 +186,7 @@ public class ScoringStatisticsService {
         }
         scoredCounts.forEach(count -> appendShareLine(
                 report, scoreType.label(count), path -> scoreType.countIn(path) == count, sample, baseline));
-        for (int count = 1; count <= scoredCounts.getLast(); count++) {
+        for (int count = 1; count < scoredCounts.getLast(); count++) {
             int minimumCount = count;
             appendShareLine(
                     report,
