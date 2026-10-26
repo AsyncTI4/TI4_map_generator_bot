@@ -195,7 +195,7 @@ public abstract class DraftItem {
         }
         textFields.add(TextDisplay.of(details));
 
-        if (hasAdditionalComponents() && !game.isTwilightsFallMode()) {
+        if (hasAdditionalComponents() && (game == null || !game.isTwilightsFallMode())) {
             List<String> adds = new ArrayList<>();
             adds.add("**__Additional Added Components:__**");
             for (DraftErrataModel i2 : Errata.getAdditionalComponents()) {
@@ -206,7 +206,7 @@ public abstract class DraftItem {
         }
 
         List<DraftErrataModel> optionalSwaps = getAvailableOptionalSwaps(game);
-        if (!optionalSwaps.isEmpty() && !game.isTwilightsFallMode()) {
+        if (!optionalSwaps.isEmpty() && (game == null || !game.isTwilightsFallMode())) {
             List<String> swaps = new ArrayList<>();
             swaps.add("**__Optional Component Swaps:__**");
             for (DraftErrataModel i2 : optionalSwaps) {
@@ -271,6 +271,7 @@ public abstract class DraftItem {
     private List<DraftErrataModel> getAvailableOptionalSwaps(Game game) {
         return Errata.getOptionalSwaps().stream()
                 .filter(item -> item.getItemCategory() != DraftCategory.MONUMENT
+                        || game == null
                         || MonumentDraftItem.isAvailable(game, item.getItemId()))
                 .toList();
     }

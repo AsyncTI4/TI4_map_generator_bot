@@ -76,6 +76,7 @@
         ],
         "requirements": "YY",
         "faction": "iron",
+        "baseUpgrade": "sd2",
         "source": "beans",
         "text": "DEPLOY: At the end of a tactical action, you may remove 2 of your mechs from the active system to place 1 space dock from your reinforcements on a planet you control in the active system. Up to 8 fighters in that system do not count against your ships' capacity. PRODUCTION 7."
     },
@@ -143,7 +144,7 @@
         "requirements": "YY",
         "faction": "natau",
         "source": "beans",
-        "text": "Each anomaly that contains 1 or more of your units gains PRODUCTION 2 as if it were a unit you control."
+        "text": "Each system that contains 1 or more of your units and an anomaly gains PRODUCTION 2 as if it were a unit you control."
     },
     {
         "alias": "benatauct",
@@ -154,6 +155,6 @@
         "requirements": "BB",
         "faction": "natau",
         "source": "beans",
-        "text": "You may treat non-home printed anomalies as adjacent to each other for the purposes of movement."
+        "text": "You may treat non-home systems that contain printed anomalies as adjacent to each other for the purposes of movement."
     }
 ]

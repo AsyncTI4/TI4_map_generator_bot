@@ -1,0 +1,241 @@
+[
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "phoenix_rising",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "forged_in_fire",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "beasheninf",
+        "additionalComponents": [
+            "ABILITY:phoenix_rising",
+            "ABILITY:forged_in_fire"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "fragmentation",
+        "additionalComponents": [
+            "ABILITY:pieces_of_a_whole"
+        ],
+        "optionalSwaps": [
+            "BREAKTHROUGH:crystellumbt",
+            "TECH:becrysta",
+            "AGENT:crystellumagent",
+            "HERO:crystellumhero",
+            "MECH:crystellum_mech"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "crystellum_flagship",
+        "additionalComponents": [
+            "ABILITY:fragmentation"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "pieces_of_a_whole",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "becrysta",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "AGENT",
+        "itemId": "crystellumagent",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "crystellumhero",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "crystellum_mech",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "dream_flagship",
+        "additionalComponents": [
+            "ABILITY:dream_nexus",
+            "ABILITY:incomprehensible_form"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "bedreamdd",
+        "additionalComponents": [
+            "ABILITY:dream_nexus",
+            "ABILITY:incomprehensible_form",
+            "ABILITY:the_waking"
+        ],
+        "optionalSwaps": [
+            "MECH:dream_mech",
+            "HERO:dreamhero",
+            "BREAKTHROUGH:dreambt",
+            "TECH:bedreamneg"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "dream_nexus",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "incomprehensible_form",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "the_waking",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "dream_mech",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "dreamhero",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "dreambt",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "bedreamneg",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "salvage_collectors",
+        "additionalComponents": [
+            "ABILITY:trade_secrets",
+            "ABILITY:modifications"
+        ],
+        "optionalSwaps": [
+            "COMMANDER:ironcommander"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "trade_secrets",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "modifications",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "ironcommander",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "proxy_network",
+        "additionalComponents": [
+            "ABILITY:neural_instruments"
+        ],
+        "optionalSwaps": [
+            "HERO:netrunnershero",
+            "BREAKTHROUGH:netrunnersbt"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "neural_instruments",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "netrunnershero",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "netrunnersbt",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "cataclysm",
+        "optionalSwaps": [
+            "COMMANDER:nataucommander"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "sacred_passage",
+        "optionalSwaps": [
+            "MECH:natau_mech"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "natauhero",
+        "optionalSwaps": [
+            "MECH:natau_mech"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "nataubt",
+        "optionalSwaps": [
+            "MECH:natau_mech"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "natau_mech",
+        "undraftable": true,
+        "source": "beans"
+    }
+]

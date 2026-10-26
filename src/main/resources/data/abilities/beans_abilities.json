@@ -50,8 +50,8 @@
         "id": "forged_in_fire",
         "name": "Forged in Fire",
         "faction": "ashen",
-        "window": "If an ability would place infantry from your reinforcements on the game board",
-        "windowEffect": "Produce them in those locations instead. For each infantry produced, return 1 captured infantry instead of spending resources.",
+        "window": "When you would place infantry from your reinforcements on the game board",
+        "windowEffect": "You must produce those units instead. For each infantry you produce, return 1 captured infantry instead of spending resources.",
         "source": "beans"
     },
     {
