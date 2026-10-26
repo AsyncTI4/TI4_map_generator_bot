@@ -637,6 +637,25 @@ class FractureTargetsTest extends BaseTi4Test {
         assertThat(ranked.score()).isEqualTo(raw.score());
     }
 
+    // Argent and Mahact moved fleet and ground forces onto the egress together and struck the next action. The strike
+    // carries the same ships without a charge for moving them as a group, so neither does the step that prepares it.
+    @Test
+    void anAssaultGroupOnTheIngressStepsOntoTheEgressWithItsGroundForces() {
+        fracture.ships(fracture.ingress, UnitType.Destroyer, 3);
+        fracture.ships(fracture.ingress, UnitType.Cruiser, 1);
+        fracture.ships(fracture.ingress, UnitType.Carrier, 1);
+        Planet planet = fracture.ingress.getPlanetUnitHolders().getFirst();
+        fracture.nekro().addPlanet(planet.getName());
+        fracture.board.test.units(fracture.ingress, planet.getName(), fracture.nekro(), UnitType.Infantry, 4);
+
+        Optional<TacticalPlan> step = stageTo("frac2");
+
+        assertThat(step).isPresent();
+        assertThat(step.get().score()).isGreaterThanOrEqualTo(TacticalPlanner.MIN_SCORE);
+        assertThat(step.get().moves()).anyMatch(move -> move.type() == UnitType.Infantry);
+        assertThat(step.get().moves()).anyMatch(move -> move.type() == UnitType.Destroyer);
+    }
+
     @Test
     void noShipIsSentToScreenAnEmptyFracture() {
         fracture.ships(fracture.ingress, UnitType.Cruiser, 1);

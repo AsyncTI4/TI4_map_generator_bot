@@ -2211,7 +2211,7 @@ public class TacticalPlanner {
                 - leaving
                 + context.departureLoss(staging, moves)
                 - DISTANCE_COST * farthest
-                - GROUP_MOVE_COST * (movedNonFighterShips(moves) - 1)
+                - groupMoveCost(opponent, moves)
                 - emptyHaulerPenalty(seat, gathering);
         TacticalPlan plan = new TacticalPlan(Kind.STAGE, staging.getPosition(), moves, Map.of(), score);
         return afterCannon(
@@ -2219,6 +2219,10 @@ public class TacticalPlanner {
                 staging,
                 plan.withScore(PlayAreaNotes.adjustedScore(context.game, seat, staging, plan)
                         + SetupHint.bonusFor(context.hints, plan)));
+    }
+
+    private static double groupMoveCost(Player opponent, List<UnitMove> moves) {
+        return opponent.isNeutral() ? 0 : GROUP_MOVE_COST * (movedNonFighterShips(moves) - 1);
     }
 
     private static double emptyHaulerPenalty(Player seat, Gathering gathering) {
