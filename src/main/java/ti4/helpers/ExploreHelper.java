@@ -12,9 +12,6 @@ import ti4.model.Mapper;
 public final class ExploreHelper {
 
     public static boolean checkForMech(String planetName, Game game, Player player) {
-        if (planetName == null) {
-            return false;
-        }
         UnitHolder unitHolder = findUnitHolder(planetName, game);
         if (unitHolder == null) {
             return false;
@@ -24,9 +21,6 @@ public final class ExploreHelper {
     }
 
     public static boolean checkForInf(String planetName, Game game, Player player) {
-        if (planetName == null) {
-            return false;
-        }
         UnitHolder unitHolder = findUnitHolder(planetName, game);
         if (unitHolder == null) {
             return false;
@@ -36,6 +30,9 @@ public final class ExploreHelper {
     }
 
     private static UnitHolder findUnitHolder(String planetName, Game game) {
+        if (planetName == null) {
+            return null;
+        }
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         return tile == null ? null : tile.getUnitHolders().get(planetName);
     }

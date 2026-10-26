@@ -1,6 +1,7 @@
 package ti4.discord.interactions.commands.explore;
 
 import java.util.Map;
+import java.util.Set;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -15,6 +16,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+import ti4.model.ExploreModel;
 import ti4.model.Mapper;
 import ti4.service.explore.ExploreService;
 
@@ -44,11 +46,11 @@ class ExploreUse extends GameStateSubcommand {
             return;
         }
 
-        if (isHazardous(id) && event.getOption(Constants.PLANET) == null) {
+        if (resolvesOnPlanet(id) && event.getOption(Constants.PLANET) == null) {
             MessageHelper.sendMessageToEventChannel(
                     event,
                     "`" + id
-                            + "` is a hazardous exploration card and resolves on a planet. Re-run the command with `planet` set.");
+                            + "` is a planet exploration card and resolves on a planet. Re-run the command with `planet` set.");
             return;
         }
 
@@ -92,8 +94,11 @@ class ExploreUse extends GameStateSubcommand {
         ExploreService.resolveExplore(event, id, tile, planetName, messageText, player, game);
     }
 
-    private static boolean isHazardous(String exploreId) {
-        return "hazardous".equalsIgnoreCase(Mapper.getExplore(exploreId).getType());
+    private static boolean resolvesOnPlanet(String exploreId) {
+        ExploreModel explore = Mapper.getExplore(exploreId);
+        boolean planetTrait = Set.of("cultural", "industrial", "hazardous")
+                .contains(explore.getType().toLowerCase());
+        return planetTrait && !"fragment".equalsIgnoreCase(explore.getResolution());
     }
 
     @Override
