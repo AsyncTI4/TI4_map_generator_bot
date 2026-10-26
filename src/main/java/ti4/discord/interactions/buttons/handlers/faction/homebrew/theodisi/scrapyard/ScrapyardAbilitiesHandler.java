@@ -102,13 +102,13 @@ public class ScrapyardAbilitiesHandler {
             return;
         }
 
-        List<Button> buttons = CUSTOM_RIGS.stream()
+        List<Button> buttons = new ArrayList<>(CUSTOM_RIGS.stream()
                 .filter(player::hasAbility)
                 .filter(rig -> !player.getExhaustedAbilities().contains(rig))
                 .map(rig -> Buttons.green(
                         player.factionButtonChecker() + USE_RIG + rig,
                         "Use " + Mapper.getAbility(rig).getName()))
-                .toList();
+                .toList());
         if (!buttons.isEmpty()) {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(

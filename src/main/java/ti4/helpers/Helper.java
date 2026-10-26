@@ -2206,6 +2206,11 @@ public final class Helper {
                     && CommandCounterHelper.hasCC(player, tile)) {
                 productionValueTotal++;
             }
+            if (player.hasTech("benataudm")
+                    && tile.isAnomaly(game, player)
+                    && FoWHelper.playerHasUnitsInSystem(player, tile)) {
+                productionValueTotal += 2;
+            }
         }
 
         if (!player.getPlanets().contains(uH.getName())) {

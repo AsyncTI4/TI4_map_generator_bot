@@ -122,7 +122,7 @@
         "id": "sacred_passage",
         "name": "Sacred Passage",
         "faction": "natau",
-        "permanentEffect": "Apply +1 to the move value of your ships that begin their movement in The Fracture or an anomaly.",
+        "permanentEffect": "Apply +1 to the MOVE value of your ships that begin their movement in The Fracture or an anomaly.",
         "source": "beans"
     },
     {

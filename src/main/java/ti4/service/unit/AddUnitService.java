@@ -281,7 +281,6 @@ public class AddUnitService {
                 player,
                 "dream",
                 "myrr",
-                "natau",
                 "oblivion",
                 "revenantxytheris",
                 "thrones",
