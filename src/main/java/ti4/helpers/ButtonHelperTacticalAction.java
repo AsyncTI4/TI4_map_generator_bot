@@ -25,6 +25,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.Dr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
@@ -139,6 +141,7 @@ public final class ButtonHelperTacticalAction {
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
         ScrapyardTechHandler.clearHotswapping(game);
         SarcosaCommanderHandler.clearAdjacency(game, player);
+        NatauLeadersHandler.clearAgentAdjacency(game, player);
         UydaiHeroService.clear(game);
         XinCommanderHandler.clearCombat(game);
         XinTechHandler.clearVeiledNetworkingStarProduction(game, player);
@@ -916,6 +919,7 @@ public final class ButtonHelperTacticalAction {
         IronSalvageRelicHandler.offerTacticalActionSalvage(game, player);
         ThirtyKSecretHooks.onSystemActivated(game, player);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        NatauBreakthroughHandler.offerTetherOnActivation(game, player, tile);
         BlueReverieTechHelper.offerNetworkedConstructors(game, tile);
         BlueReverieArtifactRelicHandler.offerUnknownArtifact(game, player);
         TheodisiLegendaryButtonHandler.offerActivationAbility(game, player);
@@ -1361,6 +1365,7 @@ public final class ButtonHelperTacticalAction {
                 && !DreamLeadersHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
             DreamLeadersHandler.offerDreamAgentButtons(game, player, player);
         }
+        NatauLeadersHandler.offerNatauAgentButtons(game, player);
         KairnPromissoryHandler.offerArchaeologicalOutpostExplore(game, tile);
 
         // Send buttons to move

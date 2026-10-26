@@ -58,11 +58,11 @@
     },
     {
         "alias": "bepnnatau",
-        "name": "Disciple",
+        "name": "Rupture",
         "faction": "natau",
         "color": "",
-        "playArea": true,
-        "text": "ACTION: Place an ingress token in a system that contains 1 or more of your ships. Then, purge this card.",
+        "playArea": false,
+        "text": "ACTION: Place or move an ingress token into a system that contains 1 or more of your ships. Then, purge this card.",
         "source": "beans"
     }
 ]

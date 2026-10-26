@@ -42,7 +42,7 @@
             "spacedock"
         ],
         "complexity": "Low",
-        "preferredColors": ["nm", "bld", "red", "splitred"],
+        "preferredColours": ["nm", "bld", "red", "splitred"],
         "source": "beans"
     },
     {
@@ -95,7 +95,7 @@
             "spacedock"
         ],
         "complexity": "Medium",
-        "preferredColors": ["eth", "gcr", "nvy", "blu"],
+        "preferredColours": ["eth", "gcr", "nvy", "blu"],
         "source": "beans"
     },
     {
@@ -139,7 +139,7 @@
             "spacedock"
         ],
         "complexity": "Medium",
-        "preferredColors": ["red", "org", "ylw", "mgm"],
+        "preferredColours": ["red", "org", "ylw", "mgm"],
         "source": "beans"
     },
     {
@@ -188,7 +188,7 @@
             "iron_spacedock"
         ],
         "complexity": "Medium",
-        "preferredColors": ["frs", "nvy", "gold", "copper"],
+        "preferredColours": ["frs", "nvy", "gold", "copper"],
         "source": "beans"
     },
     {
@@ -235,7 +235,7 @@
             "spacedock"
         ],
         "complexity": "High",
-        "preferredColors": ["blue", "ylw", "nvy", "eme"],
+        "preferredColours": ["blue", "ylw", "nvy", "eme"],
         "source": "beans"
     },
     {
@@ -277,7 +277,7 @@
             "spacedock"
         ],
         "complexity": "High",
-        "preferredColors": ["ppl", "blue", "nvy", "pnk"],
+        "preferredColours": ["ppl", "blue", "nvy", "pnk"],
         "source": "beans"
     },
     {
@@ -328,7 +328,7 @@
             "spacedock"
         ],
         "complexity": "High",
-        "preferredColors": ["ppl", "nvy", "gold", "gray"],
+        "preferredColours": ["ppl", "nvy", "gold", "gray"],
         "source": "beans"
     }
 ]

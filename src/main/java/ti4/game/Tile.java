@@ -22,6 +22,7 @@ import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.helpers.AliasHandler;
@@ -710,6 +711,9 @@ public class Tile {
                 && ThronesAbilityHandler.tracesOfRuinIsActive(game)
                 && getPlanetUnitHolders().stream()
                         .anyMatch(planet -> ThronesAbilityHandler.isThronePlanet(planet.getName()))) {
+            return true;
+        }
+        if (NatauAbilityHandler.hasNatauMech(game, this, player)) {
             return true;
         }
         return hasAnyToken("token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png");

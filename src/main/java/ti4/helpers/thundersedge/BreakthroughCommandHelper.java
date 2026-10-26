@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionBreakthroughHandler;
@@ -147,6 +148,9 @@ public final class BreakthroughCommandHelper {
             String message = player.getRepresentation() + " exhausted their _" + bt.getName() + "_ breakthrough.";
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(), message, bt.getRepresentationEmbed());
+            if ("nataubt".equals(bt.getAlias())) {
+                NatauBreakthroughHandler.offerTether(player.getGame(), player);
+            }
         });
     }
 

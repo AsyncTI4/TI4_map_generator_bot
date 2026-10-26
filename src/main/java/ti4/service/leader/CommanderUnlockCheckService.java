@@ -340,16 +340,11 @@ public class CommanderUnlockCheckService {
 
                 shouldBeUnlocked = sharedTechColors == TechnologyType.mainFour.size();
             }
-            case "natau" -> {
-                int qualifyingSystems = 0;
-                for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player)) {
-                    if (tile.isAnomaly(game, player)
-                            || FoWHelper.isTileAdjacentToAnAnomaly(game, tile.getPosition(), player)) {
-                        qualifyingSystems++;
-                    }
-                }
-                shouldBeUnlocked = (qualifyingSystems >= 3);
-            }
+            case "natau" ->
+                shouldBeUnlocked = player.getPlanets().stream()
+                        .map(game::getTileFromPlanet)
+                        .filter(Objects::nonNull)
+                        .anyMatch(Tile::isFracture);
 
             // theodisi
             case "ardentia",

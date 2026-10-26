@@ -451,6 +451,14 @@ public class CombatModHelper {
                                 .isEmpty()
                         || ButtonHelperAgents.doesTileHaveAStructureInIt(player, tile));
             case "fracture_combat" -> meetsCondition = tile != null && tile.isFracture();
+            case "fracture_ingress_combat" ->
+                meetsCondition = tile != null
+                        && (tile.isFracture()
+                                || tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS)
+                                || (game.playerHasLeaderUnlockedOrAlliance(player, "nataucommander")
+                                        && tile.isAnomaly(game, player)));
+            case "fracture_anomaly_combat" ->
+                meetsCondition = tile != null && (tile.isFracture() || tile.isAnomaly(game, player));
             case Constants.MOD_UNITS_TWO_MATCHING_NOT_FF -> {
                 if (unitsByQuantity.size() == 1) {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).getFirst();

@@ -21,7 +21,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
 import ti4.service.planet.AsgardLegendaryService;
-import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.movement.BelkoseaAgentService;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
 
@@ -44,7 +43,7 @@ public class CheckDistanceHelper {
     }
 
     private static boolean tileUnlockedForMoving(Game game, Player player, Tile tile) {
-        if (ButtonHelper.canMoveOutOfLockedSystems(player, game)
+        if (ButtonHelper.canMoveOutOfLockedSystems(player, game, tile)
                 || (game.isMonumentsMode() && MonumentsDSButtonHandler.canMoveOutOfFreeholdSystem(game, player, tile)))
             return true;
         return !CommandCounterHelper.hasCC(player, tile) || tile.getPosition().equalsIgnoreCase(game.getActiveSystem());
@@ -118,7 +117,6 @@ public class CheckDistanceHelper {
                                     && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
-                                    && !AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile2)
                                     && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     && !player.hasAbility("voidborn")
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
@@ -131,7 +129,6 @@ public class CheckDistanceHelper {
                                     && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
-                                    && !AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile2)
                                     && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !player.hasAbility("gashlai_physiology")
@@ -163,7 +160,6 @@ public class CheckDistanceHelper {
                                     && !player.hasTech("wavelength")
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
-                                    && !AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile2)
                                     && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     && !player.hasTech("absol_amd")
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)

@@ -57,6 +57,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
@@ -2596,6 +2597,11 @@ public class ButtonHelper {
             return true;
         }
         return player.getLeader("nomadhero").map(Leader::isActive).orElse(false);
+    }
+
+    public static boolean canMoveOutOfLockedSystems(Player player, Game game, Tile tile) {
+        return canMoveOutOfLockedSystems(player, game)
+                || NatauLeadersHandler.canMoveOutOfLockedAnomaly(game, player, tile);
     }
 
     public static int getAllTilesWithAlphaNBetaNUnits(Player player, Game game) {

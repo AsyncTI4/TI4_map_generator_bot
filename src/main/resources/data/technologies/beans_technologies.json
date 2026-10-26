@@ -138,18 +138,18 @@
         "alias": "benataudm",
         "name": "Divine Manifestation",
         "types": [
-            "BIOTIC"
+            "CYBERNETIC"
         ],
         "requirements": "YY",
         "faction": "natau",
         "source": "beans",
-        "text": "Each anomaly that contains 1 or more of your units gains PRODUCTION 1 as if it were a unit you control."
+        "text": "Each anomaly that contains 1 or more of your units gains PRODUCTION 2 as if it were a unit you control."
     },
     {
         "alias": "benatauct",
         "name": "Chaos Turbines",
         "types": [
-            "WARFARE"
+            "PROPULSION"
         ],
         "requirements": "BB",
         "faction": "natau",

@@ -220,8 +220,8 @@
     "type": "commander",
     "name": "Kaethos",
     "title": "The Unyielding",
-    "abilityWindow": "You may treat anomalies as if they contained an ingress token.",
     "abilityText": "Ongoing",
+    "abilityWindow": "You may treat anomalies as if they contained an ingress token.",
     "unlockCondition": "Take control of a planet in The Fracture.",
     "source": "beans"
   },

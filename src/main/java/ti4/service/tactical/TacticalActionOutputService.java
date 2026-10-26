@@ -20,6 +20,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.Dr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.HydromorphicCardHandler;
@@ -294,11 +295,18 @@ public class TacticalActionOutputService {
 
         StringBuilder output = new StringBuilder();
         int maxBonus = 0;
-        boolean ignoresAnomalies = ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
-                || AsgardLegendaryService.isBifrostBridgeActive(game, player)
-                || IronSalvageRelicHandler.carrierIgnoresAnomalies(game, player, unit.unitType())
-                || (unit.unitType() == UnitType.Flagship
-                        && AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile));
+        boolean planeShiftIgnoresAnomalies = ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player);
+        boolean bifrostBridgeIgnoresAnomalies = AsgardLegendaryService.isBifrostBridgeActive(game, player);
+        boolean carrierIgnoresAnomalies =
+                IronSalvageRelicHandler.carrierIgnoresAnomalies(game, player, unit.unitType());
+        boolean chainedIgnoresAnomalies = NatauAbilityHandler.chainedIgnoresAnomalies(player, unit);
+        boolean alluringThroneIgnoresAnomalies = unit.unitType() == UnitType.Flagship
+                && AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile);
+        boolean ignoresAnomalies = planeShiftIgnoresAnomalies
+                || bifrostBridgeIgnoresAnomalies
+                || carrierIgnoresAnomalies
+                || chainedIgnoresAnomalies
+                || alluringThroneIgnoresAnomalies;
         if (distance > moveValue && distance < 90 && !game.isL1Hero()) {
             output.append(" (distance exceeds move value (")
                     .append(distance)
@@ -350,11 +358,15 @@ public class TacticalActionOutputService {
             if (riftDistance < distance) {
                 if (ignoresAnomalies) {
                     output.append(
-                            ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
+                            planeShiftIgnoresAnomalies
                                     ? " (ignores gravity-rift effects due to _Power Word: Plane Shift_)"
-                                    : AsgardLegendaryService.isBifrostBridgeActive(game, player)
+                                    : bifrostBridgeIgnoresAnomalies
                                             ? " (ignores gravity-rift effects due to _Bifrost Bridge_)"
-                                            : " (this flagship ignores gravity-rift effects due to _Alluring Throne_)");
+                                            : carrierIgnoresAnomalies
+                                                    ? " (this carrier ignores gravity-rift effects due to _Quantum Translocation_)"
+                                                    : chainedIgnoresAnomalies
+                                                            ? " (this flagship ignores gravity-rift effects due to _The Chained_)"
+                                                            : " (this flagship ignores gravity-rift effects due to _Alluring Throne_)");
                 } else {
                     // Don't automatically count rifts, allowing the player to verify the chosen path.
                     output.append(" (gravity rifts along a path could add +")
@@ -385,6 +397,13 @@ public class TacticalActionOutputService {
             output.append(" (May apply +1 to the MOVE value of units in this system if _Jumpstarter_ does not move.)");
         }
         UnitModel unitModel = player.getUnitFromUnitKey(unit);
+        if (unitModel != null
+                && unitModel.getIsShip()
+                && player.hasAbility("sacred_passage")
+                && isSacredPassageOrigin(game, player, tile, allMovingUnits)) {
+            output.append(
+                    " (Receives +1 from _Sacred Passage_ due to starting its movement in The Fracture or an anomaly.)");
+        }
         if (unitModel != null && "qhet_cruiser2".equals(unitModel.getId())) {
             int battlecruiserDistance = CheckDistanceHelper.getDistanceBetweenTwoTiles(
                     game, null, tile.getPosition(), game.getActiveSystem(), true);
@@ -436,6 +455,7 @@ public class TacticalActionOutputService {
                 && !player.hasTech("absol_amd")
                 && !player.getRelics().contains("circletofthevoid")
                 && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
+                && !NatauAbilityHandler.chainedIgnoresAnomalies(player, unit)
                 && !(unit.unitType() == UnitType.Flagship
                         && AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile))
                 && !IronSalvageRelicHandler.carrierIgnoresAnomalies(game, player, unit.unitType())
@@ -542,8 +562,21 @@ public class TacticalActionOutputService {
                 && model.getUnitType() == UnitType.Destroyer) {
             baseMoveValue++;
         }
+        if (model.getIsShip()
+                && player.hasAbility("sacred_passage")
+                && isSacredPassageOrigin(game, player, tile, allMovingUnits)) {
+            bonusMoveValue++;
+        }
 
         return baseMoveValue + bonusMoveValue;
+    }
+
+    private boolean isSacredPassageOrigin(Game game, Player player, Tile tile, Set<UnitKey> movingUnitsFromTile) {
+        return tile.isFracture()
+                || tile.isAnomaly(game, player)
+                || (player.hasUnit("natau_mech")
+                        && movingUnitsFromTile != null
+                        && movingUnitsFromTile.stream().anyMatch(unit -> unit.unitType() == UnitType.Mech));
     }
 
     private Tile getActiveSystem(Game game) {
