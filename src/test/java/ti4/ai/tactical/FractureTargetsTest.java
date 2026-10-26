@@ -533,6 +533,17 @@ class FractureTargetsTest extends BaseTi4Test {
         fracture.ships("frac2", UnitType.Infantry, 4);
     }
 
+    // Mahact's fleet in pbd29015b: it entered the egress in round 3 and took Cocytus with its next action.
+    private void mahactFleetOnTheEgress() {
+        fracture.ships("frac2", UnitType.Cruiser, 1);
+        fracture.ships("frac2", UnitType.Destroyer, 1);
+        fracture.ships("frac2", UnitType.Dreadnought, 1);
+        fracture.ships("frac2", UnitType.Carrier, 1);
+        fracture.ships("frac2", UnitType.Fighter, 1);
+        fracture.ships("frac2", UnitType.Infantry, 1);
+        fracture.ships("frac2", UnitType.Mech, 1);
+    }
+
     // Neutral units never retaliate or bear a grudge, so a strike on them only has to repay the tactic token it
     // spends, not the margin an attack on a player needs.
     @Test
@@ -578,6 +589,52 @@ class FractureTargetsTest extends BaseTi4Test {
                 .isCloseTo(
                         withoutTempo + chance * TacticalPlanner.planetTempo(game),
                         org.assertj.core.data.Offset.offset(1e-9));
+    }
+
+    // A fleet that entered the egress to take Cocytus gives that strike up if another plan carries its ground forces
+    // back out, so the plan pays for it and the fleet strikes first.
+    @Test
+    void aFleetOnTheEgressStrikesCocytusBeforeItsGroundForcesLeave() {
+        mahactFleetOnTheEgress();
+
+        TacticalPlan top = TacticalPlanner.ranked(fracture.board.test.game, fracture.nekro())
+                .getFirst();
+
+        assertThat(top.kind()).isEqualTo(Kind.ATTACK);
+        assertThat(top.target()).isEqualTo(FractureScenario.COCYTUS);
+        assertThat(top.landings()).containsKey("cocytus");
+    }
+
+    @Test
+    void aPlanThatTakesTheGroundForcesOutOfTheEgressIsChargedTheStrike() {
+        mahactFleetOnTheEgress();
+        String ingress = fracture.ingress.getPosition();
+        TacticalPlan raw = TacticalPlanner.forTarget(fracture.board.test.game, fracture.nekro(), ingress)
+                .orElseThrow();
+
+        TacticalPlan charged = TacticalPlanner.ranked(fracture.board.test.game, fracture.nekro()).stream()
+                .filter(plan -> plan.target().equals(ingress) && plan.kind() == raw.kind())
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(raw.moves()).anyMatch(move -> "frac2".equals(move.origin()) && move.type() == UnitType.Infantry);
+        assertThat(charged.score()).isLessThan(raw.score());
+    }
+
+    @Test
+    void aFleetOnTheEgressWithoutAStrikeIsNotCharged() {
+        fracture.ships("frac2", UnitType.Carrier, 1);
+        fracture.ships("frac2", UnitType.Infantry, 2);
+        String ingress = fracture.ingress.getPosition();
+        TacticalPlan raw = TacticalPlanner.forTarget(fracture.board.test.game, fracture.nekro(), ingress)
+                .orElseThrow();
+
+        TacticalPlan ranked = TacticalPlanner.ranked(fracture.board.test.game, fracture.nekro()).stream()
+                .filter(plan -> plan.target().equals(ingress) && plan.kind() == raw.kind())
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(ranked.score()).isEqualTo(raw.score());
     }
 
     @Test
