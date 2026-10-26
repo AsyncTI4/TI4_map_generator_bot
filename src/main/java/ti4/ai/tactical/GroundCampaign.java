@@ -87,8 +87,9 @@ public final class GroundCampaign {
     private GroundCampaign(Game game, Player seat) {
         this.game = game;
         this.seat = seat;
-        this.fringe = seat.getSecretsUnscored().containsKey(OCCUPY_THE_FRINGE);
-        this.mechanize = seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY);
+        var unscored = seat.getSecretsUnscored();
+        this.fringe = unscored.containsKey(OCCUPY_THE_FRINGE);
+        this.mechanize = unscored.containsKey(MECHANIZE_THE_MILITARY);
     }
 
     public static GroundCampaign of(Game game, Player seat) {

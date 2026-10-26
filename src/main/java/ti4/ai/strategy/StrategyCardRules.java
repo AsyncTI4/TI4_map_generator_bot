@@ -1205,12 +1205,14 @@ public class StrategyCardRules {
             case CONSTRUCTION -> StructurePolicy.bestSecondary(game, seat).map(StructurePolicy.Placement::value);
             case WARFARE -> homeBuild(game, seat).map(plan -> CardValueScale.PRODUCTION_SHARE * plan.value());
             case POLITICS -> politicsValue(game, seat);
-            case TRADE ->
-                seat.getCommoditiesTotal() > seat.getCommodities()
-                        ? Optional.of(CardValueScale.COMMODITY * (seat.getCommoditiesTotal() - seat.getCommodities()))
-                        : Optional.empty();
+            case TRADE -> tradeFollowValue(seat);
             default -> Optional.empty();
         };
+    }
+
+    private static Optional<Double> tradeFollowValue(Player seat) {
+        int missing = seat.getCommoditiesTotal() - seat.getCommodities();
+        return missing > 0 ? Optional.of(CardValueScale.COMMODITY * missing) : Optional.empty();
     }
 
     private static Optional<Double> diplomacyFollowValue(Game game, Player seat) {

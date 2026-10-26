@@ -167,15 +167,17 @@ class CarthDeals {
         String ours = seat.getFaction();
         int sent = deal.total(ours, ItemType.COMMODITIES);
         int back = deal.received(ours, ItemType.TRADE_GOODS) + deal.received(ours, ItemType.COMMODITIES);
+        int commodities = seat.getCommodities();
+        int commoditiesTotal = seat.getCommoditiesTotal();
         boolean onlyGoods = deal.items().stream()
                 .allMatch(item -> item.type() == ItemType.COMMODITIES || item.type() == ItemType.TRADE_GOODS);
         return offerer.hasLeader(AGENT)
                 && !offerer.hasUnexhaustedLeader(AGENT)
-                && seat.getCommodities() == seat.getCommoditiesTotal()
+                && commodities == commoditiesTotal
                 && onlyGoods
                 && sent >= 1
-                && sent <= seat.getCommodities()
-                && sent + back <= seat.getCommoditiesTotal()
+                && sent <= commodities
+                && sent + back <= commoditiesTotal
                 && acceptable(game, seat, offerer, back);
     }
 
