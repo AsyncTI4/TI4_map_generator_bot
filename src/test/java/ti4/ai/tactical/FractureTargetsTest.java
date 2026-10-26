@@ -656,6 +656,41 @@ class FractureTargetsTest extends BaseTi4Test {
         assertThat(step.get().moves()).anyMatch(move -> move.type() == UnitType.Destroyer);
     }
 
+    // The neutral units never move, so a strike one step from the egress is as sure next action as it is now; only a
+    // rival can spoil it, and the counterstrike at the egress already prices that. The step is worth the strike it
+    // prepares less the costs of making it (here only the distance, as nothing threatens the egress).
+    @Test
+    void aStepOntoTheEgressCountsTheWholeStrikeItPrepares() {
+        fracture.ships(fracture.ingress, UnitType.Dreadnought, 1);
+        fracture.ships(fracture.ingress, UnitType.Destroyer, 1);
+        fracture.ships(fracture.ingress, UnitType.Carrier, 1);
+        fracture.ships(fracture.ingress, UnitType.Fighter, 1);
+        Planet planet = fracture.ingress.getPlanetUnitHolders().getFirst();
+        fracture.nekro().addPlanet(planet.getName());
+        fracture.board.test.units(fracture.ingress, planet.getName(), fracture.nekro(), UnitType.Infantry, 4);
+        Game game = fracture.board.test.game;
+        Player neutral = game.getNeutral();
+        Tile cocytus = fracture.fracture(FractureScenario.COCYTUS);
+        Tile egress = fracture.fracture("frac2");
+        TacticalPlanner.Context context = new TacticalPlanner.Context(game, fracture.nekro());
+        TacticalPlanner.Gathering gathering = TacticalPlanner.gather(
+                        context, cocytus, egress, TacticalPlanner.stageLead(neutral))
+                .orElseThrow();
+        double strike =
+                TacticalPlanner.futureScore(context, cocytus, neutral, egress, gathering.ships(), gathering.cargo());
+
+        TacticalPlan step = TacticalPlanner.stagePlan(
+                        context,
+                        cocytus,
+                        neutral,
+                        gathering.withCounter(TacticalPlanner.counterAt(context, gathering, neutral)))
+                .orElseThrow();
+
+        assertThat(gathering.cargo()).isNotEmpty();
+        assertThat(strike).isGreaterThan(TacticalPlanner.attackMinScore(neutral));
+        assertThat(step.score()).isCloseTo(strike - 0.2, org.assertj.core.data.Offset.offset(0.05));
+    }
+
     @Test
     void noShipIsSentToScreenAnEmptyFracture() {
         fracture.ships(fracture.ingress, UnitType.Cruiser, 1);

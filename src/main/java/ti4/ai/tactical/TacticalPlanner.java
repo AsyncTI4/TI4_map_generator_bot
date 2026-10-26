@@ -90,7 +90,6 @@ public class TacticalPlanner {
     private static final double STAGE_SHIP_STAKE = 0.5;
     private static final int STAGE_TARGETS = 3;
     private static final int FRACTURE_STAGE_LEAD = 3;
-    private static final double FRACTURE_STAGE_SHARE = 0.8;
     private static final double FRACTURE_STEP_SHARE = 0.85;
     private static final double FLANK_SPEED_COST = 1.5;
     private static final int STAGING_CANDIDATES = 4;
@@ -1920,7 +1919,7 @@ public class TacticalPlanner {
                 .mapToInt(move -> stepsToTarget(context, gathering.staging(), target, move.type(), FRACTURE_STAGE_LEAD))
                 .max()
                 .orElse(FRACTURE_STAGE_LEAD);
-        return routeShare(context) * FRACTURE_STAGE_SHARE * Math.pow(FRACTURE_STEP_SHARE, steps - 1);
+        return routeShare(context) * Math.pow(FRACTURE_STEP_SHARE, steps - 1);
     }
 
     private static double routeShare(Context context) {
@@ -2081,7 +2080,7 @@ public class TacticalPlanner {
                     .mapToInt(move -> stepsToTarget(context, origin, styx, move.type(), FRACTURE_STAGE_LEAD))
                     .max()
                     .orElse(FRACTURE_STAGE_LEAD);
-            return routeShare(context) * FRACTURE_STAGE_SHARE * Math.pow(FRACTURE_STEP_SHARE, steps - 1) * future;
+            return routeShare(context) * Math.pow(FRACTURE_STEP_SHARE, steps - 1) * future;
         });
     }
 
