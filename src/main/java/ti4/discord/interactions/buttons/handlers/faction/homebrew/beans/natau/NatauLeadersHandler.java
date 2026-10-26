@@ -38,7 +38,7 @@ public class NatauLeadersHandler {
                 continue;
             }
             MessageHelper.sendMessageToChannelWithButtons(
-                    agentOwner.getCorrectChannel(),
+                    agentOwner.getCardsInfoThread(),
                     agentOwner.getRepresentationNoPing() + ", you may exhaust Serael, the Natau agent, to let "
                             + activePlayer.getRepresentationNoPing()
                             + " treat a non-home anomaly as adjacent to the active system this tactical action.",
