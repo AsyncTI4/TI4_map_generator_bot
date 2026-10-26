@@ -36,6 +36,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.draft.DraftManager;
 import ti4.service.fow.LoreService;
+import ti4.service.game.PrivateThreadVisibilityService;
 import ti4.service.milty.MiltyDraftDisplayService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.settings.users.UserSettingsManager;
@@ -256,6 +257,7 @@ class Replace extends GameStateSubcommand {
             }
         }
 
+        PrivateThreadVisibilityService.restoreThreadManagement(game, oldMember);
         Helper.fixGameChannelPermissions(guild, game);
         ThreadChannel mapThread = game.getBotMapUpdatesThread();
         if (mapThread != null && !mapThread.isLocked()) {

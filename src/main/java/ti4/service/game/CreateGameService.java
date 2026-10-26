@@ -217,6 +217,16 @@ public class CreateGameService {
             actionsChannelManager =
                     actionsChannelManager.putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0);
         }
+        for (Member member : members) {
+            if (PrivateThreadVisibilityService.needsThreadManagementDenied(member, chatChannel)) {
+                chatChannelManager =
+                        chatChannelManager.putMemberPermissionOverride(member.getIdLong(), 0, threadPermission);
+            }
+            if (PrivateThreadVisibilityService.needsThreadManagementDenied(member, actionsChannel)) {
+                actionsChannelManager =
+                        actionsChannelManager.putMemberPermissionOverride(member.getIdLong(), 0, threadPermission);
+            }
+        }
         chatChannelManager.queue(Consumers.nop(), BotLogger::catchRestError);
         actionsChannelManager.queue(Consumers.nop(), BotLogger::catchRestError);
 

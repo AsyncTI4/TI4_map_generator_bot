@@ -118,6 +118,7 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
+import ti4.service.game.PrivateThreadVisibilityService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.map.TokenPlanetService;
@@ -3568,6 +3569,7 @@ public final class Helper {
     }
 
     public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Game game) {
+        PrivateThreadVisibilityService.hideOtherPlayersPrivateThreads(guild, game);
         if (game.isCommunityMode()) {
             return;
         }
@@ -3676,7 +3678,10 @@ public final class Helper {
                 Member member = guild.getMemberById(playerID);
                 if (member == null) continue;
                 long allow = Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-                textChannelManager = textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
+                long deny = PrivateThreadVisibilityService.needsThreadManagementDenied(member, textChannel)
+                        ? PrivateThreadVisibilityService.THREAD_MANAGEMENT
+                        : 0;
+                textChannelManager = textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, deny);
             }
             textChannelManager.queue(Consumers.nop(), BotLogger::catchRestError);
         }
