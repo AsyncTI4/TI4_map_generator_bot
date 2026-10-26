@@ -641,9 +641,8 @@ public class Tile {
                 wormholes.addAll(Mapper.getTokenWormholes(token));
             }
         }
-        UnitHolder space = getSpaceUnitHolder();
         for (String color : creussFlagshipColors) {
-            if (space != null && space.getUnitCount(UnitType.Flagship, color) > 0) {
+            if (unitHolders.values().stream().anyMatch(holder -> holder.getUnitCount(UnitType.Flagship, color) > 0)) {
                 wormholes.add(WormholeModel.Wormhole.DELTA);
             }
         }

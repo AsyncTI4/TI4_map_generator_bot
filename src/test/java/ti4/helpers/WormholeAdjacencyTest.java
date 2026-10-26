@@ -7,9 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.game.persistence.TestGameHarness;
+import ti4.helpers.Units.UnitType;
 import ti4.model.Mapper;
 import ti4.model.WormholeModel.Wormhole;
 import ti4.testUtils.BaseTi4Test;
@@ -51,9 +53,19 @@ class WormholeAdjacencyTest extends BaseTi4Test {
             tile.getSpaceUnitHolder().addToken("token_whdelta.png");
             tile.getSpaceUnitHolder().addToken("token_creussepsilon.png");
             tile.getPlanetUnitHolders().getFirst().addToken("attachment_sigma_weirdway.png");
+            // The old FoWHelper check found the Creuss flagship on any holder, so a planet counts too.
+            Player creuss = game.addPlayer("creuss-test", "creuss-test");
+            creuss.setFaction("ghost");
+            creuss.setColor("lightgray");
+            creuss.addOwnedUnitByID("ghost_flagship");
+            tile.addUnit(
+                    tile.getPlanetUnitHolders().getFirst().getName(),
+                    Units.getUnitKey(UnitType.Flagship, creuss.getColorID()),
+                    1);
 
             assertThat(tile.getWormholes(game))
-                    .containsExactlyInAnyOrder(Wormhole.DELTA, Wormhole.EPSILON, Wormhole.ALPHA, Wormhole.BETA);
+                    .containsExactlyInAnyOrder(
+                            Wormhole.DELTA, Wormhole.EPSILON, Wormhole.ALPHA, Wormhole.BETA, Wormhole.DELTA);
         }
     }
 
