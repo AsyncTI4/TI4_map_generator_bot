@@ -101,6 +101,7 @@ final class OffenseOutlook {
                     * (base
                             + explore
                             + custodians
+                            + neutralTempo(planet, opponent)
                             + FracturePrize.gain(game, seat, planet)
                             + ShardPrize.gain(game, seat, planet));
             territory += w * g * terms.territoryValues().getOrDefault(planet.getName(), 0.0);
@@ -191,6 +192,12 @@ final class OffenseOutlook {
                 capture,
                 cancel,
                 score);
+    }
+
+    private double neutralTempo(Planet planet, Player opponent) {
+        if (!opponent.isNeutral()) return 0;
+        Player controller = BoardView.controller(game, planet.getName());
+        return controller == null || controller.isNeutral() ? TacticalPlanner.planetTempo(game) : 0;
     }
 
     private record Denial(double objective, double homeBlock, double harmPoints) {}

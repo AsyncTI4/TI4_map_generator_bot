@@ -96,7 +96,7 @@ public class TacticalPlanner {
     private static final int STAGING_CANDIDATES = 4;
     private static final int STAGING_TILES_PER_TARGET = 2;
     static final double ATTACK_MIN_SCORE = 4.0;
-    static final double NEUTRAL_ATTACK_MIN_SCORE = 2.5;
+    static final double NEUTRAL_ATTACK_MIN_SCORE = ExploreValues.COMMAND_TOKEN;
     private static final double DISTANCE_COST = 0.2;
     private static final double PLANET_TEMPO_VALUE = 0.8;
     private static final double APPROACH_SHARE = 0.5;
@@ -2552,7 +2552,7 @@ public class TacticalPlanner {
         return Optional.ofNullable(best);
     }
 
-    private static double planetTempo(Game game) {
+    static double planetTempo(Game game) {
         return PLANET_TEMPO_VALUE * earlyGameWeight(game);
     }
 

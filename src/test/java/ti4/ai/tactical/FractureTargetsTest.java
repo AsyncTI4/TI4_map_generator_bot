@@ -526,6 +526,60 @@ class FractureTargetsTest extends BaseTi4Test {
         assertThat(standings.ready(sardakk)).isEmpty();
     }
 
+    private void cocytusFleetOnTheEgress() {
+        fracture.ships("frac2", UnitType.Destroyer, 3);
+        fracture.ships("frac2", UnitType.Cruiser, 1);
+        fracture.ships("frac2", UnitType.Carrier, 1);
+        fracture.ships("frac2", UnitType.Infantry, 4);
+    }
+
+    // Neutral units never retaliate or bear a grudge, so a strike on them only has to repay the tactic token it
+    // spends, not the margin an attack on a player needs.
+    @Test
+    void aStrikeOnNeutralUnitsOnlyHasToRepayItsToken() {
+        assertThat(TacticalPlanner.attackMinScore(fracture.board.test.game.getNeutral()))
+                .isEqualTo(ti4.ai.explore.ExploreValues.COMMAND_TOKEN)
+                .isLessThan(TacticalPlanner.ATTACK_MIN_SCORE);
+    }
+
+    @Test
+    void aFleetOnTheEgressThatBeatsTheGuardTakesCocytusBelowThePlayerBar() {
+        cocytusFleetOnTheEgress();
+
+        Optional<TacticalPlan> plan = attackOn(FractureScenario.COCYTUS);
+
+        assertThat(plan).isPresent();
+        assertThat(plan.get().landings()).containsEntry("cocytus", 4);
+        assertThat(plan.get().score()).isLessThan(TacticalPlanner.ATTACK_MIN_SCORE);
+    }
+
+    // Taking a planet nobody controls is an expansion with a fight first, so it earns the same early-game tempo as
+    // landing on a free planet, on top of the planet, its relic and the win chances.
+    @Test
+    void aNeutralPlanetEarnsTheTempoOfAnExpansion() {
+        cocytusFleetOnTheEgress();
+        Game game = fracture.board.test.game;
+        Tile cocytus = fracture.fracture(FractureScenario.COCYTUS);
+        TacticalPlanner.Context context = new TacticalPlanner.Context(game, fracture.nekro());
+        TacticalPlanner.Candidate best = TacticalPlanner.candidatePool(context, cocytus, game.getNeutral()).stream()
+                .max(java.util.Comparator.comparingDouble(found -> found.quick().score()))
+                .orElseThrow();
+        Planet planet = cocytus.getPlanetUnitHolders().getFirst();
+        double chance =
+                best.estimate().spaceWin() * best.estimate().groundWins().get(planet.getName());
+
+        StrikeValue value = context.offense().evaluate(best.strike(), best.estimate(), best.terms(), true);
+
+        double withoutTempo = chance
+                * (ti4.ai.eval.BoardView.planetValue(planet)
+                        + ti4.ai.eval.FracturePrize.gain(game, fracture.nekro(), planet));
+        assertThat(TacticalPlanner.planetTempo(game)).isPositive();
+        assertThat(value.planets())
+                .isCloseTo(
+                        withoutTempo + chance * TacticalPlanner.planetTempo(game),
+                        org.assertj.core.data.Offset.offset(1e-9));
+    }
+
     @Test
     void noShipIsSentToScreenAnEmptyFracture() {
         fracture.ships(fracture.ingress, UnitType.Cruiser, 1);
