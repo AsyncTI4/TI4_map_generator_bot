@@ -1,0 +1,24 @@
+{
+  "name": "2p-combat-undo",
+  "description": "2p-combat with undo test buttons: roll in the combat thread, undo the roll, and see the roll buttons come back.",
+  "fog": false,
+  "you": {
+    "faction": "letnev",
+    "home": "301",
+    "techs": ["amd"],
+    "units": { "101": "2 dn, cv, 4 ff" }
+  },
+  "seats": [
+    { "faction": "nekro", "home": "310", "units": { "101": "ca, 2 dd, 3 ff" } }
+  ],
+  "defaults": { "acs": 3, "tg": 4, "ccs": "3/3/2" },
+  "start": "action",
+  "combat": ["101"],
+  "shortcuts": [
+    { "label": "Next dice all hit", "steps": [ { "do": "setStored", "key": "testBedDice", "value": "10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10" } ] },
+    { "label": "Next dice all miss", "steps": [ { "do": "setStored", "key": "testBedDice", "value": "1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1" } ] },
+    { "label": "Back to random dice", "steps": [ { "do": "removeStored", "key": "testBedDice" } ] },
+    { "label": "Letnev presses UNDO", "steps": [ { "as": "you", "in": "you:combat", "pressId": "ultimateUndo_0" } ] },
+    { "label": "Nekro presses UNDO", "steps": [ { "as": "seat1", "in": "seat1:combat", "pressId": "ultimateUndo_0" } ] }
+  ]
+}

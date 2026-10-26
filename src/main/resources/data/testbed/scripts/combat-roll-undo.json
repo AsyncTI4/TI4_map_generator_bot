@@ -1,0 +1,21 @@
+{
+  "name": "combat-roll-undo",
+  "description": "2p-combat-undo: Letnev rolls all hits, Nekro cannot undo Letnev's roll, Letnev undoes it, the roll buttons are re-posted and the re-roll uses new dice.",
+  "preset": "2p-combat-undo",
+  "stopOnFail": true,
+  "steps": [
+    { "label": "Next dice all hit", "do": "setStored", "key": "testBedDice", "value": "10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10" },
+    { "label": "Letnev rolls", "as": "you", "in": "you:combat", "press": "Roll Space Combat" },
+    { "expect": { "in": "you:combat", "matches": "Total hits [1-9]" } },
+    { "label": "Nekro tries to undo Letnev's roll", "as": "seat1", "in": "you:combat", "pressId": "ultimateUndo_0" },
+    { "expect": { "in": "you:combat", "contains": "You were not the player who pressed the latest button" } },
+    { "label": "Letnev undoes the roll", "as": "you", "in": "you:combat", "pressId": "ultimateUndo_0" },
+    { "expect": { "ephemeral": "You undid something" } },
+    { "expect": { "in": "you:combat", "buttons": ["Roll Space Combat"] } },
+    { "note": "The undo restored the save from before the roll, so testBedDice is back to all hits; switch to misses to prove the re-roll is a new roll." },
+    { "label": "Next dice all miss", "do": "setStored", "key": "testBedDice", "value": "1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1" },
+    { "label": "Letnev re-rolls", "as": "you", "in": "you:combat", "press": "Roll Space Combat" },
+    { "expect": { "in": "you:combat", "contains": "Total hits 0" } },
+    { "label": "Clear fixed dice", "do": "removeStored", "key": "testBedDice" }
+  ]
+}
