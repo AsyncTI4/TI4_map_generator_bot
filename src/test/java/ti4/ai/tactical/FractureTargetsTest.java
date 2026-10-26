@@ -526,6 +526,171 @@ class FractureTargetsTest extends BaseTi4Test {
         assertThat(standings.ready(sardakk)).isEmpty();
     }
 
+    private void cocytusFleetOnTheEgress() {
+        fracture.ships("frac2", UnitType.Destroyer, 3);
+        fracture.ships("frac2", UnitType.Cruiser, 1);
+        fracture.ships("frac2", UnitType.Carrier, 1);
+        fracture.ships("frac2", UnitType.Infantry, 4);
+    }
+
+    // Mahact's fleet in pbd29015b: it entered the egress in round 3 and took Cocytus with its next action.
+    private void mahactFleetOnTheEgress() {
+        fracture.ships("frac2", UnitType.Cruiser, 1);
+        fracture.ships("frac2", UnitType.Destroyer, 1);
+        fracture.ships("frac2", UnitType.Dreadnought, 1);
+        fracture.ships("frac2", UnitType.Carrier, 1);
+        fracture.ships("frac2", UnitType.Fighter, 1);
+        fracture.ships("frac2", UnitType.Infantry, 1);
+        fracture.ships("frac2", UnitType.Mech, 1);
+    }
+
+    // Neutral units never retaliate or bear a grudge, so a strike on them only has to repay the tactic token it
+    // spends, not the margin an attack on a player needs.
+    @Test
+    void aStrikeOnNeutralUnitsOnlyHasToRepayItsToken() {
+        assertThat(TacticalPlanner.attackMinScore(fracture.board.test.game.getNeutral()))
+                .isEqualTo(ti4.ai.explore.ExploreValues.COMMAND_TOKEN)
+                .isLessThan(TacticalPlanner.ATTACK_MIN_SCORE);
+    }
+
+    @Test
+    void aFleetOnTheEgressThatBeatsTheGuardTakesCocytusBelowThePlayerBar() {
+        cocytusFleetOnTheEgress();
+
+        Optional<TacticalPlan> plan = attackOn(FractureScenario.COCYTUS);
+
+        assertThat(plan).isPresent();
+        assertThat(plan.get().landings()).containsEntry("cocytus", 4);
+        assertThat(plan.get().score()).isLessThan(TacticalPlanner.ATTACK_MIN_SCORE);
+    }
+
+    // Taking a planet nobody controls is an expansion with a fight first, so it earns the same early-game tempo as
+    // landing on a free planet, on top of the planet, its relic and the win chances.
+    @Test
+    void aNeutralPlanetEarnsTheTempoOfAnExpansion() {
+        cocytusFleetOnTheEgress();
+        Game game = fracture.board.test.game;
+        Tile cocytus = fracture.fracture(FractureScenario.COCYTUS);
+        TacticalPlanner.Context context = new TacticalPlanner.Context(game, fracture.nekro());
+        TacticalPlanner.Candidate best = TacticalPlanner.candidatePool(context, cocytus, game.getNeutral()).stream()
+                .max(java.util.Comparator.comparingDouble(found -> found.quick().score()))
+                .orElseThrow();
+        Planet planet = cocytus.getPlanetUnitHolders().getFirst();
+        double chance =
+                best.estimate().spaceWin() * best.estimate().groundWins().get(planet.getName());
+
+        StrikeValue value = context.offense().evaluate(best.strike(), best.estimate(), best.terms(), true);
+
+        double withoutTempo = chance
+                * (ti4.ai.eval.BoardView.planetValue(planet)
+                        + ti4.ai.eval.FracturePrize.gain(game, fracture.nekro(), planet));
+        assertThat(TacticalPlanner.planetTempo(game)).isPositive();
+        assertThat(value.planets())
+                .isCloseTo(
+                        withoutTempo + chance * TacticalPlanner.planetTempo(game),
+                        org.assertj.core.data.Offset.offset(1e-9));
+    }
+
+    // A fleet that entered the egress to take Cocytus gives that strike up if another plan carries its ground forces
+    // back out, so the plan pays for it and the fleet strikes first.
+    @Test
+    void aFleetOnTheEgressStrikesCocytusBeforeItsGroundForcesLeave() {
+        mahactFleetOnTheEgress();
+
+        TacticalPlan top = TacticalPlanner.ranked(fracture.board.test.game, fracture.nekro())
+                .getFirst();
+
+        assertThat(top.kind()).isEqualTo(Kind.ATTACK);
+        assertThat(top.target()).isEqualTo(FractureScenario.COCYTUS);
+        assertThat(top.landings()).containsKey("cocytus");
+    }
+
+    @Test
+    void aPlanThatTakesTheGroundForcesOutOfTheEgressIsChargedTheStrike() {
+        mahactFleetOnTheEgress();
+        String ingress = fracture.ingress.getPosition();
+        TacticalPlan raw = TacticalPlanner.forTarget(fracture.board.test.game, fracture.nekro(), ingress)
+                .orElseThrow();
+
+        TacticalPlan charged = TacticalPlanner.ranked(fracture.board.test.game, fracture.nekro()).stream()
+                .filter(plan -> plan.target().equals(ingress) && plan.kind() == raw.kind())
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(raw.moves()).anyMatch(move -> "frac2".equals(move.origin()) && move.type() == UnitType.Infantry);
+        assertThat(charged.score()).isLessThan(raw.score());
+    }
+
+    @Test
+    void aFleetOnTheEgressWithoutAStrikeIsNotCharged() {
+        fracture.ships("frac2", UnitType.Carrier, 1);
+        fracture.ships("frac2", UnitType.Infantry, 2);
+        String ingress = fracture.ingress.getPosition();
+        TacticalPlan raw = TacticalPlanner.forTarget(fracture.board.test.game, fracture.nekro(), ingress)
+                .orElseThrow();
+
+        TacticalPlan ranked = TacticalPlanner.ranked(fracture.board.test.game, fracture.nekro()).stream()
+                .filter(plan -> plan.target().equals(ingress) && plan.kind() == raw.kind())
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(ranked.score()).isEqualTo(raw.score());
+    }
+
+    // Argent and Mahact moved fleet and ground forces onto the egress together and struck the next action. The strike
+    // carries the same ships without a charge for moving them as a group, so neither does the step that prepares it.
+    @Test
+    void anAssaultGroupOnTheIngressStepsOntoTheEgressWithItsGroundForces() {
+        fracture.ships(fracture.ingress, UnitType.Destroyer, 3);
+        fracture.ships(fracture.ingress, UnitType.Cruiser, 1);
+        fracture.ships(fracture.ingress, UnitType.Carrier, 1);
+        Planet planet = fracture.ingress.getPlanetUnitHolders().getFirst();
+        fracture.nekro().addPlanet(planet.getName());
+        fracture.board.test.units(fracture.ingress, planet.getName(), fracture.nekro(), UnitType.Infantry, 4);
+
+        Optional<TacticalPlan> step = stageTo("frac2");
+
+        assertThat(step).isPresent();
+        assertThat(step.get().score()).isGreaterThanOrEqualTo(TacticalPlanner.MIN_SCORE);
+        assertThat(step.get().moves()).anyMatch(move -> move.type() == UnitType.Infantry);
+        assertThat(step.get().moves()).anyMatch(move -> move.type() == UnitType.Destroyer);
+    }
+
+    // The neutral units never move, so a strike one step from the egress is as sure next action as it is now; only a
+    // rival can spoil it, and the counterstrike at the egress already prices that. The step is worth the strike it
+    // prepares less the costs of making it (here only the distance, as nothing threatens the egress).
+    @Test
+    void aStepOntoTheEgressCountsTheWholeStrikeItPrepares() {
+        fracture.ships(fracture.ingress, UnitType.Dreadnought, 1);
+        fracture.ships(fracture.ingress, UnitType.Destroyer, 1);
+        fracture.ships(fracture.ingress, UnitType.Carrier, 1);
+        fracture.ships(fracture.ingress, UnitType.Fighter, 1);
+        Planet planet = fracture.ingress.getPlanetUnitHolders().getFirst();
+        fracture.nekro().addPlanet(planet.getName());
+        fracture.board.test.units(fracture.ingress, planet.getName(), fracture.nekro(), UnitType.Infantry, 4);
+        Game game = fracture.board.test.game;
+        Player neutral = game.getNeutral();
+        Tile cocytus = fracture.fracture(FractureScenario.COCYTUS);
+        Tile egress = fracture.fracture("frac2");
+        TacticalPlanner.Context context = new TacticalPlanner.Context(game, fracture.nekro());
+        TacticalPlanner.Gathering gathering = TacticalPlanner.gather(
+                        context, cocytus, egress, TacticalPlanner.stageLead(neutral))
+                .orElseThrow();
+        double strike =
+                TacticalPlanner.futureScore(context, cocytus, neutral, egress, gathering.ships(), gathering.cargo());
+
+        TacticalPlan step = TacticalPlanner.stagePlan(
+                        context,
+                        cocytus,
+                        neutral,
+                        gathering.withCounter(TacticalPlanner.counterAt(context, gathering, neutral)))
+                .orElseThrow();
+
+        assertThat(gathering.cargo()).isNotEmpty();
+        assertThat(strike).isGreaterThan(TacticalPlanner.attackMinScore(neutral));
+        assertThat(step.score()).isCloseTo(strike - 0.2, org.assertj.core.data.Offset.offset(0.05));
+    }
+
     @Test
     void noShipIsSentToScreenAnEmptyFracture() {
         fracture.ships(fracture.ingress, UnitType.Cruiser, 1);

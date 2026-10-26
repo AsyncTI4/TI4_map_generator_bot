@@ -90,13 +90,12 @@ public class TacticalPlanner {
     private static final double STAGE_SHIP_STAKE = 0.5;
     private static final int STAGE_TARGETS = 3;
     private static final int FRACTURE_STAGE_LEAD = 3;
-    private static final double FRACTURE_STAGE_SHARE = 0.8;
     private static final double FRACTURE_STEP_SHARE = 0.85;
     private static final double FLANK_SPEED_COST = 1.5;
     private static final int STAGING_CANDIDATES = 4;
     private static final int STAGING_TILES_PER_TARGET = 2;
     static final double ATTACK_MIN_SCORE = 4.0;
-    static final double NEUTRAL_ATTACK_MIN_SCORE = 2.5;
+    static final double NEUTRAL_ATTACK_MIN_SCORE = ExploreValues.COMMAND_TOKEN;
     private static final double DISTANCE_COST = 0.2;
     private static final double PLANET_TEMPO_VALUE = 0.8;
     private static final double APPROACH_SHARE = 0.5;
@@ -1920,7 +1919,7 @@ public class TacticalPlanner {
                 .mapToInt(move -> stepsToTarget(context, gathering.staging(), target, move.type(), FRACTURE_STAGE_LEAD))
                 .max()
                 .orElse(FRACTURE_STAGE_LEAD);
-        return routeShare(context) * FRACTURE_STAGE_SHARE * Math.pow(FRACTURE_STEP_SHARE, steps - 1);
+        return routeShare(context) * Math.pow(FRACTURE_STEP_SHARE, steps - 1);
     }
 
     private static double routeShare(Context context) {
@@ -1966,6 +1965,49 @@ public class TacticalPlanner {
     }
 
     private static double marchForfeitOf(Context context, TacticalPlan plan) {
+        return styxMarchForfeit(context, plan) + fractureStrikeForfeit(context, plan);
+    }
+
+    private static double fractureStrikeForfeit(Context context, TacticalPlan plan) {
+        if (isFractureTile(context.game, plan.target())) return 0;
+        double forfeit = 0;
+        for (String position :
+                plan.moves().stream().map(UnitMove::origin).distinct().toList()) {
+            Tile origin = context.game.getTileByPosition(position);
+            if (origin == null || !origin.isFracture()) continue;
+            double held = heldFractureStrike(context, origin);
+            if (held > 0) forfeit += held * departingShare(context, origin, plan.moves());
+        }
+        return forfeit;
+    }
+
+    private static double heldFractureStrike(Context context, Tile origin) {
+        return FracturePrize.tiles(context.game).stream()
+                .filter(target -> target != origin && !holdsEveryPlanet(context.seat, target))
+                .filter(target -> target.getPlanetUnitHolders().stream().noneMatch(FracturePrize::isStyx))
+                .mapToDouble(target -> marchValue(context, origin, target))
+                .max()
+                .orElse(0);
+    }
+
+    private static boolean holdsEveryPlanet(Player seat, Tile tile) {
+        return tile.getPlanetUnitHolders().stream()
+                .allMatch(planet -> seat.getPlanets().contains(planet.getName()));
+    }
+
+    private static double departingShare(Context context, Tile origin, List<UnitMove> moves) {
+        List<UnitMove> fromOrigin = moves.stream()
+                .filter(move -> move.origin().equals(origin.getPosition()))
+                .toList();
+        double stationed = fleetCost(context.seat, context.stageGroup(origin));
+        double ships =
+                stationed <= 0 ? 0 : Math.min(1, fleetCost(context.seat, departingShips(fromOrigin)) / stationed);
+        int ground = BoardView.groundForces(BoardView.space(origin), context.seat);
+        double cargo = ground <= 0 ? 0 : Math.min(1, (double) unitCount(groundIn(fromOrigin)) / ground);
+        return Math.max(ships, cargo);
+    }
+
+    private static double styxMarchForfeit(Context context, TacticalPlan plan) {
         Optional<Tile> styx = styxToTake(context);
         if (styx.isEmpty() || plan.target().equals(styx.get().getPosition())) return 0;
         Tile target = context.game.getTileByPosition(plan.target());
@@ -2022,9 +2064,10 @@ public class TacticalPlanner {
     }
 
     private static double marchValue(Context context, Tile origin, Tile styx) {
-        return context.marchValues.computeIfAbsent(origin.getPosition(), position -> {
+        return context.marchValues.computeIfAbsent(origin.getPosition() + "#" + styx.getPosition(), key -> {
             Player opponent = singleOpponent(context.game, context.seat, styx);
             if (opponent == null) return 0.0;
+            String position = origin.getPosition();
             UnitHolder space = BoardView.space(origin);
             List<UnitMove> cargo = BoardView.GROUND_FORCES.stream()
                     .filter(type -> BoardView.count(space, context.seat, type) > 0)
@@ -2037,7 +2080,7 @@ public class TacticalPlanner {
                     .mapToInt(move -> stepsToTarget(context, origin, styx, move.type(), FRACTURE_STAGE_LEAD))
                     .max()
                     .orElse(FRACTURE_STAGE_LEAD);
-            return routeShare(context) * FRACTURE_STAGE_SHARE * Math.pow(FRACTURE_STEP_SHARE, steps - 1) * future;
+            return routeShare(context) * Math.pow(FRACTURE_STEP_SHARE, steps - 1) * future;
         });
     }
 
@@ -2167,7 +2210,7 @@ public class TacticalPlanner {
                 - leaving
                 + context.departureLoss(staging, moves)
                 - DISTANCE_COST * farthest
-                - GROUP_MOVE_COST * (movedNonFighterShips(moves) - 1)
+                - groupMoveCost(opponent, moves)
                 - emptyHaulerPenalty(seat, gathering);
         TacticalPlan plan = new TacticalPlan(Kind.STAGE, staging.getPosition(), moves, Map.of(), score);
         return afterCannon(
@@ -2175,6 +2218,10 @@ public class TacticalPlanner {
                 staging,
                 plan.withScore(PlayAreaNotes.adjustedScore(context.game, seat, staging, plan)
                         + SetupHint.bonusFor(context.hints, plan)));
+    }
+
+    private static double groupMoveCost(Player opponent, List<UnitMove> moves) {
+        return opponent.isNeutral() ? 0 : GROUP_MOVE_COST * (movedNonFighterShips(moves) - 1);
     }
 
     private static double emptyHaulerPenalty(Player seat, Gathering gathering) {
@@ -2552,7 +2599,7 @@ public class TacticalPlanner {
         return Optional.ofNullable(best);
     }
 
-    private static double planetTempo(Game game) {
+    static double planetTempo(Game game) {
         return PLANET_TEMPO_VALUE * earlyGameWeight(game);
     }
 
