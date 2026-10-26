@@ -5,11 +5,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.MovementGraph;
+import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.strategy.CardPlan.Benefit;
 import ti4.ai.tactical.ProductionPlanner;
 import ti4.ai.tactical.ProductionPlanner.BuildPlan;
@@ -114,7 +117,7 @@ class WarfareUses {
                     .mapToInt(type -> BoardView.moveValueWithGravityDrive(seat, type))
                     .max()
                     .orElse(0);
-            if (move <= 0) continue;
+            if (move <= 0 || !carriesGroundForces(seat, origin)) continue;
             Set<String> near =
                     MovementGraph.reach(game, seat, origin.getPosition(), move).keySet();
             Map<String, Integer> far = MovementGraph.reach(game, seat, origin.getPosition(), 2 * move);
@@ -122,20 +125,42 @@ class WarfareUses {
                 if (near.contains(position)) continue;
                 Tile tile = game.getTileByPosition(position);
                 if (tile == null || BoardView.hasEnemyShips(game, seat, tile)) continue;
-                double value = CardValueScale.FAR_REACH_SHARE * uncontrolledValue(game, seat, tile);
+                double value = CardValueScale.FAR_REACH_SHARE * reachValue(in, tile);
                 if (value > best.value()) best = new Benefit(CardUse.WARFARE_FAR_REACH, value, position);
             }
         }
         return best;
     }
 
-    private static double uncontrolledValue(Game game, Player seat, Tile tile) {
-        double value = tile.getPlanetUnitHolders().stream()
+    private static boolean carriesGroundForces(Player seat, Tile origin) {
+        boolean capacity = BoardView.ships(BoardView.space(origin), seat).keySet().stream()
+                .anyMatch(type -> BoardView.MOVING_SHIPS.contains(type) && BoardView.capacity(seat, type) > 0);
+        return capacity
+                && origin.getUnitHolders().values().stream()
+                        .anyMatch(holder -> BoardView.groundForces(holder, seat) > 0);
+    }
+
+    private static double reachValue(PlanInputs in, Tile tile) {
+        Game game = in.game();
+        Player seat = in.seat();
+        if (tile != game.getMecatolTile() || game.isCustodiansScored()) return uncontrolledValue(seat, tile);
+        if (ScoringReserve.planForCustodians(game, seat).isEmpty()) return 0;
+        return custodiansRaceGain(in);
+    }
+
+    private static double custodiansRaceGain(PlanInputs in) {
+        CustodiansRace.Snapshot race = in.race();
+        Player seat = in.seat();
+        double thisRound = race.raceValue(seat, OptionalInt.of(in.game().getRound()), CustodiansRace.Order.UNKNOWN);
+        double unaided = race.raceValue(seat, race.arrival(seat), CustodiansRace.Order.UNKNOWN);
+        return Math.max(0, thisRound - unaided);
+    }
+
+    private static double uncontrolledValue(Player seat, Tile tile) {
+        return tile.getPlanetUnitHolders().stream()
                 .filter(planet -> !seat.getPlanets().contains(planet.getName()))
                 .mapToDouble(BoardView::planetValue)
                 .sum();
-        if (tile == game.getMecatolTile() && !game.isCustodiansScored()) value += CardValueScale.VICTORY_POINT;
-        return value;
     }
 
     private static Optional<Benefit> unblock(PlanInputs in) {

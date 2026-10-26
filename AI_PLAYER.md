@@ -1557,8 +1557,11 @@ Seven small generic changes don't reference `ti4.ai`:
     same decisions. `SelfPlayEnvironment.decisionOverride` replaces one decision, so a run can force another choice.
   - `RolloutExperimentTest` (`-Dai.selfplay.rollouts=true`) is branch-and-compare on the first strategy card pick of a
     round: from a snapshot, each of the seat's top options (by its own card values) is forced and played to the start
-    of round R + 2 over several continuation seeds, with the decks the seat cannot see reshuffled before each one (a
-    determinized, information-set style rollout; other hands stay real). Options share continuation seeds. It prints
+    of round R + 2 over several continuation seeds (12 by default). Before each continuation `Determinizer` resamples
+    everything the seat cannot see: other seats' action cards and unscored secrets go back into their decks and are
+    dealt again in the same counts, and the hidden decks are shuffled, so the seat cannot plan around cards it could
+    not know about (promissory notes are not resampled yet). Options share continuation seeds. A rollout takes about
+    80 seconds, which an async game can afford per decision. It prints
     each option's victory point margin and how often the AI's own pick was the best one. Switches:
     `.games`, `.threads`, `.round`, `.options`, `.seeds`, `.seed` under `ai.selfplay.rollouts`.
   - Every action card play carries the round it was first seen in, and the batch summary prints the plays by round
