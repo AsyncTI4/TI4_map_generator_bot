@@ -171,6 +171,9 @@ public class DestroyUnitService {
 
     private static void handleDestroyedUnits(
             GenericInteractionCreateEvent event, Game game, List<RemovedUnit> units, boolean combat) {
+        if (units.isEmpty()) {
+            return;
+        }
         // batch up infantry for INF2-ish effects
         for (Player player : game.getRealPlayersNNeutral()) {
             int numInfantry = 0;
