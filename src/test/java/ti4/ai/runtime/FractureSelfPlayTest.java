@@ -3,7 +3,6 @@ package ti4.ai.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
@@ -76,18 +75,22 @@ class FractureSelfPlayTest extends BaseTi4Test {
     // The neutral dice are real, and a fleet that lands a handful of infantry can lose the battle on them (about one
     // game in ten for the Cocytus fleet). A scenario whose fleet died in the Fracture says nothing about the planning,
     // so it is played again on a fresh game; only a fleet that survives, or never attacks, is judged.
+    private static final long CLOCK_START = 1_790_000_000_000L;
+
     private static Played play(Supplier<Attack> scenarios) throws Exception {
-        Played played = playOnce(scenarios.get());
+        Played played = playOnce(scenarios.get(), 0);
         for (int attempt = 1; attempt < ATTEMPTS && played.scenario().fleetLost; attempt++) {
-            played = playOnce(scenarios.get());
+            played = playOnce(scenarios.get(), attempt);
         }
         return played;
     }
 
-    private static Played playOnce(Attack scenario) throws Exception {
-        try (SelfPlayEnvironment env = new SelfPlayEnvironment(System.currentTimeMillis())) {
-            SelfPlayGame selfPlay =
-                    new SelfPlayGame(env, "aifrac" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000));
+    // The game name and clock start come from the seed as well (message ids and names feed the AI), so a failure
+    // replays with -Dai.selfplay.seed=<printed seed minus the attempt>. Each retry gets the next seed.
+    private static Played playOnce(Attack scenario, int attempt) throws Exception {
+        long seed = SelfPlayGame.BASE_SEED + attempt;
+        try (SelfPlayEnvironment env = new SelfPlayEnvironment(CLOCK_START)) {
+            SelfPlayGame selfPlay = new SelfPlayGame(env, "aifrac" + Math.floorMod(seed, 1_000_000L), attempt, seed);
             scenario.attach(selfPlay);
             try {
                 selfPlay.setUp(FACTIONS);
