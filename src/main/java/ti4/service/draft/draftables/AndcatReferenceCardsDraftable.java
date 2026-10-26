@@ -22,6 +22,7 @@ import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.MapTemplateHelper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.helpers.settingsFramework.menus.AndcatReferenceCardsDraftableSettings;
@@ -99,7 +100,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
 
         // Shuffle each faction group
         for (List<String> partition : partitions) {
-            Collections.shuffle(partition);
+            Collections.shuffle(partition, RandomHelper.current());
         }
 
         // To get a nice distribution of factions, we want to build at least ~80% of all possible packages
@@ -132,7 +133,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         remainingFactions.addAll(strongFactions);
         remainingFactions.addAll(weakFactions);
         remainingFactions.addAll(midFactions); // Medium factions last to mix better
-        Collections.shuffle(remainingFactions);
+        Collections.shuffle(remainingFactions, RandomHelper.current());
 
         // Finish filling packages from the remaining pool
         // We only need to finish numPackages
@@ -713,7 +714,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
                 .filter(f -> f.getPriorityNumber() != null)
                 .filter(f -> !f.getAlias().contains("keleres"))
                 .collect(Collectors.toList());
-        Collections.shuffle(availableFactions);
+        Collections.shuffle(availableFactions, RandomHelper.current());
         return availableFactions.isEmpty() ? null : availableFactions.getFirst();
     }
 }

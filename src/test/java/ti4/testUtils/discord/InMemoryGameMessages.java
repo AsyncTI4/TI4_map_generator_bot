@@ -34,6 +34,29 @@ public final class InMemoryGameMessages {
         return List.copyOf(byGame.getOrDefault(gameName, List.of()));
     }
 
+    // A game's messages with their own reaction sets, so later reactions do not reach the copy.
+    public synchronized List<GameMessage> snapshot(String gameName) {
+        return copies(byGame.getOrDefault(gameName, List.of()));
+    }
+
+    // Puts a game's messages back as they were recorded, with their own reaction sets, for replaying a snapshot.
+    public synchronized void restore(String gameName, List<GameMessage> messages) {
+        byGame.put(gameName, copies(messages));
+    }
+
+    private static List<GameMessage> copies(List<GameMessage> messages) {
+        List<GameMessage> copies = new ArrayList<>();
+        for (GameMessage message : messages) {
+            copies.add(new GameMessage(
+                    message.messageId(),
+                    message.type(),
+                    message.factionsThatReacted(),
+                    message.gameSaveTime(),
+                    message.key()));
+        }
+        return copies;
+    }
+
     private synchronized Object answer(InvocationOnMock invocation) {
         Object[] args = invocation.getArguments();
         return switch (invocation.getMethod().getName()) {

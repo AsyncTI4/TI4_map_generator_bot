@@ -21,6 +21,7 @@ import ti4.game.Game;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
@@ -280,7 +281,7 @@ public class TEOptionService {
                         allCards.add(tech.getID());
                     }
                 }
-                Collections.shuffle(allCards);
+                Collections.shuffle(allCards, RandomHelper.current());
                 StringBuilder msg = new StringBuilder("The following abilities have been banned:\n");
                 for (int x = 0; x < allCards.size() / 2; x++) {
                     BanService.appendStoredValue(game, "bannedTechs", allCards.get(x));

@@ -31,6 +31,7 @@ import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.PatternHelper;
+import ti4.helpers.RandomHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
@@ -165,7 +166,7 @@ public class FrankenDrazDraft extends FrankenDraft {
                 .filter(java.util.Objects::nonNull)
                 .toList();
         List<DraftItem> selectedFactionItems = FactionDraftItem.buildAllItems(selectedFactions);
-        Collections.shuffle(selectedFactionItems);
+        Collections.shuffle(selectedFactionItems, RandomHelper.current());
         allDraftableItems.put(DraftCategory.FACTION, selectedFactionItems);
         allDraftableItems.put(DraftCategory.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
 

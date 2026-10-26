@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -1659,7 +1658,7 @@ public final class ButtonHelperFactionSpecific {
             unitHolder.addDamagedUnit(Mapper.getUnitKey("cavalry", player.getColorID()), 1);
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 6);
+        int randomJokeChance = RandomHelper.current().nextInt(1, 6);
         if (randomJokeChance == 5) {
             File audioFile = ResourceHelper.getFile("voices/nomad/", "Cavalry.mp3");
             if (audioFile.exists()) {

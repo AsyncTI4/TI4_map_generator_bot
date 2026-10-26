@@ -118,6 +118,33 @@ public final class FakeDiscord {
                 .toList();
     }
 
+    // The channels, messages and id counters at one moment. Restoring drops what was created since and puts every
+    // older channel and message back as it was, so a game can be played on from the same Discord more than once.
+    public record Snapshot(
+            Map<Long, FakeChannel.State> channels,
+            Map<Long, FakeMessage.State> messages,
+            long lastMillis,
+            int sequence,
+            int nextComponentId) {}
+
+    public synchronized Snapshot snapshot() {
+        Map<Long, FakeChannel.State> channelStates = new LinkedHashMap<>();
+        channels.forEach((id, channel) -> channelStates.put(id, channel.state()));
+        Map<Long, FakeMessage.State> messageStates = new LinkedHashMap<>();
+        messages.forEach((id, message) -> messageStates.put(id, message.state()));
+        return new Snapshot(channelStates, messageStates, lastMillis, sequence, nextComponentId);
+    }
+
+    public synchronized void restore(Snapshot snapshot) {
+        channels.keySet().retainAll(snapshot.channels().keySet());
+        channels.forEach((id, channel) -> channel.restore(snapshot.channels().get(id)));
+        messages.keySet().retainAll(snapshot.messages().keySet());
+        messages.forEach((id, message) -> message.restore(snapshot.messages().get(id)));
+        lastMillis = snapshot.lastMillis();
+        sequence = snapshot.sequence();
+        nextComponentId = snapshot.nextComponentId();
+    }
+
     public synchronized List<FakeMessage> allMessages() {
         return List.copyOf(messages.values());
     }

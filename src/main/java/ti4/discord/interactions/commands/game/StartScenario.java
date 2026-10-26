@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -23,6 +22,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.NucleusSliceDraftableSettings;
@@ -96,7 +96,7 @@ public class StartScenario extends GameStateSubcommand {
         }
         for (String faction : factions) {
             if (game.getPlayerFromColorOrFaction(faction) == null) {
-                int face = ThreadLocalRandom.current().nextInt(0, players.size());
+                int face = RandomHelper.current().nextInt(0, players.size());
                 Tile tile = game.getTileFromPositionOrAlias(faction);
                 if ("ghost".equalsIgnoreCase(faction)) {
                     tile = game.getTileFromPositionOrAlias("creussgate");
@@ -104,7 +104,7 @@ public class StartScenario extends GameStateSubcommand {
                 boolean speakerAlreadyExist = game.getSpeaker() != null;
                 boolean speaker = false;
                 if (!speakerAlreadyExist) {
-                    int chance = ThreadLocalRandom.current().nextInt(0, players.size());
+                    int chance = RandomHelper.current().nextInt(0, players.size());
                     speaker = chance == face;
                 }
                 if (tile != null) {
@@ -285,7 +285,7 @@ public class StartScenario extends GameStateSubcommand {
                 break;
             }
             if (game.getPlayerFromColorOrFaction(faction) == null) {
-                int face = ThreadLocalRandom.current().nextInt(0, players.size());
+                int face = RandomHelper.current().nextInt(0, players.size());
                 Tile tile = game.getTileFromPositionOrAlias(faction);
                 if ("ghost".equalsIgnoreCase(faction)) {
                     tile = game.getTileFromPositionOrAlias("creussgate");
@@ -360,7 +360,7 @@ public class StartScenario extends GameStateSubcommand {
 
     public static String drawRandomFactionTech(Game game) {
         List<TechnologyModel> techs = new ArrayList<>(Mapper.getTechs().values());
-        Collections.shuffle(techs);
+        Collections.shuffle(techs, RandomHelper.current());
         for (TechnologyModel model : techs) {
             if (!model.getSource().isOfficial() || model.getSource() == ComponentSource.twilights_fall) {
                 continue;
@@ -442,7 +442,7 @@ public class StartScenario extends GameStateSubcommand {
         String specError = NucleusSpecs.validateSpecsForGame(specs, game);
         SliceGenerationPipeline.queue(event, game, specs, (NucleusOutcome outcome) -> {
             List<Player> players = new ArrayList<>(game.getPlayers().values());
-            Collections.shuffle(players);
+            Collections.shuffle(players, RandomHelper.current());
             int num = 199;
             new SliceDraftable().initialize(outcome.slices());
             game.getDraftManager().tryStartDraft();
@@ -507,7 +507,7 @@ public class StartScenario extends GameStateSubcommand {
             }
             commanders.add(commanderName);
         }
-        Collections.shuffle(commanders);
+        Collections.shuffle(commanders, RandomHelper.current());
         return commanders.getFirst();
     }
 
@@ -534,7 +534,7 @@ public class StartScenario extends GameStateSubcommand {
                 break;
             }
             if (game.getPlayerFromColorOrFaction(faction) == null) {
-                int face = ThreadLocalRandom.current().nextInt(0, players.size());
+                int face = RandomHelper.current().nextInt(0, players.size());
                 Tile tile = game.getTileFromPositionOrAlias(faction);
                 boolean speaker = "mentak".equalsIgnoreCase(faction);
                 if (tile != null) {
@@ -550,7 +550,7 @@ public class StartScenario extends GameStateSubcommand {
         Player mentak = game.getPlayerFromColorOrFaction("mentak");
         ArrayList<String> relics = new ArrayList<>(
                 List.of("quantumcore", "circletofthevoid", "dynamiscore", "prophetstears", "titanprototype"));
-        Collections.shuffle(relics);
+        Collections.shuffle(relics, RandomHelper.current());
         if (mentak != null) {
             for (int x = 0; x < 2; x++) {
                 String relicID = relics.removeFirst();

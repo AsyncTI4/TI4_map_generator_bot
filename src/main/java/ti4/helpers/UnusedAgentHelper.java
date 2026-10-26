@@ -46,7 +46,7 @@ public class UnusedAgentHelper {
             }
         }
         if (!agents.isEmpty()) {
-            Collections.shuffle(agents);
+            Collections.shuffle(agents, RandomHelper.current());
             return agents.getFirst();
         }
         return null;

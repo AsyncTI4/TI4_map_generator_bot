@@ -54,7 +54,7 @@ public class UnusedCommanderHelper {
             commanders.add(commanderName);
         }
         if (!commanders.isEmpty()) {
-            Collections.shuffle(commanders);
+            Collections.shuffle(commanders, RandomHelper.current());
             return commanders.getFirst();
         }
         return "";
@@ -88,7 +88,7 @@ public class UnusedCommanderHelper {
             commanders.add(commanderName);
         }
         if (!commanders.isEmpty()) {
-            Collections.shuffle(commanders);
+            Collections.shuffle(commanders, RandomHelper.current());
             return commanders.getFirst();
         }
         return "";

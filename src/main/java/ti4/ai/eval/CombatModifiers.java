@@ -1,11 +1,13 @@
 package ti4.ai.eval;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.ai.brain.DecisionMemo;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -21,11 +23,25 @@ import ti4.service.combat.CombatRollType;
 @UtilityClass
 public class CombatModifiers {
 
+    private static final String HIT_MODIFIERS_MEMO = "combat.hitModifiers";
     private static final Set<String> STANDING_PERSISTENCE = Set.of("ALWAYS", "CONDITIONAL");
 
     public record Side(Player player, Map<UnitType, Integer> units) {}
 
     public static Map<UnitType, Integer> hitModifiers(
+            Game game, Tile tile, UnitHolder holder, Side side, Side opponent) {
+        return DecisionMemo.remember(
+                () -> Collections.unmodifiableMap(computeHitModifiers(game, tile, holder, side, opponent)),
+                HIT_MODIFIERS_MEMO,
+                tile.getPosition(),
+                holder.getName(),
+                side.player(),
+                new HashMap<>(side.units()),
+                opponent.player(),
+                new HashMap<>(opponent.units()));
+    }
+
+    private static Map<UnitType, Integer> computeHitModifiers(
             Game game, Tile tile, UnitHolder holder, Side side, Side opponent) {
         Map<UnitType, Integer> modifiers = new HashMap<>();
         Map<UnitModel, Integer> mine = models(side);

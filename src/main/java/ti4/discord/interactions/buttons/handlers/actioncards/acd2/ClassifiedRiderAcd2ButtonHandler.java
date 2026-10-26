@@ -12,6 +12,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
@@ -62,7 +63,7 @@ class ClassifiedRiderAcd2ButtonHandler {
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String soId = buttonID.replace("resolveClassifiedRiderStep2_", "");
         if (!game.getSecretObjectives().contains(soId)) {
-            Collections.shuffle(game.getSecretObjectives());
+            Collections.shuffle(game.getSecretObjectives(), RandomHelper.current());
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
@@ -72,7 +73,7 @@ class ClassifiedRiderAcd2ButtonHandler {
         }
 
         game.drawSpecificSecretObjective(soId, player.getUserID());
-        Collections.shuffle(game.getSecretObjectives());
+        Collections.shuffle(game.getSecretObjectives(), RandomHelper.current());
         ButtonHelper.deleteMessage(event);
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         MessageHelper.sendMessageToChannel(

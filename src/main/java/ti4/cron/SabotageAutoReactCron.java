@@ -2,7 +2,6 @@ package ti4.cron;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import ti4.discord.utility.DiscordErrorUtility;
@@ -10,6 +9,7 @@ import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.ConsumeGameUtility;
+import ti4.helpers.RandomHelper;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
@@ -84,7 +84,7 @@ public class SabotageAutoReactCron {
         }
 
         int rollMax = player.getAutoSaboPassMedian() * RUNS_PER_HOUR;
-        int rollResult = ThreadLocalRandom.current().nextInt(1, rollMax + 1);
+        int rollResult = RandomHelper.current().nextInt(1, rollMax + 1);
         return rollResult == rollMax;
     }
 }

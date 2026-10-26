@@ -36,6 +36,14 @@ public class SecondaryQueue {
         OPEN.remove(gameName);
     }
 
+    public static Map<String, Long> snapshot(String gameName) {
+        return Map.copyOf(OPEN.getOrDefault(gameName, Map.of()));
+    }
+
+    public static void restore(String gameName, Map<String, Long> open) {
+        OPEN.put(gameName, new ConcurrentHashMap<>(open));
+    }
+
     public static Optional<String> blockerFor(Game game, Player seat, int initiative, long now) {
         Player holder = game.getPlayerFromSC(initiative);
         if (holder == null || holder == seat) return Optional.empty();

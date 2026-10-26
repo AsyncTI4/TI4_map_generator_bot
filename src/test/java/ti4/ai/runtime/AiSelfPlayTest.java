@@ -1163,10 +1163,15 @@ class AiSelfPlayTest extends BaseTi4Test {
                 .toList();
     }
 
+    private static final boolean SEEDED_BATCH = System.getProperty("ai.selfplay.seed") != null;
+    private static final long SEEDED_CLOCK_START = 1_790_000_000_000L;
+
     // Every game gets its own thread, environment and fake Discord. Their virtual clocks start a millisecond apart and
-    // only ever move in whole steps, so no two games can stamp the same message id.
+    // only ever move in whole steps, so no two games can stamp the same message id. With -Dai.selfplay.seed the clock
+    // start and game names are fixed too, since message ids and names feed the AI: the same seed then replays the
+    // batch.
     private static List<SelfPlayGame.Outcome> playAll(int games, int threads) throws Exception {
-        long clockStart = System.currentTimeMillis();
+        long clockStart = SEEDED_BATCH ? SEEDED_CLOCK_START : System.currentTimeMillis();
         if (threads == 1) {
             List<SelfPlayGame.Outcome> outcomes = new ArrayList<>();
             for (int i = 0; i < games; i++) outcomes.add(playFullGame(clockStart + i, i, games));
@@ -1210,8 +1215,10 @@ class AiSelfPlayTest extends BaseTi4Test {
     private static SelfPlayGame.Outcome play(
             Predicate<Game> stopWhen, long maxVirtualMillis, int maxTicks, long clockStart, int slot) throws Exception {
         try (SelfPlayEnvironment env = new SelfPlayEnvironment(clockStart)) {
-            SelfPlayGame game = new SelfPlayGame(
-                    env, "aiselfplay" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000), slot);
+            String name = SEEDED_BATCH
+                    ? "aiseed" + Math.floorMod(SelfPlayGame.BASE_SEED + slot, 1_000_000L)
+                    : "aiselfplay" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000);
+            SelfPlayGame game = new SelfPlayGame(env, name, slot);
             try {
                 game.setUp(factions());
                 SelfPlayGame.Outcome outcome = game.run(stopWhen, maxVirtualMillis, maxTicks);

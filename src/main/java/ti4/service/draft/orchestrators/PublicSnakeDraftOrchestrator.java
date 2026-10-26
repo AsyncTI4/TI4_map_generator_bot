@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.PublicSnakeDraftSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
@@ -64,7 +65,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         } else {
             List<String> shuffledPlayers =
                     new ArrayList<>(draftManager.getPlayerStates().keySet());
-            Collections.shuffle(shuffledPlayers);
+            Collections.shuffle(shuffledPlayers, RandomHelper.current());
             setDraftOrder(draftManager, shuffledPlayers);
         }
 

@@ -24,6 +24,7 @@ import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.testUtils.discord.FakeChannel;
@@ -196,6 +197,10 @@ final class SelfPlayGame {
     private int recordedRound;
     private long wallStart = System.nanoTime();
     private final int slot;
+    // Every random draw the game thread makes (dice, decks, seat ids, AI profile seeds) comes from this seed, so a game
+    // replays from -Dai.selfplay.seed=<printed seed> with its slot. Without the property each batch picks a base seed.
+    static final long BASE_SEED = Long.getLong("ai.selfplay.seed", System.nanoTime() & 0xFFFFFFFFL);
+    final long seed;
     private final java.util.Set<String> legacySeats = new java.util.LinkedHashSet<>();
     private final java.util.Set<String> heldCards = new java.util.LinkedHashSet<>();
     private final List<Integer> playRounds = new ArrayList<>();
@@ -204,6 +209,8 @@ final class SelfPlayGame {
     private boolean relicsHandedOut;
     private final FractureTracker fracture;
     private String probedTurn = "";
+    private ManagedGame observedManaged;
+    private Game observedGame;
     private int fleetLogRound;
     private final ResearchPlanLog researchPlans =
             ResearchPlanLog.enabled() ? new ResearchPlanLog(System.out::println) : null;
@@ -213,13 +220,20 @@ final class SelfPlayGame {
     }
 
     SelfPlayGame(SelfPlayEnvironment env, String name, int slot) {
+        this(env, name, slot, BASE_SEED + slot);
+    }
+
+    SelfPlayGame(SelfPlayEnvironment env, String name, int slot, long seed) {
         this.env = env;
         this.name = name;
         this.slot = slot;
+        this.seed = seed;
         this.fracture = new FractureTracker(FRACTURE_SEED * 1009L + slot);
     }
 
     Game setUp(List<String> factions) throws Exception {
+        RandomHelper.seedThisThread(seed);
+        env.seeded = true;
         actions = env.discord.createTextChannel(name + "-actions");
         TextChannel tableTalk = env.discord.createTextChannel(name + "-table-talk");
         ThreadChannel mapUpdates =
@@ -235,6 +249,7 @@ final class SelfPlayGame {
                 false,
                 setupEvent());
         AiRuntime.forget(name);
+        env.trajectory = TrajectoryLog.openIfEnabled(name, () -> env.gameMessages.messages(name));
         env.game = () -> {
             ManagedGame managed = GameManager.getManagedGame(name);
             return managed == null ? null : managed.getGame();
@@ -385,14 +400,14 @@ final class SelfPlayGame {
 
     Outcome run(Predicate<Game> stopWhen, long maxVirtualMillis, int maxTicks) {
         env.markStart();
-        lane = new AiLane(name);
+        if (lane == null) lane = new AiLane(name);
         long lastProgressAt = env.now();
         String lastProgress = "";
         int ticks = 0;
         while (true) {
             long now = env.now();
             ManagedGame managed = GameManager.getManagedGame(name);
-            Game game = managed == null ? null : managed.getGame();
+            Game game = observed(managed);
             if (game == null) return outcome(Ending.LOST_GAME, null, ticks);
             recordVictoryPoints(game);
             recordPlayRounds(game);
@@ -485,7 +500,89 @@ final class SelfPlayGame {
             game.setLastActivePlayerChange(new Date(env.now()));
             issuedTurnStamp = env.now();
         }
-        GameManager.save(game, "AI self-play scenario");
+        saveObserved(game, "AI self-play scenario");
+    }
+
+    // Everything the game, the fake Discord and the AI keep for this game at one moment of the virtual clock: the save
+    // file, channels and messages, message reactions, per-game AI state, the seats' runtime state (pressed buttons,
+    // memory, action history) and the seeded random source. Restoring it and running on plays the same game again.
+    record Snapshot(
+            String save,
+            ti4.testUtils.discord.FakeDiscord.Snapshot discord,
+            List<ti4.message.GameMessage> gameMessages,
+            AiGameState.Snapshot aiState,
+            AiLane lane,
+            long clock,
+            byte[] random,
+            long issuedTurnStamp) {}
+
+    Snapshot snapshot() {
+        Game game = observed(GameManager.getManagedGame(name));
+        return new Snapshot(
+                ti4.game.persistence.SaveText.of(game),
+                env.discord.snapshot(),
+                env.gameMessages.snapshot(name),
+                AiGameState.snapshot(name),
+                lane == null ? null : lane.copy(),
+                env.now(),
+                serialized(RandomHelper.current()),
+                issuedTurnStamp);
+    }
+
+    void restore(Snapshot snapshot) {
+        Game game = ti4.game.persistence.SaveText.read(snapshot.save());
+        GameManager.save(game, "AI self-play restore");
+        observedGame = null;
+        observedManaged = null;
+        env.discord.restore(snapshot.discord());
+        env.gameMessages.restore(name, snapshot.gameMessages());
+        AiGameState.restore(name, snapshot.aiState());
+        lane = snapshot.lane() == null ? null : snapshot.lane().copy();
+        env.clock.set(snapshot.clock());
+        RandomHelper.useForThisThread((java.util.Random) deserialized(snapshot.random()));
+        issuedTurnStamp = snapshot.issuedTurnStamp();
+    }
+
+    private static byte[] serialized(java.io.Serializable value) {
+        try (var bytes = new java.io.ByteArrayOutputStream();
+                var out = new java.io.ObjectOutputStream(bytes)) {
+            out.writeObject(value);
+            out.flush();
+            return bytes.toByteArray();
+        } catch (java.io.IOException e) {
+            throw new java.io.UncheckedIOException(e);
+        }
+    }
+
+    private static Object deserialized(byte[] bytes) {
+        try (var in = new java.io.ObjectInputStream(new java.io.ByteArrayInputStream(bytes))) {
+            return in.readObject();
+        } catch (java.io.IOException e) {
+            throw new java.io.UncheckedIOException(e);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    // Every save replaces the managed game, so while it is the same instance the file is unchanged and the game
+    // loaded for it is still current; this spares the harness a full reload of the save file at every check.
+    private Game observed(ManagedGame managed) {
+        if (managed == null) return null;
+        if (managed != observedManaged || observedGame == null) {
+            observedGame = managed.getGame();
+            observedManaged = observedGame == null ? null : managed;
+        }
+        return observedGame;
+    }
+
+    void forgetObservedGame() {
+        observedGame = null;
+        observedManaged = null;
+    }
+
+    private void saveObserved(Game game, String reason) {
+        GameManager.save(game, reason);
+        if (game == observedGame) observedManaged = GameManager.getManagedGame(name);
     }
 
     // An interaction from the game's owner in the actions channel, for engine calls a scenario makes itself.
@@ -496,15 +593,14 @@ final class SelfPlayGame {
     // The engine stamps a new turn with the wall clock; the AI compares it with message times from the virtual
     // clock, so every turn change is re-stamped with the virtual time of the tick that caused it.
     private void stampTurnStart(long tickTime) {
-        ManagedGame managed = GameManager.getManagedGame(name);
-        Game game = managed == null ? null : managed.getGame();
+        Game game = observed(GameManager.getManagedGame(name));
         if (game == null) return;
         Date changed = game.getLastActivePlayerChange();
         long stamp = changed == null ? -1 : changed.getTime();
         if (stamp == issuedTurnStamp) return;
         game.setLastActivePlayerChange(new Date(tickTime));
         issuedTurnStamp = tickTime;
-        GameManager.save(game, "AI self-play clock");
+        saveObserved(game, "AI self-play clock");
     }
 
     // One line per round, taken when the next round starts, so the report shows how fast each seat scores.
@@ -609,15 +705,14 @@ final class SelfPlayGame {
     // seconds of game time, which the virtual clock covers in a few real milliseconds, so the stamp is aged here to
     // keep the guard's meaning: in game time, the previous flip was long ago.
     private void ageAgendaFlipGuard() {
-        ManagedGame managed = GameManager.getManagedGame(name);
-        Game game = managed == null ? null : managed.getGame();
+        Game game = observed(GameManager.getManagedGame(name));
         if (game == null) return;
         String flippedAt = game.getStoredValue(AGENDA_FLIP_STAMP);
         if (flippedAt.isEmpty() || !flippedAt.chars().allMatch(Character::isDigit)) return;
         long aged = System.currentTimeMillis() - AGENDA_FLIP_AGE_MILLIS;
         if (Long.parseLong(flippedAt) <= aged) return;
         game.setStoredValue(AGENDA_FLIP_STAMP, String.valueOf(aged));
-        GameManager.save(game, "AI self-play clock");
+        saveObserved(game, "AI self-play clock");
     }
 
     private static String progressOf(Game game, ManagedGame managed) {
@@ -626,6 +721,7 @@ final class SelfPlayGame {
     }
 
     private Outcome outcome(Ending ending, Game game, int ticks) {
+        if (env.trajectory != null) env.trajectory.finish(ending.name(), seed, game);
         return new Outcome(
                 ending,
                 game == null ? 0 : game.getRound(),
@@ -896,6 +992,9 @@ final class SelfPlayGame {
         StringBuilder report = new StringBuilder();
         report.append("=== AI self-play ")
                 .append(ending)
+                .append(" (seed ")
+                .append(seed)
+                .append(')')
                 .append(" after ")
                 .append(ticks)
                 .append(" ticks, ")

@@ -101,6 +101,33 @@ public final class FakeMessage {
         return proxy;
     }
 
+    // Everything a message can change after it is posted, so a fake Discord can be put back to an earlier moment.
+    record State(
+            String content,
+            List<MessageEmbed> embeds,
+            List<MessageTopLevelComponentUnion> components,
+            List<String> attachments,
+            List<String> reactions,
+            boolean pinned,
+            boolean deleted,
+            int edits) {}
+
+    synchronized State state() {
+        return new State(content, embeds, components, attachments, List.copyOf(reactions), pinned, deleted, edits);
+    }
+
+    synchronized void restore(State state) {
+        content = state.content();
+        embeds = state.embeds();
+        components = state.components();
+        attachments = state.attachments();
+        reactions.clear();
+        reactions.addAll(state.reactions());
+        pinned = state.pinned();
+        deleted = state.deleted();
+        edits = state.edits();
+    }
+
     synchronized void markDeleted() {
         deleted = true;
     }

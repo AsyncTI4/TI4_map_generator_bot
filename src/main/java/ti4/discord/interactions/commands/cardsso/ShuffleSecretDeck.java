@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.cardsso;
 import java.util.Collections;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.GameStateSubcommand;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 
 class ShuffleSecretDeck extends GameStateSubcommand {
@@ -13,7 +14,7 @@ class ShuffleSecretDeck extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Collections.shuffle(getGame().getSecretObjectives());
+        Collections.shuffle(getGame().getSecretObjectives(), RandomHelper.current());
         MessageHelper.sendMessageToEventChannel(event, "Shuffled the secret objective deck.");
     }
 }

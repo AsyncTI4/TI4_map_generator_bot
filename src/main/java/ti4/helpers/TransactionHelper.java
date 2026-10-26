@@ -1138,7 +1138,7 @@ public class TransactionHelper {
             return "The joy of sharing a one in a million empty transaction offer message";
         }
 
-        int result = ThreadLocalRandom.current().nextInt(0, nothingMessages.size());
+        int result = RandomHelper.current().nextInt(0, nothingMessages.size());
         try {
             return nothingMessages.get(result);
         } catch (Exception e) {
@@ -1972,7 +1972,7 @@ public class TransactionHelper {
     }
 
     private static String getRandomPillageSource() {
-        int randomIndex = ThreadLocalRandom.current().nextInt(0, shadyOrganizations.size());
+        int randomIndex = RandomHelper.current().nextInt(0, shadyOrganizations.size());
         return shadyOrganizations.get(randomIndex);
     }
 

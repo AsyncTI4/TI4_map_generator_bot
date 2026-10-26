@@ -1526,6 +1526,41 @@ Seven small generic changes don't reference `ti4.ai`:
     feasibility, `attackExists`, `noGathering`, `future` for a future strike under 4, or `ok` with the plan's score,
     the biggest gathering and the future strike, counterstrike and leave cost of the best one), next to the seat's
     top-ranked plan.
+  - `-Dai.selfplay.researchplan=true` prints each seat's research plan at the start of every round and whenever it
+    changes (`ResearchPlanLog`). It is off by default: rebuilding every plan at each harness step cost about a fifth
+    of a game's CPU.
+  - `-Dai.selfplay.trajectories=DIR` writes a trajectory log per game, `DIR/GAME.jsonl.gz` (`TrajectoryLog`): one JSON
+    line per seat decision that does something (presses, unsure fallbacks, announcements, proposals; idles and waits
+    are left out) with the round, phase, active seat, a board summary per seat, the enabled buttons the seat could see
+    grouped by prompt, and the chosen button with its reason; then a `press` line with each press outcome and a closing
+    `outcome` line with the ending, final points and leaders. A full game is about 1 MB.
+    `-Dai.selfplay.trajectories.snapshots=true` also keeps `DIR/GAME.snapshots.zip` (about 40 MB per game): for every
+    decision the save file of the board and the rest of the turn context (prompts, pressed keys, the seat's memory
+    before deciding, the virtual time, the game's message reactions and open strategy card follows).
+    `TrajectoryReplay` loads one and asks the brain again; `TrajectoryReplayTest` (`-Dai.selfplay.replay=true`) plays
+    round 1 that way and checks every press replays to the same choice.
+  - Seeds: every random draw the game makes goes through `RandomHelper.current()`, which a self-play game thread seeds
+    (dice, deck shuffles, secret ids, AI seat ids and profile seeds). Each report header prints the game's seed.
+    `-Dai.selfplay.seed=N` gives slot `i` seed `N + i` and also fixes the game names and the virtual clock start
+    (message ids and names feed the AI), so the same command replays the batch. Cosmetic randomness (emoji, joke
+    texts built when a class loads, map rendering) stays unseeded on purpose.
+    `DeterminismSelfPlayTest` (`-Dai.selfplay.determinism=true`, `-Dai.selfplay.determinism.rounds=N`, default 2)
+    plays one seed twice in one JVM and compares the trajectory logs line by line; a whole game matched (6,227
+    lines) on 2026-10-25. Iteration order over objects with identity hashes breaks this, which is why `Tile` hashes
+    by tile id and the combat roll keeps its units in insertion order. Across separate JVM runs a seed reproduced a
+    game into round 6 (7,516 of about 8,130 lines) before a combat split: hash orders of keys built from enums still
+    differ between JVMs somewhere in combat resolution. Per-game AI memory that lives outside the save
+    (`SecondaryQueue`, `SlayIntent`, `FractureMarch`) sits behind `AiGameState`, which `AiRuntime.forget` clears.
+  - Snapshots: `SelfPlayGame.snapshot()` / `restore()` capture everything in-process (save file, fake Discord channels
+    and messages, message reactions, `AiGameState`, the seats' runtime state, virtual clock, random source).
+    `EnvironmentSnapshotTest` (`-Dai.selfplay.snapshot=true`) plays round 2 twice from one snapshot and requires the
+    same decisions. `SelfPlayEnvironment.decisionOverride` replaces one decision, so a run can force another choice.
+  - `RolloutExperimentTest` (`-Dai.selfplay.rollouts=true`) is branch-and-compare on the first strategy card pick of a
+    round: from a snapshot, each of the seat's top options (by its own card values) is forced and played to the start
+    of round R + 2 over several continuation seeds, with the decks the seat cannot see reshuffled before each one (a
+    determinized, information-set style rollout; other hands stay real). Options share continuation seeds. It prints
+    each option's victory point margin and how often the AI's own pick was the best one. Switches:
+    `.games`, `.threads`, `.round`, `.options`, `.seeds`, `.seed` under `ai.selfplay.rollouts`.
   - Every action card play carries the round it was first seen in, and the batch summary prints the plays by round
     for the whole batch and each card's average round. `Overrule` gets its own block: its plays by round, the strategy
     cards its picks chose, how many of those picks raised the seat's points before its turn ended, and how many seats

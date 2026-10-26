@@ -2,7 +2,6 @@ package ti4.ai.discord;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -26,6 +25,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -120,7 +120,7 @@ class AiWatch extends Subcommand {
         ThreadChannel mapUpdates = actions.createThreadChannel(name + Constants.BOT_CHANNEL_SUFFIX)
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
                 .complete();
-        List<String> factions = SelfPlaySetup.pickFactions(seats, ThreadLocalRandom.current());
+        List<String> factions = SelfPlaySetup.pickFactions(seats, RandomHelper.current());
         Game game;
         try {
             game = SelfPlaySetup.setUp(

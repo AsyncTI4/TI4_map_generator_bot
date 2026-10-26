@@ -277,7 +277,7 @@ public final class ButtonHelperTwilightsFall {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toCollection(ArrayList::new));
 
-            Collections.shuffle(slice);
+            Collections.shuffle(slice, RandomHelper.current());
             if (slice.get(1).getTile().getPlanetUnitHolders().isEmpty()
                     || slice.get(1).getTile().isAnomaly()) {
                 Collections.rotate(slice, 1);
@@ -428,6 +428,14 @@ public final class ButtonHelperTwilightsFall {
     @ButtonHandler("chooseHomeSystem_")
     public static void chooseHomeSystem(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String oldFactionHS = FrankenHomeService.getPlayerHsFaction(player);
+        if (oldFactionHS == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event,
+                    player.getRepresentation()
+                            + ", could not find your current home system on the map, so it can't be swapped yet."
+                            + " Ask the game admin to check that the map was built.");
+            return;
+        }
         DraftItem oldFactionItem = new HomeSystemDraftItem(oldFactionHS);
         FrankenButtonHandler.resolveFrankenItemRemove(event, player, oldFactionItem);
 

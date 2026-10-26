@@ -53,6 +53,27 @@ final class AiLane {
         return thinking;
     }
 
+    synchronized AiLane copy() {
+        AiLane copy = new AiLane(gameName);
+        copy.delegatedPresses.addAll(delegatedPresses);
+        seats.forEach((seatId, seat) -> copy.seats.put(seatId, seat.copy()));
+        copy.failures.addAll(failures);
+        copy.dueAt.set(dueAt.get());
+        copy.refereeAttempts.putAll(refereeAttempts);
+        copy.lastSeenModified = lastSeenModified;
+        copy.lastUndoIndex = lastUndoIndex;
+        copy.lastWatchdog = lastWatchdog;
+        copy.lastActionAt = lastActionAt;
+        copy.lastActorId = lastActorId;
+        copy.gameOverAnnounced = gameOverAnnounced;
+        copy.delegationRound = delegationRound;
+        copy.delegationsThisRound = delegationsThisRound;
+        copy.lastSlowWarning = lastSlowWarning;
+        copy.thinkingAborts = thinkingAborts;
+        copy.lastAbort = lastAbort;
+        return copy;
+    }
+
     synchronized void noteAbort(String summary) {
         thinkingAborts++;
         lastAbort = summary;

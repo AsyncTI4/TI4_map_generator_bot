@@ -65,10 +65,11 @@ public class AiRuntime {
 
     public static void forget(String gameName) {
         LANES.remove(gameName);
+        AiGameState.forget(gameName);
     }
 
     static void forget(AiLane lane) {
-        LANES.remove(lane.getGameName(), lane);
+        if (LANES.remove(lane.getGameName(), lane)) AiGameState.forget(lane.getGameName());
     }
 
     public static Optional<ThinkingStats> thinkingStats(String gameName) {

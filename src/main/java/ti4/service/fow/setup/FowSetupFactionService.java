@@ -31,6 +31,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.PatternHelper;
+import ti4.helpers.RandomHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
@@ -337,7 +338,7 @@ final class FowSetupFactionService {
         }
 
         List<FactionModel> pool = new ArrayList<>(FrankenDraft.getDraftableFactionsForGame(game));
-        Collections.shuffle(pool);
+        Collections.shuffle(pool, RandomHelper.current());
         if (pool.size() < count) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -359,7 +360,7 @@ final class FowSetupFactionService {
             List<String> offered;
             if (allowDuplicates) {
                 List<FactionModel> shuffledCopy = new ArrayList<>(pool);
-                Collections.shuffle(shuffledCopy);
+                Collections.shuffle(shuffledCopy, RandomHelper.current());
                 offered = shuffledCopy.subList(0, count).stream()
                         .map(FactionModel::getAlias)
                         .toList();
@@ -875,7 +876,7 @@ final class FowSetupFactionService {
         }
 
         List<String> availablePositions = new ArrayList<>(availableHomeSystemPositions(game));
-        Collections.shuffle(availablePositions);
+        Collections.shuffle(availablePositions, RandomHelper.current());
 
         if (availablePositions.size() < needsPosition.size()) {
             MessageHelper.sendMessageToChannel(

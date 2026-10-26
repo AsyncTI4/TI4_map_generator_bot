@@ -346,7 +346,7 @@ public final class DiscordantStarsHelper {
                     .toList());
         }
         List<String> tileToPullFromUnshuffled = new ArrayList<>(tilesToPullFrom);
-        Collections.shuffle(tilesToPullFrom);
+        Collections.shuffle(tilesToPullFrom, RandomHelper.current());
 
         if (tilesToPullFrom.size() < count) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from");
@@ -378,7 +378,7 @@ public final class DiscordantStarsHelper {
                 .toList());
 
         List<MiltyDraftTile> tileToPullFromUnshuffled = new ArrayList<>(unusedBlueTiles);
-        Collections.shuffle(unusedBlueTiles);
+        Collections.shuffle(unusedBlueTiles, RandomHelper.current());
 
         if (unusedBlueTiles.size() < count) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from");

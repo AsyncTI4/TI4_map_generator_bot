@@ -83,13 +83,14 @@ class ResearchPlanLogTest extends BaseTi4Test {
     }
 
     @Test
-    void isOnUnlessSwitchedOff() {
+    void isOffUnlessSwitchedOn() {
+        // Off by default: rebuilding every seat's plan on each harness step cost about a fifth of a game's CPU.
         System.clearProperty(ResearchPlanLog.PROPERTY);
-        assertThat(ResearchPlanLog.enabled()).isTrue();
+        assertThat(ResearchPlanLog.enabled()).isFalse();
 
-        System.setProperty(ResearchPlanLog.PROPERTY, "false");
+        System.setProperty(ResearchPlanLog.PROPERTY, "true");
         try {
-            assertThat(ResearchPlanLog.enabled()).isFalse();
+            assertThat(ResearchPlanLog.enabled()).isTrue();
         } finally {
             System.clearProperty(ResearchPlanLog.PROPERTY);
         }

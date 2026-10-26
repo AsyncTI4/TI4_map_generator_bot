@@ -15,6 +15,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.model.TileHelper;
@@ -45,7 +46,7 @@ public class OblivionTileHelper {
                             && !tileModel.isHyperlane();
                 })
                 .toList());
-        Collections.shuffle(unusedTiles);
+        Collections.shuffle(unusedTiles, RandomHelper.current());
 
         List<String> drawnTiles = new ArrayList<>();
         unusedTiles.stream()

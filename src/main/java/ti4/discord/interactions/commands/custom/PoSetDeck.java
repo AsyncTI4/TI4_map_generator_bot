@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 
@@ -42,7 +43,7 @@ class PoSetDeck extends GameStateSubcommand {
 
         if (!stage1IdList.isEmpty()) {
             if (shuffle) {
-                Collections.shuffle(stage1IdList);
+                Collections.shuffle(stage1IdList, RandomHelper.current());
             }
             getGame().setPublicObjectives1(stage1IdList);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Public objective stage 1 deck created.");
@@ -50,7 +51,7 @@ class PoSetDeck extends GameStateSubcommand {
 
         if (!stage2IdList.isEmpty()) {
             if (shuffle) {
-                Collections.shuffle(stage2IdList);
+                Collections.shuffle(stage2IdList, RandomHelper.current());
             }
             getGame().setPublicObjectives2(stage2IdList);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Public objective stage 2 deck created.");

@@ -22,6 +22,22 @@ class SearchMemoTest {
     }
 
     @Test
+    void outsideASearchRemembersForTheDecision() {
+        // The board does not change while a seat decides, so search values computed outside a search are kept for
+        // the rest of the decision instead of being recomputed by every caller.
+        AtomicInteger calls = new AtomicInteger();
+
+        try (DecisionMemo.Open ignored = DecisionMemo.open()) {
+            assertThat(count(calls, "a", 1)).isEqualTo(count(calls, "a", 1));
+        }
+        try (DecisionMemo.Open ignored = DecisionMemo.open()) {
+            count(calls, "a", 1);
+        }
+
+        assertThat(calls).hasValue(2);
+    }
+
+    @Test
     void computesOncePerKeyInsideAScope() {
         AtomicInteger calls = new AtomicInteger();
 

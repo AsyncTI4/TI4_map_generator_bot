@@ -2,6 +2,7 @@ package ti4.ai.tactical;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import ti4.ai.eval.BoardView;
 import ti4.game.Game;
@@ -24,6 +25,24 @@ public record FractureMarch(int round, String position) {
         } else if (of(game, seat).filter(march -> leavesTheMarch(march, plan)).isPresent()) {
             MARCHES.remove(key(game, seat));
         }
+    }
+
+    public static void forget(String gameName) {
+        MARCHES.keySet().removeIf(key -> key.startsWith(gameName + "|"));
+    }
+
+    public static Map<String, FractureMarch> snapshot(String gameName) {
+        String prefix = gameName + "|";
+        Map<String, FractureMarch> marches = new TreeMap<>();
+        MARCHES.forEach((key, march) -> {
+            if (key.startsWith(prefix)) marches.put(key.substring(prefix.length()), march);
+        });
+        return marches;
+    }
+
+    public static void restore(String gameName, Map<String, FractureMarch> marches) {
+        forget(gameName);
+        marches.forEach((faction, march) -> MARCHES.put(gameName + "|" + faction, march));
     }
 
     static void remember(Game game, Player seat, String position) {
