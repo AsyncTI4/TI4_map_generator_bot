@@ -41,6 +41,15 @@ class ExploreUse extends GameStateSubcommand {
 
         if (!Mapper.isValidExplore(id)) {
             MessageHelper.sendMessageToEventChannel(event, "Invalid ID specified: " + id);
+            return;
+        }
+
+        if (isHazardous(id) && event.getOption(Constants.PLANET) == null) {
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "`" + id
+                            + "` is a hazardous exploration card and resolves on a planet. Re-run the command with `planet` set.");
+            return;
         }
 
         if (!force && game.pickExplore(id) == null) {
@@ -81,6 +90,10 @@ class ExploreUse extends GameStateSubcommand {
             messageText +=
                     "\nThis card was drawn __forcefully__ (if the card wasn't in the deck, it was created from thin air).";
         ExploreService.resolveExplore(event, id, tile, planetName, messageText, player, game);
+    }
+
+    private static boolean isHazardous(String exploreId) {
+        return "hazardous".equalsIgnoreCase(Mapper.getExplore(exploreId).getType());
     }
 
     @Override
