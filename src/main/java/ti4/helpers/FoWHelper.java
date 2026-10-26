@@ -21,6 +21,8 @@ import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.FrameShiftBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.game.Game;
@@ -592,9 +594,13 @@ public final class FoWHelper {
         Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player, false, forDistance);
         adjacentPositions.addAll(wormholeAdjacencies);
 
-        Set<String> otherAdjacencies = getNonWormholeAdjacencies(game, position);
+        Set<String> otherAdjacencies = getNonWormholeAdjacencies(game, player, position);
         adjacentPositions.addAll(otherAdjacencies);
         AsgardLegendaryService.addBifrostBridgeAdjacencies(game, player, position, adjacentPositions);
+
+        if (forDistance) {
+            NatauAbilityHandler.addChaosTurbineAdjacencies(game, player, position, adjacentPositions);
+        }
 
         if (player != null
                 && (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
@@ -706,6 +712,9 @@ public final class FoWHelper {
                 if (SarcosaCommanderHandler.treatsAsAdjacent(game, player, position, tilePosition)) {
                     adjacentPositions.add(tilePosition);
                 }
+                if (NatauLeadersHandler.treatsAsAdjacent(game, player, position, tilePosition)) {
+                    adjacentPositions.add(tilePosition);
+                }
             }
         }
 
@@ -717,7 +726,7 @@ public final class FoWHelper {
         return adjacentPositions;
     }
 
-    private static Set<String> getNonWormholeAdjacencies(Game game, String position) {
+    private static Set<String> getNonWormholeAdjacencies(Game game, Player player, String position) {
         Set<String> adjacentPositions = new HashSet<>();
         Set<Tile> allTiles = new HashSet<>(game.getTileMap().values());
         Tile tile = game.getTileByPosition(position);
@@ -763,6 +772,12 @@ public final class FoWHelper {
                     case Constants.TOKEN_EGRESS -> adjToFeatures.add(Feature.ingress);
                 }
             }
+        }
+
+        if (player != null
+                && game.playerHasLeaderUnlockedOrAlliance(player, "nataucommander")
+                && tile.isAnomaly(game, player)) {
+            adjToFeatures.add(Feature.egress);
         }
 
         for (Tile t : allTiles) {

@@ -30,5 +30,35 @@
                 "alias": "mimetic_override"
             }
         ]
+    },
+    {
+        "alias": "amaluuns_strength_bonus",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "fracture_ingress_combat",
+        "scope": "",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "ability",
+                "alias": "amaluuns_strength"
+            }
+        ]
+    },
+    {
+        "alias": "chained_bonus",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "CONDITIONAL",
+        "condition": "fracture_anomaly_combat",
+        "scope": "fs",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "natau_flagship"
+            }
+        ]
     }
 ]

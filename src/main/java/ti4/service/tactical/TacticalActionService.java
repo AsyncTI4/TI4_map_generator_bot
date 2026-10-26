@@ -246,8 +246,7 @@ public class TacticalActionService {
                 "tyris",
                 "lunarium",
                 "zephyrion",
-                "vyserix",
-                "natau");
+                "vyserix");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
 
         if (tile.isFracture()) {
@@ -431,7 +430,7 @@ public class TacticalActionService {
             }
             boolean canSelect = (movedFrom || hasUnits)
                     && (!CommandCounterHelper.hasCC(event, player.getColor(), tile)
-                            || ButtonHelper.canMoveOutOfLockedSystems(player, game)
+                            || ButtonHelper.canMoveOutOfLockedSystems(player, game, tile)
                             || MonumentsDSButtonHandler.canMoveOutOfFreeholdSystem(game, player, tile)
                             || tile.getPosition().equalsIgnoreCase(game.getActiveSystem()));
             if (canSelect) {
