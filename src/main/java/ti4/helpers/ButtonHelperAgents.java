@@ -49,6 +49,7 @@ import ti4.model.ExploreModel;
 import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
+import ti4.model.WormholeModel.Wormhole;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -1611,8 +1612,8 @@ public final class ButtonHelperAgents {
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
         if ("ghostagent".equalsIgnoreCase(agent) && game.isFowMode()) {
-            Set<String> currentWhs = FoWHelper.getTileWHs(game, game.getActiveSystem());
-            if (!currentWhs.isEmpty() && !currentWhs.contains(Constants.DELTA)) {
+            Set<Wormhole> currentWhs = FoWHelper.getTileWHs(game, game.getActiveSystem());
+            if (!currentWhs.isEmpty() && !currentWhs.contains(Wormhole.DELTA)) {
                 game.setStoredValue("ghostagent_active", game.getActiveSystem());
             }
         }

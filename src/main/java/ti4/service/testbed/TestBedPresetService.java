@@ -368,6 +368,10 @@ public class TestBedPresetService {
         preset.getStored().forEach((key, value) -> {
             if (key.isBlank() || value.isBlank()) errors.add("preset: `stored` keys and values may not be blank.");
         });
+        preset.getGameOptions().forEach((key, value) -> {
+            String problem = TestBedComponentService.gameOptionProblem(key, value);
+            if (problem != null) errors.add("preset: " + problem);
+        });
         for (Seat seat : preset.allSeats()) {
             if (seat.getScoredObjectives() == null) continue;
             for (String objective : seat.getScoredObjectives()) {

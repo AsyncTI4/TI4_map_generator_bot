@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
 import ti4.game.Game;
@@ -29,6 +30,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
+import ti4.model.WormholeModel.Wormhole;
 
 final class SpaceTokens {
 
@@ -61,9 +63,13 @@ final class SpaceTokens {
             x = centerPosition.x;
             y = centerPosition.y;
         }
+        WormholeTokenMerge.DrawOrder drawOrder = game.isWormholeTokenMerge()
+                ? WormholeTokenMerge.apply(tokenList)
+                : new WormholeTokenMerge.DrawOrder(tokenList, Map.of());
         int index = 0;
-        for (String tokenID : tokenList) {
-            String tokenPath = ImageResources.tokenOrAttachment(tokenID);
+        for (String tokenID : drawOrder.tokens()) {
+            WormholeTokenMerge.Merged merged = drawOrder.merged().get(tokenID);
+            String tokenPath = merged != null ? tokenID : ImageResources.tokenOrAttachment(tokenID);
             if (game.isLiberationC4Mode()) {
                 tokenPath = tokenPath.replace("token_creuss", "token_crimsoncreuss");
                 tokenPath = tokenPath.replace("token_crimsoncreussepsilon", "token_creussepsilon");
@@ -78,7 +84,7 @@ final class SpaceTokens {
                 tokenPath = tokenPath.replace("token_frontier", "token_frontier_cpti");
             }
 
-            BufferedImage tokenImage = ImageHelper.read(tokenPath);
+            BufferedImage tokenImage = merged != null ? merged.image() : ImageHelper.read(tokenPath);
             if (tokenImage == null) return;
 
             if (Constants.TOKEN_PLANETS.contains(tokenName)) {
@@ -123,37 +129,49 @@ final class SpaceTokens {
                 }
                 g.drawImage(tokenImage, drawX, drawY, null);
                 drawTheodisiTokenCount(g, tokenPath, game, tile, drawX, drawY, tokenImage);
-                drawLawMarks(g, tokenPath, game, tile, drawX, drawY, tokenImage);
+                List<Wormhole> wormholes = merged != null ? merged.wormholes() : Mapper.getTokenWormholes(tokenID);
+                drawLawMarks(g, wormholes, game, tile, drawX, drawY, tokenImage);
             }
         }
     }
 
     private static void drawLawMarks(
-            Graphics2D g, String tokenPath, Game game, Tile tile, int drawX, int drawY, BufferedImage tokenImage) {
+            Graphics2D g,
+            List<Wormhole> wormholes,
+            Game game,
+            Tile tile,
+            int drawX,
+            int drawY,
+            BufferedImage tokenImage) {
         boolean reconstruction = LawWormholeMarks.isReconstructionInPlay(game);
         int offsetX = (tokenImage.getWidth() - 80) / 2;
         int offsetY = (tokenImage.getWidth() - 80) / 2;
-        String lowerPath = tokenPath.toLowerCase();
-        boolean alphaOrBeta = lowerPath.contains("alpha") || lowerPath.contains("beta");
+        boolean alpha = wormholes.contains(Wormhole.ALPHA);
+        boolean beta = wormholes.contains(Wormhole.BETA);
+        boolean alphaOrBeta = alpha || beta;
         if (LawWormholeMarks.isTravelBanInPlay(game) && alphaOrBeta) {
             g.drawImage(
                     LawWormholeMarks.blockedWormholeImage(reconstruction),
                     drawX + offsetX + 40,
                     drawY + offsetY + 40,
                     null);
-        } else if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)
-                && isWormholeToken(tokenPath)) {
+        } else if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED) && !wormholes.isEmpty()) {
             g.drawImage(
                     LawWormholeMarks.blockedWormholeImage(reconstruction && alphaOrBeta),
                     drawX + offsetX + 40,
                     drawY + offsetY + 40,
                     null);
         }
-        if (reconstruction && lowerPath.contains("alpha")) {
-            g.drawImage(LawWormholeMarks.reconstructionPartnerImage("beta"), drawX + offsetX, drawY + offsetY, null);
+        if (reconstruction && alpha) {
+            g.drawImage(
+                    LawWormholeMarks.reconstructionPartnerImage(Wormhole.BETA), drawX + offsetX, drawY + offsetY, null);
         }
-        if (reconstruction && lowerPath.contains("beta")) {
-            g.drawImage(LawWormholeMarks.reconstructionPartnerImage("alpha"), drawX + offsetX, drawY + offsetY, null);
+        if (reconstruction && beta) {
+            g.drawImage(
+                    LawWormholeMarks.reconstructionPartnerImage(Wormhole.ALPHA),
+                    drawX + offsetX + (alpha ? 40 : 0),
+                    drawY + offsetY,
+                    null);
         }
         if (LawWormholeMarks.isNexusLawInPlay(game)
                 && "82b".equals(tile.getTileID())
@@ -165,17 +183,6 @@ final class SpaceTokens {
                     drawY + offsetY + 40,
                     null);
         }
-    }
-
-    private static boolean isWormholeToken(String tokenPath) {
-        String path = tokenPath.toLowerCase();
-        return path.contains("wormhole")
-                || path.contains("token_creuss")
-                || path.contains("token_crimsoncreuss")
-                || path.contains("token_custom_eronous_wh")
-                || path.contains("token_gamma")
-                || path.contains("token_ion")
-                || path.contains("token_wh");
     }
 
     private static void drawTheodisiTokenCount(

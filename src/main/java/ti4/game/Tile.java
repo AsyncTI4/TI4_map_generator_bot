@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -630,29 +629,33 @@ public class Tile {
 
     @JsonIgnore
     public List<WormholeModel.Wormhole> getWormholes(Game game) {
-        Set<WormholeModel.Wormhole> whs = EnumSet.noneOf(WormholeModel.Wormhole.class);
-        List<WormholeModel.Wormhole> whs2 = new ArrayList<>(whs);
-        if (getTileModel().getWormholes() != null) {
-            Set<WormholeModel.Wormhole> tileWhs = getTileModel().getWormholes();
-            whs2.addAll(tileWhs.stream().filter(Objects::nonNull).toList());
-        }
-        for (String token : getSpaceUnitHolder().getTokenList()) {
-            if (token.contains("alpha") || token.contains("sigma_weirdway")) whs2.add(WormholeModel.Wormhole.ALPHA);
-            if (token.contains("beta") || token.contains("sigma_weirdway")) whs2.add(WormholeModel.Wormhole.BETA);
-            if (token.contains("gamma")) whs2.add(WormholeModel.Wormhole.GAMMA);
-        }
-        String ghostFlagshipColor;
-        for (Player p : game.getPlayers().values()) {
-            if (p.ownsUnit("ghost_flagship")
-                    || p.ownsUnit("sigma_creuss_flagship_1")
-                    || p.ownsUnit("sigma_creuss_flagship_2")) {
-                ghostFlagshipColor = p.getColor();
-                if (getSpaceUnitHolder().getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
-                    whs2.add(WormholeModel.Wormhole.DELTA);
-                }
+        return getWormholes(creussFlagshipColors(game));
+    }
+
+    @JsonIgnore
+    public List<WormholeModel.Wormhole> getWormholes(Collection<String> creussFlagshipColors) {
+        List<WormholeModel.Wormhole> wormholes = new ArrayList<>(Mapper.getWormholes(tileID));
+        for (UnitHolder unitHolder : unitHolders.values()) {
+            for (String token : unitHolder.getTokenList()) {
+                wormholes.addAll(Mapper.getTokenWormholes(token));
             }
         }
-        return whs2;
+        UnitHolder space = getSpaceUnitHolder();
+        for (String color : creussFlagshipColors) {
+            if (space != null && space.getUnitCount(UnitType.Flagship, color) > 0) {
+                wormholes.add(WormholeModel.Wormhole.DELTA);
+            }
+        }
+        return wormholes;
+    }
+
+    public static List<String> creussFlagshipColors(Game game) {
+        return game.getPlayers().values().stream()
+                .filter(p -> p.ownsUnit("ghost_flagship")
+                        || p.ownsUnit("sigma_creuss_flagship_1")
+                        || p.ownsUnit("sigma_creuss_flagship_2"))
+                .map(Player::getColor)
+                .toList();
     }
 
     @JsonIgnore

@@ -30,6 +30,7 @@ public class TestBedPreset {
     private Map<String, String> customHyperlanes = new LinkedHashMap<>();
     private List<String> fowOptions = new ArrayList<>();
     private Map<String, String> stored = new LinkedHashMap<>();
+    private Map<String, String> gameOptions = new LinkedHashMap<>();
     private Map<String, String> decks = new LinkedHashMap<>();
     private List<TestBedScript.Shortcut> shortcuts = new ArrayList<>();
 

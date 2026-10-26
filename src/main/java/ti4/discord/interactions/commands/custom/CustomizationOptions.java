@@ -80,6 +80,10 @@ class CustomizationOptions extends GameStateSubcommand {
         // anti-bombardment planets"));
         addOptions(
                 new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.WORMHOLE_TOKEN_MERGE,
+                "Draw the wormhole tokens in a system as one combined token"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TRANSACTION_METHOD, "Use the new transaction method"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BANNERS, "Show faction banner at start of turn"));
         addOptions(new OptionData(
@@ -176,6 +180,9 @@ class CustomizationOptions extends GameStateSubcommand {
 
         Boolean showG = event.getOption(Constants.SHOW_GEARS, null, OptionMapping::getAsBoolean);
         if (showG != null) game.setShowGears(showG);
+
+        Boolean mergeWormholes = event.getOption(Constants.WORMHOLE_TOKEN_MERGE, null, OptionMapping::getAsBoolean);
+        if (mergeWormholes != null) game.setWormholeTokenMerge(mergeWormholes);
 
         Boolean showBa = event.getOption(Constants.SHOW_BANNERS, null, OptionMapping::getAsBoolean);
         if (showBa != null) game.setShowBanners(showBa);
