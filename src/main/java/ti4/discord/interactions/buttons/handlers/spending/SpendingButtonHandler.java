@@ -28,6 +28,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.logging.BotLogger;
@@ -38,6 +39,9 @@ import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 class SpendingButtonHandler {
+
+    private static final String SPEND_PAGE_PREFIX = "spendPage_";
+    private static final int MAX_BUTTONS_PER_MESSAGE = 25;
 
     @ButtonHandler("reduceComm_")
     public static void reduceComm(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
@@ -166,27 +170,8 @@ class SpendingButtonHandler {
         if (buttonID.split("_").length > 1) {
             whatIsItFor = buttonID.split("_")[1];
         }
-
-        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, whatIsItFor);
-        for (ActionRow row : event.getMessage().getComponentTree().findAll(ActionRow.class)) {
-            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
-            for (ActionRowChildComponentUnion but : buttonRow) {
-                if (but instanceof Button butt) {
-                    if ("spendBlacktfCapturedInfantry".equals(butt.getCustomId())
-                            && !TwilightsFallMonumentsButtonHandler.canSpendBlacktfCapturedInfantry(game, player)) {
-                        continue;
-                    }
-                    if (!Helper.doesListContainButtonID(buttons, butt.getCustomId())) {
-                        buttons.add(butt);
-                    }
-                }
-            }
-        }
-        String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, whatIsItFor);
-        event.getMessage()
-                .editMessage(exhaustedMessage)
-                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
-                .queue(Consumers.nop(), BotLogger::catchRestError);
+        showSpendButtons(
+                event, player, game, whatIsItFor, Helper.buildSpentThingsMessage(player, game, whatIsItFor), 0);
     }
 
     @ButtonHandler("resetSpend")
@@ -201,26 +186,71 @@ class SpendingButtonHandler {
             whatIsItFor = buttonID.split("_")[2];
         }
         player.resetSpentThings();
-        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, whatIsItFor);
+        showSpendButtons(
+                event, player, game, whatIsItFor, Helper.buildSpentThingsMessage(player, game, whatIsItFor), 0);
+    }
+
+    @ButtonHandler(SPEND_PAGE_PREFIX)
+    public static void turnSpendPage(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String pageArgs = buttonID.substring(SPEND_PAGE_PREFIX.length());
+        int separator = pageArgs.lastIndexOf("_page");
+        String whatIsItFor = pageArgs.substring(0, separator);
+        int page = Integer.parseInt(pageArgs.substring(separator + "_page".length()));
+        showSpendButtons(event, player, game, whatIsItFor, event.getMessage().getContentRaw(), page);
+    }
+
+    private static void showSpendButtons(
+            ButtonInteractionEvent event, Player player, Game game, String whatIsItFor, String message, int page) {
+        List<Button> spendButtons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, player, whatIsItFor));
+        List<Button> fixedButtons = new ArrayList<>();
+        spendButtons.removeIf(button -> isResetSpendButton(button) && fixedButtons.add(button));
+        for (Button button : buttonsOnMessage(event)) {
+            if (isResetSpendButton(button)
+                    || button.getCustomId() == null
+                    || button.getCustomId().startsWith(SPEND_PAGE_PREFIX)
+                    || Helper.doesListContainButtonID(spendButtons, button.getCustomId())
+                    || Helper.doesListContainButtonID(fixedButtons, button.getCustomId())) {
+                continue;
+            }
+            if ("spendBlacktfCapturedInfantry".equals(button.getCustomId())
+                    && !TwilightsFallMonumentsButtonHandler.canSpendBlacktfCapturedInfantry(game, player)) {
+                continue;
+            }
+            fixedButtons.add(button);
+        }
+        event.getMessage()
+                .editMessage(message)
+                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(
+                        spendButtonPage(spendButtons, fixedButtons, whatIsItFor, page)))
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static List<Button> buttonsOnMessage(ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
         for (ActionRow row : event.getMessage().getComponentTree().findAll(ActionRow.class)) {
-            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
-            for (ActionRowChildComponentUnion but : buttonRow) {
-                if (but instanceof Button butt) {
-                    if ("spendBlacktfCapturedInfantry".equals(butt.getCustomId())
-                            && !TwilightsFallMonumentsButtonHandler.canSpendBlacktfCapturedInfantry(game, player)) {
-                        continue;
-                    }
-                    if (!buttons.contains(butt)) {
-                        buttons.add(butt);
-                    }
+            for (ActionRowChildComponentUnion component : row.getComponents()) {
+                if (component instanceof Button button) {
+                    buttons.add(button);
                 }
             }
         }
-        String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, whatIsItFor);
-        event.getMessage()
-                .editMessage(exhaustedMessage)
-                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
-                .queue(Consumers.nop(), BotLogger::catchRestError);
+        return buttons;
+    }
+
+    private static boolean isResetSpendButton(Button button) {
+        return button.getCustomId() != null && button.getCustomId().startsWith("resetSpend");
+    }
+
+    private static List<Button> spendButtonPage(
+            List<Button> spendButtons, List<Button> fixedButtons, String whatIsItFor, int page) {
+        List<Button> paged = NewStuffHelper.paginateWithPinnedButtons(
+                spendButtons, fixedButtons, SPEND_PAGE_PREFIX + whatIsItFor + "_", MAX_BUTTONS_PER_MESSAGE, page);
+        if (!paged.isEmpty()) {
+            return paged;
+        }
+        List<Button> truncated = new ArrayList<>(spendButtons);
+        truncated.addAll(fixedButtons);
+        return truncated.subList(0, Math.min(MAX_BUTTONS_PER_MESSAGE, truncated.size()));
     }
 
     @ButtonHandler("resetProducedThings")
