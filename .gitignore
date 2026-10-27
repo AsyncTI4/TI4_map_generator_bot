@@ -30,6 +30,7 @@ runlocally.ps1
 *test-save.txt
 src/test/resources/maps/undo
 src/test/resources/pm_json/
+src/test/resources/global_settings.json
 tibot.db
 scripts/__pycache__/
 scripts/**/__pycache__/
