@@ -40,8 +40,13 @@ import ti4.service.leader.agent.modules.homebrew.ArdentiaAgent;
 import ti4.service.leader.agent.modules.homebrew.AugersAgent;
 import ti4.service.leader.agent.modules.homebrew.AxisAgent;
 import ti4.service.leader.agent.modules.homebrew.BentorAgent;
+import ti4.service.leader.agent.modules.homebrew.CeldauriAgent;
+import ti4.service.leader.agent.modules.homebrew.CheiranAgent;
 import ti4.service.leader.agent.modules.homebrew.CymiaeAgent;
 import ti4.service.leader.agent.modules.homebrew.DihmohnAgent;
+import ti4.service.leader.agent.modules.homebrew.FlorzenAgent;
+import ti4.service.leader.agent.modules.homebrew.FogAllianceAgent;
+import ti4.service.leader.agent.modules.homebrew.FreeSystemsAgent;
 import ti4.service.leader.agent.modules.homebrew.GhotiAgent;
 import ti4.service.leader.agent.modules.homebrew.GledgeAgent;
 import ti4.service.leader.agent.modules.homebrew.HomebrewExhaustOnlyAgents;
@@ -74,6 +79,7 @@ import ti4.service.leader.agent.modules.homebrew.VanguardAgent;
 import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
 import ti4.service.leader.agent.modules.homebrew.VeldyrAgent;
 import ti4.service.leader.agent.modules.homebrew.VeylorAgent;
+import ti4.service.leader.agent.modules.homebrew.ZealotsAgent;
 import ti4.service.leader.agent.modules.homebrew.ZelianAgent;
 import ti4.service.leader.agent.modules.homebrew.ZephyrionAgent;
 import ti4.service.leader.agent.modules.twilightsfall.ExperimentalGenomeAgent;
@@ -156,7 +162,13 @@ class AgentModules {
                             new ArgentAgent(),
                             new MercerAgent(),
                             new L1z1xAgent(),
-                            new DihmohnAgent()),
+                            new DihmohnAgent(),
+                            new CheiranAgent(),
+                            new FreeSystemsAgent(),
+                            new FlorzenAgent(),
+                            new CeldauriAgent(),
+                            new ZealotsAgent(),
+                            new FogAllianceAgent()),
                     ExhaustOnlyAgents.ALL,
                     HomebrewExhaustOnlyAgents.ALL)
             .<AgentModule<?>>flatMap(List::stream)

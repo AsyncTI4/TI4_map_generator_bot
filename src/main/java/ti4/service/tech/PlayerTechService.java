@@ -79,9 +79,11 @@ import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.modules.JolNarAgent;
 import ti4.service.leader.agent.modules.homebrew.MirvedaAgent;
 import ti4.service.leader.agent.modules.homebrew.VeldyrAgent;
+import ti4.service.leader.agent.modules.homebrew.ZealotsAgent;
 import ti4.service.leader.agent.modules.twilightsfall.ExperimentalGenomeAgent;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.EndTurnService;
@@ -974,15 +976,12 @@ public class PlayerTechService {
 
         if (player.hasUnexhaustedLeader("zealotsagent")) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.gray(
-                    "exhaustAgent_zealotsagent_" + player.getFaction(), "Use Rhodun Agent", FactionEmojis.zealots));
+            buttons.add(ZealotsAgent.button(player));
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
-                            + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                            + "Priestess Tuh, the Rhodun"
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                            + " agent, to produce 1 ship at home or in a system where you have a technology specialty planet.",
+                            + " you may use " + AgentLifecycle.agentNameForHolder(game, player, "zealotsagent")
+                            + ", to produce 1 ship at home or in a system where you have a technology specialty planet.",
                     buttons);
         }
 

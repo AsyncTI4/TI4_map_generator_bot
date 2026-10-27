@@ -2,13 +2,11 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +14,6 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
 import ti4.discord.interactions.buttons.ids.AgentStepIds;
-import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -31,9 +28,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.Mapper;
-import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
-import ti4.service.RemoveCommandCounterService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -425,51 +420,9 @@ public final class ButtonHelperAgents {
         String agentTarget = rest.contains("_") ? rest.substring(rest.indexOf('_') + 1) : null;
         AgentLifecycle.exhaust(game, player, playerLeader, agent, agentTarget);
 
-        MessageChannel channel = player.getCorrectChannel();
-
-        // Clever Clever Ssruu
-        String ssruuClever = "";
-        String ssruuSlash = "";
-        if ("yssarilagent".equalsIgnoreCase(playerLeader.getId())
-                || "yssarilagent_br".equalsIgnoreCase(playerLeader.getId())) {
-            ssruuClever = "Clever Clever ";
-            ssruuSlash = "/Yssaril";
-        }
-
-        if ("fogallianceagent".equalsIgnoreCase(agent)) {
-            fogAllianceAgentStep1(game, player);
-        }
-
-        if ("cheiranagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
-                    + "Operator Kkavras, the Cheiran" + ssruuSlash + " agent.";
-            MessageHelper.sendMessageToChannel(channel, exhaustText);
-            resolveCheiranAgentStep1(player, game, rest);
-        }
-        if ("freesystemsagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
-                    + "Cordo Haved, the Free Systems" + ssruuSlash + " agent.";
-            MessageHelper.sendMessageToChannel(channel, exhaustText);
-            resolveFreeSystemsAgentStep1(player, game, rest);
-        }
-        if ("florzenagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Sal Gavda, the Florzen"
-                    + ssruuSlash + " agent.";
-            MessageHelper.sendMessageToChannel(channel, exhaustText);
-            resolveFlorzenAgentStep1(player, game, rest);
-        }
-        if ("celdauriagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
-                    + "George Nobin, the Celdauri" + ssruuSlash + " agent.";
-            MessageHelper.sendMessageToChannel(channel, exhaustText);
-            resolveCeldauriAgentStep2(player, game, event, rest);
-        }
-        if ("zealotsagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
-                    + "Priestess Tuh, the Rhodun" + ssruuSlash + " agent.";
-            MessageHelper.sendMessageToChannel(channel, exhaustText);
-            resolveZealotsAgentStep2(player, game, rest);
-        }
+        boolean viaYssaril = "yssarilagent".equalsIgnoreCase(playerLeader.getId())
+                || "yssarilagent_br".equalsIgnoreCase(playerLeader.getId());
+        String ssruuClever = viaYssaril ? "Clever Clever " : "";
         TkHelperGenomes.onExhaust(event, game, player, agent, ssruuClever, rest);
 
         AgentLifecycle.finish(event, game, player, agent);
@@ -714,21 +667,6 @@ public final class ButtonHelperAgents {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static List<Tile> getAdjacentTilesWithStructuresInThemAndNoCC(Player player, Game game, Tile origTile) {
-        List<Tile> tiles = new ArrayList<>();
-        List<String> adjTiles =
-                new ArrayList<>(FoWHelper.getAdjacentTiles(game, origTile.getPosition(), player, false));
-        for (String posTile : adjTiles) {
-            Tile adjTile = game.getTileByPosition(posTile);
-            if (adjTile != null
-                    && doesTileHaveAStructureInIt(player, adjTile)
-                    && !CommandCounterHelper.hasCC(player, adjTile)) {
-                tiles.add(adjTile);
-            }
-        }
-        return tiles;
-    }
-
     public static List<Tile> getAdjacentTilesWithStructuresInThem(Player player, Game game, Tile origTile) {
         List<Tile> tiles = new ArrayList<>();
         List<String> adjTiles =
@@ -740,103 +678,6 @@ public final class ButtonHelperAgents {
             }
         }
         return tiles;
-    }
-
-    public static List<String> getAttachments(Game game, Player player) {
-        List<String> legendaries = new ArrayList<>();
-        for (String planet : player.getPlanets()) {
-            if (planet.contains("custodia") || planet.contains("ghoti")) {
-                continue;
-            }
-            UnitHolder uh = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            if (uh == null) {
-                continue;
-            }
-            for (String token : uh.getTokenList()) {
-                if (!token.contains("attachment")) {
-                    continue;
-                }
-                token = token.replace(".png", "").replace("attachment_", "").replace("_", ";");
-
-                String s = uh.getName() + "_" + token;
-                if (!token.contains("sleeper") && !token.contains("control") && !legendaries.contains(s)) {
-                    legendaries.add(s);
-                }
-            }
-        }
-        return legendaries;
-    }
-
-    private static List<String> getAllControlledPlanetsInThisSystemAndAdjacent(Game game, Player player, Tile tile) {
-        List<String> legendaries = new ArrayList<>();
-        List<String> adjTiles =
-                new ArrayList<>(FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false));
-        adjTiles.add(tile.getPosition());
-        for (String adjTilePos : adjTiles) {
-            Tile adjTile = game.getTileByPosition(adjTilePos);
-            if (adjTile.isHomeSystem(game)) {
-                continue;
-            }
-            for (UnitHolder unitHolder : adjTile.getPlanetUnitHolders()) {
-                if (player.getPlanets().contains(unitHolder.getName())) {
-                    legendaries.add(unitHolder.getName());
-                }
-            }
-        }
-        return legendaries;
-    }
-
-    public static List<String> getAvailableLegendaryAbilities(Game game) {
-        List<String> legendaries = new ArrayList<>();
-        for (Player player : game.getRealPlayers()) {
-            for (String planet : player.getPlanets()) {
-                if (planet.contains("custodia") || planet.contains("ghoti")) {
-                    continue;
-                }
-                PlanetModel model = Mapper.getPlanet(planet);
-                if (model.getLegendaryAbilityText() != null
-                        && !model.getLegendaryAbilityText().isEmpty()) {
-                    legendaries.add(planet);
-                }
-            }
-        }
-        return legendaries;
-    }
-
-    private static void resolveCheiranAgentStep1(Player cheiran, Game game, String buttonID) {
-        Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(
-                    cheiran.getCorrectChannel(), "Could not resolve target player, please resolve manually.");
-            return;
-        }
-        List<Button> buttons = new ArrayList<>();
-        for (Tile tile : getCheiranAgentTiles(player, game)) {
-            buttons.add(Buttons.green(
-                    "cheiranAgentStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
-        }
-        String msg =
-                player.getRepresentationUnfogged() + ", choose the system you wish to remove your command token from.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
-    }
-
-    private static void resolveFreeSystemsAgentStep1(Player cheiran, Game game, String buttonID) {
-        Player player = cheiran;
-        if (buttonID.contains("_")) {
-            player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        }
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(
-                    cheiran.getCorrectChannel(), "Could not resolve target player, please resolve manually.");
-            return;
-        }
-        List<Button> buttons = new ArrayList<>();
-        for (String planet : getAvailableLegendaryAbilities(game)) {
-            buttons.add(Buttons.green("freeSystemsAgentStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
-        }
-        String msg = player.getRepresentationUnfogged()
-                + ", please choose the legendary planet ability that you wish to use.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
     @ButtonHandler("refreshWithOlradinAgent_")
@@ -858,42 +699,6 @@ public final class ButtonHelperAgents {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    private static void resolveFlorzenAgentStep1(Player cheiran, Game game, String buttonID) {
-        Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(
-                    cheiran.getCorrectChannel(), "Could not resolve target player, please resolve manually.");
-            return;
-        }
-        List<Button> buttons = new ArrayList<>();
-        for (String attachment : getAttachments(game, player)) {
-            String planet = attachment.split("_")[0];
-            String attach = attachment.split("_")[1];
-            buttons.add(Buttons.green(
-                    "florzenAgentStep2_" + attachment, attach + " on " + Helper.getPlanetRepresentation(planet, game)));
-        }
-        String msg = player.getRepresentationUnfogged() + ", please choose the attachment you wish to use.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
-    }
-
-    @ButtonHandler("florzenAgentStep2_")
-    public static void resolveFlorzenAgentStep2(
-            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String planet = buttonID.split("_")[1];
-        String attachment = buttonID.split("_")[2];
-        List<Button> buttons = new ArrayList<>();
-        for (String planet2 :
-                getAllControlledPlanetsInThisSystemAndAdjacent(game, player, game.getTileFromPlanet(planet))) {
-            buttons.add(Buttons.green(
-                    "florzenAgentStep3_" + planet + "_" + planet2 + "_" + attachment,
-                    Helper.getPlanetRepresentation(planet2, game)));
-        }
-        String msg = player.getRepresentationUnfogged()
-                + ", please choose the adjacent planet you wish to put the attachment on.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("florzenAgentStep3_")
     public static void resolveFlorzenAgentStep3(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
@@ -910,81 +715,6 @@ public final class ButtonHelperAgents {
                 + Helper.getPlanetRepresentation(planet2, game) + " using Florzen powers";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("freeSystemsAgentStep2_")
-    public static void resolveFreeSystemsAgentStep2(
-            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String planet = buttonID.split("_")[1];
-        PlanetExhaustAbility.doAction(event, player, planet, game, false);
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentationNoPing() + " chose to replicate the "
-                        + Helper.getPlanetRepresentation(planet, game)
-                        + " legendary ability by exhausting "
-                        + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                        + "Cordo Haved, the Free Systems"
-                        + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("cheiranAgentStep2_")
-    public static void resolveCheiranAgentStep2(
-            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String pos = buttonID.split("_")[1];
-        Tile origTile = game.getTileByPosition(pos);
-        RemoveCommandCounterService.fromTile(player.getColor(), origTile, game);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getFactionEmoji() + " removed 1 command token from "
-                        + origTile.getRepresentationForButtons(game, player) + " using "
-                        + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                        + "Operator Kkavras, the Cheiran"
-                        + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
-        List<Button> buttons = new ArrayList<>();
-        for (Tile tile : getAdjacentTilesWithStructuresInThemAndNoCC(player, game, origTile)) {
-            buttons.add(Buttons.green(
-                    "cheiranAgentStep3_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
-            if (getAdjacentTilesWithStructuresInThemAndNoCC(player, game, origTile)
-                            .size()
-                    == 1) {
-                resolveCheiranAgentStep3(player, game, event, "cheiranAgentStep3_" + tile.getPosition());
-                return;
-            }
-        }
-        String msg = player.getRepresentationUnfogged()
-                + ", please choose the adjacent tile that you wish to place your command token in.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("cheiranAgentStep3_")
-    private static void resolveCheiranAgentStep3(
-            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String pos = buttonID.split("_")[1];
-        Tile origTile = game.getTileByPosition(pos);
-        CommandCounterHelper.addCC(event, player, origTile, true);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getFactionEmoji() + " placed 1 command token in "
-                        + origTile.getRepresentationForButtons(game, player) + " using "
-                        + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                        + "Operator Kkavras, the Cheiran"
-                        + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
-        ButtonHelper.deleteMessage(event);
-    }
-
-    public static List<Tile> getCheiranAgentTiles(Player player, Game game) {
-        List<Tile> tiles = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (CommandCounterHelper.hasCC(player, tile)) {
-                if (!getAdjacentTilesWithStructuresInThemAndNoCC(player, game, tile)
-                        .isEmpty()) {
-                    tiles.add(tile);
-                }
-            }
-        }
-        return tiles;
     }
 
     @ButtonHandler("ghotiATG")
@@ -1024,132 +754,6 @@ public final class ButtonHelperAgents {
             ArborecButtonHandlers.resolveArboHeroBuild(game, player, event, "arboHeroBuild_" + tilePos);
         }
         ButtonHelper.deleteMessage(event);
-    }
-
-    private static void resolveZealotsAgentStep2(Player zealots, Game game, String buttonID) {
-        Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(
-                    zealots.getCorrectChannel(), "Could not resolve target player, please resolve manually.");
-            return;
-        }
-        List<Button> buttons = new ArrayList<>();
-        Set<String> addedPositions = new HashSet<>();
-
-        for (String planet : player.getPlanetsAllianceMode()) {
-            if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
-                continue;
-            }
-            Tile tile = game.getTileFromPlanet(planet);
-            if (tile == null || addedPositions.contains(tile.getPosition())) {
-                continue;
-            }
-            boolean techSkipSystemWithoutEnemyShips = !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
-                    && ButtonHelper.checkForTechSkips(game, planet);
-            if (techSkipSystemWithoutEnemyShips || tile.isHomeSystem(game)) {
-                addedPositions.add(tile.getPosition());
-                buttons.add(Buttons.green(
-                        "produceOneUnitInTile_" + tile.getPosition() + "_ZealotsAgent",
-                        tile.getRepresentationForButtons(game, player)));
-            }
-        }
-        String msg = player.getFactionEmojiOrColor()
-                + " may produce a unit in their home system or in a system with a technology specialty planet due to "
-                + (zealots.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "Priestess Tuh, the Rhodun" + (zealots.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                + " agent.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
-        if (game.isFowMode() && zealots != player) {
-            MessageHelper.sendMessageToChannel(zealots.getCorrectChannel(), msg);
-        }
-    }
-
-    private static void resolveCeldauriAgentStep2(
-            Player celdauri, Game game, GenericInteractionCreateEvent event, String buttonID) {
-        Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(
-                    celdauri.getCorrectChannel(), "Could not resolve target player, please resolve manually.");
-            return;
-        }
-        if (player.getCommodities() < 2 && player.getTg() < 2) {
-            MessageHelper.sendMessageToChannel(
-                    celdauri.getCorrectChannel(), "Player did not have the money, please resolve manually.");
-            return;
-        }
-        if (game.getActivePlayer() != player) {
-            MessageHelper.sendMessageToChannel(
-                    celdauri.getCorrectChannel(), "Target player is not active player, please resolve manually.");
-            return;
-        }
-        Tile tileAS = game.getTileByPosition(game.getActiveSystem());
-        if (tileAS == null) {
-            MessageHelper.sendMessageToChannel(
-                    celdauri.getCorrectChannel(), "Active system is null, please resolve manually.");
-            return;
-        }
-        List<Button> buttons = new ArrayList<>();
-        String option = "";
-        for (UnitHolder planet : tileAS.getPlanetUnitHolders()) {
-            if (player.getPlanetsAllianceMode().contains(planet.getName())) {
-                buttons.add(Buttons.green(
-                        "celdauriAgentStep3_" + planet.getName(),
-                        "Place 1 Space Dock on " + Helper.getPlanetRepresentation(planet.getName(), game)));
-                option = "celdauriAgentStep3_" + planet.getName();
-            }
-        }
-        if (buttons.size() == 1) {
-            resolveCeldauriAgentStep3(player, game, event, option);
-            return;
-        }
-
-        String msg =
-                player.getRepresentationUnfogged() + ", please choose the planet you wish to place 1 space dock on.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
-        if (event instanceof ButtonInteractionEvent event2) {
-            event2.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        }
-    }
-
-    @ButtonHandler("celdauriAgentStep3_")
-    private static void resolveCeldauriAgentStep3(
-            Player player, Game game, GenericInteractionCreateEvent event, String buttonID) {
-        String planet = buttonID.split("_")[1];
-        String msg = player.getFactionEmoji() + " put 1 space dock on "
-                + Helper.getPlanetRepresentation(planet, game) + " using "
-                + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "George Nobin, the Celdauri" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                + " agent.";
-        Tile tile = game.getTileFromPlanet(planet);
-        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 sd " + planet);
-        if (player.getCommodities() > 1) {
-            player.setCommodities(player.getCommodities() - 2);
-            msg += "\n" + player.getFactionEmoji() + " Paid 2 commodities";
-        } else {
-            msg += "\n" + player.getFactionEmoji() + " Paid 2 trade goods " + player.gainTG(-2) + ".";
-        }
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        CommanderUnlockCheckService.checkPlayer(player, "titans", "saar", "rohdhna", "cheiran", "celdauri");
-        if (tile != null && tile.isFracture()) {
-            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
-        }
-        AgendaHelper.ministerOfIndustryCheck(player, game, game.getTileFromPlanet(planet), event);
-        if (event instanceof ButtonInteractionEvent event2) {
-            event2.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        }
-    }
-
-    private static void fogAllianceAgentStep1(Game game, Player player) {
-        String msg =
-                player.getRepresentationUnfogged() + ", please choose the system that you wish to move ships from.";
-        List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (FoWHelper.playerHasShipsInSystem(player, tile) && !CommandCounterHelper.hasCC(player, tile)) {
-                buttons.add(Buttons.green(
-                        "fogAllianceAgentStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
-            }
-        }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
     @ButtonHandler("moveShipToAdjacentSystemStep1")
@@ -1210,41 +814,6 @@ public final class ButtonHelperAgents {
         }
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
-    }
-
-    @ButtonHandler("fogAllianceAgentStep2_")
-    public static void fogAllianceAgentStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String msg = player.getRepresentationUnfogged() + ", please choose the system you wish to move ships to.";
-        List<Button> buttons = new ArrayList<>();
-        String ogTile = buttonID.split("_")[1];
-        for (Tile tile : game.getTileMap().values()) {
-            for (Player p2 : game.getRealPlayers()) {
-                if (!player.getAllianceMembers().contains(p2.getFaction()) || player == p2) {
-                    continue;
-                }
-                if (FoWHelper.playerHasShipsInSystem(p2, tile) && !nextToOrInHostileHome(game, player, tile)) {
-                    buttons.add(Buttons.green(
-                            "fogAllianceAgentStep3_" + tile.getPosition() + "_" + ogTile,
-                            tile.getRepresentationForButtons(game, player)));
-                }
-            }
-        }
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
-    }
-
-    private static boolean nextToOrInHostileHome(Game game, Player player, Tile tile) {
-        for (Player p2 : game.getRealPlayers()) {
-            if (player.getAllianceMembers().contains(p2.getFaction()) || player == p2) {
-                continue;
-            }
-            for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
-                if (p2.getHomeSystemTile().getPosition().equalsIgnoreCase(pos2)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     @ButtonHandler("moveGloryStart_")
