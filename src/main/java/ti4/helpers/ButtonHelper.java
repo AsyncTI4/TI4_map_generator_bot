@@ -172,6 +172,8 @@ import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.leader.agent.modules.NaazAgent;
+import ti4.service.leader.agent.modules.homebrew.CheiranAgent;
+import ti4.service.leader.agent.modules.homebrew.FreeSystemsAgent;
 import ti4.service.leader.agent.modules.homebrew.KhraskAgent;
 import ti4.service.leader.agent.modules.homebrew.LiZhoAgent;
 import ti4.service.leader.agent.modules.homebrew.OlradinAgent;
@@ -5224,20 +5226,11 @@ public class ButtonHelper {
         if (player.hasUnexhaustedLeader("lizhoagent")) {
             endButtons.add(LiZhoAgent.button(player));
         }
-        if (player.hasUnexhaustedLeader("cheiranagent")
-                && !ButtonHelperAgents.getCheiranAgentTiles(player, game).isEmpty()) {
-            endButtons.add(Buttons.green(
-                    player.factionButtonChecker() + "exhaustAgent_cheiranagent_" + player.getFaction(),
-                    "Use Cheiran Agent",
-                    FactionEmojis.cheiran));
+        if (player.hasUnexhaustedLeader("cheiranagent")) {
+            CheiranAgent.button(game, player).ifPresent(endButtons::add);
         }
-        if (player.hasUnexhaustedLeader("freesystemsagent")
-                && !player.getReadiedPlanets().isEmpty()
-                && !ButtonHelperAgents.getAvailableLegendaryAbilities(game).isEmpty()) {
-            endButtons.add(Buttons.green(
-                    player.factionButtonChecker() + "exhaustAgent_freesystemsagent_" + player.getFaction(),
-                    "Use Free Systems Agent",
-                    FactionEmojis.freesystems));
+        if (player.hasUnexhaustedLeader("freesystemsagent")) {
+            FreeSystemsAgent.button(game, player).ifPresent(endButtons::add);
         }
         if (player.hasUnexhaustedLeader("crystellumagent")) {
             CrystellumLeadersHandler.addCrystellumAgentEndTurnButton(endButtons, game, player);

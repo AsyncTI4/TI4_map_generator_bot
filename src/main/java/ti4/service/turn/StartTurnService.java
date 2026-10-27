@@ -53,7 +53,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.ComponentActionHelper;
@@ -97,6 +96,7 @@ import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.HacanAgent;
 import ti4.service.leader.agent.modules.NekroAgent;
+import ti4.service.leader.agent.modules.homebrew.FlorzenAgent;
 import ti4.service.leader.agent.modules.homebrew.KolleccAgent;
 import ti4.service.leader.agent.modules.homebrew.PharadnAgent;
 import ti4.service.leader.agent.modules.homebrew.VadenAgent;
@@ -944,12 +944,8 @@ public class StartTurnService {
                 startButtons.add(Buttons.gray(
                         factionChecker + "exhaustTech_dscymiy", "Exhaust Recursive Worm", FactionEmojis.cymiae));
             }
-            if (player.hasUnexhaustedLeader("florzenagent")
-                    && !ButtonHelperAgents.getAttachments(game, player).isEmpty()) {
-                startButtons.add(Buttons.green(
-                        factionChecker + "exhaustAgent_florzenagent_" + player.getFaction(),
-                        "Use Florzen Agent",
-                        FactionEmojis.florzen));
+            if (player.hasUnexhaustedLeader("florzenagent")) {
+                FlorzenAgent.button(game, player).ifPresent(startButtons::add);
             }
             if (player.hasUnexhaustedLeader("vadenagent")) {
                 startButtons.add(VadenAgent.button(player));

@@ -3,7 +3,6 @@ package ti4.service.leader.agent.modules.homebrew;
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.ids.AgentStepIds;
 import ti4.game.Player;
 import ti4.helpers.Helper;
 import ti4.service.emoji.FactionEmojis;
@@ -33,7 +32,7 @@ public final class OlradinAgent extends TargetedAgent {
         Player target = use.payload();
         List<Button> planets = target.getExhaustedPlanets().stream()
                 .map(planet -> Buttons.green(
-                        target.factionButtonChecker() + AgentStepIds.flagCopy(READY_PREFIX + planet, use.viaYssaril()),
+                        ownedStepId(target, READY_PREFIX + planet, use.viaYssaril()),
                         "Ready " + Helper.getPlanetRepresentation(planet, use.game())))
                 .toList();
         return AgentOutcome.offer(

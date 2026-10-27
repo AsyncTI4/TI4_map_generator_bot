@@ -120,6 +120,7 @@ import ti4.service.leader.UydaiHeroService;
 import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.modules.EmpyreanAgent;
 import ti4.service.leader.agent.modules.L1z1xAgent;
+import ti4.service.leader.agent.modules.homebrew.CeldauriAgent;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
@@ -197,21 +198,14 @@ public final class ButtonHelperTacticalAction {
                 }
             }
             if (player.hasUnexhaustedLeader("celdauriagent")) {
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.gray(
-                        "exhaustAgent_celdauriagent_" + player.getFaction(),
-                        "Use Celdauri Agent",
-                        FactionEmojis.celdauri));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        player.getRepresentationUnfogged()
-                                + " you may use "
-                                + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "George Nobin, the Celdauri"
-                                + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                                + " agent to place 1 space dock for 2 trade goods or 2 commodities",
-                        buttons);
+                CeldauriAgent.button(game, player)
+                        .ifPresent(button -> MessageHelper.sendMessageToChannelWithButtons(
+                                player.getCorrectChannel(),
+                                player.getRepresentationUnfogged()
+                                        + " you may use "
+                                        + AgentLifecycle.agentNameForHolder(game, player, "celdauriagent")
+                                        + " to place 1 space dock for 2 trade goods or 2 commodities.",
+                                List.of(button, Buttons.red("deleteButtons", "Decline"))));
             }
             if (player.hasAbility("miniaturization")
                     || player.hasUnit("tk-keshnu")

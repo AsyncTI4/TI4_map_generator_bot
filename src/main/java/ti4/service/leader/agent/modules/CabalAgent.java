@@ -5,7 +5,6 @@ import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.ids.AgentStepIds;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -74,9 +73,8 @@ public final class CabalAgent extends TargetedAgent {
                 .filter(unit ->
                         ButtonHelper.getNumberOfUnitsOnTheBoard(use.game(), victim, unit.unit()) < unit.boardLimit())
                 .map(unit -> Buttons.red(
-                        use.user().factionButtonChecker()
-                                + AgentStepIds.flagCopy(
-                                        CAPTURE_PREFIX + unit.unit() + "_" + victim.getFaction(), use.viaYssaril()),
+                        ownedStepId(
+                                use.user(), CAPTURE_PREFIX + unit.unit() + "_" + victim.getFaction(), use.viaYssaril()),
                         "Capture " + unit.unit(),
                         unit.emoji()))
                 .toList();

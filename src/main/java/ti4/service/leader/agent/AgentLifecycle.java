@@ -123,6 +123,12 @@ public class AgentLifecycle {
         return agentName(game, leaderId, viaYssaril);
     }
 
+    public static String stepAgentName(Game game, Player presser, String leaderId, boolean viaYssaril) {
+        boolean presserHoldsIt =
+                presser.hasLeader(leaderId) || (viaYssaril && holdsOnlyAYssarilCopy(presser, leaderId));
+        return agentNameShownTo(game, presser, presserHoldsIt ? presser : null, leaderId, viaYssaril);
+    }
+
     static String agentName(Game game, String leaderId, boolean viaYssaril) {
         AgentModule<?> module = AgentModules.find(leaderId)
                 .orElseThrow(() -> new IllegalArgumentException("No agent module for " + leaderId));
@@ -141,7 +147,7 @@ public class AgentLifecycle {
         return !player.hasLeader(agentId) && YSSARIL_AGENTS.stream().anyMatch(player::hasLeader);
     }
 
-    private static boolean isYssarilAgent(String leaderId) {
+    public static boolean isYssarilAgent(String leaderId) {
         return YSSARIL_AGENTS.stream().anyMatch(leaderId::equalsIgnoreCase);
     }
 

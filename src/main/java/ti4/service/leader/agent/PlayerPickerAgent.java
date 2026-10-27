@@ -122,8 +122,7 @@ public abstract class PlayerPickerAgent extends AgentModule<PlayerPickerAgent.Ch
         Player user = use.user();
         List<Button> players =
                 AgendaRiderHelper.getPlayerOutcomeButtons(use.game(), null, PICK_STEP + agentId(), null).stream()
-                        .map(button -> button.withCustomId(user.factionButtonChecker()
-                                + AgentStepIds.flagCopy(button.getCustomId(), use.viaYssaril())))
+                        .map(button -> button.withCustomId(ownedStepId(user, button.getCustomId(), use.viaYssaril())))
                         .toList();
         return AgentOutcome.of(Message.addressedTo(
                 user, ", please choose the faction on which you wish to use " + use.agentName() + ".", players));
