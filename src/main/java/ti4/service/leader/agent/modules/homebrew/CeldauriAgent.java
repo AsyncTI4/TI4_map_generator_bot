@@ -16,6 +16,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
@@ -37,25 +38,19 @@ public final class CeldauriAgent extends TargetedAgent {
         super(ID, "George Nobin, the Celdauri");
     }
 
-    public static Button button(Player celdauri) {
-        return Buttons.gray(
+    public static Optional<Button> button(Game game, Player celdauri) {
+        if (whyNotUsableOn(game, celdauri).isPresent()) {
+            return Optional.empty();
+        }
+        return Optional.of(Buttons.gray(
                 ownedButtonId(celdauri, ID, celdauri.getFaction()),
                 useLabel(celdauri, ID, "Celdauri Agent"),
-                FactionEmojis.celdauri);
+                FactionEmojis.celdauri));
     }
 
     @Override
     public Optional<String> unusableReason(Game game, Player user, Player target) {
-        if (game.getActivePlayer() != target) {
-            return Optional.of(target.getFactionEmojiOrColor() + " is not the active player");
-        }
-        if (target.getCommodities() < COST && target.getTg() < COST) {
-            return Optional.of(target.getFactionEmojiOrColor() + " cannot pay 2 trade goods or 2 commodities");
-        }
-        if (planetsForASpaceDock(game, target).isEmpty()) {
-            return Optional.of(target.getFactionEmojiOrColor() + " controls no planet in the active system");
-        }
-        return Optional.empty();
+        return whyNotUsableOn(game, target);
     }
 
     @Override
@@ -86,8 +81,13 @@ public final class CeldauriAgent extends TargetedAgent {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that planet.");
             return;
         }
-        String agentName = AgentLifecycle.agentNameShownTo(
-                game, player, player.hasLeader(ID) ? player : null, ID, step.viaYssaril());
+        if (!canPay(player)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing() + ", you no longer have 2 trade goods or 2 commodities to pay.");
+            return;
+        }
+        String agentName = AgentLifecycle.stepAgentName(game, player, ID, step.viaYssaril());
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), placeSpaceDock(event, game, player, planet, agentName));
         ButtonHelper.deleteMessage(event);
@@ -99,9 +99,28 @@ public final class CeldauriAgent extends TargetedAgent {
             return List.of();
         }
         return activeSystem.getPlanetUnitHolders().stream()
+                .filter(planet -> player.getPlanetsAllianceMode().contains(planet.getName()))
+                .filter(planet -> planet.getUnitCount(UnitType.Spacedock, player.getColor()) == 0)
                 .map(UnitHolder::getName)
-                .filter(planet -> player.getPlanetsAllianceMode().contains(planet))
                 .toList();
+    }
+
+    private static Optional<String> whyNotUsableOn(Game game, Player target) {
+        if (game.getActivePlayer() != target) {
+            return Optional.of(target.getFactionEmojiOrColor() + " is not the active player");
+        }
+        if (!canPay(target)) {
+            return Optional.of(target.getFactionEmojiOrColor() + " cannot pay 2 trade goods or 2 commodities");
+        }
+        if (planetsForASpaceDock(game, target).isEmpty()) {
+            return Optional.of(
+                    target.getFactionEmojiOrColor() + " controls no planet without a space dock in the active system");
+        }
+        return Optional.empty();
+    }
+
+    private static boolean canPay(Player player) {
+        return player.getCommodities() >= COST || player.getTg() >= COST;
     }
 
     private static String placeSpaceDock(

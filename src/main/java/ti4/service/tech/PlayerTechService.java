@@ -975,14 +975,13 @@ public class PlayerTechService {
         }
 
         if (player.hasUnexhaustedLeader("zealotsagent")) {
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(ZealotsAgent.button(player));
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged()
-                            + " you may use " + AgentLifecycle.agentNameForHolder(game, player, "zealotsagent")
-                            + ", to produce 1 ship at home or in a system where you have a technology specialty planet.",
-                    buttons);
+            ZealotsAgent.button(game, player)
+                    .ifPresent(button -> MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(),
+                            player.getRepresentationUnfogged()
+                                    + " you may use " + AgentLifecycle.agentNameForHolder(game, player, "zealotsagent")
+                                    + ", to produce 1 ship at home or in a system where you have a technology specialty planet.",
+                            List.of(button)));
         }
 
         if (shareKnowledge) {

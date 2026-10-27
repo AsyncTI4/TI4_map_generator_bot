@@ -79,7 +79,7 @@ public final class CheiranAgent extends TargetedAgent {
                 event.getMessageChannel(),
                 player.getFactionEmojiOrColor() + " removed 1 command token from "
                         + origin.getRepresentationForButtons(game, player) + " using "
-                        + stepAgentName(game, player, step) + ".");
+                        + AgentLifecycle.stepAgentName(game, player, ID, step.viaYssaril()) + ".");
         List<Tile> destinations = destinations(game, player, origin);
         if (destinations.size() == 1) {
             placeToken(event, game, player, destinations.getFirst(), step);
@@ -116,7 +116,7 @@ public final class CheiranAgent extends TargetedAgent {
                 .toList();
     }
 
-    private static List<Tile> destinations(Game game, Player player, Tile origin) {
+    static List<Tile> destinations(Game game, Player player, Tile origin) {
         List<Tile> tiles = new ArrayList<>();
         for (String position : FoWHelper.getAdjacentTiles(game, origin.getPosition(), player, false)) {
             Tile tile = game.getTileByPosition(position);
@@ -136,12 +136,7 @@ public final class CheiranAgent extends TargetedAgent {
                 event.getMessageChannel(),
                 player.getFactionEmojiOrColor() + " placed 1 command token in "
                         + destination.getRepresentationForButtons(game, player) + " using "
-                        + stepAgentName(game, player, step) + ".");
+                        + AgentLifecycle.stepAgentName(game, player, ID, step.viaYssaril()) + ".");
         ButtonHelper.deleteMessage(event);
-    }
-
-    private static String stepAgentName(Game game, Player player, AgentStepIds.Parsed step) {
-        return AgentLifecycle.agentNameShownTo(
-                game, player, player.hasLeader(ID) ? player : null, ID, step.viaYssaril());
     }
 }

@@ -3,6 +3,7 @@ package ti4.service.leader.agent.modules.homebrew;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
@@ -26,11 +27,23 @@ public final class ZealotsAgent extends TargetedAgent {
         super(ID, "Priestess Tuh, the Rhodun");
     }
 
-    public static Button button(Player zealots) {
-        return Buttons.gray(
+    public static Optional<Button> button(Game game, Player zealots) {
+        if (productionSystems(game, zealots).isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(Buttons.gray(
                 ownedButtonId(zealots, ID, zealots.getFaction()),
                 useLabel(zealots, ID, "Rhodun Agent"),
-                FactionEmojis.zealots);
+                FactionEmojis.zealots));
+    }
+
+    @Override
+    public Optional<String> unusableReason(Game game, Player user, Player target) {
+        if (productionSystems(game, target).isEmpty()) {
+            return Optional.of(target.getFactionEmojiOrColor()
+                    + " has no home system or technology specialty system to produce a ship in");
+        }
+        return Optional.empty();
     }
 
     @Override
@@ -38,16 +51,14 @@ public final class ZealotsAgent extends TargetedAgent {
         Player target = use.payload();
         List<Button> systems = productionSystems(use.game(), target).stream()
                 .map(tile -> Buttons.green(
-                        target.factionButtonChecker() + PRODUCE_STEP + tile.getPosition() + PRODUCTION_REASON,
+                        ownedStepId(target, PRODUCE_STEP + tile.getPosition() + PRODUCTION_REASON, false),
                         tile.getRepresentationForButtons(use.game(), target)))
                 .toList();
-        return AgentOutcome.offer(
-                Message.addressedTo(
-                        target,
-                        ", you may produce 1 ship in your home system or in a system with a technology specialty"
-                                + " planet you control, due to " + use.agentNameFor(target) + ".",
-                        systems),
-                use.noteToUser(target, " has no system to produce a ship in with " + use.agentName() + "."));
+        return AgentOutcome.of(Message.addressedTo(
+                target,
+                ", you may produce 1 ship in your home system or in a system with a technology specialty"
+                        + " planet you control, due to " + use.agentNameFor(target) + ".",
+                systems));
     }
 
     static List<Tile> productionSystems(Game game, Player player) {

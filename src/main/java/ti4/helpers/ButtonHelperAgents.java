@@ -43,6 +43,7 @@ import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.modules.ArtunoAgent;
 import ti4.service.leader.agent.modules.CabalAgent;
 import ti4.service.leader.agent.modules.SardakkAgent;
+import ti4.service.leader.agent.modules.homebrew.FlorzenAgent;
 import ti4.service.planet.PlanetService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -412,7 +413,6 @@ public final class ButtonHelperAgents {
         if (agent.contains("_")) {
             agent = agent.substring(0, agent.indexOf('_'));
         }
-        // Leader playerLeader = player.getLeaderByIdPreferReadied(agent).orElse(null);
         Leader playerLeader = player.getLeader(agent).orElse(null);
         if (playerLeader == null || AgentLifecycle.refuseIfExhausted(event, player, playerLeader)) {
             return;
@@ -420,10 +420,13 @@ public final class ButtonHelperAgents {
         String agentTarget = rest.contains("_") ? rest.substring(rest.indexOf('_') + 1) : null;
         AgentLifecycle.exhaust(game, player, playerLeader, agent, agentTarget);
 
-        boolean viaYssaril = "yssarilagent".equalsIgnoreCase(playerLeader.getId())
-                || "yssarilagent_br".equalsIgnoreCase(playerLeader.getId());
-        String ssruuClever = viaYssaril ? "Clever Clever " : "";
-        TkHelperGenomes.onExhaust(event, game, player, agent, ssruuClever, rest);
+        TkHelperGenomes.onExhaust(
+                event,
+                game,
+                player,
+                agent,
+                AgentLifecycle.isYssarilAgent(playerLeader.getId()) ? "Clever Clever " : "",
+                rest);
 
         AgentLifecycle.finish(event, game, player, agent);
     }
@@ -689,12 +692,7 @@ public final class ButtonHelperAgents {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getFactionEmoji() + " readied " + Helper.getPlanetRepresentation(planetName, game) + " with "
-                        + AgentLifecycle.agentNameShownTo(
-                                game,
-                                player,
-                                player.hasLeader("olradinagent") ? player : null,
-                                "olradinagent",
-                                step.viaYssaril())
+                        + AgentLifecycle.stepAgentName(game, player, "olradinagent", step.viaYssaril())
                         + ".");
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -705,15 +703,16 @@ public final class ButtonHelperAgents {
         String planet = buttonID.split("_")[1];
         String planet2 = buttonID.split("_")[2];
         String attachment = buttonID.replace("florzenAgentStep3_" + planet + "_" + planet2 + "_", "");
-        attachment = attachment.replace(";", "_");
-        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        UnitHolder uH2 = ButtonHelper.getUnitHolderFromPlanetName(planet2, game);
-        uH.removeToken("attachment_" + attachment + ".png");
-        uH2.addToken("attachment_" + attachment + ".png");
-        String msg = player.getRepresentationUnfogged() + " removed " + attachment + " from "
-                + Helper.getPlanetRepresentation(planet, game) + " and put it on "
-                + Helper.getPlanetRepresentation(planet2, game) + " using Florzen powers";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        if (!FlorzenAgent.moveAttachment(game, planet, planet2, attachment)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "That attachment is no longer there, please resolve manually.");
+            return;
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getFactionEmojiOrColor() + " removed " + attachment.replace(";", "_") + " from "
+                        + Helper.getPlanetRepresentation(planet, game) + " and put it on "
+                        + Helper.getPlanetRepresentation(planet2, game) + " using Florzen powers.");
         ButtonHelper.deleteMessage(event);
     }
 

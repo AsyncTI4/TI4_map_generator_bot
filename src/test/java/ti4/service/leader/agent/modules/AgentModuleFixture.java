@@ -76,6 +76,12 @@ public final class AgentModuleFixture {
         assertThat(button.getLabel()).hasSizeLessThanOrEqualTo(DISCORD_LABEL_LIMIT);
     }
 
+    public static void assertOwnedBy(Button button, Player owner) {
+        assertThat(ComponentIdEnvelope.decode(button.getCustomId()).ownerFaction())
+                .isEqualTo(owner.getFaction());
+        assertThat(button.getCustomId()).hasSizeLessThanOrEqualTo(DISCORD_ID_LIMIT);
+    }
+
     // A follow-up step button: only the owner can press it, and it carries the Clever Clever flag when it should.
     public static void assertOwnedStep(Button button, Player owner, boolean viaYssaril) {
         ComponentIdEnvelope envelope = ComponentIdEnvelope.decode(button.getCustomId());

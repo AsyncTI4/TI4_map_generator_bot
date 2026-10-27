@@ -2,12 +2,12 @@ package ti4.service.leader.agent.modules;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ti4.service.leader.agent.modules.AgentModuleFixture.assertOwnedAgentButton;
+import static ti4.service.leader.agent.modules.AgentModuleFixture.assertOwnedBy;
 
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import org.junit.jupiter.api.Test;
 import ti4.discord.interactions.routing.ComponentIdEnvelope;
-import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
@@ -323,11 +323,6 @@ class TilePayloadAgentsTest extends BaseTi4Test {
 
         assertThat(handlerIds(outcome.messages().getFirst()))
                 .containsExactly("mitoMechPlacement_" + ADJACENT + "_" + Constants.SPACE + "_l1z1x");
-    }
-
-    private static void assertOwnedBy(Button button, Player owner) {
-        assertThat(ComponentIdEnvelope.decode(button.getCustomId()).ownerFaction())
-                .isEqualTo(owner.getFaction());
     }
 
     private static List<String> handlerIds(Message message) {

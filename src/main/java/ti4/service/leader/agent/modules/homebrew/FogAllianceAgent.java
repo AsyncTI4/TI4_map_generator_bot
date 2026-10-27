@@ -36,6 +36,9 @@ public final class FogAllianceAgent extends UntargetedAgent {
         if (originSystems(game, user).isEmpty()) {
             return Optional.of("You have no ships in a system without your command token");
         }
+        if (destinations(game, user).isEmpty()) {
+            return Optional.of("No alliance member has ships in a system you can move to");
+        }
         return Optional.empty();
     }
 
@@ -44,7 +47,7 @@ public final class FogAllianceAgent extends UntargetedAgent {
         Player user = use.user();
         List<Button> systems = originSystems(use.game(), user).stream()
                 .map(tile -> Buttons.green(
-                        user.factionButtonChecker() + DESTINATION_STEP + tile.getPosition(),
+                        ownedStepId(user, DESTINATION_STEP + tile.getPosition(), false),
                         tile.getRepresentationForButtons(use.game(), user)))
                 .toList();
         return AgentOutcome.of(
@@ -56,7 +59,7 @@ public final class FogAllianceAgent extends UntargetedAgent {
         String origin = StringUtils.substringAfter(buttonID, DESTINATION_STEP);
         List<Button> buttons = destinations(game, player).stream()
                 .map(tile -> Buttons.green(
-                        player.factionButtonChecker() + MOVE_STEP + tile.getPosition() + "_" + origin,
+                        ownedStepId(player, MOVE_STEP + tile.getPosition() + "_" + origin, false),
                         tile.getRepresentationForButtons(game, player)))
                 .toList();
         String message = buttons.isEmpty()

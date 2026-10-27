@@ -33,8 +33,7 @@ public final class FreeSystemsAgent extends SelfOrTargetedAgent {
     }
 
     public static Optional<Button> button(Game game, Player freeSystems) {
-        if (freeSystems.getReadiedPlanets().isEmpty()
-                || legendaryAbilities(game).isEmpty()) {
+        if (legendaryAbilities(game).isEmpty()) {
             return Optional.empty();
         }
         return Optional.of(Buttons.green(
@@ -72,8 +71,7 @@ public final class FreeSystemsAgent extends SelfOrTargetedAgent {
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " chose to replicate the "
                         + Helper.getPlanetRepresentation(planet, game) + " legendary ability with "
-                        + AgentLifecycle.agentNameShownTo(
-                                game, player, player.hasLeader(ID) ? player : null, ID, step.viaYssaril())
+                        + AgentLifecycle.stepAgentName(game, player, ID, step.viaYssaril())
                         + ".");
         ButtonHelper.deleteMessage(event);
     }
