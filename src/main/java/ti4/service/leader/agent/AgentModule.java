@@ -1,19 +1,26 @@
 package ti4.service.leader.agent;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.discord.interactions.buttons.ids.AgentStepIds;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.AgendaRiderHelper;
+import ti4.helpers.ButtonHelper;
 import ti4.model.LeaderModel;
 import ti4.model.Mapper;
 import ti4.service.emoji.TI4Emoji;
+import ti4.service.leader.agent.AgentOutcome.Message;
 
 public abstract class AgentModule<P> {
+
+    private static final String CONTENT_FOR_EMPTY_MESSAGE = "Combat";
 
     private final String agentId;
     private final String displayName;
@@ -57,6 +64,27 @@ public abstract class AgentModule<P> {
 
     protected static String ownedButtonId(Player owner, String agentId, String... payloadSegments) {
         return owner.factionButtonChecker() + AgentButtonIds.format(agentId, payloadSegments);
+    }
+
+    protected static void offerUnitOwnerPicker(
+            ButtonInteractionEvent event, Game game, Player holder, String agentId, String position) {
+        AgentOutcome outcome = AgentOutcome.of(Message.addressedTo(
+                holder,
+                ", please choose the faction to give " + AgentLifecycle.agentNameForHolder(game, holder, agentId)
+                        + " to.",
+                unitOwnerButtons(game, holder, agentId, position)));
+        if (event.getMessage().getContentRaw().isEmpty()) {
+            outcome = outcome.withPressedMessageEdit(CONTENT_FOR_EMPTY_MESSAGE);
+        }
+        AgentLifecycle.deliver(outcome, event, holder);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    protected static List<Button> unitOwnerButtons(Game game, Player holder, String agentId, String position) {
+        return AgendaRiderHelper.getPlayerOutcomeButtons(game, null, AgentButtonIds.format(agentId, position), null)
+                .stream()
+                .map(button -> button.withCustomId(holder.factionButtonChecker() + button.getCustomId()))
+                .toList();
     }
 
     protected static String ownedStepId(Player owner, String stepId, boolean viaYssaril) {

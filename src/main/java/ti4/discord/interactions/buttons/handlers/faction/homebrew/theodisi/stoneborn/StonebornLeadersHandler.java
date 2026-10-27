@@ -24,7 +24,7 @@ import ti4.model.Mapper;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 
 @UtilityClass
 public class StonebornLeadersHandler {
@@ -128,7 +128,7 @@ public class StonebornLeadersHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        ExhaustLeaderService.exhaustLeader(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, agentID);
         offerHazorusFragmentPurge(game, agentOwner, target, agentID);
         ButtonHelper.deleteTheOneButton(event);
     }

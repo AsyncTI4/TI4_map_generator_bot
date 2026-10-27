@@ -103,7 +103,6 @@ import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.helpers.thundersedge.TeHelperUnits;
-import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.tile.SystemContextImage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -122,6 +121,7 @@ import ti4.service.leader.agent.modules.YinAgent;
 import ti4.service.leader.agent.modules.homebrew.HomebrewExhaustOnlyAgents;
 import ti4.service.leader.agent.modules.homebrew.KjalengardAgent;
 import ti4.service.leader.agent.modules.homebrew.KortaliAgent;
+import ti4.service.leader.agent.modules.homebrew.tknova.SplittingGenomeAgent;
 import ti4.service.planet.JotunheimLegendaryService;
 import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
@@ -2054,7 +2054,7 @@ public class StartCombatService {
                 buttons.add(YinAgent.offerButton(agentHolder, pos));
             }
 
-            buttons.addAll(TkHelperGenomes.getGeneralCombatButtons(game, pos, p1, p2, agentHolder, factionChecker));
+            SplittingGenomeAgent.combatOffer(game, agentHolder, p1, pos).ifPresent(buttons::add);
 
             if ((!game.isFowMode() || agentHolder == p1)
                     && (isSpaceCombat || !game.isTwilightsFallMode())

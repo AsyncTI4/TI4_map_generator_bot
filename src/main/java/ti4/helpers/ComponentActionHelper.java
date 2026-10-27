@@ -65,6 +65,7 @@ import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.relic.BookOfLatviniaService;
 import ti4.service.relic.MutagenService;
 import ti4.service.relic.QuantumEntanglerService;
@@ -709,7 +710,7 @@ public class ComponentActionHelper {
                         String message = p1.getRepresentationUnfogged() + ", please choose the user of the agent.";
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     } else {
-                        ButtonHelperAgents.exhaustAgent(buttonID, event, game, p1);
+                        AgentLifecycle.press(buttonID, event, game, p1);
                     }
                 } else if (buttonID.contains("hero")) {
                     PlayHeroService.playHero(

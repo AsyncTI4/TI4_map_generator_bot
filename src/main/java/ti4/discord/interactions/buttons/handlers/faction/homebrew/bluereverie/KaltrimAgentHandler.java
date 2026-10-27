@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.Mapper;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 
 @UtilityClass
 public class KaltrimAgentHandler {
@@ -44,7 +44,7 @@ public class KaltrimAgentHandler {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "Keda Demas can no longer be used on that player.");
             return;
         }
-        ExhaustLeaderService.exhaustLeader(game, agentOwner, agentOwner.unsafeGetLeader(AGENT));
+        AgentLifecycle.spend(game, agentOwner, AGENT);
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),
                 target.getRepresentation() + ", gain 1 command token due to Keda Demas, the Kaltrim agent.",

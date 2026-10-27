@@ -20,7 +20,6 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Administra
 import ti4.discord.interactions.buttons.handlers.commandcounter.CommandCounterButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimAgentHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
@@ -60,6 +59,7 @@ import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.strategycard.StrategyCardMessageService;
@@ -1651,8 +1651,7 @@ public final class ButtonHelperSCs {
                             + Helper.getSCName(scNum, game) + "**.");
             Leader playerLeader = player.unsafeGetLeader("mahactagent");
             if (playerLeader != null) {
-                playerLeader.setExhausted(true);
-                RevenantBreakthroughHandler.exhaustRevenantRisingForAttachedAgent(game, player, playerLeader);
+                AgentLifecycle.spend(game, player, "mahactagent");
                 for (Player p2 : game.getPlayers().values()) {
                     for (Integer sc2 : p2.getSCs()) {
                         if (sc2 == scNum) {

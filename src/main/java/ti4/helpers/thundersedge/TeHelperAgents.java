@@ -34,7 +34,7 @@ import ti4.service.RemoveCommandCounterService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.LeaderEmojis;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
@@ -228,39 +228,17 @@ public final class TeHelperAgents {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             Player p3 = game.getPlayerFromColorOrFaction(matcher.group("faction"));
 
-            player.getLeaderByID("naaluagent-te").ifPresent(zeu -> {
-                ExhaustLeaderService.exhaustLeader(game, player, zeu);
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentationNoPing() + " exhausted "
-                                + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "Z'eu ΩΩ, the Naalu" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                                + " to remove the just-placed command token from " + tile.getRepresentationForButtons()
-                                + ".");
-                RemoveCommandCounterService.fromTile(event, p3, tile);
-            });
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
-                    List<Button> buttons2 = new ArrayList<>();
-                    String msg;
-                    if (game.isTwilightsFallMode()) {
-                        buttons2.add(Buttons.green(
-                                p2.factionButtonChecker() + "useTCS_naaluagent-te_" + player.getFaction(),
-                                "Spend A Command Token To Ready Limit Genome"));
-                        buttons2.add(Buttons.red(p2.factionButtonChecker() + "deleteButtons", "Decline"));
-                        msg = p2.getRepresentationUnfogged()
-                                + " you have the opportunity to spend a command token via _Temporal Command Suite_ to ready _Limit Genome_, and potentially resolve a transaction.";
-                    } else {
-                        buttons2.add(Buttons.green(
-                                p2.factionButtonChecker() + "exhaustTCS_naaluagent-te_" + player.getFaction(),
-                                "Exhaust Temporal Command Suite to Ready Naalu Agent"));
-                        buttons2.add(Buttons.red(p2.factionButtonChecker() + "deleteButtons", "Decline"));
-                        msg = p2.getRepresentationUnfogged()
-                                + ", you have the opportunity to exhaust _Temporal Command Suite_ to ready Z'eu ΩΩ, and potentially resolve a transaction.";
-                    }
-                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons2);
-                }
+            if (player.getLeaderByID("naaluagent-te").isEmpty()) {
+                return;
             }
+            AgentLifecycle.spend(game, player, "naaluagent-te");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + " exhausted "
+                            + AgentLifecycle.agentNameForHolder(game, player, "naaluagent-te")
+                            + " to remove the just-placed command token from " + tile.getRepresentationForButtons()
+                            + ".");
+            RemoveCommandCounterService.fromTile(event, p3, tile);
         });
         ButtonHelper.deleteMessage(event);
     }

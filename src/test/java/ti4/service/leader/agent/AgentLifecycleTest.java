@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -94,14 +95,55 @@ class AgentLifecycleTest extends BaseTi4Test {
         // Exhausting needs the Spring context, so the agent is already exhausted and the press is refused.
         mentak.getLeader("mentakagent").orElseThrow().setExhausted(true);
 
-        assertThat(AgentLifecycle.resolve("exhaustAgent_mentakagent_pi_hacan", null, game, mentak))
+        assertThat(AgentLifecycle.resolveWithModule(
+                        AgentButtonIds.parse("exhaustAgent_mentakagent_pi_hacan"), null, game, mentak))
                 .isTrue();
     }
 
     @Test
-    void anAgentWithoutAModuleIsLeftToTheLegacyChain() {
-        assertThat(AgentLifecycle.resolve("exhaustAgent_" + NOT_AN_AGENT_MODULE, null, game, mentak))
+    void anAgentWithoutAModuleIsNotResolvedByOne() {
+        assertThat(AgentLifecycle.resolveWithModule(
+                        AgentButtonIds.parse("exhaustAgent_" + NOT_AN_AGENT_MODULE), null, game, mentak))
                 .isFalse();
+    }
+
+    @Test
+    void anAgentWithoutAModuleIsNamedFromItsLeaderCardAndFaction() {
+        assertThat(AgentLifecycle.cardName(game, "mahactagent")).isEqualTo("Jae Mir Kan, the Mahact");
+        assertThat(AgentLifecycle.agentName(game, "naaluagent-te", false))
+                .startsWith("Z'eu")
+                .endsWith(", the Naalu agent");
+    }
+
+    @Test
+    void spendingACleverCleverCopyExhaustsTheYssarilAgentWithoutTheSpringContext() {
+        Player yssaril = game.addPlayer("yssarilUser", "Yssaril Player");
+        yssaril.setFaction(game, "yssaril");
+        yssaril.setColor("blue");
+
+        AgentLifecycle.spend(game, yssaril, "mentakagent");
+
+        assertThat(yssaril.getLeader("yssarilagent").orElseThrow().isExhausted())
+                .isTrue();
+        assertThat(mentak.getLeader("mentakagent").orElseThrow().isExhausted()).isFalse();
+    }
+
+    @Test
+    void temporalCommandSuiteLabelsFitInAButtonEvenForCleverCleverCopies() {
+        for (boolean twilightsFall : List.of(false, true)) {
+            game.setTwilightsFallMode(twilightsFall);
+            for (AgentModule<?> module : AgentModules.ALL) {
+                for (String leaderId : leaderIds(module)) {
+                    String label = AgentLifecycle.temporalCommandSuiteLabel(
+                            game, AgentLifecycle.agentName(game, leaderId, true));
+                    assertThat(label).as(leaderId).hasSizeLessThanOrEqualTo(80);
+                }
+            }
+        }
+        game.setFowMode(true);
+        Player other = game.addPlayer("otherUser", "Other Player");
+        assertThat(AgentLifecycle.agentNameShownTo(game, other, mentak, "mentakagent", false))
+                .isEqualTo("an agent");
     }
 
     @Test
@@ -132,7 +174,7 @@ class AgentLifecycleTest extends BaseTi4Test {
 
         for (AgentModule<?> module : AgentModules.ALL) {
             for (String leaderId : leaderIds(module)) {
-                String cardName = AgentLifecycle.cardName(game, module, leaderId);
+                String cardName = AgentLifecycle.cardName(game, leaderId);
                 if (cardName.endsWith("Genome")) {
                     assertThat(AgentLifecycle.agentName(cardName, false))
                             .as(leaderId)

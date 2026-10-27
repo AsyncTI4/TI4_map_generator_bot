@@ -23,7 +23,6 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
@@ -401,34 +400,6 @@ public final class ButtonHelperAgents {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), message + ".");
-    }
-
-    @ButtonHandler("exhaustAgent_")
-    public static void exhaustAgent(String buttonID, GenericInteractionCreateEvent event, Game game, Player player) {
-        if (AgentLifecycle.resolve(buttonID, event, game, player)) {
-            return;
-        }
-        String agent = buttonID.replace("exhaustAgent_", "");
-        String rest = agent;
-        if (agent.contains("_")) {
-            agent = agent.substring(0, agent.indexOf('_'));
-        }
-        Leader playerLeader = player.getLeader(agent).orElse(null);
-        if (playerLeader == null || AgentLifecycle.refuseIfExhausted(event, player, playerLeader)) {
-            return;
-        }
-        String agentTarget = rest.contains("_") ? rest.substring(rest.indexOf('_') + 1) : null;
-        AgentLifecycle.exhaust(game, player, playerLeader, agent, agentTarget);
-
-        TkHelperGenomes.onExhaust(
-                event,
-                game,
-                player,
-                agent,
-                AgentLifecycle.isYssarilAgent(playerLeader.getId()) ? "Clever Clever " : "",
-                rest);
-
-        AgentLifecycle.finish(event, game, player, agent);
     }
 
     @ButtonHandler("presetEdynAgentStep1")

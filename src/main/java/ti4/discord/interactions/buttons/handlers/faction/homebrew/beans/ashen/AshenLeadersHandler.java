@@ -32,7 +32,7 @@ import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.unit.AddUnitService;
 import tools.jackson.databind.ObjectMapper;
 
@@ -325,7 +325,7 @@ public class AshenLeadersHandler {
             return;
         }
 
-        ExhaustLeaderService.exhaustLeader(game, ashenPlayer, agent);
+        AgentLifecycle.spend(game, ashenPlayer, AGENT_ID);
         AddUnitService.addUnits(event, destination, game, target.getColor(), "1 " + selectedUnit.getAsyncId());
         ButtonHelper.deleteMessage(event);
 

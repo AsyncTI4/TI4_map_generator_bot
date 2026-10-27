@@ -18,7 +18,7 @@ import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.tech.PlayerTechService;
 
 @UtilityClass
@@ -328,7 +328,7 @@ public class NetrunnersLeadersHandler {
                 || !isEligibleGain(game, player, sourceTech, gainedTech)) {
             return;
         }
-        ExhaustLeaderService.exhaustLeader(game, agentOwner, agentOwner.unsafeGetLeader(AGENT));
+        AgentLifecycle.spend(game, agentOwner, AGENT);
         player.removeTech(sourceTech);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),

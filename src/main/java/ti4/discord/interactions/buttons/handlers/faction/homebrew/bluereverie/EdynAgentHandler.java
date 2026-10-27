@@ -15,7 +15,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 
 @UtilityClass
 public class EdynAgentHandler {
@@ -78,7 +78,7 @@ public class EdynAgentHandler {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "Allant can no longer be used for that landing.");
             return;
         }
-        ExhaustLeaderService.exhaustLeader(game, agentOwner, agentOwner.unsafeGetLeader(AGENT));
+        AgentLifecycle.spend(game, agentOwner, AGENT);
         ButtonHelperAbilities.resolveCoexistence(event, game, landingPlayer, payload[1]);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(

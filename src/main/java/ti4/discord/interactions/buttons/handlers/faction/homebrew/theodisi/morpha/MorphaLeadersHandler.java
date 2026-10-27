@@ -21,8 +21,8 @@ import ti4.model.Mapper;
 import ti4.service.actioncard.ForceGiveActionCardService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.strategycard.StrategyCardSecondaryButtonService;
 
@@ -215,7 +215,7 @@ public class MorphaLeadersHandler {
             return;
         }
 
-        ExhaustLeaderService.exhaustLeader(game, player, agent);
+        AgentLifecycle.spend(game, player, AGENT);
         game.setStoredValue(targetKey(player), target.getFaction());
         sendDiscardSelection(game, target, player);
         ButtonHelper.deleteMessage(event);

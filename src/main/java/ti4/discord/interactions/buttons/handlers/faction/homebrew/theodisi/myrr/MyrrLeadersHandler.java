@@ -32,7 +32,7 @@ import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.RemoveUnitService;
@@ -126,7 +126,7 @@ public class MyrrLeadersHandler {
             return;
         }
 
-        ExhaustLeaderService.exhaustLeader(game, agentOwner, agentOwner.unsafeGetLeader(AGENT));
+        AgentLifecycle.spend(game, agentOwner, AGENT);
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),

@@ -65,7 +65,6 @@ import ti4.helpers.thirtyk.ThirtyKRelicHooks;
 import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.helpers.thundersedge.TeHelperTechs;
-import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.card.BannerGenerator;
 import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
@@ -100,6 +99,7 @@ import ti4.service.leader.agent.modules.homebrew.FlorzenAgent;
 import ti4.service.leader.agent.modules.homebrew.KolleccAgent;
 import ti4.service.leader.agent.modules.homebrew.PharadnAgent;
 import ti4.service.leader.agent.modules.homebrew.VadenAgent;
+import ti4.service.leader.agent.modules.homebrew.tknova.DeploymentGenomeAgent;
 import ti4.service.map.PlayerAreaWarningService;
 import ti4.service.relic.QuantumEntanglerService;
 import ti4.service.strategycard.PlayStrategyCardService;
@@ -987,7 +987,7 @@ public class StartTurnService {
                 startButtons.add(OblivionLeadersHandler.getOblivionAgentButton(player));
             }
 
-            startButtons.addAll(TkHelperGenomes.getStartOfTurnButtons(game, player));
+            DeploymentGenomeAgent.startOfTurnOffer(player).ifPresent(startButtons::add);
         }
         if (player.hasTech("pa")
                 && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {

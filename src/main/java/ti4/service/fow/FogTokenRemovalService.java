@@ -15,11 +15,9 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
-import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
@@ -31,6 +29,7 @@ import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.RemoveCommandCounterService;
+import ti4.service.leader.agent.AgentLifecycle;
 
 @UtilityClass
 public class FogTokenRemovalService {
@@ -215,9 +214,6 @@ public class FogTokenRemovalService {
     }
 
     private static void exhaustMahactAgent(Game game, Player mahact) {
-        Leader agent = mahact.unsafeGetLeader("mahactagent");
-        if (agent == null) return;
-        agent.setExhausted(true);
-        RevenantBreakthroughHandler.exhaustRevenantRisingForAttachedAgent(game, mahact, agent);
+        AgentLifecycle.spend(game, mahact, "mahactagent");
     }
 }

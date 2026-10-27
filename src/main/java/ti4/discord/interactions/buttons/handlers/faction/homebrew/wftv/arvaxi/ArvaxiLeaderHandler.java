@@ -17,8 +17,8 @@ import ti4.model.Mapper;
 import ti4.service.actioncard.ForceGiveActionCardService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PurgeHeroService;
+import ti4.service.leader.agent.AgentLifecycle;
 
 @UtilityClass
 public class ArvaxiLeaderHandler {
@@ -92,7 +92,7 @@ public class ArvaxiLeaderHandler {
         String acID = ActionCardHelper.getDiscardedAcID(game, acIndex);
         String acName = acID != null ? Mapper.getActionCard(acID).getName() : "the action card";
 
-        player.getLeader("arvaxiagent").ifPresent(agent -> ExhaustLeaderService.exhaustLeader(game, player, agent));
+        AgentLifecycle.spend(game, player, "arvaxiagent");
 
         game.pickActionCard(target.getUserID(), acIndex);
         ActionCardHelper.sendActionCardInfo(game, target);

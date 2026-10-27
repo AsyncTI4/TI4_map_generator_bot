@@ -19,7 +19,7 @@ import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 
 @UtilityClass
 public class VerydithLeadersHandler {
@@ -108,7 +108,7 @@ public class VerydithLeadersHandler {
         }
 
         Leader agent = player.getLeaderByID("verydithagent").orElse(null);
-        ExhaustLeaderService.exhaustLeader(game, player, agent);
+        AgentLifecycle.spend(game, player, "verydithagent");
 
         MessageHelper.sendMessageToChannelWithButtons(
                 receiver.getCorrectChannel(),

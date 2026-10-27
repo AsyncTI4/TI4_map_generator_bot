@@ -17,6 +17,7 @@ import ti4.service.leader.agent.AgentOutcome.Message;
 public abstract class PlayerPickerAgent extends AgentModule<PlayerPickerAgent.Choice> {
 
     static final String PICK_STEP = "agentPick_";
+    // TODO: drop these once games started before the agent-module migration (2026-10-27) have finished.
     private static final Map<String, String> LEGACY_PICK_STEPS = Map.of(
             "nekroAgentRes_", "nekroagent",
             "kolleccAgentRes_", "kolleccagent",

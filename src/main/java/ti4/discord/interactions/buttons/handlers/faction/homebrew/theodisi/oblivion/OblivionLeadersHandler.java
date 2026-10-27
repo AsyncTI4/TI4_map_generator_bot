@@ -33,7 +33,7 @@ import ti4.model.TileModel.TileBack;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -99,7 +99,7 @@ public class OblivionLeadersHandler {
                     event.getMessageChannel(), "There are no eligible systems for a frontier token.");
             return;
         }
-        ExhaustLeaderService.exhaustLeader(game, player, agent);
+        AgentLifecycle.spend(game, player, AGENT);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
@@ -119,7 +119,7 @@ public class OblivionLeadersHandler {
                     event.getMessageChannel(), "There are no eligible systems for a frontier token.");
             return;
         }
-        ExhaustLeaderService.exhaustLeader(game, player, agent);
+        AgentLifecycle.spend(game, player, AGENT);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
