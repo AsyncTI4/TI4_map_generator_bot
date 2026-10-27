@@ -1366,15 +1366,16 @@ public final class ButtonHelperTacticalAction {
         KairnPromissoryHandler.offerArchaeologicalOutpostExplore(game, tile);
 
         // Send buttons to move
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationNoPing() + ", please choose the first system you wish to move from.",
-                systemButtons);
 
         // send ephemeral image
         FileUpload file = SystemContextImage.upload(game, event, 1, tile.getPosition(), player);
 
         MessageHelper.sendEphemeralFileInResponseToButtonPress(file, event);
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + ", please choose the first system you wish to move from.",
+                systemButtons);
 
         // Resolve other abilities
         if (player.hasAbility("recycled_materials")) {
