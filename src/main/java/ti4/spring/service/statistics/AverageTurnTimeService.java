@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
@@ -27,8 +26,8 @@ public class AverageTurnTimeService {
     private static final int DEFAULT_MINIMUM_NUMBER_OF_TURNS = 100;
 
     private final PlayerEntityRepository playerEntityRepository;
+    private final UserGameInfoService userGameInfoService;
 
-    @Transactional(readOnly = true)
     public void getAverageTurnTimes(SlashCommandInteractionEvent event) {
         boolean ignoreEndedGames =
                 event.getOption(Constants.IGNORE_ENDED_GAMES, Boolean.FALSE, OptionMapping::getAsBoolean);
@@ -50,6 +49,9 @@ public class AverageTurnTimeService {
 
             int times = 3;
 
+            Map<String, List<Integer>> fastestDaysByUserId =
+                    userGameInfoService.getThreeFastestDaysToComplete6PlayerGamesByUserId();
+
             for (int i = 1; i < times; i++) {
 
                 result = "";
@@ -64,8 +66,7 @@ public class AverageTurnTimeService {
 
                 for (var stats : sortedResults) {
                     String userId = stats.userId;
-                    List<Integer> threeFastestDays =
-                            UserGameInfoService.get().getUsersThreeFastestDaysToComplete6PlayerGames(userId);
+                    List<Integer> threeFastestDays = fastestDaysByUserId.getOrDefault(userId, List.of());
                     List<Integer> threeFastestDaysCopy = new ArrayList<>(threeFastestDays);
                     if (i == 1) {
                         if (threeFastestDaysCopy.size() > 3) {
@@ -151,7 +152,6 @@ public class AverageTurnTimeService {
         return sb.toString();
     }
 
-    @Transactional(readOnly = true)
     public String getAverageTurnTimesString(List<String> userIds) {
         List<UserAverageTurnTimeAccumulator> averageTurnTimes = getAverageTurnTimes(userIds);
         return toResultString(averageTurnTimes);
