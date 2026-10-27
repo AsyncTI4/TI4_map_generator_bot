@@ -7,8 +7,10 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesAbilityHandler;
 import ti4.draft.DraftCategory;
 import ti4.game.Player;
@@ -21,6 +23,7 @@ import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
 import ti4.model.GenericCardModel;
 import ti4.model.Mapper;
+import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class FrankenAbilityService {
@@ -141,6 +144,23 @@ public class FrankenAbilityService {
                                 + ", please choose which side you want your starting balance token to be on.",
                         ButtonHelper.getBalanceButtons(player));
             }
+            if ("cataclysm".equalsIgnoreCase(abilityID)) {
+                MessageHelper.sendMessageToChannelWithButton(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", once the map is built, press this button to begin the cataclysm.",
+                        NatauAbilityHandler.getCataclysmFrankenButton(player));
+            }
+            if ("phoenix_rising".equalsIgnoreCase(abilityID)) {
+                AddUnitService.addUnits(event, player.getNomboxTile(), player.getGame(), player.getColor(), "12 inf");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationNoPing()
+                                + " captured 12 infantry due to their _Phoenix Rising_ ability.");
+            }
+            if ("custom_rigs".equalsIgnoreCase(abilityID)) {
+                ScrapyardAbilitiesHandler.getScrapyardRigsButtons(player.getGame(), player);
+            }
         }
         MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
@@ -155,6 +175,9 @@ public class FrankenAbilityService {
             }
             sb.append('\n');
             player.removeAbility(abilityID);
+            if ("custom_rigs".equalsIgnoreCase(abilityID)) {
+                ScrapyardAbilitiesHandler.CUSTOM_RIGS.forEach(player::removeAbility);
+            }
         }
         MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
