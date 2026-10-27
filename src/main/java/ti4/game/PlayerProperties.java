@@ -102,6 +102,8 @@ public class PlayerProperties {
     private int pillageCounter;
     private int magenInfantryCounter;
     private int ghostCommanderCounter;
+    private int dacxiveCounter;
+    private int yinSpinnerCounter;
 
     // Omega Phase
     private int priorityPosition;

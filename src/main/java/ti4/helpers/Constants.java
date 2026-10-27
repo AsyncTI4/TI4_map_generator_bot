@@ -1439,6 +1439,8 @@ public final class Constants {
     public static final String SARWEEN_COUNT = "sarween_count";
     public static final String GHOST_COMMANDER_COUNT = "ghost_commander_count";
     public static final String MAGEN_INFANTRY_COUNT = "magen_infantry_count";
+    public static final String DACXIVE_COUNT = "dacxive_count";
+    public static final String YIN_SPINNER_COUNT = "yin_spinner_count";
     public static final String PATH_TOKEN_COUNT = "path_token_count";
     public static final String HONOR_COUNT = "honor_count";
     public static final String DISHONOR_COUNT = "dishonor_count";

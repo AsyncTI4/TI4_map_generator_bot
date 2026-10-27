@@ -1349,11 +1349,14 @@ public class BlueReverieTechHelper {
         }
         player.exhaustTech("dxa_br");
         AddUnitService.addUnits(event, tile, game, player.getColor(), "gf " + planet);
+        player.setDacxiveCounter(player.getDacxiveCounter() + 1);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation(false, false) + " exhausted _Daxcive Animators_ and placed 1 infantry on "
                         + Helper.getPlanetRepresentation(planet, game)
-                        + ".");
+                        + "."
+                        + "\n-# _Daxcive Animators_ has placed " + player.getDacxiveCounter()
+                        + " infantry this game so far.");
         ButtonHelper.deleteMessage(event);
     }
 }
