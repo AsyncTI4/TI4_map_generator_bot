@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ti4.game.Game;
 import ti4.spring.context.RequestContext;
@@ -47,7 +48,7 @@ public class GameWebDataController {
     }
 
     @GetMapping(value = "/events", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<GameEventDto>> getEvents() {
+    public ResponseEntity<List<GameEventDto>> getEvents(@RequestParam(required = false) Long since) {
         Game game = RequestContext.getGame();
         if (game == null) {
             return ResponseEntity.notFound().build();
@@ -55,6 +56,9 @@ public class GameWebDataController {
         if (game.isFowMode()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(gameEventService.getEvents(game));
+        if (since == null) {
+            return ResponseEntity.ok(gameEventService.getEvents(game));
+        }
+        return ResponseEntity.ok(gameEventService.getEventsSince(game, since));
     }
 }
