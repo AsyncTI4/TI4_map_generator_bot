@@ -142,6 +142,12 @@ public class TradeCardRules {
         return TradeTerms.mastersOfTrade(seat) ? Math.min(total, holder.get().getCommodities()) : total;
     }
 
+    static boolean holdsUnplayedTrade(Game game, Player seat) {
+        return seat.getSCs().stream()
+                .anyMatch(card -> StrategyCard.of(game, card) == StrategyCard.TRADE
+                        && !game.getPlayedSCs().contains(card));
+    }
+
     static boolean holdsFor(AiTurnContext context, Player partner) {
         return heldFor(context)
                 .filter(holder -> Standings.same(holder, partner))

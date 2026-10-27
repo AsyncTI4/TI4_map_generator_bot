@@ -86,15 +86,15 @@ class DealItemTest {
         assertThat(parsed("sendingnekro_receivingsol_PNs_blue_cf").type()).isEqualTo(ItemType.UNSUPPORTED);
     }
 
-    // A supermassive fragment, cards, free-text details and malformed amounts are kept, but as items the AI cannot
-    // judge.
+    // A supermassive fragment, cards and malformed amounts are kept, but as items the AI cannot judge. Free-text
+    // details are their own item: an AI seat's extortion demand carries its threat there.
     @Test
     void marksWhatItCannotJudgeAsUnsupported() {
         assertThat(parsed("sendingsol_receivingnekro_Frags_supermassive_fragment")
                         .type())
                 .isEqualTo(ItemType.UNSUPPORTED);
         assertThat(parsed("sendingsol_receivingnekro_SOs_generic1").type()).isEqualTo(ItemType.UNSUPPORTED);
-        assertThat(parsed("sendingsol_receivingnekro_details_text").type()).isEqualTo(ItemType.UNSUPPORTED);
+        assertThat(parsed("sendingsol_receivingnekro_details_text").type()).isEqualTo(ItemType.DETAILS);
         assertThat(parsed("sendingsol_receivingnekro_TGs_lots").type()).isEqualTo(ItemType.UNSUPPORTED);
     }
 

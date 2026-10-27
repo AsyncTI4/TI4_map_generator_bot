@@ -112,8 +112,9 @@ public class CombatRules {
 
     private static Optional<AiDecision> assignHits(AiTurnContext context, List<AiPrompt> prompts) {
         for (AiPrompt prompt : prompts) {
-            Optional<PromptButton> assign = prompt.firstEnabled(button ->
-                    button.isOwnedBy(context.faction()) && button.handlerId().startsWith(ASSIGN_PREFIX));
+            Optional<PromptButton> assign = prompt.firstEnabled(button -> button.isOwnedBy(context.faction())
+                    && button.handlerId().startsWith(ASSIGN_PREFIX)
+                    && !assignsNothing(button));
             if (assign.isEmpty()) continue;
             if (isRoundHit(assign.get())) {
                 Optional<Match> ownRoll = Prompts.first(
@@ -569,6 +570,11 @@ public class CombatRules {
 
     private static boolean isBarrageHit(PromptButton button) {
         return button.handlerId().startsWith(AFB_HIT_PREFIX);
+    }
+
+    static boolean assignsNothing(PromptButton button) {
+        return button.handlerId().startsWith(ASSIGN_PREFIX)
+                && "0".equals(StringUtils.substringAfterLast(button.handlerId(), "_"));
     }
 
     private static boolean isRoundHit(PromptButton button) {

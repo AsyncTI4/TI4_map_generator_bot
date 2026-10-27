@@ -13,6 +13,7 @@ enum ItemType {
     FRAGMENTS("Frags"),
     ACTION_CARDS("ACs"),
     PLANETS("Planets"),
+    DETAILS("details"),
     UNSUPPORTED("");
 
     private static final Set<ItemType> COUNTABLE = EnumSet.of(TRADE_GOODS, COMMODITIES, SEND_DEBT, CLEAR_DEBT);

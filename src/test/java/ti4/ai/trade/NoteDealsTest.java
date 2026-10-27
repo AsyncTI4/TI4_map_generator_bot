@@ -102,7 +102,8 @@ class NoteDealsTest extends BaseTi4Test {
         List<NoteDeals.Option> actual = NoteDeals.best(table.context(), partners);
 
         assertThat(partners).hasSizeGreaterThan(2);
-        assertThat(expected).hasSizeGreaterThan(20);
+        // Selling Support for the Throne for a few trade goods is vetoed, so swaps and purchases make up the list.
+        assertThat(expected).hasSizeGreaterThan(8);
         assertThat(actual).hasSameSizeAs(expected);
         for (int index = 0; index < expected.size(); index++) {
             assertThat(actual.get(index).partner())

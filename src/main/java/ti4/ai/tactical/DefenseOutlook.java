@@ -656,7 +656,8 @@ public final class DefenseOutlook {
                 * commitment(enemy, force)
                 * motiveFactor(enemy, tile, force, planets)
                 * appetiteShare
-                * ceasefire(enemy);
+                * ceasefire(enemy)
+                * boughtOff(enemy, tile, horizon);
         return clamp(raw, 0, 1);
     }
 
@@ -717,6 +718,10 @@ public final class DefenseOutlook {
         return scoringLoss(tile) >= SCORING_CRITICAL;
     }
 
+    private double boughtOff(Player enemy, Tile tile, Horizon horizon) {
+        return horizon == Horizon.NEXT_ROUND ? 1.0 : ExtortionPlans.fearOf(game, enemy, seat, tile);
+    }
+
     private double ceasefire(Player enemy) {
         return seat.getPromissoryNotes().containsKey(enemy.getColor() + CEASEFIRE) ? CEASEFIRE_FEAR : 1.0;
     }
@@ -749,7 +754,10 @@ public final class DefenseOutlook {
     double attackLikelihood(Player enemy, Tile tile, Horizon horizon, double netGain) {
         double alternative = Math.max(alternative(enemy, tile) - ACTION_COST, APPETITE_SCALE);
         double share = attackShare(netGain - actionCost(enemy), alternative);
-        return clamp(roundFactor(horizon) * aggression(enemy) * share * ceasefire(enemy), 0, 1);
+        return clamp(
+                roundFactor(horizon) * aggression(enemy) * share * ceasefire(enemy) * boughtOff(enemy, tile, horizon),
+                0,
+                1);
     }
 
     static double attackShare(double appetite, double alternative) {

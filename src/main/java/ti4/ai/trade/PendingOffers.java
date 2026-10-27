@@ -144,6 +144,7 @@ class PendingOffers {
     }
 
     private static void accepted(AiTurnContext context, Player partner, Pending pending) {
+        if (pending.purpose() == Purpose.EXTORTION) Extortion.accepted(context, partner);
         Trust.record(context, partner, Trust.Event.ACCEPTED_OFFER);
         TradeLegality.useWindow(context, partner);
         TechnologyRequest.noteProposalAccepted(context, partner, pending.purpose());
@@ -238,6 +239,7 @@ class PendingOffers {
                 newestRescind(context, partner, Long.MIN_VALUE).or(() -> rememberedRescind(context, partner, pending));
         if (button.isEmpty() && OfferBuilder.active(context)) return Optional.empty();
         if (ranOutOfTime(partner, stale)) penalise(context, partner, pending);
+        if (pending.purpose() == Purpose.EXTORTION && stale != Stale.CROSSED) Extortion.refused(context, partner);
         if (stale == Stale.CROSSED && pending.purpose().settles()) TradeCardRules.countered(context, partner);
         close(context, partner, sentNumber(context, partner));
         if (button.isPresent()) return Optional.of(button.get().press(reason));
@@ -286,6 +288,7 @@ class PendingOffers {
     }
 
     private static long replyTimeout(Player partner, Purpose purpose) {
+        if (purpose == Purpose.EXTORTION) return Extortion.replyTimeout(partner);
         if (AiSeats.isAiSeat(partner)) return AI_REPLY_TIMEOUT_MILLIS;
         return purpose.waitsLongForHumans() ? HUMAN_LONG_REPLY_TIMEOUT_MILLIS : HUMAN_REPLY_TIMEOUT_MILLIS;
     }

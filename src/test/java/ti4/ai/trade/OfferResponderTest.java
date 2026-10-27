@@ -72,6 +72,25 @@ class OfferResponderTest extends BaseTi4Test {
 
     private static final String[] WASH = {"sendingsol_receivingnekro_Comms_3", "sendingnekro_receivingsol_Comms_3"};
 
+    // Sol (an AI seat) threatens an attack that would cost Nekro 8 unless Nekro pays 3 trade goods, the plan written
+    // into the transaction's details: Nekro pays.
+    @Test
+    void paysAnExtortionDemandWorthLessThanTheAttack() {
+        TradeTable table = table(true);
+        table.stock(table.nekro, 3, 5);
+        Extortion.record(table.game, table.sol, table.nekro, new Extortion.Threat("305", 3, 8, 0));
+
+        assertThat(pressed(answer(
+                        table,
+                        offer(
+                                table,
+                                "extortion",
+                                1,
+                                "sendingnekro_receivingsol_TGs_3",
+                                "sendingsol_receivingnekro_details_Iffin777refuse"))))
+                .isEqualTo("acceptOffer_blue_1");
+    }
+
     // C4.4 row 1 against a human: 3.0 - 1.8 = 1.2 for Nekro, minus 0.1 of Sol's 1.5 is 1.05, above the 0.5 margin.
     @Test
     void acceptsAFairWash() {

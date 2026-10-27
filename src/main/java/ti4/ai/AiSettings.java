@@ -42,6 +42,7 @@ public class AiSettings {
     public static final int MAX_GAME_DELEGATIONS_PER_ROUND = 60;
     public static final int MAX_REPEATED_FALLBACKS = 5;
     public static final int HISTORY_SIZE = 50;
+    public static final int COMBAT_HISTORY_SIZE = 100;
     public static final String PACE_KEY = "aiPace";
     public static final String FAST_PACE = "fast";
     public static final String TRADING_PROPERTY = "ai.trading";

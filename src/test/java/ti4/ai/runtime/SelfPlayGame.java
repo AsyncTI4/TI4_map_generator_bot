@@ -703,13 +703,16 @@ final class SelfPlayGame {
 
     // The engine refuses to flip an agenda within 6 wall-clock seconds of the previous flip. The referee waits 20
     // seconds of game time, which the virtual clock covers in a few real milliseconds, so the stamp is aged here to
-    // keep the guard's meaning: in game time, the previous flip was long ago.
+    // keep the guard's meaning: in game time, the previous flip was long ago. The AI reads the same stamp against the
+    // virtual clock (has the reveal settled? was this prompt made in this agenda?), so it must never be ahead of
+    // that clock: a seeded batch starts its clock in September 2026, and a wall-clock stamp then looked a month in the
+    // future, so a Veto was never resolved and riders never placed (seeds 15 and 21 stalled in "agendawaiting").
     private void ageAgendaFlipGuard() {
         Game game = observed(GameManager.getManagedGame(name));
         if (game == null) return;
         String flippedAt = game.getStoredValue(AGENDA_FLIP_STAMP);
         if (flippedAt.isEmpty() || !flippedAt.chars().allMatch(Character::isDigit)) return;
-        long aged = System.currentTimeMillis() - AGENDA_FLIP_AGE_MILLIS;
+        long aged = Math.min(env.now(), System.currentTimeMillis() - AGENDA_FLIP_AGE_MILLIS);
         if (Long.parseLong(flippedAt) <= aged) return;
         game.setStoredValue(AGENDA_FLIP_STAMP, String.valueOf(aged));
         saveObserved(game, "AI self-play clock");

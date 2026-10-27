@@ -7,6 +7,8 @@ import java.util.OptionalInt;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.DecisionMemo;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.eval.FractureCampaign;
+import ti4.ai.secrets.SecretOdds;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Helper;
@@ -15,9 +17,11 @@ import ti4.helpers.Helper;
 public class WinRace {
 
     private static final String ACTION_PHASE = "action";
+    private static final int IMMEDIATELY = -1;
     private static final int DURING_ACTION_PHASE = 0;
     private static final int LEADERSHIP_TOKENS = 3;
     private static final int MECATOL_POINT = 1;
+    private static final int STYX_POINT = 1;
 
     public static List<Player> winnersBefore(Game game, Player seat) {
         if (game.isFowMode() || game.getVp() <= 0 || !ACTION_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) {
@@ -38,18 +42,49 @@ public class WinRace {
         return theirs.isPresent() && (mine.isEmpty() || theirs.getAsInt() < mine.getAsInt());
     }
 
+    public record Boost(int immediatePoints, int actionPoints, int extraPublic, boolean takesMecatol) {
+
+        public static final Boost NONE = new Boost(0, 0, 0, false);
+    }
+
     static OptionalInt finish(Game game, Player player) {
-        int missing = game.getVp() - player.getTotalVictoryPoints();
-        if (missing <= 0) return OptionalInt.of(DURING_ACTION_PHASE);
-        List<Integer> publics = readyPublics(game, player);
-        boolean imperial = ScoringStakes.holdsUnplayedImperial(game, player);
-        int duringAction = 0;
-        if (imperial) {
-            duringAction = best(publics, 0) + (player.controlsMecatol(true) ? MECATOL_POINT : 0);
-            if (duringAction >= missing) return OptionalInt.of(DURING_ACTION_PHASE);
+        return finish(game, player, Boost.NONE);
+    }
+
+    public static OptionalInt finish(Game game, Player player, Boost boost) {
+        int missing = game.getVp() - player.getTotalVictoryPoints() - boost.immediatePoints();
+        if (missing <= 0) return OptionalInt.of(boost.immediatePoints() > 0 ? IMMEDIATELY : DURING_ACTION_PHASE);
+        List<Integer> publics = new ArrayList<>(readyPublics(game, player));
+        if (boost.extraPublic() > 0) {
+            publics.add(boost.extraPublic());
+            publics.sort(Comparator.reverseOrder());
         }
+        boolean imperial = ScoringStakes.holdsUnplayedImperial(game, player);
+        boolean mecatol = player.controlsMecatol(true) || boost.takesMecatol();
+        int duringAction = boost.actionPoints();
+        if (imperial) duringAction += best(publics, 0) + (mecatol ? MECATOL_POINT : 0);
+        if (duringAction >= missing) return OptionalInt.of(DURING_ACTION_PHASE);
         int byStatus = duringAction + best(publics, imperial ? 1 : 0);
-        return byStatus >= missing ? OptionalInt.of(1 + player.getLowestSC()) : OptionalInt.empty();
+        return byStatus >= missing ? OptionalInt.of(1 + player.getInitiative()) : OptionalInt.empty();
+    }
+
+    public static Boost feared(Game game, Player viewer, Player rival, int immediatePoints) {
+        int actionPoints = (int) Math.round(SecretOdds.chanceReady(game, viewer, rival))
+                + (FractureCampaign.dock(game, rival).isPresent() ? STYX_POINT : 0);
+        return new Boost(immediatePoints, actionPoints, 0, ScoringPaths.imperialAwaitsMecatol(game, rival));
+    }
+
+    public static boolean canWinThisRound(Game game, Player viewer, Player player) {
+        return DecisionMemo.remember(
+                () -> finish(game, player, feared(game, viewer, player, 0)).isPresent(),
+                "win.canWinThisRound",
+                viewer,
+                player,
+                game.getRound());
+    }
+
+    public static boolean finishesBefore(OptionalInt mine, OptionalInt theirs) {
+        return mine.isPresent() && (theirs.isEmpty() || mine.getAsInt() < theirs.getAsInt());
     }
 
     private static int best(List<Integer> descending, int index) {

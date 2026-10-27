@@ -50,8 +50,10 @@ class MilitarySupportTradeTest extends BaseTi4Test {
         table.stock(sol, 0, 0);
     }
 
+    // No carrier to move infantry, and its 4 spare infantry already at home: Nekro has no use for more.
     private void withoutCarrier() {
         nekroHome.removeUnit("space", Units.getUnitKey(UnitType.Carrier, nekro.getColor()), 1);
+        table.test.units(nekroHome, "mordaiii", nekro, UnitType.Infantry, 6);
     }
 
     private AiTurnContext contextFor(Player seat) {
@@ -130,11 +132,44 @@ class MilitarySupportTradeTest extends BaseTi4Test {
         assertThat(MilitarySupportDeals.sell(contextFor(sol), List.of(nekro))).isEmpty();
     }
 
+    // Sol may sell it on a turn spent on a component or strategic action, or on the turn it passes: having no tactic
+    // token left for another action does not stop the sale.
     @Test
-    void solKeepsItWhenItHasNoTokenLeftForAnotherAction() {
+    void solSellsItEvenWithNoTokenLeftForAnotherAction() {
         table.test.isActive(sol, "action");
         sol.setTacticalCC(0);
 
+        assertThat(MilitarySupportDeals.sell(contextFor(sol), List.of(nekro)).map(AiTestGame::pressedId))
+                .contains("transaction");
+    }
+
+    // A buyer ahead of the table pays for its lead: half a trade good per point ahead of the others' average, on top of
+    // the usual rivalry discount. Three points ahead the note costs Sol more than the trade good it earns.
+    @Test
+    void solIsWarierOfABuyerWithALead() {
+        table.test.isActive(sol, "action");
+        double level = MilitarySupport.givenCost(table.game, sol, nekro);
+
+        table.points(nekro, 1);
+        assertThat(MilitarySupport.givenCost(table.game, sol, nekro)).isGreaterThan(level);
+
+        TradeTable leading = TradeTable.withAiSol();
+        leading.points(leading.nekro, 3);
+        assertThat(MilitarySupport.givenCost(leading.game, leading.sol, leading.nekro))
+                .isGreaterThan(MilitarySupport.PRICE);
+    }
+
+    // Nekro on 9 with Imperial and Mecatol Rex has a public path to 10: Sol never sells it Military Support.
+    @Test
+    void solNeverSellsToABuyerWithAPublicPathToWin() {
+        table.test.isActive(sol, "action");
+        for (int card = 1; card <= 8; card++) table.game.setScTradeGood(card, 0);
+        nekro.addSC(8);
+        nekro.addPlanet("mr");
+        table.points(nekro, 9);
+
+        assertThat(MilitarySupport.publicPathToWin(table.game, nekro)).isTrue();
+        assertThat(MilitarySupport.givenCost(table.game, sol, nekro)).isInfinite();
         assertThat(MilitarySupportDeals.sell(contextFor(sol), List.of(nekro))).isEmpty();
     }
 

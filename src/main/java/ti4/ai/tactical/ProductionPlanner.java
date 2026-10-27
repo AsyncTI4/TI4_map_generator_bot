@@ -62,7 +62,7 @@ public class ProductionPlanner {
     private static final int WANTED_UPGRADED_LIGHT_SHIPS = 4;
     private static final int WANTED_CRUISERS = 2;
     private static final int WANTED_MECHS = 2;
-    private static final int WANTED_SPARE_INFANTRY = 4;
+    static final int WANTED_SPARE_INFANTRY = 4;
     private static final int MIN_SPARE_INFANTRY = 2;
     private static final int INFANTRY_ROOM_PER_CARRIER = 2;
     private static final int ENABLING_SHIPS = 2;

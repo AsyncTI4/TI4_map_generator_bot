@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.AiSeats;
 import ti4.ai.brain.SearchMemo;
 import ti4.ai.scoring.SpendUnlock;
 import ti4.game.Game;
@@ -49,6 +50,7 @@ class Stinginess {
     enum Veto {
         WIN("could let them win"),
         LEADER("feeds the leader"),
+        THRONE("keeps Support for the Throne"),
         UNSUPPORTED("unsupported items"),
         TWO_NOTES("two notes"),
         ILLEGAL("illegal");
@@ -128,13 +130,24 @@ class Stinginess {
         int points = (net > 0 ? SpendUnlock.pointDelta(game, partner, net) : 0) + thronePoints(game, partner, deal);
         if (points > 0 && Standings.vp(partner) + points >= Standings.goal(game)) vetoes.add(Veto.WIN);
         if (points > 0 && rivalry(game, seat, partner) >= FEEDS_LEADER) vetoes.add(Veto.LEADER);
-        if (deal.hasUnsupported() || TradeActionCards.blocked(seat, partner, deal)) vetoes.add(Veto.UNSUPPORTED);
+        if (!ThroneSale.allowed(game, seat, partner, deal)) vetoes.add(Veto.THRONE);
+        if (deal.hasUnsupported()
+                || TradeActionCards.blocked(seat, partner, deal)
+                || theirDetails(seat, partner, deal)) {
+            vetoes.add(Veto.UNSUPPORTED);
+        }
         if (deal.total(seat.getFaction(), ItemType.PROMISSORY) > 1
                 || deal.total(partner.getFaction(), ItemType.PROMISSORY) > 1) {
             vetoes.add(Veto.TWO_NOTES);
         }
         if (!TradeLegality.isLegal(game, seat, partner, deal)) vetoes.add(Veto.ILLEGAL);
         return vetoes;
+    }
+
+    private static boolean theirDetails(Player seat, Player partner, Deal deal) {
+        return !AiSeats.isAiSeat(partner)
+                && deal.items().stream()
+                        .anyMatch(item -> item.type() == ItemType.DETAILS && !item.isFrom(seat.getFaction()));
     }
 
     static int thronePoints(Game game, Player receiver, Deal deal) {
@@ -182,7 +195,7 @@ class Stinginess {
                 FragmentValue.gain(FragmentValue.Holdings.of(partner), item.fragmentKind(), amount, false);
             case ACTION_CARDS -> TradeActionCards.worthToTable(seat, partner, item);
             case PLANETS -> TradePlanets.worth(game, item.detail());
-            case UNSUPPORTED -> 0;
+            case DETAILS, UNSUPPORTED -> 0;
         };
     }
 
@@ -200,7 +213,7 @@ class Stinginess {
                 FragmentValue.loss(FragmentValue.Holdings.of(partner), item.fragmentKind(), amount, false);
             case ACTION_CARDS -> TradeActionCards.worthToTable(partner, seat, item);
             case PLANETS -> TradePlanets.worth(game, item.detail());
-            case UNSUPPORTED -> 0;
+            case DETAILS, UNSUPPORTED -> 0;
         };
     }
 

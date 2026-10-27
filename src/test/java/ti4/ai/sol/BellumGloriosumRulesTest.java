@@ -107,6 +107,23 @@ class BellumGloriosumRulesTest extends BaseTi4Test {
         assertThat(BellumGloriosumRules.next(muchLater)).isEmpty();
     }
 
+    // The build prompt is edited in place, so it keeps the time it was first posted. A main build begun 10 minutes
+    // before the offer, this turn, is still open: accepting Bellum Gloriosum then reset its tally, and self-play seed
+    // 18
+    // looped re-placing the same destroyers and dreadnought until Sol ran out of trade goods.
+    @Test
+    void waitsForAMainBuildStartedEarlierThisTurn() {
+        test.game.setLastActivePlayerChange(new java.util.Date(NOW - 20 * 60_000L));
+        AiPrompt mainBuild = prompt(
+                "main",
+                PromptSource.PUBLIC,
+                NOW - 10 * 60_000L,
+                List.of("FFCC_sol_place_destroyer_301", "FFCC_sol_deleteButtons_tacticalAction_301"),
+                List.of("Destroyer", "Done Producing Units"));
+
+        assertThat(BellumGloriosumRules.next(context(offer(4), mainBuild))).isEmpty();
+    }
+
     @Test
     void waitsForTheNormalBuildToBeDoneBeforeStarting() {
         AiPrompt mainBuild = prompt(

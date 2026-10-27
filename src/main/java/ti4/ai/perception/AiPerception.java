@@ -151,7 +151,8 @@ public class AiPerception {
     private static List<AiPrompt> read(MessageChannel channel, String botId, PromptSource source) {
         List<Message> history;
         try {
-            history = channel.getHistory().retrievePast(AiSettings.HISTORY_SIZE).complete();
+            int size = source == PromptSource.COMBAT_THREAD ? AiSettings.COMBAT_HISTORY_SIZE : AiSettings.HISTORY_SIZE;
+            history = channel.getHistory().retrievePast(size).complete();
         } catch (RuntimeException e) {
             BotLogger.warning("AI players could not read " + channel.getName() + ": " + e.getMessage());
             return List.of();

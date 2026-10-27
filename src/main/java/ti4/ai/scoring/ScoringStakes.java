@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import ti4.ai.brain.SearchMemo;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.secrets.SecretOdds;
 import ti4.game.Game;
@@ -21,6 +22,7 @@ public class ScoringStakes {
     private static final int RISES_FROM_GOAL = 4;
     private static final double RIVAL_POINT_SHARE = 0.25;
     private static final int MECATOL_POINTS = 1;
+    private static final String PROJECTED_MEMO = "stakes.projectedPoints";
 
     public record OverrulePlay(int points, boolean wins) {
 
@@ -60,6 +62,25 @@ public class ScoringStakes {
         double points = publicPoints(game, player);
         if (holdsUnplayedImperial(game, player) && player.controlsMecatol(true)) points += MECATOL_POINTS;
         return points + SecretOdds.chanceReady(game, viewer, player);
+    }
+
+    public static double tempoLead(Game game, Player viewer, Player player) {
+        double others = game.getRealPlayers().stream()
+                .filter(other -> other != player && !other.isEliminated())
+                .mapToDouble(other -> projectedPoints(game, viewer, other))
+                .average()
+                .orElse(0);
+        return projectedPoints(game, viewer, player) - others;
+    }
+
+    private static double projectedPoints(Game game, Player viewer, Player player) {
+        return SearchMemo.remember(
+                () -> player.getTotalVictoryPoints()
+                        + ScoringPaths.readyPoints(game, player)
+                        + SecretOdds.chanceReady(game, viewer, player),
+                PROJECTED_MEMO,
+                viewer,
+                player);
     }
 
     public static boolean contender(Game game, Player viewer, Player player) {

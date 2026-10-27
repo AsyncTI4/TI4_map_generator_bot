@@ -54,6 +54,11 @@ public class TradeRules {
         return TradeCardRules.settle(context);
     }
 
+    public static Optional<AiDecision> awaitExtortion(AiTurnContext context) {
+        if (!AiSettings.isTradingEnabled()) return Optional.empty();
+        return Extortion.await(context);
+    }
+
     public static Optional<AiDecision> startDeals(AiTurnContext context) {
         if (!AiSettings.isTradingEnabled()) return Optional.empty();
         return OwnTurnDeals.start(context);

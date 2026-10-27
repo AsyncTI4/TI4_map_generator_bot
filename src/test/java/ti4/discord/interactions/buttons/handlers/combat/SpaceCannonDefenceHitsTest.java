@@ -123,6 +123,29 @@ class SpaceCannonDefenceHitsTest extends BaseTi4Test {
                 .doesNotContain("cancelPdsDefenceHits");
     }
 
+    // Cancelling the only hit leaves nothing to assign: the assignment message goes away instead of offering an
+    // "Auto-assign Hits" for 0 hits, which did nothing and left an AI seat pressing it forever.
+    @Test
+    void cancellingTheLastHitRemovesTheAssignment() {
+        ButtonInteractionEvent event = mock(ButtonInteractionEvent.class, RETURNS_DEEP_STUBS);
+
+        CombatButtonHandler.cancelSpaceCannonDefenceHits(event, nekro, "cancelPdsDefenceHits_304_1_lodor", game);
+
+        messages.verify(() -> MessageHelper.sendMessageToChannel(any(), contains("canceled 1 hit")));
+        verify(event.getHook()).deleteOriginal();
+        verify(event.getMessage(), org.mockito.Mockito.never()).editMessage(any(CharSequence.class));
+    }
+
+    // An "Auto-assign Hits" for 0 hits left over on an older message clears itself.
+    @Test
+    void autoAssigningNoHitsClearsTheMessage() {
+        ButtonInteractionEvent event = mock(ButtonInteractionEvent.class, RETURNS_DEEP_STUBS);
+
+        CombatButtonHandler.autoAssignGroundHits(event, nekro, "autoAssignGroundHits_lodor_0", game);
+
+        verify(event.getHook()).deleteOriginal();
+    }
+
     @Test
     void parsesTheCancelIdWithOrWithoutTheFactionChecker() {
         CancelSpaceCannonDefenceHitsButtonId expected = new CancelSpaceCannonDefenceHitsButtonId("304", 2, "lodor");

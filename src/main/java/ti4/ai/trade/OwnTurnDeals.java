@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
@@ -15,6 +16,8 @@ import ti4.ai.AiSeats;
 import ti4.ai.AiSettings;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.promissory.NoteGiving;
+import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.PaymentRules;
 import ti4.ai.scoring.SpendUnlock;
 import ti4.ai.strategy.StrategyCardRules;
@@ -75,8 +78,13 @@ class OwnTurnDeals {
         if (announced.isPresent()) return announced;
         Optional<AiDecision> started = timed("trade.techRequest", () -> TechnologyRequest.start(context, partners))
                 .or(() -> timed("trade.desperation", () -> desperation(context, partners)))
+                .or(() -> timed("trade.extortion", () -> Extortion.propose(context, partners)))
                 .or(() -> timed("trade.wash", () -> wash(context, partners, partner -> true)))
-                .or(() -> timed("trade.noteProposals", () -> NoteDeals.propose(context, partners)))
+                .or(() -> timed(
+                        "trade.noteProposals",
+                        () -> TradeCardRules.holdsUnplayedTrade(context.game(), context.seat())
+                                ? Optional.empty()
+                                : NoteDeals.propose(context, partners)))
                 .or(() -> timed("trade.fragments", () -> FragmentDeals.propose(context, partners)))
                 .or(() -> timed("trade.militarySupport", () -> MilitarySupportDeals.propose(context, partners)))
                 .or(() -> timed("trade.sell", () -> sell(context, partners)))
@@ -158,16 +166,39 @@ class OwnTurnDeals {
         }
         int needed = shortBy.getAsInt();
         double spendCap = Desperation.spendCap(game, seat, SpendUnlock.pointDelta(game, seat, needed));
-        for (Player lender : lenders(context, partners, needed)) {
-            Optional<Deal> deal = DealSearch.cheapest(context, lender, packages(context, lender, needed, spendCap));
+        List<Player> lenders = lenders(context, partners, needed);
+        Optional<AiDecision> start = buyFrom(context, lenders, lender -> packages(context, lender, needed, spendCap));
+        if (start.isEmpty() && ObjectivePolicy.scorablePublics(game, seat).isEmpty()) {
+            start = buyFrom(context, lenders, lender -> thronePackages(context, lender, needed, spendCap));
+        }
+        start.ifPresent(ignored -> TradeMemory.increment(context.memory(), key));
+        return start;
+    }
+
+    private static Optional<AiDecision> buyFrom(
+            AiTurnContext context, List<Player> lenders, Function<Player, List<Deal>> packages) {
+        for (Player lender : lenders) {
+            Optional<Deal> deal = DealSearch.cheapest(context, lender, packages.apply(lender));
             if (deal.isEmpty()) continue;
             Optional<AiDecision> start = OfferBuilder.start(context, lender, deal.get(), Purpose.DESPERATION);
-            if (start.isPresent()) {
-                TradeMemory.increment(context.memory(), key);
-                return start;
-            }
+            if (start.isPresent()) return start;
         }
         return Optional.empty();
+    }
+
+    static List<Deal> thronePackages(AiTurnContext context, Player lender, int needed, double spendCap) {
+        Game game = context.game();
+        Player seat = context.seat();
+        Deal ask = Deal.EMPTY.adjust(lender.getFaction(), seat.getFaction(), ItemType.TRADE_GOODS, needed);
+        double trust = Trust.of(context, lender);
+        return ownThrone(seat)
+                .map(alias -> seat.getPromissoryNotes().get(alias))
+                .filter(Objects::nonNull)
+                .map(id -> ask.with(
+                        new DealItem(seat.getFaction(), lender.getFaction(), ItemType.PROMISSORY, String.valueOf(id))))
+                .filter(deal -> DealSearch.giveCost(game, seat, lender, deal, trust) <= spendCap)
+                .stream()
+                .toList();
     }
 
     private static List<Player> lenders(AiTurnContext context, List<Player> partners, int needed) {
@@ -217,6 +248,14 @@ class OwnTurnDeals {
             }
         }
         return List.copyOf(distinct.values());
+    }
+
+    private static Optional<String> ownThrone(Player seat) {
+        return seat.getPromissoryNotes().keySet().stream()
+                .filter(seat::ownsPromissoryNote)
+                .filter(alias -> alias.endsWith(NoteGiving.THRONE))
+                .filter(alias -> NotesForTrade.inHand(seat, alias))
+                .findFirst();
     }
 
     private static Optional<AiDecision> wash(AiTurnContext context, List<Player> partners, Predicate<Player> eligible) {

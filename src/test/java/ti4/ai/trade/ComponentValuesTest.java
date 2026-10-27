@@ -266,6 +266,26 @@ class ComponentValuesTest extends BaseTi4Test {
         assertThat(giveCost("black_sftt")).isLessThan(0.5 * 5 / 4 * 6);
     }
 
+    // A buyer scoring ahead of the table pays for its tempo: half a point (its vpWorth) per point it leads the average
+    // of
+    // the other seats by. Sol on 3 against Nekro and Letnev on 0 leads by 3: 0.5 x 3 x 6 = 9 on top. A buyer level
+    // with or behind the table pays no premium.
+    @Test
+    void aBuyerScoringAheadPaysForItsTempo() {
+        table.game.setRound(4);
+        assertThat(ThroneValue.tempoPremium(table.game, nekro, sol)).isZero();
+        double level = giveCost("black_sftt");
+
+        table.points(sol, 3);
+
+        assertThat(ThroneValue.tempoPremium(table.game, nekro, sol)).isCloseTo(0.5 * 3 * 6, within(EXACT));
+        assertThat(giveCost("black_sftt")).isGreaterThan(level + 8);
+
+        table.points(nekro, 3);
+        table.points(letnev, 3);
+        assertThat(ThroneValue.tempoPremium(table.game, nekro, sol)).isZero();
+    }
+
     // Late in the game there is little left to wait for: the option of keeping it shrinks.
     @Test
     void theOptionShrinksAsTheGameEnds() {

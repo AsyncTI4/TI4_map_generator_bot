@@ -96,9 +96,13 @@ record Deal(List<DealItem> items) {
         return items.stream().anyMatch(item -> item.type() == ItemType.UNSUPPORTED);
     }
 
+    boolean hasDetails() {
+        return items.stream().anyMatch(item -> item.type() == ItemType.DETAILS);
+    }
+
     Deal withoutUnsupported() {
         return new Deal(items.stream()
-                .filter(item -> item.type() != ItemType.UNSUPPORTED)
+                .filter(item -> item.type() != ItemType.UNSUPPORTED && item.type() != ItemType.DETAILS)
                 .toList());
     }
 
@@ -176,13 +180,13 @@ record Deal(List<DealItem> items) {
         return switch (item.type()) {
             case TRADE_GOODS, COMMODITIES, SEND_DEBT, CLEAR_DEBT -> parties;
             case FRAGMENTS -> parties + SUMMARY_FIELDS + item.fragmentKind();
-            case PROMISSORY, ACTION_CARDS, PLANETS, UNSUPPORTED -> parties + SUMMARY_FIELDS + item.detail();
+            case PROMISSORY, ACTION_CARDS, PLANETS, DETAILS, UNSUPPORTED -> parties + SUMMARY_FIELDS + item.detail();
         };
     }
 
     private static int summaryAmount(DealItem item) {
         return switch (item.type()) {
-            case PROMISSORY, ACTION_CARDS, PLANETS, UNSUPPORTED -> 1;
+            case PROMISSORY, ACTION_CARDS, PLANETS, DETAILS, UNSUPPORTED -> 1;
             default -> item.amount();
         };
     }

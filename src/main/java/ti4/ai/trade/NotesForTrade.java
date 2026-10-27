@@ -120,7 +120,7 @@ class NotesForTrade {
         if (alias.endsWith(CEASEFIRE)) return CeasefireValue.givenCost(game, seat, receiver);
         if (alias.endsWith(POLITICAL_SECRET)) return politicalSecretValue(game);
         if (POLITICAL_FAVOR.equals(alias)) return politicalFavorCost(game);
-        if (MilitarySupport.ALIAS.equals(alias)) return MilitarySupport.givenCost(seat);
+        if (MilitarySupport.ALIAS.equals(alias)) return MilitarySupport.givenCost(game, seat, receiver);
         if (ConvoysValue.isConvoys(alias)) return ConvoysValue.GIVE_COST;
         return OWN_FACTION_NOTE_COST;
     }

@@ -139,7 +139,7 @@ public class BellumGloriosumRules {
     }
 
     private static boolean mainBuildOpen(AiTurnContext context, AiPrompt offer) {
-        long since = offer.createdAtMillis() - MAIN_BUILD_WINDOW_MILLIS;
+        long since = Math.min(offer.createdAtMillis() - MAIN_BUILD_WINDOW_MILLIS, Prompts.turnStart(context));
         return context.prompts().stream()
                 .filter(prompt -> prompt != offer && prompt.createdAtMillis() >= since)
                 .flatMap(prompt -> prompt.enabledButtons().stream())

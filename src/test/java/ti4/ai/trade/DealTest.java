@@ -65,9 +65,13 @@ class DealTest extends BaseTi4Test {
 
     @Test
     void dropsWhatItCannotJudge() {
-        Deal deal = deal("sendingsol_receivingnekro_details_text", "sendingnekro_receivingsol_TGs_2");
+        Deal deal = deal(
+                "sendingsol_receivingnekro_SOs_generic1",
+                "sendingsol_receivingnekro_details_text",
+                "sendingnekro_receivingsol_TGs_2");
 
         assertThat(deal.hasUnsupported()).isTrue();
+        assertThat(deal.withoutUnsupported().hasDetails()).isFalse();
         assertThat(deal.withoutUnsupported().hasUnsupported()).isFalse();
         assertThat(deal.withoutUnsupported().total("nekro", ItemType.TRADE_GOODS))
                 .isEqualTo(2);

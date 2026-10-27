@@ -39,6 +39,13 @@ public class GroundDrops {
                 .max();
     }
 
+    public static int spareShortfall(Game game, Player seat) {
+        Tile home = seat.getHomeSystemTile();
+        if (home == null) return 0;
+        return Math.max(
+                0, ProductionPlanner.WANTED_SPARE_INFANTRY - TacticalPlanner.movableGroundForces(game, seat, home));
+    }
+
     public static Optional<String> bestPlanetIn(Game game, Player seat, Tile tile, Optional<TacticalPlan> plan) {
         List<String> inTile =
                 tile.getPlanetUnitHolders().stream().map(Planet::getName).toList();

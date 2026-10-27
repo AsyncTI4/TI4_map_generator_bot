@@ -7,7 +7,6 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.SearchMemo;
-import ti4.ai.tactical.TacticalPlanner;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.service.turn.EndTurnService;
@@ -55,7 +54,7 @@ class MilitarySupportDeals {
         Player seat = context.seat();
         if (!MilitarySupport.ownerHolds(seat)
                 || !MilitarySupport.freeToLend(seat)
-                || !TacticalPlanner.hasTokensForAnAction(game, seat)) {
+                || TradeCardRules.holdsUnplayedTrade(game, seat)) {
             return Optional.empty();
         }
         Integer id = seat.getPromissoryNotes().get(MilitarySupport.ALIAS);
@@ -64,6 +63,7 @@ class MilitarySupportDeals {
                 .filter(partner -> partner.getTg() >= MilitarySupport.PRICE)
                 .filter(partner -> !MilitarySupport.holdsForeign(partner))
                 .filter(partner -> MilitarySupport.wantsInfantry(game, partner))
+                .filter(partner -> !MilitarySupport.publicPathToWin(game, partner))
                 .map(partner -> new Offer(
                         partner,
                         Deal.EMPTY
@@ -77,7 +77,9 @@ class MilitarySupportDeals {
                                         seat.getFaction(),
                                         ItemType.TRADE_GOODS,
                                         MilitarySupport.PRICE),
-                        MilitarySupport.receivedBy(game, partner) * (1 - Stinginess.rivalry(game, seat, partner))))
+                        MilitarySupport.receivedBy(game, partner)
+                                * (1 - Stinginess.rivalry(game, seat, partner))
+                                / (1 + MilitarySupport.lead(game, seat, partner))))
                 .sorted(Comparator.comparingDouble(Offer::score).reversed())
                 .toList();
         for (Offer offer : offers) {

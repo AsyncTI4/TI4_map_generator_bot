@@ -36,7 +36,7 @@ public class ComponentValues {
             case PROMISSORY -> receivedNote(game, seat, from, item, seatPrivate);
             case ACTION_CARDS -> TradeActionCards.receiveValue(game, seat, from, item, seatPrivate);
             case PLANETS -> TradePlanets.receiveValue(game, item);
-            case UNSUPPORTED -> 0;
+            case DETAILS, UNSUPPORTED -> 0;
         };
     }
 
@@ -55,7 +55,7 @@ public class ComponentValues {
             case PROMISSORY -> givenNote(game, seat, to, item, seatPrivate);
             case ACTION_CARDS -> TradeActionCards.giveCost(game, seat, to, item, seatPrivate);
             case PLANETS -> NotesForTrade.INFINITE;
-            case UNSUPPORTED -> 0;
+            case DETAILS, UNSUPPORTED -> 0;
         };
     }
 

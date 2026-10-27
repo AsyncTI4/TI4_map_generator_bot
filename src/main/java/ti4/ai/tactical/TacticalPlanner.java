@@ -64,6 +64,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
@@ -72,6 +73,7 @@ import ti4.model.UnitModel;
 public class TacticalPlanner {
 
     public static final double MIN_SCORE = 1.0;
+    static final double SCORING_PLAN_SHARE = 0.5;
     private static final double STALL_MIN_SCORE = 0.3;
     private static final int NEIGHBOUR_SEARCH_RANGE = 6;
     private static final double ADVANCE_SHARE = 0.5;
@@ -392,8 +394,12 @@ public class TacticalPlanner {
         try (Thinking.Span ignored = Thinking.enter("tactical.for.flank")) {
             plans.addAll(flankSpeedPlans(context, activatable));
         }
-        return plans.stream()
+        List<TacticalPlan> adjusted = plans.stream()
+                .filter(plan -> !ExtortionPlans.honoured(context.game, context.seat, plan))
                 .map(plan -> plan.withScore(plan.score() - marchForfeit(context, plan)))
+                .map(plan -> ExtortionPlans.adjust(context.game, context.seat, plan))
+                .toList();
+        return ExtortionPlans.honourPayments(context.game, context.seat, adjusted).stream()
                 .sorted(Comparator.comparingDouble(TacticalPlan::score).reversed())
                 .toList();
     }
@@ -416,6 +422,7 @@ public class TacticalPlanner {
                                 .flatMap(Optional::stream),
                         marches)
                 .filter(plan -> plan.score() >= 0)
+                .filter(plan -> !ExtortionPlans.honoured(game, seat, plan))
                 .max(Comparator.comparingDouble(TacticalPlan::score))
                 .or(() -> freeStep(context));
     }
@@ -429,7 +436,8 @@ public class TacticalPlanner {
 
     public static Optional<TacticalPlan> forWarfareTarget(Game game, Player seat, String target) {
         Tile tile = game.getTileByPosition(target);
-        return tile == null ? Optional.empty() : bestFor(Context.tokenFree(game, seat), tile);
+        if (tile == null) return Optional.empty();
+        return bestFor(Context.tokenFree(game, seat), tile).filter(plan -> !ExtortionPlans.honoured(game, seat, plan));
     }
 
     static double ownAreaBonus(Territory.Zone zone) {
@@ -618,10 +626,50 @@ public class TacticalPlanner {
                 .isPresent();
     }
 
+    public static boolean scores(Game game, Player seat, TacticalPlan plan) {
+        return DecisionMemo.remember(
+                () -> scoringValue(game, seat, plan) >= SCORING_PLAN_SHARE * ObjectiveValue.VICTORY_POINT_VALUE,
+                "tactical.scores",
+                seat,
+                plan);
+    }
+
+    static double scoringValue(Game game, Player seat, TacticalPlan plan) {
+        Tile tile = game.getTileByPosition(plan.target());
+        if (tile == null) return 0;
+        double objectives = Math.max(
+                0,
+                new Context(game, seat)
+                        .objectiveGain(tile, plan.moves(), plan.landings().keySet()));
+        double secrets = opponentsAt(game, seat, tile).stream()
+                .mapToDouble(opponent -> actionSecretBonus(
+                        game,
+                        seat,
+                        tile,
+                        opponent,
+                        plan.moves(),
+                        FoWHelper.playerHasShipsInSystem(opponent, tile),
+                        !plan.landings().isEmpty()))
+                .max()
+                .orElse(0);
+        return objectives + secrets;
+    }
+
+    public static List<Player> opponentsAt(Game game, Player seat, Tile tile) {
+        Set<String> planets =
+                tile.getPlanetUnitHolders().stream().map(Planet::getName).collect(Collectors.toSet());
+        return game.getRealPlayers().stream()
+                .filter(player -> player != seat)
+                .filter(player -> FoWHelper.playerHasUnitsInSystem(player, tile)
+                        || player.getPlanets().stream().anyMatch(planets::contains))
+                .toList();
+    }
+
     public static Optional<TacticalPlan> forTarget(Game game, Player seat, String target) {
         try (Thinking.Span ignored = Thinking.enter("tactical.target")) {
             Tile tile = game.getTileByPosition(target);
-            return tile == null ? Optional.empty() : bestFor(new Context(game, seat), tile);
+            if (tile == null) return Optional.empty();
+            return bestFor(new Context(game, seat), tile).filter(plan -> !ExtortionPlans.honoured(game, seat, plan));
         }
     }
 

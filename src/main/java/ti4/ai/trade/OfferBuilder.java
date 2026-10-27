@@ -48,7 +48,8 @@ class OfferBuilder {
             Purpose.TECHNOLOGY_REQUEST,
             Purpose.TECHNOLOGY_HOLD,
             Purpose.DEBT_PAYMENT,
-            Purpose.DEBT_COLLECTION);
+            Purpose.DEBT_COLLECTION,
+            Purpose.EXTORTION);
     private static final List<Order> ORDER = List.of(
             new Order(true, ItemType.COMMODITIES),
             new Order(true, ItemType.TRADE_GOODS),
@@ -279,6 +280,7 @@ class OfferBuilder {
                 builder.get().button(BuilderPrompts.SEND + build.partner().getColor());
         if (send.isEmpty()) return idle(build);
         Draft draft = build.draft();
+        if (draft.purpose() == Purpose.EXTORTION) Extortion.addDetails(build.game(), build.seat(), build.partner());
         PendingOffers.record(build.context(), build.partner(), draft.purpose(), draft.target());
         TradeLegality.useWindow(build.context(), build.partner(), draft.purpose());
         Draft.clear(build.context().memory());
@@ -296,6 +298,7 @@ class OfferBuilder {
         Deal deal = build.draft().target();
         Purpose purpose = build.draft().purpose();
         double trust = Trust.of(build.context(), partner);
+        if (purpose == Purpose.EXTORTION) return TradeValue.coverable(game, seat, partner, deal);
         if (purpose.asksAFavor()) return TradeValue.commitmentOk(game, seat, partner, deal);
         if (purpose.proposes()) {
             return TradeValue.coverable(game, seat, partner, deal)

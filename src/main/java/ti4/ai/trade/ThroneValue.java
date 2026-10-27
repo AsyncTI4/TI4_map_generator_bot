@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FactionAggression;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.ThronePoint;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -36,6 +37,7 @@ class ThroneValue {
 
     private static final double EARLY_COST = 6.0;
     private static final double FIT_WEIGHT = 1.5;
+    private static final double TEMPO_SHARE_PER_POINT = 0.5;
 
     static final Weights DEFAULT =
             new Weights(0.02, 0.03, 0.02, 0.2, 0.4, 0.3, 0.5, 4.0, 0.5, 4, 0.75, 1.0, 0.3, 0.5, 2.0, 2.5);
@@ -65,7 +67,14 @@ class ThroneValue {
                         retained(game, seat, weights)
                                 - peace(game, seat, receiver, weights)
                                 - fit(game, seat, receiver))
-                + earlyCost(game, seat, receiver);
+                + earlyCost(game, seat, receiver)
+                + tempoPremium(game, seat, receiver);
+    }
+
+    static double tempoPremium(Game game, Player seat, Player receiver) {
+        double lead = ScoringStakes.tempoLead(game, seat, receiver);
+        if (lead <= 0) return 0;
+        return TEMPO_SHARE_PER_POINT * lead * ScoringStakes.vpWorth(game, receiver);
     }
 
     static double earlyCost(Game game, Player seat, Player partner) {

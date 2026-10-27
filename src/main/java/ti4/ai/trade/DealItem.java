@@ -57,6 +57,7 @@ record DealItem(String sender, String receiver, ItemType type, String detail) {
             case FRAGMENTS -> FRAGMENT.matcher(detail).matches();
             case ACTION_CARDS -> CARD.matcher(detail).matches();
             case PLANETS -> PLANET.matcher(detail).matches();
+            case DETAILS -> !detail.isEmpty();
             case UNSUPPORTED -> false;
         };
     }
@@ -67,7 +68,7 @@ record DealItem(String sender, String receiver, ItemType type, String detail) {
             case PROMISSORY, ACTION_CARDS ->
                 isGeneric() ? Integer.parseInt(detail.substring(GENERIC_NOTE.length())) : SINGLE;
             case FRAGMENTS -> Integer.parseInt(detail.substring(FRAGMENT_KIND_LENGTH));
-            case PLANETS, UNSUPPORTED -> SINGLE;
+            case PLANETS, DETAILS, UNSUPPORTED -> SINGLE;
         };
     }
 

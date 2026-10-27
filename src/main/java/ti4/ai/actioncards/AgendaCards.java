@@ -14,6 +14,7 @@ class AgendaCards {
     static final String VETO = "veto";
     static final String VETO_TITLE = "Veto";
     private static final String REVEALED_AT = "lastAgendaReactTime";
+    private static final long FUTURE_SKEW_MILLIS = 60_000L;
     private static final long REVEAL_GUARD_MILLIS = 7_000L;
     private static final KeepFloor PRIOR = (game, seat, alias) -> ActionCardPrior.keepPrior(alias);
 
@@ -32,7 +33,8 @@ class AgendaCards {
     static boolean revealSettled(AiTurnContext context) {
         String revealed = context.game().getStoredValue(REVEALED_AT);
         if (revealed.isEmpty() || !StringUtils.isNumeric(revealed)) return true;
-        return context.now() >= Long.parseLong(revealed) + REVEAL_GUARD_MILLIS;
+        long at = Long.parseLong(revealed);
+        return at > context.now() + FUTURE_SKEW_MILLIS || context.now() >= at + REVEAL_GUARD_MILLIS;
     }
 
     static AiCard rider(String title) {

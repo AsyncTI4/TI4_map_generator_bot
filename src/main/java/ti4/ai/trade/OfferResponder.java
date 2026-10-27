@@ -114,6 +114,16 @@ class OfferResponder {
         if (DebtRules.repays(context, offerer, deal) && TradeValue.commitmentOk(context, offerer, deal)) {
             return Verdict.accepted();
         }
+        if (Extortion.isCounter(game, seat, offerer, deal) && !deal.hasDetails()) {
+            Extortion.settle(context, offerer);
+            return Verdict.accepted();
+        }
+        if (Extortion.isDemand(game, seat, offerer, deal)) {
+            return TradeValue.of(game, seat, offerer, deal, Trust.of(context, offerer))
+                            .clears(TradeValue.margin(offerer))
+                    ? Verdict.accepted()
+                    : Verdict.rejected();
+        }
         Optional<Boolean> technology = TechnologyRequest.accepts(context, offerer, deal);
         if (technology.isPresent()) {
             return technology.get() && TradeValue.commitmentOk(context, offerer, deal)
@@ -121,7 +131,9 @@ class OfferResponder {
                     : Verdict.rejected();
         }
         double trust = Trust.of(context, offerer);
-        if (deal.hasUnsupported()) return withoutUnsupported(context, offerer, deal);
+        if (deal.hasUnsupported() || (deal.hasDetails() && !AiSeats.isAiSeat(offerer))) {
+            return withoutUnsupported(context, offerer, deal);
+        }
         if (!TradeValue.ourSideCovered(context, offerer, deal)) return nearest(context, offerer, deal);
         if (isLoan(seat, offerer, deal) && !AiSeats.isAiSeat(offerer) && trust < Trust.LENDING) {
             return Verdict.rejected();

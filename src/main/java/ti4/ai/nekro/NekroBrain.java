@@ -275,6 +275,7 @@ public class NekroBrain implements FactionBrain {
             TradeRules::carthDeal,
             TradeRules::carthPreWash,
             TradeRules::startDeals,
+            TradeRules::awaitExtortion,
             this::takeTurn,
             StrategyCardRules::follow,
             this::declineStrategyCardFollow,

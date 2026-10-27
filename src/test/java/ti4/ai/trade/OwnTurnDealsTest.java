@@ -222,6 +222,37 @@ class OwnTurnDealsTest extends BaseTi4Test {
                 .isTrue();
     }
 
+    // Two short of Negotiate Trade Routes with no commodities left, Nekro may sell its own Support for the Throne for
+    // the 2 trade goods in round 4: the point it unlocks (spend cap 0.75 x 6 = 4.5) outweighs what keeping the note is
+    // worth. Once Sol is scoring 3 points ahead of the table, its tempo premium (0.5 x 3 x 6 = 9) prices the note out.
+    @Test
+    void sellsItsThroneForAPointOnlyToABuyerNotRunningAway() {
+        assertThat(thronePackages(twoShortWithThrone(), 0)).hasSize(1);
+        assertThat(thronePackages(twoShortWithThrone(), 3)).isEmpty();
+
+        // With its 3 commodities back, the ordinary package is bought and the Throne stays home.
+        TradeTable withCommodities = twoShortWithThrone();
+        withCommodities.stock(withCommodities.nekro, 3, 3);
+        start(withCommodities);
+        assertThat(draft(withCommodities).purpose()).isEqualTo(Purpose.DESPERATION);
+        assertThat(draft(withCommodities).target().notes("nekro")).isEmpty();
+    }
+
+    private static TradeTable twoShortWithThrone() {
+        TradeTable table = twoShort(true);
+        table.game.setRound(4);
+        table.stock(table.nekro, 0, 3);
+        table.nekro.addOwnedPromissoryNoteByID("black_sftt");
+        table.nekro.setPromissoryNote("black_sftt", 11);
+        return table;
+    }
+
+    private static List<Deal> thronePackages(TradeTable table, int solLead) {
+        table.points(table.sol, solLead);
+        double spendCap = Desperation.spendCap(table.game, table.nekro, 1);
+        return OwnTurnDeals.thronePackages(context(table), table.sol, 2, spendCap);
+    }
+
     // A human isn't priced by what an AI would accept, but must gain at least 0.5: 2 commodities for 2 trade goods
     // gives Sol nothing, 3 for 2 gives it 1.0. Being a point behind doesn't change that for a human.
     @Test

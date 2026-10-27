@@ -21,6 +21,7 @@ enum Purpose {
     TECHNOLOGY_HOLD("payment to hold Technology until later"),
     DEBT_PAYMENT("debt payment"),
     DEBT_COLLECTION("debt collection"),
+    EXTORTION("extortion demand"),
     COUNTER("counter-offer"),
     CLEANUP("offer"),
     ADOPTED("offer");

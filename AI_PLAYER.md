@@ -895,6 +895,43 @@ to build one by hand:
     partner leads (fully for a player close to winning), and refuses to give a point to a player who could win with it
     or to a clear leader. It accepts deals worth at least 0.3 to it (from an AI) or 0.5 (from a human) after that, and
     prices its own offers to another AI by working out what that AI would accept.
+  - **Selling its own _Support for the Throne_** (`ThroneSale`, a trade veto on every path). Never when the receiver
+    then has a path to win on public information (their points + 1 + what the website's score breakdown shows ready to
+    score, `ScoringPaths`). Usually not when hidden information could get them there (likely ready secrets, a route to
+    Styx, Imperial with Mecatol still to take), unless the AI finishes first (`WinRace`: on the spot, then in the
+    action phase, then by initiative at status). Otherwise only in a Throne swap, for a point it could not score any
+    other way (its only feasible public objective, offered as a last resort after every ordinary package failed), for
+    at least 10 trade goods of value with no debt, or to buy off an extortion that would cost it a point. Its price
+    also rises with the buyer's scoring tempo (half a point per point ahead of the table's average).
+  - **Extortion** (`Extortion`, `ExtortionPlans`). Only when its best move is an attack on a neighbour and being paid
+    would leave it better off: the demand plus its next best move elsewhere must beat the attack (an attack it needs to
+    score is usually worth more, so it just attacks). At most 2 demands a round. When the attack is needed to score
+    this round it asks only for _Support for the Throne_. Against a player who could win this round it only makes a
+    demand that lets it win first (an AI seat never pays one, so in practice only humans are asked), and it never asks
+    for a _Support for the Throne_ that would take it to the goal: no player hands over the winning point.
+    - It asks for something worth 1 to 5 trade goods (trade goods, a relic fragment or one of the victim's promissory
+      notes), priced at the most the victim would still pay. It asks for _Support for the Throne_ only when the attack
+      would stop the victim scoring, and always when it is their home system (if the attack lands troops). The plan
+      goes into the transaction's details, and it waits for the answer (5 minutes for an AI seat, 15 for a human).
+    - Paid: that system is spared for the rest of the round, every other attack on the payer is worth half as much
+      that round (unless it is the only way to score), and each demand a player has paid adds 2 trade goods to what the
+      next one against them must be worth. The payer trusts the deal for the round: no fear of an attack from the
+      extorter on the spared system, half the usual fear elsewhere. If a payer who could not win when it paid becomes
+      able to win that round, all deals are off on both sides.
+    - A counter-offer of tribute from the victim settles the demand. A demand only counts as paid once the asked item
+      has actually left the victim, and a settled demand no longer counts toward any later deal with that seat.
+      Refused, expired or rescinded: the attack gains the demand's worth in planning and goes ahead if still possible.
+    - An AI victim pays when the attack would cost more: its planets there, half its ships, every ground force and
+      structure on those planets, and the points it would really lose. Details a human writes into an offer are still
+      dropped before the AI answers.
+  - **Trade holder first.** A seat holding an unplayed _Trade_ starts no note deals or _Military Support_ sales at the
+    start of its turn: it plays _Trade_ and settles with its followers first.
+  - **Military Support** (`MilitarySupportDeals`). Sol sells it for 1 trade good at the start of any of its own turns
+    (tactical, component or strategic action, or the turn it passes) while its strategy pool is empty. A buyer wants it
+    when the 2 infantry are worth more than the price: a ground need (an invasion, holding a threatened planet, staging,
+    Occupy the Fringe) or a shortfall in the 4 spare infantry production keeps at home, each filling infantry worth 1.
+    Sol never sells it to a player with a public path to win, and charges a buyer half a trade good more per point it
+    leads the table by (so a clear leader is refused), preferring buyers who trail.
   - **Trust.** Human players start at 0.8 and AI seats are always 1: +0.1 for accepting its offer or paying debt, −0.3
     for not paying for a free Trade follow, −0.2 for not paying a debt it collects. It lives in the AI's memory and
     resets on undo or restart.

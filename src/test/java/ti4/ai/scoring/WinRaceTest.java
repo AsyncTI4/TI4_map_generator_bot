@@ -129,4 +129,44 @@ class WinRaceTest extends BaseTi4Test {
 
         assertThat(WinRace.winnersBefore(test.game, test.nekro)).isEmpty();
     }
+
+    // The user's Support for the Throne case: Sol on 8 holds Imperial without Mecatol. With a Throne point (9) and the
+    // fear that it takes Mecatol, Imperial's point lands it on 10 in the action phase, ahead of Nekro on 9 scoring a
+    // public at status.
+    @Test
+    void anImperialHolderWhoTakesMecatolWinsInTheActionPhase() {
+        test.sol.addSC(IMPERIAL);
+        tokens(test.sol, 0, 0);
+        points(test.sol, 8);
+        points(test.nekro, 5);
+
+        WinRace.Boost feared = new WinRace.Boost(1, 0, 0, true);
+        assertThat(WinRace.finish(test.game, test.sol, feared)).hasValue(0);
+        assertThat(WinRace.finish(test.game, test.sol, new WinRace.Boost(1, 0, 0, false)))
+                .isEmpty();
+
+        var nekro = WinRace.finish(test.game, test.nekro, new WinRace.Boost(0, 0, 1, false));
+        assertThat(nekro).hasValue(1 + TRADE);
+        assertThat(WinRace.finishesBefore(nekro, WinRace.finish(test.game, test.sol, feared)))
+                .isFalse();
+    }
+
+    // Both finish at status: lower initiative scores first (LRR 81.1), and a point gained in the deal itself comes
+    // before either.
+    @Test
+    void initiativeOrdersStatusPhaseFinishes() {
+        test.sol.addSC(DIPLOMACY);
+        tokens(test.sol, 0, 0);
+        points(test.sol, 9);
+        points(test.nekro, 5);
+        WinRace.Boost onePublic = new WinRace.Boost(0, 0, 1, false);
+
+        var nekro = WinRace.finish(test.game, test.nekro, onePublic);
+        var sol = WinRace.finish(test.game, test.sol, onePublic);
+        assertThat(WinRace.finishesBefore(sol, nekro)).isTrue();
+        assertThat(WinRace.finishesBefore(nekro, sol)).isFalse();
+
+        var nekroNow = WinRace.finish(test.game, test.nekro, new WinRace.Boost(1, 0, 0, false));
+        assertThat(WinRace.finishesBefore(nekroNow, sol)).isTrue();
+    }
 }
