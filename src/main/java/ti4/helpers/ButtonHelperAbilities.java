@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,6 +54,7 @@ import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.MentakAgent;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.FlipTileService;
@@ -871,16 +873,22 @@ public final class ButtonHelperAbilities {
     public static void offerOmenDiceButtons2(Game game, Player player, String componentID) {
         String msg = player.getRepresentationUnfogged()
                 + " you may play an Omen die with the following buttons. Duplicate dice are not shown.";
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(), msg, omenDiceButtons(game, player, componentID));
+    }
+
+    public static List<Button> omenDiceButtons(Game game, Player player, String componentID) {
         List<Button> buttons = new ArrayList<>();
         List<Integer> dice = new ArrayList<>();
         for (int die : getAllOmenDie(game)) {
             if (!dice.contains(die)) {
-                buttons.add(Buttons.green("useOmenDie_" + die + "_" + componentID, "Use Result: " + die));
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + "useOmenDie_" + die + "_" + componentID, "Use Result: " + die));
                 dice.add(die);
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Delete these"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete these"));
+        return buttons;
     }
 
     @ButtonHandler("useOmenDie_")
@@ -1010,10 +1018,7 @@ public final class ButtonHelperAbilities {
             }
             if (player.hasUnexhaustedLeader("mentakagent")) {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green(
-                        player.factionButtonChecker() + "exhaustAgent_mentakagent_" + pillaged.getFaction(),
-                        "Use Mentak Agent",
-                        FactionEmojis.Mentak));
+                buttons.add(MentakAgent.button(player, pillaged));
                 buttons.add(Buttons.red("deleteButtons", "Done"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
@@ -1028,10 +1033,7 @@ public final class ButtonHelperAbilities {
                         && p2.hasUnexhaustedLeader("yssarilagent")
                         && player.hasLeader("mentakagent")) {
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.green(
-                            "FFCC_" + p2.getFaction() + "_" + "exhaustAgent_mentakagent_" + pillaged.getFaction(),
-                            "Use Mentak Agent",
-                            FactionEmojis.Mentak));
+                    buttons.add(MentakAgent.button(p2, pillaged));
                     buttons.add(Buttons.red("deleteButtons", "Done"));
                     MessageHelper.sendMessageToChannelWithButtons(
                             p2.getCorrectChannel(),
@@ -1218,8 +1220,14 @@ public final class ButtonHelperAbilities {
     }
 
     public static List<Button> getPlanetPlaceUnitButtonsForMechMitosis(Player player, Game game, String reason) {
+        return getPlanetPlaceUnitButtonsForMechMitosis(
+                player, game, reason, game.getTileMap().values());
+    }
+
+    public static List<Button> getPlanetPlaceUnitButtonsForMechMitosis(
+            Player player, Game game, String reason, Collection<Tile> tiles) {
         List<Button> planetButtons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : tiles) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 String colorID = Mapper.getColorID(player.getColor());
                 int numInf = unitHolder.getUnitCount(UnitType.Infantry, colorID);

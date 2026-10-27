@@ -126,6 +126,13 @@ A single action row can hold **either** up to 5 buttons **or** one select menu â
   `Player.fogSafeEmoji()` / `getFactionEmojiOrColor()`. If none of them fits, suggest a cheap best-effort
   fix (e.g. `game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel()`). If even that
   isn't feasible, leave a compact TODO in the method saying what leaks, so it can be made fog safe later.
+- **Never ping other players into a private cards-info thread.** A player's `#cards-info` thread
+  (`getCardsInfoThread()`) is private: it shows their hand and secrets, and pinging someone in it adds them
+  to the thread. Buttons pressed there reply there by default, so when a message is for another player
+  (or is something everyone should see, like an agent being exhausted), send it to
+  that player's `getCorrectChannel()` instead (the actions channel, or their private channel in Fog of War). Agent
+  modules get this from `AgentLifecycle.deliver`; elsewhere, check
+  `event.getMessageChannel().getType() == ChannelType.GUILD_PRIVATE_THREAD`.
 - **Domain vocabulary lives in [GLOSSARY.md](GLOSSARY.md).** Use its terms in code, messages and
   PR text, and check it for TI4 rules, table slang (wash, plastic, guac, X-1) and Discord surface
   names. Add new terms there when you introduce a domain concept.

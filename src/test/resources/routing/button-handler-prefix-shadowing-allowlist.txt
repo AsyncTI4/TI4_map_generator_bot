@@ -23,8 +23,6 @@ dream_bt_move_nexus_ -> dream_bt_move_nexus_from_
 dream_hero_move_nexus_ -> dream_hero_move_nexus_from_
 dream_offer_move_nexus -> dream_offer_move_nexus_from_
 dream_recurring_mech_ -> dream_recurring_mech_paid_
-exhaustAgent_ -> exhaustAgent_kaloraagent
-exhaustAgent_ -> exhaustAgent_lunariumagent
 expeditionInfo -> expeditionInfoAndButtons
 finishComponentAction -> finishComponentAction_
 finishKairnHero -> finishKairnHeroPurgedExplores

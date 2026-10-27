@@ -887,6 +887,12 @@ class GameSaveService {
             writer.write(Constants.MAGEN_INFANTRY_COUNT + " " + player.getMagenInfantryCounter());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.DACXIVE_COUNT + " " + player.getDacxiveCounter());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.YIN_SPINNER_COUNT + " " + player.getYinSpinnerCounter());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.PATH_TOKEN_COUNT + " " + player.getPathTokenCounter());
             writer.write(System.lineSeparator());
 

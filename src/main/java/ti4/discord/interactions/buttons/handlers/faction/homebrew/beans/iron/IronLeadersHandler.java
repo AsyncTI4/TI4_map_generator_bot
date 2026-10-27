@@ -18,25 +18,19 @@ import ti4.message.MessageHelper;
 
 @UtilityClass
 public class IronLeadersHandler {
+    public static final String PRODUCTION_SYSTEM_PROMPT =
+            ", choose a system to produce 1 unit with _Shipwright Kastel_. Its cost is reduced by 1.";
     private static final String SELECT_PRODUCTION_SYSTEM = "ironAgentProductionSystem_";
     private static final String SELECT_HERO_PRODUCTION_SYSTEM = "ironHeroProductionSystem_";
     private static final String PRODUCTION_CONTEXT = "ironAgentProduction_";
 
-    public static void offerShipwrightKastelProduction(Game game, Player target) {
-        List<Button> buttons = getProductionSystemButtons(game, target);
-
-        if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    target.getCorrectChannel(),
-                    target.getRepresentationNoPing() + " has no system containing one of their units with PRODUCTION.");
-        } else {
-            NewStuffHelper.sendPaginated(
-                    target.getCorrectChannel(),
-                    productionSystemMessage(target),
-                    buttons,
-                    List.of(),
-                    target.factionButtonChecker() + SELECT_PRODUCTION_SYSTEM);
-        }
+    public static List<Button> agentProductionSystemButtons(Game game, Player target) {
+        return NewStuffHelper.paginateWithPinnedButtons(
+                getProductionSystemButtons(game, target),
+                List.of(),
+                target.factionButtonChecker() + SELECT_PRODUCTION_SYSTEM,
+                25,
+                0);
     }
 
     @ButtonHandler(SELECT_PRODUCTION_SYSTEM)
@@ -165,8 +159,7 @@ public class IronLeadersHandler {
     }
 
     private static String productionSystemMessage(Player player) {
-        return player.getRepresentation()
-                + ", choose a system to produce 1 unit with _Shipwright Kastel_. Its cost is reduced by 1.";
+        return player.getRepresentation() + PRODUCTION_SYSTEM_PROMPT;
     }
 
     private static String heroProductionSystemMessage(Player player) {

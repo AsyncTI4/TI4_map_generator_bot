@@ -9,6 +9,13 @@ import org.springframework.data.repository.query.Param;
 interface GameEventRepository extends CrudRepository<GameEventEntity, Long> {
     List<GameEventEntity> findByGameNameAndSeqLessThanEqualOrderBySeqAsc(String gameName, long seq);
 
+    List<GameEventEntity> findByGameNameAndSeqLessThanEqualAndTimestampEpochMillisGreaterThanOrderBySeqAsc(
+            String gameName, long seq, long timestampEpochMillis);
+
+    @Query("select distinct e.gameName from GameEventEntity e where e.timestampEpochMillis > :since"
+            + " order by e.gameName")
+    List<String> findGameNamesWithEventsAfter(@Param("since") long since);
+
     @Query("select e.mapState from GameEventEntity e where e.gameName = :gameName and e.seq <= :seq"
             + " and e.mapState is not null order by e.seq desc")
     List<String> findLatestMapStates(@Param("gameName") String gameName, @Param("seq") long seq, Pageable pageable);

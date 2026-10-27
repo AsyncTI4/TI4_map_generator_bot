@@ -61,6 +61,13 @@ import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.MonumentsService;
 import ti4.service.game.NekroMonumentService;
+import ti4.service.leader.agent.modules.HacanAgent;
+import ti4.service.leader.agent.modules.NekroAgent;
+import ti4.service.leader.agent.modules.homebrew.KolleccAgent;
+import ti4.service.leader.agent.modules.homebrew.MykoMentoriAgent;
+import ti4.service.leader.agent.modules.homebrew.PharadnAgent;
+import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
+import ti4.service.leader.agent.modules.twilightsfall.ResearchGenomeAgent;
 
 @UtilityClass
 public class CardsInfoService {
@@ -137,11 +144,10 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("initialPeak", "Peek At Next Objective", FactionEmojis.augers));
         }
         if (player.hasUnexhaustedLeader("mykomentoriagent")) {
-            buttons.add(
-                    Buttons.gray("exhaustAgent_mykomentoriagent", "Use Myko-Mentori Agent", FactionEmojis.mykomentori));
+            buttons.add(MykoMentoriAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("hacanagent")) {
-            buttons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
+            buttons.add(HacanAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("atokeraagent")) {
             buttons.add(Buttons.gray("useAtokeraAgent", "Use Magruda, the Atokera Agent", FactionEmojis.atokera));
@@ -222,10 +228,10 @@ public class CardsInfoService {
                     FactionEmojis.belkosea));
         }
         if (player.hasUnexhaustedLeader("researchagent")) {
-            buttons.add(Buttons.gray("exhaustAgent_researchagent", "Use Research Genome", FactionEmojis.Deepwrought));
+            buttons.add(ResearchGenomeAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("pharadnagent")) {
-            buttons.add(Buttons.gray("exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));
+            buttons.add(PharadnAgent.button(player));
         }
         Button lightrailOrdnanceButton = BRLightrailOrdnanceRelicHandler.getCardsInfoButton(game, player);
         if (lightrailOrdnanceButton != null) {
@@ -449,7 +455,7 @@ public class CardsInfoService {
             buttons.add(Buttons.green("exhaustTech_dsuydag", "Exhaust Messiah Protocols", TechEmojis.BioticTech));
         }
         if (player.hasUnexhaustedLeader("nekroagent")) {
-            buttons.add(Buttons.gray("exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
+            buttons.add(NekroAgent.button(player));
         }
         if (player.hasReadyBreakthrough("lanefirbt")) {
             buttons.add(Buttons.gray("useLanefirBt", "Use Lanefir Breakthrough", FactionEmojis.lanefir));
@@ -474,7 +480,7 @@ public class CardsInfoService {
         }
         MonumentsBRButtonHandler.addArmageddonProjectCardsInfoButtons(buttons, game, player);
         if (player.hasUnexhaustedLeader("vaylerianagent")) {
-            buttons.add(Buttons.gray("exhaustAgent_vaylerianagent", "Use Vaylerian Agent", FactionEmojis.vaylerian));
+            buttons.add(VaylerianAgent.pickTargetButton(player));
         }
         if (player.ownsUnit("ghost_mech")
                 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0
@@ -487,7 +493,7 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("nivynMechStep1_", "Use Nivyn Mech", FactionEmojis.nivyn));
         }
         if (player.hasUnexhaustedLeader("kolleccagent")) {
-            buttons.add(Buttons.gray("exhaustAgent_kolleccagent", "Use Kollecc Agent", FactionEmojis.kollecc));
+            buttons.add(KolleccAgent.button(player));
         }
         if (player.hasAbility("cunning")) {
             buttons.add(Buttons.green("setTrapStep1", "Set a Trap"));

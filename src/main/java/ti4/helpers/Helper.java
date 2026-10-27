@@ -120,6 +120,7 @@ import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.leader.agent.modules.ArgentAgent;
 import ti4.service.map.TokenPlanetService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
@@ -2984,10 +2985,7 @@ public final class Helper {
                 && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
 
             if (player.hasUnexhaustedLeader("argentagent")) {
-                unitButtons.add(Buttons.blue(
-                        player.factionButtonChecker() + "exhaustAgent_argentagent_" + tile.getPosition(),
-                        "Use Argent Agent",
-                        FactionEmojis.Argent));
+                unitButtons.add(ArgentAgent.button(player, tile));
             }
             if (player.hasTechReady("sar")) {
                 unitButtons.add(Buttons.blue(

@@ -67,12 +67,14 @@ import ti4.service.agenda.MonumentsAgendaService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.LoreService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.homebrew.GhotiAgent;
+import ti4.service.leader.agent.modules.homebrew.MortheusAgent;
+import ti4.service.leader.agent.modules.twilightsfall.ExperimentalGenomeAgent;
 import ti4.service.planet.FlipTileService;
 import ti4.service.planet.PlanetService;
 import ti4.service.tactical.TacticalActionService;
@@ -2768,16 +2770,13 @@ public final class ButtonHelperModifyUnits {
             buttons.add(Buttons.red("useRelic_boon", "Use Boon Of The Cerulean God Relic"));
         }
         if (player.hasUnexhaustedLeader("ghotiagent")) {
-            buttons.add(Buttons.red(
-                    "exhaustAgent_ghotiagent_" + player.getFaction(), "Use Ghoti Agent", FactionEmojis.ghoti));
+            buttons.add(GhotiAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("experimentalagent")) {
-            buttons.add(
-                    Buttons.gray("exhaustAgent_experimentalagent", "Use Experimental Genome", FactionEmojis.Jolnar));
+            buttons.add(ExperimentalGenomeAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("mortheusagent")) {
-            buttons.add(Buttons.red(
-                    "exhaustAgent_mortheusagent_" + player.getFaction(), "Use Mortheus Agent", FactionEmojis.mortheus));
+            buttons.add(MortheusAgent.button(player));
         }
         Button DoneExhausting;
         if (!buttonID.contains("deleteButtons")) {

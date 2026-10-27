@@ -29,11 +29,7 @@ public class TaLeadersHandler {
     private static final String AGENT_CHOOSE_TRAIT_PREFIX = "taAgentChooseTrait_";
     private static final String AGENT_RESOLVE_TRAIT_PREFIX = "taAgentResolveTrait_";
 
-    public static void resolveTaAgentTarget(Game game, Player player) {
-        if (game == null || player == null) {
-            return;
-        }
-
+    public static List<Button> agentPlanetButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String planetName : player.getPlanets()) {
             Tile tile = game.getTileFromPlanet(planetName);
@@ -45,16 +41,9 @@ public class TaLeadersHandler {
             }
         }
         if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " has no explorable planets for Len, the Ta agent.");
-            return;
+            return buttons;
         }
-        String message = player.getRepresentationUnfogged() + ", choose a planet for Len, the Ta agent.";
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                message,
-                NewStuffHelper.buttonPagination(buttons, player.factionButtonChecker() + AGENT_CHOOSE_TRAIT_PREFIX, 0));
+        return NewStuffHelper.buttonPagination(buttons, player.factionButtonChecker() + AGENT_CHOOSE_TRAIT_PREFIX, 0);
     }
 
     @ButtonHandler(AGENT_CHOOSE_TRAIT_PREFIX)

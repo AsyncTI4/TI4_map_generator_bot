@@ -18,11 +18,26 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.map.FractureService;
 
 @UtilityClass
 public class NatauAbilityHandler {
     private static final String ADD_CATACLYSM_INGRESS = "natauAddCataclysmIngress_";
+
+    public static Button getCataclysmFrankenButton(Player player) {
+        return Buttons.green(
+                player.factionButtonChecker() + "beginCataclysmFranken", "Begin Cataclysm", FactionEmojis.natau);
+    }
+
+    @ButtonHandler("beginCataclysmFranken")
+    public static void beginCataclysmFranken(ButtonInteractionEvent event, Game game, Player player) {
+        if (player == null || game == null || !player.hasAbility("cataclysm")) {
+            return;
+        }
+
+        beginCataclysm(event, player, game);
+    }
 
     public static void beginCataclysm(GenericInteractionCreateEvent event, Player player, Game game) {
         FractureService.enterPlayOrExplain(event, game, player, null);

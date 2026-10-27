@@ -1,0 +1,92 @@
+package ti4.service.leader.agent;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
+import ti4.model.LeaderModel;
+import ti4.model.Mapper;
+import ti4.testUtils.BaseTi4Test;
+
+/**
+ * Pins which agents still fall through to the legacy exhaustAgent code, which only exhausts the card.
+ *
+ * <p>An agent whose ability window mentions an action can be pressed from the component-action menu, which calls
+ * exhaustAgent with the bare leader id. Without a module that press exhausts the card and does nothing else, so a
+ * new action agent must either get a module or be added here on purpose. Remove ids from this list as they get
+ * modules.
+ */
+class LegacyAgentFallThroughGuardTest extends BaseTi4Test {
+
+    private static final Set<String> ACTION_AGENTS_WITHOUT_A_MODULE = Set.of(
+            "arachianagent",
+            "arachneraagent",
+            "arvaxiagent",
+            "bsp_mentakagent",
+            "bsp_sardakkagent",
+            "bsp_xxchaagent",
+            "councilorsagent",
+            "craveragent",
+            "crystellumagent",
+            "dreamagent",
+            "horatioagent",
+            "ironhullagent",
+            "lumerisagent",
+            "mahactagent",
+            "morphaagent",
+            "psmagent",
+            "revenantagent",
+            "tknovarecursiveagent",
+            "uchoiragent",
+            "zooidagent");
+
+    private static final Path SOURCES = Path.of("src", "main", "java");
+    private static final Pattern AGENT_SELECTION = Pattern.compile("getAgentSelection_([a-z0-9]+)");
+
+    @Test
+    void onlyTheKnownActionAgentsLackAModule() {
+        List<String> withoutModule = Mapper.getLeaders().values().stream()
+                .filter(leader -> "agent".equals(leader.getType()))
+                .filter(leader -> leader.getAbilityWindow() != null
+                        && leader.getAbilityWindow().toLowerCase(Locale.ROOT).contains("action"))
+                .map(LeaderModel::getId)
+                .filter(id -> AgentModules.find(id).isEmpty())
+                .toList();
+
+        assertThat(withoutModule).containsExactlyInAnyOrderElementsOf(ACTION_AGENTS_WITHOUT_A_MODULE);
+    }
+
+    @Test
+    void everyUseOnSomeoneElseButtonReachesAModule() throws IOException {
+        List<String> selectedAgents;
+        try (Stream<Path> files = Files.walk(SOURCES)) {
+            selectedAgents = files.filter(file -> file.toString().endsWith(".java"))
+                    .flatMap(LegacyAgentFallThroughGuardTest::agentSelections)
+                    .distinct()
+                    .toList();
+        }
+
+        assertThat(selectedAgents).isNotEmpty();
+        assertThat(selectedAgents)
+                .as("a getAgentSelection_<id> picker sends exhaustAgent_<id>_<faction>, which needs a module")
+                .allSatisfy(id -> assertThat(AgentModules.find(id)).isPresent());
+    }
+
+    private static Stream<String> agentSelections(Path file) {
+        try {
+            Matcher matcher = AGENT_SELECTION.matcher(Files.readString(file, StandardCharsets.UTF_8));
+            return matcher.results().map(result -> result.group(1));
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+}

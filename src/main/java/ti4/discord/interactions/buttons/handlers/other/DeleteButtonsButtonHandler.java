@@ -34,7 +34,6 @@ import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperTacticalAction;
@@ -61,6 +60,14 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.LoreService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.AgentLifecycle;
+import ti4.service.leader.agent.modules.MercerAgent;
+import ti4.service.leader.agent.modules.WinnuAgent;
+import ti4.service.leader.agent.modules.homebrew.GhotiAgent;
+import ti4.service.leader.agent.modules.homebrew.GledgeAgent;
+import ti4.service.leader.agent.modules.homebrew.LunariumAgent;
+import ti4.service.leader.agent.modules.homebrew.MortheusAgent;
+import ti4.service.leader.agent.modules.homebrew.RohDhnaAgent;
 import ti4.service.turn.StartTurnService;
 import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
@@ -359,46 +366,35 @@ class DeleteButtonsButtonHandler {
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
-                    buttons.add(Buttons.red("exhaustAgent_winnuagent", "Use Winnu Agent", FactionEmojis.Winnu));
+                    buttons.add(WinnuAgent.button(player));
                 }
                 if (player.hasUnexhaustedLeader("lunariumagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
-                    buttons.add(
-                            Buttons.red("exhaustAgent_lunariumagent", "Use Lunarium Agent", FactionEmojis.lunarium));
+                    buttons.add(LunariumAgent.button(player));
                 }
                 if (player.hasUnexhaustedLeader("gledgeagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
-                    buttons.add(Buttons.red(
-                            "exhaustAgent_gledgeagent_" + player.getFaction(),
-                            "Use Gledge Agent",
-                            FactionEmojis.gledge));
+                    buttons.add(GledgeAgent.button(player));
                 }
 
                 if (player.hasUnexhaustedLeader("ghotiagent")) {
-                    buttons.add(Buttons.red(
-                            "exhaustAgent_ghotiagent_" + player.getFaction(), "Use Ghoti Agent", FactionEmojis.ghoti));
+                    buttons.add(GhotiAgent.button(player));
                 }
 
                 if (player.hasUnexhaustedLeader("mortheusagent")) {
-                    buttons.add(Buttons.red(
-                            "exhaustAgent_mortheusagent_" + player.getFaction(),
-                            "Use Mortheus Agent",
-                            FactionEmojis.mortheus));
+                    buttons.add(MortheusAgent.button(player));
                 }
                 if (player.hasUnexhaustedLeader("rohdhnaagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
-                    buttons.add(Buttons.red(
-                            "exhaustAgent_rohdhnaagent_" + player.getFaction(),
-                            "Use Roh'Dhna Agent",
-                            FactionEmojis.rohdhna));
+                    buttons.add(RohDhnaAgent.button(player));
                 }
                 if (player.hasLeaderUnlocked("hacanhero")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
@@ -520,11 +516,9 @@ class DeleteButtonsButtonHandler {
                 List<Button> systemButtons2;
                 systemButtons2 = new ArrayList<>();
                 if (player.hasUnexhaustedLeader("nomadagentmercer")) {
-                    String message = player.getRepresentationUnfogged() + ", you may use "
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                            + "Field Marshal Mercer, a Nomad"
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
-                    systemButtons2.addAll(ButtonHelperAgents.getMercerAgentInitialButtons(game, player));
+                    String message = player.getRepresentationNoPing() + ", you may use "
+                            + AgentLifecycle.agentNameForHolder(game, player, "nomadagentmercer") + ".";
+                    systemButtons2.addAll(MercerAgent.buttons(game, player));
                     systemButtons2.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
                 }

@@ -172,7 +172,7 @@ public class FactionDraftItem extends DraftItem {
         if (Mapper.isValidBreakthrough(breakthrough)) {
             addIfAllowed(game, components, DraftCategory.BREAKTHROUGH, breakthrough, breakthrough);
         }
-        if (game.isMonumentsMode() && game.getActiveBagDraft() instanceof FrankenDrazDraft) {
+        if (game != null && game.isMonumentsMode() && game.getActiveBagDraft() instanceof FrankenDrazDraft) {
             Mapper.getUnits().values().stream()
                     .filter(UnitModel::getIsMonument)
                     .filter(unit -> faction.getAlias().equals(unit.getFaction().orElse(null)))
@@ -191,7 +191,7 @@ public class FactionDraftItem extends DraftItem {
             return;
         }
         String resolvedBanValue = itemId.equals(banValue) ? resolvedItemId : banValue;
-        if (isBanned(game, category, resolvedBanValue)) {
+        if (game != null && isBanned(game, category, resolvedBanValue)) {
             return;
         }
         DraftItem item = generate(category, resolvedItemId);
@@ -202,7 +202,7 @@ public class FactionDraftItem extends DraftItem {
     }
 
     private static String resolveFrankenReplacement(Game game, DraftCategory category, String itemId) {
-        if (!game.isFrankenGame()) {
+        if (game == null || !game.isFrankenGame()) {
             return itemId;
         }
 

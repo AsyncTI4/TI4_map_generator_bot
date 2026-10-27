@@ -53,7 +53,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.ComponentActionHelper;
@@ -95,6 +94,12 @@ import ti4.service.fow.WhisperService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.HacanAgent;
+import ti4.service.leader.agent.modules.NekroAgent;
+import ti4.service.leader.agent.modules.homebrew.FlorzenAgent;
+import ti4.service.leader.agent.modules.homebrew.KolleccAgent;
+import ti4.service.leader.agent.modules.homebrew.PharadnAgent;
+import ti4.service.leader.agent.modules.homebrew.VadenAgent;
 import ti4.service.map.PlayerAreaWarningService;
 import ti4.service.relic.QuantumEntanglerService;
 import ti4.service.strategycard.PlayStrategyCardService;
@@ -939,18 +944,11 @@ public class StartTurnService {
                 startButtons.add(Buttons.gray(
                         factionChecker + "exhaustTech_dscymiy", "Exhaust Recursive Worm", FactionEmojis.cymiae));
             }
-            if (player.hasUnexhaustedLeader("florzenagent")
-                    && !ButtonHelperAgents.getAttachments(game, player).isEmpty()) {
-                startButtons.add(Buttons.green(
-                        factionChecker + "exhaustAgent_florzenagent_" + player.getFaction(),
-                        "Use Florzen Agent",
-                        FactionEmojis.florzen));
+            if (player.hasUnexhaustedLeader("florzenagent")) {
+                FlorzenAgent.button(game, player).ifPresent(startButtons::add);
             }
             if (player.hasUnexhaustedLeader("vadenagent")) {
-                startButtons.add(Buttons.gray(
-                        factionChecker + "exhaustAgent_vadenagent_" + player.getFaction(),
-                        "Use Vaden Agent",
-                        FactionEmojis.vaden));
+                startButtons.add(VadenAgent.button(player));
             }
             if (player.hasAbility("laws_order") && !game.getLaws().isEmpty()) {
                 startButtons.add(Buttons.gray(
@@ -983,8 +981,7 @@ public class StartTurnService {
                         FactionEmojis.olradin));
             }
             if (player.hasUnexhaustedLeader("kolleccagent")) {
-                startButtons.add(Buttons.gray(
-                        factionChecker + "exhaustAgent_kolleccagent", "Use Kollecc Agent", FactionEmojis.kollecc));
+                startButtons.add(KolleccAgent.button(player));
             }
             if (player.hasUnexhaustedLeader("oblivionagent")) {
                 startButtons.add(OblivionLeadersHandler.getOblivionAgentButton(player));
@@ -1018,8 +1015,7 @@ public class StartTurnService {
         Button modify = Buttons.gray("getModifyTiles", "Modify Units");
         startButtons.add(modify);
         if (player.hasUnexhaustedLeader("hacanagent")) {
-            startButtons.add(
-                    Buttons.gray(factionChecker + "exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
+            startButtons.add(HacanAgent.button(player));
         }
         if (player.hasUnlockedBreakthrough("titansbt")) {
             startButtons.add(Buttons.gray("selectPlayerToSleeper", "Add a sleeper token", MiscEmojis.Sleeper));
@@ -1031,8 +1027,7 @@ public class StartTurnService {
                     FactionEmojis.belkosea));
         }
         if (player.hasUnexhaustedLeader("pharadnagent")) {
-            startButtons.add(Buttons.gray(
-                    factionChecker + "exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));
+            startButtons.add(PharadnAgent.button(player));
         }
         if (player.hasReadyBreakthrough("pharadnbt")) {
             startButtons.add(Buttons.gray(
@@ -1043,8 +1038,7 @@ public class StartTurnService {
                     factionChecker + "exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw 1 Acton Card"));
         }
         if (player.hasUnexhaustedLeader("nekroagent") && player.getAcCount() > 0) {
-            startButtons.add(
-                    Buttons.gray(factionChecker + "exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
+            startButtons.add(NekroAgent.button(player));
         }
         if (player.hasReadyBreakthrough("lanefirbt")) {
             startButtons.add(Buttons.gray("useLanefirBt", "Use Lanefir Breakthrough", FactionEmojis.lanefir));

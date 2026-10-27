@@ -79,6 +79,12 @@ import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.AgentLifecycle;
+import ti4.service.leader.agent.modules.JolNarAgent;
+import ti4.service.leader.agent.modules.homebrew.MirvedaAgent;
+import ti4.service.leader.agent.modules.homebrew.VeldyrAgent;
+import ti4.service.leader.agent.modules.homebrew.ZealotsAgent;
+import ti4.service.leader.agent.modules.twilightsfall.ExperimentalGenomeAgent;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
@@ -910,10 +916,7 @@ public class PlayerTechService {
             }
             if (player.hasUnexhaustedLeader("mirvedaagent") && player.getStrategicCC() > 0) {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.gray(
-                        "exhaustAgent_mirvedaagent_" + player.getFaction(),
-                        "Use Mirveda Agent",
-                        FactionEmojis.mirveda));
+                buttons.add(MirvedaAgent.button(player));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         player.getRepresentationUnfogged()
@@ -972,17 +975,13 @@ public class PlayerTechService {
         }
 
         if (player.hasUnexhaustedLeader("zealotsagent")) {
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.gray(
-                    "exhaustAgent_zealotsagent_" + player.getFaction(), "Use Rhodun Agent", FactionEmojis.zealots));
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged()
-                            + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                            + "Priestess Tuh, the Rhodun"
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                            + " agent, to produce 1 ship at home or in a system where you have a technology specialty planet.",
-                    buttons);
+            ZealotsAgent.button(game, player)
+                    .ifPresent(button -> MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(),
+                            player.getRepresentationUnfogged()
+                                    + " you may use " + AgentLifecycle.agentNameForHolder(game, player, "zealotsagent")
+                                    + ", to produce 1 ship at home or in a system where you have a technology specialty planet.",
+                            List.of(button)));
         }
 
         if (shareKnowledge) {
@@ -1200,15 +1199,13 @@ public class PlayerTechService {
             buttons.add(Buttons.red("prophetsTears_TechSkip", "Exhaust Prophet's Tears for Technology Prerequisite"));
         }
         if (player.hasUnexhaustedLeader("jolnaragent")) {
-            buttons.add(Buttons.gray("exhaustAgent_jolnaragent", "Use Jol-Nar Agent", FactionEmojis.Jolnar));
+            buttons.add(JolNarAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("experimentalagent")) {
-            buttons.add(
-                    Buttons.gray("exhaustAgent_experimentalagent", "Use Experimental Genome", FactionEmojis.Jolnar));
+            buttons.add(ExperimentalGenomeAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("veldyragent")) {
-            buttons.add(Buttons.red(
-                    "exhaustAgent_veldyragent_" + player.getFaction(), "Use Veldyr Agent", FactionEmojis.veldyr));
+            buttons.add(VeldyrAgent.button(player));
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
             buttons.add(Buttons.gray("yinCommanderStep1_", "Remove Infantry via Yin Commander", FactionEmojis.Yin));

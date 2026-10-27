@@ -91,6 +91,7 @@ import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRel
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
+import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -170,6 +171,13 @@ import ti4.service.game.GameColorsService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.leader.agent.modules.NaazAgent;
+import ti4.service.leader.agent.modules.homebrew.CheiranAgent;
+import ti4.service.leader.agent.modules.homebrew.FreeSystemsAgent;
+import ti4.service.leader.agent.modules.homebrew.KhraskAgent;
+import ti4.service.leader.agent.modules.homebrew.LiZhoAgent;
+import ti4.service.leader.agent.modules.homebrew.OlradinAgent;
+import ti4.service.leader.agent.modules.twilightsfall.ExperimentalGenomeAgent;
 import ti4.service.map.SystemPickerService;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.planet.AddPlanetService;
@@ -801,8 +809,7 @@ public class ButtonHelper {
             buttons.add(Buttons.red("reduceComm_2_" + whatIsItFor, "Spend 2 Commodities"));
         }
         if (player.hasUnexhaustedLeader("olradinagent")) {
-            buttons.add(Buttons.gray(
-                    "exhaustAgent_olradinagent_" + player.getFaction(), "Use Olradin Agent", FactionEmojis.olradin));
+            buttons.add(OlradinAgent.button(player));
         }
         if (player.getNombox().hasUnits()
                 && !whatIsItFor.contains("inf")
@@ -813,8 +820,7 @@ public class ButtonHelper {
             buttons.add(Buttons.gray("getReleaseButtons", "Release captured units", FactionEmojis.Cabal));
         }
         if (player.hasUnexhaustedLeader("experimentalagent") && !whatIsItFor.contains("inf")) {
-            buttons.add(
-                    Buttons.gray("exhaustAgent_experimentalagent", "Use Experimental Genome", FactionEmojis.Jolnar));
+            buttons.add(ExperimentalGenomeAgent.button(player));
         }
         if (player.getNombox().hasUnits() && player.hasAbility("mark_of_pharadn")) {
             buttons.add(Buttons.gray("getReleaseButtons", "Release captured units", FactionEmojis.pharadn));
@@ -831,8 +837,7 @@ public class ButtonHelper {
         }
         if (player.hasUnexhaustedLeader("khraskagent")
                 && (whatIsItFor.contains("inf") || whatIsItFor.contains("both"))) {
-            buttons.add(Buttons.gray(
-                    "exhaustAgent_khraskagent_" + player.getFaction(), "Use Khrask Agent", FactionEmojis.khrask));
+            buttons.add(KhraskAgent.button(player));
         }
         if (player.hasAbility("diplomats")
                 && !ButtonHelperAbilities.getDiplomatButtons(game, player).isEmpty()) {
@@ -4027,7 +4032,7 @@ public class ButtonHelper {
     }
 
     public static List<Button> getButtonsForAgentSelection(Game game, String agent) {
-        return AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "exhaustAgent_" + agent, null);
+        return AgendaRiderHelper.getPlayerOutcomeButtons(game, null, AgentButtonIds.format(agent), null);
     }
 
     @ButtonHandler("deleteMessage_") // deleteMessage_{Optional String to send to the event channel after}
@@ -5216,31 +5221,16 @@ public class ButtonHelper {
 
         // Agents
         if (player.hasUnexhaustedLeader("naazagent")) {
-            endButtons.add(Buttons.green(
-                    player.factionButtonChecker() + "exhaustAgent_naazagent_" + player.getFaction(),
-                    "Use Naaz-Rokha Agents",
-                    FactionEmojis.Naaz));
+            endButtons.add(NaazAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("lizhoagent")) {
-            endButtons.add(Buttons.green(
-                    player.factionButtonChecker() + "exhaustAgent_lizhoagent",
-                    "Use Li-Zho Agent",
-                    FactionEmojis.lizho));
+            endButtons.add(LiZhoAgent.button(player));
         }
-        if (player.hasUnexhaustedLeader("cheiranagent")
-                && !ButtonHelperAgents.getCheiranAgentTiles(player, game).isEmpty()) {
-            endButtons.add(Buttons.green(
-                    player.factionButtonChecker() + "exhaustAgent_cheiranagent_" + player.getFaction(),
-                    "Use Cheiran Agent",
-                    FactionEmojis.cheiran));
+        if (player.hasUnexhaustedLeader("cheiranagent")) {
+            CheiranAgent.button(game, player).ifPresent(endButtons::add);
         }
-        if (player.hasUnexhaustedLeader("freesystemsagent")
-                && !player.getReadiedPlanets().isEmpty()
-                && !ButtonHelperAgents.getAvailableLegendaryAbilities(game).isEmpty()) {
-            endButtons.add(Buttons.green(
-                    player.factionButtonChecker() + "exhaustAgent_freesystemsagent_" + player.getFaction(),
-                    "Use Free Systems Agent",
-                    FactionEmojis.freesystems));
+        if (player.hasUnexhaustedLeader("freesystemsagent")) {
+            FreeSystemsAgent.button(game, player).ifPresent(endButtons::add);
         }
         if (player.hasUnexhaustedLeader("crystellumagent")) {
             CrystellumLeadersHandler.addCrystellumAgentEndTurnButton(endButtons, game, player);
@@ -7012,7 +7002,14 @@ public class ButtonHelper {
     }
 
     public static List<Button> getButtonsForMovingGroundForcesToAPlanet(Game game, String planetName, Player player) {
+        List<Button> buttons = new ArrayList<>(getGroundForceMoveButtonsWithoutDone(game, planetName, player));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Moving to This Planet"));
+        return buttons;
+    }
+
+    public static List<Button> getGroundForceMoveButtonsWithoutDone(Game game, String planetName, Player player) {
         List<Button> buttons = new ArrayList<>();
+        String moveStep = player.factionButtonChecker() + "mercerMove_" + planetName + "_";
         boolean bioplasmosis = game.getPhaseOfGame().contains("status");
         Tile destination = game.getTileFromPlanet(planetName);
         for (Tile tile : game.getTileMap().values()) {
@@ -7029,15 +7026,13 @@ public class ButtonHelper {
                 if (uH.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
                     if (uH instanceof Planet) {
                         buttons.add(Buttons.green(
-                                "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
-                                        + "_infantry",
+                                moveStep + tile.getPosition() + "_" + uH.getName() + "_infantry",
                                 "Move Infantry from " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
                                         + Helper.getPlanetRepresentation(planetName, game)));
                     } else {
                         if (!bioplasmosis) {
                             buttons.add(Buttons.green(
-                                    "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
-                                            + "_infantry",
+                                    moveStep + tile.getPosition() + "_" + uH.getName() + "_infantry",
                                     "Move Infantry from Space of " + tile.getPosition() + " To "
                                             + Helper.getPlanetRepresentation(planetName, game)));
                         }
@@ -7047,14 +7042,13 @@ public class ButtonHelper {
                         && (game.isTwilightsFallMode() || !game.getPhaseOfGame().contains("status"))) {
                     if (uH instanceof Planet) {
                         buttons.add(Buttons.green(
-                                "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName() + "_mech",
+                                moveStep + tile.getPosition() + "_" + uH.getName() + "_mech",
                                 "Move Mech from " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
                                         + Helper.getPlanetRepresentation(planetName, game)));
                     } else {
                         if (!bioplasmosis) {
                             buttons.add(Buttons.green(
-                                    "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
-                                            + "_mech",
+                                    moveStep + tile.getPosition() + "_" + uH.getName() + "_mech",
                                     "Move Mech from Space of " + tile.getPosition() + " to "
                                             + Helper.getPlanetRepresentation(planetName, game)));
                         }
@@ -7064,12 +7058,12 @@ public class ButtonHelper {
                     if (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0) {
                         if (uH instanceof Planet) {
                             buttons.add(Buttons.green(
-                                    "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName() + "_pds",
+                                    moveStep + tile.getPosition() + "_" + uH.getName() + "_pds",
                                     "Move PDS from " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
                                             + Helper.getPlanetRepresentation(planetName, game)));
                         } else {
                             buttons.add(Buttons.green(
-                                    "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName() + "_pds",
+                                    moveStep + tile.getPosition() + "_" + uH.getName() + "_pds",
                                     "Move PDS from Space of " + tile.getRepresentation() + " to "
                                             + Helper.getPlanetRepresentation(planetName, game)));
                         }
@@ -7077,7 +7071,6 @@ public class ButtonHelper {
                 }
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done Moving to This Planet"));
         return buttons;
     }
 

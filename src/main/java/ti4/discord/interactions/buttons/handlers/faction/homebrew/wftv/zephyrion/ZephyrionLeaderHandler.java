@@ -30,7 +30,7 @@ import ti4.service.unit.DestroyUnitService;
 @UtilityClass
 public class ZephyrionLeaderHandler {
 
-    public static void postAgentTargetButtons(Game game, Player player) {
+    public static List<Button> agentTargetButtons(Game game, Player player) {
         List<String> bounties = ZephyrionBountyHandler.getBountiesForPlayer(game);
         List<Button> buttons = new ArrayList<>();
         for (Player otherPlayer : game.getRealPlayersExcludingThis(player)) {
@@ -48,10 +48,7 @@ public class ZephyrionLeaderHandler {
                 }
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " you may use the buttons to select the ship you want to kill.",
-                buttons);
+        return buttons;
     }
 
     @ButtonHandler("zephAgentRes_")
