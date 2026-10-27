@@ -17,7 +17,8 @@ public class Special2Command implements ParentCommand {
                     new Galvanize(),
                     new LoreCommand(),
                     new Skulls(),
-                    new ImportDeckConfig())
+                    new ImportDeckConfig(),
+                    new SetupBotPlayer())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

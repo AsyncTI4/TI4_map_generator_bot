@@ -663,15 +663,15 @@ public class ButtonHelperHeroes {
 
     @ButtonHandler("khraskHeroStep4Ready_")
     public static void resolveKhraskHeroStep4Ready(
-            Player player, Game game, ButtonInteractionEvent event, String flaggedButtonID) {
-        AgentStepIds.Parsed step = AgentStepIds.parse(flaggedButtonID);
-        String buttonID = step.id();
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        AgentStepIds.Parsed step = AgentStepIds.parse(buttonID);
+        String normalizedButtonID = step.id();
         var spec = PlanetTargetSpec.of("khraskHeroStep4Ready_" + BlindSelectionService.TBD_FACTION);
-        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
+        if (PlanetTargetService.handlePlanetPage(event, game, player, normalizedButtonID, spec)) return;
         var target = PlanetTargetService.resolve(
                 game,
                 player,
-                buttonID,
+                normalizedButtonID,
                 spec,
                 t -> t.owner().getExhaustedPlanets().contains(t.planetId()));
         if (target == null) {

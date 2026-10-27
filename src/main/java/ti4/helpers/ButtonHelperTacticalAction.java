@@ -10,6 +10,7 @@ import java.util.Set;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.FrameShiftBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PirateHordeBrActionCardHandler;
@@ -99,6 +100,7 @@ import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.helpers.thundersedge.TeHelperPromissories;
 import ti4.helpers.thundersedge.TeHelperTechs;
+import ti4.image.tile.SystemContextImage;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
@@ -1368,6 +1370,11 @@ public final class ButtonHelperTacticalAction {
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + ", please choose the first system you wish to move from.",
                 systemButtons);
+
+        // send ephemeral image
+        FileUpload file = SystemContextImage.upload(game, event, 1, tile.getPosition(), player);
+
+        MessageHelper.sendEphemeralFileInResponseToButtonPress(file, event);
 
         // Resolve other abilities
         if (player.hasAbility("recycled_materials")) {

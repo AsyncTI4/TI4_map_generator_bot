@@ -1856,10 +1856,14 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (noFactionIcon) {
             sb = new StringBuilder();
         }
-        if (ping) {
-            sb.append(getPing());
+        if (isBotPlayer()) {
+            sb.append("Bot Player");
         } else {
-            sb.append(getUserName());
+            if (ping) {
+                sb.append(getPing());
+            } else {
+                sb.append(getUserName());
+            }
         }
         if (getColor() != null && !"null".equals(getColor()) && !noColor) {
             sb.append(' ').append(ColorEmojis.getColorEmojiWithName(getColor()));
