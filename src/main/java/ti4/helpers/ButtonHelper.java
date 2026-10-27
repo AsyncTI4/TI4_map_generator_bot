@@ -171,7 +171,10 @@ import ti4.service.game.GameColorsService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.leader.agent.modules.NaazAgent;
 import ti4.service.leader.agent.modules.homebrew.KhraskAgent;
+import ti4.service.leader.agent.modules.homebrew.LiZhoAgent;
+import ti4.service.leader.agent.modules.twilightsfall.ExperimentalGenomeAgent;
 import ti4.service.map.SystemPickerService;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.planet.AddPlanetService;
@@ -815,8 +818,7 @@ public class ButtonHelper {
             buttons.add(Buttons.gray("getReleaseButtons", "Release captured units", FactionEmojis.Cabal));
         }
         if (player.hasUnexhaustedLeader("experimentalagent") && !whatIsItFor.contains("inf")) {
-            buttons.add(
-                    Buttons.gray("exhaustAgent_experimentalagent", "Use Experimental Genome", FactionEmojis.Jolnar));
+            buttons.add(ExperimentalGenomeAgent.button(player));
         }
         if (player.getNombox().hasUnits() && player.hasAbility("mark_of_pharadn")) {
             buttons.add(Buttons.gray("getReleaseButtons", "Release captured units", FactionEmojis.pharadn));
@@ -5217,16 +5219,10 @@ public class ButtonHelper {
 
         // Agents
         if (player.hasUnexhaustedLeader("naazagent")) {
-            endButtons.add(Buttons.green(
-                    player.factionButtonChecker() + "exhaustAgent_naazagent_" + player.getFaction(),
-                    "Use Naaz-Rokha Agents",
-                    FactionEmojis.Naaz));
+            endButtons.add(NaazAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("lizhoagent")) {
-            endButtons.add(Buttons.green(
-                    player.factionButtonChecker() + "exhaustAgent_lizhoagent",
-                    "Use Li-Zho Agent",
-                    FactionEmojis.lizho));
+            endButtons.add(LiZhoAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("cheiranagent")
                 && !ButtonHelperAgents.getCheiranAgentTiles(player, game).isEmpty()) {

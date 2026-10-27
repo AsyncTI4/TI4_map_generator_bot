@@ -187,11 +187,10 @@ public class AgentLifecycle {
 
     public static void deliver(AgentOutcome outcome, GenericInteractionCreateEvent pressedButton, Player presser) {
         for (AgentOutcome.Message message : outcome.messages()) {
-            boolean privateToRecipient =
-                    message.recipient() != presser && presser.getGame().isFowMode();
-            MessageChannel channel =
-                    privateToRecipient ? message.recipient().getCorrectChannel() : replyChannel(presser, pressedButton);
-            MessageHelper.sendMessageToChannelWithButtons(channel, message.text(), new ArrayList<>(message.buttons()));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    deliveryChannel(message, pressedButton, presser),
+                    message.text(),
+                    new ArrayList<>(message.buttons()));
         }
         if (outcome.pressedMessageEdit() != null && pressedButton instanceof ButtonInteractionEvent buttonEvent) {
             buttonEvent
@@ -199,6 +198,17 @@ public class AgentLifecycle {
                     .editMessage(outcome.pressedMessageEdit())
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         }
+    }
+
+    private static MessageChannel deliveryChannel(
+            AgentOutcome.Message message, GenericInteractionCreateEvent pressedButton, Player presser) {
+        if (message.secret()) {
+            return message.recipient().getCardsInfoThread();
+        }
+        if (message.recipient() != presser && presser.getGame().isFowMode()) {
+            return message.recipient().getCorrectChannel();
+        }
+        return replyChannel(presser, pressedButton);
     }
 
     private static void cleanUpPressedButton(ButtonInteractionEvent buttonEvent) {

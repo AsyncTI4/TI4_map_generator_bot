@@ -55,6 +55,12 @@ public final class TeHelperAgents {
     }
 
     public static void postRalNelAgentStep1(Game game, Player player) {
+        List<Button> buttons = drawRalNelAgentCards(game, player);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(), ralNelAgentPrompt(game, player), buttons);
+    }
+
+    public static List<Button> drawRalNelAgentCards(Game game, Player player) {
         Map<String, Integer> acsBefore = new HashMap<>(player.getActionCards());
         ActionCardHelper.drawActionCards(player, 2);
         Map<String, Integer> acsAfter = new HashMap<>(player.getActionCards());
@@ -67,12 +73,15 @@ public final class TeHelperAgents {
             ActionCardModel model = Mapper.getActionCard(ac);
             buttons.add(Buttons.red("handleRalNelAgent_" + ac, model.getName(), CardEmojis.getACEmoji(game)));
         }
+        return buttons;
+    }
 
+    public static String ralNelAgentPrompt(Game game, Player player) {
         String msg = player.getRepresentation(true, true)
                 + ", please choose the action card you wish to send to another another player.";
         if (player.getActionCards().size() > ButtonHelper.getACLimit(game, player))
             msg += "\nNB: This happens __before__ discarding down to hand limit.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        return msg;
     }
 
     @ButtonHandler("handleRalNelAgent_")

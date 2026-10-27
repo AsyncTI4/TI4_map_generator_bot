@@ -19,4 +19,11 @@ public class AgentTargets {
         }
         return Optional.ofNullable(game.getPlayerFromColorOrFaction(StringUtils.substringBefore(payload, "_")));
     }
+
+    public static Optional<Player> playerOrUser(Game game, Player user, String payload) {
+        if (StringUtils.isEmpty(payload)) {
+            return Optional.of(user);
+        }
+        return player(game, payload);
+    }
 }

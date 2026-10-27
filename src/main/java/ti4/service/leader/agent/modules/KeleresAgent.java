@@ -1,7 +1,6 @@
 package ti4.service.leader.agent.modules;
 
 import java.util.Optional;
-import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.service.leader.agent.AgentModule;
@@ -20,10 +19,7 @@ public final class KeleresAgent extends AgentModule<Player> {
 
     @Override
     public Optional<Player> decode(Game game, Player user, String payload) {
-        if (StringUtils.isEmpty(payload)) {
-            return Optional.of(user);
-        }
-        return AgentTargets.player(game, payload);
+        return AgentTargets.playerOrUser(game, user, payload);
     }
 
     @Override

@@ -872,6 +872,11 @@ public final class ButtonHelperAbilities {
     public static void offerOmenDiceButtons2(Game game, Player player, String componentID) {
         String msg = player.getRepresentationUnfogged()
                 + " you may play an Omen die with the following buttons. Duplicate dice are not shown.";
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(), msg, omenDiceButtons(game, componentID));
+    }
+
+    public static List<Button> omenDiceButtons(Game game, String componentID) {
         List<Button> buttons = new ArrayList<>();
         List<Integer> dice = new ArrayList<>();
         for (int die : getAllOmenDie(game)) {
@@ -881,7 +886,7 @@ public final class ButtonHelperAbilities {
             }
         }
         buttons.add(Buttons.red("deleteButtons", "Delete these"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        return buttons;
     }
 
     @ButtonHandler("useOmenDie_")

@@ -21,9 +21,7 @@ import ti4.service.leader.UnlockLeaderService;
 @UtilityClass
 public class OnyxxaLeaderHandler {
 
-    public static void postAgentMoveShipButtons(Game game, Player targetPlayer) {
-        String msg = targetPlayer.getRepresentationUnfogged()
-                + ", please choose the system that you wish to move a ship from.";
+    public static List<Button> agentMoveShipButtons(Game game, Player targetPlayer) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.playerHasShipsInSystem(targetPlayer, tile)) {
@@ -32,7 +30,7 @@ public class OnyxxaLeaderHandler {
                         tile.getRepresentationForButtons(game, targetPlayer)));
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(targetPlayer.getCorrectChannel(), msg, buttons);
+        return buttons;
     }
 
     // Commander: Strategist Kreel — unlock condition:

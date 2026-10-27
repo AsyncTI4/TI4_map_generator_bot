@@ -8,35 +8,60 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.service.leader.agent.modules.ArtunoAgent;
+import ti4.service.leader.agent.modules.BastionAgent;
+import ti4.service.leader.agent.modules.EmpyreanAgent;
 import ti4.service.leader.agent.modules.ExhaustOnlyAgents;
 import ti4.service.leader.agent.modules.GhostAgent;
+import ti4.service.leader.agent.modules.JolNarAgent;
 import ti4.service.leader.agent.modules.KeleresAgent;
 import ti4.service.leader.agent.modules.LetnevAgent;
 import ti4.service.leader.agent.modules.MentakAgent;
+import ti4.service.leader.agent.modules.NaazAgent;
 import ti4.service.leader.agent.modules.ObsidianAgent;
+import ti4.service.leader.agent.modules.RalNelAgent;
 import ti4.service.leader.agent.modules.SardakkAgent;
 import ti4.service.leader.agent.modules.SolAgent;
 import ti4.service.leader.agent.modules.WinnuAgent;
+import ti4.service.leader.agent.modules.homebrew.AeternaAgent;
+import ti4.service.leader.agent.modules.homebrew.ArdentiaAgent;
 import ti4.service.leader.agent.modules.homebrew.AugersAgent;
+import ti4.service.leader.agent.modules.homebrew.AxisAgent;
 import ti4.service.leader.agent.modules.homebrew.BentorAgent;
 import ti4.service.leader.agent.modules.homebrew.CymiaeAgent;
+import ti4.service.leader.agent.modules.homebrew.GhotiAgent;
 import ti4.service.leader.agent.modules.homebrew.GledgeAgent;
 import ti4.service.leader.agent.modules.homebrew.HomebrewExhaustOnlyAgents;
+import ti4.service.leader.agent.modules.homebrew.IronAgent;
 import ti4.service.leader.agent.modules.homebrew.KaloraAgent;
 import ti4.service.leader.agent.modules.homebrew.KhraskAgent;
+import ti4.service.leader.agent.modules.homebrew.KolumeAgent;
 import ti4.service.leader.agent.modules.homebrew.KortaliAgent;
+import ti4.service.leader.agent.modules.homebrew.KryxosAgent;
 import ti4.service.leader.agent.modules.homebrew.KyroAgent;
+import ti4.service.leader.agent.modules.homebrew.LiZhoAgent;
 import ti4.service.leader.agent.modules.homebrew.LunariumAgent;
 import ti4.service.leader.agent.modules.homebrew.MirvedaAgent;
+import ti4.service.leader.agent.modules.homebrew.MortheusAgent;
+import ti4.service.leader.agent.modules.homebrew.MykoMentoriAgent;
 import ti4.service.leader.agent.modules.homebrew.NokarAgent;
+import ti4.service.leader.agent.modules.homebrew.OnyxxaAgent;
+import ti4.service.leader.agent.modules.homebrew.RohDhnaAgent;
+import ti4.service.leader.agent.modules.homebrew.SarcosaAgent;
+import ti4.service.leader.agent.modules.homebrew.TaAgent;
 import ti4.service.leader.agent.modules.homebrew.TnelisAgent;
+import ti4.service.leader.agent.modules.homebrew.TyrisAgent;
 import ti4.service.leader.agent.modules.homebrew.UydaiAgent;
 import ti4.service.leader.agent.modules.homebrew.VadenAgent;
+import ti4.service.leader.agent.modules.homebrew.VanguardAgent;
 import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
 import ti4.service.leader.agent.modules.homebrew.VeldyrAgent;
+import ti4.service.leader.agent.modules.homebrew.VeylorAgent;
 import ti4.service.leader.agent.modules.homebrew.ZelianAgent;
+import ti4.service.leader.agent.modules.homebrew.ZephyrionAgent;
+import ti4.service.leader.agent.modules.twilightsfall.ExperimentalGenomeAgent;
 import ti4.service.leader.agent.modules.twilightsfall.HyperAgent;
 import ti4.service.leader.agent.modules.twilightsfall.ResearchGenomeAgent;
+import ti4.service.leader.agent.modules.twilightsfall.ValiantGenomeAgent;
 
 @UtilityClass
 class AgentModules {
@@ -70,7 +95,32 @@ class AgentModules {
                             new ObsidianAgent(),
                             new ResearchGenomeAgent(),
                             new TnelisAgent(),
-                            new UydaiAgent()),
+                            new UydaiAgent(),
+                            new NaazAgent(),
+                            new JolNarAgent(),
+                            new EmpyreanAgent(),
+                            new BastionAgent(),
+                            new RalNelAgent(),
+                            new ExperimentalGenomeAgent(),
+                            new ValiantGenomeAgent(),
+                            new RohDhnaAgent(),
+                            new LiZhoAgent(),
+                            new TyrisAgent(),
+                            new ZephyrionAgent(),
+                            new MykoMentoriAgent(),
+                            new GhotiAgent(),
+                            new KolumeAgent(),
+                            new AxisAgent(),
+                            new MortheusAgent(),
+                            new OnyxxaAgent(),
+                            new IronAgent(),
+                            new ArdentiaAgent(),
+                            new KryxosAgent(),
+                            new AeternaAgent(),
+                            new VeylorAgent(),
+                            new TaAgent(),
+                            new VanguardAgent(),
+                            new SarcosaAgent()),
                     ExhaustOnlyAgents.ALL,
                     HomebrewExhaustOnlyAgents.ALL)
             .<AgentModule<?>>flatMap(List::stream)

@@ -1,16 +1,14 @@
 package ti4.service.leader.agent.modules.twilightsfall;
 
-import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.game.Game;
 import ti4.game.Player;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentUse;
+import ti4.service.leader.agent.UntargetedAgent;
 
-public final class ResearchGenomeAgent extends AgentModule<Player> {
+public final class ResearchGenomeAgent extends UntargetedAgent {
 
     static final String ID = "researchagent";
     static final String SPLICE_KEY_PREFIX = "researchagentSplice";
@@ -22,11 +20,6 @@ public final class ResearchGenomeAgent extends AgentModule<Player> {
     public static Button button(Player player) {
         return Buttons.gray(
                 ownedButtonId(player, ID), useLabel(player, ID, "Research Genome"), FactionEmojis.Deepwrought);
-    }
-
-    @Override
-    public Optional<Player> decode(Game game, Player user, String payload) {
-        return Optional.of(user);
     }
 
     @Override

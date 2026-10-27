@@ -61,6 +61,7 @@ import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.MonumentsService;
 import ti4.service.game.NekroMonumentService;
+import ti4.service.leader.agent.modules.homebrew.MykoMentoriAgent;
 import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
 import ti4.service.leader.agent.modules.twilightsfall.ResearchGenomeAgent;
 
@@ -139,8 +140,7 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("initialPeak", "Peek At Next Objective", FactionEmojis.augers));
         }
         if (player.hasUnexhaustedLeader("mykomentoriagent")) {
-            buttons.add(
-                    Buttons.gray("exhaustAgent_mykomentoriagent", "Use Myko-Mentori Agent", FactionEmojis.mykomentori));
+            buttons.add(MykoMentoriAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("hacanagent")) {
             buttons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));

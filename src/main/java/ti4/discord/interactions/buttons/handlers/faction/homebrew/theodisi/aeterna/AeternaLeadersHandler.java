@@ -238,26 +238,19 @@ public class AeternaLeadersHandler {
     }
 
     // Agent
-    public static void startAeternaAgent(Game game, Player player) {
+    public static List<Button> agentShipButtons(Game game, Player player) {
         List<Button> buttons = getAeternaAgentShipButtons(game, player);
-        String prefix = player.factionButtonChecker() + SELECT_AGENT_SHIP;
-        String message = player.getRepresentationNoPing()
-                + ", please choose a non-fighter ship to destroy for Morwen Deyth, the Aeterna agent.";
-
         if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationNoPing() + " has no eligible non-fighter ships.");
-            return;
+            return buttons;
         }
-
+        String prefix = player.factionButtonChecker() + SELECT_AGENT_SHIP;
         List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
         List<Button> paginatedButtons = NewStuffHelper.buttonPagination(buttons, extraButtons, prefix, 25, 0, false);
         if (buttons.size() <= 24) {
             paginatedButtons = new ArrayList<>(buttons);
             paginatedButtons.addAll(extraButtons);
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, paginatedButtons);
+        return paginatedButtons;
     }
 
     @ButtonHandler(SELECT_AGENT_SHIP)
