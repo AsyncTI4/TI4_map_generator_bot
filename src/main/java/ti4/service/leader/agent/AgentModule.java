@@ -8,6 +8,8 @@ import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.TI4Emoji;
 
 public abstract class AgentModule<P> {
@@ -58,6 +60,17 @@ public abstract class AgentModule<P> {
 
     protected static Button useButton(Player owner, String agentId, String agentLabel, TI4Emoji emoji) {
         return Buttons.gray(ownedButtonId(owner, agentId), useLabel(owner, agentId, agentLabel), emoji);
+    }
+
+    protected static String cardLabel(Player owner, String agentId, String officialLabel) {
+        return twilightsFallName(owner.getGame(), agentId).orElse(officialLabel);
+    }
+
+    static Optional<String> twilightsFallName(Game game, String agentId) {
+        if (game == null || !game.isTwilightsFallMode()) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(Mapper.getLeader(agentId)).flatMap(LeaderModel::getTFName);
     }
 
     protected static String useLabel(Player owner, String agentId, String agentLabel) {

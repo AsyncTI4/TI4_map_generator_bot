@@ -4,17 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AgendaRiderHelper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
@@ -24,8 +28,9 @@ import ti4.service.leader.agent.AgentUse;
 public final class YinAgent extends AgentModule<YinAgent.Replacement> {
 
     static final String ID = "yinagent";
-    public static final String OFFER_STEP = "yinagent_";
+    private static final String OFFER_STEP = "yinagent_";
     private static final String PLACE_PREFIX = "placeOneNDone_skipbuild";
+    private static final String CONTENT_FOR_EMPTY_MESSAGE = "Combat";
 
     public YinAgent() {
         super(ID, "Brother Milor, the Yin");
@@ -35,13 +40,9 @@ public final class YinAgent extends AgentModule<YinAgent.Replacement> {
 
     public static Button offerButton(Player yin, String position) {
         return Buttons.gray(
-                yin.factionButtonChecker() + OFFER_STEP + position, useLabel(yin, ID, "Yin Agent"), FactionEmojis.Yin);
-    }
-
-    public static List<Button> ownerButtons(Game game, Player yin, String position) {
-        return AgendaRiderHelper.getPlayerOutcomeButtons(game, null, AgentButtonIds.format(ID, position), null).stream()
-                .map(button -> button.withCustomId(yin.factionButtonChecker() + button.getCustomId()))
-                .toList();
+                yin.factionButtonChecker() + OFFER_STEP + position,
+                useLabel(yin, ID, cardLabel(yin, ID, "Yin Agent")),
+                FactionEmojis.Yin);
     }
 
     public static List<Button> placementButtons(Game game, Player owner, Tile system) {
@@ -50,6 +51,9 @@ public final class YinAgent extends AgentModule<YinAgent.Replacement> {
                 owner.factionButtonChecker() + PLACE_PREFIX + "_2ff_" + system.getPosition(),
                 "Place 2 Fighters",
                 UnitEmojis.fighter));
+        if (game.isTwilightsFallMode()) {
+            return buttons;
+        }
         for (Planet planet : system.getPlanetUnitHolders()) {
             String planetName = planet.getName();
             buttons.add(Buttons.green(
@@ -58,6 +62,26 @@ public final class YinAgent extends AgentModule<YinAgent.Replacement> {
                     UnitEmojis.infantry));
         }
         return buttons;
+    }
+
+    @ButtonHandler(OFFER_STEP)
+    static void offerOwners(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String position = buttonID.substring(OFFER_STEP.length());
+        AgentOutcome outcome = AgentOutcome.of(Message.addressedTo(
+                player,
+                ", please choose the faction to give " + AgentLifecycle.agentNameForHolder(game, player, ID) + " to.",
+                ownerButtons(game, player, position)));
+        if (event.getMessage().getContentRaw().isEmpty()) {
+            outcome = outcome.withPressedMessageEdit(CONTENT_FOR_EMPTY_MESSAGE);
+        }
+        AgentLifecycle.deliver(outcome, event, player);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    static List<Button> ownerButtons(Game game, Player yin, String position) {
+        return AgendaRiderHelper.getPlayerOutcomeButtons(game, null, AgentButtonIds.format(ID, position), null).stream()
+                .map(button -> button.withCustomId(yin.factionButtonChecker() + button.getCustomId()))
+                .toList();
     }
 
     @Override

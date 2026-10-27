@@ -47,10 +47,7 @@ import ti4.service.leader.RefreshLeaderService;
 import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.modules.ArtunoAgent;
 import ti4.service.leader.agent.modules.CabalAgent;
-import ti4.service.leader.agent.modules.L1z1xAgent;
-import ti4.service.leader.agent.modules.MercerAgent;
 import ti4.service.leader.agent.modules.SardakkAgent;
-import ti4.service.leader.agent.modules.YinAgent;
 import ti4.service.planet.PlanetService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -1350,34 +1347,6 @@ public final class ButtonHelperAgents {
         return buttons;
     }
 
-    public static List<Button> getMercerAgentInitialButtons(Game game, Player player) {
-        Tile tile = game.getTileByPosition(game.getActiveSystem());
-        List<Button> buttons = new ArrayList<>();
-        for (Planet planet : tile.getPlanetUnitHolders()) {
-            String planetID = planet.getName();
-            String planetRepresentation = Helper.getPlanetRepresentation(planetID, game);
-            if (player.getPlanetsAllianceMode().contains(planetID)) {
-                buttons.add(MercerAgent.button(player, game.getActiveSystem(), planetID, planetRepresentation));
-            }
-        }
-        return buttons;
-    }
-
-    public static List<Button> getL1Z1XAgentButtons(Game game, Tile tile, Player player) {
-        List<Button> buttons = new ArrayList<>();
-        if (tile == null) return buttons;
-
-        for (Planet planet : tile.getPlanetUnitHolders()) {
-            String planetId = planet.getName();
-            if (player.getPlanetsAllianceMode().contains(planetId)
-                    && FoWHelper.playerHasInfantryOnPlanet(player, tile, planetId)) {
-                String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
-                buttons.add(L1z1xAgent.button(player, game.getActiveSystem(), planetId, planetRepresentation));
-            }
-        }
-        return buttons;
-    }
-
     public static List<Button> getTFAwakenButtons(Game game, Tile tile, Player player) {
         List<Button> buttons = new ArrayList<>();
         if (tile == null) return buttons;
@@ -1438,22 +1407,6 @@ public final class ButtonHelperAgents {
                             + ", and place " + StringHelper.pluralize(tg, "trade good") + " on her.",
                     buttons);
         }
-    }
-
-    @ButtonHandler("yinagent_")
-    public static void yinAgent(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        List<Button> buttons = YinAgent.ownerButtons(game, player, buttonID.substring(YinAgent.OFFER_STEP.length()));
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                player.getRepresentationNoPing() + ", please choose the faction to give "
-                        + AgentLifecycle.agentNameForHolder(game, player, "yinagent") + " to.",
-                buttons);
-        String exhaustedMessage = event.getMessage().getContentRaw();
-        if (exhaustedMessage.isEmpty()) {
-            exhaustedMessage = "Combat";
-        }
-        event.getMessage().editMessage(exhaustedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler("jolNarAgentRemoval_")

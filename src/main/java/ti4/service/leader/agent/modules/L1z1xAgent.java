@@ -1,12 +1,14 @@
 package ti4.service.leader.agent.modules;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelperAbilities;
@@ -36,37 +38,51 @@ public final class L1z1xAgent extends AgentModule<L1z1xAgent.Choice> {
 
     record ReplaceInfantry(Tile tile, String planet) implements Choice {}
 
-    public static Button button(Player l1z1x, String position, String planet, String planetRepresentation) {
-        return Buttons.green(
-                ownedButtonId(l1z1x, ID, position, planet),
-                useLabel(l1z1x, ID, "L1Z1X Agent on " + planetRepresentation),
-                FactionEmojis.L1Z1X);
+    public static List<Button> buttons(Game game, Tile activeSystem, Player l1z1x) {
+        if (activeSystem == null) {
+            return List.of();
+        }
+        List<Button> buttons = new ArrayList<>();
+        for (Planet planet : activeSystem.getPlanetUnitHolders()) {
+            String planetName = planet.getName();
+            if (l1z1x.getPlanetsAllianceMode().contains(planetName)
+                    && FoWHelper.playerHasInfantryOnPlanet(l1z1x, activeSystem, planetName)) {
+                buttons.add(Buttons.green(
+                        ownedButtonId(l1z1x, ID, activeSystem.getPosition(), planetName),
+                        useLabel(
+                                l1z1x,
+                                ID,
+                                cardLabel(l1z1x, ID, "L1Z1X Agent") + " on "
+                                        + Helper.getPlanetRepresentation(planetName, game)),
+                        FactionEmojis.L1Z1X));
+            }
+        }
+        return buttons;
     }
 
     @Override
     public Optional<Choice> decode(Game game, Player user, String payload) {
-        if (StringUtils.isEmpty(payload)) {
-            return Optional.of(new OfferPlanets(user));
-        }
-        Player target = game.getPlayerFromColorOrFaction(payload);
-        if (target != null) {
-            return Optional.of(new OfferPlanets(target));
-        }
-        Tile tile = game.getTileByPosition(StringUtils.substringBefore(payload, "_"));
-        String planet = StringUtils.substringAfter(payload, "_");
-        if (tile == null || planet.isEmpty() || tile.getUnitHolderFromPlanet(planet) == null) {
-            return AgentTargets.player(game, payload).map(OfferPlanets::new);
-        }
-        return Optional.of(new ReplaceInfantry(tile, planet));
+        return AgentTargets.playerOrPlanetInSystem(
+                game,
+                user,
+                payload,
+                OfferPlanets::new,
+                planet -> new ReplaceInfantry(planet.system(), planet.planet()));
     }
 
     @Override
     public Optional<String> unusableReason(Game game, Player user, Choice choice) {
-        if (choice instanceof ReplaceInfantry replace
-                && !FoWHelper.playerHasInfantryOnPlanet(user, replace.tile(), replace.planet())) {
-            return Optional.of("You have no infantry on " + Helper.getPlanetRepresentation(replace.planet(), game));
-        }
-        return Optional.empty();
+        return switch (choice) {
+            case ReplaceInfantry replace ->
+                FoWHelper.playerHasInfantryOnPlanet(user, replace.tile(), replace.planet())
+                        ? Optional.empty()
+                        : Optional.of(
+                                "You have no infantry on " + Helper.getPlanetRepresentation(replace.planet(), game));
+            case OfferPlanets offer ->
+                mechSwapButtons(game, offer.target()).isEmpty()
+                        ? Optional.of(offer.target().getFactionEmojiOrColor() + " has no infantry in the active system")
+                        : Optional.empty();
+        };
     }
 
     @Override
@@ -77,23 +93,24 @@ public final class L1z1xAgent extends AgentModule<L1z1xAgent.Choice> {
         };
     }
 
-    static List<Button> mechSwapButtons(Game game, Player player) {
-        List<Button> everywhere =
-                new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game, "l1z1x"));
-        String activeSystemStep = "mitoMechPlacement_" + game.getActiveSystem() + "_";
-        List<Button> inActiveSystem = everywhere.stream()
-                .filter(button -> button.getCustomId().contains(activeSystemStep))
-                .toList();
-        return inActiveSystem.isEmpty() ? everywhere : inActiveSystem;
+    private static List<Button> mechSwapButtons(Game game, Player player) {
+        return ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(
+                player, game, "l1z1x", systemsWithInfantryToReplace(game));
+    }
+
+    private static Collection<Tile> systemsWithInfantryToReplace(Game game) {
+        if (StringUtils.isBlank(game.getActiveSystem())) {
+            return game.getTileMap().values();
+        }
+        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+        return activeSystem == null ? List.of() : List.of(activeSystem);
     }
 
     private static AgentOutcome offerPlanets(AgentUse<Choice> use, Player target) {
-        return AgentOutcome.offer(
-                Message.addressedTo(
-                        target,
-                        ", use buttons to resolve " + use.agentNameFor(target) + ".",
-                        mechSwapButtons(use.game(), target)),
-                use.noteToUser(target, " has no infantry to replace with a mech."));
+        return AgentOutcome.of(Message.addressedTo(
+                target,
+                ", use buttons to resolve " + use.agentNameFor(target) + ".",
+                mechSwapButtons(use.game(), target)));
     }
 
     private static AgentOutcome replaceInfantry(AgentUse<Choice> use, ReplaceInfantry replace) {

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -42,14 +41,8 @@ public final class SardakkAgent extends AgentModule<SardakkAgent.Choice> {
 
     @Override
     public Optional<Choice> decode(Game game, Player user, String payload) {
-        if (StringUtils.isEmpty(payload)) {
-            return Optional.of(new OfferPlanets(user));
-        }
-        Player target = game.getPlayerFromColorOrFaction(payload);
-        if (target != null) {
-            return Optional.of(new OfferPlanets(target));
-        }
-        return placeOnPlanet(game, payload);
+        return AgentTargets.playerOrPlanetInSystem(
+                game, user, payload, OfferPlanets::new, planet -> new PlaceOnPlanet(planet.system(), planet.planet()));
     }
 
     @Override
@@ -72,16 +65,6 @@ public final class SardakkAgent extends AgentModule<SardakkAgent.Choice> {
                         .anyMatch(planet -> button.getCustomId().endsWith("_" + planet.getName())))
                 .toList();
         return inActiveSystem.isEmpty() ? everyPlanet : inActiveSystem;
-    }
-
-    private static Optional<Choice> placeOnPlanet(Game game, String payload) {
-        String position = StringUtils.substringBefore(payload, "_");
-        String planet = StringUtils.substringAfter(payload, "_");
-        Tile tile = game.getTileByPosition(position);
-        if (tile == null || planet.isEmpty() || tile.getUnitHolderFromPlanet(planet) == null) {
-            return AgentTargets.player(game, payload).map(OfferPlanets::new);
-        }
-        return Optional.of(new PlaceOnPlanet(tile, planet));
     }
 
     private static AgentOutcome offerPlanets(AgentUse<Choice> use, Player target) {

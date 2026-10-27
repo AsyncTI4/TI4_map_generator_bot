@@ -119,6 +119,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UydaiHeroService;
 import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.modules.EmpyreanAgent;
+import ti4.service.leader.agent.modules.L1z1xAgent;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
@@ -1160,7 +1161,7 @@ public final class ButtonHelperTacticalAction {
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
 
-        List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(game, tile, player);
+        List<Button> button3 = L1z1xAgent.buttons(game, tile, player);
         if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !game.isL1Hero()) {
             String msg = player.getRepresentationUnfogged() + ", you can use buttons to resolve "
                     + AgentLifecycle.agentNameForHolder(game, player, "l1z1xagent") + ", if you so wish.";

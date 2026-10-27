@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -1219,8 +1220,14 @@ public final class ButtonHelperAbilities {
     }
 
     public static List<Button> getPlanetPlaceUnitButtonsForMechMitosis(Player player, Game game, String reason) {
+        return getPlanetPlaceUnitButtonsForMechMitosis(
+                player, game, reason, game.getTileMap().values());
+    }
+
+    public static List<Button> getPlanetPlaceUnitButtonsForMechMitosis(
+            Player player, Game game, String reason, Collection<Tile> tiles) {
         List<Button> planetButtons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : tiles) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 String colorID = Mapper.getColorID(player.getColor());
                 int numInf = unitHolder.getUnitCount(UnitType.Infantry, colorID);

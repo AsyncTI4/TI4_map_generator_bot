@@ -34,7 +34,6 @@ import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperTacticalAction;
@@ -62,6 +61,7 @@ import ti4.service.fow.LoreService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.AgentLifecycle;
+import ti4.service.leader.agent.modules.MercerAgent;
 import ti4.service.leader.agent.modules.WinnuAgent;
 import ti4.service.leader.agent.modules.homebrew.GhotiAgent;
 import ti4.service.leader.agent.modules.homebrew.GledgeAgent;
@@ -516,9 +516,9 @@ class DeleteButtonsButtonHandler {
                 List<Button> systemButtons2;
                 systemButtons2 = new ArrayList<>();
                 if (player.hasUnexhaustedLeader("nomadagentmercer")) {
-                    String message = player.getRepresentationUnfogged() + ", you may use "
+                    String message = player.getRepresentationNoPing() + ", you may use "
                             + AgentLifecycle.agentNameForHolder(game, player, "nomadagentmercer") + ".";
-                    systemButtons2.addAll(ButtonHelperAgents.getMercerAgentInitialButtons(game, player));
+                    systemButtons2.addAll(MercerAgent.buttons(game, player));
                     systemButtons2.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
                 }

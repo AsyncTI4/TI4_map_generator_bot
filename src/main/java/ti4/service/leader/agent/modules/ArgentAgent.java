@@ -29,7 +29,7 @@ public final class ArgentAgent extends AgentModule<Tile> {
     public static Button button(Player argent, Tile productionSystem) {
         return Buttons.blue(
                 ownedButtonId(argent, ID, productionSystem.getPosition()),
-                useLabel(argent, ID, "Argent Agent"),
+                useLabel(argent, ID, cardLabel(argent, ID, "Argent Agent")),
                 FactionEmojis.Argent);
     }
 
@@ -47,7 +47,7 @@ public final class ArgentAgent extends AgentModule<Tile> {
                 placementButtons(use.game(), producer, use.payload())));
     }
 
-    static List<Button> placementButtons(Game game, Player producer, Tile productionSystem) {
+    private static List<Button> placementButtons(Game game, Player producer, Tile productionSystem) {
         List<Button> buttons = new ArrayList<>();
         for (String position : FoWHelper.getAdjacentTiles(game, productionSystem.getPosition(), producer, false)) {
             Tile tile = game.getTileByPosition(position);
@@ -70,7 +70,9 @@ public final class ArgentAgent extends AgentModule<Tile> {
                         UnitEmojis.mech));
             }
         }
-        buttons.add(Buttons.red("deleteButtons_spitItOut", "Done With Argent Agent"));
+        buttons.add(Buttons.red(
+                producer.factionButtonChecker() + "deleteButtons_spitItOut",
+                "Done With " + cardLabel(producer, ID, "Argent Agent")));
         return buttons;
     }
 }
