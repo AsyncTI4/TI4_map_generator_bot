@@ -1,5 +1,6 @@
 package ti4.ai.expedition;
 
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.GameHorizon;
 import ti4.game.Game;
@@ -15,16 +16,23 @@ public class BreakthroughValue {
     public static final double FRACTURE_CHANCE = 0.2;
     public static final double FRACTURE_VALUE = 2.0;
     static final double FULL_VALUE_ROUNDS = 4;
+    static final double HACAN_FLOOR = 8.0;
+    private static final Map<String, Double> PRIORITY_FLOORS = Map.of("hacan", HACAN_FLOOR);
 
     public static boolean isLocked(Player seat) {
         return !seat.getBreakthroughIDs().isEmpty()
                 && seat.getBreakthroughIDs().stream().anyMatch(id -> !seat.isBreakthroughUnlocked(id));
     }
 
+    public static boolean isPriority(Player seat) {
+        return isLocked(seat) && PRIORITY_FLOORS.containsKey(seat.getFaction());
+    }
+
     public static double of(Game game, Player seat) {
         if (!isLocked(seat)) return 0;
         double lift = ExpeditionStats.breakthroughLiftPoints(seat.getFaction());
-        return Math.max(LEAST, BASE + PER_WIN_POINT * lift) * timing(game);
+        double floor = PRIORITY_FLOORS.getOrDefault(seat.getFaction(), 0.0);
+        return Math.max(floor, Math.max(LEAST, BASE + PER_WIN_POINT * lift)) * timing(game);
     }
 
     public static double fractureRoll(Game game, Player seat) {

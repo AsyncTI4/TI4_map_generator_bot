@@ -99,6 +99,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
     final MecatolTracker mecatol = new MecatolTracker();
     final ExpeditionTracker expeditions = new ExpeditionTracker();
     final PromissoryTracker promissory = new PromissoryTracker();
+    final LeaderTracker leaders = new LeaderTracker();
     // Trading: every accepted offer (read from the offerer's items just before the Accept press), the presses each seat
     // made by handler family, and the Trade settlements each holder sent and had accepted.
     final List<TradeRecord> tradeLedger = new ArrayList<>();
@@ -316,6 +317,21 @@ final class SelfPlayEnvironment implements AutoCloseable {
         return result;
     }
 
+    private void noteHeroBuild(String faction) {
+        Game current = game.get();
+        Player player = current == null ? null : current.getPlayerFromColorOrFaction(faction);
+        if (player == null) return;
+        leaders.note(
+                current.getRound(),
+                faction,
+                "HEROBUILD produced " + player.getCurrentProducedUnits() + " fleet pool " + player.getFleetCC());
+    }
+
+    private int currentRound() {
+        Game current = game.get();
+        return current == null ? 0 : current.getRound();
+    }
+
     private Object actuator(InvocationOnMock invocation) throws Throwable {
         boolean press = "press".equals(invocation.getMethod().getName());
         Optional<TradeRecord> offered =
@@ -328,6 +344,12 @@ final class SelfPlayEnvironment implements AutoCloseable {
             AiActuator.PressTarget target = invocation.getArgument(1);
             AiActuator.SeatIdentity seat = invocation.getArgument(0);
             pressOutcomes.merge(outcome.outcome().name(), 1, Integer::sum);
+            leaders.pressed(
+                    currentRound(),
+                    seat.faction(),
+                    target.customId(),
+                    outcome.outcome().name());
+            if (target.customId().contains("purgeHacanHero")) noteHeroBuild(seat.faction());
             if (outcome.pressed()) {
                 String family = handlerFamily(target.customId());
                 pressedHandlers.merge(family, 1, Integer::sum);
@@ -461,6 +483,8 @@ final class SelfPlayEnvironment implements AutoCloseable {
                 if (!(decision instanceof AiDecision.Idle))
                     record(context.faction() + " decided " + describe(decision));
                 countReason(decision);
+                if (decision instanceof AiDecision.Press leaderPress)
+                    leaders.decided(context.game().getRound(), context.faction(), leaderPress.reason());
                 noteOffer(context.faction(), decision);
                 rememberReason(decision);
                 countRoundAction(decision, context.game().getRound());

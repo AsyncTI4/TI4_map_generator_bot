@@ -103,6 +103,18 @@ public class ProductionPlanner {
     private static final String HACAN_HERO = "hacanhero";
     private static final int FREE_BUILD_RESOURCES = 1000;
     private static final double HERO_MIN_SAVING = 10;
+    private static final double LATE_HERO_MIN_SAVING = 6;
+    private static final int LATE_HERO_ROUND = 5;
+    private static final double HERO_VALUE_PER_RESOURCE = 0.5;
+    private static final int HERO_FLEET_MAX = 6;
+    private static final List<UnitType> HERO_BUILD_ORDER = List.of(
+            UnitType.Warsun,
+            UnitType.Flagship,
+            UnitType.Dreadnought,
+            UnitType.Carrier,
+            UnitType.Mech,
+            UnitType.Cruiser,
+            UnitType.Destroyer);
     private static final String AUTO_FACTORIES = "hacanbt";
     private static final int AUTO_FACTORIES_SHIPS = 3;
     private static final double FLEET_TOKEN_VALUE = 1.0;
@@ -176,6 +188,13 @@ public class ProductionPlanner {
 
         public int units() {
             return orders.stream().mapToInt(BuildOrder::units).sum();
+        }
+
+        public int ships() {
+            return orders.stream()
+                    .filter(order -> BoardView.MOVING_SHIPS.contains(order.type()))
+                    .mapToInt(BuildOrder::units)
+                    .sum();
         }
 
         public int units(UnitType type) {
@@ -257,7 +276,12 @@ public class ProductionPlanner {
             int overSupplyCarriers,
             int extraProduction) {
         try (Thinking.Span ignored = Thinking.enter("production.plan")) {
-            return buildPlan(game, seat, tile, extraResources, defense, overSupplyCarriers, extraProduction);
+            BuildPlan base =
+                    buildPlan(game, seat, tile, extraResources, defense, overSupplyCarriers, extraProduction, 0);
+            if (!grantsFleetToken(game, seat)) return base;
+            BuildPlan fed =
+                    buildPlan(game, seat, tile, extraResources, defense, overSupplyCarriers, extraProduction, 1);
+            return fed.ships() >= AUTO_FACTORIES_SHIPS && fed.value() > base.value() ? fed : base;
         }
     }
 
@@ -277,14 +301,15 @@ public class ProductionPlanner {
             int extraResources,
             DefenseOutlook defense,
             int overSupplyCarriers,
-            int extraProduction) {
+            int extraProduction,
+            int fleetRoomBonus) {
         if (BoardView.hasEnemyShips(game, seat, tile)) return new BuildPlan(List.of());
         Budget budget;
         try (Thinking.Span ignored = Thinking.enter("production.budget")) {
             budget = new Budget(
                     Helper.getProductionValue(seat, game, tile, false) + extraProduction,
                     spendableResources(game, seat) + extraResources + (seat.hasTech("st") ? 1 : 0) + aidaDiscount(seat),
-                    FleetLimit.ships(seat) - BoardView.nonFighterShips(BoardView.space(tile), seat),
+                    FleetLimit.ships(seat) - BoardView.nonFighterShips(BoardView.space(tile), seat) + fleetRoomBonus,
                     seat.hasUnlockedBreakthrough(BELLUM_GLORIOSUM));
         }
         budget.overSupply = Math.max(0, overSupplyCarriers);
@@ -331,21 +356,86 @@ public class ProductionPlanner {
         return CARRIER_VALUE + (sustains ? SUSTAINING_CARRIER_BONUS : 0);
     }
 
+    public static boolean grantsFleetToken(Game game, Player seat) {
+        if (!seat.hasUnlockedBreakthrough(AUTO_FACTORIES)) return false;
+        return !ButtonHelper.isLawInPlay(game, FLEET_REGULATIONS) || seat.getEffectiveFleetCC() < REGULATED_FLEET;
+    }
+
+    public static boolean holdsHero(Player seat) {
+        return seat.hasLeaderUnlocked(HACAN_HERO);
+    }
+
     public static Optional<BuildPlan> freeBuild(Game game, Player seat, Tile tile, DefenseOutlook defense) {
-        if (!seat.hasLeaderUnlocked(HACAN_HERO) || BoardView.hasEnemyShips(game, seat, tile)) return Optional.empty();
-        BuildPlan free = plan(game, seat, tile, FREE_BUILD_RESOURCES, defense);
+        return freeBuild(game, seat, tile, defense, 0);
+    }
+
+    public static Optional<BuildPlan> freeBuild(
+            Game game, Player seat, Tile tile, DefenseOutlook defense, int shipsMovedOut) {
+        if (!holdsHero(seat) || BoardView.hasEnemyShips(game, seat, tile)) return Optional.empty();
+        BuildPlan free = heroPlan(game, seat, tile, defense, shipsMovedOut);
         int capacity = Helper.getProductionValue(seat, game, tile, false);
-        if (free.totalCost() < HERO_MIN_SAVING || free.units() < capacity) return Optional.empty();
+        if (free.totalCost() < heroMinSaving(game) || free.units() < capacity) return Optional.empty();
         return Optional.of(free);
+    }
+
+    public static double heroGainFromRoom(
+            Game game, Player seat, Tile tile, DefenseOutlook defense, int shipsMovedOut, double baseline) {
+        if (shipsMovedOut <= 0) return 0;
+        Optional<BuildPlan> cleared = freeBuild(game, seat, tile, defense, shipsMovedOut);
+        if (cleared.isEmpty()) return 0;
+        Optional<BuildPlan> now = freeBuild(game, seat, tile, defense);
+        double current = now.map(BuildPlan::value).orElse(baseline);
+        return Math.max(0, cleared.get().value() - current);
+    }
+
+    public static int heroFleetTarget(Game game, Player seat) {
+        Tile home = seat.getHomeSystemTile();
+        if (!holdsHero(seat) || home == null) return 0;
+        int slots = Math.min(HERO_FLEET_MAX, Helper.getProductionValue(seat, game, home, false));
+        return Math.max(0, slots - (grantsFleetToken(game, seat) ? 1 : 0));
+    }
+
+    private static double heroMinSaving(Game game) {
+        return game.getRound() >= LATE_HERO_ROUND ? LATE_HERO_MIN_SAVING : HERO_MIN_SAVING;
+    }
+
+    private static BuildPlan heroPlan(Game game, Player seat, Tile tile, DefenseOutlook defense, int shipsMovedOut) {
+        BuildPlan plain = heroPlanWithRoom(game, seat, tile, defense, shipsMovedOut);
+        if (!grantsFleetToken(game, seat)) return plain;
+        BuildPlan fed = heroPlanWithRoom(game, seat, tile, defense, shipsMovedOut + 1);
+        return fed.ships() >= AUTO_FACTORIES_SHIPS && fed.totalCost() > plain.totalCost() ? fed : plain;
+    }
+
+    private static BuildPlan heroPlanWithRoom(
+            Game game, Player seat, Tile tile, DefenseOutlook defense, int extraFleetRoom) {
+        int fleetRoom =
+                FleetLimit.ships(seat) - BoardView.nonFighterShips(BoardView.space(tile), seat) + extraFleetRoom;
+        Budget budget = new Budget(Helper.getProductionValue(seat, game, tile, false), FREE_BUILD_RESOURCES, fleetRoom);
+        Builder builder = new Builder(game, seat, tile, budget, defense);
+        heroBuildOrder(builder).forEach(type -> planHeroUnits(builder, type));
+        fillProduction(builder);
+        return new BuildPlan(builder.orders);
+    }
+
+    private static List<UnitType> heroBuildOrder(Builder builder) {
+        return HERO_BUILD_ORDER.stream()
+                .sorted(Comparator.comparingDouble((UnitType type) -> builder.cost(type))
+                        .reversed())
+                .toList();
+    }
+
+    private static void planHeroUnits(Builder builder, UnitType type) {
+        double value = HERO_VALUE_PER_RESOURCE * builder.cost(type);
+        if (type == UnitType.Mech) {
+            builder.groundUpTo(type, Integer.MAX_VALUE, value);
+        } else {
+            builder.shipsUpTo(type, Integer.MAX_VALUE, value, false);
+        }
     }
 
     private static void planAutoFactories(Builder builder) {
         Player seat = builder.seat;
-        if (!seat.hasUnlockedBreakthrough(AUTO_FACTORIES)) return;
-        if (ButtonHelper.isLawInPlay(builder.game, FLEET_REGULATIONS)
-                && seat.getEffectiveFleetCC() >= REGULATED_FLEET) {
-            return;
-        }
+        if (!grantsFleetToken(builder.game, seat)) return;
         int ships = builder.plannedNonFighterShips();
         int missing = AUTO_FACTORIES_SHIPS - ships;
         if (ships == 0 || missing <= 0) return;
@@ -813,6 +903,12 @@ public class ProductionPlanner {
         void shipsUpTo(UnitType type, int target, double value, boolean scoring) {
             while (count(type) < target) {
                 if (!ship(type, value, scoring)) return;
+            }
+        }
+
+        void groundUpTo(UnitType type, int target, double value) {
+            while (count(type) < target) {
+                if (!ground(type, 1, value)) return;
             }
         }
 

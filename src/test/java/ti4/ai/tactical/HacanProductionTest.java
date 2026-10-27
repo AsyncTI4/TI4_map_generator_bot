@@ -126,4 +126,80 @@ class HacanProductionTest extends BaseTi4Test {
                         + with.units(UnitType.Carrier))
                 .isEqualTo(3);
     }
+
+    // The free build spends its slots on the most expensive units first: the flagship, then dreadnoughts, with no
+    // infantry or fighters left over when the fleet pool has room for a ship in every slot.
+    @Test
+    void fillsTheFreeBuildWithTheMostExpensiveShips() {
+        unlockHero();
+        test.nekro.setFleetCC(8);
+
+        BuildPlan free = ProductionPlanner.freeBuild(test.game, test.nekro, home, defense())
+                .orElseThrow();
+
+        assertThat(free.units(UnitType.Flagship)).isEqualTo(1);
+        assertThat(free.units(UnitType.Dreadnought)).isEqualTo(5);
+        assertThat(free.units(UnitType.Infantry)).isZero();
+        assertThat(free.units(UnitType.Fighter)).isZero();
+    }
+
+    // Ships that leave the dock system first leave room in the fleet pool, so the free build holds more ships.
+    @Test
+    void shipsMovedOutOfTheDockSystemGiveTheFreeBuildMoreRoom() {
+        unlockHero();
+        test.nekro.setFleetCC(4);
+        BuildPlan crowded = ProductionPlanner.freeBuild(test.game, test.nekro, home, defense())
+                .orElseThrow();
+
+        BuildPlan cleared = ProductionPlanner.freeBuild(test.game, test.nekro, home, defense(), 2)
+                .orElseThrow();
+
+        assertThat(cleared.totalCost()).isGreaterThan(crowded.totalCost());
+        assertThat(cleared.ships()).isEqualTo(crowded.ships() + 2);
+    }
+
+    // A third non-fighter ship brings an Auto-Factories fleet token before the fleet limit is checked, so the free
+    // build may hold one ship more than the pool has room for.
+    @Test
+    void autoFactoriesLetsTheFreeBuildHoldOneShipMore() {
+        unlockHero();
+        test.nekro.setFleetCC(4);
+        BuildPlan without = ProductionPlanner.freeBuild(test.game, test.nekro, home, defense())
+                .orElseThrow();
+
+        test.nekro.addBreakthrough("hacanbt");
+        test.nekro.setBreakthroughUnlocked("hacanbt", true);
+        BuildPlan with = ProductionPlanner.freeBuild(test.game, test.nekro, home, defense())
+                .orElseThrow();
+
+        assertThat(with.ships()).isEqualTo(without.ships() + 1);
+    }
+
+    // The status phase tokens go into the fleet pool while the hero is unlocked, enough for a ship per production slot
+    // (less the one Auto-Factories brings).
+    @Test
+    void preparesTheFleetPoolForTheHeroBuild() {
+        assertThat(ProductionPlanner.heroFleetTarget(test.game, test.nekro)).isZero();
+
+        unlockHero();
+        int slots = Math.min(6, Helper.getProductionValue(test.nekro, test.game, home, false));
+        assertThat(ProductionPlanner.heroFleetTarget(test.game, test.nekro)).isEqualTo(slots);
+
+        test.nekro.addBreakthrough("hacanbt");
+        test.nekro.setBreakthroughUnlocked("hacanbt", true);
+        assertThat(ProductionPlanner.heroFleetTarget(test.game, test.nekro)).isEqualTo(slots - 1);
+    }
+
+    // With the hero held and a fleet pool that is full, moving ships out of the dock system is worth the extra ships
+    // the free build can then hold.
+    @Test
+    void movingShipsOutOfTheDockSystemIsWorthTheLargerFreeBuild() {
+        unlockHero();
+        test.nekro.setFleetCC(4);
+
+        assertThat(ProductionPlanner.heroGainFromRoom(test.game, test.nekro, home, defense(), 2, 0))
+                .isPositive();
+        assertThat(ProductionPlanner.heroGainFromRoom(test.game, test.nekro, home, defense(), 0, 0))
+                .isZero();
+    }
 }

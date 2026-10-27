@@ -1223,6 +1223,7 @@ class AiSelfPlayTest extends BaseTi4Test {
                 game.setUp(factions());
                 SelfPlayGame.Outcome outcome = game.run(stopWhen, maxVirtualMillis, maxTicks);
                 System.out.println(outcome.report());
+                env.leaders.lines().forEach(line -> System.out.println("LEADERS " + game.name + " " + line));
                 // Every channel and thread in this game's fake Discord must be its own; anything else means a call was
                 // routed to the wrong game while several games ran at once.
                 List<String> foreign = env.discord.channels().stream()

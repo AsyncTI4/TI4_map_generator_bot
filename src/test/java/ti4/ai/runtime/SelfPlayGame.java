@@ -414,6 +414,7 @@ final class SelfPlayGame {
             env.promissory.observe(game);
             objectives.observe(game);
             relics.observe(game);
+            env.leaders.observe(game);
             if (fracture.due(game)) force(game, fracture::enter);
             if (relicsDue(game)) {
                 relicsHandedOut = true;

@@ -15,6 +15,7 @@ import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.strategy.TechPath;
 import ti4.ai.strategy.TokenPlan;
+import ti4.ai.tactical.ProductionPlanner;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -175,11 +176,13 @@ public class CommandTokenPolicy {
         int largest = largestStack(game, seat);
         int bonus = fleetBonus(seat);
         int cap = fleetCap(game, seat);
+        int heroFleet = ProductionPlanner.heroFleetTarget(game, seat);
         if (ACTION_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) {
             TokenPlan plan = TokenPlan.of(game, seat);
             return List.of(
                     new Level(Pool.FLEET, Math.min(cap, largest) - bonus),
                     new Level(Pool.TACTIC, 1),
+                    new Level(Pool.FLEET, Math.min(cap, heroFleet) - bonus),
                     new Level(Pool.FLEET, Math.min(cap, BASE_FLEET) - bonus),
                     new Level(Pool.FLEET, Math.min(cap, fleetForAnOpenSlot(game, seat, largest, cap)) - bonus),
                     new Level(Pool.FLEET, Math.min(cap, objectiveFleet(game, seat, largest, cap)) - bonus),
@@ -191,6 +194,7 @@ public class CommandTokenPolicy {
         return List.of(
                 new Level(Pool.FLEET, Math.min(cap, largest) - bonus),
                 new Level(Pool.TACTIC, 1),
+                new Level(Pool.FLEET, Math.min(cap, heroFleet) - bonus),
                 new Level(Pool.FLEET, Math.min(cap, fleetForAnOpenSlot(game, seat, largest, cap)) - bonus),
                 new Level(Pool.STRATEGY, strategizeHeld(game, seat) ? 1 : 0),
                 new Level(Pool.TACTIC, TACTIC_FIRST),

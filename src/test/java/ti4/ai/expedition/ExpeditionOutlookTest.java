@@ -292,4 +292,18 @@ class ExpeditionOutlookTest extends BaseTi4Test {
         assertThat(ExpeditionOutlook.claimNow(test.game, mahact))
                 .hasValueSatisfying(choice -> assertThat(choice.kind()).isEqualTo(ExpeditionKind.TRADE_GOODS));
     }
+
+    // The Hacan breakthrough is worth a floor of 8 to the seat, so it pays seven resources for it while turns remain
+    // (a price no other faction here pays) and claims at once instead of waiting to pass.
+    @Test
+    void hacanPaysUpToItsFloorForTheBreakthroughAndClaimsAtOnce() {
+        Player hacan = test.addSeat("200000000000000010", "hacan", "yellow");
+        hacan.addBreakthrough("hacanbt");
+        sevenResources(hacan);
+        sevenResources(test.nekro);
+
+        assertThat(BreakthroughValue.of(test.game, hacan)).isGreaterThanOrEqualTo(BreakthroughValue.HACAN_FLOOR);
+        assertThat(ExpeditionOutlook.claimNow(test.game, hacan)).isPresent();
+        assertThat(ExpeditionOutlook.claimNow(test.game, test.nekro)).isEmpty();
+    }
 }

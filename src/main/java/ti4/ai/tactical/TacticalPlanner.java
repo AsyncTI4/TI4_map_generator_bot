@@ -397,6 +397,7 @@ public class TacticalPlanner {
         List<TacticalPlan> adjusted = plans.stream()
                 .filter(plan -> !ExtortionPlans.honoured(context.game, context.seat, plan))
                 .map(plan -> plan.withScore(plan.score() - marchForfeit(context, plan)))
+                .map(plan -> plan.withScore(plan.score() + heroRoomBonus(context, plan)))
                 .map(plan -> ExtortionPlans.adjust(context.game, context.seat, plan))
                 .toList();
         return ExtortionPlans.honourPayments(context.game, context.seat, adjusted).stream()
@@ -3287,6 +3288,25 @@ public class TacticalPlanner {
         int allowance = hasDock(seat, origin) ? BoardView.DOCK_FIGHTER_ALLOWANCE : 0;
         int ground = BoardView.groundForces(space, seat) - groundForcesFromSpace(moves);
         return ground + Math.max(0, fighters - allowance) - capacity;
+    }
+
+    private static double heroRoomBonus(Context context, TacticalPlan plan) {
+        Player seat = context.seat;
+        Tile home = seat.getHomeSystemTile();
+        if (plan.kind() == Kind.PRODUCE || home == null || !ProductionPlanner.holdsHero(seat)) return 0;
+        int leaving = plan.moves().stream()
+                .filter(move -> move.origin().equals(home.getPosition()))
+                .filter(move -> BoardView.MOVING_SHIPS.contains(move.type()))
+                .mapToInt(UnitMove::count)
+                .sum();
+        if (leaving == 0 || !hasDock(seat, home)) return 0;
+        return ProductionPlanner.heroGainFromRoom(
+                context.game,
+                seat,
+                home,
+                context.defense(),
+                leaving,
+                context.buildPlan(home).value());
     }
 
     private static boolean hasDock(Player seat, Tile tile) {
