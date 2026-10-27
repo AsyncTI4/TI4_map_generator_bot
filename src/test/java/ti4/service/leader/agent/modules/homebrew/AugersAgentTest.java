@@ -1,4 +1,4 @@
-package ti4.service.leader.agent.modules;
+package ti4.service.leader.agent.modules.homebrew;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,11 +29,6 @@ class AugersAgentTest extends BaseTi4Test {
         // A Project Pi faction id contains the "_" separator, which the old split("_")[1] parsing truncated.
         explorer.setFaction(game, "pi_hacan");
         explorer.setColor("blue");
-    }
-
-    @Test
-    void offersTheLegacyButtonIdForTheExplorer() {
-        assertThat(AugersAgent.buttonId(explorer)).isEqualTo("exhaustAgent_augersagent_pi_hacan");
     }
 
     @Test
@@ -68,6 +63,6 @@ class AugersAgentTest extends BaseTi4Test {
     }
 
     private AgentUse<Player> use() {
-        return new AgentUse<>(game, augers, explorer, "Clodho, the Ilyxum agent", null);
+        return new AgentUse<>(game, augers, explorer, "Clodho, the Ilyxum agent", false, null);
     }
 }

@@ -117,6 +117,9 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.ExhaustOnlyAgents;
+import ti4.service.leader.agent.modules.homebrew.HomebrewExhaustOnlyAgents;
+import ti4.service.leader.agent.modules.homebrew.KortaliAgent;
 import ti4.service.planet.JotunheimLegendaryService;
 import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
@@ -1946,11 +1949,7 @@ public class StartCombatService {
                 buttons.add(ThronesLeadersHandler.getThronesAgentButton(agentHolder));
             }
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("titansagent")) {
-                buttons.add(Buttons.gray(
-                        factionChecker + "exhaustAgent_titansagent",
-                        "Use Titans " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "Agent",
-                        FactionEmojis.Titans));
+                buttons.add(ExhaustOnlyAgents.TITANS.button(agentHolder));
             }
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasRelicReady("heartofixth")) {
                 buttons.add(Buttons.blue(
@@ -1959,11 +1958,7 @@ public class StartCombatService {
                         agentHolder.getFactionEmoji()));
             }
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("gheminaagent")) {
-                buttons.add(Buttons.gray(
-                        factionChecker + "exhaustAgent_gheminaagent",
-                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "Ghemina Agents",
-                        FactionEmojis.ghemina));
+                buttons.add(HomebrewExhaustOnlyAgents.GHEMINA.button(agentHolder));
             }
 
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("kjalengardagent")) {
@@ -2041,11 +2036,7 @@ public class StartCombatService {
             }
 
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("nomadagentthundarian")) {
-                buttons.add(Buttons.gray(
-                        factionChecker + "exhaustAgent_nomadagentthundarian",
-                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "The Thundarian",
-                        FactionEmojis.Nomad));
+                buttons.add(ExhaustOnlyAgents.THUNDARIAN.button(agentHolder));
             }
             List<Tile> flagshipTile =
                     CheckUnitContainmentService.getTilesContainingPlayersUnits(game, agentHolder, UnitType.Flagship);
@@ -2199,20 +2190,12 @@ public class StartCombatService {
                 && !game.isFowMode()
                 && isGroundCombat
                 && !p1.getFragments().isEmpty()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Buttons.gray(
-                    factionChecker + "exhaustAgent_kortaliagent_" + p1.getColor(),
-                    "Use Kortali Agent",
-                    FactionEmojis.kortali));
+            buttons.add(KortaliAgent.button(p2, p1));
         }
         if (p1.hasUnexhaustedLeader("kortaliagent")
                 && isGroundCombat
                 && !p2.getFragments().isEmpty()) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Buttons.gray(
-                    factionChecker + "exhaustAgent_kortaliagent_" + p2.getColor(),
-                    "Use Kortali Agent",
-                    FactionEmojis.kortali));
+            buttons.add(KortaliAgent.button(p1, p2));
         }
 
         if ((p2.hasAbility("glory")) && !game.isFowMode()) {

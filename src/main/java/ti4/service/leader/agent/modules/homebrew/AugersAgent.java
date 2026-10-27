@@ -1,39 +1,30 @@
-package ti4.service.leader.agent.modules;
+package ti4.service.leader.agent.modules.homebrew;
 
-import java.util.Optional;
-import ti4.discord.interactions.buttons.ids.AgentButtonIds;
-import ti4.game.Game;
+import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
-import ti4.service.leader.agent.AgentModule;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
-import ti4.service.leader.agent.AgentTargets;
 import ti4.service.leader.agent.AgentUse;
+import ti4.service.leader.agent.TargetedAgent;
 
-public final class AugersAgent implements AgentModule<Player> {
+public final class AugersAgent extends TargetedAgent {
 
     static final String ID = "augersagent";
     private static final int TRADE_GOODS_GAINED = 2;
 
-    public static String buttonId(Player explorer) {
-        return AgentButtonIds.format(ID, explorer.getFaction());
+    public AugersAgent() {
+        super(ID, "Clodho, the Ilyxum");
     }
 
-    @Override
-    public String agentId() {
-        return ID;
-    }
-
-    @Override
-    public String displayName() {
-        return "Clodho, the Ilyxum";
-    }
-
-    @Override
-    public Optional<Player> decode(Game game, Player user, String payload) {
-        return AgentTargets.player(game, payload);
+    public static Button button(Player augers, Player explorer) {
+        return Buttons.green(
+                ownedButtonId(augers, ID, explorer.getFaction()),
+                useLabel(augers, ID, "Ilyxum Agent on " + explorer.getColor()),
+                FactionEmojis.augers);
     }
 
     @Override

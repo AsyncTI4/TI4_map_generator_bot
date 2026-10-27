@@ -53,6 +53,8 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
+import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -609,15 +611,10 @@ public class AddPlanetService {
                 && player.hasUnexhaustedLeader("vaylerianagent")
                 && !setup) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green(
-                    "exhaustAgent_vaylerianagent_" + player.getFaction(),
-                    "Use Vaylerian Agent",
-                    FactionEmojis.vaylerian));
+            buttons.add(VaylerianAgent.button(player));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             String msg2 = player.getRepresentationUnfogged() + " you may use "
-                    + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "Yvin Korduul, the Vaylerian" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                    + " agent, to draw 1 action card.";
+                    + AgentLifecycle.agentNameFor(game, player, "vaylerianagent") + ", to draw 1 action card.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons);
         }
         if (game.getActivePlayerID() != null

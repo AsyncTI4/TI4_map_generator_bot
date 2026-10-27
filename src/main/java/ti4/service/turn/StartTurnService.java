@@ -95,6 +95,7 @@ import ti4.service.fow.WhisperService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.homebrew.VadenAgent;
 import ti4.service.map.PlayerAreaWarningService;
 import ti4.service.relic.QuantumEntanglerService;
 import ti4.service.strategycard.PlayStrategyCardService;
@@ -947,10 +948,7 @@ public class StartTurnService {
                         FactionEmojis.florzen));
             }
             if (player.hasUnexhaustedLeader("vadenagent")) {
-                startButtons.add(Buttons.gray(
-                        factionChecker + "exhaustAgent_vadenagent_" + player.getFaction(),
-                        "Use Vaden Agent",
-                        FactionEmojis.vaden));
+                startButtons.add(VadenAgent.button(player));
             }
             if (player.hasAbility("laws_order") && !game.getLaws().isEmpty()) {
                 startButtons.add(Buttons.gray(

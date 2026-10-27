@@ -2,20 +2,54 @@ package ti4.service.leader.agent;
 
 import java.util.Optional;
 import java.util.Set;
+import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 
-public interface AgentModule<P> {
+public abstract class AgentModule<P> {
 
-    String agentId();
+    private final String agentId;
+    private final String displayName;
 
-    default Set<String> aliasIds() {
+    protected AgentModule(String agentId, String displayName) {
+        this.agentId = agentId;
+        this.displayName = displayName;
+    }
+
+    public final String agentId() {
+        return agentId;
+    }
+
+    public Set<String> aliasIds() {
         return Set.of();
     }
 
-    String displayName();
+    public final String displayName() {
+        return displayName;
+    }
 
-    Optional<P> decode(Game game, Player user, String payload);
+    public abstract Optional<P> decode(Game game, Player user, String payload);
 
-    AgentOutcome resolve(AgentUse<P> use);
+    public Optional<String> unusableReason(Game game, Player user, P payload) {
+        return Optional.empty();
+    }
+
+    public String exhaustAnnouncement(AgentUse<P> use) {
+        return use.user().getRepresentation() + " has exhausted " + use.agentName() + ".";
+    }
+
+    public abstract AgentOutcome resolve(AgentUse<P> use);
+
+    protected static Optional<Tile> activeSystem(Game game) {
+        return Optional.ofNullable(game.getTileByPosition(game.getActiveSystem()));
+    }
+
+    protected static String ownedButtonId(Player owner, String agentId, String... payloadSegments) {
+        return owner.factionButtonChecker() + AgentButtonIds.format(agentId, payloadSegments);
+    }
+
+    protected static String useLabel(Player owner, String agentId, String agentLabel) {
+        return (AgentLifecycle.holdsOnlyAYssarilCopy(owner, agentId) ? "Use Clever Clever " : "Use ") + agentLabel;
+    }
 }

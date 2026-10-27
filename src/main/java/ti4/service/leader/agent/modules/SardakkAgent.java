@@ -5,11 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
-import ti4.discord.interactions.buttons.ids.AgentButtonIds;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Helper;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
@@ -18,9 +19,13 @@ import ti4.service.leader.agent.AgentTargets;
 import ti4.service.leader.agent.AgentUse;
 import ti4.service.unit.AddUnitService;
 
-public final class SardakkAgent implements AgentModule<SardakkAgent.Choice> {
+public final class SardakkAgent extends AgentModule<SardakkAgent.Choice> {
 
     static final String ID = "sardakkagent";
+
+    public SardakkAgent() {
+        super(ID, "T'ro An, the N'orr");
+    }
 
     sealed interface Choice {}
 
@@ -28,18 +33,11 @@ public final class SardakkAgent implements AgentModule<SardakkAgent.Choice> {
 
     record PlaceOnPlanet(Tile tile, String planet) implements Choice {}
 
-    public static String planetButtonId(String position, String planet) {
-        return AgentButtonIds.format(ID, position, planet);
-    }
-
-    @Override
-    public String agentId() {
-        return ID;
-    }
-
-    @Override
-    public String displayName() {
-        return "T'ro An, the N'orr";
+    public static Button button(Player sardakk, String position, String planet, String planetRepresentation) {
+        return Buttons.green(
+                ownedButtonId(sardakk, ID, position, planet),
+                useLabel(sardakk, ID, "N'orr Agent on " + planetRepresentation),
+                FactionEmojis.Sardakk);
     }
 
     @Override

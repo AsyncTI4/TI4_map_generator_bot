@@ -61,6 +61,9 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.LoreService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.WinnuAgent;
+import ti4.service.leader.agent.modules.homebrew.GledgeAgent;
+import ti4.service.leader.agent.modules.homebrew.LunariumAgent;
 import ti4.service.turn.StartTurnService;
 import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
@@ -359,25 +362,21 @@ class DeleteButtonsButtonHandler {
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
-                    buttons.add(Buttons.red("exhaustAgent_winnuagent", "Use Winnu Agent", FactionEmojis.Winnu));
+                    buttons.add(WinnuAgent.button(player));
                 }
                 if (player.hasUnexhaustedLeader("lunariumagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
-                    buttons.add(
-                            Buttons.red("exhaustAgent_lunariumagent", "Use Lunarium Agent", FactionEmojis.lunarium));
+                    buttons.add(LunariumAgent.button(player));
                 }
                 if (player.hasUnexhaustedLeader("gledgeagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
-                    buttons.add(Buttons.red(
-                            "exhaustAgent_gledgeagent_" + player.getFaction(),
-                            "Use Gledge Agent",
-                            FactionEmojis.gledge));
+                    buttons.add(GledgeAgent.button(player));
                 }
 
                 if (player.hasUnexhaustedLeader("ghotiagent")) {

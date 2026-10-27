@@ -61,6 +61,7 @@ import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.MonumentsService;
 import ti4.service.game.NekroMonumentService;
+import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
 
 @UtilityClass
 public class CardsInfoService {
@@ -474,7 +475,7 @@ public class CardsInfoService {
         }
         MonumentsBRButtonHandler.addArmageddonProjectCardsInfoButtons(buttons, game, player);
         if (player.hasUnexhaustedLeader("vaylerianagent")) {
-            buttons.add(Buttons.gray("exhaustAgent_vaylerianagent", "Use Vaylerian Agent", FactionEmojis.vaylerian));
+            buttons.add(VaylerianAgent.pickTargetButton(player));
         }
         if (player.ownsUnit("ghost_mech")
                 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0
