@@ -85,6 +85,7 @@ import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.modules.homebrew.AugersAgent;
 import ti4.service.map.FractureService;
 import ti4.service.planet.AddPlanetService;
@@ -523,9 +524,8 @@ public class ExploreService {
                     buttons.add(AugersAgent.button(p2, player));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
                     String msg2 = p2.getRepresentationUnfogged() + " you may use "
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                            + "Clodho, the Ilyxum" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                            + " agent, on " + player.getFactionEmojiOrColor() + " to give them 2 trade goods.";
+                            + AgentLifecycle.agentNameFor(game, p2, "augersagent") + ", on "
+                            + player.getFactionEmojiOrColor() + " to give them 2 trade goods.";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg2, buttons);
                 }
             }

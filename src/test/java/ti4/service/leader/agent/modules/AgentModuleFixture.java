@@ -7,8 +7,10 @@ import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentUse;
+import ti4.service.leader.agent.TargetedAgent;
 
 /**
  * A two-player game for agent module tests: the agent's owner and a target whose Project Pi faction id
@@ -45,12 +47,11 @@ public final class AgentModuleFixture {
     }
 
     public <P> AgentUse<P> use(AgentModule<P> module, P payload) {
-        return new AgentUse<>(game, user, payload, module.displayName() + " agent", false, null);
+        return new AgentUse<>(game, user, payload, AgentLifecycle.agentName(module.displayName(), false), false, null);
     }
 
     public <P> AgentUse<P> useAsYssarilCopy(AgentModule<P> module, P payload) {
-        return new AgentUse<>(
-                game, user, payload, "Clever Clever " + module.displayName() + "/Yssaril agent", true, null);
+        return new AgentUse<>(game, user, payload, AgentLifecycle.agentName(module.displayName(), true), true, null);
     }
 
     // Only the owner can press the button, and the router still hands the exact legacy id to the handler.
@@ -60,5 +61,20 @@ public final class AgentModuleFixture {
         assertThat(envelope.handlerId()).isEqualTo(legacyHandlerId);
         assertThat(button.getCustomId()).hasSizeLessThanOrEqualTo(DISCORD_ID_LIMIT);
         assertThat(button.getLabel()).hasSizeLessThanOrEqualTo(DISCORD_LABEL_LIMIT);
+    }
+
+    public void assertDecodesTargets(TargetedAgent module) {
+        assertThat(module.decode(game, user, TARGET_FACTION))
+                .as(module.agentId() + " with a pi_ faction")
+                .contains(target);
+        assertThat(module.decode(game, user, TARGET_COLOR))
+                .as(module.agentId() + " with a colour")
+                .contains(target);
+        assertThat(module.decode(game, user, ""))
+                .as(module.agentId() + " without a target")
+                .isEmpty();
+        assertThat(module.decode(game, user, "nobody"))
+                .as(module.agentId() + " with an unknown target")
+                .isEmpty();
     }
 }

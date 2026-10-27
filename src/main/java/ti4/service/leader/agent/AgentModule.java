@@ -5,10 +5,9 @@ import java.util.Set;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 
 public abstract class AgentModule<P> {
-
-    private static final String YSSARIL_AGENT = "yssarilagent";
 
     private final String agentId;
     private final String displayName;
@@ -32,18 +31,25 @@ public abstract class AgentModule<P> {
 
     public abstract Optional<P> decode(Game game, Player user, String payload);
 
+    public Optional<String> unusableReason(Game game, Player user, P payload) {
+        return Optional.empty();
+    }
+
     public String exhaustAnnouncement(AgentUse<P> use) {
         return use.user().getRepresentation() + " has exhausted " + use.agentName() + ".";
     }
 
     public abstract AgentOutcome resolve(AgentUse<P> use);
 
+    protected static Optional<Tile> activeSystem(Game game) {
+        return Optional.ofNullable(game.getTileByPosition(game.getActiveSystem()));
+    }
+
     protected static String ownedButtonId(Player owner, String agentId, String... payloadSegments) {
         return owner.factionButtonChecker() + AgentButtonIds.format(agentId, payloadSegments);
     }
 
     protected static String useLabel(Player owner, String agentId, String agentLabel) {
-        boolean holdsOnlyAYssarilCopy = !owner.hasLeader(agentId) && owner.hasLeader(YSSARIL_AGENT);
-        return (holdsOnlyAYssarilCopy ? "Use Clever Clever " : "Use ") + agentLabel;
+        return (AgentLifecycle.holdsOnlyAYssarilCopy(owner, agentId) ? "Use Clever Clever " : "Use ") + agentLabel;
     }
 }

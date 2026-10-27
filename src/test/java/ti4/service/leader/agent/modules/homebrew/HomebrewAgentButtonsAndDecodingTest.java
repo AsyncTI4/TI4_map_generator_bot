@@ -12,7 +12,7 @@ import ti4.service.leader.agent.modules.homebrew.VaylerianAgent.DrawFor;
 import ti4.service.leader.agent.modules.homebrew.VaylerianAgent.PickTarget;
 import ti4.testUtils.BaseTi4Test;
 
-class TargetedAgentDecodingTest extends BaseTi4Test {
+class HomebrewAgentButtonsAndDecodingTest extends BaseTi4Test {
 
     @Test
     void everyTargetedHomebrewAgentDecodesFactionsColoursAndProjectPiIds() {
@@ -31,21 +31,7 @@ class TargetedAgentDecodingTest extends BaseTi4Test {
                 new VeldyrAgent(),
                 new ZelianAgent());
 
-        for (TargetedAgent module : targeted) {
-            Player user = fixture.user;
-            assertThat(module.decode(fixture.game, user, AgentModuleFixture.TARGET_FACTION))
-                    .as(module.agentId() + " with a pi_ faction")
-                    .contains(fixture.target);
-            assertThat(module.decode(fixture.game, user, AgentModuleFixture.TARGET_COLOR))
-                    .as(module.agentId() + " with a colour")
-                    .contains(fixture.target);
-            assertThat(module.decode(fixture.game, user, ""))
-                    .as(module.agentId() + " without a target")
-                    .isEmpty();
-            assertThat(module.decode(fixture.game, user, "nobody"))
-                    .as(module.agentId() + " with an unknown target")
-                    .isEmpty();
-        }
+        targeted.forEach(fixture::assertDecodesTargets);
     }
 
     @Test

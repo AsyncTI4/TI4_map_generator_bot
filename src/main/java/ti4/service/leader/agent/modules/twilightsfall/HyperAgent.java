@@ -13,12 +13,7 @@ public final class HyperAgent extends TargetedAgent {
     private static final String GENOME = "_Hyper Genome_";
 
     public HyperAgent() {
-        super(ID, GENOME);
-    }
-
-    @Override
-    public String exhaustAnnouncement(AgentUse<Player> use) {
-        return use.user().getRepresentation() + " has exhausted the " + use.agentName() + ".";
+        super(ID, "Hyper Genome");
     }
 
     @Override

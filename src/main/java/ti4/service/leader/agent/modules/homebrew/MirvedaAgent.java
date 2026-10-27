@@ -1,8 +1,10 @@
 package ti4.service.leader.agent.modules.homebrew;
 
 import java.util.List;
+import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.service.emoji.FactionEmojis;
@@ -27,12 +29,16 @@ public final class MirvedaAgent extends TargetedAgent {
     }
 
     @Override
+    public Optional<String> unusableReason(Game game, Player user, Player target) {
+        if (target.getStrategicCC() < 1) {
+            return Optional.of(target.getFactionEmojiOrColor() + " has no command tokens in their strategy pool");
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player target = use.payload();
-        if (target.getStrategicCC() < 1) {
-            return AgentOutcome.of(Message.inPressedChannel(
-                    "Target does not have any command tokens in their strategy pool, and so nothing has happened."));
-        }
         target.setStrategicCC(target.getStrategicCC() - 1);
         ButtonHelperCommanders.resolveMuaatCommanderCheck(
                 target, use.game(), use.event(), "used " + FactionEmojis.mirveda + " Logic Machina");

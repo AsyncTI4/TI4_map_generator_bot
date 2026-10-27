@@ -77,9 +77,7 @@ public final class VaylerianAgent extends AgentModule<VaylerianAgent.Choice> {
             return;
         }
         String agentName = AgentLifecycle.agentName(DISPLAY_NAME, step.viaYssaril());
-        for (Message message : drawFor(game, player, target, agentName).messages()) {
-            MessageHelper.sendMessageToChannel(message.recipient().getCorrectChannel(), message.text());
-        }
+        AgentLifecycle.deliver(drawFor(game, player, target, agentName), event);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -96,8 +94,8 @@ public final class VaylerianAgent extends AgentModule<VaylerianAgent.Choice> {
         Player user = use.user();
         List<Button> targets =
                 AgendaRiderHelper.getPlayerOutcomeButtons(use.game(), null, PICK_TARGET_PREFIX, null).stream()
-                        .map(button ->
-                                button.withCustomId(AgentStepIds.flagCopy(button.getCustomId(), use.viaYssaril())))
+                        .map(button -> button.withCustomId(user.factionButtonChecker()
+                                + AgentStepIds.flagCopy(button.getCustomId(), use.viaYssaril())))
                         .toList();
         return AgentOutcome.of(Message.withButtons(
                 user,

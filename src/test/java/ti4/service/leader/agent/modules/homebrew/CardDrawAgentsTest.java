@@ -3,6 +3,7 @@ package ti4.service.leader.agent.modules.homebrew;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.modules.AgentModuleFixture;
 import ti4.service.leader.agent.modules.homebrew.VaylerianAgent.DrawFor;
@@ -42,9 +43,11 @@ class CardDrawAgentsTest extends BaseTi4Test {
 
         assertThat(outcome.messages()).singleElement().satisfies(message -> {
             assertThat(message.recipient()).isSameAs(fixture.user);
-            assertThat(message.buttons())
-                    .isNotEmpty()
-                    .allSatisfy(button -> assertThat(button.getCustomId()).startsWith("vaylerianAgent_"));
+            assertThat(message.buttons()).isNotEmpty().allSatisfy(button -> {
+                ComponentIdEnvelope envelope = ComponentIdEnvelope.decode(button.getCustomId());
+                assertThat(envelope.ownerFaction()).isEqualTo(fixture.user.getFaction());
+                assertThat(envelope.handlerId()).startsWith("vaylerianAgent_");
+            });
         });
     }
 }

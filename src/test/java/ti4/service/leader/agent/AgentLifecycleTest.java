@@ -76,4 +76,41 @@ class AgentLifecycleTest extends BaseTi4Test {
         assertThat(AgentLifecycle.isYssarilCopy("yssarilagent", "yssarilagent")).isFalse();
         assertThat(AgentLifecycle.isYssarilCopy("augersagent", "augersagent")).isFalse();
     }
+
+    @Test
+    void anAgentWithAModuleIsHandledByTheLifecycle() {
+        // Exhausting needs the Spring context, so the agent is already exhausted and the press is refused.
+        mentak.getLeader("mentakagent").orElseThrow().setExhausted(true);
+
+        assertThat(AgentLifecycle.resolve("exhaustAgent_mentakagent_pi_hacan", null, game, mentak))
+                .isTrue();
+    }
+
+    @Test
+    void anAgentWithoutAModuleIsLeftToTheLegacyChain() {
+        assertThat(AgentLifecycle.resolve("exhaustAgent_hacanagent", null, game, mentak))
+                .isFalse();
+    }
+
+    @Test
+    void namesBlueReverieYssarilCopiesAsCopies() {
+        assertThat(AgentLifecycle.isYssarilCopy("yssarilagent_br", "mentakagent"))
+                .isTrue();
+        assertThat(AgentLifecycle.isYssarilCopy("yssarilagent_br", "yssarilagent_br"))
+                .isFalse();
+    }
+
+    @Test
+    void namesGenomesWithoutTheAgentSuffix() {
+        assertThat(AgentLifecycle.agentName("Captain's Genome", false)).isEqualTo("the _Captain's Genome_");
+        assertThat(AgentLifecycle.agentName("Captain's Genome", true))
+                .isEqualTo("the Clever Clever _Captain's Genome_");
+    }
+
+    @Test
+    void usesTheTwilightsFallNameInTwilightsFallGames() {
+        game.setTwilightsFallMode(true);
+
+        assertThat(AgentLifecycle.agentNameFor(game, mentak, "saaragent")).isEqualTo("the _Captain's Genome_");
+    }
 }

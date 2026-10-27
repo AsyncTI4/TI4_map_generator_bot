@@ -1,15 +1,27 @@
 package ti4.service.leader.agent;
 
 import java.util.Optional;
+import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.service.emoji.TI4Emoji;
 
 public final class ExhaustOnlyAgent extends AgentModule<ExhaustOnlyAgent.Choice> {
 
     public record Choice(Optional<Player> target) {}
 
-    public ExhaustOnlyAgent(String agentId, String displayName) {
+    private final String buttonLabel;
+    private final TI4Emoji emoji;
+
+    public ExhaustOnlyAgent(String agentId, String displayName, String buttonLabel, TI4Emoji emoji) {
         super(agentId, displayName);
+        this.buttonLabel = buttonLabel;
+        this.emoji = emoji;
+    }
+
+    public Button button(Player owner) {
+        return Buttons.gray(ownedButtonId(owner, agentId()), useLabel(owner, agentId(), buttonLabel), emoji);
     }
 
     @Override

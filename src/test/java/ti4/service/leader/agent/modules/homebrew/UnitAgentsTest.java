@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.modules.AgentModuleFixture;
 import ti4.testUtils.BaseTi4Test;
@@ -25,17 +26,17 @@ class UnitAgentsTest extends BaseTi4Test {
     }
 
     @Test
-    void kortaliNoLongerCrashesWhenThereIsNothingToTake() {
-        // The old code called nextInt(0) here and threw.
+    void kortaliIsNotUsableWhenThereIsNothingToTake() {
+        // The old code called nextInt(0) here and threw; now the agent is not exhausted at all.
         AgentModuleFixture fixture = new AgentModuleFixture("kortali");
         KortaliAgent kortali = new KortaliAgent();
 
-        AgentOutcome outcome = kortali.resolve(fixture.use(kortali, fixture.target));
-
-        assertThat(outcome.messages()).singleElement().satisfies(message -> {
-            assertThat(message.recipient()).isSameAs(fixture.user);
-            assertThat(message.text()).contains("no relic fragments");
-        });
+        assertThat(kortali.unusableReason(fixture.game, fixture.user, fixture.target))
+                .hasValueSatisfying(reason -> assertThat(reason).contains("no relic fragments"));
+        assertThat(AgentLifecycle.use(fixture.game, fixture.user, "kortaliagent", "pi_hacan", null))
+                .isFalse();
+        assertThat(fixture.user.getLeader("kortaliagent").orElseThrow().isExhausted())
+                .isFalse();
     }
 
     @Test
@@ -54,18 +55,22 @@ class UnitAgentsTest extends BaseTi4Test {
     }
 
     @Test
-    void nokarNeedsTheTargetToHaveShipsThere() {
+    void nokarIsNotUsableWithoutTheTargetsShipsThere() {
         AgentModuleFixture fixture = new AgentModuleFixture("nokar");
         NokarAgent nokar = new NokarAgent();
 
-        AgentOutcome outcome = nokar.resolve(fixture.use(nokar, fixture.target));
+        assertThat(nokar.unusableReason(fixture.game, fixture.user, fixture.target))
+                .hasValueSatisfying(reason -> assertThat(reason).contains("no ships"));
+    }
 
-        assertThat(fixture.tile
-                        .getUnitHolders()
-                        .get("space")
-                        .getUnitCount(UnitType.Destroyer, fixture.target.getColor()))
-                .isZero();
-        assertThat(outcome.messages().getFirst().text()).contains("no destroyer placed");
+    @Test
+    void nokarIsNotUsableWithoutAnActiveSystem() {
+        AgentModuleFixture fixture = new AgentModuleFixture("nokar");
+        fixture.game.setActiveSystem("");
+        NokarAgent nokar = new NokarAgent();
+
+        assertThat(nokar.unusableReason(fixture.game, fixture.user, fixture.target))
+                .hasValueSatisfying(reason -> assertThat(reason).contains("active system"));
     }
 
     @Test
@@ -83,12 +88,36 @@ class UnitAgentsTest extends BaseTi4Test {
     }
 
     @Test
-    void zelianNeedsInfantryInSpace() {
+    void zelianIsNotUsableWithoutInfantryInSpace() {
         AgentModuleFixture fixture = new AgentModuleFixture("zelian");
+        ZelianAgent zelian = new ZelianAgent();
+
+        assertThat(zelian.unusableReason(fixture.game, fixture.user, fixture.target))
+                .hasValueSatisfying(reason -> assertThat(reason).contains("no infantry"));
+    }
+
+    @Test
+    void zelianUsedOnYourselfOffersLandingButtonsInANewMessage() {
+        // Editing the pressed message would be undone by the pressed-button cleanup that runs afterwards.
+        AgentModuleFixture fixture = new AgentModuleFixture("zelian");
+        fixture.tile.addUnit("space", Units.getUnitKey(UnitType.Infantry, fixture.user.getColorID()), 1);
+        ZelianAgent zelian = new ZelianAgent();
+
+        AgentOutcome outcome = zelian.resolve(fixture.use(zelian, fixture.user));
+
+        assertThat(outcome.messages())
+                .anySatisfy(message -> assertThat(message.text()).contains("land troops"));
+    }
+
+    @Test
+    void zelianUsedOnSomeoneElseOffersNoLandingButtons() {
+        AgentModuleFixture fixture = new AgentModuleFixture("zelian");
+        fixture.tile.addUnit("space", Units.getUnitKey(UnitType.Infantry, fixture.target.getColorID()), 1);
         ZelianAgent zelian = new ZelianAgent();
 
         AgentOutcome outcome = zelian.resolve(fixture.use(zelian, fixture.target));
 
-        assertThat(outcome.messages().getFirst().text()).contains("no mech placed");
+        assertThat(outcome.messages())
+                .noneSatisfy(message -> assertThat(message.text()).contains("land troops"));
     }
 }

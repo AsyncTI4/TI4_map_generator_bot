@@ -11,15 +11,7 @@ class HyperAgentTest extends BaseTi4Test {
 
     @Test
     void decodesFactionsColoursAndProjectPiIds() {
-        AgentModuleFixture fixture = new AgentModuleFixture("mentak");
-        HyperAgent hyper = new HyperAgent();
-
-        assertThat(hyper.decode(fixture.game, fixture.user, AgentModuleFixture.TARGET_FACTION))
-                .contains(fixture.target);
-        assertThat(hyper.decode(fixture.game, fixture.user, AgentModuleFixture.TARGET_COLOR))
-                .contains(fixture.target);
-        assertThat(hyper.decode(fixture.game, fixture.user, "")).isEmpty();
-        assertThat(hyper.decode(fixture.game, fixture.user, "nobody")).isEmpty();
+        new AgentModuleFixture("mentak").assertDecodesTargets(new HyperAgent());
     }
 
     @Test
@@ -61,6 +53,6 @@ class HyperAgentTest extends BaseTi4Test {
         HyperAgent hyper = new HyperAgent();
 
         assertThat(hyper.exhaustAnnouncement(fixture.use(hyper, fixture.target)))
-                .endsWith(" has exhausted the _Hyper Genome_ agent.");
+                .endsWith(" has exhausted the _Hyper Genome_.");
     }
 }

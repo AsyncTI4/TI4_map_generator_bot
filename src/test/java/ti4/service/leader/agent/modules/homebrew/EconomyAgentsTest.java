@@ -84,16 +84,12 @@ class EconomyAgentsTest extends BaseTi4Test {
     }
 
     @Test
-    void mirvedaDoesNothingWithoutAStrategyToken() {
+    void mirvedaIsNotUsableWithoutAStrategyToken() {
         AgentModuleFixture fixture = new AgentModuleFixture("mirveda");
         fixture.target.setStrategicCC(0);
         MirvedaAgent mirveda = new MirvedaAgent();
 
-        AgentOutcome outcome = mirveda.resolve(fixture.use(mirveda, fixture.target));
-
-        assertThat(fixture.target.getStrategicCC()).isZero();
-        assertThat(outcome.messages())
-                .singleElement()
-                .satisfies(message -> assertThat(message.goesToPressedChannel()).isTrue());
+        assertThat(mirveda.unusableReason(fixture.game, fixture.user, fixture.target))
+                .hasValueSatisfying(reason -> assertThat(reason).contains("no command tokens"));
     }
 }

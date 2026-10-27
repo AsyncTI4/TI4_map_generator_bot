@@ -56,13 +56,5 @@ public record AgentOutcome(List<Message> messages, String pressedMessageEdit) {
         public static Message withButtons(Player recipient, String text, List<Button> buttons) {
             return new Message(recipient, text, buttons);
         }
-
-        public static Message inPressedChannel(String text) {
-            return new Message(null, text, List.of());
-        }
-
-        public boolean goesToPressedChannel() {
-            return recipient == null;
-        }
     }
 }

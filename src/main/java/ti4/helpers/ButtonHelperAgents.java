@@ -149,6 +149,10 @@ public final class ButtonHelperAgents {
     @ButtonHandler("toldarAgent_")
     public static void toldarAgent(Player toldar, Game game, String buttonID, GenericInteractionCreateEvent event) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        Leader toldarAgent = toldar.getLeader("toldaragent").orElse(null);
+        if (p2 == null || toldarAgent == null || AgentLifecycle.refuseIfExhausted(event, toldar, toldarAgent)) {
+            return;
+        }
 
         exhaustAgent("exhaustAgent_toldaragent_startToldarAgent_" + p2.getFaction(), event, game, toldar);
         int commodities = p2.getCommodities();
@@ -1455,35 +1459,30 @@ public final class ButtonHelperAgents {
 
     public static boolean checkForEdynAgentPreset(
             Game game, Player passedPlayer, Player upNextPlayer, GenericInteractionCreateEvent event) {
-        Player edyn = Helper.getPlayerFromUnlockedLeader(game, "edynagent");
-        if (edyn != null && edyn.hasUnexhaustedLeader("edynagent")) {
-            String preset = game.getStoredValue("edynAgentPreset");
-            if (!preset.isEmpty()) {
-                if (preset.split("_")[1].equalsIgnoreCase(passedPlayer.getFaction())) {
-                    Player edyn2 = game.getPlayerFromColorOrFaction(preset.split("_")[2]);
-                    Player newActivePlayer = game.getPlayerFromColorOrFaction(preset.split("_")[0]);
-                    if (!AgentLifecycle.use(game, edyn2, "edynagent", "", event)) {
-                        return false;
-                    }
-                    game.setStoredValue("edynAgentPreset", "");
-                    game.setStoredValue(
-                            "edynAgentInAction",
-                            newActivePlayer.getFaction() + "_" + edyn2.getFaction() + "_" + upNextPlayer.getFaction());
-                    List<Button> buttons = StartTurnService.getStartOfTurnButtons(newActivePlayer, game, true, event);
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            newActivePlayer.getCorrectChannel(),
-                            newActivePlayer.getRepresentationUnfogged()
-                                    + " you may take 1 action now due to "
-                                    + (edyn.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                    + "Allant, the Edyn" + (edyn.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                                    + " agent.",
-                            buttons);
-                    game.updateActivePlayer(newActivePlayer);
-                    return true;
-                }
-            }
+        String preset = game.getStoredValue("edynAgentPreset");
+        if (preset.isEmpty() || !preset.split("_")[1].equalsIgnoreCase(passedPlayer.getFaction())) {
+            return false;
         }
-        return false;
+        Player edyn = game.getPlayerFromColorOrFaction(preset.split("_")[2]);
+        Player newActivePlayer = game.getPlayerFromColorOrFaction(preset.split("_")[0]);
+        game.setStoredValue("edynAgentPreset", "");
+        if (edyn == null || newActivePlayer == null) {
+            return false;
+        }
+        if (!AgentLifecycle.use(game, edyn, "edynagent", "", event)) {
+            return false;
+        }
+        game.setStoredValue(
+                "edynAgentInAction",
+                newActivePlayer.getFaction() + "_" + edyn.getFaction() + "_" + upNextPlayer.getFaction());
+        List<Button> buttons = StartTurnService.getStartOfTurnButtons(newActivePlayer, game, true, event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                newActivePlayer.getCorrectChannel(),
+                newActivePlayer.getRepresentationUnfogged() + " you may take 1 action now due to "
+                        + AgentLifecycle.agentNameFor(game, edyn, "edynagent") + ".",
+                buttons);
+        game.updateActivePlayer(newActivePlayer);
+        return true;
     }
 
     public static boolean checkForEdynAgentActive(Game game, GenericInteractionCreateEvent event) {

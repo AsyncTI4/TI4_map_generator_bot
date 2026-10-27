@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
@@ -22,6 +20,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -32,7 +31,8 @@ import ti4.spring.service.gameevent.GameSubEvent;
 @UtilityClass
 public class AgentLifecycle {
 
-    private static final String YSSARIL_AGENT = "yssarilagent";
+    private static final String GENOME = "Genome";
+    private static final List<String> YSSARIL_AGENTS = List.of("yssarilagent", "yssarilagent_br");
     private static final List<String> MESSAGES_TO_DELETE_WHOLE = List.of(
             "choose the user of the agent",
             "please choose the target",
@@ -88,15 +88,41 @@ public class AgentLifecycle {
         offerTemporalCommandSuite(game, player, agentId);
     }
 
-    public static String agentName(String displayName, boolean viaYssaril) {
-        if (!viaYssaril) {
-            return displayName + " agent";
+    public static String agentName(String cardName, boolean viaYssaril) {
+        if (cardName.endsWith(GENOME)) {
+            return viaYssaril ? "the Clever Clever _" + cardName + "_" : "the _" + cardName + "_";
         }
-        return "Clever Clever " + displayName + "/Yssaril agent";
+        if (!viaYssaril) {
+            return cardName + " agent";
+        }
+        return "Clever Clever " + cardName + "/Yssaril agent";
+    }
+
+    public static String agentNameFor(Game game, Player holder, String agentId) {
+        AgentModule<?> module = AgentModules.find(agentId)
+                .orElseThrow(() -> new IllegalArgumentException("No agent module for " + agentId));
+        return agentName(cardName(game, module), holdsOnlyAYssarilCopy(holder, agentId));
+    }
+
+    static String cardName(Game game, AgentModule<?> module) {
+        if (!game.isTwilightsFallMode()) {
+            return module.displayName();
+        }
+        return Optional.ofNullable(Mapper.getLeader(module.agentId()))
+                .flatMap(LeaderModel::getTFName)
+                .orElse(module.displayName());
     }
 
     static boolean isYssarilCopy(String exhaustedLeaderId, String agentId) {
-        return YSSARIL_AGENT.equalsIgnoreCase(exhaustedLeaderId) && !YSSARIL_AGENT.equalsIgnoreCase(agentId);
+        return isYssarilAgent(exhaustedLeaderId) && !isYssarilAgent(agentId);
+    }
+
+    static boolean holdsOnlyAYssarilCopy(Player player, String agentId) {
+        return !player.hasLeader(agentId) && YSSARIL_AGENTS.stream().anyMatch(player::hasLeader);
+    }
+
+    private static boolean isYssarilAgent(String leaderId) {
+        return YSSARIL_AGENTS.stream().anyMatch(leaderId::equalsIgnoreCase);
     }
 
     private static <P> boolean run(
@@ -107,12 +133,12 @@ public class AgentLifecycle {
             Player player,
             boolean pressedAgentButton) {
         String agentId = parsed.agentId();
-        Leader leader = player.getLeaderByIdPreferReadied(agentId).orElse(null);
-        if (leader == null || refuseIfExhausted(event, player, leader)) {
+        Leader leader = player.getLeader(agentId).orElse(null);
+        if (leader == null || refuseIfExhausted(pressedAgentButton ? event : null, player, leader)) {
             return false;
         }
         boolean viaYssaril = isYssarilCopy(leader.getId(), agentId);
-        String agentName = agentName(module.displayName(), viaYssaril);
+        String agentName = agentName(cardName(game, module), viaYssaril);
         Optional<P> payload = module.decode(game, player, parsed.payload());
         if (payload.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -120,11 +146,17 @@ public class AgentLifecycle {
                     "Could not work out how to resolve " + agentName + ", so it was not exhausted.");
             return false;
         }
+        Optional<String> unusable = module.unusableReason(game, player, payload.get());
+        if (unusable.isPresent()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), unusable.get() + ", so " + agentName + " was not exhausted.");
+            return false;
+        }
 
         exhaust(game, player, leader, agentId, parsed.hasPayload() ? parsed.payload() : null);
         AgentUse<P> use = new AgentUse<>(game, player, payload.get(), agentName, viaYssaril, event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), module.exhaustAnnouncement(use));
-        deliver(module.resolve(use), use, pressedAgentButton);
+        deliver(module.resolve(use), event, pressedAgentButton);
         if (pressedAgentButton) {
             finish(event, game, player, agentId);
         } else {
@@ -148,14 +180,18 @@ public class AgentLifecycle {
         game.setStoredValue(key, game.getStoredValue(key) + " Exhausted the " + model.getAlias() + " leader.");
     }
 
-    private static void deliver(AgentOutcome outcome, AgentUse<?> use, boolean pressedAgentButton) {
+    public static void deliver(AgentOutcome outcome, GenericInteractionCreateEvent event) {
+        deliver(outcome, event, true);
+    }
+
+    private static void deliver(AgentOutcome outcome, GenericInteractionCreateEvent event, boolean pressedAgentButton) {
         for (AgentOutcome.Message message : outcome.messages()) {
             MessageHelper.sendMessageToChannelWithButtons(
-                    channelFor(message, use), message.text(), new ArrayList<>(message.buttons()));
+                    message.recipient().getCorrectChannel(), message.text(), new ArrayList<>(message.buttons()));
         }
         if (pressedAgentButton
                 && outcome.pressedMessageEdit() != null
-                && use.event() instanceof ButtonInteractionEvent buttonEvent) {
+                && event instanceof ButtonInteractionEvent buttonEvent) {
             buttonEvent
                     .getMessage()
                     .editMessage(outcome.pressedMessageEdit())
@@ -163,24 +199,11 @@ public class AgentLifecycle {
         }
     }
 
-    private static MessageChannel channelFor(AgentOutcome.Message message, AgentUse<?> use) {
-        if (!message.goesToPressedChannel()) {
-            return message.recipient().getCorrectChannel();
-        }
-        return use.event() != null
-                ? use.event().getMessageChannel()
-                : use.user().getCorrectChannel();
-    }
-
     private static void cleanUpPressedButton(ButtonInteractionEvent buttonEvent) {
-        String pressedMessage = buttonEvent.getMessage().getContentRaw();
-        boolean hasOtherButtons = buttonEvent.getMessage().getComponentTree().findAll(ActionRow.class).stream()
-                .map(ActionRow::getComponents)
-                .anyMatch(components -> !components.isEmpty());
-        if (hasOtherButtons && !isTargetPicker(pressedMessage)) {
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(buttonEvent);
-        } else {
+        if (isTargetPicker(buttonEvent.getMessage().getContentRaw())) {
             buttonEvent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        } else {
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(buttonEvent);
         }
     }
 
