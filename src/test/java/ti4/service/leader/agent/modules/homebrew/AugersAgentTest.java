@@ -32,11 +32,6 @@ class AugersAgentTest extends BaseTi4Test {
     }
 
     @Test
-    void offersTheLegacyButtonIdForTheExplorer() {
-        assertThat(AugersAgent.button(explorer).getCustomId()).isEqualTo("exhaustAgent_augersagent_pi_hacan");
-    }
-
-    @Test
     void decodesAFactionContainingTheSeparator() {
         assertThat(module.decode(game, augers, "pi_hacan")).contains(explorer);
     }
@@ -68,6 +63,6 @@ class AugersAgentTest extends BaseTi4Test {
     }
 
     private AgentUse<Player> use() {
-        return new AgentUse<>(game, augers, explorer, "Clodho, the Ilyxum agent", null);
+        return new AgentUse<>(game, augers, explorer, "Clodho, the Ilyxum agent", false, null);
     }
 }

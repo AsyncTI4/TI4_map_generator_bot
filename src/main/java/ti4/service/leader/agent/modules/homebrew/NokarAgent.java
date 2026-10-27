@@ -2,7 +2,6 @@ package ti4.service.leader.agent.modules.homebrew;
 
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.FoWHelper;
@@ -23,8 +22,8 @@ public final class NokarAgent extends TargetedAgent {
 
     public static Button button(Player nokar) {
         return Buttons.gray(
-                AgentButtonIds.format(ID, nokar.getFaction()),
-                "Use Nokar Agent to Place 1 Destroyer",
+                ownedButtonId(nokar, ID, nokar.getFaction()),
+                useLabel(nokar, ID, "Nokar Agent to Place 1 Destroyer"),
                 FactionEmojis.nokar);
     }
 

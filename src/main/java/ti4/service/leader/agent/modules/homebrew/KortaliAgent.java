@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Player;
 import ti4.model.ExploreModel;
 import ti4.model.Mapper;
@@ -24,8 +23,8 @@ public final class KortaliAgent extends TargetedAgent {
 
     public static Button button(Player kortali, Player opponent) {
         return Buttons.gray(
-                kortali.factionButtonChecker() + AgentButtonIds.format(ID, opponent.getColor()),
-                "Use Kortali Agent",
+                ownedButtonId(kortali, ID, opponent.getColor()),
+                useLabel(kortali, ID, "Kortali Agent"),
                 FactionEmojis.kortali);
     }
 

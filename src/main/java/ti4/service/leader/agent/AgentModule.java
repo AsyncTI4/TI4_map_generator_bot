@@ -2,10 +2,13 @@ package ti4.service.leader.agent;
 
 import java.util.Optional;
 import java.util.Set;
+import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Game;
 import ti4.game.Player;
 
 public abstract class AgentModule<P> {
+
+    private static final String YSSARIL_AGENT = "yssarilagent";
 
     private final String agentId;
     private final String displayName;
@@ -34,4 +37,13 @@ public abstract class AgentModule<P> {
     }
 
     public abstract AgentOutcome resolve(AgentUse<P> use);
+
+    protected static String ownedButtonId(Player owner, String agentId, String... payloadSegments) {
+        return owner.factionButtonChecker() + AgentButtonIds.format(agentId, payloadSegments);
+    }
+
+    protected static String useLabel(Player owner, String agentId, String agentLabel) {
+        boolean holdsOnlyAYssarilCopy = !owner.hasLeader(agentId) && owner.hasLeader(YSSARIL_AGENT);
+        return (holdsOnlyAYssarilCopy ? "Use Clever Clever " : "Use ") + agentLabel;
+    }
 }

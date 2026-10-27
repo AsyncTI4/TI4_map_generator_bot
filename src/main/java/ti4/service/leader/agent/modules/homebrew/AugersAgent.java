@@ -2,7 +2,6 @@ package ti4.service.leader.agent.modules.homebrew;
 
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -21,10 +20,10 @@ public final class AugersAgent extends TargetedAgent {
         super(ID, "Clodho, the Ilyxum");
     }
 
-    public static Button button(Player explorer) {
+    public static Button button(Player augers, Player explorer) {
         return Buttons.green(
-                AgentButtonIds.format(ID, explorer.getFaction()),
-                "Use Ilyxum Agent on " + explorer.getColor(),
+                ownedButtonId(augers, ID, explorer.getFaction()),
+                useLabel(augers, ID, "Ilyxum Agent on " + explorer.getColor()),
                 FactionEmojis.augers);
     }
 

@@ -4,7 +4,6 @@ import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Helper;
@@ -22,8 +21,8 @@ public final class WinnuAgent extends SpendAgent {
         super(ID, "Berekar Berekon, the Winnu");
     }
 
-    public static Button button() {
-        return Buttons.red(AgentButtonIds.format(ID), "Use Winnu Agent", FactionEmojis.Winnu);
+    public static Button button(Player winnu) {
+        return Buttons.red(ownedButtonId(winnu, ID), useLabel(winnu, ID, "Winnu Agent"), FactionEmojis.Winnu);
     }
 
     @Override

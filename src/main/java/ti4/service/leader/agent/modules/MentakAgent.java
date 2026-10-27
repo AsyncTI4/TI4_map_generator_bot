@@ -2,7 +2,6 @@ package ti4.service.leader.agent.modules;
 
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.service.emoji.FactionEmojis;
@@ -20,8 +19,8 @@ public final class MentakAgent extends TargetedAgent {
 
     public static Button button(Player user, Player pillaged) {
         return Buttons.green(
-                user.factionButtonChecker() + AgentButtonIds.format(ID, pillaged.getFaction()),
-                "Use Mentak Agent",
+                ownedButtonId(user, ID, pillaged.getFaction()),
+                useLabel(user, ID, "Mentak Agent"),
                 FactionEmojis.Mentak);
     }
 

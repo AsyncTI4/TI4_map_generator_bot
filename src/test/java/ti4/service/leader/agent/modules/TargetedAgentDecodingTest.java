@@ -1,6 +1,7 @@
 package ti4.service.leader.agent.modules;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ti4.service.leader.agent.modules.AgentModuleFixture.assertOwnedAgentButton;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -42,13 +43,21 @@ class TargetedAgentDecodingTest extends BaseTi4Test {
     }
 
     @Test
-    void buildersKeepTheLegacyWireShape() {
-        // Buttons already posted in Discord use these exact strings, so the format must not drift.
+    void buttonsAreOwnedByTheHolderAndKeepTheLegacyHandlerIds() {
         AgentModuleFixture fixture = new AgentModuleFixture("mentak");
-        Player target = fixture.target;
+        Player holder = fixture.user;
 
-        assertThat(WinnuAgent.button().getCustomId()).isEqualTo("exhaustAgent_winnuagent");
-        assertThat(MentakAgent.button(fixture.user, target).getCustomId())
-                .isEqualTo(fixture.user.factionButtonChecker() + "exhaustAgent_mentakagent_pi_hacan");
+        assertOwnedAgentButton(WinnuAgent.button(holder), holder, "exhaustAgent_winnuagent");
+        assertOwnedAgentButton(MentakAgent.button(holder, fixture.target), holder, "exhaustAgent_mentakagent_pi_hacan");
+        assertOwnedAgentButton(
+                SardakkAgent.button(holder, "101", "lodor", "Lodor"), holder, "exhaustAgent_sardakkagent_101_lodor");
+    }
+
+    @Test
+    void aPlayerWhoOnlyHasTheYssarilCopyIsOfferedCleverClever() {
+        AgentModuleFixture fixture = new AgentModuleFixture("yssaril");
+
+        assertThat(SardakkAgent.button(fixture.user, "101", "lodor", "Lodor").getLabel())
+                .isEqualTo("Use Clever Clever N'orr Agent on Lodor");
     }
 }

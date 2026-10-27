@@ -7,7 +7,8 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.service.leader.agent.AgentOutcome.Message;
 
-public record AgentUse<P>(Game game, Player user, P payload, String agentName, GenericInteractionCreateEvent event) {
+public record AgentUse<P>(
+        Game game, Player user, P payload, String agentName, boolean viaYssaril, GenericInteractionCreateEvent event) {
 
     public AgentOutcome inActiveSystem(Function<Tile, AgentOutcome> resolution) {
         Tile activeSystem = game.getTileByPosition(game.getActiveSystem());

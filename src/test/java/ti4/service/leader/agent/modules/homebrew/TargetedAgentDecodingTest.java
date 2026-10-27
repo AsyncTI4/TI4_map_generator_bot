@@ -1,6 +1,7 @@
 package ti4.service.leader.agent.modules.homebrew;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ti4.service.leader.agent.modules.AgentModuleFixture.assertOwnedAgentButton;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -58,30 +59,33 @@ class TargetedAgentDecodingTest extends BaseTi4Test {
     }
 
     @Test
-    void buildersKeepTheLegacyWireShape() {
-        // Buttons already posted in Discord use these exact strings, so the format must not drift.
+    void buttonsAreOwnedByTheHolderAndKeepTheLegacyHandlerIds() {
         AgentModuleFixture fixture = new AgentModuleFixture("mentak");
-        Player target = fixture.target;
+        Player holder = fixture.target;
+        Player other = fixture.user;
 
-        assertThat(CymiaeAgent.button(target).getCustomId()).isEqualTo("exhaustAgent_cymiaeagent_pi_hacan");
-        assertThat(GledgeAgent.button(target).getCustomId()).isEqualTo("exhaustAgent_gledgeagent_pi_hacan");
-        assertThat(KhraskAgent.button(target).getCustomId()).isEqualTo("exhaustAgent_khraskagent_pi_hacan");
-        assertThat(VeldyrAgent.button(target).getCustomId()).isEqualTo("exhaustAgent_veldyragent_pi_hacan");
-        assertThat(VaylerianAgent.button().getCustomId()).isEqualTo("exhaustAgent_vaylerianagent");
-        assertThat(VaylerianAgent.button(target).getCustomId()).isEqualTo("exhaustAgent_vaylerianagent_pi_hacan");
-        assertThat(NokarAgent.button(target).getCustomId()).isEqualTo("exhaustAgent_nokaragent_pi_hacan");
-        assertThat(ZelianAgent.button(target).getCustomId()).isEqualTo("exhaustAgent_zelianagent_pi_hacan");
-        assertThat(MirvedaAgent.button(target).getCustomId()).isEqualTo("exhaustAgent_mirvedaagent_pi_hacan");
+        assertOwnedAgentButton(CymiaeAgent.button(holder), holder, "exhaustAgent_cymiaeagent_pi_hacan");
+        assertOwnedAgentButton(GledgeAgent.button(holder), holder, "exhaustAgent_gledgeagent_pi_hacan");
+        assertOwnedAgentButton(KhraskAgent.button(holder), holder, "exhaustAgent_khraskagent_pi_hacan");
+        assertOwnedAgentButton(VeldyrAgent.button(holder), holder, "exhaustAgent_veldyragent_pi_hacan");
+        assertOwnedAgentButton(VaylerianAgent.pickTargetButton(holder), holder, "exhaustAgent_vaylerianagent");
+        assertOwnedAgentButton(VaylerianAgent.button(holder), holder, "exhaustAgent_vaylerianagent_pi_hacan");
+        assertOwnedAgentButton(NokarAgent.button(holder), holder, "exhaustAgent_nokaragent_pi_hacan");
+        assertOwnedAgentButton(ZelianAgent.button(holder), holder, "exhaustAgent_zelianagent_pi_hacan");
+        assertOwnedAgentButton(MirvedaAgent.button(holder), holder, "exhaustAgent_mirvedaagent_pi_hacan");
+        assertOwnedAgentButton(VadenAgent.button(holder), holder, "exhaustAgent_vadenagent_pi_hacan");
+        assertOwnedAgentButton(KaloraAgent.button(holder), holder, "exhaustAgent_kaloraagent");
+        assertOwnedAgentButton(LunariumAgent.button(holder), holder, "exhaustAgent_lunariumagent");
+        // The holder of these agents is not the player the agent is used on.
+        assertOwnedAgentButton(KortaliAgent.button(holder, other), holder, "exhaustAgent_kortaliagent_red");
+        assertOwnedAgentButton(AugersAgent.button(holder, other), holder, "exhaustAgent_augersagent_mentak");
     }
 
     @Test
-    void ownerGatedButtonsOnlyWorkForTheAgentsOwner() {
-        AgentModuleFixture fixture = new AgentModuleFixture("kortali");
-        String ownerGate = fixture.user.factionButtonChecker();
+    void aPlayerWhoOnlyHasTheYssarilCopyIsOfferedCleverClever() {
+        AgentModuleFixture fixture = new AgentModuleFixture("yssaril");
 
-        assertThat(KortaliAgent.button(fixture.user, fixture.target).getCustomId())
-                .isEqualTo(ownerGate + "exhaustAgent_kortaliagent_blue");
-        assertThat(VadenAgent.button(fixture.user).getCustomId())
-                .isEqualTo(ownerGate + "exhaustAgent_vadenagent_kortali");
+        assertThat(CymiaeAgent.button(fixture.user).getLabel()).isEqualTo("Use Clever Clever Cymiae Agent");
+        assertThat(CymiaeAgent.button(fixture.target).getLabel()).isEqualTo("Use Cymiae Agent");
     }
 }

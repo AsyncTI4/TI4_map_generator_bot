@@ -8,7 +8,9 @@ import org.junit.jupiter.api.Test;
 import ti4.helpers.Constants;
 import ti4.model.LeaderModel;
 import ti4.model.Mapper;
+import ti4.service.leader.agent.modules.ExhaustOnlyAgents;
 import ti4.service.leader.agent.modules.homebrew.AugersAgent;
+import ti4.service.leader.agent.modules.homebrew.HomebrewExhaustOnlyAgents;
 import ti4.testUtils.BaseTi4Test;
 
 class AgentModulesTest extends BaseTi4Test {
@@ -39,5 +41,16 @@ class AgentModulesTest extends BaseTi4Test {
     void refusesTwoModulesForTheSameAgent() {
         assertThatThrownBy(() -> AgentModules.indexById(List.of(new AugersAgent(), new AugersAgent())))
                 .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void everyExhaustOnlyAgentIsRegistered() {
+        // The registry is the one place that lists official and homebrew agents together.
+        for (ExhaustOnlyAgent agent : ExhaustOnlyAgents.ALL) {
+            assertThat(AgentModules.find(agent.agentId())).contains(agent);
+        }
+        for (ExhaustOnlyAgent agent : HomebrewExhaustOnlyAgents.ALL) {
+            assertThat(AgentModules.find(agent.agentId())).contains(agent);
+        }
     }
 }

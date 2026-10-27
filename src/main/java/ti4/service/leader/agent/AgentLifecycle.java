@@ -42,8 +42,29 @@ public class AgentLifecycle {
     public static boolean resolve(String buttonId, GenericInteractionCreateEvent event, Game game, Player player) {
         AgentButtonIds.Parsed parsed = AgentButtonIds.parse(buttonId);
         Optional<AgentModule<?>> module = AgentModules.find(parsed.agentId());
-        module.ifPresent(found -> use(found, parsed, event, game, player));
+        module.ifPresent(found -> run(found, parsed, event, game, player, true));
         return module.isPresent();
+    }
+
+    public static boolean use(
+            Game game, Player player, String agentId, String payload, GenericInteractionCreateEvent event) {
+        AgentModule<?> module = AgentModules.find(agentId)
+                .orElseThrow(() -> new IllegalArgumentException("No agent module for " + agentId));
+        return run(module, new AgentButtonIds.Parsed(agentId, payload), event, game, player, false);
+    }
+
+    public static boolean refuseIfExhausted(GenericInteractionCreateEvent event, Player player, Leader leader) {
+        if (!leader.isExhausted()) {
+            return false;
+        }
+        String message = leader.getLeaderModel().map(LeaderModel::getName).orElse(leader.getId())
+                + " is already exhausted, so it cannot be used again until it is readied.";
+        if (event == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " " + message);
+        } else {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, message);
+        }
+        return true;
     }
 
     public static void exhaust(Game game, Player player, Leader leader, String agentId, String target) {
@@ -67,42 +88,49 @@ public class AgentLifecycle {
         offerTemporalCommandSuite(game, player, agentId);
     }
 
-    static String agentName(String displayName, String exhaustedLeaderId, String agentId) {
-        if (!isYssarilCopy(exhaustedLeaderId, agentId)) {
+    public static String agentName(String displayName, boolean viaYssaril) {
+        if (!viaYssaril) {
             return displayName + " agent";
         }
         return "Clever Clever " + displayName + "/Yssaril agent";
     }
 
-    private static boolean isYssarilCopy(String exhaustedLeaderId, String agentId) {
+    static boolean isYssarilCopy(String exhaustedLeaderId, String agentId) {
         return YSSARIL_AGENT.equalsIgnoreCase(exhaustedLeaderId) && !YSSARIL_AGENT.equalsIgnoreCase(agentId);
     }
 
-    private static <P> void use(
+    private static <P> boolean run(
             AgentModule<P> module,
             AgentButtonIds.Parsed parsed,
             GenericInteractionCreateEvent event,
             Game game,
-            Player player) {
+            Player player,
+            boolean pressedAgentButton) {
         String agentId = parsed.agentId();
-        Leader leader = player.getLeader(agentId).orElse(null);
-        if (leader == null) {
-            return;
+        Leader leader = player.getLeaderByIdPreferReadied(agentId).orElse(null);
+        if (leader == null || refuseIfExhausted(event, player, leader)) {
+            return false;
         }
-        String agentName = agentName(module.displayName(), leader.getId(), agentId);
+        boolean viaYssaril = isYssarilCopy(leader.getId(), agentId);
+        String agentName = agentName(module.displayName(), viaYssaril);
         Optional<P> payload = module.decode(game, player, parsed.payload());
         if (payload.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "Could not work out how to resolve " + agentName + ", so it was not exhausted.");
-            return;
+            return false;
         }
 
         exhaust(game, player, leader, agentId, parsed.hasPayload() ? parsed.payload() : null);
-        AgentUse<P> use = new AgentUse<>(game, player, payload.get(), agentName, event);
+        AgentUse<P> use = new AgentUse<>(game, player, payload.get(), agentName, viaYssaril, event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), module.exhaustAnnouncement(use));
-        deliver(module.resolve(use), use);
-        finish(event, game, player, agentId);
+        deliver(module.resolve(use), use, pressedAgentButton);
+        if (pressedAgentButton) {
+            finish(event, game, player, agentId);
+        } else {
+            offerTemporalCommandSuite(game, player, agentId);
+        }
+        return true;
     }
 
     private static void recordGameEvent(Game game, Player player, String agentId, String target) {
@@ -120,12 +148,14 @@ public class AgentLifecycle {
         game.setStoredValue(key, game.getStoredValue(key) + " Exhausted the " + model.getAlias() + " leader.");
     }
 
-    private static void deliver(AgentOutcome outcome, AgentUse<?> use) {
+    private static void deliver(AgentOutcome outcome, AgentUse<?> use, boolean pressedAgentButton) {
         for (AgentOutcome.Message message : outcome.messages()) {
             MessageHelper.sendMessageToChannelWithButtons(
                     channelFor(message, use), message.text(), new ArrayList<>(message.buttons()));
         }
-        if (outcome.pressedMessageEdit() != null && use.event() instanceof ButtonInteractionEvent buttonEvent) {
+        if (pressedAgentButton
+                && outcome.pressedMessageEdit() != null
+                && use.event() instanceof ButtonInteractionEvent buttonEvent) {
             buttonEvent
                     .getMessage()
                     .editMessage(outcome.pressedMessageEdit())

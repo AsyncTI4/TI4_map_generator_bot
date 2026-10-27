@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -32,7 +31,9 @@ public final class ZelianAgent extends TargetedAgent {
 
     public static Button button(Player zelian) {
         return Buttons.gray(
-                AgentButtonIds.format(ID, zelian.getFaction()), "Use Zelian Agent Yourself", FactionEmojis.zelian);
+                ownedButtonId(zelian, ID, zelian.getFaction()),
+                useLabel(zelian, ID, "Zelian Agent Yourself"),
+                FactionEmojis.zelian);
     }
 
     @Override

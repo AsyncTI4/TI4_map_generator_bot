@@ -39,11 +39,6 @@ class SardakkAgentTest extends BaseTi4Test {
     }
 
     @Test
-    void offersTheLegacyCombatButtonId() {
-        assertThat(SardakkAgent.planetButtonId("101", "lodor")).isEqualTo("exhaustAgent_sardakkagent_101_lodor");
-    }
-
-    @Test
     void withoutAPayloadTheUserPicksAPlanet() {
         assertThat(module.decode(game, sardakk, "")).contains(new OfferPlanets(sardakk));
     }
@@ -73,7 +68,8 @@ class SardakkAgentTest extends BaseTi4Test {
     void placingPutsTwoInfantryOnThePlanet() {
         Choice choice = module.decode(game, sardakk, "101_lodor").orElseThrow();
 
-        AgentOutcome outcome = module.resolve(new AgentUse<>(game, sardakk, choice, "T'ro An, the N'orr agent", null));
+        AgentOutcome outcome =
+                module.resolve(new AgentUse<>(game, sardakk, choice, "T'ro An, the N'orr agent", false, null));
 
         assertThat(tile.getUnitHolders().get("lodor").getUnitCount(UnitType.Infantry, sardakk.getColor()))
                 .isEqualTo(2);

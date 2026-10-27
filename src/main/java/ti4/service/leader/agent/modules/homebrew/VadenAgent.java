@@ -2,7 +2,6 @@ package ti4.service.leader.agent.modules.homebrew;
 
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -22,9 +21,7 @@ public final class VadenAgent extends TargetedAgent {
 
     public static Button button(Player vaden) {
         return Buttons.gray(
-                vaden.factionButtonChecker() + AgentButtonIds.format(ID, vaden.getFaction()),
-                "Use Vaden Agent",
-                FactionEmojis.vaden);
+                ownedButtonId(vaden, ID, vaden.getFaction()), useLabel(vaden, ID, "Vaden Agent"), FactionEmojis.vaden);
     }
 
     @Override

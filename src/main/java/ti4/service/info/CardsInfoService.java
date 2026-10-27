@@ -475,7 +475,7 @@ public class CardsInfoService {
         }
         MonumentsBRButtonHandler.addArmageddonProjectCardsInfoButtons(buttons, game, player);
         if (player.hasUnexhaustedLeader("vaylerianagent")) {
-            buttons.add(VaylerianAgent.button());
+            buttons.add(VaylerianAgent.pickTargetButton(player));
         }
         if (player.ownsUnit("ghost_mech")
                 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0

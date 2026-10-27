@@ -520,7 +520,7 @@ public class ExploreService {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2.hasUnexhaustedLeader("augersagent")) {
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(AugersAgent.button(player));
+                    buttons.add(AugersAgent.button(p2, player));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
                     String msg2 = p2.getRepresentationUnfogged() + " you may use "
                             + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
