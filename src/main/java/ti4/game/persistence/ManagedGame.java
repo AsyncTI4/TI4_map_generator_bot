@@ -9,12 +9,14 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import lombok.AccessLevel;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.FoWHelper;
 
 @Getter
@@ -35,6 +37,8 @@ public class ManagedGame {
     private final boolean fastScFollowMode;
     private final boolean fogQol01;
     private final boolean injectRules;
+    private final boolean autoPingEnabled;
+    private final boolean temporaryPingDisable;
     private final long creationDateTime;
     private final long lastModifiedDate;
     private final String activePlayerId;
@@ -46,7 +50,10 @@ public class ManagedGame {
     private final TextChannel tableTalkChannel;
     private final ThreadChannel launchPostThread;
     private final Set<ManagedPlayer> players;
-    private final Map<ManagedPlayer, Boolean> playerToIsReal;
+
+    @Getter(AccessLevel.NONE)
+    private final Map<ManagedPlayer, Seat> playerToSeat;
+
     private final Map<String, String> teamMateToPrimaryId;
 
     public ManagedGame(Game game) {
@@ -63,6 +70,8 @@ public class ManagedGame {
         fastScFollowMode = game.isFastSCFollowMode();
         fogQol01 = FoWHelper.isFogQol01(game);
         injectRules = game.isInjectRulesLinks();
+        autoPingEnabled = game.getAutoPingStatus();
+        temporaryPingDisable = game.isTemporaryPingDisable();
         creationDateTime = game.getCreationDateTime();
         lastModifiedDate = game.getLastModifiedDate();
         activePlayerId = sanitizeToNull(game.getActivePlayerID());
@@ -79,10 +88,9 @@ public class ManagedGame {
         players = game.getPlayers().values().stream()
                 .map(p -> GameManager.addOrMergePlayer(this, p))
                 .collect(toUnmodifiableSet());
-        playerToIsReal = game.getPlayers().values().stream()
+        playerToSeat = game.getPlayers().values().stream()
                 .collect(Collectors.toUnmodifiableMap(
-                        p -> getPlayer(p.getUserID()),
-                        p -> ((p.isRealPlayer() && !p.isNpc()) || (p.isEliminated() && game.isHasEnded()))));
+                        p -> getPlayer(p.getUserID()), p -> Seat.of(p, game.isHasEnded())));
         teamMateToPrimaryId = collectTeamMates(game);
     }
 
@@ -134,10 +142,19 @@ public class ManagedGame {
     }
 
     public List<ManagedPlayer> getRealPlayers() {
-        return playerToIsReal.entrySet().stream()
-                .filter(Map.Entry::getValue)
+        return playerToSeat.entrySet().stream()
+                .filter(entry -> entry.getValue() == Seat.REAL)
                 .map(Map.Entry::getKey)
                 .toList();
+    }
+
+    public long countRealAndEliminatedPlayers() {
+        return playerToSeat.values().stream().filter(Seat::isRealOrEliminated).count();
+    }
+
+    public boolean isRealOrEliminatedPlayer(String userId) {
+        ManagedPlayer player = getPlayer(userId);
+        return player != null && playerToSeat.get(player).isRealOrEliminated();
     }
 
     public boolean matches(Game game) {
@@ -158,5 +175,25 @@ public class ManagedGame {
     @Override
     public int hashCode() {
         return Objects.hashCode(name);
+    }
+
+    private enum Seat {
+        REAL,
+        REAL_OR_ELIMINATED,
+        OTHER;
+
+        static Seat of(Player player, boolean gameHasEnded) {
+            if ((player.isRealPlayer() && !player.isNpc()) || (player.isEliminated() && gameHasEnded)) {
+                return REAL;
+            }
+            if (player.isRealPlayer() || player.isEliminated()) {
+                return REAL_OR_ELIMINATED;
+            }
+            return OTHER;
+        }
+
+        boolean isRealOrEliminated() {
+            return this != OTHER;
+        }
     }
 }
