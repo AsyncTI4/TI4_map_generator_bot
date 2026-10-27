@@ -16,10 +16,12 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
@@ -32,6 +34,7 @@ final class WormholeTokenMerge {
     private static final int DEFAULT_SIZE = 80;
     private static final Font LETTER_FONT = new Font(Font.SERIF, Font.BOLD, 40);
     private static final String REFERENCE_GLYPHS = "θψ";
+    private static final Map<String, Float> HUE_BY_TOKEN = new ConcurrentHashMap<>();
 
     record Part(Wormhole wormhole, String tokenFile, int count) {}
 
@@ -41,10 +44,10 @@ final class WormholeTokenMerge {
 
     private WormholeTokenMerge() {}
 
-    static DrawOrder apply(List<String> tokens) {
+    static DrawOrder apply(List<String> tokens, int minTokens) {
         List<String> mergeable =
                 tokens.stream().filter(WormholeTokenMerge::isMergeable).toList();
-        if (mergeable.size() < 2) return new DrawOrder(tokens, Map.of());
+        if (mergeable.size() < Math.max(2, minTokens)) return new DrawOrder(tokens, Map.of());
 
         Map<String, Merged> merged = new LinkedHashMap<>();
         for (List<Part> group : group(mergeable)) {
@@ -76,16 +79,28 @@ final class WormholeTokenMerge {
                     new Part(wormhole, token, 1),
                     (existing, added) -> new Part(existing.wormhole(), existing.tokenFile(), existing.count() + 1));
         }
-        List<Part> ordered = new ArrayList<>(parts.values());
-        int groups = (ordered.size() + MAX_WORMHOLES_PER_TOKEN - 1) / MAX_WORMHOLES_PER_TOKEN;
-        List<List<Part>> result = new ArrayList<>();
-        int from = 0;
-        for (int i = 0; i < groups; i++) {
-            int size = ordered.size() / groups + (i < ordered.size() % groups ? 1 : 0);
-            result.add(List.copyOf(ordered.subList(from, from + size)));
-            from += size;
-        }
-        return result;
+        List<Part> byHue = parts.values().stream()
+                .sorted(Comparator.comparingDouble(WormholeTokenMerge::hue).thenComparing(Part::wormhole))
+                .toList();
+        int groups = (byHue.size() + MAX_WORMHOLES_PER_TOKEN - 1) / MAX_WORMHOLES_PER_TOKEN;
+        List<List<Part>> dealt = new ArrayList<>();
+        for (int i = 0; i < groups; i++) dealt.add(new ArrayList<>());
+        for (int i = 0; i < byHue.size(); i++) dealt.get(i % groups).add(byHue.get(i));
+        return dealt.stream()
+                .map(group -> group.stream()
+                        .sorted(Comparator.comparing(Part::wormhole))
+                        .toList())
+                .toList();
+    }
+
+    private static float hue(Part part) {
+        return HUE_BY_TOKEN.computeIfAbsent(part.tokenFile(), file -> {
+            String path = ImageResources.tokenOrAttachment(file);
+            BufferedImage image = path == null ? null : ImageHelper.read(path);
+            if (image == null) return 0f;
+            Color tint = dominantTint(image);
+            return Color.RGBtoHSB(tint.getRed(), tint.getGreen(), tint.getBlue(), null)[0];
+        });
     }
 
     private static String cacheKey(List<Part> group) {

@@ -117,7 +117,7 @@ public class GameProperties {
     private boolean stratPings = true;
     private boolean testBetaFeaturesMode;
     private boolean showOwnedPNsInPlayerArea;
-    private boolean wormholeTokenMerge;
+    private int wormholeTokenMergeFrom;
     private String hexBorderStyle = "off"; // values are off/dash/solid
     private String textSize = "medium";
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;

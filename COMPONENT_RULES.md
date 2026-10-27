@@ -69,7 +69,8 @@ to its wormholes.
 - **Renamed enum constants keep their old name as `@JsonAlias`.** Custom tiles in storage may still
   use it.
 - **One entry per source.** Two alpha tokens are two alpha wormholes (LRR 101, note II).
-- **Merged token icons are display only.** With the game option `wormhole_token_merge`, `SpaceTokens` draws
-  the plain wormhole tokens of a space area as wedge icons (`WormholeTokenMerge`, at most 3 per icon, split evenly). Game state
+- **Merged token icons are display only.** With the game option `wormhole_token_merge` set to N (2-9), `SpaceTokens` draws
+  the plain wormhole tokens of a space area as wedge icons once it holds at least N of them (`WormholeTokenMerge`,
+  at most 3 per icon, split evenly, far-apart colours dealt into the same icon). Game state
   keeps the single tokens. A token with its own identity (Creuss, Ion Storm, Vortex) sets
   `"wormholeIconMerge": false` and stays a separate icon.

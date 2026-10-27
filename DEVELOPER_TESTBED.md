@@ -82,7 +82,7 @@ To test a component, get it into play with the preset (or mid-script with `do: h
 | Tile outside the map string (maps A-G, corners, Fracture) | game `tiles`: position to tile id | `"tiles": { "a000": "39", "tl": "82" }` |
 | Fog option | game `fowOptions` (fog presets) | `"fowOptions": ["map_connections", "ghost_hexes"]` |
 | Game stored value (map sectors, feature state) | game `stored` | `"stored": { "fowMapSegments": "core=000:3" }` |
-| Game option (`/custom` setting; currently `wormhole_token_merge`) | game `gameOptions`; switch mid-script with `do: setGameOption` | `"gameOptions": { "wormhole_token_merge": "true" }`, `{ "do": "setGameOption", "key": "wormhole_token_merge", "value": "false" }` |
+| Game option (`/custom` setting; currently `wormhole_token_merge`) | game `gameOptions`; switch mid-script with `do: setGameOption` | `"gameOptions": { "wormhole_token_merge": "2" }`, `{ "do": "setGameOption", "key": "wormhole_token_merge", "value": "0" }` |
 | Card decks (homebrew sets) | game `decks`: slot (`ac`, `so`, `relic`, `explore`, `agenda`) to deck id | `"decks": { "ac": "action_cards_30k", "explore": "explores_30k" }` |
 | Next explore card | script `do: stackExplore` (value: explore id) puts the card on top of its deck | `{ "do": "stackExplore", "value": "tourismbureau30k" }` |
 | Breakthrough | seat `breakthrough`: `unlocked` or `exhausted` | `"breakthrough": "unlocked"` |
@@ -270,7 +270,7 @@ copy-paste templates.
 | `tiles` | Extra tiles by position, placed over the map string: maps A-G (`a000`-`g848`), corners, Fracture. |
 | `fowOptions` | Fog options switched on at apply (names as in the FoW options, e.g. `map_connections`). `fow_plus` turns on full FoW+ mode, including the options it forces. |
 | `stored` | Game stored values set at apply. Unlike script `setStored`, values may contain `:` and `,` (sector definitions do). |
-| `gameOptions` | Game options set at apply, `true`/`false`. Supported keys: `wormhole_token_merge`. Add a key in `TestBedComponentService.GAME_OPTIONS`. |
+| `gameOptions` | Game options set at apply. Supported keys: `wormhole_token_merge` (`0` off, `2`-`9` = merge from that many wormhole tokens). Add a key in `TestBedComponentService.GAME_OPTIONS`. |
 | `decks` | Deck ids switched on before seats get cards, so `acs`, `sos` and `relics` can give cards from homebrew decks. Slots: `ac`, `so`, `relic`, `explore`, `agenda`. |
 | `shortcuts` | Test buttons for the **Preset** group. |
 
@@ -300,7 +300,7 @@ and ids fail with every error listed at once; problems that only show while appl
 | `note` | `{ "note": "round 2 starts" }` |
 | `press` | `{ "as": "sol", "press": "strategicAction_3", "in": "main" }` |
 | `pressId` | `{ "as": "nekro", "pressId": "sc_follow_3" }` |
-| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields; when it gives cards the seat's cards info is re-sent so the new hand buttons appear), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck), `removeToken` (key: tile position or planet, value: token or attachment as in the preset `tokens` field; fails if it is not there), `setGameOption` (key: option as in the preset `gameOptions` field, value: `true` or `false`) |
+| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields; when it gives cards the seat's cards info is re-sent so the new hand buttons appear), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck), `removeToken` (key: tile position or planet, value: token or attachment as in the preset `tokens` field; fails if it is not there), `setGameOption` (key and value as in the preset `gameOptions` field) |
 | `wait` | `{ "wait": 5 }` (seconds) |
 | `expect` | one of the checks below |
 

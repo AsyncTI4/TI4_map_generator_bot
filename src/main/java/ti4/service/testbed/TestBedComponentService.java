@@ -27,21 +27,21 @@ import ti4.service.option.FOWOptionService.FOWOption;
 @UtilityClass
 public class TestBedComponentService {
 
-    static final Map<String, BiConsumer<Game, Boolean>> GAME_OPTIONS =
-            Map.of(Constants.WORMHOLE_TOKEN_MERGE, Game::setWormholeTokenMerge);
+    static final Map<String, BiConsumer<Game, Integer>> GAME_OPTIONS =
+            Map.of(Constants.WORMHOLE_TOKEN_MERGE, Game::setWormholeTokenMergeFrom);
 
     static String gameOptionProblem(String key, String value) {
         if (!GAME_OPTIONS.containsKey(key)) {
             return "unknown game option `" + key + "`; use " + GAME_OPTIONS.keySet() + ".";
         }
-        if (!"true".equals(value) && !"false".equals(value)) {
-            return "game option `" + key + "` takes `true` or `false`.";
+        if (!value.matches("[0-9]")) {
+            return "game option `" + key + "` takes a number from 0 to 9.";
         }
         return null;
     }
 
     static void setGameOption(Game game, String key, String value) {
-        GAME_OPTIONS.get(key).accept(game, Boolean.parseBoolean(value));
+        GAME_OPTIONS.get(key).accept(game, Integer.parseInt(value));
     }
 
     static void applyGameState(Game game, TestBedPreset preset, List<String> warnings) {

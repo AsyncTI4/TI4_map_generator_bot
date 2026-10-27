@@ -63,8 +63,8 @@ final class SpaceTokens {
             x = centerPosition.x;
             y = centerPosition.y;
         }
-        WormholeTokenMerge.DrawOrder drawOrder = game.isWormholeTokenMerge()
-                ? WormholeTokenMerge.apply(tokenList)
+        WormholeTokenMerge.DrawOrder drawOrder = game.getWormholeTokenMergeFrom() > 0
+                ? WormholeTokenMerge.apply(tokenList, game.getWormholeTokenMergeFrom())
                 : new WormholeTokenMerge.DrawOrder(tokenList, Map.of());
         int index = 0;
         for (String tokenID : drawOrder.tokens()) {

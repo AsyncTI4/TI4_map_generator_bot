@@ -36,6 +36,12 @@ class WormholeTokenMergeTest extends BaseTi4Test {
                         "token_whxi.png",
                         "token_whomega.png"))
                 .containsExactly(3, 3, 2);
+        // Sorted by colour and dealt round-robin: delta (blue) and xi (azure) end up in different icons.
+        assertThat(WormholeTokenMerge.group(List.of(ALPHA, BETA, "token_whdelta.png", "token_whxi.png")))
+                .noneMatch(group -> group.stream()
+                        .map(WormholeTokenMerge.Part::wormhole)
+                        .toList()
+                        .containsAll(List.of(Wormhole.DELTA, Wormhole.XI)));
         // Two images of the same wormhole (the legacy eta file and the current one) share one wedge.
         assertThat(WormholeTokenMerge.group(List.of("token_wheta.png", ALPHA, "token_custom_eronous_wheta.png"))
                         .getFirst())
@@ -47,7 +53,7 @@ class WormholeTokenMergeTest extends BaseTi4Test {
     void onlyPlainWormholeTokensMergeInPlaceOfTheFirstOne() {
         // Creuss tokens keep their own icon (Wormhole Generator moves specific ones); frontier is no wormhole.
         WormholeTokenMerge.DrawOrder order =
-                WormholeTokenMerge.apply(List.of("token_frontier.png", ALPHA, CREUSS_BETA, BETA));
+                WormholeTokenMerge.apply(List.of("token_frontier.png", ALPHA, CREUSS_BETA, BETA), 2);
 
         assertThat(order.tokens()).hasSize(3).startsWith("token_frontier.png").endsWith(CREUSS_BETA);
         WormholeTokenMerge.Merged merged = order.merged().get(order.tokens().get(1));
@@ -55,7 +61,10 @@ class WormholeTokenMergeTest extends BaseTi4Test {
         assertThat(merged.image().getWidth()).isEqualTo(80);
 
         List<String> oneWormhole = List.of(ALPHA, CREUSS_BETA);
-        assertThat(WormholeTokenMerge.apply(oneWormhole).tokens()).isEqualTo(oneWormhole);
+        assertThat(WormholeTokenMerge.apply(oneWormhole, 2).tokens()).isEqualTo(oneWormhole);
+        // Below the game's threshold nothing merges.
+        List<String> twoWormholes = List.of(ALPHA, BETA);
+        assertThat(WormholeTokenMerge.apply(twoWormholes, 3).tokens()).isEqualTo(twoWormholes);
     }
 
     @Test
@@ -68,7 +77,7 @@ class WormholeTokenMergeTest extends BaseTi4Test {
         List.of(ALPHA, BETA, GAMMA).forEach(tile.getSpaceUnitHolder()::addToken);
 
         BufferedImage singles = render(tile, game);
-        game.setWormholeTokenMerge(true);
+        game.setWormholeTokenMergeFrom(2);
 
         assertThat(pixels(render(tile, game))).isNotEqualTo(pixels(singles));
     }
