@@ -1,5 +1,6 @@
 package ti4.service.leader.agent.modules;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -19,13 +20,13 @@ import ti4.service.unit.AddUnitService;
 
 public final class SardakkAgent implements AgentModule<SardakkAgent.Choice> {
 
-    public static final String ID = "sardakkagent";
+    static final String ID = "sardakkagent";
 
-    public sealed interface Choice {}
+    sealed interface Choice {}
 
-    public record OfferPlanets(Player target) implements Choice {}
+    record OfferPlanets(Player target) implements Choice {}
 
-    public record PlaceOnPlanet(Tile tile, String planet) implements Choice {}
+    record PlaceOnPlanet(Tile tile, String planet) implements Choice {}
 
     public static String planetButtonId(String position, String planet) {
         return AgentButtonIds.format(ID, position, planet);
@@ -53,6 +54,28 @@ public final class SardakkAgent implements AgentModule<SardakkAgent.Choice> {
         return placeOnPlanet(game, payload);
     }
 
+    @Override
+    public AgentOutcome resolve(AgentUse<Choice> use) {
+        return switch (use.payload()) {
+            case OfferPlanets offer -> offerPlanets(use, offer.target());
+            case PlaceOnPlanet place -> placeInfantry(use, place);
+        };
+    }
+
+    static List<Button> placementButtons(Game game, Player player) {
+        List<Button> everyPlanet =
+                new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
+        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+        if (activeSystem == null) {
+            return everyPlanet;
+        }
+        List<Button> inActiveSystem = everyPlanet.stream()
+                .filter(button -> activeSystem.getPlanetUnitHolders().stream()
+                        .anyMatch(planet -> button.getCustomId().endsWith("_" + planet.getName())))
+                .toList();
+        return inActiveSystem.isEmpty() ? everyPlanet : inActiveSystem;
+    }
+
     private static Optional<Choice> placeOnPlanet(Game game, String payload) {
         String position = StringUtils.substringBefore(payload, "_");
         String planet = StringUtils.substringAfter(payload, "_");
@@ -63,20 +86,11 @@ public final class SardakkAgent implements AgentModule<SardakkAgent.Choice> {
         return Optional.of(new PlaceOnPlanet(tile, planet));
     }
 
-    @Override
-    public AgentOutcome resolve(AgentUse<Choice> use) {
-        return switch (use.payload()) {
-            case OfferPlanets offer -> offerPlanets(use, offer.target());
-            case PlaceOnPlanet place -> placeInfantry(use, place);
-        };
-    }
-
     private static AgentOutcome offerPlanets(AgentUse<Choice> use, Player target) {
-        List<Button> buttons = Helper.getPlanetPlaceUnitButtons(target, use.game(), "2gf", "placeOneNDone_skipbuild");
         return AgentOutcome.of(Message.withButtons(
                 target,
                 target.getRepresentationUnfogged() + ", use buttons to resolve " + use.agentName() + ".",
-                buttons));
+                placementButtons(use.game(), target)));
     }
 
     private static AgentOutcome placeInfantry(AgentUse<Choice> use, PlaceOnPlanet place) {

@@ -1,0 +1,30 @@
+{
+    "id": "mora",
+    "tileId": "th26",
+    "name": "Mora",
+    "aliases": [
+        "mora"
+    ],
+    "resources": 2,
+    "influence": 1,
+    "planetTypes": [
+        "CULTURAL"
+    ],
+    "techSpecialties": [
+        "WARFARE"
+    ],
+    "planetLayout": {
+        "unitHolderName": "mora",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 201,
+            "y": 208
+        },
+        "planetRadius": 63
+    },
+    "positionInTile": {
+        "x": 201,
+        "y": 208
+    },
+    "source": "theodisi"
+}

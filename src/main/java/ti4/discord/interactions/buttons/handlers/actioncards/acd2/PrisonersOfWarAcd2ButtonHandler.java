@@ -13,10 +13,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.PromissoryNoteHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
-import ti4.service.emoji.CardEmojis;
 
 @UtilityClass
 class PrisonersOfWarAcd2ButtonHandler {
@@ -55,71 +52,7 @@ class PrisonersOfWarAcd2ButtonHandler {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Prisoners of War_.");
             return;
         }
-
-        List<String> sendablePNs = sendablePromissoryNotes(target);
-        if (sendablePNs.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    target.getRepresentationNoPing()
-                            + " has no promissory notes in hand to give for _Prisoners of War_. Continue by placing"
-                            + " their command token.");
-            sendCommandTokenButtons(player, game, target);
-            return;
-        }
-
-        List<Button> buttons = new ArrayList<>();
-        for (String pnId : sendablePNs) {
-            buttons.add(Buttons.green(
-                    target.factionButtonChecker() + "prisonersOfWarGivePN_" + player.getFaction() + "_" + pnId,
-                    Mapper.getPromissoryNote(pnId).getName(),
-                    CardEmojis.PN));
-        }
-        MessageHelper.sendMessageToChannelWithButtons(
-                target.getCardsInfoThread(),
-                target.getRepresentationUnfogged() + ", choose which promissory note to give to "
-                        + FoWHelper.factionEmojiOrAnon(game, player, "your opponent")
-                        + " for _Prisoners of War_.",
-                buttons);
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", " + target.getFactionEmojiOrColor()
-                        + " was asked to give you a promissory note for _Prisoners of War_.");
-    }
-
-    @ButtonHandler("prisonersOfWarGivePN_")
-    public static void resolvePrisonersOfWarGivePN(
-            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        // player == the opponent giving the promissory note
-        String[] parts = buttonID.replace("prisonersOfWarGivePN_", "").split("_", 2);
-        ButtonHelper.deleteMessage(event);
-        if (parts.length < 2) {
-            return;
-        }
-        Player receiver = game.getPlayerFromColorOrFaction(parts[0]);
-        String pnId = parts[1];
-        Integer pnIndex = player.getPromissoryNotes().get(pnId);
-        if (receiver == null || pnIndex == null) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(), "That promissory note is no longer available for _Prisoners of War_.");
-            return;
-        }
-
-        player.removePromissoryNote(pnIndex);
-        receiver.setPromissoryNote(pnId);
-        PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
-        PromissoryNoteHelper.sendPromissoryNoteInfo(game, receiver, false);
-
-        String pnName = Mapper.getPromissoryNote(pnId).getName();
-        MessageHelper.sendMessageToChannel(
-                player.getCardsInfoThread(),
-                "# " + player.getRepresentation() + " you gave the promissory note _" + pnName
-                        + "_ for _Prisoners of War_.");
-        MessageHelper.sendMessageToChannel(
-                receiver.getCardsInfoThread(),
-                "# " + receiver.getRepresentation() + " you gained the promissory note _" + pnName
-                        + "_ from _Prisoners of War_.");
-
-        sendCommandTokenButtons(receiver, game, player);
+        sendCommandTokenButtons(player, game, target);
     }
 
     @ButtonHandler("prisonersOfWarPlaceCC_")
@@ -169,15 +102,5 @@ class PrisonersOfWarAcd2ButtonHandler {
                 player.getRepresentationUnfogged() + ", choose a non-home system containing your units to place "
                         + target.getRepresentationNoPing() + "'s command token in for _Prisoners of War_.",
                 buttons);
-    }
-
-    private static List<String> sendablePromissoryNotes(Player player) {
-        List<String> sendable = new ArrayList<>();
-        for (String pn : player.getPromissoryNotes().keySet()) {
-            if (!player.getPromissoryNotesInPlayArea().contains(pn)) {
-                sendable.add(pn);
-            }
-        }
-        return sendable;
     }
 }

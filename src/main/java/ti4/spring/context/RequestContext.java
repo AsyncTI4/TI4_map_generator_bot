@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.context.SecurityContextHolder;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.logging.RollbarManager;
 
 @UtilityClass
 public class RequestContext {
@@ -21,9 +20,6 @@ public class RequestContext {
 
     static void setGame(Game game) {
         RequestContext.game.set(game);
-        if (game != null) {
-            RollbarManager.put("game_name", game.getName());
-        }
     }
 
     public static Game getGame() {

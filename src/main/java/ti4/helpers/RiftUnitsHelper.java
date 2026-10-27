@@ -22,13 +22,12 @@ import ti4.game.UnitHolder;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.planet.AsgardLegendaryService;
-import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
@@ -501,12 +500,6 @@ public final class RiftUnitsHelper {
                         player.getCorrectChannel(),
                         player.getRepresentationNoPing()
                                 + " reminder that you have _Veythros_ the Thrones of Ruin commander, and may choose to ignore the effects of each anomaly. If you ignored the move bonus, you do not need to roll for rifting.");
-            }
-            if (AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile)) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentationNoPing()
-                                + " reminder that their flagship may ignore gravity-rift effects due to _Alluring Throne_.");
             }
             MessageHelper.sendMessageToChannelWithButtons(
                     channel,

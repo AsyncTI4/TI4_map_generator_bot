@@ -40,8 +40,6 @@ public interface Command<T extends GenericInteractionCreateEvent> {
 
     default void register(CommandListUpdateAction update) {}
 
-    default void registerSearchCommands(CommandListUpdateAction update) {}
-
     default void onException(T event, Throwable throwable) {
         String messageText = "Error trying to execute command: " + getName();
         String errorMessage = ExceptionUtils.getMessage(throwable);

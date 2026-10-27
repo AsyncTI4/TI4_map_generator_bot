@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -18,10 +19,10 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper.ACStatus;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
 
 public final class NewStuffHelper {
@@ -107,6 +108,30 @@ public final class NewStuffHelper {
         }
         buttonsToUse.addAll(pinnedButtons);
         return buttonsToUse;
+    }
+
+    public static void sendPaginated(
+            MessageChannel channel, String message, List<Button> buttons, List<Button> pinned, String navPrefix) {
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
+                channel, message, paginateWithPinnedButtons(buttons, pinned, navPrefix, 25, 0));
+    }
+
+    public static boolean turnPage(
+            ButtonInteractionEvent event,
+            String buttonID,
+            String message,
+            Supplier<List<Button>> buttons,
+            List<Button> pinned,
+            String navPrefix) {
+        Matcher pageMatch = Pattern.compile(RegexHelper.pageRegex()).matcher(buttonID);
+        if (!pageMatch.find()) return false;
+        int page = Integer.parseInt(pageMatch.group("page"));
+        sendOrEditButtons(
+                event,
+                event.getChannel(),
+                message,
+                paginateWithPinnedButtons(buttons.get(), pinned, navPrefix, 25, page));
+        return true;
     }
 
     private static List<List<Button>> splitIntoPagesLeavingRoomForNavButtons(List<Button> allButtons, int capacity) {

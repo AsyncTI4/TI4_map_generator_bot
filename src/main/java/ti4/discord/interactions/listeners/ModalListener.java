@@ -18,7 +18,7 @@ import ti4.helpers.settingsFramework.menus.BaseGameMiniMiltySettings;
 import ti4.helpers.settingsFramework.menus.FrankenSettings;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
-import ti4.logging.RollbarManager;
+import ti4.message.MessageHelper;
 import ti4.service.game.GameNameService;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.deploy.ActiveLeaseService;
@@ -59,27 +59,23 @@ public final class ModalListener extends ListenerAdapter {
         event.deferEdit().queue(Consumers.nop(), BotLogger::catchRestError);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        String rawModalID = event.getModalId();
-        ExecutionLockType lockType = registry.isSave(rawModalID) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
+        HandlerRegistry.Route<ModalContext> route = registry.resolve(event.getModalId());
+        ExecutionLockType lockType = route.shouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutorServiceManager.runAsyncWithLock(
                 "ModalListener task for  `" + gameName + "`",
                 gameName,
                 event.getMessageChannel(),
-                () -> handleModal(event),
+                () -> handleModal(event, route),
                 lockType);
     }
 
-    private void handleModal(ModalInteractionEvent event) {
+    private void handleModal(ModalInteractionEvent event, HandlerRegistry.Route<ModalContext> route) {
         ModalContext context = new ModalContext(event);
         if (!context.isValid()) {
             BotLogger.warning(new LogOrigin(event), "Invalid modal context.");
             return;
         }
         try {
-            RollbarManager.putInteractionMetadata("modal", event);
-            RollbarManager.put("modal_id", event.getModalId());
-            RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
-
             CombatReplayService combatReplayService =
                     CombatContestSettings.isEnabledStatic() ? SpringContext.getBean(CombatReplayService.class) : null;
             if (combatReplayService != null) {
@@ -87,7 +83,7 @@ public final class ModalListener extends ListenerAdapter {
                         combatReplayService.capturePreInteractionSnapshot(context.getGame()));
             }
             try {
-                resolveModalInteractionEvent(context);
+                resolveModalInteractionEvent(context, route);
                 context.save();
             } finally {
                 if (combatReplayService != null) {
@@ -98,16 +94,15 @@ public final class ModalListener extends ListenerAdapter {
             String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: "
                     + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
             BotLogger.error(new LogOrigin(event), message, e);
-        } finally {
-            RollbarManager.clear();
         }
     }
 
-    private void resolveModalInteractionEvent(@Nonnull ModalContext context) {
+    private void resolveModalInteractionEvent(
+            @Nonnull ModalContext context, HandlerRegistry.Route<ModalContext> route) {
         String modalID = context.getModalID();
         Game game = context.getGame();
 
-        if (registry.handle(modalID, context)) return;
+        if (route.dispatch(context)) return;
 
         if (modalID.startsWith("jmfA_")) {
             // Detect new settings menu navId() to route to the correct handler.
@@ -125,6 +120,13 @@ public final class ModalListener extends ListenerAdapter {
                 return;
             }
             game.initializeMiltySettings().parseInput(context);
+            return;
         }
+
+        context.setShouldSave(false);
+        BotLogger.error(
+                new LogOrigin(context.getEvent(), context),
+                "Unrouted modal: `" + modalID + "`. This could just be a stale modal.");
+        MessageHelper.sendMessageToEventChannel(context.getEvent(), "We couldn't resolve what to do with this modal.");
     }
 }

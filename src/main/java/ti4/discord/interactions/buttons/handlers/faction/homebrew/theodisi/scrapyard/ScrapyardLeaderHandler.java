@@ -9,6 +9,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -20,8 +22,8 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollType;
@@ -56,7 +58,7 @@ public class ScrapyardLeaderHandler {
                 target == agentOwner ? target.getCorrectChannel() : agentOwner.getCardsInfoThread(),
                 agentOwner.getRepresentation()
                         + ", you may exhaust _Rikka \"Razor Fang\" Corvin_ to let the active player swap the movement and combat values "
-                        + "of 2 of your units until the end of this tactical action.",
+                        + "of 2 of their units until the end of this tactical action.",
                 buttons);
     }
 
@@ -269,6 +271,8 @@ public class ScrapyardLeaderHandler {
         UnitModel warSun = player.getPriorityUnitByAsyncID("ws", null);
         String warSunTech = warSun == null ? "ws" : warSun.getRequiredTechId().orElse("ws");
         player.addTech(warSunTech);
+        NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
+        NetrunnersTechHandler.resolveDataMining(event, game, player, warSunTech);
         game.removeStoredValue(heroCostKey(player));
         game.setStoredValue(heroWarsunKey(player), "2");
         ButtonHelper.deleteMessage(event);

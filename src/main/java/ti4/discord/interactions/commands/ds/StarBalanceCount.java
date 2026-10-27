@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
+import ti4.helpers.BlueReverieHelper;
 import ti4.message.MessageHelper;
 
 class StarBalanceCount extends GameStateSubcommand {
@@ -19,7 +20,7 @@ class StarBalanceCount extends GameStateSubcommand {
         int count = Math.max(event.getOption("count").getAsInt(), 0);
         Player player = getPlayer();
         player.setStarbalanceCounter(count);
-
+        BlueReverieHelper.checkXinHarmony(getGame());
         MessageHelper.sendMessageToChannel(event.getChannel(), "Set Star Balance count to " + count + ".");
     }
 }

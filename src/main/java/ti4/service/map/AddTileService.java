@@ -16,8 +16,8 @@ import ti4.game.Planet;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
-import ti4.image.TileHelper;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 
@@ -63,6 +63,9 @@ public class AddTileService {
         if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
+        if (game.isLostLegaciesTiles()) {
+            sources.add(ComponentSource.theodisi);
+        }
         if (eronousTiles) {
             sources.add(ComponentSource.eronous);
         }
@@ -100,6 +103,7 @@ public class AddTileService {
                 availableTiles = TileHelper.getAllTileModels().stream()
                         .filter(tileModel -> tileModel.getTileBack() == TileBack.GREEN)
                         .filter(tileModel -> sources.contains(tileModel.getSource()))
+                        .filter(AddTileService::isSelectedTileSource)
                         .filter(tileModel -> !existingTileModels.contains(tileModel))
                         .filter(tileModel -> !drawnTiles.contains(tileModel.getId()))
                         .filter(tileModel -> new Tile(tileModel.getId(), "none").isHomeSystem())
@@ -119,6 +123,7 @@ public class AddTileService {
         return TileHelper.getAllTileModels().stream()
                 .filter(tileModel -> tileModel.getTileBack() == TileBack.BLUE)
                 .filter(tileModel -> sources.contains(tileModel.getSource()))
+                .filter(AddTileService::isSelectedTileSource)
                 .filter(tileModel -> !existingTileModels.contains(tileModel))
                 .filter(tileModel -> !drawnTiles.contains(tileModel.getId()))
                 .collect(Collectors.toList());
@@ -129,10 +134,15 @@ public class AddTileService {
         return TileHelper.getAllTileModels().stream()
                 .filter(tileModel -> tileModel.getTileBack() == TileBack.RED)
                 .filter(tileModel -> sources.contains(tileModel.getSource()))
+                .filter(AddTileService::isSelectedTileSource)
                 // Allow duplicate tiles if they are empty
                 .filter(tileModel -> tileModel.isEmpty()
                         || (!existingTileModels.contains(tileModel) && !drawnTiles.contains(tileModel.getId())))
                 .collect(Collectors.toList());
+    }
+
+    private static boolean isSelectedTileSource(TileModel tileModel) {
+        return tileModel.getSource() != ComponentSource.theodisi || TileHelper.isLostLegaciesTile(tileModel);
     }
 
     public enum RandomOption {

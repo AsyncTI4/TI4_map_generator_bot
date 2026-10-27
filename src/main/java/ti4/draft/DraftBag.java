@@ -1,8 +1,10 @@
 package ti4.draft;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import ti4.draft.items.SpeakerOrderDraftItem;
 
@@ -24,6 +26,17 @@ public class DraftBag {
         return Contents.stream()
                 .filter(i -> i.getItemCategory() == cat)
                 .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public List<DraftItem> getDistinctCategory(DraftCategory cat) {
+        Set<String> seenAliases = new HashSet<>();
+        return getCategory(cat).stream()
+                .filter(item -> seenAliases.add(item.getAlias()))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public boolean containsAlias(String alias) {
+        return Contents.stream().anyMatch(item -> item.getAlias().equals(alias));
     }
 
     public int getCategoryCount(DraftCategory cat) {

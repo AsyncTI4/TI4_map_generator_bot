@@ -22,7 +22,6 @@ import ti4.helpers.BombardmentAssignment;
 import ti4.helpers.BombardmentAssignmentType;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
-import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.NewStuffHelper;
@@ -358,7 +357,7 @@ public class AshenLeadersHandler {
             if (tile.getPosition().equalsIgnoreCase(activeSystem)) {
                 continue;
             }
-            if (FoWHelper.playerHasActualShipsInSystem(target, tile) && CommandCounterHelper.hasCC(target, tile)) {
+            if (FoWHelper.playerHasActualShipsInSystem(target, tile)) {
                 tiles.add(tile);
             }
         }

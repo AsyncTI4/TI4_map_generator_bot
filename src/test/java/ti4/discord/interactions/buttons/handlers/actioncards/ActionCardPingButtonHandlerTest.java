@@ -14,6 +14,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -264,6 +265,108 @@ class ActionCardPingButtonHandlerTest extends BaseTi4Test {
                         () -> GMService.logActivity(
                                 any(), argThat(m -> m.toLowerCase().contains("no private channel")), eq(true)),
                         atLeastOnce());
+            }
+        }
+    }
+
+    // ---- blind system pings: any position is accepted, delivery only where a real system sits ----
+
+    @Test
+    void pingSystemTarget_actorWhoCannotSeeTheSystemStillPingsThePlayersWhoCan() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = harness.load();
+            game.setFowMode(true);
+
+            VisibilityCase c = findVisibilityCase(game);
+            assertThat(c).isNotNull();
+            // The blind actor is the peer who cannot see the tile; everyone who can see it is a recipient.
+            Player blindActor = c.invisiblePeer();
+            givePrivateChannel(blindActor);
+            List<TextChannel> seeingChannels = new ArrayList<>();
+            seeingChannels.add(givePrivateChannel(c.actor()));
+            c.visiblePeers().forEach(p -> seeingChannels.add(givePrivateChannel(p)));
+
+            try (MockedStatic<MessageHelper> mh = mockStatic(MessageHelper.class);
+                    MockedStatic<GMService> gm = mockStatic(GMService.class)) {
+                boolean sent = ActionCardPingButtonHandler.pingSystemTarget(
+                        game, blindActor, c.tile().getPosition(), false, "");
+
+                assertThat(sent).isTrue();
+                for (TextChannel seeingChannel : seeingChannels) {
+                    mh.verify(() -> MessageHelper.sendMessageToChannel(eq(seeingChannel), any()));
+                }
+            }
+        }
+    }
+
+    @Test
+    void pingSystemTarget_emptyPositionIsAcceptedButDeliveredToNobody() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = harness.load();
+            game.setFowMode(true);
+            Player actor = game.getRealPlayers().getFirst();
+            game.getRealPlayers().forEach(ActionCardPingButtonHandlerTest::givePrivateChannel);
+            TextChannel actorChannel = actor.getPrivateChannel();
+            TextChannel mainChannel = giveMainChannel(game);
+            String emptyPosition = "999";
+            assertThat(game.getTileByPosition(emptyPosition)).isNull();
+
+            try (MockedStatic<MessageHelper> mh = mockStatic(MessageHelper.class)) {
+                assertThat(ActionCardPingButtonHandler.pingSystemTarget(game, actor, emptyPosition, false, ""))
+                        .isTrue();
+                // Only the actor's own confirmation, identical in shape to a real ping's.
+                mh.verify(() -> MessageHelper.sendMessageToChannel(
+                        eq(actorChannel), argThat(msg -> msg.contains(emptyPosition))));
+                mh.verify(() -> MessageHelper.sendMessageToChannel(any(), any()));
+            }
+
+            try (MockedStatic<MessageHelper> mh = mockStatic(MessageHelper.class)) {
+                assertThat(ActionCardPingButtonHandler.pingSystemTarget(game, actor, emptyPosition, true, ""))
+                        .isTrue();
+                mh.verify(() -> MessageHelper.sendMessageToChannel(eq(mainChannel), any()), never());
+                mh.verify(() -> MessageHelper.sendMessageToChannel(any(), any()), never());
+            }
+        }
+    }
+
+    @Test
+    void pingSystemTarget_hyperlaneTileIsNotASystemAndIsDeliveredToNobody() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = harness.load();
+            game.setFowMode(true);
+            Player actor = game.getRealPlayers().getFirst();
+            game.getRealPlayers().forEach(ActionCardPingButtonHandlerTest::givePrivateChannel);
+            TextChannel mainChannel = giveMainChannel(game);
+            game.setTile(new Tile("hl", "999"));
+
+            try (MockedStatic<MessageHelper> mh = mockStatic(MessageHelper.class)) {
+                assertThat(ActionCardPingButtonHandler.pingSystemTarget(game, actor, "999", true, ""))
+                        .isTrue();
+                mh.verify(() -> MessageHelper.sendMessageToChannel(eq(mainChannel), any()), never());
+            }
+        }
+    }
+
+    @Test
+    void offerSystemChoices_leavesOutHyperlaneTiles() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = harness.load();
+            // Outside fog every tile is offered, so the hyperlane can only be missing because it was filtered.
+            game.setFowMode(false);
+            Player actor = game.getRealPlayers().getFirst();
+            TextChannel actorChannel = givePrivateChannel(actor);
+            giveMainChannel(game);
+            game.setTile(new Tile("hl", "999"));
+
+            try (MockedStatic<MessageHelper> mh = mockStatic(MessageHelper.class)) {
+                ActionCardPingButtonHandler.pickType(game, actor, Constants.AC_PING_PICK + "system_12345678_Sabotage");
+
+                mh.verify(() -> MessageHelper.sendMessageToChannelWithButtons(
+                        eq(actorChannel),
+                        any(),
+                        argThat(buttons -> !buttons.isEmpty()
+                                && buttons.stream()
+                                        .noneMatch(b -> b.getCustomId().endsWith("_999")))));
             }
         }
     }

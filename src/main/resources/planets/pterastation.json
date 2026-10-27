@@ -1,0 +1,27 @@
+{
+    "id": "pterastation",
+    "tileId": "th42",
+    "name": "Ptera Station",
+    "aliases": [
+        "ptera",
+        "pterastation"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": [
+        "SPACESTATION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "pterastation",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 179,
+            "y": 146
+        }
+    },
+    "positionInTile": {
+            "x": 179,
+            "y": 146
+    },
+    "source": "theodisi"
+}

@@ -73,14 +73,7 @@ class SardakkAgentTest extends BaseTi4Test {
     void placingPutsTwoInfantryOnThePlanet() {
         Choice choice = module.decode(game, sardakk, "101_lodor").orElseThrow();
 
-        AgentOutcome outcome = module.resolve(AgentUse.of(
-                module,
-                game,
-                sardakk,
-                sardakk.getLeader(SardakkAgent.ID).orElseThrow(),
-                SardakkAgent.ID,
-                choice,
-                null));
+        AgentOutcome outcome = module.resolve(new AgentUse<>(game, sardakk, choice, "T'ro An, the N'orr agent", null));
 
         assertThat(tile.getUnitHolders().get("lodor").getUnitCount(UnitType.Infantry, sardakk.getColor()))
                 .isEqualTo(2);

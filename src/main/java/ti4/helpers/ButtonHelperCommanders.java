@@ -9,11 +9,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -25,10 +27,10 @@ import ti4.game.UnitHolder;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
@@ -703,7 +705,8 @@ public class ButtonHelperCommanders {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1 Trade Good", MiscEmojis.tg));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
+                    MessageChannel channel = event == null ? player.getCorrectChannel() : event.getMessageChannel();
+                    MessageHelper.sendMessageToChannelWithButtons(channel, mMessage, buttons);
                 }
                 case AUTO -> {
                     String message = player.getRepresentationUnfogged()
@@ -966,6 +969,14 @@ public class ButtonHelperCommanders {
         String enemyFaction = buttonID.split("_")[1];
         Player enemy = game.getPlayerFromColorOrFaction(enemyFaction);
         if (enemy == null) return;
+        if (XinTechHandler.hasAstromanticCloakSteel(enemy)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", you cannot look at this player's Action Cards, Promissory Notes, or Secret Objectives"
+                            + " because they have _Astromantic Cloak (Steel)_!");
+            return;
+        }
         String message = player.getFactionEmoji() + " used So Ata, the Yssaril commander, to look at the ";
         String type = buttonID.split("_")[0];
         if ("ac".equalsIgnoreCase(type)) {
@@ -1009,17 +1020,35 @@ public class ButtonHelperCommanders {
 
         String message = player.getFactionEmojiOrColor() + " moved 1 " + mechorInf + " from " + planetRepresentation2
                 + " to " + planetRepresentation + " using G'hom Sek'kus, the Sardakk Commander.";
-        RemoveUnitService.removeUnits(
-                event, game.getTileFromPlanet(planet2), game, player.getColor(), "1 " + mechorInf + " " + planet2);
+        Tile origin = game.getTileFromPlanet(planet2);
+        planet1 = FlipTileService.unlockMalliceIfNeeded(event, planet1, game);
+        Tile destination = game.getTileFromPlanet(planet1);
+        if (origin == null || destination == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "Could not find " + planetRepresentation2 + " or " + planetRepresentation + " on the map.");
+            return;
+        }
+        RemoveUnitService.removeUnits(event, origin, game, player.getColor(), "1 " + mechorInf + " " + planet2);
+        AddUnitService.addUnits(event, destination, game, player.getColor(), "1 " + mechorInf + " " + planet1);
 
-        FlipTileService.flipTileIfNeeded(event, game.getTileFromPlanet(planet1), game);
-        planet1 = planet1.replace("lockedm", "m");
-        AddUnitService.addUnits(
-                event, game.getTileFromPlanet(planet1), game, player.getColor(), "1 " + mechorInf + " " + planet1);
-
+        rememberSardakkCommanderSource(game, player, planet2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    private static String sardakkCommanderMarker(String planet) {
+        return " Sardakk commander used " + planet + ".";
+    }
+
+    static void rememberSardakkCommanderSource(Game game, Player player, String planet) {
+        String key = "currentActionSummary" + player.getFaction();
+        game.setStoredValue(key, game.getStoredValue(key) + sardakkCommanderMarker(planet));
+    }
+
+    static boolean sardakkCommanderUsedThisActivation(Game game, Player player, String planet) {
+        String summary = game.getStoredValue("currentActionSummary" + player.getFaction());
+        return StringUtils.substringAfterLast(summary, " Activated ").contains(sardakkCommanderMarker(planet));
     }
 
     @ButtonHandler("ralnelMechPull_")
@@ -1073,6 +1102,7 @@ public class ButtonHelperCommanders {
                     }
                     String planetId2 = planetReal2.getName();
                     String planetName2 = Helper.getPlanetName(planetId2);
+                    if (sardakkCommanderUsedThisActivation(game, player, planetId2)) continue;
                     if (numInf > 0 && !planetId.equalsIgnoreCase(planetId2)) {
                         String id = "sardakkcommander_infantry_" + planetId + "_" + planetId2;
                         String label = "1 Inf From " + planetName2 + " To " + planetName + " With Commander";

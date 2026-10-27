@@ -9,9 +9,9 @@ import ti4.discord.interactions.commands.Subcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.MapTemplateHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
+import ti4.model.Mapper;
 
 public class PreviewMapTemplate extends Subcommand {
 

@@ -1,6 +1,7 @@
 package ti4.service.leader.agent.modules;
 
 import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -12,7 +13,7 @@ import ti4.service.leader.agent.AgentUse;
 
 public final class WinnuAgent implements AgentModule<Player> {
 
-    public static final String ID = "winnuagent";
+    static final String ID = "winnuagent";
 
     public static String buttonId() {
         return AgentButtonIds.format(ID);
@@ -30,7 +31,10 @@ public final class WinnuAgent implements AgentModule<Player> {
 
     @Override
     public Optional<Player> decode(Game game, Player user, String payload) {
-        return AgentTargets.playerOrSelf(game, user, payload);
+        if (StringUtils.isEmpty(payload)) {
+            return Optional.of(user);
+        }
+        return AgentTargets.player(game, payload);
     }
 
     @Override

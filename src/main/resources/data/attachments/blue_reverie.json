@@ -33,5 +33,21 @@
         "imagePath": "attachment_superweapon_grom.png",
         "isFakeAttachment": true,
         "source": "blue_reverie"
+    },
+    {
+        "id": "ee_positiveres",
+        "name": "Ecological Engineering (Res)",
+        "imagePath": "attachment_positiveres.png",
+        "resourcesModifier": 1,
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "ee_positiveinf",
+        "name": "Ecological Engineering (Inf)",
+        "imagePath": "attachment_positiveinf.png",
+        "influenceModifier": 1,
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
     }
 ]

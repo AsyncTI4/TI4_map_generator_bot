@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.game.MonumentsService;
 import ti4.service.tactical.LandingContext;

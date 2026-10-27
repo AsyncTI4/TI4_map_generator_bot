@@ -18,8 +18,8 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.helper.GameHelper;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.map.FractureService;
 import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
@@ -32,7 +32,7 @@ public class GameStatisticsFilterer {
     public static final String MIN_PLAYER_COUNT_FILTER = "min_player_count";
     static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";
     public static final String GAME_TYPES_FILTER = "game_type";
-    static final String FOG_FILTER = "is_fog";
+    public static final String FOG_FILTER = "is_fog";
     static final String HOMEBREW_FILTER = "has_homebrew";
     public static final String HAS_WINNER_FILTER = "has_winner";
     public static final String WINNING_FACTION_FILTER = "winning_faction";

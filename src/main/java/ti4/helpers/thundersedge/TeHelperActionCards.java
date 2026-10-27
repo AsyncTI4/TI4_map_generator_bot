@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -82,6 +82,7 @@ public class TeHelperActionCards {
             case "puppetsonastring" -> buttons.add(Buttons.green(ffcc + "startAction", "Start Your Action")); // preset
             case "rescue" -> buttons.add(Buttons.green(ffcc + "startRescue", "Start Rescue"));
             case "overrule" -> buttons.add(Buttons.green(ffcc + "overruleStart", "Start Overrule"));
+            case "overrule_br" -> buttons.add(Buttons.green(ffcc + "overruleBrStart", "Start Overrule"));
             case "strategize" -> buttons.add(Buttons.green(ffcc + "strategize", resolve));
         }
 
@@ -93,7 +94,7 @@ public class TeHelperActionCards {
         return false;
     }
 
-    private static List<Button> getOverruleButtons(Game game) {
+    private static List<Button> getOverruleButtons(Game game, Player player, boolean blueReverie) {
         List<Button> scButtons = new ArrayList<>();
         for (Integer sc : game.getSCList()) {
             if (sc <= 0
@@ -101,10 +102,12 @@ public class TeHelperActionCards {
             Button button;
             String label = Helper.getSCName(sc, game);
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
+            String buttonID =
+                    player.factionButtonChecker() + "winnuHero_" + sc + "_overrule" + (blueReverie ? "_br" : "");
             if (scEmoji != CardEmojis.SCBackBlank && !game.isHomebrewSCMode()) {
-                button = Buttons.gray("winnuHero_" + sc + "_overrule", label, scEmoji);
+                button = Buttons.gray(buttonID, label, scEmoji);
             } else {
-                button = Buttons.gray("winnuHero_" + sc + "_overrule", sc + " " + label);
+                button = Buttons.gray(buttonID, sc + " " + label);
             }
             scButtons.add(button);
         }
@@ -452,7 +455,15 @@ public class TeHelperActionCards {
 
     @ButtonHandler("overruleStart")
     private static void resolveOverrule(Game game, Player player, ButtonInteractionEvent event) {
-        List<Button> buttons = getOverruleButtons(game);
+        List<Button> buttons = getOverruleButtons(game, player, false);
+        String message = "Choose the strategy card you wish to perform the primary of.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("overruleBrStart")
+    private static void resolveBlueReverieOverrule(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = getOverruleButtons(game, player, true);
         String message = "Choose the strategy card you wish to perform the primary of.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);

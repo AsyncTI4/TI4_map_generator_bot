@@ -1,0 +1,16 @@
+{
+    "id": "fracture21",
+    "name": "Fracture Set3 Midway Egress",
+    "aliases": [
+        "fracture21",
+        "egressmidway",
+        "frac21",
+        "fracmidegr"
+    ],
+    "hasEgress": true,
+    "imagePath": "fracture21.png",
+    "shipPositionsType": "TYPE08",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

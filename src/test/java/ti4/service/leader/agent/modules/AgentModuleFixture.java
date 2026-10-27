@@ -10,18 +10,18 @@ import ti4.service.leader.agent.AgentUse;
  * A two-player game for agent module tests: the agent's owner and a target whose Project Pi faction id
  * ("pi_hacan") contains the "_" separator that the old split("_")[1] parsing truncated.
  */
-final class AgentModuleFixture {
+public final class AgentModuleFixture {
 
-    static final String TARGET_FACTION = "pi_hacan";
-    static final String TARGET_COLOR = "blue";
-    static final String ACTIVE_SYSTEM = "101";
+    public static final String TARGET_FACTION = "pi_hacan";
+    public static final String TARGET_COLOR = "blue";
+    public static final String ACTIVE_SYSTEM = "101";
 
-    final Game game;
-    final Player user;
-    final Player target;
-    final Tile tile;
+    public final Game game;
+    public final Player user;
+    public final Player target;
+    public final Tile tile;
 
-    AgentModuleFixture(String userFaction) {
+    public AgentModuleFixture(String userFaction) {
         game = new Game();
         game.newGameSetup();
         game.setName("agent-module-test");
@@ -37,8 +37,7 @@ final class AgentModuleFixture {
         game.setActiveSystem(ACTIVE_SYSTEM);
     }
 
-    <P> AgentUse<P> use(AgentModule<P> module, P payload) {
-        return AgentUse.of(
-                module, game, user, user.getLeader(module.agentId()).orElseThrow(), module.agentId(), payload, null);
+    public <P> AgentUse<P> use(AgentModule<P> module, P payload) {
+        return new AgentUse<>(game, user, payload, module.displayName() + " agent", null);
     }
 }

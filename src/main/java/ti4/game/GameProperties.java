@@ -74,6 +74,7 @@ public class GameProperties {
     private String pendingSubEventsJson = "";
     // Undo-safe compact movement captured when tactical displacement is committed.
     private String pendingMovementState = "";
+    private String lastPlayerStateJson = "";
     private String latestCommand = "";
     private String latestOutcomeVotedFor = "";
     private String playersWhoHitPersistentNoAfter = "";
@@ -103,7 +104,7 @@ public class GameProperties {
     private boolean botStratReacts;
     private boolean botShushing;
     private boolean ccNPlasticLimit = true;
-    private boolean injectRulesLinks = true;
+    private boolean injectRulesLinks;
     private boolean newTransactionMethod = true;
     private boolean nomadCoin;
     private boolean queueSO = true;
@@ -151,6 +152,8 @@ public class GameProperties {
     private @ExportableField boolean feastOrFamineMode;
     private @ExportableField boolean zealousOrthodoxyMode;
     private @ExportableField boolean stellarAtomicsMode;
+    private @ExportableField boolean oplusplusRegularMode;
+    private @ExportableField boolean oplusplusCouncilMode;
     private @ExportableField boolean noSwapMode;
     private @ExportableField boolean veiledHeartMode;
     private @ExportableField boolean limitedWhispersMode;
@@ -170,6 +173,7 @@ public class GameProperties {
     private @ExportableField boolean discordantStarsMode;
     private @ExportableField boolean blueReverieMode;
     private @ExportableField boolean unchartedSpaceStuff;
+    private @ExportableField boolean lostLegaciesTiles;
     private @ExportableField boolean miltyModMode;
     private @ExportableField boolean promisesPromisesMode;
     private @ExportableField boolean flagshippingMode;
@@ -208,6 +212,7 @@ public class GameProperties {
     // Decks
     private List<String> secretObjectives;
     private List<String> actionCards;
+    private List<String> hydromorphicCards = new ArrayList<>();
     private List<String> agendas;
     private List<String> mandates;
     private List<String> events; // ignis_aurora
@@ -229,6 +234,11 @@ public class GameProperties {
 
     public boolean hasFullPriorityTrackMode() {
         return priorityTrackMode == PriorityTrackMode.FULL;
+    }
+
+    public void reopen() {
+        hasEnded = false;
+        endedDate = 0;
     }
 
     // Misc Helpers

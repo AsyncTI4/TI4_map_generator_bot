@@ -1,6 +1,7 @@
 package ti4.discord.interactions.commands.planet;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -15,5 +16,10 @@ class PlanetAdd extends PlanetAddRemove {
     @Override
     public void doAction(GenericInteractionCreateEvent event, Player player, String planet, Game game) {
         AddPlanetService.addPlanet(player, planet, game, event, false);
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

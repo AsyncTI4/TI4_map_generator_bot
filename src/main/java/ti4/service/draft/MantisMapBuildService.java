@@ -25,12 +25,12 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
+import ti4.model.TileHelper;
 import ti4.service.draft.MantisMapBuildContext.PlayerTiles;
 import ti4.service.explore.AddFrontierTokensService;
 
@@ -327,10 +327,10 @@ public class MantisMapBuildService {
                 }
             }
             game.setShowMapSetup(false);
-            // Update the main game map
-            ButtonHelper.updateMap(mapBuildContext.game(), event, "Mantis Map Build Completed");
             // Do any post-build work
             mapBuildContext.buildCompleteCallback().accept(event);
+            // Update the main game map
+            ButtonHelper.updateMap(mapBuildContext.game(), event, "Mantis Map Build Completed");
             return;
         }
 

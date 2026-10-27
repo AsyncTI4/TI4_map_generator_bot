@@ -67,9 +67,11 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
+import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
+import ti4.model.Mapper;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -176,6 +178,7 @@ class AgendaResolveButtonHandler {
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "edyn");
         }
         List<Player> riders = AgendaHelper.getWinningRiders(winner, game, event);
+        ThirtyKActionCardHooks.resolveAgendaPredictions(game, winner, event);
         List<Player> voters = AgendaHelper.getWinningVoters(winner, game);
         VeylorLeadersHandler.resolveVeylorHeroLosingVote(game, winner);
         VeylorAbilitiesHandler.resolveLobbyistDues(event, game, winner);
@@ -183,6 +186,7 @@ class AgendaResolveButtonHandler {
         notifyIndoctrinationTeam(game, voters);
         checkFlorzenUnlock(voters, riders);
         processRiders(game, riders);
+        ThirtyKSecretHooks.onAgendaResolved(game);
         String resMes = buildResolutionMessage(game, winner);
         int aCount = computeNextAgendaCount(game);
         List<Button> buttons = buildNextButtons(game, aCount);
@@ -508,11 +512,15 @@ class AgendaResolveButtonHandler {
                     + ", please use this buttons to proceed after fully resolving the agenda.";
             buttons = StartTurnService.getStartOfTurnButtons(executiveOrderPlayer, game, true, event);
             game.removeStoredValue("executiveOrder");
+            game.removeStoredValue("executiveOrderBr");
+            game.removeStoredValue("proFormaSession");
             game.updateActivePlayer(executiveOrderPlayer);
             Player oldSpeaker = game.getPlayer(game.getStoredValue("oldSpeakerExecutiveOrder"));
             game.setSpeaker(oldSpeaker);
             game.setPhaseOfGame("action");
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);
+            MessageChannel turnChannel =
+                    game.isFowMode() ? executiveOrderPlayer.getCorrectChannel() : event.getChannel();
+            MessageHelper.sendMessageToChannelWithButtons(turnChannel, voteMessage, buttons);
         }
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);

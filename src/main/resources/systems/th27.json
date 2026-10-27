@@ -1,0 +1,20 @@
+{
+    "id": "th27",
+    "name": "Nexar/Ulth",
+    "aliases": [
+        "th27",
+        "nexar",
+        "ulth"
+    ],
+    "imagePath": "th27.png",
+    "planets": [
+        "nexar",
+        "ulth"
+    ],
+    "shipPositionsType": "TYPE05",
+    "wormholes": [
+        "BETA"
+    ],
+    "tileBack": "blue",
+    "source": "theodisi"
+}

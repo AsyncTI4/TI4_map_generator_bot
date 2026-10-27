@@ -1,0 +1,14 @@
+{
+  "name": "jmsc-so-quick-deliberations",
+  "description": "The first player to pass while holding Quick Deliberations gets a Score button, and pressing it scores the secret.",
+  "preset": "jmsc-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "do": "hand", "as": "sol", "hand": { "sos": ["quickdeliberationsjmsc"] } },
+    { "expect": { "state": "hacan.passed", "equals": "false" } },
+    { "as": "sol", "pressId": "FFCC_sol_passForRound" },
+    { "expect": { "in": "sol:cards-info", "contains": "first player to pass" } },
+    { "as": "sol", "press": "so_score_hand_{so:quickdeliberationsjmsc}", "in": "sol:cards-info" },
+    { "expect": { "state": "sol.sosScored", "contains": "quickdeliberationsjmsc" } }
+  ]
+}

@@ -8,9 +8,9 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.game.Player;
 import ti4.helpers.ColorChangeHelper;
-import ti4.image.Mapper;
 import ti4.model.ColorModel;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.service.game.GameColorsService;
 
 @UtilityClass

@@ -23,6 +23,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.CombatMessageHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.testbed.TestBedService;
 
 @UtilityClass
 public class FOWCombatThreadMirroring {
@@ -44,7 +45,7 @@ public class FOWCombatThreadMirroring {
         }
 
         Game game = managedGame.getGame();
-        Player player = getCommunityModePlayer(event.getMember(), game);
+        Player player = getCommunityModePlayer(event.getMember(), event.getChannel(), game);
         Set<Player> combatParticipants = getCombatParticipants((ThreadChannel) event.getChannel(), game);
         if (player == null || !player.isRealPlayer() || !combatParticipants.contains(player)) {
             return;
@@ -80,7 +81,7 @@ public class FOWCombatThreadMirroring {
         return matcher.find() ? matcher.group(1).trim() : null;
     }
 
-    private static Player getCommunityModePlayer(Member member, Game game) {
+    private static Player getCommunityModePlayer(Member member, Channel channel, Game game) {
         Player player = game.getPlayer(member.getUser().getId());
         if (game.isCommunityMode()) {
             List<Role> roles = member.getRoles();
@@ -90,7 +91,8 @@ public class FOWCombatThreadMirroring {
                 }
             }
         }
-        return player;
+        return TestBedService.resolveActingPlayer(
+                game, member, member.getUser().getId(), channel == null ? null : channel.getId(), player);
     }
 
     private static Set<Player> getCombatParticipants(ThreadChannel combatChannel, Game game) {
@@ -124,7 +126,7 @@ public class FOWCombatThreadMirroring {
         if (!isFowCombatThread(event.getChannel())) return false;
 
         Player actualPlayer = combatPlayer.getFaction() != null && !"neutral".equals(combatPlayer.getFaction())
-                ? getCommunityModePlayer(event.getMember(), game)
+                ? getCommunityModePlayer(event.getMember(), event.getChannel(), game)
                 : combatPlayer;
         return mirrorMessage(
                 (ThreadChannel) event.getChannel(), actualPlayer, game, parseCombatRollMessage(message, combatPlayer));
@@ -134,7 +136,10 @@ public class FOWCombatThreadMirroring {
         if (!isFowCombatThread(event.getChannel())) return false;
 
         return mirrorMessage(
-                (ThreadChannel) event.getChannel(), getCommunityModePlayer(event.getMember(), game), game, message);
+                (ThreadChannel) event.getChannel(),
+                getCommunityModePlayer(event.getMember(), event.getChannel(), game),
+                game,
+                message);
     }
 
     private static boolean mirrorMessage(ThreadChannel channel, Player player, Game game, String message) {

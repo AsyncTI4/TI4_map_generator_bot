@@ -32,6 +32,9 @@ public class GameWebStatePipeline {
         WebSocketNotifier notifier = getNotifierIfAvailable();
         if (notifier == null) return;
 
+        // TODO: Skip the rebuild when nobody subscribes to /topic/game/{name}/state; invalidate the
+        // GameWebDataService cache instead so REST recomputes on demand. Ask the simple broker's
+        // subscription registry: SimpUserRegistry misses anonymous website viewers.
         String gameName = game.getName();
         if (!pendingGameNames.add(gameName)) return;
 

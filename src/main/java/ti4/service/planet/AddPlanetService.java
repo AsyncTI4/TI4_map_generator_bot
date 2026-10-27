@@ -1,6 +1,7 @@
 package ti4.service.planet;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,8 +14,9 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -32,11 +34,14 @@ import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
+import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
-import ti4.image.Mapper;
+import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
@@ -48,7 +53,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
-import ti4.service.leader.agent.modules.VaylerianAgent;
+import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -63,19 +68,40 @@ public class AddPlanetService {
         addPlanet(player, planet, game, null, false);
     }
 
+    private static void recordControlEstablished(
+            Game game, Player player, String planet, Player previousOwner, boolean setup) {
+        String previousFaction = previousOwner == null ? null : previousOwner.getFaction();
+        GameSubEvent.ControlEstablished controlEstablished =
+                new GameSubEvent.ControlEstablished(planet, player.getFaction(), previousFaction);
+        if (GameEventDraft.stage(game, controlEstablished) || setup) {
+            return;
+        }
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("planet", planet);
+        if (previousFaction != null) {
+            payload.put("previousOwner", previousFaction);
+        }
+        GameEventService.commit(game, GameEventType.CONTROL_ESTABLISHED, player, payload);
+    }
+
     public static void addPlanet(
             Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setup) {
+        boolean setupRequested = setup;
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
         DiscordantStarsHelper.checkBRTaranisCrest(game);
         EronousPlanetService.resolveCantrisPO(game, planet, player);
+        IxthLegendaryButtonHandler.onPlanetGained(game, player, planet);
         if (setup && "ponthous".equalsIgnoreCase(planet)) {
             // Setup exhausts Ponthous without opening its optional ready-planet window.
             player.getExhaustedPlanets().add(planet);
         } else {
             player.exhaustPlanet(planet);
         }
-        if ("mirage".equals(planet) || "avernus".equals(planet) || "thundersedge".equals(planet)) {
+        if ("mirage".equals(planet)
+                || "avernus".equals(planet)
+                || "thundersedge".equals(planet)
+                || "oceanus".equals(planet)) {
             game.clearPlanetsCache();
         }
         Tile tile = game.getTileFromPlanet(planet);
@@ -111,6 +137,9 @@ public class AddPlanetService {
         if (player.ownsUnit("kairn_flagship") && ButtonHelper.doesPlayerHaveFSHere("kairn_flagship", player, tile)) {
             player.gainCommodities(1);
             ButtonHelperStats.afterGainCommsChecks(game, player, 1);
+        }
+        if (!setup && tile != null && tile.isFracture()) {
+            CommanderUnlockCheckService.checkPlayer(player, "natau");
         }
         int shrineCount = 0;
         shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine1.png") ? 1 : 0);
@@ -158,7 +187,7 @@ public class AddPlanetService {
         String color = player.getColor();
         if (color != null && !"null".equals(color)) {
             String ccID = Mapper.getControlID(color);
-            String ccPath = Mapper.getCCPath(ccID);
+            String ccPath = ImageResources.commandToken(ccID);
             if (ccPath != null) {
                 unitHolder.addControl(ccID);
             }
@@ -214,6 +243,7 @@ public class AddPlanetService {
                         ButtonHelperAgents.resolveArtunoCheck(player_, 1);
                     }
                     player_.removePlanet(planet);
+                    ThirtyKSecretHooks.onPlanetLost(game, player_, unitHolder);
                     CommanderUnlockCheckService.checkPlayer(player_, "uydai");
                     List<String> relics = new ArrayList<>(player_.getRelics());
                     if ("mr".equalsIgnoreCase(planet)) {
@@ -321,6 +351,7 @@ public class AddPlanetService {
                 }
             }
         }
+        ThirtyKActionCardHooks.onPlanetControlChanged(game, player, previousOwner, planet);
         if ((!alreadyOwned && player.hasAbility("contagion_blex") || player.hasAbility("plague_reservoir"))
                 && player.hasTech("dxa")
                 && !doubleCheck
@@ -379,6 +410,23 @@ public class AddPlanetService {
         }
         if (!alreadyOwned && player.hasLeader("tacommander")) {
             CommanderUnlockCheckService.checkPlayer(player, "ta");
+        }
+        if (!alreadyOwned
+                && !setup
+                && !"setup".equalsIgnoreCase(game.getPhaseOfGame())
+                && player.hasAbility("hydrospheric_extraction")
+                && !"used".equals(game.getStoredValue("hydroExtractUsed_" + player.getFaction()))) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "useHydroExtract_" + planet,
+                    "Use Hydrospheric Extraction",
+                    FactionEmojis.morpha));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", you may use _Hydrospheric Extraction_ and destroy 1 unit on this planet to draw 1 Action Card.",
+                    buttons);
         }
         if (game.isMinorFactionsMode()
                 && tile != null
@@ -466,7 +514,7 @@ public class AddPlanetService {
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Established control of "
                         + Helper.getPlanetRepresentation(planet, game) + ".");
-        GameEventDraft.stage(game, new GameSubEvent.ControlEstablished(planet));
+        recordControlEstablished(game, player, planet, previousOwner, setupRequested);
         if ((game.getPhaseOfGame().contains("agenda")
                         || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
                 && player.hasAbility("scavenge")

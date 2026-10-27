@@ -1,0 +1,17 @@
+{
+  "name": "30k-explore-2p",
+  "description": "Sol holds Wellon (industrial), Quann (cultural) and Mehar Xull (hazardous) with infantry, two destroyers on a frontier token at 317, and the 30k decks; action phase.",
+  "fog": false,
+  "decks": { "ac": "action_cards_30k", "so": "secret_objectives_30k", "relic": "relics_30k", "explore": "explores_30k" },
+  "you": {
+    "faction": "sol",
+    "home": "301",
+    "sc": 1,
+    "planets": ["wellon", "quann", "meharxull"],
+    "units": { "101": "1 inf wellon", "201": "1 inf quann", "106": "2 inf meharxull", "317": "2 dd" }
+  },
+  "seats": [ { "faction": "hacan", "home": "310", "sc": 5 } ],
+  "defaults": { "tg": 3, "commodities": 2, "ccs": "3/3/2" },
+  "tokens": { "317": ["frontier"] },
+  "start": "action"
+}

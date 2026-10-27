@@ -9,8 +9,9 @@ import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
+import ti4.service.testbed.TestBedService;
 
 class ShowPurgedActionCards extends GameStateSubcommand {
 
@@ -24,7 +25,8 @@ class ShowPurgedActionCards extends GameStateSubcommand {
     }
 
     private static void showPurged(Game game, GenericInteractionCreateEvent event) {
-        Player viewer = game.getPlayer(event.getUser().getId());
+        Player viewer = TestBedService.resolveActingPlayer(
+                game, event, game.getPlayer(event.getUser().getId()));
         boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, viewer);
         StringBuilder sb = new StringBuilder();
         sb.append("Action card purge list: ").append('\n');

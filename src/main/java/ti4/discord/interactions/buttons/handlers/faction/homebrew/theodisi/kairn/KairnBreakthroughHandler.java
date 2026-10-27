@@ -11,9 +11,10 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.RelicHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.RelicModel;
 import ti4.service.emoji.ExploreEmojis;
 
@@ -23,7 +24,6 @@ public class KairnBreakthroughHandler {
     private static final String VIEW_RELICS = "viewKairnBtRelics";
     private static final String PURGE_AND_REPLACE = "kairnBtPurgeAndReplace_";
     private static final String SELECT_REPLACEMENT = "kairnBtSelectReplacement_";
-    private static final String READY_BREAKTHROUGH = "readyKairnBt";
 
     public static void refreshRelics(Game game, Player player) {
         if (game == null || player == null || !player.hasUnlockedBreakthrough("kairnbt")) return;
@@ -37,10 +37,16 @@ public class KairnBreakthroughHandler {
             relics.add(relic);
         }
         setStoredRelics(game, player, relics);
-        MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(),
-                player.getRepresentationNoPing() + " placed " + relics.size() + " relic"
-                        + (relics.size() == 1 ? "" : "s") + " on **Relic Trading Hub**.");
+        List<MessageEmbed> embeds = relics.stream()
+                .map(KairnBreakthroughHandler::getRelicModel)
+                .filter(java.util.Objects::nonNull)
+                .map(relic -> relic.getRepresentationEmbed(false, true))
+                .toList();
+        MessageHelper.sendMessageToChannelWithEmbeds(
+                player.getCorrectChannel(),
+                FoWHelper.actorOrAnon(game, player, "A player") + " placed " + relics.size() + " relic"
+                        + (relics.size() == 1 ? "" : "s") + " on **Relic Trading Hub**.",
+                embeds);
     }
 
     public static Button getRelicsCardsInfoButton(Player player) {
@@ -58,12 +64,6 @@ public class KairnBreakthroughHandler {
                 buttons.add(Buttons.green(
                         owner.factionButtonChecker() + PURGE_AND_REPLACE + target.getFaction() + "|" + gainedRelic,
                         "Purge and Replace",
-                        ExploreEmojis.Relic));
-            }
-            if (owner.isBreakthroughExhausted("kairnbt")) {
-                buttons.add(Buttons.gray(
-                        owner.factionButtonChecker() + READY_BREAKTHROUGH,
-                        "Ready Relic Trading Hub",
                         ExploreEmojis.Relic));
             }
             buttons.add(Buttons.red(owner.factionButtonChecker() + "deleteButtons", "Decline"));
@@ -157,16 +157,6 @@ public class KairnBreakthroughHandler {
                     model.getRepresentationEmbed(false, true));
         }
         RelicHelper.resolveRelicEffects(event, game, target, relic);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(READY_BREAKTHROUGH)
-    public static void readyBreakthrough(ButtonInteractionEvent event, Player player) {
-        if (player != null && player.hasUnlockedBreakthrough("kairnbt") && player.isBreakthroughExhausted("kairnbt")) {
-            player.setBreakthroughExhausted("kairnbt", false);
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), player.getRepresentationNoPing() + " readied _Relic Trading Hub_.");
-        }
         ButtonHelper.deleteMessage(event);
     }
 

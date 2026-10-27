@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Guards against the same interaction-handler value being registered by more than one method.
  *
- * <p>{@link HandlerRegistry#register} does a plain {@code handlers.put(key, ...)} into a {@code HashMap}, so a second
+ * <p>{@link HandlerRegistry#register} does a plain {@code routes.put(key, ...)} into a {@code HashMap}, so a second
  * method declaring the same {@code value()} silently overwrites the first with no warning. When that happens, edits to
  * one copy have no effect and there is no way to tell which method the bot actually runs. This test fails the build if
  * any such duplicate exists.

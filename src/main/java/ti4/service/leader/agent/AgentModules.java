@@ -6,28 +6,28 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
-import ti4.service.leader.agent.modules.AugersAgent;
-import ti4.service.leader.agent.modules.BentorAgent;
-import ti4.service.leader.agent.modules.CymiaeAgent;
-import ti4.service.leader.agent.modules.GledgeAgent;
 import ti4.service.leader.agent.modules.HyperAgent;
-import ti4.service.leader.agent.modules.KhraskAgent;
-import ti4.service.leader.agent.modules.KortaliAgent;
-import ti4.service.leader.agent.modules.KyroAgent;
 import ti4.service.leader.agent.modules.MentakAgent;
-import ti4.service.leader.agent.modules.MirvedaAgent;
-import ti4.service.leader.agent.modules.NokarAgent;
 import ti4.service.leader.agent.modules.SardakkAgent;
-import ti4.service.leader.agent.modules.VadenAgent;
-import ti4.service.leader.agent.modules.VaylerianAgent;
-import ti4.service.leader.agent.modules.VeldyrAgent;
 import ti4.service.leader.agent.modules.WinnuAgent;
-import ti4.service.leader.agent.modules.ZelianAgent;
+import ti4.service.leader.agent.modules.homebrew.AugersAgent;
+import ti4.service.leader.agent.modules.homebrew.BentorAgent;
+import ti4.service.leader.agent.modules.homebrew.CymiaeAgent;
+import ti4.service.leader.agent.modules.homebrew.GledgeAgent;
+import ti4.service.leader.agent.modules.homebrew.KhraskAgent;
+import ti4.service.leader.agent.modules.homebrew.KortaliAgent;
+import ti4.service.leader.agent.modules.homebrew.KyroAgent;
+import ti4.service.leader.agent.modules.homebrew.MirvedaAgent;
+import ti4.service.leader.agent.modules.homebrew.NokarAgent;
+import ti4.service.leader.agent.modules.homebrew.VadenAgent;
+import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
+import ti4.service.leader.agent.modules.homebrew.VeldyrAgent;
+import ti4.service.leader.agent.modules.homebrew.ZelianAgent;
 
 @UtilityClass
-public class AgentModules {
+class AgentModules {
 
-    public static final List<AgentModule<?>> ALL = List.of(
+    static final List<AgentModule<?>> ALL = List.of(
             new AugersAgent(),
             new SardakkAgent(),
             new BentorAgent(),
@@ -48,7 +48,7 @@ public class AgentModules {
 
     private static final Map<String, AgentModule<?>> BY_ID = indexById(ALL);
 
-    public static Optional<AgentModule<?>> find(String agentId) {
+    static Optional<AgentModule<?>> find(String agentId) {
         if (agentId == null) {
             return Optional.empty();
         }

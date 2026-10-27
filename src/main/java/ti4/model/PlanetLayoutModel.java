@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
-import ti4.image.UnitTokenPosition;
 
 @Data
 public class PlanetLayoutModel {

@@ -56,7 +56,7 @@
       "WARFARE",
       "BIOTIC"
     ],
-    "text": "When you gain this breakthrough and at the start of each strategy phase, shuffle each relic on this card back into the deck. Then, draw 3 relics and place each relic on this card face down. You may look at the relics on this card at any time. After a player gains a relic, you may exhaust this card to purge that relic and give them 1 on this card or ready this card.",
+    "text": "When you gain this breakthrough and at the start of each strategy phase, shuffle each relic on this card back into the deck. Then, draw 3 relics and place each relic on this card. After a player gains a relic, you may exhaust this card to purge that relic and give them 1 on this card.",
     "source": "theodisi"
   },
   {
@@ -176,7 +176,7 @@
       "BIOTIC",
       "WARFARE"
     ],
-    "text": "When you spend a command token to perform the secondary effect of a strategy card, you may place 1 neutral infantry into coexistence on a non-fracture planet that contains your ground forces.\nOnce per action, when you win a ground combat, gain 2 trade goods.",
+    "text": "When you spend a command token to perform the secondary effect of a strategy card, you may place 1 neutral infantry into coexistence on a non-fracture non-legendary planet that contains your ground forces. Resolve combat on that planet.\nOnce per action, when you win a ground combat, gain 2 trade goods.",
     "source": "theodisi"
   },
   {
@@ -188,7 +188,7 @@
       "BIOTIC",
       "WARFARE"
     ],
-    "text": "When 1 or more of your units are destroyed, you may capture them.\nACTION: Return any number of your captured units to your reinforcements. Gain trade goods equal to half their combined cost (rounded down).",
+    "text": "When 1 or more of your units are destroyed, you may capture them.\nACTION: Exhaust this card to return any number of your captured units to your reinforcements. Gain trade goods equal to half their combined cost (rounded down).",
     "source": "theodisi"
   },
   {
@@ -200,7 +200,7 @@
       "PROPULSION",
       "BIOTIC"
     ],
-    "text": "During a transaction, you and the other player can include relics as part of a transaction. No “Gain” effects are triggered by this transaction.\nACTION: Exhaust this card and purge 1 relic to research a technology or explore 1 planet of each trait.\nUNLEASH: Remove 3 fragmentum tokens of different colors from your player sheet.",
+    "text": "ACTION: Purge 1 relic fragment in your play area and explore up to 1 planet of the same trait as that purged relic fragment. Then, you may gain 1 purged relic fragment of any other color.\n\n**UNLEASH**: Remove 2 fragmentum tokens of the same color from your player sheet.",
     "source": "theodisi"
   },
   {
@@ -209,18 +209,16 @@
     "shortName": "Refragment\nUnleashed",
     "faction": "stoneborn",
     "synergy": [
-      "PROPULSION",
-      "BIOTIC",
-      "CYBERNETIC",
-      "WARFARE"
+      "NONE"
     ],
-    "text": "During a transaction, you and the other player can include relics as part of a transaction. No “Gain” effects are triggered by this transaction.\nACTION: Exhaust this card and purge 1 relic to research a technology and explore 1 planet you control of each trait.",
+    "text": "ACTION: Purge 1 relic fragment in your play area and explore up to 1 planet of the same trait as that purged relic fragment. Then, you may gain 2 purged relic fragments of any other color.",
+    "notes": "This breakthrough has synergy with all technology types. Bot can't show 4 synergies on the model.",
     "source": "theodisi"
   },
   {
     "alias": "morphabt",
-    "name": "Metamorphic Transference",
-    "shortName": "Meta\nTransfer",
+    "name": "Metamorphic",
+    "shortName": "Meta\nmorphic",
     "faction": "morpha",
     "synergy": [
       "BIOTIC",

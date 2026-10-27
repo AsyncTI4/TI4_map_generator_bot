@@ -9,7 +9,7 @@ import ti4.service.leader.agent.TargetedAgent;
 
 public final class MentakAgent extends TargetedAgent {
 
-    public static final String ID = "mentakagent";
+    static final String ID = "mentakagent";
 
     public static String buttonId(Player pillaged) {
         return AgentButtonIds.format(ID, pillaged.getFaction());

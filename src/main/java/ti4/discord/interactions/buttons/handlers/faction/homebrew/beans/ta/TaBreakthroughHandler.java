@@ -11,7 +11,9 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Helper;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
 
@@ -75,7 +77,7 @@ public class TaBreakthroughHandler {
     }
 
     public static boolean canUseSafeHavensCoexistence(Game game, Player player, String planetName) {
-        if (game == null || player == null || !player.hasUnlockedBreakthrough(SAFE_HAVENS)) {
+        if (game == null || player == null || !player.hasReadyBreakthrough(SAFE_HAVENS)) {
             return false;
         }
         Tile tile = game.getTileFromPlanet(planetName);
@@ -83,6 +85,31 @@ public class TaBreakthroughHandler {
         return planet != null
                 && player.getPlanets().contains(planetName)
                 && TaAbilityHandler.planetHasAnyAttachment(tile, planetName);
+    }
+
+    public static Button getSafeHavensCoexistenceButton(Player player, String planetName) {
+        return Buttons.green(
+                player.factionButtonChecker() + "taSafeHavensCoexistence_" + planetName,
+                "Use Safe Havens",
+                player.getFactionEmoji());
+    }
+
+    @ButtonHandler("taSafeHavensCoexistence_")
+    public static void useSafeHavensCoexistence(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String planetName = buttonID.replace("taSafeHavensCoexistence_", "");
+        if (!canUseSafeHavensCoexistence(game, player, planetName)
+                || !ButtonHelperAbilities.resolveCoexistence(event, game, player, planetName)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        BreakthroughCommandHelper.exhaustBreakthrough(player, SAFE_HAVENS);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " forced their ground forces into coexistence on "
+                        + Helper.getPlanetRepresentation(planetName, game)
+                        + " with **Safe Havens**. That combat ends in a draw.");
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void clearSafeHavens(Game game) {

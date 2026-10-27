@@ -213,5 +213,69 @@
         "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction.ACTION: Purge 2 of your Mutagen cards and draw 1 random unused faction reference card. Gain 1 of that faction's unused non-unit faction technologies, agents or its alliance card.",
         "flavorText": "*Test 203411: The chaotic forces of the Throne of Pride's genetic material have been deemed entirely unfit for integration with Kryxos broods. Chaotic and unpredictable results make finding any meaningful results a futile effort.*",
         "source": "theodisi"
+    },
+    {
+        "id": "stonebornculturalfragment",
+        "name": "Stoneborn Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "This card is always considered a Cultural Relic Fragment. This card may be exchanged as part of a transaction. When this card is purged, return it to the Fragmentum relic fragment deck.",
+        "source": "theodisi"
+    },
+    {
+        "id": "stonebornhazardousfragment",
+        "name": "Stoneborn Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "This card is always considered a Hazardous Relic Fragment. This card may be exchanged as part of a transaction. When this card is purged, return it to the Fragmentum relic fragment deck.",
+        "source": "theodisi"
+    },
+    {
+        "id": "stonebornindustrialfragment",
+        "name": "Stoneborn Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "This card is always considered an Industrial Relic Fragment. This card may be exchanged as part of a transaction. When this card is purged, return it to the Fragmentum relic fragment deck.",
+        "source": "theodisi"
+    },
+    {
+        "id": "stonebornunknownfragment",
+        "name": "Stoneborn Unknown Relic Fragment",
+        "type": "Frontier",
+        "resolution": "Fragment",
+        "text": "This card may be considered a Relic Fragment of any type. This card may be exchanged as part of a transaction. When this card is purged, return it to the Fragmentum relic fragment deck.",
+        "source": "theodisi"
+    },
+    {
+        "id": "stonebornculturalfragment2",
+        "name": "Stoneborn Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "This card is always considered a Cultural Relic Fragment. This card may be exchanged as part of a transaction. When this card is purged, return it to the Fragmentum relic fragment deck.",
+        "source": "theodisi"
+    },
+    {
+        "id": "stonebornhazardousfragment2",
+        "name": "Stoneborn Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "This card is always considered a Hazardous Relic Fragment. This card may be exchanged as part of a transaction. When this card is purged, return it to the Fragmentum relic fragment deck.",
+        "source": "theodisi"
+    },
+    {
+        "id": "stonebornindustrialfragment2",
+        "name": "Stoneborn Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "This card is always considered an Industrial Relic Fragment. This card may be exchanged as part of a transaction. When this card is purged, return it to the Fragmentum relic fragment deck.",
+        "source": "theodisi"
+    },
+    {
+        "id": "stonebornunknownfragment2",
+        "name": "Stoneborn Unknown Relic Fragment",
+        "type": "Frontier",
+        "resolution": "Fragment",
+        "text": "This card may be considered a Relic Fragment of any type. This card may be exchanged as part of a transaction. When this card is purged, return it to the Fragmentum relic fragment deck.",
+        "source": "theodisi"
     }
 ]

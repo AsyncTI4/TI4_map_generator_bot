@@ -6,7 +6,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
-import ti4.helpers.TIGLHelper;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
@@ -27,10 +26,6 @@ public class DraftSetupService {
         // Load the general game settings
         boolean success = game.loadGameSettingsFromSettings(event, settings);
         if (!success) return "Fix the game settings before continuing";
-        if (game.isCompetitiveTIGLGame()) {
-            TIGLHelper.sendTIGLSetupText(game);
-        }
-
         DraftSpec specs = DraftSpec.createFromMiltySettings(settings);
 
         if (specs.getTemplate().isNucleusTemplate()) {
@@ -56,6 +51,9 @@ public class DraftSetupService {
         }
         if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
+        }
+        if (game.isLostLegaciesTiles()) {
+            sources.add(ComponentSource.theodisi);
         }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             sources.add(ComponentSource.thunders_edge);
@@ -152,10 +150,6 @@ public class DraftSetupService {
         // Game object setup and validation
         boolean success = game.loadGameSettingsFromSettings(event, settings);
         if (!success) return "Fix the game settings before continuing";
-        if (game.isCompetitiveTIGLGame()) {
-            TIGLHelper.sendTIGLSetupText(game);
-        }
-
         // Setup managers and game state
         DraftManager draftManager = game.getDraftManager();
         draftManager.resetForNewDraft();
@@ -175,6 +169,9 @@ public class DraftSetupService {
         }
         if (game.isUnchartedSpaceStuff()) {
             tileSources.add(ComponentSource.uncharted_space);
+        }
+        if (game.isLostLegaciesTiles()) {
+            tileSources.add(ComponentSource.theodisi);
         }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             tileSources.add(ComponentSource.thunders_edge);

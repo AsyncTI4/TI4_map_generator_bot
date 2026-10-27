@@ -1,7 +1,5 @@
 package ti4.discord.interactions.buttons.ids;
 
-import java.util.Arrays;
-import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 public final class AgentButtonIds {
@@ -37,10 +35,6 @@ public final class AgentButtonIds {
 
         public boolean hasPayload() {
             return !payload.isEmpty();
-        }
-
-        public List<String> segments() {
-            return hasPayload() ? Arrays.asList(payload.split(SEPARATOR)) : List.of();
         }
     }
 }

@@ -16,7 +16,6 @@ import ti4.discord.interactions.selections.SelectionMenuProcessor;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.migration.DataMigrationManager;
 import ti4.logging.BotLogger;
-import ti4.logging.RollbarManager;
 import ti4.settings.GlobalSettings;
 import ti4.spring.service.deploy.ActiveLeaseService;
 import ti4.spring.service.jda.JdaLifecycleService;
@@ -35,7 +34,6 @@ public class AsyncTI4DiscordBot {
 
     static void main(String[] args) {
         GlobalSettings.loadSettings();
-        RollbarManager.init();
         BotLogger.info("\n# __BOT IS STARTING UP__");
 
         ConfigurableApplicationContext applicationContext = SpringApplication.run(AsyncTI4DiscordBot.class, args);

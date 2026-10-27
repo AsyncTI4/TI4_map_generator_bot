@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.components.separator.Separator.Spacing;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
@@ -31,12 +32,12 @@ import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.PatternHelper;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
 import ti4.message.componentsV2.MessageV2Editor;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.franken.FrankenDraftBagService;
 import ti4.service.milty.MiltyDraftManager;
@@ -50,18 +51,8 @@ public class FrankenDrazDraft extends FrankenDraft {
     public static final String LOST_LEGACIES_FACTION_LIMITS_KEY = "frankenDrazLostLegaciesFactionLimits";
     private static final int DEFAULT_MONUMENT_LIMIT = 2;
     private static final int DEFAULT_FACTION_LIMIT = 6;
-    private static final Set<String> EXCLUDED_FACTIONS = Set.of(
-            "lazax",
-            "admins",
-            "franken",
-            "keleresm",
-            "keleresx",
-            "miltymod",
-            "qulane",
-            "neutral",
-            "obsidian",
-            "stoneborn",
-            "morpha");
+    private static final Set<String> EXCLUDED_FACTIONS =
+            Set.of("lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "obsidian");
     private static final List<DraftCategory> POST_DRAFT_COMPONENT_CATEGORIES = List.of(
             DraftCategory.ABILITY,
             DraftCategory.TECH,
@@ -296,7 +287,7 @@ public class FrankenDrazDraft extends FrankenDraft {
         }
     }
 
-    public static void sendFactionComponentCards(ButtonInteractionEvent event, Player player, String faction) {
+    public static void sendFactionComponentCards(GenericInteractionCreateEvent event, Player player, String faction) {
         FactionDraftItem item = new FactionDraftItem(faction);
         List<DraftItem> components = item.getComponents(player.getGame());
         if (components.isEmpty()) {
@@ -319,6 +310,25 @@ public class FrankenDrazDraft extends FrankenDraft {
         builder.send();
         MessageHelper.sendEphemeralMessageToEventChannel(
                 event, "Sent " + item.getShortDescription() + " components to your cards info thread.");
+    }
+
+    public static void sendFactionComponentCards(GenericInteractionCreateEvent event, String faction) {
+        FactionDraftItem item = new FactionDraftItem(faction);
+        List<DraftItem> components = item.getComponents(null);
+        if (components.isEmpty()) {
+            MessageHelper.sendMessageToEventChannel(event, "## " + item.getTitle(null) + " Components\nNone.");
+            return;
+        }
+
+        List<Color> accents = FrankenDraftBagService.getAccents();
+        MessageV2Builder builder = new MessageV2Builder(event.getMessageChannel());
+        builder.append("## " + item.getTitle(null) + " Components");
+        for (DraftItem component : components) {
+            List<ContainerChildComponent> cardComponents = new ArrayList<>(component.getTextDisplays(null, null, true));
+            builder.append(Container.of(cardComponents).withAccentColor(accents.getFirst()));
+            Collections.rotate(accents, -1);
+        }
+        builder.send();
     }
 
     @ButtonHandler(value = "frankenDrazCategory", save = false)
@@ -431,7 +441,7 @@ public class FrankenDrazDraft extends FrankenDraft {
     }
 
     private List<Container> buildPostDraftCategoryContainers(Player player, DraftCategory category) {
-        List<DraftItem> all = player.getDraftHand().getCategory(category);
+        List<DraftItem> all = player.getDraftHand().getDistinctCategory(category);
         if (all.isEmpty()) {
             return List.of();
         }

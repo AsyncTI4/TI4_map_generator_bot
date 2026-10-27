@@ -11,10 +11,11 @@ import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.SpinRingsHelper;
-import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.BoardPosition;
+import ti4.model.MapPositionMapper;
 
 /**
  * Using /spin commands, save spin settings and execute them manually or with
@@ -248,7 +249,8 @@ public class SpinService {
                     || steps.isEmpty()
                     || direction == null
                     || trigger == null
-                    || !PositionMapper.isTilePositionValid(center)) {
+                    || !MapPositionMapper.isTilePositionValid(center)
+                    || BoardPosition.isBoardPosition(center)) {
                 return false;
             }
             int smallestRing = ring.stream().min(Integer::compareTo).orElse(0);

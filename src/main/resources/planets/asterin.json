@@ -1,0 +1,30 @@
+{
+    "id": "asterin",
+    "tileId": "th36",
+    "name": "Asterin",
+    "aliases": [
+        "asterin"
+    ],
+    "resources": 0,
+    "influence": 2,
+    "planetTypes": [
+        "CULTURAL"
+    ],
+    "techSpecialties": [
+        "CYBERNETIC"
+    ],
+    "planetLayout": {
+        "unitHolderName": "asterin",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 128,
+            "y": 85
+        },
+        "planetRadius": 60
+    },
+    "positionInTile": {
+        "x": 128,
+        "y": 85
+    },
+    "source": "theodisi"
+}

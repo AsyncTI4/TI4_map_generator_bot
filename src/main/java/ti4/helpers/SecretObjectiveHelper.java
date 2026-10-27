@@ -11,13 +11,15 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
@@ -141,7 +143,9 @@ public class SecretObjectiveHelper {
                     StringBuilder message2 = new StringBuilder(player.getRepresentation() + " purged");
                     for (String fragId : fragmentsToPurge) {
                         player.removeFragment(fragId);
-                        game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+                        if (!StonebornAbilityHandler.returnPurgedFragment(game, fragId)) {
+                            game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+                        }
                         if (fragId.startsWith("supermassive")) {
                             ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, fragId);
                         }
@@ -155,6 +159,7 @@ public class SecretObjectiveHelper {
                             default -> message2.append(' ').append(fragId);
                         }
                     }
+                    StonebornAbilityHandler.offerFragmentumTokenPlacement(game, player, event, fragmentsToPurge);
                     CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
                     message2.append(" relic fragments.");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2.toString());
@@ -224,7 +229,7 @@ public class SecretObjectiveHelper {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
 
-        if (player.hasTech("tf-plausibled")) {
+        if (player.hasTech("tf-plausibled") || player.hasAbility("plausible_deniability_br")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
             buttons.add(Buttons.red("deleteButtons", "Done"));
@@ -258,6 +263,14 @@ public class SecretObjectiveHelper {
     }
 
     public static void showAll(Player player, Player player2, Game game) {
+        if (XinTechHandler.hasAstromanticCloakSteel(player) && player != player2) {
+            MessageHelper.sendMessageToChannel(
+                    player2.getCorrectChannel(),
+                    player2.getRepresentation()
+                            + ", you cannot look at " + player.getRepresentationNoPing() + "'s"
+                            + " Secret Objectives because they have _Astromantic Cloak (Steel)!");
+            return;
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(game.getName()).append('\n');
         sb.append("Player: ").append(player.getUserName()).append('\n');

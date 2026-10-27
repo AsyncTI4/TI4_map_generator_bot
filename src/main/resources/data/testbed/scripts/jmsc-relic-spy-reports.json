@@ -1,0 +1,15 @@
+{
+  "name": "jmsc-relic-spy-reports",
+  "description": "Spy Reports: Sol targets the non-neighbour Hacan and privately sees 2 random action cards; Hacan is told which.",
+  "preset": "jmsc-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "do": "hand", "as": "hacan", "hand": { "acs": 3 } },
+    { "expect": { "state": "sol.relics", "contains": "spyreportsjmsc" } },
+    { "as": "sol", "pressId": "FFCC_sol_componentActionRes_relic_spyreportsjmsc" },
+    { "as": "sol", "press": "thirtyKSpyTarget_hacan" },
+    { "expect": { "in": "sol:cards-info", "contains": "shows you these action cards" } },
+    { "expect": { "in": "hacan:cards-info", "contains": "used _Spy Reports_" } },
+    { "expect": { "state": "sol.exhaustedRelics", "contains": "spyreportsjmsc" } }
+  ]
+}

@@ -43,7 +43,7 @@ public class MapCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "Game";
+        return "Build and edit the map: tiles, hyperlanes, adjacencies and templates";
     }
 
     @Override

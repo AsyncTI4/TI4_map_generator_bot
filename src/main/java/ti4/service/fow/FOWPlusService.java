@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -33,9 +34,9 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.combat.StartCombatService;
@@ -63,12 +64,13 @@ public final class FOWPlusService {
     private static final String FOWPLUS_TAG = "FoW+";
     private static final String VOID_TILEID = "-1";
 
-    private static final String FOWPLUS_EXPLORE_DECK = "explores_fowplus";
+    public static final String FOWPLUS_EXPLORE_DECK = "explores_fowplus";
     private static final String FOWPLUS_EXPLORE_WAVE = "fowplus_wave";
     private static final String FOWPLUS_EXPLORE_VORTEX = "fowplus_vortex";
     private static final String FOWPLUS_EXPLORE_CLARITY = "fowplus_clarity";
     private static final String FOWPLUS_EXPLORE_FRACTURE = "fowplus_fracture";
     private static final String FOWPLUS_EXPLORE_SPOOR = "fowplus_spoor";
+    private static final String PREVIOUS_EXPLORE_DECK_KEY = "fowPlusPreviousExploreDeck";
     private static final String FOWPLUS_EXPLORE_SACRIFICE = "fowplus_sacrifice";
 
     public static final List<Pair<FOWOption, Boolean>> FORCED_FOWPLUS_OPTIONS = List.of(
@@ -88,16 +90,15 @@ public final class FOWPlusService {
         return game.getFowOption(FOWOption.FOW_PLUS);
     }
 
+    public static final String FOWPLUS_PLAY_CHANGES = """
+            - Can only activate tiles you can see (Blind Tile button to activate any other tile)
+            - Activating a tile without a tile is valid and will send ships into The Void
+            - Cannot remove tokens from tiles you cannot see
+            - Explore deck set to `explores_fowplus`""";
+
     public static void setActive(Game game, boolean active) {
-        game.setFowOption(FOWOption.FOW_PLUS, active);
-
         if (active) {
-            for (var option : FORCED_FOWPLUS_OPTIONS) {
-                game.setFowOption(option.getLeft(), option.getRight());
-            }
-            game.setExplorationDeckID(FOWPLUS_EXPLORE_DECK);
-            game.addTag(FOWPLUS_TAG);
-
+            enable(game);
             MessageHelper.sendMessageToChannel(GMService.getGMChannel(game), """
                     ### FoW+ mode activated. Following options are forced:
                     - No comms in agenda phase
@@ -107,17 +108,40 @@ public final class FOWPlusService {
                     - Hide unexplored (0b) map tiles
                     - Hide anchored player info areas
                     ### In addition, following changes are in effect:
-                    - Can only activate tiles you can see (Blind Tile button to activate any other tile)
-                    - Activating a tile without a tile is valid and will send ships into The Void
-                    - Cannot remove tokens from tiles you cannot see
-                    - Explore deck set to `explores_fowplus`""");
+                    """ + FOWPLUS_PLAY_CHANGES);
         } else {
-            game.removeTag(FOWPLUS_TAG);
-            MessageHelper.sendMessageToChannel(GMService.getGMChannel(game), """
-                    ### FoW+ mode disabled.
-                    Use `/fow fow_options` to reset options.
-                    Use `/game set_deck` to reset explore deck.""");
+            boolean deckRestored = disable(game);
+            MessageHelper.sendMessageToChannel(
+                    GMService.getGMChannel(game),
+                    "### FoW+ mode disabled.\nUse `/fow fow_options` to reset options.\n"
+                            + (deckRestored
+                                    ? "Explore deck set back to `" + game.getExplorationDeckID() + "`."
+                                    : "Use `/game set_deck` to reset explore deck."));
         }
+    }
+
+    public static void enable(Game game) {
+        game.setFowOption(FOWOption.FOW_PLUS, true);
+        for (var option : FORCED_FOWPLUS_OPTIONS) {
+            game.setFowOption(option.getLeft(), option.getRight());
+        }
+        if (!FOWPLUS_EXPLORE_DECK.equals(game.getExplorationDeckID())) {
+            game.setStoredValue(PREVIOUS_EXPLORE_DECK_KEY, game.getExplorationDeckID());
+        }
+        game.setExplorationDeckID(FOWPLUS_EXPLORE_DECK);
+        game.addTag(FOWPLUS_TAG);
+    }
+
+    static boolean disable(Game game) {
+        game.setFowOption(FOWOption.FOW_PLUS, false);
+        game.removeTag(FOWPLUS_TAG);
+        String previousDeck = game.getStoredValue(PREVIOUS_EXPLORE_DECK_KEY);
+        if (!FOWPLUS_EXPLORE_DECK.equals(game.getExplorationDeckID()) || StringUtils.isBlank(previousDeck)) {
+            return false;
+        }
+        game.setExplorationDeckID(previousDeck);
+        game.removeStoredValue(PREVIOUS_EXPLORE_DECK_KEY);
+        return true;
     }
 
     public static boolean canActivatePosition(String position, Player player, Game game, Set<String> visiblePositions) {
@@ -160,13 +184,18 @@ public final class FOWPlusService {
         String origMessageId = event.getModalId().replace("blindActivation_", "");
         String position = event.getValue(Constants.POSITION).getAsString().trim();
 
-        if (!PositionMapper.isTilePositionValid(position)) {
+        if (!MapPositionMapper.isTilePositionValid(position)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Position " + position + " is invalid.");
             return;
         }
 
         String targetPosition = position;
         Tile tile = game.getTileByPosition(targetPosition);
+        if (!isActive(game) && !ButtonHelper.canActivateTile(game, player, tile)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "You cannot activate position " + position + ".");
+            return;
+        }
         if (tile == null) {
             tile = voidTile(targetPosition);
         }
@@ -268,11 +297,11 @@ public final class FOWPlusService {
     }
 
     // Hide explore and relic decks
-    public static boolean deckInfoAvailable(Player player, Game game) {
-        if (!isActive(game) && !game.getFowOption(FOWOption.HIDE_EXPLORES)
-                || game.getPlayersWithGMRole().contains(player)) return true;
+    public static boolean deckInfoAvailable(Game game, @Nullable String viewerId, MessageChannel channel) {
+        if (!isActive(game) && !game.getFowOption(FOWOption.HIDE_EXPLORES) || FoWHelper.isGameMaster(viewerId, game))
+            return true;
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Deck info not available.");
+        MessageHelper.sendMessageToChannel(channel, "Deck info not available.");
         return false;
     }
 
@@ -308,7 +337,7 @@ public final class FOWPlusService {
             case FOWPLUS_EXPLORE_VORTEX:
                 AddTokenCommand.addToken(event, tile, "vortex", game);
                 FoWHelper.pingSystem(game, tile.getPosition(), "Space warps unnaturally.");
-                int nonCarriedFF = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false)[4];
+                int nonCarriedFF = ButtonHelper.fleetAndCapacity(player, game, tile, false)[4];
                 if (nonCarriedFF > 0) {
                     RemoveUnitService.removeUnit(
                             event, tile, game, player, tile.getSpaceUnitHolder(), UnitType.Fighter, nonCarriedFF);

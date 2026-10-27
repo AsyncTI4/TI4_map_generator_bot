@@ -12,7 +12,7 @@ import ti4.ResourceHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.image.io.ImageResources;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -142,7 +142,7 @@ class ColorModelTest extends BaseTi4Test {
                 Mapper.getControlID(color.getAlias()),
                 Mapper.getSweepID(color.getAlias()));
         for (String id : tokenIDs) {
-            String path = Mapper.getCCPath(id);
+            String path = ImageResources.commandToken(id);
             assertNotNull(path, "Could not find token file: " + id);
         }
     }

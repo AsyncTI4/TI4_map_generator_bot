@@ -1,0 +1,27 @@
+{
+    "id": "aureolestation",
+    "tileId": "th24",
+    "name": "Aureole Station",
+    "aliases": [
+        "aureole",
+        "aureolestation"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": [
+        "SPACESTATION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "aureolestation",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 79
+        }
+    },
+    "positionInTile": {
+        "x": 136,
+        "y": 79
+    },
+    "source": "theodisi"
+}

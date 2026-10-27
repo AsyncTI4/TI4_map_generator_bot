@@ -15,10 +15,6 @@ public interface AgentModule<P> {
 
     String displayName();
 
-    default String cardName(boolean viaYssaril) {
-        return AgentNames.cardName(displayName(), viaYssaril);
-    }
-
     Optional<P> decode(Game game, Player user, String payload);
 
     default String exhaustAnnouncement(AgentUse<P> use) {

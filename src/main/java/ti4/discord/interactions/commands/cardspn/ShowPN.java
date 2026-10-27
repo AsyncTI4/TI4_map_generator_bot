@@ -13,13 +13,13 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 class ShowPN extends GameStateSubcommand {
 
     public ShowPN() {
-        super(Constants.SHOW_PN, "Show Promissory Note to player", true, true);
+        super(Constants.SHOW_PN, "Show one of your Promissory Notes to a player", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER,
                         Constants.PROMISSORY_NOTE_ID,

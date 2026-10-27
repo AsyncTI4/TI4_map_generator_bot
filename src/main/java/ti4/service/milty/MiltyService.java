@@ -22,12 +22,11 @@ import ti4.game.Tile;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.TIGLHelper;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.rules.ThundersEdgeRulesService;
 
@@ -70,9 +69,6 @@ public class MiltyService {
                 Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,
                 Boolean.toString(
                         settings.getSourceSettings().getEchoesOfYggdrasil().isVal()));
-        if (game.isCompetitiveTIGLGame()) {
-            TIGLHelper.sendTIGLSetupText(game);
-        }
 
         MiltyDraftSpec specs = MiltyDraftSpec.fromSettings(settings);
 
@@ -95,6 +91,9 @@ public class MiltyService {
         }
         if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
+        }
+        if (game.isLostLegaciesTiles()) {
+            sources.add(ComponentSource.theodisi);
         }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             sources.add(ComponentSource.thunders_edge);
@@ -180,8 +179,9 @@ public class MiltyService {
         }
 
         game.clearTileMap();
+        boolean mapChanged = false;
         try {
-            MiltyDraftHelper.buildPartialMap(game, event);
+            mapChanged = MiltyDraftHelper.buildPartialMap(game);
         } catch (Exception e) {
             // Ignore
         }
@@ -194,17 +194,22 @@ public class MiltyService {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "### You are using preset slices!! Starting the draft right away!");
             specs.presetSlices.forEach(draftManager::addSlice);
+            MiltyDraftEventRecorder.recordStarted(game, draftManager);
             MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), startMsg);
-            boolean slicesCreated = GenerateSlicesService.generateSlices(event, draftManager, specs);
-            if (!slicesCreated) {
+            GenerateSlicesService.Result result = GenerateSlicesService.generateSlices(event, draftManager, specs);
+            if (result.impossibleReason() != null) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(), result.impossibleSettingsMessage(specs.numSlices));
+            } else if (!result.slicesCreated()) {
                 String msg = "Generating slices was too hard so I gave up.... Please try again.";
                 if (specs.numSlices == maxSlices) {
                     msg += "\n*...and maybe consider asking for fewer slices*";
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             } else {
+                MiltyDraftEventRecorder.recordStarted(game, draftManager);
                 MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
 
                 game.setPhaseOfGame("miltydraft");
@@ -227,6 +232,9 @@ public class MiltyService {
                     }
                 }
             }
+        }
+        if (mapChanged) {
+            ButtonHelper.updateMap(game, event);
         }
         return null;
     }
@@ -406,11 +414,11 @@ public class MiltyService {
         String pos = "tr";
         for (List<String> positions : CollectionUtils.permutations(List.of("tl", "tr", "bl", "br"))) {
             boolean acceptable = true;
-            Point center = PositionMapper.getTilePosition("000");
+            Point center = MapPositionMapper.getTilePosition("000");
             for (int x = 0; x < tilesWithAnchors.size(); x++) {
                 String xAnchorPos = tilesWithAnchors.get(x).pos();
                 if (xAnchorPos != null) {
-                    Point anchor = PositionMapper.getTilePosition(xAnchorPos);
+                    Point anchor = MapPositionMapper.getTilePosition(xAnchorPos);
                     String corner = positions.get(x);
                     acceptable &= switch (corner) {
                         case "tl" -> anchor.x <= center.x && anchor.y <= center.y;

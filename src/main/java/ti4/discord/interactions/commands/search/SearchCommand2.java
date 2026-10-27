@@ -36,7 +36,7 @@ public class SearchCommand2 implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "Search game component descriptions";
+        return "Search commands, decks, events, factions, strategy cards, sources, emojis, titles";
     }
 
     @Override

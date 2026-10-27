@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -11,9 +12,10 @@ import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
-import ti4.image.TileHelper;
+import ti4.model.BoardPosition;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
+import ti4.model.TileHelper;
 import ti4.service.fow.FOWPlusService;
 
 @UtilityClass
@@ -171,7 +173,9 @@ public class RegexHelper {
 
     /** @return group matching any legal tile position in the bot */
     public static String posRegex(String group) {
-        return regexBuilder(group, PositionMapper.getTilePositions());
+        List<String> positions = new ArrayList<>(MapPositionMapper.getTilePositions());
+        positions.add(BoardPosition.REGEX);
+        return regexBuilder(group, positions);
     }
 
     /** @return group "pos" matching any legal tile position in the bot */

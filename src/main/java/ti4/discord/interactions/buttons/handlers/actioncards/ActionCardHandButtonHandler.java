@@ -9,7 +9,8 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -18,14 +19,15 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
+import ti4.helpers.HydromorphicHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
-import ti4.service.leader.agent.modules.CymiaeAgent;
+import ti4.service.leader.agent.modules.homebrew.CymiaeAgent;
 import ti4.service.turn.StartTurnService;
 
 @UtilityClass
@@ -35,6 +37,15 @@ class ActionCardHandButtonHandler {
     static void getACFrom(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String faction = buttonID.replace("getACFrom_", "");
         Player victim = game.getPlayerFromColorOrFaction(faction);
+        if (victim == null || XinTechHandler.hasAstromanticCloakSteel(victim)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", you cannot forcibly take "
+                            + (victim == null ? "that player's" : victim.getRepresentationNoPing() + "'s")
+                            + " Action Cards.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         List<Button> buttons = ButtonHelperFactionSpecific.getButtonsToTakeSomeonesAC(player, victim);
         ActionCardHelper.showAll(victim, player, game);
         MessageHelper.sendMessageToChannelWithButtons(
@@ -62,6 +73,14 @@ class ActionCardHandButtonHandler {
         int acIndex = Integer.parseInt(stripped.split("_")[0]);
         String receiverFaction = stripped.split("_")[1];
         Player receiver = game.getPlayerFromColorOrFaction(receiverFaction);
+        if (XinTechHandler.hasAstromanticCloakSteel(player)) {
+            MessageHelper.sendMessageToChannel(
+                    receiver == null ? event.getMessageChannel() : receiver.getCorrectChannel(),
+                    "You cannot forcibly take " + player.getRepresentationNoPing()
+                            + "'s Action Cards because they have _Astromantic Cloak (Steel)_!");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         if (receiver == null || !player.getActionCards().containsValue(acIndex)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Could not resolve, please resolve manually.");
@@ -92,6 +111,7 @@ class ActionCardHandButtonHandler {
         boolean drawReplacement = false;
         boolean retainButtons = false;
         boolean arvaxiCommander = false;
+        boolean drawHydromorphic = false;
         if (acIndex.contains("stall")) {
             acIndex = acIndex.replace("stall", "");
             stalling = true;
@@ -107,6 +127,14 @@ class ActionCardHandButtonHandler {
         if (acIndex.endsWith("arvaxicommander")) {
             acIndex = acIndex.replace("arvaxicommander", "");
             arvaxiCommander = true;
+        }
+        if (acIndex.endsWith("hydromorphic")) {
+            acIndex = acIndex.replace("hydromorphic", "");
+            drawHydromorphic = true;
+        }
+        if (drawHydromorphic && !player.hasTech("thmorphag")) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "You do not have Synaptic Relays.");
+            return;
         }
 
         MessageChannel channel = game.getMainGameChannel() != null ? game.getMainGameChannel() : actionsChannel;
@@ -157,6 +185,13 @@ class ActionCardHandButtonHandler {
             if (drawReplacement) {
                 ActionCardHelper.drawActionCards(player, 1);
             }
+            if (drawHydromorphic) {
+                HydromorphicHelper.draw(game, player, 1);
+                ActionCardHelper.drawActionCards(player, 1);
+                List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, "Please choose an action or end your turn.", systemButtons);
+            }
             ButtonHelper.checkACLimit(game, player);
             if (!retainButtons) {
                 ButtonHelper.deleteMessage(event);
@@ -194,6 +229,11 @@ class ActionCardHandButtonHandler {
     // TODO: bake this into /ac play
     @ButtonHandler(Constants.AC_PLAY_FROM_HAND)
     static void acPlayFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        if (player.hasAbility("hydromorphic")) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "You cannot use Action Card effects while you have Hydromorphic.");
+            return;
+        }
         String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
         MessageChannel channel = game.getMainGameChannel();
         if (ActionCardHelper.isSabotageOrShatter(acID)) {

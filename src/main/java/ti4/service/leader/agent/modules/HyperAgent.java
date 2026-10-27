@@ -9,7 +9,7 @@ import ti4.service.leader.agent.TargetedAgent;
 
 public final class HyperAgent extends TargetedAgent {
 
-    public static final String ID = "hyperagent";
+    static final String ID = "hyperagent";
     private static final String GENOME = "_Hyper Genome_";
 
     @Override
@@ -20,11 +20,6 @@ public final class HyperAgent extends TargetedAgent {
     @Override
     public String displayName() {
         return GENOME;
-    }
-
-    @Override
-    public String cardName(boolean viaYssaril) {
-        return viaYssaril ? "Clever Clever " + GENOME : GENOME;
     }
 
     @Override

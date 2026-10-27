@@ -25,8 +25,9 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.image.io.ImageResources;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.planet.PlanetService;
 
 public class AddTokenCommand extends AddRemoveTokenCommand {
@@ -52,13 +53,13 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
     public static void addToken(GenericInteractionCreateEvent event, Tile tile, String tokenName, Game game) {
         MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();
         String tokenFileName = Mapper.getAttachmentImagePath(tokenName);
-        String tokenPath = Tile.getAttachmentPath(tokenFileName);
+        String tokenPath = ImageResources.attachment(tokenFileName);
         if (tokenFileName != null && tokenPath != null) {
             addToken(event, tile, tokenFileName, true, game);
         } else {
             tokenName = AliasHandler.resolveToken(tokenName);
             tokenFileName = Mapper.getTokenID(tokenName);
-            tokenPath = Tile.getTokenPath(tokenFileName);
+            tokenPath = ImageResources.tokenOrAttachment(tokenFileName);
 
             if (tokenPath == null) {
                 MessageHelper.sendMessageToChannel(channel, "Token: " + tokenName + " is not valid");

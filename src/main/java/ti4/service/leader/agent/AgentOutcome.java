@@ -35,13 +35,6 @@ public record AgentOutcome(List<Message> messages, String pressedMessageEdit) {
         return new AgentOutcome(combined, pressedMessageEdit);
     }
 
-    public AgentOutcome and(AgentOutcome other) {
-        List<Message> combined = new ArrayList<>(messages);
-        combined.addAll(other.messages());
-        String edit = other.pressedMessageEdit() != null ? other.pressedMessageEdit() : pressedMessageEdit;
-        return new AgentOutcome(combined, edit);
-    }
-
     public AgentOutcome withPressedMessageEdit(String text) {
         return new AgentOutcome(messages, text);
     }

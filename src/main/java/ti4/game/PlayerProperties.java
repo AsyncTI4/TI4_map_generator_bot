@@ -28,6 +28,7 @@ public class PlayerProperties {
     private String decalSet;
     private String notes = "";
     private String fogFilter;
+    private boolean fogGhostHexes = true;
 
     // Channels & IDs
     private @Nullable String roleIDForCommunity;
@@ -38,6 +39,7 @@ public class PlayerProperties {
     // State and settings
     private boolean passed;
     private boolean readyToPassBag;
+    private boolean oplusplusCouncilConfirmed;
     private boolean searchWarrant;
     private boolean dummy;
     private boolean npc;
@@ -93,6 +95,7 @@ public class PlayerProperties {
     // Firmament Plots
     private final Map<String, Integer> plotCards = new LinkedHashMap<>();
     private final Map<String, List<String>> plotCardsFactions = new LinkedHashMap<>();
+    private final Map<String, Integer> hydromorphicCards = new LinkedHashMap<>();
 
     // Stat tracking
     private int sarweenCounter;

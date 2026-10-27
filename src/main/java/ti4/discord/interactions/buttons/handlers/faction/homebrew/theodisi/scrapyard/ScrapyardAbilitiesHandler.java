@@ -23,9 +23,9 @@ import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.UnitEmojis;
@@ -102,14 +102,15 @@ public class ScrapyardAbilitiesHandler {
             return;
         }
 
-        List<Button> buttons = CUSTOM_RIGS.stream()
+        List<Button> buttons = new ArrayList<>(CUSTOM_RIGS.stream()
                 .filter(player::hasAbility)
                 .filter(rig -> !player.getExhaustedAbilities().contains(rig))
                 .map(rig -> Buttons.green(
                         player.factionButtonChecker() + USE_RIG + rig,
                         "Use " + Mapper.getAbility(rig).getName()))
-                .toList();
+                .toList());
         if (!buttons.isEmpty()) {
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", you may exhaust one or more Custom Rigs for this tactical action:",

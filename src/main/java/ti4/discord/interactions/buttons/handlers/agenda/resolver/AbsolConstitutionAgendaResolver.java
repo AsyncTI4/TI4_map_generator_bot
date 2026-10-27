@@ -5,9 +5,9 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.game.Game;
 import ti4.helpers.AgendaHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
+import ti4.model.Mapper;
 
 public class AbsolConstitutionAgendaResolver implements ForAgainstAgendaResolver {
     @Override

@@ -6,9 +6,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.model.LeaderModel;
-import ti4.service.leader.agent.modules.AugersAgent;
+import ti4.model.Mapper;
+import ti4.service.leader.agent.modules.homebrew.AugersAgent;
 import ti4.testUtils.BaseTi4Test;
 
 class AgentModulesTest extends BaseTi4Test {
@@ -39,19 +39,5 @@ class AgentModulesTest extends BaseTi4Test {
     void refusesTwoModulesForTheSameAgent() {
         assertThatThrownBy(() -> AgentModules.indexById(List.of(new AugersAgent(), new AugersAgent())))
                 .isInstanceOf(IllegalStateException.class);
-    }
-
-    @Test
-    void namesTheAgentOnceForBothTheRealCardAndAYssarilCopy() {
-        assertThat(AgentNames.cardName("Clodho, the Ilyxum", false)).isEqualTo("Clodho, the Ilyxum agent");
-        assertThat(AgentNames.cardName("Clodho, the Ilyxum", true))
-                .isEqualTo("Clever Clever Clodho, the Ilyxum/Yssaril agent");
-    }
-
-    @Test
-    void onlyAnExhaustedYssarilAgentStandingInForAnotherAgentIsACopy() {
-        assertThat(AgentNames.isYssarilCopy("yssarilagent", "augersagent")).isTrue();
-        assertThat(AgentNames.isYssarilCopy("augersagent", "augersagent")).isFalse();
-        assertThat(AgentNames.isYssarilCopy("yssarilagent", "yssarilagent")).isFalse();
     }
 }

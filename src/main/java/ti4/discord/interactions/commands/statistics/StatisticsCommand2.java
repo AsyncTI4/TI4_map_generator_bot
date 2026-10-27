@@ -19,6 +19,7 @@ public class StatisticsCommand2 implements ParentCommand {
                     new SliceTileWinRates(),
                     new PlanetWinRates(),
                     new SupportWinRates(),
+                    new ScoringStats(),
                     new StellarConverterStatistics(),
                     new FactionRecordOfTech(),
                     new FactionRecordOfSCPick(),
@@ -32,7 +33,7 @@ public class StatisticsCommand2 implements ParentCommand {
     }
 
     public String getDescription() {
-        return "Statistics";
+        return "Faction and component statistics: win rates, tech, strategy cards, colors";
     }
 
     @Override

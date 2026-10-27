@@ -25,8 +25,10 @@
     "planetType": "INDUSTRIAL",
     "cardImagePath": null,
     "techSpecialties": null,
-    "legendaryAbilityName": "placeholder",
-    "legendaryAbilityText": "foo bar",
+    "legendaryAbilityName": "Transgravity Conduit",
+    "legendaryAbilityText": "After you activate a system you may exhaust this card during the \"Movement\" step of your tactical action to ignore the effects of an anomaly.",
+    "legendaryAbilityFlavourText": "A cosmic electromagnetic pocket of near-limitless energy.",
+    "legendaryNotes": "Choose the anomaly when you use the ability; its effects are ignored for the rest of this tactical action.",
     "unitPositions": {
         "unitHolderName": "horace",
         "coordinateMap": {

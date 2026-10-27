@@ -12,4 +12,5 @@ public record GameEventDto(
         long timestamp,
         JsonNode payload,
         @JsonInclude(JsonInclude.Include.NON_NULL) String mapState,
-        @JsonInclude(JsonInclude.Include.NON_NULL) String movementState) {}
+        @JsonInclude(JsonInclude.Include.NON_NULL) String movementState,
+        @JsonInclude(JsonInclude.Include.NON_NULL) String playerState) {}

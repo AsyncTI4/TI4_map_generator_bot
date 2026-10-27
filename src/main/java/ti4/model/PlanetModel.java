@@ -14,8 +14,6 @@ import net.dv8tion.jda.api.entities.sticker.Sticker;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.JdaService;
 import ti4.helpers.Stickers;
-import ti4.image.TileHelper;
-import ti4.image.UnitTokenPosition;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechSpecialtyModel.TechSpecialty;
@@ -146,6 +144,10 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(name).orElse("");
     }
 
+    private String getImageAltText() {
+        return Optional.ofNullable(name).orElse(id);
+    }
+
     public String getNameRepresentation() {
         return getEmoji() + " _" + name + "_ " + getPlanetTypeEmoji();
     }
@@ -193,7 +195,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (includeAliases) sb.append("\nAliases: ").append(aliases);
         eb.setFooter(sb.toString());
 
-        if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL());
+        if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL(), getImageAltText());
 
         return eb.build();
     }
@@ -212,7 +214,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (legendaryNotes != null) {
             eb.setDescription(legendaryAbilityText + "\n-# [" + legendaryNotes + "]");
         }
-        if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL());
+        if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL(), getImageAltText());
         return eb.build();
     }
 

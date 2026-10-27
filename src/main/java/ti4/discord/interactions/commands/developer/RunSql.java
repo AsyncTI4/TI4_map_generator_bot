@@ -14,7 +14,7 @@ import ti4.spring.service.developer.RunSqlService;
 class RunSql extends Subcommand {
 
     RunSql() {
-        super("run_sql", "Run SQL directly against the SQLite database.");
+        super("run_sql", "Run SQL directly against the PostgreSQL database.");
         addOptions(
                 new OptionData(OptionType.STRING, "sql", "The SQL query or statement to execute.").setRequired(true));
     }

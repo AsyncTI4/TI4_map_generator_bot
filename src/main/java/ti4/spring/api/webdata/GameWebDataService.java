@@ -90,7 +90,7 @@ public class GameWebDataService {
 
         Map<String, WebScoreBreakdown> playerScoreBreakdowns = new HashMap<>();
         for (Player player : game.getRealPlayersNNeutral()) {
-            playerScoreBreakdowns.put(player.getFaction(), WebScoreBreakdown.fromPlayer(player, game));
+            playerScoreBreakdowns.put(player.getFaction(), WebScoreBreakdown.fromPlayer(player, game, webObjectives));
         }
 
         List<WebLaw> lawsInPlay = new ArrayList<>();
