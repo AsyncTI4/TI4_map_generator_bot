@@ -2,6 +2,7 @@ package ti4.service.leader.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static ti4.service.leader.agent.modules.AgentModuleFixture.NOT_AN_AGENT_MODULE;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ class AgentModulesTest extends BaseTi4Test {
         assertThat(AgentModules.find("augersagent")).containsInstanceOf(AugersAgent.class);
         assertThat(AgentModules.find("AugersAgent")).containsInstanceOf(AugersAgent.class);
         // Unmigrated agents must fall through to the legacy exhaustAgent branches.
-        assertThat(AgentModules.find("hacanagent")).isEmpty();
+        assertThat(AgentModules.find(NOT_AN_AGENT_MODULE)).isEmpty();
         assertThat(AgentModules.find(null)).isEmpty();
     }
 

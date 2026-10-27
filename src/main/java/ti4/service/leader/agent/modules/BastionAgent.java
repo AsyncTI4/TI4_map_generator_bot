@@ -34,6 +34,6 @@ public final class BastionAgent extends TargetedAgent {
                         ", please choose the unit that should be galvanized.",
                         GalvanizeService.getToggleGalvanizeButtons(
                                 target, use.game(), activeSystem(use.game()).orElseThrow())),
-                Message.addressedTo(target, " has no units that can be galvanized in the active system."));
+                use.noteToUser(target, " has no units that can be galvanized in the active system."));
     }
 }

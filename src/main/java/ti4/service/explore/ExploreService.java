@@ -524,7 +524,7 @@ public class ExploreService {
                     buttons.add(AugersAgent.button(p2, player));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
                     String msg2 = p2.getRepresentationUnfogged() + " you may use "
-                            + AgentLifecycle.agentNameFor(game, p2, "augersagent") + ", on "
+                            + AgentLifecycle.agentNameForHolder(game, p2, "augersagent") + ", on "
                             + player.getFactionEmojiOrColor() + " to give them 2 trade goods.";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg2, buttons);
                 }

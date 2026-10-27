@@ -7,21 +7,29 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
+import ti4.service.leader.agent.modules.ArborecAgent;
 import ti4.service.leader.agent.modules.ArtunoAgent;
 import ti4.service.leader.agent.modules.BastionAgent;
+import ti4.service.leader.agent.modules.CabalAgent;
+import ti4.service.leader.agent.modules.DeepwroughtAgent;
 import ti4.service.leader.agent.modules.EmpyreanAgent;
 import ti4.service.leader.agent.modules.ExhaustOnlyAgents;
 import ti4.service.leader.agent.modules.GhostAgent;
+import ti4.service.leader.agent.modules.HacanAgent;
 import ti4.service.leader.agent.modules.JolNarAgent;
 import ti4.service.leader.agent.modules.KeleresAgent;
 import ti4.service.leader.agent.modules.LetnevAgent;
 import ti4.service.leader.agent.modules.MentakAgent;
+import ti4.service.leader.agent.modules.MuaatAgent;
 import ti4.service.leader.agent.modules.NaazAgent;
+import ti4.service.leader.agent.modules.NekroAgent;
 import ti4.service.leader.agent.modules.ObsidianAgent;
 import ti4.service.leader.agent.modules.RalNelAgent;
+import ti4.service.leader.agent.modules.RebellionAgent;
 import ti4.service.leader.agent.modules.SardakkAgent;
 import ti4.service.leader.agent.modules.SolAgent;
 import ti4.service.leader.agent.modules.WinnuAgent;
+import ti4.service.leader.agent.modules.XxchaAgent;
 import ti4.service.leader.agent.modules.homebrew.AeternaAgent;
 import ti4.service.leader.agent.modules.homebrew.ArdentiaAgent;
 import ti4.service.leader.agent.modules.homebrew.AugersAgent;
@@ -34,6 +42,8 @@ import ti4.service.leader.agent.modules.homebrew.HomebrewExhaustOnlyAgents;
 import ti4.service.leader.agent.modules.homebrew.IronAgent;
 import ti4.service.leader.agent.modules.homebrew.KaloraAgent;
 import ti4.service.leader.agent.modules.homebrew.KhraskAgent;
+import ti4.service.leader.agent.modules.homebrew.KjalengardAgent;
+import ti4.service.leader.agent.modules.homebrew.KolleccAgent;
 import ti4.service.leader.agent.modules.homebrew.KolumeAgent;
 import ti4.service.leader.agent.modules.homebrew.KortaliAgent;
 import ti4.service.leader.agent.modules.homebrew.KryxosAgent;
@@ -44,7 +54,9 @@ import ti4.service.leader.agent.modules.homebrew.MirvedaAgent;
 import ti4.service.leader.agent.modules.homebrew.MortheusAgent;
 import ti4.service.leader.agent.modules.homebrew.MykoMentoriAgent;
 import ti4.service.leader.agent.modules.homebrew.NokarAgent;
+import ti4.service.leader.agent.modules.homebrew.OlradinAgent;
 import ti4.service.leader.agent.modules.homebrew.OnyxxaAgent;
+import ti4.service.leader.agent.modules.homebrew.PharadnAgent;
 import ti4.service.leader.agent.modules.homebrew.RohDhnaAgent;
 import ti4.service.leader.agent.modules.homebrew.SarcosaAgent;
 import ti4.service.leader.agent.modules.homebrew.TaAgent;
@@ -120,7 +132,19 @@ class AgentModules {
                             new VeylorAgent(),
                             new TaAgent(),
                             new VanguardAgent(),
-                            new SarcosaAgent()),
+                            new SarcosaAgent(),
+                            new NekroAgent(),
+                            new HacanAgent(),
+                            new CabalAgent(),
+                            new XxchaAgent(),
+                            new RebellionAgent(),
+                            new MuaatAgent(),
+                            new ArborecAgent(),
+                            new DeepwroughtAgent(),
+                            new KolleccAgent(),
+                            new PharadnAgent(),
+                            new OlradinAgent(),
+                            new KjalengardAgent()),
                     ExhaustOnlyAgents.ALL,
                     HomebrewExhaustOnlyAgents.ALL)
             .<AgentModule<?>>flatMap(List::stream)

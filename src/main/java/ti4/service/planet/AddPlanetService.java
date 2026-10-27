@@ -614,7 +614,7 @@ public class AddPlanetService {
             buttons.add(VaylerianAgent.button(player));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             String msg2 = player.getRepresentationUnfogged() + " you may use "
-                    + AgentLifecycle.agentNameFor(game, player, "vaylerianagent") + ", to draw 1 action card.";
+                    + AgentLifecycle.agentNameForHolder(game, player, "vaylerianagent") + ", to draw 1 action card.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons);
         }
         if (game.getActivePlayerID() != null

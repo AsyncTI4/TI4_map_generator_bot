@@ -6,18 +6,18 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.game.Game;
 import ti4.game.Player;
 
-public record AgentOutcome(List<Message> messages, String pressedMessageEdit) {
+public record AgentOutcome(List<Message> messages, String pressedMessageEdit, boolean deletesPressedMessage) {
 
     public AgentOutcome {
         messages = List.copyOf(messages);
     }
 
     public static AgentOutcome none() {
-        return new AgentOutcome(List.of(), null);
+        return new AgentOutcome(List.of(), null, false);
     }
 
     public static AgentOutcome of(Message... messages) {
-        return new AgentOutcome(List.of(messages), null);
+        return new AgentOutcome(List.of(messages), null, false);
     }
 
     public static AgentOutcome notifyInFog(Game game, Player primary, String message, Player affected) {
@@ -40,11 +40,15 @@ public record AgentOutcome(List<Message> messages, String pressedMessageEdit) {
     public AgentOutcome and(Message message) {
         List<Message> combined = new ArrayList<>(messages);
         combined.add(message);
-        return new AgentOutcome(combined, pressedMessageEdit);
+        return new AgentOutcome(combined, pressedMessageEdit, deletesPressedMessage);
     }
 
     public AgentOutcome withPressedMessageEdit(String text) {
-        return new AgentOutcome(messages, text);
+        return new AgentOutcome(messages, text, deletesPressedMessage);
+    }
+
+    public AgentOutcome deletingPressedMessage() {
+        return new AgentOutcome(messages, pressedMessageEdit, true);
     }
 
     public record Message(
@@ -57,6 +61,7 @@ public record AgentOutcome(List<Message> messages, String pressedMessageEdit) {
 
         public enum Route {
             REPLY,
+            EVERYONE,
             CARDS_INFO_THREAD
         }
 
@@ -82,6 +87,10 @@ public record AgentOutcome(List<Message> messages, String pressedMessageEdit) {
 
         public Message inCardsInfoThread() {
             return new Message(recipient, text, buttons, Route.CARDS_INFO_THREAD, namesRecipient, pagedButtons);
+        }
+
+        public Message forEveryone() {
+            return new Message(recipient, text, buttons, Route.EVERYONE, namesRecipient, pagedButtons);
         }
 
         public Message withPagedButtons() {

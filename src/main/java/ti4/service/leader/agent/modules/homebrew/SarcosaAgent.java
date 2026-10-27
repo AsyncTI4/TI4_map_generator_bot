@@ -24,6 +24,6 @@ public final class SarcosaAgent extends SelfOrTargetedAgent {
                                 ", choose a system in or adjacent to one containing your units.",
                                 SarcosaAgentHandler.agentSystemButtons(use.game(), target))
                         .withPagedButtons(),
-                Message.addressedTo(target, " has no eligible systems."));
+                use.noteToUser(target, " has no eligible systems."));
     }
 }

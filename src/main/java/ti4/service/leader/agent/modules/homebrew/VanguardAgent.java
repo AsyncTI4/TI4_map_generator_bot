@@ -24,6 +24,6 @@ public final class VanguardAgent extends TargetedAgent {
                         ", choose a non-home planet containing your ground forces for " + use.agentNameFor(target)
                                 + ".",
                         VanguardLeadersHandler.agentPlanetButtons(use.game(), target)),
-                Message.addressedTo(target, " has no eligible non-home planet containing their ground forces."));
+                use.noteToUser(target, " has no eligible non-home planet containing their ground forces."));
     }
 }

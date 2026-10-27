@@ -119,6 +119,7 @@ import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.ExhaustOnlyAgents;
 import ti4.service.leader.agent.modules.homebrew.HomebrewExhaustOnlyAgents;
+import ti4.service.leader.agent.modules.homebrew.KjalengardAgent;
 import ti4.service.leader.agent.modules.homebrew.KortaliAgent;
 import ti4.service.planet.JotunheimLegendaryService;
 import ti4.service.tech.BastionTechService;
@@ -1962,11 +1963,7 @@ public class StartCombatService {
             }
 
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("kjalengardagent")) {
-                buttons.add(Buttons.gray(
-                        factionChecker + "exhaustAgent_kjalengardagent",
-                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "Kjalengard Agent",
-                        FactionEmojis.kjalengard));
+                buttons.add(KjalengardAgent.button(agentHolder));
             }
 
             if ((!game.isFowMode() || agentHolder == p1)

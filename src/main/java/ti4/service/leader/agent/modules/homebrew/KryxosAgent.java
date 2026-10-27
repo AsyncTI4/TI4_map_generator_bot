@@ -23,8 +23,7 @@ public final class KryxosAgent extends TargetedAgent {
                         target,
                         ", please choose the non-faction technology to return for " + use.agentNameFor(target) + ".",
                         KryxosLeadersHandler.agentReturnTechButtons(target)),
-                Message.addressedTo(
-                        target,
-                        " has no non-faction technology available to return for " + use.agentNameFor(target) + "."));
+                use.noteToUser(
+                        target, " has no non-faction technology available to return for " + use.agentName() + "."));
     }
 }

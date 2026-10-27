@@ -35,6 +35,6 @@ public final class MortheusAgent extends TargetedAgent {
                                 + " which system the unit was produced in first, after which it will give tiles to"
                                 + " move it to.",
                         ButtonHelper.getDomnaStepOneTiles(target, use.game())),
-                Message.addressedTo(target, " has no ships to move."));
+                use.noteToUser(target, " has no ships to move."));
     }
 }

@@ -1,7 +1,6 @@
 package ti4.service.leader.agent.modules.twilightsfall;
 
 import net.dv8tion.jda.api.components.buttons.Button;
-import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Player;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentOutcome;
@@ -18,8 +17,7 @@ public final class ExperimentalGenomeAgent extends SelfOrTargetedAgent {
     }
 
     public static Button button(Player player) {
-        return Buttons.gray(
-                ownedButtonId(player, ID), useLabel(player, ID, "Experimental Genome"), FactionEmojis.Jolnar);
+        return useButton(player, ID, "Experimental Genome", FactionEmojis.Jolnar);
     }
 
     @Override
