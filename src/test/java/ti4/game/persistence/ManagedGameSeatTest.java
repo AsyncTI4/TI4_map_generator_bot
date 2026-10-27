@@ -27,6 +27,8 @@ class ManagedGameSeatTest extends BaseTi4Test {
         eliminated.setEliminated(true);
         Player npc = seat(game, 2);
         npc.setNpc(true);
+        Player dummy = seat(game, 3);
+        dummy.setDummy(true);
         String spectator = game.addPlayer(uniqueName("spectator"), "Spectator").getUserID();
 
         ManagedGame managedGame = new ManagedGame(game);
@@ -38,6 +40,8 @@ class ManagedGameSeatTest extends BaseTi4Test {
         assertThat(managedGame.isRealOrEliminatedPlayer(eliminated.getUserID())).isTrue();
         // NPCs count toward the join limit table size but are not "real" for presence and activity checks.
         assertThat(managedGame.isRealOrEliminatedPlayer(npc.getUserID())).isTrue();
+        // A dummy seat has a faction and color but is neither real nor eliminated.
+        assertThat(managedGame.isRealOrEliminatedPlayer(dummy.getUserID())).isFalse();
         assertThat(managedGame.isRealOrEliminatedPlayer(spectator)).isFalse();
         assertThat(managedGame.isRealOrEliminatedPlayer(uniqueName("stranger"))).isFalse();
         // An eliminated seat keeps its faction and color, so it still counts as real; only the NPC drops out.
