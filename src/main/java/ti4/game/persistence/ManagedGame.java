@@ -52,7 +52,7 @@ public class ManagedGame {
     private final Set<ManagedPlayer> players;
 
     @Getter(AccessLevel.NONE)
-    private final Map<ManagedPlayer, Seat> playerToSeat;
+    private final Map<ManagedPlayer, Status> playerToStatus;
 
     private final Map<String, String> teamMateToPrimaryId;
 
@@ -88,9 +88,9 @@ public class ManagedGame {
         players = game.getPlayers().values().stream()
                 .map(p -> GameManager.addOrMergePlayer(this, p))
                 .collect(toUnmodifiableSet());
-        playerToSeat = game.getPlayers().values().stream()
+        playerToStatus = game.getPlayers().values().stream()
                 .collect(Collectors.toUnmodifiableMap(
-                        p -> getPlayer(p.getUserID()), p -> Seat.of(p, game.isHasEnded())));
+                        p -> getPlayer(p.getUserID()), p -> Status.of(p, game.isHasEnded())));
         teamMateToPrimaryId = collectTeamMates(game);
     }
 
@@ -142,19 +142,21 @@ public class ManagedGame {
     }
 
     public List<ManagedPlayer> getRealPlayers() {
-        return playerToSeat.entrySet().stream()
-                .filter(entry -> entry.getValue() == Seat.REAL)
+        return playerToStatus.entrySet().stream()
+                .filter(entry -> entry.getValue() == Status.REAL)
                 .map(Map.Entry::getKey)
                 .toList();
     }
 
     public long countRealAndEliminatedPlayers() {
-        return playerToSeat.values().stream().filter(Seat::isRealOrEliminated).count();
+        return playerToStatus.values().stream()
+                .filter(Status::isRealOrEliminated)
+                .count();
     }
 
     public boolean isRealOrEliminatedPlayer(String userId) {
         ManagedPlayer player = getPlayer(userId);
-        return player != null && playerToSeat.get(player).isRealOrEliminated();
+        return player != null && playerToStatus.get(player).isRealOrEliminated();
     }
 
     public boolean matches(Game game) {
@@ -177,12 +179,12 @@ public class ManagedGame {
         return Objects.hashCode(name);
     }
 
-    private enum Seat {
+    private enum Status {
         REAL,
         REAL_OR_ELIMINATED,
         OTHER;
 
-        static Seat of(Player player, boolean gameHasEnded) {
+        static Status of(Player player, boolean gameHasEnded) {
             if ((player.isRealPlayer() && !player.isNpc()) || (player.isEliminated() && gameHasEnded)) {
                 return REAL;
             }
