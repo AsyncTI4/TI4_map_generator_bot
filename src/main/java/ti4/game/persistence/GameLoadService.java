@@ -1183,6 +1183,9 @@ class GameLoadService {
                     player.setGhostCommanderCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.MAGEN_INFANTRY_COUNT ->
                     player.setMagenInfantryCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.DACXIVE_COUNT -> player.setDacxiveCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.YIN_SPINNER_COUNT ->
+                    player.setYinSpinnerCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PILLAGE_COUNT -> player.setPillageCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PATH_TOKEN_COUNT -> player.setPathTokenCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.HONOR_COUNT -> player.setHonorCounter(Integer.parseInt(tokenizer.nextToken()));
