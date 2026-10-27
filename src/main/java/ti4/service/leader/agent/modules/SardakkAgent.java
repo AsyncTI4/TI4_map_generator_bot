@@ -18,9 +18,13 @@ import ti4.service.leader.agent.AgentTargets;
 import ti4.service.leader.agent.AgentUse;
 import ti4.service.unit.AddUnitService;
 
-public final class SardakkAgent implements AgentModule<SardakkAgent.Choice> {
+public final class SardakkAgent extends AgentModule<SardakkAgent.Choice> {
 
     static final String ID = "sardakkagent";
+
+    public SardakkAgent() {
+        super(ID, "T'ro An, the N'orr");
+    }
 
     sealed interface Choice {}
 
@@ -30,16 +34,6 @@ public final class SardakkAgent implements AgentModule<SardakkAgent.Choice> {
 
     public static String planetButtonId(String position, String planet) {
         return AgentButtonIds.format(ID, position, planet);
-    }
-
-    @Override
-    public String agentId() {
-        return ID;
-    }
-
-    @Override
-    public String displayName() {
-        return "T'ro An, the N'orr";
     }
 
     @Override

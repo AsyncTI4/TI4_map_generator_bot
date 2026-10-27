@@ -13,7 +13,7 @@ class TargetedAgentDecodingTest extends BaseTi4Test {
     @Test
     void everyTargetedAgentDecodesFactionsColoursAndProjectPiIds() {
         AgentModuleFixture fixture = new AgentModuleFixture("mentak");
-        List<TargetedAgent> targeted = List.of(new HyperAgent(), new MentakAgent());
+        List<TargetedAgent> targeted = List.of(new MentakAgent());
 
         for (TargetedAgent module : targeted) {
             Player user = fixture.user;
@@ -47,7 +47,8 @@ class TargetedAgentDecodingTest extends BaseTi4Test {
         AgentModuleFixture fixture = new AgentModuleFixture("mentak");
         Player target = fixture.target;
 
-        assertThat(MentakAgent.buttonId(target)).isEqualTo("exhaustAgent_mentakagent_pi_hacan");
-        assertThat(WinnuAgent.buttonId()).isEqualTo("exhaustAgent_winnuagent");
+        assertThat(WinnuAgent.button().getCustomId()).isEqualTo("exhaustAgent_winnuagent");
+        assertThat(MentakAgent.button(fixture.user, target).getCustomId())
+                .isEqualTo(fixture.user.factionButtonChecker() + "exhaustAgent_mentakagent_pi_hacan");
     }
 }

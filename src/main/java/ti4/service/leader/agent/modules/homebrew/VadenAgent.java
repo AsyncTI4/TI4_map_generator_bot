@@ -1,10 +1,13 @@
 package ti4.service.leader.agent.modules.homebrew;
 
+import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperStats;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentUse;
 import ti4.service.leader.agent.TargetedAgent;
@@ -13,18 +16,15 @@ public final class VadenAgent extends TargetedAgent {
 
     static final String ID = "vadenagent";
 
-    public static String buttonId(Player target) {
-        return AgentButtonIds.format(ID, target.getFaction());
+    public VadenAgent() {
+        super(ID, "Yudri Sukhov, the Vaden");
     }
 
-    @Override
-    public String agentId() {
-        return ID;
-    }
-
-    @Override
-    public String displayName() {
-        return "Yudri Sukhov, the Vaden";
+    public static Button button(Player vaden) {
+        return Buttons.gray(
+                vaden.factionButtonChecker() + AgentButtonIds.format(ID, vaden.getFaction()),
+                "Use Vaden Agent",
+                FactionEmojis.vaden);
     }
 
     @Override

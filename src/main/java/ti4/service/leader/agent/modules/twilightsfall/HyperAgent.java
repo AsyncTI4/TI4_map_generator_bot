@@ -1,4 +1,4 @@
-package ti4.service.leader.agent.modules;
+package ti4.service.leader.agent.modules.twilightsfall;
 
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
@@ -12,14 +12,8 @@ public final class HyperAgent extends TargetedAgent {
     static final String ID = "hyperagent";
     private static final String GENOME = "_Hyper Genome_";
 
-    @Override
-    public String agentId() {
-        return ID;
-    }
-
-    @Override
-    public String displayName() {
-        return GENOME;
+    public HyperAgent() {
+        super(ID, GENOME);
     }
 
     @Override

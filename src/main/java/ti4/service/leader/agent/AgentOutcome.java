@@ -20,6 +20,10 @@ public record AgentOutcome(List<Message> messages, String pressedMessageEdit) {
         return new AgentOutcome(List.of(messages), null);
     }
 
+    public static AgentOutcome notifyInFog(Game game, Player primary, String message, Player affected) {
+        return notifyInFog(game, primary, message, affected, message);
+    }
+
     public static AgentOutcome notifyInFog(
             Game game, Player primary, String primaryMessage, Player affected, String affectedMessage) {
         AgentOutcome outcome = of(Message.to(primary, primaryMessage));

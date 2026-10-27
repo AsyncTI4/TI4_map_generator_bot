@@ -1,23 +1,25 @@
-package ti4.service.leader.agent.modules;
+package ti4.service.leader.agent.modules.twilightsfall;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import ti4.service.leader.agent.AgentOutcome;
+import ti4.service.leader.agent.modules.AgentModuleFixture;
 import ti4.testUtils.BaseTi4Test;
 
-class MentakAndHyperAgentTest extends BaseTi4Test {
+class HyperAgentTest extends BaseTi4Test {
 
     @Test
-    void mentakDrawsForBothPlayers() {
+    void decodesFactionsColoursAndProjectPiIds() {
         AgentModuleFixture fixture = new AgentModuleFixture("mentak");
-        int userBefore = fixture.user.getAcCount();
-        int targetBefore = fixture.target.getAcCount();
+        HyperAgent hyper = new HyperAgent();
 
-        new MentakAgent().resolve(fixture.use(new MentakAgent(), fixture.target));
-
-        assertThat(fixture.user.getAcCount()).isEqualTo(userBefore + 1);
-        assertThat(fixture.target.getAcCount()).isEqualTo(targetBefore + 1);
+        assertThat(hyper.decode(fixture.game, fixture.user, AgentModuleFixture.TARGET_FACTION))
+                .contains(fixture.target);
+        assertThat(hyper.decode(fixture.game, fixture.user, AgentModuleFixture.TARGET_COLOR))
+                .contains(fixture.target);
+        assertThat(hyper.decode(fixture.game, fixture.user, "")).isEmpty();
+        assertThat(hyper.decode(fixture.game, fixture.user, "nobody")).isEmpty();
     }
 
     @Test

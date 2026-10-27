@@ -1,32 +1,29 @@
 package ti4.service.leader.agent.modules;
 
 import java.util.Optional;
+import net.dv8tion.jda.api.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Helper;
-import ti4.service.leader.agent.AgentModule;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentTargets;
 import ti4.service.leader.agent.AgentUse;
+import ti4.service.leader.agent.SpendAgent;
 
-public final class WinnuAgent implements AgentModule<Player> {
+public final class WinnuAgent extends SpendAgent {
 
     static final String ID = "winnuagent";
 
-    public static String buttonId() {
-        return AgentButtonIds.format(ID);
+    public WinnuAgent() {
+        super(ID, "Berekar Berekon, the Winnu");
     }
 
-    @Override
-    public String agentId() {
-        return ID;
-    }
-
-    @Override
-    public String displayName() {
-        return "Berekar Berekon, the Winnu";
+    public static Button button() {
+        return Buttons.red(AgentButtonIds.format(ID), "Use Winnu Agent", FactionEmojis.Winnu);
     }
 
     @Override
@@ -35,12 +32,6 @@ public final class WinnuAgent implements AgentModule<Player> {
             return Optional.of(user);
         }
         return AgentTargets.player(game, payload);
-    }
-
-    @Override
-    public String exhaustAnnouncement(AgentUse<Player> use) {
-        return use.user().getRepresentation() + " has exhausted " + use.agentName() + " to use on "
-                + use.payload().getRepresentationNoPing() + ".";
     }
 
     @Override

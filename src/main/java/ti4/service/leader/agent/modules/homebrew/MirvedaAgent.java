@@ -1,6 +1,7 @@
 package ti4.service.leader.agent.modules.homebrew;
 
 import java.util.List;
+import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Player;
@@ -15,18 +16,13 @@ public final class MirvedaAgent extends TargetedAgent {
 
     static final String ID = "mirvedaagent";
 
-    public static String buttonId(Player target) {
-        return AgentButtonIds.format(ID, target.getFaction());
+    public MirvedaAgent() {
+        super(ID, "Logic Machina, the Mirveda");
     }
 
-    @Override
-    public String agentId() {
-        return ID;
-    }
-
-    @Override
-    public String displayName() {
-        return "Logic Machina, the Mirveda";
+    public static Button button(Player mirveda) {
+        return Buttons.gray(
+                AgentButtonIds.format(ID, mirveda.getFaction()), "Use Mirveda Agent", FactionEmojis.mirveda);
     }
 
     @Override

@@ -6,7 +6,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
-import ti4.service.leader.agent.modules.HyperAgent;
 import ti4.service.leader.agent.modules.MentakAgent;
 import ti4.service.leader.agent.modules.SardakkAgent;
 import ti4.service.leader.agent.modules.WinnuAgent;
@@ -23,6 +22,7 @@ import ti4.service.leader.agent.modules.homebrew.VadenAgent;
 import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
 import ti4.service.leader.agent.modules.homebrew.VeldyrAgent;
 import ti4.service.leader.agent.modules.homebrew.ZelianAgent;
+import ti4.service.leader.agent.modules.twilightsfall.HyperAgent;
 
 @UtilityClass
 class AgentModules {

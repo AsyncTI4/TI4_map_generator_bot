@@ -1,24 +1,21 @@
 package ti4.service.leader.agent.modules.homebrew;
 
+import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Player;
+import ti4.service.emoji.FactionEmojis;
 
 public final class VeldyrAgent extends SpendModifierAgent {
 
     static final String ID = "veldyragent";
 
-    public static String buttonId(Player spender) {
-        return AgentButtonIds.format(ID, spender.getFaction());
+    public VeldyrAgent() {
+        super(ID, "Solis Morden, the Veldyr");
     }
 
-    @Override
-    public String agentId() {
-        return ID;
-    }
-
-    @Override
-    public String displayName() {
-        return "Solis Morden, the Veldyr";
+    public static Button button(Player spender) {
+        return Buttons.red(AgentButtonIds.format(ID, spender.getFaction()), "Use Veldyr Agent", FactionEmojis.veldyr);
     }
 
     @Override

@@ -1,22 +1,29 @@
 package ti4.service.leader.agent.modules.homebrew;
 
 import java.util.Optional;
+import net.dv8tion.jda.api.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaRiderHelper;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.service.leader.agent.AgentTargets;
 import ti4.service.leader.agent.AgentUse;
 
-public final class VaylerianAgent implements AgentModule<VaylerianAgent.Choice> {
+public final class VaylerianAgent extends AgentModule<VaylerianAgent.Choice> {
 
     static final String ID = "vaylerianagent";
     private static final String PICK_TARGET_PREFIX = "vaylerianAgent";
+
+    public VaylerianAgent() {
+        super(ID, "Yvin Korduul, the Vaylerian");
+    }
 
     sealed interface Choice {}
 
@@ -24,22 +31,13 @@ public final class VaylerianAgent implements AgentModule<VaylerianAgent.Choice> 
 
     record PickTarget() implements Choice {}
 
-    public static String buttonId() {
-        return AgentButtonIds.format(ID);
+    public static Button button() {
+        return Buttons.gray(AgentButtonIds.format(ID), "Use Vaylerian Agent", FactionEmojis.vaylerian);
     }
 
-    public static String buttonId(Player target) {
-        return AgentButtonIds.format(ID, target.getFaction());
-    }
-
-    @Override
-    public String agentId() {
-        return ID;
-    }
-
-    @Override
-    public String displayName() {
-        return "Yvin Korduul, the Vaylerian";
+    public static Button button(Player target) {
+        return Buttons.green(
+                AgentButtonIds.format(ID, target.getFaction()), "Use Vaylerian Agent", FactionEmojis.vaylerian);
     }
 
     @Override

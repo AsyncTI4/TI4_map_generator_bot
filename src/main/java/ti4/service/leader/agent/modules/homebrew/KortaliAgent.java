@@ -2,10 +2,13 @@ package ti4.service.leader.agent.modules.homebrew;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Player;
 import ti4.model.ExploreModel;
 import ti4.model.Mapper;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.service.leader.agent.AgentUse;
@@ -15,18 +18,15 @@ public final class KortaliAgent extends TargetedAgent {
 
     static final String ID = "kortaliagent";
 
-    public static String buttonId(Player opponent) {
-        return AgentButtonIds.format(ID, opponent.getColor());
+    public KortaliAgent() {
+        super(ID, "Queen Lucreia, the Kortali");
     }
 
-    @Override
-    public String agentId() {
-        return ID;
-    }
-
-    @Override
-    public String displayName() {
-        return "Queen Lucreia, the Kortali";
+    public static Button button(Player kortali, Player opponent) {
+        return Buttons.gray(
+                kortali.factionButtonChecker() + AgentButtonIds.format(ID, opponent.getColor()),
+                "Use Kortali Agent",
+                FactionEmojis.kortali);
     }
 
     @Override
@@ -46,6 +46,6 @@ public final class KortaliAgent extends TargetedAgent {
         String fragmentName = card == null ? fragment : card.getName();
         String message = target.getFactionEmojiOrColor() + " lost a " + fragmentName + " to "
                 + kortali.getFactionEmojiOrColor() + " due to " + use.agentName() + ".";
-        return AgentOutcome.notifyInFog(use.game(), target, message, kortali, message);
+        return AgentOutcome.notifyInFog(use.game(), target, message, kortali);
     }
 }

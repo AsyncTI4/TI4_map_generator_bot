@@ -25,7 +25,6 @@ import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.button.ReactionService;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.homebrew.CymiaeAgent;
 import ti4.service.turn.StartTurnService;
@@ -200,9 +199,7 @@ class ActionCardHandButtonHandler {
             }
             if (player.hasUnexhaustedLeader("cymiaeagent")) {
                 List<Button> buttons2 = new ArrayList<>();
-                Button hacanButton =
-                        Buttons.gray(CymiaeAgent.buttonId(player), "Use Cymiae Agent", FactionEmojis.cymiae);
-                buttons2.add(hacanButton);
+                buttons2.add(CymiaeAgent.button(player));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()

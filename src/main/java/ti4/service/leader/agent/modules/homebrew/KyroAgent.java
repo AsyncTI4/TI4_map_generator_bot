@@ -15,14 +15,8 @@ public final class KyroAgent extends TargetedAgent {
 
     static final String ID = "kyroagent";
 
-    @Override
-    public String agentId() {
-        return ID;
-    }
-
-    @Override
-    public String displayName() {
-        return "Tox, the Kyro";
+    public KyroAgent() {
+        super(ID, "Tox, the Kyro");
     }
 
     @Override
@@ -38,7 +32,7 @@ public final class KyroAgent extends TargetedAgent {
         int infantry = commoditiesTotal - 1;
         List<Button> placeInfantry =
                 Helper.getPlanetPlaceUnitButtons(kyro, use.game(), infantry + "gf", "placeOneNDone_skipbuild");
-        return AgentOutcome.notifyInFog(use.game(), target, message, kyro, message)
+        return AgentOutcome.notifyInFog(use.game(), target, message, kyro)
                 .and(Message.withButtons(
                         kyro,
                         kyro.getRepresentationUnfogged() + ", please choose the planet you wish to drop " + infantry

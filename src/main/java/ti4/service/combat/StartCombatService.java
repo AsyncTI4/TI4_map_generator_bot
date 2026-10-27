@@ -2200,16 +2200,12 @@ public class StartCombatService {
                 && !game.isFowMode()
                 && isGroundCombat
                 && !p1.getFragments().isEmpty()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Buttons.gray(
-                    factionChecker + KortaliAgent.buttonId(p1), "Use Kortali Agent", FactionEmojis.kortali));
+            buttons.add(KortaliAgent.button(p2, p1));
         }
         if (p1.hasUnexhaustedLeader("kortaliagent")
                 && isGroundCombat
                 && !p2.getFragments().isEmpty()) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Buttons.gray(
-                    factionChecker + KortaliAgent.buttonId(p2), "Use Kortali Agent", FactionEmojis.kortali));
+            buttons.add(KortaliAgent.button(p1, p2));
         }
 
         if ((p2.hasAbility("glory")) && !game.isFowMode()) {

@@ -11,14 +11,8 @@ public final class BentorAgent extends TargetedAgent {
 
     static final String ID = "bentoragent";
 
-    @Override
-    public String agentId() {
-        return ID;
-    }
-
-    @Override
-    public String displayName() {
-        return "C.O.O. Mgur, the Bentor";
+    public BentorAgent() {
+        super(ID, "C.O.O. Mgur, the Bentor");
     }
 
     @Override

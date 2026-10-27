@@ -1,8 +1,11 @@
 package ti4.service.leader.agent.modules;
 
+import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentUse;
 import ti4.service.leader.agent.TargetedAgent;
@@ -11,18 +14,15 @@ public final class MentakAgent extends TargetedAgent {
 
     static final String ID = "mentakagent";
 
-    public static String buttonId(Player pillaged) {
-        return AgentButtonIds.format(ID, pillaged.getFaction());
+    public MentakAgent() {
+        super(ID, "Suffi An, the Mentak");
     }
 
-    @Override
-    public String agentId() {
-        return ID;
-    }
-
-    @Override
-    public String displayName() {
-        return "Suffi An, the Mentak";
+    public static Button button(Player user, Player pillaged) {
+        return Buttons.green(
+                user.factionButtonChecker() + AgentButtonIds.format(ID, pillaged.getFaction()),
+                "Use Mentak Agent",
+                FactionEmojis.Mentak);
     }
 
     @Override

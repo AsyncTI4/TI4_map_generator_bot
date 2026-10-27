@@ -5,21 +5,33 @@ import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
 
-public interface AgentModule<P> {
+public abstract class AgentModule<P> {
 
-    String agentId();
+    private final String agentId;
+    private final String displayName;
 
-    default Set<String> aliasIds() {
+    protected AgentModule(String agentId, String displayName) {
+        this.agentId = agentId;
+        this.displayName = displayName;
+    }
+
+    public final String agentId() {
+        return agentId;
+    }
+
+    public Set<String> aliasIds() {
         return Set.of();
     }
 
-    String displayName();
+    public final String displayName() {
+        return displayName;
+    }
 
-    Optional<P> decode(Game game, Player user, String payload);
+    public abstract Optional<P> decode(Game game, Player user, String payload);
 
-    default String exhaustAnnouncement(AgentUse<P> use) {
+    public String exhaustAnnouncement(AgentUse<P> use) {
         return use.user().getRepresentation() + " has exhausted " + use.agentName() + ".";
     }
 
-    AgentOutcome resolve(AgentUse<P> use);
+    public abstract AgentOutcome resolve(AgentUse<P> use);
 }

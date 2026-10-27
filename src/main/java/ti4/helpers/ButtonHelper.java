@@ -833,7 +833,7 @@ public class ButtonHelper {
         }
         if (player.hasUnexhaustedLeader("khraskagent")
                 && (whatIsItFor.contains("inf") || whatIsItFor.contains("both"))) {
-            buttons.add(Buttons.gray(KhraskAgent.buttonId(player), "Use Khrask Agent", FactionEmojis.khrask));
+            buttons.add(KhraskAgent.button(player));
         }
         if (player.hasAbility("diplomats")
                 && !ButtonHelperAbilities.getDiplomatButtons(game, player).isEmpty()) {

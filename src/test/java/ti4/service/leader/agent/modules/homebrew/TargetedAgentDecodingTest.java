@@ -63,16 +63,25 @@ class TargetedAgentDecodingTest extends BaseTi4Test {
         AgentModuleFixture fixture = new AgentModuleFixture("mentak");
         Player target = fixture.target;
 
-        assertThat(CymiaeAgent.buttonId(target)).isEqualTo("exhaustAgent_cymiaeagent_pi_hacan");
-        assertThat(GledgeAgent.buttonId(target)).isEqualTo("exhaustAgent_gledgeagent_pi_hacan");
-        assertThat(KhraskAgent.buttonId(target)).isEqualTo("exhaustAgent_khraskagent_pi_hacan");
-        assertThat(VeldyrAgent.buttonId(target)).isEqualTo("exhaustAgent_veldyragent_pi_hacan");
-        assertThat(VaylerianAgent.buttonId()).isEqualTo("exhaustAgent_vaylerianagent");
-        assertThat(VaylerianAgent.buttonId(target)).isEqualTo("exhaustAgent_vaylerianagent_pi_hacan");
-        assertThat(VadenAgent.buttonId(target)).isEqualTo("exhaustAgent_vadenagent_pi_hacan");
-        assertThat(KortaliAgent.buttonId(target)).isEqualTo("exhaustAgent_kortaliagent_blue");
-        assertThat(NokarAgent.buttonId(target)).isEqualTo("exhaustAgent_nokaragent_pi_hacan");
-        assertThat(ZelianAgent.buttonId(target)).isEqualTo("exhaustAgent_zelianagent_pi_hacan");
-        assertThat(MirvedaAgent.buttonId(target)).isEqualTo("exhaustAgent_mirvedaagent_pi_hacan");
+        assertThat(CymiaeAgent.button(target).getCustomId()).isEqualTo("exhaustAgent_cymiaeagent_pi_hacan");
+        assertThat(GledgeAgent.button(target).getCustomId()).isEqualTo("exhaustAgent_gledgeagent_pi_hacan");
+        assertThat(KhraskAgent.button(target).getCustomId()).isEqualTo("exhaustAgent_khraskagent_pi_hacan");
+        assertThat(VeldyrAgent.button(target).getCustomId()).isEqualTo("exhaustAgent_veldyragent_pi_hacan");
+        assertThat(VaylerianAgent.button().getCustomId()).isEqualTo("exhaustAgent_vaylerianagent");
+        assertThat(VaylerianAgent.button(target).getCustomId()).isEqualTo("exhaustAgent_vaylerianagent_pi_hacan");
+        assertThat(NokarAgent.button(target).getCustomId()).isEqualTo("exhaustAgent_nokaragent_pi_hacan");
+        assertThat(ZelianAgent.button(target).getCustomId()).isEqualTo("exhaustAgent_zelianagent_pi_hacan");
+        assertThat(MirvedaAgent.button(target).getCustomId()).isEqualTo("exhaustAgent_mirvedaagent_pi_hacan");
+    }
+
+    @Test
+    void ownerGatedButtonsOnlyWorkForTheAgentsOwner() {
+        AgentModuleFixture fixture = new AgentModuleFixture("kortali");
+        String ownerGate = fixture.user.factionButtonChecker();
+
+        assertThat(KortaliAgent.button(fixture.user, fixture.target).getCustomId())
+                .isEqualTo(ownerGate + "exhaustAgent_kortaliagent_blue");
+        assertThat(VadenAgent.button(fixture.user).getCustomId())
+                .isEqualTo(ownerGate + "exhaustAgent_vadenagent_kortali");
     }
 }
