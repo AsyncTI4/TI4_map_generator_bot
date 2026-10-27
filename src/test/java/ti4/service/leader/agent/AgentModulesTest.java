@@ -33,7 +33,7 @@ class AgentModulesTest extends BaseTi4Test {
         assertThat(AgentModules.find("augersagent")).containsInstanceOf(AugersAgent.class);
         assertThat(AgentModules.find("AugersAgent")).containsInstanceOf(AugersAgent.class);
         // Unmigrated agents must fall through to the legacy exhaustAgent branches.
-        assertThat(AgentModules.find("hacanagent")).isEmpty();
+        assertThat(AgentModules.find("yinagent")).isEmpty();
         assertThat(AgentModules.find(null)).isEmpty();
     }
 

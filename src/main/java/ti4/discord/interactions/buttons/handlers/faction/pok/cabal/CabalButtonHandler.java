@@ -9,7 +9,9 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.ids.AgentStepIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -29,6 +31,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
@@ -39,9 +42,10 @@ class CabalButtonHandler {
     @ButtonHandler("cabalAgentCapture_")
     public static void resolveCabalAgentCapture(
             String buttonID, Player player, Game game, ButtonInteractionEvent event) {
-        String unit = buttonID.split("_")[1];
-        String faction = buttonID.split("_")[2];
-        Player p2 = game.getPlayerFromColorOrFaction(faction);
+        AgentStepIds.Parsed step = AgentStepIds.parse(buttonID);
+        String unitAndFaction = StringUtils.substringAfter(step.id(), "_");
+        String unit = StringUtils.substringBefore(unitAndFaction, "_");
+        Player p2 = game.getPlayerFromColorOrFaction(StringUtils.substringAfter(unitAndFaction, "_"));
         if (p2 == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "Unable to resolve player, please resolve manually.");
@@ -52,9 +56,7 @@ class CabalButtonHandler {
                 p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + " a " + unit
                         + " of yours has been captured by "
-                        + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                        + "The Stillness of Stars, the Vuil'raith"
-                        + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent. "
+                        + AgentLifecycle.agentName(game, "cabalagent", step.viaYssaril()) + ". "
                         + "Rejoice, for your " + commodities + " commodities been washed.");
         p2.setTg(p2.getTg() + commodities);
         p2.setCommodities(0);

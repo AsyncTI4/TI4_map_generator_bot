@@ -3,6 +3,7 @@ package ti4.service.leader.agent.modules;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.ids.AgentStepIds;
 import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -59,6 +60,15 @@ public final class AgentModuleFixture {
         ComponentIdEnvelope envelope = ComponentIdEnvelope.decode(button.getCustomId());
         assertThat(envelope.ownerFaction()).isEqualTo(owner.getFaction());
         assertThat(envelope.handlerId()).isEqualTo(legacyHandlerId);
+        assertThat(button.getCustomId()).hasSizeLessThanOrEqualTo(DISCORD_ID_LIMIT);
+        assertThat(button.getLabel()).hasSizeLessThanOrEqualTo(DISCORD_LABEL_LIMIT);
+    }
+
+    // A follow-up step button: only the owner can press it, and it carries the Clever Clever flag when it should.
+    public static void assertOwnedStep(Button button, Player owner, boolean viaYssaril) {
+        ComponentIdEnvelope envelope = ComponentIdEnvelope.decode(button.getCustomId());
+        assertThat(envelope.ownerFaction()).isEqualTo(owner.getFaction());
+        assertThat(AgentStepIds.parse(envelope.handlerId()).viaYssaril()).isEqualTo(viaYssaril);
         assertThat(button.getCustomId()).hasSizeLessThanOrEqualTo(DISCORD_ID_LIMIT);
         assertThat(button.getLabel()).hasSizeLessThanOrEqualTo(DISCORD_LABEL_LIMIT);
     }

@@ -174,6 +174,7 @@ import ti4.service.leader.UnlockLeaderService;
 import ti4.service.leader.agent.modules.NaazAgent;
 import ti4.service.leader.agent.modules.homebrew.KhraskAgent;
 import ti4.service.leader.agent.modules.homebrew.LiZhoAgent;
+import ti4.service.leader.agent.modules.homebrew.OlradinAgent;
 import ti4.service.leader.agent.modules.twilightsfall.ExperimentalGenomeAgent;
 import ti4.service.map.SystemPickerService;
 import ti4.service.milty.MiltyDraftTile;
@@ -806,8 +807,7 @@ public class ButtonHelper {
             buttons.add(Buttons.red("reduceComm_2_" + whatIsItFor, "Spend 2 Commodities"));
         }
         if (player.hasUnexhaustedLeader("olradinagent")) {
-            buttons.add(Buttons.gray(
-                    "exhaustAgent_olradinagent_" + player.getFaction(), "Use Olradin Agent", FactionEmojis.olradin));
+            buttons.add(OlradinAgent.button(player));
         }
         if (player.getNombox().hasUnits()
                 && !whatIsItFor.contains("inf")

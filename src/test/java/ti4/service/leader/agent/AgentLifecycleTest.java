@@ -61,7 +61,7 @@ class AgentLifecycleTest extends BaseTi4Test {
 
     @Test
     void inProcessUseRequiresAModule() {
-        assertThatThrownBy(() -> AgentLifecycle.use(game, mentak, "hacanagent", "", null))
+        assertThatThrownBy(() -> AgentLifecycle.use(game, mentak, "yinagent", "", null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -98,7 +98,7 @@ class AgentLifecycleTest extends BaseTi4Test {
 
     @Test
     void anAgentWithoutAModuleIsLeftToTheLegacyChain() {
-        assertThat(AgentLifecycle.resolve("exhaustAgent_hacanagent", null, game, mentak))
+        assertThat(AgentLifecycle.resolve("exhaustAgent_yinagent", null, game, mentak))
                 .isFalse();
     }
 

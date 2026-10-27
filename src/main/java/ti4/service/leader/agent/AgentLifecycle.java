@@ -87,8 +87,17 @@ public class AgentLifecycle {
     }
 
     public static void finish(GenericInteractionCreateEvent event, Game game, Player player, String agentId) {
+        finish(event, game, player, agentId, false);
+    }
+
+    private static void finish(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player player,
+            String agentId,
+            boolean deleteWholePressedMessage) {
         if (event instanceof ButtonInteractionEvent buttonEvent) {
-            cleanUpPressedButton(buttonEvent);
+            cleanUpPressedButton(buttonEvent, deleteWholePressedMessage);
         }
         offerTemporalCommandSuite(game, player, agentId);
     }
@@ -104,9 +113,13 @@ public class AgentLifecycle {
     }
 
     public static String agentNameFor(Game game, Player holder, String agentId) {
+        return agentName(game, agentId, holdsOnlyAYssarilCopy(holder, agentId));
+    }
+
+    public static String agentName(Game game, String agentId, boolean viaYssaril) {
         AgentModule<?> module = AgentModules.find(agentId)
                 .orElseThrow(() -> new IllegalArgumentException("No agent module for " + agentId));
-        return agentName(cardName(game, module), holdsOnlyAYssarilCopy(holder, agentId));
+        return agentName(cardName(game, module), viaYssaril);
     }
 
     static String cardName(Game game, AgentModule<?> module) {
@@ -165,9 +178,10 @@ public class AgentLifecycle {
                 AgentOutcome.of(Message.addressedTo(player, module.exhaustAnnouncementAfterName(use))),
                 pressedButton,
                 player);
-        deliver(module.resolve(use), pressedButton, player);
+        AgentOutcome outcome = module.resolve(use);
+        deliver(outcome, pressedButton, player);
         if (pressedAgentButton) {
-            finish(event, game, player, agentId);
+            finish(event, game, player, agentId, outcome.deletesPressedMessage());
         } else {
             offerTemporalCommandSuite(game, player, agentId);
         }
@@ -269,8 +283,8 @@ public class AgentLifecycle {
         return first != null && second != null && first.getId().equals(second.getId());
     }
 
-    private static void cleanUpPressedButton(ButtonInteractionEvent buttonEvent) {
-        if (isTargetPicker(buttonEvent.getMessage().getContentRaw())) {
+    private static void cleanUpPressedButton(ButtonInteractionEvent buttonEvent, boolean deleteWholeMessage) {
+        if (deleteWholeMessage || isTargetPicker(buttonEvent.getMessage().getContentRaw())) {
             buttonEvent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(buttonEvent);
