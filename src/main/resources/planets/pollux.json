@@ -1,0 +1,26 @@
+{
+    "id": "pollux",
+    "tileId": "fracture34",
+    "name": "Pollux",
+    "aliases": [
+        "fracture34",
+        "pollux",
+        "pol",
+        "frac34"
+    ],
+    "resources": 0,
+    "influence": 2,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "planetLayout": {
+        "unitHolderName": "pollux",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 171.0,
+            "y": 131.0
+        }
+    },
+    "flavorText": "*Enclosed within nested orbital gyroscopes, this artifical world's heavy core is perpetually recalibrated to anchor the fragile spatial geometry of its twin.*",
+    "source": "merford"
+}

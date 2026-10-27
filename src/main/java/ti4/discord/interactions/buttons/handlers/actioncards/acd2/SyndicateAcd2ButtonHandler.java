@@ -16,8 +16,8 @@ import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 @UtilityClass
 class SyndicateAcd2ButtonHandler {

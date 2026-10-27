@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -22,7 +24,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.game.GameUndoNameService;
 import ti4.service.info.CardsInfoService;
-import ti4.spring.websocket.WebSocketNotifier;
+import ti4.spring.websocket.GameWebStatePipeline;
 
 @UtilityClass
 class GameUndoService {
@@ -106,13 +108,16 @@ class GameUndoService {
                 replaceGameFileWithUndo(gameName, latestUndoIndex, currentGameFile.toPath());
                 return null;
             }
-            WebSocketNotifier.notifyGameStateChange(loadedGame);
+            GameWebStatePipeline.queue(loadedGame);
 
             generateSavedButtons(Objects.requireNonNullElse(savedButtonsGame, gameToUndo));
             sendAnyChangedCardsInfo(gameToUndo, loadedGame);
             GameMessageManager.removeAfter(gameName, loadedGame.getLastModifiedDate());
 
-            sendUndoConfirmationMessage(gameToUndo, undoIndex, latestUndoIndex);
+            List<String> undoCommands = removeUndoneSaves(gameToUndo, undoIndex, latestUndoIndex);
+            if (!gameToUndo.isFowMode()) {
+                sendUndoConfirmationMessage(gameToUndo, undoIndex, latestUndoIndex, undoCommands);
+            }
             return loadedGame;
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(gameToUndo), "Error trying to undo: " + gameName, e);
@@ -127,6 +132,21 @@ class GameUndoService {
                 CardsInfoService.sendCardsInfo(loadedGame, p1);
             }
         }
+        if (loadedGame.getRealPlayers().size() < 1) {
+            for (Player player : loadedGame.getPlayers().values()) {
+                if (loadedGame
+                        .getStoredValue(player.getUserID() + "queuedMiltyPick")
+                        .isEmpty()) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.gray("restartAllMiltyQueue", "Remove All Queues"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            loadedGame.getMainGameChannel(),
+                            "If a queue is causing issues, use this button to remove all queues.",
+                            buttons);
+                    break;
+                }
+            }
+        }
     }
 
     private static void replaceGameFileWithUndo(String gameName, int undoIndex, Path gameFilePath) throws IOException {
@@ -138,10 +158,7 @@ class GameUndoService {
         return gameName + "_" + undoIndex + Constants.TXT;
     }
 
-    private static void sendUndoConfirmationMessage(Game gameToUndo, int undoIndex, int latestUndoIndex) {
-        if (gameToUndo.isFowMode()) {
-            return;
-        }
+    private static List<String> removeUndoneSaves(Game gameToUndo, int undoIndex, int latestUndoIndex) {
         Map<String, String> undoNamesToCommandText =
                 GameUndoNameService.getUndoNamesToCommandText(gameToUndo, latestUndoIndex - undoIndex);
         List<String> undoCommands = new ArrayList<>();
@@ -153,8 +170,7 @@ class GameUndoService {
                 BotLogger.error(new LogOrigin(gameToUndo), "Failed to delete undo file: " + currentUndo);
             }
         }
-
-        sendUndoConfirmationMessage(gameToUndo, undoIndex, latestUndoIndex, undoCommands);
+        return undoCommands;
     }
 
     private static void sendUndoConfirmationMessage(
@@ -209,7 +225,7 @@ class GameUndoService {
             replaceGameFileWithUndo(gameName, latestUndoIndex, currentGameFile.toPath());
             Game loadedGame = GameLoadService.load(gameName);
             if (loadedGame != null) {
-                WebSocketNotifier.notifyGameStateChange(loadedGame);
+                GameWebStatePipeline.queue(loadedGame);
             }
             return loadedGame;
         } catch (IOException e) {

@@ -239,5 +239,44 @@
         "window": "When you produce fighters or infantry units",
         "windowEffect": "you produce only 1 for its cost instead of 2.",
         "source": "gamma"
+    },
+    {
+        "id": "thralldom",
+        "name": "Thralldom",
+        "faction": "ironhull",
+        "permanentEffect": "You capture infantry you destroy. A planet can have up to 2 Thrall tokens, increasing its resource and influence values by 1 for each of those tokens.",
+        "window": "When you exhaust a planet,",
+        "windowEffect": "you may return any number of captured infantry to place or move 1 Thrall token onto that planet for every 4 infantry returned. ",
+        "source": "gamma"
+    },
+    {
+        "id": "breakout",
+        "name": "Breakout",
+        "faction": "ironhull",
+        "window": "At the start of a ground combat on a planet with 1 or more Thrall tokens",
+        "windowEffect": "the active player may remove any number of those tokens to place 4 infantry from their reinforcements on that planet for each token removed.",
+        "source": "gamma"
+    },
+    {
+        "id": "titanic",
+        "name": "Titanic",
+        "faction": "project",
+        "window": "When you create the game board, place the Elysium Space tile where your home system would be placed, and place the Elysium Planet token into that system. The Elysium Space tile is not a home system.",
+        "source": "gamma"
+    },
+    {
+        "id": "elysium",
+        "name": "Elysium",
+        "faction": "project",
+        "window": "During setup, gain and ready the Elysium planet ability card. The system that contains the Elysium Planet token is your home system.",
+        "permanentEffect":"You can score objectives if you control Elysium, even if you do not control all the planets in your home system.",
+        "source": "gamma"
+    },
+    {
+        "id": "prudent",
+        "name": "Prudent",
+        "faction": "project",
+        "window": "During setup, place all of your starting ground forces in the space area of your home system.",
+        "source": "gamma"
     }
 ]

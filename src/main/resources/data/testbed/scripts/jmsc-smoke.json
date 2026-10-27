@@ -1,0 +1,15 @@
+{
+  "name": "jmsc-smoke",
+  "description": "The JMSC decks are in play, the Fracture is on the board, and JMSC cards reach a seat's hand.",
+  "preset": "jmsc-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "expect": { "state": "game.decks", "contains": "ac:action_cards_jmsc" } },
+    { "expect": { "state": "game.decks", "contains": "relic:relics_jmsc" } },
+    { "expect": { "state": "sol.acIds", "contains": "siphonfundsjmsc1" } },
+    { "expect": { "state": "sol.soIds", "contains": "newworldsjmsc" } },
+    { "expect": { "state": "sol.relics", "contains": "spyreportsjmsc" } },
+    { "do": "stackExplore", "value": "ponderingthenebulaejmsc" },
+    { "expect": { "state": "game.exploreDeck", "contains": "ponderingthenebulaejmsc" } }
+  ]
+}

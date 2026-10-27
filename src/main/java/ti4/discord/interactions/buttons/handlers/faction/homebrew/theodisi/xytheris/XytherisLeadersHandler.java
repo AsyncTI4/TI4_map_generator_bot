@@ -299,8 +299,9 @@ public class XytherisLeadersHandler {
                 + (unit.getSustainDamage() ? 1 : 0)
                 + (unit.getProductionValue() > 0 || unit.getBasicProduction() != null ? 1 : 0)
                 + (unit.getPlanetaryShield() ? 1 : 0)
-                + (unit.getAbility().stream().anyMatch(ability -> ability.toLowerCase(Locale.ROOT)
-                                .contains("deploy"))
+                + (unit.getAbility().stream()
+                                .anyMatch(ability ->
+                                        ability.toLowerCase(Locale.ROOT).contains("deploy"))
                         ? 1
                         : 0)
                 + (unit.getAfbDieCount() > 0 ? 1 : 0);

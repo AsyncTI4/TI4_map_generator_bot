@@ -11,14 +11,14 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.TIGLHelper;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.MapPositionMapper;
 import ti4.model.MapTemplateModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 
 @UtilityClass
@@ -57,9 +57,6 @@ public class MiltyRandomSetupService {
                 Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,
                 Boolean.toString(
                         settings.getSourceSettings().getEchoesOfYggdrasil().isVal()));
-        if (game.isCompetitiveTIGLGame()) {
-            TIGLHelper.sendTIGLSetupText(game);
-        }
 
         MiltyDraftSpec specs = MiltyDraftSpec.fromSettings(settings);
         int playerCount = specs.playerIDs.size();
@@ -93,6 +90,9 @@ public class MiltyRandomSetupService {
         }
         if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
+        }
+        if (game.isLostLegaciesTiles()) {
+            sources.add(ComponentSource.theodisi);
         }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             sources.add(ComponentSource.thunders_edge);
@@ -154,8 +154,9 @@ public class MiltyRandomSetupService {
                                 ? "\n - True Random Galaxy is enabled, so tile slots will roll red/blue independently."
                                 : ""));
         game.clearTileMap();
+        boolean mapChanged = false;
         try {
-            MiltyDraftHelper.buildPartialMap(game, event);
+            mapChanged = MiltyDraftHelper.buildPartialMap(game);
         } catch (Exception e) {
             // Ignore
         }
@@ -164,26 +165,43 @@ public class MiltyRandomSetupService {
             p.getCardsInfoThread();
         }
 
+        String sliceError = createSlices(event, draftManager, specs, trueRandomGalaxy);
+        if (sliceError == null) {
+            assignRandomPicks(draftManager, specs);
+            presetRandomKeleresFlavorIfNeeded(draftManager, game);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    game.getPing() + " random setup generated. Applying factions, speaker order, and map now.");
+            mapChanged |= FinishDraftService.finishDraft(event, draftManager, game);
+            applyRandomGalacticEvents(event, game, randomEventCount);
+            game.updateActivePlayer(null);
+        }
+        if (mapChanged) {
+            ButtonHelper.updateMap(game, event);
+        }
+        return sliceError;
+    }
+
+    private static String createSlices(
+            GenericInteractionCreateEvent event,
+            MiltyDraftManager draftManager,
+            MiltyDraftSpec specs,
+            boolean trueRandomGalaxy) {
         boolean slicesCreated = true;
         if (trueRandomGalaxy) {
             slicesCreated = generateTrueRandomGalaxySlices(draftManager, specs);
         } else if (specs.presetSlices != null) {
             specs.presetSlices.forEach(draftManager::addSlice);
         } else {
-            slicesCreated = GenerateSlicesService.generateSlices(event, draftManager, specs);
+            GenerateSlicesService.Result result = GenerateSlicesService.generateSlices(event, draftManager, specs);
+            if (result.impossibleReason() != null) {
+                return result.impossibleSettingsMessage(specs.numSlices);
+            }
+            slicesCreated = result.slicesCreated();
         }
         if (!slicesCreated) {
             return "Generating slices was too hard so I gave up.... Please try again.";
         }
-
-        assignRandomPicks(draftManager, specs);
-        presetRandomKeleresFlavorIfNeeded(draftManager, game);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                game.getPing() + " random setup generated. Applying factions, speaker order, and map now.");
-        FinishDraftService.finishDraft(event, draftManager, game);
-        applyRandomGalacticEvents(event, game, randomEventCount);
-        game.updateActivePlayer(null);
         return null;
     }
 
@@ -270,7 +288,7 @@ public class MiltyRandomSetupService {
         List<String> tilePositions = template.emulatedTiles();
         for (String pos1 : tilePositions) {
             List<Boolean> row = new ArrayList<>();
-            List<String> adj = PositionMapper.getAdjacentTilePositions(pos1);
+            List<String> adj = MapPositionMapper.getAdjacentTilePositions(pos1);
             for (String pos2 : tilePositions) {
                 row.add(adj.contains(pos2));
             }

@@ -1,6 +1,7 @@
 package ti4.discord.interactions.commands.explore;
 
 import java.util.Map;
+import java.util.Set;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -14,8 +15,9 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.ExploreModel;
+import ti4.model.Mapper;
 import ti4.service.explore.ExploreService;
 
 class ExploreUse extends GameStateSubcommand {
@@ -41,6 +43,15 @@ class ExploreUse extends GameStateSubcommand {
 
         if (!Mapper.isValidExplore(id)) {
             MessageHelper.sendMessageToEventChannel(event, "Invalid ID specified: " + id);
+            return;
+        }
+
+        if (resolvesOnPlanet(id) && event.getOption(Constants.PLANET) == null) {
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "`" + id
+                            + "` is a planet exploration card and resolves on a planet. Re-run the command with `planet` set.");
+            return;
         }
 
         if (!force && game.pickExplore(id) == null) {
@@ -81,5 +92,17 @@ class ExploreUse extends GameStateSubcommand {
             messageText +=
                     "\nThis card was drawn __forcefully__ (if the card wasn't in the deck, it was created from thin air).";
         ExploreService.resolveExplore(event, id, tile, planetName, messageText, player, game);
+    }
+
+    private static boolean resolvesOnPlanet(String exploreId) {
+        ExploreModel explore = Mapper.getExplore(exploreId);
+        boolean planetTrait = Set.of("cultural", "industrial", "hazardous")
+                .contains(explore.getType().toLowerCase());
+        return planetTrait && !"fragment".equalsIgnoreCase(explore.getResolution());
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

@@ -1,0 +1,16 @@
+{
+    "id": "fracture16",
+    "name": "Fracture Set2 Egress Right",
+    "aliases": [
+        "fracture16",
+        "Set2egressright",
+        "frac16",
+        "fracrightegr"
+    ],
+    "hasEgress": true,
+    "imagePath": "fracture16.png",
+    "shipPositionsType": "TYPE08",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

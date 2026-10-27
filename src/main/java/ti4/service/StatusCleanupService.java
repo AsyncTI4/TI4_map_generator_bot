@@ -10,8 +10,6 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -20,11 +18,12 @@ import ti4.helpers.AgendaWhensAftersHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SpinRingsHelper;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.service.info.ListPlayerInfoService;
@@ -99,7 +98,7 @@ public class StatusCleanupService {
         }
 
         game.setCurrentACDrawStatusInfo("");
-        if (!game.isFowMode()) {
+        if (!game.isFowMode() || FoWHelper.isFogQol01(game)) {
             for (Player p : game.getActionPhaseTurnOrder()) {
                 ButtonHelper.drawStatusACs(game, p, null);
             }
@@ -107,8 +106,6 @@ public class StatusCleanupService {
 
         for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
 
-            NetrunnersAbilitiesHandler.clearProxyNetwork(game, player);
-            NetrunnersFactionTechsHandler.clearDataMining(game, player);
             player.setPassed(false);
             Set<Integer> SCs = player.getSCs();
             for (int sc : SCs) {

@@ -543,7 +543,7 @@ public class DreamLeadersHandler {
     }
 
     private static boolean isDreamHeroNexusDestination(Game game, Tile tile) {
-        return tile != null && !tile.isHomeSystem(game) && !tile.isMecatol(game);
+        return tile != null && !tile.isHomeSystem(game);
     }
 
     private static List<Tile> getDreamHeroUnitDestinations(Game game, Player player) {

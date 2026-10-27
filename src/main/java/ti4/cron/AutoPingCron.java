@@ -15,10 +15,13 @@ import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.AgendaHelper;
+import ti4.helpers.FoWHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.button.ReactionService;
+import ti4.service.fow.GMService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
@@ -201,6 +204,9 @@ public class AutoPingCron {
             MessageHelper.sendPrivateMessageToPlayer(player, game, pingMessage);
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "Active player has been pinged. This is ping #" + pingNumber + ".");
+            if (pingNumber == 2 && FoWHelper.isFogQol01(game) && player.getPrivateChannel() != null) {
+                offerTemporaryPingDisable(player, player.getPrivateChannel());
+            }
             return;
         }
         MessageChannel gameChannel = player.getCorrectChannel();
@@ -209,15 +215,19 @@ public class AutoPingCron {
         }
         MessageHelper.sendMessageToChannel(gameChannel, pingMessage);
         if (pingNumber == 2) {
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.red("temporaryPingDisable", "Disable Pings For Turn"));
-            buttons.add(Buttons.gray("deleteButtons", "Delete These Buttons"));
-            MessageHelper.sendMessageToChannelWithButtons(
-                    gameChannel,
-                    player.getRepresentationNoPing() + ", if the game is not waiting on you, you may disable the"
-                            + " auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
-                    buttons);
+            offerTemporaryPingDisable(player, gameChannel);
         }
+    }
+
+    private static void offerTemporaryPingDisable(Player player, MessageChannel channel) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.red("temporaryPingDisable", "Disable Pings For Turn"));
+        buttons.add(Buttons.gray("deleteButtons", "Delete These Buttons"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                channel,
+                player.getRepresentationNoPing() + ", if the game is not waiting on you, you may disable the"
+                        + " auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
+                buttons);
     }
 
     private static String getPingMessage(
@@ -290,27 +300,40 @@ public class AutoPingCron {
         if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS / 2 * game.getAutoPingSpacer())) {
 
             StringBuilder msg = new StringBuilder();
+            List<String> fogPlayersNotReady = new ArrayList<>();
             for (Player player : game.getRealPlayers()) {
-                if (game.getStoredValue("statusHomeworkReactionFor" + player.getFaction() + "Round" + game.getRound())
+                if (game.isFowMode()) {
+                    pingFogPlayerForStatusHomework(game, player);
+                    if (!ReactionService.isFowStatusDone(game, player)) {
+                        fogPlayersNotReady.add(player.getRepresentationNoPing());
+                    }
+                } else if (game.getStoredValue(
+                                "statusHomeworkReactionFor" + player.getFaction() + "Round" + game.getRound())
                         .isEmpty()) {
                     msg.append(player.getRepresentation()).append(", ");
-                } else if (game.isFowMode()
-                        && game.getStoredValue("fowStatusDone") != null
-                        && !game.getStoredValue("fowStatusDone").contains(player.getFaction())) {
-                    MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentationUnfogged() + ", please click \"Ready for "
-                                    + (game.isCustodiansScored() ? "Agenda" : "Strategy") + " Phase\".");
-                }
-                if (game.isFowMode() && !game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
-                    MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(), player.getRepresentationUnfogged() + ", please draw ACs.");
                 }
             }
-            if (!game.isFowMode() && !msg.isEmpty()) {
+            if (!msg.isEmpty()) {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), msg + "please allocate command tokens.\n");
             }
+            if (FoWHelper.isFogQol01(game) && !fogPlayersNotReady.isEmpty()) {
+                GMService.sendMessageToGMRoom(
+                        game, "Status homework is waiting on: " + String.join(", ", fogPlayersNotReady) + ".");
+            }
             AutoPingMetadataManager.addPing(game.getName());
+        }
+    }
+
+    private static void pingFogPlayerForStatusHomework(Game game, Player player) {
+        if (!ReactionService.isFowStatusDone(game, player)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", please click \"Ready for "
+                            + (game.isCustodiansScored() ? "Agenda" : "Strategy") + " Phase\".");
+        }
+        if (!game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), player.getRepresentationUnfogged() + ", please draw ACs.");
         }
     }
 

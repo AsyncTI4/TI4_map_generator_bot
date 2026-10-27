@@ -8,8 +8,8 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.TokenModel;
 
@@ -20,6 +20,7 @@ public final class TokenPlanetService {
         cradle,
         oasis,
         avernus,
+        oceanus,
         thundersedge,
         illusion,
         phantasm,

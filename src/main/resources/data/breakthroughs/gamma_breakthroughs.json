@@ -121,14 +121,38 @@
     },
     {
         "alias": "industriesbt",
-        "name": "Industrial OVerload",
-        "shortName": "Industrial\nOVerload",
+        "name": "Industrial Overload",
+        "shortName": "Industrial\nOverload",
         "faction": "industries",
         "synergy": [
             "CYBERNETIC",
             "WARFARE"
         ],
         "text": "If you have the Space Dock II technology, flip this card and place it on top of Space Dock II.\nForgeworld [Combat 6; PRODUCTION X, PLANETARY SHIELD, SUSTAIN DAMAGE] This unit is treated as both a structure and a ground force.This unit's PRODUCTION value is equal to 6 more than the resource or influence value of this planet.Up to 6 fighters in this system do not count against your ships' capacity.",
+        "source": "gamma"
+    },
+    {
+        "alias": "ironhullbt",
+        "name": "Harrier Colosseums",
+        "shortName": "Harrier\nColosseums",
+        "faction": "ironhull",
+        "synergy": [
+            "PROPULSION",
+            "CYBERNETIC"
+        ],
+        "text": "ACTION: Exhaust this card to place a thrall token on a non-home planet. Planets you do not control that contain Thrall tokens are also treated as stations except for the purposes of control; units can be committed to, produced on, and placed on these planets.\nWhen a player places infantry on a planet you do not control with your BREAKOUT  faction ability, that player places 2 additional infantry.",
+        "source": "gamma"
+    },
+    {
+        "alias": "projectbt",
+        "name": "Globus Cassus",
+        "shortName": "Globus\nCassus",
+        "faction": "project",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "Elysium is also treated as a station except for the purposes of control; units can be committed to, produced on, and placed on Elysium. At the end of your turn, you may exhaust Elysium to explore the frontier deck in Elysium's system. If your home system contains more than 1 planet, flip this card.\nYou can use technology specialties on planets you do not control in your home system without exhausting them, even if those planets are exhausted. You treat planets in systems that contain The Elysium Planet token as if you controlled them for the purpose of scoring. If your home system only contains 1 planet, flip this card.",
         "source": "gamma"
     }
 ]

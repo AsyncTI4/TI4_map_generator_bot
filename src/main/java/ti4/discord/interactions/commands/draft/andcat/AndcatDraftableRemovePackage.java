@@ -42,8 +42,9 @@ class AndcatDraftableRemovePackage extends GameStateSubcommand {
             draftable.getReferenceCardPackages().remove(packageNum);
             // Also remove any picks players have made for that package
             for (var playerState : draftManager.getPlayerStates().values()) {
-                playerState.getPicks(draftable.getType()).removeIf(c -> c.choiceKey()
-                        .equals(choiceKey));
+                playerState
+                        .getPicks(draftable.getType())
+                        .removeIf(c -> c.choiceKey().equals(choiceKey));
             }
 
             MessageHelper.sendMessageToChannel(

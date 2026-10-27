@@ -1,0 +1,16 @@
+{
+    "id": "th40",
+    "name": "Avarin",
+    "aliases": [
+        "th40",
+        "avarin"
+    ],
+    "imagePath": "th40.png",
+    "planets": [
+        "avarin"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "red",
+    "isSupernova": true,
+    "source": "theodisi"
+}

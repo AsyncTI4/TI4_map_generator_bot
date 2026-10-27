@@ -1,6 +1,7 @@
 package ti4.service.fow;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -8,14 +9,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -23,6 +28,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.thirtyk.ThirtyKTransactions;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -32,6 +38,9 @@ public class FowCommunicationThreadService {
 
     private static final String YES_CHAR = "↔";
     private static final String NO_CHAR = "X";
+    private static final String GUILD_SHIPS = "guild_ships";
+    private static final String COLOR_SEPARATOR = "-";
+    static final String ENCOUNTERED_KEY_PREFIX = "fowCommsEncountered_";
     public static final Pattern THREAD_NAME_PATTERN =
             Pattern.compile("^(\\w+)\\s*(?:" + YES_CHAR + "|" + NO_CHAR + ")\\s*(\\w+)");
 
@@ -46,7 +55,12 @@ public class FowCommunicationThreadService {
     }
 
     public static void checkNewCommPartners(Game game, Player player) {
-        if (!isActive(game)) return;
+        if (!AnonymousCommsService.isActive(game) && !isActive(game)) return;
+        Map<Player, Set<Player>> basePartners = recordEncounters(game);
+        if (AnonymousCommsService.isActive(game)) {
+            AnonymousCommsService.refreshPartners(game, basePartners);
+            return;
+        }
 
         Set<String> checkedPairs = new HashSet<>();
         getGameThreadChannels(game).thenAccept(threads -> {
@@ -84,12 +98,29 @@ public class FowCommunicationThreadService {
         return game.getPhaseOfGame().startsWith("agenda") && game.isHiddenAgendaMode();
     }
 
-    private static Set<Player> getCommPartners(Game game, Player player) {
+    static Set<Player> getCommPartners(Game game, Player player) {
+        return getCommPartners(game, player, null);
+    }
+
+    static Set<Player> getCommPartners(Game game, Player player, @Nullable Set<Player> basePartners) {
         if (areAllowedToTalkInAgenda(game)) {
             Set<Player> allPlayers = new HashSet<>(game.getRealPlayers());
             allPlayers.remove(player);
             return allPlayers;
         }
+        Set<Player> commPartners = new HashSet<>(basePartners == null ? baseCommPartners(game, player) : basePartners);
+        commPartners.addAll(ThirtyKTransactions.partnersOf(game, player));
+        if (AnonymousCommsService.isActive(game) && hasGuildShips(player)) {
+            commPartners.addAll(guildShipsPartners(game, player));
+        }
+        return commPartners;
+    }
+
+    static boolean hasGuildShips(Player player) {
+        return player.hasAbility(GUILD_SHIPS);
+    }
+
+    private static Set<Player> baseCommPartners(Game game, Player player) {
         Set<Player> commPartners = new HashSet<>(player.getNeighbouringPlayers(true));
         if (player.hasSpaceStation()) {
             game.getRealPlayers().stream()
@@ -97,6 +128,33 @@ public class FowCommunicationThreadService {
                     .forEach(commPartners::add);
         }
         return commPartners;
+    }
+
+    private static Set<Player> guildShipsPartners(Game game, Player player) {
+        Set<String> encountered = encounteredColors(game, player);
+        return game.getRealPlayers().stream()
+                .filter(other -> !other.equals(player) && encountered.contains(other.getColor()))
+                .collect(Collectors.toSet());
+    }
+
+    public static Set<String> encounteredColors(Game game, Player player) {
+        String stored = game.getStoredValue(ENCOUNTERED_KEY_PREFIX + player.getColor());
+        return Arrays.stream(stored.split(COLOR_SEPARATOR))
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    static Map<Player, Set<Player>> recordEncounters(Game game) {
+        Map<Player, Set<Player>> basePartners = new HashMap<>();
+        for (Player player : game.getRealPlayers()) {
+            Set<Player> partners = baseCommPartners(game, player);
+            basePartners.put(player, partners);
+            Set<String> encountered = encounteredColors(game, player);
+            partners.stream().filter(Player::isRealPlayer).map(Player::getColor).forEach(encountered::add);
+            if (encountered.isEmpty()) continue;
+            game.setStoredValue(ENCOUNTERED_KEY_PREFIX + player.getColor(), String.join(COLOR_SEPARATOR, encountered));
+        }
+        return basePartners;
     }
 
     public static CompletableFuture<List<ThreadChannel>> getGameThreadChannels(Game game) {
@@ -114,6 +172,23 @@ public class FowCommunicationThreadService {
                         future::completeExceptionally);
 
         return future;
+    }
+
+    public static void deleteManagedThreads(Game game, MessageChannel feedback) {
+        getGameThreadChannels(game).thenAccept(threads -> {
+            for (ThreadChannel thread : threads) {
+                if (!THREAD_NAME_PATTERN.matcher(thread.getName()).find()) continue;
+                String threadName = thread.getName();
+                thread.delete()
+                        .onErrorFlatMap(err -> {
+                            MessageHelper.sendMessageToChannel(
+                                    feedback, "Error deleting thread: " + threadName + " : " + err.getMessage());
+                            return null;
+                        })
+                        .queueAfter(1, TimeUnit.SECONDS);
+                MessageHelper.sendMessageToChannel(feedback, "Deleted thread: " + threadName);
+            }
+        });
     }
 
     public static Optional<ThreadChannel> findOpenCommThread(Game game, Player p1, Player p2) {
@@ -185,30 +260,39 @@ public class FowCommunicationThreadService {
                         + otherPlayer.getRepresentationNoPing();
                 if (!threadLocked && isHiddenAgenda(game)) {
                     // Reminder of Hidden Agenda mode
-                    threadChannel.getManager().setArchived(false).queue(success -> threadChannel
-                            .sendMessage(
-                                    "⚠️ Reminder that during Hidden Agenda __only__ the speaker is allowed to speak.")
-                            .queue(Consumers.nop(), BotLogger::catchRestError));
+                    threadChannel
+                            .getManager()
+                            .setArchived(false)
+                            .queue(success -> threadChannel
+                                    .sendMessage(
+                                            "⚠️ Reminder that during Hidden Agenda __only__ the speaker is allowed to speak.")
+                                    .queue(Consumers.nop(), BotLogger::catchRestError));
                 } else if (areAbleToCommunicate && threadLocked) {
                     // Allow talking
-                    threadChannel.getManager().setArchived(false).queue(success -> threadChannel
+                    threadChannel
                             .getManager()
-                            .setName(threadName.replace(NO_CHAR, YES_CHAR))
-                            .queue(nameUpdated -> threadChannel
-                                    .sendMessage(notice
-                                            + (areAllowedToTalkInAgenda
-                                                    ? " __may__ communicate in Agenda Phase."
-                                                    : " have regained comms and __may__ communicate."))
-                                    .queue(Consumers.nop(), BotLogger::catchRestError)));
+                            .setArchived(false)
+                            .queue(success -> threadChannel
+                                    .getManager()
+                                    .setName(threadName.replace(NO_CHAR, YES_CHAR))
+                                    .queue(nameUpdated -> threadChannel
+                                            .sendMessage(notice
+                                                    + (areAllowedToTalkInAgenda
+                                                            ? " __may__ communicate in Agenda Phase."
+                                                            : " have regained comms and __may__ communicate."))
+                                            .queue(Consumers.nop(), BotLogger::catchRestError)));
 
                 } else if (!areAbleToCommunicate && !threadLocked) {
                     // Deny talking
-                    threadChannel.getManager().setArchived(false).queue(success -> threadChannel
+                    threadChannel
                             .getManager()
-                            .setName(threadName.replace(YES_CHAR, NO_CHAR))
-                            .queue(nameUpdated -> threadChannel
-                                    .sendMessage(notice + " have lost comms and __may not__ communicate.")
-                                    .queue(Consumers.nop(), BotLogger::catchRestError)));
+                            .setArchived(false)
+                            .queue(success -> threadChannel
+                                    .getManager()
+                                    .setName(threadName.replace(YES_CHAR, NO_CHAR))
+                                    .queue(nameUpdated -> threadChannel
+                                            .sendMessage(notice + " have lost comms and __may not__ communicate.")
+                                            .queue(Consumers.nop(), BotLogger::catchRestError)));
                 }
             }
         } finally {

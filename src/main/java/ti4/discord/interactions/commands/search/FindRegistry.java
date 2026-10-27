@@ -13,14 +13,14 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.model.AbilityModel;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.EmbeddableModel;
+import ti4.model.Mapper;
 import ti4.model.ModelInterface;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileHelper;
 
 @UtilityClass
 class FindRegistry {
@@ -200,17 +200,20 @@ class FindRegistry {
             Function<T, String> textSearch,
             Function<T, MessageEmbed> exactEmbed,
             Function<T, MessageEmbed> listEmbed) {
-        return new FindSpec(key, displayName, () -> models.get().stream()
-                .map(model -> new FindItem(
-                        model.getAlias(),
-                        model.getSource(),
-                        model.getAutoCompleteName(),
-                        model.getNameRepresentation(),
-                        textSearch.apply(model),
-                        model::search,
-                        () -> exactEmbed.apply(model),
-                        () -> listEmbed.apply(model)))
-                .toList());
+        return new FindSpec(
+                key,
+                displayName,
+                () -> models.get().stream()
+                        .map(model -> new FindItem(
+                                model.getAlias(),
+                                model.getSource(),
+                                model.getAutoCompleteName(),
+                                model.getNameRepresentation(),
+                                textSearch.apply(model),
+                                model::search,
+                                () -> exactEmbed.apply(model),
+                                () -> listEmbed.apply(model)))
+                        .toList());
     }
 
     private static <T extends ModelInterface & EmbeddableModel> FindSpec spec(

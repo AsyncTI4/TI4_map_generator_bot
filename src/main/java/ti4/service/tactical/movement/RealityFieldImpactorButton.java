@@ -9,11 +9,13 @@ import ti4.service.tactical.MoveContext;
 
 public final class RealityFieldImpactorButton implements MoveAbilityButton {
     public boolean enabled(MoveContext ctx) {
-        return ctx.player.hasTech("dspharb");
+        return ctx.player.hasTech("dspharb") && !RealityFieldImpactorService.hasBeenUsed(ctx.game);
     }
 
     public List<Button> build(MoveContext ctx) {
         return List.of(Buttons.gray(
-                "declareUse_Reality Field Impactor", "Declare Reality Field Impactor", FactionEmojis.pharadn));
+                ctx.player.factionButtonChecker() + "useRealityFieldImpactor",
+                "Use Reality-Field Impactor",
+                FactionEmojis.pharadn));
     }
 }

@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.settings.users.UserSettingsManager;
 
 class SetPreferredColourList extends Subcommand {

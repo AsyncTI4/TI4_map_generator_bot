@@ -1,0 +1,12 @@
+{
+  "name": "30k-explore-cross-species",
+  "description": "Cross-species Mingling on Quann with no foreign infantry nearby places exactly 1 infantry (X = 0 + 1).",
+  "preset": "30k-explore-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "expect": { "state": "planet.quann.units", "equals": "quann:{sol.color}_gf=1" } },
+    { "do": "stackExplore", "value": "crossspeciesmingling30k" },
+    { "as": "sol", "pressId": "FFCC_{sol.faction}_movedNExplored_filler_quann_cultural" },
+    { "expect": { "state": "planet.quann.units", "equals": "quann:{sol.color}_gf=2" } }
+  ]
+}

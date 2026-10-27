@@ -93,13 +93,28 @@ public class SusSlashCommandService {
         if (managedGame != null) {
             TextChannel mainGameChannel = managedGame.getMainGameChannel();
             TextChannel tableTalkChannel = managedGame.getTableTalkChannel();
-            String tabletalkLink =
-                    String.format("[__[" + tableTalkChannel.getName() + "](%s)__]", tableTalkChannel.getJumpUrl());
-            String actionsLink = String.format("[__[Actions](%s)__]", mainGameChannel.getJumpUrl());
-            message.append(" ").append(actionsLink);
-            message.append(" ").append(tabletalkLink);
+            if (mainGameChannel != null) {
+                message.append(" ").append(String.format("[__[Actions](%s)__]", mainGameChannel.getJumpUrl()));
+            }
+            if (tableTalkChannel != null) {
+                message.append(" ")
+                        .append(String.format(
+                                "[__[" + tableTalkChannel.getName() + "](%s)__]", tableTalkChannel.getJumpUrl()));
+            }
         }
         MessageHelper.sendMessageToChannel(moderationLogChannel, message.toString());
+    }
+
+    public static void reportModeratorCheck(SlashCommandInteractionEvent event) {
+        TextChannel susLogChannel = JdaService.guildPrimary == null
+                ? null
+                : JdaService.guildPrimary.getTextChannelsByName("sus-slash-commands-log", true).stream()
+                        .findFirst()
+                        .orElse(null);
+        if (susLogChannel == null) return;
+        String message =
+                "Moderator check: " + event.getUser().getEffectiveName() + " `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToChannel(susLogChannel, message);
     }
 
     private static void reportToSusSlashCommandLog(

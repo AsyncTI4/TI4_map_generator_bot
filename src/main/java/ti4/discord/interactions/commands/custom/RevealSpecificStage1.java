@@ -7,9 +7,9 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 
 class RevealSpecificStage1 extends GameStateSubcommand {
@@ -40,7 +40,8 @@ class RevealSpecificStage1 extends GameStateSubcommand {
 
         MessageHelper.sendMessageToChannel(
                 event.getChannel(), "### " + game.getPing() + " **Stage 1 Public Objective Revealed**");
-        event.getChannel().sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin()
-                .queue(Consumers.nop(), BotLogger::catchRestError));
+        event.getChannel()
+                .sendMessageEmbeds(po.getRepresentationEmbed())
+                .queue(m -> m.pin().queue(Consumers.nop(), BotLogger::catchRestError));
     }
 }

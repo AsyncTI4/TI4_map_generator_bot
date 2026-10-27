@@ -6,8 +6,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
 
 class PingSystem extends GameStateSubcommand {
 
@@ -20,7 +20,7 @@ class PingSystem extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String position = event.getOption(Constants.POSITION).getAsString().toLowerCase();
-        if (!PositionMapper.isTilePositionValid(position)) {
+        if (!MapPositionMapper.isTilePositionValid(position)) {
             MessageHelper.replyToMessage(event, "Tile position is not allowed");
             return;
         }

@@ -1,0 +1,18 @@
+{
+    "id": "th23",
+    "name": "Neryth",
+    "aliases": [
+        "th23",
+        "neryth"
+    ],
+    "imagePath": "th23.png",
+    "planets": [
+        "neryth"
+    ],
+    "shipPositionsType": "TYPE04",
+    "wormholes": [
+        "GAMMA"
+    ],
+    "tileBack": "blue",
+    "source": "theodisi"
+}

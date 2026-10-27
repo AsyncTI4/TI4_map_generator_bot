@@ -14,6 +14,7 @@ import ti4.helpers.BombardmentAssignment;
 import ti4.helpers.BombardmentAssignmentType;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
 import tools.jackson.databind.ObjectMapper;
 
@@ -48,6 +49,18 @@ public class BombardmentService {
                     .getValue()
                     .getGalvanizedUnitCount(entry.getKey().getKey().getUnitType(), player.getColorID());
             if (entry.getKey().getValue().getName().equalsIgnoreCase(planet)) {
+                continue;
+            }
+            if (player.hasRelic("salvage_war_sun") && entry.getKey().getKey().getUnitType() == UnitType.Warsun) {
+                for (String bombardablePlanet : getBombardablePlanets(player, game, tile)) {
+                    int planetGalvanizedCount = galvanizedCount;
+                    for (int x = 0; x < entry.getValue(); x++) {
+                        String asyncId = entry.getKey().getKey().getAsyncId();
+                        assignments.add(new BombardmentAssignment(
+                                asyncId, bombardablePlanet, planetGalvanizedCount > 0, BombardmentAssignmentType.UNIT));
+                        planetGalvanizedCount--;
+                    }
+                }
                 continue;
             }
             for (int x = 0; x < entry.getValue(); x++) {

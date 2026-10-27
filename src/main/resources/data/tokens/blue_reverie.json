@@ -43,5 +43,14 @@
             "kaltrimshrine4"
         ],
         "source": "blue_reverie"
+    },
+    {
+        "id": "gedustation",
+        "imagePath": "token_gedustation.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "gedustation"
+        ],
+        "source": "blue_reverie"
     }
 ]

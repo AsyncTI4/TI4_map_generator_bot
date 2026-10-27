@@ -9,7 +9,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AgendaSummaryHelper;
 import ti4.helpers.Helper;
-import ti4.image.TileGenerator;
+import ti4.image.tile.SystemContextImage;
 import ti4.message.MessageHelper;
 import ti4.service.agenda.IxthianArtifactService;
 import ti4.service.emoji.PlanetEmojis;
@@ -27,8 +27,7 @@ public class AbsolArtifactAgendaResolver implements ForAgainstAgendaResolver {
         if (watchParty != null && !game.isFowMode()) {
             Tile tile = game.getMecatolTile();
             if (tile != null) {
-                FileUpload systemWithContext =
-                        new TileGenerator(game, event, null, 1, tile.getPosition()).createFileUpload();
+                FileUpload systemWithContext = SystemContextImage.upload(game, event, 1, tile.getPosition());
                 String message = "# _Ixthian Artifact_ has resolved! " + watchPartyPing + "\n"
                         + AgendaSummaryHelper.getSummaryOfVotes(game, true).replace("# _Ixthian Artifact_\n", "")
                         + "\nSurrounding Mecatol Rex in " + game.getName() + ".";

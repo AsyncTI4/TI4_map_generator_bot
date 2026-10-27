@@ -4,9 +4,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.label.Label;
@@ -37,7 +38,6 @@ import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.service.statistics.AverageTurnTimeService;
 import ti4.spring.service.statistics.UserGameInfoService;
 import ti4.spring.service.statistics.matchmaking.queue.JoinBlocker;
 import ti4.spring.service.statistics.matchmaking.queue.MatchmakerService;
@@ -47,6 +47,8 @@ import ti4.spring.service.statistics.matchmaking.queue.PlayerSearchService;
 
 @UtilityClass
 public class CreateGameButtonHandler {
+
+    private static final Pattern USER_MENTION = Pattern.compile("<@!?(\\d+)>");
 
     @ButtonHandler("launchGame")
     public static void createGameChannelsButton(ButtonInteractionEvent event) {
@@ -200,12 +202,11 @@ public class CreateGameButtonHandler {
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    private static List<Member> fetchMembersFromMessage(String buttonMsg, Guild guild) {
+    static List<Member> fetchMembersFromMessage(String buttonMsg, Guild guild) {
         List<Member> members = new ArrayList<>();
-        for (int i = 0; i < StringUtils.countMatches(buttonMsg, "<@"); i++) {
-            String user = buttonMsg.split("@")[i + 1];
-            user = StringUtils.substringBefore(user, ">");
-            Member member = guild.getMemberById(user);
+        Matcher mention = USER_MENTION.matcher(buttonMsg);
+        while (mention.find()) {
+            Member member = guild.getMemberById(mention.group(1));
             if (member != null) {
                 members.add(member);
             }
@@ -278,9 +279,6 @@ public class CreateGameButtonHandler {
 
         StringBuilder activityList = new StringBuilder();
 
-        var userIds = members.stream().map(Member::getId).toList();
-        Map<String, Long> userIdsToAverageTurnTimes =
-                AverageTurnTimeService.getBean().getUserIdsToAverageTurnTimes(userIds);
         int playerNumber = 1;
         for (Member member : members) {
             String mention = ping ? member.getUser().getAsMention() : member.getEffectiveName();

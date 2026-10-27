@@ -14,6 +14,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -32,11 +34,11 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -593,9 +595,9 @@ public class RevenantLeadersHandler {
                     Buttons.red(agentOwner.factionButtonChecker() + "deleteButtons", "No Thanks"));
             MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
                     agentOwner.getCardsInfoThread(),
-                    agentOwner.getRepresentation() + ", " + tokenOwner.getRepresentationNoPing()
+                    agentOwner.getRepresentationNoPing() + ", " + tokenOwner.getRepresentationNoPing()
                             + " placed a command token in " + sourceTile.getRepresentationForButtons(game, agentOwner)
-                            + ". You may exhaust **Kruth Torrious** to move it.",
+                            + ". You may exhaust **Kruth Torrious, the Revenant agent** to move it.",
                     buttons);
         }
     }
@@ -817,7 +819,7 @@ public class RevenantLeadersHandler {
                     "Manually Assign " + hits + " Hit" + (hits == 1 ? "" : "s")));
         } else {
             hitButtons.add(Buttons.green(
-                    opponent.factionButtonChecker() + "autoAssignGroundHits_" + holder.getName() + "_" + hits,
+                    opponent.factionButtonChecker() + AutoAssignGroundHitsButtonIds.format(holder.getName(), hits),
                     "Auto-assign " + hits + " Hit" + (hits == 1 ? "" : "s")));
             hitButtons.add(Buttons.red(
                     opponent.factionButtonChecker() + "getDamageButtons_" + tile.getPosition()
@@ -1870,6 +1872,7 @@ public class RevenantLeadersHandler {
         // Each unchosen hero was purged as part of the effect.
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         OblivionUnitHandler.doOblivionMechCheck(game, player);
+        StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
     }
 
     // Green Revenant Leader Set

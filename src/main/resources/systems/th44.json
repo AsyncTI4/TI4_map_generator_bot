@@ -1,0 +1,17 @@
+{
+    "id": "th44",
+    "name": "Gamma Wormhole/Nebula",
+    "aliases": [
+        "th44",
+        "gammawormhole"
+    ],
+    "imagePath": "th44.png",
+    "planets": [],
+    "shipPositionsType": "TYPE08",
+    "wormholes": [
+        "GAMMA"
+    ],
+    "tileBack": "red",
+    "isNebula": true,
+    "source": "theodisi"
+}

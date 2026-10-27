@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 

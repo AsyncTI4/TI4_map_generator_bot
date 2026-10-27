@@ -1,0 +1,262 @@
+[
+    {
+        "alias": "unspentreserves30k",
+        "name": "Unspent Reserves",
+        "phase": "Status",
+        "text": "Have commodities equal to your commodity value.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "FULL"
+    },
+    {
+        "alias": "braveextinction30k",
+        "name": "Brave Extinction",
+        "phase": "Status",
+        "text": "Have 3 or fewer infantry on the game board.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "FULL"
+    },
+    {
+        "alias": "lightmilitary30k",
+        "name": "Light Military",
+        "phase": "Status",
+        "text": "Have 9 or more non-fighter ships on the game board, and no dreadnoughts, war suns or flagships on the game board.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "FULL"
+    },
+    {
+        "alias": "typecast30k",
+        "name": "Typecast",
+        "phase": "Status",
+        "text": "Have more than half of the planets you control share the same trait (cultural, hazardous or industrial).",
+        "points": 1,
+        "notes": "Home planets have no trait: they count toward your total number of planets but never toward a trait, which makes this harder for factions with several home planets.",
+        "source": "thirtyk",
+        "automation": "FULL"
+    },
+    {
+        "alias": "participationtrophy30k",
+        "name": "Participation Trophy",
+        "phase": "Status",
+        "text": "Score no public objectives, and have no other unscored secret objectives.",
+        "points": 1,
+        "notes": "Only public objectives scored during this status phase count. After scoring this objective, you cannot score a public objective later in the same status phase.",
+        "source": "thirtyk",
+        "automation": "PARTIAL",
+        "automationNotes": "The bot checks that you scored no public objective in this status phase and hold no other unscored secret. If you score this first, do not score a public objective afterwards; the bot does not stop you."
+    },
+    {
+        "alias": "relinquishtechnology30k",
+        "name": "Relinquish Technology",
+        "phase": "Action",
+        "text": "Lose control of a planet that has an attachment.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "PARTIAL",
+        "automationNotes": "When you lose control of a planet with an attachment, the bot offers a Score button. Losses the bot does not see (manual unit or planet edits) need /so score."
+    },
+    {
+        "alias": "options30k",
+        "name": "Options",
+        "phase": "Status",
+        "text": "Have 7 or more action cards in your hand.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "FULL"
+    },
+    {
+        "alias": "plannedobsolescence30k",
+        "name": "Planned Obsolescence",
+        "phase": "Action",
+        "text": "Lose control of a planet that contains a structure.",
+        "points": 1,
+        "notes": "Any player's structure counts, including one that was on the planet at the end of the combat in which you lost control of it.",
+        "source": "thirtyk",
+        "automation": "PARTIAL",
+        "automationNotes": "When you lose control of a planet, the bot offers a Score button. It says so if a structure is there now, or was there when a ground combat on the planet started this turn; otherwise confirm yourself that it held one."
+    },
+    {
+        "alias": "reclusivenature30k",
+        "name": "Reclusive Nature",
+        "phase": "Status",
+        "text": "Have no ships outside your home system and the systems adjacent to it.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "FULL"
+    },
+    {
+        "alias": "nothingtolose30k",
+        "name": "Nothing to Lose",
+        "phase": "Status",
+        "text": "Have no action cards, no trade goods and no readied planets. You may score this objective after scoring a public objective.",
+        "points": 1,
+        "notes": "If a public objective requires you to spend action cards, trade goods or planets, you qualify if you meet all 3 conditions after spending; each of them must be at 0.",
+        "source": "thirtyk",
+        "automation": "FULL"
+    },
+    {
+        "alias": "preparationforwar30k",
+        "name": "Preparation for War",
+        "phase": "Status",
+        "text": "Have 8 or more command tokens in total in your tactic, fleet and strategy pools.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "FULL"
+    },
+    {
+        "alias": "unnecessarypredictions30k",
+        "name": "Unnecessary Predictions",
+        "phase": "Status",
+        "text": "Have 3 or more command tokens in your strategy pool.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "FULL"
+    },
+    {
+        "alias": "policyindifference30k",
+        "name": "Policy Indifference",
+        "phase": "Agenda",
+        "text": "End an agenda phase with all of your planets readied, having cast no votes and played no action cards before or after an agenda was revealed.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "PARTIAL",
+        "automationNotes": "At the end of the agenda phase the bot offers a Score button if you cast no votes and all your planets are ready. Check yourself that you played no before/after agenda action cards."
+    },
+    {
+        "alias": "policydefiance30k",
+        "name": "Policy Defiance",
+        "phase": "Agenda",
+        "text": "During the agenda phase, be the only player to vote \"For\" or the only player to vote \"Against\" an agenda.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "PARTIAL",
+        "automationNotes": "When a For/Against agenda resolves, the bot offers a Score button to a player who was the only one voting on one side. Votes added outside the vote buttons are not seen. In Fog of War games there is no prompt, so votes stay hidden; score it with the normal secret objective buttons."
+    },
+    {
+        "alias": "longdistancerelationsjmsc",
+        "name": "Long-Distance Relations",
+        "phase": "Status",
+        "text": "Have the \"Alliance\" promissory note of a player whose home system is more than 5 hexes from your home system.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "FULL"
+    },
+    {
+        "alias": "wordofmouthjmsc",
+        "name": "Word of Mouth",
+        "phase": "Status",
+        "text": "Have the \"Support for the Throne\" promissory note of a player whose home system is more than 5 hexes from your home system.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "FULL"
+    },
+    {
+        "alias": "payingrespectsjmsc",
+        "name": "Paying Respects",
+        "phase": "Status",
+        "text": "Have 1 or more ships in a system adjacent to an eliminated player's home system.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "FULL"
+    },
+    {
+        "alias": "newworldsjmsc",
+        "name": "New Worlds",
+        "phase": "Status",
+        "text": "Control 2 planets that are each more than 5 hexes from your home system.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "FULL"
+    },
+    {
+        "alias": "agrandentrancejmsc",
+        "name": "A Grand Entrance",
+        "phase": "Action",
+        "text": "Win a space combat with your flagship in a system that is more than 5 hexes from the system your flagship was in at the start of this action.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "PARTIAL",
+        "automationNotes": "When a space combat ends during your turn with your flagship still there, the bot offers a Score button if the flagship was more than 5 hexes away when you activated the system (or if it could not tell where it was). Retreats and wins decided outside the assign-hits buttons (Yin agent, Courageous to the End, the Yin flagship) are not detected; confirm the win yourself."
+    },
+    {
+        "alias": "observingthepossibilitiesjmsc",
+        "name": "Observing the Possibilities",
+        "phase": "Status",
+        "text": "Have units in 4 systems that each contain a different type of wormhole.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "FULL"
+    },
+    {
+        "alias": "reprimandedjmsc",
+        "name": "Reprimanded",
+        "phase": "Action",
+        "text": "Lose a space combat in the Mecatol Rex system or in a system adjacent to Mecatol Rex.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "PARTIAL",
+        "automationNotes": "When your last ship in a system at or next to Mecatol Rex is destroyed while another player still has ships there, the bot offers a Score button. Retreats are not detected; confirm the loss yourself."
+    },
+    {
+        "alias": "underoursupervisionjmsc",
+        "name": "Under Our Supervision",
+        "phase": "Action",
+        "text": "When another player gains a victory point from the \"Imperial\" strategy card, have 1 or more ships in a system adjacent to Mecatol Rex or to that player's home system.",
+        "points": 1,
+        "notes": "Only the Mecatol Rex victory point from \"Imperial\" counts, not public objectives scored with \"Imperial\".",
+        "source": "thirtyk",
+        "automation": "PARTIAL",
+        "automationNotes": "When another player scores the Imperial Mecatol Rex point with the Imperial button, the bot offers a Score button if you have ships next to Mecatol Rex or their home system. A point scored another way needs /so score."
+    },
+    {
+        "alias": "policymakerjmsc",
+        "name": "Policy Maker",
+        "phase": "Agenda",
+        "text": "During the agenda phase, cast more votes on an agenda than any other player.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "PARTIAL",
+        "automationNotes": "When an agenda resolves, the bot offers a Score button to the player who cast strictly more votes than anyone else. Votes added outside the vote buttons are not seen. In Fog of War games there is no prompt, so votes stay hidden; score it with the normal secret objective buttons."
+    },
+    {
+        "alias": "distantflagsjmsc",
+        "name": "Distant Flags",
+        "phase": "Status",
+        "text": "Have 2 or more structures on the game board that are more than 5 hexes from your home system.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "FULL"
+    },
+    {
+        "alias": "proudflagbearerjmsc",
+        "name": "Proud Flagbearer",
+        "phase": "Status",
+        "text": "Have your flagship in a system that is more than 5 hexes from your home system and contains no other non-fighter ships.",
+        "points": 1,
+        "notes": "Only your own ships count; other players' ships in that system do not matter.",
+        "source": "thirtyk",
+        "automation": "FULL"
+    },
+    {
+        "alias": "exploitexhaustionjmsc",
+        "name": "Exploit Exhaustion",
+        "phase": "Action",
+        "text": "Win a ground combat against a player who has passed.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "PARTIAL",
+        "automationNotes": "When the last ground forces of a passed player on a planet are destroyed in ground combat, the bot offers the remaining player a Score button. Confirm the win yourself."
+    },
+    {
+        "alias": "quickdeliberationsjmsc",
+        "name": "Quick Deliberations",
+        "phase": "Action",
+        "text": "Be the first player to pass during the action phase.",
+        "points": 1,
+        "source": "thirtyk",
+        "automation": "FULL",
+        "automationNotes": "A pass set with /player stats is not seen; use /so score then."
+    }
+]

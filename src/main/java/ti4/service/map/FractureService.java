@@ -3,7 +3,9 @@ package ti4.service.map;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -22,11 +24,11 @@ import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.service.breakthrough.AlRaithService;
 import ti4.service.emoji.DiceEmojis;
@@ -37,12 +39,20 @@ import ti4.service.unit.AddUnitService;
 @UtilityClass
 public class FractureService {
 
-    /** Is there any Fracture space on the board, whether from a tile or from a fracture token? */
+    private static final String PENDING_ROLLS_KEY = "pendingFractureRolls";
+
+    /**
+     * Is there any Fracture space on the board, whether from a tile or from a
+     * fracture token?
+     */
     public static boolean isFractureInPlay(Game game) {
         return game.getTileMap().values().stream().anyMatch(Tile::isFracture);
     }
 
-    /** Positional check, for map rendering only - use {@link #isFractureInPlay} for rules. */
+    /**
+     * Positional check, for map rendering only - use {@link #isFractureInPlay} for
+     * rules.
+     */
     public static boolean isFractureRegionOnMap(Game game) {
         return Stream.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7")
                 .anyMatch(pos -> game.getTileByPosition(pos) != null);
@@ -68,8 +78,35 @@ public class FractureService {
         return "";
     }
 
+    public static void markRollPending(Game game, Player player) {
+        Set<String> pending = pendingRollUserIds(game);
+        pending.add(player.getUserID());
+        game.setStoredValue(PENDING_ROLLS_KEY, String.join(",", pending));
+    }
+
+    private static void clearRollPending(Game game, Player player) {
+        Set<String> pending = pendingRollUserIds(game);
+        pending.remove(player.getUserID());
+        game.setStoredValue(PENDING_ROLLS_KEY, String.join(",", pending));
+    }
+
+    public static List<Player> playersWithPendingRoll(Game game) {
+        if (!canFractureEnterPlay(game)) return List.of();
+        Set<String> pending = pendingRollUserIds(game);
+        return game.getRealPlayers().stream()
+                .filter(player -> pending.contains(player.getUserID()))
+                .toList();
+    }
+
+    private static Set<String> pendingRollUserIds(Game game) {
+        String stored = game.getStoredValue(PENDING_ROLLS_KEY);
+        if (stored.isEmpty()) return new LinkedHashSet<>();
+        return new LinkedHashSet<>(Arrays.asList(stored.split(",")));
+    }
+
     @ButtonHandler("rollFracture")
     private static void resolveFractureRoll(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        clearRollPending(game, player);
         String bt = player.getBreakthroughID();
         if (buttonID.contains("_")) bt = buttonID.split("_")[1];
 
@@ -79,7 +116,26 @@ public class FractureService {
             return;
         }
 
-        int result = new Die(0).getResult();
+        // Roll dice: one d10 normally, or two d10s if Cosmic Convergence is active
+        int result;
+        String diceDisplay;
+        if (game.isCosmicConvergenceMode()) {
+            Die die1 = new Die(0);
+            Die die2 = new Die(0);
+            String die1Color = (die1.getResult() == 1 || die1.getResult() == 10) ? "green" : "gray";
+            String die2Color = (die2.getResult() == 1 || die2.getResult() == 10) ? "green" : "gray";
+            diceDisplay = DiceEmojis.getDieEmoji(die1Color, die1.getResult()) + " "
+                    + DiceEmojis.getDieEmoji(die2Color, die2.getResult());
+            boolean isSuccess = (die1.getResult() == 1 || die1.getResult() == 10)
+                    || (die2.getResult() == 1 || die2.getResult() == 10);
+            result = isSuccess ? 1 : 2; // use 1 for success, anything else for fail
+        } else {
+            Die singleDie = new Die(0);
+            result = singleDie.getResult();
+            String dieColor = (result == 1 || result == 10) ? "green" : "gray";
+            diceDisplay = DiceEmojis.getDieEmoji(dieColor, result);
+        }
+
         if ("onyxxabt".equals(bt)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -97,6 +153,11 @@ public class FractureService {
         } else {
             if (result == 1 || result == 10) { // success
                 if (game.isCosmicConvergenceMode()) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation(false, false) + " rolled " + diceDisplay
+                                    + "! The Fracture is entering play. A new fracture tile will be drawn.");
+
                     int countPer = 1;
                     boolean goneThrough = false;
                     List<TechnologyType> techTypesToAddIngress = new ArrayList<>(TechnologyType.mainFour);
@@ -105,7 +166,8 @@ public class FractureService {
                                 getTilesWithSkipAndNoIngressAndNotAdding(game, type, new ArrayList<>());
                         if (tilesWithSkip.isEmpty()) continue;
 
-                        // The GM presses these in fog, so they must not carry the player's FFCC_ ownership prefix
+                        // The GM presses these in fog, so they must not carry the player's FFCC_
+                        // ownership prefix
                         String prefix = game.isFowMode() ? "" : player.factionButtonChecker();
                         List<Button> buttons = new ArrayList<>(tilesWithSkip.stream()
                                 .map(tile -> {
@@ -179,9 +241,8 @@ public class FractureService {
                             buttons);
 
                 } else {
-                    String msg =
-                            player.getRepresentation(false, false) + " rolled a " + DiceEmojis.getGreenDieEmoji(result)
-                                    + "! The Fracture is now in play! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
+                    String msg = player.getRepresentation(false, false) + " rolled a " + diceDisplay
+                            + "! The Fracture is now in play! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     if (spawnFracture(event, game)) spawnIngressTokens(event, game, player, bt);
                 }
@@ -191,19 +252,23 @@ public class FractureService {
                         "> \"Thunder rolled...\n> It rolled a " + DiceEmojis.getGrayDieEmoji(6)
                                 + ".\"\n> \\- Terry Pratchett, _Guards! Guards!_");
             } else { // fail
-                String msg = player.getRepresentation(true, false) + " rolled a " + DiceEmojis.getGrayDieEmoji(result)
-                        + ", better luck next time.";
+                String msg =
+                        player.getRepresentation(true, false) + " rolled " + diceDisplay + ", better luck next time.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
-    /** Brings The Fracture into play for an automatic effect, saying so only if it is switched off for the game. */
+    /**
+     * Brings The Fracture into play for an automatic effect, saying so only if it
+     * is switched off for the game.
+     */
     public static boolean enterPlayOrExplain(
             GenericInteractionCreateEvent event, Game game, @NotNull Player player, String breakthrough) {
         if (!spawnFracture(event, game)) {
-            // Already in play is the normal case for a later effect, so stay quiet unless it is actually disabled
+            // Already in play is the normal case for a later effect, so stay quiet unless
+            // it is actually disabled
             if (!isFractureInPlay(game)) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), whyFractureCannotEnterPlay(game));
             }
@@ -213,7 +278,10 @@ public class FractureService {
         return true;
     }
 
-    /** Places The Fracture if it is allowed to enter play. Returns true if the tiles were actually placed. */
+    /**
+     * Places The Fracture if it is allowed to enter play. Returns true if the tiles
+     * were actually placed.
+     */
     public static boolean spawnFracture(GenericInteractionCreateEvent event, Game game) {
         if (!canFractureEnterPlay(game)) return false;
         List<String> fracture = Arrays.asList(
@@ -293,7 +361,8 @@ public class FractureService {
             if (!game.isFowMode() && tilesWithSkip.size() <= numberOfIngressPerTechType) continue;
             anyChoicesToMake = true;
 
-            // The GM presses these in fog, so they must not carry the player's FFCC_ ownership prefix
+            // The GM presses these in fog, so they must not carry the player's FFCC_
+            // ownership prefix
             String prefix = game.isFowMode() ? "" : player.factionButtonChecker();
             List<Button> buttons = new ArrayList<>(tilesWithSkip.stream()
                     .map(tile -> {

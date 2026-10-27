@@ -22,6 +22,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -39,8 +40,11 @@ import ti4.cron.CardsInfoPinCleanupCron;
 import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
 import ti4.cron.CronManager;
+import ti4.cron.DiskUsageCron;
 import ti4.cron.EndOldGamesCron;
 import ti4.cron.FastScFollowCron;
+import ti4.cron.FlushUserActiveHoursCron;
+import ti4.cron.GameDatabaseReconciliationCron;
 import ti4.cron.GameMessageCleanupCron;
 import ti4.cron.InteractionLogCron;
 import ti4.cron.KeepThreadsAliveCron;
@@ -49,7 +53,6 @@ import ti4.cron.LogCacheStatsCron;
 import ti4.cron.LongExecutionHistoryCron;
 import ti4.cron.MatchmakerCron;
 import ti4.cron.OldUndoFileCleanupCron;
-import ti4.cron.PersistToSqlCron;
 import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
@@ -68,18 +71,21 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
-import ti4.image.MapRenderPipeline;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
-import ti4.image.TileHelper;
+import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.logging.LogBufferManager;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
+import ti4.model.TileHelper;
 import ti4.service.draft.SliceGenerationPipeline;
 import ti4.service.emoji.ApplicationEmojiService;
+import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
+import ti4.settings.users.UserActiveHourRecorder;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.deploy.ActiveLeaseService;
+import ti4.spring.websocket.GameWebStatePipeline;
 
 @UtilityClass
 public class JdaService {
@@ -87,6 +93,7 @@ public class JdaService {
     private static final String JDA_EVENT_POOL_NAME = "JDA Event Pool";
     private static final int EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS = 5;
     private static final int JDA_SHUTDOWN_TIMEOUT_SECONDS = 20;
+    public static final int DISCORD_REQUEST_TIMEOUT_SECONDS = 60;
     private static final Set<CacheFlag> DISABLED_JDA_CACHE_FLAGS = EnumSet.of(
             // User is playing a game, listening to Spotify, etc.
             CacheFlag.ACTIVITY,
@@ -141,6 +148,7 @@ public class JdaService {
 
     public static void startJdaAndRegisterListeners(String[] args) {
         BotLogger.info("STARTING JDA");
+        RestAction.setDefaultTimeout(DISCORD_REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         jda = JDABuilder.createDefault(args[0])
                 .setEventPool(EVENT_EXECUTOR)
                 .enableIntents(
@@ -288,12 +296,6 @@ public class JdaService {
 
         if (isProduction()) leaveNonWhitelistedGuilds();
 
-        // Attempt to start a "Search Only" version of the bot on eligible servers
-        for (Guild searchGuild : jda.getGuilds()) {
-            if (guilds.stream().anyMatch(g -> g.getId().equals(searchGuild.getId()))) continue;
-            startBotSearchOnly(searchGuild);
-        }
-
         // Check for and report a missing bot-log webhook
         if (!GlobalSettings.settingExists(GlobalSettings.ImplementedSettings.BOT_LOG_WEBHOOK_URL)) {
             BotLogger.warning(
@@ -310,7 +312,7 @@ public class JdaService {
         // load all /resources/planets/ and /resources/systems/ .json files, into 3 HashMaps (not 2)
         TileHelper.init();
         // load all /resources/positions/ .properties files, each into 1 Properties
-        PositionMapper.init();
+        MapPositionMapper.init();
         // load all /resources/data/ .json and .properties files, except logging.properties, each into 1 HashMap or
         // Properties
         Mapper.init();
@@ -328,14 +330,16 @@ public class JdaService {
         ReuploadStaleEmojisCron.register();
         LogCacheStatsCron.register();
         WinningPathCron.register();
-        PersistToSqlCron.register();
+        GameDatabaseReconciliationCron.register();
         UploadStatsCron.register();
         UploadRecentStatsCron.register();
         OldUndoFileCleanupCron.register();
+        DiskUsageCron.register();
         EndOldGamesCron.register();
         GameMessageCleanupCron.register();
         CardsInfoPinCleanupCron.register();
         LogButtonRuntimeStatisticsCron.register();
+        FlushUserActiveHoursCron.register();
         TechSummaryCron.register();
         SabotageAutoReactCron.register();
         FastScFollowCron.register();
@@ -409,29 +413,6 @@ public class JdaService {
         } catch (Exception e) {
             BotLogger.error("\n# FAILED TO START BOT ", e);
             return false;
-        }
-        return true;
-    }
-
-    private static boolean startBotSearchOnly(Guild guild) {
-        // Do not set up search commands for test bots, and definitely never for the hub server, which several test bots
-        // are still in
-        if (guild == null) return false;
-        if (System.getenv("TESTING") != null) return false;
-        if (Constants.ASYNCTI4_HUB_SERVER_ID.equals(guild.getId())) return false;
-
-        // Disable this for now
-        boolean x = true;
-        if (x) return false;
-
-        try {
-            CommandListUpdateAction commands = guild.updateCommands();
-            SlashCommandManager.getCommands().forEach(command -> command.registerSearchCommands(commands));
-            commands.queue(Consumers.nop(), BotLogger::catchRestError);
-            BotLogger.info("SEARCH-ONLY BOT STARTED UP: " + guild.getName());
-            guilds.add(guild);
-        } catch (Exception e) {
-            BotLogger.error("\n# SEARCH-ONLY BOT FAILED TO START: " + guild.getName(), e);
         }
         return true;
     }
@@ -645,9 +626,12 @@ public class JdaService {
             logShutdownResult(JDA_EVENT_POOL_NAME, shutdownEventExecutor());
             logShutdownResult(ExecutorServiceManager.class.getSimpleName(), ExecutorServiceManager.shutdown());
             logShutdownResult(CronManager.class.getSimpleName(), CronManager.shutdown());
+            UserActiveHourRecorder.flush();
             logShutdownResult(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline.shutdown());
             logShutdownResult(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline.shutdown());
             logShutdownResult(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline.shutdown());
+            logShutdownResult(GameWebStatePipeline.class.getSimpleName(), GameWebStatePipeline.shutdown());
+            logShutdownResult(GameDatabaseSyncPipeline.class.getSimpleName(), GameDatabaseSyncPipeline.shutdown());
 
             SpringContext.getBean(ActiveLeaseService.class).releaseLease();
             BotLogger.info("RELEASED ACTIVE LEASE");

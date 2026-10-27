@@ -8,13 +8,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.franken.FrankenUnitService;
 import ti4.service.game.MonumentsService;
@@ -50,6 +51,13 @@ public class UnitModelValueInjectionService {
 
         UnitValueInjection values = getPlayerUnitValueInjection(player, unit);
         UnitModel injectedUnit = values.isEmpty() ? unit : injectValues(unit, values);
+        String salvageRules = IronSalvageRelicHandler.getUnitRulesText(player, unit.getUnitType());
+        if (!salvageRules.isBlank()) {
+            if (injectedUnit == unit) injectedUnit = copyUnit(unit);
+            String ability = injectedUnit.getAbility().orElse("");
+            String appended = ability.isBlank() ? salvageRules : ability + "\n\n" + salvageRules;
+            injectedUnit.setAbility(appended.length() <= 1024 ? appended : appended.substring(0, 1021) + "...");
+        }
         if (player.getGame().isMonumentsMode() && "nekro_monument".equals(unit.getId())) {
             if (injectedUnit == unit) {
                 injectedUnit = copyUnit(unit);
@@ -188,7 +196,66 @@ public class UnitModelValueInjectionService {
             String ability = copiedAbilityText.isBlank() ? baseAbility : baseAbility + "\n\n" + copiedAbilityText;
             injectedUnit.setAbility(ability.length() <= 1024 ? ability : ability.substring(0, 1021) + "...");
         }
+        if (player.hasRelic("lightrailordnance_br") && unit.getUnitType() == UnitType.Spacedock) {
+            UnitModel pds = player.getUnitFromAsyncID(UnitType.Pds.getValue());
+            if (pds != null) {
+                injectedUnit = addLightrailOrdnanceAttributes(injectedUnit, pds);
+            }
+        }
         return injectedUnit;
+    }
+
+    private UnitModel addLightrailOrdnanceAttributes(UnitModel spaceDock, UnitModel pds) {
+        UnitModel enhancedSpaceDock = copyUnit(spaceDock);
+        enhancedSpaceDock.setMoveValue(Math.max(spaceDock.getMoveValue(), pds.getMoveValue()));
+        enhancedSpaceDock.setProductionValue(Math.max(spaceDock.getProductionValue(), pds.getProductionValue()));
+        enhancedSpaceDock.setCapacityValue(Math.max(spaceDock.getCapacityValue(), pds.getCapacityValue()));
+        enhancedSpaceDock.setFleetSupplyBonus(Math.max(spaceDock.getFleetSupplyBonus(), pds.getFleetSupplyBonus()));
+        enhancedSpaceDock.setCapacityUsed(Math.max(spaceDock.getCapacityUsed(), pds.getCapacityUsed()));
+        enhancedSpaceDock.setCost(Math.max(spaceDock.getCost(), pds.getCost()));
+        enhancedSpaceDock.setCombatDieCount(Math.max(spaceDock.getCombatDieCount(), pds.getCombatDieCount()));
+        enhancedSpaceDock.setCombatHitsOn(getBestHitsOn(
+                List.of(spaceDock, pds),
+                UnitModel::getCombatDieCount,
+                UnitModel::getCombatHitsOn,
+                spaceDock.getCombatHitsOn()));
+        enhancedSpaceDock.setAfbDieCount(Math.max(spaceDock.getAfbDieCount(), pds.getAfbDieCount()));
+        enhancedSpaceDock.setAfbHitsOn(getBestHitsOn(
+                List.of(spaceDock, pds), UnitModel::getAfbDieCount, UnitModel::getAfbHitsOn, spaceDock.getAfbHitsOn()));
+        enhancedSpaceDock.setBombardDieCount(Math.max(spaceDock.getBombardDieCount(), pds.getBombardDieCount()));
+        enhancedSpaceDock.setBombardHitsOn(getBestHitsOn(
+                List.of(spaceDock, pds),
+                UnitModel::getBombardDieCount,
+                UnitModel::getBombardHitsOn,
+                spaceDock.getBombardHitsOn()));
+        enhancedSpaceDock.setSpaceCannonDieCount(
+                Math.max(spaceDock.getSpaceCannonDieCount(), pds.getSpaceCannonDieCount()));
+        enhancedSpaceDock.setSpaceCannonHitsOn(getBestHitsOn(
+                List.of(spaceDock, pds),
+                UnitModel::getSpaceCannonDieCount,
+                UnitModel::getSpaceCannonHitsOn,
+                spaceDock.getSpaceCannonHitsOn()));
+        enhancedSpaceDock.setDeepSpaceCannon(spaceDock.getDeepSpaceCannon() || pds.getDeepSpaceCannon());
+        enhancedSpaceDock.setPlanetaryShield(spaceDock.getPlanetaryShield() || pds.getPlanetaryShield());
+        enhancedSpaceDock.setSustainDamage(spaceDock.getSustainDamage() || pds.getSustainDamage());
+        enhancedSpaceDock.setDisablesPlanetaryShield(
+                spaceDock.getDisablesPlanetaryShield() || pds.getDisablesPlanetaryShield());
+        enhancedSpaceDock.setCanBeDirectHit(spaceDock.getCanBeDirectHit() || pds.getCanBeDirectHit());
+        enhancedSpaceDock.setIsStructure(spaceDock.getIsStructure() || pds.getIsStructure());
+        enhancedSpaceDock.setIsMonument(spaceDock.getIsMonument() || pds.getIsMonument());
+        enhancedSpaceDock.setIsGroundForce(spaceDock.getIsGroundForce() || pds.getIsGroundForce());
+        enhancedSpaceDock.setIsShip(spaceDock.getIsShip() || pds.getIsShip());
+        enhancedSpaceDock.setIsSpaceOnly(spaceDock.getIsSpaceOnly() || pds.getIsSpaceOnly());
+        enhancedSpaceDock.setIsPlanetOnly(spaceDock.getIsPlanetOnly() || pds.getIsPlanetOnly());
+        String pdsAbility = pds.getAbility().orElse("");
+        if (!pdsAbility.isBlank()) {
+            String spaceDockAbility = spaceDock.getAbility().orElse("");
+            String ability = spaceDockAbility.isBlank()
+                    ? "**" + pds.getName() + "**: " + pdsAbility
+                    : spaceDockAbility + "\n\n**" + pds.getName() + "**: " + pdsAbility;
+            enhancedSpaceDock.setAbility(ability.length() <= 1024 ? ability : ability.substring(0, 1021) + "...");
+        }
+        return enhancedSpaceDock;
     }
 
     private UnitModel combineDuplicateUnits(UnitModel representative, List<UnitModel> units) {
@@ -218,7 +285,7 @@ public class UnitModelValueInjectionService {
         combined.setCapacityUsed(
                 units.stream().mapToInt(UnitModel::getCapacityUsed).max().orElse(combined.getCapacityUsed()));
         combined.setCost(
-                units.stream().map(UnitModel::getCost).max(Float::compare).orElse(combined.getCost()));
+                units.stream().map(UnitModel::getCost).min(Float::compare).orElse(combined.getCost()));
         combined.setCombatDieCount(
                 units.stream().mapToInt(UnitModel::getCombatDieCount).max().orElse(combined.getCombatDieCount()));
         combined.setCombatHitsOn(getBestHitsOn(
@@ -345,6 +412,26 @@ public class UnitModelValueInjectionService {
             integers.combatHitsOn(-2);
         }
 
+        if (player.hasRelic("salvage_war_sun") && unit.getUnitType() == UnitType.Warsun) {
+            floats.cost(-2);
+            integers.moveValue(1);
+        }
+        if (player.hasRelic("salvage_flagship") && unit.getUnitType() == UnitType.Flagship) {
+            integers.moveValue(1);
+        }
+        if (player.hasRelic("salvage_dreadnought") && unit.getUnitType() == UnitType.Dreadnought) {
+            integers.capacityValue(1);
+        }
+        if (player.hasRelic("salvage_carrier") && unit.getUnitType() == UnitType.Carrier) {
+            integers.combatHitsOn(-1);
+        }
+        if (player.hasRelic("salvage_cruiser") && unit.getUnitType() == UnitType.Cruiser) {
+            integers.capacityValue(1).spaceCannonDieCount(1).spaceCannonHitsOn(8, true);
+        }
+        if (player.hasRelic("salvage_destroyer") && unit.getUnitType() == UnitType.Destroyer) {
+            integers.combatHitsOn(-1);
+        }
+
         if (player.hasAbility("cruiser_customrig") && "cruiser".equalsIgnoreCase(unit.getBaseType())) {
             floats.cost(-1);
         }
@@ -417,6 +504,12 @@ public class UnitModelValueInjectionService {
                 integers.spaceCannonHitsOn(9, true);
             }
             booleans.isStructure(true);
+        }
+
+        if (player.hasUnlockedBreakthrough("atokerabt") && unit.getIsStructure()) {
+            integers.combatHitsOn(7, true);
+            integers.combatDieCount(1, true);
+            booleans.isGroundForce(true).sustainDamage(true);
         }
 
         if (player.getPlanets().contains("muspelheim") && unit.getUnitType() == UnitType.Pds) {

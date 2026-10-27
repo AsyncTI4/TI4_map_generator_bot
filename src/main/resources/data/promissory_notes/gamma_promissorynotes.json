@@ -125,5 +125,23 @@
         "playArea": false,
         "source": "gamma",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, resolve the PRODUCTION ability of 1 of your space docks. Then, return this card to the Jord player."
+    },
+    {
+        "alias": "ggpnihf",
+        "name": "Bloodlust Implants",
+        "faction": "ironhull",
+        "color": "",
+        "playArea": false,
+        "source": "gamma",
+        "text": "After 1 of your ground forces is destroyed during a ground combat; roll 2 dice. For each result equal to or greater than that unit's combat value, your opponent must choose and destroy 1 of their ground forces. Then, return this card to the Ironhull player."
+    },
+    {
+        "alias": "ggpnpe",
+        "name": "Voice of Elysium",
+        "faction": "project",
+        "color": "",
+        "playArea": false,
+        "source": "gamma",
+        "text": "At the end of a tactical action:Place this card face up in your play area; you may move up to 3 of your ships from the active system to your home system if it does not contain another player's ships. At the start of the status phase, return this card to the Elysium player."
     }
 ]

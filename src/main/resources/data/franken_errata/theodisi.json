@@ -201,6 +201,107 @@
         "alternateText": "During setup, place non-fighter ships with a combined cost of 8, fighters and infantry with a combined cost of 3, & 2 structures in your home system. THIS IS NOT AUTOMATED. Use `/modify_units` to set them yourself.",
         "source": "theodisi"
     },
+	{
+		"itemCategory": "STARTINGTECH",
+		"itemId": "scrapyard",
+		"alternateText": "During setup, gain 3 random technologies with 0 prerequisites.",
+		"source": "theodisi"
+	},
+    {
+        "itemCategory": "STARTINGTECH",
+        "itemId": "thurviali",
+        "alternateText": "Gain each of another player's starting technologies.",
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "STARTINGTECH",
+        "itemId": "stoneborn",
+        "alternateText": "Gain 1 of your faction technologies.",
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "thstoneborng",
+        "additionalComponents": [
+            "ABILITY:fragmentum_unleashed",
+            "ABILITY:adaptive"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "thstoneborndn",
+        "additionalComponents": [
+            "ABILITY:fragmentum_unleashed",
+            "ABILITY:adaptive"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "AGENT",
+        "itemId": "stonebornagentdormant",
+        "additionalComponents": [
+            "ABILITY:fragmentum_unleashed",
+            "ABILITY:adaptive"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "stoneborncommanderdormant",
+        "additionalComponents": [
+            "ABILITY:fragmentum_unleashed",
+            "ABILITY:adaptive"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "stonebornherodormant",
+        "additionalComponents": [
+            "ABILITY:fragmentum_unleashed",
+            "ABILITY:adaptive"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "HOMESYSTEM",
+        "itemId": "stoneborn",
+        "additionalComponents": [
+            "ABILITY:fragmentum_unleashed",
+            "ABILITY:adaptive"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "stonebornbtdormant",
+        "additionalComponents": [
+            "ABILITY:fragmentum_unleashed",
+            "ABILITY:adaptive"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "trovantous",
+        "optionalSwaps": [
+            "MECH:stoneborn_mech"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "fragmentum_unleashed",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "adaptive",
+        "undraftable": true,
+        "source": "theodisi"
+    },
     {
         "itemCategory": "ABILITY",
         "itemId": "custom_rigs",
@@ -242,7 +343,7 @@
     {
         "itemCategory": "ABILITY",
         "itemId": "celestial_envoys",
-								"undraftable": true,
+		"undraftable": true,
         "source": "theodisi"
     } 
 ]

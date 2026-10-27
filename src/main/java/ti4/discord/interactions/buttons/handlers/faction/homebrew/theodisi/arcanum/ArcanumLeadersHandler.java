@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -21,9 +23,9 @@ import ti4.helpers.Constants;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -270,7 +272,15 @@ public class ArcanumLeadersHandler {
         player.removeFragment(payload[2]);
         game.purgeExplore(payload[1]);
         game.purgeExplore(payload[2]);
-        game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 2);
+        int standardFragmentsPurged = 0;
+        if (!StonebornAbilityHandler.returnPurgedFragment(game, payload[1])) {
+            standardFragmentsPurged++;
+        }
+        if (!StonebornAbilityHandler.returnPurgedFragment(game, payload[2])) {
+            standardFragmentsPurged++;
+        }
+        game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + standardFragmentsPurged);
+        StonebornAbilityHandler.offerFragmentumTokenPlacement(game, player, event, List.of(payload[1], payload[2]));
         ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, payload[1]);
         ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, payload[2]);
         PlayerTechService.purgeTech(event, player, payload[0]);
@@ -279,6 +289,7 @@ public class ArcanumLeadersHandler {
                 player.getRepresentation() + " purged 2 relic fragments with Orthis Lithon.");
         RelicHelper.drawRelicAndNotify(player, event, game);
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
         ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         ButtonHelper.deleteMessage(event);
     }

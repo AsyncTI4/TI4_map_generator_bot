@@ -31,7 +31,7 @@ public final class VoiceOfTheCouncilHelper {
         if (lawID == null || poID == null) {
             MessageHelper.sendMessageToChannel(
                     game.getActionsChannel(),
-                    "Cannot elect _Voice of the Council_; missing agenda or custom public objective. Consider running `/omegaphase reset_voice_of_the_council`.");
+                    "Cannot elect _Voice of the Council_; missing agenda or custom public objective. Consider running `/homebrew omegaphase reset_voice_of_the_council`.");
             return;
         }
 

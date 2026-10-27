@@ -22,9 +22,9 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.explore.ExploreService;
@@ -524,9 +524,10 @@ public class KairnLeadershandler {
                 : PlanetTargetSpec.of(
                                 player.factionButtonChecker() + SELECT_KAIRN_AGENT_PLANET + agentOwner.getFaction())
                         .requiringController()
-                        .where(planet -> planet.getPlanetTypes().stream().anyMatch(trait -> List.of(
-                                        Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL)
-                                .contains(trait)));
+                        .where(planet -> planet.getPlanetTypes().stream()
+                                .anyMatch(
+                                        trait -> List.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL)
+                                                .contains(trait)));
         if (targetSpec != null && PlanetTargetService.handlePlanetPage(event, game, player, buttonID, targetSpec)) {
             return;
         }

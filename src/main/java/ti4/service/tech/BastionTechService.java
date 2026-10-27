@@ -9,6 +9,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -24,8 +25,8 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.UnitModel;
@@ -195,7 +196,7 @@ public class BastionTechService {
                 List<Button> buttons = new ArrayList<>();
                 String factionChecker = "FFCC_" + p2.getFaction() + "_";
                 buttons.add(Buttons.green(
-                        factionChecker + "autoAssignGroundHits_" + planetN + "_" + h,
+                        factionChecker + AutoAssignGroundHitsButtonIds.format(planetN, h),
                         "Auto-Assign Hit" + (h == 1 ? "" : "s")));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
@@ -228,7 +229,7 @@ public class BastionTechService {
                 List<Button> buttons = new ArrayList<>();
                 String factionChecker = "FFCC_" + p1.getFaction() + "_";
                 buttons.add(Buttons.green(
-                        factionChecker + "autoAssignGroundHits_" + planetN + "_" + h,
+                        factionChecker + AutoAssignGroundHitsButtonIds.format(planetN, h),
                         "Auto-Assign Hit" + (h == 1 ? "" : "s")));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);

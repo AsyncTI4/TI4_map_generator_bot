@@ -9,6 +9,7 @@ import lombok.Data;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.PlayerStatsHelper;
+import ti4.service.fow.FogViewer;
 
 @Data
 public class WebStatTilePositions {
@@ -18,7 +19,7 @@ public class WebStatTilePositions {
         WebStatTilePositions webStatTilePositions = new WebStatTilePositions();
         Map<String, List<String>> factionToStatTiles = new HashMap<>();
 
-        // Logic adapted from MapGenerator.playerInfo() method
+        // Logic adapted from MapSideStatLayout; unlike it, a tile search that fails does not stop later players
         List<Player> statOrder = game.getRealPlayers();
 
         Set<String> statTilesInUse = new HashSet<>();
@@ -28,7 +29,7 @@ public class WebStatTilePositions {
             }
 
             List<String> myStatTiles =
-                    PlayerStatsHelper.findThreeNearbyStatTiles(game, player, statTilesInUse, false, null);
+                    PlayerStatsHelper.findThreeNearbyStatTiles(game, player, statTilesInUse, FogViewer.unfogged(game));
             if (myStatTiles != null) {
                 statTilesInUse.addAll(myStatTiles);
                 factionToStatTiles.put(player.getFaction(), myStatTiles);

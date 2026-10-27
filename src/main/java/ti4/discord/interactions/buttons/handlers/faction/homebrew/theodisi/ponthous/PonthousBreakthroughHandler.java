@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -16,8 +17,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.DestroyUnitService;
@@ -232,7 +233,8 @@ public class PonthousBreakthroughHandler {
         boolean groundCombat = "ground".equalsIgnoreCase(combatType);
         if (groundCombat) {
             hitButtons.add(Buttons.green(
-                    opponent.factionButtonChecker() + "autoAssignGroundHits_" + combatHolder.getName() + "_" + hits,
+                    opponent.factionButtonChecker()
+                            + AutoAssignGroundHitsButtonIds.format(combatHolder.getName(), hits),
                     "Auto-assign " + hits + " Hit" + (hits == 1 ? "" : "s")));
             hitButtons.add(Buttons.red(
                     opponent.factionButtonChecker() + "getDamageButtons_" + position + "deleteThis_groundcombat",

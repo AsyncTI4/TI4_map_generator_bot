@@ -1,0 +1,15 @@
+{
+  "name": "30k-relic-tech-support-hotline",
+  "description": "Tech Support Hotline: Sol targets the distant Hacan, who is told and may now transact with Sol this turn.",
+  "preset": "30k-far-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "do": "hand", "as": "sol", "hand": { "relics": ["techsupporthotline30k"] } },
+    { "as": "sol", "pressId": "FFCC_sol_componentActionRes_relic_techsupporthotline30k" },
+    { "as": "sol", "press": "thirtyKTechSupportTarget_hacan" },
+    { "expect": { "in": "hacan:cards-info", "contains": "Tech Support Hotline" } },
+    { "expect": { "state": "stored:thirtyKTechSupport", "contains": "sol+hacan" } },
+    { "expect": { "state": "stored:thirtyKTransactGrants", "contains": "sol+hacan" } },
+    { "expect": { "state": "sol.exhaustedRelics", "contains": "techsupporthotline30k" } }
+  ]
+}

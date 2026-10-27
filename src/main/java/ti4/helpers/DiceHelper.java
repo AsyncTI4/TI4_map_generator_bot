@@ -1,6 +1,8 @@
 package ti4.helpers;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -9,14 +11,34 @@ import ti4.service.emoji.DiceEmojis;
 
 public final class DiceHelper {
 
+    private static final ThreadLocal<Deque<Integer>> FORCED_RESULTS = ThreadLocal.withInitial(ArrayDeque::new);
+
+    public static void withForcedResults(Deque<Integer> results, Runnable action) {
+        FORCED_RESULTS.set(results);
+        try {
+            action.run();
+        } finally {
+            FORCED_RESULTS.remove();
+        }
+    }
+
     @Getter
     public static class Die {
         private final int threshold;
         private final int result;
 
         public Die(int threshold) {
+            this(threshold, nextResult());
+        }
+
+        private Die(int threshold, int result) {
             this.threshold = threshold;
-            result = ThreadLocalRandom.current().nextInt(1, 11);
+            this.result = result;
+        }
+
+        private static int nextResult() {
+            Integer forced = FORCED_RESULTS.get().poll();
+            return forced != null ? forced : ThreadLocalRandom.current().nextInt(1, 11);
         }
 
         public String getGreenDieIfSuccessOrRedDieIfFailure() {
@@ -61,9 +83,7 @@ public final class DiceHelper {
     }
 
     public static Die spoof(int threshold, int result) {
-        Die d = new Die(threshold);
-        while (d.getResult() != result) d = new Die(threshold);
-        return d;
+        return new Die(threshold, result);
     }
 
     public static List<Die> rollDice(int threshold, int numDice) {

@@ -1,0 +1,14 @@
+{
+  "name": "30k-relic-placebotron",
+  "description": "Placebotron as a component action: purging it removes it and draws a new relic.",
+  "preset": "30k-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "expect": { "state": "sol.relics", "equals": "placebotron30k" } },
+    { "as": "sol", "pressId": "FFCC_sol_componentActionRes_relic_placebotron30k" },
+    { "expect": { "in": "sol:cards-info", "contains": "how do you use" } },
+    { "as": "sol", "press": "thirtyKPlacebotron_purge" },
+    { "expect": { "state": "sol.relics", "notContains": "placebotron30k" } },
+    { "expect": { "state": "sol.relics", "matches": "30k" } }
+  ]
+}

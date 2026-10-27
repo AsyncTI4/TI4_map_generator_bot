@@ -26,10 +26,10 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
@@ -665,9 +665,12 @@ public class ButtonHelperHeroes {
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         var spec = PlanetTargetSpec.of("khraskHeroStep4Ready_" + BlindSelectionService.TBD_FACTION);
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
-        var target = PlanetTargetService.resolve(game, player, buttonID, spec, t -> t.owner()
-                .getExhaustedPlanets()
-                .contains(t.planetId()));
+        var target = PlanetTargetService.resolve(
+                game,
+                player,
+                buttonID,
+                spec,
+                t -> t.owner().getExhaustedPlanets().contains(t.planetId()));
         if (target == null) {
             PlanetTargetService.fizzle(event, player);
             return;
@@ -685,27 +688,34 @@ public class ButtonHelperHeroes {
                     p2.getRepresentationUnfogged() + " your planet " + planetRep + " was readied.");
             if (player.hasLeader("xxchaagent")) {
                 UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-                if (uH != null && uH.getUnitCount(UnitType.Infantry, p2) > 0) {
-                    Tile tile = game.getTileFromPlanet(planet);
-                    for (String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
-                        Tile tile2 = game.getTileByPosition(tilePos);
-                        if (FoWHelper.playerHasShipsInSystem(player, tile2)) {
-                            List<Button> buttons = new ArrayList<>();
-                            buttons.add(Buttons.red(
-                                    "xxchaAgentRemoveInfantry_" + p2.getFaction() + "_" + planet, "Remove Infantry"));
-                            buttons.add(Buttons.gray("deleteButtons", "Decline"));
-                            MessageHelper.sendMessageToChannelWithButtons(
-                                    player.getCorrectChannel(),
-                                    player.getRepresentation()
-                                            + " you have the opportunity to remove 1 of the infantry on the readied planet if you wish.",
-                                    buttons);
-
-                            return;
-                        }
-                    }
+                Tile tile = game.getTileFromPlanet(planet);
+                if (uH != null
+                        && uH.getUnitCount(UnitType.Infantry, p2) > 0
+                        && isNextToPlanetControlledBy(game, player, tile)) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.red(
+                            "xxchaAgentRemoveInfantry_" + p2.getFaction() + "_" + planet, "Remove Infantry"));
+                    buttons.add(Buttons.gray("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + " you have the opportunity to remove 1 of the infantry on the readied planet if you wish.",
+                            buttons);
                 }
             }
         }
+    }
+
+    public static boolean isNextToPlanetControlledBy(Game game, Player player, Tile tile) {
+        if (tile == null) return false;
+        for (String position : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+            Tile adjacent = game.getTileByPosition(position);
+            if (adjacent == null) continue;
+            for (UnitHolder holder : adjacent.getPlanetUnitHolders()) {
+                if (player.getPlanets().contains(holder.getName())) return true;
+            }
+        }
+        return false;
     }
 
     public static List<Button> getAttachmentSearchButtons(Game game, Player player) {
@@ -1050,12 +1060,7 @@ public class ButtonHelperHeroes {
 
     @ButtonHandler("gheminaLordHero_")
     public static void resolveGheminaLordHero(String buttonID, Player player, Game game, ButtonInteractionEvent event) {
-        String planetID = buttonID.split("_")[1];
-        if ("lockedmallice".equalsIgnoreCase(planetID)) {
-            planetID = "mallice";
-            Tile tile = game.getTileFromPlanet("lockedmallice");
-            FlipTileService.flipTileIfNeeded(event, tile, game);
-        }
+        String planetID = FlipTileService.unlockMalliceIfNeeded(event, buttonID.split("_")[1], game);
         AddPlanetService.addPlanet(player, planetID, game, event, false);
         PlanetService.refreshPlanet(player, planetID);
         String planetRep = Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game);
@@ -1724,7 +1729,7 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile1 : game.getTileMap().values()) {
             String pos1 = tile1.getPosition();
-            for (Player p2 : game.getRealPlayers()) {
+            for (Player p2 : game.getRealPlayersNNeutral()) {
                 if (FoWHelper.playerHasShipsInSystem(p2, tile1)) {
                     boolean adjacentPeeps = false;
                     for (String pos2 : FoWHelper.getAdjacentTiles(game, pos1, p2, false)) {

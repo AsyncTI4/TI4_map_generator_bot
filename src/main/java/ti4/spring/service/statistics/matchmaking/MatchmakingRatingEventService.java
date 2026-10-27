@@ -27,6 +27,7 @@ import ti4.message.MessageHelper;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.PlayerEntity;
 import ti4.spring.service.persistence.PlayerEntityRepository;
+import ti4.spring.service.statistics.matchmaking.queue.MatchQualityCalculator;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +40,8 @@ public class MatchmakingRatingEventService {
     private static final Duration RATINGS_CACHE_TTL = Duration.ofHours(8);
     private static final Duration AVERAGE_RATING_CACHE_TTL = Duration.ofHours(8);
     private static final String RATINGS_CACHE_KEY = "key";
+    private static final Rating DEFAULT_NEW_PLAYER_RATING =
+            MatchmakingGameInfo.create().getDefaultRating();
 
     private final Cache<String, List<MatchmakingRating>> unconservativeRatingsCache = createRatingsCache();
     private final Cache<String, List<MatchmakingRating>> conservativeRatingsCache = createRatingsCache();
@@ -147,6 +150,28 @@ public class MatchmakingRatingEventService {
 
     public static long toDisplayRating(BigDecimal rating) {
         return rating.multiply(ONE_HUNDRED).setScale(0, RoundingMode.HALF_UP).longValueExact();
+    }
+
+    public String describeGameRatings(String gameName, Map<String, String> usernameByUserId) {
+        Set<String> userIds = usernameByUserId.keySet();
+        Map<String, MatchmakingRating> ratingByUserId = getCachedConservativePlayerRatings().stream()
+                .filter(rating -> userIds.contains(rating.userId()))
+                .collect(Collectors.toMap(MatchmakingRating::userId, rating -> rating));
+        return GameRatingDescriber.describe(new GameRatingDescriber.GameRatings(
+                gameName,
+                usernameByUserId,
+                ratingByUserId,
+                getAverageDisplayRating(userIds),
+                toDisplayRating(getAverageConservativeRating()),
+                getSkillTier(userIds),
+                matchQuality(userIds)));
+    }
+
+    private double matchQuality(Set<String> userIds) {
+        Map<String, Rating> ratings = getPlayerRatings(userIds);
+        return MatchQualityCalculator.matchQuality(userIds.stream()
+                .map(userId -> ratings.getOrDefault(userId, DEFAULT_NEW_PLAYER_RATING))
+                .toList());
     }
 
     public Map<String, Rating> getPlayerRatings(Set<String> userIds) {

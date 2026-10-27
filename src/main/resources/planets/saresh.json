@@ -1,0 +1,27 @@
+{
+    "id": "saresh",
+    "tileId": "th37",
+    "name": "Saresh",
+    "aliases": [
+        "saresh"
+    ],
+    "resources": 2,
+    "influence": 0,
+    "planetTypes": [
+        "CULTURAL"
+    ],
+    "planetLayout": {
+        "unitHolderName": "saresh",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 199,
+            "y": 213
+        },
+        "planetRadius": 60
+    },
+    "positionInTile": {
+        "x": 199,
+        "y": 213
+    },
+    "source": "theodisi"
+}

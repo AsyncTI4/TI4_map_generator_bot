@@ -10,6 +10,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Constants;
 import ti4.json.JsonMapperManager;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class GameTest extends BaseTi4Test {
@@ -108,6 +109,35 @@ class GameTest extends BaseTi4Test {
         assertThat(game.getPublicObjectives2Peekable()).containsExactly("centralize_trade", "galvanize");
         assertThat(game.getPublicObjectives2Peeked())
                 .containsEntry("centralize_trade", List.of("hasThe2", "hasThe1", "naaluPnPlayer"));
+    }
+
+    @Test
+    void shouldFullyRemoveSecretObjectiveConvertedToPublicWhenRemovedByName() {
+        var game = new Game();
+        String secretId = "accept_bribes_pbd100";
+        String secretName = Mapper.getSecretObjective(secretId).getName();
+        game.addToSoToPoList(secretId);
+        game.addCustomPO(secretName, 1);
+
+        game.removeRevealedObjective(secretName);
+
+        assertThat(game.getSoToPoList()).doesNotContain(secretId);
+        assertThat(game.getRevealedPublicObjectives()).doesNotContainKey(secretName);
+        assertThat(game.getCustomPublicVP()).doesNotContainKey(secretName);
+    }
+
+    @Test
+    void shouldFullyRemoveSecretObjectiveConvertedToPublicWhenRemovedById() {
+        var game = new Game();
+        String secretId = "accept_bribes_pbd100";
+        String secretName = Mapper.getSecretObjective(secretId).getName();
+        game.addToSoToPoList(secretId);
+        game.addCustomPO(secretName, 1);
+
+        game.removeRevealedObjective(secretId);
+
+        assertThat(game.getSoToPoList()).doesNotContain(secretId);
+        assertThat(game.getRevealedPublicObjectives()).doesNotContainKey(secretName);
     }
 
     @Test

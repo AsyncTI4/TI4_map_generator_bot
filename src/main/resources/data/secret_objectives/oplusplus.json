@@ -1,0 +1,690 @@
+[
+    {
+        "alias": "achieve_supreme_influence",
+        "name": "Achieve Supreme Influence",
+        "phase": "Status",
+        "text": "Control 4 planets outside your home system with more influence than resources.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "oplusplus_adapt_new_strategies",
+        "name": "Adapt New Strategies",
+        "phase": "Status",
+        "text": "Own 2 faction technologies. \"Valefar Assimilator\" technologies do not count toward this objective.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "advance_weaponry",
+        "name": "Advance Weaponry",
+        "phase": "Status",
+        "text": "Own unit upgrade technologies with combined prerequisites that include each color.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "allow_others_a_voice",
+        "name": "Allow Others A Voice",
+        "phase": "Agenda",
+        "text": "After the second agenda of the agenda phase is resolved, have more influence on readied planets than any other player.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "amass_forces",
+        "name": "Amass Forces",
+        "phase": "Status",
+        "text": "Have at least 10 units in each of 4 systems.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "assemble_a_swarm",
+        "name": "Assemble a Swarm",
+        "phase": "Status",
+        "text": "Have 20 fighters on the game board.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "attain_resource_supremacy",
+        "name": "Attain Resource Supremacy",
+        "phase": "Status",
+        "text": "Control 4 planets outside your home system with more resources than influence.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "balance_imperial_interests",
+        "name": "Balance Imperial Interests",
+        "phase": "Status",
+        "text": "Control planets that have a combined value of at least 9 resources and at least 9 influence.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "battle_before_the_unknown",
+        "name": "Battle Before the Unknown",
+        "phase": "Action",
+        "text": "Win a combat in a system that contains a wormhole.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "brave_hazards",
+        "name": "Brave Hazards",
+        "phase": "Status",
+        "text": "Control a hazardous planet adjacent to another player's home system. (Planets adjacent to the Creuss Gate or the Sorrow count as adjacent to those factions' home systems.)",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "build_a_wonder",
+        "name": "Build a Wonder",
+        "phase": "Status",
+        "text": "Have 3 structures in a non-home system.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "build_transport_network",
+        "name": "Build Transport Network",
+        "phase": "Status",
+        "text": "Have a unit with capacity in each of 5 systems.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "check_and_balance",
+        "name": "Check and Balance",
+        "phase": "Action",
+        "text": "Win a combat against the speaker.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "colonize_distant_stars",
+        "name": "Colonize Distant Stars",
+        "phase": "Status",
+        "text": "Control a planet in each of 3 systems that are not in or adjacent to your home system.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "come_see_conquer",
+        "name": "Come. See. Conquer.",
+        "phase": "Action",
+        "text": "Win more than 1 ground combat in a system during the same tactical action.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "connect_the_cosmos",
+        "name": "Connect The Cosmos",
+        "phase": "Status",
+        "text": "Have a unit in each of 2 different systems that contain a wormhole of the same type.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "decimation",
+        "name": "Decimation",
+        "phase": "Action",
+        "text": "Win a space combat in the first round of combat where your opponent did not successfully execute a retreat.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "decisive_legislation",
+        "name": "Decisive Legislation",
+        "phase": "Agenda",
+        "text": "Vote for an outcome that receives at least 10 more votes than any other outcome.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "defend_infrastructure",
+        "name": "Defend Infrastructure",
+        "phase": "Status",
+        "text": "Have 9 infantry on each of 2 planets that contain a structure.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "destroy_research_vessels",
+        "name": "Destroy Research Vessels",
+        "phase": "Action",
+        "text": "Win a space combat against a player with the most technologies.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "develop_the_ultimate_weapon",
+        "name": "Develop The Ultimate Weapon",
+        "phase": "Status",
+        "text": "Own War Sun technology.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "diversify_approaches",
+        "name": "Diversify Approaches",
+        "phase": "Status",
+        "text": "Have at least 1 space dock in a system with an industrial planet, at least 2 PDS on cultural planets, and at least 1 mech on a hazardous planet.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "diversify_fleets",
+        "name": "Diversify Fleets",
+        "phase": "Status",
+        "text": "Have 5 different types of non-fighter ships in a system.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "diversify_holdings",
+        "name": "Diversify Holdings",
+        "phase": "Status",
+        "text": "Control 2 cultural, industrial, and hazardous planets.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "diversify_outposts",
+        "name": "Diversify Outposts",
+        "phase": "Status",
+        "text": "Control 3 technology specialty planets of different colors.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "dominate_cities",
+        "name": "Dominate Cities",
+        "phase": "Status",
+        "text": "Have non-fighter ships in 5 systems that contain a structure.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "dominate_culture",
+        "name": "Dominate Culture",
+        "phase": "Status",
+        "text": "Control a cultural planet adjacent to another player's home system. (Planets adjacent to the Creuss Gate or the Sorrow count as adjacent to those factions' home systems.)",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "domineer",
+        "name": "Domineer",
+        "phase": "Status",
+        "text": "Have ships in 4 systems that contain a PDS.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "expand_reach",
+        "name": "Expand Reach",
+        "phase": "Status",
+        "text": "Have at least 1 ship in each of 3 systems that are not in or adjacent to your home system.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "field_test_advancements",
+        "name": "Field Test Advancements",
+        "phase": "Action",
+        "text": "Win a combat in which 2 of your surviving units are of different unit types whose unit upgrades you own.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "focus_advancements",
+        "name": "Focus Advancements",
+        "phase": "Status",
+        "text": "Control 2 planets with the same technology specialty.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "forge_daring_culture",
+        "name": "Forge Daring Culture",
+        "phase": "Status",
+        "text": "Control 3 hazardous planets and 2 cultural planets.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "forgive_debts",
+        "name": "Forgive Debts",
+        "phase": "Status",
+        "text": "Return 3 promissory notes from your hand to the hands of their original owners.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "form_a_contact_network",
+        "name": "Form a Contact Network",
+        "phase": "Status",
+        "text": "Control 4 planets outside of your home system that each have an influence value of 2 or higher.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "form_the_heart_of_a_new_empire",
+        "name": "Form the Heart of a New Empire",
+        "phase": "Status",
+        "text": "Control a planet in a system that is adjacent to 6 systems that contain your units.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "fortify_riches",
+        "name": "Fortify Riches",
+        "phase": "Status",
+        "text": "Have a structure on each of 3 planets with at least 2 resources.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "fuel_industrial_machine",
+        "name": "Fuel Industrial Machine",
+        "phase": "Status",
+        "text": "Control 3 industrial planets and 2 hazardous planets.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "fuel_war_machine",
+        "name": "Fuel War Machine",
+        "phase": "Status",
+        "text": "Have 3 space docks on the game board.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "gather_abundance",
+        "name": "Gather Abundance",
+        "phase": "Status",
+        "text": "Control 4 planets outside of your home system that each have a resource value of 2 or higher.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "heavy_artillery",
+        "name": "Heavy Artillery",
+        "phase": "Status",
+        "text": "Have 12 units on the game board with any combination of BOMBARDMENT, SPACE CANNON, or ANTI-FIGHTER BARRAGE.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "industrialize_culture",
+        "name": "Industrialize Culture",
+        "phase": "Status",
+        "text": "Control 3 cultural planets and 2 industrial planets.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "learn_from_others",
+        "name": "Learn from Others",
+        "phase": "Status",
+        "text": "Fulfill the requirements to score 2 secret objectives other players have scored.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "learn_the_cosmos_secrets",
+        "name": "Learn the Cosmos' Secrets",
+        "phase": "Status",
+        "text": "Have 1 or more units in 4 systems that are each in or adjacent to an anomaly.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "leverage_soft_power",
+        "name": "Leverage Soft Power",
+        "phase": "Status",
+        "text": "Have 2 or less promissory notes in your hand.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "master_archaeology",
+        "name": "Master Archaeology",
+        "phase": "Status",
+        "text": "Have 2 or more relics.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "master_biotics",
+        "name": "Master Biotics",
+        "phase": "Status",
+        "text": "Control a green technology specialty planet, 2 green technologies, and at least 1 unit upgrade technology with at least 1 green prerequisite.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "master_cybernetics",
+        "name": "Master Cybernetics",
+        "phase": "Status",
+        "text": "Control a yellow technology specialty planet, 2 yellow technologies, and at least 1 unit upgrade technology with at least 1 yellow prerequisite.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "master_negotiation",
+        "name": "Master Negotiation",
+        "phase": "Status",
+        "text": "Have at least 10 promissory notes in your hand.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "master_propulsion",
+        "name": "Master Propulsion",
+        "phase": "Status",
+        "text": "Control a blue technology specialty planet, 2 blue technologies, and at least 1 unit upgrade technology with at least 1 blue prerequisite.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "master_warfare",
+        "name": "Master Warfare",
+        "phase": "Status",
+        "text": "Control a red technology specialty planet, 2 red technologies, and at least 1 unit upgrade technology with at least 1 red prerequisite.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "mine_rare_minerals",
+        "name": "Mine Rare Minerals",
+        "phase": "Status",
+        "text": "Control 4 hazardous planets.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "no_witnesses",
+        "name": "No Witnesses",
+        "phase": "Action",
+        "text": "Win a space combat in a system that contains no planets.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "overpowering_defense",
+        "name": "Overpowering Defense",
+        "phase": "Status",
+        "text": "Have at least 7 units on the game board with SUSTAIN DAMAGE.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "overrun_defenses",
+        "name": "Overrun Defenses",
+        "phase": "Action",
+        "text": "Win a ground combat on a planet that contained another player's PDS at the start of the combat.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "prioritize_speed",
+        "name": "Prioritize Speed",
+        "phase": "Status",
+        "text": "Have 8 cruisers on the game board.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "punish_heretics",
+        "name": "Punish Heretics",
+        "phase": "Action",
+        "text": "Win a combat against a player with the most relics; minimum 1.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "punish_the_weak",
+        "name": "Punish the Weak",
+        "phase": "Action",
+        "text": "Win a combat against a player with the least victory points.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "rebel_against_political_elites",
+        "name": "Rebel Against Political Elites",
+        "phase": "Action",
+        "text": "Win a combat against a player that owns an elect player law.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "recruit_a_large_army",
+        "name": "Recruit A Large Army",
+        "phase": "Status",
+        "text": "Have 20 infantry on the game board.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "selective_arsenal",
+        "name": "Selective Arsenal",
+        "phase": "Status",
+        "text": "Have none of 2 different unit types in your reinforcements for which at least 1 of your neighbors owns the unit upgrade technology.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "settle_spacetimes_edge",
+        "name": "Settle Spacetime's Edge",
+        "phase": "Status",
+        "text": "Control 3 planets that are each in or adjacent to a system containing a wormhole.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "settle_the_frontier",
+        "name": "Settle the Frontier",
+        "phase": "Status",
+        "text": "Control 4 planets that are in or adjacent to an anomaly.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "show_of_strength",
+        "name": "Show of Strength",
+        "phase": "Status",
+        "text": "Have at least 1 ship in each of 2 systems that contain a planet another player controls.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "show_the_council_your_strength",
+        "name": "Show the Council Your Strength",
+        "phase": "Action",
+        "text": "Win a combat in the Mecatol Rex system.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "spare_no_munitions",
+        "name": "Spare No Munitions",
+        "phase": "Action",
+        "text": "After your opponent assigns hits, have 3 hits left unassigned.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "spread_influence",
+        "name": "Spread Influence",
+        "phase": "Status",
+        "text": "Have 1 or more units in each of at least 8 systems.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "strategic_encroachment",
+        "name": "Strategic Encroachment",
+        "phase": "Status",
+        "text": "Control a planet with an attachment adjacent to another player's home system. (Planets adjacent to the Creuss Gate or the Sorrow count as adjacent to those factions' home systems.)",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "structure_dominance",
+        "name": "Structure Dominance",
+        "phase": "Action",
+        "text": "Win a combat against a player that has the most structures on the board.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "study_the_symbols",
+        "name": "Study the Symbols",
+        "phase": "Status",
+        "text": "Have a unit in or adjacent to at least 3 systems that contain a legendary planet or Mecatol Rex.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "study_their_defenses",
+        "name": "Study Their Defenses",
+        "phase": "Status",
+        "text": "Have ships in each of 2 systems that are in or adjacent to systems that contain other player's PDS.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "study_their_supply_chain",
+        "name": "Study Their Supply Chain",
+        "phase": "Status",
+        "text": "Have ships in each of 2 systems that are in or adjacent to systems that contain other player's space docks.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "suffer_slings_and_arrows",
+        "name": "Suffer Slings and Arrows",
+        "phase": "Action",
+        "text": "Have 3 damaged units at the end of a combat you won.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "support_the_weak",
+        "name": "Support the Weak",
+        "phase": "Status",
+        "text": "Have 1 of your promissory notes in the play area of a player with the least victory points.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "surprise_your_enemies",
+        "name": "Surprise Your Enemies",
+        "phase": "Action",
+        "text": "Win a combat against a player who has passed.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "tactical_fatigue",
+        "name": "Tactical Fatigue",
+        "phase": "Status",
+        "text": "Have at least 5 exhausted non-planet, non-strategy cards in your play area.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "take_influential_strongholds",
+        "name": "Take Influential Strongholds",
+        "phase": "Status",
+        "text": "Have a structure on each of 3 planets with at least 2 influence.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "take_their_minerals",
+        "name": "Take Their Minerals",
+        "phase": "Action",
+        "text": "Win a ground combat on a hazardous planet.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "target_powerful_ships",
+        "name": "Target Powerful Ships",
+        "phase": "Action",
+        "text": "Destroy 2 of your opponents units with SUSTAIN DAMAGE in the same round of combat.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "technological_exhaustion",
+        "name": "Technological Exhaustion",
+        "phase": "Status",
+        "text": "Exhaust 3 of your technologies that have an ability that exhausts that card.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "toppling_the_leader",
+        "name": "Toppling the Leader",
+        "phase": "Action",
+        "text": "Win a combat against a player with the highest initiative in a home system, a system that contains Mecatol Rex, or a system that contains a legendary planet.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "undercut_their_industry",
+        "name": "Undercut Their Industry",
+        "phase": "Action",
+        "text": "Win a ground combat on an industrial planet.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "undermine_their_culture",
+        "name": "Undermine Their Culture",
+        "phase": "Action",
+        "text": "Win a ground combat on a cultural planet.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "unflappable_command",
+        "name": "Unflappable Command",
+        "phase": "Status",
+        "text": "Have no command tokens in your reinforcements.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "unseat_the_false_king",
+        "name": "Unseat the False King",
+        "phase": "Action",
+        "text": "Take control of Mecatol Rex when it was controlled by another player.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "usurp_industrial_power",
+        "name": "Usurp Industrial Power",
+        "phase": "Status",
+        "text": "Control an industrial planet adjacent to another player's home system. (Planets adjacent to the Creuss Gate or the Sorrow count as adjacent to those factions' home systems.)",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "weaken_the_powerful",
+        "name": "Weaken the Powerful",
+        "phase": "Action",
+        "text": "Win a combat against a player that controls the most planets.",
+        "points": 1,
+        "source": "oplusplus"
+    }
+]

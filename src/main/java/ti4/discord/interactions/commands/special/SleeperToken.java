@@ -13,7 +13,7 @@ import ti4.helpers.SleeperTokenHelper;
 class SleeperToken extends GameStateSubcommand {
 
     public SleeperToken() {
-        super(Constants.SLEEPER_TOKEN, "Select planets were to add/remove Sleeper tokens", true, true);
+        super(Constants.SLEEPER_TOKEN, "Select planets where to add/remove Sleeper tokens", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet")
                 .setRequired(true)
                 .setAutoComplete(true));

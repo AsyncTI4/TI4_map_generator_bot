@@ -14,8 +14,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.RegexHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.StrategyCardModel;
 import ti4.service.button.ReactionService;
@@ -33,7 +33,7 @@ public class MindsieveService {
     }
 
     public boolean canUseMindsieve(Player naalu, Player primary, StrategyCardModel scModel) {
-        if (scModel == null || scModel.usesAutomationForSCID("pok1leadership")) return false;
+        if (primary == null || scModel == null || scModel.usesAutomationForSCID("pok1leadership")) return false;
         if (!naalu.hasUnlockedBreakthrough(id)) return false;
         for (String pn : naalu.getPromissoryNotes().keySet()) {
             PromissoryNoteModel model = Mapper.getPromissoryNote(pn);
@@ -92,6 +92,13 @@ public class MindsieveService {
                     Player primary = game.getPlayerFromSC(sc);
                     StrategyCardModel scModel =
                             game.getStrategyCardModelByInitiative(sc).orElse(null);
+                    if (primary == null || scModel == null) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getMessageChannel(),
+                                "No player currently holds that strategy card, so _Mindsieve_ cannot be used to follow it.");
+                        ButtonHelper.deleteMessage(event);
+                        return;
+                    }
                     SendPromissoryService.sendPromissoryToPlayer(event, game, naalu, primary, pn);
 
                     if (!naalu.getFollowedSCs().contains(sc))

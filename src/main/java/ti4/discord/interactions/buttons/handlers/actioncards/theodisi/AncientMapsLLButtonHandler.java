@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionTileHelper;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -14,10 +15,10 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperExplore;
 import ti4.helpers.NewStuffHelper;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.service.emoji.ExploreEmojis;
 
@@ -79,7 +80,10 @@ public class AncientMapsLLButtonHandler {
 
         player.removeFragment(fragmentId);
         game.purgeExplore(fragmentId);
-        game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+        if (!StonebornAbilityHandler.returnPurgedFragment(game, fragmentId)) {
+            game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+        }
+        StonebornAbilityHandler.offerFragmentumTokenPlacement(game, player, event, List.of(fragmentId));
         if (fragmentId.startsWith("supermassive")) {
             ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, fragmentId);
         }

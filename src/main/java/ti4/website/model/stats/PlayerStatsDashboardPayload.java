@@ -16,10 +16,10 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.model.AgendaModel;
+import ti4.model.Mapper;
 import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
@@ -66,6 +66,7 @@ public class PlayerStatsDashboardPayload {
     public List<String> getAlliances() {
         return player.getPromissoryNotesInPlayArea().stream()
                 .map(Mapper::getPromissoryNote)
+                .filter(Objects::nonNull)
                 .filter(pn -> "Alliance".equalsIgnoreCase(pn.getName()))
                 .filter(pn -> game.getPNOwner(pn.getAlias()) != null)
                 .map(pn -> game.getPNOwner(pn.getAlias()).getColor())
@@ -172,14 +173,17 @@ public class PlayerStatsDashboardPayload {
         // Secrets
         player.getSecretsScored().keySet().stream()
                 .map(Mapper::getSecretObjective)
+                .filter(Objects::nonNull)
                 .map(SecretObjectiveModel::getName)
                 .forEach(objectives::add);
 
         // Supports
         player.getPromissoryNotesInPlayArea().stream()
+                .filter(player::givesSupportForTheThroneVictoryPoint)
                 .map(Mapper::getPromissoryNote)
+                .filter(Objects::nonNull)
                 .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
-                .map(pn -> "Support for the Throne (" + pn.getColor() + ")")
+                .map(pn -> "Support for the Throne (" + pn.getColor().get() + ")")
                 .forEach(objectives::add);
 
         return objectives;

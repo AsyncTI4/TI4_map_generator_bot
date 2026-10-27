@@ -181,8 +181,8 @@
         ]
     },
     {
-        "source": "balacasi",
-        "name": "Balacasi",
+        "source": "wftv",
+        "name": "Whispers from the Void",
         "canal": "community",
         "subcanal": "lil homebrew",
         "credits": "balacasi",
@@ -209,7 +209,7 @@
         "name": "Gamma Galaxies",
         "canal": "community",
         "subcanal": "lil homebrew",
-        "credits": "Gamma Galaxies",
+        "credits": "addictunraveled, Cacotopos, Mr_Anvil, Philroi, Luminous, etc.",
         "description": "Reimagining of existing actions",
         "data": []
     },
@@ -349,8 +349,16 @@
         "name": "TI Addiction",
         "canal": "community",
         "subcanal": "personal projs",
-        "credits": "aubreynadler",
+        "credits": "addictunraveled",
         "description": "Splits Mecatol Rex into a 3-planet system (Mecatol City, Jun, The Polar Castelle) with new legendary abilities"
+    },
+    {
+        "source": "oplusplus",
+        "name": "O++",
+        "canal": "community",
+        "subcanal": "personal projs",
+        "credits": "Dave Blair",
+        "description": "New objectives and associated galactic event for setup"
     },
     {
         "source": "combosloth",
@@ -365,15 +373,31 @@
         "name": "New Dawn",
         "canal": "community",
         "subcanal": "personal projs",
-        "credits": "aubreynadler",
+        "credits": "ShaMedic",
         "description": "Optional alternate unit-upgrade technologies for 13 existing factions, swapped in during setup by purging a faction technology"
     },
     {
+        "source": "merford",
+        "name": "Refracture",
+        "canal": "community",
+        "subcanal": "personal projs",
+        "credits": "Mr.Merford",
+        "description": "New Layouts for Fracture" 
+    },
+    { 
         "source": "goose",
         "name": "Goose",
         "canal": "community",
         "subcanal": "lil homebrew",
         "credits": "Goose",
         "description": "Homebrew from Goose"
+    },
+    {
+        "source": "thirtyk",
+        "name": "30k Content Lab",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "Jason",
+        "description": "Jason's TI4 Content Laboratories: the 30k card set and the JMSC big-map card set"
     }
 ]

@@ -20,8 +20,8 @@ import ti4.game.Player;
 import ti4.game.PlayerProperties;
 import ti4.game.helper.GameHelper;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.model.AgendaModel;
+import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.game.GameModeService;
@@ -120,6 +120,7 @@ public class GameStatsDashboardPayload {
                 .map(Player::getPromissoryNotesOwned)
                 .flatMap(Collection::stream)
                 .map(Mapper::getPromissoryNote)
+                .filter(Objects::nonNull)
                 .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
                 .map(pn -> "Support for the Throne (" + pn.getColor().get() + ")")
                 .forEach(otherObjectives::add);
@@ -156,6 +157,7 @@ public class GameStatsDashboardPayload {
         for (Player player : game.getRealAndEliminatedPlayers()) {
             secrets.addAll(player.getSecretsScored().keySet().stream()
                     .map(Mapper::getSecretObjective)
+                    .filter(Objects::nonNull)
                     .map(SecretObjectiveModel::getName)
                     .toList());
         }

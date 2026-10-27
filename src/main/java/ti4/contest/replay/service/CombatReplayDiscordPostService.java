@@ -20,7 +20,7 @@ import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.helpers.ThreadGetter;
-import ti4.image.TileGenerator;
+import ti4.image.tile.SystemContextImage;
 import ti4.message.MessageHelper;
 
 @Service
@@ -71,7 +71,7 @@ public class CombatReplayDiscordPostService {
         if (snapshotGame == null) {
             return sendDiscordMessage(channel, message, embeds);
         }
-        try (FileUpload fileUpload = new TileGenerator(snapshotGame, null, null, 0, tilePosition).createFileUpload()) {
+        try (FileUpload fileUpload = SystemContextImage.upload(snapshotGame, null, 0, tilePosition)) {
             List<String> messageParts = MessageHelper.splitLargeText(message, 2000);
             for (int i = 0; i < Math.max(0, messageParts.size() - 1); i++) {
                 channel.sendMessage(messageParts.get(i)).complete();

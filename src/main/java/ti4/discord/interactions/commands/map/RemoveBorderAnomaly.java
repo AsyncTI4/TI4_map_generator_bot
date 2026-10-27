@@ -11,6 +11,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.Mapper;
 
 class RemoveBorderAnomaly extends GameStateSubcommand {
 
@@ -35,8 +36,12 @@ class RemoveBorderAnomaly extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         String tilesString = event.getOption(Constants.PRIMARY_TILE).getAsString();
-        BorderAnomalyModel.BorderAnomalyType anomalyType = BorderAnomalyModel.getBorderAnomalyTypeFromString(
-                event.getOption(Constants.BORDER_TYPE, null, OptionMapping::getAsString));
+        String anomalyTypeString = event.getOption(Constants.BORDER_TYPE, null, OptionMapping::getAsString);
+        BorderAnomalyModel anomalyType = Mapper.resolveBorderAnomaly(anomalyTypeString);
+        if (anomalyTypeString != null && anomalyType == null) {
+            AddBorderAnomaly.sendUnknownTypeMessage(event, anomalyTypeString);
+            return;
+        }
         Set<String> tiles = Helper.getSetFromCSV(tilesString);
 
         if (Constants.ALL.equals(tilesString)) {
@@ -62,7 +67,7 @@ class RemoveBorderAnomaly extends GameStateSubcommand {
                 if (game.getBorderAnomalies().stream()
                         .anyMatch(anom -> anom.getTile().equals(tile)
                                 && anom.getDirection() == d
-                                && (anomalyType == null || anom.getType() == anomalyType))) {
+                                && (anomalyType == null || anom.isType(anomalyType.getId())))) {
                     game.removeBorderAnomaly(tile, d);
                     amountRemoved++;
                 }

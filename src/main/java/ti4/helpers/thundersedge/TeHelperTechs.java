@@ -32,8 +32,8 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
@@ -44,6 +44,7 @@ import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 
 public final class TeHelperTechs {
+    private static final String BLUE_REVERIE_EXECUTIVE_ORDER = "executiveOrderBr";
 
     // Generic Tech
     @ButtonHandler("useMagenDefense_")
@@ -592,24 +593,50 @@ public final class TeHelperTechs {
 
     @ButtonHandler("useExecutiveOrder_")
     private static void executiveOrder(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        boolean top = buttonID.contains("top");
+        boolean blueReverieExecutiveOrder = player.hasTech("executiveorder_br");
+        revealExecutiveOrderAgenda(event, game, player, top, blueReverieExecutiveOrder, "Executive Order");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void revealProFormaSessionAgenda(GenericInteractionCreateEvent event, Game game, Player player) {
+        game.setStoredValue("proFormaSession", player.getFaction());
+        revealExecutiveOrderAgenda(event, game, player, true, false, "Pro Forma Session");
+    }
+
+    private static void revealExecutiveOrderAgenda(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player player,
+            boolean top,
+            boolean blueReverieExecutiveOrder,
+            String sourceName) {
         game.setStoredValue("executiveOrder", player.getFaction());
         game.setPhaseOfGame("agenda");
-        boolean top = buttonID.contains("top");
 
-        String msg = game.getPing() + " the " + buttonID.split("_")[1]
-                + " agenda has been revealed with _Executive Order_. ";
+        String msg = game.getPing() + " the " + (top ? "top" : "bottom") + " agenda has been revealed with _"
+                + sourceName + "_. ";
 
-        if (game.isFowMode()) {
-            msg += "Speaker has been temporarily changed to simulate the effect of the technology.";
+        if (blueReverieExecutiveOrder) {
+            msg += game.isFowMode()
+                    ? "The Executive Order owner will vote first."
+                    : player.getRepresentation() + " will vote first.";
+        } else if (game.isFowMode()) {
+            msg += "Speaker has been temporarily changed to simulate the effect of _" + sourceName + "_.";
         } else {
-            msg += player.getRepresentation()
-                    + " has been temporarily made speaker to simulate the effect of the technology.";
+            msg += player.getRepresentation() + " has been temporarily made speaker to simulate the effect of _"
+                    + sourceName + "_.";
         }
+
         game.setStoredValue("oldSpeakerExecutiveOrder", game.getSpeakerUserID());
-        game.setSpeaker(player);
+        if (blueReverieExecutiveOrder) {
+            game.setStoredValue(BLUE_REVERIE_EXECUTIVE_ORDER, player.getFaction());
+        } else {
+            game.removeStoredValue(BLUE_REVERIE_EXECUTIVE_ORDER);
+            game.setSpeaker(player);
+        }
 
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
-        AgendaHelper.revealAgenda(event, !top, game, event.getChannel());
-        ButtonHelper.deleteMessage(event);
+        AgendaHelper.revealAgenda(event, !top, game, game.getMainGameChannel());
     }
 }

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 
 @UtilityClass
 public class WinningPathHelper {
@@ -27,7 +27,7 @@ public class WinningPathHelper {
                 otherVictoryPoints(game, winner.getUserID()));
     }
 
-    private static String describe(WinningPathBreakdown path) {
+    public static String describe(WinningPathBreakdown path) {
         String otherPoints = summarizeOtherVictoryPoints(path.otherPoints());
         return String.format(
                 "%d stage 1 objectives, %d stage 2 objectives, %d secret objectives, %d %s%s",

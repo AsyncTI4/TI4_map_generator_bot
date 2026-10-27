@@ -1,18 +1,14 @@
 package ti4.discord.interactions.commands.statistics;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.buttons.handlers.game.CreateGameButtonHandler;
 import ti4.discord.interactions.commands.Subcommand;
-import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
@@ -30,7 +26,6 @@ class CompareActivityTimes extends Subcommand {
 
     CompareActivityTimes() {
         super(Constants.COMPARE_ACTIVITY_TIMES, "Compare different players set Activity Times");
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE1, "The role you want to compare"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player @playerName"));
@@ -43,28 +38,17 @@ class CompareActivityTimes extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        List<Member> members = new ArrayList<>();
-        if (event.getOption(Constants.ROLE1) != null) {
-            Role role = event.getOption(Constants.ROLE1).getAsRole();
-            members.addAll(event.getGuild().getMembersWithRoles(role));
-        }
-        PLAYER_OPTIONS_TO_CHECK.stream()
-                .map(playerOptionName -> event.getOption(playerOptionName, null, OptionMapping::getAsUser))
+        List<Member> members = PLAYER_OPTIONS_TO_CHECK.stream()
+                .map(playerOptionName -> event.getOption(playerOptionName, null, OptionMapping::getAsMember))
                 .filter(Objects::nonNull)
-                .map(User::getId)
-                .map(GameManager::getManagedPlayer)
-                .forEach(player -> members.add(event.getGuild().getMemberById(player.getId())));
+                .distinct()
+                .toList();
         if (members.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No valid players or roles provided to compare.");
+            MessageHelper.sendMessageToEventChannel(event, "No valid players provided to compare.");
             return;
         }
 
         String message = CreateGameButtonHandler.generateMemberListMessage(members, "Activity Times", false);
-
-        if (members.size() <= 10) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), message);
-            return;
-        }
-        MessageHelper.sendMessageToThread(event.getChannel(), "Compare Activity Times", message);
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
 }

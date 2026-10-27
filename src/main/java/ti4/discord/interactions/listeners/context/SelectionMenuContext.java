@@ -9,9 +9,12 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 @Getter
 public class SelectionMenuContext extends ListenerContext {
 
-    private String menuID;
     private String messageID;
     private List<String> values;
+
+    public String getMenuID() {
+        return getComponentID();
+    }
 
     public StringSelectInteractionEvent getEvent() {
         if (event instanceof StringSelectInteractionEvent event2) return event2;
@@ -32,7 +35,6 @@ public class SelectionMenuContext extends ListenerContext {
         if (!isValid()) return; // super failed
 
         // Proceed with additional context
-        menuID = componentID; // ID after checking faction
         messageID = event.getMessageId();
         values = new ArrayList<>(event.getValues());
     }

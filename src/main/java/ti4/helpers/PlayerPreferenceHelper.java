@@ -23,7 +23,7 @@ import ti4.settings.users.UserSettingsManager;
 public final class PlayerPreferenceHelper {
 
     @ButtonHandler(value = "offerPlayerPref", save = false)
-    public static void offerPlayerPreferences(Player player, ButtonInteractionEvent event) {
+    public static void offerPlayerPreferences(Player player, ButtonInteractionEvent event, Game game) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("playerPref_autoSaboReact", "Auto No-Sabo React Time", CardEmojis.getACEmoji(player)));
         buttons.add(Buttons.gray("playerPref_afkTimes", "AFK Times"));
@@ -35,6 +35,11 @@ public final class PlayerPreferenceHelper {
             buttons.add(Buttons.gray("playerPref_hideTransactables", "Stop showing player areas start of transaction"));
         else buttons.add(Buttons.gray("playerPref_showTransactables", "Show player areas start of transaction"));
         buttons.add(Buttons.gray("playerPref_refreshMapStyle", "Refresh Map Style"));
+        if (FoWHelper.isFogQol01(game)) {
+            if (player.getUserSettings().isFogMapOnTurnStart())
+                buttons.add(Buttons.gray("playerPref_fogTurnMapOff", "Stop posting my fog map at turn start"));
+            else buttons.add(Buttons.gray("playerPref_fogTurnMapOn", "Post my fog map at turn start"));
+        }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation() + ", please choose the thing you wish to change.",
@@ -80,8 +85,17 @@ public final class PlayerPreferenceHelper {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
             }
             case "refreshMapStyle" -> offerRefreshMapStyles(player);
+            case "fogTurnMapOn" -> setFogMapOnTurnStart(player, true);
+            case "fogTurnMapOff" -> setFogMapOnTurnStart(player, false);
         }
         ButtonHelper.deleteMessage(event);
+    }
+
+    private static void setFogMapOnTurnStart(Player player, boolean enabled) {
+        UserSettings settings = player.getUserSettings();
+        settings.setFogMapOnTurnStart(enabled);
+        UserSettingsManager.save(settings);
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
     }
 
     private static void offerRefreshMapStyles(Player player) {

@@ -1,0 +1,18 @@
+{
+    "id": "fracture32",
+    "name": "Castor",
+    "aliases": [
+        "fracture32",
+        "castor",
+        "cas",
+        "frac32"
+    ],
+    "imagePath": "fracture32.png",
+    "planets": [
+        "castor"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

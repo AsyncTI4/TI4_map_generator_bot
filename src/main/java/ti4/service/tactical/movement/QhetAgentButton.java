@@ -3,20 +3,17 @@ package ti4.service.tactical.movement;
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.helpers.FoWHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.tactical.MoveAbilityButton;
 import ti4.service.tactical.MoveContext;
 
 public final class QhetAgentButton implements MoveAbilityButton {
     public boolean enabled(MoveContext ctx) {
-        return ctx.player.hasUnexhaustedLeader("qhetagent")
-                && ctx.active != null
-                && !ctx.active.isHomeSystem(ctx.game)
-                && FoWHelper.otherPlayersHaveShipsInSystem(ctx.player, ctx.active, ctx.game);
+        return ctx.player.hasUnexhaustedLeader("qhetagent") && ctx.active != null;
     }
 
     public List<Button> build(MoveContext ctx) {
-        return List.of(Buttons.gray("exhaustAgent_qhetagent", "Use Qhet Agent", FactionEmojis.qhet));
+        return List.of(
+                Buttons.gray(ctx.player.factionButtonChecker() + "useQhetAgent", "Use Qhet Agent", FactionEmojis.qhet));
     }
 }

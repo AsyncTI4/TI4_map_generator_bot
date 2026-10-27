@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -250,8 +251,8 @@ public class XytherisAbilityHandler {
                         game.getUnitHolderFromPlanet(game.getStoredValue("bombardmentTarget" + player.getFaction()));
                 if (bombardmentTarget != null) {
                     assignmentButtons.add(Buttons.green(
-                            target.dummyPlayerSpoof() + "autoAssignGroundHits_" + bombardmentTarget.getName() + "_"
-                                    + remainingHits,
+                            target.dummyPlayerSpoof()
+                                    + AutoAssignGroundHitsButtonIds.format(bombardmentTarget.getName(), remainingHits),
                             "Auto-Assign " + remainingHits + " Hit" + (remainingHits == 1 ? "" : "s")));
                 }
             } else {

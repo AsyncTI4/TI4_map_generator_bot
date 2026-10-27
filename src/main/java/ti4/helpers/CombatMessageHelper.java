@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -14,9 +15,9 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.DiceHelper.Die;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.CombatModifierModel;
+import ti4.model.Mapper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
@@ -26,6 +27,9 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 
 public final class CombatMessageHelper {
+    private static final Pattern MENTIONS_DICE =
+            Pattern.compile("(?<![a-z])(die|dice|roll|rolls|rolled)(?![a-z])", Pattern.CASE_INSENSITIVE);
+
     public static void displayDuplicateUnits(GenericInteractionCreateEvent event, List<String> dupes) {
         if (dupes.isEmpty()) return;
         // Gracefully fail when units don't exist
@@ -231,35 +235,50 @@ public final class CombatMessageHelper {
                     plusPrefix = "";
                 }
                 String modifierName = namedModifier.getName();
+                String modifierMessage;
                 if (StringUtils.isNotBlank(modifierName)) {
                     if (mod.getMaxDice() != null) {
-                        modifierMessages.add(String.format(
+                        modifierMessage = String.format(
                                 "%s%s to up to %s %s from %s",
                                 plusPrefix,
                                 modifierValue,
                                 mod.getMaxDice(),
                                 mod.getMaxDice() == 1 ? "die" : "dice",
-                                modifierName));
+                                modifierName);
                     } else {
-                        modifierMessages.add(modifierName);
+                        modifierMessage = modifierName;
                     }
                 } else {
                     if (mod.getMaxDice() != null) {
-                        modifierMessages.add(String.format(
+                        modifierMessage = String.format(
                                 "%s%s to up to %s %s for %s",
                                 plusPrefix,
                                 modifierValue,
                                 mod.getMaxDice(),
                                 mod.getMaxDice() == 1 ? "die" : "dice",
-                                unitScope));
+                                unitScope);
                     } else {
-                        modifierMessages.add(String.format("%s%s for %s", plusPrefix, modifierValue, unitScope));
+                        modifierMessage = String.format("%s%s for %s", plusPrefix, modifierValue, unitScope);
                     }
                 }
+                modifierMessages.add(
+                        withExtraDiceNotice(mod.getType(), mod.getValue(), mod.getValueScalingType(), modifierMessage));
             }
             result += String.join("\n", modifierMessages).replace("Optional[", "") + "\n";
         }
         return result;
+    }
+
+    public static String withExtraDiceNotice(
+            String modifierType, int value, String valueScalingType, String modifierMessage) {
+        if (!Constants.COMBAT_EXTRA_ROLLS.equals(modifierType)
+                || MENTIONS_DICE.matcher(modifierMessage).find()) {
+            return modifierMessage;
+        }
+        String scaling =
+                StringUtils.isBlank(valueScalingType) ? "" : ", scaling with " + valueScalingType.replace('_', ' ');
+        return String.format(
+                "%s (%+d extra %s%s)", modifierMessage, value, Math.abs(value) == 1 ? "die" : "dice", scaling);
     }
 
     public static String displayHitResults(int totalHits) {

@@ -24,7 +24,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.model.TileModel;
 import ti4.service.fow.LoreService.LoreEntry;
 import ti4.service.map.CustomHyperlaneService;
@@ -1149,9 +1149,9 @@ class LoreServiceTest extends BaseTi4Test {
     @Nested
     class ImportErrorReporting {
 
-        // PositionMapper's real position keys are "000", "101", "102"... — distinct from the "001"
+        // MapPositionMapper's real position keys are "000", "101", "102"... — distinct from the "001"
         // used elsewhere in this file as an arbitrary Tile-map key. validateLore (used by import)
-        // checks PositionMapper, so these tests need an actual recognized position.
+        // checks MapPositionMapper, so these tests need an actual recognized position.
         @BeforeEach
         void registerValidSystemPosition() {
             game.setTile(new Tile("18", "000"));
@@ -2216,7 +2216,7 @@ class LoreServiceTest extends BaseTi4Test {
 
         @Test
         void validateLoreRespectsExplicitTagsAndAutoTagsCollisions() {
-            // validateLore needs a PositionMapper-recognized position with a tile on the board.
+            // validateLore needs a MapPositionMapper-recognized position with a tile on the board.
             game.setTile(new Tile("18", "000"));
             Map<String, LoreEntry> saved = new HashMap<>();
             LoreEntry e = entry("!tg +1");

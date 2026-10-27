@@ -24,11 +24,14 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.statistics.StatsTrackingButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
+import ti4.discord.utility.DiscordThreadUtility;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.TIGLHelper;
+import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.draft.DraftManager;
@@ -68,6 +71,13 @@ class Replace extends GameStateSubcommand {
                     "Could not find the player to replace. Please try again, and if the problem persists contact `@Bothelper`.");
             return;
         }
+        if (replacedPlayer.isEliminated()) {
+            MessageHelper.replyToMessage(
+                    event,
+                    "That player has been eliminated, so there is no seat to hand over. Ask a `@Bothelper` if they"
+                            + " were eliminated by mistake.");
+            return;
+        }
 
         OptionMapping replacementPlayerOption = event.getOption(Constants.PLAYER);
         if (replacementPlayerOption == null) {
@@ -76,14 +86,10 @@ class Replace extends GameStateSubcommand {
         }
 
         User replacementUser = replacementPlayerOption.getAsUser();
-        Player possibleSpectatorToRemove = game.getPlayer(replacementUser.getId());
-        if (possibleSpectatorToRemove != null
-                && possibleSpectatorToRemove.getFaction() != null
-                && !"null".equalsIgnoreCase(possibleSpectatorToRemove.getFaction())) {
+        Player alreadyInGame = game.getPlayer(replacementUser.getId());
+        if (alreadyInGame != null && !isSpectator(alreadyInGame)) {
             MessageHelper.replyToMessage(event, "Specify player that is **__not__** in the game to be the replacement");
             return;
-        } else if (possibleSpectatorToRemove != null) {
-            game.removePlayer(possibleSpectatorToRemove.getUserID());
         }
 
         Guild guild = game.getGuild();
@@ -94,6 +100,35 @@ class Replace extends GameStateSubcommand {
         if (newMember == null) {
             MessageHelper.replyToMessage(event, "Added player must be on the game's server.");
             return;
+        }
+
+        if (game.isCompetitiveTIGLGame()) {
+            TIGLRank incomingRank = TIGLHelper.rankAtGameStartFor(game, replacementUser.getId());
+            if (incomingRank == null) {
+                ReplaceRankButtonHandler.warnRankUnverified(event.getChannel(), game, replacementUser);
+            } else if (TIGLHelper.isBelowGameRank(game, incomingRank)) {
+                ReplaceRankButtonHandler.askToLowerGameRank(
+                        event.getChannel(), game, replacedPlayer, replacementUser, incomingRank);
+                return;
+            }
+        }
+
+        performReplacement(game, replacedPlayer, replacementUser, guild, newMember, event.getChannel());
+        if (game.isCompetitiveTIGLGame()) {
+            TIGLHelper.initializeRanksAsync(game, event.getChannel());
+        }
+    }
+
+    static void performReplacement(
+            Game game,
+            Player replacedPlayer,
+            User replacementUser,
+            Guild guild,
+            Member newMember,
+            MessageChannel feedbackChannel) {
+        Player spectatorToRemove = game.getPlayer(replacementUser.getId());
+        if (isSpectator(spectatorToRemove)) {
+            game.removePlayer(spectatorToRemove.getUserID());
         }
 
         // REMOVE ROLE
@@ -198,7 +233,10 @@ class Replace extends GameStateSubcommand {
                         .replace(
                                 oldPlayerUserName.replace("/", ""),
                                 replacedPlayer.getUserName().replace("/", ""));
-                cardsInfo.getManager().setName(newCardsInfoName).queue(Consumers.nop(), BotLogger::catchRestError);
+                cardsInfo
+                        .getManager()
+                        .setName(DiscordThreadUtility.fitThreadName(newCardsInfoName))
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
                 if (oldMember != null) {
                     cardsInfo.removeThreadMember(oldMember).queue(Consumers.nop(), BotLogger::catchRestError);
                 }
@@ -218,7 +256,7 @@ class Replace extends GameStateSubcommand {
             }
         }
 
-        Helper.fixGameChannelPermissions(event.getGuild(), game);
+        Helper.fixGameChannelPermissions(guild, game);
         ThreadChannel mapThread = game.getBotMapUpdatesThread();
         if (mapThread != null && !mapThread.isLocked()) {
             mapThread
@@ -242,7 +280,7 @@ class Replace extends GameStateSubcommand {
 
         if (!replacementUser.isBot()) {
             MessageHelper.sendMessageToChannelWithButtons(
-                    event.getChannel(),
+                    feedbackChannel,
                     replacementUser.getAsMention()
                             + " Should this game's stats be tracked for you, or the player you replaced?",
                     List.of(
@@ -258,10 +296,14 @@ class Replace extends GameStateSubcommand {
         String message = "Game: " + game.getName() + "  Player: " + oldPlayerUserId + " replaced by player: "
                 + replacementUser.getName();
         if (FoWHelper.isPrivateGame(game) || game.getActionsChannel() == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            MessageHelper.sendMessageToChannel(feedbackChannel, message);
         } else {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
         }
+    }
+
+    static boolean isSpectator(Player player) {
+        return player != null && (player.getFaction() == null || "null".equalsIgnoreCase(player.getFaction()));
     }
 
     private static void updateDraftManagerPlayer(String oldPlayerUserId, String newPlayerUserId, Game game) {
@@ -281,7 +323,7 @@ class Replace extends GameStateSubcommand {
         }
     }
 
-    private void updateThread(ThreadChannel thread, Member oldMember, Member newMember) {
+    private static void updateThread(ThreadChannel thread, Member oldMember, Member newMember) {
         thread.retrieveThreadMemberById(oldMember.getId())
                 .queue(
                         oldThreadMember -> thread.getManager()

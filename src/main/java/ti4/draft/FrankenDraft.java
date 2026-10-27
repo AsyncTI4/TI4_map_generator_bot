@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import ti4.draft.items.AbilityDraftItem;
 import ti4.draft.items.AgentDraftItem;
@@ -28,15 +29,16 @@ import ti4.draft.items.UnitDraftItem;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.PatternHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.milty.EchoesOfYggdrasilService;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 
 public class FrankenDraft extends BagDraft {
+    public static final String ENABLED_FACTION_SOURCES_KEY = "frankenEnabledFactionSources";
 
     public FrankenDraft(Game owner) {
         super(owner);
@@ -106,29 +108,22 @@ public class FrankenDraft extends BagDraft {
     }
 
     private static final String[] excludedFactions = {
-        "lazax",
-        "admins",
-        "franken",
-        "keleresm",
-        "keleresx",
-        "miltymod",
-        "qulane",
-        "neutral",
-        "obsidian",
-        "stoneborn",
-        "morpha"
+        "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "obsidian"
     };
 
     public static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllFrankenLegalFactions(game);
         String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedFactions"));
+        Set<ComponentSource> enabledFactionSources = getEnabledFactionSources(game);
         if (!game.isDiscordantStarsMode()) {
-            factionSet.removeIf(factionModel ->
-                    factionModel.getSource().isDs() && !factionModel.getSource().isTe());
+            factionSet.removeIf(factionModel -> factionModel.getSource().isDs()
+                    && !factionModel.getSource().isTe()
+                    && !enabledFactionSources.contains(factionModel.getSource()));
         }
         if (!game.isBlueReverieMode()) {
-            factionSet.removeIf(factionModel ->
-                    factionModel.getSource().isBr() && !factionModel.getSource().isTe());
+            factionSet.removeIf(factionModel -> factionModel.getSource().isBr()
+                    && !factionModel.getSource().isTe()
+                    && !enabledFactionSources.contains(factionModel.getSource()));
         }
         factionSet.removeIf(factionModel -> contains(results, factionModel.getAlias()));
 
@@ -147,10 +142,14 @@ public class FrankenDraft extends BagDraft {
     public static List<FactionModel> getAllFrankenLegalFactions(@Nullable Game game) {
         List<FactionModel> factionSet = Mapper.getFactionsValues();
         List<String> excludedFactions = Arrays.asList(FrankenDraft.excludedFactions);
+        Set<ComponentSource> enabledFactionSources = getEnabledFactionSources(game);
 
         factionSet.removeIf((FactionModel model) -> {
             if (excludedFactions.contains(model.getAlias())) {
                 return true;
+            }
+            if (enabledFactionSources.contains(model.getSource())) {
+                return false;
             }
             if ((game == null || game.isThundersEdge()) && model.getSource().isTe()) {
                 return false;
@@ -169,6 +168,52 @@ public class FrankenDraft extends BagDraft {
             return !model.getSource().isPok();
         });
         return factionSet;
+    }
+
+    public static boolean enableFactionSource(Game game, ComponentSource source) {
+        Set<ComponentSource> sources = getEnabledFactionSources(game);
+        if (!sources.add(source)) {
+            return false;
+        }
+        game.setStoredValue(ENABLED_FACTION_SOURCES_KEY, encodeFactionSources(sources));
+        return true;
+    }
+
+    public static Set<ComponentSource> getEnabledFactionSources(@Nullable Game game) {
+        return getFactionSources(game, ENABLED_FACTION_SOURCES_KEY);
+    }
+
+    public static boolean disableFactionSource(Game game, ComponentSource source) {
+        Set<ComponentSource> sources = getEnabledFactionSources(game);
+        if (!sources.remove(source)) {
+            return false;
+        }
+        if (sources.isEmpty()) {
+            game.removeStoredValue(ENABLED_FACTION_SOURCES_KEY);
+        } else {
+            game.setStoredValue(ENABLED_FACTION_SOURCES_KEY, encodeFactionSources(sources));
+        }
+        return true;
+    }
+
+    private static Set<ComponentSource> getFactionSources(@Nullable Game game, String key) {
+        Set<ComponentSource> sources = new java.util.LinkedHashSet<>();
+        if (game == null) {
+            return sources;
+        }
+        for (String sourceId : PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue(key))) {
+            ComponentSource source = ComponentSource.fromString(sourceId);
+            if (source != null) {
+                sources.add(source);
+            }
+        }
+        return sources;
+    }
+
+    private static String encodeFactionSources(Set<ComponentSource> sources) {
+        return sources.stream()
+                .map(ComponentSource::toString)
+                .collect(java.util.stream.Collectors.joining(Constants.FIN_SEPARATOR));
     }
 
     @Override
@@ -288,6 +333,9 @@ public class FrankenDraft extends BagDraft {
         }
         if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
+        }
+        if (game.isLostLegaciesTiles()) {
+            sources.add(ComponentSource.theodisi);
         }
         if (Boolean.parseBoolean(game.getStoredValue(Constants.INCLUDE_ERONOUS_TILES))) {
             sources.add(ComponentSource.eronous);

@@ -72,6 +72,10 @@ class PlanetTargetLeakGuardTest {
             "SleeperTokenHelper.java#p2",
             // Hacan mech trade: a transaction the owner initiates, listing only their own mech planets.
             "ButtonHelperFactionSpecific.java#hacan",
+            // Atokera agent: the voter alone chooses from their own exhausted planets.
+            "AtokeraAgentHandler.java#voter",
+            // Audit: the affected player chooses only from their own planets in their private channel.
+            "AuditBrActionCardHandler.java#target",
             // Non-fog branches of the coexistence flows; all now take the PlanetTargetService path in fog.
             "ButtonHelperAgents.java#p2",
             "DSHelperBreakthroughs.java#p1",

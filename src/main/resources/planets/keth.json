@@ -1,0 +1,28 @@
+{
+    "id": "keth",
+    "tileId": "th38",
+    "name": "Keth",
+    "aliases": [
+        "keth"
+    ],
+    "resources": 0,
+    "influence": 1,
+    "planetTypes": [
+        "CULTURAL",
+        "HAZARDOUS"
+    ],
+    "planetLayout": {
+        "unitHolderName": "keth",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 205
+        },
+        "planetRadius": 63
+    },
+    "positionInTile": {
+            "x": 200,
+            "y": 205
+    },
+    "source": "theodisi"
+}

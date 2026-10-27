@@ -30,6 +30,16 @@ class YinHeroButtonHandler {
 
     @ButtonHandler("yinHeroStart")
     public static void yinHeroStart(ButtonInteractionEvent event, Game game, Player player) {
+        yinHeroStart(event, game, player, false);
+    }
+
+    @ButtonHandler("yinBrHeroStart")
+    public static void yinBrHeroStart(ButtonInteractionEvent event, Game game, Player player) {
+        yinHeroStart(event, game, player, true);
+    }
+
+    private static void yinHeroStart(ButtonInteractionEvent event, Game game, Player player, boolean blueReverie) {
+        String planetPrefix = player.factionButtonChecker() + (blueReverie ? "yinBrHeroPlanet" : "yinHeroPlanet");
         if (game.isFowMode()) {
             // Both branches below disclose holdings: picking a player then listing their planets, and the
             // "unowned" branch walking the whole map (which also reveals, by omission, which planets ARE
@@ -37,22 +47,28 @@ class YinHeroButtonHandler {
             List<Button> fogButtons = PlanetTargetService.targetButtons(
                     game,
                     player,
-                    PlanetTargetSpec.of(player.factionButtonChecker() + "yinHeroPlanet")
+                    PlanetTargetSpec.of(planetPrefix)
                             .where(p -> !p.isSpaceStation(game)
                                     && game.getTileFromPlanet(p.getName()) != null
-                                    && !game.getTileFromPlanet(p.getName()).isHomeSystem(game))
-                            .withPageNavPrefix(player.factionButtonChecker() + "yinHeroPlanet_"),
+                                    && !game.getTileFromPlanet(p.getName()).isHomeSystem(game)
+                                    && (!blueReverie || !p.isLegendary()))
+                            .withPageNavPrefix(planetPrefix + "_"),
                     new ArrayList<>());
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getChannel(), "Please choose which planet to invade.", fogButtons);
             return;
         }
         List<Button> buttons = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "yinHeroTarget", null);
-        if (game.getTileByPosition("tl") != null
-                && "82a".equalsIgnoreCase(game.getTileByPosition("tl").getTileID())) {
-            buttons.add(Buttons.green("yinHeroPlanet_lockedmallice", "Invade Mallice"));
+        if (blueReverie) {
+            buttons = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "yinBrHeroTarget", null);
         }
-        buttons.add(Buttons.green("yinHeroTarget_unowned", "Take Unowned Planet"));
+        if (!blueReverie
+                && game.getTileByPosition("tl") != null
+                && "82a".equalsIgnoreCase(game.getTileByPosition("tl").getTileID())) {
+            buttons.add(Buttons.green(planetPrefix + "_lockedmallice", "Invade Mallice"));
+        }
+        buttons.add(
+                Buttons.green((blueReverie ? "yinBrHeroTarget" : "yinHeroTarget") + "_unowned", "Take Unowned Planet"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(), "Please choose the player that owns the planet you wish to land on.", buttons);
     }
@@ -60,21 +76,32 @@ class YinHeroButtonHandler {
     // Non-fog only - see yinHeroStart, which skips this step entirely in fog.
     @ButtonHandler("yinHeroTarget_")
     public static void yinHeroTarget(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
-        String faction = buttonID.replace("yinHeroTarget_", "");
+        yinHeroTarget(event, buttonID, game, player, false);
+    }
+
+    @ButtonHandler("yinBrHeroTarget_")
+    public static void yinBrHeroTarget(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        yinHeroTarget(event, buttonID, game, player, true);
+    }
+
+    private static void yinHeroTarget(
+            ButtonInteractionEvent event, String buttonID, Game game, Player player, boolean blueReverie) {
+        String targetPrefix = blueReverie ? "yinBrHeroTarget_" : "yinHeroTarget_";
+        String planetPrefix = player.factionButtonChecker() + (blueReverie ? "yinBrHeroPlanet_" : "yinHeroPlanet_");
+        String faction = buttonID.replace(targetPrefix, "");
         List<Button> buttons = new ArrayList<>();
         Player target = game.getPlayerFromColorOrFaction(faction);
         if (target != null && !"unowned".equalsIgnoreCase(faction)) {
             for (String planet : target.getPlanets()) {
                 if (game.getTileFromPlanet(planet) == null
                         || game.getTileFromPlanet(planet).isHomeSystem(game)
+                        || (blueReverie && game.getUnitHolderFromPlanet(planet).isLegendary())
                         || Helper.getPlanetRepresentation(planet, game)
                                 .toLowerCase()
                                 .contains("dmz")) {
                     continue;
                 }
-                buttons.add(Buttons.green(
-                        player.factionButtonChecker() + "yinHeroPlanet_" + planet,
-                        Helper.getPlanetRepresentation(planet, game)));
+                buttons.add(Buttons.green(planetPrefix + planet, Helper.getPlanetRepresentation(planet, game)));
             }
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getChannel(), "Please choose which planet to invade.", buttons);
@@ -83,7 +110,7 @@ class YinHeroButtonHandler {
             for (Tile tile : game.getTileMap().values()) {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                     if (unitHolder instanceof Planet planet) {
-                        if (planet.isSpaceStation(game)) {
+                        if (planet.isSpaceStation(game) || (blueReverie && planet.isLegendary())) {
                             continue;
                         }
                         boolean owned = false;
@@ -95,7 +122,7 @@ class YinHeroButtonHandler {
                         }
                         if (!owned) {
                             buttons.add(Buttons.green(
-                                    player.factionButtonChecker() + "yinHeroPlanet_" + planet.getName(),
+                                    planetPrefix + planet.getName(),
                                     Helper.getPlanetRepresentation(planet.getName(), game)));
                         }
                     }
@@ -108,25 +135,32 @@ class YinHeroButtonHandler {
 
     @ButtonHandler("yinHeroPlanet_")
     public static void yinHeroPlanet(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
-        var spec = PlanetTargetSpec.of(player.factionButtonChecker() + "yinHeroPlanet")
+        yinHeroPlanet(event, buttonID, game, player, false);
+    }
+
+    @ButtonHandler("yinBrHeroPlanet_")
+    public static void yinBrHeroPlanet(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        yinHeroPlanet(event, buttonID, game, player, true);
+    }
+
+    private static void yinHeroPlanet(
+            ButtonInteractionEvent event, String buttonID, Game game, Player player, boolean blueReverie) {
+        String planetButtonPrefix = blueReverie ? "yinBrHeroPlanet" : "yinHeroPlanet";
+        String planetPrefix = player.factionButtonChecker() + planetButtonPrefix;
+        var spec = PlanetTargetSpec.of(planetPrefix)
                 .where(p -> !p.isSpaceStation(game)
                         && game.getTileFromPlanet(p.getName()) != null
-                        && !game.getTileFromPlanet(p.getName()).isHomeSystem(game))
-                .withPageNavPrefix(player.factionButtonChecker() + "yinHeroPlanet_");
+                        && !game.getTileFromPlanet(p.getName()).isHomeSystem(game)
+                        && (!blueReverie || !p.isLegendary()))
+                .withPageNavPrefix(planetPrefix + "_");
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
-        String planet = buttonID.replace("yinHeroPlanet_", "");
-        if ("lockedmallice".equalsIgnoreCase(planet)) {
-            planet = "mallice";
-            FlipTileService.flipTileIfNeeded(event, game.getTileFromPlanet("lockedmallice"), game);
-        } else if ("hexlockedmallice".equalsIgnoreCase(planet)) {
-            planet = "hexmallice";
-            FlipTileService.flipTileIfNeeded(event, game.getTileFromPlanet("hexlockedmallice"), game);
-        }
+        String planet =
+                FlipTileService.unlockMalliceIfNeeded(event, buttonID.replace(planetButtonPrefix + "_", ""), game);
         Tile targetTile = game.getTileFromPlanet(planet);
         Planet targetPlanet = game.getUnitHolderFromPlanet(planet);
         boolean mallice = planet.toLowerCase().contains("mallice");
         // Existence is checked in both modes - it only replaces a crash.
-        if (targetTile == null || targetPlanet == null) {
+        if (targetTile == null || targetPlanet == null || (blueReverie && targetPlanet.isLegendary())) {
             PlanetTargetService.fizzle(event, player);
             return;
         }
@@ -152,7 +186,8 @@ class YinHeroButtonHandler {
         List<Button> buttons = new ArrayList<>();
         for (int x = 1; x < 4; x++) {
             buttons.add(Buttons.green(
-                    player.factionButtonChecker() + "yinHeroInfantry_" + planet + "_" + x,
+                    player.factionButtonChecker() + (blueReverie ? "yinBrHeroInfantry_" : "yinHeroInfantry_") + planet
+                            + "_" + x,
                     "Land " + x + " infantry",
                     UnitEmojis.infantry));
         }
@@ -163,7 +198,17 @@ class YinHeroButtonHandler {
 
     @ButtonHandler("yinHeroInfantry_")
     public static void lastStepOfYinHero(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        String planetNInf = buttonID.replace("yinHeroInfantry_", "");
+        lastStepOfYinHero(buttonID, event, game, player, false);
+    }
+
+    @ButtonHandler("yinBrHeroInfantry_")
+    public static void lastStepOfYinBrHero(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        lastStepOfYinHero(buttonID, event, game, player, true);
+    }
+
+    private static void lastStepOfYinHero(
+            String buttonID, ButtonInteractionEvent event, Game game, Player player, boolean blueReverie) {
+        String planetNInf = buttonID.replace(blueReverie ? "yinBrHeroInfantry_" : "yinHeroInfantry_", "");
         String planet = planetNInf.split("_")[0];
         String amount = planetNInf.split("_")[1];
         Tile tile = game.getTileFromPlanet(planet);

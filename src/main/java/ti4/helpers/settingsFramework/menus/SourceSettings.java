@@ -12,8 +12,8 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.game.Game;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.SourceEmojis;
@@ -33,6 +33,7 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting discoStars;
     private final BooleanSetting betaTestMode;
     private final BooleanSetting unchartedSpace;
+    private final BooleanSetting lostLegaciesTiles;
     private final BooleanSetting blueReverie;
     private final BooleanSetting absol;
     private final BooleanSetting ignis;
@@ -63,6 +64,7 @@ public class SourceSettings extends SettingsMenu {
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
         teDemo = new BooleanSetting("ThundersEdge", "Thunders Edge", game.isThundersEdge());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
+        lostLegaciesTiles = new BooleanSetting("LostLegaciesTiles", "Lost Legacies Tiles", game.isLostLegaciesTiles());
         blueReverie = new BooleanSetting("BlueReverie", "Blue Reverie", game.isBlueReverieMode());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());
         ignis = new BooleanSetting(
@@ -82,6 +84,8 @@ public class SourceSettings extends SettingsMenu {
         codexes.setEmoji(FactionEmojis.Keleres);
         discoStars.setEmoji(SourceEmojis.DiscordantStars);
         unchartedSpace.setEmoji(SourceEmojis.DiscordantStars);
+        lostLegaciesTiles.setEmoji(SourceEmojis.Theodisi);
+        blueReverie.setEmoji(SourceEmojis.BlueReverie);
         absol.setEmoji(SourceEmojis.Absol);
         eronous.setEmoji(SourceEmojis.Eronous);
         actionCardDeck2.setEmoji(SourceEmojis.ActionDeck2);
@@ -93,6 +97,7 @@ public class SourceSettings extends SettingsMenu {
         discoStars.setExtraInfo("Adds Discordant Stars factions only.");
         blueReverie.setExtraInfo("Adds Blue Reverie factions only.");
         unchartedSpace.setExtraInfo("Adds Uncharted Space content.");
+        lostLegaciesTiles.setExtraInfo("Adds Lost Legacies tiles to the draft tile pool.");
         lostLegacies.setExtraInfo("Adds Lost Legacies factions only.");
         monuments.setExtraInfo(
                 "Adds faction monuments plus Monuments action cards, agendas, secrets, and strategy cards.");
@@ -115,6 +120,7 @@ public class SourceSettings extends SettingsMenu {
             discoStars.initialize(json.get("discoStars"));
             teDemo.initialize(json.get("teDemo"));
             unchartedSpace.initialize(json.get("unchartedSpace"));
+            lostLegaciesTiles.initialize(json.get("lostLegaciesTiles"));
             blueReverie.initialize(json.get("blueReverie"));
             absol.initialize(json.get("absol"));
             ignis.initialize(json.get("ignis"));
@@ -143,6 +149,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(discoStars);
         ls.add(blueReverie);
         ls.add(unchartedSpace);
+        ls.add(lostLegaciesTiles);
         ls.add(absol);
         ls.add(ignis);
         ls.add(eronous);
@@ -178,6 +185,7 @@ public class SourceSettings extends SettingsMenu {
                     ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
         if (discoStars.isVal()) sources.add(ComponentSource.ds);
         if (unchartedSpace.isVal()) sources.add(ComponentSource.uncharted_space);
+        if (lostLegaciesTiles.isVal()) sources.add(ComponentSource.theodisi);
         if (absol.isVal()) sources.add(ComponentSource.absol);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         return sources;
@@ -197,7 +205,7 @@ public class SourceSettings extends SettingsMenu {
         if (teDemo.isVal()) sources.add(ComponentSource.thunders_edge);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         if (ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
-        if (whispers.isVal()) sources.add(ComponentSource.balacasi);
+        if (whispers.isVal()) sources.add(ComponentSource.wftv);
         if (deepreaches.isVal()) sources.add(ComponentSource.beans);
         if (lostLegacies.isVal()) sources.add(ComponentSource.theodisi);
         return sources;

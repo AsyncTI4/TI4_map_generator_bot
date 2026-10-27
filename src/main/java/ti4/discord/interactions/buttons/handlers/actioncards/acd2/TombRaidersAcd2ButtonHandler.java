@@ -1,86 +1,235 @@
 package ti4.discord.interactions.buttons.handlers.actioncards.acd2;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
-import ti4.helpers.Constants;
-import ti4.image.Mapper;
-import ti4.logging.BotLogger;
+import ti4.game.Tile;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.DiceHelper;
+import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
-import ti4.model.ExploreModel;
+import ti4.service.async.DieRollSequenceService;
 import ti4.service.emoji.ExploreEmojis;
-import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
 class TombRaidersAcd2ButtonHandler {
 
+    private static final int RELIC_THRESHOLD = 10;
+    private static final int MAX_PLANET_BUTTONS = 25;
+    private static final List<String> ACTIVITIES = List.of(
+            "🧗 Climbing...",
+            "🏊 Swimming...",
+            "🚣 Rowing...",
+            "🚵 Biking...",
+            "🏇 Racing...",
+            "🤺 Fencing...",
+            "🤸 Yippee?...",
+            "🪂 Parachuting...",
+            "⛷️ Skiing...",
+            "🗿 Sight-seeing...",
+            "🛖 Consulting natives...",
+            "🏚️ Breaking in...",
+            "🏔️ Ascending...",
+            "🌋 Krakatoa...",
+            "🏜️ Investigating a mirage...",
+            "🏝️ Shipwrecked...",
+            "🏰 Courting...",
+            "🗺️ X marks the spot?...",
+            "🐉 Slaying...",
+            "🏃 Running away...",
+            "🥷 Stealthing...",
+            "🧞 Wishing...",
+            "🕵️ Sleuthing...",
+            "🪤 Springing traps...",
+            "🐍 Snakes. Why'd it have to be snakes?...",
+            "🪨 Outrunning a boulder...",
+            "🔥 Dodging fireballs...",
+            "🧟 Waking the mummy...",
+            "🏺 Dusting off pottery...",
+            "📜 Deciphering hieroglyphs...",
+            "⛏️ Digging...",
+            "🧭 Navigating...",
+            "🕯️ Lighting a torch...",
+            "🗝️ Picking a lock...",
+            "🕸️ Brushing off cobwebs...",
+            "🪦 Disturbing a grave...",
+            "🐊 Crocodiles...",
+            "🛕 Entering the temple...",
+            "⚖️ Swapping the idol for a sandbag...",
+            "🐪 Camel riding...",
+            "💎 Pocketing the gem...");
+
     @ButtonHandler("resolveTombRaiders")
     public static void resolveTombRaiders(Player player, Game game, ButtonInteractionEvent event) {
-        player.gainCommodities(2);
-        List<String> types = new ArrayList<>(List.of("hazardous", "cultural", "industrial", "frontier"));
-        StringBuilder sb = new StringBuilder();
-        int fragmentsGained = 0;
-        sb.append(player.getRepresentationUnfogged()).append(" gained 2 commodities and:");
-        for (String type : types) {
-            String cardId = game.drawExplore(type);
-            ExploreModel card = Mapper.getExplore(cardId);
-            String cardType = card.getResolution();
-            sb.append("\n- ");
-            if (Constants.FRAGMENT.equalsIgnoreCase(cardType)) {
-                sb.append(ExploreEmojis.getFragEmoji(type)).append(" ");
-            } else {
-                sb.append("❌ ");
-            }
-            sb.append("Revealed _")
-                    .append(card.getName())
-                    .append("_ from the top of the ")
-                    .append(type)
-                    .append(" deck and ");
-            if (Constants.FRAGMENT.equalsIgnoreCase(cardType)) {
-                sb.append("gained it.");
-                player.addFragment(cardId);
-                fragmentsGained++;
-                game.purgeExplore(cardId);
-            } else {
-                sb.append("discarded it.");
-            }
+        List<String> activeSystemPlanets = getActiveSystemPlanets(player, game);
+        List<Button> buttons = new ArrayList<>(getPlanetButtons(player, game, activeSystemPlanets));
+        if (buttons.isEmpty()) {
+            buttons.addAll(getPlanetButtons(player, game, player.getPlanets()));
+        } else if (!getOtherPlanets(player, activeSystemPlanets).isEmpty()) {
+            buttons.add(Buttons.gray(player.factionButtonChecker() + "tombRaidersOther", "Other"));
         }
-        sb.append("\n").append(getTombRaidersLoreQuip(fragmentsGained));
-        CommanderUnlockCheckService.checkPlayer(player, "kollecc");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        offerPlanets(player, game, event, buttons);
     }
 
-    private static String getTombRaidersLoreQuip(int fragmentsGained) {
-        List<String> quips =
-                switch (fragmentsGained) {
-                    case 0 ->
-                        List.of(
-                                "\"They're digging in the wrong place!\" — Indiana Jones, _Raiders of the Lost Ark_",
-                                "\"X never, ever marks the spot.\" — Indiana Jones, _Indiana Jones and the Last Crusade_",
-                                "\"He chose... poorly.\" — Grail Knight, _Indiana Jones and the Last Crusade_");
-                    case 1 ->
-                        List.of(
-                                "\"It belongs in a museum!\" — Indiana Jones, _Indiana Jones and the Last Crusade_",
-                                "\"Throw me the idol, I'll throw you the whip!\" — Satipo, _Raiders of the Lost Ark_");
-                    case 2 ->
-                        List.of(
-                                "\"You want to be a good archaeologist, you've got to get out of the library!\" — Indiana Jones, _Indiana Jones and the Last Crusade_",
-                                "\"You and I are very much alike. Archaeology is our religion.\" — René Belloq, _Raiders of the Lost Ark_",
-                                "\"This is the second time I've had to reclaim my property from you.\" — Indiana Jones, _Indiana Jones and the Last Crusade_");
-                    case 3 ->
-                        List.of(
-                                "\"Fortune and glory, kid. Fortune and glory.\" — Indiana Jones, _Indiana Jones and the Temple of Doom_",
-                                "\"Dr. Jones. Again we see there is nothing you can possess which I cannot take away.\" — René Belloq, _Raiders of the Lost Ark_");
-                    default ->
-                        List.of("\"You have chosen... wisely.\" — Grail Knight, _Indiana Jones and the Last Crusade_");
-                };
+    @ButtonHandler("tombRaidersOther")
+    public static void tombRaidersOther(Player player, Game game, ButtonInteractionEvent event) {
+        List<String> otherPlanets = getOtherPlanets(player, getActiveSystemPlanets(player, game));
+        offerPlanets(player, game, event, getPlanetButtons(player, game, otherPlanets));
+    }
+
+    @ButtonHandler("tombRaidersPlanet_")
+    public static void tombRaidersPlanet(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String planetName = buttonID.replace("tombRaidersPlanet_", "");
+        Planet planet = game.getPlanetsInfo().get(planetName);
+        ButtonHelper.deleteMessage(event);
+        if (planet == null || !player.hasPlanet(planetName)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not resolve _Tomb Raiders_ for that planet.");
+            return;
+        }
+
+        rollUntilTen(player, game, planetName, getDiceCount(planet), "is rolling");
+    }
+
+    @ButtonHandler("tombRaidersKeepRolling_")
+    public static void tombRaidersKeepRolling(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String payload = buttonID.replace("tombRaidersKeepRolling_", "");
+        int separator = payload.indexOf('_');
+        ButtonHelper.deleteMessage(event);
+        if (separator < 0) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resume _Tomb Raiders_.");
+            return;
+        }
+        int remainingDice = Integer.parseInt(payload.substring(0, separator));
+        rollUntilTen(player, game, payload.substring(separator + 1), remainingDice, "keeps rolling");
+    }
+
+    private static void rollUntilTen(Player player, Game game, String planetName, int diceCount, String verb) {
+        List<DiceHelper.Die> shownRolls = untilFirstSuccess(DiceHelper.rollDice(RELIC_THRESHOLD, diceCount));
+        MessageChannel channel = player.getCorrectChannel();
+        String header = player.getRepresentation() + " " + verb + " up to " + diceCount + " "
+                + (diceCount == 1 ? "die" : "dice") + " for _Tomb Raiders_ on "
+                + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + ".";
+        String relicButtonId = player.factionButtonChecker() + "drawRelic";
+        String keepRollingButtonId = player.factionButtonChecker() + "tombRaidersKeepRolling_"
+                + (diceCount - shownRolls.size()) + "_" + planetName;
+        DieRollSequenceService.play(
+                channel,
+                header,
+                pickActivities(shownRolls.size()),
+                shownRolls,
+                () -> announceOutcome(channel, shownRolls, diceCount, relicButtonId, keepRollingButtonId));
+    }
+
+    private static List<DiceHelper.Die> untilFirstSuccess(List<DiceHelper.Die> rolls) {
+        for (int i = 0; i < rolls.size(); i++) {
+            if (rolls.get(i).isSuccess()) {
+                return rolls.subList(0, i + 1);
+            }
+        }
+        return rolls;
+    }
+
+    private static void announceOutcome(
+            MessageChannel channel,
+            List<DiceHelper.Die> shownRolls,
+            int diceCount,
+            String relicButtonId,
+            String keepRollingButtonId) {
+        boolean foundRelic = DiceHelper.countSuccesses(shownRolls) > 0;
+        String message = getTombRaidersLoreQuip(foundRelic);
+        if (!foundRelic) {
+            MessageHelper.sendMessageToChannel(channel, message);
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green(relicButtonId, "Draw Relic", ExploreEmojis.Relic));
+        int remainingDice = diceCount - shownRolls.size();
+        if (remainingDice > 0) {
+            message += "\nIf that 10 gets changed, use the other button to keep rolling the remaining " + remainingDice
+                    + (remainingDice == 1 ? " die." : " dice.");
+            buttons.add(Buttons.gray(keepRollingButtonId, "Keep Rolling (" + remainingDice + " left)"));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+    }
+
+    private static List<String> pickActivities(int count) {
+        List<String> activities = new ArrayList<>();
+        while (activities.size() < count) {
+            List<String> shuffled = new ArrayList<>(ACTIVITIES);
+            Collections.shuffle(shuffled);
+            activities.addAll(shuffled);
+        }
+        return activities.subList(0, count);
+    }
+
+    private static int getDiceCount(Planet planet) {
+        if (planet.getPlanetTypes().isEmpty()) {
+            return planet.getSumResourcesInfluence();
+        }
+        return planet.getHigherofInfluenceOrResource();
+    }
+
+    private static void offerPlanets(Player player, Game game, ButtonInteractionEvent event, List<Button> buttons) {
+        ButtonHelper.deleteMessage(event);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has no planets to target with _Tomb Raiders_.");
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose the planet you just gained for _Tomb Raiders_.",
+                buttons);
+    }
+
+    private static List<Button> getPlanetButtons(Player player, Game game, List<String> planets) {
+        return planets.stream()
+                .limit(MAX_PLANET_BUTTONS)
+                .map(planet -> Buttons.green(
+                        player.factionButtonChecker() + "tombRaidersPlanet_" + planet,
+                        Helper.getPlanetRepresentation(planet, game)))
+                .toList();
+    }
+
+    private static List<String> getOtherPlanets(Player player, List<String> activeSystemPlanets) {
+        return player.getPlanets().stream()
+                .filter(planet -> !activeSystemPlanets.contains(planet))
+                .toList();
+    }
+
+    private static List<String> getActiveSystemPlanets(Player player, Game game) {
+        Tile activeSystem = game.getTileByPosition(game.getCurrentActiveSystem());
+        if (activeSystem == null) {
+            return List.of();
+        }
+        return activeSystem.getPlanetUnitHolders().stream()
+                .map(Planet::getName)
+                .filter(player::hasPlanet)
+                .toList();
+    }
+
+    private static String getTombRaidersLoreQuip(boolean foundRelic) {
+        List<String> quips = foundRelic
+                ? List.of(
+                        "\"It belongs in a museum!\" — Indiana Jones, _Indiana Jones and the Last Crusade_",
+                        "\"Fortune and glory, kid. Fortune and glory.\" — Indiana Jones, _Indiana Jones and the Temple of Doom_",
+                        "\"You have chosen... wisely.\" — Grail Knight, _Indiana Jones and the Last Crusade_")
+                : List.of(
+                        "\"They're digging in the wrong place!\" — Indiana Jones, _Raiders of the Lost Ark_",
+                        "\"X never, ever marks the spot.\" — Indiana Jones, _Indiana Jones and the Last Crusade_",
+                        "\"He chose... poorly.\" — Grail Knight, _Indiana Jones and the Last Crusade_");
         return quips.get(ThreadLocalRandom.current().nextInt(quips.size()));
     }
 }

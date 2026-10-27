@@ -1,0 +1,28 @@
+{
+    "id": "idejett",
+    "tileId": "th32",
+    "name": "Idejett",
+    "aliases": [
+        "idejett"
+    ],
+    "resources": 0,
+    "influence": 1,
+    "planetTypes": [
+        "CULTURAL",
+        "INDUSTRIAL"
+    ],
+    "planetLayout": {
+        "unitHolderName": "idejett",
+        "resourcesLocation": "TopRight",
+        "centerPosition": {
+            "x": 219,
+            "y": 85
+        },
+        "planetRadius": 66
+    },
+    "positionInTile": {
+        "x": 219,
+        "y": 85
+    },
+    "source": "theodisi"
+}
