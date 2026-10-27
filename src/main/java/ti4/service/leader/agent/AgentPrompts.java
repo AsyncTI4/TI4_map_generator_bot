@@ -28,6 +28,14 @@ public class AgentPrompts {
                 ButtonHelper.getGainCCButtons(target));
     }
 
+    public static Message loseCommandTokens(Game game, Player target) {
+        game.setStoredValue(ORIGINAL_COMMAND_TOKENS_KEY_PREFIX + target.getFaction(), target.getCCRepresentation());
+        return Message.addressedTo(
+                target,
+                ", your current command tokens are " + target.getCCRepresentation() + ". Use buttons to lose tokens.",
+                ButtonHelper.getLoseCCButtons(target));
+    }
+
     public static Message removeInfantry(Game game, Player target) {
         return Message.addressedTo(
                 target, ", you may use the buttons to remove infantry.", infantryRemovalButtons(game, target));

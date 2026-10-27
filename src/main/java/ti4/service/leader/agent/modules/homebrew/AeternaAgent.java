@@ -24,6 +24,6 @@ public final class AeternaAgent extends TargetedAgent {
                                 ", please choose a non-fighter ship to destroy for " + use.agentNameFor(target) + ".",
                                 AeternaLeadersHandler.agentShipButtons(use.game(), target))
                         .withPagedButtons(),
-                Message.addressedTo(target, " has no eligible non-fighter ships."));
+                use.noteToUser(target, " has no eligible non-fighter ships."));
     }
 }

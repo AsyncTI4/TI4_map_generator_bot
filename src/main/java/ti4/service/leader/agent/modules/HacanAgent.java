@@ -1,10 +1,6 @@
 package ti4.service.leader.agent.modules;
 
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.routing.ButtonHandler;
-import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperStats;
 import ti4.service.emoji.FactionEmojis;
@@ -16,25 +12,20 @@ import ti4.service.leader.agent.PlayerPickerAgent;
 public final class HacanAgent extends PlayerPickerAgent {
 
     static final String ID = "hacanagent";
-    private static final String PICK_PLAYER_PREFIX = "hacanAgentRefresh";
     private static final int COMMODITIES_FOR_THE_HACAN = 2;
 
     public HacanAgent() {
-        super(ID, "Carth of Golden Sands, the Hacan", PICK_PLAYER_PREFIX);
+        super(ID, "Carth of Golden Sands, the Hacan");
     }
 
     public static Button button(Player hacan) {
-        return Buttons.gray(ownedButtonId(hacan, ID), useLabel(hacan, ID, "Hacan Agent"), FactionEmojis.Hacan);
-    }
-
-    @ButtonHandler(PICK_PLAYER_PREFIX + "_")
-    public static void resolvePickedPlayer(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        resolvePickedPlayer(ID, buttonID, event, game, player);
+        return useButton(hacan, ID, "Hacan Agent", FactionEmojis.Hacan);
     }
 
     @Override
-    protected AgentOutcome resolveFor(AgentUse<Choice> use, Player target) {
+    protected AgentOutcome resolveFor(AgentUse<Player> use) {
         Player hacan = use.user();
+        Player target = use.payload();
         if (target == hacan) {
             return gainCommodities(use, hacan);
         }
@@ -47,7 +38,7 @@ public final class HacanAgent extends PlayerPickerAgent {
                                 + "'s commodities."));
     }
 
-    private static AgentOutcome gainCommodities(AgentUse<Choice> use, Player hacan) {
+    private static AgentOutcome gainCommodities(AgentUse<Player> use, Player hacan) {
         int before = hacan.getCommodities();
         ButtonHelperStats.gainComms(use.event(), use.game(), hacan, COMMODITIES_FOR_THE_HACAN, false, true);
         int gained = hacan.getCommodities() - before;

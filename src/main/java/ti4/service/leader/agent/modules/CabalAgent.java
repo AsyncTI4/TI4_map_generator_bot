@@ -22,14 +22,13 @@ public final class CabalAgent extends TargetedAgent {
     static final String ID = "cabalagent";
     private static final String CAPTURE_PREFIX = "cabalAgentCapture_";
     private static final String LEGACY_PAYLOAD_PREFIX = "startCabalAgent_";
-    private static final int NO_BOARD_LIMIT = Integer.MAX_VALUE;
 
     private record Capturable(String unit, UnitEmojis emoji, int cost, int boardLimit) {}
 
     private static final List<Capturable> CAPTURABLE = List.of(
             new Capturable("destroyer", UnitEmojis.destroyer, 1, 8),
-            new Capturable("fighter", UnitEmojis.fighter, 1, NO_BOARD_LIMIT),
-            new Capturable("infantry", UnitEmojis.infantry, 1, NO_BOARD_LIMIT),
+            new Capturable("fighter", UnitEmojis.fighter, 1, Integer.MAX_VALUE),
+            new Capturable("infantry", UnitEmojis.infantry, 1, Integer.MAX_VALUE),
             new Capturable("mech", UnitEmojis.mech, 2, 4),
             new Capturable("cruiser", UnitEmojis.cruiser, 2, 8),
             new Capturable("carrier", UnitEmojis.carrier, 3, 4),
@@ -72,8 +71,8 @@ public final class CabalAgent extends TargetedAgent {
         int commodityValue = victim.getCommoditiesTotal();
         return CAPTURABLE.stream()
                 .filter(unit -> unit.cost() <= commodityValue)
-                .filter(unit -> unit.boardLimit() == NO_BOARD_LIMIT
-                        || ButtonHelper.getNumberOfUnitsOnTheBoard(use.game(), victim, unit.unit()) < unit.boardLimit())
+                .filter(unit ->
+                        ButtonHelper.getNumberOfUnitsOnTheBoard(use.game(), victim, unit.unit()) < unit.boardLimit())
                 .map(unit -> Buttons.red(
                         use.user().factionButtonChecker()
                                 + AgentStepIds.flagCopy(

@@ -13,8 +13,9 @@ import ti4.service.leader.agent.TargetedAgent;
 
 public final class RebellionAgent extends TargetedAgent {
 
-    static final String ID = "redcreussagent";
-    private static final String THUNDERS_EDGE_ID = "crimsonagent";
+    static final String ID = "crimsonagent";
+    private static final String CODEX_ID = "redcreussagent";
+    private static final String CODEX_DISPLAY_NAME = "\"Who Knows?\", the Rebellion";
 
     public RebellionAgent() {
         super(ID, "Ahk Ravin, the Rebellion");
@@ -22,7 +23,12 @@ public final class RebellionAgent extends TargetedAgent {
 
     @Override
     public Set<String> aliasIds() {
-        return Set.of(THUNDERS_EDGE_ID);
+        return Set.of(CODEX_ID);
+    }
+
+    @Override
+    public String displayName(String leaderId) {
+        return CODEX_ID.equalsIgnoreCase(leaderId) ? CODEX_DISPLAY_NAME : displayName();
     }
 
     @Override
@@ -38,6 +44,6 @@ public final class RebellionAgent extends TargetedAgent {
                         swapper,
                         ", please choose the first system that you wish to swap a ship between (and transport).",
                         systems),
-                Message.addressedTo(swapper, " has no ships to swap."));
+                use.noteToUser(swapper, " has no ships to swap."));
     }
 }

@@ -1,7 +1,6 @@
 package ti4.service.leader.agent.modules.homebrew;
 
 import net.dv8tion.jda.api.components.buttons.Button;
-import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.service.emoji.FactionEmojis;
@@ -20,8 +19,7 @@ public final class MykoMentoriAgent extends UntargetedAgent {
     }
 
     public static Button button(Player myko) {
-        return Buttons.gray(
-                ownedButtonId(myko, ID), useLabel(myko, ID, "Myko-Mentori Agent"), FactionEmojis.mykomentori);
+        return useButton(myko, ID, "Myko-Mentori Agent", FactionEmojis.mykomentori);
     }
 
     @Override

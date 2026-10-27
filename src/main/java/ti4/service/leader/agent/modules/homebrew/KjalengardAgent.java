@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.components.buttons.Button;
-import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperStats;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
@@ -24,8 +24,7 @@ public final class KjalengardAgent extends UntargetedAgent {
     }
 
     public static Button button(Player kjalengard) {
-        return Buttons.gray(
-                ownedButtonId(kjalengard, ID), useLabel(kjalengard, ID, "Kjalengard Agent"), FactionEmojis.kjalengard);
+        return useButton(kjalengard, ID, "Kjalengard Agent", FactionEmojis.kjalengard);
     }
 
     @Override
@@ -52,12 +51,12 @@ public final class KjalengardAgent extends UntargetedAgent {
             return AgentOutcome.of(gloryMove);
         }
         int oldCommodities = activePlayer.getCommodities();
-        activePlayer.setCommodities(oldCommodities + activePlayer.getNeighbourCount());
+        ButtonHelperStats.gainComms(use.event(), game, activePlayer, activePlayer.getNeighbourCount(), false, true);
         return AgentOutcome.of(
                 Message.plain(
                         activePlayer,
                         activePlayer.getFactionEmojiOrColor() + " commodities went from " + oldCommodities + " -> "
-                                + activePlayer.getCommodities() + "."),
+                                + activePlayer.getCommodities() + " due to " + use.agentNameFor(activePlayer) + "."),
                 gloryMove);
     }
 

@@ -24,6 +24,6 @@ public final class IronAgent extends TargetedAgent {
                                 IronLeadersHandler.PRODUCTION_SYSTEM_PROMPT,
                                 IronLeadersHandler.agentProductionSystemButtons(use.game(), target))
                         .withPagedButtons(),
-                Message.addressedTo(target, " has no system containing one of their units with PRODUCTION."));
+                use.noteToUser(target, " has no system containing one of their units with PRODUCTION."));
     }
 }

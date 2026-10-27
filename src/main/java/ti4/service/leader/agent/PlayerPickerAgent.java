@@ -1,11 +1,13 @@
 package ti4.service.leader.agent;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.ids.AgentStepIds;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AgendaRiderHelper;
@@ -14,20 +16,27 @@ import ti4.service.leader.agent.AgentOutcome.Message;
 
 public abstract class PlayerPickerAgent extends AgentModule<PlayerPickerAgent.Choice> {
 
-    public sealed interface Choice {}
+    static final String PICK_STEP = "agentPick_";
+    private static final Map<String, String> LEGACY_PICK_STEPS = Map.of(
+            "nekroAgentRes_", "nekroagent",
+            "kolleccAgentRes_", "kolleccagent",
+            "hacanAgentRefresh_", "hacanagent",
+            "pharadnAgentSelect_", "pharadnagent",
+            "vaylerianAgent_", "vaylerianagent");
 
-    public record PickPlayer() implements Choice {}
+    public sealed interface Choice permits PickPlayer, ResolveFor {}
 
-    public record ResolveFor(Player target) implements Choice {}
+    private record PickPlayer() implements Choice {}
 
-    private final String pickStepPrefix;
+    private record ResolveFor(Player target) implements Choice {}
 
-    protected PlayerPickerAgent(String agentId, String displayName, String pickStepPrefix) {
+    record Pick(PlayerPickerAgent picker, Player target, boolean viaYssaril) {}
+
+    protected PlayerPickerAgent(String agentId, String displayName) {
         super(agentId, displayName);
-        this.pickStepPrefix = pickStepPrefix;
     }
 
-    protected abstract AgentOutcome resolveFor(AgentUse<Choice> use, Player target);
+    protected abstract AgentOutcome resolveFor(AgentUse<Player> use);
 
     @Override
     public final Optional<Choice> decode(Game game, Player user, String payload) {
@@ -40,37 +49,79 @@ public abstract class PlayerPickerAgent extends AgentModule<PlayerPickerAgent.Ch
     @Override
     public final AgentOutcome resolve(AgentUse<Choice> use) {
         return switch (use.payload()) {
-            case ResolveFor resolveFor -> resolveFor(use, resolveFor.target());
+            case ResolveFor resolveFor -> resolveFor(withTarget(use, resolveFor.target()));
             case PickPlayer ignored -> offerPlayers(use);
         };
     }
 
-    public static void resolvePickedPlayer(
-            String agentId, String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        PlayerPickerAgent picker = AgentModules.find(agentId)
-                .filter(PlayerPickerAgent.class::isInstance)
-                .map(PlayerPickerAgent.class::cast)
-                .orElseThrow(() -> new IllegalArgumentException("No player picker agent for " + agentId));
-        AgentStepIds.Parsed step = AgentStepIds.parse(buttonID);
-        Optional<Player> target = AgentTargets.player(game, StringUtils.substringAfter(step.id(), "_"));
-        if (target.isEmpty()) {
+    protected static Message pickNote(AgentUse<Player> use) {
+        Player user = use.user();
+        return Message.plain(
+                user,
+                user.getFactionEmojiOrColor() + " selected " + use.payload().getFactionEmojiOrColor() + " as user of "
+                        + use.agentName() + ".");
+    }
+
+    @ButtonHandler(PICK_STEP)
+    @ButtonHandler("nekroAgentRes_")
+    @ButtonHandler("kolleccAgentRes_")
+    @ButtonHandler("hacanAgentRefresh_")
+    @ButtonHandler("pharadnAgentSelect_")
+    @ButtonHandler("vaylerianAgent_")
+    static void resolvePick(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        Optional<Pick> pick = parsePick(game, buttonID);
+        if (pick.isEmpty()) {
             AgentLifecycle.deliver(
                     AgentOutcome.of(Message.plain(player, "Could not find that player, please resolve manually.")),
                     event,
                     player);
             return;
         }
-        String agentName = AgentLifecycle.agentName(AgentLifecycle.cardName(game, picker), step.viaYssaril());
-        AgentUse<Choice> use =
-                new AgentUse<>(game, player, new ResolveFor(target.get()), agentName, step.viaYssaril(), event);
-        AgentLifecycle.deliver(picker.resolveFor(use, target.get()), event, player);
+        PlayerPickerAgent picker = pick.get().picker();
+        boolean viaYssaril = pick.get().viaYssaril();
+        String agentName = AgentLifecycle.agentName(game, picker.agentId(), viaYssaril);
+        AgentUse<Player> use = new AgentUse<>(game, player, pick.get().target(), agentName, viaYssaril, event);
+        AgentLifecycle.deliver(picker.resolveFor(use), event, player);
         ButtonHelper.deleteMessage(event);
+    }
+
+    static Optional<Pick> parsePick(Game game, String buttonID) {
+        AgentStepIds.Parsed step = AgentStepIds.parse(buttonID);
+        String id = step.id();
+        String agentId;
+        String targetPayload;
+        if (id.startsWith(PICK_STEP)) {
+            String agentAndTarget = id.substring(PICK_STEP.length());
+            agentId = StringUtils.substringBefore(agentAndTarget, "_");
+            targetPayload = StringUtils.substringAfter(agentAndTarget, "_");
+        } else {
+            Optional<Map.Entry<String, String>> legacy = LEGACY_PICK_STEPS.entrySet().stream()
+                    .filter(entry -> id.startsWith(entry.getKey()))
+                    .findFirst();
+            if (legacy.isEmpty()) {
+                return Optional.empty();
+            }
+            agentId = legacy.get().getValue();
+            targetPayload = id.substring(legacy.get().getKey().length());
+        }
+        Optional<PlayerPickerAgent> picker = AgentModules.find(agentId)
+                .filter(PlayerPickerAgent.class::isInstance)
+                .map(PlayerPickerAgent.class::cast);
+        Optional<Player> target = AgentTargets.player(game, targetPayload);
+        if (picker.isEmpty() || target.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(new Pick(picker.get(), target.get(), step.viaYssaril()));
+    }
+
+    private static AgentUse<Player> withTarget(AgentUse<Choice> use, Player target) {
+        return new AgentUse<>(use.game(), use.user(), target, use.agentName(), use.viaYssaril(), use.event());
     }
 
     private AgentOutcome offerPlayers(AgentUse<Choice> use) {
         Player user = use.user();
         List<Button> players =
-                AgendaRiderHelper.getPlayerOutcomeButtons(use.game(), null, pickStepPrefix, null).stream()
+                AgendaRiderHelper.getPlayerOutcomeButtons(use.game(), null, PICK_STEP + agentId(), null).stream()
                         .map(button -> button.withCustomId(user.factionButtonChecker()
                                 + AgentStepIds.flagCopy(button.getCustomId(), use.viaYssaril())))
                         .toList();

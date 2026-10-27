@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.service.leader.agent.AgentOutcome;
-import ti4.service.leader.agent.PlayerPickerAgent.PickPlayer;
-import ti4.service.leader.agent.PlayerPickerAgent.ResolveFor;
 import ti4.service.leader.agent.modules.AgentModuleFixture;
 import ti4.testUtils.BaseTi4Test;
 
@@ -29,7 +27,7 @@ class CardDrawAgentsTest extends BaseTi4Test {
         int before = fixture.target.getAcCount();
         VaylerianAgent vaylerian = new VaylerianAgent();
 
-        vaylerian.resolve(fixture.use(vaylerian, new ResolveFor(fixture.target)));
+        vaylerian.resolve(fixture.use(vaylerian, fixture.pickedPlayer(vaylerian, fixture.target)));
 
         assertThat(fixture.target.getAcCount()).isEqualTo(before + 1);
     }
@@ -39,14 +37,14 @@ class CardDrawAgentsTest extends BaseTi4Test {
         AgentModuleFixture fixture = new AgentModuleFixture("vaylerian");
         VaylerianAgent vaylerian = new VaylerianAgent();
 
-        AgentOutcome outcome = vaylerian.resolve(fixture.use(vaylerian, new PickPlayer()));
+        AgentOutcome outcome = vaylerian.resolve(fixture.use(vaylerian, fixture.playerPicker(vaylerian)));
 
         assertThat(outcome.messages()).singleElement().satisfies(message -> {
             assertThat(message.recipient()).isSameAs(fixture.user);
             assertThat(message.buttons()).isNotEmpty().allSatisfy(button -> {
                 ComponentIdEnvelope envelope = ComponentIdEnvelope.decode(button.getCustomId());
                 assertThat(envelope.ownerFaction()).isEqualTo(fixture.user.getFaction());
-                assertThat(envelope.handlerId()).startsWith("vaylerianAgent_");
+                assertThat(envelope.handlerId()).startsWith("agentPick_vaylerianagent_");
             });
         });
     }

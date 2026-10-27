@@ -24,6 +24,6 @@ public final class TaAgent extends TargetedAgent {
                                 ", choose a planet for " + use.agentNameFor(target) + ".",
                                 TaLeadersHandler.agentPlanetButtons(use.game(), target))
                         .withPagedButtons(),
-                Message.addressedTo(target, " has no explorable planets for " + use.agentNameFor(target) + "."));
+                use.noteToUser(target, " has no explorable planets for " + use.agentName() + "."));
     }
 }

@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -19,37 +17,28 @@ import ti4.service.leader.agent.PlayerPickerAgent;
 public final class KolleccAgent extends PlayerPickerAgent {
 
     static final String ID = "kolleccagent";
-    private static final String PICK_PLAYER_PREFIX = "kolleccAgentRes";
     private static final String EXPLORE_PREFIX = "kolleccAgentResStep2_";
 
     public KolleccAgent() {
-        super(ID, "Captain Dust, the Kollecc", PICK_PLAYER_PREFIX);
+        super(ID, "Captain Dust, the Kollecc");
     }
 
     public static Button button(Player kollecc) {
-        return Buttons.gray(ownedButtonId(kollecc, ID), useLabel(kollecc, ID, "Kollecc Agent"), FactionEmojis.kollecc);
-    }
-
-    @ButtonHandler(PICK_PLAYER_PREFIX + "_")
-    public static void resolvePickedPlayer(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        resolvePickedPlayer(ID, buttonID, event, game, player);
+        return useButton(kollecc, ID, "Kollecc Agent", FactionEmojis.kollecc);
     }
 
     @Override
-    protected AgentOutcome resolveFor(AgentUse<Choice> use, Player target) {
-        Player kollecc = use.user();
+    protected AgentOutcome resolveFor(AgentUse<Player> use) {
+        Player target = use.payload();
         return AgentOutcome.of(
-                Message.plain(
-                        kollecc,
-                        kollecc.getFactionEmojiOrColor() + " selected " + target.getFactionEmojiOrColor()
-                                + " as user of " + use.agentName() + "."),
+                pickNote(use),
                 Message.addressedTo(
                         target,
                         ", please choose the exploration deck to reveal 2 cards from.",
                         exploreButtons(use.game(), target)));
     }
 
-    static List<Button> exploreButtons(Game game, Player explorer) {
+    private static List<Button> exploreButtons(Game game, Player explorer) {
         String owner = explorer.factionButtonChecker();
         Set<String> traits = ButtonHelper.getTypesOfPlanetPlayerHas(game, explorer);
         List<Button> buttons = new ArrayList<>();

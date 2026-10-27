@@ -11,6 +11,7 @@ import ti4.game.Tile;
 import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentUse;
+import ti4.service.leader.agent.PlayerPickerAgent;
 import ti4.service.leader.agent.TargetedAgent;
 
 /**
@@ -21,6 +22,9 @@ public final class AgentModuleFixture {
 
     public static final int DISCORD_ID_LIMIT = 100;
     public static final int DISCORD_LABEL_LIMIT = 80;
+
+    // An id that will never get a module, for tests about agents the router does not know.
+    public static final String NOT_AN_AGENT_MODULE = "notarealagent";
 
     public static final String TARGET_FACTION = "pi_hacan";
     public static final String TARGET_COLOR = "blue";
@@ -49,6 +53,14 @@ public final class AgentModuleFixture {
 
     public <P> AgentUse<P> use(AgentModule<P> module, P payload) {
         return new AgentUse<>(game, user, payload, AgentLifecycle.agentName(module.displayName(), false), false, null);
+    }
+
+    public PlayerPickerAgent.Choice playerPicker(PlayerPickerAgent agent) {
+        return agent.decode(game, user, "").orElseThrow();
+    }
+
+    public PlayerPickerAgent.Choice pickedPlayer(PlayerPickerAgent agent, Player picked) {
+        return agent.decode(game, user, picked.getColor()).orElseThrow();
     }
 
     public <P> AgentUse<P> useAsYssarilCopy(AgentModule<P> module, P payload) {

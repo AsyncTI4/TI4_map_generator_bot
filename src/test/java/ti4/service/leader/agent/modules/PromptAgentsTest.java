@@ -19,9 +19,10 @@ class PromptAgentsTest extends BaseTi4Test {
                 .contains(fixture.target);
         AgentOutcome outcome = naaz.resolve(fixture.use(naaz, fixture.target));
 
+        // The target controls no planets here, so the user hears there is nothing to explore.
         assertThat(outcome.messages()).singleElement().satisfies(message -> {
-            assertThat(message.recipient()).isSameAs(fixture.target);
-            assertThat(message.text()).contains("explore");
+            assertThat(message.recipient()).isSameAs(fixture.user);
+            assertThat(message.text()).contains("no planets to explore");
         });
     }
 

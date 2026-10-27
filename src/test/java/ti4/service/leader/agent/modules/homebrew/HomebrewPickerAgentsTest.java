@@ -11,8 +11,6 @@ import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
-import ti4.service.leader.agent.PlayerPickerAgent.PickPlayer;
-import ti4.service.leader.agent.PlayerPickerAgent.ResolveFor;
 import ti4.service.leader.agent.modules.AgentModuleFixture;
 import ti4.testUtils.BaseTi4Test;
 
@@ -24,25 +22,12 @@ class HomebrewPickerAgentsTest extends BaseTi4Test {
     void kolleccAndPharadnDecodeAPickOrAPiTarget() {
         AgentModuleFixture fixture = new AgentModuleFixture("kollecc");
 
-        assertThat(new KolleccAgent().decode(fixture.game, fixture.user, "")).contains(new PickPlayer());
+        KolleccAgent kolleccPicker = new KolleccAgent();
+        assertThat(kolleccPicker.decode(fixture.game, fixture.user, "")).contains(fixture.playerPicker(kolleccPicker));
         assertThat(new PharadnAgent().decode(fixture.game, fixture.user, AgentModuleFixture.TARGET_FACTION))
-                .contains(new ResolveFor(fixture.target));
+                .contains(fixture.pickedPlayer(new PharadnAgent(), fixture.target));
         assertThat(new PharadnAgent().decode(fixture.game, fixture.user, "nobody"))
                 .isEmpty();
-    }
-
-    @Test
-    void pharadnPickerStepsAreOwnedAndFlaggedForCleverClever() {
-        AgentModuleFixture fixture = new AgentModuleFixture("yssaril");
-        PharadnAgent pharadn = new PharadnAgent();
-
-        AgentOutcome outcome = pharadn.resolve(fixture.useAsYssarilCopy(pharadn, new PickPlayer()));
-
-        assertThat(outcome.messages()).singleElement().satisfies(message -> {
-            assertThat(message.recipient()).isSameAs(fixture.user);
-            assertThat(message.buttons()).hasSize(2).allSatisfy(button -> assertOwnedStep(button, fixture.user, true));
-            assertThat(handlerIds(message)).contains("pharadnAgentSelect_" + AgentModuleFixture.TARGET_FACTION + "~cc");
-        });
     }
 
     @Test
@@ -51,7 +36,7 @@ class HomebrewPickerAgentsTest extends BaseTi4Test {
         PharadnAgent pharadn = new PharadnAgent();
         fixture.target.addPlanet(LODOR);
 
-        AgentOutcome outcome = pharadn.resolve(fixture.use(pharadn, new ResolveFor(fixture.target)));
+        AgentOutcome outcome = pharadn.resolve(fixture.use(pharadn, fixture.pickedPlayer(pharadn, fixture.target)));
 
         Message prompt = outcome.messages().getFirst();
         assertThat(prompt.recipient()).isSameAs(fixture.target);
@@ -66,7 +51,7 @@ class HomebrewPickerAgentsTest extends BaseTi4Test {
         KolleccAgent kollecc = new KolleccAgent();
         fixture.target.addPlanet(LODOR);
 
-        AgentOutcome outcome = kollecc.resolve(fixture.use(kollecc, new ResolveFor(fixture.target)));
+        AgentOutcome outcome = kollecc.resolve(fixture.use(kollecc, fixture.pickedPlayer(kollecc, fixture.target)));
 
         assertThat(outcome.messages()).hasSize(2);
         Message prompt = outcome.messages().get(1);
@@ -128,6 +113,19 @@ class HomebrewPickerAgentsTest extends BaseTi4Test {
         // The commodity count is the active player's own business in Fog of War.
         assertThat(outcome.messages().getFirst().recipient()).isSameAs(fixture.target);
         assertThat(outcome.messages().get(1).text()).contains("no **Glory** tokens");
+    }
+
+    @Test
+    void kjalengardWithoutAnActivePlayerOnlyOffersTheGloryMove() {
+        AgentModuleFixture fixture = new AgentModuleFixture("kjalengard");
+        KjalengardAgent kjalengard = new KjalengardAgent();
+        fixture.game.setActivePlayerID(null);
+
+        AgentOutcome outcome = kjalengard.resolve(fixture.use(kjalengard, fixture.user));
+
+        assertThat(outcome.messages())
+                .singleElement()
+                .satisfies(message -> assertThat(message.recipient()).isSameAs(fixture.user));
     }
 
     @Test

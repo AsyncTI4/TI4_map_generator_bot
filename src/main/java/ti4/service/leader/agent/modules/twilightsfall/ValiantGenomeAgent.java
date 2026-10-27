@@ -23,6 +23,6 @@ public final class ValiantGenomeAgent extends TargetedAgent {
                         target,
                         ", please choose the recently deceased unit that you wish to use the genome on.",
                         ButtonHelperActionCards.getCourageousOptions(target, use.game(), true, "courageous")),
-                Message.addressedTo(target, " has no recently destroyed units to use the genome on."));
+                use.noteToUser(target, " has no recently destroyed units to use the genome on."));
     }
 }

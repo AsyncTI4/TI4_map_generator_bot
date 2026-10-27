@@ -35,6 +35,6 @@ public final class MuaatAgent extends TargetedAgent {
                         producer,
                         ", please choose which system to use " + use.agentNameFor(producer) + " in.",
                         systems),
-                Message.addressedTo(producer, " has no war sun or flagship to produce units with."));
+                use.noteToUser(producer, " has no war sun or flagship to produce units with."));
     }
 }

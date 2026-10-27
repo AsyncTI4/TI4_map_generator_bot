@@ -3,6 +3,7 @@ package ti4.service.leader.agent.modules;
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.ids.AgentStepIds;
 import ti4.game.Player;
 import ti4.helpers.Helper;
 import ti4.service.leader.agent.AgentOutcome;
@@ -24,8 +25,10 @@ public final class XxchaAgent extends TargetedAgent {
         Player planetOwner = use.payload();
         List<Button> planets = planetOwner.getExhaustedPlanets().stream()
                 .map(planet -> Buttons.gray(
-                        xxcha.factionButtonChecker() + "khraskHeroStep4Ready_" + planetOwner.getFaction() + "_"
-                                + planet,
+                        xxcha.factionButtonChecker()
+                                + AgentStepIds.flagCopy(
+                                        "khraskHeroStep4Ready_" + planetOwner.getFaction() + "_" + planet,
+                                        use.viaYssaril()),
                         Helper.getPlanetRepresentation(planet, use.game())))
                 .toList();
         return AgentOutcome.offer(

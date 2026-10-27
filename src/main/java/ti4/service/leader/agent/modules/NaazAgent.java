@@ -33,6 +33,6 @@ public final class NaazAgent extends SelfOrTargetedAgent {
                         explorer,
                         ", please choose which planet you wish to explore.",
                         ButtonHelper.getButtonsToExploreAllPlanets(explorer, use.game())),
-                Message.addressedTo(explorer, " has no planets to explore."));
+                use.noteToUser(explorer, " has no planets to explore."));
     }
 }

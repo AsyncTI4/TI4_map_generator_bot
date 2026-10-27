@@ -57,23 +57,6 @@ import ti4.service.unit.RemoveUnitService;
 
 public final class ButtonHelperAgents {
 
-    public static List<Button> getTilesToArboAgent(Player player, Game game) {
-        String factionChecker = player.factionButtonChecker();
-        List<Button> buttons = new ArrayList<>();
-        for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
-            if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
-                Tile tile = tileEntry.getValue();
-                Button validTile = Buttons.green(
-                        factionChecker + "arboAgentIn_" + tileEntry.getKey(),
-                        tile.getRepresentationForButtons(game, player));
-                buttons.add(validTile);
-            }
-        }
-        Button validTile2 = Buttons.red(factionChecker + "deleteButtons", "Decline");
-        buttons.add(validTile2);
-        return buttons;
-    }
-
     public static void cabalAgentInitiation(Game game, Player p2) {
         for (Player cabal : game.getRealPlayers()) {
             if (cabal == p2) {
@@ -85,7 +68,7 @@ public final class ButtonHelperAgents {
                                 ? cabal.getRepresentationNoPing()
                                 : cabal.getRepresentationUnfogged())
                         + " you may use "
-                        + AgentLifecycle.agentNameFor(game, cabal, "cabalagent") + ", on "
+                        + AgentLifecycle.agentNameForHolder(game, cabal, "cabalagent") + ", on "
                         + p2.getFactionEmojiOrColor() + " who has "
                         + p2.getCommoditiesTotal() + " commodit" + (p2.getCommoditiesTotal() == 1 ? "y" : "ies") + ".";
                 buttons.add(CabalAgent.button(cabal, p2));
@@ -751,7 +734,7 @@ public final class ButtonHelperAgents {
         MessageHelper.sendMessageToChannelWithButtons(
                 newActivePlayer.getCorrectChannel(),
                 newActivePlayer.getRepresentationUnfogged() + " you may take 1 action now due to "
-                        + AgentLifecycle.agentNameFor(game, edyn, "edynagent") + ".",
+                        + AgentLifecycle.agentNameForHolder(game, edyn, "edynagent") + ".",
                 buttons);
         game.updateActivePlayer(newActivePlayer);
         return true;
@@ -1023,7 +1006,13 @@ public final class ButtonHelperAgents {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getFactionEmoji() + " readied " + Helper.getPlanetRepresentation(planetName, game) + " with "
-                        + AgentLifecycle.agentName(game, "olradinagent", step.viaYssaril()) + ".");
+                        + AgentLifecycle.agentNameShownTo(
+                                game,
+                                player,
+                                player.hasLeader("olradinagent") ? player : null,
+                                "olradinagent",
+                                step.viaYssaril())
+                        + ".");
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
@@ -1623,7 +1612,7 @@ public final class ButtonHelperAgents {
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
                             + " you have the opportunity to exhaust "
-                            + AgentLifecycle.agentNameFor(player.getGame(), player, "nomadagentartuno")
+                            + AgentLifecycle.agentNameForHolder(player.getGame(), player, "nomadagentartuno")
                             + ", and place " + StringHelper.pluralize(tg, "trade good") + " on her.",
                     buttons);
         }

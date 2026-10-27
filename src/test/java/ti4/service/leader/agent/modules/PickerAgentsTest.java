@@ -13,8 +13,6 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
-import ti4.service.leader.agent.PlayerPickerAgent.PickPlayer;
-import ti4.service.leader.agent.PlayerPickerAgent.ResolveFor;
 import ti4.service.leader.agent.TargetedAgent;
 import ti4.testUtils.BaseTi4Test;
 
@@ -41,30 +39,17 @@ class PickerAgentsTest extends BaseTi4Test {
         AgentModuleFixture fixture = new AgentModuleFixture("nekro");
         NekroAgent nekro = new NekroAgent();
 
-        assertThat(nekro.decode(fixture.game, fixture.user, "")).contains(new PickPlayer());
+        assertThat(nekro.decode(fixture.game, fixture.user, "")).contains(fixture.playerPicker(nekro));
         assertThat(nekro.decode(fixture.game, fixture.user, AgentModuleFixture.TARGET_FACTION))
-                .contains(new ResolveFor(fixture.target));
-        AgentOutcome outcome = nekro.resolve(fixture.use(nekro, new PickPlayer()));
+                .contains(fixture.pickedPlayer(nekro, fixture.target));
+        AgentOutcome outcome = nekro.resolve(fixture.use(nekro, fixture.playerPicker(nekro)));
 
         assertThat(outcome.messages()).singleElement().satisfies(message -> {
             assertThat(message.recipient()).isSameAs(fixture.user);
             assertThat(message.namesRecipient()).isTrue();
             assertThat(message.buttons()).hasSize(2).allSatisfy(button -> assertOwnedStep(button, fixture.user, false));
-            assertThat(handlerIds(message)).contains("nekroAgentRes_" + AgentModuleFixture.TARGET_FACTION);
+            assertThat(handlerIds(message)).contains("agentPick_nekroagent_" + AgentModuleFixture.TARGET_FACTION);
         });
-    }
-
-    @Test
-    void aCleverCleverPickerFlagsItsStepIds() {
-        AgentModuleFixture fixture = new AgentModuleFixture("yssaril");
-        NekroAgent nekro = new NekroAgent();
-
-        AgentOutcome outcome = nekro.resolve(fixture.useAsYssarilCopy(nekro, new PickPlayer()));
-
-        // The step handler reads the ~cc flag to name the card "Clever Clever ...".
-        assertThat(outcome.messages().getFirst().buttons())
-                .isNotEmpty()
-                .allSatisfy(button -> assertOwnedStep(button, fixture.user, true));
     }
 
     @Test
@@ -74,7 +59,7 @@ class PickerAgentsTest extends BaseTi4Test {
         Player target = fixture.target;
         int tradeGoods = target.getTg();
 
-        AgentOutcome outcome = nekro.resolve(fixture.use(nekro, new ResolveFor(target)));
+        AgentOutcome outcome = nekro.resolve(fixture.use(nekro, fixture.pickedPlayer(nekro, target)));
 
         assertThat(target.getTg()).isEqualTo(tradeGoods + 2);
         assertThat(fixture.game.getStoredValue("originalCCsFor" + AgentModuleFixture.TARGET_FACTION))
@@ -96,7 +81,7 @@ class PickerAgentsTest extends BaseTi4Test {
         HacanAgent hacan = new HacanAgent();
         fixture.user.setCommodities(0);
 
-        AgentOutcome outcome = hacan.resolve(fixture.use(hacan, new ResolveFor(fixture.user)));
+        AgentOutcome outcome = hacan.resolve(fixture.use(hacan, fixture.pickedPlayer(hacan, fixture.user)));
 
         assertThat(fixture.user.getCommodities()).isEqualTo(2);
         assertThat(outcome.messages()).singleElement().satisfies(message -> {
@@ -158,7 +143,8 @@ class PickerAgentsTest extends BaseTi4Test {
 
         AgentOutcome outcome = rebellion.resolve(fixture.use(rebellion, fixture.target));
 
-        assertThat(rebellion.aliasIds()).containsExactly("crimsonagent");
+        assertThat(rebellion.agentId()).isEqualTo("crimsonagent");
+        assertThat(rebellion.aliasIds()).containsExactly("redcreussagent");
         Message prompt = outcome.messages().getFirst();
         assertThat(prompt.recipient()).isSameAs(fixture.target);
         assertThat(prompt.buttons())
@@ -190,8 +176,9 @@ class PickerAgentsTest extends BaseTi4Test {
 
         AgentOutcome outcome = muaat.resolve(fixture.use(muaat, fixture.target));
 
+        // Only the user who spent the agent needs to hear that it did nothing.
         assertThat(outcome.messages()).singleElement().satisfies(message -> {
-            assertThat(message.recipient()).isSameAs(fixture.target);
+            assertThat(message.recipient()).isSameAs(fixture.user);
             assertThat(message.buttons()).isEmpty();
         });
     }
@@ -229,6 +216,64 @@ class PickerAgentsTest extends BaseTi4Test {
         assertThat(prompt.buttons())
                 .singleElement()
                 .satisfies(button -> assertOwnedAgentButton(button, fixture.user, "exchangeProgramPart3_" + LODOR));
+    }
+
+    @Test
+    void hacanReplenishesAnotherPlayerAndHidesItsNameInFogOfWar() {
+        AgentModuleFixture fixture = new AgentModuleFixture("hacan");
+        fixture.game.setFowMode(true);
+        HacanAgent hacan = new HacanAgent();
+        Player target = fixture.target;
+        target.setCommodities(0);
+
+        AgentOutcome outcome = hacan.resolve(fixture.use(hacan, fixture.pickedPlayer(hacan, target)));
+
+        assertThat(target.getCommodities()).isEqualTo(target.getCommoditiesTotal());
+        assertThat(outcome.messages()).anySatisfy(message -> {
+            assertThat(message.recipient()).isSameAs(target);
+            assertThat(message.text()).contains("an agent").doesNotContain("Hacan");
+        });
+    }
+
+    @Test
+    void arborecWithoutShipsTellsTheUserInsteadOfPromptingTheTarget() {
+        AgentModuleFixture fixture = new AgentModuleFixture("arborec");
+        ArborecAgent arborec = new ArborecAgent();
+
+        AgentOutcome outcome = arborec.resolve(fixture.use(arborec, fixture.target));
+
+        assertThat(outcome.messages()).singleElement().satisfies(message -> {
+            assertThat(message.recipient()).isSameAs(fixture.user);
+            assertThat(message.buttons()).isEmpty();
+        });
+    }
+
+    @Test
+    void deepwroughtTellsTheResearcherTheyMayIgnoreAPrerequisite() {
+        AgentModuleFixture fixture = new AgentModuleFixture("deepwrought");
+        DeepwroughtAgent deepwrought = new DeepwroughtAgent();
+
+        AgentOutcome outcome = deepwrought.resolve(fixture.use(deepwrought, fixture.target));
+
+        assertThat(outcome.messages()).anySatisfy(message -> {
+            assertThat(message.recipient()).isSameAs(fixture.target);
+            assertThat(message.namesRecipient()).isTrue();
+            assertThat(message.text()).contains("ignore 1 prerequisite");
+        });
+    }
+
+    @Test
+    void aCleverCleverXxchaFlagsItsReadySteps() {
+        AgentModuleFixture fixture = new AgentModuleFixture("yssaril");
+        XxchaAgent xxcha = new XxchaAgent();
+        fixture.target.addPlanet(LODOR);
+        fixture.target.exhaustPlanet(LODOR);
+
+        AgentOutcome outcome = xxcha.resolve(fixture.useAsYssarilCopy(xxcha, fixture.target));
+
+        assertThat(outcome.messages().getFirst().buttons())
+                .isNotEmpty()
+                .allSatisfy(button -> assertOwnedStep(button, fixture.user, true));
     }
 
     @Test

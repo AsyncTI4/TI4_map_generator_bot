@@ -6,8 +6,6 @@ import static ti4.service.leader.agent.modules.AgentModuleFixture.assertOwnedAge
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.game.Player;
-import ti4.service.leader.agent.PlayerPickerAgent.PickPlayer;
-import ti4.service.leader.agent.PlayerPickerAgent.ResolveFor;
 import ti4.service.leader.agent.TargetedAgent;
 import ti4.service.leader.agent.modules.AgentModuleFixture;
 import ti4.testUtils.BaseTi4Test;
@@ -39,8 +37,9 @@ class HomebrewAgentButtonsAndDecodingTest extends BaseTi4Test {
         AgentModuleFixture fixture = new AgentModuleFixture("vaylerian");
         VaylerianAgent vaylerian = new VaylerianAgent();
 
-        assertThat(vaylerian.decode(fixture.game, fixture.user, "")).contains(new PickPlayer());
-        assertThat(vaylerian.decode(fixture.game, fixture.user, "pi_hacan")).contains(new ResolveFor(fixture.target));
+        assertThat(vaylerian.decode(fixture.game, fixture.user, "")).contains(fixture.playerPicker(vaylerian));
+        assertThat(vaylerian.decode(fixture.game, fixture.user, "pi_hacan"))
+                .contains(fixture.pickedPlayer(vaylerian, fixture.target));
         assertThat(vaylerian.decode(fixture.game, fixture.user, "nobody")).isEmpty();
     }
 

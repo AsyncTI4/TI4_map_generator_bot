@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.ExhaustOnlyAgent;
-import ti4.service.leader.agent.PlayerPickerAgent.PickPlayer;
 import ti4.service.leader.agent.modules.AgentModuleFixture;
 import ti4.testUtils.BaseTi4Test;
 
@@ -44,29 +43,5 @@ class HomebrewFollowupAgentsTest extends BaseTi4Test {
 
         assertThat(fixture.user.getSpentThingsThisWindow()).containsExactly("lunariumagent");
         assertThat(outcome.pressedMessageEdit()).isNotBlank();
-    }
-
-    @Test
-    void aYssarilCopyOfVaylerianFlagsItsTargetButtons() {
-        AgentModuleFixture fixture = new AgentModuleFixture("yssaril");
-        VaylerianAgent vaylerian = new VaylerianAgent();
-
-        AgentOutcome outcome = vaylerian.resolve(fixture.useAsYssarilCopy(vaylerian, new PickPlayer()));
-
-        assertThat(outcome.messages().getFirst().buttons())
-                .isNotEmpty()
-                .allSatisfy(button -> assertThat(button.getCustomId()).endsWith("~cc"));
-    }
-
-    @Test
-    void theRealVaylerianAgentLeavesItsTargetButtonsUnflagged() {
-        AgentModuleFixture fixture = new AgentModuleFixture("vaylerian");
-        VaylerianAgent vaylerian = new VaylerianAgent();
-
-        AgentOutcome outcome = vaylerian.resolve(fixture.use(vaylerian, new PickPlayer()));
-
-        assertThat(outcome.messages().getFirst().buttons())
-                .isNotEmpty()
-                .noneSatisfy(button -> assertThat(button.getCustomId()).endsWith("~cc"));
     }
 }

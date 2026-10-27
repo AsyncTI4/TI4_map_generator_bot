@@ -24,7 +24,7 @@ class PromptGenomesTest extends BaseTi4Test {
     }
 
     @Test
-    void valiantGenomeOffersTheTargetItsDeceasedUnits() {
+    void valiantGenomeWithNoDeceasedUnitsTellsTheUser() {
         AgentModuleFixture fixture = new AgentModuleFixture("bastion");
         ValiantGenomeAgent valiant = new ValiantGenomeAgent();
 
@@ -33,7 +33,7 @@ class PromptGenomesTest extends BaseTi4Test {
 
         assertThat(outcome.messages())
                 .singleElement()
-                .satisfies(message -> assertThat(message.recipient()).isSameAs(fixture.target));
+                .satisfies(message -> assertThat(message.recipient()).isSameAs(fixture.user));
     }
 
     @Test

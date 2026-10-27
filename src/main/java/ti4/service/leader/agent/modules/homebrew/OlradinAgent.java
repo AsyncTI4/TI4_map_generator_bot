@@ -42,6 +42,6 @@ public final class OlradinAgent extends TargetedAgent {
                         ", please choose the planet, of a __different__ trait from the one you just exhausted,"
                                 + " that you wish to ready.",
                         planets),
-                Message.addressedTo(target, " has no exhausted planet to ready."));
+                use.noteToUser(target, " has no exhausted planet to ready."));
     }
 }

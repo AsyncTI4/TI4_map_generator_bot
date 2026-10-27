@@ -33,13 +33,18 @@ public final class DeepwroughtAgent extends TargetedAgent {
 
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
+        Player researcher = use.payload();
         return AgentOutcome.offer(
-                Message.addressedTo(
-                        use.user(),
-                        ", after " + use.payload().getRepresentationNoPing()
-                                + " ignores a prerequisite, please choose the planet of theirs that you will coexist on.",
-                        coexistButtons(use.game(), use.user(), use.payload())),
-                Message.addressedTo(use.user(), ", there is no non-home planet of theirs to coexist on."));
+                        Message.addressedTo(
+                                use.user(),
+                                ", after " + use.payload().getRepresentationNoPing()
+                                        + " ignores a prerequisite, please choose the planet of theirs that you will coexist on.",
+                                coexistButtons(use.game(), use.user(), researcher)),
+                        Message.addressedTo(use.user(), ", there is no non-home planet of theirs to coexist on."))
+                .and(Message.addressedTo(
+                        researcher,
+                        ", you may ignore 1 prerequisite on the technology you are researching, due to "
+                                + use.agentNameFor(researcher) + "."));
     }
 
     private static List<Button> coexistButtons(Game game, Player deepwrought, Player researcher) {

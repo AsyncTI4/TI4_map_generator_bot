@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.ids.AgentStepIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -662,7 +663,9 @@ public class ButtonHelperHeroes {
 
     @ButtonHandler("khraskHeroStep4Ready_")
     public static void resolveKhraskHeroStep4Ready(
-            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+            Player player, Game game, ButtonInteractionEvent event, String flaggedButtonID) {
+        AgentStepIds.Parsed step = AgentStepIds.parse(flaggedButtonID);
+        String buttonID = step.id();
         var spec = PlanetTargetSpec.of("khraskHeroStep4Ready_" + BlindSelectionService.TBD_FACTION);
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
         var target = PlanetTargetService.resolve(
@@ -686,7 +689,7 @@ public class ButtonHelperHeroes {
             MessageHelper.sendMessageToChannel(
                     p2.getCorrectChannel(),
                     p2.getRepresentationUnfogged() + " your planet " + planetRep + " was readied.");
-            if (player.hasLeader("xxchaagent")) {
+            if (player.hasLeader("xxchaagent") || step.viaYssaril()) {
                 UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                 Tile tile = game.getTileFromPlanet(planet);
                 if (uH != null

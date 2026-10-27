@@ -23,6 +23,6 @@ public final class OnyxxaAgent extends TargetedAgent {
                         target,
                         ", please choose the system that you wish to move a ship from.",
                         OnyxxaLeaderHandler.agentMoveShipButtons(use.game(), target)),
-                Message.addressedTo(target, " has no ships to move."));
+                use.noteToUser(target, " has no ships to move."));
     }
 }

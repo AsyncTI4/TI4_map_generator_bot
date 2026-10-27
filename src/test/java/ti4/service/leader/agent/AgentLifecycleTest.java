@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static ti4.service.leader.agent.modules.AgentModuleFixture.NOT_AN_AGENT_MODULE;
 
+import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -61,7 +63,7 @@ class AgentLifecycleTest extends BaseTi4Test {
 
     @Test
     void inProcessUseRequiresAModule() {
-        assertThatThrownBy(() -> AgentLifecycle.use(game, mentak, "yinagent", "", null))
+        assertThatThrownBy(() -> AgentLifecycle.use(game, mentak, NOT_AN_AGENT_MODULE, "", null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -98,7 +100,7 @@ class AgentLifecycleTest extends BaseTi4Test {
 
     @Test
     void anAgentWithoutAModuleIsLeftToTheLegacyChain() {
-        assertThat(AgentLifecycle.resolve("exhaustAgent_yinagent", null, game, mentak))
+        assertThat(AgentLifecycle.resolve("exhaustAgent_" + NOT_AN_AGENT_MODULE, null, game, mentak))
                 .isFalse();
     }
 
@@ -121,7 +123,7 @@ class AgentLifecycleTest extends BaseTi4Test {
     void usesTheTwilightsFallNameInTwilightsFallGames() {
         game.setTwilightsFallMode(true);
 
-        assertThat(AgentLifecycle.agentNameFor(game, mentak, "saaragent")).isEqualTo("the _Captain's Genome_");
+        assertThat(AgentLifecycle.agentNameForHolder(game, mentak, "saaragent")).isEqualTo("the _Captain's Genome_");
     }
 
     @Test
@@ -129,16 +131,86 @@ class AgentLifecycleTest extends BaseTi4Test {
         game.setTwilightsFallMode(true);
 
         for (AgentModule<?> module : AgentModules.ALL) {
-            String cardName = AgentLifecycle.cardName(game, module);
-            if (cardName.endsWith("Genome")) {
-                assertThat(AgentLifecycle.agentName(cardName, false))
-                        .as(module.agentId())
-                        .doesNotContain("agent");
-                assertThat(AgentLifecycle.agentName(cardName, true))
-                        .as(module.agentId())
-                        .doesNotContain("agent");
+            for (String leaderId : leaderIds(module)) {
+                String cardName = AgentLifecycle.cardName(game, module, leaderId);
+                if (cardName.endsWith("Genome")) {
+                    assertThat(AgentLifecycle.agentName(cardName, false))
+                            .as(leaderId)
+                            .doesNotContain("agent");
+                    assertThat(AgentLifecycle.agentName(cardName, true))
+                            .as(leaderId)
+                            .doesNotContain("agent");
+                }
             }
         }
+    }
+
+    @Test
+    void eachRebellionCardIsNamedForItself() {
+        assertThat(AgentLifecycle.agentName(game, "crimsonagent", false)).isEqualTo("Ahk Ravin, the Rebellion agent");
+        assertThat(AgentLifecycle.agentName(game, "redcreussagent", false))
+                .isEqualTo("\"Who Knows?\", the Rebellion agent");
+        game.setTwilightsFallMode(true);
+        assertThat(AgentLifecycle.agentName(game, "crimsonagent", false)).isEqualTo("the _Breach Genome_");
+    }
+
+    @Test
+    void stepHandlersHideTheAgentFromOtherPlayersInFogOfWar() {
+        Player victim = playerWithOwnChannels();
+
+        assertThat(AgentLifecycle.agentNameShownTo(game, victim, mentak, "mentakagent", false))
+                .isEqualTo("Suffi An, the Mentak agent");
+        game.setFowMode(true);
+        assertThat(AgentLifecycle.agentNameShownTo(game, victim, mentak, "mentakagent", false))
+                .isEqualTo("an agent");
+        assertThat(AgentLifecycle.agentNameShownTo(game, mentak, mentak, "mentakagent", false))
+                .isEqualTo("Suffi An, the Mentak agent");
+    }
+
+    @Test
+    void theAnnouncementLeavesAPrivateThreadForEveryoneToSee() {
+        // Exhausting an agent is public, even when the button sat in the presser's cards-info thread.
+        Player holder = playerWithOwnChannels();
+        MessageChannel cardsInfo = channel("cards-info");
+        when(cardsInfo.getType()).thenReturn(ChannelType.GUILD_PRIVATE_THREAD);
+        Message announcement =
+                Message.addressedTo(holder, " has exhausted an agent.").forEveryone();
+
+        assertThat(AgentLifecycle.deliveryChannel(announcement, pressIn(cardsInfo), holder))
+                .isSameAs(holder.getCorrectChannel());
+        MessageChannel actions = channel("actions");
+        assertThat(AgentLifecycle.deliveryChannel(announcement, pressIn(actions), holder))
+                .isSameAs(actions);
+    }
+
+    @Test
+    void notesAboutAnotherPlayerGoToTheUserWithoutPingingThem() {
+        Player target = playerWithOwnChannels();
+        when(target.getFactionEmojiOrColor()).thenReturn(":hacan:");
+        AgentUse<Player> use = new AgentUse<>(game, mentak, target, "Suffi An, the Mentak agent", false, null);
+
+        Message note = use.noteToUser(target, " has nothing to offer.");
+
+        assertThat(note.recipient()).isSameAs(mentak);
+        assertThat(note.namesRecipient()).isFalse();
+        assertThat(note.text()).isEqualTo(":hacan: has nothing to offer.");
+        assertThat(use.noteToUser(mentak, " has nothing.").namesRecipient()).isTrue();
+    }
+
+    @Test
+    void anOutcomeCanAskForTheWholePressedMessageToGo() {
+        assertThat(AgentLifecycle.deletesWholeMessage("Use the agent or decline.", true))
+                .isTrue();
+        assertThat(AgentLifecycle.deletesWholeMessage("Use the agent or decline.", false))
+                .isFalse();
+        assertThat(AgentLifecycle.deletesWholeMessage("Mentak, please choose the target of your agent.", false))
+                .isTrue();
+    }
+
+    private static List<String> leaderIds(AgentModule<?> module) {
+        List<String> ids = new ArrayList<>(module.aliasIds());
+        ids.add(module.agentId());
+        return ids;
     }
 
     @Test
