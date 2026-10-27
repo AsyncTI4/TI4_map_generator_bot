@@ -302,7 +302,7 @@ class ExpeditionOutlookTest extends BaseTi4Test {
         sevenResources(hacan);
         sevenResources(test.nekro);
 
-        assertThat(BreakthroughValue.of(test.game, hacan)).isGreaterThanOrEqualTo(BreakthroughValue.HACAN_FLOOR);
+        assertThat(BreakthroughValue.of(test.game, hacan)).isGreaterThanOrEqualTo(BreakthroughValue.PRIORITY_FLOOR);
         assertThat(ExpeditionOutlook.claimNow(test.game, hacan)).isPresent();
         assertThat(ExpeditionOutlook.claimNow(test.game, test.nekro)).isEmpty();
     }

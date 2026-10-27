@@ -159,4 +159,68 @@ class DarktalonTreillaRulesTest extends BaseTi4Test {
 
         assertThat(DarktalonTreillaRules.insteadOfTacticalAction(context, turn)).isEmpty();
     }
+
+    private void fleetBesideMecatol(int dreadnoughts) {
+        test.place("18", "000");
+        String beside = ti4.model.MapPositionMapper.getAdjacentTilePositions("000").stream()
+                .filter(candidate -> !"x".equals(candidate) && test.game.getTileByPosition(candidate) == null)
+                .findFirst()
+                .orElseThrow();
+        Tile launch = test.place("47", beside);
+        test.units(launch, "space", test.nekro, UnitType.Dreadnought, dreadnoughts);
+        test.units(launch, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(launch, "space", test.nekro, UnitType.Infantry, 3);
+        test.nekro.addPlanet("abyz");
+        test.nekro.addPlanet("fria");
+        test.nekro.addPlanet("mordaiii");
+    }
+
+    // In round four or five the hero is how Imperial gets its point: the fleet that the supply would cut down goes
+    // at Mecatol Rex whole.
+    @Test
+    void playsTheHeroToSendTheWholeFleetAtMecatolWhenHoldingImperial() {
+        test.game.setRound(4);
+        test.nekro.addSC(8);
+        fleetBesideMecatol(5);
+
+        assertThat(DarktalonTreillaRules.assaultsMecatol(test.game, test.nekro)).isTrue();
+        assertThat(pressed(beforeTactical())).isEqualTo("FFCC_nekro_componentAction");
+    }
+
+    @Test
+    void keepsTheHeroForMecatolWithoutImperialOrWarfare() {
+        test.game.setRound(4);
+        fleetBesideMecatol(5);
+
+        assertThat(DarktalonTreillaRules.assaultsMecatol(test.game, test.nekro)).isFalse();
+    }
+
+    @Test
+    void keepsTheHeroForMecatolOutsideRoundsFourAndFive() {
+        test.game.setRound(3);
+        test.nekro.addSC(8);
+        fleetBesideMecatol(5);
+
+        assertThat(DarktalonTreillaRules.assaultsMecatol(test.game, test.nekro)).isFalse();
+    }
+
+    // With the hero in play the Mecatol strike takes every ship that reaches, not just the carrier and its infantry.
+    @Test
+    void sendsEveryShipAtMecatolOnceTheHeroIsInPlay() {
+        test.game.setRound(4);
+        test.nekro.addSC(8);
+        fleetBesideMecatol(5);
+        test.nekro.getLeader("letnevhero").orElseThrow().setActive(true);
+
+        ti4.ai.tactical.TacticalPlan strike = ti4.ai.tactical.TacticalPlanner.ranked(test.game, test.nekro).stream()
+                .filter(plan -> "000".equals(plan.target()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(strike.moves().stream()
+                        .filter(move -> move.type() == UnitType.Dreadnought)
+                        .mapToInt(ti4.ai.tactical.TacticalPlan.UnitMove::count)
+                        .sum())
+                .isEqualTo(5);
+    }
 }

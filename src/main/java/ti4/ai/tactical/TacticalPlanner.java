@@ -37,6 +37,7 @@ import ti4.ai.explore.ExploreDeck;
 import ti4.ai.explore.ExploreOutlook;
 import ti4.ai.explore.ExploreSite;
 import ti4.ai.explore.ExploreValues;
+import ti4.ai.letnev.GravleashPlan;
 import ti4.ai.promissory.PlayAreaNotes;
 import ti4.ai.sardakk.CommanderReach;
 import ti4.ai.scoring.Footprint;
@@ -537,14 +538,18 @@ public class TacticalPlanner {
         UnitHolder space = BoardView.space(origin);
         List<UnitMove> idle = new ArrayList<>();
         for (UnitType type : BoardView.MOVING_SHIPS) {
-            if (!context.reaches(origin, target, type)) continue;
+            if (!context.linkedReaches(origin, target, type)) continue;
             int count = BoardView.count(space, seat, type)
                     - countOf(movesFrom(origin, base), type)
                     - reservedShips(context, origin, target, type);
             if (count > 0) idle.add(new UnitMove(origin.getPosition(), BoardView.SPACE, type, count));
         }
+        List<UnitMove> staying = context.defense().holdBack(origin, movesFrom(origin, base), idle);
+        List<UnitMove> together = new ArrayList<>(movesFrom(origin, base));
+        together.addAll(staying);
+        if (!context.carriesItsOwnSpeed(origin, target, together)) return List.of();
         List<Follower> followers = new ArrayList<>();
-        for (UnitMove move : context.defense().holdBack(origin, movesFrom(origin, base), idle)) {
+        for (UnitMove move : staying) {
             double gain = context.lockShare()
                     * context.goals()
                             .forwardGain(
@@ -700,7 +705,73 @@ public class TacticalPlanner {
                         + SetupHint.bonusFor(context.hints, plan)))
                 .max(Comparator.comparingDouble(TacticalPlan::score))
                 .map(plan -> timed("tactical.for.fighters", () -> Optional.of(withFighters(context, tile, plan)))
-                        .orElse(plan));
+                        .orElse(plan))
+                .map(plan -> massedAtMecatol(context, tile, plan));
+    }
+
+    public static int shipsReaching(Game game, Player seat, Tile target) {
+        Context context = new Context(game, seat);
+        int ships = 0;
+        for (Tile origin : context.origins()) {
+            if (origin == target) continue;
+            for (UnitType type : BoardView.MOVING_SHIPS) {
+                if (context.linkedReaches(origin, target, type)) {
+                    ships += BoardView.count(BoardView.space(origin), seat, type);
+                }
+            }
+        }
+        return ships;
+    }
+
+    private static TacticalPlan massedAtMecatol(Context context, Tile target, TacticalPlan plan) {
+        Player seat = context.seat;
+        boolean assault = FleetLimit.heroLiftsLimit(seat)
+                && GravleashPlan.assaultRound(context.game)
+                && target == context.game.getMecatolTile()
+                && !seat.controlsMecatol(true)
+                && (plan.kind() == Kind.EXPAND || plan.kind() == Kind.ATTACK);
+        if (!assault) return plan;
+        List<UnitMove> moves = new ArrayList<>(plan.moves());
+        for (Tile origin : context.origins()) {
+            if (origin == target) continue;
+            massFrom(context, origin, target, plan.moves()).ifPresent(legal -> {
+                moves.removeIf(move -> move.origin().equals(origin.getPosition()));
+                moves.addAll(legal);
+            });
+        }
+        return new TacticalPlan(plan.kind(), plan.target(), merge(moves), plan.landings(), plan.score());
+    }
+
+    private static Optional<List<UnitMove>> massFrom(
+            Context context, Tile origin, Tile target, List<UnitMove> planned) {
+        Player seat = context.seat;
+        UnitHolder space = BoardView.space(origin);
+        List<UnitMove> here = new ArrayList<>(movesFrom(origin, planned));
+        for (UnitType type : BoardView.MOVING_SHIPS) {
+            int spare = BoardView.count(space, seat, type) - countOf(here, type);
+            if (spare > 0 && context.linkedReaches(origin, target, type)) {
+                here.add(new UnitMove(origin.getPosition(), BoardView.SPACE, type, spare));
+            }
+        }
+        List<UnitMove> group = merge(here);
+        List<UnitMove> kept = keepingOneBehind(context, origin, target, group);
+        if (!context.carriesItsOwnSpeed(origin, target, kept)) return Optional.empty();
+        return legalMoves(context, origin, target, kept, true);
+    }
+
+    private static List<UnitMove> keepingOneBehind(Context context, Tile origin, Tile target, List<UnitMove> group) {
+        if (origin != context.seat.getHomeSystemTile()) return group;
+        for (UnitType type : List.of(UnitType.Destroyer, UnitType.Cruiser)) {
+            if (countOf(group, type) == 0) continue;
+            List<UnitMove> fewer = new ArrayList<>();
+            for (UnitMove move : group) {
+                boolean lighter = move.type() == type && move.count() > 0;
+                if (lighter && move.count() == 1) continue;
+                fewer.add(lighter ? new UnitMove(move.origin(), move.holder(), type, move.count() - 1) : move);
+            }
+            return context.carriesItsOwnSpeed(origin, target, fewer) ? fewer : group;
+        }
+        return group;
     }
 
     private static Optional<TacticalPlan> moving(
@@ -1446,7 +1517,7 @@ public class TacticalPlanner {
         List<UnitMove> ships = new ArrayList<>();
         for (UnitType type : BoardView.MOVING_SHIPS) {
             int available = BoardView.count(originSpace, seat, type);
-            if (available == 0 || !context.reaches(origin, tile, type)) continue;
+            if (available == 0 || !context.linkedReaches(origin, tile, type)) continue;
             ships.add(new UnitMove(origin.getPosition(), BoardView.SPACE, type, available));
         }
         Comparator<UnitType> preference = BoardView.hasEnemyShips(game, seat, tile)
@@ -1481,6 +1552,7 @@ public class TacticalPlanner {
         if (fighters > 0) {
             departing.add(new UnitMove(origin.getPosition(), BoardView.SPACE, UnitType.Fighter, fighters));
         }
+        if (!context.carriesItsOwnSpeed(origin, tile, departing)) return new Departure(List.of(), List.of(), false);
         return new Departure(departing, take(cargo, capacity - fighters), unitCount(leaving) < unitCount(candidates));
     }
 
@@ -2359,6 +2431,7 @@ public class TacticalPlanner {
             Collection<UnitType> types,
             ToIntFunction<UnitType> available,
             Comparator<UnitType> preference) {
+        if (GravleashPlan.hasBreakthrough(context.seat)) return Optional.empty();
         return types.stream()
                 .filter(type -> available.applyAsInt(type) > 0)
                 .filter(type ->
@@ -3029,7 +3102,7 @@ public class TacticalPlanner {
         UnitHolder originSpace = BoardView.space(origin);
         for (UnitType type : POSITION_SHIPS) {
             int available = BoardView.undamaged(originSpace, seat, type);
-            if (available > 0 && context.reaches(origin, tile, type)) {
+            if (available > 0 && context.linkedReaches(origin, tile, type)) {
                 ships.add(new UnitMove(origin.getPosition(), BoardView.SPACE, type, available));
             }
         }
@@ -3042,7 +3115,9 @@ public class TacticalPlanner {
                         Comparator.comparingDouble((UnitType type) -> -cost(seat, type)))
                 .ifPresent(ships::add);
         List<UnitMove> departing = context.defense().holdBack(origin, List.of(), ships);
-        if (movedNonFighterShips(departing) < 2) return Optional.empty();
+        if (movedNonFighterShips(departing) < 2 || !context.carriesItsOwnSpeed(origin, tile, departing)) {
+            return Optional.empty();
+        }
         Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, departing);
         if (legal.isEmpty()) return Optional.empty();
         double barrageGain = barrageGain(context, origin, tile, legal.get());
@@ -3096,7 +3171,7 @@ public class TacticalPlanner {
         UnitHolder originSpace = BoardView.space(origin);
         for (UnitType type : BoardView.MOVING_SHIPS) {
             int count = BoardView.count(originSpace, seat, type);
-            if (count > 0 && context.reaches(origin, tile, type)) {
+            if (count > 0 && context.linkedReaches(origin, tile, type)) {
                 available.add(new UnitMove(origin.getPosition(), BoardView.SPACE, type, count));
             }
         }
@@ -3113,6 +3188,7 @@ public class TacticalPlanner {
             after = next.after();
             costAfter = next.costAfter();
         }
+        if (!context.carriesItsOwnSpeed(origin, tile, chosen)) return Optional.empty();
         if (chosen.isEmpty()) {
             return ferriedDefence(context, tile, origin, candidates, now, costNow, buildBonus);
         }
@@ -3845,6 +3921,22 @@ public class TacticalPlanner {
         ProductionPlanner.BuildPlan buildPlan(Tile tile) {
             return builds.computeIfAbsent(
                     tile.getPosition(), position -> ProductionPlanner.plan(game, seat, tile, 0, defense()));
+        }
+
+        boolean linkedReaches(Tile origin, Tile target, UnitType type) {
+            if (!GravleashPlan.hasBreakthrough(seat)) return reaches(origin, target, type);
+            UnitHolder space = BoardView.space(origin);
+            return BoardView.MOVING_SHIPS.stream()
+                    .anyMatch(each ->
+                            BoardView.count(space, seat, each) > 0 && reachesWithGravityDrive(origin, target, each));
+        }
+
+        boolean carriesItsOwnSpeed(Tile origin, Tile target, List<UnitMove> moves) {
+            if (!GravleashPlan.hasBreakthrough(seat)) return true;
+            return moves.stream()
+                    .filter(move -> move.origin().equals(origin.getPosition()))
+                    .filter(move -> BoardView.MOVING_SHIPS.contains(move.type()))
+                    .anyMatch(move -> reachesWithGravityDrive(origin, target, move.type()));
         }
 
         boolean reaches(Tile origin, Tile target, UnitType type) {

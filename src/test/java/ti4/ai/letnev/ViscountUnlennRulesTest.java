@@ -107,20 +107,22 @@ class ViscountUnlennRulesTest extends BaseTi4Test {
         assertThat(ViscountUnlennRules.atRoundStart(later, moment)).isEmpty();
     }
 
+    // The agent is never saved: it readies every status phase, so every space combat gets the die, even a won or a lost
+    // one.
     @Test
-    void doesNotUseTheAgentOnAFightItHasAlreadyWon() {
+    void usesTheAgentOnAFightItHasAlreadyWon() {
         fleets(UnitType.Dreadnought, 6, UnitType.Fighter, 1);
 
-        assertThat(ViscountUnlennRules.atRoundStart(context(combatStart()), moment))
-                .isEmpty();
+        assertThat(pressed(ViscountUnlennRules.atRoundStart(context(combatStart()), moment)))
+                .isEqualTo("FFCC_letnev_getAgentSelection_letnevagent");
     }
 
     @Test
-    void doesNotUseTheAgentOnAHopelessFight() {
+    void usesTheAgentOnAHopelessFight() {
         fleets(UnitType.Fighter, 1, UnitType.Dreadnought, 6);
 
-        assertThat(ViscountUnlennRules.atRoundStart(context(combatStart()), moment))
-                .isEmpty();
+        assertThat(pressed(ViscountUnlennRules.atRoundStart(context(combatStart()), moment)))
+                .isEqualTo("FFCC_letnev_getAgentSelection_letnevagent");
     }
 
     @Test
@@ -132,13 +134,13 @@ class ViscountUnlennRulesTest extends BaseTi4Test {
     }
 
     @Test
-    void doesNotUseTheAgentOnAFightTheDieCannotSave() {
+    void usesTheAgentOnAFightTheDieCannotSave() {
         fleets(UnitType.Destroyer, 1, UnitType.Dreadnought, 8);
 
         assertThat(CombatForecast.extraDie(test.game, letnev, position, SPACE).worthSpending())
                 .isFalse();
-        assertThat(ViscountUnlennRules.atRoundStart(context(combatStart()), moment))
-                .isEmpty();
+        assertThat(pressed(ViscountUnlennRules.atRoundStart(context(combatStart()), moment)))
+                .isEqualTo("FFCC_letnev_getAgentSelection_letnevagent");
     }
 
     @Test

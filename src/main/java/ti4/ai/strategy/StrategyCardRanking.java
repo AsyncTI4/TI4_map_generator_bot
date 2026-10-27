@@ -6,6 +6,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.letnev.GravleashPlan;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.trace.Thinking;
@@ -72,6 +73,7 @@ public class StrategyCardRanking {
     private static double value(Game game, Player seat, CardPlan plan) {
         double denial = plan.card() == StrategyCard.IMPERIAL ? imperialDenial(game, seat) : 0;
         return baseValue(game, seat, plan)
+                + GravleashPlan.cardBonus(game, seat, plan.card())
                 + denial
                 + CardValueScale.TRADE_GOOD * game.getScTradeGoods().getOrDefault(plan.initiative(), 0);
     }

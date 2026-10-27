@@ -14,8 +14,8 @@ import ti4.game.Player;
 // the AI pressed with the reason it gave.
 final class LeaderTracker {
 
-    private static final Pattern LEADER_BUTTON =
-            Pattern.compile("(?i)agent|commander|hero|exhaustForVotes|purge|leader|envoy|carth|gila|harrugh|quieron");
+    private static final Pattern LEADER_BUTTON = Pattern.compile(
+            "(?i)agent|commander|hero|exhaustForVotes|purge|leader|envoy|carth|gila|harrugh|quieron|unlenn|treilla|farran|pick (Imperial|Warfare)|play (Imperial|Warfare)");
 
     private final Map<String, String> states = new HashMap<>();
     private final Map<String, String> breakthroughs = new HashMap<>();
@@ -48,7 +48,16 @@ final class LeaderTracker {
         }
     }
 
+    private void observeGravityDrive(Player seat) {
+        String state = seat.hasTech("gd") ? "owned" : "missing";
+        String before = breakthroughs.put(seat.getFaction() + "/gd", state);
+        if (!state.equals(before) && "owned".equals(state)) {
+            lines.add(String.format("r%d %s gravitydrive: owned", round, seat.getFaction()));
+        }
+    }
+
     private void observeBreakthroughs(Player seat) {
+        observeGravityDrive(seat);
         for (String id : seat.getBreakthroughIDs()) {
             String state = seat.isBreakthroughUnlocked(id) ? "unlocked" : "locked";
             String before = breakthroughs.put(seat.getFaction() + "/" + id, state);

@@ -16,8 +16,9 @@ public class BreakthroughValue {
     public static final double FRACTURE_CHANCE = 0.2;
     public static final double FRACTURE_VALUE = 2.0;
     static final double FULL_VALUE_ROUNDS = 4;
-    static final double HACAN_FLOOR = 8.0;
-    private static final Map<String, Double> PRIORITY_FLOORS = Map.of("hacan", HACAN_FLOOR);
+    public static final double PRIORITY_FLOOR = 8.0;
+    private static final Map<String, Double> PRIORITY_FLOORS =
+            Map.of("hacan", PRIORITY_FLOOR, "letnev", PRIORITY_FLOOR);
 
     public static boolean isLocked(Player seat) {
         return !seat.getBreakthroughIDs().isEmpty()

@@ -18,6 +18,7 @@ import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.Threats;
+import ti4.ai.letnev.GravleashPlan;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ObjectiveValue;
@@ -99,6 +100,8 @@ public class ProductionPlanner {
             List.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Dreadnought);
     private static final String AI_DEVELOPMENT = "aida";
     private static final int AIDA_MIN_DISCOUNT = 2;
+    private static final List<UnitType> VARIETY_SHIPS =
+            List.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought);
     private static final List<UnitType> HEAVY_SHIPS = List.of(UnitType.Flagship, UnitType.Warsun);
     private static final String HACAN_HERO = "hacanhero";
     private static final int FREE_BUILD_RESOURCES = 1000;
@@ -317,6 +320,7 @@ public class ProductionPlanner {
         phase("production.scoringUnits", () -> planScoringUnits(builder));
         phase("production.defensiveUnits", () -> planDefensiveUnits(builder));
         phase("production.coreShips", () -> planCoreShips(builder));
+        phase("production.shipVariety", () -> planShipVariety(builder));
         phase("production.fractureFleet", () -> planFractureFleet(builder));
         phase("production.surplusShips", () -> planSurplusShips(builder));
         phase("production.coreGround", () -> planCoreGround(builder));
@@ -616,6 +620,14 @@ public class ProductionPlanner {
         if (firesFromAdjacentSystems(builder.seat) && frontlineInterest(builder) > 0) wantedMechs++;
         while (builder.count(UnitType.Mech) < wantedMechs && builder.leavesRoomToFill(builder.cost(UnitType.Mech))) {
             if (!builder.ground(UnitType.Mech, 1, builder.fillerValue(UnitType.Mech))) return;
+        }
+    }
+
+    private static void planShipVariety(Builder builder) {
+        if (!GravleashPlan.hasBreakthrough(builder.seat)) return;
+        for (UnitType type : VARIETY_SHIPS) {
+            if (builder.countHere(type) > 0 || !builder.leavesRoomToFill(builder.cost(type))) continue;
+            builder.ship(type, builder.fillerValue(type) + GravleashPlan.SHIP_TYPE_VALUE, false);
         }
     }
 
@@ -982,7 +994,7 @@ public class ProductionPlanner {
             }
         }
 
-        private int countHere(UnitType type) {
+        int countHere(UnitType type) {
             return BoardView.count(BoardView.space(tile), seat, type) + planned(type);
         }
 

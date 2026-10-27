@@ -8,10 +8,8 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
-import ti4.ai.eval.BoardView;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
-import ti4.ai.tactical.CombatForecast;
 import ti4.ai.tactical.CombatMoment;
 import ti4.game.Player;
 
@@ -43,17 +41,8 @@ public class ViscountUnlennRules {
         if (context.memory().has(key) || !ownsReadyAgent(context.seat())) return Optional.empty();
         Optional<Match> open = openButton(context);
         if (open.isEmpty()) return Optional.empty();
-        if (!worthUsing(context, moment)) {
-            context.memory().put(key, DECIDED);
-            return Optional.empty();
-        }
         context.memory().put(key, SELECTING + FIELD + context.now());
         return Optional.of(open.get().press("use Viscount Unlenn to give a ship an extra die"));
-    }
-
-    static boolean worthUsing(AiTurnContext context, CombatMoment moment) {
-        return CombatForecast.extraDie(context.game(), context.seat(), moment.position(), BoardView.SPACE)
-                .worthSpending();
     }
 
     private static Optional<AiDecision> chooseTarget(AiTurnContext context, String key, long since) {

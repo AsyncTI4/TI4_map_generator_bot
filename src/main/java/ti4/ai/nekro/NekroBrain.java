@@ -552,6 +552,8 @@ public class NekroBrain implements FactionBrain {
         if (TacticalRules.actionTaken(context)) return Optional.empty();
         Optional<AiDecision> diodes = TransitDiodesRules.start(context, thisTurn);
         if (diodes.isPresent()) return diodes;
+        Optional<AiDecision> hero = DarktalonTreillaRules.insteadOfTacticalAction(context, thisTurn);
+        if (hero.isPresent()) return hero;
         Optional<AiDecision> warfareFirst = warfareBeforeFollowUp(context, thisTurn);
         if (warfareFirst.isPresent()) return warfareFirst;
         Optional<AiDecision> sling = SlingRelayRules.insteadOfTacticalAction(context, thisTurn);
@@ -566,8 +568,6 @@ public class NekroBrain implements FactionBrain {
         if (cardAction.isPresent()) return cardAction;
         Optional<AiDecision> techAction = TechRules.insteadOfTacticalAction(context, thisTurn);
         if (techAction.isPresent()) return techAction;
-        Optional<AiDecision> hero = DarktalonTreillaRules.insteadOfTacticalAction(context, thisTurn);
-        if (hero.isPresent()) return hero;
         Optional<AiDecision> xxchaStall = XxchaAgentRules.insteadOfTacticalAction(context, thisTurn);
         if (xxchaStall.isPresent()) return xxchaStall;
         Optional<AiDecision> solHero = SolHeroRules.insteadOfTacticalAction(context, thisTurn);

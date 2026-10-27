@@ -21,6 +21,7 @@ import ti4.ai.eval.GameHorizon;
 import ti4.ai.eval.Territory;
 import ti4.ai.eval.ValueScale;
 import ti4.ai.explore.ExploreValues;
+import ti4.ai.letnev.GravleashPlan;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringStakes;
@@ -227,7 +228,8 @@ public class ResearchPolicy {
                 + frontierTapValue(game, seat, alias)
                 + groundSecretValue(game, seat, tech)
                 + barrageSecretValue(game, seat, tech)
-                + Endurance.researchValue(seat, alias);
+                + Endurance.researchValue(seat, alias)
+                + GravleashPlan.driveBonus(seat, alias);
     }
 
     static double frontierTapValue(Game game, Player seat, String alias) {

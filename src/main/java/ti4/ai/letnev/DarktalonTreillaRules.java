@@ -8,6 +8,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
+import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FleetLimit;
 import ti4.ai.perception.AiPrompt;
@@ -44,9 +45,15 @@ public class DarktalonTreillaRules {
                 .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
         if (menu.isEmpty()) return Optional.empty();
         context.memory().put(CHECKED + FIELD + context.turnKey(), DONE);
-        if (!wantsToStackMoreThanTheFleetAllows(context.game(), context.seat(), context)) return Optional.empty();
+        boolean assault = assaultsMecatol(context.game(), context.seat());
+        if (!assault && !wantsToStackMoreThanTheFleetAllows(context.game(), context.seat(), context)) {
+            return Optional.empty();
+        }
         remember(context, MENU);
-        return Optional.of(menu.get().press("play Darktalon Treilla to lift its fleet supply for a bigger attack"));
+        String reason = assault
+                ? "play Darktalon Treilla to send its whole fleet at Mecatol Rex"
+                : "play Darktalon Treilla to lift its fleet supply for a bigger attack";
+        return Optional.of(menu.get().press(reason));
     }
 
     public static Optional<AiDecision> next(AiTurnContext context) {
@@ -78,6 +85,19 @@ public class DarktalonTreillaRules {
                 .map(TacticalPlan::score)
                 .orElse(0.0);
         return unlimited.get().score() - Math.max(0, limited) >= MIN_GAIN;
+    }
+
+    static boolean assaultsMecatol(Game game, Player seat) {
+        Tile mecatol = game.getMecatolTile();
+        if (mecatol == null || !GravleashPlan.assaultRound(game) || seat.controlsMecatol(true)) return false;
+        boolean imperial = GravleashPlan.holdsUnplayed(game, seat, StrategyCard.IMPERIAL);
+        boolean warfare =
+                GravleashPlan.hasBreakthrough(seat) && GravleashPlan.holdsUnplayed(game, seat, StrategyCard.WARFARE);
+        if (!imperial && !warfare) return false;
+        boolean takeable = FleetLimit.assumingUnlimited(seat, () -> TacticalPlanner.ranked(game, seat)).stream()
+                .filter(plan -> plan.target().equals(mecatol.getPosition()))
+                .anyMatch(plan -> plan.kind() == TacticalPlan.Kind.EXPAND || plan.kind() == TacticalPlan.Kind.ATTACK);
+        return takeable && TacticalPlanner.shipsReaching(game, seat, mecatol) > FleetLimit.ships(seat);
     }
 
     static boolean exceedsFleetSupply(Game game, Player seat, TacticalPlan plan) {
