@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.ManagedGame;
@@ -29,9 +29,20 @@ public class UserGameInfoService {
 
     private final PlayerEntityRepository playerEntityRepository;
 
-    @Transactional(readOnly = true)
     public List<Integer> getUsersThreeFastestDaysToComplete6PlayerGames(String userId) {
-        return playerEntityRepository.findAllWithGamesByUserIdEquals(userId).stream()
+        return toFastestDaysToComplete(playerEntityRepository.findAllWithGamesByUserIdEquals(userId));
+    }
+
+    public Map<String, List<Integer>> getThreeFastestDaysToComplete6PlayerGamesByUserId() {
+        return playerEntityRepository.findAllWithUsersAndSixPlayerCompletedGames().stream()
+                .collect(Collectors.groupingBy(
+                        player -> player.getUser().getId(),
+                        Collectors.collectingAndThen(
+                                Collectors.toList(), UserGameInfoService::toFastestDaysToComplete)));
+    }
+
+    private static List<Integer> toFastestDaysToComplete(List<PlayerEntity> players) {
+        return players.stream()
                 .map(PlayerEntity::getGame)
                 .filter(game -> game.getPlayerCount() == 6)
                 .map(UserGameInfoService::getDaysToComplete)
@@ -46,7 +57,6 @@ public class UserGameInfoService {
                 .toDays();
     }
 
-    @Transactional(readOnly = true)
     public boolean hasCompletedGameInDays(String userId, int maxDurationDays) {
         return playerEntityRepository.findAllWithCompletedGamesByUserIdEquals(userId).stream()
                 .map(PlayerEntity::getGame)
@@ -54,7 +64,6 @@ public class UserGameInfoService {
                 .anyMatch(days -> days <= maxDurationDays);
     }
 
-    @Transactional(readOnly = true)
     public String getUserGameInfo(List<User> users) {
         List<String> userIds = users.stream().map(User::getId).toList();
         List<PlayerEntity> players = playerEntityRepository.findAllWithUsersAndGamesByUserIdIn(userIds);
@@ -63,7 +72,6 @@ public class UserGameInfoService {
         return toResultString(users, statsByUserId);
     }
 
-    @Transactional(readOnly = true)
     public UserGameRecord getUserGameRecord(String userId) {
         List<PlayerEntity> players = playerEntityRepository.findAllWithUsersAndGamesByUserIdIn(List.of(userId));
         List<String> replacedGameNames = players.stream()

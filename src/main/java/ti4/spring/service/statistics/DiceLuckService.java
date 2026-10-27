@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
@@ -26,7 +25,6 @@ public class DiceLuckService {
 
     private final PlayerEntityRepository playerEntityRepository;
 
-    @Transactional(readOnly = true)
     public void getActualVersusExpectedHits(SlashCommandInteractionEvent event) {
         boolean ignoreEndedGames =
                 event.getOption(Constants.IGNORE_ENDED_GAMES, Boolean.FALSE, OptionMapping::getAsBoolean);
@@ -64,7 +62,6 @@ public class DiceLuckService {
         return usersToDiceLuckAccumulators;
     }
 
-    @Transactional(readOnly = true)
     public String getDiceLuck(List<String> userIds) {
         List<PlayerEntity> players = playerEntityRepository.findAllWithUsersByUserIdIn(userIds);
 
