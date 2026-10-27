@@ -1,4 +1,4 @@
-package ti4.helpers;
+package ti4.service.leader.agent.modules;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,15 +42,14 @@ class SardakkAgentPlacementButtonsTest extends BaseTi4Test {
     void onlyPlanetsInTheActiveSystemAreOffered() {
         game.setActiveSystem("201");
 
-        assertThat(planetsOf(ButtonHelperAgents.sardakkAgentPlacementButtons(game, player)))
-                .containsExactly("lodor");
+        assertThat(planetsOf(SardakkAgent.placementButtons(game, player))).containsExactly("lodor");
     }
 
     @Test
     void theOffersPlaceTwoInfantry() {
         game.setActiveSystem("201");
 
-        assertThat(ButtonHelperAgents.sardakkAgentPlacementButtons(game, player))
+        assertThat(SardakkAgent.placementButtons(game, player))
                 .allSatisfy(button -> assertThat(button.getCustomId()).contains("placeOneNDone_skipbuild_2gf_"));
     }
 
@@ -59,15 +58,13 @@ class SardakkAgentPlacementButtonsTest extends BaseTi4Test {
         game.setActiveSystem("201");
         player.removePlanet("lodor");
 
-        assertThat(planetsOf(ButtonHelperAgents.sardakkAgentPlacementButtons(game, player)))
-                .containsExactly("quann");
+        assertThat(planetsOf(SardakkAgent.placementButtons(game, player))).containsExactly("quann");
     }
 
     @Test
     void everyControlledPlanetIsOfferedOutsideATacticalAction() {
         game.setActiveSystem("");
 
-        assertThat(planetsOf(ButtonHelperAgents.sardakkAgentPlacementButtons(game, player)))
-                .containsExactlyInAnyOrder("lodor", "quann");
+        assertThat(planetsOf(SardakkAgent.placementButtons(game, player))).containsExactlyInAnyOrder("lodor", "quann");
     }
 }
