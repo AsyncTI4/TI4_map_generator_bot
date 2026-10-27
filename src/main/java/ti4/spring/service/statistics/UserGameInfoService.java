@@ -33,10 +33,6 @@ public class UserGameInfoService {
         return toFastestDaysToComplete(playerEntityRepository.findAllWithGamesByUserIdEquals(userId));
     }
 
-    /**
-     * Batch equivalent of {@link #getUsersThreeFastestDaysToComplete6PlayerGames(String)}, keyed by user id. Callers
-     * reporting on the whole player base use this so they issue one query instead of one per user.
-     */
     public Map<String, List<Integer>> getThreeFastestDaysToComplete6PlayerGamesByUserId() {
         return playerEntityRepository.findAllWithUsersAndSixPlayerCompletedGames().stream()
                 .collect(Collectors.groupingBy(
@@ -76,7 +72,6 @@ public class UserGameInfoService {
         return toResultString(users, statsByUserId);
     }
 
-    @Transactional(readOnly = true)
     public UserGameRecord getUserGameRecord(String userId) {
         List<PlayerEntity> players = playerEntityRepository.findAllWithUsersAndGamesByUserIdIn(List.of(userId));
         List<String> replacedGameNames = players.stream()

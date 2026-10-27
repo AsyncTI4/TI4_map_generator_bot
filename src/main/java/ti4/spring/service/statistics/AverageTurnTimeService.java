@@ -48,7 +48,6 @@ public class AverageTurnTimeService {
 
             int times = 3;
 
-            // Fetched once up front: looking this up per user would issue a query per player in the report.
             Map<String, List<Integer>> fastestDaysByUserId =
                     UserGameInfoService.get().getThreeFastestDaysToComplete6PlayerGamesByUserId();
 

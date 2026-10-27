@@ -63,7 +63,6 @@ public class MatchmakingRatingEventService {
         sendMessage(event, playerRatings, games, showRating);
     }
 
-    @Transactional(readOnly = true)
     public void showRatingHistory(SlashCommandInteractionEvent event, String userId, String username) {
         List<PlayerEntity> players = playerEntityRepository.findAllWithUsersAndGamesByCompletedNonAllianceGame(false);
         List<MatchmakingGame> games = MatchmakingGame.getMatchmakingGames(players);
