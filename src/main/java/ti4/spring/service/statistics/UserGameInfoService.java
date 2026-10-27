@@ -12,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import ti4.game.Game;
-import ti4.game.Player;
 import ti4.game.persistence.ManagedGame;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.Helper;
@@ -188,7 +186,6 @@ public class UserGameInfoService {
         if (managedPlayer == null) return 0;
         return (int) managedPlayer.getGames().stream()
                 .filter(managedGame -> !managedGame.isHasEnded())
-                .map(ManagedGame::getGame)
                 .filter(isRealPlayerIn3PlusPlayerGame(managedPlayer))
                 .count();
     }
@@ -197,7 +194,6 @@ public class UserGameInfoService {
         if (managedPlayer == null) return 0;
         return (int) managedPlayer.getGames().stream()
                 .filter(managedGame -> managedGame.isHasEnded() && managedGame.isHasWinner())
-                .map(ManagedGame::getGame)
                 .filter(isRealPlayerIn3PlusPlayerGame(managedPlayer))
                 .count();
     }
@@ -222,14 +218,9 @@ public class UserGameInfoService {
         return StringUtils.countMatches(trackRecord, "replaced") + StringUtils.countMatches(trackRecord, "Dropped");
     }
 
-    private static Predicate<Game> isRealPlayerIn3PlusPlayerGame(ManagedPlayer managedPlayer) {
-        return game -> {
-            List<Player> realAndEliminatedPlayers = game.getRealAndEliminatedPlayers();
-            return realAndEliminatedPlayers.size() >= 3
-                    && realAndEliminatedPlayers.stream()
-                            .map(Player::getUserID)
-                            .anyMatch(id -> managedPlayer.getId().equals(id));
-        };
+    private static Predicate<ManagedGame> isRealPlayerIn3PlusPlayerGame(ManagedPlayer managedPlayer) {
+        return managedGame -> managedGame.countRealAndEliminatedPlayers() >= 3
+                && managedGame.isRealOrEliminatedPlayer(managedPlayer.getId());
     }
 
     public static UserGameInfoService get() {
