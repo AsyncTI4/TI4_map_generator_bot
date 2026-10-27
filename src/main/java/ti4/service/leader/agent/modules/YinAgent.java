@@ -46,12 +46,16 @@ public final class YinAgent extends AgentModule<YinAgent.Replacement> {
     }
 
     public static List<Button> placementButtons(Game game, Player owner, Tile system) {
+        return placementButtons(game, owner, system, !game.isTwilightsFallMode());
+    }
+
+    public static List<Button> placementButtons(Game game, Player owner, Tile system, boolean groundForcesToo) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
                 owner.factionButtonChecker() + PLACE_PREFIX + "_2ff_" + system.getPosition(),
                 "Place 2 Fighters",
                 UnitEmojis.fighter));
-        if (game.isTwilightsFallMode()) {
+        if (!groundForcesToo) {
             return buttons;
         }
         for (Planet planet : system.getPlanetUnitHolders()) {

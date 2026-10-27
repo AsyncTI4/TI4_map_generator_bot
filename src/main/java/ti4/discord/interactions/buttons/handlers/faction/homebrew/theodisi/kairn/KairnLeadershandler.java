@@ -30,7 +30,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.turn.StartTurnService;
 
 @UtilityClass
@@ -439,7 +439,7 @@ public class KairnLeadershandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        ExhaustLeaderService.exhaustLeader(game, player, agent);
+        AgentLifecycle.spend(game, player, agent);
         drawKairnAgentExplores(event, game, player, player, planet, values[1]);
         ButtonHelper.deleteMessage(event);
     }
@@ -487,7 +487,7 @@ public class KairnLeadershandler {
             ButtonHelper.deleteTheOneButton(event);
             return;
         }
-        ExhaustLeaderService.exhaustLeader(game, player, agent);
+        AgentLifecycle.spend(game, player, agent);
         drawKairnAgentExplores(event, game, player, player, planet, values[1]);
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -506,7 +506,7 @@ public class KairnLeadershandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        ExhaustLeaderService.exhaustLeader(game, player, agent);
+        AgentLifecycle.spend(game, player, agent);
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),
                 player.getRepresentationNoPing()

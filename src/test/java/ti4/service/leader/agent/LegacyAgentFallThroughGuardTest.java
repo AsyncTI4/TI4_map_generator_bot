@@ -18,10 +18,10 @@ import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 /**
- * Pins which agents still fall through to the legacy exhaustAgent code, which only exhausts the card.
+ * Pins which agents have no module, so a press only exhausts and announces the card.
  *
  * <p>An agent whose ability window mentions an action can be pressed from the component-action menu, which calls
- * exhaustAgent with the bare leader id. Without a module that press exhausts the card and does nothing else, so a
+ * AgentLifecycle.press with the bare leader id. Without a module that press does nothing more, so a
  * new action agent must either get a module or be added here on purpose. Remove ids from this list as they get
  * modules.
  */

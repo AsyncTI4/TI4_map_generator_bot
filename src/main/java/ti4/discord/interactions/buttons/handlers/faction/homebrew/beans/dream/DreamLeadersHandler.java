@@ -16,7 +16,7 @@ import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -126,9 +126,7 @@ public class DreamLeadersHandler {
             return;
         }
 
-        dreamAgentOwner
-                .getLeader("dreamagent")
-                .ifPresent(agent -> ExhaustLeaderService.exhaustLeader(game, dreamAgentOwner, agent));
+        dreamAgentOwner.getLeader("dreamagent").ifPresent(agent -> AgentLifecycle.spend(game, dreamAgentOwner, agent));
         game.setStoredValue(AGENT_PENDING_PLAYER_KEY, activePlayer.getFaction());
         game.setStoredValue(AGENT_PENDING_OWNER_KEY, dreamAgentOwner.getFaction());
         ButtonHelper.deleteMessage(event);

@@ -14,7 +14,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 
 @UtilityClass
 public class AtokeraAgentHandler {
@@ -46,7 +46,7 @@ public class AtokeraAgentHandler {
             return;
         }
 
-        ExhaustLeaderService.exhaustLeader(game, player, player.unsafeGetLeader(AGENT));
+        AgentLifecycle.spend(game, player, player.unsafeGetLeader(AGENT));
         game.setStoredValue(pendingKey(player), "yes");
         List<Button> buttons = voters.stream()
                 .map(voter -> Buttons.gray(

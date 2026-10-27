@@ -8,10 +8,10 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 
 class ExhaustLeader extends GameStateSubcommand {
 
@@ -57,7 +57,7 @@ class ExhaustLeader extends GameStateSubcommand {
             return;
         }
         if (leaderID.contains("researchagent")) {
-            ButtonHelperAgents.exhaustAgent(leaderID, event, game, player);
+            AgentLifecycle.press(leaderID, event, game, player);
         } else {
             ExhaustLeaderService.exhaustLeader(game, player, playerLeader, tgCount);
         }

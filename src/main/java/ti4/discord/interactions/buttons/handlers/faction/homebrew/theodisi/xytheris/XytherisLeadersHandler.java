@@ -22,7 +22,7 @@ import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 
 @UtilityClass
 public class XytherisLeadersHandler {
@@ -91,7 +91,7 @@ public class XytherisLeadersHandler {
             return;
         }
 
-        ExhaustLeaderService.exhaustLeader(game, player, agent);
+        AgentLifecycle.spend(game, player, agent);
         game.removeStoredValue(MYRIX_AGENT_WINDOW);
         game.setStoredValue(MYRIX_AGENT_PENDING, target.getFaction());
         List<Button> buttons = new ArrayList<>(buttonsByUnitLocation.values());

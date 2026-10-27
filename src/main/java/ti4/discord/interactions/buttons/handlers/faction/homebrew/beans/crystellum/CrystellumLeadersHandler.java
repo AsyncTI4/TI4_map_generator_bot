@@ -24,7 +24,7 @@ import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
@@ -198,7 +198,7 @@ public class CrystellumLeadersHandler {
         if (agent == null) {
             return;
         }
-        ExhaustLeaderService.exhaustLeader(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, agent);
         AddUnitService.addUnits(event, activeSystem, game, target.getColor(), amount + " fighter");
         if (!target.getFaction().equals(agentOwner.getFaction())) {
             AddUnitService.addUnits(

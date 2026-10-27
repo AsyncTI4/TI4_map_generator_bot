@@ -20,7 +20,7 @@ import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.combat.CombatRollService;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 
@@ -81,7 +81,7 @@ public class PonthousLeadersHandler {
             return;
         }
 
-        ExhaustLeaderService.exhaustLeader(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, agent);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 agentOwner.getRepresentation() + " exhausted General Caelyn, the Ponthous agent, on "

@@ -28,7 +28,7 @@ import ti4.model.NamedCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
@@ -77,7 +77,7 @@ public class ScrapyardLeaderHandler {
         Leader agent = agentOwner.getLeader("scrapyardagent").orElse(null);
         if (agent == null) return;
 
-        ExhaustLeaderService.exhaustLeader(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, agent);
         MessageHelper.sendMessageToChannel(
                 target.getCorrectChannel(),
                 target.getRepresentation() + " is using _Rikka \"Razor Fang\" Corvin_ to swap the movement and combat "

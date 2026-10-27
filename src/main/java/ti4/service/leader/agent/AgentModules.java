@@ -82,6 +82,9 @@ import ti4.service.leader.agent.modules.homebrew.VeylorAgent;
 import ti4.service.leader.agent.modules.homebrew.ZealotsAgent;
 import ti4.service.leader.agent.modules.homebrew.ZelianAgent;
 import ti4.service.leader.agent.modules.homebrew.ZephyrionAgent;
+import ti4.service.leader.agent.modules.homebrew.twilightkart.DeploymentGenomeAgent;
+import ti4.service.leader.agent.modules.homebrew.twilightkart.SplittingGenomeAgent;
+import ti4.service.leader.agent.modules.homebrew.twilightkart.SwarmGenomeAgent;
 import ti4.service.leader.agent.modules.twilightsfall.ExperimentalGenomeAgent;
 import ti4.service.leader.agent.modules.twilightsfall.HyperAgent;
 import ti4.service.leader.agent.modules.twilightsfall.ResearchGenomeAgent;
@@ -168,7 +171,10 @@ class AgentModules {
                             new FlorzenAgent(),
                             new CeldauriAgent(),
                             new ZealotsAgent(),
-                            new FogAllianceAgent()),
+                            new FogAllianceAgent(),
+                            new DeploymentGenomeAgent(),
+                            new SwarmGenomeAgent(),
+                            new SplittingGenomeAgent()),
                     ExhaustOnlyAgents.ALL,
                     HomebrewExhaustOnlyAgents.ALL)
             .<AgentModule<?>>flatMap(List::stream)

@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -94,14 +95,17 @@ class AgentLifecycleTest extends BaseTi4Test {
         // Exhausting needs the Spring context, so the agent is already exhausted and the press is refused.
         mentak.getLeader("mentakagent").orElseThrow().setExhausted(true);
 
-        assertThat(AgentLifecycle.resolve("exhaustAgent_mentakagent_pi_hacan", null, game, mentak))
+        assertThat(AgentLifecycle.resolveWithModule(
+                        AgentButtonIds.parse("exhaustAgent_mentakagent_pi_hacan"), null, game, mentak))
                 .isTrue();
     }
 
     @Test
-    void anAgentWithoutAModuleIsLeftToTheLegacyChain() {
-        assertThat(AgentLifecycle.resolve("exhaustAgent_" + NOT_AN_AGENT_MODULE, null, game, mentak))
+    void anAgentWithoutAModuleIsOnlyExhausted() {
+        assertThat(AgentLifecycle.resolveWithModule(
+                        AgentButtonIds.parse("exhaustAgent_" + NOT_AN_AGENT_MODULE), null, game, mentak))
                 .isFalse();
+        assertThat(AgentLifecycle.cardName(game, "mahactagent")).isEqualTo("Jae Mir Kan");
     }
 
     @Test
@@ -132,7 +136,7 @@ class AgentLifecycleTest extends BaseTi4Test {
 
         for (AgentModule<?> module : AgentModules.ALL) {
             for (String leaderId : leaderIds(module)) {
-                String cardName = AgentLifecycle.cardName(game, module, leaderId);
+                String cardName = AgentLifecycle.cardName(game, leaderId);
                 if (cardName.endsWith("Genome")) {
                     assertThat(AgentLifecycle.agentName(cardName, false))
                             .as(leaderId)

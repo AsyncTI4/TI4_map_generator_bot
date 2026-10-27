@@ -25,7 +25,7 @@ import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -208,7 +208,7 @@ public class ThronesLeadersHandler {
             return;
         }
 
-        ExhaustLeaderService.exhaustLeader(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, agent);
         AddUnitService.addUnits(event, destination, game, target.getColor(), "1 " + ship.getAsyncId());
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(

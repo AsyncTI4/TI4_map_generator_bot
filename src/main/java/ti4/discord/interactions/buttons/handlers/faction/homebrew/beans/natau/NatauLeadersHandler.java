@@ -15,7 +15,7 @@ import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 
 @UtilityClass
 public class NatauLeadersHandler {
@@ -74,7 +74,7 @@ public class NatauLeadersHandler {
             return;
         }
 
-        agentOwner.getLeader(AGENT).ifPresent(agent -> ExhaustLeaderService.exhaustLeader(game, agentOwner, agent));
+        agentOwner.getLeader(AGENT).ifPresent(agent -> AgentLifecycle.spend(game, agentOwner, agent));
         List<Button> buttons = getNatauAgentAnomalyButtons(game, activePlayer);
         String message = activePlayer.getRepresentation()
                 + ", choose the non-home anomaly to treat as adjacent to the active system this tactical action.";

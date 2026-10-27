@@ -14,7 +14,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.message.MessageHelper;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.tactical.movement.BelkoseaAgentService;
 
 @UtilityClass
@@ -58,7 +58,7 @@ public class BelkoseaAgentHandler {
             return;
         }
 
-        ExhaustLeaderService.exhaustLeader(game, player, player.unsafeGetLeader(AGENT));
+        AgentLifecycle.spend(game, player, player.unsafeGetLeader(AGENT));
         BelkoseaAgentService.ignoreOtherShips(game, activePlayer, tile);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(

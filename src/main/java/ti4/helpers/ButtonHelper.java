@@ -115,7 +115,6 @@ import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.helpers.thundersedge.TeHelperUnits;
-import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.io.ImageResources;
 import ti4.image.map.MapRenderPipeline;
 import ti4.image.tile.SystemContextImage;
@@ -177,6 +176,7 @@ import ti4.service.leader.agent.modules.homebrew.FreeSystemsAgent;
 import ti4.service.leader.agent.modules.homebrew.KhraskAgent;
 import ti4.service.leader.agent.modules.homebrew.LiZhoAgent;
 import ti4.service.leader.agent.modules.homebrew.OlradinAgent;
+import ti4.service.leader.agent.modules.homebrew.twilightkart.SwarmGenomeAgent;
 import ti4.service.leader.agent.modules.twilightsfall.ExperimentalGenomeAgent;
 import ti4.service.map.SystemPickerService;
 import ti4.service.milty.MiltyDraftTile;
@@ -5235,7 +5235,9 @@ public class ButtonHelper {
         if (player.hasUnexhaustedLeader("crystellumagent")) {
             CrystellumLeadersHandler.addCrystellumAgentEndTurnButton(endButtons, game, player);
         }
-        endButtons.addAll(TkHelperGenomes.getEndOfTurnButtons(game, player));
+        if (player.hasUnexhaustedLeader("tknovaswarmagent")) {
+            endButtons.add(SwarmGenomeAgent.button(player));
+        }
 
         // OTHER stuff
         if (!player.hasAbility("arms_dealers")) {
@@ -6967,6 +6969,13 @@ public class ButtonHelper {
     }
 
     public static void resolveTransitDiodesStep1(Game game, Player player) {
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", use buttons to choose the planet you wish to move troops to.",
+                getTransitDiodesPlanetButtons(game, player));
+    }
+
+    public static List<Button> getTransitDiodesPlanetButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanetsAllianceMode()) {
             if (planet.toLowerCase().contains("custodia")
@@ -6980,13 +6989,12 @@ public class ButtonHelper {
                 continue;
             }
 
-            buttons.add(Buttons.green("transitDiodes_" + planet, Helper.getPlanetRepresentation(planet, game)));
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "transitDiodes_" + planet,
+                    Helper.getPlanetRepresentation(planet, game)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentation() + ", use buttons to choose the planet you wish to move troops to.",
-                buttons);
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Resolving"));
+        return buttons;
     }
 
     @ButtonHandler("transitDiodes_")

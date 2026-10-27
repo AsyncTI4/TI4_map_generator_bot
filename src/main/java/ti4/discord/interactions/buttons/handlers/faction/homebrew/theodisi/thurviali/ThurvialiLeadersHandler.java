@@ -24,7 +24,7 @@ import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.fow.PlanetTargetService;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.MoveUnitService;
 
@@ -546,7 +546,7 @@ public class ThurvialiLeadersHandler {
             return;
         }
 
-        ExhaustLeaderService.exhaustLeader(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, agent);
         sendHopeMoveButtons(game, firstMover, target, agentOwner);
         sendHopeMoveButtons(game, target, firstMover, agentOwner);
         game.removeStoredValue(HOPE_SELECTION_MODE + agentOwner.getFaction());

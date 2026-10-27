@@ -11,7 +11,7 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.message.MessageHelper;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 
 @UtilityClass
 public class XinAgentHandler {
@@ -46,7 +46,7 @@ public class XinAgentHandler {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "There are no exhausted strategy cards to follow.");
             return;
         }
-        ExhaustLeaderService.exhaustLeader(game, agentOwner, agentOwner.unsafeGetLeader(AGENT));
+        AgentLifecycle.spend(game, agentOwner, agentOwner.unsafeGetLeader(AGENT));
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),
                 target.getRepresentation()
