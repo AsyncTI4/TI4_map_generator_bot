@@ -56,7 +56,8 @@ public final class MercerAgent extends AgentModule<String> {
 
     @Override
     public Optional<String> unusableReason(Game game, Player user, String planet) {
-        if (ButtonHelper.groundForceMoveButtons(game, planet, user).isEmpty()) {
+        if (ButtonHelper.getGroundForceMoveButtonsWithoutDone(game, planet, user)
+                .isEmpty()) {
             return Optional.of(
                     "You have no ground forces that can move to " + Helper.getPlanetRepresentation(planet, game));
         }
