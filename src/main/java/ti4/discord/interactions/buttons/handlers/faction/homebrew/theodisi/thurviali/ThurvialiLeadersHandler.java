@@ -546,7 +546,7 @@ public class ThurvialiLeadersHandler {
             return;
         }
 
-        AgentLifecycle.spend(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, "thurvialiagent");
         sendHopeMoveButtons(game, firstMover, target, agentOwner);
         sendHopeMoveButtons(game, target, firstMover, agentOwner);
         game.removeStoredValue(HOPE_SELECTION_MODE + agentOwner.getFaction());

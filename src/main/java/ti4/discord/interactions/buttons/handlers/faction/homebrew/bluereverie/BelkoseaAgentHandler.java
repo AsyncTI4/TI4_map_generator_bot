@@ -58,7 +58,7 @@ public class BelkoseaAgentHandler {
             return;
         }
 
-        AgentLifecycle.spend(game, player, player.unsafeGetLeader(AGENT));
+        AgentLifecycle.spend(game, player, AGENT);
         BelkoseaAgentService.ignoreOtherShips(game, activePlayer, tile);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(

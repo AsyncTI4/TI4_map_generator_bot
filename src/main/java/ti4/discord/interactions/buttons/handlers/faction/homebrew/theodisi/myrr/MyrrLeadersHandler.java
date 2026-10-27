@@ -126,7 +126,7 @@ public class MyrrLeadersHandler {
             return;
         }
 
-        AgentLifecycle.spend(game, agentOwner, agentOwner.unsafeGetLeader(AGENT));
+        AgentLifecycle.spend(game, agentOwner, AGENT);
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),

@@ -328,7 +328,7 @@ public class NetrunnersLeadersHandler {
                 || !isEligibleGain(game, player, sourceTech, gainedTech)) {
             return;
         }
-        AgentLifecycle.spend(game, agentOwner, agentOwner.unsafeGetLeader(AGENT));
+        AgentLifecycle.spend(game, agentOwner, AGENT);
         player.removeTech(sourceTech);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),

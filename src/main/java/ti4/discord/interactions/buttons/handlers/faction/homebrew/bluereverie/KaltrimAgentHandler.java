@@ -44,7 +44,7 @@ public class KaltrimAgentHandler {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "Keda Demas can no longer be used on that player.");
             return;
         }
-        AgentLifecycle.spend(game, agentOwner, agentOwner.unsafeGetLeader(AGENT));
+        AgentLifecycle.spend(game, agentOwner, AGENT);
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),
                 target.getRepresentation() + ", gain 1 command token due to Keda Demas, the Kaltrim agent.",

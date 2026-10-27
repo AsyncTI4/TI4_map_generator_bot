@@ -101,11 +101,49 @@ class AgentLifecycleTest extends BaseTi4Test {
     }
 
     @Test
-    void anAgentWithoutAModuleIsOnlyExhausted() {
+    void anAgentWithoutAModuleIsNotResolvedByOne() {
         assertThat(AgentLifecycle.resolveWithModule(
                         AgentButtonIds.parse("exhaustAgent_" + NOT_AN_AGENT_MODULE), null, game, mentak))
                 .isFalse();
-        assertThat(AgentLifecycle.cardName(game, "mahactagent")).isEqualTo("Jae Mir Kan");
+    }
+
+    @Test
+    void anAgentWithoutAModuleIsNamedFromItsLeaderCardAndFaction() {
+        assertThat(AgentLifecycle.cardName(game, "mahactagent")).isEqualTo("Jae Mir Kan, the Mahact");
+        assertThat(AgentLifecycle.agentName(game, "naaluagent-te", false))
+                .startsWith("Z'eu")
+                .endsWith(", the Naalu agent");
+    }
+
+    @Test
+    void spendingACleverCleverCopyExhaustsTheYssarilAgentWithoutTheSpringContext() {
+        Player yssaril = game.addPlayer("yssarilUser", "Yssaril Player");
+        yssaril.setFaction(game, "yssaril");
+        yssaril.setColor("blue");
+
+        AgentLifecycle.spend(game, yssaril, "mentakagent");
+
+        assertThat(yssaril.getLeader("yssarilagent").orElseThrow().isExhausted())
+                .isTrue();
+        assertThat(mentak.getLeader("mentakagent").orElseThrow().isExhausted()).isFalse();
+    }
+
+    @Test
+    void temporalCommandSuiteLabelsFitInAButtonEvenForCleverCleverCopies() {
+        for (boolean twilightsFall : List.of(false, true)) {
+            game.setTwilightsFallMode(twilightsFall);
+            for (AgentModule<?> module : AgentModules.ALL) {
+                for (String leaderId : leaderIds(module)) {
+                    String label = AgentLifecycle.temporalCommandSuiteLabel(
+                            game, AgentLifecycle.agentName(game, leaderId, true));
+                    assertThat(label).as(leaderId).hasSizeLessThanOrEqualTo(80);
+                }
+            }
+        }
+        game.setFowMode(true);
+        Player other = game.addPlayer("otherUser", "Other Player");
+        assertThat(AgentLifecycle.agentNameShownTo(game, other, mentak, "mentakagent", false))
+                .isEqualTo("an agent");
     }
 
     @Test

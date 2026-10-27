@@ -202,7 +202,7 @@ public class RevenantLeadersHandler {
                 ButtonHelper.deleteMessage(event);
                 return;
             }
-            AgentLifecycle.spend(game, player, agent);
+            AgentLifecycle.spend(game, player, REVVERYDITHAGENT);
             target.setTacticalCC(target.getTacticalCC() + 1);
             MessageHelper.sendMessageToChannel(
                     target.getCorrectChannel(),
@@ -226,7 +226,7 @@ public class RevenantLeadersHandler {
             return;
         }
         game.removeStoredValue(REVVERYDITH_PENDING + player.getFaction());
-        AgentLifecycle.spend(game, player, agent);
+        AgentLifecycle.spend(game, player, REVVERYDITHAGENT);
         CommandCounterHelper.addCC(event, player, tile, ping, false, true);
         ButtonHelper.deleteMessage(event);
     }
@@ -570,7 +570,7 @@ public class RevenantLeadersHandler {
             ButtonHelper.deleteTheOneButton(event);
             return;
         }
-        AgentLifecycle.spend(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, REVSTRATUMAGENT);
         if (agentOwner != player) {
             ActionCardHelper.drawActionCards(agentOwner, 1);
         }
@@ -628,7 +628,7 @@ public class RevenantLeadersHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        AgentLifecycle.spend(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, REVARDENTIAAGENT);
         ti4.service.RemoveCommandCounterService.fromTile(tokenOwner.getColor(), sourceTile, game);
         String prefix = agentOwner.factionButtonChecker() + MOVE_REVARDENTIA_TOKEN + tokenOwner.getFaction() + "|";
         List<Button> extraButtons =
@@ -930,7 +930,7 @@ public class RevenantLeadersHandler {
                     event, "Could not find Thrash \"Feral\" Burner, the Revenant of Scrapyard agent.");
             return false;
         }
-        AgentLifecycle.spend(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, REVSCRAPYARD);
         sendRevScrapyardSystemButtons(null, game, target, "", buttons);
         return true;
     }
@@ -1312,7 +1312,7 @@ public class RevenantLeadersHandler {
             return;
         }
 
-        AgentLifecycle.spend(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, REVXYTHERIS);
         game.setStoredValue(REVXYTHERIS_TARGET + agentOwner.getFaction(), target.getFaction());
         MessageHelper.sendMessageToChannel(
                 target.getCorrectChannel(),
@@ -1710,7 +1710,7 @@ public class RevenantLeadersHandler {
             return;
         }
 
-        AgentLifecycle.spend(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, REVBASE);
         player.refreshTech(techId);
 
         MessageHelper.sendMessageToChannel(
@@ -1911,7 +1911,7 @@ public class RevenantLeadersHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        AgentLifecycle.spend(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, REVARCAGENT);
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),
                 target.getRepresentation()

@@ -74,7 +74,7 @@ public class NatauLeadersHandler {
             return;
         }
 
-        agentOwner.getLeader(AGENT).ifPresent(agent -> AgentLifecycle.spend(game, agentOwner, agent));
+        AgentLifecycle.spend(game, agentOwner, AGENT);
         List<Button> buttons = getNatauAgentAnomalyButtons(game, activePlayer);
         String message = activePlayer.getRepresentation()
                 + ", choose the non-home anomaly to treat as adjacent to the active system this tactical action.";

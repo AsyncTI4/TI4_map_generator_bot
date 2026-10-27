@@ -78,7 +78,7 @@ public class EdynAgentHandler {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "Allant can no longer be used for that landing.");
             return;
         }
-        AgentLifecycle.spend(game, agentOwner, agentOwner.unsafeGetLeader(AGENT));
+        AgentLifecycle.spend(game, agentOwner, AGENT);
         ButtonHelperAbilities.resolveCoexistence(event, game, landingPlayer, payload[1]);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(

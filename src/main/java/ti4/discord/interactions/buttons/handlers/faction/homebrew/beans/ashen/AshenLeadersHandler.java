@@ -325,7 +325,7 @@ public class AshenLeadersHandler {
             return;
         }
 
-        AgentLifecycle.spend(game, ashenPlayer, agent);
+        AgentLifecycle.spend(game, ashenPlayer, AGENT_ID);
         AddUnitService.addUnits(event, destination, game, target.getColor(), "1 " + selectedUnit.getAsyncId());
         ButtonHelper.deleteMessage(event);
 

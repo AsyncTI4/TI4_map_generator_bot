@@ -46,7 +46,7 @@ public class XinAgentHandler {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "There are no exhausted strategy cards to follow.");
             return;
         }
-        AgentLifecycle.spend(game, agentOwner, agentOwner.unsafeGetLeader(AGENT));
+        AgentLifecycle.spend(game, agentOwner, AGENT);
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),
                 target.getRepresentation()

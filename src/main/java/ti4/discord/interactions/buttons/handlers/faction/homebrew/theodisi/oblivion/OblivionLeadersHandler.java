@@ -99,7 +99,7 @@ public class OblivionLeadersHandler {
                     event.getMessageChannel(), "There are no eligible systems for a frontier token.");
             return;
         }
-        AgentLifecycle.spend(game, player, agent);
+        AgentLifecycle.spend(game, player, AGENT);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
@@ -119,7 +119,7 @@ public class OblivionLeadersHandler {
                     event.getMessageChannel(), "There are no eligible systems for a frontier token.");
             return;
         }
-        AgentLifecycle.spend(game, player, agent);
+        AgentLifecycle.spend(game, player, AGENT);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),

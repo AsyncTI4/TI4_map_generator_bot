@@ -1,4 +1,4 @@
-package ti4.service.leader.agent.modules.homebrew.twilightkart;
+package ti4.service.leader.agent.modules.homebrew.tknova;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ti4.service.leader.agent.modules.AgentModuleFixture.assertOwnedAgentButton;
@@ -12,22 +12,59 @@ import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.service.leader.agent.modules.AgentModuleFixture;
 import ti4.testUtils.BaseTi4Test;
 
-class TwilightKartGenomesTest extends BaseTi4Test {
+class TkNovaGenomesTest extends BaseTi4Test {
 
     private static final String LODOR = "lodor";
     private static final String ACTIVE = AgentModuleFixture.ACTIVE_SYSTEM;
 
     @Test
-    void genomeButtonsAreOwnedAndKeepTheirIds() {
+    void genomesAreOfferedOnlyToTheirHolderAndKeepTheirIds() {
         AgentModuleFixture fixture = new AgentModuleFixture("nomad");
+        assertThat(DeploymentGenomeAgent.startOfTurnOffer(fixture.user)).isEmpty();
+        assertThat(SwarmGenomeAgent.endOfTurnOffer(fixture.user)).isEmpty();
+        assertThat(SplittingGenomeAgent.combatOffer(fixture.game, fixture.user, fixture.user, ACTIVE))
+                .isEmpty();
+        fixture.user.addLeader("tknovadeploymentagent");
+        fixture.user.addLeader("tknovaswarmagent");
+        fixture.user.addLeader("tknovasplittingagent");
 
-        assertOwnedAgentButton(
-                DeploymentGenomeAgent.button(fixture.user), fixture.user, "exhaustAgent_tknovadeploymentagent");
-        assertOwnedAgentButton(SwarmGenomeAgent.button(fixture.user), fixture.user, "exhaustAgent_tknovaswarmagent");
-        assertOwnedAgentButton(
-                SplittingGenomeAgent.button(fixture.user, ACTIVE),
-                fixture.user,
-                "exhaustAgent_tknovasplittingagent_" + ACTIVE);
+        assertThat(DeploymentGenomeAgent.startOfTurnOffer(fixture.user))
+                .hasValueSatisfying(
+                        button -> assertOwnedAgentButton(button, fixture.user, "exhaustAgent_tknovadeploymentagent"));
+        assertThat(SwarmGenomeAgent.endOfTurnOffer(fixture.user))
+                .hasValueSatisfying(
+                        button -> assertOwnedAgentButton(button, fixture.user, "exhaustAgent_tknovaswarmagent"));
+        assertThat(SplittingGenomeAgent.combatOffer(fixture.game, fixture.user, fixture.target, ACTIVE))
+                .hasValueSatisfying(
+                        button -> assertOwnedAgentButton(button, fixture.user, "tknovaSplittingOffer_" + ACTIVE));
+    }
+
+    @Test
+    void splittingAsksItsHolderWhoseUnitWasDestroyed() {
+        AgentModuleFixture fixture = new AgentModuleFixture("yin");
+        fixture.user.addLeader("tknovasplittingagent");
+
+        List<String> owners = SplittingGenomeAgent.ownerButtons(fixture.game, fixture.user, ACTIVE).stream()
+                .map(button -> {
+                    assertOwnedBy(button, fixture.user);
+                    return ComponentIdEnvelope.decode(button.getCustomId()).handlerId();
+                })
+                .toList();
+
+        assertThat(owners)
+                .contains("exhaustAgent_tknovasplittingagent_" + ACTIVE + "_" + AgentModuleFixture.TARGET_FACTION);
+    }
+
+    @Test
+    void splittingIsNotOfferedToAFogOfWarHolderWhoIsNotTheFirstCombatant() {
+        AgentModuleFixture fixture = new AgentModuleFixture("yin");
+        fixture.user.addLeader("tknovasplittingagent");
+        fixture.game.setFowMode(true);
+
+        assertThat(SplittingGenomeAgent.combatOffer(fixture.game, fixture.user, fixture.target, ACTIVE))
+                .isEmpty();
+        assertThat(SplittingGenomeAgent.combatOffer(fixture.game, fixture.user, fixture.user, ACTIVE))
+                .isPresent();
     }
 
     @Test

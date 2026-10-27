@@ -534,7 +534,7 @@ public class ArcanumLeadersHandler {
             return;
         }
 
-        AgentLifecycle.spend(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, "arcanumagent");
         target.removeTech(returnedTechID);
         ButtonHelper.deleteMessage(event);
 

@@ -46,7 +46,7 @@ public class AtokeraAgentHandler {
             return;
         }
 
-        AgentLifecycle.spend(game, player, player.unsafeGetLeader(AGENT));
+        AgentLifecycle.spend(game, player, AGENT);
         game.setStoredValue(pendingKey(player), "yes");
         List<Button> buttons = voters.stream()
                 .map(voter -> Buttons.gray(

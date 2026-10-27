@@ -126,7 +126,7 @@ public class DreamLeadersHandler {
             return;
         }
 
-        dreamAgentOwner.getLeader("dreamagent").ifPresent(agent -> AgentLifecycle.spend(game, dreamAgentOwner, agent));
+        AgentLifecycle.spend(game, dreamAgentOwner, "dreamagent");
         game.setStoredValue(AGENT_PENDING_PLAYER_KEY, activePlayer.getFaction());
         game.setStoredValue(AGENT_PENDING_OWNER_KEY, dreamAgentOwner.getFaction());
         ButtonHelper.deleteMessage(event);

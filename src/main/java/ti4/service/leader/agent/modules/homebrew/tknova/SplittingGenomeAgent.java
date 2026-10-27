@@ -1,9 +1,12 @@
-package ti4.service.leader.agent.modules.homebrew.twilightkart;
+package ti4.service.leader.agent.modules.homebrew.tknova;
 
+import java.util.List;
 import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -18,6 +21,7 @@ import ti4.service.leader.agent.modules.YinAgent;
 public final class SplittingGenomeAgent extends AgentModule<SplittingGenomeAgent.Replacement> {
 
     static final String ID = "tknovasplittingagent";
+    private static final String OFFER_STEP = "tknovaSplittingOffer_";
 
     public SplittingGenomeAgent() {
         super(ID, "Splitting Genome");
@@ -25,9 +29,23 @@ public final class SplittingGenomeAgent extends AgentModule<SplittingGenomeAgent
 
     record Replacement(Tile system, Player owner) {}
 
-    public static Button button(Player holder, String position) {
-        return Buttons.gray(
-                ownedButtonId(holder, ID, position), useLabel(holder, ID, "Splitting Genome"), FactionEmojis.Yin);
+    public static Optional<Button> combatOffer(Game game, Player holder, Player firstCombatant, String position) {
+        if (!holder.hasUnexhaustedLeader(ID) || (game.isFowMode() && holder != firstCombatant)) {
+            return Optional.empty();
+        }
+        return Optional.of(Buttons.gray(
+                holder.factionButtonChecker() + OFFER_STEP + position,
+                useLabel(holder, ID, "Splitting Genome"),
+                FactionEmojis.Yin));
+    }
+
+    @ButtonHandler(OFFER_STEP)
+    static void offerOwners(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        offerUnitOwnerPicker(event, game, player, ID, buttonID.substring(OFFER_STEP.length()));
+    }
+
+    static List<Button> ownerButtons(Game game, Player holder, String position) {
+        return unitOwnerButtons(game, holder, ID, position);
     }
 
     @Override
@@ -46,6 +64,7 @@ public final class SplittingGenomeAgent extends AgentModule<SplittingGenomeAgent
         return AgentOutcome.of(Message.addressedTo(
                 owner,
                 ", use buttons to resolve " + use.agentNameFor(owner) + ".",
-                YinAgent.placementButtons(use.game(), owner, use.payload().system(), true)));
+                YinAgent.fightersOrInfantryButtons(
+                        use.game(), owner, use.payload().system())));
     }
 }

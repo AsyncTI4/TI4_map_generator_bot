@@ -215,7 +215,7 @@ public class MorphaLeadersHandler {
             return;
         }
 
-        AgentLifecycle.spend(game, player, agent);
+        AgentLifecycle.spend(game, player, AGENT);
         game.setStoredValue(targetKey(player), target.getFaction());
         sendDiscardSelection(game, target, player);
         ButtonHelper.deleteMessage(event);

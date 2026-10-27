@@ -176,7 +176,7 @@ import ti4.service.leader.agent.modules.homebrew.FreeSystemsAgent;
 import ti4.service.leader.agent.modules.homebrew.KhraskAgent;
 import ti4.service.leader.agent.modules.homebrew.LiZhoAgent;
 import ti4.service.leader.agent.modules.homebrew.OlradinAgent;
-import ti4.service.leader.agent.modules.homebrew.twilightkart.SwarmGenomeAgent;
+import ti4.service.leader.agent.modules.homebrew.tknova.SwarmGenomeAgent;
 import ti4.service.leader.agent.modules.twilightsfall.ExperimentalGenomeAgent;
 import ti4.service.map.SystemPickerService;
 import ti4.service.milty.MiltyDraftTile;
@@ -5235,9 +5235,7 @@ public class ButtonHelper {
         if (player.hasUnexhaustedLeader("crystellumagent")) {
             CrystellumLeadersHandler.addCrystellumAgentEndTurnButton(endButtons, game, player);
         }
-        if (player.hasUnexhaustedLeader("tknovaswarmagent")) {
-            endButtons.add(SwarmGenomeAgent.button(player));
-        }
+        SwarmGenomeAgent.endOfTurnOffer(player).ifPresent(endButtons::add);
 
         // OTHER stuff
         if (!player.hasAbility("arms_dealers")) {

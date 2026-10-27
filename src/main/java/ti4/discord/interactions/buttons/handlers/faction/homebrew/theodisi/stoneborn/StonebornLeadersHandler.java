@@ -128,7 +128,7 @@ public class StonebornLeadersHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        AgentLifecycle.spend(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, agentID);
         offerHazorusFragmentPurge(game, agentOwner, target, agentID);
         ButtonHelper.deleteTheOneButton(event);
     }

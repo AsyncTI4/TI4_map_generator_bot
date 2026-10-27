@@ -198,7 +198,7 @@ public class CrystellumLeadersHandler {
         if (agent == null) {
             return;
         }
-        AgentLifecycle.spend(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, AGENT_ID);
         AddUnitService.addUnits(event, activeSystem, game, target.getColor(), amount + " fighter");
         if (!target.getFaction().equals(agentOwner.getFaction())) {
             AddUnitService.addUnits(

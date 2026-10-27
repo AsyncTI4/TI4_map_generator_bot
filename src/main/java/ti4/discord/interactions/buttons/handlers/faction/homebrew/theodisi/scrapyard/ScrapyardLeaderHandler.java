@@ -77,7 +77,7 @@ public class ScrapyardLeaderHandler {
         Leader agent = agentOwner.getLeader("scrapyardagent").orElse(null);
         if (agent == null) return;
 
-        AgentLifecycle.spend(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, "scrapyardagent");
         MessageHelper.sendMessageToChannel(
                 target.getCorrectChannel(),
                 target.getRepresentation() + " is using _Rikka \"Razor Fang\" Corvin_ to swap the movement and combat "

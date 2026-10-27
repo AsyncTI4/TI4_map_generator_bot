@@ -108,7 +108,7 @@ public class VerydithLeadersHandler {
         }
 
         Leader agent = player.getLeaderByID("verydithagent").orElse(null);
-        AgentLifecycle.spend(game, player, agent);
+        AgentLifecycle.spend(game, player, "verydithagent");
 
         MessageHelper.sendMessageToChannelWithButtons(
                 receiver.getCorrectChannel(),

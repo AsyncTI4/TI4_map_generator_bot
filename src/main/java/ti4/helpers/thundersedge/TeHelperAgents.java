@@ -228,16 +228,17 @@ public final class TeHelperAgents {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             Player p3 = game.getPlayerFromColorOrFaction(matcher.group("faction"));
 
-            player.getLeaderByID("naaluagent-te").ifPresent(zeu -> {
-                AgentLifecycle.spend(game, player, zeu);
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        player.getRepresentationNoPing() + " exhausted "
-                                + AgentLifecycle.agentNameForHolder(game, player, "naaluagent-te")
-                                + " to remove the just-placed command token from " + tile.getRepresentationForButtons()
-                                + ".");
-                RemoveCommandCounterService.fromTile(event, p3, tile);
-            });
+            if (player.getLeaderByID("naaluagent-te").isEmpty()) {
+                return;
+            }
+            AgentLifecycle.spend(game, player, "naaluagent-te");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + " exhausted "
+                            + AgentLifecycle.agentNameForHolder(game, player, "naaluagent-te")
+                            + " to remove the just-placed command token from " + tile.getRepresentationForButtons()
+                            + ".");
+            RemoveCommandCounterService.fromTile(event, p3, tile);
         });
         ButtonHelper.deleteMessage(event);
     }

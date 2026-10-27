@@ -41,7 +41,7 @@ public class QhetAgentHandler {
             return;
         }
 
-        AgentLifecycle.spend(game, agentOwner, agentOwner.unsafeGetLeader(AGENT));
+        AgentLifecycle.spend(game, agentOwner, AGENT);
         ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannel(
                 agentOwner.getCorrectChannel(),

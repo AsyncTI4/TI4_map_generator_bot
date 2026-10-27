@@ -92,7 +92,7 @@ public class ArvaxiLeaderHandler {
         String acID = ActionCardHelper.getDiscardedAcID(game, acIndex);
         String acName = acID != null ? Mapper.getActionCard(acID).getName() : "the action card";
 
-        player.getLeader("arvaxiagent").ifPresent(agent -> AgentLifecycle.spend(game, player, agent));
+        AgentLifecycle.spend(game, player, "arvaxiagent");
 
         game.pickActionCard(target.getUserID(), acIndex);
         ActionCardHelper.sendActionCardInfo(game, target);

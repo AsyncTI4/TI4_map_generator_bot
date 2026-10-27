@@ -24,6 +24,7 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 import ti4.model.Mapper;
 import ti4.service.leader.ExhaustLeaderService;
@@ -53,9 +54,11 @@ public class AgentLifecycle {
         }
     }
 
-    public static void spend(Game game, Player holder, Leader agent) {
-        exhaust(game, holder, agent, agent.getId(), null);
-        offerTemporalCommandSuite(game, holder, agent.getId());
+    public static void spend(Game game, Player holder, String agentId) {
+        holder.getLeader(agentId).ifPresent(agent -> {
+            exhaust(game, holder, agent, agentId, null);
+            offerTemporalCommandSuite(game, holder, agentId, isYssarilCopy(agent.getId(), agentId));
+        });
     }
 
     static boolean resolveWithModule(
@@ -72,7 +75,7 @@ public class AgentLifecycle {
         return run(module, new AgentButtonIds.Parsed(agentId, payload), event, game, player, false);
     }
 
-    public static boolean refuseIfExhausted(GenericInteractionCreateEvent event, Player player, Leader leader) {
+    static boolean refuseIfExhausted(GenericInteractionCreateEvent event, Player player, Leader leader) {
         if (!leader.isExhausted()) {
             return false;
         }
@@ -86,22 +89,13 @@ public class AgentLifecycle {
         return true;
     }
 
-    public static void exhaust(Game game, Player player, Leader leader, String agentId, String target) {
+    private static void exhaust(Game game, Player player, Leader leader, String agentId, String target) {
         recordGameEvent(game, player, agentId, target);
         ExhaustLeaderService.exhaustLeader(game, player, leader);
         leader.getLeaderModel().ifPresent(model -> {
-            SpringContext.getBean(CombatReplayService.class)
-                    .mirrorLeaderPlayed(
-                            game,
-                            player,
-                            model.getAlias(),
-                            player.getCorrectChannel().getName());
+            mirrorToCombatReplay(game, player, model);
             recordInActionSummary(game, player, model);
         });
-    }
-
-    public static void finish(GenericInteractionCreateEvent event, Game game, Player player, String agentId) {
-        finish(event, game, player, agentId, false);
     }
 
     private static void finish(
@@ -109,11 +103,24 @@ public class AgentLifecycle {
             Game game,
             Player player,
             String agentId,
+            boolean viaYssaril,
             boolean deleteWholePressedMessage) {
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             cleanUpPressedButton(buttonEvent, deleteWholePressedMessage);
         }
-        offerTemporalCommandSuite(game, player, agentId);
+        offerTemporalCommandSuite(game, player, agentId, viaYssaril);
+    }
+
+    private static void mirrorToCombatReplay(Game game, Player player, LeaderModel model) {
+        if (!SpringContext.isInitialized()) {
+            return;
+        }
+        SpringContext.getBean(CombatReplayService.class)
+                .mirrorLeaderPlayed(
+                        game,
+                        player,
+                        model.getAlias(),
+                        player.getCorrectChannel().getName());
     }
 
     public static String agentName(String cardName, boolean viaYssaril) {
@@ -151,8 +158,16 @@ public class AgentLifecycle {
     static String cardName(Game game, String leaderId) {
         return AgentModule.twilightsFallName(game, leaderId)
                 .or(() -> AgentModules.find(leaderId).map(module -> module.displayName(leaderId)))
-                .or(() -> Optional.ofNullable(Mapper.getLeader(leaderId)).map(LeaderModel::getName))
+                .or(() -> Optional.ofNullable(Mapper.getLeader(leaderId)).map(AgentLifecycle::nameWithFaction))
                 .orElse(leaderId);
+    }
+
+    private static String nameWithFaction(LeaderModel leader) {
+        FactionModel faction = leader.getFaction() == null ? null : Mapper.getFaction(leader.getFaction());
+        if (faction == null || faction.getShortName() == null) {
+            return leader.getName();
+        }
+        return leader.getName() + ", the " + faction.getShortName();
     }
 
     static boolean isYssarilCopy(String exhaustedLeaderId, String agentId) {
@@ -163,7 +178,7 @@ public class AgentLifecycle {
         return !player.hasLeader(agentId) && YSSARIL_AGENTS.stream().anyMatch(player::hasLeader);
     }
 
-    public static boolean isYssarilAgent(String leaderId) {
+    private static boolean isYssarilAgent(String leaderId) {
         return YSSARIL_AGENTS.stream().anyMatch(leaderId::equalsIgnoreCase);
     }
 
@@ -206,9 +221,9 @@ public class AgentLifecycle {
         AgentOutcome outcome = module.resolve(use);
         deliver(outcome, pressedButton, player);
         if (pressedAgentButton) {
-            finish(event, game, player, agentId, outcome.deletesPressedMessage());
+            finish(event, game, player, agentId, viaYssaril, outcome.deletesPressedMessage());
         } else {
-            offerTemporalCommandSuite(game, player, agentId);
+            offerTemporalCommandSuite(game, player, agentId, viaYssaril);
         }
         return true;
     }
@@ -221,13 +236,14 @@ public class AgentLifecycle {
             return;
         }
         exhaust(game, player, leader, agentId, parsed.hasPayload() ? parsed.payload() : null);
-        String agentName = agentName(game, agentId, isYssarilCopy(leader.getId(), agentId));
+        boolean viaYssaril = isYssarilCopy(leader.getId(), agentId);
+        String agentName = agentName(game, agentId, viaYssaril);
         deliver(
                 AgentOutcome.of(Message.addressedTo(player, " has exhausted " + agentName + ".")
                         .forEveryone()),
                 event,
                 player);
-        finish(event, game, player, agentId, false);
+        finish(event, game, player, agentId, viaYssaril, false);
     }
 
     private static MessageChannel replyChannel(Player player, GenericInteractionCreateEvent pressedButton) {
@@ -345,28 +361,32 @@ public class AgentLifecycle {
                 || MESSAGES_TO_DELETE_WHOLE.stream().anyMatch(pressedMessage::contains);
     }
 
-    private static void offerTemporalCommandSuite(Game game, Player player, String agentId) {
+    static String temporalCommandSuiteLabel(Game game, String agentName) {
+        return (game.isTwilightsFallMode() ? "Token: Ready " : "TCS: Ready ") + agentName;
+    }
+
+    private static void offerTemporalCommandSuite(Game game, Player player, String agentId, boolean viaYssaril) {
         for (Player p2 : game.getRealPlayers()) {
             if (!p2.hasTech("tcs") || p2.getExhaustedTechs().contains("tcs")) {
                 continue;
             }
             List<Button> buttons = new ArrayList<>();
-            String cardName = game.isFowMode() && p2 != player ? AgentUse.FOG_SAFE_AGENT_NAME : cardName(game, agentId);
+            String agentName = agentNameShownTo(game, p2, player, agentId, viaYssaril);
             String msg;
             if (game.isTwilightsFallMode()) {
                 buttons.add(Buttons.green(
                         p2.factionButtonChecker() + "useTCS_" + agentId + "_" + player.getFaction(),
-                        "Spend A Command Token to Ready " + cardName));
+                        temporalCommandSuiteLabel(game, agentName)));
                 msg = p2.getRepresentationNoPing()
                         + " you have the opportunity to spend a command token via _Temporal Command Suite_ to ready "
-                        + cardName
+                        + agentName
                         + ", and potentially resolve a transaction.";
             } else {
                 buttons.add(Buttons.green(
                         p2.factionButtonChecker() + "exhaustTCS_" + agentId + "_" + player.getFaction(),
-                        "Exhaust Temporal Command Suite to Ready " + cardName));
+                        temporalCommandSuiteLabel(game, agentName)));
                 msg = p2.getRepresentationNoPing()
-                        + " you have the opportunity to exhaust _Temporal Command Suite_ to ready " + cardName
+                        + " you have the opportunity to exhaust _Temporal Command Suite_ to ready " + agentName
                         + ", and potentially resolve a transaction.";
             }
             buttons.add(Buttons.red(p2.factionButtonChecker() + "deleteButtons", "Decline"));

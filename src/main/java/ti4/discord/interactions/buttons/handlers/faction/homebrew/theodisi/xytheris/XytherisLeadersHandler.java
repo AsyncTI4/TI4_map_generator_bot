@@ -91,7 +91,7 @@ public class XytherisLeadersHandler {
             return;
         }
 
-        AgentLifecycle.spend(game, player, agent);
+        AgentLifecycle.spend(game, player, AGENT_ID);
         game.removeStoredValue(MYRIX_AGENT_WINDOW);
         game.setStoredValue(MYRIX_AGENT_PENDING, target.getFaction());
         List<Button> buttons = new ArrayList<>(buttonsByUnitLocation.values());

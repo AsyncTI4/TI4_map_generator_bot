@@ -1,4 +1,4 @@
-package ti4.service.leader.agent.modules.homebrew.twilightkart;
+package ti4.service.leader.agent.modules.homebrew.tknova;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +22,11 @@ public final class SwarmGenomeAgent extends SelfOrTargetedAgent {
         super(ID, "Swarm Genome");
     }
 
-    public static Button button(Player holder) {
-        return useButton(holder, ID, "Swarm Genome", FactionEmojis.Sardakk);
+    public static Optional<Button> endOfTurnOffer(Player holder) {
+        if (!holder.hasUnexhaustedLeader(ID)) {
+            return Optional.empty();
+        }
+        return Optional.of(useButton(holder, ID, "Swarm Genome", FactionEmojis.Sardakk));
     }
 
     @Override

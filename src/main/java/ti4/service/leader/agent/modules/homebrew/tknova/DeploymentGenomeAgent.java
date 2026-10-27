@@ -1,4 +1,4 @@
-package ti4.service.leader.agent.modules.homebrew.twilightkart;
+package ti4.service.leader.agent.modules.homebrew.tknova;
 
 import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -19,8 +19,11 @@ public final class DeploymentGenomeAgent extends SelfOrTargetedAgent {
         super(ID, "Deployment Genome");
     }
 
-    public static Button button(Player holder) {
-        return useButton(holder, ID, "Deployment Genome", FactionEmojis.Nomad);
+    public static Optional<Button> startOfTurnOffer(Player holder) {
+        if (!holder.hasUnexhaustedLeader(ID)) {
+            return Optional.empty();
+        }
+        return Optional.of(useButton(holder, ID, "Deployment Genome", FactionEmojis.Nomad));
     }
 
     @Override

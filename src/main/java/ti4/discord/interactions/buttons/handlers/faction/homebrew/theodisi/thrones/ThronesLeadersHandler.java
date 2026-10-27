@@ -208,7 +208,7 @@ public class ThronesLeadersHandler {
             return;
         }
 
-        AgentLifecycle.spend(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, AGENT_ID);
         AddUnitService.addUnits(event, destination, game, target.getColor(), "1 " + ship.getAsyncId());
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(

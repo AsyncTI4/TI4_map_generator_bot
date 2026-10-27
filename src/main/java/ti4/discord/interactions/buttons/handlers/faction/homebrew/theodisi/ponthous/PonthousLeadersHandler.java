@@ -81,7 +81,7 @@ public class PonthousLeadersHandler {
             return;
         }
 
-        AgentLifecycle.spend(game, agentOwner, agent);
+        AgentLifecycle.spend(game, agentOwner, AGENT_ID);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 agentOwner.getRepresentation() + " exhausted General Caelyn, the Ponthous agent, on "

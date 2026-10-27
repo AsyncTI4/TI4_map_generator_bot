@@ -439,7 +439,7 @@ public class KairnLeadershandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        AgentLifecycle.spend(game, player, agent);
+        AgentLifecycle.spend(game, player, "kairnagent");
         drawKairnAgentExplores(event, game, player, player, planet, values[1]);
         ButtonHelper.deleteMessage(event);
     }
@@ -487,7 +487,7 @@ public class KairnLeadershandler {
             ButtonHelper.deleteTheOneButton(event);
             return;
         }
-        AgentLifecycle.spend(game, player, agent);
+        AgentLifecycle.spend(game, player, "kairnagent");
         drawKairnAgentExplores(event, game, player, player, planet, values[1]);
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -506,7 +506,7 @@ public class KairnLeadershandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        AgentLifecycle.spend(game, player, agent);
+        AgentLifecycle.spend(game, player, "kairnagent");
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),
                 player.getRepresentationNoPing()
