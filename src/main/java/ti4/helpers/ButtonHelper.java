@@ -7009,12 +7009,12 @@ public class ButtonHelper {
     }
 
     public static List<Button> getButtonsForMovingGroundForcesToAPlanet(Game game, String planetName, Player player) {
-        List<Button> buttons = new ArrayList<>(groundForceMoveButtons(game, planetName, player));
+        List<Button> buttons = new ArrayList<>(getGroundForceMoveButtonsWithoutDone(game, planetName, player));
         buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Moving to This Planet"));
         return buttons;
     }
 
-    public static List<Button> groundForceMoveButtons(Game game, String planetName, Player player) {
+    public static List<Button> getGroundForceMoveButtonsWithoutDone(Game game, String planetName, Player player) {
         List<Button> buttons = new ArrayList<>();
         String moveStep = player.factionButtonChecker() + "mercerMove_" + planetName + "_";
         boolean bioplasmosis = game.getPhaseOfGame().contains("status");
