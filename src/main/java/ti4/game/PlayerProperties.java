@@ -42,6 +42,7 @@ public class PlayerProperties {
     private boolean oplusplusCouncilConfirmed;
     private boolean searchWarrant;
     private boolean dummy;
+    private boolean botPlayer;
     private boolean npc;
     private boolean autoPassOnWhensAfters;
     private boolean eliminated;

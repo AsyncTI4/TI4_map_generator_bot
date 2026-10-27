@@ -850,6 +850,9 @@ class GameSaveService {
             writer.write(Constants.DUMMY + " " + player.isDummy());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.DUMMY + " " + player.isBotPlayer());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.NPC + " " + player.isNpc());
             writer.write(System.lineSeparator());
 
