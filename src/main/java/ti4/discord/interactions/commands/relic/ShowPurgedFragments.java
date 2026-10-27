@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.ButtonHelperExplore;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 class ShowPurgedFragments extends GameStateSubcommand {
 

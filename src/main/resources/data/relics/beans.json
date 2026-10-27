@@ -1,0 +1,44 @@
+[
+    {
+        "alias": "salvage_war_sun",
+        "name": "War Sun",
+        "text": "When you use this unit's BOMBARDMENT ability, you may roll against each planet in its system.\n\nHellfire: After rolling for this unit's BOMBARDMENT ability, you may discard this card to double all hits produced by this unit against 1 planet in that system.\n\nCost -2, Move +1",
+        "isFakeRelic": true,
+        "source": "beans"
+    },
+    {
+        "alias": "salvage_flagship",
+        "name": "Flagship",
+        "text": "Slipspace Transfer: You may discard this card at the start of a round of combat to remove this unit from the board and place it in the active system.\n\nMove +1",
+        "isFakeRelic": true,
+        "source": "beans"
+    },
+    {
+        "alias": "salvage_dreadnought",
+        "name": "Dreadnought",
+        "text": "At the start of space combat, you may choose 1 of your units of this type to roll 1 die. On a result equal to or greater than that unit's BOMBARDMENT value, produce 1 hit.\n\nDyadic Jump Drive: After you activate a system, you may discard this card to apply +2 to the MOVE value of each unit of this type on the board that you control.\n\nCapacity +1",
+        "isFakeRelic": true,
+        "source": "beans"
+    },
+    {
+        "alias": "salvage_carrier",
+        "name": "Carrier",
+        "text": "While you are the active player, this unit may ignore the effects of anomalies.\n\nQuantum Translocation: After you activate a system, you may discard this card to allow this unit to transport ground forces out of systems that contain your command tokens.\n\nCombat +1",
+        "isFakeRelic": true,
+        "source": "beans"
+    },
+    {
+        "alias": "salvage_cruiser",
+        "name": "Cruiser",
+        "text": "This unit gains SPACE CANNON 8.\n\nSlip-Link: After a player moves ships into this unit's system, you may discard this card to move up to 2 units of this type from adjacent systems into this unit's system.\n\nCapacity +1",
+        "isFakeRelic": true,
+        "source": "beans"
+    },
+    {
+        "alias": "salvage_destroyer",
+        "name": "Destroyer",
+        "text": "During the Anti-Fighter Barrage step of a space combat in a system adjacent to this unit's system, you may use the ANTI-FIGHTER BARRAGE ability of 1 of your units of this type in this system.\n\nHeat Seekers: After you roll for this unit's ANTI-FIGHTER BARRAGE ability, you may discard this card to reroll all misses.\n\nCombat +1",
+        "isFakeRelic": true,
+        "source": "beans"
+    }
+]

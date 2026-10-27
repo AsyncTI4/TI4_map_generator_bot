@@ -14,7 +14,7 @@ import ti4.service.leader.agent.AgentUse;
 
 public final class AugersAgent implements AgentModule<Player> {
 
-    public static final String ID = "augersagent";
+    static final String ID = "augersagent";
     private static final int TRADE_GOODS_GAINED = 2;
 
     public static String buttonId(Player explorer) {

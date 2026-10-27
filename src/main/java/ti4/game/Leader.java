@@ -12,9 +12,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.franken.FrankenAlternateTextService;
 

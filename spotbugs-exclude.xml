@@ -23,7 +23,10 @@
     </Match>
     <!-- False positive (3) -->
     <Match>
-        <Class name="ti4.image.MapGenerator"/>
+        <Or>
+            <Class name="ti4.image.map.AnchorStats"/>
+            <Class name="ti4.image.map.HexTileStats"/>
+        </Or>
         <Bug pattern="PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS"/>
     </Match>
     <!-- False positive (2) -->

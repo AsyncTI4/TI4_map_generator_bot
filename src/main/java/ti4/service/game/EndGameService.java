@@ -25,15 +25,17 @@ import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.RepositoryDispatchEvent;
 import ti4.helpers.StatusHelper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.helpers.async.RoundSummaryHelper;
-import ti4.image.MapRenderPipeline;
+import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.async.RoleService;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.fow.FogGameSummaryService;
 import ti4.service.fow.setup.FowSetupWizardService;
 import ti4.service.statistics.game.WinningPathComparisonService;
 import ti4.service.statistics.game.WinningPathHelper;
@@ -47,9 +49,12 @@ import ti4.spring.service.gameevent.GameEventType;
 @UtilityClass
 public class EndGameService {
 
+    public static final String MOST_POINTS_END_GAME_BUTTON_ID = "endGameMostPoints";
+
     public static void secondHalfOfGameEnd(
             GenericInteractionCreateEvent event, Game game, boolean publish, boolean archiveChannels, boolean rematch) {
         String gameName = game.getName();
+        List<Player> fogGameMasters = fogGameMasters(game);
         List<Role> gameRoles = event.getGuild().getRolesByName(gameName, true);
         boolean deleteRole = true;
         if (gameRoles.size() > 1) {
@@ -67,7 +72,7 @@ public class EndGameService {
             // The game-winning objective may have just been staged into the status-scoring draft.
             StatusHelper.commitStatusScoringEvent(game);
             List<String> winners =
-                    game.getWinners().stream().map(Player::getFaction).toList();
+                    game.getWinnersOnceEnded().stream().map(Player::getFaction).toList();
             GameEventService.commit(
                     game, GameEventType.GAME_ENDED, null, winners.isEmpty() ? Map.of() : Map.of("winner", winners));
         }
@@ -165,7 +170,7 @@ public class EndGameService {
                 threadChannel.getManager().setArchived(true).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
-        gameEndStuff(game, event, publish);
+        gameEndStuff(game, event, publish, fogGameMasters);
 
         // GET BOTHELPER LOUNGE
         List<TextChannel> bothelperLoungeChannels = JdaService.guildPrimary.getTextChannelsByName("staff-lounge", true);
@@ -196,13 +201,69 @@ public class EndGameService {
         }
     }
 
+    public static boolean objectivesHaveRunOut(Game game) {
+        if (game.isRedTapeMode() || game.isCivilizedSocietyMode()) {
+            return false;
+        }
+        return finalObjectiveWasRevealedBefore(game) || endGameDeckIsEmpty(game);
+    }
+
+    private static boolean finalObjectiveWasRevealedBefore(Game game) {
+        if (game.isOmegaPhaseMode()) {
+            return game.getRound() > 9;
+        }
+        return game.getRound() > 9 || (game.getRound() == 9 && hasReachedStatusPhase(game));
+    }
+
+    private static boolean hasReachedStatusPhase(Game game) {
+        String phase = game.getPhaseOfGame();
+        return phase.contains("status") || phase.contains("agenda");
+    }
+
+    private static boolean endGameDeckIsEmpty(Game game) {
+        if (game.isOmegaPhaseMode()) {
+            return game.getPublicObjectives1Peekable().isEmpty() && game.getPublicObjectives1DeckSize() == 0;
+        }
+        return game.getPublicObjectives2Peekable().isEmpty() && game.getPublicObjectives2DeckSize() == 0;
+    }
+
+    public static void recordMostPointsWinner(Game game, MessageChannel channel) {
+        Optional<Player> winner = game.getMostPointsWinner();
+        if (winner.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    "No winner has been recorded: the players tied for the most victory points could not be separated by initiative, so this game will end without a winner.");
+            return;
+        }
+        game.recordWinner(winner.get());
+        MessageHelper.sendMessageToChannel(
+                channel,
+                winner.get().getRepresentationNoPing() + " has been recorded as the winner with "
+                        + StringHelper.pluralize(winner.get().getTotalVictoryPoints(), "victory point")
+                        + ", the most of any player (ties go to the earliest initiative).");
+    }
+
     static void gameEndStuff(Game game, GenericInteractionCreateEvent event, boolean publish) {
+        gameEndStuff(game, event, publish, fogGameMasters(game));
+    }
+
+    private static List<Player> fogGameMasters(Game game) {
+        return isAnyFog(game) ? game.getPlayersWithGMRole() : List.of();
+    }
+
+    private static boolean isAnyFog(Game game) {
+        return game.isFowMode() || game.isLightFogMode();
+    }
+
+    private static void gameEndStuff(
+            Game game, GenericInteractionCreateEvent event, boolean publish, List<Player> fogGameMasters) {
         String gameName = game.getName();
 
         game.setHasEnded(true);
         game.setEndedDate(System.currentTimeMillis());
         game.setAutoPing(false);
         game.setAutoPingSpacer(0);
+        FogGameSummaryService.rememberGameMasters(game, fogGameMasters);
 
         GameMessageManager.remove(List.of(game.getName()));
 
@@ -217,6 +278,9 @@ public class EndGameService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
 
         writeChronicle(game, event, publish);
+        if (isAnyFog(game) && publish && !game.getRealPlayers().isEmpty()) {
+            FogGameSummaryService.postSettingsLog(game, fogGameMasters);
+        }
         WinningPathPersistenceService.addGame(game);
     }
 
@@ -380,7 +444,7 @@ public class EndGameService {
         sb.append('\n');
         if (game.isFowMode()) {
             sb.append("**GM:** ");
-            for (Player gm : game.getPlayersWithGMRole()) {
+            for (Player gm : FogGameSummaryService.gameMasters(game)) {
                 appendUserName(sb, gm);
                 sb.append(' ');
             }

@@ -2,7 +2,9 @@ package ti4.service.leader;
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesCommanderUnlockHandler;
 import ti4.game.Game;
@@ -18,6 +20,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.unit.CheckUnitContainmentService;
 
@@ -38,6 +41,11 @@ public class CommanderUnlockCheckService {
             if (player.hasLeader(factionToCheck + "commander")
                     && !player.hasLeaderUnlocked(factionToCheck + "commander")) {
                 checkConditionsAndUnlock(player, factionToCheck, factionToCheck + "commander");
+            }
+            if ("stoneborn".equals(factionToCheck)
+                    && player.hasLeader("stoneborncommanderdormant")
+                    && !player.hasLeaderUnlocked("stoneborncommanderdormant")) {
+                checkConditionsAndUnlock(player, "stoneborn", "stoneborncommanderdormant");
             }
             if ("mahact".equals(factionToCheck)
                     && player.hasLeader("mahactcommander_y")
@@ -303,6 +311,8 @@ public class CommanderUnlockCheckService {
 
                 shouldBeUnlocked = eligibleSystems >= 2;
             }
+            case "iron" ->
+                shouldBeUnlocked = player.getRelics().stream().anyMatch(IronSalvageRelicHandler::isSalvageRelic);
             case "ta" -> {
                 int eligiblePlanets = 0;
                 for (String planetName : player.getPlanets()) {
@@ -318,19 +328,23 @@ public class CommanderUnlockCheckService {
 
                 shouldBeUnlocked = eligiblePlanets >= 4;
             }
-            case "netrunners" ->
-                shouldBeUnlocked = TechnologyType.mainFour.stream()
-                        .anyMatch(type -> ButtonHelper.getNumberOfCertainTypeOfTech(player, type) >= 3);
-            case "natau" -> {
-                int qualifyingSystems = 0;
-                for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player)) {
-                    if (tile.isAnomaly(game, player)
-                            || FoWHelper.isTileAdjacentToAnAnomaly(game, tile.getPosition(), player)) {
-                        qualifyingSystems++;
-                    }
-                }
-                shouldBeUnlocked = (qualifyingSystems >= 3);
+            case "netrunners" -> {
+                int sharedTechColors = (int) TechnologyType.mainFour.stream()
+                        .filter(color -> player.getTechs().stream()
+                                .map(Mapper::getTech)
+                                .filter(Objects::nonNull)
+                                .filter(tech -> tech.getTypes().contains(color))
+                                .anyMatch(tech -> game.getRealPlayersExcludingThis(player).stream()
+                                        .anyMatch(other -> other.hasTech(tech.getAlias()))))
+                        .count();
+
+                shouldBeUnlocked = sharedTechColors == TechnologyType.mainFour.size();
             }
+            case "natau" ->
+                shouldBeUnlocked = player.getPlanets().stream()
+                        .map(game::getTileFromPlanet)
+                        .filter(Objects::nonNull)
+                        .anyMatch(Tile::isFracture);
 
             // theodisi
             case "ardentia",
@@ -350,6 +364,7 @@ public class CommanderUnlockCheckService {
                     "thrones",
                     "ponthous",
                     "scrapyard",
+                    "stoneborn",
                     "morpha",
                     "thurviali" ->
                 shouldBeUnlocked =

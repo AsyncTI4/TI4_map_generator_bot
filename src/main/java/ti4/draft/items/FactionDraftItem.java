@@ -14,10 +14,10 @@ import ti4.draft.FrankenDrazDraft;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.PatternHelper;
-import ti4.image.Mapper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -172,7 +172,7 @@ public class FactionDraftItem extends DraftItem {
         if (Mapper.isValidBreakthrough(breakthrough)) {
             addIfAllowed(game, components, DraftCategory.BREAKTHROUGH, breakthrough, breakthrough);
         }
-        if (game.isMonumentsMode() && game.getActiveBagDraft() instanceof FrankenDrazDraft) {
+        if (game != null && game.isMonumentsMode() && game.getActiveBagDraft() instanceof FrankenDrazDraft) {
             Mapper.getUnits().values().stream()
                     .filter(UnitModel::getIsMonument)
                     .filter(unit -> faction.getAlias().equals(unit.getFaction().orElse(null)))
@@ -191,7 +191,7 @@ public class FactionDraftItem extends DraftItem {
             return;
         }
         String resolvedBanValue = itemId.equals(banValue) ? resolvedItemId : banValue;
-        if (isBanned(game, category, resolvedBanValue)) {
+        if (game != null && isBanned(game, category, resolvedBanValue)) {
             return;
         }
         DraftItem item = generate(category, resolvedItemId);
@@ -202,7 +202,7 @@ public class FactionDraftItem extends DraftItem {
     }
 
     private static String resolveFrankenReplacement(Game game, DraftCategory category, String itemId) {
-        if (!game.isFrankenGame()) {
+        if (game == null || !game.isFrankenGame()) {
             return itemId;
         }
 
@@ -249,6 +249,7 @@ public class FactionDraftItem extends DraftItem {
             case HOMESYSTEM -> storedListContains(game, "bannedHSs", value);
             case STARTINGTECH -> storedListContains(game, "bannedStartingTechs", value);
             case STARTINGFLEET -> storedListContains(game, "bannedFleets", value);
+            case UNIT -> storedListContains(game, "bannedUnits", value);
             default -> false;
         };
     }

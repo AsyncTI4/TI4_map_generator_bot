@@ -1,0 +1,29 @@
+{
+    "id": "matercalyxa",
+    "tileId": "fracture13",
+    "name": "Mater Calyxa",
+    "aliases": [
+        "mater",
+        "calyxa",
+        "mc"
+    ],
+    "resources": 4,
+    "influence": 4,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "legendaryAbilityName": "The Sovereign Crown",
+    "legendaryAbilityText": "When you exhaust the Imperial or Aeterna Strategy Card, gain 1 victory point.",
+    "legendaryAbilityFlavourText": "Ex tegmine fracto lux reginae oritur. In hoc cathedra fracta, silentium stellarum imperat et vindicat.",
+    "planetLayout": {
+        "unitHolderName": "matercalyxa",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 169.0,
+            "y": 151.0
+        }
+    },
+    "contrastColor": "orange",
+    "flavourText": "*Far from any borders of known reality, rests one of the largest megastructures in recorded history. Though her outer mechanical mantle is peeled away, the planet's core still generates energy beyond comprehension.*",
+    "source": "merford"
+}

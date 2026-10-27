@@ -5,13 +5,12 @@ import java.util.List;
 import lombok.Data;
 import ti4.game.Game;
 import ti4.model.BorderAnomalyHolder;
-import ti4.model.BorderAnomalyModel.BorderAnomalyType;
 
 @Data
 public class WebBorderAnomalies {
 
     /**
-     * @param type e.g., "VOID_TETHER", "SPATIAL_TEAR", etc.
+     * @param type e.g., "void_tether", "spatial_tear", etc.
      */
     public record BorderAnomalyInfo(String tile, int direction, String type) {}
 
@@ -23,14 +22,9 @@ public class WebBorderAnomalies {
 
         web.borderAnomalies = new ArrayList<>();
         for (BorderAnomalyHolder anomaly : anomalies) {
-            if (anomaly == null) continue;
-            // Only include non-ARROW anomalies (ARROW is used for custom adjacency and shouldn't be displayed)
-            if (anomaly.getType() != BorderAnomalyType.ARROW) {
-                web.borderAnomalies.add(new BorderAnomalyInfo(
-                        anomaly.getTile(),
-                        anomaly.getDirection(),
-                        anomaly.getType().toString()));
-            }
+            if (anomaly == null || anomaly.getModel() == null) continue;
+            web.borderAnomalies.add(
+                    new BorderAnomalyInfo(anomaly.getTile(), anomaly.getDirection(), anomaly.getType()));
         }
 
         return web;

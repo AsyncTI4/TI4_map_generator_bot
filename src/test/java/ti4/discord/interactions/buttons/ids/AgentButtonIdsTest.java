@@ -26,7 +26,6 @@ class AgentButtonIdsTest extends BaseTi4Test {
         assertThat(parsed.agentId()).isEqualTo("augersagent");
         // The payload is kept whole: faction ids such as pi_hacan contain the separator.
         assertThat(parsed.payload()).isEqualTo("pi_hacan");
-        assertThat(parsed.segments()).containsExactly("pi", "hacan");
     }
 
     @Test
@@ -35,7 +34,6 @@ class AgentButtonIdsTest extends BaseTi4Test {
 
         assertThat(parsed.agentId()).isEqualTo("saaragent");
         assertThat(parsed.hasPayload()).isFalse();
-        assertThat(parsed.segments()).isEmpty();
     }
 
     @Test

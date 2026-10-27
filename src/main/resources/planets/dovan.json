@@ -1,0 +1,30 @@
+{
+    "id": "dovan",
+    "tileId": "th36",
+    "name": "Dovan",
+    "aliases": [
+        "dovan"
+    ],
+    "resources": 1,
+    "influence": 2,
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "techSpecialties": [
+        "WARFARE"
+    ],
+    "planetLayout": {
+        "unitHolderName": "dovan",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 207
+        },
+        "planetRadius": 63
+    },
+    "positionInTile": {
+        "x": 200,
+        "y": 207
+    },
+    "source": "theodisi"
+}

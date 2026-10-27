@@ -8,9 +8,9 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
+import ti4.model.Mapper;
 
 class LookAtTopEvent extends GameStateSubcommand {
 
@@ -23,7 +23,14 @@ class LookAtTopEvent extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
+        if (game.getEvents().isEmpty()) {
+            MessageHelper.replyToMessage(event, "The event deck is empty.");
+            return;
+        }
+
+        int count = Math.min(
+                event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt),
+                game.getEvents().size());
 
         StringBuilder sb = new StringBuilder();
         sb.append("-----------\n");

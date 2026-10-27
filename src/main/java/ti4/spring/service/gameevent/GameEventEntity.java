@@ -38,4 +38,7 @@ class GameEventEntity {
 
     @Column(columnDefinition = "TEXT")
     private String movementState;
+
+    @Column(columnDefinition = "TEXT")
+    private String playerState;
 }

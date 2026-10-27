@@ -33,7 +33,7 @@ public class CombatCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "Combat";
+        return "Roll combat dice and start combats";
     }
 
     @Override

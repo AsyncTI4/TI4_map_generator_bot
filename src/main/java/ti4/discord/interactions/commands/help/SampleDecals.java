@@ -1,32 +1,39 @@
 package ti4.discord.interactions.commands.help;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.ResourceHelper;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.DrawingUtil;
-import ti4.image.ImageHelper;
-import ti4.image.MapGenerator;
-import ti4.image.Mapper;
+import ti4.image.draw.ImageGrid;
+import ti4.image.draw.StarfieldPage;
+import ti4.image.io.Fonts;
+import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageResources;
+import ti4.image.io.ImageUploads;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.UnitDecalService;
-import ti4.service.image.FileUploadService;
 
 class SampleDecals extends Subcommand {
+
+    private static final int SPACING = 24;
+    private static final int DREAD_WIDTH = 77 + 2 * SPACING;
+    private static final int DREAD_IMAGE_HEIGHT = 76;
+    private static final int LINE_HEIGHT = 18;
+    private static final int CELL_HEIGHT = DREAD_IMAGE_HEIGHT + 3 * LINE_HEIGHT + 2 * SPACING;
 
     public SampleDecals() {
         super(Constants.SAMPLE_DECALS, "Show a sample image of dreadnoughts with various decals.");
@@ -68,102 +75,51 @@ class SampleDecals extends Subcommand {
 
         Collections.sort(decals);
 
-        int SPACING = 24;
-        int DREADWIDTH = 77 + 2 * SPACING;
-        int DREADSUBHIGHT = 76;
-        int LINEHEIGHT = 18;
-        int DREADTEXHIGHT = DREADSUBHIGHT + 3 * LINEHEIGHT + 2 * SPACING;
-        Font bigFont = Storage.getFont16();
-        Font smallFont = Storage.getFont12();
-        int PAGEWIDTH = 2400;
-        int PAGEHIGHT = 3600;
-        int PERROW = Math.min(PAGEWIDTH / DREADWIDTH, (int) Math.ceil(Math.sqrt(decals.size())));
+        int perRow = Math.min(StarfieldPage.width() / DREAD_WIDTH, (int) Math.ceil(Math.sqrt(decals.size())));
+        int rows = (decals.size() + perRow - 1) / perRow;
+        StarfieldPage page = new StarfieldPage(perRow * DREAD_WIDTH, rows * CELL_HEIGHT);
+        ImageGrid.Layout layout = new ImageGrid.Layout(page.left(), page.top(), perRow, DREAD_WIDTH, CELL_HEIGHT);
 
-        int left = ThreadLocalRandom.current().nextInt(PAGEWIDTH - PERROW * DREADWIDTH);
-        int top = ThreadLocalRandom.current()
-                .nextInt(PAGEHIGHT - ((decals.size() + PERROW - 1) / PERROW) * DREADTEXHIGHT);
-        int right = left + PERROW * DREADWIDTH;
-        int bottom = top + ((decals.size() + PERROW - 1) / PERROW) * DREADTEXHIGHT;
-        int x = left;
-        int y = top;
-        int n = 0;
+        drawDecals(page.graphics(), layout, decals, colorID);
 
-        BufferedImage coloursImage = new BufferedImage(PAGEWIDTH, PAGEHIGHT, BufferedImage.TYPE_INT_ARGB);
-        BufferedImage backgroundImage = ImageHelper.read(ResourceHelper.getExtraFile("starfield.png"));
-        Graphics2D graphic = coloursImage.createGraphics();
-        graphic.drawImage(backgroundImage, 0, 0, null);
-        BasicStroke stroke = new BasicStroke(3.0f);
-
-        UnitKey base = Units.getUnitKey(UnitType.Dreadnought, colorID);
-        BufferedImage noDecal = ImageHelper.read(ResourceHelper.getInstance().getUnitFile(base));
-        for (String d : decals) {
-            String decalName = String.format("%s_%s%s", d, "dn", DrawingUtil.getBlackWhiteFileSuffix(colorID));
-            BufferedImage decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decalName));
-            graphic.drawImage(noDecal, x + SPACING, y + SPACING, null);
-            graphic.drawImage(decal, x + SPACING, y + SPACING, null);
-
-            String label = Mapper.getDecalName(d);
-            int mid = -1;
-            int i = label.indexOf(' ');
-            while (i >= 0) {
-                if (Math.abs(label.length() / 2.0 - 0.5 - mid) + (n % 2)
-                        > Math.abs(label.length() / 2.0
-                                - 0.5
-                                - i)) { // the (n%2) means that tie breaks will alternate each decal, hopefully reducing
-                    // collisions
-                    mid = i;
-                }
-                i = label.indexOf(' ', i + 1);
-            }
-
-            graphic.setFont(bigFont);
-            String row1 = (mid == -1 ? label : label.substring(0, mid));
-            String row2 = (mid == -1 ? "" : label.substring(mid + 1));
-            int drawX = x + DREADWIDTH / 2;
-            int drawY = y + DREADSUBHIGHT + SPACING;
-            DrawingUtil.superDrawString(
-                    graphic,
-                    row1,
-                    drawX,
-                    drawY,
-                    Color.WHITE,
-                    MapGenerator.HorizontalAlign.Center,
-                    MapGenerator.VerticalAlign.Top,
-                    stroke,
-                    Color.BLACK);
-            DrawingUtil.superDrawString(
-                    graphic,
-                    row2,
-                    drawX,
-                    drawY + LINEHEIGHT,
-                    Color.WHITE,
-                    MapGenerator.HorizontalAlign.Center,
-                    MapGenerator.VerticalAlign.Top,
-                    stroke,
-                    Color.BLACK);
-            graphic.setFont(smallFont);
-            DrawingUtil.superDrawString(
-                    graphic,
-                    d,
-                    drawX,
-                    drawY + 2 * LINEHEIGHT,
-                    Color.WHITE,
-                    MapGenerator.HorizontalAlign.Center,
-                    MapGenerator.VerticalAlign.Top,
-                    stroke,
-                    Color.BLACK);
-
-            n += 1;
-            if (n >= PERROW) {
-                n = 0;
-                x = left;
-                y += DREADTEXHIGHT;
-            } else {
-                x += DREADWIDTH;
-            }
-        }
-        coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
-        FileUpload fileUpload = FileUploadService.createFileUpload(coloursImage, "decal_sample_" + top + "_" + left);
+        BufferedImage decalsImage = page.crop(layout.left() + perRow * DREAD_WIDTH, layout.top() + rows * CELL_HEIGHT);
+        FileUpload fileUpload =
+                ImageUploads.createFileUpload(decalsImage, "decal_sample_" + page.top() + "_" + page.left());
         MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
+    }
+
+    private static void drawDecals(Graphics2D graphic, ImageGrid.Layout layout, List<String> decals, String colorID) {
+        ImageGrid.LabelStyle labels = new ImageGrid.LabelStyle(
+                Fonts.ti(16),
+                Fonts.ti(12),
+                new BasicStroke(3.0f),
+                DREAD_WIDTH,
+                DREAD_IMAGE_HEIGHT + SPACING,
+                LINE_HEIGHT);
+        UnitKey base = Units.getUnitKey(UnitType.Dreadnought, colorID);
+        BufferedImage noDecal = ImageHelper.read(ImageResources.unit(base));
+        String decalSuffix = Mapper.getColor(colorID).blackWhiteFileSuffix();
+        int index = 0;
+        for (String decalId : decals) {
+            Point cell = layout.origin(index);
+            BufferedImage decal = ImageHelper.read(ImageResources.decal(decalId + "_dn" + decalSuffix));
+            graphic.drawImage(noDecal, cell.x + SPACING, cell.y + SPACING, null);
+            graphic.drawImage(decal, cell.x + SPACING, cell.y + SPACING, null);
+            List<String> titles = splitInTwoRows(Mapper.getDecalName(decalId), (index % layout.columns()) % 2);
+            ImageGrid.drawLabels(graphic, labels, cell.x, cell.y, titles, List.of(decalId));
+            index++;
+        }
+    }
+
+    private static List<String> splitInTwoRows(String label, int tieBreak) {
+        int mid = -1;
+        int space = label.indexOf(' ');
+        while (space >= 0) {
+            if (Math.abs(label.length() / 2.0 - 0.5 - mid) + tieBreak > Math.abs(label.length() / 2.0 - 0.5 - space)) {
+                mid = space;
+            }
+            space = label.indexOf(' ', space + 1);
+        }
+        return mid == -1 ? List.of(label, "") : List.of(label.substring(0, mid), label.substring(mid + 1));
     }
 }

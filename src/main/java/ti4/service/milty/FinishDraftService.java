@@ -15,11 +15,11 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.MapTemplateHelper;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
 import ti4.service.map.AddTileListService;
@@ -41,10 +41,11 @@ class FinishDraftService {
         return null;
     }
 
-    public void finishDraft(GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game) {
+    public boolean finishDraft(GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game) {
         MessageChannel mainGameChannel = game.getMainGameChannel();
+        boolean mapChanged = false;
         try {
-            MiltyDraftHelper.buildPartialMap(game, event);
+            mapChanged = MiltyDraftHelper.buildPartialMap(game);
             boolean keleresExists = false;
             for (String playerId : manager.getPlayers()) {
                 Player player = game.getPlayer(playerId);
@@ -117,5 +118,6 @@ class FinishDraftService {
             MessageHelper.sendMessageToChannel(mainGameChannel, error.toString());
             BotLogger.error(new LogOrigin(event, game), e.getMessage(), e);
         }
+        return mapChanged;
     }
 }

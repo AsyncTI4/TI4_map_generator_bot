@@ -1,0 +1,45 @@
+{
+  "name": "30k-ac-fog-public-reprimand",
+  "description": "Fog: Letnev plays Public Reprimand on Nekro, who loses its trade goods; no faction is named in the main channel.",
+  "preset": "30k-fog-4p",
+  "stopOnFail": true,
+  "steps": [
+    {
+      "do": "hand",
+      "as": "letnev",
+      "hand": {
+        "acs": [
+          "publicreprimand30k"
+        ]
+      }
+    },
+    {
+      "as": "letnev",
+      "press": "ac_play_from_hand_{ac:publicreprimand30k}",
+      "in": "letnev:cards-info"
+    },
+    {
+      "as": "letnev",
+      "press": "thkAcReprimand_{nekro.color}",
+      "in": "letnev"
+    },
+    {
+      "as": "nekro",
+      "press": "thkAcReprimandLose_{letnev.color}",
+      "in": "nekro"
+    },
+    {
+      "expect": {
+        "state": "nekro.tg",
+        "equals": "0"
+      }
+    },
+    {
+      "expect": {
+        "in": "main",
+        "noFactionLeak": true,
+        "since": "start"
+      }
+    }
+  ]
+}

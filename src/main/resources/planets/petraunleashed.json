@@ -9,8 +9,8 @@
         "x": 170.0,
         "y": 128.0
     },
-    "resources": 3,
-    "influence": 3,
+    "resources": 5,
+    "influence": 5,
     "factionHomeworld": "stoneborn",
     "planetType": "FACTION",
     "cardImagePath": null,

@@ -11,10 +11,6 @@ public record AgentOutcome(List<Message> messages) {
         messages = List.copyOf(messages);
     }
 
-    public static AgentOutcome none() {
-        return new AgentOutcome(List.of());
-    }
-
     public static AgentOutcome of(Message... messages) {
         return new AgentOutcome(List.of(messages));
     }

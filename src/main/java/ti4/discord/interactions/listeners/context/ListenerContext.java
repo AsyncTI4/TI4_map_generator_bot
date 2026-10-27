@@ -14,7 +14,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaAbilityHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.game.Game;
@@ -26,6 +26,7 @@ import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
+import ti4.service.testbed.TestBedService;
 import ti4.settings.users.UserSettingsManager;
 
 @Getter
@@ -82,7 +83,11 @@ public abstract class ListenerContext {
 
         if (game != null) {
             String userID = event.getUser().getId();
-            player = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
+            Player clickerPlayer = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
+            player = TestBedService.resolveActingPlayerForComponent(game, event, clickerPlayer);
+            if (player != null && player != clickerPlayer && !TestBedService.isPanelComponent(compID)) {
+                TestBedService.logActingAs(game, event.getUser().getName(), player, getContextType() + " " + compID);
+            }
 
             if (player == null && !allowsNonPlayerInteraction()) {
                 String message = event.getUser().getAsMention() + " is not a player of the game";
@@ -193,6 +198,7 @@ public abstract class ListenerContext {
     }
 
     public void save() {
+        if (!shouldSave) return;
         if (game != null) {
             GameManager.save(game, EventAuditService.getReason(getEvent()));
         }

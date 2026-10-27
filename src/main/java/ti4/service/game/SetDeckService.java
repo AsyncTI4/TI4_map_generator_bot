@@ -1,6 +1,7 @@
 package ti4.service.game;
 
 import java.util.ArrayList;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -8,8 +9,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.model.DeckModel;
+import ti4.model.Mapper;
 
 @UtilityClass
 public class SetDeckService {
@@ -32,10 +33,34 @@ public class SetDeckService {
                 }
                 yield game.validateAndSetActionCardDeck(event, deckModel);
             }
-            case Constants.SO_DECK -> game.validateAndSetSecretObjectiveDeck(event, deckModel);
-            case Constants.RELIC_DECK -> game.validateAndSetRelicDeck(deckModel);
-            case Constants.AGENDA_DECK -> game.validateAndSetAgendaDeck(event, deckModel);
-            case Constants.EVENT_DECK -> game.validateAndSetEventDeck(event, deckModel);
+            case Constants.SO_DECK -> {
+                if (resetDeck) {
+                    game.resetSecretObjectiveDeck(deckModel);
+                    yield true;
+                }
+                yield game.validateAndSetSecretObjectiveDeck(event, deckModel);
+            }
+            case Constants.RELIC_DECK -> {
+                if (resetDeck) {
+                    game.resetRelicDeck(deckModel);
+                    yield true;
+                }
+                yield game.validateAndSetRelicDeck(deckModel);
+            }
+            case Constants.AGENDA_DECK -> {
+                if (resetDeck) {
+                    game.resetAgendaDeck(deckModel);
+                    yield true;
+                }
+                yield game.validateAndSetAgendaDeck(event, deckModel);
+            }
+            case Constants.EVENT_DECK -> {
+                if (resetDeck) {
+                    game.resetEventDeck(deckModel);
+                    yield true;
+                }
+                yield game.validateAndSetEventDeck(event, deckModel);
+            }
             case Constants.STAGE_1_PUBLIC_DECK -> {
                 game.setPublicObjectives1(new ArrayList<>(deckModel.getNewShuffledDeck()));
                 game.setStage1PublicDeckID(deckModel.getAlias());
@@ -53,6 +78,10 @@ public class SetDeckService {
                 yield true;
             }
             case Constants.EXPLORATION_DECKS -> {
+                if (resetDeck) {
+                    game.resetExplorationDeck(deckModel);
+                    yield true;
+                }
                 game.setExploreDeck(new ArrayList<>(deckModel.getNewShuffledDeck()));
                 game.setExplorationDeckID(deckModel.getAlias());
                 yield true;
@@ -87,16 +116,17 @@ public class SetDeckService {
             game.getPublicObjectives1Peeked().clear();
             game.getPublicObjectives1Peekable().clear();
             game.setUpPeekableObjectives(5, 1);
-            game.getRevealedPublicObjectives()
-                    .keySet()
-                    .removeIf(Mapper.getPublicObjectivesStage1().keySet()::contains);
+            removeRevealedObjectivesOf(game, Mapper.getPublicObjectivesStage1().keySet());
         } else {
             game.getPublicObjectives2Peeked().clear();
             game.getPublicObjectives2Peekable().clear();
             game.setUpPeekableObjectives(5, 2);
-            game.getRevealedPublicObjectives()
-                    .keySet()
-                    .removeIf(Mapper.getPublicObjectivesStage2().keySet()::contains);
+            removeRevealedObjectivesOf(game, Mapper.getPublicObjectivesStage2().keySet());
         }
+    }
+
+    private static void removeRevealedObjectivesOf(Game game, Set<String> stageObjectiveIds) {
+        new ArrayList<>(game.getRevealedPublicObjectives().keySet())
+                .stream().filter(stageObjectiveIds::contains).forEach(game::removeRevealedObjective);
     }
 }

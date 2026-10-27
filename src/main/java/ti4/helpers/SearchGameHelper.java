@@ -9,18 +9,24 @@ import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.callbacks.IDeferrableCallback;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
-import ti4.image.Mapper;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.game.ManagedGameService;
+import ti4.service.game.TeamSeatService;
+import ti4.service.game.TeamSeatService.FogSeat;
 
 @UtilityClass
 public class SearchGameHelper {
@@ -62,39 +68,42 @@ public class SearchGameHelper {
             boolean ignoreAborted,
             boolean wantNum,
             User user2) {
+        return searchGames(
+                user,
+                event,
+                onlyMyTurn,
+                includeEndedGames,
+                showAverageTurnTime,
+                showSecondaries,
+                showGameModes,
+                ignoreSpectate,
+                ignoreAborted,
+                wantNum,
+                user2,
+                false);
+    }
+
+    public static int searchGames(
+            User user,
+            GenericInteractionCreateEvent event,
+            boolean onlyMyTurn,
+            boolean includeEndedGames,
+            boolean showAverageTurnTime,
+            boolean showSecondaries,
+            boolean showGameModes,
+            boolean ignoreSpectate,
+            boolean ignoreAborted,
+            boolean wantNum,
+            User user2,
+            boolean ephemeral) {
         String userID = user.getId();
 
-        Predicate<ManagedGame> ignoreSpectateFilter = ignoreSpectate
-                ? game -> game.getRealPlayers().stream()
-                        .anyMatch(player -> player.getId().equals(user.getId()))
-                : game -> game.getPlayers().stream()
-                        .anyMatch(player -> player.getId().equals(user.getId()));
-
+        Predicate<ManagedGame> allFilterPredicates =
+                gameFilter(userID, onlyMyTurn, includeEndedGames, ignoreSpectate, ignoreAborted, false);
         if (user2 != null) {
-            Predicate<ManagedGame> ignoreSpectateFilter2 = ignoreSpectate
-                    ? game -> game.getRealPlayers().stream()
-                            .anyMatch(player -> player.getId().equals(user2.getId()))
-                    : game -> game.getPlayers().stream()
-                            .anyMatch(player -> player.getId().equals(user2.getId()));
-            ignoreSpectateFilter = ignoreSpectateFilter.and(ignoreSpectateFilter2);
+            allFilterPredicates = allFilterPredicates.and(participationFilter(user2.getId(), ignoreSpectate));
         }
-        Predicate<ManagedGame> onlyMyTurnFilter =
-                onlyMyTurn ? game -> Objects.equals(game.getActivePlayerId(), user.getId()) : game -> true;
-        Predicate<ManagedGame> endedGamesFilter =
-                includeEndedGames ? game -> true : game -> !game.isHasEnded() && !game.isFowMode();
-        Predicate<ManagedGame> onlyEndedFoWGames = game -> !game.isFowMode() || game.isHasEnded();
-        Predicate<ManagedGame> ignoreAbortedFilter =
-                ignoreAborted ? game -> !game.isHasEnded() || game.isHasWinner() : game -> true;
-        Predicate<ManagedGame> allFilterPredicates = ignoreSpectateFilter
-                .and(onlyMyTurnFilter)
-                .and(endedGamesFilter)
-                .and(onlyEndedFoWGames)
-                .and(ignoreAbortedFilter);
-
-        var filteredManagedGames = GameManager.getManagedGames().stream()
-                .filter(allFilterPredicates)
-                .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
-                .toList();
+        var filteredManagedGames = filterAndSort(allFilterPredicates);
 
         int index = 1;
         if (wantNum) {
@@ -109,13 +118,64 @@ public class SearchGameHelper {
             sb.append('\n');
             index++;
         }
+        String fogGameList = user2 == null
+                ? fogGameList(user, event, onlyMyTurn, showAverageTurnTime, showSecondaries, showGameModes)
+                : "";
+        if (ephemeral) {
+            sendEphemeral(event, sb + fogGameList);
+            return filteredManagedGames.size();
+        }
         if (event instanceof SlashCommandInteractionEvent slash) {
             MessageHelper.sendMessageToThread(slash.getChannel(), user.getName() + "'s Game List", sb.toString());
         }
         if (event instanceof ButtonInteractionEvent butt) {
             MessageHelper.sendMessageToThread(butt.getChannel(), user.getName() + "'s Game List", sb.toString());
         }
+        if (!fogGameList.isEmpty()) {
+            sendEphemeral(event, fogGameList);
+        } else if (event instanceof SlashCommandInteractionEvent slash) {
+            slash.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
+        }
         return filteredManagedGames.size();
+    }
+
+    private static String fogGameList(
+            User user,
+            GenericInteractionCreateEvent event,
+            boolean onlyMyTurn,
+            boolean showAverageTurnTime,
+            boolean showSecondaries,
+            boolean showGameModes) {
+        List<FogSeat> seats = TeamSeatService.findSharedActiveFogSeats(
+                        user.getId(), event.getUser().getId())
+                .stream()
+                .filter(seat -> !onlyMyTurn
+                        || seat.seat().getUserID().equals(seat.game().getActivePlayerID()))
+                .toList();
+        if (seats.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder("\n**__Fog games (only visible to you)__**\n");
+        int index = 1;
+        for (FogSeat seat : seats) {
+            TextChannel privateChannel = seat.seat().getPrivateChannel();
+            String channelLink = privateChannel == null ? "" : privateChannel.getAsMention();
+            sb.append('`').append(Helper.leftpad("" + index, 2)).append(".`");
+            sb.append(getPlayerMapListRepresentation(
+                    seat.game(), seat.seat(), channelLink, showAverageTurnTime, showSecondaries, showGameModes));
+            sb.append('\n');
+            index++;
+        }
+        return sb.toString();
+    }
+
+    private static void sendEphemeral(GenericInteractionCreateEvent event, String text) {
+        if (!(event instanceof IDeferrableCallback callback)) {
+            return;
+        }
+        for (String chunk : MessageHelper.splitLargeText(text, 2000)) {
+            callback.getHook().sendMessage(chunk).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
+        }
     }
 
     public static void msgGames(
@@ -127,28 +187,8 @@ public class SearchGameHelper {
             boolean pingGame,
             String msg) {
 
-        Predicate<ManagedGame> ignoreSpectateFilter = ignoreSpectate
-                ? game -> game.getRealPlayers().stream()
-                        .anyMatch(player -> player.getId().equals(user.getId()))
-                : game -> game.getPlayers().stream()
-                        .anyMatch(player -> player.getId().equals(user.getId()));
-        Predicate<ManagedGame> onlyMyTurnFilter =
-                onlyMyTurn ? game -> Objects.equals(game.getActivePlayerId(), user.getId()) : game -> true;
-        Predicate<ManagedGame> endedGamesFilter =
-                includeEndedGames ? game -> true : game -> !game.isHasEnded() && !game.isFowMode();
-        Predicate<ManagedGame> onlyEndedFoWGames = game -> !game.isFowMode() || game.isHasEnded();
-        Predicate<ManagedGame> ignoreAbortedFilter =
-                ignoreAborted ? game -> !game.isHasEnded() || game.isHasWinner() : game -> true;
-        Predicate<ManagedGame> allFilterPredicates = ignoreSpectateFilter
-                .and(onlyMyTurnFilter)
-                .and(endedGamesFilter)
-                .and(onlyEndedFoWGames)
-                .and(ignoreAbortedFilter);
-
-        var filteredManagedGames = GameManager.getManagedGames().stream()
-                .filter(allFilterPredicates)
-                .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
-                .toList();
+        var filteredManagedGames = filterAndSort(
+                gameFilter(user.getId(), onlyMyTurn, includeEndedGames, ignoreSpectate, ignoreAborted, false));
 
         for (var managedGame : filteredManagedGames) {
             if (managedGame.getTableTalkChannel() != null) {
@@ -169,12 +209,65 @@ public class SearchGameHelper {
         }
     }
 
+    public static List<ManagedGame> findGamesIncludingActiveFog(
+            String userId, boolean includeEndedGames, boolean ignoreAborted) {
+        return filterAndSort(gameFilter(userId, false, includeEndedGames, false, ignoreAborted, true));
+    }
+
+    private static List<ManagedGame> filterAndSort(Predicate<ManagedGame> filter) {
+        return GameManager.getManagedGames().stream()
+                .filter(filter)
+                .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
+                .toList();
+    }
+
+    static Predicate<ManagedGame> gameFilter(
+            String userId,
+            boolean onlyMyTurn,
+            boolean includeEndedGames,
+            boolean ignoreSpectate,
+            boolean ignoreAborted,
+            boolean includeActiveFog) {
+        Predicate<ManagedGame> onlyMyTurnFilter = onlyMyTurn
+                ? game -> Objects.equals(game.getActivePlayerId(), game.getSeatUserId(userId))
+                : game -> true;
+        Predicate<ManagedGame> endedGamesFilter = includeEndedGames ? game -> true : game -> !game.isHasEnded();
+        Predicate<ManagedGame> activeFogFilter =
+                includeActiveFog ? game -> true : game -> !game.isFowMode() || game.isHasEnded();
+        Predicate<ManagedGame> ignoreAbortedFilter =
+                ignoreAborted ? game -> !game.isHasEnded() || game.isHasWinner() : game -> true;
+        return participationFilter(userId, ignoreSpectate)
+                .and(onlyMyTurnFilter)
+                .and(endedGamesFilter)
+                .and(activeFogFilter)
+                .and(ignoreAbortedFilter);
+    }
+
+    private static Predicate<ManagedGame> participationFilter(String userId, boolean ignoreSpectate) {
+        return ignoreSpectate
+                ? game -> game.getRealPlayers().stream()
+                        .anyMatch(player -> player.getId().equals(game.getSeatUserId(userId)))
+                : game -> game.getPlayers().stream()
+                        .anyMatch(player -> player.getId().equals(game.getSeatUserId(userId)));
+    }
+
     private static String getPlayerMapListRepresentation(
             Game game, String userID, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes) {
-        Player player = game.getPlayer(userID);
+        Player player = TeamSeatService.seatOf(game, userID);
         if (player == null) return "";
         String gameChannelLink =
                 game.getActionsChannel() == null ? "" : game.getActionsChannel().getAsMention();
+        return getPlayerMapListRepresentation(
+                game, player, gameChannelLink, showAverageTurnTime, showSecondaries, showGameModes);
+    }
+
+    private static String getPlayerMapListRepresentation(
+            Game game,
+            Player player,
+            String gameChannelLink,
+            boolean showAverageTurnTime,
+            boolean showSecondaries,
+            boolean showGameModes) {
         StringBuilder sb = new StringBuilder();
         if (Mapper.isValidFaction(player.getFaction())) sb.append(player.getFactionEmoji());
         if (player.getColor() != null && !"null".equals(player.getColor()))
@@ -190,8 +283,9 @@ public class SearchGameHelper {
                 if (winner.getUserID().equals(player.getUserID())) sb.append(" **👑WINNER👑**");
             }
         }
-        if (game.getActivePlayerID() != null && game.getActivePlayerID().equals(userID) && !game.isHasEnded())
-            sb.append(" - __It is your turn__");
+        if (game.getActivePlayerID() != null
+                && game.getActivePlayerID().equals(player.getUserID())
+                && !game.isHasEnded()) sb.append(" - __It is your turn__");
         if (showSecondaries && !game.isHasEnded()) {
             List<String> secondaries = new ArrayList<>();
             for (int sc : game.getPlayedSCs()) {

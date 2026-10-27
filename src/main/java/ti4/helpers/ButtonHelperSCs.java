@@ -22,9 +22,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Ka
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
@@ -38,13 +38,15 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.helpers.thirtyk.ThirtyKRelicHooks;
+import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -250,9 +252,14 @@ public final class ButtonHelperSCs {
         }
 
         List<Button> buttons = Helper.getPlanetRefreshButtons(player, game);
-        Button doneRefreshing = Buttons.red("deleteButtons_diplomacy", "Done Readying Planets"); // spitItOut
+        Button doneRefreshing = Buttons.red(
+                player.factionButtonChecker() + "deleteButtons_diplomacy", "Done Readying Planets"); // spitItOut
         buttons.add(doneRefreshing);
-        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
+        } else {
+            ButtonHelper.sendMessageToRightStratThread(player, game, message, "diplomacy", buttons);
+        }
         if (player.hasAbility("peace_accords") && !game.isTwilightsFallMode()) {
             List<Button> buttons2 = ButtonHelperAbilities.getXxchaPeaceAccordsButtons(
                     game, player, event, player.factionButtonChecker());
@@ -368,7 +375,9 @@ public final class ButtonHelperSCs {
         boolean used = addUsedSCPlayer(event.getMessageId() + "score_imperial", game, player);
         if (used) return;
         ButtonHelperFactionSpecific.keleresIIHQCCGainCheck(player, game);
+        int pointsBefore = player.getTotalVictoryPoints();
         ScorePublicObjectiveService.scorePO(event, game, player, 0);
+        if (player.getTotalVictoryPoints() > pointsBefore) ThirtyKSecretHooks.onImperialPointScored(game, player);
     }
 
     @ButtonHandler("sc_trade_follow")
@@ -397,15 +406,17 @@ public final class ButtonHelperSCs {
         }
         OnyxxaAbilityHandler.checkSilentAccord(game, player, event, scNum);
 
+        boolean firstFollow = !player.getFollowedSCs().contains(scNum);
         if (player.getStrategicCC() > 0) {
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Trade**");
         }
         String message = deductCC(game, player, scNum);
-        if (!player.getFollowedSCs().contains(scNum)) {
+        if (firstFollow) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
         }
         player.addFollowedSC(scNum, event);
         ButtonHelperStats.replenishComms(event, game, player, true);
+        resolveBrTradeFollowBenefits(game, player, scModel, firstFollow);
 
         ReactionService.addReaction(event, game, player, message);
         ReactionService.addReaction(event, game, player, " has replenished commodities.");
@@ -502,12 +513,10 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("sc_refresh")
     public static void refresh(Game game, Player player, ButtonInteractionEvent event) {
-        boolean used = addUsedSCPlayer(event.getMessageId(), game, player);
-        if (used) {
-            return;
-        }
-        int initComm = player.getCommodities();
-        player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
+        resolveRefresh(game, player, event);
+    }
+
+    private static boolean resolveRefresh(Game game, Player player, ButtonInteractionEvent event) {
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
             StrategyCardModel model =
@@ -527,29 +536,45 @@ public final class ButtonHelperSCs {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "Unable to locate the **Trade** strategy card. Commodity washing was not processed.");
-            return;
+            return false;
         }
+        if (!payForBrTradeFollow(game, player, event, scModel)) {
+            return false;
+        }
+        boolean used = addUsedSCPlayer(event.getMessageId(), game, player);
+        if (used) {
+            return false;
+        }
+        int initComm = player.getCommodities();
+        player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
         int tradeInitiative = scModel.getInitiative();
-        if (!player.getFollowedSCs().contains(tradeInitiative)) {
+        boolean firstFollow = !player.getFollowedSCs().contains(tradeInitiative);
+        if (firstFollow) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, tradeInitiative, game, event);
         }
         player.addFollowedSC(tradeInitiative, event);
+        resolveBrTradeFollowBenefits(game, player, scModel, firstFollow);
         ReactionService.addReaction(event, game, player, "has replenished commodities.");
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
         ButtonHelperStats.afterGainCommsChecks(game, player, player.getCommodities() - initComm);
         ButtonHelperStats.offerBountyBrokerageAfterReplenish(game, player);
+        return true;
     }
 
     @ButtonHandler("sc_refresh_and_wash")
     public static void refreshAndWash(Game game, Player player, ButtonInteractionEvent event) {
+        resolveRefreshAndWash(game, player, event);
+    }
+
+    private static boolean resolveRefreshAndWash(Game game, Player player, ButtonInteractionEvent event) {
         String messageID = event.getMessageId();
         if (player.hasAbility("military_industrial_complex")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
                             + " since you cannot send players commodities due to your faction ability, washing here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
-            return;
+            return false;
         }
 
         if (player.getSCs().contains(5) && !game.isHomebrewSCMode()) {
@@ -557,7 +582,7 @@ public final class ButtonHelperSCs {
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
                             + " since you have the **Trade** strategy card, and the primary is done automatically when you play **Trade**, washing here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong.");
-            return;
+            return false;
         }
 
         if (!game.isTwilightsFallMode() && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
@@ -566,12 +591,36 @@ public final class ButtonHelperSCs {
                     player.getRepresentationUnfogged()
                             + " since you do not currently hold your _Trade Agreement_, washing here seems likely an error and will mess with the _Trade Agreement_ resolution."
                             + " Nothing has been processed as a result. Try a different route of washing your commodities if this correction is wrong.");
-            return;
+            return false;
         }
 
+        StrategyCardModel scModel = null;
+        for (int scNum : player.getUnfollowedSCs()) {
+            StrategyCardModel model =
+                    game.getStrategyCardModelByInitiative(scNum).orElse(null);
+            if (model != null && model.usesAutomationForSCID("pok5trade")) {
+                scModel = model;
+                break;
+            }
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("trade").orElse(null);
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("amicus").orElse(null);
+        }
+        if (scModel == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Unable to locate the **Trade** strategy card. Commodity washing was not processed.");
+            return false;
+        }
+        if (!payForBrTradeFollow(game, player, event, scModel)) {
+            return false;
+        }
         boolean used = addUsedSCPlayer(messageID, game, player);
         if (used) {
-            return;
+            return false;
         }
         int commoditiesTotal = player.getCommoditiesTotal();
         int washedCommsPower = commoditiesTotal + player.getTg();
@@ -581,30 +630,9 @@ public final class ButtonHelperSCs {
         if (!game.isAgeOfCommerceMode()) {
             player.setCommodities(0);
         }
-
-        StrategyCardModel scModel = null;
-        for (int scNum : player.getUnfollowedSCs()) {
-            StrategyCardModel model =
-                    game.getStrategyCardModelByInitiative(scNum).orElse(null);
-            if (model != null && model.usesAutomationForSCID("pok5trade")) {
-                scModel = model;
-                break;
-            }
-        }
-        if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("trade").orElse(null);
-        }
-        if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("amicus").orElse(null);
-        }
-        if (scModel == null) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    "Unable to locate the **Trade** strategy card. Commodity washing was not processed.");
-            return;
-        }
         int tradeInitiative = scModel.getInitiative();
-        if (!player.getFollowedSCs().contains(tradeInitiative)) {
+        boolean firstFollow = !player.getFollowedSCs().contains(tradeInitiative);
+        if (firstFollow) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, tradeInitiative, game, event);
         }
         player.addFollowedSC(tradeInitiative, event);
@@ -664,6 +692,52 @@ public final class ButtonHelperSCs {
         if (commoditiesTotal > 0) {
             ButtonHelperStats.offerBountyBrokerageAfterTradeWash(game, player);
         }
+        resolveBrTradeFollowBenefits(game, player, scModel, firstFollow);
+        return true;
+    }
+
+    private static boolean payForBrTradeFollow(
+            Game game, Player player, ButtonInteractionEvent event, StrategyCardModel scModel) {
+        int tradeInitiative = scModel.getInitiative();
+        if (!"br5trade".equals(scModel.getId()) || player.getFollowedSCs().contains(tradeInitiative)) {
+            return true;
+        }
+
+        if (player.getStrategicCC() > 0) {
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Trade**");
+        }
+
+        String message = deductCC(game, player, tradeInitiative);
+        ReactionService.addReaction(event, game, player, message);
+        return !message.contains("**can't follow.**");
+    }
+
+    private static void resolveBrTradeFollowBenefits(
+            Game game, Player player, StrategyCardModel scModel, boolean firstFollow) {
+        if (!firstFollow || !"br5trade".equals(scModel.getId())) {
+            return;
+        }
+        Player tradeOwner = game.getPlayerFromSC(scModel.getInitiative());
+        if (tradeOwner == null || tradeOwner == player) {
+            return;
+        }
+        String tradeGoodChange = player.gainTG(2, true);
+        ButtonHelperAgents.resolveArtunoCheck(player, 2);
+        ButtonHelperAbilities.pillageCheck(player, game);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " gained 2 trade goods " + tradeGoodChange
+                        + " from the Trade secondary.");
+
+        int oldCommodities = tradeOwner.getCommodities();
+        tradeOwner.gainCommodities(1);
+        int commoditiesGained = tradeOwner.getCommodities() - oldCommodities;
+        ButtonHelperStats.afterGainCommsChecks(game, tradeOwner, commoditiesGained);
+        MessageHelper.sendMessageToChannel(
+                tradeOwner.getCorrectChannel(),
+                tradeOwner.getRepresentationNoPing() + " gained " + commoditiesGained + " "
+                        + (commoditiesGained == 1 ? "commodity" : "commodities") + " due to "
+                        + player.getRepresentationNoPing() + " following the Trade secondary.");
     }
 
     @ButtonHandler("anarchy7Build_")
@@ -1515,6 +1589,7 @@ public final class ButtonHelperSCs {
         message = player.getRepresentationUnfogged() + ", your current command tokens are "
                 + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+        ThirtyKRelicHooks.onLeadershipGain(game, player);
         Button getTactic = Buttons.green(player.factionButtonChecker() + "increase_tactic_cc", "Gain 1 Tactic Token");
         Button getFleet = Buttons.green(player.factionButtonChecker() + "increase_fleet_cc", "Gain 1 Fleet Token");
         Button getStrat =
@@ -1788,6 +1863,10 @@ public final class ButtonHelperSCs {
 
         if (player.isElected("tk-endorse")) {
             return msgStart + " You are elected for _Endorse_, so you do not spend a token.";
+        }
+
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "netrunnerscommander") && scNum == 7) {
+            return msgStart + " No command token was spent due to **Tek Mir-un**, the Net-Runners commander.";
         }
 
         int strategicCC = player.getStrategicCC();

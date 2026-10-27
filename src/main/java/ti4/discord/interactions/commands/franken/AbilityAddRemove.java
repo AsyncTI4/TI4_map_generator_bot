@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 
 abstract class AbilityAddRemove extends GameStateSubcommand {
 

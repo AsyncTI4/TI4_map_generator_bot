@@ -117,9 +117,9 @@ class SCPick extends GameStateSubcommand {
 
         // SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
-            MessageHelper.sendMessageToChannel(privatePlayer.getPrivateChannel(), msgExtra);
-            game.updateActivePlayer(privatePlayer);
             if (!allPicked) {
+                MessageHelper.sendMessageToChannel(privatePlayer.getPrivateChannel(), msgExtra);
+                game.updateActivePlayer(privatePlayer);
                 game.setPhaseOfGame("strategy");
                 MessageHelper.sendMessageToChannelWithButtons(
                         privatePlayer.getPrivateChannel(),

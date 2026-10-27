@@ -1,0 +1,32 @@
+{
+    "id": "cadris",
+    "tileId": "th25",
+    "name": "Cadris",
+    "aliases": [
+        "cadris"
+    ],
+    "resources": 3,
+    "influence": 1,
+    "planetTypes": [
+        "HAZARDOUS",
+        "INDUSTRIAL"
+    ],
+    "techSpecialties": [
+        "PROPULSION",
+        "BIOTIC"
+    ],
+    "planetLayout": {
+        "unitHolderName": "cadris",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 171,
+            "y": 153
+        },
+        "planetRadius": 65
+    },
+    "positionInTile": {
+        "x": 171,
+        "y": 153
+    },
+    "source": "theodisi"
+}

@@ -16,11 +16,12 @@ import ti4.helpers.CryypterHelper;
 import ti4.helpers.omega_phase.OmegaPhaseModStatusHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TI4Emoji;
+import ti4.service.objectives.OPlusPlusCouncilService;
 
 @UtilityClass
 public class HomebrewService {
@@ -36,6 +37,7 @@ public class HomebrewService {
                 "US Explores/Relics/ACs",
                 "Uncharted Space Explores, Relics and Action Cards",
                 SourceEmojis.UnchartedSpace),
+        HBLOSTLEGACIESTILES("Lost Legacies Tiles", "Adds Lost Legacies tiles", SourceEmojis.Theodisi),
         HBACDECK2("AC2 Deck", "Action Cards Deck 2", SourceEmojis.ActionDeck2),
         HBREDTAPE("Red Tape", "Red Tape mode", null),
         HBIGNISAURORA("Ignis Aurora", "Ignis Aurora decks for SC/agendas/techs/events/relics", null),
@@ -46,7 +48,8 @@ public class HomebrewService {
         HBREMOVESFTT("No Supports", "Remove Support for the Thrones", null),
         HBHBSC("Homebrew SCs", "Indicate game uses homebrew Strategy Cards", CardEmojis.SCBackBlank),
         HBOMEGAPHASE("Omega Phase", "Enable Omega Phase homebrew mode", null),
-        HBVOTC("Voices of the Council", "Voices of the Council mode", null);
+        HBVOTC("Voices of the Council", "Voices of the Council mode", null),
+        HBOPLUSPLUS("O++", "O++ objective pool, either drafted normally or via deal/purge/pool", null);
 
         public final String name;
         public final String description;
@@ -98,10 +101,13 @@ public class HomebrewService {
         game.setDiscordantStarsMode(false);
         game.setBlueReverieMode(false);
         game.setUnchartedSpaceStuff(false);
+        game.setLostLegaciesTiles(false);
         game.setAbsolMode(false);
         game.setOmegaPhaseMode(false);
         game.setVotcMode(false);
         game.setMonumentsMode(false);
+        game.setOplusplusRegularMode(false);
+        game.setOplusplusCouncilMode(false);
         game.setStoredValue("homebrewMode", "");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
@@ -203,6 +209,10 @@ public class HomebrewService {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), "Set the explores/action cards/relics to Uncharted Space stuff.");
             }
+            case HBLOSTLEGACIESTILES -> {
+                game.setLostLegaciesTiles(true);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added Lost Legacies tiles.");
+            }
             case HBACDECK2 -> {
                 String acd2 = "action_deck_2";
                 String suffix = game.isThundersEdge() && game.isProphecyOfKings()
@@ -261,6 +271,40 @@ public class HomebrewService {
                 OmegaPhaseModStatusHelper.PrintGreeting(game);
             }
             case HBVOTC -> CryypterHelper.votcSetup(game, event);
+            case HBOPLUSPLUS -> {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green("oplusplusSetup_regular", "Regular O++"));
+                buttons.add(Buttons.green("oplusplusSetup_council", "Objective Council"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(),
+                        "**Regular O++**: a standard game using the O++ objective decks.\n"
+                                + "**Objective Council**: deal each player 5 Stage I, 5 Stage II, and 8 secrets from the O++ pool; each player chooses which of each type they want to be in the game, discarding 3 of each type from their hand (2 if there are 3 players), then everyone's choices are pooled into the decks for the game.",
+                        buttons);
+            }
+        }
+    }
+
+    @ButtonHandler("oplusplusSetup_")
+    public static void setUpOPlusPlus(Game game, ButtonInteractionEvent event, String buttonID) {
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        String choice = buttonID.split("_")[1];
+        if (game.getRevealedPublicObjectives().size() > 1) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "Can't enable O++ after revealing public objectives.");
+            return;
+        }
+        if ("regular".equalsIgnoreCase(choice)) {
+            game.setOplusplusRegularMode(true);
+            game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_oplusplus"));
+            game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_oplusplus"));
+            game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_oplusplus"));
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set the O++ objective decks (Regular O++).");
+        } else if ("council".equalsIgnoreCase(choice)) {
+            game.setOplusplusCouncilMode(true);
+            game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_oplusplus"));
+            game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_oplusplus"));
+            game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_oplusplus"));
+            OPlusPlusCouncilService.start(game, event);
         }
     }
 }

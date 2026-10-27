@@ -9,7 +9,11 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -23,8 +27,8 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitKey;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
@@ -101,6 +105,22 @@ public class ListTechService {
         acquireATech(event, game, player, sc, false, TechnologyType.mainFive, first);
     }
 
+    @ButtonHandler("acquireAUnitUpgrade")
+    public void acquireAUnitUpgrade(ButtonInteractionEvent event, Game game, Player player) {
+        game.setComponentAction(true);
+        List<Button> buttons = unitUpgradeButtons(game, player);
+        String message = buttons.isEmpty()
+                ? player.getRepresentation() + ", there is no unit upgrade technology you can research right now."
+                : player.getRepresentation() + ", please choose which unit upgrade technology you wish to research.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+    }
+
+    public static List<Button> unitUpgradeButtons(Game game, Player player) {
+        List<TechnologyModel> upgrades =
+                getAllTechOfAType(game, TechnologyType.UNITUPGRADE.toString(), player, false, true);
+        return getTechButtons(upgrades, player);
+    }
+
     @ButtonHandler("acquireAUnitTechWithInf")
     public void acquireAUnitTechWithInf(ButtonInteractionEvent event, Game game, Player player) {
         boolean sc = false;
@@ -136,6 +156,10 @@ public class ListTechService {
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
                 }
                 player.addTech(tech);
+                NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
+                NetrunnersTechHandler.resolveDataMining(event, game, player, tech);
+                NetrunnersLeadersHandler.offerZorNoAhnForOwner(event, game, player, tech);
+                NetrunnersUnitHandler.offerNimdaDeploy(game, player);
                 ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 ButtonHelper.deleteMessage(event);
@@ -155,10 +179,6 @@ public class ListTechService {
             boolean dwsBt,
             List<TechnologyType> techTypes,
             boolean first) {
-        if (sc && first && NetrunnersLeadersHandler.shouldChooseCommanderTechnologySecondary(game, player)) {
-            NetrunnersLeadersHandler.offerCommanderTechnologySecondary(game, player);
-            return;
-        }
         game.setComponentAction(!sc);
         String finsFactionCheckerPrefix = player.factionButtonChecker();
         game.setComponentAction(!sc);
@@ -166,7 +186,6 @@ public class ListTechService {
         String techSuffix = dwsBt ? "_dwsbt" : "";
 
         if (sc || dwsBt) {
-            boolean commanderSkipsToken = NetrunnersLeadersHandler.commanderSkipsTechnologySecondaryToken(game, player);
             boolean used = dwsBt || ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
             StrategyCardModel scModel =
                     game.getStrategyCardModelByName("technology").orElse(null);
@@ -176,25 +195,19 @@ public class ListTechService {
                     && !player.getFollowedSCs().contains(scModel.getInitiative())) {
                 int scNum = scModel.getInitiative();
                 player.addFollowedSC(scNum, event);
-                if (!commanderSkipsToken) {
-                    ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
-                    if (player.getStrategicCC() > 0) {
-                        ButtonHelperCommanders.resolveMuaatCommanderCheck(
-                                player, game, event, "followed **Technology**");
-                    }
-                    String message = ButtonHelperSCs.deductCC(game, player, scNum);
-                    ReactionService.addReaction(event, game, player, message);
-                } else {
-                    ReactionService.addReaction(
-                            event,
-                            game,
-                            player,
-                            "used **Tek Mir-un** to follow **Technology** without spending a strategy token.");
+                ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
+                if (player.getStrategicCC() > 0) {
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Technology**");
                 }
+                String message = ButtonHelperSCs.deductCC(game, player, scNum);
+                ReactionService.addReaction(event, game, player, message);
             }
-            game.removeStoredValue("netrunnersCommanderTechnologySecondary" + player.getFaction());
 
             if (first) {
+                if (NetrunnersAbilityHandler.offerProxyNetwork(game, player)) {
+                    return;
+                }
+                NetrunnersPromissoryHandler.sendSharedNetworkAccessReminder(game, player);
                 ButtonHelperCommanders.yinCommanderSummary(player, game);
                 ButtonHelperCommanders.veldyrCommanderSummary(player, game);
                 String getAllButtonSpoof = "getAllTechOfType_allTechResearchable" + techSuffix;
@@ -202,6 +215,11 @@ public class ListTechService {
                 return;
             }
         }
+
+        if (NetrunnersAbilityHandler.offerProxyNetwork(game, player)) {
+            return;
+        }
+        NetrunnersPromissoryHandler.sendSharedNetworkAccessReminder(game, player);
 
         List<Button> buttons = new ArrayList<>();
         for (TechnologyType type : techTypes) {
@@ -219,7 +237,6 @@ public class ListTechService {
                 default -> {}
             }
         }
-
         ButtonHelperCommanders.yinCommanderSummary(player, game);
         ButtonHelperCommanders.veldyrCommanderSummary(player, game);
         String message = player.getRepresentation() + ", what type of technology do you wish to get?";
@@ -245,6 +262,13 @@ public class ListTechService {
             payType = "normal";
         }
 
+        if (NetrunnersAbilityHandler.offerProxyNetwork(game, player)) {
+            if (!techType.contains("allTechResearchable")) {
+                ButtonHelper.deleteMessage(event);
+            }
+            return;
+        }
+
         List<Button> buttons = new ArrayList<>();
         if (techType.contains("allTechResearchable")) {
             for (TechnologyType type : TechnologyType.mainFive) {
@@ -263,7 +287,6 @@ public class ListTechService {
         } else {
             buttons.add(Buttons.gray("acquireATechWithSC_second", "Get Other Technology"));
         }
-
         String message = player.getRepresentation() + ", please choose which technology you wish to get.";
 
         if (!techType.contains("allTechResearchable")) {
@@ -272,10 +295,6 @@ public class ListTechService {
             message +=
                     " The buttons shown correspond to technologies that the bot believes you meet the prerequisites for."
                             + " To get a technology that isn't shown, please use the \"Get Other Technology\" button.";
-        }
-        if (player.hasAbility("doctrine_knowledge")) {
-            message +=
-                    "\n\n**REMINDER**: You have the _Knowledge_ doctrine and therefore may ignore 1 prerequisite on techs owned by your neighbors. This is not automated, and you must use the \"Get Other Technology\" button.";
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
     }
@@ -331,7 +350,8 @@ public class ListTechService {
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "zealotscommander")) {
                         wilds++;
                     } else {
-                        if (synergies.contains(TechnologyType.valueOf(type.toUpperCase()))) {
+                        if (synergies.stream()
+                                .anyMatch(synergy -> synergy.name().equalsIgnoreCase(type))) {
                             requirements = X.matcher(requirements).replaceFirst("");
                             if (player.hasAbility("ancient_knowledge")) {
                                 requirements = X.matcher(requirements).replaceFirst("");

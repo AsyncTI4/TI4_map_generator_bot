@@ -33,6 +33,7 @@ public class MiltySliceDraftableSettings extends SettingsMenu {
     private final IntegerRangeSetting numLegends;
 
     private static final String MENU_ID = "miltySlice";
+    private static final int SCPT_2025_FINALS_SLICE_COUNT = 6;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -90,7 +91,9 @@ public class MiltySliceDraftableSettings extends SettingsMenu {
     public List<Button> specialButtons() {
         String idPrefix = menuAction + "_" + navId() + "_";
         List<Button> ls = new ArrayList<>(super.specialButtons());
-        ls.add(Buttons.gray(idPrefix + "scpt2025finals", "SCPT 2025 Finals", "<:scpt:1289722139750039634>"));
+        if (draftPlayerCount() <= SCPT_2025_FINALS_SLICE_COUNT) {
+            ls.add(Buttons.gray(idPrefix + "scpt2025finals", "SCPT 2025 Finals", "<:scpt:1289722139750039634>"));
+        }
         if (parent instanceof SliceDraftableSettings sds && sds.getPresetSlices() == null) {
             ls.add(Buttons.red(idPrefix + "richPreset", "Rich galaxy", MiscEmojis.tg));
             ls.add(Buttons.red(idPrefix + "poorPreset", "Poor galaxy", MiscEmojis.comm));
@@ -114,7 +117,20 @@ public class MiltySliceDraftableSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
+    private int draftPlayerCount() {
+        if (parent != null && parent.getParent() instanceof DraftSystemSettings draftSystemSettings) {
+            return draftSystemSettings.getPlayerUserIds().size();
+        }
+        return SCPT_2025_FINALS_SLICE_COUNT;
+    }
+
     private String scpt2025finals(GenericInteractionCreateEvent event) {
+        int players = draftPlayerCount();
+        if (players > SCPT_2025_FINALS_SLICE_COUNT) {
+            return "The SCPT 2025 Finals preset only has " + SCPT_2025_FINALS_SLICE_COUNT
+                    + " slices, so it can only be used with " + SCPT_2025_FINALS_SLICE_COUNT
+                    + " or fewer players (this draft has " + players + ").";
+        }
         Game game = null;
         if (getParent() instanceof MiltySettings ms) {
             game = ms.getGame();
@@ -141,7 +157,7 @@ public class MiltySliceDraftableSettings extends SettingsMenu {
             MessageHelper.sendMessageToEventChannel(event, msg);
         }
         if (parent instanceof SliceDraftableSettings sds) {
-            sds.getNumSlices().setVal(6);
+            sds.getNumSlices().setVal(SCPT_2025_FINALS_SLICE_COUNT);
             return sds.setPresetSlices(ttsString);
         }
         return "Unknown Event";

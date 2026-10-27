@@ -31,7 +31,6 @@
         "alias": "superweaponavailyn",
         "name": "Superweapon Availyn",
         "text": "This system is a nebula. At any time, you may exhaust this card to produce up to 3 fighters in a system that contains your ships. PRODUCTION 3",
-        "notes": "You must be participating in the combat to place the fighters.",
         "isFakeRelic": true,
         "source": "blue_reverie"
     },
@@ -47,7 +46,6 @@
         "alias": "superweaponglatison",
         "name": "Superweapon Glatison",
         "text": "At any time, you may exhaust this card to repair all of your damaged units. Other players' units in this system lose SUSTAIN DAMAGE. ANTI-FIGHTER BARRAGE 4(x2).",
-        "notes": "The ANTI-FIGHTER BARRAGE is not automated.",
         "isFakeRelic": true,
         "source": "blue_reverie"
     },
@@ -99,6 +97,13 @@
         "alias": "taraniscrest",
         "name": "Taranis Crest",
         "text": "After you gain control of a planet from another player, you may place 1 infantry from that player's reinforcements into coexistence on that planet.\nApply +1 to the resource and influence values of planets you control that contain coexisting units.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "lightrailordnance_br",
+        "name": "Lightrail Ordnance",
+        "text": "Each of your space docks also has the attributes, unit abilities, and ability text of your PDS units.\n\nAt any time, you may purge this card to research 1 non-faction unit upgrade technology, if able.",
+        "flavourText": "*A single sparkle was the only warning the Yin fleet had before a massive hole had been punched through the hull of the Van Hauge.\nThen, searing light.*",
         "source": "blue_reverie"
     }
 ]

@@ -8,21 +8,26 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.BelkoseaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesUnitHandler;
@@ -30,6 +35,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BRLightrailOrdnanceRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
@@ -43,6 +49,7 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -136,11 +143,8 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("hacanagent")) {
             buttons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
         }
-        if (player.hasUnexhaustedLeader("netrunnersagent")) {
-            buttons.add(NetrunnersLeadersHandler.getAgentCardsInfoButton(player));
-        }
-        if (player.hasUnexhaustedLeader("ironagent")) {
-            buttons.add(IronLeadersHandler.getMasterOfDefenseCardsInfoButton());
+        if (player.hasUnexhaustedLeader("atokeraagent")) {
+            buttons.add(Buttons.gray("useAtokeraAgent", "Use Magruda, the Atokera Agent", FactionEmojis.atokera));
         }
         if (player.hasUnexhaustedLeader("kairnagent")) {
             buttons.add(KairnLeadershandler.getKairnAgentCardsInfoButton(player));
@@ -148,11 +152,18 @@ public class CardsInfoService {
         if (player.hasLeader("myrragent")) {
             buttons.add(MyrrLeadersHandler.getMyrrAgentCardsInfoButton(player));
         }
+        if (player.hasUnexhaustedLeader("morphaagent")) {
+            buttons.add(MorphaLeadersHandler.getGolgiCardsInfoButton(player));
+        }
         if (KairnAbilityHandler.canOfferSharedDiscoveriesCardsInfoButton(game, player)) {
             buttons.add(KairnAbilityHandler.getSharedDiscoveriesButton(player));
         }
         if (player.hasUnlockedBreakthrough("kairnbt")) {
             buttons.add(KairnBreakthroughHandler.getRelicsCardsInfoButton(player));
+        }
+        Button trinityStockpileButton = BelkoseaBreakthroughHandler.getTrinityStockpileButton(game, player);
+        if (trinityStockpileButton != null) {
+            buttons.add(trinityStockpileButton);
         }
         if (!"setup".equalsIgnoreCase(game.getPhaseOfGame()) && player.hasUnexhaustedLeader("arcanumagent")) {
             buttons.add(ArcanumLeadersHandler.getVeylaCardsInfoButton(player));
@@ -176,12 +187,15 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("ashenagent")) {
             buttons.add(AshenLeadersHandler.getAshTenderCardsInfoButton(player));
         }
+        if (player.hasUnexhaustedLeader("netrunnersagent")) {
+            buttons.add(NetrunnersLeadersHandler.getNetrunnersAgentCardsInfoButton(player));
+        }
         if (player.hasUnexhaustedLeader("dreamagent")
                 && !DreamLeadersHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
             buttons.add(DreamLeadersHandler.getDreamAgentCardsInfoButton(player));
         }
-        if (player.hasAbility("doctrine") && player.hasAbility("paradigm") && player.hasAbility("natau_decree")) {
-            buttons.add(NatauAbilityHandler.getShowDoctrinesButton(player));
+        if (player.hasUnexhaustedLeader("natauagent")) {
+            buttons.add(NatauLeadersHandler.getNatauAgentCardsInfoButton(player));
         }
         if (player.hasAbility("intrigue")) {
             buttons.add(Buttons.blue("startIntrigueCard", "Pay For Intrigue Card", FactionEmojis.xin));
@@ -212,6 +226,14 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("pharadnagent")) {
             buttons.add(Buttons.gray("exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));
+        }
+        Button lightrailOrdnanceButton = BRLightrailOrdnanceRelicHandler.getCardsInfoButton(game, player);
+        if (lightrailOrdnanceButton != null) {
+            buttons.add(lightrailOrdnanceButton);
+        }
+        if (player.hasReadyBreakthrough("pharadnbt")) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "hiddenVaultsDestroy", "Destroy Units", FactionEmojis.pharadn));
         }
         if (IsPlayerElectedService.isPlayerElected(game, player, "minister_peace")) {
             buttons.add(Buttons.gray("ministerOfPeace", "Use Minister of Peace", CardEmojis.Agenda));
@@ -509,6 +531,13 @@ public class CardsInfoService {
         if (player.hasAbility("reflections_of_the_void") && OblivionAbilityHandler.hasReflections(game)) {
             buttons.add(OblivionAbilityHandler.getReflectionLedgerButton(player));
         }
+        if (player.hasAbility("fragmentum_unleashed")) {
+            buttons.add(StonebornAbilityHandler.getFragmentumTokensInfoButton(player));
+        }
+        if (player.hasUnexhaustedLeader("stonebornagentdormant")
+                || player.hasUnexhaustedLeader("stonebornagentunleashed")) {
+            buttons.add(StonebornLeadersHandler.getHazorusCardsInfoButton(player));
+        }
         if (player.hasUnexhaustedLeader("thronesagent")) {
             buttons.add(ThronesLeadersHandler.getThronesAgentButton(player));
         }
@@ -539,6 +568,20 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("thurvialiagent")) {
             buttons.add(ThurvialiLeadersHandler.getHopeCardsInfoButton(player));
+        }
+        buttons.addAll(KaltrimBreakthroughHandler.getEchoOperativesRepairButtons(game, player));
+        if (player.hasReadyBreakthrough("sarcosabt")) {
+            buttons.add(SarcosaBreakthroughHandler.getGraveholdButton(player));
+        }
+        if (player.hasTechReady("l4_br")) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "repairUnitsL4",
+                    "Repair All Your Damaged Units",
+                    FactionEmojis.Letnev));
+        }
+        Button viralEntanglementButton = BlueReverieTechHelper.getViralEntanglementButton(player);
+        if (viralEntanglementButton != null) {
+            buttons.add(viralEntanglementButton);
         }
         Button doubleDragonsDeploy = ThurvialiUnitHandler.getDoubleDragonsDeployButton(game, player);
         if (doubleDragonsDeploy != null) {

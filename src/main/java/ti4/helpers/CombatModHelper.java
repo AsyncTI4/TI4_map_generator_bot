@@ -1,9 +1,11 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,9 +17,9 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionBountyHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -26,11 +28,11 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.model.AbilityModel;
 import ti4.model.AgendaModel;
 import ti4.model.BreakthroughModel;
 import ti4.model.CombatModifierModel;
+import ti4.model.Mapper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
@@ -46,6 +48,25 @@ import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class CombatModHelper {
+
+    private static final Set<String> CODE_CARD_ABILITIES =
+            Set.of("bestow", "reflect", "ascend", "thwart", "deceive", "scourge");
+
+    public static int getMaxDice(CombatModifierModel modifier, Player player, Player opponent) {
+        if (modifier.getMaxDice() == null) {
+            return 0;
+        }
+        if (!"shared_tech_max_prerequisites".equals(modifier.getMaxDiceScalingType()) || opponent == null) {
+            return modifier.getMaxDice();
+        }
+        return player.getTechs().stream()
+                .filter(opponent::hasTech)
+                .map(Mapper::getTech)
+                .filter(Objects::nonNull)
+                .mapToInt(technology -> technology.getRequirements().orElse("").length())
+                .max()
+                .orElse(0);
+    }
 
     private static Boolean IsModInScopeForUnits(
             List<UnitModel> units, CombatModifierModel modifier, CombatRollType rollType, Game game, Player player) {
@@ -430,6 +451,14 @@ public class CombatModHelper {
                                 .isEmpty()
                         || ButtonHelperAgents.doesTileHaveAStructureInIt(player, tile));
             case "fracture_combat" -> meetsCondition = tile != null && tile.isFracture();
+            case "fracture_ingress_combat" ->
+                meetsCondition = tile != null
+                        && (tile.isFracture()
+                                || tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS)
+                                || (game.playerHasLeaderUnlockedOrAlliance(player, "nataucommander")
+                                        && tile.isAnomaly(game, player)));
+            case "fracture_anomaly_combat" ->
+                meetsCondition = tile != null && (tile.isFracture() || tile.isAnomaly(game, player));
             case Constants.MOD_UNITS_TWO_MATCHING_NOT_FF -> {
                 if (unitsByQuantity.size() == 1) {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).getFirst();
@@ -620,9 +649,10 @@ public class CombatModHelper {
                     for (Integer i : opponentUnitsByQuantity.values()) {
                         opponentUnits += i;
                     }
-                    meetsCondition = ownUnits < opponentUnits;
+                    meetsCondition = ownUnits <= opponentUnits;
                 }
             }
+            case "toldar_mech_owner" -> meetsCondition = player.ownsUnit("toldar_mech");
             case "lizho_commander_particular" -> {
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "lizhocommander")) {
                     int nonFighter = 0;
@@ -728,6 +758,7 @@ public class CombatModHelper {
                 }
             }
             case "active_player" -> meetsCondition = game.getActivePlayer() == player;
+            case "opponent_not_neutral" -> meetsCondition = opponent != null && !opponent.isNeutral();
             case "rhodun_monument_combat" -> {
                 boolean opponentHasUnitUpgrade = opponent != null
                         && opponent.getTechs().stream()
@@ -801,25 +832,10 @@ public class CombatModHelper {
                         scalingCount += 1;
                     }
                 }
-                case "code" -> {
-                    if (player.getHonorCounter() > 1) {
-                        scalingCount += 1;
-                        if (player.getHonorCounter() > 4) {
-                            scalingCount += 1;
-                            if (player.getHonorCounter() > 7) {
-                                scalingCount += 1;
-                            }
-                        }
-                    }
-
-                    if (player.getDishonorCounter() > 1) {
-                        scalingCount += 1;
-                        if (player.getDishonorCounter() < 4) {
-                            scalingCount += 1;
-                            scalingCount += 1;
-                        }
-                    }
-                }
+                case "code" ->
+                    scalingCount = player.getAbilities().stream()
+                            .filter(CODE_CARD_ABILITIES::contains)
+                            .count();
                 case Constants.LAW -> scalingCount = game.getLaws().size();
                 case Constants.MOD_OPPONENT_PO_EXCLUSIVE_SCORED -> {
                     if (opponent != null) {
@@ -973,20 +989,17 @@ public class CombatModHelper {
                 }
                 case "opponent_sftt" -> scalingCount = getOpponentSfttCount(opponent);
                 case "nonhome_system_with_planet" -> scalingCount = getSystemsWithControlledPlanets(game, player);
-                case "galvanized_unit_count" -> {
-                    scalingCount = getGalvanizedUnitCount(
-                            game, unitHolder, origUnit, player, rollType == CombatRollType.bombardment);
-                    if (rollType == CombatRollType.SpaceCannonOffence && origUnit.getDeepSpaceCannon()) {
-                        for (String adjPos :
-                                FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
-                            Tile tile = game.getTileByPosition(adjPos);
-                            for (UnitHolder uH : tile.getUnitHolders().values()) {
-                                scalingCount += getGalvanizedUnitCount(game, uH, origUnit, player);
-                            }
-                        }
-                    }
-                }
+                case "galvanized_unit_count" ->
+                    scalingCount =
+                            getGalvanizedScalingCount(game, unitHolder, origUnit, player, activeSystem, rollType);
                 case "unique_ships" -> scalingCount = getUniqueNonFighterShipCount(activeSystem, player);
+                case "opponent_warfare_tech" ->
+                    scalingCount = opponent == null
+                            ? 0
+                            : opponent.getTechs().stream()
+                                    .map(Mapper::getTech)
+                                    .filter(tech -> tech != null && tech.isType("warfare"))
+                                    .count();
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
                         scalingCount = opponent.getTechs().stream()
@@ -1053,6 +1066,28 @@ public class CombatModHelper {
             }
         }
         return count;
+    }
+
+    private static int getGalvanizedScalingCount(
+            Game game,
+            UnitHolder unitHolder,
+            UnitModel origUnit,
+            Player player,
+            Tile activeSystem,
+            CombatRollType rollType) {
+        if (rollType != CombatRollType.SpaceCannonOffence || !origUnit.getDeepSpaceCannon()) {
+            return getGalvanizedUnitCount(game, unitHolder, origUnit, player, rollType == CombatRollType.bombardment);
+        }
+        Set<UnitHolder> holders = Collections.newSetFromMap(new IdentityHashMap<>());
+        holders.add(unitHolder);
+        for (String adjacentPosition :
+                FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+            holders.addAll(
+                    game.getTileByPosition(adjacentPosition).getUnitHolders().values());
+        }
+        return holders.stream()
+                .mapToInt(holder -> getGalvanizedUnitCount(game, holder, origUnit, player))
+                .sum();
     }
 
     private static int getGalvanizedUnitCount(Game game, UnitHolder uH, UnitModel origUnit, Player player) {

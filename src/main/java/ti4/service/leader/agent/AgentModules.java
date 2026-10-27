@@ -10,13 +10,13 @@ import ti4.service.leader.agent.modules.AugersAgent;
 import ti4.service.leader.agent.modules.SardakkAgent;
 
 @UtilityClass
-public class AgentModules {
+class AgentModules {
 
-    public static final List<AgentModule<?>> ALL = List.of(new AugersAgent(), new SardakkAgent());
+    static final List<AgentModule<?>> ALL = List.of(new AugersAgent(), new SardakkAgent());
 
     private static final Map<String, AgentModule<?>> BY_ID = indexById(ALL);
 
-    public static Optional<AgentModule<?>> find(String agentId) {
+    static Optional<AgentModule<?>> find(String agentId) {
         if (agentId == null) {
             return Optional.empty();
         }

@@ -1,0 +1,12 @@
+{
+    "id": "th47",
+    "name": "Empty Space",
+    "aliases": [
+        "th47"
+    ],
+    "imagePath": "th47.png",
+    "planets": [],
+    "shipPositionsType": "TYPE08",
+    "tileBack": "blue",
+    "source": "theodisi"
+}

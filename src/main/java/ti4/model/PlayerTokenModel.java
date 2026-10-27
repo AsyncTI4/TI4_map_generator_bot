@@ -2,7 +2,6 @@ package ti4.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import ti4.image.Mapper;
 
 /**
  * Command, Control, Fleet, + Homebrew stuff
@@ -50,10 +49,5 @@ public class PlayerTokenModel implements TokenModelInterface, ColorableModelInte
     @JsonIgnore
     public String getFileName() {
         return imagePath;
-    }
-
-    @JsonIgnore
-    public String getFilePath() {
-        return Mapper.getAttachmentImagePath(imagePath);
     }
 }

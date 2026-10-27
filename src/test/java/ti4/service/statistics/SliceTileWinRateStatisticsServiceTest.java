@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.image.PositionMapper;
-import ti4.image.TileHelper;
+import ti4.model.MapPositionMapper;
+import ti4.model.TileHelper;
 import ti4.testUtils.BaseTi4Test;
 
 class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
@@ -102,7 +102,7 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
                     onBoardNeighbours(ringTwoPosition).contains(ringOnePosition),
                     ringOnePosition + " should be adjacent to " + ringTwoPosition);
             assertTrue(
-                    PositionMapper.getAdjacentTilePositions(MECATOL_POSITION).contains(ringOnePosition),
+                    MapPositionMapper.getAdjacentTilePositions(MECATOL_POSITION).contains(ringOnePosition),
                     ringOnePosition + " should be adjacent to " + MECATOL_POSITION);
 
             slice.forEach(
@@ -283,7 +283,7 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
     }
 
     private static Set<String> onBoardNeighbours(String position) {
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(adjacent -> !"x".equals(adjacent))
                 .filter(adjacent -> {
                     int ring = Integer.parseInt(adjacent) / 100;

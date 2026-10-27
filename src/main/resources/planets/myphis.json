@@ -1,0 +1,31 @@
+{
+    "id": "myphis",
+    "tileId": "th35",
+    "name": "Myphis",
+    "aliases": [
+        "myphis"
+    ],
+    "resources": 1,
+    "influence": 2,
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "techSpecialties": [
+        "BIOTIC",
+        "CYBERNETIC"
+    ],
+    "planetLayout": {
+        "unitHolderName": "myphis",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 169,
+            "y": 150
+        },
+        "planetRadius": 58
+    },
+    "positionInTile": {
+        "x": 169,
+        "y": 150
+    },
+    "source": "theodisi"
+}

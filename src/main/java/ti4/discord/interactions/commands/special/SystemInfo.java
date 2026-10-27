@@ -18,9 +18,9 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.image.TileGenerator;
-import ti4.image.TileHelper;
+import ti4.image.tile.SystemContextImage;
 import ti4.message.MessageHelper;
+import ti4.model.TileHelper;
 import ti4.service.combat.StartCombatService;
 
 class SystemInfo extends GameStateSubcommand {
@@ -93,8 +93,7 @@ class SystemInfo extends GameStateSubcommand {
             return;
         }
 
-        FileUpload systemWithContext =
-                new TileGenerator(game, event, null, context, tile.getPosition()).createFileUpload();
+        FileUpload systemWithContext = SystemContextImage.upload(game, event, context, tile.getPosition());
         MessageHelper.sendMessageToChannel(
                 channel, ButtonHelper.getTileSummaryMessage(game, justUnits, tile, ogPlayer, event));
         MessageHelper.sendMessageWithFile(channel, systemWithContext, tile.getRepresentationForButtons(), false);

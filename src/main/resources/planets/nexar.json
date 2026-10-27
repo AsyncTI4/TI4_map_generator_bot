@@ -1,0 +1,30 @@
+{
+    "id": "nexar",
+    "tileId": "th27",
+    "name": "Nexar",
+    "aliases": [
+        "nexar"
+    ],
+    "resources": 1,
+    "influence": 0,
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "techSpecialties": [
+        "PROPULSION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "nexar",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 129,
+            "y": 82
+        },
+        "planetRadius": 61
+    },
+    "positionInTile": {
+        "x": 129,
+        "y": 82
+    },
+    "source": "theodisi"
+}

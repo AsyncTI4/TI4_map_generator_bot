@@ -1,0 +1,26 @@
+{
+  "name": "selftest-components",
+  "description": "Self-test of component setup and play: objectives, laws, fragments, breakthroughs, a promissory note and an action card.",
+  "preset": "components-2p",
+  "steps": [
+    { "note": "Game state set up by the preset" },
+    { "expect": { "state": "game.revealedPos", "contains": "corner" } },
+    { "expect": { "state": "game.laws", "contains": "arms_reduction" } },
+    { "expect": { "state": "sol.posScored", "equals": "corner" } },
+    { "expect": { "state": "sol.fragments", "contains": "crf1" } },
+    { "expect": { "state": "sol.breakthroughs", "contains": ":unlocked" } },
+    { "expect": { "state": "sol.pns", "contains": "{hacan.color}_sftt" } },
+    { "expect": { "state": "hacan.pns", "notContains": "{hacan.color}_sftt" } },
+
+    { "note": "Play an action card through its hand number; Hacan declines Sabotage" },
+    { "as": "sol", "press": "ac_play_from_hand_{ac:economic_initiative}", "in": "sol:cards-info" },
+    { "expect": { "state": "sol.acIds", "notContains": "economic_initiative" } },
+    { "expect": { "state": "game.acDiscard", "contains": "economic_initiative" } },
+    { "as": "hacan", "press": "no_sabotage", "in": "main" },
+    { "expect": { "state": "hacan.acIds", "contains": "sabo1" } },
+
+    { "note": "Play Hacan's Support for the Throne" },
+    { "as": "sol", "press": "resolvePNPlay_{hacan.color}_sftt", "in": "sol:cards-info" },
+    { "expect": { "state": "sol.pnsInPlay", "contains": "{hacan.color}_sftt" } }
+  ]
+}

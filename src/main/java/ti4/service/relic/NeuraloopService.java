@@ -11,8 +11,8 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.RelicHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.objectives.DrawSecretService;
 import ti4.service.objectives.RevealPublicObjectiveService;
@@ -102,6 +102,7 @@ public class NeuraloopService {
         player.removeExhaustedRelic(relic);
         RelicHelper.resolveRelicLossEffects(game, player, relic);
         game.removeRevealedObjective(poID);
+        RevealPublicObjectiveService.unpinRevealedObjective(game, poID);
         String msg = "## " + game.getPing() + " " + player.getRepresentation() + " is using _Neuraloop_, purging "
                 + ("neuraloop".equals(relic) ? "itself" : Mapper.getRelic(relic).getName())
                 + ", to replace the recently revealed objective with a random " + deck + ".";

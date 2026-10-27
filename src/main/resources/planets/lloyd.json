@@ -24,8 +24,10 @@
     "planetType": "HAZARDOUS",
     "cardImagePath": null,
     "techSpecialties": null,
-    "legendaryAbilityName": "placeholder",
-    "legendaryAbilityText": "foo bar",
+    "legendaryAbilityName": "New Elysium",
+    "legendaryAbilityText": "At the end of your turn you may exhaust this card to choose and resolve 1 terraforming initiative.",
+    "legendaryAbilityFlavourText": "The children of Ul will bring life to a lifeless planet, in the hope of bringing wisdom to a troubled galaxy.",
+    "legendaryNotes": "Initiatives attach to Lloyd. Orbital Slingshot is a reminder only, apply the +1 move yourself. Interplanetary Hub only triggers on tactical-action activations.",
     "unitPositions": {
         "unitHolderName": "lloyd",
         "coordinateMap": {

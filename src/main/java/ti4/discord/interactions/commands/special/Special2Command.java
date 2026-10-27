@@ -11,8 +11,8 @@ public class Special2Command implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
                     new SetupNeutralPlayer(),
-                    new GeneratePainBoxMapString(),
                     new SearchWinningPath(),
+                    new ListWinningPaths(),
                     new SetExpedition(),
                     new Galvanize(),
                     new LoreCommand(),

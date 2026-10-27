@@ -2,8 +2,8 @@ package ti4.discord.interactions.buttons.handlers.agenda.resolver;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.game.Game;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 public record MiscountMessageAgendaResolver(String agendaId) implements AgendaResolver {
 

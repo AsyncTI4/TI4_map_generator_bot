@@ -3,7 +3,6 @@ package ti4.discord.interactions.buttons.handlers.combat;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
@@ -74,7 +73,10 @@ class BombardmentButtonHandler {
     public static void bombardConfirm(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String pos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);
-        if (tile.isScar(game) && !player.hasUnlockedBreakthrough("nivynbt") && !player.hasTech("tf-singularitypoint")) {
+        if (tile.isScar(game)
+                && !player.hasUnlockedBreakthrough("nivynbt")
+                && !player.hasTech("tf-singularitypoint")
+                && !player.hasTech("dsxinystar")) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     player.getRepresentation()
@@ -299,7 +301,7 @@ class BombardmentButtonHandler {
     private static List<BombardmentAssignment> getAssignments(Player player, Game game) {
         String json = game.getStoredValue("assignedBombardment" + player.getFaction());
         if (json == null || json.isBlank()) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return MAPPER.readValue(json, new TypeReference<>() {});
     }

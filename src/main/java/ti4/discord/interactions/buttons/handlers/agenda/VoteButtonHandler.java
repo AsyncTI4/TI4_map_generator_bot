@@ -3,8 +3,10 @@ package ti4.discord.interactions.buttons.handlers.agenda;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +17,7 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.AgendaRiderHelper;
 import ti4.helpers.AgendaSummaryHelper;
 import ti4.helpers.ButtonHelper;
@@ -28,6 +31,8 @@ import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 
 @UtilityClass
 class VoteButtonHandler {
+
+    private static final int PLANET_EXHAUST_MESSAGE_LOOKBACK = 20;
 
     @ButtonHandler("erasePreVote")
     static void erasePreVote(GenericInteractionCreateEvent event, Player player, Game game) {
@@ -47,6 +52,38 @@ class VoteButtonHandler {
     static void preVote(ButtonInteractionEvent event, Player player, Game game) {
         game.setStoredValue("preVoting" + player.getFaction(), "0");
         firstStepOfVoting(game, event, player);
+    }
+
+    @ButtonHandler("resetMyVote")
+    static void resetMyVote(ButtonInteractionEvent event, Player player, Game game) {
+        AgendaHelper.undoThingsSpentOnThisVote(game, player);
+        deleteEarlierPlanetExhaustMessages(event, player);
+        firstStepOfVoting(game, event, player);
+    }
+
+    private static void deleteEarlierPlanetExhaustMessages(ButtonInteractionEvent event, Player player) {
+        event.getChannel()
+                .getHistoryBefore(event.getMessage(), PLANET_EXHAUST_MESSAGE_LOOKBACK)
+                .queue(
+                        history -> history.getRetrievedHistory().stream()
+                                .filter(message -> isPlanetExhaustMessageOf(message, player))
+                                .forEach(message -> message.delete().queue(Consumers.nop(), BotLogger::catchRestError)),
+                        BotLogger::catchRestError);
+    }
+
+    static boolean isPlanetExhaustMessageOf(Message message, Player player) {
+        if (message.getAuthor().getIdLong() != message.getJDA().getSelfUser().getIdLong()) {
+            return false;
+        }
+        List<String> buttonIds = message.getComponentTree().findAll(Button.class).stream()
+                .map(Button::getCustomId)
+                .filter(Objects::nonNull)
+                .toList();
+        boolean hasVoteButton = buttonIds.stream().anyMatch(id -> id.startsWith("exhaustForVotes_"));
+        boolean onlyOwnPlanets = buttonIds.stream()
+                .filter(id -> id.startsWith("exhaustForVotes_planet_"))
+                .allMatch(id -> player.getPlanets().contains(id.substring("exhaustForVotes_planet_".length())));
+        return hasVoteButton && onlyOwnPlanets;
     }
 
     @ButtonHandler("vote")

@@ -1,0 +1,30 @@
+{
+    "id": "ilun",
+    "tileId": "th37",
+    "name": "Ilun",
+    "aliases": [
+        "ilun"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "techSpecialties": [
+        "PROPULSION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "ilun",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 127,
+            "y": 89
+        },
+        "planetRadius": 60
+    },
+    "positionInTile": {
+        "x": 127,
+        "y": 89
+    },
+    "source": "theodisi"
+}

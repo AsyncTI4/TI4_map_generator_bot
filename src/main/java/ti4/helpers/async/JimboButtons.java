@@ -16,10 +16,10 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.RegexHelper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 
 // Jazz's Interactive Map Builder

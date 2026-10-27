@@ -42,9 +42,11 @@ public class XinHeroHandler {
                     player.factionButtonChecker() + SELECT_EFFECT + target.getFaction() + "_secondary",
                     "Resolve a Strategy Card Secondary"));
         }
-        buttons.add(Buttons.gray(
-                player.factionButtonChecker() + SELECT_EFFECT + target.getFaction() + "_secrets",
-                "Look at Secret Objectives"));
+        if (!XinTechHandler.hasAstromanticCloakSteel(target)) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + SELECT_EFFECT + target.getFaction() + "_secrets",
+                    "Look at Secret Objectives"));
+        }
         buttons.add(Buttons.red(
                 player.factionButtonChecker() + SELECT_EFFECT + target.getFaction() + "_skip",
                 "Skip " + target.getColor()));
@@ -68,6 +70,10 @@ public class XinHeroHandler {
         switch (values[1]) {
             case "secondary" -> offerSecondaryButtons(event, game, player, target);
             case "secrets" -> {
+                if (XinTechHandler.hasAstromanticCloakSteel(target)) {
+                    ButtonHelper.deleteMessage(event);
+                    return;
+                }
                 resolveTarget(player, target);
                 SecretObjectiveHelper.showAll(target, player, game);
                 offerTargetButtons(game, player);

@@ -8,10 +8,11 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.FoWHelper;
-import ti4.image.Mapper;
+import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.ColorEmojis;
 
 @UtilityClass
@@ -27,7 +28,7 @@ public class RemoveCommandCounterService {
 
     public static void fromTile(String color, Tile tile, Game game) {
         String ccID = Mapper.getCCID(color);
-        String ccPath = Tile.getCCPath(ccID);
+        String ccPath = ImageResources.commandToken(ccID);
         if (ccPath == null) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "Command Counter: " + color + " is not valid and not supported.");

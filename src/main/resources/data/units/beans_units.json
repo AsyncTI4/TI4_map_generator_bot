@@ -15,7 +15,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "This unit is also a nexus token. If it is removed using INCOMPREHENSIBLE FORM, produce 1 hit and assign it to 1 of your opponents' ships."
+    "ability": "This unit is also a nexus token; it cannot be affected by abilities that place or move nexus tokens. If it is removed using INCOMPREHENSIBLE FORM, produce 1 hit and assign it to 1 of your opponent's ships."
   },
   {
     "id": "dream_mech",
@@ -30,7 +30,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "When this unit would be destroyed, you may spend 1 influence to place it on another planet in a system that contains 1 of your nexus tokens."
+    "ability": "When this unit would be destroyed, you may spend 1 influence to instead place it in a system that contains a nexus token."
   },
   {
     "id": "dream_destroyer",
@@ -89,7 +89,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "After this unit is destroyed, you may return a number of captured fighters from your faction sheet up to the capacity value of this unit to place 1 ship in this system with a cost of no more than the amount of fighters returned."
+    "ability": "When this unit is destroyed, you may return a number of captured fighters from your faction sheet up to the capacity value of this unit to place 1 ship in this system with a cost up to the amount of fighters returned."
   },
   {
     "id": "crystellum_mech",
@@ -119,7 +119,7 @@
     "combatDieCount": 1,
     "moveValue": 3,
     "isShip": true,
-    "ability": "This unit may move without being transported. Fighters in excess of  your capacity count against your fleet limit. When this unit is destroyed, it captures itself. At the start of your turn, you may place up to 2 fighters from your reinforcements in any system that contains a planet you control."
+    "ability": "This unit may move without being transported. Fighters in excess of  your capacity count against your fleet limit.\n\nWhen this unit is destroyed, capture it. At the start of your turn, you may place 1 fighter from your reinforcements in any system that contains a planet you control."
   },
   {
     "id": "ashen_flagship",
@@ -139,7 +139,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "For each infantry destroyed by this unit's BOMBARDMENT ability, commit 1 captured infantry from your faction sheet to that planet."
+    "ability": "During your tactical actions, for each infantry destroyed by this unit's BOMBARDMENT ability, place 1 captured infantry from your faction sheet on that planet."
   },
   {
     "id": "ashen_mech",
@@ -174,7 +174,7 @@
     "bombardDieCount": 1,
     "sustainDamage": true,
     "isShip": true,
-    "ability": "During combat, when this unit would be destroyed, you may use its BOMBARDMENT ability against a planet in its system."
+    "ability": "During combat, when this unit is destroyed, you may use its BOMBARDMENT ability against a planet in its system."
   },
   {
     "id": "ashen_dreadnought2",
@@ -196,7 +196,7 @@
     "sustainDamage": true,
     "canBeDirectHit": false,
     "isShip": true,
-    "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.\n\nDuring combat, when this unit would be destroyed or uses its SUSTAIN DAMAGE ability, you may use its BOMBARDMENT ability against a planet in its system."
+    "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.\n\nDuring combat, when this unit is destroyed or uses its SUSTAIN DAMAGE ability, you may use its BOMBARDMENT ability against a planet in its system."
   },
   {
     "id": "ashen_infantry",
@@ -240,50 +240,51 @@
     "capacityValue": 3,
     "capacityUsed": 1,
     "cost": 8,
-    "combatHitsOn": 5,
+    "combatHitsOn": 7,
     "combatDieCount": 2,
-    "afbHitsOn": 5,
-    "afbDieCount": 3,
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "Your mechs in the space area of this system gain Anti-Fighter Barrage 7(x2)."
+    "ability": "Once per combat round, after 1 of your other non-fighter ships is destroyed in this system, you may repair 1 of your damaged units in this system."
   },
   {
     "id": "iron_mech",
     "baseType": "mech",
     "asyncId": "mf",
-    "name": "Riptide I",
-    "upgradesToUnitId": "iron_mech2",
+    "name": "Exo-Forge",
     "source": "beans",
     "faction": "iron",
     "capacityUsed": 1,
     "cost": 2,
-    "combatHitsOn": 5,
+    "combatHitsOn": 6,
     "combatDieCount": 1,
     "sustainDamage": true,
-    "isShip": true,
     "isGroundForce": true,
-    "ability": "When this unit is destroyed, place 1 infantry from your reinforcements on its planet. If it was in the space area, place 1 fighter instead."
+    "ability": "This unit's PRODUCTION value is equal to half the resource value of its planet, rounded up."
   },
   {
-    "id": "iron_mech2",
-    "baseType": "mech",
-    "asyncId": "mf",
-    "name": "Riptide II",
-    "upgradesFromUnitId": "iron_mech",
-    "requiredTechId": "beironmf",
+    "id": "iron_spacedock",
+    "baseType": "spacedock",
+    "asyncId": "sd",
+    "name": "Tideyard I",
+    "upgradesToUnitId": "iron_spacedock2",
     "source": "beans",
     "faction": "iron",
-    "moveValue": 1,
-    "capacityUsed": 1,
-    "cost": 2,
-    "combatHitsOn": 4,
-    "combatDieCount": 1,
-    "sustainDamage": true,
-    "isShip": true,
-    "isGroundForce": true,
-    "ability": "When this unit is destroyed, place 1 infantry from your reinforcements on its planet. If it was in the space area, place 1 fighter instead. This unit may move without being transported. Mechs in excess of capacity count against your fleet limit."
+    "productionValue": 5,
+    "isStructure": true,
+    "ability": "DEPLOY: At the end of a tactical action, you may remove 2 of your mechs from the active system to place 1 space dock from your reinforcements on a planet you control in the active system. Up to 4 fighters in that system do not count against your ships' capacity."
+  },
+  {
+    "id": "iron_spacedock2",
+    "baseType": "spacedock",
+    "asyncId": "sd",
+    "name": "Tideyard II",
+    "upgradesFromUnitId": "iron_spacedock",
+    "requiredTechId": "beironsd",
+    "source": "beans",
+    "faction": "iron",
+    "productionValue": 7,
+    "ability": "DEPLOY: At the end of a tactical action, you may remove 2 of your mechs from the active system to place 1 space dock from your reinforcements on a planet you control in the active system. Up to 8 fighters in that system do not count against your ships' capacity."
   },
   {
     "id": "ta_flagship",
@@ -322,7 +323,7 @@
     "id": "netrunners_flagship",
     "baseType": "flagship",
     "asyncId": "fs",
-    "name": "Trojan",
+    "name": "Mi-Dum",
     "source": "beans",
     "faction": "netrunners",
     "moveValue": 1,
@@ -330,17 +331,17 @@
     "capacityUsed": 1,
     "cost": 8,
     "combatHitsOn": 7,
-    "combatDieCount": 2,
+    "combatDieCount": 1,
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "After this unit moves, before SPACE CANNON OFFENSE, choose 1 unit ability other than SUSTAIN DAMAGE. All units in this unit's system lose that ability until the end of this action."
+    "ability": "When this unit makes a combat roll, it rolls 1 additional die for each red technology your opponent owns."
   },
   {
     "id": "netrunners_mech",
     "baseType": "mech",
     "asyncId": "mf",
-    "name": "Legion",
+    "name": "Nimda",
     "source": "beans",
     "faction": "netrunners",
     "capacityUsed": 1,
@@ -367,13 +368,13 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "Other player's units in this system lose their unit abilities while this unit is not damaged."
+    "ability": "This unit's movement is not affected by anomalies. During a combat in The Fracture or an anomaly, apply +2 to the result of each of this unit's combat rolls."
   },
   {
     "id": "natau_mech",
     "baseType": "mech",
     "asyncId": "mf",
-    "name": "Penitent",
+    "name": "Schism",
     "source": "beans",
     "faction": "natau",
     "capacityUsed": 1,
@@ -382,6 +383,6 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "This unit gains +1 to its combat rolls for each exhausted doctrine in your play area."
+    "ability": "This unit's system is an anomaly."
   }
 ]

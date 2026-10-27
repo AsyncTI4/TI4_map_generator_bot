@@ -1,0 +1,16 @@
+{
+    "id": "fracture12",
+    "name": "Rift Egress",
+    "aliases": [
+        "fracture12",
+        "riftegress",
+        "frac12"
+    ],
+    "hasEgress": true,
+    "isRift": true,
+    "imagePath": "fracture12.png",
+    "shipPositionsType": "TYPE08",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

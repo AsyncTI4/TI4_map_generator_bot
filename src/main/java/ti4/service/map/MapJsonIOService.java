@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
-import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
@@ -25,14 +24,15 @@ import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.URLReaderHelper;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
+import ti4.image.io.ImageResources;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.service.fow.LoreService;
 import ti4.service.fow.LoreService.LoreEntry;
 import tools.jackson.databind.json.JsonMapper;
@@ -91,7 +91,7 @@ public class MapJsonIOService {
                     if (bah.getTile().equals(tile.getPosition())) {
                         BorderAnomalyIO bi = new BorderAnomalyIO();
                         bi.setDirection(bah.getDirection());
-                        bi.setType(bah.getType().toString());
+                        bi.setType(bah.getType());
                         baList.add(bi);
                     }
                 }
@@ -159,6 +159,7 @@ public class MapJsonIOService {
             }
 
             mapData.setMapInfo(tiles);
+            MapSectorJsonService.exportSectors(game, mapData);
 
             if (includeLore) {
                 Map<String, List<LoreIO>> phaseLore = new HashMap<>();
@@ -194,18 +195,18 @@ public class MapJsonIOService {
             game.getCustomHyperlaneData().clear();
             LoreService.clearLore(game);
 
+            List<TileIO> placedTiles = new ArrayList<>();
             for (TileIO tileIO : mapData.getMapInfo()) {
                 // Isolated per tile: an unexpected failure processing one tile must not abort the
                 // rest of the map (or phase lore, handled after this loop) — it's reported and
                 // skipped instead, same as every other per-item failure in this importer.
                 try {
                     if (handleTile(tileIO, game, errorSb)) {
+                        placedTiles.add(tileIO);
                         handleTokens(tileIO, game, errorSb);
                         handleCustomHyperlane(tileIO, game, errorSb);
                         handleBorderAnomalies(tileIO, game, errorSb);
-                        handleSystemLore(tileIO, game, errorSb);
                         handlePlanetAttachments(tileIO, game, errorSb);
-                        handlePlanetLore(tileIO, game, errorSb);
                         handleAdjacencyOverrides(tileIO, game, errorSb);
                         handleCustomAdjacencies(tileIO, game, errorSb);
                     }
@@ -213,10 +214,29 @@ public class MapJsonIOService {
                     appendError(errorSb, tileIO, "unexpected error, tile skipped: " + e.getMessage());
                 }
             }
+            for (TileIO tileIO : placedTiles) {
+                try {
+                    handleSystemLore(tileIO, game, errorSb);
+                } catch (Exception e) {
+                    appendError(errorSb, tileIO, "unexpected error, system lore skipped: " + e.getMessage());
+                }
+                try {
+                    handlePlanetLore(tileIO, game, errorSb);
+                } catch (Exception e) {
+                    appendError(errorSb, tileIO, "unexpected error, planet lore skipped: " + e.getMessage());
+                }
+            }
             try {
                 handlePhaseLore(mapData, game, errorSb);
             } catch (Exception e) {
                 errorSb.append("- phase lore: unexpected error, skipped: ")
+                        .append(e.getMessage())
+                        .append('\n');
+            }
+            try {
+                MapSectorJsonService.importSectors(game, mapData, errorSb);
+            } catch (Exception e) {
+                errorSb.append("- sectors and galaxies: unexpected error, skipped: ")
                         .append(e.getMessage())
                         .append('\n');
             }
@@ -234,12 +254,13 @@ public class MapJsonIOService {
         }
 
         if (!errorSb.isEmpty()) {
-            MessageHelper.sendMessageToChannel(feedbackChannel, "Some tiles failed to import:\n" + errorSb);
+            MessageHelper.sendMessageToChannel(
+                    feedbackChannel, "Some parts of the map did not import cleanly:\n" + errorSb);
         }
     }
 
     private static boolean handleTile(TileIO tileIO, Game game, StringBuilder sb) {
-        if (!PositionMapper.isTilePositionValid(tileIO.getPosition())) {
+        if (!MapPositionMapper.isTilePositionValid(game, tileIO.getPosition())) {
             appendError(sb, tileIO, "Invalid tile position: " + tileIO.getPosition());
             return false;
         }
@@ -251,7 +272,7 @@ public class MapJsonIOService {
             appendError(sb, tileIO, "Could not find tile: " + tileID);
             return false;
         }
-        String tilePath = ResourceHelper.getTileFile(tileName);
+        String tilePath = ImageResources.tile(tileName);
         if (tilePath == null) {
             appendError(sb, tileIO, "Could not find tile: " + tileID);
             return false;
@@ -269,10 +290,10 @@ public class MapJsonIOService {
         for (String token : tileIO.getTokens()) {
             Tile tile = game.getTileByPosition(tileIO.getPosition());
             String tokenFileName = token;
-            String tokenPath = Tile.getTokenPath(tokenFileName);
+            String tokenPath = ImageResources.tokenOrAttachment(tokenFileName);
             if (tokenPath == null) {
                 tokenFileName = Mapper.getTokenID(token);
-                tokenPath = Tile.getTokenPath(tokenFileName);
+                tokenPath = ImageResources.tokenOrAttachment(tokenFileName);
                 if (tokenPath == null) {
                     appendError(sb, tileIO, "Token not found: " + token);
                     continue;
@@ -301,13 +322,7 @@ public class MapJsonIOService {
         if (tileIO.getBorderAnomalies() == null) return;
 
         for (BorderAnomalyIO anomalyIO : tileIO.getBorderAnomalies()) {
-            BorderAnomalyModel.BorderAnomalyType anomalyType;
-            try {
-                anomalyType = BorderAnomalyModel.BorderAnomalyType.valueOf(
-                        anomalyIO.getType().toUpperCase());
-            } catch (Exception e) {
-                anomalyType = BorderAnomalyModel.getBorderAnomalyTypeFromString(anomalyIO.getType());
-            }
+            BorderAnomalyModel anomalyType = Mapper.resolveBorderAnomaly(anomalyIO.getType());
 
             if (anomalyType == null) {
                 appendError(
@@ -317,7 +332,7 @@ public class MapJsonIOService {
                                 + anomalyIO.getDirection());
                 continue;
             }
-            game.addBorderAnomaly(tileIO.getPosition(), anomalyIO.getDirection(), anomalyType);
+            game.addBorderAnomaly(tileIO.getPosition(), anomalyIO.getDirection(), anomalyType.getId());
         }
     }
 
@@ -335,10 +350,10 @@ public class MapJsonIOService {
             for (String attachment : planetIO.getAttachments()) {
                 String attachmentFileName = attachment;
                 Tile tile = game.getTileByPosition(tileIO.getPosition());
-                String attachmentPath = Tile.getAttachmentPath(attachmentFileName);
+                String attachmentPath = ImageResources.attachment(attachmentFileName);
                 if (attachmentPath == null) {
                     attachmentFileName = Mapper.getAttachmentImagePath(attachment);
-                    attachmentPath = Tile.getAttachmentPath(attachmentFileName);
+                    attachmentPath = ImageResources.attachment(attachmentFileName);
                     if (attachmentPath == null) {
                         appendError(sb, tileIO, "Attachment not found: " + attachment);
                         continue;
@@ -504,6 +519,16 @@ public class MapJsonIOService {
         // LoreService.getPhaseTargetNames. Phase lore has no tile of its own, so it can't live in
         // any TileIO entry.
         private Map<String, List<LoreIO>> phaseLore;
+        private Map<String, String> galaxies;
+        private Integer sectorGap;
+    }
+
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class SectorIO {
+        private String type;
+        private Integer distance;
+        private String name;
     }
 
     @Data
@@ -522,6 +547,7 @@ public class MapJsonIOService {
         private List<LoreIO> systemLoreEntries;
         private List<String> customAdjacencies;
         private List<AdjacencyOverrideIO> adjacencyOverrides;
+        private SectorIO sector;
     }
 
     @Data

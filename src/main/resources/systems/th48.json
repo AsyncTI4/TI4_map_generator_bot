@@ -1,0 +1,15 @@
+{
+    "id": "th48",
+    "name": "Entropic Scar/Asteroids",
+    "aliases": [
+        "th48",
+        "entropicscarasteroids"
+    ],
+    "imagePath": "th48.png",
+    "planets": [],
+    "shipPositionsType": "TYPE08",
+    "tileBack": "red",
+    "isAsteroidField": true,
+    "isScar": true,
+    "source": "theodisi"
+}

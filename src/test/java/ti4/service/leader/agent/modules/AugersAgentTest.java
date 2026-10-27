@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
-import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentUse;
@@ -57,8 +56,7 @@ class AugersAgentTest extends BaseTi4Test {
     void givesTheExplorerTwoTradeGoods() {
         explorer.setTg(3);
 
-        AgentOutcome outcome =
-                module.resolve(use(augers.getLeader("augersagent").orElseThrow()));
+        AgentOutcome outcome = module.resolve(use());
 
         assertThat(explorer.getTg()).isEqualTo(5);
         assertThat(outcome.messages()).singleElement().satisfies(message -> {
@@ -69,16 +67,7 @@ class AugersAgentTest extends BaseTi4Test {
         });
     }
 
-    @Test
-    void namesAYssarilCopyAsCleverClever() {
-        Leader yssarilAgent = new Leader("yssarilagent");
-
-        AgentOutcome outcome = module.resolve(use(yssarilAgent));
-
-        assertThat(outcome.messages().getFirst().text()).contains("Clever Clever Clodho, the Ilyxum/Yssaril agent");
-    }
-
-    private AgentUse<Player> use(Leader exhaustedLeader) {
-        return new AgentUse<>(game, augers, exhaustedLeader, AugersAgent.ID, module.displayName(), explorer, null);
+    private AgentUse<Player> use() {
+        return new AgentUse<>(game, augers, explorer, "Clodho, the Ilyxum agent", null);
     }
 }

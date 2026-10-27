@@ -9,6 +9,8 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.planet.AlfheimLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.VanaheimLegendaryButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -24,8 +26,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
 import ti4.service.planet.AsgardLegendaryService;
@@ -255,7 +257,46 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = "Please choose the system that the ship you wish to move is in.";
                 buttons.addAll(ButtonHelper.getDomnaStepOneTiles(player, game));
             }
-            case "eko" -> output = "blank";
+            case "horace" -> {
+                IxthLegendaryButtonHandler.offerHoraceAnomalies(game, player);
+                output = "blank";
+            }
+            case "lapidus" -> {
+                IxthLegendaryButtonHandler.offerLapidusExplore(game, player);
+                output = "blank";
+            }
+            case "eko" -> {
+                IxthLegendaryButtonHandler.offerEkoSystems(game, player);
+                output = "blank";
+            }
+            case "lloyd" -> {
+                IxthLegendaryButtonHandler.offerLloydInitiatives(game, player);
+                output = "blank";
+            }
+            case "avarin" -> {
+                TheodisiLegendaryButtonHandler.offerAvarinUnitUpgradeResearch(game, player);
+                output = "blank";
+            }
+            case "celyon" -> {
+                TheodisiLegendaryButtonHandler.offerCelyonPlanetSelection(game, player);
+                output = "blank";
+            }
+            case "illyra" -> {
+                TheodisiLegendaryButtonHandler.offerIllyraPlanetSelection(game, player);
+                output = "blank";
+            }
+            case "thren" -> {
+                TheodisiLegendaryButtonHandler.resolveThrenRemoteFactory(game, player);
+                output = "blank";
+            }
+            case "vespix" -> {
+                TheodisiLegendaryButtonHandler.offerVespixPlanetSelection(game, player);
+                output = "blank";
+            }
+            case "petra", "petraunleashed" -> {
+                output = "Please choose which planet you would like to explore.";
+                buttons.addAll(ButtonHelper.getButtonsToExploreAllPlanets(player, game));
+            }
             default -> {
                 if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null
                         && game.isAbsolMode()

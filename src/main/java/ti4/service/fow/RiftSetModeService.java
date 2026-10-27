@@ -5,7 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.JdaService;
@@ -22,13 +24,14 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RiftUnitsHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.UnitModel;
 import ti4.service.button.ReactionService;
@@ -389,13 +392,13 @@ public final class RiftSetModeService {
         return false;
     }
 
-    public static boolean deckInfoAvailable(Player player, Game game) {
+    public static boolean deckInfoAvailable(Game game, @Nullable String viewerId, MessageChannel channel) {
         if (!isActive(game)
-                || player == null
-                || Constants.eronousId.equals(player.getUserID())
-                || game.getPlayersWithGMRole().contains(player)) return true;
+                || viewerId == null
+                || Constants.eronousId.equals(viewerId)
+                || FoWHelper.isGameMaster(viewerId, game)) return true;
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), MiscEmojis.GravityRift.emojiString());
+        MessageHelper.sendMessageToChannel(channel, MiscEmojis.GravityRift.emojiString());
         return false;
     }
 

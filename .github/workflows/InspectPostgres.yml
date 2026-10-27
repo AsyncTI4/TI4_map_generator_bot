@@ -1,0 +1,28 @@
+on: workflow_dispatch
+name: InspectPostgres
+concurrency:
+  group: "InspectPostgres"
+jobs:
+  inspect:
+    name: Inspect Postgres
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          script: |
+            echo "=== all containers including stopped ==="
+            docker ps -a --format '{{.Names}}\t{{.Status}}\t{{.Image}}\t{{.CreatedAt}}'
+            echo "=== postgres as a host service ==="
+            systemctl status postgresql --no-pager 2>&1 | head -10 || true
+            systemctl list-unit-files 2>/dev/null | grep -i postgres || echo "no postgresql unit"
+            echo "=== listening on 5432 ==="
+            ss -lntp 2>/dev/null | grep 5432 || echo "nothing listening"
+            echo "=== why did it stop ==="
+            journalctl -u postgresql --no-pager -n 20 2>/dev/null || true
+            echo "=== docker volumes ==="
+            docker volume ls
