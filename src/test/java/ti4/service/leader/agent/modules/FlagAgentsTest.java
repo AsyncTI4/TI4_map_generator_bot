@@ -40,7 +40,7 @@ class FlagAgentsTest extends BaseTi4Test {
         keleres.resolve(fixture.use(keleres, fixture.target));
 
         assertThat(fixture.game.getStoredValue(KeleresAgent.TARGET_KEY)).isEqualTo(fixture.target.getFaction());
-        assertThat(keleres.exhaustAnnouncement(fixture.use(keleres, fixture.target)))
+        assertThat(keleres.exhaustAnnouncementAfterName(fixture.use(keleres, fixture.target)))
                 .contains("to target " + fixture.target.getRepresentationNoPing());
     }
 

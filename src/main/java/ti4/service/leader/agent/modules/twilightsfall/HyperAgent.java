@@ -22,9 +22,8 @@ public final class HyperAgent extends TargetedAgent {
         Player target = use.payload();
         boolean fog = use.game().isFowMode();
 
-        String userMessage = user.getRepresentation() + " drew " + cardsDrawn(user);
-        String targetMessage =
-                target.getRepresentation() + " drew " + cardsDrawn(target) + (fog ? " via " + GENOME : "");
+        String userMessage = " drew " + cardsDrawn(user);
+        String targetMessage = " drew " + cardsDrawn(target) + (fog ? " via " + GENOME : "");
         if (target.getTg() > 0) {
             target.setTg(target.getTg() - 1);
             user.gainTG(1, true);
@@ -37,7 +36,7 @@ public final class HyperAgent extends TargetedAgent {
 
         ActionCardHelper.drawActionCardsSilent(user, 1);
         ActionCardHelper.drawActionCardsSilent(target, 1);
-        return AgentOutcome.of(Message.to(user, userMessage), Message.to(target, targetMessage));
+        return AgentOutcome.of(Message.addressedTo(user, userMessage), Message.addressedTo(target, targetMessage));
     }
 
     private static String cardsDrawn(Player player) {

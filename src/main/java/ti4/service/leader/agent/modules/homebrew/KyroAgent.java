@@ -28,15 +28,15 @@ public final class KyroAgent extends TargetedAgent {
         ButtonHelper.resolveMinisterOfCommerceCheck(use.game(), target, use.event());
         ButtonHelperAgents.cabalAgentInitiation(use.game(), target);
 
-        String message = target.getFactionEmojiOrColor() + " replenished commodities due to " + use.agentName() + ".";
+        String message =
+                target.getFactionEmojiOrColor() + " replenished commodities due to " + use.agentNameFor(target) + ".";
         int infantry = commoditiesTotal - 1;
         List<Button> placeInfantry =
                 Helper.getPlanetPlaceUnitButtons(kyro, use.game(), infantry + "gf", "placeOneNDone_skipbuild");
         return AgentOutcome.notifyInFog(use.game(), target, message, kyro)
-                .and(Message.withButtons(
+                .and(Message.addressedTo(
                         kyro,
-                        kyro.getRepresentationUnfogged() + ", please choose the planet you wish to drop " + infantry
-                                + " infantry upon.",
+                        ", please choose the planet you wish to drop " + infantry + " infantry upon.",
                         placeInfantry));
     }
 }

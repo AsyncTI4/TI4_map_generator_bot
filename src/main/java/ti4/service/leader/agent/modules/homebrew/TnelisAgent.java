@@ -1,17 +1,16 @@
 package ti4.service.leader.agent.modules.homebrew;
 
-import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentUse;
+import ti4.service.leader.agent.UntargetedAgent;
 
-public final class TnelisAgent extends AgentModule<Player> {
+public final class TnelisAgent extends UntargetedAgent {
 
     static final String ID = "tnelisagent";
     static final String FACTION_KEY = "tnelisAgentFaction";
@@ -25,11 +24,6 @@ public final class TnelisAgent extends AgentModule<Player> {
                 ownedButtonId(tnelis, ID, tnelis.getFaction()),
                 useLabel(tnelis, ID, "Tnelis Agent"),
                 FactionEmojis.tnelis);
-    }
-
-    @Override
-    public Optional<Player> decode(Game game, Player user, String payload) {
-        return Optional.of(user);
     }
 
     @Override

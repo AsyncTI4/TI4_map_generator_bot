@@ -34,7 +34,7 @@ public final class VadenAgent extends TargetedAgent {
 
         String message = target.getFactionEmojiOrColor() + " max influence planet has " + maxInfluence
                 + " influence, so they gained " + gained + " commodit" + (gained == 1 ? "y" : "ies") + " ("
-                + initialCommodities + "->" + target.getCommodities() + ") due to " + use.agentName() + ".";
+                + initialCommodities + "->" + target.getCommodities() + ") due to " + use.agentNameFor(target) + ".";
         return AgentOutcome.notifyInFog(
                 use.game(), target, message, use.user(), target.getFactionEmojiOrColor() + " has finished resolving");
     }

@@ -2,11 +2,14 @@ package ti4.service.leader.agent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -23,6 +26,7 @@ import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.Mapper;
 import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
@@ -156,8 +160,12 @@ public class AgentLifecycle {
 
         exhaust(game, player, leader, agentId, parsed.hasPayload() ? parsed.payload() : null);
         AgentUse<P> use = new AgentUse<>(game, player, payload.get(), agentName, viaYssaril, event);
-        MessageHelper.sendMessageToChannel(replyChannel, module.exhaustAnnouncement(use));
-        deliver(module.resolve(use), pressedAgentButton ? event : null, player);
+        GenericInteractionCreateEvent pressedButton = pressedAgentButton ? event : null;
+        deliver(
+                AgentOutcome.of(Message.addressedTo(player, module.exhaustAnnouncementAfterName(use))),
+                pressedButton,
+                player);
+        deliver(module.resolve(use), pressedButton, player);
         if (pressedAgentButton) {
             finish(event, game, player, agentId);
         } else {
@@ -186,12 +194,20 @@ public class AgentLifecycle {
     }
 
     public static void deliver(AgentOutcome outcome, GenericInteractionCreateEvent pressedButton, Player presser) {
-        for (AgentOutcome.Message message : outcome.messages()) {
-            boolean privateToRecipient =
-                    message.recipient() != presser && presser.getGame().isFowMode();
-            MessageChannel channel =
-                    privateToRecipient ? message.recipient().getCorrectChannel() : replyChannel(presser, pressedButton);
-            MessageHelper.sendMessageToChannelWithButtons(channel, message.text(), new ArrayList<>(message.buttons()));
+        Set<Player> sentButtonsElsewhere = new LinkedHashSet<>();
+        for (Message message : outcome.messages()) {
+            MessageChannel channel = deliveryChannel(message, pressedButton, presser);
+            String text = message.namesRecipient()
+                    ? addresseeName(message.recipient(), channel, pressedButton, presser) + message.text()
+                    : message.text();
+            send(channel, text, message);
+            if (sentAnotherPlayerButtonsElsewhere(message, channel, pressedButton, presser)) {
+                sentButtonsElsewhere.add(message.recipient());
+            }
+        }
+        for (Player recipient : sentButtonsElsewhere) {
+            MessageHelper.sendMessageToChannel(
+                    replyChannel(presser, pressedButton), sentButtonsConfirmation(recipient));
         }
         if (outcome.pressedMessageEdit() != null && pressedButton instanceof ButtonInteractionEvent buttonEvent) {
             buttonEvent
@@ -199,6 +215,58 @@ public class AgentLifecycle {
                     .editMessage(outcome.pressedMessageEdit())
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         }
+    }
+
+    private static void send(MessageChannel channel, String text, Message message) {
+        List<Button> buttons = new ArrayList<>(message.buttons());
+        if (message.pagedButtons()) {
+            MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, text, buttons);
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(channel, text, buttons);
+        }
+    }
+
+    static boolean sentAnotherPlayerButtonsElsewhere(
+            Message message, MessageChannel deliveredTo, GenericInteractionCreateEvent pressedButton, Player presser) {
+        return pressedButton != null
+                && message.recipient() != presser
+                && !message.buttons().isEmpty()
+                && !sameChannel(deliveredTo, pressedButton.getMessageChannel());
+    }
+
+    static String sentButtonsConfirmation(Player recipient) {
+        String who = recipient.getGame().isFowMode() ? "the chosen player" : recipient.getRepresentationNoPing();
+        return "Sent the buttons to " + who + ".";
+    }
+
+    static String addresseeName(
+            Player recipient, MessageChannel channel, GenericInteractionCreateEvent pressedButton, Player presser) {
+        boolean presserIsReadingThisChannel = recipient == presser
+                && pressedButton != null
+                && sameChannel(channel, pressedButton.getMessageChannel());
+        return presserIsReadingThisChannel
+                ? recipient.getRepresentationNoPing()
+                : recipient.getRepresentationUnfogged();
+    }
+
+    static MessageChannel deliveryChannel(
+            Message message, GenericInteractionCreateEvent pressedButton, Player presser) {
+        Player recipient = message.recipient();
+        if (message.route() == Message.Route.CARDS_INFO_THREAD) {
+            return recipient.getCardsInfoThread();
+        }
+        if (recipient != presser && (presser.getGame().isFowMode() || pressedInPrivateThread(pressedButton))) {
+            return recipient.getCorrectChannel();
+        }
+        return replyChannel(presser, pressedButton);
+    }
+
+    private static boolean pressedInPrivateThread(GenericInteractionCreateEvent pressedButton) {
+        return pressedButton != null && pressedButton.getMessageChannel().getType() == ChannelType.GUILD_PRIVATE_THREAD;
+    }
+
+    private static boolean sameChannel(MessageChannel first, MessageChannel second) {
+        return first != null && second != null && first.getId().equals(second.getId());
     }
 
     private static void cleanUpPressedButton(ButtonInteractionEvent buttonEvent) {

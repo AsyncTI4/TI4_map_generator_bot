@@ -36,7 +36,7 @@ class HomebrewFlagAgentsTest extends BaseTi4Test {
         var toldar = HomebrewExhaustOnlyAgents.TOLDAR;
         var choice = toldar.decode(fixture.game, fixture.user, "pi_hacan").orElseThrow();
 
-        assertThat(toldar.exhaustAnnouncement(fixture.use(toldar, choice)))
+        assertThat(toldar.exhaustAnnouncementAfterName(fixture.use(toldar, choice)))
                 .contains("Maertin Donaais, the Toldar agent on");
     }
 }

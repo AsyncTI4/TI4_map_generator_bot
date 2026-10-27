@@ -52,10 +52,9 @@ public final class ArtunoAgent extends AgentModule<Integer> {
         Player artuno = use.user();
         artuno.getLeader(ID).ifPresent(leader -> leader.setTgCount(tradeGoods));
         tellAJokeSometimes(artuno);
-        return AgentOutcome.of(Message.to(
+        return AgentOutcome.of(Message.addressedTo(
                 artuno,
-                artuno.getRepresentation() + " placed " + StringHelper.pluralize(tradeGoods, "trade good")
-                        + " on top of " + use.agentName() + "."));
+                " placed " + StringHelper.pluralize(tradeGoods, "trade good") + " on top of " + use.agentName() + "."));
     }
 
     private static void tellAJokeSometimes(Player artuno) {

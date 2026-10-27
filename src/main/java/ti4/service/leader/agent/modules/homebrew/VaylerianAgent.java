@@ -86,7 +86,7 @@ public final class VaylerianAgent extends AgentModule<VaylerianAgent.Choice> {
         if (!game.isFowMode()) {
             return AgentOutcome.none();
         }
-        return AgentOutcome.of(Message.to(
+        return AgentOutcome.of(Message.plain(
                 user, target.getFactionEmojiOrColor() + " gained 1 action card from using " + agentName + "."));
     }
 
@@ -97,10 +97,7 @@ public final class VaylerianAgent extends AgentModule<VaylerianAgent.Choice> {
                         .map(button -> button.withCustomId(user.factionButtonChecker()
                                 + AgentStepIds.flagCopy(button.getCustomId(), use.viaYssaril())))
                         .toList();
-        return AgentOutcome.of(Message.withButtons(
-                user,
-                user.getRepresentationUnfogged() + ", please choose the faction on which you wish to use "
-                        + use.agentName() + ".",
-                targets));
+        return AgentOutcome.of(Message.addressedTo(
+                user, ", please choose the faction on which you wish to use " + use.agentName() + ".", targets));
     }
 }

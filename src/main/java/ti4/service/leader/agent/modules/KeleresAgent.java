@@ -1,15 +1,11 @@
 package ti4.service.leader.agent.modules;
 
-import java.util.Optional;
-import org.apache.commons.lang3.StringUtils;
-import ti4.game.Game;
 import ti4.game.Player;
-import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
-import ti4.service.leader.agent.AgentTargets;
 import ti4.service.leader.agent.AgentUse;
+import ti4.service.leader.agent.SelfOrTargetedAgent;
 
-public final class KeleresAgent extends AgentModule<Player> {
+public final class KeleresAgent extends SelfOrTargetedAgent {
 
     static final String ID = "keleresagent";
     static final String TARGET_KEY = "keleresAgentTarget";
@@ -19,16 +15,8 @@ public final class KeleresAgent extends AgentModule<Player> {
     }
 
     @Override
-    public Optional<Player> decode(Game game, Player user, String payload) {
-        if (StringUtils.isEmpty(payload)) {
-            return Optional.of(user);
-        }
-        return AgentTargets.player(game, payload);
-    }
-
-    @Override
-    public String exhaustAnnouncement(AgentUse<Player> use) {
-        return use.user().getRepresentation() + " has exhausted " + use.agentName() + " to target "
+    public String exhaustAnnouncementAfterName(AgentUse<Player> use) {
+        return " has exhausted " + use.agentName() + " to target "
                 + use.payload().getRepresentationNoPing() + ".";
     }
 

@@ -33,12 +33,12 @@ public final class AugersAgent extends TargetedAgent {
         int oldTg = target.getTg();
         target.setTg(oldTg + TRADE_GOODS_GAINED);
 
-        AgentOutcome outcome = AgentOutcome.of(Message.to(
+        AgentOutcome outcome = AgentOutcome.of(Message.plain(
                 target,
                 target.getFactionEmojiOrColor() + " gained " + TRADE_GOODS_GAINED + " trade goods from "
-                        + use.agentName() + ", being used (" + oldTg + "->" + target.getTg() + ")."));
+                        + use.agentNameFor(target) + ", being used (" + oldTg + "->" + target.getTg() + ")."));
         if (use.game().isFowMode()) {
-            outcome = outcome.and(Message.to(
+            outcome = outcome.and(Message.plain(
                     use.user(),
                     target.getFactionEmojiOrColor() + " gained " + TRADE_GOODS_GAINED
                             + " trade goods due to agent usage."));

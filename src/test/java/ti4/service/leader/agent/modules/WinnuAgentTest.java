@@ -35,7 +35,7 @@ class WinnuAgentTest extends BaseTi4Test {
         AgentModuleFixture fixture = new AgentModuleFixture("winnu");
         WinnuAgent winnu = new WinnuAgent();
 
-        assertThat(winnu.exhaustAnnouncement(fixture.use(winnu, fixture.target)))
+        assertThat(winnu.exhaustAnnouncementAfterName(fixture.use(winnu, fixture.target)))
                 .contains("has exhausted Berekar Berekon, the Winnu agent for use on")
                 .contains(fixture.target.getRepresentationNoPing());
     }

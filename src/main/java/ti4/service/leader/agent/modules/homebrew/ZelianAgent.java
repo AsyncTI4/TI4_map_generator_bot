@@ -55,15 +55,14 @@ public final class ZelianAgent extends TargetedAgent {
         AddUnitService.addUnits(use.event(), tile, use.game(), target.getColor(), "1 mech");
 
         String message = target.getFactionEmojiOrColor() + " replace 1 infantry with 1 mech in "
-                + tile.getRepresentationForButtons(use.game(), target) + " due to " + use.agentName() + ".";
+                + tile.getRepresentationForButtons(use.game(), target) + " due to " + use.agentNameFor(target) + ".";
         AgentOutcome outcome = AgentOutcome.notifyInFog(use.game(), target, message, use.user());
         if (target != use.user()) {
             return outcome;
         }
-        return outcome.and(Message.withButtons(
+        return outcome.and(Message.addressedTo(
                 target,
-                target.getRepresentationUnfogged() + ", you may now land troops in "
-                        + tile.getRepresentationForButtons(use.game(), target) + ".",
+                ", you may now land troops in " + tile.getRepresentationForButtons(use.game(), target) + ".",
                 TacticalActionService.getLandingTroopsButtons(use.game(), target, tile)));
     }
 }

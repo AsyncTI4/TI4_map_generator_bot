@@ -41,20 +41,7 @@ import ti4.service.unit.RemoveUnitService;
 
 public final class TeHelperAgents {
 
-    public static boolean handleTeAgentExhaust(Game game, Player player, String leaderID, String targetPlayer) {
-        Player target = game.getPlayerFromColorOrFaction(targetPlayer);
-        if (target == null) target = player;
-        switch (leaderID) {
-            case "crimsonagent" -> postCrimsonAgentStep1(game, target);
-            case "ralnelagent" -> postRalNelAgentStep1(game, target);
-            default -> {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static void postRalNelAgentStep1(Game game, Player player) {
+    public static List<Button> drawRalNelAgentCards(Game game, Player player) {
         Map<String, Integer> acsBefore = new HashMap<>(player.getActionCards());
         ActionCardHelper.drawActionCards(player, 2);
         Map<String, Integer> acsAfter = new HashMap<>(player.getActionCards());
@@ -67,12 +54,7 @@ public final class TeHelperAgents {
             ActionCardModel model = Mapper.getActionCard(ac);
             buttons.add(Buttons.red("handleRalNelAgent_" + ac, model.getName(), CardEmojis.getACEmoji(game)));
         }
-
-        String msg = player.getRepresentation(true, true)
-                + ", please choose the action card you wish to send to another another player.";
-        if (player.getActionCards().size() > ButtonHelper.getACLimit(game, player))
-            msg += "\nNB: This happens __before__ discarding down to hand limit.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        return buttons;
     }
 
     @ButtonHandler("handleRalNelAgent_")
@@ -121,15 +103,6 @@ public final class TeHelperAgents {
             }
             ButtonHelper.deleteMessage(event);
         });
-    }
-
-    private static void postCrimsonAgentStep1(Game game, Player player) {
-        Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
-        String message =
-                player.getRepresentation() + ", please choose the first system from which you wish to swap a ship.";
-        List<Button> buttons =
-                ButtonHelper.getTilesWithPredicateForAction(player, game, "handleCrimsonAgent", pred, false);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
     @ButtonHandler("handleCrimsonAgent_")

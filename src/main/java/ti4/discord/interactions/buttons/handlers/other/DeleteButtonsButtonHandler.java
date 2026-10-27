@@ -62,8 +62,11 @@ import ti4.service.fow.LoreService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.WinnuAgent;
+import ti4.service.leader.agent.modules.homebrew.GhotiAgent;
 import ti4.service.leader.agent.modules.homebrew.GledgeAgent;
 import ti4.service.leader.agent.modules.homebrew.LunariumAgent;
+import ti4.service.leader.agent.modules.homebrew.MortheusAgent;
+import ti4.service.leader.agent.modules.homebrew.RohDhnaAgent;
 import ti4.service.turn.StartTurnService;
 import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
@@ -380,24 +383,17 @@ class DeleteButtonsButtonHandler {
                 }
 
                 if (player.hasUnexhaustedLeader("ghotiagent")) {
-                    buttons.add(Buttons.red(
-                            "exhaustAgent_ghotiagent_" + player.getFaction(), "Use Ghoti Agent", FactionEmojis.ghoti));
+                    buttons.add(GhotiAgent.button(player));
                 }
 
                 if (player.hasUnexhaustedLeader("mortheusagent")) {
-                    buttons.add(Buttons.red(
-                            "exhaustAgent_mortheusagent_" + player.getFaction(),
-                            "Use Mortheus Agent",
-                            FactionEmojis.mortheus));
+                    buttons.add(MortheusAgent.button(player));
                 }
                 if (player.hasUnexhaustedLeader("rohdhnaagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
-                    buttons.add(Buttons.red(
-                            "exhaustAgent_rohdhnaagent_" + player.getFaction(),
-                            "Use Roh'Dhna Agent",
-                            FactionEmojis.rohdhna));
+                    buttons.add(RohDhnaAgent.button(player));
                 }
                 if (player.hasLeaderUnlocked("hacanhero")
                         && !"muaatagent".equalsIgnoreCase(buttonID)

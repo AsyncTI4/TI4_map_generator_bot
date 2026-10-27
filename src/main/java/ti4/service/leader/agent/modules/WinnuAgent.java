@@ -2,7 +2,6 @@ package ti4.service.leader.agent.modules;
 
 import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -27,10 +26,7 @@ public final class WinnuAgent extends SpendAgent {
 
     @Override
     public Optional<Player> decode(Game game, Player user, String payload) {
-        if (StringUtils.isEmpty(payload)) {
-            return Optional.of(user);
-        }
-        return AgentTargets.player(game, payload);
+        return AgentTargets.playerOrUser(game, user, payload);
     }
 
     @Override

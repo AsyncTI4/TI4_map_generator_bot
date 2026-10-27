@@ -1,14 +1,12 @@
 package ti4.service.leader.agent.modules.homebrew;
 
-import java.util.Optional;
-import ti4.game.Game;
 import ti4.game.Player;
-import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.service.leader.agent.AgentUse;
+import ti4.service.leader.agent.UntargetedAgent;
 
-public final class UydaiAgent extends AgentModule<Player> {
+public final class UydaiAgent extends UntargetedAgent {
 
     static final String ID = "uydaiagent";
 
@@ -17,13 +15,8 @@ public final class UydaiAgent extends AgentModule<Player> {
     }
 
     @Override
-    public Optional<Player> decode(Game game, Player user, String payload) {
-        return Optional.of(user);
-    }
-
-    @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
-        return AgentOutcome.of(Message.to(
+        return AgentOutcome.of(Message.plain(
                 use.user(),
                 "This is not automated. The following command allows you to place a card back on the bottom of a"
                         + " deck: `/game place_drawable_card`. Any immediate effects of the already drawn card will"
