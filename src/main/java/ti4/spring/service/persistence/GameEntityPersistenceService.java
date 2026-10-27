@@ -27,6 +27,11 @@ public class GameEntityPersistenceService {
         deleteGameRows(gameName);
     }
 
+    @Transactional
+    public void recordSourceLastModified(String gameName, long lastModified) {
+        gameEntityRepository.updateSourceLastModified(gameName, lastModified);
+    }
+
     private void upsertUsers(List<UserEntity> users) {
         List<UserEntity> usersToSave = users.stream()
                 .filter(user ->

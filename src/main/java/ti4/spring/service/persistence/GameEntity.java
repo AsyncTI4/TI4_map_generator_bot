@@ -31,6 +31,9 @@ public class GameEntity {
     @Column(name = "ended_epoch_milliseconds")
     private Long endedEpochMilliseconds;
 
+    @Column(name = "source_last_modified_epoch_milliseconds")
+    private Long sourceLastModifiedEpochMilliseconds;
+
     @Column(name = "round_number")
     private int round;
 
