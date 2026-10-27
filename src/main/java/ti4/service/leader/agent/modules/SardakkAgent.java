@@ -85,10 +85,8 @@ public final class SardakkAgent extends AgentModule<SardakkAgent.Choice> {
     }
 
     private static AgentOutcome offerPlanets(AgentUse<Choice> use, Player target) {
-        return AgentOutcome.of(Message.withButtons(
-                target,
-                target.getRepresentationUnfogged() + ", use buttons to resolve " + use.agentName() + ".",
-                placementButtons(use.game(), target)));
+        return AgentOutcome.of(Message.addressedTo(
+                target, ", use buttons to resolve " + use.agentName() + ".", placementButtons(use.game(), target)));
     }
 
     private static AgentOutcome placeInfantry(AgentUse<Choice> use, PlaceOnPlanet place) {

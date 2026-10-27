@@ -27,10 +27,9 @@ public final class MykoMentoriAgent extends UntargetedAgent {
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player myko = use.user();
-        return AgentOutcome.of(Message.withButtons(
+        return AgentOutcome.of(Message.addressedTo(
                 myko,
-                myko.getRepresentationUnfogged()
-                        + ", you may play an Omen die with the following buttons. Duplicate dice are not shown.",
+                ", you may play an Omen die with the following buttons. Duplicate dice are not shown.",
                 ButtonHelperAbilities.omenDiceButtons(use.game(), OMEN_DIE_FROM_AGENT)));
     }
 }

@@ -19,8 +19,8 @@ public final class IronAgent extends TargetedAgent {
         Player target = use.payload();
         return AgentOutcome.offer(
                 target,
-                IronLeadersHandler.productionSystemMessage(target),
+                ", choose a system to produce 1 unit with " + use.agentName() + ". Its cost is reduced by 1.",
                 IronLeadersHandler.agentProductionSystemButtons(use.game(), target),
-                target.getRepresentationNoPing() + " has no system containing one of their units with PRODUCTION.");
+                " has no system containing one of their units with PRODUCTION.");
     }
 }

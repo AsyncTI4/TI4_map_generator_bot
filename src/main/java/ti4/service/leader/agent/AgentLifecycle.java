@@ -23,6 +23,7 @@ import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.Mapper;
 import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
@@ -156,8 +157,9 @@ public class AgentLifecycle {
 
         exhaust(game, player, leader, agentId, parsed.hasPayload() ? parsed.payload() : null);
         AgentUse<P> use = new AgentUse<>(game, player, payload.get(), agentName, viaYssaril, event);
-        MessageHelper.sendMessageToChannel(replyChannel, module.exhaustAnnouncement(use));
-        deliver(module.resolve(use), pressedAgentButton ? event : null, player);
+        GenericInteractionCreateEvent pressedButton = pressedAgentButton ? event : null;
+        deliver(AgentOutcome.of(Message.addressedTo(player, module.exhaustAnnouncement(use))), pressedButton, player);
+        deliver(module.resolve(use), pressedButton, player);
         if (pressedAgentButton) {
             finish(event, game, player, agentId);
         } else {
@@ -186,11 +188,12 @@ public class AgentLifecycle {
     }
 
     public static void deliver(AgentOutcome outcome, GenericInteractionCreateEvent pressedButton, Player presser) {
-        for (AgentOutcome.Message message : outcome.messages()) {
-            MessageHelper.sendMessageToChannelWithButtons(
-                    deliveryChannel(message, pressedButton, presser),
-                    message.text(),
-                    new ArrayList<>(message.buttons()));
+        for (Message message : outcome.messages()) {
+            MessageChannel channel = deliveryChannel(message, pressedButton, presser);
+            String text = message.addressed()
+                    ? addresseeName(message.recipient(), channel, pressedButton, presser) + message.text()
+                    : message.text();
+            MessageHelper.sendMessageToChannelWithButtons(channel, text, new ArrayList<>(message.buttons()));
         }
         if (outcome.pressedMessageEdit() != null && pressedButton instanceof ButtonInteractionEvent buttonEvent) {
             buttonEvent
@@ -200,8 +203,19 @@ public class AgentLifecycle {
         }
     }
 
+    static String addresseeName(
+            Player recipient, MessageChannel channel, GenericInteractionCreateEvent pressedButton, Player presser) {
+        boolean presserIsReadingThisChannel = recipient == presser
+                && pressedButton != null
+                && channel != null
+                && channel.getId().equals(pressedButton.getMessageChannel().getId());
+        return presserIsReadingThisChannel
+                ? recipient.getRepresentationNoPing()
+                : recipient.getRepresentationUnfogged();
+    }
+
     private static MessageChannel deliveryChannel(
-            AgentOutcome.Message message, GenericInteractionCreateEvent pressedButton, Player presser) {
+            Message message, GenericInteractionCreateEvent pressedButton, Player presser) {
         if (message.secret()) {
             return message.recipient().getCardsInfoThread();
         }

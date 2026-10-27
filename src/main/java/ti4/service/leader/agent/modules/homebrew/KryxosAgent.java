@@ -19,10 +19,8 @@ public final class KryxosAgent extends TargetedAgent {
         Player target = use.payload();
         return AgentOutcome.offer(
                 target,
-                target.getRepresentationUnfogged() + ", please choose the non-faction technology to return for "
-                        + use.agentName() + ".",
+                ", please choose the non-faction technology to return for " + use.agentName() + ".",
                 KryxosLeadersHandler.agentReturnTechButtons(target),
-                target.getRepresentationNoPing() + " has no non-faction technology available to return for "
-                        + use.agentName() + ".");
+                " has no non-faction technology available to return for " + use.agentName() + ".");
     }
 }

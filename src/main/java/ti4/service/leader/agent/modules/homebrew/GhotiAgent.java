@@ -26,9 +26,9 @@ public final class GhotiAgent extends TargetedAgent {
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player target = use.payload();
-        return AgentOutcome.of(Message.withButtons(
+        return AgentOutcome.of(Message.addressedTo(
                 target,
-                target.getRepresentationUnfogged() + ", please choose how you wish to use " + use.agentName() + ".",
+                ", please choose how you wish to use " + use.agentName() + ".",
                 List.of(
                         Buttons.green("ghotiATG", "Get 1 Trade Good"),
                         Buttons.gray("ghotiAProd", "Produce 2 Additional Units"),

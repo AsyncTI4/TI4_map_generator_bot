@@ -42,8 +42,9 @@ class HyperAgentTest extends BaseTi4Test {
 
         AgentOutcome outcome = hyper.resolve(fixture.use(hyper, fixture.target));
 
-        assertThat(outcome.messages().get(0).text())
-                .startsWith(fixture.user.getRepresentation() + " drew 1 action card");
+        // The lifecycle puts the user's name in front when it delivers the message.
+        assertThat(outcome.messages().get(0).addressed()).isTrue();
+        assertThat(outcome.messages().get(0).text()).startsWith(" drew 1 action card");
         assertThat(outcome.messages().get(1).text()).contains("drew 2 action cards (Scheming)");
     }
 

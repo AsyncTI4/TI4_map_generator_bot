@@ -21,6 +21,6 @@ public final class VeylorAgent extends TargetedAgent {
         Player target = use.payload();
         ActionCardHelper.drawActionCards(target, 1);
         AgendaHelper.drawAgenda(1, use.game(), target);
-        return AgentOutcome.of(Message.to(target, target.getRepresentation() + " drew 1 agenda."));
+        return AgentOutcome.of(Message.addressedTo(target, " drew 1 agenda."));
     }
 }

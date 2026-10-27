@@ -18,9 +18,9 @@ public final class ArdentiaAgent extends TargetedAgent {
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player target = use.payload();
-        return AgentOutcome.of(Message.withButtons(
+        return AgentOutcome.of(Message.addressedTo(
                 target,
-                target.getRepresentationUnfogged() + ", please choose how to spend 1 influence.",
+                ", please choose how to spend 1 influence.",
                 ArdentiaLeadersHandler.agentPaymentButtons(use.game(), target)));
     }
 }

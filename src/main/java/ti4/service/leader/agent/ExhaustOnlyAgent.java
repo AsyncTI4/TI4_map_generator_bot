@@ -36,7 +36,7 @@ public final class ExhaustOnlyAgent extends AgentModule<ExhaustOnlyAgent.Choice>
                 .filter(target -> target != use.user())
                 .map(target -> " on " + target.getRepresentationNoPing())
                 .orElse("");
-        return use.user().getRepresentation() + " has exhausted " + use.agentName() + onTarget + ".";
+        return " has exhausted " + use.agentName() + onTarget + ".";
     }
 
     @Override

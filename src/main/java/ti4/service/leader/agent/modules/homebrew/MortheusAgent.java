@@ -28,10 +28,9 @@ public final class MortheusAgent extends TargetedAgent {
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player target = use.payload();
-        return AgentOutcome.of(Message.withButtons(
+        return AgentOutcome.of(Message.addressedTo(
                 target,
-                target.getRepresentationUnfogged()
-                        + ", please choose which system the ship you just produced is in.\nYou need to tell the bot"
+                ", please choose which system the ship you just produced is in.\nYou need to tell the bot"
                         + " which system the unit was produced in first, after which it will give tiles to move it to.",
                 ButtonHelper.getDomnaStepOneTiles(target, use.game())));
     }

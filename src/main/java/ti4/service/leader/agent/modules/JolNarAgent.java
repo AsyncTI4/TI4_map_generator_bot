@@ -26,9 +26,9 @@ public final class JolNarAgent extends AgentModule<Player> {
     }
 
     public static Message offerInfantryRemoval(Game game, Player target) {
-        return Message.withButtons(
+        return Message.addressedTo(
                 target,
-                target.getRepresentationUnfogged() + ", you may use the buttons to remove infantry.",
+                ", you may use the buttons to remove infantry.",
                 ButtonHelperAgents.getJolNarAgentButtons(target, game));
     }
 

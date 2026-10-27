@@ -19,9 +19,8 @@ public final class AeternaAgent extends TargetedAgent {
         Player target = use.payload();
         return AgentOutcome.offer(
                 target,
-                target.getRepresentationUnfogged() + ", please choose a non-fighter ship to destroy for "
-                        + use.agentName() + ".",
+                ", please choose a non-fighter ship to destroy for " + use.agentName() + ".",
                 AeternaLeadersHandler.agentShipButtons(use.game(), target),
-                target.getRepresentationNoPing() + " has no eligible non-fighter ships.");
+                " has no eligible non-fighter ships.");
     }
 }

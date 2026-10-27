@@ -19,11 +19,10 @@ public final class KolumeAgent extends TargetedAgent {
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player target = use.payload();
-        return AgentOutcome.of(Message.withButtons(
+        return AgentOutcome.of(Message.addressedTo(
                 target,
-                target.getRepresentationUnfogged()
-                        + ", use buttons to redistribute 1 command token (the bot allows more but "
-                        + use.agentName() + " is restricted to redistributing 1).",
+                ", use buttons to redistribute 1 command token (the bot allows more but " + use.agentName()
+                        + " is restricted to redistributing 1).",
                 List.of(
                         Buttons.REDISTRIBUTE_CCs,
                         Buttons.red(target.factionButtonChecker() + "deleteButtons", "Delete These Buttons"))));

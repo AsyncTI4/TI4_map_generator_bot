@@ -33,11 +33,12 @@ public record AgentOutcome(List<Message> messages, String pressedMessageEdit) {
         return outcome;
     }
 
-    public static AgentOutcome offer(Player recipient, String prompt, List<Button> buttons, String whenNothingToOffer) {
+    public static AgentOutcome offer(
+            Player recipient, String promptAfterName, List<Button> buttons, String nothingToOfferAfterName) {
         if (buttons.isEmpty()) {
-            return of(Message.to(recipient, whenNothingToOffer));
+            return of(Message.addressedTo(recipient, nothingToOfferAfterName));
         }
-        return of(Message.withButtons(recipient, prompt, buttons));
+        return of(Message.addressedTo(recipient, promptAfterName, buttons));
     }
 
     public AgentOutcome and(Message message) {
@@ -50,22 +51,30 @@ public record AgentOutcome(List<Message> messages, String pressedMessageEdit) {
         return new AgentOutcome(messages, text);
     }
 
-    public record Message(Player recipient, String text, List<Button> buttons, boolean secret) {
+    public record Message(Player recipient, String text, List<Button> buttons, boolean secret, boolean addressed) {
 
         public Message {
             buttons = List.copyOf(buttons);
         }
 
         public static Message to(Player recipient, String text) {
-            return new Message(recipient, text, List.of(), false);
+            return new Message(recipient, text, List.of(), false, false);
         }
 
         public static Message withButtons(Player recipient, String text, List<Button> buttons) {
-            return new Message(recipient, text, buttons, false);
+            return new Message(recipient, text, buttons, false, false);
+        }
+
+        public static Message addressedTo(Player recipient, String textAfterName) {
+            return new Message(recipient, textAfterName, List.of(), false, true);
+        }
+
+        public static Message addressedTo(Player recipient, String textAfterName, List<Button> buttons) {
+            return new Message(recipient, textAfterName, buttons, false, true);
         }
 
         public static Message privatelyTo(Player recipient, String text, List<Button> buttons) {
-            return new Message(recipient, text, buttons, true);
+            return new Message(recipient, text, buttons, true, false);
         }
     }
 }

@@ -27,8 +27,8 @@ public final class SarcosaAgent extends AgentModule<Player> {
         Player target = use.payload();
         return AgentOutcome.offer(
                 target,
-                target.getRepresentationUnfogged() + ", choose a system in or adjacent to one containing your units.",
+                ", choose a system in or adjacent to one containing your units.",
                 SarcosaAgentHandler.agentSystemButtons(use.game(), target),
-                target.getRepresentationNoPing() + " has no eligible systems.");
+                " has no eligible systems.");
     }
 }

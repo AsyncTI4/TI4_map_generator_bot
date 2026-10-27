@@ -2,7 +2,11 @@ package ti4.service.leader.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
@@ -112,5 +116,65 @@ class AgentLifecycleTest extends BaseTi4Test {
         game.setTwilightsFallMode(true);
 
         assertThat(AgentLifecycle.agentNameFor(game, mentak, "saaragent")).isEqualTo("the _Captain's Genome_");
+    }
+
+    @Test
+    void noGenomeIsCalledAnAgentInTwilightsFall() {
+        game.setTwilightsFallMode(true);
+
+        for (AgentModule<?> module : AgentModules.ALL) {
+            String cardName = AgentLifecycle.cardName(game, module);
+            if (cardName.endsWith("Genome")) {
+                assertThat(AgentLifecycle.agentName(cardName, false))
+                        .as(module.agentId())
+                        .doesNotContain("agent");
+                assertThat(AgentLifecycle.agentName(cardName, true))
+                        .as(module.agentId())
+                        .doesNotContain("agent");
+            }
+        }
+    }
+
+    @Test
+    void thePresserIsNotPingedInTheChannelTheyPressedIn() {
+        MessageChannel pressedChannel = channel("1");
+        GenericInteractionCreateEvent press = pressIn(pressedChannel);
+
+        assertThat(AgentLifecycle.addresseeName(mentak, pressedChannel, press, mentak))
+                .isEqualTo(mentak.getRepresentationNoPing());
+    }
+
+    @Test
+    void thePresserIsPingedInAnyOtherChannel() {
+        GenericInteractionCreateEvent press = pressIn(channel("1"));
+
+        assertThat(AgentLifecycle.addresseeName(mentak, channel("2"), press, mentak))
+                .isEqualTo(mentak.getRepresentationUnfogged());
+        // Without a pressed agent button the message lands in the player's own channel, so they are pinged.
+        assertThat(AgentLifecycle.addresseeName(mentak, channel("1"), null, mentak))
+                .isEqualTo(mentak.getRepresentationUnfogged());
+    }
+
+    @Test
+    void anotherPlayerIsPingedEvenInThePressedChannel() {
+        Player target = game.addPlayer("targetUser", "Target Player");
+        target.setFaction(game, "hacan");
+        target.setColor("blue");
+        MessageChannel pressedChannel = channel("1");
+
+        assertThat(AgentLifecycle.addresseeName(target, pressedChannel, pressIn(pressedChannel), mentak))
+                .isEqualTo(target.getRepresentationUnfogged());
+    }
+
+    private static MessageChannel channel(String id) {
+        MessageChannel channel = mock(MessageChannel.class);
+        when(channel.getId()).thenReturn(id);
+        return channel;
+    }
+
+    private static GenericInteractionCreateEvent pressIn(MessageChannel channel) {
+        GenericInteractionCreateEvent press = mock(GenericInteractionCreateEvent.class);
+        when(press.getMessageChannel()).thenReturn(channel);
+        return press;
     }
 }

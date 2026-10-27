@@ -19,8 +19,8 @@ public final class TaAgent extends TargetedAgent {
         Player target = use.payload();
         return AgentOutcome.offer(
                 target,
-                target.getRepresentationUnfogged() + ", choose a planet for " + use.agentName() + ".",
+                ", choose a planet for " + use.agentName() + ".",
                 TaLeadersHandler.agentPlanetButtons(use.game(), target),
-                target.getRepresentationNoPing() + " has no explorable planets for " + use.agentName() + ".");
+                " has no explorable planets for " + use.agentName() + ".");
     }
 }

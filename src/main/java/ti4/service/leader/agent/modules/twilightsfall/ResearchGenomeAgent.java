@@ -24,7 +24,7 @@ public final class ResearchGenomeAgent extends UntargetedAgent {
 
     @Override
     public String exhaustAnnouncement(AgentUse<Player> use) {
-        return use.user().getRepresentationNoPing() + " has used " + use.agentName() + " to add 3 cards to the draft.";
+        return " has used " + use.agentName() + " to add 3 cards to the draft.";
     }
 
     @Override

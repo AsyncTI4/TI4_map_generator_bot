@@ -43,15 +43,13 @@ public final class MirvedaAgent extends TargetedAgent {
         ButtonHelperCommanders.resolveMuaatCommanderCheck(
                 target, use.game(), use.event(), "used " + FactionEmojis.mirveda + " Logic Machina");
         return AgentOutcome.of(
-                Message.to(
+                Message.addressedTo(
                         target,
-                        target.getRepresentationUnfogged()
-                                + ", 1 command token has been removed from your strategy pool due to use of "
-                                + use.agentName() + ". You may add it back if you didn't agree to the agent."),
-                Message.withButtons(
+                        ", 1 command token has been removed from your strategy pool due to use of " + use.agentName()
+                                + ". You may add it back if you didn't agree to the agent."),
+                Message.addressedTo(
                         target,
-                        target.getRepresentationUnfogged()
-                                + ", please research a technology of a color which matches one of the prerequisites on the unit upgrade you just gained.",
+                        ", please research a technology of a color which matches one of the prerequisites on the unit upgrade you just gained.",
                         List.of(Buttons.GET_A_TECH, Buttons.red("deleteButtons", "Delete This"))));
     }
 }

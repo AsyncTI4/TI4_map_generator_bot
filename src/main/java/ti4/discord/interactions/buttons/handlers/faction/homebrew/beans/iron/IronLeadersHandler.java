@@ -156,7 +156,7 @@ public class IronLeadersHandler {
                 player.factionButtonChecker() + SELECT_HERO_PRODUCTION_SYSTEM);
     }
 
-    public static String productionSystemMessage(Player player) {
+    private static String productionSystemMessage(Player player) {
         return player.getRepresentation()
                 + ", choose a system to produce 1 unit with _Shipwright Kastel_. Its cost is reduced by 1.";
     }

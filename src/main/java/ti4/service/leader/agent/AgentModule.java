@@ -36,7 +36,7 @@ public abstract class AgentModule<P> {
     }
 
     public String exhaustAnnouncement(AgentUse<P> use) {
-        return use.user().getRepresentation() + " has exhausted " + use.agentName() + ".";
+        return " has exhausted " + use.agentName() + ".";
     }
 
     public abstract AgentOutcome resolve(AgentUse<P> use);

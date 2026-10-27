@@ -60,10 +60,9 @@ public final class ZelianAgent extends TargetedAgent {
         if (target != use.user()) {
             return outcome;
         }
-        return outcome.and(Message.withButtons(
+        return outcome.and(Message.addressedTo(
                 target,
-                target.getRepresentationUnfogged() + ", you may now land troops in "
-                        + tile.getRepresentationForButtons(use.game(), target) + ".",
+                ", you may now land troops in " + tile.getRepresentationForButtons(use.game(), target) + ".",
                 TacticalActionService.getLandingTroopsButtons(use.game(), target, tile)));
     }
 }

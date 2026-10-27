@@ -36,9 +36,9 @@ public final class EmpyreanAgent extends AgentModule<Player> {
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player target = use.payload();
         use.game().setStoredValue(ORIGINAL_TOKENS_KEY_PREFIX + target.getFaction(), target.getCCRepresentation());
-        return AgentOutcome.of(Message.withButtons(
+        return AgentOutcome.of(Message.addressedTo(
                 target,
-                target.getRepresentationUnfogged() + ", your current command tokens are " + target.getCCRepresentation()
+                ", your current command tokens are " + target.getCCRepresentation()
                         + ". Use buttons to gain command tokens.",
                 ButtonHelper.getGainCCButtons(target)));
     }

@@ -31,6 +31,6 @@ public final class BentorAgent extends TargetedAgent {
                 + (commGain == 1 ? "y" : "ies")
                 + " due to " + use.agentName() + ".";
         return AgentOutcome.notifyInFog(
-                use.game(), target, message, use.user(), target.getRepresentation() + " has finished resolving.");
+                use.game(), target, message, use.user(), target.getFactionEmojiOrColor() + " has finished resolving.");
     }
 }

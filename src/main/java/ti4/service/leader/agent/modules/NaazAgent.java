@@ -36,9 +36,9 @@ public final class NaazAgent extends AgentModule<Player> {
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player explorer = use.payload();
-        return AgentOutcome.of(Message.withButtons(
+        return AgentOutcome.of(Message.addressedTo(
                 explorer,
-                explorer.getRepresentationUnfogged() + ", please choose which planet you wish to explore.",
+                ", please choose which planet you wish to explore.",
                 ButtonHelper.getButtonsToExploreAllPlanets(explorer, use.game())));
     }
 }

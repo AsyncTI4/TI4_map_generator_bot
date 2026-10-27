@@ -31,9 +31,9 @@ public final class RohDhnaAgent extends TargetedAgent {
         Player target = use.payload();
         target.addSpentThing("Exhausted " + use.agentName() + ", for 1 command token.");
         use.game().setStoredValue(ORIGINAL_TOKENS_KEY_PREFIX + target.getFaction(), target.getCCRepresentation());
-        return AgentOutcome.of(Message.withButtons(
+        return AgentOutcome.of(Message.addressedTo(
                 target,
-                target.getRepresentationUnfogged() + ", your current command tokens are " + target.getCCRepresentation()
+                ", your current command tokens are " + target.getCCRepresentation()
                         + ". Use buttons to gain command tokens.",
                 ButtonHelper.getGainCCButtons(target)));
     }

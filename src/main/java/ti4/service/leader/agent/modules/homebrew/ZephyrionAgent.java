@@ -18,10 +18,9 @@ public final class ZephyrionAgent extends UntargetedAgent {
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player zephyrion = use.user();
-        return AgentOutcome.of(Message.withButtons(
+        return AgentOutcome.of(Message.addressedTo(
                 zephyrion,
-                zephyrion.getRepresentationUnfogged()
-                        + ", you may use the buttons to select the ship you want to kill.",
+                ", you may use the buttons to select the ship you want to kill.",
                 ZephyrionLeaderHandler.agentTargetButtons(use.game(), zephyrion)));
     }
 }

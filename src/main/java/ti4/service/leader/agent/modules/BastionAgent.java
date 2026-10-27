@@ -28,9 +28,9 @@ public final class BastionAgent extends TargetedAgent {
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player target = use.payload();
-        return AgentOutcome.of(Message.withButtons(
+        return AgentOutcome.of(Message.addressedTo(
                 target,
-                target.getRepresentationUnfogged() + ", please choose the unit that should be galvanized.",
+                ", please choose the unit that should be galvanized.",
                 GalvanizeService.getToggleGalvanizeButtons(
                         target, use.game(), activeSystem(use.game()).orElseThrow())));
     }

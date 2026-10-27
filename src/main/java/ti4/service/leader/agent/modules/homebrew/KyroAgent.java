@@ -33,10 +33,9 @@ public final class KyroAgent extends TargetedAgent {
         List<Button> placeInfantry =
                 Helper.getPlanetPlaceUnitButtons(kyro, use.game(), infantry + "gf", "placeOneNDone_skipbuild");
         return AgentOutcome.notifyInFog(use.game(), target, message, kyro)
-                .and(Message.withButtons(
+                .and(Message.addressedTo(
                         kyro,
-                        kyro.getRepresentationUnfogged() + ", please choose the planet you wish to drop " + infantry
-                                + " infantry upon.",
+                        ", please choose the planet you wish to drop " + infantry + " infantry upon.",
                         placeInfantry));
     }
 }

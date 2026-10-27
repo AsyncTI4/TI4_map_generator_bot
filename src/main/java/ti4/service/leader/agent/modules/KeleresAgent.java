@@ -24,7 +24,7 @@ public final class KeleresAgent extends AgentModule<Player> {
 
     @Override
     public String exhaustAnnouncement(AgentUse<Player> use) {
-        return use.user().getRepresentation() + " has exhausted " + use.agentName() + " to target "
+        return " has exhausted " + use.agentName() + " to target "
                 + use.payload().getRepresentationNoPing() + ".";
     }
 

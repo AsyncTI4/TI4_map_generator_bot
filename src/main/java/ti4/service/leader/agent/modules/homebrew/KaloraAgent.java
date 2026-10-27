@@ -26,9 +26,7 @@ public final class KaloraAgent extends UntargetedAgent {
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player user = use.user();
-        return AgentOutcome.of(Message.withButtons(
-                user,
-                user.getRepresentationUnfogged() + ", please use the buttons to gain 1 command token.",
-                ButtonHelper.getGainCCButtons(user)));
+        return AgentOutcome.of(Message.addressedTo(
+                user, ", please use the buttons to gain 1 command token.", ButtonHelper.getGainCCButtons(user)));
     }
 }

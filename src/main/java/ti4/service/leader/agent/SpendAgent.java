@@ -10,7 +10,7 @@ public abstract class SpendAgent extends TargetedAgent {
 
     @Override
     public String exhaustAnnouncement(AgentUse<Player> use) {
-        return use.user().getRepresentation() + " has exhausted " + use.agentName() + " for use on "
+        return " has exhausted " + use.agentName() + " for use on "
                 + use.payload().getRepresentationNoPing() + ".";
     }
 }
