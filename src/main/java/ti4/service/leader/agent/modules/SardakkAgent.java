@@ -86,13 +86,15 @@ public final class SardakkAgent extends AgentModule<SardakkAgent.Choice> {
 
     private static AgentOutcome offerPlanets(AgentUse<Choice> use, Player target) {
         return AgentOutcome.of(Message.addressedTo(
-                target, ", use buttons to resolve " + use.agentName() + ".", placementButtons(use.game(), target)));
+                target,
+                ", use buttons to resolve " + use.agentNameFor(target) + ".",
+                placementButtons(use.game(), target)));
     }
 
     private static AgentOutcome placeInfantry(AgentUse<Choice> use, PlaceOnPlanet place) {
         Player user = use.user();
         AddUnitService.addUnits(use.event(), place.tile(), use.game(), user.getColor(), "2 gf " + place.planet());
-        return AgentOutcome.of(Message.to(
+        return AgentOutcome.of(Message.plain(
                 user,
                 user.getFactionEmoji() + " placed " + UnitEmojis.infantry + UnitEmojis.infantry + " on "
                         + Helper.getPlanetRepresentation(place.planet(), use.game()) + "."));

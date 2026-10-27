@@ -16,7 +16,7 @@ public final class ObsidianAgent extends UntargetedAgent {
 
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
-        return AgentOutcome.of(Message.to(
+        return AgentOutcome.of(Message.plain(
                 use.user(),
                 "Just tell the relevant player to destroy the unit with the assign hits button available under the"
                         + " picture of the combat."));

@@ -15,7 +15,7 @@ abstract class SpendModifierAgent extends SpendAgent {
 
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
-        use.payload().addSpentThing("Exhausted " + use.agentName() + ", " + spentThingEffect() + ".");
+        use.payload().addSpentThing("Exhausted " + use.agentNameFor(use.payload()) + ", " + spentThingEffect() + ".");
         return AgentOutcome.none();
     }
 }

@@ -16,7 +16,7 @@ public final class UydaiAgent extends UntargetedAgent {
 
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
-        return AgentOutcome.of(Message.to(
+        return AgentOutcome.of(Message.plain(
                 use.user(),
                 "This is not automated. The following command allows you to place a card back on the bottom of a"
                         + " deck: `/game place_drawable_card`. Any immediate effects of the already drawn card will"

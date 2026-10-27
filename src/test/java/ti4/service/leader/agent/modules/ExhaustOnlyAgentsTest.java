@@ -27,7 +27,7 @@ class ExhaustOnlyAgentsTest extends BaseTi4Test {
         Choice onTarget = saar.decode(fixture.game, fixture.user, "pi_hacan").orElseThrow();
 
         assertThat(saar.resolve(fixture.use(saar, onTarget)).messages()).isEmpty();
-        assertThat(saar.exhaustAnnouncement(fixture.use(saar, onTarget)))
+        assertThat(saar.exhaustAnnouncementAfterName(fixture.use(saar, onTarget)))
                 .contains("has exhausted Captain Mendosa, the Saar agent on")
                 .endsWith(fixture.target.getRepresentationNoPing() + ".");
     }

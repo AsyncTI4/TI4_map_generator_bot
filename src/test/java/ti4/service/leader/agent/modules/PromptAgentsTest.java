@@ -75,7 +75,7 @@ class PromptAgentsTest extends BaseTi4Test {
 
         assertThat(fixture.user.getAcCount()).isEqualTo(actionCards + 2);
         assertThat(outcome.messages()).singleElement().satisfies(message -> {
-            assertThat(message.secret()).isTrue();
+            assertThat(message.route()).isEqualTo(AgentOutcome.Message.Route.CARDS_INFO_THREAD);
             assertThat(message.recipient()).isSameAs(fixture.user);
             assertThat(message.buttons()).hasSize(2);
         });

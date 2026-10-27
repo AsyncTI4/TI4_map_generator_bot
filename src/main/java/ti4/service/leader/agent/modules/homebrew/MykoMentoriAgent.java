@@ -30,6 +30,6 @@ public final class MykoMentoriAgent extends UntargetedAgent {
         return AgentOutcome.of(Message.addressedTo(
                 myko,
                 ", you may play an Omen die with the following buttons. Duplicate dice are not shown.",
-                ButtonHelperAbilities.omenDiceButtons(use.game(), OMEN_DIE_FROM_AGENT)));
+                ButtonHelperAbilities.omenDiceButtons(use.game(), myko, OMEN_DIE_FROM_AGENT)));
     }
 }

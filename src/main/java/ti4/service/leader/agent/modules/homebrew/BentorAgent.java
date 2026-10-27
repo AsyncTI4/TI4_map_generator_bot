@@ -29,7 +29,7 @@ public final class BentorAgent extends TargetedAgent {
         String message = target.getFactionEmojiOrColor() + " gained " + StringHelper.pluralize(tgGain, "trade good")
                 + " (" + oldTg + "->" + target.getTg() + ") and " + commGain + " commodit"
                 + (commGain == 1 ? "y" : "ies")
-                + " due to " + use.agentName() + ".";
+                + " due to " + use.agentNameFor(target) + ".";
         return AgentOutcome.notifyInFog(
                 use.game(), target, message, use.user(), target.getFactionEmojiOrColor() + " has finished resolving.");
     }

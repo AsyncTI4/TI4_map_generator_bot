@@ -49,7 +49,7 @@ public final class KortaliAgent extends TargetedAgent {
         ExploreModel card = Mapper.getExplore(fragment);
         String fragmentName = card == null ? fragment : card.getName();
         String message = target.getFactionEmojiOrColor() + " lost a " + fragmentName + " to "
-                + kortali.getFactionEmojiOrColor() + " due to " + use.agentName() + ".";
+                + kortali.getFactionEmojiOrColor() + " due to " + use.agentNameFor(target) + ".";
         return AgentOutcome.notifyInFog(use.game(), target, message, kortali);
     }
 }

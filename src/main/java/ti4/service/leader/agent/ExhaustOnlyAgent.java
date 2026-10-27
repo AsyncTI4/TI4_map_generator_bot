@@ -30,7 +30,7 @@ public final class ExhaustOnlyAgent extends AgentModule<ExhaustOnlyAgent.Choice>
     }
 
     @Override
-    public String exhaustAnnouncement(AgentUse<Choice> use) {
+    public String exhaustAnnouncementAfterName(AgentUse<Choice> use) {
         String onTarget = use.payload()
                 .target()
                 .filter(target -> target != use.user())

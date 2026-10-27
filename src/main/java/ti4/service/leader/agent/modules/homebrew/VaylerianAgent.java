@@ -86,7 +86,7 @@ public final class VaylerianAgent extends AgentModule<VaylerianAgent.Choice> {
         if (!game.isFowMode()) {
             return AgentOutcome.none();
         }
-        return AgentOutcome.of(Message.to(
+        return AgentOutcome.of(Message.plain(
                 user, target.getFactionEmojiOrColor() + " gained 1 action card from using " + agentName + "."));
     }
 

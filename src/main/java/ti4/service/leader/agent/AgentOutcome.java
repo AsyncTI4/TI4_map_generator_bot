@@ -26,19 +26,15 @@ public record AgentOutcome(List<Message> messages, String pressedMessageEdit) {
 
     public static AgentOutcome notifyInFog(
             Game game, Player primary, String primaryMessage, Player affected, String affectedMessage) {
-        AgentOutcome outcome = of(Message.to(primary, primaryMessage));
+        AgentOutcome outcome = of(Message.plain(primary, primaryMessage));
         if (game.isFowMode() && affected != primary) {
-            return outcome.and(Message.to(affected, affectedMessage));
+            return outcome.and(Message.plain(affected, affectedMessage));
         }
         return outcome;
     }
 
-    public static AgentOutcome offer(
-            Player recipient, String promptAfterName, List<Button> buttons, String nothingToOfferAfterName) {
-        if (buttons.isEmpty()) {
-            return of(Message.addressedTo(recipient, nothingToOfferAfterName));
-        }
-        return of(Message.addressedTo(recipient, promptAfterName, buttons));
+    public static AgentOutcome offer(Message prompt, Message whenNothingToOffer) {
+        return of(prompt.buttons().isEmpty() ? whenNothingToOffer : prompt);
     }
 
     public AgentOutcome and(Message message) {
@@ -51,30 +47,45 @@ public record AgentOutcome(List<Message> messages, String pressedMessageEdit) {
         return new AgentOutcome(messages, text);
     }
 
-    public record Message(Player recipient, String text, List<Button> buttons, boolean secret, boolean addressed) {
+    public record Message(
+            Player recipient,
+            String text,
+            List<Button> buttons,
+            Route route,
+            boolean namesRecipient,
+            boolean pagedButtons) {
+
+        public enum Route {
+            REPLY,
+            CARDS_INFO_THREAD
+        }
 
         public Message {
             buttons = List.copyOf(buttons);
         }
 
-        public static Message to(Player recipient, String text) {
-            return new Message(recipient, text, List.of(), false, false);
+        public static Message plain(Player recipient, String text) {
+            return plain(recipient, text, List.of());
         }
 
-        public static Message withButtons(Player recipient, String text, List<Button> buttons) {
-            return new Message(recipient, text, buttons, false, false);
+        public static Message plain(Player recipient, String text, List<Button> buttons) {
+            return new Message(recipient, text, buttons, Route.REPLY, false, false);
         }
 
         public static Message addressedTo(Player recipient, String textAfterName) {
-            return new Message(recipient, textAfterName, List.of(), false, true);
+            return addressedTo(recipient, textAfterName, List.of());
         }
 
         public static Message addressedTo(Player recipient, String textAfterName, List<Button> buttons) {
-            return new Message(recipient, textAfterName, buttons, false, true);
+            return new Message(recipient, textAfterName, buttons, Route.REPLY, true, false);
         }
 
-        public static Message privatelyTo(Player recipient, String text, List<Button> buttons) {
-            return new Message(recipient, text, buttons, true, false);
+        public Message inCardsInfoThread() {
+            return new Message(recipient, text, buttons, Route.CARDS_INFO_THREAD, namesRecipient, pagedButtons);
+        }
+
+        public Message withPagedButtons() {
+            return new Message(recipient, text, buttons, route, namesRecipient, true);
         }
     }
 }

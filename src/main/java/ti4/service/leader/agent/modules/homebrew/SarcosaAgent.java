@@ -1,15 +1,13 @@
 package ti4.service.leader.agent.modules.homebrew;
 
-import java.util.Optional;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaAgentHandler;
-import ti4.game.Game;
 import ti4.game.Player;
-import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
-import ti4.service.leader.agent.AgentTargets;
+import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.service.leader.agent.AgentUse;
+import ti4.service.leader.agent.SelfOrTargetedAgent;
 
-public final class SarcosaAgent extends AgentModule<Player> {
+public final class SarcosaAgent extends SelfOrTargetedAgent {
 
     static final String ID = "sarcosaagent";
 
@@ -18,17 +16,14 @@ public final class SarcosaAgent extends AgentModule<Player> {
     }
 
     @Override
-    public Optional<Player> decode(Game game, Player user, String payload) {
-        return AgentTargets.playerOrUser(game, user, payload);
-    }
-
-    @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player target = use.payload();
         return AgentOutcome.offer(
-                target,
-                ", choose a system in or adjacent to one containing your units.",
-                SarcosaAgentHandler.agentSystemButtons(use.game(), target),
-                " has no eligible systems.");
+                Message.addressedTo(
+                                target,
+                                ", choose a system in or adjacent to one containing your units.",
+                                SarcosaAgentHandler.agentSystemButtons(use.game(), target))
+                        .withPagedButtons(),
+                Message.addressedTo(target, " has no eligible systems."));
     }
 }

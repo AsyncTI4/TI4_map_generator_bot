@@ -16,7 +16,7 @@ abstract class NextRollAgent extends TargetedAgent {
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player target = use.payload();
         use.game().setCurrentReacts(agentId(), target.getFaction());
-        return AgentOutcome.of(Message.to(
+        return AgentOutcome.of(Message.plain(
                 use.user(),
                 target.getFactionEmojiOrColor() + " will receive " + use.agentName() + ", on their next roll."));
     }

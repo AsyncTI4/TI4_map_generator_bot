@@ -28,7 +28,6 @@ public class VeylorLeadersHandler {
     private static final String GAIN_HERO_CC = "gainVeylorHeroCC_";
     private static final String CHOOSE_COMMANDER_SYSTEM = "veylorCommanderSelectSystem_";
 
-    // Agent
     // Commander
     public static Button offerVeylorCommanderUnlock(Player player) {
         if (player == null || !player.hasLeader("veylorcommander") || player.hasLeaderUnlocked("veylorcommander")) {

@@ -23,7 +23,7 @@ public final class TyrisAgent extends UntargetedAgent {
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player tyris = use.user();
         List<Button> buttons = new ArrayList<>(ButtonHelper.getEchoAvailableSystems(use.game(), tyris));
-        buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+        buttons.add(Buttons.red(tyris.factionButtonChecker() + "deleteButtons", "Delete These Buttons"));
         return AgentOutcome.of(Message.addressedTo(
                 tyris, ", use buttons to place a frontier token in a system with no planets.", buttons));
     }

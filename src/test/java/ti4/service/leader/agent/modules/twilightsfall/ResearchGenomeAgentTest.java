@@ -18,7 +18,7 @@ class ResearchGenomeAgentTest extends BaseTi4Test {
 
         assertThat(fixture.game.getStoredValue(ResearchGenomeAgent.SPLICE_KEY_PREFIX + fixture.user.getFaction()))
                 .isEqualTo("Yes");
-        assertThat(research.exhaustAnnouncement(fixture.use(research, fixture.user)))
+        assertThat(research.exhaustAnnouncementAfterName(fixture.use(research, fixture.user)))
                 .endsWith("has used the _Research Genome_ to add 3 cards to the draft.");
     }
 

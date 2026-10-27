@@ -18,6 +18,8 @@ import ti4.message.MessageHelper;
 
 @UtilityClass
 public class IronLeadersHandler {
+    public static final String PRODUCTION_SYSTEM_PROMPT =
+            ", choose a system to produce 1 unit with _Shipwright Kastel_. Its cost is reduced by 1.";
     private static final String SELECT_PRODUCTION_SYSTEM = "ironAgentProductionSystem_";
     private static final String SELECT_HERO_PRODUCTION_SYSTEM = "ironHeroProductionSystem_";
     private static final String PRODUCTION_CONTEXT = "ironAgentProduction_";
@@ -157,8 +159,7 @@ public class IronLeadersHandler {
     }
 
     private static String productionSystemMessage(Player player) {
-        return player.getRepresentation()
-                + ", choose a system to produce 1 unit with _Shipwright Kastel_. Its cost is reduced by 1.";
+        return player.getRepresentation() + PRODUCTION_SYSTEM_PROMPT;
     }
 
     private static String heroProductionSystemMessage(Player player) {

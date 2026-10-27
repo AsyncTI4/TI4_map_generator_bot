@@ -19,7 +19,7 @@ class PromptGenomesTest extends BaseTi4Test {
         AgentOutcome outcome = experimental.resolve(fixture.use(experimental, fixture.user));
 
         assertThat(outcome.messages().getFirst().text()).contains("remove infantry");
-        assertThat(experimental.exhaustAnnouncement(fixture.use(experimental, fixture.user)))
+        assertThat(experimental.exhaustAnnouncementAfterName(fixture.use(experimental, fixture.user)))
                 .endsWith("has exhausted the _Experimental Genome_.");
     }
 

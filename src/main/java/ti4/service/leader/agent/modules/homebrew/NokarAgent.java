@@ -46,7 +46,7 @@ public final class NokarAgent extends TargetedAgent {
         Tile tile = activeSystem(use.game()).orElseThrow();
         AddUnitService.addUnits(use.event(), tile, use.game(), target.getColor(), "1 destroyer");
         String message = target.getFactionEmojiOrColor() + " place 1 destroyer in "
-                + tile.getRepresentationForButtons(use.game(), target) + " due to " + use.agentName() + ". "
+                + tile.getRepresentationForButtons(use.game(), target) + " due to " + use.agentNameFor(target) + ". "
                 + "A transaction may be done with transaction buttons.";
         return AgentOutcome.notifyInFog(use.game(), target, message, use.user());
     }

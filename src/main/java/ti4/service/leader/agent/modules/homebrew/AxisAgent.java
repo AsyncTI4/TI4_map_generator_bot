@@ -25,11 +25,12 @@ public final class AxisAgent extends TargetedAgent {
         if (target != axis) {
             ButtonHelperStats.gainComms(use.event(), use.game(), axis, COMMODITIES_FOR_HELPING, false, true);
         }
+        String owner = target.factionButtonChecker();
         return AgentOutcome.of(Message.addressedTo(
                 target,
                 ", please choose whether you wish to place 1 cruiser or 1 destroyer in a system with your ships.",
                 List.of(
-                        Buttons.green("step2axisagent_cruiser", "Place 1 cruiser"),
-                        Buttons.green("step2axisagent_destroyer", "Place 1 destroyer"))));
+                        Buttons.green(owner + "step2axisagent_cruiser", "Place 1 cruiser"),
+                        Buttons.green(owner + "step2axisagent_destroyer", "Place 1 destroyer"))));
     }
 }

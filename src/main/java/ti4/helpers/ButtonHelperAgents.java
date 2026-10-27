@@ -1973,21 +1973,6 @@ public final class ButtonHelperAgents {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
-    public static List<Button> getJolNarAgentButtons(Player player, Game game) {
-        List<Button> buttons = new ArrayList<>();
-        for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Infantry)) {
-            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
-                    buttons.add(Buttons.green(
-                            "jolNarAgentRemoval_" + tile.getPosition() + "_" + unitHolder.getName(),
-                            "Remove infantry from " + ButtonHelper.getUnitHolderRep(unitHolder, tile, game)));
-                }
-            }
-        }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
-        return buttons;
-    }
-
     @ButtonHandler("jolNarAgentRemoval_")
     public static void resolveJolNarAgentRemoval(
             Player player, Game game, String buttonID, ButtonInteractionEvent event) {

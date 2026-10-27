@@ -21,10 +21,11 @@ public final class KolumeAgent extends TargetedAgent {
         Player target = use.payload();
         return AgentOutcome.of(Message.addressedTo(
                 target,
-                ", use buttons to redistribute 1 command token (the bot allows more but " + use.agentName()
+                ", use buttons to redistribute 1 command token (the bot allows more but " + use.agentNameFor(target)
                         + " is restricted to redistributing 1).",
                 List.of(
-                        Buttons.REDISTRIBUTE_CCs,
+                        Buttons.green(
+                                target.factionButtonChecker() + "redistributeCCButtons", "Redistribute Command Tokens"),
                         Buttons.red(target.factionButtonChecker() + "deleteButtons", "Delete These Buttons"))));
     }
 }

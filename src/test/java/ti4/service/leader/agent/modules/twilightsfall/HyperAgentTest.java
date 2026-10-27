@@ -43,7 +43,7 @@ class HyperAgentTest extends BaseTi4Test {
         AgentOutcome outcome = hyper.resolve(fixture.use(hyper, fixture.target));
 
         // The lifecycle puts the user's name in front when it delivers the message.
-        assertThat(outcome.messages().get(0).addressed()).isTrue();
+        assertThat(outcome.messages().get(0).namesRecipient()).isTrue();
         assertThat(outcome.messages().get(0).text()).startsWith(" drew 1 action card");
         assertThat(outcome.messages().get(1).text()).contains("drew 2 action cards (Scheming)");
     }
@@ -53,7 +53,7 @@ class HyperAgentTest extends BaseTi4Test {
         AgentModuleFixture fixture = new AgentModuleFixture("mentak");
         HyperAgent hyper = new HyperAgent();
 
-        assertThat(hyper.exhaustAnnouncement(fixture.use(hyper, fixture.target)))
+        assertThat(hyper.exhaustAnnouncementAfterName(fixture.use(hyper, fixture.target)))
                 .endsWith(" has exhausted the _Hyper Genome_.");
     }
 }

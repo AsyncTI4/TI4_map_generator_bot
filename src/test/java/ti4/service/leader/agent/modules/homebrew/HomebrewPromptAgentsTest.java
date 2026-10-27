@@ -98,6 +98,43 @@ class HomebrewPromptAgentsTest extends BaseTi4Test {
     }
 
     @Test
+    void followUpButtonsBelongToThePlayerWhoMustPressThem() {
+        AgentModuleFixture fixture = new AgentModuleFixture("ghoti");
+        String targetOnly = fixture.target.factionButtonChecker();
+
+        for (AgentModule<Player> agent :
+                List.<AgentModule<Player>>of(new GhotiAgent(), new AxisAgent(), new KolumeAgent())) {
+            List<Button> buttons = agent.resolve(fixture.use(agent, fixture.target))
+                    .messages()
+                    .getFirst()
+                    .buttons();
+            assertThat(buttons)
+                    .as(agent.agentId())
+                    .allSatisfy(button -> assertThat(button.getCustomId()).startsWith(targetOnly));
+        }
+        TyrisAgent tyris = new TyrisAgent();
+        assertThat(tyris.resolve(fixture.use(tyris, fixture.user))
+                        .messages()
+                        .getFirst()
+                        .buttons())
+                .allSatisfy(button -> assertThat(button.getCustomId()).startsWith(fixture.user.factionButtonChecker()));
+    }
+
+    @Test
+    void otherPlayersPromptsHideTheAgentNameInFogOfWar() {
+        AgentModuleFixture fixture = new AgentModuleFixture("ghoti");
+        fixture.game.setFowMode(true);
+        GhotiAgent ghoti = new GhotiAgent();
+
+        String prompt = ghoti.resolve(fixture.use(ghoti, fixture.target))
+                .messages()
+                .getFirst()
+                .text();
+
+        assertThat(prompt).doesNotContain("Ghoti").contains("an agent");
+    }
+
+    @Test
     void homebrewPromptAgentButtonsAreOwnedByTheHolder() {
         AgentModuleFixture fixture = new AgentModuleFixture("ghoti");
         Player holder = fixture.user;

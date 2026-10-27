@@ -18,9 +18,11 @@ public final class ValiantGenomeAgent extends TargetedAgent {
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player target = use.payload();
-        return AgentOutcome.of(Message.addressedTo(
-                target,
-                ", please choose the recently deceased unit that you wish to use the genome on.",
-                ButtonHelperActionCards.getCourageousOptions(target, use.game(), true, "courageous")));
+        return AgentOutcome.offer(
+                Message.addressedTo(
+                        target,
+                        ", please choose the recently deceased unit that you wish to use the genome on.",
+                        ButtonHelperActionCards.getCourageousOptions(target, use.game(), true, "courageous")),
+                Message.addressedTo(target, " has no recently destroyed units to use the genome on."));
     }
 }

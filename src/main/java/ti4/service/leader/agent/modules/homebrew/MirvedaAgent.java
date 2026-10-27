@@ -45,8 +45,8 @@ public final class MirvedaAgent extends TargetedAgent {
         return AgentOutcome.of(
                 Message.addressedTo(
                         target,
-                        ", 1 command token has been removed from your strategy pool due to use of " + use.agentName()
-                                + ". You may add it back if you didn't agree to the agent."),
+                        ", 1 command token has been removed from your strategy pool due to use of "
+                                + use.agentNameFor(target) + ". You may add it back if you didn't agree to the agent."),
                 Message.addressedTo(
                         target,
                         ", please research a technology of a color which matches one of the prerequisites on the unit upgrade you just gained.",

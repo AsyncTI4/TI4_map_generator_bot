@@ -25,9 +25,11 @@ public final class LiZhoAgent extends UntargetedAgent {
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player liZho = use.user();
-        return AgentOutcome.of(Message.addressedTo(
-                liZho,
-                ", please choose the system containing your ships where you wish to place your fighters.",
-                Helper.getTileWithShipsPlaceUnitButtons(liZho, use.game(), "2ff", "placeOneNDone_skipbuild")));
+        return AgentOutcome.offer(
+                Message.addressedTo(
+                        liZho,
+                        ", please choose the system containing your ships where you wish to place your fighters.",
+                        Helper.getTileWithShipsPlaceUnitButtons(liZho, use.game(), "2ff", "placeOneNDone_skipbuild")),
+                Message.addressedTo(liZho, " has no system containing their ships."));
     }
 }

@@ -18,9 +18,11 @@ public final class OnyxxaAgent extends TargetedAgent {
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player target = use.payload();
-        return AgentOutcome.of(Message.addressedTo(
-                target,
-                ", please choose the system that you wish to move a ship from.",
-                OnyxxaLeaderHandler.agentMoveShipButtons(use.game(), target)));
+        return AgentOutcome.offer(
+                Message.addressedTo(
+                        target,
+                        ", please choose the system that you wish to move a ship from.",
+                        OnyxxaLeaderHandler.agentMoveShipButtons(use.game(), target)),
+                Message.addressedTo(target, " has no ships to move."));
     }
 }

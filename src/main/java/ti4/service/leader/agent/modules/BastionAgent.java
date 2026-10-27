@@ -28,10 +28,12 @@ public final class BastionAgent extends TargetedAgent {
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Player target = use.payload();
-        return AgentOutcome.of(Message.addressedTo(
-                target,
-                ", please choose the unit that should be galvanized.",
-                GalvanizeService.getToggleGalvanizeButtons(
-                        target, use.game(), activeSystem(use.game()).orElseThrow())));
+        return AgentOutcome.offer(
+                Message.addressedTo(
+                        target,
+                        ", please choose the unit that should be galvanized.",
+                        GalvanizeService.getToggleGalvanizeButtons(
+                                target, use.game(), activeSystem(use.game()).orElseThrow())),
+                Message.addressedTo(target, " has no units that can be galvanized in the active system."));
     }
 }

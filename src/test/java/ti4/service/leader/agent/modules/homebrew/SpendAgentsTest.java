@@ -24,7 +24,7 @@ class SpendAgentsTest extends BaseTi4Test {
         AgentModuleFixture fixture = new AgentModuleFixture("gledge");
         GledgeAgent gledge = new GledgeAgent();
 
-        assertThat(gledge.exhaustAnnouncement(fixture.use(gledge, fixture.target)))
+        assertThat(gledge.exhaustAnnouncementAfterName(fixture.use(gledge, fixture.target)))
                 .contains("has exhausted Durran, the Gledge agent for use on")
                 .contains(fixture.target.getRepresentationNoPing());
     }
