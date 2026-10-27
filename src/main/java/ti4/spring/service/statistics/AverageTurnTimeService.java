@@ -26,6 +26,7 @@ public class AverageTurnTimeService {
     private static final int DEFAULT_MINIMUM_NUMBER_OF_TURNS = 100;
 
     private final PlayerEntityRepository playerEntityRepository;
+    private final UserGameInfoService userGameInfoService;
 
     public void getAverageTurnTimes(SlashCommandInteractionEvent event) {
         boolean ignoreEndedGames =
@@ -49,7 +50,7 @@ public class AverageTurnTimeService {
             int times = 3;
 
             Map<String, List<Integer>> fastestDaysByUserId =
-                    UserGameInfoService.get().getThreeFastestDaysToComplete6PlayerGamesByUserId();
+                    userGameInfoService.getThreeFastestDaysToComplete6PlayerGamesByUserId();
 
             for (int i = 1; i < times; i++) {
 
