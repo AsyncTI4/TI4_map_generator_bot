@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.service.leader.agent.modules.ArborecAgent;
+import ti4.service.leader.agent.modules.ArgentAgent;
 import ti4.service.leader.agent.modules.ArtunoAgent;
 import ti4.service.leader.agent.modules.BastionAgent;
 import ti4.service.leader.agent.modules.CabalAgent;
@@ -18,9 +19,12 @@ import ti4.service.leader.agent.modules.GhostAgent;
 import ti4.service.leader.agent.modules.HacanAgent;
 import ti4.service.leader.agent.modules.JolNarAgent;
 import ti4.service.leader.agent.modules.KeleresAgent;
+import ti4.service.leader.agent.modules.L1z1xAgent;
 import ti4.service.leader.agent.modules.LetnevAgent;
 import ti4.service.leader.agent.modules.MentakAgent;
+import ti4.service.leader.agent.modules.MercerAgent;
 import ti4.service.leader.agent.modules.MuaatAgent;
+import ti4.service.leader.agent.modules.NaaluAgent;
 import ti4.service.leader.agent.modules.NaazAgent;
 import ti4.service.leader.agent.modules.NekroAgent;
 import ti4.service.leader.agent.modules.ObsidianAgent;
@@ -30,12 +34,14 @@ import ti4.service.leader.agent.modules.SardakkAgent;
 import ti4.service.leader.agent.modules.SolAgent;
 import ti4.service.leader.agent.modules.WinnuAgent;
 import ti4.service.leader.agent.modules.XxchaAgent;
+import ti4.service.leader.agent.modules.YinAgent;
 import ti4.service.leader.agent.modules.homebrew.AeternaAgent;
 import ti4.service.leader.agent.modules.homebrew.ArdentiaAgent;
 import ti4.service.leader.agent.modules.homebrew.AugersAgent;
 import ti4.service.leader.agent.modules.homebrew.AxisAgent;
 import ti4.service.leader.agent.modules.homebrew.BentorAgent;
 import ti4.service.leader.agent.modules.homebrew.CymiaeAgent;
+import ti4.service.leader.agent.modules.homebrew.DihmohnAgent;
 import ti4.service.leader.agent.modules.homebrew.GhotiAgent;
 import ti4.service.leader.agent.modules.homebrew.GledgeAgent;
 import ti4.service.leader.agent.modules.homebrew.HomebrewExhaustOnlyAgents;
@@ -144,7 +150,13 @@ class AgentModules {
                             new KolleccAgent(),
                             new PharadnAgent(),
                             new OlradinAgent(),
-                            new KjalengardAgent()),
+                            new KjalengardAgent(),
+                            new NaaluAgent(),
+                            new YinAgent(),
+                            new ArgentAgent(),
+                            new MercerAgent(),
+                            new L1z1xAgent(),
+                            new DihmohnAgent()),
                     ExhaustOnlyAgents.ALL,
                     HomebrewExhaustOnlyAgents.ALL)
             .<AgentModule<?>>flatMap(List::stream)

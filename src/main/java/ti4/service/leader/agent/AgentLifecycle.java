@@ -24,7 +24,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
-import ti4.model.Mapper;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.spring.context.SpringContext;
@@ -131,13 +130,7 @@ public class AgentLifecycle {
     }
 
     static String cardName(Game game, AgentModule<?> module, String leaderId) {
-        String displayName = module.displayName(leaderId);
-        if (!game.isTwilightsFallMode()) {
-            return displayName;
-        }
-        return Optional.ofNullable(Mapper.getLeader(leaderId))
-                .flatMap(LeaderModel::getTFName)
-                .orElse(displayName);
+        return AgentModule.twilightsFallName(game, leaderId).orElse(module.displayName(leaderId));
     }
 
     static boolean isYssarilCopy(String exhaustedLeaderId, String agentId) {

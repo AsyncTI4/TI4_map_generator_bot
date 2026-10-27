@@ -7009,7 +7009,14 @@ public class ButtonHelper {
     }
 
     public static List<Button> getButtonsForMovingGroundForcesToAPlanet(Game game, String planetName, Player player) {
+        List<Button> buttons = new ArrayList<>(groundForceMoveButtons(game, planetName, player));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Moving to This Planet"));
+        return buttons;
+    }
+
+    public static List<Button> groundForceMoveButtons(Game game, String planetName, Player player) {
         List<Button> buttons = new ArrayList<>();
+        String moveStep = player.factionButtonChecker() + "mercerMove_" + planetName + "_";
         boolean bioplasmosis = game.getPhaseOfGame().contains("status");
         Tile destination = game.getTileFromPlanet(planetName);
         for (Tile tile : game.getTileMap().values()) {
@@ -7026,15 +7033,13 @@ public class ButtonHelper {
                 if (uH.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
                     if (uH instanceof Planet) {
                         buttons.add(Buttons.green(
-                                "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
-                                        + "_infantry",
+                                moveStep + tile.getPosition() + "_" + uH.getName() + "_infantry",
                                 "Move Infantry from " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
                                         + Helper.getPlanetRepresentation(planetName, game)));
                     } else {
                         if (!bioplasmosis) {
                             buttons.add(Buttons.green(
-                                    "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
-                                            + "_infantry",
+                                    moveStep + tile.getPosition() + "_" + uH.getName() + "_infantry",
                                     "Move Infantry from Space of " + tile.getPosition() + " To "
                                             + Helper.getPlanetRepresentation(planetName, game)));
                         }
@@ -7044,14 +7049,13 @@ public class ButtonHelper {
                         && (game.isTwilightsFallMode() || !game.getPhaseOfGame().contains("status"))) {
                     if (uH instanceof Planet) {
                         buttons.add(Buttons.green(
-                                "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName() + "_mech",
+                                moveStep + tile.getPosition() + "_" + uH.getName() + "_mech",
                                 "Move Mech from " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
                                         + Helper.getPlanetRepresentation(planetName, game)));
                     } else {
                         if (!bioplasmosis) {
                             buttons.add(Buttons.green(
-                                    "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
-                                            + "_mech",
+                                    moveStep + tile.getPosition() + "_" + uH.getName() + "_mech",
                                     "Move Mech from Space of " + tile.getPosition() + " to "
                                             + Helper.getPlanetRepresentation(planetName, game)));
                         }
@@ -7061,12 +7065,12 @@ public class ButtonHelper {
                     if (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0) {
                         if (uH instanceof Planet) {
                             buttons.add(Buttons.green(
-                                    "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName() + "_pds",
+                                    moveStep + tile.getPosition() + "_" + uH.getName() + "_pds",
                                     "Move PDS from " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
                                             + Helper.getPlanetRepresentation(planetName, game)));
                         } else {
                             buttons.add(Buttons.green(
-                                    "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName() + "_pds",
+                                    moveStep + tile.getPosition() + "_" + uH.getName() + "_pds",
                                     "Move PDS from Space of " + tile.getRepresentation() + " to "
                                             + Helper.getPlanetRepresentation(planetName, game)));
                         }
@@ -7074,7 +7078,6 @@ public class ButtonHelper {
                 }
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done Moving to This Planet"));
         return buttons;
     }
 
