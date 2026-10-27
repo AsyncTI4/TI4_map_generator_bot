@@ -18,7 +18,7 @@ public class GameEntityMapper {
 
     static final String UNKNOWN_USER_PREFIX = "UNKNOWN USER ";
     private static final String TITLES_KEY_PREFIX = "TitlesFor";
-    public static final int MINIMUM_PERSISTED_PLAYER_COUNT = 3;
+    private static final int MINIMUM_PERSISTED_PLAYER_COUNT = 3;
 
     public static boolean shouldPersist(Game game) {
         return game.getRealAndEliminatedPlayers().size() >= MINIMUM_PERSISTED_PLAYER_COUNT;
@@ -42,7 +42,6 @@ public class GameEntityMapper {
         gameEntity.setVictoryPointGoal(game.getVp());
         gameEntity.setCreationEpochMilliseconds(game.getCreationDateTime());
         gameEntity.setEndedEpochMilliseconds(getEndedDate(game));
-        gameEntity.setSourceLastModifiedEpochMilliseconds(game.getLastModifiedDate());
         gameEntity.setCompleted(game.getWinner().isPresent() && game.isHasEnded());
         gameEntity.setFractureInPlay(FractureService.isFractureInPlay(game));
         gameEntity.setHomebrew(game.isHomebrew());

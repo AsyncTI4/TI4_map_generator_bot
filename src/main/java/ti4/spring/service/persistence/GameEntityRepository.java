@@ -12,8 +12,4 @@ public interface GameEntityRepository extends JpaRepository<GameEntity, String> 
     @Modifying
     @Query("DELETE FROM GameEntity g WHERE g.gameName = :gameName")
     void deleteByGameName(@Param("gameName") String gameName);
-
-    @Modifying
-    @Query("UPDATE GameEntity g SET g.sourceLastModifiedEpochMilliseconds = :lastModified WHERE g.gameName = :gameName")
-    int updateSourceLastModified(@Param("gameName") String gameName, @Param("lastModified") long lastModified);
 }

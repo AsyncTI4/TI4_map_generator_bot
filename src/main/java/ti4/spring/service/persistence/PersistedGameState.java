@@ -7,8 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-public record PersistedGameState(
-        GameColumns game, List<PlayerRow> players, List<TitleRow> titles, Long sourceLastModifiedEpochMilliseconds) {
+public record PersistedGameState(GameColumns game, List<PlayerRow> players, List<TitleRow> titles) {
 
     public record GameColumns(
             String gameName,
@@ -58,12 +57,7 @@ public record PersistedGameState(
                 .map(title -> new TitleRow(title.getUser().getId(), title.getTitle()))
                 .sorted(Comparator.comparing(TitleRow::toString))
                 .toList();
-        return new PersistedGameState(
-                toGameColumns(game), playerRows, titleRows, game.getSourceLastModifiedEpochMilliseconds());
-    }
-
-    public boolean wasSyncedFrom(long lastModifiedDate) {
-        return Objects.equals(sourceLastModifiedEpochMilliseconds, lastModifiedDate);
+        return new PersistedGameState(toGameColumns(game), playerRows, titleRows);
     }
 
     public List<String> describeDifferencesFrom(PersistedGameState actual) {

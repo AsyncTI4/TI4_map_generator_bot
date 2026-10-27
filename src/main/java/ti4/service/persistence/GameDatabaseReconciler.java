@@ -57,15 +57,15 @@ public class GameDatabaseReconciler {
                     return;
                 }
                 String gameName = managedGame.getName();
-                PersistedGameState persistedState = persistedStates.get(gameName);
-                if (wasChangedAfter(gameName, startedAt) || isUnchangedSinceLastSync(managedGame, persistedState)) {
+                if (wasChangedAfter(gameName, startedAt)) {
                     existingGameNames.add(gameName);
                     continue;
                 }
                 Game game = loadGame(managedGame);
                 if (game == null) continue;
                 existingGameNames.add(gameName);
-                reconcileGame(game, persistedState, persistenceService).ifPresent(discrepancies::add);
+                reconcileGame(game, persistedStates.get(gameName), persistenceService)
+                        .ifPresent(discrepancies::add);
             }
             for (String persistedGameName : persistedStates.keySet()) {
                 if (existingGameNames.contains(persistedGameName)) continue;
@@ -101,12 +101,7 @@ public class GameDatabaseReconciler {
         }
 
         List<String> differences = PersistedGameState.of(snapshot).describeDifferencesFrom(persistedState);
-        if (differences.isEmpty()) {
-            if (!persistedState.wasSyncedFrom(game.getLastModifiedDate())) {
-                recordSourceLastModified(game, persistenceService);
-            }
-            return Optional.empty();
-        }
+        if (differences.isEmpty()) return Optional.empty();
         return Optional.of(repair(
                 gameName, "differs in " + String.join("; ", differences), () -> persistenceService.replace(snapshot)));
     }
@@ -128,22 +123,6 @@ public class GameDatabaseReconciler {
         } catch (Exception e) {
             BotLogger.error(TASK_NAME + " could not delete unreferenced users.", e);
             return Optional.of(description + " (repair failed)");
-        }
-    }
-
-    static boolean isUnchangedSinceLastSync(ManagedGame managedGame, PersistedGameState persistedState) {
-        if (persistedState == null) {
-            return managedGame.countRealAndEliminatedPlayers() < GameEntityMapper.MINIMUM_PERSISTED_PLAYER_COUNT;
-        }
-        return persistedState.wasSyncedFrom(managedGame.getLastModifiedDate());
-    }
-
-    private static void recordSourceLastModified(Game game, GameEntityPersistenceService persistenceService) {
-        if (DatabasePersistenceGate.isDisabled()) return;
-        try {
-            persistenceService.recordSourceLastModified(game.getName(), game.getLastModifiedDate());
-        } catch (Exception e) {
-            BotLogger.error(TASK_NAME + " could not record the sync time of game " + game.getName() + ".", e);
         }
     }
 
