@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
@@ -139,30 +140,34 @@ public class AgentLifecycle {
         }
         boolean viaYssaril = isYssarilCopy(leader.getId(), agentId);
         String agentName = agentName(cardName(game, module), viaYssaril);
+        MessageChannel replyChannel = replyChannel(player, pressedAgentButton ? event : null);
         Optional<P> payload = module.decode(game, player, parsed.payload());
         if (payload.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    "Could not work out how to resolve " + agentName + ", so it was not exhausted.");
+                    replyChannel, "Could not work out how to resolve " + agentName + ", so it was not exhausted.");
             return false;
         }
         Optional<String> unusable = module.unusableReason(game, player, payload.get());
         if (unusable.isPresent()) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), unusable.get() + ", so " + agentName + " was not exhausted.");
+                    replyChannel, unusable.get() + ", so " + agentName + " was not exhausted.");
             return false;
         }
 
         exhaust(game, player, leader, agentId, parsed.hasPayload() ? parsed.payload() : null);
         AgentUse<P> use = new AgentUse<>(game, player, payload.get(), agentName, viaYssaril, event);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), module.exhaustAnnouncement(use));
-        deliver(module.resolve(use), event, pressedAgentButton);
+        MessageHelper.sendMessageToChannel(replyChannel, module.exhaustAnnouncement(use));
+        deliver(module.resolve(use), pressedAgentButton ? event : null, player);
         if (pressedAgentButton) {
             finish(event, game, player, agentId);
         } else {
             offerTemporalCommandSuite(game, player, agentId);
         }
         return true;
+    }
+
+    private static MessageChannel replyChannel(Player player, GenericInteractionCreateEvent pressedButton) {
+        return pressedButton != null ? pressedButton.getMessageChannel() : player.getCorrectChannel();
     }
 
     private static void recordGameEvent(Game game, Player player, String agentId, String target) {
@@ -180,18 +185,15 @@ public class AgentLifecycle {
         game.setStoredValue(key, game.getStoredValue(key) + " Exhausted the " + model.getAlias() + " leader.");
     }
 
-    public static void deliver(AgentOutcome outcome, GenericInteractionCreateEvent event) {
-        deliver(outcome, event, true);
-    }
-
-    private static void deliver(AgentOutcome outcome, GenericInteractionCreateEvent event, boolean pressedAgentButton) {
+    public static void deliver(AgentOutcome outcome, GenericInteractionCreateEvent pressedButton, Player presser) {
         for (AgentOutcome.Message message : outcome.messages()) {
-            MessageHelper.sendMessageToChannelWithButtons(
-                    message.recipient().getCorrectChannel(), message.text(), new ArrayList<>(message.buttons()));
+            boolean privateToRecipient =
+                    message.recipient() != presser && presser.getGame().isFowMode();
+            MessageChannel channel =
+                    privateToRecipient ? message.recipient().getCorrectChannel() : replyChannel(presser, pressedButton);
+            MessageHelper.sendMessageToChannelWithButtons(channel, message.text(), new ArrayList<>(message.buttons()));
         }
-        if (pressedAgentButton
-                && outcome.pressedMessageEdit() != null
-                && event instanceof ButtonInteractionEvent buttonEvent) {
+        if (outcome.pressedMessageEdit() != null && pressedButton instanceof ButtonInteractionEvent buttonEvent) {
             buttonEvent
                     .getMessage()
                     .editMessage(outcome.pressedMessageEdit())

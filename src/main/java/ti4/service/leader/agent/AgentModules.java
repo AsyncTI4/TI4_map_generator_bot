@@ -7,9 +7,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
+import ti4.service.leader.agent.modules.ArtunoAgent;
 import ti4.service.leader.agent.modules.ExhaustOnlyAgents;
+import ti4.service.leader.agent.modules.GhostAgent;
+import ti4.service.leader.agent.modules.KeleresAgent;
+import ti4.service.leader.agent.modules.LetnevAgent;
 import ti4.service.leader.agent.modules.MentakAgent;
+import ti4.service.leader.agent.modules.ObsidianAgent;
 import ti4.service.leader.agent.modules.SardakkAgent;
+import ti4.service.leader.agent.modules.SolAgent;
 import ti4.service.leader.agent.modules.WinnuAgent;
 import ti4.service.leader.agent.modules.homebrew.AugersAgent;
 import ti4.service.leader.agent.modules.homebrew.BentorAgent;
@@ -23,11 +29,14 @@ import ti4.service.leader.agent.modules.homebrew.KyroAgent;
 import ti4.service.leader.agent.modules.homebrew.LunariumAgent;
 import ti4.service.leader.agent.modules.homebrew.MirvedaAgent;
 import ti4.service.leader.agent.modules.homebrew.NokarAgent;
+import ti4.service.leader.agent.modules.homebrew.TnelisAgent;
+import ti4.service.leader.agent.modules.homebrew.UydaiAgent;
 import ti4.service.leader.agent.modules.homebrew.VadenAgent;
 import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
 import ti4.service.leader.agent.modules.homebrew.VeldyrAgent;
 import ti4.service.leader.agent.modules.homebrew.ZelianAgent;
 import ti4.service.leader.agent.modules.twilightsfall.HyperAgent;
+import ti4.service.leader.agent.modules.twilightsfall.ResearchGenomeAgent;
 
 @UtilityClass
 class AgentModules {
@@ -52,7 +61,16 @@ class AgentModules {
                             new WinnuAgent(),
                             new KaloraAgent(),
                             new LunariumAgent(),
-                            new ZelianAgent()),
+                            new ZelianAgent(),
+                            new ArtunoAgent(),
+                            new KeleresAgent(),
+                            new SolAgent(),
+                            new LetnevAgent(),
+                            new GhostAgent(),
+                            new ObsidianAgent(),
+                            new ResearchGenomeAgent(),
+                            new TnelisAgent(),
+                            new UydaiAgent()),
                     ExhaustOnlyAgents.ALL,
                     HomebrewExhaustOnlyAgents.ALL)
             .<AgentModule<?>>flatMap(List::stream)

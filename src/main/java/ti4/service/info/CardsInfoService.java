@@ -62,6 +62,7 @@ import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.MonumentsService;
 import ti4.service.game.NekroMonumentService;
 import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
+import ti4.service.leader.agent.modules.twilightsfall.ResearchGenomeAgent;
 
 @UtilityClass
 public class CardsInfoService {
@@ -223,7 +224,7 @@ public class CardsInfoService {
                     FactionEmojis.belkosea));
         }
         if (player.hasUnexhaustedLeader("researchagent")) {
-            buttons.add(Buttons.gray("exhaustAgent_researchagent", "Use Research Genome", FactionEmojis.Deepwrought));
+            buttons.add(ResearchGenomeAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("pharadnagent")) {
             buttons.add(Buttons.gray("exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));

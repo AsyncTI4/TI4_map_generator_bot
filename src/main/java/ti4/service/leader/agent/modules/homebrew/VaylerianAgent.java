@@ -77,7 +77,7 @@ public final class VaylerianAgent extends AgentModule<VaylerianAgent.Choice> {
             return;
         }
         String agentName = AgentLifecycle.agentName(DISPLAY_NAME, step.viaYssaril());
-        AgentLifecycle.deliver(drawFor(game, player, target, agentName), event);
+        AgentLifecycle.deliver(drawFor(game, player, target, agentName), event, player);
         ButtonHelper.deleteMessage(event);
     }
 
