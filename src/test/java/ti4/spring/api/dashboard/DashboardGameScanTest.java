@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.ManagedGame;
+import ti4.helpers.TIGLHelper;
 import ti4.testUtils.BaseTi4Test;
 
 class DashboardGameScanTest extends BaseTi4Test {
@@ -46,6 +47,43 @@ class DashboardGameScanTest extends BaseTi4Test {
                 .extracting(PlayerDashboardResponse.DashboardGame::gameId)
                 .containsExactly(ongoing.getName(), lost.getName(), won.getName());
         assertThat(scan.games()).allSatisfy(game -> assertThat(game.yourSeat()).isNotNull());
+    }
+
+    @Test
+    void rankDiceLuckAndAggregateKeyMatchThePerPassResults() {
+        String userId = "dashboard-user-" + UUID.randomUUID();
+        Game ongoing = gameWithUser(userId, 1, 1);
+        Game older = gameWithUser(userId, 1, 1);
+        older.setHasEnded(true);
+        older.recordWinner(older.getPlayer(userId));
+        Game oldest = gameWithUser(userId, 1, 1);
+        oldest.setHasEnded(true);
+        oldest.recordWinner(oldest.getPlayer(userId));
+        older.getPlayer(userId).setPlayerTIGLRankAtGameStart(TIGLHelper.TIGLRank.AGENT);
+        oldest.getPlayer(userId).setPlayerTIGLRankAtGameStart(TIGLHelper.TIGLRank.HERO);
+        hits(ongoing.getPlayer(userId), 20, 3);
+        hits(older.getPlayer(userId), 30, 4);
+        ManagedGame missing = spy(new ManagedGame(gameWithUser(userId, 1, 1)));
+        doReturn(null).when(missing).getGame();
+
+        DashboardService.DashboardGameScan scan = DashboardService.scanGames(
+                userId, List.of(loadable(ongoing), missing, loadable(older), loadable(oldest)));
+
+        // Newest first, so the most recent game that recorded a rank wins.
+        assertThat(scan.latestTiglRank()).isEqualTo(TIGLHelper.TIGLRank.AGENT.getName());
+        assertThat(scan.diceLuckSummary().expectedHits()).isEqualTo(5.0);
+        assertThat(scan.diceLuckSummary().actualHits()).isEqualTo(7.0);
+        assertThat(scan.games())
+                .extracting(PlayerDashboardResponse.DashboardGame::gameId)
+                .containsExactly(ongoing.getName(), older.getName(), oldest.getName());
+        assertThat(scan.trackedCompletedGameNames())
+                .isSubsetOf(older.getName(), oldest.getName())
+                .doesNotContain(ongoing.getName());
+    }
+
+    private static void hits(Player player, int expectedHitsTimes10, int actualHits) {
+        player.setExpectedHitsTimes10(expectedHitsTimes10);
+        player.setActualHits(actualHits);
     }
 
     private static ManagedGame loadable(Game game) {

@@ -194,7 +194,7 @@ class DashboardService {
             }
         }
 
-        private PlayerDashboardResponse.DiceLuckSummary diceLuckSummary() {
+        PlayerDashboardResponse.DiceLuckSummary diceLuckSummary() {
             Double ratio = expectedHits > 0 ? actualHits / expectedHits : null;
             return new PlayerDashboardResponse.DiceLuckSummary(actualHits, expectedHits, ratio);
         }
