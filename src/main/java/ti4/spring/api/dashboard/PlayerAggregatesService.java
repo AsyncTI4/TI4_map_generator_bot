@@ -59,12 +59,13 @@ class PlayerAggregatesService {
      * 3) Queue async recompute if stale/missing.
      * 4) Return fresh cached payload if present, otherwise an empty aggregate shell.
      */
-    PlayerDashboardResponse.PlayerAggregates getOrQueueRefresh(String userId, List<ManagedGame> playerGames) {
+    PlayerDashboardResponse.PlayerAggregates getOrQueueRefresh(
+            String userId, Collection<String> trackedCompletedGameNames) {
         if (DatabasePersistenceGate.isDisabled()) {
-            List<String> completedGameIds = getTrackedCompletedGameIds(playerGames);
+            List<String> completedGameIds = getTrackedCompletedGameIds(trackedCompletedGameNames);
             return emptyAggregates(false, "", completedGameIds.size(), 0, null, completedGameIds);
         }
-        CacheContext context = buildCacheContext(userId, playerGames);
+        CacheContext context = buildCacheContext(userId, trackedCompletedGameNames);
         if (needsRefresh(context)) {
             queueRecompute(context.userId(), context.completedGameIds(), context.completedGamesHash());
         }
@@ -74,8 +75,8 @@ class PlayerAggregatesService {
     /**
      * Builds the cache context used for refresh and response decisions.
      */
-    private CacheContext buildCacheContext(String userId, List<ManagedGame> playerGames) {
-        List<String> completedGameIds = getTrackedCompletedGameIds(playerGames);
+    private CacheContext buildCacheContext(String userId, Collection<String> trackedCompletedGameNames) {
+        List<String> completedGameIds = getTrackedCompletedGameIds(trackedCompletedGameNames);
         String completedGamesHash = hashCompletedGameIds(completedGameIds);
         PlayerAggregatesCache cached = repository.findById(userId).orElse(null);
         boolean shouldRecompute = shouldRecompute(cached, completedGamesHash, completedGameIds.size());
@@ -189,23 +190,21 @@ class PlayerAggregatesService {
                 0);
     }
 
+    static boolean isTrackedCompletedGame(ManagedGame managedGame, Game game) {
+        return managedGame.isHasEnded() && isValidGameForAggregates(managedGame, game);
+    }
+
     /**
      * Determines the canonical completed-game ID set used by hash and recompute logic.
      *
-     * <p>Only ended games that pass {@link #isValidGameForAggregates(ManagedGame, Game)} are included.
+     * <p>Callers pass the ended games that pass {@link #isTrackedCompletedGame(ManagedGame, Game)}.
      * IDs are deduplicated and sorted so the resulting hash is stable and independent of iteration order.
      */
-    private static List<String> getTrackedCompletedGameIds(List<ManagedGame> playerGames) {
-        if (playerGames == null || playerGames.isEmpty()) {
+    private static List<String> getTrackedCompletedGameIds(Collection<String> trackedCompletedGameNames) {
+        if (trackedCompletedGameNames == null || trackedCompletedGameNames.isEmpty()) {
             return Collections.emptyList();
         }
-        return playerGames.stream()
-                .filter(ManagedGame::isHasEnded)
-                .filter(managedGame -> {
-                    Game game = managedGame.getGame();
-                    return game != null && isValidGameForAggregates(managedGame, game);
-                })
-                .map(ManagedGame::getName)
+        return trackedCompletedGameNames.stream()
                 .filter(Objects::nonNull)
                 .distinct()
                 .sorted()

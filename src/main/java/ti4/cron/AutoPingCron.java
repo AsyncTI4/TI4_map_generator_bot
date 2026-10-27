@@ -1,10 +1,10 @@
 package ti4.cron;
 
-import static java.util.function.Predicate.*;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -99,13 +99,21 @@ public class AutoPingCron {
 
         removeEndedGamesFromAutoPingMetadata();
 
+        Set<String> gamesWithAutoPing = AutoPingMetadataManager.getGameNamesWithAutoPing();
         GameManager.getManagedGames().stream()
-                .filter(not(ManagedGame::isHasEnded))
+                .filter(managedGame -> isDueForAutoPingCheck(managedGame, gamesWithAutoPing))
                 .map(ManagedGame::getGame)
-                .filter(game -> game.getAutoPingStatus() && !game.isTemporaryPingDisable())
+                .filter(Objects::nonNull)
                 .forEach(AutoPingCron::autoPingGame);
 
         BotLogger.logCron("Finished AutoPingCron.");
+    }
+
+    static boolean isDueForAutoPingCheck(ManagedGame managedGame, Set<String> gamesWithAutoPing) {
+        return !managedGame.isHasEnded()
+                && managedGame.isAutoPingEnabled()
+                && !managedGame.isTemporaryPingDisable()
+                && gamesWithAutoPing.contains(managedGame.getName());
     }
 
     private static void removeEndedGamesFromAutoPingMetadata() {
