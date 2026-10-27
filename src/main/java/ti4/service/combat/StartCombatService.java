@@ -118,6 +118,7 @@ import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.ExhaustOnlyAgents;
+import ti4.service.leader.agent.modules.YinAgent;
 import ti4.service.leader.agent.modules.homebrew.HomebrewExhaustOnlyAgents;
 import ti4.service.leader.agent.modules.homebrew.KjalengardAgent;
 import ti4.service.leader.agent.modules.homebrew.KortaliAgent;
@@ -2050,11 +2051,7 @@ public class StartCombatService {
             if ((!game.isFowMode() || agentHolder == p1)
                     && (isSpaceCombat || !game.isTwilightsFallMode())
                     && agentHolder.hasUnexhaustedLeader("yinagent")) {
-                buttons.add(Buttons.gray(
-                        factionChecker + "yinagent_" + pos,
-                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "Yin Agent",
-                        FactionEmojis.Yin));
+                buttons.add(YinAgent.offerButton(agentHolder, pos));
             }
 
             buttons.addAll(TkHelperGenomes.getGeneralCombatButtons(game, pos, p1, p2, agentHolder, factionChecker));

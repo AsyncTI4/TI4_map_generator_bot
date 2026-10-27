@@ -1,7 +1,5 @@
 package ti4.helpers.twilight_kart;
 
-import static ti4.helpers.ButtonHelperAgents.getYinAgentButtons;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
@@ -22,6 +21,7 @@ import ti4.model.LeaderModel;
 import ti4.model.Mapper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TI4Emoji;
+import ti4.service.leader.agent.modules.YinAgent;
 
 @UtilityClass
 public class TkHelperGenomes {
@@ -150,7 +150,8 @@ public class TkHelperGenomes {
                     targetPlayer = game.getPlayerFromColorOrFaction(targetFaction);
                 }
 
-                if (targetPlayer == null) {
+                Tile tile = game.getTileByPosition(pos);
+                if (targetPlayer == null || tile == null) {
                     return;
                 }
                 MessageChannel yinChannel = event.getMessageChannel();
@@ -161,7 +162,7 @@ public class TkHelperGenomes {
                 MessageHelper.sendMessageToChannelWithButtons(
                         yinChannel,
                         targetPlayer.getRepresentationUnfogged() + ", use buttons to resolve the " + ssruuClever + name,
-                        getYinAgentButtons(targetPlayer, game, pos));
+                        YinAgent.placementButtons(game, targetPlayer, tile));
             }
         }
     }
