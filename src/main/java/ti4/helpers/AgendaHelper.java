@@ -130,7 +130,7 @@ public final class AgendaHelper {
                 if (p2.getDebtTokenCount(player.getColor()) >= 3) {
                     buttons.add(Buttons.blue("sendTGTo_" + p2.getFaction() + "_debt3", "Erase 3 Debt"));
                 }
-                buttons.add(Buttons.DELETE_THESE_BUTTONS);
+                buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
         }

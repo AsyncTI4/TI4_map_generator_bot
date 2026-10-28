@@ -73,7 +73,7 @@ public final class NewStuffHelper {
                 buttonsToUse.add(nextPage);
             }
             if (extraButtons != null) buttonsToUse.addAll(extraButtons);
-            if (deleteButton) buttonsToUse.add(Buttons.DELETE_THESE_BUTTONS);
+            if (deleteButton) buttonsToUse.add(Buttons.DELETE_BUTTONS);
             return buttonsToUse;
         }
         return allButtons;

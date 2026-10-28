@@ -2881,7 +2881,7 @@ public final class ButtonHelperFactionSpecific {
                 }
             }
         }
-        buttons.add(Buttons.DELETE_THESE_BUTTONS);
+        buttons.add(Buttons.DELETE_BUTTONS);
         return buttons;
     }
 
@@ -2897,7 +2897,7 @@ public final class ButtonHelperFactionSpecific {
                 }
             }
         }
-        buttons.add(Buttons.DELETE_THESE_BUTTONS);
+        buttons.add(Buttons.DELETE_BUTTONS);
         return buttons;
     }
 

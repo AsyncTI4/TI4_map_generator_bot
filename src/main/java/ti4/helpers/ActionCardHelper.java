@@ -922,7 +922,7 @@ public class ActionCardHelper {
                         UnitEmojis.mech);
                 List<Button> empyButtons = new ArrayList<>();
                 empyButtons.add(empyButton);
-                Button refuse = Buttons.DELETE_THESE_BUTTONS;
+                Button refuse = Buttons.DELETE_BUTTONS;
                 empyButtons.add(refuse);
                 MessageHelper.sendMessageToChannelWithButtons(
                         empy.getCardsInfoThread(),
@@ -939,7 +939,7 @@ public class ActionCardHelper {
                         UnitEmojis.fighter);
                 List<Button> tfButtons = new ArrayList<>();
                 tfButtons.add(tfButton);
-                Button refuse = Buttons.DELETE_THESE_BUTTONS;
+                Button refuse = Buttons.DELETE_BUTTONS;
                 tfButtons.add(refuse);
                 MessageHelper.sendMessageToChannelWithButtons(
                         tfTriune.getCardsInfoThread(),
@@ -959,7 +959,7 @@ public class ActionCardHelper {
                             "sabotage_xxcha_" + actionCardTitle + "_" + player.getFaction(),
                             "Cancel " + actionCardTitle + " With Instinct Training",
                             FactionEmojis.Xxcha));
-                    xxchaButtons.add(Buttons.DELETE_THESE_BUTTONS);
+                    xxchaButtons.add(Buttons.DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(
                             player2.getCardsInfoThread(),
                             player2.getRepresentationUnfogged()
@@ -2833,7 +2833,7 @@ public class ActionCardHelper {
             buttons.add(Buttons.green(
                     buttonPrefix + acStringID, Mapper.getActionCard(acStringID).getName()));
         }
-        buttons.add(Buttons.DELETE_THESE_BUTTONS);
+        buttons.add(Buttons.DELETE_BUTTONS);
         if (buttons.size() > 25) {
             buttons.add(25, Buttons.red("deleteButtons_", "Delete These Buttons"));
         }

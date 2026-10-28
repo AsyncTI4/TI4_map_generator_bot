@@ -43,7 +43,7 @@ public class DiscardSecretService {
             buttons.add(Buttons.gray(
                     "drawSpecificSO_" + soIDString,
                     "Retrieve " + Mapper.getSecretObjective(soIDString).getName()));
-            buttons.add(Buttons.DELETE_THESE_BUTTONS);
+            buttons.add(Buttons.DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
 

@@ -41,7 +41,6 @@ public final class Buttons {
     public static final Button CANCEL = gray("deleteButtons", "Cancel");
     public static final Button DECLINE_DELETE_BUTTONS = red("deleteButtons", "Decline");
     public static final Button DONE_RED_DELETE_BUTTONS = red("deleteButtons", "Done");
-    public static final Button DELETE_THESE_BUTTONS = red("deleteButtons", "Delete These Buttons");
     public static final Button DELETE_BUTTONS = red("deleteButtons", "Delete Buttons");
     public static final Button CANCEL_DELETE_BUTTONS = red("deleteButtons", "Cancel");
     public static final Button DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS = red("deleteButtons", "Done Exhausting Planets");

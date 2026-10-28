@@ -3219,7 +3219,7 @@ public class ButtonHelper {
                         "Replace Sleeper on " + Helper.getPlanetRepresentation(planet, game)
                                 + " With 1 Mech & Infantry."));
             }
-            planetsWithSleepers.add(Buttons.DELETE_THESE_BUTTONS);
+            planetsWithSleepers.add(Buttons.DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     "Use buttons to resolve the replacement of the Sleeper token on "
@@ -3243,7 +3243,7 @@ public class ButtonHelper {
                         "Replace PDS on " + planet + " With the Ouranos (the Ul flagship)."));
             }
         }
-        planetsWithPDS.add(Buttons.DELETE_THESE_BUTTONS);
+        planetsWithPDS.add(Buttons.DELETE_BUTTONS);
         return planetsWithPDS;
     }
 
@@ -3255,7 +3255,7 @@ public class ButtonHelper {
                     factionChecker + "removeSleeperFromPlanet_" + planet,
                     "Remove Sleeper on " + Helper.getPlanetRepresentation(planet, game)));
         }
-        planetsWithSleepers.add(Buttons.DELETE_THESE_BUTTONS);
+        planetsWithSleepers.add(Buttons.DELETE_BUTTONS);
         return planetsWithSleepers;
     }
 
@@ -3993,7 +3993,7 @@ public class ButtonHelper {
             }
         }
         if (fromButton) {
-            buttonsToRemoveCC.add(Buttons.DELETE_THESE_BUTTONS);
+            buttonsToRemoveCC.add(Buttons.DELETE_BUTTONS);
         }
 
         return buttonsToRemoveCC;

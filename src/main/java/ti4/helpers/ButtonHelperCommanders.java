@@ -840,7 +840,7 @@ public class ButtonHelperCommanders {
                 List<Button> buttons = new ArrayList<>();
 
                 buttons.add(Buttons.DRAW_1_ACTION_CARD_DELETE);
-                buttons.add(Buttons.DELETE_THESE_BUTTONS);
+                buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
@@ -865,7 +865,7 @@ public class ButtonHelperCommanders {
                         }
                     }
                     if (removeTechButtons.size() > 2) {
-                        removeTechButtons.add(Buttons.DELETE_THESE_BUTTONS);
+                        removeTechButtons.add(Buttons.DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
                                 player.getRepresentationUnfogged()

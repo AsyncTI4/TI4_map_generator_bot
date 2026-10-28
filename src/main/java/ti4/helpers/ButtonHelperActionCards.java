@@ -1455,7 +1455,7 @@ public final class ButtonHelperActionCards {
             buttons.add(button);
         }
         if (game.getRealPlayers().size() < 5) {
-            buttons.add(Buttons.DELETE_THESE_BUTTONS);
+            buttons.add(Buttons.DELETE_BUTTONS);
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(

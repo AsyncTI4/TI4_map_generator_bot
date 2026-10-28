@@ -437,7 +437,7 @@ public class PlayStrategyCardService {
                 MindsieveService.serveMindsieveButtons(game, player3, scToPlay);
                 StoneEmbraceService.serveStoneEmbraceButtons(game, player3, scToPlay);
                 List<Button> empNMahButtons = new ArrayList<>();
-                Button deleteB = Buttons.DELETE_THESE_BUTTONS;
+                Button deleteB = Buttons.DELETE_BUTTONS;
                 empNMahButtons.add(deleteB);
                 if (player3.hasRelic("emelpar") && !player3.getExhaustedRelics().contains("emelpar")) {
                     empNMahButtons.addFirst(emelpar);

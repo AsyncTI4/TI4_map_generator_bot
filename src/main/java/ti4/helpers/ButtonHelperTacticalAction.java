@@ -466,7 +466,7 @@ public final class ButtonHelperTacticalAction {
         if (unitsWereMoved && tile.getPlanetUnitHolders().isEmpty() && player.hasUnexhaustedLeader("empyreanagent")) {
             List<Button> empyButtons = new ArrayList<>();
             empyButtons.add(EmpyreanAgent.button(player));
-            empyButtons.add(Buttons.DELETE_THESE_BUTTONS);
+            empyButtons.add(Buttons.DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     player.getRepresentationUnfogged() + ", use button to exhaust "
