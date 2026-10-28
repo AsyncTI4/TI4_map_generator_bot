@@ -12,8 +12,6 @@ import ti4.game.Game;
 import ti4.model.StrategyCardModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
-import ti4.service.emoji.MiscEmojis;
-import ti4.service.emoji.UnitEmojis;
 
 @UtilityClass
 public class StrategyCardSecondaryButtonService {
@@ -35,13 +33,12 @@ public class StrategyCardSecondaryButtonService {
             return List.of();
         }
         return switch (scModel.getBotSCAutomationID()) {
-            case "pok1leadership", "anarchy1" ->
-                List.of(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
-            case "pok2diplomacy", "base2", "luminous1" -> List.of(Buttons.green("diploRefresh2", "Ready 2 Planets"));
+            case "pok1leadership", "anarchy1" -> List.of(Buttons.SPEND_AND_GAIN_COMMAND_TOKENS);
+            case "pok2diplomacy", "base2", "luminous1" -> List.of(Buttons.DIPLO_READY_2_PLANETS);
             case "anarchy2" ->
                 List.of(
                         Buttons.gray("anarchy2secondary", "Ready a Card (Other Than Strategy Card)"),
-                        Buttons.green("diploRefresh2", "Ready Planets"));
+                        Buttons.DIPLO_READY_PLANETS);
             case "anarchy3", "luminous9" ->
                 List.of(Buttons.gray("anarchy3secondary", "Perform Unchosen Or Exhausted Secondary"));
             case "luminous2" ->
@@ -54,40 +51,36 @@ public class StrategyCardSecondaryButtonService {
                 List.of(Buttons.gray("cryypterSC3Draw", "Draw Action Cards", CardEmojis.getACEmoji(game)));
             case "pok4construction", "te4construction", "monuments4construction", "monumentstf4" ->
                 getConstructionButtons(game, scModel);
-            case "pok5trade" -> List.of(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
-            case "pok6warfare", "anarchy7", "luminous7" -> List.of(Buttons.green("warfareBuild", "Build At Home"));
-            case "te6warfare" -> List.of(Buttons.green("warfareTeBuild", "Build At Home"));
+            case "pok5trade" -> List.of(Buttons.REPLENISH_COMMODITIES);
+            case "pok6warfare", "anarchy7", "luminous7" -> List.of(Buttons.WARFARE_BUILD_AT_HOME);
+            case "te6warfare" -> List.of(Buttons.WARFARE_TE_BUILD_AT_HOME);
             case "anarchy8" -> List.of(Buttons.green("resolveAnarchy8Secondary", "Lift Command Token"));
             case "anarchy10" -> List.of(Buttons.gray("anarchy10PeekStart", "Peek at Public", CardEmojis.Public1));
             case "tf2" -> List.of(Buttons.blue("participateInSplice_2", "Participate In Splice"));
             case "tf6" ->
                 List.of(
-                        Buttons.green("warfareTeBuild", "Build At Home"),
+                        Buttons.WARFARE_TE_BUILD_AT_HOME,
                         Buttons.blue("participateInSplice_6", "Participate In Splice"));
             case "tf7" -> List.of(Buttons.blue("participateInSplice_7", "Participate In Splice"));
-            case "tf8" ->
-                List.of(
-                        Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective),
-                        Buttons.gray("drawParadigm", "Draw Paradigm"));
+            case "tf8" -> List.of(Buttons.NON_SC_DRAW_SECRET_OBJECTIVE, Buttons.gray("drawParadigm", "Draw Paradigm"));
             case "ignisaurora2" ->
                 List.of(Buttons.green("ignisAuroraSC8Secondary", "Draw Unknown Relic Fragment", ExploreEmojis.UFrag));
             case "pok7technology", "manytech8", "manytech9", "manytech10", "manytech11", "manytech12" ->
                 List.of(Buttons.GET_A_TECH);
-            case "pok8imperial", "anarchy11", "manytech13" ->
-                List.of(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
+            case "pok8imperial", "anarchy11", "manytech13" -> List.of(Buttons.NON_SC_DRAW_SECRET_OBJECTIVE);
             default -> List.of();
         };
     }
 
     private static List<Button> getConstructionButtons(Game game, StrategyCardModel scModel) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
-        buttons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
+        buttons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
+        buttons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
         if (game.isFacilitiesMode()) {
             buttons.add(Buttons.green("construction_facility", "Place A Facility"));
         }
         if (game.isMonumentToTheAgesMode()) {
-            buttons.add(Buttons.green("construction_agesmonument", "Place A Monument (Cost 5 TG)"));
+            buttons.add(Buttons.CONSTRUCTION_PLACE_A_MONUMENT);
         }
         return buttons;
     }

@@ -258,7 +258,7 @@ public class AshenUnitHandler {
                             + unitId,
                     "Use Ashfall Engine on " + Helper.getPlanetRepresentationNoResInf(planet, game)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         String timing = fromSustain ? "used SUSTAIN DAMAGE" : "was destroyed";
         String amountText = fromSustain || triggerCount == 1

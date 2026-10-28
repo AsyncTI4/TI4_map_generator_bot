@@ -42,7 +42,7 @@ public class TaBreakthroughHandler {
                         player.factionButtonChecker() + SAFE_HAVENS_PLACE + tile.getPosition() + "|" + planetName,
                         "Place 1 Infantry",
                         player.getFactionEmoji()),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", you may place 1 infantry on "

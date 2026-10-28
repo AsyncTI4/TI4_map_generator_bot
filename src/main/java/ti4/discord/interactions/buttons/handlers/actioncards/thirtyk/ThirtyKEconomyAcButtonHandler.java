@@ -412,7 +412,7 @@ public class ThirtyKEconomyAcButtonHandler {
         Player actor = ThirtyKAcTargets.target(game, buttonID, REPRIMAND_PAY);
         ButtonHelper.deleteMessage(event);
         List<Button> buttons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, player, "inf"));
-        buttons.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
+        buttons.add(Buttons.DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", exhaust planets to pay 3 influence for _Public Reprimand_.",

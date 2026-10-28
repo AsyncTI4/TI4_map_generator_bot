@@ -143,7 +143,7 @@ public class DeorbitBarrageService {
                         buttons);
             }
             buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-            Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
+            Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_FINISH_COMPONENT_ACTION;
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),

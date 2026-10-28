@@ -86,7 +86,7 @@ public class TkHelperActionCards {
             case "tk-evade" -> nop(); // No automation required, just ignore the hits :)
             case "tk-exhort" -> nop(); // Automated via the Combat Modifier system
             case "tk-fortify" -> {
-                buttons.add(Buttons.green("construction_spacedock", "Place A Space Dock", UnitEmojis.spacedock));
+                buttons.add(Buttons.CONSTRUCTION_PLACE_A_SPACE_DOCK);
                 buttons.add(Buttons.green("construction_pds", "Place A PDS", UnitEmojis.pds));
                 buttons.add(Buttons.DONE_DELETE_BUTTONS);
             }

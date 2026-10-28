@@ -367,7 +367,7 @@ public class BlueReverieExploreHandler {
                 Buttons.green(
                         player.factionButtonChecker() + PLACE_FORGOTTEN_LEGION + "3|" + planetName,
                         "Place 3 Neutral Infantry"),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing()

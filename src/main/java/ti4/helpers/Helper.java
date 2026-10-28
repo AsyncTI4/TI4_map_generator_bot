@@ -227,7 +227,7 @@ public final class Helper {
         List<Button> proceedButtons = new ArrayList<>();
         String msg = "These buttons can help with bugs/issues that occur during the Agenda Phase.";
         proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
-        proceedButtons.add(Buttons.blue("transaction", "Transaction"));
+        proceedButtons.add(Buttons.TRANSACTION);
         proceedButtons.add(Buttons.red("eraseMyVote", "Erase My Vote And Have Me Vote Again"));
         proceedButtons.add(Buttons.red("eraseMyRiders", "Erase My Riders"));
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, proceedButtons);

@@ -50,7 +50,7 @@ public class NeuraloopService {
                 buttons.add(Buttons.gray(pre + "stage1", "Replace with Stage 1 Public Objective", CardEmojis.Public1));
                 buttons.add(Buttons.gray(pre + "stage2", "Replace with Stage 2 Public Objective", CardEmojis.Public2));
                 buttons.add(Buttons.gray(pre + "secret", "Replace with Secret Objective", CardEmojis.SecretObjective));
-                buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                buttons.add(Buttons.DELETE_THESE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
         }

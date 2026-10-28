@@ -28,7 +28,7 @@ public class VerydithPromissoryHandler {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
                 player.factionButtonChecker() + "playPactRenewed", "Play Pact Renewed", FactionEmojis.verydith));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),

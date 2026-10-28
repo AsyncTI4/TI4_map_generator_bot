@@ -13,10 +13,13 @@ import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.MapSegmentService;
 import ti4.website.AsyncTi4WebsiteHelper;
 
@@ -36,6 +39,48 @@ public final class Buttons {
     public static final Button REDISTRIBUTE_CCs = green("redistributeCCButtons", "Redistribute Command Tokens");
     public static final Button DONE_DELETE_BUTTONS = gray("deleteButtons", "Done");
     public static final Button CANCEL = gray("deleteButtons", "Cancel");
+    public static final Button DECLINE_DELETE_BUTTONS = red("deleteButtons", "Decline");
+    public static final Button DONE_RED_DELETE_BUTTONS = red("deleteButtons", "Done");
+    public static final Button DELETE_THESE_BUTTONS = red("deleteButtons", "Delete These Buttons");
+    public static final Button DELETE_BUTTONS = red("deleteButtons", "Delete Buttons");
+    public static final Button CANCEL_DELETE_BUTTONS = red("deleteButtons", "Cancel");
+    public static final Button DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS = red("deleteButtons", "Done Exhausting Planets");
+    public static final Button DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT =
+            red("deleteButtons_spitItOut", "Done Exhausting Planets");
+    public static final Button DONE_EXHAUSTING_PLANETS_FINISH_COMPONENT_ACTION =
+            red("finishComponentAction_spitItOut", "Done Exhausting Planets");
+    public static final Button DECLINE_DELETE_BUTTONS_GRAY = gray("deleteButtons", "Decline");
+    public static final Button WARFARE_BUILD_AT_HOME = green("warfareBuild", "Build At Home");
+    public static final Button WARFARE_TE_BUILD_AT_HOME = green("warfareTeBuild", "Build At Home");
+    public static final Button SPEND_AND_GAIN_COMMAND_TOKENS =
+            green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens");
+    public static final Button CONSTRUCTION_PLACE_1_PDS = green("construction_pds", "Place 1 PDS", UnitEmojis.pds);
+    public static final Button CONSTRUCTION_PLACE_1_SPACE_DOCK =
+            green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock);
+    public static final Button CONSTRUCTION_PLACE_A_SPACE_DOCK =
+            green("construction_spacedock", "Place A Space Dock", UnitEmojis.spacedock);
+    public static final Button CONSTRUCTION_PLACE_A_MONUMENT =
+            green("construction_agesmonument", "Place A Monument (Cost 5 TG)");
+    public static final Button REPLENISH_COMMODITIES = gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm);
+    public static final Button DRAW_1_ABILITY = green("drawSingularNewSpliceCard_ability", "Draw 1 Ability");
+    public static final Button DRAW_1_UNIT_UPGRADE = green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade");
+    public static final Button NON_SC_DRAW_SECRET_OBJECTIVE =
+            gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective);
+    public static final Button SC_DRAW_SECRET_OBJECTIVE =
+            gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective);
+    public static final Button SC_DRAW_2_ACTION_CARDS =
+            gray("sc_ac_draw", "Draw 2 Action Cards", CardEmojis.ActionCard);
+    public static final Button DRAW_1_ACTION_CARD_DELETE = green("draw_1_ACDelete", "Draw 1 Action Card");
+    public static final Button DIPLO_READY_2_PLANETS = green("diploRefresh2", "Ready 2 Planets");
+    public static final Button DIPLO_READY_PLANETS = green("diploRefresh2", "Ready Planets");
+    public static final Button TRANSACTION = blue("transaction", "Transaction");
+    public static final Button USE_PRODUCTION_BIOMES =
+            blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan);
+    public static final Button PASS_ON_AFTERS = blue("declineToQueueAnAfter", "Pass On \"After\"s");
+    public static final Button PASS_ON_WHENS = blue("declineToQueueAWhen", "Pass On \"When\"s");
+    public static final Button GAIN_1_COMMODITY = blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm);
+    public static final Button FLIP_AGENDA = blue("flip_agenda", "Flip Agenda");
+    public static final Button PRE_VOTE = green("preVote", "Pre-Vote");
     public static final Button FACTION_EMBED = green("factionEmbedRefresh", "Refresh Faction Display");
     public static final Button DEAL_2_SO =
             green("deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt);

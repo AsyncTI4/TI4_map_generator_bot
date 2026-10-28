@@ -54,7 +54,7 @@ public final class MyrrAgent extends AgentModule<MyrrAgent.ShipsMoved> {
         MessageHelper.sendMessageToChannelWithButtons(
                 activatingPlayer.getCorrectChannel(),
                 activatingPlayer.getRepresentation() + ", you may exhaust Kelron Dross, the Myrr agent.",
-                List.of(offerButton(activatingPlayer, tile), Buttons.red("deleteButtons", "Decline")));
+                List.of(offerButton(activatingPlayer, tile), Buttons.DECLINE_DELETE_BUTTONS));
     }
 
     static Button offerButton(Player holder, Tile tile) {
@@ -137,7 +137,7 @@ public final class MyrrAgent extends AgentModule<MyrrAgent.ShipsMoved> {
                     "Destroy 1 " + unitKey.humanReadableName(),
                     unitKey.unitEmoji()));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         return buttons;
     }
 

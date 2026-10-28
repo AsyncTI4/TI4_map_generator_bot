@@ -922,7 +922,7 @@ public class ActionCardHelper {
                         UnitEmojis.mech);
                 List<Button> empyButtons = new ArrayList<>();
                 empyButtons.add(empyButton);
-                Button refuse = Buttons.red("deleteButtons", "Delete These Buttons");
+                Button refuse = Buttons.DELETE_THESE_BUTTONS;
                 empyButtons.add(refuse);
                 MessageHelper.sendMessageToChannelWithButtons(
                         empy.getCardsInfoThread(),
@@ -939,7 +939,7 @@ public class ActionCardHelper {
                         UnitEmojis.fighter);
                 List<Button> tfButtons = new ArrayList<>();
                 tfButtons.add(tfButton);
-                Button refuse = Buttons.red("deleteButtons", "Delete These Buttons");
+                Button refuse = Buttons.DELETE_THESE_BUTTONS;
                 tfButtons.add(refuse);
                 MessageHelper.sendMessageToChannelWithButtons(
                         tfTriune.getCardsInfoThread(),
@@ -959,7 +959,7 @@ public class ActionCardHelper {
                             "sabotage_xxcha_" + actionCardTitle + "_" + player.getFaction(),
                             "Cancel " + actionCardTitle + " With Instinct Training",
                             FactionEmojis.Xxcha));
-                    xxchaButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                    xxchaButtons.add(Buttons.DELETE_THESE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(
                             player2.getCardsInfoThread(),
                             player2.getRepresentationUnfogged()
@@ -1755,7 +1755,7 @@ public class ActionCardHelper {
                 Button resolveButton = FreedomFightersDsActionCardHandler.getResolveButton(game, player);
                 if (resolveButton != null) {
                     codedButtons.add(resolveButton);
-                    codedButtons.add(Buttons.red("deleteButtons", "Decline"));
+                    codedButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
                 }
             }
@@ -1993,15 +1993,15 @@ public class ActionCardHelper {
             }
             if ("tf-mutate1".equals(automationID) || "tf-mutate2".equals(automationID)) {
                 codedButtons.add(Buttons.red("discardSpliceCard_ability", "Discard 1 Ability"));
-                codedButtons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
-                codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+                codedButtons.add(Buttons.DRAW_1_ABILITY);
+                codedButtons.add(Buttons.DONE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
             if ("tf-evolve".equals(automationID)) {
-                codedButtons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
+                codedButtons.add(Buttons.DRAW_1_UNIT_UPGRADE);
                 codedButtons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
-                codedButtons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
-                codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+                codedButtons.add(Buttons.DRAW_1_ABILITY);
+                codedButtons.add(Buttons.DONE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
             if ("tf-helix".equals(automationID)) {
@@ -2011,7 +2011,7 @@ public class ActionCardHelper {
                         player.factionButtonChecker() + "startSplice_2_all", "Initiate Genome (Agent) Splice"));
                 codedButtons.add(Buttons.blue(
                         player.factionButtonChecker() + "startSplice_6_all", "Initiate Unit Upgrade Splice"));
-                codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+                codedButtons.add(Buttons.DONE_DELETE_BUTTONS);
                 for (Player p : game.getRealPlayers()) {
                     ButtonHelperActionCards.checkForPlayingSpliceCards(game, p);
                 }
@@ -2108,7 +2108,7 @@ public class ActionCardHelper {
                         MiscEmojis.Wash));
                 codedButtons.add(Buttons.blue(
                         player.factionButtonChecker() + "gainComms_1_stay", "Gain 1 Commodity", MiscEmojis.comm));
-                codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+                codedButtons.add(Buttons.DONE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
             if ("tf-thieve".equals(automationID)) {
@@ -2440,7 +2440,7 @@ public class ActionCardHelper {
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green(
                             "pay1tgforKeleres", "Pay 1 Trade Good to Unleash Suffi An", LeaderEmojis.KeleresCommander));
-                    buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons2.add(Buttons.DECLINE_DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
                 }
                 serveReverseEngineerButtons(game, player, List.of(acID));
@@ -2560,7 +2560,7 @@ public class ActionCardHelper {
             }
 
             if (!reverseButtons.isEmpty()) {
-                reverseButtons.add(Buttons.red("deleteButtons", "Decline"));
+                reverseButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(), msg.toString(), reverseButtons);
             }
@@ -2608,7 +2608,7 @@ public class ActionCardHelper {
                 } else {
                     msg.append("_").append(lastCardName).append("_.");
                 }
-                twinningButtons.add(Buttons.red("deleteButtons", "Decline"));
+                twinningButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(), msg.toString(), twinningButtons);
             }
@@ -2833,7 +2833,7 @@ public class ActionCardHelper {
             buttons.add(Buttons.green(
                     buttonPrefix + acStringID, Mapper.getActionCard(acStringID).getName()));
         }
-        buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+        buttons.add(Buttons.DELETE_THESE_BUTTONS);
         if (buttons.size() > 25) {
             buttons.add(25, Buttons.red("deleteButtons_", "Delete These Buttons"));
         }

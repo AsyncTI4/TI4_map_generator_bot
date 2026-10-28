@@ -923,7 +923,7 @@ public class CombatRollService {
         if (message.contains("adding +1, at the risk of your")) {
             Button thalnosButton = Buttons.green(
                     "startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos", ExploreEmojis.Relic);
-            Button decline = Buttons.gray("deleteButtons", "Decline");
+            Button decline = Buttons.DECLINE_DELETE_BUTTONS_GRAY;
             String thalnosMessage =
                     "Use this button to roll for Thalnos.\n-# Note that if it matters, the dice were just rolled in the following format: (normal dice for unit 1)+(normal dice for unit 2)...etc...+(extra dice for unit 1)+(extra dice for unit 2)...etc.\n-# Sol and Letnev agents automatically are given as extra dice for unit 1.";
             MessageHelper.sendMessageToChannelWithButtons(
@@ -1397,7 +1397,7 @@ public class CombatRollService {
                             player.factionButtonChecker() + "meteorSlings_" + planet,
                             "Infantry on " + Helper.getPlanetRepresentation(planet, game)));
 
-                    buttons.add(Buttons.red("deleteButtons", "Done"));
+                    buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
                     String msg2 = player.getRepresentation() + " you could potentially cancel "
                             + (h == 1 ? "the BOMBARDMENT hit" : "some BOMBARDMENT hits")
                             + " to place infantry instead. Use these buttons to do so, and press done when done. The bot did not track how many hits you got. ";
@@ -1487,7 +1487,7 @@ public class CombatRollService {
                 : "autoAssignSpaceHits_" + tile.getPosition() + "_0";
         List<Button> buttons = List.of(
                 Buttons.green(buttonPrefix + repairId, "Repair With Duranium Armor"),
-                Buttons.gray("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS_GRAY);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 opponent.getRepresentationUnfogged()

@@ -372,7 +372,7 @@ public class LostLegciesExploreHandler {
 
         List<Button> buttons = List.of(
                 Buttons.green(player.factionButtonChecker() + USE_POLY + planetName, "Use Polymorphism"),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation()

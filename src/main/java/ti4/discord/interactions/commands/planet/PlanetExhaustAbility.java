@@ -94,7 +94,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             case "hopesend" -> {
                 output = "Use buttons to drop 1 mech on a planet or to draw 1 action card.";
                 buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
-                buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
+                buttons.add(Buttons.DRAW_1_ACTION_CARD_DELETE);
             }
             case "alfheim" -> {
                 channel = player.getCardsInfoThread();
@@ -308,7 +308,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             }
         }
 
-        if (!buttons.isEmpty()) buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+        if (!buttons.isEmpty()) buttons.add(Buttons.DELETE_THESE_BUTTONS);
         if (!"blank".equalsIgnoreCase(output)) {
             MessageHelper.sendMessageToChannelWithButtons(channel, output, buttons);
         }

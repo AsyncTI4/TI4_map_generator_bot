@@ -50,9 +50,6 @@ import ti4.model.StrategyCardModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
-import ti4.service.emoji.FactionEmojis;
-import ti4.service.emoji.MiscEmojis;
-import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
@@ -116,7 +113,7 @@ public final class ButtonHelperSCs {
                     + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
                     + " If you do, you will also choose another player, who will gain 2 trade goods.";
             List<Button> buttons2 = new ArrayList<>();
-            buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+            buttons2.add(Buttons.USE_PRODUCTION_BIOMES);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
         }
     }
@@ -180,7 +177,7 @@ public final class ButtonHelperSCs {
                     + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
                     + " If you do, you will also choose another player, who will gain 2 trade goods.";
             List<Button> buttons2 = new ArrayList<>();
-            buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+            buttons2.add(Buttons.USE_PRODUCTION_BIOMES);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
         }
     }
@@ -262,7 +259,7 @@ public final class ButtonHelperSCs {
             List<Button> buttons2 = ButtonHelperAbilities.getXxchaPeaceAccordsButtons(
                     game, player, event, player.factionButtonChecker());
             if (!buttons2.isEmpty()) {
-                buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                buttons2.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged() + ", please resolve **Peace Accords**.",
@@ -754,7 +751,7 @@ public final class ButtonHelperSCs {
                     + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
                     + " If you do, you will also choose another player, who will gain 2 trade goods.";
             List<Button> buttons2 = new ArrayList<>();
-            buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+            buttons2.add(Buttons.USE_PRODUCTION_BIOMES);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
         }
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -793,12 +790,12 @@ public final class ButtonHelperSCs {
         List<Button> scButtons = new ArrayList<>();
         if (!Helper.getRemainingSCs(game).contains(1)
                 || (game.getScPlayed().get(1) != null && game.getScPlayed().get(1))) {
-            scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
+            scButtons.add(Buttons.SPEND_AND_GAIN_COMMAND_TOKENS);
         }
         if (!Helper.getRemainingSCs(game).contains(2)
                 || (game.getScPlayed().get(2) != null && game.getScPlayed().get(2))) {
             scButtons.add(Buttons.gray("anarchy2secondary", "Ready a Card (Other Than Strategy Card)"));
-            scButtons.add(Buttons.green("diploRefresh2", "Ready Planets"));
+            scButtons.add(Buttons.DIPLO_READY_PLANETS);
         }
         if (!Helper.getRemainingSCs(game).contains(4)
                 || (game.getScPlayed().get(4) != null && game.getScPlayed().get(4))) {
@@ -806,16 +803,16 @@ public final class ButtonHelperSCs {
         }
         if (!Helper.getRemainingSCs(game).contains(5)
                 || (game.getScPlayed().get(5) != null && game.getScPlayed().get(5))) {
-            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
-            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
+            scButtons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
+            scButtons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
         }
         if (!Helper.getRemainingSCs(game).contains(6)
                 || (game.getScPlayed().get(6) != null && game.getScPlayed().get(6))) {
-            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
+            scButtons.add(Buttons.REPLENISH_COMMODITIES);
         }
         if (!Helper.getRemainingSCs(game).contains(7)
                 || (game.getScPlayed().get(7) != null && game.getScPlayed().get(7))) {
-            scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
+            scButtons.add(Buttons.WARFARE_BUILD_AT_HOME);
         }
         if (!Helper.getRemainingSCs(game).contains(8)
                 || (game.getScPlayed().get(8) != null && game.getScPlayed().get(8))) {
@@ -827,9 +824,9 @@ public final class ButtonHelperSCs {
         }
         if (!Helper.getRemainingSCs(game).contains(11)
                 || (game.getScPlayed().get(11) != null && game.getScPlayed().get(11))) {
-            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
+            scButtons.add(Buttons.NON_SC_DRAW_SECRET_OBJECTIVE);
         }
-        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+        scButtons.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         return scButtons;
     }
@@ -928,7 +925,7 @@ public final class ButtonHelperSCs {
         if (Helper.getRemainingSCs(game).contains(2)
                 && (game.getScPlayed().get(2) == null || !game.getScPlayed().get(2))) {
             scButtons.add(Buttons.gray("anarchy2secondary", "Ready a Card (Other Than Strategy Card)"));
-            scButtons.add(Buttons.green("diploRefresh2", "Ready Planets"));
+            scButtons.add(Buttons.DIPLO_READY_PLANETS);
         }
         if (Helper.getRemainingSCs(game).contains(3)
                 && (game.getScPlayed().get(3) == null || !game.getScPlayed().get(3))) {
@@ -940,16 +937,16 @@ public final class ButtonHelperSCs {
         }
         if (Helper.getRemainingSCs(game).contains(5)
                 && (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5))) {
-            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
-            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
+            scButtons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
+            scButtons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
         }
         if (Helper.getRemainingSCs(game).contains(6)
                 && (game.getScPlayed().get(6) == null || !game.getScPlayed().get(6))) {
-            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
+            scButtons.add(Buttons.REPLENISH_COMMODITIES);
         }
         if (Helper.getRemainingSCs(game).contains(7)
                 && (game.getScPlayed().get(7) == null || !game.getScPlayed().get(7))) {
-            scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
+            scButtons.add(Buttons.WARFARE_BUILD_AT_HOME);
         }
         if (Helper.getRemainingSCs(game).contains(8)
                 && (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8))) {
@@ -961,9 +958,9 @@ public final class ButtonHelperSCs {
         }
         if (Helper.getRemainingSCs(game).contains(11)
                 && (game.getScPlayed().get(11) == null || !game.getScPlayed().get(11))) {
-            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
+            scButtons.add(Buttons.NON_SC_DRAW_SECRET_OBJECTIVE);
         }
-        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+        scButtons.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         return scButtons;
     }
@@ -1520,7 +1517,7 @@ public final class ButtonHelperSCs {
                 .sendMessageEmbeds(po.getRepresentationEmbed())
                 .queue(m -> m.pin().queue(Consumers.nop(), BotLogger::catchRestError));
         buttons.add(Buttons.green("cutTape_" + objID, "Reveal Objective"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation() + ", please choose whether to reveal the objective or not.",

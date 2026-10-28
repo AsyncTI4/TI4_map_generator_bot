@@ -99,7 +99,7 @@ public class ScrapyardLeaderHandler {
             return;
         }
         buttons.sort(Comparator.comparing(Button::getLabel));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", choose a unit type for Nix \"Stray\" Calder.",

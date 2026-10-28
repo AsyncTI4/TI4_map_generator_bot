@@ -144,7 +144,7 @@ public class BlueReverieRelicHandler {
                 || getAendsTorchShips(game, player).isEmpty()) return;
         List<Button> buttons = List.of(
                 Buttons.green(player.factionButtonChecker() + USE_AENDS_TORCH + tile.getPosition(), "Use Aend's Torch"),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + ", you may exhaust _Aend's Torch_ to place a neutral ship in "
