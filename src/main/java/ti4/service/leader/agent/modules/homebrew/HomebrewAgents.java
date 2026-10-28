@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.stream.Stream;
 import ti4.service.leader.agent.AgentCatalog;
 import ti4.service.leader.agent.AgentModule;
+import ti4.service.leader.agent.modules.homebrew.beans.AshenAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.CrystellumAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.NetrunnersAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.BelkoseaAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.EdynBrAgent;
@@ -89,7 +91,11 @@ public final class HomebrewAgents implements AgentCatalog {
                             new ScrapyardAgent(),
                             new HazorusAgent(),
                             new GolgiAgent(),
-                            new HopeOfTheCosmosAgent()),
+                            new HopeOfTheCosmosAgent(),
+                            new AshenAgent(),
+                            new NetrunnersAgent(),
+                            new EdynAgent(),
+                            new LanefirAgent()),
                     HomebrewExhaustOnlyAgents.ALL)
             .<AgentModule<?>>flatMap(List::stream)
             .toList();

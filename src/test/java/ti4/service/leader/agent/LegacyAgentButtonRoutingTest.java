@@ -58,7 +58,22 @@ class LegacyAgentButtonRoutingTest extends BaseTi4Test {
             "useThurvialiAgentOnOther",
             "selectThurvialiAgentTarget_",
             "selectThurvialiAgentSource_",
-            "selectThurvialiAgentDestination_");
+            "selectThurvialiAgentDestination_",
+            "ashenAgentSelectTarget",
+            "ashenAgentUseOn_",
+            "ashenAgentChooseUnit_",
+            "ashenAgentPlace_",
+            "useNetrunnersAgentOnOther",
+            "netrunnersAgentSelectTarget_",
+            "netrunnersAgentSelectSelfTech_",
+            "netrunnersAgentSelectTargetTech_",
+            "netrunnersAgentGainTech_",
+            "netrunnersAgentSourcePage_",
+            "netrunnersAgentGainPage_",
+            "presetEdynAgentStep1",
+            "presetEdynAgentStep2_",
+            "presetEdynAgentStep3_",
+            "lanefirAgentRes_");
 
     @Test
     void everyLegacyAgentButtonPrefixStillHasAHandler() {

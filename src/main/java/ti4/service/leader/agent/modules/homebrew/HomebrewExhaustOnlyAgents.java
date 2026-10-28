@@ -14,10 +14,6 @@ public class HomebrewExhaustOnlyAgents {
             new ExhaustOnlyAgent("xanagent", "Noro Weba, the Xan", "Xan Agent", FactionEmojis.xan);
     public static final ExhaustOnlyAgent NIVYN =
             new ExhaustOnlyAgent("nivynagent", "Suldhan Wraeg, the Nivyn", "Nivyn Agent", FactionEmojis.nivyn);
-    public static final ExhaustOnlyAgent EDYN =
-            new ExhaustOnlyAgent("edynagent", "Allant, the Edyn", "Edyn Agent", FactionEmojis.edyn);
-    public static final ExhaustOnlyAgent LANEFIR =
-            new ExhaustOnlyAgent("lanefiragent", "Vassa Hagi, the Lanefir", "Lanefir Agent", FactionEmojis.lanefir);
 
-    public static final List<ExhaustOnlyAgent> ALL = List.of(GHEMINA, XAN, NIVYN, EDYN, LANEFIR);
+    public static final List<ExhaustOnlyAgent> ALL = List.of(GHEMINA, XAN, NIVYN);
 }

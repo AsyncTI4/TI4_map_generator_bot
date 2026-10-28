@@ -8,8 +8,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.BelkoseaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimBreakthroughHandler;
@@ -56,13 +54,16 @@ import ti4.service.game.MonumentsService;
 import ti4.service.game.NekroMonumentService;
 import ti4.service.leader.agent.modules.HacanAgent;
 import ti4.service.leader.agent.modules.NekroAgent;
+import ti4.service.leader.agent.modules.homebrew.EdynAgent;
 import ti4.service.leader.agent.modules.homebrew.KolleccAgent;
 import ti4.service.leader.agent.modules.homebrew.MykoMentoriAgent;
 import ti4.service.leader.agent.modules.homebrew.PharadnAgent;
 import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.AshenAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.CrystellumAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.NetrunnersAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.BelkoseaAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
@@ -196,10 +197,10 @@ public class CardsInfoService {
                     FactionEmojis.oblivion));
         }
         if (player.hasUnexhaustedLeader("ashenagent")) {
-            buttons.add(AshenLeadersHandler.getAshTenderCardsInfoButton(player));
+            buttons.add(AshenAgent.cardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("netrunnersagent")) {
-            buttons.add(NetrunnersLeadersHandler.getNetrunnersAgentCardsInfoButton(player));
+            buttons.add(NetrunnersAgent.cardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("dreamagent")
                 && !DreamAgent.anomalyTiles(game).isEmpty()) {
@@ -265,7 +266,7 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("getAgentSelection_olradinagent", "Use Olradin Agent", FactionEmojis.olradin));
         }
         if (player.hasUnexhaustedLeader("edynagent")) {
-            buttons.add(Buttons.gray("presetEdynAgentStep1", "Preset Edyn Agent", FactionEmojis.edyn));
+            buttons.add(EdynAgent.cardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("celdauriagent")) {
             buttons.add(Buttons.gray("getAgentSelection_celdauriagent", "Use Celdauri Agent", FactionEmojis.celdauri));

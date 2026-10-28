@@ -173,6 +173,7 @@ import ti4.service.leader.agent.modules.NaazAgent;
 import ti4.service.leader.agent.modules.homebrew.CheiranAgent;
 import ti4.service.leader.agent.modules.homebrew.FreeSystemsAgent;
 import ti4.service.leader.agent.modules.homebrew.KhraskAgent;
+import ti4.service.leader.agent.modules.homebrew.LanefirAgent;
 import ti4.service.leader.agent.modules.homebrew.LiZhoAgent;
 import ti4.service.leader.agent.modules.homebrew.OlradinAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.CrystellumAgent;
@@ -6276,20 +6277,12 @@ public class ButtonHelper {
             msg2 += name1 + ": " + card1.getText() + "\n";
             msg2 += name2 + ": " + card2.getText() + "\n";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
-        } else if (player.hasUnexhaustedLeader("lanefiragent")) {
+        } else if (LanefirAgent.canRedraw(player)) {
             String cardID = game.drawExplore(Constants.FRONTIER);
             ExploreModel card = Mapper.getExplore(cardID);
             String name1 = card.getName();
-            Button resolveExplore1 = Buttons.green(
-                    "lanefirAgentRes_Decline_frontier_" + cardID + "_" + tile.getPosition(), "Choose " + name1);
-            Button resolveExplore2 =
-                    Buttons.green("lanefirAgentRes_Accept_frontier_" + tile.getPosition(), "Use Lanefir Agent");
-            List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
-            String message = player.getRepresentationUnfogged()
-                    + " You have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "Vassa Hagi , the Lanefir"
-                    + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                    + " agent, and thus may decline this exploration to draw another one instead.";
+            List<Button> buttons = LanefirAgent.frontierButtons(player, cardID, tile);
+            String message = LanefirAgent.offerMessage(game, player);
             if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                 String pF = player.getFactionEmoji();
                 MessageHelper.sendMessageToChannel(
