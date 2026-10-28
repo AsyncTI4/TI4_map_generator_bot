@@ -33,7 +33,7 @@ public final class RevenantScrapyardAgent extends AgentModule<Player> {
     private static final String LABEL = "Use Revenant Scrapyard Agent";
 
     public RevenantScrapyardAgent() {
-        super(ID, "Thrash \"Feral\" Burner, the Revenant");
+        super(ID, "Thrash \"Feral\" Burner, the Revenant of Scrapyard");
     }
 
     public static Button startTurnButton(Player player) {

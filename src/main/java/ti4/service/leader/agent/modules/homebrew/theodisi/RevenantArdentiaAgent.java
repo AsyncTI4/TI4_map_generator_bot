@@ -36,7 +36,7 @@ public final class RevenantArdentiaAgent extends AgentModule<RevenantArdentiaAge
     public record TokenMove(Player tokenOwner, Tile source) {}
 
     public RevenantArdentiaAgent() {
-        super(ID, "Kruth Torrious, the Revenant");
+        super(ID, "Kruth Torrious, the Revenant of Ardentia");
     }
 
     public static void offerAfterCommandTokenPlaced(Game game, Player tokenOwner, Tile sourceTile) {

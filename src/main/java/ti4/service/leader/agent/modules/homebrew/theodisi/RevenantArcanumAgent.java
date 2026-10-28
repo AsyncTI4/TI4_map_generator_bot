@@ -30,7 +30,7 @@ public final class RevenantArcanumAgent extends AgentModule<Player> {
     private static final String SELECT_RETURNED_TECH = "selectRevenantArcanumReturnTech_";
 
     public RevenantArcanumAgent() {
-        super(ID, "Lothos Yvollus, the Revenant of Arcanum");
+        super(ID, "Lothos Yvollus, the Revenant of the Arcanum");
     }
 
     public static void offerAfterPass(Game game, Player passedPlayer) {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -13,8 +14,14 @@ import ti4.service.leader.agent.AgentLifecycle;
 @UtilityClass
 public class TemporalCommandSuiteService {
 
+    private static final int MAX_LABEL_LENGTH = 80;
+
     public static String label(Game game, String agentName) {
-        return (game.isTwilightsFallMode() ? "Token: Ready " : "TCS: Ready ") + agentName;
+        String label = (game.isTwilightsFallMode() ? "Token: Ready " : "TCS: Ready ") + agentName;
+        if (label.length() <= MAX_LABEL_LENGTH) {
+            return label;
+        }
+        return "TCS: Ready " + StringUtils.removeEnd(agentName, "/Yssaril agent");
     }
 
     public static void offer(Game game, Player agentHolder, String agentId, boolean viaYssaril) {
