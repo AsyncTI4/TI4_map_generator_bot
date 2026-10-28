@@ -23,7 +23,7 @@ public final class ScrapyardAgent extends AgentModule<Player> {
     private static final String LEGACY_DECLARE = "sendRikkaReminderMessage";
 
     public ScrapyardAgent() {
-        super(ID, "Rikka \"Razor Fang\" Corvin, the Scrapyard");
+        super(ID, "Rikka Corvin, the Scrapyard");
     }
 
     public static void offer(Player activePlayer, Player agentOwner) {
