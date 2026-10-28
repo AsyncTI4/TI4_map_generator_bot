@@ -90,7 +90,10 @@ public class AddUnitService {
             return;
         }
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
-        for (ParsedUnit parsedUnit : parsedUnits) {
+        for (ParsedUnit requested : parsedUnits) {
+            ParsedUnit parsedUnit =
+                    limitToSupply(event, game, tile, requested, unreturned(requested.unitKey(), removed));
+            if (parsedUnit.count() <= 0) continue;
             List<Integer> states = pickStatesForAddedUnit(parsedUnit, removed);
             tile.getUnitHolders().get(parsedUnit.location()).addUnitsWithStates(parsedUnit.unitKey(), states);
             tile = FlipTileService.flipTileIfNeeded(tile, game);
@@ -114,7 +117,7 @@ public class AddUnitService {
         }
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit requested : parsedUnits) {
-            ParsedUnit parsedUnit = limitToSupply(event, game, tile, requested);
+            ParsedUnit parsedUnit = limitToSupply(event, game, tile, requested, 0);
             if (parsedUnit.count() <= 0) continue;
             tile.addUnit(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count());
             tile = FlipTileService.flipTileIfNeeded(tile, game);
@@ -226,9 +229,16 @@ public class AddUnitService {
         checkFleetCapacity(tile, color, game);
     }
 
+    private static int unreturned(Units.UnitKey unitKey, List<RemovedUnit> removed) {
+        return removed.stream()
+                .filter(unit -> unit.unitKey().equals(unitKey))
+                .mapToInt(RemovedUnit::getTotalRemoved)
+                .sum();
+    }
+
     private static ParsedUnit limitToSupply(
-            GenericInteractionCreateEvent event, Game game, Tile tile, ParsedUnit requested) {
-        int allowed = spawnableCount(game, tile, requested.unitKey());
+            GenericInteractionCreateEvent event, Game game, Tile tile, ParsedUnit requested, int returning) {
+        int allowed = returning + spawnableCount(game, tile, requested.unitKey(), returning);
         if (requested.count() <= allowed) return requested;
         if (event != null) {
             boolean tokenBacked = SanityLimits.isTokenBacked(requested.unitKey().unitType());
@@ -243,17 +253,15 @@ public class AddUnitService {
         return new ParsedUnit(requested.unitKey(), allowed, requested.location());
     }
 
-    private static int spawnableCount(Game game, Tile tile, Units.UnitKey unitKey) {
+    private static int spawnableCount(Game game, Tile tile, Units.UnitKey unitKey, int returning) {
         if (SanityLimits.isTokenBacked(unitKey.unitType())) {
             int inTile = tile.getUnitHolders().values().stream()
                     .mapToInt(unitHolder -> unitHolder.getUnitCount(unitKey))
                     .sum();
-            return Math.max(0, SanityLimits.INFANTRY_AND_FIGHTERS_PER_TILE - inTile);
+            return Math.max(0, SanityLimits.INFANTRY_AND_FIGHTERS_PER_TILE - inTile - returning);
         }
-        return Math.max(
-                0,
-                SanityLimits.reinforcementLimit(game, unitKey)
-                        - ButtonHelper.getNumberOfUnitsOnTheBoard(game, unitKey));
+        int onBoard = ButtonHelper.getNumberOfUnitsOnTheBoard(game, unitKey);
+        return Math.max(0, SanityLimits.reinforcementLimit(game, unitKey) - onBoard - returning);
     }
 
     private static void handleFogOfWar(Tile tile, String color, Game game, String unitList) {

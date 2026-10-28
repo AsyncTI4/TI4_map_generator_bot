@@ -3,6 +3,7 @@ package ti4.service.unit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashSet;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
@@ -15,6 +16,7 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.model.Mapper;
+import ti4.service.unit.RemoveUnitService.RemovedUnit;
 import ti4.testUtils.BaseTi4Test;
 
 class AddUnitSupplyLimitTest extends BaseTi4Test {
@@ -94,5 +96,47 @@ class AddUnitSupplyLimitTest extends BaseTi4Test {
 
         assertThat(tile.getSpaceUnitHolder().getUnitCount(key(UnitType.Infantry)))
                 .isEqualTo(10);
+    }
+
+    // /move_units takes a separate destination list, so it can ask for more units than it removed.
+    @Test
+    void movingCannotSpawnExtraUnitsBeyondReinforcements() {
+        int reinforcements = letnev.getUnitCap("dn");
+        otherTile.addUnit(Constants.SPACE, key(UnitType.Dreadnought), reinforcements);
+        List<RemovedUnit> removed =
+                RemoveUnitService.removeUnits(null, otherTile, game, letnev.getColor(), "2 dreadnought");
+
+        AddUnitService.addUnits(null, tile, game, letnev.getColor(), "50 dreadnought", removed);
+
+        assertThat(tile.getSpaceUnitHolder().getUnitCount(key(UnitType.Dreadnought)))
+                .isEqualTo(2);
+        assertThat(ButtonHelper.getNumberOfUnitsOnTheBoard(game, key(UnitType.Dreadnought)))
+                .isEqualTo(reinforcements);
+    }
+
+    @Test
+    void movingAFleetThatIsAlreadyOverTheLimitKeepsEveryUnit() {
+        int reinforcements = letnev.getUnitCap("dn");
+        otherTile.addUnit(Constants.SPACE, key(UnitType.Dreadnought), reinforcements + 3);
+        List<RemovedUnit> removed = RemoveUnitService.removeUnits(
+                null, otherTile, game, letnev.getColor(), (reinforcements + 3) + " dreadnought");
+
+        AddUnitService.addUnits(null, tile, game, letnev.getColor(), (reinforcements + 3) + " dreadnought", removed);
+
+        assertThat(tile.getSpaceUnitHolder().getUnitCount(key(UnitType.Dreadnought)))
+                .isEqualTo(reinforcements + 3);
+    }
+
+    @Test
+    void movingInfantryCannotPushASystemPast999() {
+        tile.addUnit(Constants.SPACE, key(UnitType.Infantry), 990);
+        otherTile.addUnit(Constants.SPACE, key(UnitType.Infantry), 5);
+        List<RemovedUnit> removed =
+                RemoveUnitService.removeUnits(null, otherTile, game, letnev.getColor(), "5 infantry");
+
+        AddUnitService.addUnits(null, tile, game, letnev.getColor(), "500 infantry", removed);
+
+        assertThat(tile.getSpaceUnitHolder().getUnitCount(key(UnitType.Infantry)))
+                .isEqualTo(SanityLimits.INFANTRY_AND_FIGHTERS_PER_TILE);
     }
 }
