@@ -39,7 +39,7 @@ import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TileModel;
-import ti4.model.WormholeModel;
+import ti4.model.WormholeModel.Wormhole;
 import ti4.service.combat.StartCombatService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.game.GameNameService;
@@ -969,136 +969,23 @@ public final class FoWHelper {
         return !getTileWHs(game, position).isEmpty();
     }
 
-    public static Set<String> getTileWHs(Game game, String position) {
-        Tile tile = game.getTileByPosition(position);
-
-        String ghostFlagshipColor = null;
-        for (Player p : game.getPlayers().values()) {
-            if (p.ownsUnit("ghost_flagship")
-                    || p.ownsUnit("sigma_creuss_flagship_1")
-                    || p.ownsUnit("sigma_creuss_flagship_2")) {
-                ghostFlagshipColor = p.getColor();
-                break;
-            }
-        }
-
-        Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            Set<String> tokenList = unitHolder.getTokenList();
-            for (String token : tokenList) {
-                String tokenName =
-                        "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
-                if (!tokenName.contains("champion")) {
-                    tokenName = tokenName.replace("ion", "");
-                }
-                for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
-                    if (tokenName.contains(wh.getWhString())) {
-                        // wormholeIDs.add(wh.getWhString());
-                        wormholeIDs.add(wh.toString());
-                        break;
-                    }
-                }
-                if (tokenName.contains("sigma_weirdway")) {
-                    wormholeIDs.add(Constants.ALPHA);
-                    wormholeIDs.add(Constants.BETA);
-                }
-            }
-            if (unitHolder.getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
-                wormholeIDs.add(Constants.DELTA);
-            }
-        }
-
-        return wormholeIDs;
+    public static Set<Wormhole> getTileWHs(Game game, String position) {
+        Set<Wormhole> wormholes = EnumSet.noneOf(Wormhole.class);
+        wormholes.addAll(game.getTileByPosition(position).getWormholes(game));
+        return wormholes;
     }
 
     public static boolean doesTileHaveAlphaOrBeta(Game game, String position) {
-        Tile tile = game.getTileByPosition(position);
-
-        Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            Set<String> tokenList = unitHolder.getTokenList();
-            for (String token : tokenList) {
-                String tokenName =
-                        "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
-                if (!tokenName.contains("champion")) {
-                    tokenName = tokenName.replace("ion", "");
-                }
-                for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
-                    if (tokenName.contains(wh.getWhString())) {
-                        wormholeIDs.add(wh.getWhString());
-                        if (!wh.toString().contains("eta") || wh.toString().contains("beta")) {
-                            wormholeIDs.add(wh.toString());
-                        }
-                        break;
-                    }
-                }
-                if (tokenName.contains("sigma_weirdway")) {
-                    wormholeIDs.add(Constants.ALPHA);
-                    wormholeIDs.add(Constants.BETA);
-                }
-            }
-        }
-
-        return (wormholeIDs.contains(Constants.ALPHA) || wormholeIDs.contains(Constants.BETA));
+        Set<Wormhole> wormholes = getTileWHs(game, position);
+        return wormholes.contains(Wormhole.ALPHA) || wormholes.contains(Wormhole.BETA);
     }
 
     public static boolean doesTileHaveBeta(Game game, String position) {
-        Tile tile = game.getTileByPosition(position);
-
-        Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            Set<String> tokenList = unitHolder.getTokenList();
-            for (String token : tokenList) {
-                String tokenName =
-                        "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
-                if (!tokenName.contains("champion")) {
-                    tokenName = tokenName.replace("ion", "");
-                }
-                for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
-                    if (tokenName.contains(wh.getWhString())) {
-                        wormholeIDs.add(wh.getWhString());
-                        if (!wh.toString().contains("eta") || wh.toString().contains("beta")) {
-                            wormholeIDs.add(wh.toString());
-                        }
-                        break;
-                    }
-                }
-                if (tokenName.contains("sigma_weirdway")) {
-                    wormholeIDs.add(Constants.ALPHA);
-                    wormholeIDs.add(Constants.BETA);
-                }
-            }
-        }
-
-        return wormholeIDs.stream().anyMatch(id -> id.contains(Constants.BETA));
+        return getTileWHs(game, position).contains(Wormhole.BETA);
     }
 
     public static boolean doesTileHaveAlpha(Game game, String position) {
-        Tile tile = game.getTileByPosition(position);
-
-        Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            Set<String> tokenList = unitHolder.getTokenList();
-            for (String token : tokenList) {
-                String tokenName =
-                        "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
-                if (!tokenName.contains("champion")) {
-                    tokenName = tokenName.replace("ion", "");
-                }
-                for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
-                    if (tokenName.contains(wh.getWhString())) {
-                        wormholeIDs.add(wh.getWhString());
-                        break;
-                    }
-                }
-                if (tokenName.contains("sigma_weirdway")) {
-                    wormholeIDs.add(Constants.ALPHA);
-                    wormholeIDs.add(Constants.BETA);
-                }
-            }
-        }
-
-        return wormholeIDs.stream().anyMatch(id -> id.contains(Constants.ALPHA));
+        return getTileWHs(game, position).contains(Wormhole.ALPHA);
     }
 
     /**
@@ -1114,82 +1001,51 @@ public final class FoWHelper {
     private static Set<String> getWormholeAdjacencies(
             Game game, String position, Player player, boolean neighbors, boolean forDistance) {
         Set<String> adjacentPositions = new HashSet<>();
-        Set<Tile> allTiles = new HashSet<>(game.getTileMap().values());
         Tile tile = game.getTileByPosition(position);
-
-        String ghostFlagshipColor = null;
-        for (Player p : game.getPlayers().values()) {
-            if (p.ownsUnit("ghost_flagship")
-                    || p.ownsUnit("sigma_creuss_flagship_1")
-                    || p.ownsUnit("sigma_creuss_flagship_2")) {
-                ghostFlagshipColor = p.getColor();
-                break;
-            }
+        if (tile == null || tile.getTileID() == null) {
+            return adjacentPositions;
         }
 
         boolean wh_recon = ButtonHelper.isLawInPlay(game, "wormhole_recon");
         boolean absol_recon = ButtonHelper.isLawInPlay(game, "absol_recon");
-        if (tile == null || tile.getTileID() == null) {
-            return adjacentPositions;
-        }
-        Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            Set<String> tokenList = unitHolder.getTokenList();
-            for (String token : tokenList) {
-                String tokenName =
-                        "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
-                if (!tokenName.contains("champion")) {
-                    tokenName = tokenName.replace("ion", "");
-                }
-                for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
-                    if (tokenName.contains(wh.getWhString())) {
-                        wormholeIDs.add(wh.toString());
-                        break;
-                    }
-                }
-                if (tokenName.contains("sigma_weirdway")) {
-                    wormholeIDs.add(Constants.ALPHA);
-                    wormholeIDs.add(Constants.BETA);
-                }
-            }
-            if (unitHolder.getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
-                wormholeIDs.add(Constants.DELTA);
-            }
-        }
+        List<String> creussFlagshipColors = Tile.creussFlagshipColors(game);
+        Set<Wormhole> wormholes = EnumSet.noneOf(Wormhole.class);
+        wormholes.addAll(tile.getWormholes(creussFlagshipColors));
 
         boolean hasQuantumEntanglement = player != null && player.hasAbility("quantum_entanglement");
+        boolean alphaBetaLinked = hasQuantumEntanglement || wh_recon || absol_recon;
 
         if (player != null
                 && player.hasAbility("sundered")
                 && player == game.getActivePlayer()
                 && forDistance
                 && !game.getCurrentActiveSystem().isEmpty()) {
-            Set<String> keepers = new HashSet<>(Set.of("epsilon"));
-            if (hasQuantumEntanglement || wh_recon || absol_recon) {
-                keepers.addAll(Set.of("alpha", "beta"));
+            Set<Wormhole> keepers = EnumSet.of(Wormhole.EPSILON);
+            if (alphaBetaLinked) {
+                keepers.addAll(Set.of(Wormhole.ALPHA, Wormhole.BETA));
             }
-            wormholeIDs.removeIf(wh -> !keepers.contains(wh.toLowerCase()));
+            wormholes.retainAll(keepers);
         }
 
         if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)) {
-            Set<String> keepers = new HashSet<>();
-            if (hasQuantumEntanglement || wh_recon || absol_recon) {
-                keepers.addAll(Set.of("alpha", "beta"));
+            Set<Wormhole> keepers = EnumSet.noneOf(Wormhole.class);
+            if (alphaBetaLinked) {
+                keepers.addAll(Set.of(Wormhole.ALPHA, Wormhole.BETA));
             }
-            wormholeIDs.removeIf(wh -> !keepers.contains(wh.toLowerCase()));
+            wormholes.retainAll(keepers);
         }
 
         if (player != null
                 && "ghost".equals(player.getFaction())
                 && game.getPlayerFromColorOrFaction("crimson") != null) {
-            wormholeIDs.removeIf("epsilon"::equalsIgnoreCase);
+            wormholes.remove(Wormhole.EPSILON);
         }
 
-        if (hasQuantumEntanglement || wh_recon || absol_recon) {
-            if (wormholeIDs.contains(Constants.ALPHA)) {
-                wormholeIDs.add(Constants.BETA);
-            } else if (wormholeIDs.contains(Constants.BETA)) {
-                wormholeIDs.add(Constants.ALPHA);
+        if (alphaBetaLinked) {
+            if (wormholes.contains(Wormhole.ALPHA)) {
+                wormholes.add(Wormhole.BETA);
+            } else if (wormholes.contains(Wormhole.BETA)) {
+                wormholes.add(Wormhole.ALPHA);
             }
         }
 
@@ -1201,8 +1057,8 @@ public final class FoWHelper {
                 && !player.getPlanets().contains("mr")
                 && (tile.getUnitHolders().containsKey("mrte")
                         || tile.getUnitHolders().containsKey("mr"))) {
-            wormholeIDs.add(Constants.BETA);
-            wormholeIDs.add(Constants.ALPHA);
+            wormholes.add(Wormhole.BETA);
+            wormholes.add(Wormhole.ALPHA);
         }
 
         boolean hasLazaxGateFoldingBr = player != null
@@ -1210,8 +1066,8 @@ public final class FoWHelper {
                 && !game.getCurrentActiveSystem().isEmpty()
                 && player.hasTech("lgf_br");
         if (hasLazaxGateFoldingBr && hasUncontrolledLegendaryPlanet(player, tile)) {
-            wormholeIDs.add(Constants.BETA);
-            wormholeIDs.add(Constants.ALPHA);
+            wormholes.add(Wormhole.BETA);
+            wormholes.add(Wormhole.ALPHA);
         }
 
         if (player != null
@@ -1225,67 +1081,30 @@ public final class FoWHelper {
                 }
             }
             if (hasUncontrolledLeg) {
-                wormholeIDs.add(Constants.BETA);
-                wormholeIDs.add(Constants.ALPHA);
+                wormholes.add(Wormhole.BETA);
+                wormholes.add(Wormhole.ALPHA);
             }
         }
-        if (!hasQuantumEntanglement
-                && !wh_recon
-                && !absol_recon
-                && forDistance
-                && ButtonHelper.isLawInPlay(game, "travel_ban")
-                && !neighbors) {
-            wormholeIDs.remove(Constants.ALPHA);
-            wormholeIDs.remove(Constants.BETA);
+        if (!alphaBetaLinked && forDistance && ButtonHelper.isLawInPlay(game, "travel_ban") && !neighbors) {
+            wormholes.remove(Wormhole.ALPHA);
+            wormholes.remove(Wormhole.BETA);
         }
 
-        if (wormholeIDs.isEmpty()) {
+        if (wormholes.isEmpty()) {
             return adjacentPositions;
-        }
-
-        Set<String> wormholeTiles = new HashSet<>();
-        for (String wormholeID : wormholeIDs) {
-            wormholeTiles.addAll(Mapper.getWormholesTiles(wormholeID));
         }
 
         boolean ghostAgent = player != null
                 && player.isActivePlayer()
                 && !StringUtils.isEmpty(game.getStoredValue("ghostagent_active"))
                 && game.getActiveSystem().equals(game.getStoredValue("ghostagent_active"));
-        for (Tile tile_ : allTiles) {
-            String position_ = tile_.getPosition();
-
-            if (wormholeTiles.contains(tile_.getTileID()) || ghostAgent && doesTileHaveWHs(game, position_)) {
-                adjacentPositions.add(position_);
-                continue;
-            }
-            if (hasLazaxGateFoldingBr
-                    && hasUncontrolledLegendaryPlanet(player, tile_)
-                    && (wormholeIDs.contains(Constants.ALPHA) || wormholeIDs.contains(Constants.BETA))) {
-                adjacentPositions.add(position_);
-                continue;
-            }
-            for (UnitHolder unitHolder : tile_.getUnitHolders().values()) {
-                Set<String> tokenList = unitHolder.getTokenList();
-                for (String token : tokenList) {
-                    for (String wormholeID : wormholeIDs) {
-                        if (token.contains(wormholeID)
-                                && !("eta".equals(wormholeID)
-                                        && (token.contains("beta")
-                                                || token.contains("theta")
-                                                || token.contains("zeta")))) {
-                            adjacentPositions.add(position_);
-                        }
-                    }
-                    if (token.contains("sigma_weirdway")
-                            && (wormholeIDs.contains(Constants.ALPHA) || wormholeIDs.contains(Constants.BETA))) {
-                        adjacentPositions.add(position_);
-                    }
-                }
-                if (wormholeIDs.contains(Constants.DELTA)
-                        && unitHolder.getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
-                    adjacentPositions.add(position_);
-                }
+        boolean alphaOrBeta = wormholes.contains(Wormhole.ALPHA) || wormholes.contains(Wormhole.BETA);
+        for (Tile target : game.getTileMap().values()) {
+            List<Wormhole> targetWormholes = target.getWormholes(creussFlagshipColors);
+            if (!Collections.disjoint(wormholes, targetWormholes)
+                    || ghostAgent && !targetWormholes.isEmpty()
+                    || hasLazaxGateFoldingBr && alphaOrBeta && hasUncontrolledLegendaryPlanet(player, target)) {
+                adjacentPositions.add(target.getPosition());
             }
         }
         return adjacentPositions;

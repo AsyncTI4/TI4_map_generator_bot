@@ -147,7 +147,13 @@ _Avoid_: Unit tech
 The System a Faction starts in and defends.
 
 **Wormhole**:
-A System feature that links it to other Systems bearing the same wormhole type.
+A System feature that links it to other Systems bearing the same wormhole type. It comes from the System tile or from a wormhole token or attachment in the System. Several wormholes of the same type count separately (LRR 101, note II), e.g. for Particle Synthesis.
+
+**Weirdway**:
+A Sigma planet attachment that gives its System an alpha and a beta wormhole and -1 move to ships of players who don't control the planet.
+
+**Lambda wormhole**:
+A Sigma wormhole carried by the three lambda wormhole tokens. Lambda wormholes only connect to each other.
 
 **Wormhole nexus**:
 The extra System where alpha, beta and gamma wormholes converge, which starts with only its gamma wormhole and becomes active when a unit enters it or Mallice is controlled.

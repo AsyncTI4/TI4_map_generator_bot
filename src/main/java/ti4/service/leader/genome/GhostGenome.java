@@ -1,6 +1,5 @@
 package ti4.service.leader.genome;
 
-import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -27,8 +26,8 @@ public final class GhostGenome extends LeaningGenome<Player> {
     }
 
     private static boolean activatedSystemHasAWormholeAndIsNotAHome(Game game) {
-        Set<String> wormholes = FoWHelper.getTileWHs(game, game.getActiveSystem());
         Tile active = game.getTileByPosition(game.getActiveSystem());
-        return !wormholes.isEmpty() && (active == null || !active.isHomeSystem(game));
+        return FoWHelper.doesTileHaveWHs(game, game.getActiveSystem())
+                && (active == null || !active.isHomeSystem(game));
     }
 }
