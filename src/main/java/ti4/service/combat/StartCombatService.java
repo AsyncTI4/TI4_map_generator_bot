@@ -121,7 +121,9 @@ import ti4.service.leader.agent.modules.YinAgent;
 import ti4.service.leader.agent.modules.homebrew.HomebrewExhaustOnlyAgents;
 import ti4.service.leader.agent.modules.homebrew.KjalengardAgent;
 import ti4.service.leader.agent.modules.homebrew.KortaliAgent;
-import ti4.service.leader.agent.modules.homebrew.tknova.SplittingGenomeAgent;
+import ti4.service.leader.genome.homebrew.tknova.AristocraticGenome;
+import ti4.service.leader.genome.homebrew.tknova.HumanGenome;
+import ti4.service.leader.genome.homebrew.tknova.SplittingGenome;
 import ti4.service.planet.JotunheimLegendaryService;
 import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
@@ -576,6 +578,8 @@ public class StartCombatService {
         }
         game.setStoredValue("solagent", "");
         game.setStoredValue("letnevagent", "");
+        game.setStoredValue(HumanGenome.ID, "");
+        game.setStoredValue(AristocraticGenome.ID, "");
         game.setStoredValue("classifiedWeapons", "");
 
         // sigma homebrew
@@ -1991,6 +1995,31 @@ public class StartCombatService {
                                 + "Valiant Genome",
                         FactionEmojis.Bastion));
             }
+            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("tknovavaliantagent")) {
+                buttons.add(Buttons.gray(
+                        factionChecker + "getAgentSelection_tknovavaliantagent",
+                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Valiant Genome",
+                        FactionEmojis.Bastion));
+            }
+            if ((!game.isFowMode() || agentHolder == p1)
+                    && agentHolder.hasUnexhaustedLeader(HumanGenome.ID)
+                    && isGroundCombat) {
+                buttons.add(Buttons.gray(
+                        factionChecker + "getAgentSelection_" + HumanGenome.ID,
+                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Human Genome",
+                        FactionEmojis.Sol));
+            }
+            if ((!game.isFowMode() || agentHolder == p1)
+                    && agentHolder.hasUnexhaustedLeader(AristocraticGenome.ID)
+                    && "space".equalsIgnoreCase(groundOrSpace)) {
+                buttons.add(Buttons.gray(
+                        factionChecker + "getAgentSelection_" + AristocraticGenome.ID,
+                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Aristocratic Genome",
+                        FactionEmojis.Letnev));
+            }
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("obsidianagent")) {
                 buttons.add(Buttons.gray(
                         factionChecker + "getAgentSelection_obsidianagent",
@@ -2054,7 +2083,7 @@ public class StartCombatService {
                 buttons.add(YinAgent.offerButton(agentHolder, pos));
             }
 
-            SplittingGenomeAgent.combatOffer(game, agentHolder, p1, pos).ifPresent(buttons::add);
+            SplittingGenome.combatOffer(game, agentHolder, p1, pos).ifPresent(buttons::add);
 
             if ((!game.isFowMode() || agentHolder == p1)
                     && (isSpaceCombat || !game.isTwilightsFallMode())

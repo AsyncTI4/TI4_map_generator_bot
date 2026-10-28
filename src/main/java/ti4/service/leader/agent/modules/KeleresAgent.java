@@ -16,6 +16,9 @@ public final class KeleresAgent extends SelfOrTargetedAgent {
 
     @Override
     public String exhaustAnnouncementAfterName(AgentUse<Player> use) {
+        if (use.payload() == use.user()) {
+            return " has exhausted " + use.agentName() + " to spend commodities as if they were trade goods.";
+        }
         return " has exhausted " + use.agentName() + " to target "
                 + use.payload().getRepresentationNoPing() + ".";
     }

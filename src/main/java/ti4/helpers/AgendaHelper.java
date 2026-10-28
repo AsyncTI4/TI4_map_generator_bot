@@ -34,7 +34,6 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Exploratio
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.AtokeraAgentHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
@@ -87,6 +86,7 @@ import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.testbed.TestBedService;
 import ti4.service.unit.AddUnitService;
@@ -434,7 +434,7 @@ public final class AgendaHelper {
                             player.getCorrectChannel(), Helper.buildSpentThingsMessageForVoting(player, game, false));
                 }
             }
-            AtokeraAgentHandler.clearVotes(player, game);
+            AtokeraAgent.clearVotes(player, game);
 
             if (!game.isFowMode()) {
                 Button eraseAndReVote = Buttons.red("eraseMyVote", "Erase my vote & have me vote again");
@@ -2457,7 +2457,7 @@ public final class AgendaHelper {
     private static Map<String, Integer> getAdditionalVotesFromOtherSources(Game game, Player player) {
         Map<String, Integer> additionalVotesAndSources = new LinkedHashMap<>();
 
-        int atokeraVotes = AtokeraAgentHandler.getVotes(player, game);
+        int atokeraVotes = AtokeraAgent.getVotes(player, game);
         if (atokeraVotes > 0) {
             additionalVotesAndSources.put(FactionEmojis.atokera + " _Magruda, the Atokera Agent_", atokeraVotes);
         }

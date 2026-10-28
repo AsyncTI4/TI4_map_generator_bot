@@ -59,6 +59,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FowAutoDeclineService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.SpeakerService;
+import ti4.service.leader.agent.modules.MahactAgent;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -463,8 +464,7 @@ public class PlayStrategyCardService {
                     if (nothingToRemove && !game.isFowMode()) {
                         continue;
                     }
-                    empNMahButtons.addFirst(
-                            Buttons.green("mahactA_follow_" + scToPlay, "Use Mahact Agent", FactionEmojis.Mahact));
+                    empNMahButtons.addFirst(MahactAgent.followButton(player3, scToPlay));
                     MessageHelper.sendMessageToChannelWithButtons(
                             player3.getCardsInfoThread(),
                             player3.getRepresentationUnfogged() + " You may follow **" + stratCardName + "** with "

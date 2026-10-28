@@ -22,7 +22,6 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.FrameShiftBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.game.Game;
@@ -46,6 +45,7 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.game.GameNameService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.UydaiHeroService;
+import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -712,7 +712,7 @@ public final class FoWHelper {
                 if (SarcosaCommanderHandler.treatsAsAdjacent(game, player, position, tilePosition)) {
                     adjacentPositions.add(tilePosition);
                 }
-                if (NatauLeadersHandler.treatsAsAdjacent(game, player, position, tilePosition)) {
+                if (NatauAgent.treatsAsAdjacent(game, player, position, tilePosition)) {
                     adjacentPositions.add(tilePosition);
                 }
             }

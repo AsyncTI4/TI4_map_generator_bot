@@ -16,17 +16,11 @@ import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class DreamLeadersHandler {
 
-    private static final String AGENT_IGNORED_ANOMALY_TILE_KEY = "dreamAgentIgnoredAnomalyTile";
-    private static final String AGENT_IGNORED_ANOMALY_PLAYER_KEY = "dreamAgentIgnoredAnomalyPlayer";
-    private static final String AGENT_PENDING_PLAYER_KEY = "dreamAgentPendingPlayer";
-    private static final String AGENT_PENDING_OWNER_KEY = "dreamAgentPendingOwner";
-    private static final String AGENT_DECLINE = "dream_agent_decline";
     private static final String HERO_NEXUS_USES_KEY = "dreamHeroNexusUses";
     private static final int HERO_BUTTON_LIMIT = 25;
     private static final Pattern TO_ = Pattern.compile("_to_");
@@ -39,170 +33,6 @@ public class DreamLeadersHandler {
     }
 
     // Xal'thuun, the Dreaming Throne agent
-
-    public static Button getDreamAgentCardsInfoButton(Player dreamPlayer) {
-        return Buttons.gray(
-                dreamPlayer.factionButtonChecker() + "dream_agent_select_player",
-                "Use Dream Agent",
-                FactionEmojis.dream);
-    }
-
-    @ButtonHandler("dream_agent_select_player")
-    public static void offerDreamAgentTargetButtons(ButtonInteractionEvent event, Game game, Player dreamPlayer) {
-        if (!dreamPlayer.hasUnexhaustedLeader("dreamagent")) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Xal'thuun, the Dreaming Throne agent, is no longer available.");
-            return;
-        }
-        if (getDreamAgentAnomalyTiles(game).isEmpty()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "There are no valid non-home anomalies to choose.");
-            return;
-        }
-
-        List<Button> buttons = game.getRealPlayers().stream()
-                .filter(target -> !target.getFaction().equalsIgnoreCase(dreamPlayer.getFaction()))
-                .map(target -> Buttons.gray(
-                        dreamPlayer.factionButtonChecker() + "dream_agent_offer_" + target.getFaction() + "_"
-                                + dreamPlayer.getFaction(),
-                        target.getColorDisplayName(),
-                        target.fogSafeEmoji()))
-                .toList();
-        if (buttons.isEmpty()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "No eligible players were found for Xal'thuun, the Dreaming Throne agent.");
-            return;
-        }
-
-        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
-                event,
-                dreamPlayer.getRepresentationUnfogged() + ", choose a player for Xal'thuun, the Dreaming Throne agent.",
-                buttons);
-    }
-
-    public static void offerDreamAgentButtons(Game game, Player activePlayer, Player dreamPlayer) {
-        if (dreamPlayer == null || !dreamPlayer.hasUnexhaustedLeader("dreamagent")) return;
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.gray(
-                dreamPlayer.factionButtonChecker()
-                        + "dream_agent_offer_"
-                        + activePlayer.getFaction()
-                        + "_"
-                        + dreamPlayer.getFaction(),
-                "Use Dream Agent",
-                FactionEmojis.dream));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                game.getActionsChannel(),
-                dreamPlayer.getRepresentation()
-                        + ", you may exhaust Xal'thuun, the Dreaming Throne agent, to choose a non-home anomaly to ignore during this tactical action.",
-                buttons);
-    }
-
-    @ButtonHandler("dream_agent_offer_")
-    public static void offerDreamAgentChoice(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] parts = buttonID.replace("dream_agent_offer_", "").split("_", 2);
-        Player activePlayer = game.getPlayerFromColorOrFaction(parts[0]);
-        Player dreamAgentOwner = parts.length > 1 ? game.getPlayerFromColorOrFaction(parts[1]) : null;
-        if (dreamAgentOwner == null || !player.getFaction().equalsIgnoreCase(dreamAgentOwner.getFaction())) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Only the Dreaming Throne player may use Xal'thuun, the Dreaming Throne agent.");
-            return;
-        }
-        if (!dreamAgentOwner.hasUnexhaustedLeader("dreamagent")) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Xal'thuun, the Dreaming Throne agent, is no longer available.");
-            return;
-        }
-        if (activePlayer == null) {
-            activePlayer = game.getActivePlayer();
-        }
-        if (activePlayer == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Could not find the active player.");
-            return;
-        }
-        List<Tile> anomalyTiles = getDreamAgentAnomalyTiles(game);
-        if (anomalyTiles.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "There are no valid non-home anomalies to choose.");
-            return;
-        }
-
-        AgentLifecycle.spend(game, dreamAgentOwner, "dreamagent");
-        game.setStoredValue(AGENT_PENDING_PLAYER_KEY, activePlayer.getFaction());
-        game.setStoredValue(AGENT_PENDING_OWNER_KEY, dreamAgentOwner.getFaction());
-        ButtonHelper.deleteMessage(event);
-
-        List<Button> buttons = new ArrayList<>();
-        for (Tile tile : anomalyTiles) {
-            buttons.add(Buttons.green(
-                    "dream_agent_choose_" + activePlayer.getFaction() + "_" + tile.getPosition(),
-                    tile.getRepresentationForButtons(game, activePlayer)));
-        }
-        buttons.add(Buttons.red(AGENT_DECLINE, "Decline"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                activePlayer.getCorrectChannel(),
-                activePlayer.getRepresentation()
-                        + ", choose the anomaly whose movement effects you will ignore during this tactical action.",
-                buttons);
-    }
-
-    @ButtonHandler("dream_agent_choose_")
-    public static void chooseDreamAgentAnomaly(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String data = buttonID.replace("dream_agent_choose_", "");
-        String[] parts = data.split("_", 2);
-        Player dreamAgentOwner = game.getPlayerFromColorOrFaction(game.getStoredValue(AGENT_PENDING_OWNER_KEY));
-        if (parts.length != 2
-                || !player.getFaction().equalsIgnoreCase(parts[0])
-                || !player.getFaction().equalsIgnoreCase(game.getStoredValue(AGENT_PENDING_PLAYER_KEY))
-                || dreamAgentOwner == null
-                || dreamAgentOwner
-                        .getLeader("dreamagent")
-                        .map(leader -> !leader.isExhausted())
-                        .orElse(true)) {
-            MessageHelper.sendMessageToEventChannel(event, "Only the chosen active player may choose that anomaly.");
-            return;
-        }
-        Tile tile = game.getTileByPosition(parts[1]);
-        if (tile == null || tile.isHomeSystem(game) || !tile.isAnomaly(game, player)) {
-            MessageHelper.sendMessageToEventChannel(event, "That is not a valid non-home anomaly.");
-            return;
-        }
-        game.setStoredValue(AGENT_IGNORED_ANOMALY_TILE_KEY, tile.getPosition());
-        game.setStoredValue(AGENT_IGNORED_ANOMALY_PLAYER_KEY, player.getFaction());
-        game.removeStoredValue(AGENT_PENDING_PLAYER_KEY);
-        game.removeStoredValue(AGENT_PENDING_OWNER_KEY);
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToEventChannel(
-                event,
-                player.getRepresentation() + ", will ignore the movement effects of "
-                        + tile.getRepresentationForButtons(game, player) + " during this tactical action.");
-    }
-
-    @ButtonHandler(AGENT_DECLINE)
-    public static void declineDreamAgentChoice(ButtonInteractionEvent event, Game game) {
-        clearDreamAgentAnomaly(game);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    public static boolean playerIgnoresDreamAgentAnomaly(Game game, Player player, Tile tile) {
-        if (game == null || player == null || tile == null) return false;
-        return tile.getPosition().equalsIgnoreCase(game.getStoredValue(AGENT_IGNORED_ANOMALY_TILE_KEY))
-                && player.getFaction().equalsIgnoreCase(game.getStoredValue(AGENT_IGNORED_ANOMALY_PLAYER_KEY));
-    }
-
-    public static void clearDreamAgentAnomaly(Game game) {
-        game.removeStoredValue(AGENT_IGNORED_ANOMALY_TILE_KEY);
-        game.removeStoredValue(AGENT_IGNORED_ANOMALY_PLAYER_KEY);
-        game.removeStoredValue(AGENT_PENDING_PLAYER_KEY);
-        game.removeStoredValue(AGENT_PENDING_OWNER_KEY);
-    }
-
-    public static List<Tile> getDreamAgentAnomalyTiles(Game game) {
-        return game.getTileMap().values().stream()
-                .filter(tile -> !tile.isHomeSystem(game))
-                .filter(tile -> tile.isAnomaly(game, null))
-                .toList();
-    }
 
     // Reality Unbound - Unknown Geometries, the Dreaming Throne hero
 

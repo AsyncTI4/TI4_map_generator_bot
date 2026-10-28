@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.service.leader.LeaderAgents;
 import ti4.service.leader.agent.PlayerPickerAgent.Pick;
 import ti4.service.leader.agent.modules.AgentModuleFixture;
 import ti4.testUtils.BaseTi4Test;
@@ -17,7 +18,7 @@ import ti4.testUtils.BaseTi4Test;
 class PlayerPickerAgentTest extends BaseTi4Test {
 
     private static List<PlayerPickerAgent> pickers() {
-        return AgentModules.ALL.stream()
+        return LeaderAgents.all().stream()
                 .filter(PlayerPickerAgent.class::isInstance)
                 .map(PlayerPickerAgent.class::cast)
                 .toList();

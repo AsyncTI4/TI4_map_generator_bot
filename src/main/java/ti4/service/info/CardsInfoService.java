@@ -10,8 +10,6 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.BelkoseaBreakthroughHandler;
@@ -67,7 +65,14 @@ import ti4.service.leader.agent.modules.homebrew.KolleccAgent;
 import ti4.service.leader.agent.modules.homebrew.MykoMentoriAgent;
 import ti4.service.leader.agent.modules.homebrew.PharadnAgent;
 import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
-import ti4.service.leader.agent.modules.twilightsfall.ResearchGenomeAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.BelkoseaAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.XinAgent;
+import ti4.service.leader.genome.ResearchGenome;
+import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
 
 @UtilityClass
 public class CardsInfoService {
@@ -150,7 +155,7 @@ public class CardsInfoService {
             buttons.add(HacanAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("atokeraagent")) {
-            buttons.add(Buttons.gray("useAtokeraAgent", "Use Magruda, the Atokera Agent", FactionEmojis.atokera));
+            buttons.add(AtokeraAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("kairnagent")) {
             buttons.add(KairnLeadershandler.getKairnAgentCardsInfoButton(player));
@@ -197,11 +202,11 @@ public class CardsInfoService {
             buttons.add(NetrunnersLeadersHandler.getNetrunnersAgentCardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("dreamagent")
-                && !DreamLeadersHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
-            buttons.add(DreamLeadersHandler.getDreamAgentCardsInfoButton(player));
+                && !DreamAgent.anomalyTiles(game).isEmpty()) {
+            buttons.add(DreamAgent.cardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("natauagent")) {
-            buttons.add(NatauLeadersHandler.getNatauAgentCardsInfoButton(player));
+            buttons.add(NatauAgent.cardsInfoButton(player));
         }
         if (player.hasAbility("intrigue")) {
             buttons.add(Buttons.blue("startIntrigueCard", "Pay For Intrigue Card", FactionEmojis.xin));
@@ -228,7 +233,7 @@ public class CardsInfoService {
                     FactionEmojis.belkosea));
         }
         if (player.hasUnexhaustedLeader("researchagent")) {
-            buttons.add(ResearchGenomeAgent.button(player));
+            buttons.add(ResearchGenome.button(player));
         }
         if (player.hasUnexhaustedLeader("pharadnagent")) {
             buttons.add(PharadnAgent.button(player));
@@ -392,16 +397,13 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("getAxisOrderReturns", "Un-Buy Axis Order (Fix Mistake)", FactionEmojis.axis));
         }
         if (player.hasUnexhaustedLeader("belkoseaagent")) {
-            buttons.add(Buttons.gray(
-                    player.factionButtonChecker() + "useBelkoseaAgent", "Use Belkosea Agent", FactionEmojis.belkosea));
+            buttons.add(BelkoseaAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("qhetagent")) {
-            buttons.add(
-                    Buttons.gray(player.factionButtonChecker() + "useQhetAgent", "Use Qhet Agent", FactionEmojis.qhet));
+            buttons.add(QhetAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("xinagent")) {
-            buttons.add(
-                    Buttons.gray(player.factionButtonChecker() + "useXinAgent", "Use Xin Agent", FactionEmojis.xin));
+            buttons.add(XinAgent.button(player));
         }
         if (player.hasAbility("hired_guns")) {
             buttons.add(Buttons.gray("fakeHiredGuns", "Sell Ships Via Hired Guns", FactionEmojis.nokar));
@@ -456,6 +458,9 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("nekroagent")) {
             buttons.add(NekroAgent.button(player));
+        }
+        if (player.hasUnexhaustedLeader("tknovarecursiveagent")) {
+            buttons.add(RecursiveGenome.button(player));
         }
         if (player.hasReadyBreakthrough("lanefirbt")) {
             buttons.add(Buttons.gray("useLanefirBt", "Use Lanefir Breakthrough", FactionEmojis.lanefir));

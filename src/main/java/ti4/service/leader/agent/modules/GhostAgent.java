@@ -14,7 +14,7 @@ import ti4.service.leader.agent.UntargetedAgent;
 public final class GhostAgent extends UntargetedAgent {
 
     static final String ID = "ghostagent";
-    static final String ACTIVE_KEY = "ghostagent_active";
+    public static final String ACTIVE_KEY = "ghostagent_active";
 
     public GhostAgent() {
         super(ID, "Emissary Taivra, the Creuss");

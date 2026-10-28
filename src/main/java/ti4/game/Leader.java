@@ -90,9 +90,7 @@ public class Leader {
 
     @JsonIgnore
     public String getName(Game game) {
-        if (game.isTwilightsFallMode())
-            return getLeaderModel().map(LeaderModel::getTFNameIfAble).orElse(id);
-        return getLeaderModel().map(LeaderModel::getName).orElse(id);
+        return getLeaderModel().map(model -> model.getName(game)).orElse(id);
     }
 
     @JsonIgnore

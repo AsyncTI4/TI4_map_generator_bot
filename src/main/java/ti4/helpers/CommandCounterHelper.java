@@ -14,12 +14,12 @@ import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButto
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.helpers.thundersedge.TeHelperAgents;
 import ti4.image.io.ImageResources;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.NaaluTeAgent;
 
 public final class CommandCounterHelper {
 
@@ -124,7 +124,7 @@ public final class CommandCounterHelper {
 
         for (Player p : player.getGame().getRealPlayers()) {
             if (p.hasUnexhaustedLeader("naaluagent-te")) {
-                TeHelperAgents.serveNaaluAgentButtons(player.getGame(), p, tile, player);
+                NaaluTeAgent.offerTokenRemoval(player.getGame(), p, tile, player);
             }
         }
         RevenantLeadersHandler.offerRevArdentiaAgentButtons(player.getGame(), player, tile);

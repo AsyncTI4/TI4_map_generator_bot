@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.AdministrativeExemptionLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.commandcounter.CommandCounterButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimAgentHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
@@ -54,12 +53,11 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
-import ti4.service.fow.FogTokenRemovalService;
 import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.RefreshLeaderService;
-import ti4.service.leader.agent.AgentLifecycle;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.KaltrimAgent;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.strategycard.StrategyCardMessageService;
@@ -1614,9 +1612,9 @@ public final class ButtonHelperSCs {
     }
 
     @ButtonHandler("scepterE_follow_")
-    @ButtonHandler("mahactA_follow_")
     @ButtonHandler("thardentiag_follow_")
-    public static void mahactAndScepterFollow(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+    public static void scepterAndCognitiveParallaxFollow(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String lastChar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
         boolean setStatus = true;
         int scNum = 1;
@@ -1629,11 +1627,6 @@ public final class ButtonHelperSCs {
                 setStatus = false;
             }
         }
-        if (setStatus && game.isFowMode() && buttonID.contains("mahact")) {
-            FogTokenRemovalService.startMahactAgent(event, game, player, scNum);
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
         if (setStatus) {
             if (!player.getFollowedSCs().contains(scNum)) {
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
@@ -1641,36 +1634,7 @@ public final class ButtonHelperSCs {
             player.addFollowedSC(scNum, event);
         }
         MessageChannel channel = ButtonHelper.getSCFollowChannel(game, player, scNum);
-        if (buttonID.contains("mahact")) {
-            MessageHelper.sendMessageToChannel(
-                    channel,
-                    player.getFactionEmojiOrColor() + " exhausted "
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                            + "Jae Mir Kan, the Mahact"
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " Agent, to follow **"
-                            + Helper.getSCName(scNum, game) + "**.");
-            Leader playerLeader = player.unsafeGetLeader("mahactagent");
-            if (playerLeader != null) {
-                AgentLifecycle.spend(game, player, "mahactagent");
-                for (Player p2 : game.getPlayers().values()) {
-                    for (Integer sc2 : p2.getSCs()) {
-                        if (sc2 == scNum) {
-                            List<Button> buttonsToRemoveCC = new ArrayList<>();
-                            for (Tile tile : ButtonHelper.getTilesWithYourCC(p2, game, event)) {
-                                buttonsToRemoveCC.add(Buttons.green(
-                                        player.factionButtonChecker() + "removeCCFromBoard_mahactAgent"
-                                                + p2.getFaction() + "_" + tile.getPosition(),
-                                        tile.getRepresentationForButtons(game, player)));
-                            }
-                            MessageHelper.sendMessageToChannelWithButtons(
-                                    channel,
-                                    player.getRepresentationUnfogged() + " Use buttons to remove a command token.",
-                                    buttonsToRemoveCC);
-                        }
-                    }
-                }
-            }
-        } else if (buttonID.contains("scepterE")) {
+        if (buttonID.contains("scepterE")) {
             MessageHelper.sendMessageToChannel(
                     channel,
                     player.getRepresentationUnfogged() + " exhausted the _" + RelicHelper.sillySpelling()
@@ -1694,6 +1658,11 @@ public final class ButtonHelperSCs {
             ButtonHelper.deleteMessage(event);
             return;
         }
+        reactToFollowedStrategyCard(game, player, channel);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void reactToFollowedStrategyCard(Game game, Player player, MessageChannel channel) {
         Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
 
         if (channel instanceof ThreadChannel) {
@@ -1705,7 +1674,6 @@ public final class ButtonHelperSCs {
                     channel,
                     "Hey, something went wrong leaving a react. Try following anyways and if it spends a strategy token, given yourself one back with `/player cc`.");
         }
-        ButtonHelper.deleteMessage(event);
     }
 
     public static void reactToStrategyCardMessage(Game game, Player player, int scNum, String message) {
@@ -1929,7 +1897,7 @@ public final class ButtonHelperSCs {
         ReactionService.addReaction(event, game, player, message);
         ActionCardHelper.drawActionCardsSilent(player, 2);
         if (followedPolitics) {
-            KaltrimAgentHandler.offerAfterPoliticsSecondary(game, player);
+            KaltrimAgent.offerAfterPoliticsSecondary(game, player);
         }
 
         if (player.hasAbility("contagion")) {

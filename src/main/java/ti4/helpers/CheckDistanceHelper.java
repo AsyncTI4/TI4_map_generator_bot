@@ -9,7 +9,6 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamFactionTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaBreakthroughHandler;
@@ -20,6 +19,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
+import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
 import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.tactical.movement.BelkoseaAgentService;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
@@ -114,7 +114,7 @@ public class CheckDistanceHelper {
                                     && player != null
                                     && !DreamAbilitiesHandler.ignoresNebula(player, game, tile)
                                     && !DreamFactionTechHandler.treatsNebulasAsAdjacent(game, player, tile)
-                                    && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                                    && !DreamAgent.playerIgnoresAnomaly(game, player, tile)
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
                                     && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
@@ -126,7 +126,7 @@ public class CheckDistanceHelper {
                             || (tile.isSupernova()
                                     && !RealityFieldImpactorService.nullifies(game, tile)
                                     && player != null
-                                    && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                                    && !DreamAgent.playerIgnoresAnomaly(game, player, tile)
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
                                     && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
@@ -155,7 +155,7 @@ public class CheckDistanceHelper {
                                     && !tile.isZelianAsteroidField()
                                     && !RealityFieldImpactorService.nullifies(game, tile)
                                     && player != null
-                                    && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                                    && !DreamAgent.playerIgnoresAnomaly(game, player, tile)
                                     && !player.hasTech("amd")
                                     && !player.hasTech("wavelength")
                                     && !player.getRelics().contains("circletofthevoid")
@@ -172,7 +172,7 @@ public class CheckDistanceHelper {
                     if (tile != null
                             && tile.isGravityRift(game, player)
                             && !RealityFieldImpactorService.nullifies(game, tile)
-                            && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                            && !DreamAgent.playerIgnoresAnomaly(game, player, tile)
                             && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                             && !AsgardLegendaryService.isBifrostBridgeActive(game, player)
                             && !TheodisiLegendaryButtonHandler.ignoresAvarinAnomaly(game, player, tile)

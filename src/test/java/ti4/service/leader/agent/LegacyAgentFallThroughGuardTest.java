@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import ti4.model.LeaderModel;
 import ti4.model.Mapper;
+import ti4.service.leader.LeaderAgents;
 import ti4.testUtils.BaseTi4Test;
 
 /**
@@ -26,8 +27,16 @@ import ti4.testUtils.BaseTi4Test;
  */
 class LegacyAgentFallThroughGuardTest extends BaseTi4Test {
 
-    private static final Set<String> ACTION_AGENTS_WITHOUT_A_MODULE =
-            Set.of("arachneraagent", "bsp_xxchaagent", "horatioagent", "lumerisagent", "psmagent", "uchoiragent");
+    private static final Set<String> ACTION_AGENTS_WITHOUT_A_MODULE = Set.of(
+            "arachianagent",
+            "arachneraagent",
+            "bsp_xxchaagent",
+            "horatioagent",
+            "ironhullagent",
+            "lumerisagent",
+            "psmagent",
+            "uchoiragent",
+            "zooidagent");
 
     private static final Path SOURCES = Path.of("src", "main", "java");
     private static final Pattern AGENT_SELECTION = Pattern.compile("getAgentSelection_([a-z0-9]+)");
@@ -38,7 +47,7 @@ class LegacyAgentFallThroughGuardTest extends BaseTi4Test {
                 .filter(leader -> "agent".equals(leader.getType()))
                 .filter(leader -> "ACTION:".equalsIgnoreCase(leader.getAbilityWindow()))
                 .map(LeaderModel::getId)
-                .filter(id -> AgentModules.find(id).isEmpty())
+                .filter(id -> !LeaderAgents.isRegistered(id))
                 .toList();
 
         assertThat(withoutModule).containsExactlyInAnyOrderElementsOf(ACTION_AGENTS_WITHOUT_A_MODULE);
@@ -57,7 +66,7 @@ class LegacyAgentFallThroughGuardTest extends BaseTi4Test {
         assertThat(selectedAgents).isNotEmpty();
         assertThat(selectedAgents)
                 .as("a getAgentSelection_<id> picker sends exhaustAgent_<id>_<faction>, which needs a module")
-                .allSatisfy(id -> assertThat(AgentModules.find(id)).isPresent());
+                .allSatisfy(id -> assertThat(LeaderAgents.isRegistered(id)).isTrue());
     }
 
     private static Stream<String> agentSelections(Path file) {

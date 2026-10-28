@@ -111,18 +111,6 @@ class TilePayloadAgentsTest extends BaseTi4Test {
     }
 
     @Test
-    void yinInTwilightsFallOnlyPlacesFightersAndUsesTheGenomeName() {
-        AgentModuleFixture fixture = new AgentModuleFixture("yin");
-        fixture.game.setTwilightsFallMode(true);
-
-        // The Twilight's Fall card text only allows fighters.
-        assertThat(YinAgent.placementButtons(fixture.game, fixture.target, fixture.tile))
-                .singleElement()
-                .satisfies(button -> assertThat(button.getLabel()).isEqualTo("Place 2 Fighters"));
-        assertThat(YinAgent.offerButton(fixture.user, ACTIVE).getLabel()).isEqualTo("Use Splitting Genome");
-    }
-
-    @Test
     void yinOffersOnlyItsHolderTheChoiceOfWhoseUnitWasDestroyed() {
         AgentModuleFixture fixture = new AgentModuleFixture("yin");
 

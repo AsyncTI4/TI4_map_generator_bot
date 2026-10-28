@@ -29,7 +29,6 @@ import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.RemoveCommandCounterService;
-import ti4.service.leader.agent.AgentLifecycle;
 
 @UtilityClass
 public class FogTokenRemovalService {
@@ -42,8 +41,7 @@ public class FogTokenRemovalService {
     private static final String MAHACT = "mahact";
     private static final String FLUX = "flux";
 
-    public static void startMahactAgent(ButtonInteractionEvent event, Game game, Player mahact, int sc) {
-        exhaustMahactAgent(game, mahact);
+    public static void startMahactAgent(GenericInteractionCreateEvent event, Game game, Player mahact, int sc) {
         offer(event, game, mahact, MAHACT, String.valueOf(sc));
     }
 
@@ -51,7 +49,8 @@ public class FogTokenRemovalService {
         offer(event, game, remover, FLUX, owner.getFaction());
     }
 
-    private static void offer(ButtonInteractionEvent event, Game game, Player remover, String kind, String target) {
+    private static void offer(
+            GenericInteractionCreateEvent event, Game game, Player remover, String kind, String target) {
         Player owner = owner(game, kind, target);
         List<Tile> ownerTokens = owner == null ? List.of() : ButtonHelper.getTilesWithYourCC(owner, game, event);
         if (ownerTokens.isEmpty()) {
@@ -211,9 +210,5 @@ public class FogTokenRemovalService {
 
     private static String effectName(String kind) {
         return MAHACT.equals(kind) ? "Jae Mir Kan" : "Flux";
-    }
-
-    private static void exhaustMahactAgent(Game game, Player mahact) {
-        AgentLifecycle.spend(game, mahact, "mahactagent");
     }
 }

@@ -9,6 +9,7 @@ public final class MoveAbilityButtons {
     public static final List<MoveAbilityButton> ABILITIES = List.of(
             new SaarAgentButton(),
             new FirmamentAgentButton(),
+            new MirrorGenomeButton(),
             new TempestButton(),
             new BelkoseaAgentButton(),
             new QhetAgentButton(),
