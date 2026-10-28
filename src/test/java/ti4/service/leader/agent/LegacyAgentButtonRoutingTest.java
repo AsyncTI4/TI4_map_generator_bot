@@ -73,7 +73,32 @@ class LegacyAgentButtonRoutingTest extends BaseTi4Test {
             "presetEdynAgentStep1",
             "presetEdynAgentStep2_",
             "presetEdynAgentStep3_",
-            "lanefirAgentRes_");
+            "lanefirAgentRes_",
+            "selectFirstTargetVerydithAgent",
+            "selectSecondTargetVerydithAgent_",
+            "resolveVerydithAgent_",
+            "useMyrrAgent_",
+            "useMyrrAgentOnActivePlayer",
+            "myrrAgentDestroy_",
+            "useKairnAgent",
+            "useKairnAgentDirect_",
+            "useKairnAgentInterrupt_",
+            "selectKairnAgentTarget_",
+            "selectKairnAgentPlanet_",
+            "selectKairnAgentTrait_",
+            "resolveKairnAgentExplore_",
+            "arcanumVeylaUseSelf",
+            "arcanumVeylaUseOnOther",
+            "arcanumVeylaTarget_",
+            "arcanumVeylaReturnTech_",
+            "arcanumVeylaGainTech_",
+            "useMyrixAgent",
+            "myrixAgentShip_",
+            "useOblivionAgent",
+            "useOblivionAgent_other",
+            "oblivionAgentTarget_",
+            "addOblivionFrontierToken_",
+            "discardPeekedFrontier_");
 
     @Test
     void everyLegacyAgentButtonPrefixStillHasAHandler() {

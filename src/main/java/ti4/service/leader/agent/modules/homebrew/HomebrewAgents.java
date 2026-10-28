@@ -15,12 +15,18 @@ import ti4.service.leader.agent.modules.homebrew.bluereverie.EdynBrAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.KaltrimAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.XinAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.ArcanumAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.GolgiAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.HazorusAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.HopeOfTheCosmosAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.KairnAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.OblivionAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.PonthousAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ScrapyardAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ThronesAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.VerydithAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
 import ti4.service.leader.agent.modules.homebrew.wftv.ArvaxiAgent;
 
 public final class HomebrewAgents implements AgentCatalog {
@@ -95,7 +101,13 @@ public final class HomebrewAgents implements AgentCatalog {
                             new AshenAgent(),
                             new NetrunnersAgent(),
                             new EdynAgent(),
-                            new LanefirAgent()),
+                            new LanefirAgent(),
+                            new VerydithAgent(),
+                            new MyrrAgent(),
+                            new KairnAgent(),
+                            new ArcanumAgent(),
+                            new XytherisAgent(),
+                            new OblivionAgent()),
                     HomebrewExhaustOnlyAgents.ALL)
             .<AgentModule<?>>flatMap(List::stream)
             .toList();

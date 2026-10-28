@@ -49,7 +49,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxo
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.HydromorphicCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
@@ -123,7 +122,9 @@ import ti4.service.leader.agent.modules.homebrew.CeldauriAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ScrapyardAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
@@ -365,7 +366,7 @@ public final class ButtonHelperTacticalAction {
         AeternaUnitsHandler.clearGraveyardActionState(game);
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         KryxosBreakthroughHandler.clearPrototypeInnovators(game);
-        MyrrLeadersHandler.clearMyrrAgent(game);
+        MyrrAgent.clearProduction(game);
         ThronesUnitHandler.clearPendingGholaWindows(game);
         RevenantLeadersHandler.clearRedLeaderTacticalState(game);
         ThronesTechHandler.clearRiftTouchedBastion(game);
@@ -551,7 +552,7 @@ public final class ButtonHelperTacticalAction {
         }
         EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
         if (unitsWereMoved && player.hasUnexhaustedLeader("myrragent")) {
-            MyrrLeadersHandler.offerMyrrAgent(game, player, tile);
+            MyrrAgent.offerAfterMove(game, player, tile);
         }
         if (unitsWereMoved) {
             IronSalvageRelicHandler.offerCruiserSalvageAfterMovement(event, game, tile);
@@ -751,7 +752,7 @@ public final class ButtonHelperTacticalAction {
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         KairnUnitHandler.clearExcavatorMechExplore(game);
         KryxosBreakthroughHandler.clearPrototypeInnovators(game);
-        MyrrLeadersHandler.clearMyrrAgent(game);
+        MyrrAgent.clearProduction(game);
         ThronesUnitHandler.clearPendingGholaWindows(game);
         FrameShiftBrActionCardHandler.clear(game);
         MyrrTechHandler.clearSegmentedStructuring(game);
@@ -1054,7 +1055,7 @@ public final class ButtonHelperTacticalAction {
         DreamPromissoryHandler.returnVisionsOnSystemActivation(event, game, player, tile);
         AlluringThroneService.offerIllustrionLegendaryAbility(game, tile, player);
         ArcanumTechHandler.offerSigilOfTransmutation(event, game, player, tile);
-        XytherisLeadersHandler.offerMyrixAgentButtons(game, player, tile);
+        XytherisAgent.offerAfterActivation(game, player);
         game.setStoredValue("possiblyUsedRift", "");
         ThronesTechHandler.offerRiftTouchedBastion(game, tile);
         game.setStoredValue("lastActiveSystem", pos);

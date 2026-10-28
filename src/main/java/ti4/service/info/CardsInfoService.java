@@ -13,18 +13,14 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Be
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BRLightrailOrdnanceRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
@@ -68,10 +64,16 @@ import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.BelkoseaAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.XinAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.ArcanumAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.GolgiAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.HazorusAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.HopeOfTheCosmosAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.KairnAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.OblivionAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ThronesAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.VerydithAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
 import ti4.service.leader.genome.ResearchGenome;
 import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
 
@@ -159,10 +161,10 @@ public class CardsInfoService {
             buttons.add(AtokeraAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("kairnagent")) {
-            buttons.add(KairnLeadershandler.getKairnAgentCardsInfoButton(player));
+            buttons.add(KairnAgent.cardsInfoButton(player));
         }
         if (player.hasLeader("myrragent")) {
-            buttons.add(MyrrLeadersHandler.getMyrrAgentCardsInfoButton(player));
+            buttons.add(MyrrAgent.cardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("morphaagent")) {
             buttons.add(GolgiAgent.cardsInfoButton(player));
@@ -178,7 +180,7 @@ public class CardsInfoService {
             buttons.add(trinityStockpileButton);
         }
         if (!"setup".equalsIgnoreCase(game.getPhaseOfGame()) && player.hasUnexhaustedLeader("arcanumagent")) {
-            buttons.add(ArcanumLeadersHandler.getVeylaCardsInfoButton(player));
+            buttons.add(ArcanumAgent.cardsInfoButton(player));
         }
         if ("action".equalsIgnoreCase(game.getPhaseOfGame())
                 && player.isActivePlayer()
@@ -191,10 +193,7 @@ public class CardsInfoService {
                     MiscEmojis.LegendaryPlanet));
         }
         if (player.hasUnexhaustedLeader("oblivionagent")) {
-            buttons.add(Buttons.gray(
-                    player.factionButtonChecker() + "useOblivionAgent_other",
-                    "Use Avaris the Seer on someone else",
-                    FactionEmojis.oblivion));
+            buttons.add(OblivionAgent.cardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("ashenagent")) {
             buttons.add(AshenAgent.cardsInfoButton(player));
@@ -532,10 +531,7 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("getOmenDice", "Use an omen die (" + omenDice + ")", FactionEmojis.mykomentori));
         }
         if (player.hasLeader("xytherisagent")) {
-            buttons.add(Buttons.gray(
-                    player.factionButtonChecker() + "useMyrixAgent",
-                    "Use Myrix on Another Player",
-                    FactionEmojis.xytheris));
+            buttons.add(XytherisAgent.cardsInfoButton(player));
         }
         if (player.hasAbility("sting_of_the_hive") && XytherisAbilityHandler.hasStingOfTheHiveMines(game)) {
             buttons.add(XytherisAbilityHandler.getStingOfTheHiveMineLedgerButton(player));
@@ -576,7 +572,7 @@ public class CardsInfoService {
             buttons.add(ThronesThroneHandler.getCineronButton(player));
         }
         if (player.hasUnexhaustedLeader("verydithagent")) {
-            buttons.add(VerydithLeadersHandler.getVerydithAgentCardsInfoButton(player));
+            buttons.add(VerydithAgent.cardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("thurvialiagent")) {
             buttons.add(HopeOfTheCosmosAgent.cardsInfoButton(player));
