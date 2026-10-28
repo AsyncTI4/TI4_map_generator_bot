@@ -121,6 +121,8 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
 import ti4.service.franken.FrankenUnitService;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantAgent;
 import ti4.service.map.FractureService;
@@ -1370,7 +1372,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 break;
             }
         }
-        actionCards.remove(idToRemove);
+        if (actionCards.remove(idToRemove) != null) {
+            KnownCardsService.recordCardLeftHand(this, KnownCardType.ACTION_CARD);
+        }
     }
 
     public void removePromissoryNote(Integer identifier) {
@@ -1427,7 +1431,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 break;
             }
         }
-        secrets.remove(idToRemove);
+        if (secrets.remove(idToRemove) != null) {
+            KnownCardsService.recordCardLeftHand(this, KnownCardType.SECRET_OBJECTIVE);
+        }
     }
 
     public SecretObjectiveModel getSecret(Integer identifier) {
