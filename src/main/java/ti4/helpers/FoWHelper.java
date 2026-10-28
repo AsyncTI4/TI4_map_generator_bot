@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -930,11 +931,15 @@ public final class FoWHelper {
     }
 
     public static boolean isTileInExileRange(Game game, Tile tile, Player player) {
+        return isTileInExileRange(game, tile, player, position -> true);
+    }
+
+    public static boolean isTileInExileRange(Game game, Tile tile, Player player, Predicate<String> seen) {
         if (player.hasUnit("crimson_destroyer")) {
             List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
+            Set<String> adjacent = seenAdjacentTiles(game, tile.getPosition(), player, seen);
             for (Tile tile2 : destroyers) {
-                if (getAdjacentTiles(game, tile.getPosition(), player, false, true)
-                        .contains(tile2.getPosition())) {
+                if (adjacent.contains(tile2.getPosition())) {
                     return true;
                 }
             }
@@ -943,11 +948,16 @@ public final class FoWHelper {
     }
 
     public static boolean isTileInUpgradedExileRange(Game game, Tile tile, Player player) {
+        return isTileInUpgradedExileRange(game, tile, player, position -> true);
+    }
+
+    public static boolean isTileInUpgradedExileRange(Game game, Tile tile, Player player, Predicate<String> seen) {
         if (player.hasUnit("crimson_destroyer2")) {
             List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
-            for (String adjPos : getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+            for (String adjPos : seenAdjacentTiles(game, tile.getPosition(), player, seen)) {
+                Set<String> secondRing = seenAdjacentTiles(game, adjPos, player, seen);
                 for (Tile tile2 : destroyers) {
-                    if (getAdjacentTiles(game, adjPos, player, false, true).contains(tile2.getPosition())) {
+                    if (secondRing.contains(tile2.getPosition())) {
                         return true;
                     }
                 }
@@ -956,9 +966,20 @@ public final class FoWHelper {
         return false;
     }
 
+    // TODO: seen-filtering still links two seen tiles through an unseen hyperlane (FoW+ / HIDE_MAP already block it)
+    private static Set<String> seenAdjacentTiles(Game game, String position, Player player, Predicate<String> seen) {
+        Set<String> adjacent = new HashSet<>(getAdjacentTiles(game, position, player, false, true));
+        adjacent.removeIf(seen.negate());
+        return adjacent;
+    }
+
     public static boolean isTileAdjacentToAnAnomaly(Game game, String position, Player player) {
+        return isTileAdjacentToAnAnomaly(game, position, player, adjacent -> true);
+    }
+
+    public static boolean isTileAdjacentToAnAnomaly(Game game, String position, Player player, Predicate<String> seen) {
         for (String adjPos : getAdjacentTilesAndNotThisTile(game, position, player, false)) {
-            if (game.getTileByPosition(adjPos).isAnomaly(game, player)) {
+            if (seen.test(adjPos) && game.getTileByPosition(adjPos).isAnomaly(game, player)) {
                 return true;
             }
         }
@@ -1683,7 +1704,7 @@ public final class FoWHelper {
         return isGameMaster(event.getUser().getId(), game) && isGmRoom(game, event.getChannel());
     }
 
-    static boolean isGmRoom(Game game, @Nullable Channel channel) {
+    public static boolean isGmRoom(Game game, @Nullable Channel channel) {
         if (channel instanceof ThreadChannel thread) {
             channel = thread.getParentChannel();
         }

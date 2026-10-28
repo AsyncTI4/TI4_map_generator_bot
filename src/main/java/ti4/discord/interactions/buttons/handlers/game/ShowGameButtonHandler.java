@@ -92,6 +92,8 @@ class ShowGameButtonHandler {
                 mapButtons.addAll(MapSegmentService.switchButtons(
                         game, MapSegmentService.viewerId(game, event), MapSegmentService.isFoggedView(game, event)));
                 MapOverviewService.overviewButton(game, event).ifPresent(mapButtons::add);
+                MapOverviewService.gmOverviewButton(game, event, event.getMessageChannel())
+                        .ifPresent(mapButtons::add);
             }
             if (mapButtons.isEmpty()) {
                 MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload);

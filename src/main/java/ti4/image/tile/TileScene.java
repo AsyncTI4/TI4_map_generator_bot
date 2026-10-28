@@ -22,6 +22,14 @@ record TileScene(Game game, @Nullable DisplayType displayType, FogViewer viewer,
         return isPrivateView() && tile.hasFog(fowPlayer());
     }
 
+    boolean seesPosition(String position) {
+        if (!isPrivateView()) {
+            return true;
+        }
+        Tile tile = game.getTileByPosition(position);
+        return tile != null && !tile.hasFog(fowPlayer());
+    }
+
     boolean showsGeneric(@Nullable Player owner) {
         return isPrivateView() && !viewer.canSeeStats(owner);
     }

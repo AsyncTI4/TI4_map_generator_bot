@@ -16,7 +16,7 @@ final class WormholesStep implements TileStepPainter {
     public void paint(TileScene scene, TileLayer layer) {
         Game game = scene.game();
         Tile tile = layer.tile();
-        if (HighlightGuards.isFogOrHyperlane(game, tile) || HighlightGuards.isTileImageMissing(tile)) {
+        if (HighlightGuards.isHiddenOrHyperlane(scene, tile) || HighlightGuards.isTileImageMissing(tile)) {
             return;
         }
         if (!FoWHelper.doesTileHaveWHs(game, tile.getPosition())) {

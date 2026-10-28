@@ -221,6 +221,10 @@ final class UnitHolderRenderer {
                 .map(cc -> cc.replace(".png", "").replace("command_", ""))
                 .toList();
         if (tileCCsColorIDs.contains(unitKey.colorID())) return true;
-        return player.isPassed() || player.isNeutral();
+        return (player.isPassed() && seesPassedState(player)) || player.isNeutral();
+    }
+
+    private boolean seesPassedState(Player player) {
+        return !fogViewer.privateView() || fogViewer.canSeeStats(player);
     }
 }

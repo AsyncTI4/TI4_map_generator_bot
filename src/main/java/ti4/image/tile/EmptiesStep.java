@@ -5,7 +5,6 @@ import static ti4.image.tile.TileGeometry.TILE_PADDING;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.image.draw.OutlinedText;
 import ti4.image.io.Fonts;
@@ -18,9 +17,8 @@ final class EmptiesStep implements TileStepPainter {
 
     @Override
     public void paint(TileScene scene, TileLayer layer) {
-        Game game = scene.game();
         Tile tile = layer.tile();
-        if (HighlightGuards.isFogOrHyperlane(game, tile) || HighlightGuards.isTileImageMissing(tile)) {
+        if (HighlightGuards.isHiddenOrHyperlane(scene, tile) || HighlightGuards.isTileImageMissing(tile)) {
             return;
         }
         if (!tile.getPlanetUnitHolders().isEmpty()) {
