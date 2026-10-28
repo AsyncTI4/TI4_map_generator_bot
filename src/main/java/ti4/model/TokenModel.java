@@ -27,6 +27,8 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
     private Boolean isFowVision;
     private List<String> aliasList;
     private List<Wormhole> wormholes;
+    private List<String> legacyImagePaths;
+    private Boolean wormholeIconMerge;
     private ComponentSource source;
     private String placement;
     private Double scale;

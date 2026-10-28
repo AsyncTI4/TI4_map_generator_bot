@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -39,6 +40,7 @@ import ti4.logging.BotLogger;
 import ti4.model.DeckModel.DeckType;
 import ti4.model.GenericCardModel.CardType;
 import ti4.model.Source.ComponentSource;
+import ti4.model.WormholeModel.Wormhole;
 import ti4.service.emoji.CardEmojis;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
@@ -93,6 +95,9 @@ public class Mapper {
     private static volatile Map<String, TokenModel> tokens = new HashMap<>();
     // ids + image paths of tokens flagged isFowVision; precomputed so per-tile fog checks avoid getTokenKey's scan
     private static volatile Set<String> fowVisionTokenIds = new HashSet<>();
+    private static volatile Map<String, List<Wormhole>> wormholesByImagePath = new HashMap<>();
+    private static volatile Map<Wormhole, String> imagePathByWormhole = new HashMap<>();
+    private static volatile Set<String> mergeableWormholeImagePaths = new HashSet<>();
     private static volatile Map<String, GalacticEventModel> galacticevents = new HashMap<>();
 
     @Getter
@@ -151,6 +156,7 @@ public class Mapper {
 
         tokens = importJsonObjectsFromFolder("tokens", TokenModel.class);
         indexFowVisionTokens();
+        indexTokenWormholes();
         spaceTokens = importJsonObjectsFromFolder("tokens", SpaceTokenModel.class);
         units = importJsonObjectsFromFolder("units", UnitModel.class);
         frankenErrata = importJsonObjectsFromFolder("franken_errata", DraftErrataModel.class);
@@ -1282,6 +1288,54 @@ public class Mapper {
         return tokenId != null && fowVisionTokenIds.contains(tokenId);
     }
 
+    private static void indexTokenWormholes() {
+        Map<String, List<Wormhole>> byImagePath = new HashMap<>();
+        Map<Wormhole, String> byWormhole = new HashMap<>();
+        Set<String> mergeable = new HashSet<>();
+        List<TokenModel> tokensById = tokens.values().stream()
+                .sorted(Comparator.comparing(TokenModel::getId))
+                .toList();
+        for (TokenModel token : tokensById) {
+            List<Wormhole> wormholes = nonNullWormholes(token.getWormholes());
+            if (wormholes.isEmpty()) continue;
+            byImagePath.put(token.getImagePath(), wormholes);
+            if (wormholes.size() == 1) byWormhole.putIfAbsent(wormholes.getFirst(), token.getImagePath());
+            boolean mergeableToken = wormholes.size() == 1 && !Boolean.FALSE.equals(token.getWormholeIconMerge());
+            if (mergeableToken) mergeable.add(token.getImagePath());
+            for (String legacyImagePath :
+                    Optional.ofNullable(token.getLegacyImagePaths()).orElse(List.of())) {
+                byImagePath.put(legacyImagePath, wormholes);
+                if (mergeableToken) mergeable.add(legacyImagePath);
+            }
+        }
+        for (AttachmentModel attachment : attachments.values()) {
+            List<Wormhole> wormholes = nonNullWormholes(attachment.getWormholes());
+            if (!wormholes.isEmpty()) byImagePath.put(attachment.getImagePath(), wormholes);
+        }
+        wormholesByImagePath = byImagePath;
+        imagePathByWormhole = byWormhole;
+        mergeableWormholeImagePaths = mergeable;
+    }
+
+    private static List<Wormhole> nonNullWormholes(List<Wormhole> wormholes) {
+        if (wormholes == null) return List.of();
+        return wormholes.stream().filter(Objects::nonNull).toList();
+    }
+
+    @Nullable
+    public static String getWormholeTokenImagePath(Wormhole wormhole) {
+        return imagePathByWormhole.get(wormhole);
+    }
+
+    public static boolean isMergeableWormholeToken(String tokenFileName) {
+        return tokenFileName != null && mergeableWormholeImagePaths.contains(tokenFileName);
+    }
+
+    public static List<Wormhole> getTokenWormholes(String tokenFileName) {
+        if (tokenFileName == null) return List.of();
+        return wormholesByImagePath.getOrDefault(tokenFileName, List.of());
+    }
+
     public static boolean isValidToken(String id) {
         return getTokensFromProperties().contains(id);
     }
@@ -1516,29 +1570,13 @@ public class Mapper {
 
     // Wormholes
 
-    public static Set<String> getWormholes(String tileID) {
-        if (tileID == null
-                || TileHelper.getTileById(tileID) == null
-                || TileHelper.getTileById(tileID).getWormholes() == null) {
-            return new HashSet<>();
+    public static Set<Wormhole> getWormholes(String tileID) {
+        Set<Wormhole> wormholes = EnumSet.noneOf(Wormhole.class);
+        TileModel tile = tileID == null ? null : TileHelper.getTileById(tileID);
+        if (tile != null && tile.getWormholes() != null) {
+            tile.getWormholes().stream().filter(Objects::nonNull).forEach(wormholes::add);
         }
-        return TileHelper.getTileById(tileID).getWormholes().stream()
-                .filter(Objects::nonNull)
-                .map(WormholeModel.Wormhole::toString)
-                .collect(Collectors.toSet());
-    }
-
-    public static Set<String> getWormholesTiles(String wormholeID) {
-        WormholeModel.Wormhole wormhole = WormholeModel.getWormholeFromString(wormholeID);
-        if (wormhole == null) {
-            return new HashSet<>();
-        }
-
-        return TileHelper.getAllTileModels().stream()
-                .filter(tileModel -> tileModel.getWormholes() != null
-                        && tileModel.getWormholes().contains(wormhole))
-                .map(TileModel::getId)
-                .collect(Collectors.toSet());
+        return wormholes;
     }
 
     private static class ColorDeserializer extends ValueDeserializer<Color> {

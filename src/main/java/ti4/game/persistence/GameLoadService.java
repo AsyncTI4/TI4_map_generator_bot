@@ -561,6 +561,7 @@ class GameLoadService {
                 // TODO: default false here vs true in GameProperties; a missing token reverts to legacy flow.
                 case Constants.TRANSACTION_METHOD -> game.setNewTransactionMethod(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_GEARS -> game.setShowGears(parseBooleanOrDefault(info, false));
+                case Constants.WORMHOLE_TOKEN_MERGE -> game.setWormholeTokenMergeFrom(wormholeTokenMergeFrom(info));
                 case Constants.SHOW_BANNERS -> game.setShowBanners(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_HEX_BORDERS -> game.setHexBorderStyle(info);
                 case Constants.HOMEBREW_MODE -> game.setHomebrew(parseBooleanOrDefault(info, false));
@@ -1280,5 +1281,14 @@ class GameLoadService {
         }
 
         return peekedPublicObjectives;
+    }
+
+    private static int wormholeTokenMergeFrom(String info) {
+        if ("true".equalsIgnoreCase(info)) return 2;
+        try {
+            return Integer.parseInt(info.trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 }
