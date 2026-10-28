@@ -482,7 +482,7 @@ public class TeHelperActionCards {
             buttons.add(Buttons.green("draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game)));
         }
         if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
-            buttons.add(Buttons.CONSTRUCTION_PLACE_A_SPACE_DOCK);
+            buttons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
             buttons.add(Buttons.green("construction_pds", "Place A PDS", UnitEmojis.pds));
         }
         if (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5)) {

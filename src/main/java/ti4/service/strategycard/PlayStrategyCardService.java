@@ -1058,7 +1058,7 @@ public class PlayStrategyCardService {
     private static List<Button> getThundersEdgeConstructionButtons(int sc, Game game) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button buildButton = Buttons.green("constructionPrimary_produce", "[Primary] Use Production");
-        Button sdButton = Buttons.CONSTRUCTION_PLACE_A_SPACE_DOCK;
+        Button sdButton = Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK;
         Button pdsButton = Buttons.green("construction_pds", "Place a PDS", UnitEmojis.pds);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         if (game.isMonumentToTheAgesMode()) {
@@ -1401,7 +1401,7 @@ public class PlayStrategyCardService {
     private static List<Button> getMonumentsConstructionButtons(int sc, Game game) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button buildButton = Buttons.green("constructionPrimary_produce", "[Primary] Use Production");
-        Button sdButton = Buttons.CONSTRUCTION_PLACE_A_SPACE_DOCK;
+        Button sdButton = Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK;
         Button pdsButton = Buttons.green("construction_pds", "Place a PDS", UnitEmojis.pds);
         Button monumentButton = Buttons.green("construction_monument", "Place 1 Monument", UnitEmojis.Monument);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");

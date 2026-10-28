@@ -56,8 +56,6 @@ public final class Buttons {
     public static final Button CONSTRUCTION_PLACE_1_PDS = green("construction_pds", "Place 1 PDS", UnitEmojis.pds);
     public static final Button CONSTRUCTION_PLACE_1_SPACE_DOCK =
             green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock);
-    public static final Button CONSTRUCTION_PLACE_A_SPACE_DOCK =
-            green("construction_spacedock", "Place A Space Dock", UnitEmojis.spacedock);
     public static final Button CONSTRUCTION_PLACE_A_MONUMENT =
             green("construction_agesmonument", "Place A Monument (Cost 5 TG)");
     public static final Button REPLENISH_COMMODITIES = gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm);
