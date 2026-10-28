@@ -45,12 +45,16 @@ public final class ArtunoAgent extends AgentModule<Integer> {
 
     @Override
     public AgentOutcome resolve(AgentUse<Integer> use) {
+        return placeTradeGoodsOnCard(use, ID);
+    }
+
+    public static AgentOutcome placeTradeGoodsOnCard(AgentUse<Integer> use, String leaderId) {
         int tradeGoods = use.payload();
         if (tradeGoods == 0) {
             return AgentOutcome.none();
         }
         Player artuno = use.user();
-        artuno.getLeader(ID).ifPresent(leader -> leader.setTgCount(tradeGoods));
+        artuno.getLeader(leaderId).ifPresent(leader -> leader.setTgCount(tradeGoods));
         tellAJokeSometimes(artuno);
         return AgentOutcome.of(Message.addressedTo(
                 artuno,

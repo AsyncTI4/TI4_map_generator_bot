@@ -100,6 +100,7 @@ import ti4.service.leader.agent.modules.homebrew.KolleccAgent;
 import ti4.service.leader.agent.modules.homebrew.PharadnAgent;
 import ti4.service.leader.agent.modules.homebrew.VadenAgent;
 import ti4.service.leader.genome.homebrew.tknova.DeploymentGenome;
+import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
 import ti4.service.map.PlayerAreaWarningService;
 import ti4.service.relic.QuantumEntanglerService;
 import ti4.service.strategycard.PlayStrategyCardService;
@@ -1039,6 +1040,9 @@ public class StartTurnService {
         }
         if (player.hasUnexhaustedLeader("nekroagent") && player.getAcCount() > 0) {
             startButtons.add(NekroAgent.button(player));
+        }
+        if (player.hasUnexhaustedLeader("tknovarecursiveagent")) {
+            startButtons.add(RecursiveGenome.button(player));
         }
         if (player.hasReadyBreakthrough("lanefirbt")) {
             startButtons.add(Buttons.gray("useLanefirBt", "Use Lanefir Breakthrough", FactionEmojis.lanefir));

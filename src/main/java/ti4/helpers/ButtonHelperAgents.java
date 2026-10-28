@@ -43,6 +43,7 @@ import ti4.service.leader.agent.modules.ArtunoAgent;
 import ti4.service.leader.agent.modules.CabalAgent;
 import ti4.service.leader.agent.modules.SardakkAgent;
 import ti4.service.leader.agent.modules.homebrew.FlorzenAgent;
+import ti4.service.leader.genome.homebrew.tknova.InvestmentGenome;
 import ti4.service.planet.PlanetService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -934,6 +935,7 @@ public final class ButtonHelperAgents {
     }
 
     public static void resolveArtunoCheck(Player player, int tg) {
+        InvestmentGenome.offerTradeGoodsGained(player.getGame(), player, tg);
         if (player.hasUnexhaustedLeader("nomadagentartuno")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(ArtunoAgent.button(player, tg));

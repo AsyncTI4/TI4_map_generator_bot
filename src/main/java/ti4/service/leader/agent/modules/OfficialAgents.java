@@ -21,6 +21,8 @@ public final class OfficialAgents implements AgentCatalog {
                             new GhostAgent(),
                             new ObsidianAgent(),
                             new NaazAgent(),
+                            new MahactAgent(),
+                            new NaaluTeAgent(),
                             new JolNarAgent(),
                             new EmpyreanAgent(),
                             new BastionAgent(),

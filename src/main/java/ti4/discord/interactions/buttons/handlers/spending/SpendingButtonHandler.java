@@ -63,7 +63,7 @@ class SpendingButtonHandler {
         String editedMessage = Helper.buildSpentThingsMessage(player, game, whatIsItFor);
         Leader playerLeader = player.getLeader("keleresagent").orElse(null);
         if (playerLeader != null && !playerLeader.isExhausted()) {
-            AgentLifecycle.spend(game, player, "keleresagent");
+            AgentLifecycle.use(game, player, "keleresagent", "", event);
         } else {
             game.removeStoredValue("keleresAgentTarget");
         }

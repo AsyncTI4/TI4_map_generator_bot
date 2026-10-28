@@ -146,13 +146,11 @@ class TwilightsFallGenomesTest extends BaseTi4Test {
     }
 
     @Test
-    void theGenomeCatalogsDoNotChangeTheNormalGame() {
+    void aTwilightsFallGenomeIsNotUsedInANormalGame() {
         Game game = new AgentModuleFixture("mentak").game;
 
-        for (AgentModule<?> module : LeaderAgents.all()) {
-            if (module instanceof Genome<?> genome) {
-                assertThat(LeaderAgents.find(game, genome.agentId())).isNotInstanceOf(LeaningGenome.class);
-            }
+        for (AgentModule<?> genome : TwilightsFallGenomes.CATALOG.modules()) {
+            assertThat(LeaderAgents.find(game, genome.agentId())).isNotSameAs(genome);
         }
     }
 

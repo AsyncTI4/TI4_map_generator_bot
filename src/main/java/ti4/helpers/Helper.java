@@ -121,6 +121,9 @@ import ti4.service.game.MonumentsService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.agent.modules.ArgentAgent;
+import ti4.service.leader.genome.homebrew.tknova.BrutalGenome;
+import ti4.service.leader.genome.homebrew.tknova.RavenousGenome;
+import ti4.service.leader.genome.homebrew.tknova.ScornfulGenome;
 import ti4.service.map.TokenPlanetService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
@@ -2986,6 +2989,15 @@ public final class Helper {
 
             if (player.hasUnexhaustedLeader("argentagent")) {
                 unitButtons.add(ArgentAgent.button(player, tile));
+            }
+            if (player.hasUnexhaustedLeader("tknovascornfulagent")) {
+                unitButtons.add(ScornfulGenome.button(player, tile));
+            }
+            if (player.hasUnexhaustedLeader("tknovabrutalagent")) {
+                unitButtons.add(BrutalGenome.button(player, tile));
+            }
+            if (player.hasUnexhaustedLeader("tknovaravenousagent")) {
+                unitButtons.add(RavenousGenome.button(player, tile));
             }
             if (player.hasTechReady("sar")) {
                 unitButtons.add(Buttons.blue(

@@ -6,6 +6,7 @@ import ti4.game.Player;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentUse;
+import ti4.service.leader.agent.PlayerPickerAgent;
 
 public class LeaningGenome<P> extends Genome<P> {
 
@@ -22,6 +23,11 @@ public class LeaningGenome<P> extends Genome<P> {
 
     protected AgentModule<P> delegate() {
         return delegate;
+    }
+
+    @Override
+    public Optional<PlayerPickerAgent> picker() {
+        return delegate.picker();
     }
 
     @Override

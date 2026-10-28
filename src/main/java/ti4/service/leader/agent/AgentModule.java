@@ -48,6 +48,10 @@ public abstract class AgentModule<P> {
 
     public abstract Optional<P> decode(Game game, Player user, String payload);
 
+    public Optional<PlayerPickerAgent> picker() {
+        return Optional.empty();
+    }
+
     public Optional<String> unusableReason(Game game, Player user, P payload) {
         return Optional.empty();
     }

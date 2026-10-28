@@ -68,6 +68,7 @@ import ti4.service.leader.agent.modules.homebrew.MykoMentoriAgent;
 import ti4.service.leader.agent.modules.homebrew.PharadnAgent;
 import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
 import ti4.service.leader.genome.ResearchGenome;
+import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
 
 @UtilityClass
 public class CardsInfoService {
@@ -456,6 +457,9 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("nekroagent")) {
             buttons.add(NekroAgent.button(player));
+        }
+        if (player.hasUnexhaustedLeader("tknovarecursiveagent")) {
+            buttons.add(RecursiveGenome.button(player));
         }
         if (player.hasReadyBreakthrough("lanefirbt")) {
             buttons.add(Buttons.gray("useLanefirBt", "Use Lanefir Breakthrough", FactionEmojis.lanefir));

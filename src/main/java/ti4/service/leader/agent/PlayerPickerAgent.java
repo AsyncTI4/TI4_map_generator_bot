@@ -38,6 +38,11 @@ public abstract class PlayerPickerAgent extends AgentModule<PlayerPickerAgent.Ch
         super(agentId, displayName);
     }
 
+    @Override
+    public final Optional<PlayerPickerAgent> picker() {
+        return Optional.of(this);
+    }
+
     protected abstract AgentOutcome resolveFor(AgentUse<Player> use);
 
     @Override
@@ -106,9 +111,7 @@ public abstract class PlayerPickerAgent extends AgentModule<PlayerPickerAgent.Ch
             agentId = legacy.get().getValue();
             targetPayload = id.substring(legacy.get().getKey().length());
         }
-        Optional<PlayerPickerAgent> picker = LeaderAgents.findAgent(agentId)
-                .filter(PlayerPickerAgent.class::isInstance)
-                .map(PlayerPickerAgent.class::cast);
+        Optional<PlayerPickerAgent> picker = LeaderAgents.findAgent(agentId).flatMap(AgentModule::picker);
         Optional<Player> target = AgentTargets.player(game, targetPayload);
         if (picker.isEmpty() || target.isEmpty()) {
             return Optional.empty();
