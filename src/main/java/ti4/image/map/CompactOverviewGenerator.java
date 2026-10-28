@@ -138,7 +138,6 @@ public final class CompactOverviewGenerator {
         FogMemoryService.refreshForPlayerOverview(game, player);
         Map<String, Tile> tiles = knownTiles(game, player);
         FogViewer viewer = new FogViewer(game, true, player);
-        FogMemoryService.refresh(game, viewer);
         return render(
                 game,
                 playerPanels(game, player, tiles.keySet()),

@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -55,7 +56,8 @@ public class ShowGameService {
             return true;
         }
         MessageHelper.sendEphemeralMessageToEventChannel(
-                event, "Until this Fog of War game ends, its map can only be viewed in your private channel.");
+                event,
+                "Until this Fog of War game ends, its map can only be viewed in your private channel or the GM room.");
         return false;
     }
 
@@ -63,22 +65,25 @@ public class ShowGameService {
         if (!game.isFowMode()
                 || game.isHasEnded()
                 || event instanceof UserOverridenGenericInteractionCreateEvent
-                || FoWHelper.isGmRoom(game, event.getChannel())) {
+                || isGameGmRoom(game, event)) {
             return FogMapAccess.AS_ASKED;
         }
-        boolean gameMaster = FoWHelper.isGameMaster(event.getUser().getId(), game);
-        if (!isGameChannel(game, event.getChannel())) {
-            return gameMaster ? FogMapAccess.FULL_MAP : FogMapAccess.REFUSED;
+        if (!isGameChannel(game, event)) {
+            return FoWHelper.isGameMaster(event.getUser().getId(), game) ? FogMapAccess.FULL_MAP : FogMapAccess.REFUSED;
         }
-        if (gameMaster || MapSegmentService.isFoggedView(game, event)) {
-            return FogMapAccess.AS_ASKED;
+        if (!isSeatedWithPrivateChannel(game, event)) {
+            return FogMapAccess.REFUSED;
         }
-        Player player = actingPlayer(game, event);
-        boolean seatedWithPrivateChannel = player != null
-                && event.getMember() != null
-                && game.getRealPlayers().contains(player)
-                && player.getPrivateChannel() != null;
-        return seatedWithPrivateChannel ? FogMapAccess.PLAYER_VIEW : FogMapAccess.REFUSED;
+        return MapSegmentService.isFoggedView(game, event) ? FogMapAccess.AS_ASKED : FogMapAccess.PLAYER_VIEW;
+    }
+
+    @Nullable
+    public static GenericInteractionCreateEvent renderEventFor(Game game, GenericInteractionCreateEvent event) {
+        return renderEvent(fogMapAccess(game, event), event);
+    }
+
+    public static MessageChannel privateChannelOrEventChannel(Game game, GenericInteractionCreateEvent event) {
+        return redirectedPrivateChannel(game, event).orElse(event.getMessageChannel());
     }
 
     @Nullable
@@ -90,11 +95,24 @@ public class ShowGameService {
         };
     }
 
-    private static boolean isGameChannel(Game game, @Nullable Channel channel) {
+    private static boolean isSeatedWithPrivateChannel(Game game, GenericInteractionCreateEvent event) {
+        Player player = actingPlayer(game, event);
+        return player != null
+                && event.getMember() != null
+                && game.getRealPlayers().contains(player)
+                && player.getPrivateChannel() != null;
+    }
+
+    private static boolean isGameGmRoom(Game game, GenericInteractionCreateEvent event) {
+        return isInGameGuild(game, event) && FoWHelper.isGmRoom(game, event.getChannel());
+    }
+
+    private static boolean isGameChannel(Game game, GenericInteractionCreateEvent event) {
+        Channel channel = event.getChannel();
         if (channel instanceof ThreadChannel thread) {
             channel = thread.getParentChannel();
         }
-        if (channel == null) {
+        if (channel == null || !isInGameGuild(game, event)) {
             return false;
         }
         String channelId = channel.getId();
@@ -102,14 +120,16 @@ public class ShowGameService {
                 || gameChannelIds(game).anyMatch(id -> id.equals(channelId));
     }
 
+    private static boolean isInGameGuild(Game game, GenericInteractionCreateEvent event) {
+        Guild gameGuild = game.getGuild();
+        Guild eventGuild = event.getGuild();
+        return gameGuild != null && eventGuild != null && gameGuild.getId().equals(eventGuild.getId());
+    }
+
     private static Stream<String> gameChannelIds(Game game) {
         Stream<String> shared = Stream.of(game.getMainChannelID(), game.getTableTalkChannelID());
         Stream<String> privateChannels = game.getPlayers().values().stream().map(Player::getPrivateChannelID);
         return Stream.concat(shared, privateChannels).filter(Objects::nonNull);
-    }
-
-    private static boolean isFoggedGameChannel(Game game, GenericInteractionCreateEvent event) {
-        return isGameChannel(game, event.getChannel()) && MapSegmentService.isFoggedView(game, event);
     }
 
     @Nullable
@@ -135,7 +155,7 @@ public class ShowGameService {
         if (!hasGameToShow(game, event) || !mayShowMap(game, event)) {
             return;
         }
-        GenericInteractionCreateEvent renderEvent = renderEvent(fogMapAccess(game, event), event);
+        GenericInteractionCreateEvent renderEvent = renderEventFor(game, event);
         boolean shouldPersistFullMapMessageId = displayType == DisplayType.all && !game.isFowMode();
         boolean shouldPersistFowMapMessageId = displayType == DisplayType.all && game.isFowMode();
 
@@ -161,7 +181,8 @@ public class ShowGameService {
                 List<Button> buttons = Buttons.mapImageButtons(game, segment);
                 buttons.addAll(
                         MapSegmentService.switchButtons(game, MapSegmentService.viewerId(game, event), foggedView));
-                MapOverviewService.overviewButton(game, event).ifPresent(buttons::add);
+                MapOverviewService.overviewButton(game, Objects.requireNonNullElse(renderEvent, event))
+                        .ifPresent(buttons::add);
 
                 // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
                 MessageChannel channel = sendMessage(game, event);
@@ -188,14 +209,14 @@ public class ShowGameService {
         if (!hasGameToShow(game, event) || !mayShowMap(game, event)) {
             return;
         }
-        GenericInteractionCreateEvent renderEvent = renderEvent(fogMapAccess(game, event), event);
+        GenericInteractionCreateEvent renderEvent = renderEventFor(game, event);
         Consumer<FileUpload> post =
                 fileUpload -> MessageHelper.sendFileUploadToChannel(sendMessage(game, event), fileUpload);
         if (MapOverviewService.showsOverlayAsOverview(game, feature)) {
             boolean foggedView = renderEvent != null && MapSegmentService.isFoggedView(game, renderEvent);
             Player viewer =
                     foggedView ? FogViewer.resolve(game, renderEvent, null).player() : null;
-            if (!foggedView || viewer != null) {
+            if (!foggedView || (viewer != null && viewer.isRealPlayer())) {
                 MapOverviewService.queueOverlayOverview(game, viewer, feature, post);
                 return;
             }
@@ -207,10 +228,10 @@ public class ShowGameService {
         if (!hasGameToShow(game, event) || !mayShowMap(game, event)) {
             return;
         }
-        MessageChannel channel = redirectedPrivateChannel(game, event).orElse(event.getMessageChannel());
+        MessageChannel channel = privateChannelOrEventChannel(game, event);
         MapRenderPipeline.queue(
                 game,
-                renderEvent(fogMapAccess(game, event), event),
+                renderEventFor(game, event),
                 DisplayType.map,
                 segment,
                 fileUpload -> MessageHelper.sendFileUploadToChannel(channel, fileUpload));
@@ -224,13 +245,15 @@ public class ShowGameService {
     }
 
     private static Optional<MessageChannel> redirectedPrivateChannel(Game game, GenericInteractionCreateEvent event) {
-        if (!game.isFowMode() || event.getClass().equals(UserOverridenGenericInteractionCreateEvent.class)) {
+        if (!game.isFowMode()
+                || event.getClass().equals(UserOverridenGenericInteractionCreateEvent.class)
+                || isGameGmRoom(game, event)) {
             return Optional.empty();
         }
         Player player = actingPlayer(game, event);
         MessageChannel privateChannel = player != null ? player.getPrivateChannel() : null;
         boolean redirects = game.getRealPlayers().contains(player)
-                && (!game.getPlayersWithGMRole().contains(player) || isFoggedGameChannel(game, event))
+                && (!game.getPlayersWithGMRole().contains(player) || isGameChannel(game, event))
                 && privateChannel != null
                 && !event.getMessageChannel().equals(privateChannel);
         return redirects ? Optional.of(privateChannel) : Optional.empty();
@@ -239,7 +262,7 @@ public class ShowGameService {
     private static void ephemeralShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
         MapRenderPipeline.queue(
                 game,
-                renderEvent(fogMapAccess(game, event), event),
+                renderEventFor(game, event),
                 displayType,
                 fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
     }

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -27,9 +28,13 @@ class ShowGameFogAccessTest extends BaseTi4Test {
 
     private static final String PLAYER = "111";
     private static final String GM = "222";
+    private static final String SEATLESS_GM = "333";
+    private static final String NO_PRIVATE_CHANNEL = "444";
     private static final String OUTSIDER = "999";
 
     private Game game;
+    private Guild gameGuild;
+    private Guild otherGuild;
 
     @BeforeEach
     void setUp() {
@@ -39,14 +44,27 @@ class ShowGameFogAccessTest extends BaseTi4Test {
         fogGame.setFowMode(true);
         Player player = seat(fogGame, PLAYER, "sol", "blue");
         Player gm = seat(fogGame, GM, "hacan", "yellow");
+        Player seatlessGm = fogGame.addPlayer(SEATLESS_GM, "seatless-gm");
+        seat(fogGame, NO_PRIVATE_CHANNEL, "xxcha", "green");
         game = spy(fogGame);
-        doReturn(List.of(gm)).when(game).getPlayersWithGMRole();
+        doReturn(List.of(gm, seatlessGm)).when(game).getPlayersWithGMRole();
+        gameGuild = guild("game-guild");
+        otherGuild = guild("other-guild");
+        doReturn(gameGuild).when(game).getGuild();
 
-        // Only the regular player gets a resolvable private channel; it is what PLAYER_VIEW needs.
+        // Seated players need a resolvable private channel for any view inside the game; green has none.
         JDA jda = mock(JDA.class);
         player.setPrivateChannelID("blue-private-id");
+        gm.setPrivateChannelID("yellow-private-id");
         when(jda.getTextChannelById("blue-private-id")).thenReturn(mock(TextChannel.class));
+        when(jda.getTextChannelById("yellow-private-id")).thenReturn(mock(TextChannel.class));
         JdaService.jda = jda;
+    }
+
+    private static Guild guild(String id) {
+        Guild guild = mock(Guild.class);
+        when(guild.getId()).thenReturn(id);
+        return guild;
     }
 
     @AfterEach
@@ -62,7 +80,17 @@ class ShowGameFogAccessTest extends BaseTi4Test {
     }
 
     private FogMapAccess access(String userId, String channelName) {
-        return ShowGameService.fogMapAccess(game, FogEvents.eventIn(userId, channelName));
+        return ShowGameService.fogMapAccess(game, eventIn(userId, channelName, gameGuild));
+    }
+
+    private FogMapAccess accessFromOtherGuild(String userId, String channelName) {
+        return ShowGameService.fogMapAccess(game, eventIn(userId, channelName, otherGuild));
+    }
+
+    private static GenericInteractionCreateEvent eventIn(String userId, String channelName, Guild guild) {
+        GenericInteractionCreateEvent event = FogEvents.eventIn(userId, channelName);
+        when(event.getGuild()).thenReturn(guild);
+        return event;
     }
 
     @Test
@@ -100,10 +128,18 @@ class ShowGameFogAccessTest extends BaseTi4Test {
     }
 
     @Test
+    void sameNamedChannelsInAnotherGuildAreNotTheGame() {
+        // /show_game takes any game name, so anyone can name a channel "fogtest-gm-room" on another server.
+        assertEquals(FogMapAccess.REFUSED, accessFromOtherGuild(OUTSIDER, "fogtest-gm-room"));
+        assertEquals(FogMapAccess.REFUSED, accessFromOtherGuild(PLAYER, "fogtest-blue-private"));
+        assertEquals(FogMapAccess.FULL_MAP, accessFromOtherGuild(GM, "fogtest-gm-room"));
+    }
+
+    @Test
     void customNamedPrivateChannelCountsAsInsideTheGame() {
         // /game setup_channels can assign any text channel; it is recognised by ID, and since its name
         // lacks "-private" the player still gets their own vision instead of the full map.
-        GenericInteractionCreateEvent event = FogEvents.eventIn(PLAYER, "hideout");
+        GenericInteractionCreateEvent event = eventIn(PLAYER, "hideout", gameGuild);
         when(event.getChannel().getId()).thenReturn("blue-private-id");
         assertEquals(FogMapAccess.PLAYER_VIEW, ShowGameService.fogMapAccess(game, event));
 
@@ -114,6 +150,24 @@ class ShowGameFogAccessTest extends BaseTi4Test {
     void otherGameChannelsRenderThePlayersOwnVision() {
         assertEquals(FogMapAccess.PLAYER_VIEW, access(PLAYER, "fogtest-lobby"));
         assertEquals(FogMapAccess.REFUSED, access(OUTSIDER, "fogtest-lobby"));
+    }
+
+    @Test
+    void seatedGmGetsTheirOwnVisionInsideTheGame() {
+        assertEquals(FogMapAccess.PLAYER_VIEW, access(GM, "fogtest-lobby"));
+        GenericInteractionCreateEvent ownChannel = eventIn(GM, "gm-hideout", gameGuild);
+        when(ownChannel.getChannel().getId()).thenReturn("yellow-private-id");
+        assertEquals(FogMapAccess.PLAYER_VIEW, ShowGameService.fogMapAccess(game, ownChannel));
+    }
+
+    @Test
+    void insideTheGameOnlySeatsWithAPrivateChannelSeeAMap() {
+        String commonChannel = "fogtest-anonymous-announcements-private";
+        assertEquals(FogMapAccess.REFUSED, access(OUTSIDER, commonChannel));
+        assertEquals(FogMapAccess.REFUSED, access(SEATLESS_GM, commonChannel));
+        assertEquals(FogMapAccess.FULL_MAP, access(SEATLESS_GM, "general"));
+        // Nothing could redirect this player's vision out of the shared channel.
+        assertEquals(FogMapAccess.REFUSED, access(NO_PRIVATE_CHANNEL, commonChannel));
     }
 
     @Test

@@ -77,13 +77,14 @@ public class MapOverviewService {
 
     private static boolean isGameMasterInOwnPrivateChannel(
             Game game, GenericInteractionCreateEvent event, MessageChannel postedIn) {
-        if (viewOf(game, event) != View.PLAYER) {
+        if (game == null || !game.isFowMode() || game.isHasEnded() || game.getFowOption(FOWOption.CLASSIC_MAP_LAYOUT)) {
             return false;
         }
         String userId = event.getUser().getId();
         Player gameMaster = game.getPlayer(userId);
         return FoWHelper.isGameMaster(userId, game)
                 && gameMaster != null
+                && gameMaster.isRealPlayer()
                 && isSameChannel(gameMaster.getPrivateChannel(), postedIn);
     }
 
@@ -147,10 +148,15 @@ public class MapOverviewService {
             return View.GM;
         }
         Player viewer = viewer(game, event);
-        if (MapSegmentService.isFoggedView(game, event) && viewer != null && viewer.isRealPlayer()) {
+        if (viewer != null && viewer.isRealPlayer() && isFoggedFor(game, event, viewer)) {
             return View.PLAYER;
         }
         return View.NONE;
+    }
+
+    private static boolean isFoggedFor(Game game, GenericInteractionCreateEvent event, Player viewer) {
+        return MapSegmentService.isFoggedView(game, event)
+                || isSameChannel(viewer.getPrivateChannel(), event.getMessageChannel());
     }
 
     private static Player viewer(Game game, GenericInteractionCreateEvent event) {
