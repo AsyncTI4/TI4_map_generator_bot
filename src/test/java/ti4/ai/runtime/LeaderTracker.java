@@ -27,6 +27,7 @@ final class LeaderTracker {
         round = game.getRound();
         for (Player seat : game.getRealPlayers()) {
             observeBreakthroughs(seat);
+            observeMecatol(seat);
             Map<String, String> now = new HashMap<>();
             for (Leader leader : seat.getLeaders()) now.put(leader.getId(), stateOf(leader));
             for (Map.Entry<String, String> entry : now.entrySet()) {
@@ -46,6 +47,13 @@ final class LeaderTracker {
                 lines.add(String.format("r%d %s %s: -> gone (purged or removed)", round, seat.getFaction(), id));
             }
         }
+    }
+
+    private void observeMecatol(Player seat) {
+        String state = seat.controlsMecatol(true) ? "held" : "lost";
+        String before = breakthroughs.put(seat.getFaction() + "/mecatol", state);
+        if (before == null && "lost".equals(state) || state.equals(before)) return;
+        lines.add(String.format("r%d %s mecatol: %s", round, seat.getFaction(), state));
     }
 
     private void observeGravityDrive(Player seat) {
