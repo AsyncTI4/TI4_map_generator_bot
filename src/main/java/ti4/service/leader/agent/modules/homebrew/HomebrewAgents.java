@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import ti4.service.leader.agent.AgentCatalog;
 import ti4.service.leader.agent.AgentModule;
+import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.BelkoseaAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.EdynBrAgent;
@@ -65,6 +66,7 @@ public final class HomebrewAgents implements AgentCatalog {
                             new FogAllianceAgent(),
                             new XinAgent(),
                             new KaltrimAgent(),
+                            new NatauAgent(),
                             new QhetAgent(),
                             new BelkoseaAgent(),
                             new AtokeraAgent(),
