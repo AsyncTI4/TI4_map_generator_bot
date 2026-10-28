@@ -16,10 +16,10 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
+import ti4.service.leader.LeaderAgents;
 import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.testUtils.BaseTi4Test;
 
@@ -91,20 +91,19 @@ class AgentLifecycleTest extends BaseTi4Test {
     }
 
     @Test
-    void anAgentWithAModuleIsHandledByTheLifecycle() {
+    void aPressedAgentWithAModuleIsHandledByTheLifecycle() {
         // Exhausting needs the Spring context, so the agent is already exhausted and the press is refused.
         mentak.getLeader("mentakagent").orElseThrow().setExhausted(true);
 
-        assertThat(AgentLifecycle.resolveWithModule(
-                        AgentButtonIds.parse("exhaustAgent_mentakagent_pi_hacan"), null, game, mentak))
-                .isTrue();
+        AgentLifecycle.press("exhaustAgent_mentakagent_pi_hacan", null, game, mentak);
+
+        assertThat(mentak.getLeader("mentakagent").orElseThrow().isExhausted()).isTrue();
     }
 
     @Test
-    void anAgentWithoutAModuleIsNotResolvedByOne() {
-        assertThat(AgentLifecycle.resolveWithModule(
-                        AgentButtonIds.parse("exhaustAgent_" + NOT_AN_AGENT_MODULE), null, game, mentak))
-                .isFalse();
+    void anAgentWithoutAModuleFallsBackToAPlainExhaust() {
+        assertThat(LeaderAgents.findRegistered(game, NOT_AN_AGENT_MODULE)).isEmpty();
+        assertThat(LeaderAgents.find(game, NOT_AN_AGENT_MODULE)).isInstanceOf(PlainExhaustAgent.class);
     }
 
     @Test
@@ -132,7 +131,7 @@ class AgentLifecycleTest extends BaseTi4Test {
     void temporalCommandSuiteLabelsFitInAButtonEvenForCleverCleverCopies() {
         for (boolean twilightsFall : List.of(false, true)) {
             game.setTwilightsFallMode(twilightsFall);
-            for (AgentModule<?> module : AgentModules.ALL) {
+            for (AgentModule<?> module : LeaderAgents.all()) {
                 for (String leaderId : leaderIds(module)) {
                     String label = AgentLifecycle.temporalCommandSuiteLabel(
                             game, AgentLifecycle.agentName(game, leaderId, true));
@@ -172,7 +171,7 @@ class AgentLifecycleTest extends BaseTi4Test {
     void noGenomeIsCalledAnAgentInTwilightsFall() {
         game.setTwilightsFallMode(true);
 
-        for (AgentModule<?> module : AgentModules.ALL) {
+        for (AgentModule<?> module : LeaderAgents.all()) {
             for (String leaderId : leaderIds(module)) {
                 String cardName = AgentLifecycle.cardName(game, leaderId);
                 if (cardName.endsWith("Genome")) {

@@ -12,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AgendaRiderHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.service.leader.LeaderAgents;
 import ti4.service.leader.agent.AgentOutcome.Message;
 
 public abstract class PlayerPickerAgent extends AgentModule<PlayerPickerAgent.Choice> {
@@ -105,7 +106,7 @@ public abstract class PlayerPickerAgent extends AgentModule<PlayerPickerAgent.Ch
             agentId = legacy.get().getValue();
             targetPayload = id.substring(legacy.get().getKey().length());
         }
-        Optional<PlayerPickerAgent> picker = AgentModules.find(agentId)
+        Optional<PlayerPickerAgent> picker = LeaderAgents.findAgent(agentId)
                 .filter(PlayerPickerAgent.class::isInstance)
                 .map(PlayerPickerAgent.class::cast);
         Optional<Player> target = AgentTargets.player(game, targetPayload);

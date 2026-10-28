@@ -24,10 +24,9 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
-import ti4.model.Mapper;
 import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.LeaderAgents;
 import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -49,9 +48,7 @@ public class AgentLifecycle {
     @ButtonHandler(AgentButtonIds.PREFIX)
     public static void press(String buttonID, GenericInteractionCreateEvent event, Game game, Player player) {
         AgentButtonIds.Parsed parsed = AgentButtonIds.parse(buttonID);
-        if (!resolveWithModule(parsed, event, game, player)) {
-            exhaustWithoutModule(parsed, event, game, player);
-        }
+        run(LeaderAgents.find(game, parsed.agentId()), parsed, event, game, player, true);
     }
 
     public static void spend(Game game, Player holder, String agentId) {
@@ -61,16 +58,9 @@ public class AgentLifecycle {
         });
     }
 
-    static boolean resolveWithModule(
-            AgentButtonIds.Parsed parsed, GenericInteractionCreateEvent event, Game game, Player player) {
-        Optional<AgentModule<?>> module = AgentModules.find(parsed.agentId());
-        module.ifPresent(found -> run(found, parsed, event, game, player, true));
-        return module.isPresent();
-    }
-
     public static boolean use(
             Game game, Player player, String agentId, String payload, GenericInteractionCreateEvent event) {
-        AgentModule<?> module = AgentModules.find(agentId)
+        AgentModule<?> module = LeaderAgents.findRegistered(game, agentId)
                 .orElseThrow(() -> new IllegalArgumentException("No agent module for " + agentId));
         return run(module, new AgentButtonIds.Parsed(agentId, payload), event, game, player, false);
     }
@@ -157,17 +147,7 @@ public class AgentLifecycle {
 
     static String cardName(Game game, String leaderId) {
         return AgentModule.twilightsFallName(game, leaderId)
-                .or(() -> AgentModules.find(leaderId).map(module -> module.displayName(leaderId)))
-                .or(() -> Optional.ofNullable(Mapper.getLeader(leaderId)).map(AgentLifecycle::nameWithFaction))
-                .orElse(leaderId);
-    }
-
-    private static String nameWithFaction(LeaderModel leader) {
-        FactionModel faction = leader.getFaction() == null ? null : Mapper.getFaction(leader.getFaction());
-        if (faction == null || faction.getShortName() == null) {
-            return leader.getName();
-        }
-        return leader.getName() + ", the " + faction.getShortName();
+                .orElseGet(() -> LeaderAgents.find(game, leaderId).displayName(leaderId));
     }
 
     static boolean isYssarilCopy(String exhaustedLeaderId, String agentId) {
@@ -226,24 +206,6 @@ public class AgentLifecycle {
             offerTemporalCommandSuite(game, player, agentId, viaYssaril);
         }
         return true;
-    }
-
-    private static void exhaustWithoutModule(
-            AgentButtonIds.Parsed parsed, GenericInteractionCreateEvent event, Game game, Player player) {
-        String agentId = parsed.agentId();
-        Leader leader = player.getLeader(agentId).orElse(null);
-        if (leader == null || refuseIfExhausted(event, player, leader)) {
-            return;
-        }
-        exhaust(game, player, leader, agentId, parsed.hasPayload() ? parsed.payload() : null);
-        boolean viaYssaril = isYssarilCopy(leader.getId(), agentId);
-        String agentName = agentName(game, agentId, viaYssaril);
-        deliver(
-                AgentOutcome.of(Message.addressedTo(player, " has exhausted " + agentName + ".")
-                        .forEveryone()),
-                event,
-                player);
-        finish(event, game, player, agentId, viaYssaril, false);
     }
 
     private static MessageChannel replyChannel(Player player, GenericInteractionCreateEvent pressedButton) {

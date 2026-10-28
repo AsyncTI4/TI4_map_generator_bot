@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.discord.interactions.routing.AnnotationHandlerTestAccess;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.service.leader.LeaderAgents;
 
 /**
  * Guards the hand-over from the legacy exhaustAgent if-chain to agent modules.
@@ -73,7 +74,7 @@ class AgentModuleRoutingGuardTest {
     }
 
     private static List<String> registeredAgentIds() {
-        return AgentModules.ALL.stream()
+        return LeaderAgents.all().stream()
                 .flatMap(module -> Stream.concat(Stream.of(module.agentId()), module.aliasIds().stream()))
                 .map(id -> id.toLowerCase(Locale.ROOT))
                 .toList();
