@@ -52,6 +52,13 @@ public abstract class AgentModule<P> {
         return Optional.empty();
     }
 
+    public String reference(String cardName, boolean viaYssaril) {
+        if (viaYssaril) {
+            return "Clever Clever " + cardName + "/Yssaril agent";
+        }
+        return cardName + " agent";
+    }
+
     public String exhaustAnnouncementAfterName(AgentUse<P> use) {
         return " has exhausted " + use.agentName() + ".";
     }
@@ -95,13 +102,6 @@ public abstract class AgentModule<P> {
         return Buttons.gray(ownedButtonId(owner, agentId), useLabel(owner, agentId, agentLabel), emoji);
     }
 
-    static Optional<String> twilightsFallName(Game game, String agentId) {
-        if (game == null || !game.isTwilightsFallMode()) {
-            return Optional.empty();
-        }
-        return Optional.ofNullable(Mapper.getLeader(agentId)).flatMap(LeaderModel::getTFName);
-    }
-
     protected static String useLabel(Player owner, String agentId, String agentLabel) {
         return useLabel(owner, agentId, agentLabel, "");
     }
@@ -112,8 +112,11 @@ public abstract class AgentModule<P> {
     }
 
     private static Optional<String> gameCardName(Game game, String agentId) {
-        return Optional.ofNullable(Mapper.getLeader(agentId))
-                .map(leader -> leader.getName(game))
-                .filter(name -> !name.equals(Mapper.getLeader(agentId).getName()));
+        LeaderModel leader = Mapper.getLeader(agentId);
+        if (leader == null) {
+            return Optional.empty();
+        }
+        String name = leader.getName(game);
+        return name.equals(leader.getName()) ? Optional.empty() : Optional.of(name);
     }
 }

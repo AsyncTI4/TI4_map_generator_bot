@@ -121,7 +121,7 @@ import ti4.service.leader.agent.modules.YinAgent;
 import ti4.service.leader.agent.modules.homebrew.HomebrewExhaustOnlyAgents;
 import ti4.service.leader.agent.modules.homebrew.KjalengardAgent;
 import ti4.service.leader.agent.modules.homebrew.KortaliAgent;
-import ti4.service.leader.agent.modules.homebrew.tknova.SplittingGenomeAgent;
+import ti4.service.leader.genome.homebrew.tknova.SplittingGenome;
 import ti4.service.planet.JotunheimLegendaryService;
 import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
@@ -2054,7 +2054,7 @@ public class StartCombatService {
                 buttons.add(YinAgent.offerButton(agentHolder, pos));
             }
 
-            SplittingGenomeAgent.combatOffer(game, agentHolder, p1, pos).ifPresent(buttons::add);
+            SplittingGenome.combatOffer(game, agentHolder, p1, pos).ifPresent(buttons::add);
 
             if ((!game.isFowMode() || agentHolder == p1)
                     && (isSpaceCombat || !game.isTwilightsFallMode())

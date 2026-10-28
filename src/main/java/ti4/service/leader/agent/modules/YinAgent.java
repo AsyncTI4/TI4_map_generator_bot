@@ -31,30 +31,22 @@ public final class YinAgent extends AgentModule<YinAgent.Replacement> {
         super(ID, "Brother Milor, the Yin");
     }
 
-    record Replacement(Tile system, Player owner) {}
+    public record Replacement(Tile system, Player owner) {}
 
     public static Button offerButton(Player yin, String position) {
         return Buttons.gray(
                 yin.factionButtonChecker() + OFFER_STEP + position, useLabel(yin, ID, "Yin Agent"), FactionEmojis.Yin);
     }
 
-    public static List<Button> fightersOrInfantryButtons(Game game, Player owner, Tile system) {
-        return placementButtons(game, owner, system, true);
-    }
-
-    static List<Button> placementButtons(Game game, Player owner, Tile system) {
-        return placementButtons(game, owner, system, !game.isTwilightsFallMode());
-    }
-
-    private static List<Button> placementButtons(Game game, Player owner, Tile system, boolean infantryToo) {
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green(
+    public static List<Button> fighterButtons(Player owner, Tile system) {
+        return List.of(Buttons.green(
                 owner.factionButtonChecker() + PLACE_PREFIX + "_2ff_" + system.getPosition(),
                 "Place 2 Fighters",
                 UnitEmojis.fighter));
-        if (!infantryToo) {
-            return buttons;
-        }
+    }
+
+    public static List<Button> fightersOrInfantryButtons(Game game, Player owner, Tile system) {
+        List<Button> buttons = new ArrayList<>(fighterButtons(owner, system));
         for (Planet planet : system.getPlanetUnitHolders()) {
             String planetName = planet.getName();
             buttons.add(Buttons.green(
@@ -90,6 +82,6 @@ public final class YinAgent extends AgentModule<YinAgent.Replacement> {
         return AgentOutcome.of(Message.addressedTo(
                 owner,
                 ", use buttons to resolve " + use.agentNameFor(owner) + ".",
-                placementButtons(use.game(), owner, use.payload().system())));
+                fightersOrInfantryButtons(use.game(), owner, use.payload().system())));
     }
 }

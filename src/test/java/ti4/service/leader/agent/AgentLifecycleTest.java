@@ -70,12 +70,13 @@ class AgentLifecycleTest extends BaseTi4Test {
 
     @Test
     void namesTheRealCardByItsDisplayName() {
-        assertThat(AgentLifecycle.agentName("Clodho, the Ilyxum", false)).isEqualTo("Clodho, the Ilyxum agent");
+        assertThat(LeaderAgents.find(game, "mentakagent").reference("Clodho, the Ilyxum", false))
+                .isEqualTo("Clodho, the Ilyxum agent");
     }
 
     @Test
     void namesAYssarilCopyAsCleverClever() {
-        assertThat(AgentLifecycle.agentName("Clodho, the Ilyxum", true))
+        assertThat(LeaderAgents.find(game, "mentakagent").reference("Clodho, the Ilyxum", true))
                 .isEqualTo("Clever Clever Clodho, the Ilyxum/Yssaril agent");
     }
 
@@ -97,7 +98,8 @@ class AgentLifecycleTest extends BaseTi4Test {
 
     @Test
     void anAgentWithoutAModuleIsNamedFromItsLeaderCardAndFaction() {
-        assertThat(AgentLifecycle.cardName(game, "mahactagent")).isEqualTo("Jae Mir Kan, the Mahact");
+        assertThat(LeaderAgents.find(game, "mahactagent").displayName("mahactagent"))
+                .isEqualTo("Jae Mir Kan, the Mahact");
         assertThat(AgentLifecycle.agentName(game, "naaluagent-te", false))
                 .startsWith("Z'eu")
                 .endsWith(", the Naalu agent");
@@ -137,45 +139,10 @@ class AgentLifecycleTest extends BaseTi4Test {
     }
 
     @Test
-    void namesGenomesWithoutTheAgentSuffix() {
-        assertThat(AgentLifecycle.agentName("Captain's Genome", false)).isEqualTo("the _Captain's Genome_");
-        assertThat(AgentLifecycle.agentName("Captain's Genome", true))
-                .isEqualTo("the Clever Clever _Captain's Genome_");
-    }
-
-    @Test
-    void usesTheTwilightsFallNameInTwilightsFallGames() {
-        game.setTwilightsFallMode(true);
-
-        assertThat(AgentLifecycle.agentNameForHolder(game, mentak, "saaragent")).isEqualTo("the _Captain's Genome_");
-    }
-
-    @Test
-    void noGenomeIsCalledAnAgentInTwilightsFall() {
-        game.setTwilightsFallMode(true);
-
-        for (AgentModule<?> module : LeaderAgents.all()) {
-            for (String leaderId : leaderIds(module)) {
-                String cardName = AgentLifecycle.cardName(game, leaderId);
-                if (cardName.endsWith("Genome")) {
-                    assertThat(AgentLifecycle.agentName(cardName, false))
-                            .as(leaderId)
-                            .doesNotContain("agent");
-                    assertThat(AgentLifecycle.agentName(cardName, true))
-                            .as(leaderId)
-                            .doesNotContain("agent");
-                }
-            }
-        }
-    }
-
-    @Test
     void eachRebellionCardIsNamedForItself() {
         assertThat(AgentLifecycle.agentName(game, "crimsonagent", false)).isEqualTo("Ahk Ravin, the Rebellion agent");
         assertThat(AgentLifecycle.agentName(game, "redcreussagent", false))
                 .isEqualTo("\"Who Knows?\", the Rebellion agent");
-        game.setTwilightsFallMode(true);
-        assertThat(AgentLifecycle.agentName(game, "crimsonagent", false)).isEqualTo("the _Breach Genome_");
     }
 
     @Test

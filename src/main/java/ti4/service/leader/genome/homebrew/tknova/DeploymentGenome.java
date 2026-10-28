@@ -1,4 +1,4 @@
-package ti4.service.leader.agent.modules.homebrew.tknova;
+package ti4.service.leader.genome.homebrew.tknova;
 
 import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -8,14 +8,15 @@ import ti4.helpers.ButtonHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
+import ti4.service.leader.agent.AgentTargets;
 import ti4.service.leader.agent.AgentUse;
-import ti4.service.leader.agent.SelfOrTargetedAgent;
+import ti4.service.leader.genome.Genome;
 
-public final class DeploymentGenomeAgent extends SelfOrTargetedAgent {
+public final class DeploymentGenome extends Genome<Player> {
 
     static final String ID = "tknovadeploymentagent";
 
-    public DeploymentGenomeAgent() {
+    public DeploymentGenome() {
         super(ID, "Deployment Genome");
     }
 
@@ -24,6 +25,11 @@ public final class DeploymentGenomeAgent extends SelfOrTargetedAgent {
             return Optional.empty();
         }
         return Optional.of(useButton(holder, ID, "Deployment Genome", FactionEmojis.Nomad));
+    }
+
+    @Override
+    public Optional<Player> decode(Game game, Player user, String payload) {
+        return AgentTargets.playerOrUser(game, user, payload);
     }
 
     @Override

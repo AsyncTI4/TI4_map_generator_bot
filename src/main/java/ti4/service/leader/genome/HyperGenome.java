@@ -1,19 +1,26 @@
-package ti4.service.leader.agent.modules.twilightsfall;
+package ti4.service.leader.genome;
 
+import java.util.Optional;
+import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
+import ti4.service.leader.agent.AgentTargets;
 import ti4.service.leader.agent.AgentUse;
-import ti4.service.leader.agent.TargetedAgent;
 
-public final class HyperAgent extends TargetedAgent {
+public final class HyperGenome extends Genome<Player> {
 
     static final String ID = "hyperagent";
     private static final String GENOME = "_Hyper Genome_";
 
-    public HyperAgent() {
+    public HyperGenome() {
         super(ID, "Hyper Genome");
+    }
+
+    @Override
+    public Optional<Player> decode(Game game, Player user, String payload) {
+        return AgentTargets.player(game, payload);
     }
 
     @Override

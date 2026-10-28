@@ -16,6 +16,7 @@ import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.discord.interactions.routing.AnnotationHandlerTestAccess;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.service.leader.LeaderAgents;
+import ti4.testUtils.BaseTi4Test;
 
 /**
  * Guards the hand-over from the legacy exhaustAgent if-chain to agent modules.
@@ -25,7 +26,7 @@ import ti4.service.leader.LeaderAgents;
  * {@code @ButtonHandler("exhaustAgent_<id>")} would steal the press from the module entirely (Kalora and Lunarium
  * do this today). Both mistakes are silent at runtime, so they are caught here.
  */
-class AgentModuleRoutingGuardTest {
+class AgentModuleRoutingGuardTest extends BaseTi4Test {
 
     private static final Path LEGACY_HANDLER =
             Path.of("src", "main", "java", "ti4", "helpers", "ButtonHelperAgents.java");

@@ -1,4 +1,4 @@
-package ti4.service.leader.agent.modules.twilightsfall;
+package ti4.service.leader.genome;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ti4.service.leader.agent.modules.AgentModuleFixture.assertOwnedAgentButton;
@@ -13,7 +13,7 @@ class PromptGenomesTest extends BaseTi4Test {
     @Test
     void experimentalGenomeDefaultsToTheUser() {
         AgentModuleFixture fixture = new AgentModuleFixture("jolnar");
-        ExperimentalGenomeAgent experimental = new ExperimentalGenomeAgent();
+        ExperimentalGenome experimental = new ExperimentalGenome();
 
         assertThat(experimental.decode(fixture.game, fixture.user, "")).contains(fixture.user);
         AgentOutcome outcome = experimental.resolve(fixture.use(experimental, fixture.user));
@@ -26,7 +26,7 @@ class PromptGenomesTest extends BaseTi4Test {
     @Test
     void valiantGenomeWithNoDeceasedUnitsTellsTheUser() {
         AgentModuleFixture fixture = new AgentModuleFixture("bastion");
-        ValiantGenomeAgent valiant = new ValiantGenomeAgent();
+        ValiantGenome valiant = new ValiantGenome();
 
         fixture.assertDecodesTargets(valiant);
         AgentOutcome outcome = valiant.resolve(fixture.use(valiant, fixture.target));
@@ -40,7 +40,6 @@ class PromptGenomesTest extends BaseTi4Test {
     void experimentalGenomeButtonIsOwnedByTheHolder() {
         AgentModuleFixture fixture = new AgentModuleFixture("jolnar");
 
-        assertOwnedAgentButton(
-                ExperimentalGenomeAgent.button(fixture.user), fixture.user, "exhaustAgent_experimentalagent");
+        assertOwnedAgentButton(ExperimentalGenome.button(fixture.user), fixture.user, "exhaustAgent_experimentalagent");
     }
 }

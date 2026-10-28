@@ -74,7 +74,7 @@ import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.homebrew.GhotiAgent;
 import ti4.service.leader.agent.modules.homebrew.MortheusAgent;
-import ti4.service.leader.agent.modules.twilightsfall.ExperimentalGenomeAgent;
+import ti4.service.leader.genome.ExperimentalGenome;
 import ti4.service.planet.FlipTileService;
 import ti4.service.planet.PlanetService;
 import ti4.service.tactical.TacticalActionService;
@@ -2773,7 +2773,7 @@ public final class ButtonHelperModifyUnits {
             buttons.add(GhotiAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("experimentalagent")) {
-            buttons.add(ExperimentalGenomeAgent.button(player));
+            buttons.add(ExperimentalGenome.button(player));
         }
         if (player.hasUnexhaustedLeader("mortheusagent")) {
             buttons.add(MortheusAgent.button(player));

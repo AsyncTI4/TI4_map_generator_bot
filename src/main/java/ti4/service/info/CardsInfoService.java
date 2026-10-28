@@ -67,7 +67,7 @@ import ti4.service.leader.agent.modules.homebrew.KolleccAgent;
 import ti4.service.leader.agent.modules.homebrew.MykoMentoriAgent;
 import ti4.service.leader.agent.modules.homebrew.PharadnAgent;
 import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
-import ti4.service.leader.agent.modules.twilightsfall.ResearchGenomeAgent;
+import ti4.service.leader.genome.ResearchGenome;
 
 @UtilityClass
 public class CardsInfoService {
@@ -228,7 +228,7 @@ public class CardsInfoService {
                     FactionEmojis.belkosea));
         }
         if (player.hasUnexhaustedLeader("researchagent")) {
-            buttons.add(ResearchGenomeAgent.button(player));
+            buttons.add(ResearchGenome.button(player));
         }
         if (player.hasUnexhaustedLeader("pharadnagent")) {
             buttons.add(PharadnAgent.button(player));

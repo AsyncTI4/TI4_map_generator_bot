@@ -1,4 +1,4 @@
-package ti4.service.leader.agent.modules.homebrew.tknova;
+package ti4.service.leader.genome.homebrew.tknova;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,14 +11,15 @@ import ti4.helpers.Helper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
+import ti4.service.leader.agent.AgentTargets;
 import ti4.service.leader.agent.AgentUse;
-import ti4.service.leader.agent.SelfOrTargetedAgent;
+import ti4.service.leader.genome.Genome;
 
-public final class SwarmGenomeAgent extends SelfOrTargetedAgent {
+public final class SwarmGenome extends Genome<Player> {
 
     static final String ID = "tknovaswarmagent";
 
-    public SwarmGenomeAgent() {
+    public SwarmGenome() {
         super(ID, "Swarm Genome");
     }
 
@@ -27,6 +28,11 @@ public final class SwarmGenomeAgent extends SelfOrTargetedAgent {
             return Optional.empty();
         }
         return Optional.of(useButton(holder, ID, "Swarm Genome", FactionEmojis.Sardakk));
+    }
+
+    @Override
+    public Optional<Player> decode(Game game, Player user, String payload) {
+        return AgentTargets.playerOrUser(game, user, payload);
     }
 
     @Override

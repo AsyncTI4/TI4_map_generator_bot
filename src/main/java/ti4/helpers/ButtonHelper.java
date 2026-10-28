@@ -176,8 +176,8 @@ import ti4.service.leader.agent.modules.homebrew.FreeSystemsAgent;
 import ti4.service.leader.agent.modules.homebrew.KhraskAgent;
 import ti4.service.leader.agent.modules.homebrew.LiZhoAgent;
 import ti4.service.leader.agent.modules.homebrew.OlradinAgent;
-import ti4.service.leader.agent.modules.homebrew.tknova.SwarmGenomeAgent;
-import ti4.service.leader.agent.modules.twilightsfall.ExperimentalGenomeAgent;
+import ti4.service.leader.genome.ExperimentalGenome;
+import ti4.service.leader.genome.homebrew.tknova.SwarmGenome;
 import ti4.service.map.SystemPickerService;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.planet.AddPlanetService;
@@ -820,7 +820,7 @@ public class ButtonHelper {
             buttons.add(Buttons.gray("getReleaseButtons", "Release captured units", FactionEmojis.Cabal));
         }
         if (player.hasUnexhaustedLeader("experimentalagent") && !whatIsItFor.contains("inf")) {
-            buttons.add(ExperimentalGenomeAgent.button(player));
+            buttons.add(ExperimentalGenome.button(player));
         }
         if (player.getNombox().hasUnits() && player.hasAbility("mark_of_pharadn")) {
             buttons.add(Buttons.gray("getReleaseButtons", "Release captured units", FactionEmojis.pharadn));
@@ -5235,7 +5235,7 @@ public class ButtonHelper {
         if (player.hasUnexhaustedLeader("crystellumagent")) {
             CrystellumLeadersHandler.addCrystellumAgentEndTurnButton(endButtons, game, player);
         }
-        SwarmGenomeAgent.endOfTurnOffer(player).ifPresent(endButtons::add);
+        SwarmGenome.endOfTurnOffer(player).ifPresent(endButtons::add);
 
         // OTHER stuff
         if (!player.hasAbility("arms_dealers")) {

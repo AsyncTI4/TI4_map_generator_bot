@@ -39,7 +39,7 @@ class LegacyAgentFallThroughGuardTest extends BaseTi4Test {
                 .filter(leader -> "agent".equals(leader.getType()))
                 .filter(leader -> "ACTION:".equalsIgnoreCase(leader.getAbilityWindow()))
                 .map(LeaderModel::getId)
-                .filter(id -> LeaderAgents.findAgent(id).isEmpty())
+                .filter(id -> !LeaderAgents.isRegistered(id))
                 .toList();
 
         assertThat(withoutModule).containsExactlyInAnyOrderElementsOf(ACTION_AGENTS_WITHOUT_A_MODULE);
@@ -58,7 +58,7 @@ class LegacyAgentFallThroughGuardTest extends BaseTi4Test {
         assertThat(selectedAgents).isNotEmpty();
         assertThat(selectedAgents)
                 .as("a getAgentSelection_<id> picker sends exhaustAgent_<id>_<faction>, which needs a module")
-                .allSatisfy(id -> assertThat(LeaderAgents.findAgent(id)).isPresent());
+                .allSatisfy(id -> assertThat(LeaderAgents.isRegistered(id)).isTrue());
     }
 
     private static Stream<String> agentSelections(Path file) {

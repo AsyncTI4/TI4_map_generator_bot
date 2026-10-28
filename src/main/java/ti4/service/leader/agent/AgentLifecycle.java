@@ -37,7 +37,6 @@ import ti4.spring.service.gameevent.GameSubEvent;
 @UtilityClass
 public class AgentLifecycle {
 
-    private static final String GENOME = "Genome";
     private static final List<String> MESSAGES_TO_DELETE_WHOLE = List.of(
             "choose the user of the agent",
             "please choose the target",
@@ -113,16 +112,6 @@ public class AgentLifecycle {
                         player.getCorrectChannel().getName());
     }
 
-    public static String agentName(String cardName, boolean viaYssaril) {
-        if (cardName.endsWith(GENOME)) {
-            return viaYssaril ? "the Clever Clever _" + cardName + "_" : "the _" + cardName + "_";
-        }
-        if (!viaYssaril) {
-            return cardName + " agent";
-        }
-        return "Clever Clever " + cardName + "/Yssaril agent";
-    }
-
     public static String agentNameForHolder(Game game, Player holder, String leaderId) {
         return agentName(game, leaderId, holdsOnlyAYssarilCopy(holder, leaderId));
     }
@@ -142,12 +131,8 @@ public class AgentLifecycle {
     }
 
     public static String agentName(Game game, String leaderId, boolean viaYssaril) {
-        return agentName(cardName(game, leaderId), viaYssaril);
-    }
-
-    static String cardName(Game game, String leaderId) {
-        return AgentModule.twilightsFallName(game, leaderId)
-                .orElseGet(() -> LeaderAgents.find(game, leaderId).displayName(leaderId));
+        AgentModule<?> module = LeaderAgents.find(game, leaderId);
+        return module.reference(module.displayName(leaderId), viaYssaril);
     }
 
     static boolean holdsOnlyAYssarilCopy(Player player, String agentId) {

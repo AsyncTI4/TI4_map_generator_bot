@@ -1,4 +1,4 @@
-package ti4.service.leader.agent.modules.homebrew.tknova;
+package ti4.service.leader.genome.homebrew.tknova;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,19 +11,19 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.service.leader.agent.AgentTargets;
 import ti4.service.leader.agent.AgentUse;
 import ti4.service.leader.agent.modules.YinAgent;
+import ti4.service.leader.genome.Genome;
 
-public final class SplittingGenomeAgent extends AgentModule<SplittingGenomeAgent.Replacement> {
+public final class SplittingGenome extends Genome<SplittingGenome.Replacement> {
 
     static final String ID = "tknovasplittingagent";
     private static final String OFFER_STEP = "tknovaSplittingOffer_";
 
-    public SplittingGenomeAgent() {
+    public SplittingGenome() {
         super(ID, "Splitting Genome");
     }
 

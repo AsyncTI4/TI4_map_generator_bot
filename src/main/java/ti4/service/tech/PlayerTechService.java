@@ -84,7 +84,7 @@ import ti4.service.leader.agent.modules.JolNarAgent;
 import ti4.service.leader.agent.modules.homebrew.MirvedaAgent;
 import ti4.service.leader.agent.modules.homebrew.VeldyrAgent;
 import ti4.service.leader.agent.modules.homebrew.ZealotsAgent;
-import ti4.service.leader.agent.modules.twilightsfall.ExperimentalGenomeAgent;
+import ti4.service.leader.genome.ExperimentalGenome;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
@@ -1202,7 +1202,7 @@ public class PlayerTechService {
             buttons.add(JolNarAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("experimentalagent")) {
-            buttons.add(ExperimentalGenomeAgent.button(player));
+            buttons.add(ExperimentalGenome.button(player));
         }
         if (player.hasUnexhaustedLeader("veldyragent")) {
             buttons.add(VeldyrAgent.button(player));
