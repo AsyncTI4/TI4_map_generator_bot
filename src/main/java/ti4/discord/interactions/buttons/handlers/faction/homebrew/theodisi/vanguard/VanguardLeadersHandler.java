@@ -66,11 +66,7 @@ public class VanguardLeadersHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveVanguardAgentTarget(Game game, Player target) {
-        if (game == null || target == null) {
-            return;
-        }
-
+    public static List<Button> agentPlanetButtons(Game game, Player target) {
         List<Button> buttons = new ArrayList<>();
         Tile homeSystem = target.getHomeSystemTile();
         for (Tile tile : game.getTileMap().values()) {
@@ -85,19 +81,7 @@ public class VanguardLeadersHandler {
                 }
             }
         }
-
-        if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    target.getCorrectChannel(),
-                    target.getRepresentation() + " has no eligible non-home planet containing their ground forces.");
-            return;
-        }
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                target.getCorrectChannel(),
-                target.getRepresentation()
-                        + ", choose a non-home planet containing your ground forces for _Shieldmaiden Gabriella_.",
-                buttons);
+        return buttons;
     }
 
     @ButtonHandler(SELECT_PLANET)

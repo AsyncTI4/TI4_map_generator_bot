@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.draft.mantistile;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
@@ -11,9 +12,13 @@ import ti4.service.draft.draftables.MantisTileDraftable;
 class MantisTileDraftableConfigure extends GameStateSubcommand {
     protected MantisTileDraftableConfigure() {
         super(Constants.DRAFT_MANTIS_TILE_CONFIGURE, "Configure the mantis tile draftable", true, false);
-        addOption(OptionType.INTEGER, "mulligans", "Number of mulligans during map build", false);
-        addOption(OptionType.INTEGER, "extra_blues", "Number of extra blue tiles during map build", false);
-        addOption(OptionType.INTEGER, "extra_reds", "Number of extra red tiles during map build", false);
+        addOptions(new OptionData(OptionType.INTEGER, "mulligans", "Number of mulligans during map build", false)
+                .setRequiredRange(0, 10));
+        addOptions(
+                new OptionData(OptionType.INTEGER, "extra_blues", "Number of extra blue tiles during map build", false)
+                        .setRequiredRange(0, 50));
+        addOptions(new OptionData(OptionType.INTEGER, "extra_reds", "Number of extra red tiles during map build", false)
+                .setRequiredRange(0, 50));
         addOption(OptionType.STRING, "mulliganed_tiles", "Which tiles have been mulliganed (comma-separated)", false);
         addOption(OptionType.STRING, "discarded_tiles", "Which tiles have been discarded (comma-separated)", false);
     }

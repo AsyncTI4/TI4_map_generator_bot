@@ -8,8 +8,8 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
 import ti4.service.map.CustomHyperlaneService;
 
 public class MoveTile extends GameStateSubcommand {
@@ -41,7 +41,7 @@ public class MoveTile extends GameStateSubcommand {
                     event.getChannel(), "Oops, a tile already exists here: " + tileToPosition);
             return;
         }
-        if (!PositionMapper.isTilePositionValid(tileToPosition)) {
+        if (!MapPositionMapper.isTilePositionValid(getGame(), tileToPosition)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid position: " + tileToPosition);
             return;
         }

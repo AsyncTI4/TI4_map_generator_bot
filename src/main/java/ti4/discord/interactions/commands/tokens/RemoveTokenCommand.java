@@ -15,8 +15,9 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
+import ti4.image.io.ImageResources;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.map.TokenPlanetService;
 import ti4.service.planet.PlanetService;
 
@@ -43,13 +44,13 @@ public class RemoveTokenCommand extends AddRemoveTokenCommand {
             tokenName = AliasHandler.resolveAttachment(tokenName);
 
             String tokenID = Mapper.getAttachmentImagePath(tokenName);
-            String tokenPath = Tile.getAttachmentPath(tokenID);
+            String tokenPath = ImageResources.attachment(tokenID);
             if (tokenPath != null) {
                 removeToken(event, tile, tokenID, true);
                 game.clearPlanetsCache();
             } else {
                 tokenID = Mapper.getTokenID(tokenName);
-                tokenPath = Tile.getTokenPath(tokenID);
+                tokenPath = ImageResources.tokenOrAttachment(tokenID);
 
                 if (tokenPath == null) {
                     MessageHelper.replyToMessage(event, "Token: " + tokenName + " is not valid");

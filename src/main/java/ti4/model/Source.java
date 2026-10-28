@@ -50,7 +50,7 @@ public class Source {
         lost_star_charts_of_ixth,
         flagshipping,
         promises_promises,
-        balacasi,
+        wftv,
         viability_patch,
         beans,
         endlesst,
@@ -58,10 +58,12 @@ public class Source {
         gamma,
         black_spectrum,
         addiction,
+        oplusplus,
         expanded_fracture,
         muaat_mania,
         erwans_gambit,
         goose,
+        thirtyk,
 
         // async homebrew
         draft,
@@ -99,6 +101,7 @@ public class Source {
         combosloth,
         newdawn,
         deepreaches,
+        merford,
 
         // eronous' stuff
         eronous,
@@ -239,10 +242,13 @@ public class Source {
                 case omega_phase -> "Omega Phase [Homebrew]";
                 case voices_of_the_council -> "Voices of the Council [Homebrew]";
                 case theodisi -> "Lost Legacies [Homebrew]";
+                case merford -> "Refracture Project";
                 case gamma -> "Gamma Galaxies [Homebrew]";
                 case black_spectrum -> "Black Spectrum [Homebrew]";
                 case addiction -> "TI Addiction [Homebrew]";
+                case oplusplus -> "O++ [Homebrew]";
                 case goose -> "Homebrew from Goose [Homebrew]";
+                case thirtyk -> "30k Content Lab / JMSC [Homebrew]";
                 default -> toString();
             };
         }

@@ -4,13 +4,15 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.RelicModel;
+import ti4.service.explore.BlueReverieArtifactService;
 import ti4.service.info.RelicInfoService;
 
 class RelicPurge extends GameStateSubcommand {
@@ -33,18 +35,28 @@ class RelicPurge extends GameStateSubcommand {
                     event, "Invalid relic or player does not have specified relic: " + relicId);
             return;
         }
-        player.removeRelic(relicId);
-        player.removeExhaustedRelic(relicId);
-        OblivionUnitHandler.doOblivionMechCheck(getGame(), player);
+        boolean discardedSalvage = IronSalvageRelicHandler.isSalvageRelic(relicId);
+        boolean discardedArtifact = BlueReverieArtifactService.discardArtifact(getGame(), player, relicId);
+        if (!discardedArtifact) {
+            player.removeRelic(relicId);
+            player.removeExhaustedRelic(relicId);
+        }
+        if (!discardedArtifact) {
+            OblivionUnitHandler.doOblivionMechCheck(getGame(), player);
+        }
         RelicModel relicData = Mapper.getRelic(relicId);
         if (relicData != null) {
-            MessageHelper.sendMessageToEventChannel(
-                    event,
-                    player.getRepresentation() + " purged the relic _" + relicData.getName() + "_.\n> "
+            MessageHelper.sendMessageToChannel(
+                    getGame().isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
+                    player.getRepresentation()
+                            + (discardedArtifact || discardedSalvage ? " discarded _" : " purged the relic _")
+                            + relicData.getName() + "_.\n> "
                             + relicData.getText());
             RelicInfoService.sendRelicInfo(getGame(), player, event);
         } else {
-            MessageHelper.sendMessageToEventChannel(event, "Good job, purged that bad relic.");
+            MessageHelper.sendMessageToChannel(
+                    getGame().isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
+                    "Good job, purged that bad relic.");
         }
     }
 }

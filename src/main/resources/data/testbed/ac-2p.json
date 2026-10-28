@@ -1,0 +1,9 @@
+{
+  "name": "ac-2p",
+  "description": "Two seats in the action phase holding known action cards and no random draws, for scripts that play cards.",
+  "fog": false,
+  "you": { "faction": "sol", "sc": 1, "acs": ["economic_initiative"] },
+  "seats": [ { "faction": "hacan", "sc": 5, "acs": ["sabo1"] } ],
+  "defaults": { "tg": 3, "ccs": "3/3/2" },
+  "start": "action"
+}

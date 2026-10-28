@@ -7,9 +7,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
 
 class ExploreDrawAndDiscard extends GameStateSubcommand {
 
@@ -19,13 +19,13 @@ class ExploreDrawAndDiscard extends GameStateSubcommand {
                 new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.")
                         .setRequired(true)
                         .setAutoComplete(true),
-                new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of cards to draw (default 1)"));
+                new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of cards to draw (default 1)")
+                        .setRequiredRange(1, 20));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
-        count = Math.max(count, 1);
+        int count = Math.clamp(event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt), 1, 20);
 
         StringBuilder sb = new StringBuilder();
         Game game = getGame();
@@ -38,5 +38,10 @@ class ExploreDrawAndDiscard extends GameStateSubcommand {
         sb.append("Cards have been discarded. Resolve effects and/or purge manually.\n");
         sb.append("To choose a card to keep/use, run this command: `/explore use explore_card_id:{ID}`");
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

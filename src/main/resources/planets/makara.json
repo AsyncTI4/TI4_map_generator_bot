@@ -1,0 +1,24 @@
+{
+    "id": "makara",
+    "tileId": "fracture35",
+    "name": "Makara",
+    "aliases": [
+        "makara",
+        "mak"
+    ],
+    "resources": 2,
+    "influence": 2,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "planetLayout": {
+        "unitHolderName": "makara",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 171.0,
+            "y": 131.0
+        }
+    },
+    "flavorText": "*Swept by toxic, sulfurous winds, this pale desert world conceals subterranean aquatic trenches where ancient sea leviaths breed in the dark.*",
+    "source": "merford"
+}

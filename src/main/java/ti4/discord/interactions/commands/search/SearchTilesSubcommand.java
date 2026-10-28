@@ -11,10 +11,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 
 class SearchTilesSubcommand extends SearchComponentModelSubcommand {
@@ -37,8 +37,10 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
                         OptionType.BOOLEAN,
                         Constants.INCLUDE_ALIASES,
                         "True to also show the available aliases you can use"),
-                new OptionData(OptionType.INTEGER, MIN_NUM_PLANET, "Minimum number of planets on tiles"),
-                new OptionData(OptionType.INTEGER, MAX_NUM_PLANET, "Maximum number of planets on tiles"),
+                new OptionData(OptionType.INTEGER, MIN_NUM_PLANET, "Minimum number of planets on tiles")
+                        .setRequiredRange(0, 10),
+                new OptionData(OptionType.INTEGER, MAX_NUM_PLANET, "Maximum number of planets on tiles")
+                        .setRequiredRange(0, 10),
                 new OptionData(OptionType.BOOLEAN, INCLUDE_DRAFT_TILES, "Include tiles used for drafting"),
                 new OptionData(OptionType.BOOLEAN, INCLUDE_HYPERLANES, "Include Hyperlane tiles"),
                 new OptionData(

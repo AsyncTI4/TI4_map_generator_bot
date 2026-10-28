@@ -9,12 +9,14 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.SanityLimits;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
@@ -88,7 +90,10 @@ public class AddUnitService {
             return;
         }
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
-        for (ParsedUnit parsedUnit : parsedUnits) {
+        for (ParsedUnit requested : parsedUnits) {
+            ParsedUnit parsedUnit =
+                    limitToSupply(event, game, tile, requested, unreturned(requested.unitKey(), removed));
+            if (parsedUnit.count() <= 0) continue;
             List<Integer> states = pickStatesForAddedUnit(parsedUnit, removed);
             tile.getUnitHolders().get(parsedUnit.location()).addUnitsWithStates(parsedUnit.unitKey(), states);
             tile = FlipTileService.flipTileIfNeeded(tile, game);
@@ -111,7 +116,9 @@ public class AddUnitService {
             return;
         }
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
-        for (ParsedUnit parsedUnit : parsedUnits) {
+        for (ParsedUnit requested : parsedUnits) {
+            ParsedUnit parsedUnit = limitToSupply(event, game, tile, requested, 0);
+            if (parsedUnit.count() <= 0) continue;
             tile.addUnit(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count());
             tile = FlipTileService.flipTileIfNeeded(tile, game);
             AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
@@ -222,6 +229,41 @@ public class AddUnitService {
         checkFleetCapacity(tile, color, game);
     }
 
+    private static int unreturned(Units.UnitKey unitKey, List<RemovedUnit> removed) {
+        return removed.stream()
+                .filter(unit -> unit.unitKey().equals(unitKey))
+                .mapToInt(RemovedUnit::getTotalRemoved)
+                .sum();
+    }
+
+    private static ParsedUnit limitToSupply(
+            GenericInteractionCreateEvent event, Game game, Tile tile, ParsedUnit requested, int returning) {
+        int allowed = returning + spawnableCount(game, tile, requested.unitKey(), returning);
+        if (requested.count() <= allowed) return requested;
+        if (event != null) {
+            boolean tokenBacked = SanityLimits.isTokenBacked(requested.unitKey().unitType());
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "Only " + allowed + " of the " + requested.count() + " requested "
+                            + requested.unitKey().unitType().humanReadableName() + " units were placed: "
+                            + (tokenBacked
+                                    ? "a system can hold at most " + SanityLimits.INFANTRY_AND_FIGHTERS_PER_TILE + "."
+                                    : "that is all that is left in reinforcements."));
+        }
+        return new ParsedUnit(requested.unitKey(), allowed, requested.location());
+    }
+
+    private static int spawnableCount(Game game, Tile tile, Units.UnitKey unitKey, int returning) {
+        if (SanityLimits.isTokenBacked(unitKey.unitType())) {
+            int inTile = tile.getUnitHolders().values().stream()
+                    .mapToInt(unitHolder -> unitHolder.getUnitCount(unitKey))
+                    .sum();
+            return Math.max(0, SanityLimits.INFANTRY_AND_FIGHTERS_PER_TILE - inTile - returning);
+        }
+        int onBoard = ButtonHelper.getNumberOfUnitsOnTheBoard(game, unitKey);
+        return Math.max(0, SanityLimits.reinforcementLimit(game, unitKey) - onBoard - returning);
+    }
+
     private static void handleFogOfWar(Tile tile, String color, Game game, String unitList) {
         if (!game.isFowMode()) return;
 
@@ -261,6 +303,9 @@ public class AddUnitService {
         if (unitKey.unitType() == UnitType.Aurelion) {
             ThronesUnitHandler.syncAurelionStation(game, player);
         }
+        if (player.hasUnit("stoneborn_flagship") && unitKey.unitType() == UnitType.Flagship) {
+            StonebornUnitHandler.syncMobileMountain(game, player);
+        }
         if (player.ownsUnit("veylor_mech")) {
             VeylorUnitHandler.checkVeylorMech(game);
         }
@@ -277,13 +322,14 @@ public class AddUnitService {
                 player,
                 "dream",
                 "myrr",
-                "natau",
                 "oblivion",
                 "revenantxytheris",
                 "thrones",
                 "crystellum",
                 "scrapyard",
-                "thurviali");
+                "thurviali",
+                "sarcosa",
+                "xin");
     }
 
     private static void checkFleetCapacity(Tile tile, String color, Game game) {

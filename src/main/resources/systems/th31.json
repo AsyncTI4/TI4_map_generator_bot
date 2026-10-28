@@ -1,0 +1,22 @@
+{
+    "id": "th31",
+    "name": "Tael/Soryn/Eline",
+    "aliases": [
+        "th31",
+        "tael",
+        "soryn",
+        "eline"
+    ],
+    "imagePath": "th31.png",
+    "planets": [
+        "tael",
+        "soryn",
+        "eline"
+    ],
+    "shipPositionsType": "TYPE06",
+    "wormholes": [
+        "BETA"
+    ],
+    "tileBack": "blue",
+    "source": "theodisi"
+}

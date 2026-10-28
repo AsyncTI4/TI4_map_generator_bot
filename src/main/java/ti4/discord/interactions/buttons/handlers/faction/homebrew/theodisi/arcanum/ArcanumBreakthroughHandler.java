@@ -18,8 +18,8 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
@@ -47,7 +47,7 @@ public class ArcanumBreakthroughHandler {
         List<Button> buttons = List.of(
                 Buttons.green(
                         player.factionButtonChecker() + FLIP_ON_GAIN, "Flip Power Word: Wish", FactionEmojis.arcanum),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),

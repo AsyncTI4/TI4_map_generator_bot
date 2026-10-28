@@ -16,10 +16,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
@@ -29,8 +29,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -38,6 +39,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.BlueReverieHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
@@ -53,16 +55,18 @@ import ti4.helpers.PatternHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
 import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.helpers.thundersedge.TeHelperTechs;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.TechSummariesMetadataManager;
@@ -74,6 +78,13 @@ import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.AgentLifecycle;
+import ti4.service.leader.agent.modules.JolNarAgent;
+import ti4.service.leader.agent.modules.homebrew.MirvedaAgent;
+import ti4.service.leader.agent.modules.homebrew.VeldyrAgent;
+import ti4.service.leader.agent.modules.homebrew.ZealotsAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.NetrunnersAgent;
+import ti4.service.leader.genome.ExperimentalGenome;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
@@ -85,6 +96,7 @@ import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
 import ti4.spring.service.gameevent.GameSubEvent;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 @UtilityClass
 public class PlayerTechService {
@@ -92,12 +104,13 @@ public class PlayerTechService {
     public static void addTech(GenericInteractionCreateEvent event, Game game, Player player, String techID) {
         boolean gainedTech = !player.hasTech(techID);
         player.addTech(techID);
+        BlueReverieHelper.checkXinHarmony(game, player);
         if (gainedTech) {
             WhiteTfUnitHandler.offerMechRemoval(event, game, player, techID);
         }
-        NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
-        NetrunnersUnitsHandler.offerLegionDeploy(game, player);
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
+        NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
+        NetrunnersTechHandler.resolveDataMining(event, game, player, techID);
         String message = player.getRepresentation() + " added technology: "
                 + Mapper.getTech(techID).getRepresentation(false) + ".";
         if ("iihq".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
@@ -123,8 +136,12 @@ public class PlayerTechService {
             message += "\nAdded _Fabricate Station_ and its planet cards to your play area.";
         }
         CommanderUnlockCheckService.checkPlayer(
-                player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum", "netrunners", "revenantvanguard");
+                player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum", "revenantvanguard");
         MessageHelper.sendMessageToEventChannel(event, message);
+        if (gainedTech) {
+            NetrunnersAgent.offerAfterGainingTech(event, game, player, techID);
+            NetrunnersUnitHandler.offerNimdaDeploy(game, player);
+        }
     }
 
     @ButtonHandler("removeSingularity")
@@ -226,6 +243,10 @@ public class PlayerTechService {
             }
             tech = "dskortg";
         }
+        if (tech.startsWith("aws_")) {
+            pos = tech.substring("aws_".length());
+            tech = "aws";
+        }
         String inf = "";
         if (tech.contains("_inf") && tech.contains("absol_aida")) {
             tech = tech.replace("_inf", "");
@@ -278,10 +299,14 @@ public class PlayerTechService {
         }
 
         player.exhaustTech(tech);
-        NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
+        if (isComponentActionTech(game, player, techModel)) {
+            TurnActionLog.recordComponent(game, "tech");
+        }
         if (!GameEventDraft.stage(game, new GameSubEvent.TechExhausted(player.getFaction(), tech))) {
             GameEventService.commit(game, GameEventType.CARD_PLAY_TECH_EXHAUST, player, Map.of("cardId", tech));
         }
+
+        NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
 
         // Handle Ignis Aurora Techs
         if (tech.startsWith("baldrick_")) {
@@ -294,10 +319,21 @@ public class PlayerTechService {
                 ThurvialiTechHandler.resolveRestructuring(game, player);
                 deleteTheOneButtonIfButtonEvent(event);
             }
+            case "thmorphag" -> {
+                List<Button> buttons = ActionCardHelper.getDiscardActionCardButtonsWithSuffix(player, "hydromorphic");
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentationUnfogged()
+                                + ", discard 1 Action Card to draw 1 Action Card and 1 Hydromorphic card.",
+                        buttons);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
+            case "benetrunnersmo" -> NetrunnersTechHandler.resolveMimeticOverride(event, game, player);
             case "ththurvialib" -> {
                 ThurvialiTechHandler.resolveMutualism(game, player);
                 deleteTheOneButtonIfButtonEvent(event);
             }
+            case "aws" -> BlueReverieTechHelper.offerAtmanWeaveSuppressorsPlanets(event, game, player, pos);
             case "tharcanumbg" -> {
                 ArcanumTechHandler.resolveSealOfRevelation(event, game, player);
                 deleteTheOneButtonIfButtonEvent(event);
@@ -516,7 +552,7 @@ public class PlayerTechService {
             case "baarvag" -> { // Mageon
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
+                buttons.add(Buttons.DRAW_1_ACTION_CARD_DELETE);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         player.getRepresentationUnfogged() + ", use buttons to discard.",
@@ -533,7 +569,7 @@ public class PlayerTechService {
                         "Purging a relic fragment or spending a command token (and exhausting technology) is not automated at this time.");
                 ButtonHelperAgents.moveShipToAdjacentSystemStep1(game, player, null);
             }
-            case "executiveorder" -> TeHelperTechs.postExecutiveOrderButtons(event, game, player);
+            case "executiveorder", "executiveorder_br" -> TeHelperTechs.postExecutiveOrderButtons(event, game, player);
             case "nekroc4r", "nanomachines", "tf-nanomachines" -> {
                 List<Button> buttons = ButtonHelperFactionSpecific.getc4RedTechButtons(player);
                 String message = player.getRepresentation() + ", please choose one of the options for this technology:";
@@ -544,7 +580,7 @@ public class PlayerTechService {
                 deleteTheOneButtonIfButtonEvent(event);
                 ActionCardHelper.doRise(player, event, game);
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-                Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+                Button doneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
                 buttons.add(doneExhausting);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
@@ -597,7 +633,6 @@ public class PlayerTechService {
                             "reparationsStep3_" + player.getFaction() + "_" + planet,
                             Helper.getPlanetRepresentation(planet, game)));
                 }
-                ButtonHelper.deleteMessage(event);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged() + ", please choose the planet you wish to exhaust.",
@@ -689,6 +724,14 @@ public class PlayerTechService {
                 ArcanumPrimordialTechHandler.resolvePowerWordPlaneShift(event, game, player);
                 deleteTheOneButtonIfButtonEvent(event);
             }
+            case "gd_br" -> {
+                BlueReverieTechHelper.exhaustGravityDrive(game, player);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
+            case "is_br" -> {
+                BlueReverieTechHelper.offerInheritanceSystemsBr(event, game, player);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
             default ->
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), "> This technology is not automated. Please resolve manually.");
@@ -732,6 +775,12 @@ public class PlayerTechService {
             buttons.add(Buttons.gray(id, label, emoji));
         }
         return buttons;
+    }
+
+    private static boolean isComponentActionTech(Game game, Player player, TechnologyModel techModel) {
+        return "action".equalsIgnoreCase(game.getPhaseOfGame())
+                && player.isActivePlayer()
+                && techModel.getText().contains("ACTION");
     }
 
     public static void checkAndApplyCombatMods(GenericInteractionCreateEvent event, Player player, String techID) {
@@ -821,13 +870,37 @@ public class PlayerTechService {
             CommanderUnlockCheckService.checkPlayer(player, "zealots");
         }
         player.addTech(techID);
-        NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
-        NetrunnersUnitsHandler.offerLegionDeploy(game, player);
+        BlueReverieHelper.checkXinHarmony(game, player);
+        NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
+        NetrunnersTechHandler.resolveDataMining(event, game, player, techID);
+        NetrunnersAgent.offerAfterGainingTech(event, game, player, techID);
+        NetrunnersUnitHandler.offerNimdaDeploy(game, player);
         if (isResearch) {
             MonumentsTEButtonHandler.offerEpiphanyResearchButtons(game, player, techM);
+            VyserixLeaderHandler.resolveCommanderOnResearch(game, player, techM);
         }
+        if (player.hasTech("dxa_br") && !player.hasTechReady("dxa_br")) {
+            player.refreshTech("dxa_br");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " gained a technology, and so has readied _Daxcive Animators_.");
+        }
+        String researchSource = shareKnowledge
+                ? "SHARE_KNOWLEDGE"
+                : dwsBreakthrough ? "BREAKTHROUGH" : !isResearch ? "COMPONENT" : "RESEARCH";
         GameEventService.commit(
-                game, GameEventType.TECH_RESEARCHED, player, Map.of("techId", techID, "paymentType", paymentType));
+                game,
+                GameEventType.TECH_RESEARCHED,
+                player,
+                Map.of(
+                        "techId",
+                        techID,
+                        "paymentType",
+                        paymentType,
+                        "paymentRequired",
+                        paymentRequired,
+                        "source",
+                        researchSource));
         if (buttonIDComponents.contains("scrollOfAscension")) {
             ArcanumPromissoryHandler.offerScrollOwnerTechGain(game, player, techID);
         }
@@ -843,10 +916,7 @@ public class PlayerTechService {
             }
             if (player.hasUnexhaustedLeader("mirvedaagent") && player.getStrategicCC() > 0) {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.gray(
-                        "exhaustAgent_mirvedaagent_" + player.getFaction(),
-                        "Use Mirveda Agent",
-                        FactionEmojis.mirveda));
+                buttons.add(MirvedaAgent.button(player));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         player.getRepresentationUnfogged()
@@ -905,17 +975,13 @@ public class PlayerTechService {
         }
 
         if (player.hasUnexhaustedLeader("zealotsagent")) {
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.gray(
-                    "exhaustAgent_zealotsagent_" + player.getFaction(), "Use Rhodun Agent", FactionEmojis.zealots));
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged()
-                            + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                            + "Priestess Tuh, the Rhodun"
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                            + " agent, to produce 1 ship at home or in a system where you have a technology specialty planet.",
-                    buttons);
+            ZealotsAgent.button(game, player)
+                    .ifPresent(button -> MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(),
+                            player.getRepresentationUnfogged()
+                                    + " you may use " + AgentLifecycle.agentNameForHolder(game, player, "zealotsagent")
+                                    + ", to produce 1 ship at home or in a system where you have a technology specialty planet.",
+                            List.of(button)));
         }
 
         if (shareKnowledge) {
@@ -923,6 +989,9 @@ public class PlayerTechService {
             message.append(" - This tech will be automatically removed at the end of the next status phase");
         }
         if (isResearch) {
+            if (techM.getFirstType() == TechnologyType.UNITUPGRADE) {
+                CommanderUnlockCheckService.checkPlayer(player, "dihmohn");
+            }
             ButtonHelperFactionSpecific.resolveResearchAgreementCheck(player, techID, game);
         }
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
@@ -977,8 +1046,7 @@ public class PlayerTechService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), buttonText, buttons);
         }
-        CommanderUnlockCheckService.checkPlayer(
-                player, "jolnar", "nekro", "mirveda", "dihmohn", "kryxos", "arcanum", "netrunners");
+        CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda", "kryxos", "arcanum");
 
         if (game.isTwilightsFallMode()
                 && game.getRound() == 1
@@ -1042,14 +1110,6 @@ public class PlayerTechService {
                     new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2, buttons2);
         }
-        if (NatauDoctrineHandler.canUseKnowledgeExhaust(player)
-                && !NatauDoctrineHandler.eligibleKnowledgePlanets(player).isEmpty()) {
-            MessageHelper.sendMessageToChannelWithButton(
-                    player.getCorrectChannel(),
-                    player.getRepresentationUnfogged()
-                            + ", after researching a technology, you may exhaust _Knowledge_ and 1 planet you control that has a technology specialty to research a technology of that color.",
-                    NatauDoctrineHandler.getUseKnowledgeButton(player));
-        }
 
         ButtonHelper.deleteMessage(event);
     }
@@ -1087,13 +1147,13 @@ public class PlayerTechService {
             Button aiDEVButton = Buttons.red("exhaustTech_absol_aida" + inf, "Exhaust AI Development Algorithm");
             buttons.add(aiDEVButton);
         }
+        if (NetrunnersPromissoryHandler.canUseSharedNetworkAccess(player, techM)) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "useSharedNetworkAccess_" + tech, "Use Shared Network Access"));
+        }
         buttons.addAll(ArcanumUnitHandler.getRuneboundPrerequisiteSkipButtons(game, player, tech, payType));
         if ("res".equals(payType)) {
             buttons.addAll(dwsCommanders);
-        }
-        Button netrunnersAgentDiscount = NetrunnersLeadersHandler.getAgentDiscountButton(game, player, tech, payType);
-        if (netrunnersAgentDiscount != null) {
-            buttons.add(netrunnersAgentDiscount);
         }
         if (!techM.isUnitUpgrade() && player.hasAbility("iconoclasm")) {
             int culturalFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.CULTURAL);
@@ -1129,20 +1189,23 @@ public class PlayerTechService {
             Button inheritanceSystemsButton = Buttons.gray("exhaustTech_is", "Exhaust Inheritance Systems");
             buttons.add(inheritanceSystemsButton);
         }
+        if (player.hasTechReady("is_br")) {
+            Button inheritanceSystemsButton =
+                    Buttons.gray("exhaustTech_is_br", "Exhaust Inheritance Systems", FactionEmojis.L1Z1X);
+            buttons.add(inheritanceSystemsButton);
+        }
         if (player.hasRelicReady("prophetstears")) {
             buttons.add(Buttons.red("prophetsTears_AC", "Exhaust Prophet's Tears for Action Card"));
             buttons.add(Buttons.red("prophetsTears_TechSkip", "Exhaust Prophet's Tears for Technology Prerequisite"));
         }
         if (player.hasUnexhaustedLeader("jolnaragent")) {
-            buttons.add(Buttons.gray("exhaustAgent_jolnaragent", "Use Jol-Nar Agent", FactionEmojis.Jolnar));
+            buttons.add(JolNarAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("experimentalagent")) {
-            buttons.add(
-                    Buttons.gray("exhaustAgent_experimentalagent", "Use Experimental Genome", FactionEmojis.Jolnar));
+            buttons.add(ExperimentalGenome.button(player));
         }
         if (player.hasUnexhaustedLeader("veldyragent")) {
-            buttons.add(Buttons.red(
-                    "exhaustAgent_veldyragent_" + player.getFaction(), "Use Veldyr Agent", FactionEmojis.veldyr));
+            buttons.add(VeldyrAgent.button(player));
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
             buttons.add(Buttons.gray("yinCommanderStep1_", "Remove Infantry via Yin Commander", FactionEmojis.Yin));

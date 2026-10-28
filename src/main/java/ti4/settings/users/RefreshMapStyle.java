@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public enum RefreshMapStyle {
     COMBINED("combined", "Single combined image"),
-    SPLIT("split", "Separate map & stats (in channel in Fog of War)"),
+    SPLIT("split", "Separate map & stats, posted in channel"),
     SPLIT_PRIVATE("split_private", "Separate map & stats, only visible to me");
 
     private final String value;
@@ -22,7 +22,7 @@ public enum RefreshMapStyle {
         return this != COMBINED;
     }
 
-    public boolean postsInChannelInFog() {
+    public boolean postsInChannel() {
         return this == SPLIT;
     }
 

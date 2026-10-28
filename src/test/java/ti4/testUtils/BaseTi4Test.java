@@ -16,9 +16,9 @@ import ti4.discord.interactions.selections.SelectionManager;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
-import ti4.image.TileHelper;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
+import ti4.model.TileHelper;
 import ti4.service.emoji.ApplicationEmojiService;
 
 /**
@@ -65,7 +65,7 @@ public class BaseTi4Test {
 
         // Init base static data
         TileHelper.init();
-        PositionMapper.init();
+        MapPositionMapper.init();
         Mapper.init();
         AliasHandler.init();
         Storage.init();

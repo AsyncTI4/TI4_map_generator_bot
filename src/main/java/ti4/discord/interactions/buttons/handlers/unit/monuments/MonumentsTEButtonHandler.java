@@ -153,7 +153,7 @@ public class MonumentsTEButtonHandler {
         boolean ping = payload.length == 4 && "1".equals(payload[1]);
         boolean useTactic = payload.length == 4 && "1".equals(payload[2]);
         boolean useMonumentToken = payload.length == 4 && "use".equals(payload[3]);
-        if (tile == null || tile.hasCC(ti4.image.Mapper.getCCID(player.getColor()))) {
+        if (tile == null || tile.hasCC(ti4.model.Mapper.getCCID(player.getColor()))) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -185,17 +185,7 @@ public class MonumentsTEButtonHandler {
         if (!game.isMonumentsMode() || !hasKeleresMonument(game, player)) {
             return false;
         }
-        int commandTokenLimit = 16;
-        if (!game.getStoredValue("ccLimit").isBlank()) {
-            commandTokenLimit = Integer.parseInt(game.getStoredValue("ccLimit"));
-        }
-        if (!game.getStoredValue("ccLimit" + player.getColor()).isBlank()) {
-            commandTokenLimit = Integer.parseInt(game.getStoredValue("ccLimit" + player.getColor()));
-        }
-        if (player.hasRelic("endurance_steroids")) {
-            commandTokenLimit += 2;
-        }
-        return Helper.getCCCount(game, player.getColor()) < commandTokenLimit;
+        return Helper.getCCCount(game, player.getColor()) < player.getCommandTokenLimit();
     }
 
     // Epiphany Hollow
@@ -432,7 +422,7 @@ public class MonumentsTEButtonHandler {
             }
             String removedToken = controlTokens.removeFirst();
             setEpiphanyControlTokens(game, player, controlTokens);
-            TechnologyModel technology = ti4.image.Mapper.getTech(parts[1]);
+            TechnologyModel technology = ti4.model.Mapper.getTech(parts[1]);
             Player tokenOwner = game.getPlayerFromColorOrFaction(removedToken);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -452,7 +442,7 @@ public class MonumentsTEButtonHandler {
                 .filter(plot -> !player.getPuppetedFactionsForPlot(plot).contains(parts[1]))
                 .map(plot -> Buttons.gray(
                         player.factionButtonChecker() + SELECT_EPIPHANY_PLOT + parts[1] + "|" + plot,
-                        "Move Token to " + ti4.image.Mapper.getPlot(plot).getName(),
+                        "Move Token to " + ti4.model.Mapper.getPlot(plot).getName(),
                         FactionEmojis.Firmament))
                 .toList();
         if (buttons.isEmpty()) {

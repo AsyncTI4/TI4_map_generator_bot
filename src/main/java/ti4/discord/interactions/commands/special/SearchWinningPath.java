@@ -78,8 +78,8 @@ class SearchWinningPath extends Subcommand {
     SearchWinningPath() {
         super(Constants.SEARCH_WINNING_PATH, "List games whose winner took the provided path to victory");
         for (PathComponent component : COMPONENTS) {
-            addOptions(
-                    new OptionData(OptionType.INTEGER, component.optionName(), component.description()).setMinValue(0));
+            addOptions(new OptionData(OptionType.INTEGER, component.optionName(), component.description())
+                    .setRequiredRange(0, 99));
         }
         for (PathFlag flag : FLAGS) {
             addOptions(new OptionData(OptionType.BOOLEAN, flag.optionName(), "Did the winner score " + flag.label()));
@@ -103,9 +103,10 @@ class SearchWinningPath extends Subcommand {
         StringBuilder listedGames = new StringBuilder();
 
         ConsumeGameUtility.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilterForWonGame(event).and(game -> game.getWinner()
-                        .map(winner -> hasWinningPath(game, winner, searchedPath))
-                        .orElse(false)),
+                GameStatisticsFilterer.getGamesFilterForWonGame(event)
+                        .and(game -> game.getWinner()
+                                .map(winner -> hasWinningPath(game, winner, searchedPath))
+                                .orElse(false)),
                 game -> {
                     if (foundGames.add(game.getName()) && foundGames.size() <= MAX_GAMES_LISTED) {
                         listedGames.append(formatGame(game)).append('\n');

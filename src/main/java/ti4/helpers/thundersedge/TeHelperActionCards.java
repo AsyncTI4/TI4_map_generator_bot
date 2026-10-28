@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -50,6 +50,9 @@ import ti4.service.unit.RemoveUnitService;
 public class TeHelperActionCards {
 
     public static final String EXTREME_DURESS_AUTO_RESOLVING = "ExtremeDuressAutoResolving";
+    private static final String EXTREME_DURESS = "ExtremeDuress";
+    private static final String CRISIS_TARGET = "Crisis Target";
+    private static final String STASIS_TARGET = "Stasis Target";
     private static final Pattern DIGIT_PATTERN = Pattern.compile("\\d");
 
     public static void nop() {}
@@ -79,6 +82,7 @@ public class TeHelperActionCards {
             case "puppetsonastring" -> buttons.add(Buttons.green(ffcc + "startAction", "Start Your Action")); // preset
             case "rescue" -> buttons.add(Buttons.green(ffcc + "startRescue", "Start Rescue"));
             case "overrule" -> buttons.add(Buttons.green(ffcc + "overruleStart", "Start Overrule"));
+            case "overrule_br" -> buttons.add(Buttons.green(ffcc + "overruleBrStart", "Start Overrule"));
             case "strategize" -> buttons.add(Buttons.green(ffcc + "strategize", resolve));
         }
 
@@ -90,7 +94,7 @@ public class TeHelperActionCards {
         return false;
     }
 
-    private static List<Button> getOverruleButtons(Game game) {
+    private static List<Button> getOverruleButtons(Game game, Player player, boolean blueReverie) {
         List<Button> scButtons = new ArrayList<>();
         for (Integer sc : game.getSCList()) {
             if (sc <= 0
@@ -98,10 +102,12 @@ public class TeHelperActionCards {
             Button button;
             String label = Helper.getSCName(sc, game);
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
+            String buttonID =
+                    player.factionButtonChecker() + "winnuHero_" + sc + "_overrule" + (blueReverie ? "_br" : "");
             if (scEmoji != CardEmojis.SCBackBlank && !game.isHomebrewSCMode()) {
-                button = Buttons.gray("winnuHero_" + sc + "_overrule", label, scEmoji);
+                button = Buttons.gray(buttonID, label, scEmoji);
             } else {
-                button = Buttons.gray("winnuHero_" + sc + "_overrule", sc + " " + label);
+                button = Buttons.gray(buttonID, sc + " " + label);
             }
             scButtons.add(button);
         }
@@ -139,7 +145,7 @@ public class TeHelperActionCards {
                             + ", no other player has a readied strategy card, so there is no legal target for _Extreme Duress_ right now.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", choose the player who will experience _Extreme Duress_.",
@@ -157,12 +163,88 @@ public class TeHelperActionCards {
                     "Could not find that player. Please resolve _Extreme Duress_ manually.");
             return;
         }
-        game.removeStoredValue("ExtremeDuress");
+        game.removeStoredValue(EXTREME_DURESS);
         sendExtremeDuressResolutionButtons(target, player);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " played _Extreme Duress_ on " + target.getRepresentationNoPing() + ".");
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static void resolvePresetTurnStartCards(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (resolvePresetCrisis(event, game, player)) {
+            return;
+        }
+        resolvePresetStartOfTurnCards(event, game, player);
+    }
+
+    private static boolean resolvePresetCrisis(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (!game.getStoredValue(CRISIS_TARGET).equalsIgnoreCase(player.getColor())) {
+            return false;
+        }
+        Player crisisPlayer = findPlayerHoldingCard(game, "crisis");
+        if (crisisPlayer == null) {
+            return false;
+        }
+        game.removeStoredValue(CRISIS_TARGET);
+        ActionCardHelper.playAC(event, game, crisisPlayer, "crisis", game.getMainGameChannel());
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.red(player.factionButtonChecker() + "turnEnd", "End Turn"));
+        buttons.add(Buttons.green("crisisSabotaged_" + player.getColor(), "Delete These (If Crisis Was Sabo'd)"));
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(), player.getRepresentation() + ", please resolve _Crisis_.", buttons);
+        return true;
+    }
+
+    @ButtonHandler("crisisSabotaged_")
+    private static void crisisSabotaged(Game game, ButtonInteractionEvent event, String buttonID) {
+        ButtonHelper.deleteMessage(event);
+        Player target = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (target != null) {
+            resolvePresetStartOfTurnCards(event, game, target);
+        }
+    }
+
+    private static void resolvePresetStartOfTurnCards(GenericInteractionCreateEvent event, Game game, Player player) {
+        resolvePresetExtremeDuress(event, game, player);
+        resolvePresetStasis(event, game, player);
+    }
+
+    private static void resolvePresetExtremeDuress(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (!game.getStoredValue(EXTREME_DURESS).equalsIgnoreCase(player.getColor()) || !player.hasUnplayedSCs()) {
+            return;
+        }
+        Player duressPlayer = findPlayerHoldingCard(game, "extremeduress");
+        if (duressPlayer != null) {
+            game.removeStoredValue(EXTREME_DURESS);
+            autoResolveExtremeDuress(event, game, player, duressPlayer);
+        }
+    }
+
+    private static void resolvePresetStasis(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (!game.getStoredValue(STASIS_TARGET).equalsIgnoreCase(player.getColor())) {
+            return;
+        }
+        Player stasisPlayer = findPlayerHoldingCard(game, "tf-stasis");
+        if (stasisPlayer == null) {
+            return;
+        }
+        game.removeStoredValue(STASIS_TARGET);
+        ActionCardHelper.playAC(event, game, stasisPlayer, "tf-stasis", game.getMainGameChannel());
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(ButtonHelper.getEndTurnButton(game, player));
+        buttons.add(Buttons.green("deleteButtons", "Delete These (If Stasis Was Sabo'd)"));
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(), player.getRepresentation() + ", please resolve _Stasis_.", buttons);
+    }
+
+    private static Player findPlayerHoldingCard(Game game, String actionCardId) {
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2.getPlayableActionCards().contains(actionCardId)) {
+                return p2;
+            }
+        }
+        return null;
     }
 
     public static void autoResolveExtremeDuress(
@@ -373,7 +455,15 @@ public class TeHelperActionCards {
 
     @ButtonHandler("overruleStart")
     private static void resolveOverrule(Game game, Player player, ButtonInteractionEvent event) {
-        List<Button> buttons = getOverruleButtons(game);
+        List<Button> buttons = getOverruleButtons(game, player, false);
+        String message = "Choose the strategy card you wish to perform the primary of.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("overruleBrStart")
+    private static void resolveBlueReverieOverrule(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = getOverruleButtons(game, player, true);
         String message = "Choose the strategy card you wish to perform the primary of.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
@@ -392,8 +482,8 @@ public class TeHelperActionCards {
             buttons.add(Buttons.green("draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game)));
         }
         if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
-            buttons.add(Buttons.green("construction_spacedock", "Place A Space Dock", UnitEmojis.spacedock));
-            buttons.add(Buttons.green("construction_pds", "Place A PDS", UnitEmojis.pds));
+            buttons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
+            buttons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
         }
         if (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5)) {
             buttons.add(Buttons.green("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
@@ -431,7 +521,7 @@ public class TeHelperActionCards {
             msg2 = player.getRepresentation()
                     + ", you have no strategy tokens to deduct, so the bot did not deduct one. You should probably only resolve leadership.";
         }
-        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         ButtonHelper.deleteMessage(event);
@@ -543,7 +633,7 @@ public class TeHelperActionCards {
         String message = player.getRepresentation() + " choose a system to place the pirates! 🦜☠";
         if (allowRes) {
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-            Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), "Please pay the kind pirates.", buttons);

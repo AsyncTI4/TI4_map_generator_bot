@@ -12,9 +12,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.franken.FrankenAlternateTextService;
 
@@ -23,7 +23,6 @@ public class Leader {
     private final String id;
     private final String type;
 
-    @Setter
     private int tgCount;
 
     @Setter
@@ -34,6 +33,10 @@ public class Leader {
 
     @Setter
     private boolean active;
+
+    public void setTgCount(int tgCount) {
+        this.tgCount = SanityLimits.cap(tgCount, SanityLimits.TRADE_GOODS_ON_CARD);
+    }
 
     @JsonCreator
     public Leader(
@@ -87,9 +90,7 @@ public class Leader {
 
     @JsonIgnore
     public String getName(Game game) {
-        if (game.isTwilightsFallMode())
-            return getLeaderModel().map(LeaderModel::getTFNameIfAble).orElse(id);
-        return getLeaderModel().map(LeaderModel::getName).orElse(id);
+        return getLeaderModel().map(model -> model.getName(game)).orElse(id);
     }
 
     @JsonIgnore

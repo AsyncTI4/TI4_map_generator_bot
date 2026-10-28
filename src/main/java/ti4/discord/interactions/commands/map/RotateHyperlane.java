@@ -9,9 +9,9 @@ import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.service.map.AddTileService;
 
 class RotateHyperlane extends GameStateSubcommand {
@@ -20,7 +20,8 @@ class RotateHyperlane extends GameStateSubcommand {
         super(Constants.ROTATE_HYPERLANE, "Rotate hyperlane", true, false);
         addOptions(new OptionData(
                 OptionType.STRING, Constants.POSITION, "Tile position on map. Accepts comma separated list", true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ROTATION, "Rotation in degrees, default = 60", false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.ROTATION, "Rotation in degrees, default = 60", false)
+                .setRequiredRange(-360, 360));
     }
 
     @Override
@@ -29,7 +30,7 @@ class RotateHyperlane extends GameStateSubcommand {
         Set<String> positions = Helper.getSetFromCSV(positionOption);
 
         for (String position : positions) {
-            if (!PositionMapper.isTilePositionValid(position)) {
+            if (!MapPositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Position `" + position + "` not allowed");
                 return;
             }

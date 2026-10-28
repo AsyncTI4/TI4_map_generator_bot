@@ -8,27 +8,71 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.image.MapRenderPipeline;
-import ti4.image.Mapper;
+import ti4.helpers.FoWHelper;
+import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.StatusCleanupService;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.relic.NeuraloopService;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class RevealPublicObjectiveService {
 
+    private static void sendFogObjectiveProgress(Game game, String objectiveId) {
+        if (!FoWHelper.isFogQol01(game)) return;
+        int threshold = ListPlayerInfoService.getObjectiveThreshold(objectiveId, game);
+        PublicObjectiveModel model = Mapper.getPublicObjective(objectiveId);
+        if (threshold <= 0 || model == null) return;
+        for (Player player : game.getRealPlayers()) {
+            int progress =
+                    Math.min(ListPlayerInfoService.getPlayerProgressOnObjective(objectiveId, game, player), threshold);
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    "Your progress on **" + model.getName() + "**: " + progress + "/" + threshold + ".");
+        }
+    }
+
     private static final int WHITE_COLOR = 0xFFFFFF;
+
+    private static void recordRevealed(Game game, Map.Entry<String, Integer> objective, int stage) {
+        GameEventService.commit(
+                game,
+                GameEventType.PUBLIC_OBJECTIVE_REVEALED,
+                null,
+                Map.of("objectiveId", objective.getKey(), "stage", stage));
+    }
+
+    public static void unpinRevealedObjective(Game game, String objectiveKey) {
+        String embedTitleName = "__**" + revealedObjectiveName(objectiveKey) + "**__";
+        game.getActionsChannel()
+                .retrievePinnedMessages()
+                .queue(
+                        pins -> pins.stream()
+                                .map(pin -> pin.getMessage())
+                                .filter(message -> message.getEmbeds().stream()
+                                        .anyMatch(embed -> embed.getTitle() != null
+                                                && embed.getTitle().contains(embedTitleName)))
+                                .forEach(message -> message.unpin().queue(Consumers.nop(), BotLogger::catchRestError)),
+                        BotLogger::catchRestError);
+    }
+
+    private static String revealedObjectiveName(String objectiveKey) {
+        PublicObjectiveModel publicObjective = Mapper.getPublicObjective(objectiveKey);
+        return publicObjective == null ? objectiveKey : publicObjective.getName();
+    }
 
     public static void revealS2(Game game, GenericInteractionCreateEvent event) {
         revealS2(game, event, false);
@@ -52,6 +96,7 @@ public class RevealPublicObjectiveService {
             return;
         }
 
+        recordRevealed(game, objective, 2);
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         NeuraloopService.offerInitialNeuraloopChoice(game, objective.getKey());
         for (Player player : game.getRealPlayers()) {
@@ -94,6 +139,7 @@ public class RevealPublicObjectiveService {
                 MessageHelper.sendMessageToChannel(
                         channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
+            sendFogObjectiveProgress(game, objective.getKey());
             return;
         }
         // first do cleanup if necessary
@@ -112,6 +158,7 @@ public class RevealPublicObjectiveService {
                 MessageHelper.sendMessageToChannel(
                         channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
+            sendFogObjectiveProgress(game, objective.getKey());
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "### " + game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
@@ -128,6 +175,8 @@ public class RevealPublicObjectiveService {
     public static void revealTwoStage2(Game game, MessageChannel channel) {
         Map.Entry<String, Integer> objective1 = game.revealStage2();
         Map.Entry<String, Integer> objective2 = game.revealStage2();
+        recordRevealed(game, objective1, 2);
+        recordRevealed(game, objective2, 2);
 
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
@@ -201,6 +250,7 @@ public class RevealPublicObjectiveService {
             return null;
         }
 
+        recordRevealed(game, objective, 1);
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         var channel = game.getActionsChannel();
         MessageHelper.sendMessageToChannel(
@@ -221,6 +271,7 @@ public class RevealPublicObjectiveService {
                 MessageHelper.sendMessageToChannel(
                         channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
+            sendFogObjectiveProgress(game, objective.getKey());
             return objective.getKey();
         }
         // first do cleanup if necessary
@@ -239,6 +290,7 @@ public class RevealPublicObjectiveService {
                 MessageHelper.sendMessageToChannel(
                         channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
+            sendFogObjectiveProgress(game, objective.getKey());
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "### " + game.getPing() + ", it's time for the Status Cleanup Run!");
             if (!game.isFowMode()) {
@@ -256,6 +308,8 @@ public class RevealPublicObjectiveService {
     public static void revealTwoStage1(Game game) {
         Map.Entry<String, Integer> objective1 = game.revealStage1();
         Map.Entry<String, Integer> objective2 = game.revealStage1();
+        recordRevealed(game, objective1, 1);
+        recordRevealed(game, objective2, 1);
 
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());

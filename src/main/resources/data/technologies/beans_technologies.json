@@ -28,10 +28,10 @@
         "types": [
             "PROPULSION"
         ],
-        "requirements": "BB",
+        "requirements": "BBB",
         "faction": "crystellum",
         "source": "beans",
-        "text": "During movement, you may exhaust this card and destroy 1 of your non-fighter ships on the board to give a number of ships equal to the cost of the destroyed ship +1 move until the end of this tactical action."
+        "text": "During movement, you may exhaust this card and destroy 1 of your non-fighter ships on the board to apply +1 to the move value of a number of ships equal to the cost of the destroyed ship until the end of this tactical action."
     },
     {
         "alias": "becrysta",
@@ -42,7 +42,7 @@
         "requirements": "Y",
         "faction": "crystellum",
         "source": "beans",
-        "text": "At the start of your turn, you may exhaust this card and destroy 1 of your non-fighter ships from the board with a cost of no more than 3 to capture that many fighters from the supply."
+        "text": "At the start of your turn, you may exhaust this card and destroy 1 of your non-fighter ships with a cost of up to 3 to capture a number of fighters from the supply equal to the cost of the destroyed ship."
     },
     {
         "alias": "beasheninf",
@@ -69,26 +69,27 @@
         "text": "This unit cannot be destroyed by \"Direct Hit\" action cards. During combat, when this unit would be destroyed or uses its SUSTAIN DAMAGE ability, you may use its BOMBARDMENT ability against a planet in its system."
     },
     {
-        "alias": "beironmf",
-        "name": "Riptide II",
+        "alias": "beironsd",
+        "name": "Tideyard II",
         "types": [
             "UNITUPGRADE"
         ],
-        "requirements": "GRB",
+        "requirements": "YY",
         "faction": "iron",
+        "baseUpgrade": "sd2",
         "source": "beans",
-        "text": "When this unit is destroyed, place 1 infantry from your reinforcements on its planet. If it was in the space area, place 1 fighter instead. This unit may move without being transported. Mechs in excess of your capacity count against your fleet limit."
+        "text": "DEPLOY: At the end of a tactical action, you may remove 2 of your mechs from the active system to place 1 space dock from your reinforcements on a planet you control in the active system. Up to 8 fighters in that system do not count against your ships' capacity. PRODUCTION 7."
     },
     {
-        "alias": "beironats",
-        "name": "Advanced Targeting Systems",
+        "alias": "beironmf",
+        "name": "Modular Fleet",
         "types": [
-            "WARFARE"
+            "CYBERNETIC"
         ],
-        "requirements": "RR",
+        "requirements": "Y",
         "faction": "iron",
         "source": "beans",
-        "text": "At the start of the first round of ground combat, you may exhaust this card; for the remainder of this combat round, your mechs roll 1 additional combat die."
+        "text": "At the start of your turn, you may choose 1 of your non-fighter ships in a system that contains 1 or more of your units with PRODUCTION. Spend resources equal to the difference between that ship’s cost and the cost of another non-fighter ship in your reinforcements with a higher cost than the chosen ship to replace the chosen ship with that ship."
     },
     {
         "alias": "betaqr",
@@ -107,7 +108,7 @@
         "types": [
             "BIOTIC"
         ],
-        "requirements": "GGG",
+        "requirements": "GG",
         "faction": "ta",
         "source": "beans",
         "text": "At the end of your turn, you may exhaust this card and 1 planet you control to ready 1 other planet you control. If that planet has an ability card, you may ready it as well."
@@ -118,10 +119,10 @@
         "types": [
             "CYBERNETIC"
         ],
-        "requirements": "Y",
+        "requirements": "YY",
         "faction": "netrunners",
         "source": "beans",
-        "text": "At the start of the status phase, gain 1 trade good for every control token on your faction sheet."
+        "text": "When you gain a technology, for each other player that also owns that technology, gain 1 trade good."
     },
     {
         "alias": "benetrunnersmo",
@@ -129,31 +130,31 @@
         "types": [
             "WARFARE"
         ],
-        "requirements": "RRR",
+        "requirements": "RR",
         "faction": "netrunners",
         "source": "beans",
-        "text": "During combat, your opponent treats any technologies they own that you also own as having no ability text."
+        "text": "At the start of a round of combat, you may exhaust this card and choose 1 technology owned by both you and your opponent. During this round of combat, apply +1 to the result of a number of dice up to the number of prerequisites on that technology."
     },
     {
-        "alias": "benataudo",
-        "name": "Divine Order",
+        "alias": "benataudm",
+        "name": "Divine Manifestation",
         "types": [
-            "BIOTIC"
+            "CYBERNETIC"
         ],
-        "requirements": "G",
+        "requirements": "YY",
         "faction": "natau",
         "source": "beans",
-        "text": "During the agenda phase, after the speaker votes on an agenda: You may exhaust this card to treat your votes as if they were placed on any other outcome."
+        "text": "Each system that contains 1 or more of your units and an anomaly gains PRODUCTION 2 as if it were a unit you control."
     },
     {
-        "alias": "benataure",
-        "name": "Ritual Engine",
+        "alias": "benatauct",
+        "name": "Chaos Turbines",
         "types": [
-            "WARFARE"
+            "PROPULSION"
         ],
-        "requirements": "RRR",
+        "requirements": "BB",
         "faction": "natau",
         "source": "beans",
-        "text": "During the first round of combat, choose one of your non-fighter ships in the active system to roll X amount of extra combat dice, where X is the number of unique ship types your opponent has in the combat."
+        "text": "You may treat non-home systems that contain printed anomalies as adjacent to each other for the purposes of movement."
     }
 ]

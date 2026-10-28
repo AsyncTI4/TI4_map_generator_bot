@@ -9,8 +9,8 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 class ShowPNToAll extends GameStateSubcommand {
 
@@ -20,6 +20,7 @@ class ShowPNToAll extends GameStateSubcommand {
                         OptionType.INTEGER,
                         Constants.PROMISSORY_NOTE_ID,
                         "Promissory note ID, which is found between ()")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
     }
 

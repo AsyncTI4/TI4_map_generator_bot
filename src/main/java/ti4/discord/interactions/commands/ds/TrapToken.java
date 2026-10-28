@@ -15,11 +15,13 @@ import ti4.message.MessageHelper;
 class TrapToken extends GameStateSubcommand {
 
     TrapToken() {
-        super(Constants.LIZHO_TRAP, "Select planets were to add/remove trap tokens", true, true);
+        super(Constants.LIZHO_TRAP, "Select planets where to add/remove trap tokens", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet")
                 .setRequired(true)
                 .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.LIZHO_TRAP_ID, "Trap ID").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.LIZHO_TRAP_ID, "Trap ID")
+                .setRequiredRange(0, 999)
+                .setRequired(true));
     }
 
     @Override

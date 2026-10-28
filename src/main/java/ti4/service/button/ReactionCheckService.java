@@ -23,6 +23,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.StatusCleanupService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.game.EndGameService;
 import ti4.service.game.StartPhaseService;
 
 @UtilityClass
@@ -157,12 +158,7 @@ public class ReactionCheckService {
                 }
             }
         }
-        var endGameDeck =
-                game.isOmegaPhaseMode() ? game.getPublicObjectives1Peekable() : game.getPublicObjectives2Peekable();
-        var endGameRound = game.isOmegaPhaseMode() ? 9 : 7;
-        if ((game.getRound() > endGameRound || endGameDeck.isEmpty())
-                && !game.isRedTapeMode()
-                && !game.isCivilizedSocietyMode()) {
+        if (EndGameService.objectivesHaveRunOut(game)) {
             if (game.isFowMode()) {
                 message2 += "\n> - If there are no more objectives to reveal, use the button to continue as is.";
                 message2 += " Or end the game manually.";
@@ -172,7 +168,7 @@ public class ReactionCheckService {
                 message2 +=
                         " Whoever has the most points is crowned the winner, or whoever has the earliest initiative in the case of ties.";
 
-                buttons.add(Buttons.red("gameEnd", "End Game"));
+                buttons.add(Buttons.red(EndGameService.MOST_POINTS_END_GAME_BUTTON_ID, "End Game"));
                 buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
             }
         }
@@ -181,6 +177,12 @@ public class ReactionCheckService {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
                     "Since multiple unrevealed objectives are available and at least one has been peeked at, the buttons specify the position of the card they will reveal. The speaker gets to pick which one to reveal, per the rules.");
+            Player speaker = game.getSpeaker();
+            if (speaker != null) {
+                MessageHelper.sendMessageToChannel(
+                        speaker.getCorrectChannel(),
+                        speaker.getRepresentation() + " please choose which objective to reveal.");
+            }
         }
     }
 
@@ -237,7 +239,7 @@ public class ReactionCheckService {
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(), "Please proceed to the Edict Phase now.", buttons);
                     } else {
-                        Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
+                        Button flipAgenda = Buttons.FLIP_AGENDA;
                         List<Button> buttons = List.of(flipAgenda);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(), "Please flip agenda now.", buttons);
@@ -267,7 +269,7 @@ public class ReactionCheckService {
                                 "Please proceed to Edict Phase after the last person finishing doing gaining and redistributing command tokens.",
                                 buttons);
                     } else {
-                        Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
+                        Button flipAgenda = Buttons.FLIP_AGENDA;
                         List<Button> buttons = List.of(flipAgenda);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),

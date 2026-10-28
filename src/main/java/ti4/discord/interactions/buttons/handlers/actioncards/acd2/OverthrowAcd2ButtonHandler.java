@@ -26,7 +26,7 @@ class OverthrowAcd2ButtonHandler {
         List<Button> buttons = List.of(
                 Buttons.green(player.factionButtonChecker() + "overthrowChoosePrimary", "Perform Primary"),
                 Buttons.blue(player.factionButtonChecker() + "overthrowChooseSecondary", "Perform Secondary"),
-                Buttons.red("deleteButtons", "Done resolving"));
+                Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
@@ -77,14 +77,14 @@ class OverthrowAcd2ButtonHandler {
                 scButtons.add(Buttons.gray(buttonID, sc + " " + label));
             }
         }
-        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+        scButtons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         return scButtons;
     }
 
     private static List<Button> getSecondaryAbilityButtons(Game game) {
         List<Button> scButtons =
                 new ArrayList<>(StrategyCardSecondaryButtonService.getSecondaryAbilityButtons(game, game.getSCList()));
-        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+        scButtons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         return scButtons;
     }
 }

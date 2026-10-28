@@ -33,9 +33,16 @@ class SearchMyGames extends Subcommand {
                 OptionType.BOOLEAN, "ignore_spectate", "Do not show games you are spectating (default = true)"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
-                "ignore_aborted",
+                Constants.IGNORE_ABORTED,
                 "Do not show games that have ended without a winner (default = true)"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player to cross reference with"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.EPHEMERAL, "True to show the whole list only to you (default = false)"));
+    }
+
+    @Override
+    public boolean isEphemeral(SlashCommandInteractionEvent event) {
+        return true;
     }
 
     @Override
@@ -48,7 +55,8 @@ class SearchMyGames extends Subcommand {
                 event.getOption(Constants.SHOW_SECONDARIES, Boolean.TRUE, OptionMapping::getAsBoolean);
         boolean showGameModes = event.getOption(Constants.SHOW_GAME_MODES, Boolean.FALSE, OptionMapping::getAsBoolean);
         boolean ignoreSpectate = event.getOption("ignore_spectate", Boolean.TRUE, OptionMapping::getAsBoolean);
-        boolean ignoreAborted = event.getOption("ignore_aborted", Boolean.TRUE, OptionMapping::getAsBoolean);
+        boolean ignoreAborted = event.getOption(Constants.IGNORE_ABORTED, Boolean.TRUE, OptionMapping::getAsBoolean);
+        boolean ephemeral = event.getOption(Constants.EPHEMERAL, Boolean.FALSE, OptionMapping::getAsBoolean);
 
         User user = event.getOption(Constants.PLAYER, event.getUser(), OptionMapping::getAsUser);
         User user2 = event.getOption(Constants.PLAYER2, null, OptionMapping::getAsUser);
@@ -63,7 +71,8 @@ class SearchMyGames extends Subcommand {
                 ignoreSpectate,
                 ignoreAborted,
                 false,
-                user2);
+                user2,
+                ephemeral);
         if (amt > 0) {
             RoleService.checkIfNewUserIsInAnyGamesAndAddRole(user);
         }

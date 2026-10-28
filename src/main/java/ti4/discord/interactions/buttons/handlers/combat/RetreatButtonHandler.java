@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -17,9 +17,10 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
@@ -37,10 +38,15 @@ class RetreatButtonHandler {
         String pos = buttonID.split("_")[1];
         boolean skilled = false;
         boolean feint = false;
+        boolean ebbingFlow = buttonID.contains("hydromorphicEbbing");
         if (buttonID.contains("skilled")) {
             if (game.isTwilightsFallMode()) {
                 feint = true;
             }
+            skilled = true;
+            ButtonHelper.deleteMessage(event);
+        }
+        if (ebbingFlow) {
             skilled = true;
             ButtonHelper.deleteMessage(event);
         }
@@ -70,6 +76,11 @@ class RetreatButtonHandler {
         String message = player.getRepresentationUnfogged() + ", please choose a system to move to.";
         List<Button> retreatButtons =
                 ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, pos, skilled, feint);
+        if (ebbingFlow) {
+            retreatButtons = retreatButtons.stream()
+                    .map(button -> button.withCustomId(button.getCustomId() + "_hydromorphicEbbing"))
+                    .toList();
+        }
         if (retreatButtons.isEmpty()) {
             message = player.getRepresentationUnfogged() + ", there are no valid systems to retreat to.";
         }
@@ -97,6 +108,7 @@ class RetreatButtonHandler {
         if (player.hasUnlockedBreakthrough("kalorabt")) {
             KaloraBreakthroughHandler.bypassOperationsRetreat(player, game, game.getTileByPosition(pos1), event);
         }
+        ThirtyKExploreHooks.beforeRetreatInto(game, player, game.getTileByPosition(pos2));
         ButtonHelperModifyUnits.retreatSpaceUnits(buttonID, event, game, player);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
@@ -131,7 +143,7 @@ class RetreatButtonHandler {
             List<Button> breakthroughButtons = new ArrayList<>();
             breakthroughButtons.add(Buttons.blue(
                     player.factionButtonChecker() + "moveAvernus_" + pos2, "Retreat Avernus", FactionEmojis.Muaat));
-            breakthroughButtons.add(Buttons.red("deleteButtons", "Decline"));
+            breakthroughButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
             String breakthroughMessage = player.getRepresentationUnfogged() + ", you may move Avernus into "
                     + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".";
             MessageHelper.sendMessageToChannelWithButtons(
@@ -145,7 +157,7 @@ class RetreatButtonHandler {
             List<Button> flagButtons = new ArrayList<>();
             flagButtons.add(Buttons.blue(
                     player.factionButtonChecker() + "anarchy7Build_" + pos1, "Build in " + pos1, FactionEmojis.Muaat));
-            flagButtons.add(Buttons.red("deleteButtons", "Decline"));
+            flagButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
             String flagMessage = player.getRepresentationUnfogged()
                     + ", you may build in the system your flagship is retreating from.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), flagMessage, flagButtons);

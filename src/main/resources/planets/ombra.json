@@ -1,0 +1,27 @@
+{
+    "id": "ombra",
+    "tileId": "th30",
+    "name": "Ombra",
+    "aliases": [
+        "ombra"
+    ],
+    "resources": 1,
+    "influence": 2,
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "planetLayout": {
+        "unitHolderName": "ombra",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 201,
+            "y": 210
+        },
+        "planetRadius": 62
+    },
+    "positionInTile": {
+        "x": 201,
+        "y": 210
+    },
+    "source": "theodisi"
+}

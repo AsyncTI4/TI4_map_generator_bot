@@ -15,11 +15,13 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DisplayType;
-import ti4.image.MapRenderPipeline;
+import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.fow.MapOverviewService;
 import ti4.service.fow.MapSegmentService;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
+import ti4.service.testbed.TestBedService;
 import ti4.spring.api.image.GameImageService;
 import ti4.spring.context.SpringContext;
 
@@ -68,8 +70,9 @@ public class ShowGameService {
         MapRenderPipeline.queue(game, event, displayType, segment, fileUpload -> {
             if (includeButtons(displayType)) {
                 List<Button> buttons = Buttons.mapImageButtons(game, segment);
-                buttons.addAll(
-                        MapSegmentService.switchButtons(game, playerId, MapSegmentService.isFoggedView(game, event)));
+                buttons.addAll(MapSegmentService.switchButtons(
+                        game, MapSegmentService.viewerId(game, event), MapSegmentService.isFoggedView(game, event)));
+                MapOverviewService.overviewButton(game, event).ifPresent(buttons::add);
 
                 // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
                 MessageChannel channel = sendMessage(game, event);
@@ -98,7 +101,8 @@ public class ShowGameService {
         if (!game.isFowMode()) {
             return false;
         }
-        Player player = game.getPlayer(event.getUser().getId());
+        Player player = TestBedService.resolveActingPlayer(
+                game, event, game.getPlayer(event.getUser().getId()));
         MessageChannel privateChannel = player != null ? player.getPrivateChannel() : null;
         return !event.getClass().equals(UserOverridenGenericInteractionCreateEvent.class)
                 && game.getRealPlayers().contains(player)
@@ -126,7 +130,8 @@ public class ShowGameService {
                     event.getMessageChannel(),
                     "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
         } else if (game.isFowMode()) {
-            Player player = game.getPlayer(event.getUser().getId());
+            Player player = TestBedService.resolveActingPlayer(
+                    game, event, game.getPlayer(event.getUser().getId()));
             MessageChannel privateChannel = player != null ? player.getPrivateChannel() : null;
             if (!event.getClass().equals(UserOverridenGenericInteractionCreateEvent.class)
                     && game.getRealPlayers().contains(player)

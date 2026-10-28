@@ -1,0 +1,18 @@
+{
+  "name": "jmsc-ac-folding-turn-end",
+  "description": "Sol folds the edge system holding a Hacan destroyer and ends the turn; Hacan can still move the destroyer to another edge system afterwards.",
+  "preset": "jmsc-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "do": "hand", "as": "sol", "hand": { "acs": ["foldingofspacetimejmsc"] } },
+    { "do": "hand", "as": "hacan", "hand": { "units": { "303": "dd" } } },
+    { "as": "sol", "press": "ac_play_from_hand_{ac:foldingofspacetimejmsc}", "in": "sol:cards-info" },
+    { "as": "sol", "press": "thkAcFoldingStart", "in": "sol" },
+    { "as": "sol", "press": "thkAcFoldingTile_303", "in": "sol" },
+    { "as": "sol", "pressId": "FFCC_sol_turnEnd" },
+    { "expect": { "state": "game.activePlayer", "equals": "hacan" } },
+    { "label": "Hacan answers after Sol's turn ended", "as": "hacan", "press": "thkAcFoldingMove_303_305", "in": "hacan" },
+    { "expect": { "state": "tile.305.units", "contains": "dd=1" } },
+    { "expect": { "state": "tile.303.units", "notContains": "dd=1" } }
+  ]
+}

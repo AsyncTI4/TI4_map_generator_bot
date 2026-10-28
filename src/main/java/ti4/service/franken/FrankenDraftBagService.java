@@ -37,14 +37,14 @@ import ti4.draft.items.FactionDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.StringHelper;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
 import ti4.service.fow.GMService;
@@ -356,7 +356,7 @@ public class FrankenDraftBagService {
         List<ContainerChildComponent> components = new ArrayList<>();
         components.add(TextDisplay.of(cat.title(game)));
 
-        List<DraftItem> all = player.getDraftHand().getCategory(cat);
+        List<DraftItem> all = player.getDraftHand().getDistinctCategory(cat);
         if (all.isEmpty()) {
             return null;
         } else {
@@ -372,7 +372,7 @@ public class FrankenDraftBagService {
     }
 
     private static List<Button> getApplyButtons(Player player, DraftCategory cat) {
-        List<DraftItem> items = player.getDraftHand().getCategory(cat);
+        List<DraftItem> items = player.getDraftHand().getDistinctCategory(cat);
         List<Button> buttons = new ArrayList<>();
 
         List<String> appliedItems = player.getStoredList("appliedFrankenItems");
@@ -524,7 +524,7 @@ public class FrankenDraftBagService {
             }
             String faction = "franken" + (index <= 24 ? emojiNum.get(index - 1) : index);
             String tempHomeSystemLocation = String.valueOf(500 + index);
-            if (!Mapper.isValidFaction(faction) || !PositionMapper.isTilePositionValid(tempHomeSystemLocation)) {
+            if (!Mapper.isValidFaction(faction) || !MapPositionMapper.isTilePositionValid(tempHomeSystemLocation)) {
                 continue;
             }
 

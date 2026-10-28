@@ -26,9 +26,9 @@ import ti4.helpers.Helper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.async.DrumrollService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.DiceEmojis;
@@ -212,7 +212,7 @@ public class SilverFlameService {
             String ffcc = player.factionButtonChecker();
             scoreButtons.add(Buttons.green(
                     ffcc + "scoreSilverFlameBAM", "Score Become A Martyr", CardEmojis.SecretObjectiveAlt));
-            scoreButtons.add(Buttons.red("deleteButtons", "Decline"));
+            scoreButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
                     "You have _Become A Martyr_, and have just catastrophically lost control of a planet in your home system. "

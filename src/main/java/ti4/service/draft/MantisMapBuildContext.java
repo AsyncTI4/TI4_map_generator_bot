@@ -18,9 +18,9 @@ import ti4.draft.DraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
+import ti4.model.Mapper;
 import ti4.service.draft.draftables.MantisTileDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
 

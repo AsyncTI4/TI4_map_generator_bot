@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "game_event", uniqueConstraints = @UniqueConstraint(columnNames = {"gameName", "seq"}))
+@Table(
+        name = "game_event",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"gameName", "seq"}),
+        indexes = @Index(name = "idx_game_event_timestamp", columnList = "timestamp_epoch_millis"))
 class GameEventEntity {
 
     @Id
@@ -38,4 +42,7 @@ class GameEventEntity {
 
     @Column(columnDefinition = "TEXT")
     private String movementState;
+
+    @Column(columnDefinition = "TEXT")
+    private String playerState;
 }

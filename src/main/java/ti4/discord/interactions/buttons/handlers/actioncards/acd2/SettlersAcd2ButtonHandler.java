@@ -15,6 +15,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
@@ -28,44 +29,63 @@ class SettlersAcd2ButtonHandler {
 
     @ButtonHandler("resolveSettlers")
     public static void resolveSettlers(Player player, Game game, ButtonInteractionEvent event) {
-        Set<String> planets = new LinkedHashSet<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (tile == null) continue;
-            for (Planet uH : tile.getPlanetUnitHolders()) {
-                if (uH.isHomePlanet(game)) continue;
-                if (settlersTargetFor(game, player, uH.getName()) != null) {
-                    planets.add(uH.getName());
-                }
+        List<Button> buttons = new ArrayList<>();
+        for (Player target : game.getRealPlayers()) {
+            if (target != player && !settlersPlanets(game, target).isEmpty()) {
+                buttons.add(FoWHelper.fogSafeTargetButton(
+                        player.factionButtonChecker() + "settlersPlayer_" + target.getFaction(), "gray", target));
             }
         }
         ButtonHelper.deleteMessage(event);
-        if (planets.isEmpty()) {
+        if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
                             + ", there are no non-home planets containing another player's units for _Settlers_.");
             return;
         }
-        List<Button> buttons = new ArrayList<>();
-        for (String planet : planets) {
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + "settlersChoose_" + planet,
-                    Helper.getPlanetRepresentation(planet, game)));
-        }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", choose a non-home planet that contains another player's units"
-                        + " for _Settlers_.",
+                player.getRepresentationUnfogged() + ", choose another player to target with _Settlers_.",
+                buttons);
+    }
+
+    @ButtonHandler("settlersPlayer_")
+    public static void resolveSettlersPlayer(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player target = game.getPlayerFromColorOrFaction(buttonID.replace("settlersPlayer_", ""));
+        ButtonHelper.deleteMessage(event);
+        if (target == null || target == player) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Settlers_.");
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : settlersPlanets(game, target)) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "settlersChoose_" + target.getFaction() + "_" + planet,
+                    Helper.getPlanetRepresentation(planet, game)));
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    target.getRepresentationNoPing() + " has no units on a non-home planet to target with _Settlers_.");
+            return;
+        }
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", choose a non-home planet that contains "
+                        + target.getRepresentationNoPing() + "'s units for _Settlers_.",
                 buttons);
     }
 
     @ButtonHandler("settlersChoose_")
     public static void resolveSettlersChoose(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String planet = buttonID.replace("settlersChoose_", "");
-        Player target = settlersTargetFor(game, player, planet);
+        String[] parts = buttonID.replace("settlersChoose_", "").split("_", 2);
+        Player target = parts.length < 2 ? null : game.getPlayerFromColorOrFaction(parts[0]);
+        String planet = parts.length < 2 ? null : parts[1];
         ButtonHelper.deleteMessage(event);
-        if (target == null) {
+        if (target == null || target == player || !settlersPlanets(game, target).contains(planet)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Settlers_ there.");
             return;
         }
@@ -119,8 +139,10 @@ class SettlersAcd2ButtonHandler {
             return;
         }
 
-        // Refuse: the planet's controller exhausts it, then the acting player destroys up to 2 units on it.
-        player.exhaustPlanet(planet);
+        Player controller = game.getPlayerThatControlsPlanet(planet);
+        if (controller != null) {
+            controller.exhaustPlanet(planet);
+        }
         MessageHelper.sendMessageToChannel(
                 acting.getCorrectChannel(),
                 player.getRepresentationNoPing() + " refused _Settlers_ and exhausted "
@@ -198,18 +220,17 @@ class SettlersAcd2ButtonHandler {
                 buttons);
     }
 
-    private static Player settlersTargetFor(Game game, Player acting, String planet) {
-        Planet uH = game.getUnitHolderFromPlanet(planet);
-        if (uH == null) {
-            return null;
+    private static Set<String> settlersPlanets(Game game, Player target) {
+        Set<String> planets = new LinkedHashSet<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile == null) continue;
+            for (Planet uH : tile.getPlanetUnitHolders()) {
+                if (!uH.isHomePlanet(game)
+                        && ButtonHelper.getPlayersWithUnitsOnAPlanet(game, uH).contains(target)) {
+                    planets.add(uH.getName());
+                }
+            }
         }
-        Player controller = null;
-        Player firstOther = null;
-        for (Player p2 : ButtonHelper.getPlayersWithUnitsOnAPlanet(game, uH)) {
-            if (p2 == acting) continue;
-            if (firstOther == null) firstOther = p2;
-            if (p2.hasPlanet(planet)) controller = p2;
-        }
-        return controller != null ? controller : firstOther;
+        return planets;
     }
 }

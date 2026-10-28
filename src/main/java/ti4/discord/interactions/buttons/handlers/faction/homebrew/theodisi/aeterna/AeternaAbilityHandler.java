@@ -197,7 +197,7 @@ public class AeternaAbilityHandler {
             buttons.add(Buttons.green(player.factionButtonChecker() + "newMoonPlace", "Place a Captured Neutral Unit"));
         }
         buttons.add(Buttons.green(player.factionButtonChecker() + "newMoonCapture", "Capture 1 Neutral Cruiser"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please choose an effect for _New Moon_.", buttons);
         ButtonHelper.deleteTheOneButton(event);
@@ -294,9 +294,7 @@ public class AeternaAbilityHandler {
             GenericInteractionCreateEvent event, Game game, List<RemovedUnit> destroyedUnits, boolean combat) {
         if (destroyedUnits.isEmpty()) return;
         for (Player aeterna : game.getRealPlayers()) {
-            boolean duringAeternasTacticalAction = aeterna == game.getActivePlayer()
-                    && !game.getCurrentActiveSystem().isEmpty();
-            if (!aeterna.hasAbility("cycle_of_reclamation") || duringAeternasTacticalAction) continue;
+            if (!aeterna.hasAbility("cycle_of_reclamation")) continue;
             String actionCaptureKey = CYCLE_ACTION_CAPTURE + aeterna.getFaction();
             if (!game.getPhaseOfGame().startsWith("agenda")
                     && !game.getStoredValue(actionCaptureKey).isEmpty()) {

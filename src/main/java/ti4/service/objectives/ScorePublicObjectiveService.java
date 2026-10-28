@@ -10,10 +10,9 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.ActionCardHelper;
 import ti4.helpers.BreakthroughHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -22,9 +21,11 @@ import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StatusHelper;
-import ti4.image.Mapper;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.fow.FowScoringStatusService;
 import ti4.service.game.EndedGameScoringGuardService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.leader.HeroUnlockCheckService;
@@ -63,6 +64,7 @@ public class ScorePublicObjectiveService {
         boolean scored = game.scorePublicObjective(player.getUserID(), poID);
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", poName);
+            FowScoringStatusService.refresh(game, player);
         }
         if (!scored) {
             MessageHelper.sendMessageToChannel(
@@ -70,7 +72,9 @@ public class ScorePublicObjectiveService {
                     player.getFactionEmoji() + ", no such public objective ID found, or already scored, please retry.");
         } else {
             StatusHelper.recordObjectiveScored(game, player, id, "PUBLIC");
+            int tgBefore = player.getTg();
             informAboutScoring(event, channel, game, player, poID);
+            ThirtyKExploreHooks.afterPublicObjectiveScored(game, player, id, tgBefore);
             if (player.hasAbility("primordial")) {
                 KaloraAbilityHandler.primordial(player, game);
             }
@@ -153,10 +157,10 @@ public class ScorePublicObjectiveService {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), player.getRepresentation() + " gains 1 card due to _Yin Ascendant_.");
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
-            buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
+            buttons.add(Buttons.DRAW_1_ABILITY);
+            buttons.add(Buttons.DRAW_1_UNIT_UPGRADE);
             buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
-            buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+            buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
             String message2 = player.getRepresentationUnfogged() + ", please use these buttons to resolve.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
@@ -189,18 +193,6 @@ public class ScorePublicObjectiveService {
                 DrawSecretService.drawSO(event, game, p2);
             }
         }
-        if (player.hasAbility("reflect")) {
-
-            List<String> scoredPlayerList =
-                    game.getScoredPublicObjectives().computeIfAbsent(idC, key -> new ArrayList<>());
-            if (scoredPlayerList.size() > 1 && Mapper.getPublicObjective(idC) != null) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + " is drawing 1 action card due to scoring an objective someone else already scored while having the _Reflect_ Honor card.");
-                ActionCardHelper.drawActionCardsSilent(player, 1);
-            }
-        }
         if (game.isOmegaPhaseMode()) {
             // Omega Phase objectives require you to have, not spend. Skip all the spending checks.
             return;
@@ -217,8 +209,8 @@ public class ScorePublicObjectiveService {
                     && (poName.toLowerCase().contains("amass wealth")
                             || poName.toLowerCase().contains("hold vast reserves"))) {
                 message2 +=
-                        "\n-# NB: Xxekir Grom , the Xxcha hero, will allow you to use the combined values of each planet for"
-                                + " __either__ the resource or influence requirement of this objective, but __not__ both.";
+                        "\n-# NB: Xxekir Grom, the Xxcha hero, treats the combined value of each planet you exhaust as"
+                                + " __both__ its resources and its influence, so one planet can count toward the resource and the influence requirement of this objective.";
             }
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
             List<Integer> unfollowedSCs = player.getUnfollowedSCs();
@@ -239,7 +231,7 @@ public class ScorePublicObjectiveService {
                 message2 += "\n" + Helper.buildSpentThingsMessage(player, game, "both");
                 buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
             }
-            Button DoneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
+            Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS;
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }

@@ -5,13 +5,16 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
+import ti4.helpers.BlueReverieHelper;
 import ti4.message.MessageHelper;
 
 class SteelBalanceCount extends GameStateSubcommand {
 
     public SteelBalanceCount() {
         super("steelbalance_count", "Set steel balance amount", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, "count", "Count").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, "count", "Count")
+                .setRequiredRange(0, 99)
+                .setRequired(true));
     }
 
     @Override
@@ -19,7 +22,7 @@ class SteelBalanceCount extends GameStateSubcommand {
         int count = Math.max(event.getOption("count").getAsInt(), 0);
         Player player = getPlayer();
         player.setSteelbalanceCounter(count);
-
+        BlueReverieHelper.checkXinHarmony(getGame());
         MessageHelper.sendMessageToChannel(event.getChannel(), "Set Steel Balance count to " + count + ".");
     }
 }

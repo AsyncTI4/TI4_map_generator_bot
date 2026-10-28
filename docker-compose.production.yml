@@ -37,9 +37,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:?Set the POSTGRES_USER repository variable}
       REPO_DISPATCH_TOKEN: ${REPO_DISPATCH_TOKEN}
       RESOURCE_PATH: /opt/resources
-      ROLLBAR_ACCESS_TOKEN: ${ROLLBAR_ACCESS_TOKEN}
-      ROLLBAR_CODE_VERSION: ${ROLLBAR_CODE_VERSION}
-      ROLLBAR_ENVIRONMENT: ${ROLLBAR_ENVIRONMENT}
       TI4_ULTIMATE_STATISTICS_API_KEY: ${TI4_ULTIMATE_STATISTICS_API_KEY}
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:8081/api/public/ping >/dev/null 2>&1"]

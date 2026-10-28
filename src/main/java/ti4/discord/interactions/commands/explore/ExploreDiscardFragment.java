@@ -10,9 +10,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
 
 class ExploreDiscardFragment extends GameStateSubcommand {
 
@@ -28,7 +28,7 @@ class ExploreDiscardFragment extends GameStateSubcommand {
                 .setAutoComplete(true)
                 .setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to discard (default 1)")
-                .setMinValue(1));
+                .setRequiredRange(1, 20));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color (default you)")
                 .setAutoComplete(true));
     }

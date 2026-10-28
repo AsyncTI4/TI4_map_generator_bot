@@ -1,0 +1,14 @@
+{
+  "name": "30k-explore-distraction-efforts",
+  "description": "Distraction Efforts on a frontier token gives Sol 3 trade goods and an extra Component Action button.",
+  "preset": "30k-explore-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "expect": { "state": "sol.tg", "equals": "3" } },
+    { "do": "stackExplore", "value": "distractionefforts30k" },
+    { "as": "sol", "pressId": "FFCC_{sol.faction}_exploreFront_317" },
+    { "expect": { "state": "sol.tg", "equals": "6" } },
+    { "expect": { "in": "sol:cards-info", "contains": "additional component action", "buttons": ["componentAction"] } },
+    { "expect": { "state": "game.exploreDiscard", "contains": "distractionefforts30k" } }
+  ]
+}

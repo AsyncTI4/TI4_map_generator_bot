@@ -2,297 +2,114 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
+import ti4.helpers.Constants;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
-import ti4.model.AbilityModel;
+import ti4.model.UnitModel;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.map.FractureService;
 
 @UtilityClass
 public class NatauAbilityHandler {
-    private static final List<String> DOCTRINE_LIST = List.of(
-            "doctrine_wrath",
-            "doctrine_strength",
-            "doctrine_revelation",
-            "doctrine_knowledge",
-            "doctrine_discovery",
-            "doctrine_stability");
-    private static final String SHOW_DOCTRINES = "showNatauDoctrines";
-    private static final String DOCTRINE = "doctrine";
-    private static final String PARADIGM = "paradigm";
-    private static final String DECREE = "natau_decree";
-    private static final String CHOOSE_DOCTRINE = "natauChooseDoctrine_";
-    private static final String CHOOSE_SWAP_DOCTRINE = "natauChooseSwapDoctrine_";
-    private static final String REPLACE_DOCTRINE = "natauReplaceDoctrine_";
+    private static final String ADD_CATACLYSM_INGRESS = "natauAddCataclysmIngress_";
 
-    private static boolean hasNatauDoctrinePackage(Player player) {
-        return player != null
-                && player.hasAbility(DOCTRINE)
-                && player.hasAbility(DECREE)
-                && player.hasAbility(PARADIGM);
+    public static Button getCataclysmFrankenButton(Player player) {
+        return Buttons.green(
+                player.factionButtonChecker() + "beginCataclysmFranken", "Begin Cataclysm", FactionEmojis.natau);
     }
 
-    public static List<AbilityModel> getActiveDoctrinesModels(Player player) {
-        if (player == null) {
-            return new ArrayList<>();
-        }
-
-        List<AbilityModel> activeDoctrines = new ArrayList<>();
-        for (String doctrineId : DOCTRINE_LIST) {
-            if (!player.hasAbility(doctrineId)) {
-                continue;
-            }
-            if (Mapper.getAbility(doctrineId) == null) {
-                continue;
-            }
-
-            activeDoctrines.add(Mapper.getAbility(doctrineId));
-        }
-
-        return activeDoctrines;
-    }
-
-    public static List<AbilityModel> getInactiveDoctrinesModels(Player player) {
-        if (player == null) {
-            return new ArrayList<>();
-        }
-
-        List<AbilityModel> inactiveDoctrines = new ArrayList<>();
-        for (String doctrineId : DOCTRINE_LIST) {
-            if (player.hasAbility(doctrineId)) {
-                continue;
-            }
-            if (Mapper.getAbility(doctrineId) == null) {
-                continue;
-            }
-
-            inactiveDoctrines.add(Mapper.getAbility(doctrineId));
-        }
-
-        return inactiveDoctrines;
-    }
-
-    public static Button getShowDoctrinesButton(Player player) {
-        return Buttons.green(player.factionButtonChecker() + SHOW_DOCTRINES, "Show Doctrines");
-    }
-
-    @ButtonHandler(SHOW_DOCTRINES)
-    public static void showDoctrines(ButtonInteractionEvent event, Game game, Player player) {
-        if (event == null || game == null || player == null) {
+    @ButtonHandler("beginCataclysmFranken")
+    public static void beginCataclysmFranken(ButtonInteractionEvent event, Game game, Player player) {
+        if (player == null || game == null || !player.hasAbility("cataclysm")) {
             return;
         }
 
-        List<AbilityModel> activeDoctrines = getActiveDoctrinesModels(player);
-        List<AbilityModel> inactiveDoctrines = getInactiveDoctrinesModels(player);
-        List<MessageEmbed> embeds = new ArrayList<>();
-        embeds.add(buildDoctrineEmbed("Doctrines In Play Area", activeDoctrines));
-        embeds.add(buildDoctrineEmbed("Doctrines In Reinforcements", inactiveDoctrines));
-
-        List<Button> buttons = List.of(Buttons.red("deleteButtons", "Done Viewing"));
-        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-                event.getMessageChannel(), player.getRepresentation() + "##Doctrines", embeds, buttons);
+        beginCataclysm(event, player, game);
     }
 
-    private static MessageEmbed buildDoctrineEmbed(String title, List<AbilityModel> doctrines) {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(title);
+    public static void beginCataclysm(GenericInteractionCreateEvent event, Player player, Game game) {
+        FractureService.enterPlayOrExplain(event, game, player, null);
 
-        StringBuilder description = new StringBuilder();
-        if (doctrines.isEmpty()) {
-            description.append("None");
-        } else {
-            for (AbilityModel doctrine : doctrines) {
-                if (!description.isEmpty()) {
-                    description.append("\n\n");
-                }
-                description.append(doctrine.getRepresentation());
+        List<Button> anomalies = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (!tile.isAnomaly() || tile.isHomeSystem(game) || tile.isSupernova()) {
+                continue;
             }
-        }
 
-        eb.setDescription(description.toString());
-        return eb.build();
-    }
-
-    public static void offerDoctrineSetupButtons(GenericInteractionCreateEvent event, Game game, Player player) {
-        if (!hasNatauDoctrinePackage(player)) {
-            return;
-        }
-
-        int activeDoctrineCount = getActiveDoctrinesModels(player).size();
-        int doctrinesRemaining = 2 - activeDoctrineCount;
-        if (doctrinesRemaining <= 0) {
-            return;
-        }
-
-        List<AbilityModel> inactiveDoctrines = getInactiveDoctrinesModels(player);
-        List<Button> buttons = new ArrayList<>();
-        for (AbilityModel doctrine : inactiveDoctrines) {
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + CHOOSE_DOCTRINE + doctrine.getAlias(), doctrine.getName()));
+            anomalies.add(Buttons.green(
+                    player.factionButtonChecker() + ADD_CATACLYSM_INGRESS + tile.getPosition(),
+                    "Place Ingress in " + tile.getRepresentationForButtons(game, player)));
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose " + doctrinesRemaining + " doctrine"
-                        + (doctrinesRemaining == 1 ? "" : "s") + " to place in your play area:",
-                buttons);
-    }
-
-    @ButtonHandler(CHOOSE_DOCTRINE)
-    public static void resolveChooseDoctrine(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (event == null || game == null || player == null) {
-            return;
-        }
-        String doctrineId = buttonID.replace(CHOOSE_DOCTRINE, "");
-
-        if (!hasNatauDoctrinePackage(player)
-                || !DOCTRINE_LIST.contains(doctrineId)
-                || player.hasAbility(doctrineId)
-                || Mapper.getAbility(doctrineId) == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "Unable to add doctrine. Either an error occurred or the player already has the doctrine in their play area.");
-            return;
-        }
-        if (getActiveDoctrinesModels(player).size() >= 2) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "You have already chosen both doctrines for your play area.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        player.addAbility(doctrineId);
-        player.removeExhaustedAbility(doctrineId);
-        AbilityModel addedDoctrine = Mapper.getAbility(doctrineId);
-
-        List<AbilityModel> activeDoctrines = getActiveDoctrinesModels(player);
-        if (activeDoctrines.size() < 2) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " added " + addedDoctrine.getNameRepresentation()
-                            + " to their play area.");
-            ButtonHelper.deleteMessage(event);
-            offerDoctrineSetupButtons(event, game, player);
-            return;
-        }
-
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentation() + " added " + addedDoctrine.getNameRepresentation()
-                        + " to their play area. Both doctrines have now been chosen.");
-        ButtonHelper.deleteMessage(event);
-    }
-
-    public static void resolveParadigmStartOfStatus(GenericInteractionCreateEvent event, Game game, Player player) {
-        if (event == null || game == null || !hasNatauDoctrinePackage(player)) {
-            return;
-        }
-
-        List<AbilityModel> activeDoctrines = getActiveDoctrinesModels(player);
-        List<AbilityModel> inactiveDoctrines = getInactiveDoctrinesModels(player);
-        for (AbilityModel doctrine : activeDoctrines) {
-            String doctrineId = doctrine.getAlias();
-            player.removeExhaustedAbility(doctrineId);
-        }
-
-        if (activeDoctrines.isEmpty()) {
-            return;
-        }
-        if (inactiveDoctrines.isEmpty()) {
-            return;
-        }
-
-        List<Button> buttons = new ArrayList<>();
-        for (AbilityModel doctrine : activeDoctrines) {
-            buttons.add(Buttons.red(
-                    player.factionButtonChecker() + CHOOSE_SWAP_DOCTRINE + doctrine.getAlias(), doctrine.getName()));
-        }
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
                 player.getRepresentation()
-                        + ", your doctrines have been readied. Please choose which doctrine to replace:",
-                buttons);
+                        + ", after placing the normal ingress tokens, please choose a non-home, non-supernova anomaly in which to place an ingress token.",
+                anomalies);
     }
 
-    @ButtonHandler(CHOOSE_SWAP_DOCTRINE)
-    public static void resolveSwapDoctrine(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (event == null || game == null || player == null) {
+    @ButtonHandler(ADD_CATACLYSM_INGRESS)
+    public static void addCataclysmIngress(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Tile tile = game.getTileByPosition(buttonID.substring(ADD_CATACLYSM_INGRESS.length()));
+        if (tile == null || !tile.isAnomaly() || tile.isHomeSystem(game) || tile.isSupernova()) {
             return;
         }
-        String doctrineId = buttonID.replace(CHOOSE_SWAP_DOCTRINE, "");
-
-        if (!hasNatauDoctrinePackage(player) || !DOCTRINE_LIST.contains(doctrineId) || !player.hasAbility(doctrineId)) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(), "You do not have that doctrine in your play area.");
-            return;
-        }
-
-        List<AbilityModel> inactiveDoctrines = getInactiveDoctrinesModels(player);
-        List<Button> buttons = new ArrayList<>();
-        for (AbilityModel doctrine : inactiveDoctrines) {
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + REPLACE_DOCTRINE + doctrineId + "|" + doctrine.getAlias(),
-                    doctrine.getName()));
-        }
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(), "Choose which doctrine will be the replacement:", buttons);
-
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(REPLACE_DOCTRINE)
-    public static void resolveReplaceDoctrine(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (event == null || game == null || player == null) {
-            return;
-        }
-        String payload = buttonID.substring(REPLACE_DOCTRINE.length());
-        String[] parts = payload.split("\\|", 2);
-        if (parts.length != 2) {
-            return;
-        }
-        String activeDoctrineId = parts[0];
-        String inactiveDoctrineId = parts[1];
-
-        if (!hasNatauDoctrinePackage(player)
-                || !DOCTRINE_LIST.contains(activeDoctrineId)
-                || !DOCTRINE_LIST.contains(inactiveDoctrineId)
-                || Mapper.getAbility(activeDoctrineId) == null
-                || Mapper.getAbility(inactiveDoctrineId) == null) {
-            return;
-        }
-        if (player.hasAbility(inactiveDoctrineId)) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(), "You already have that doctrine in your play area.");
-            return;
-        }
-        if (!player.hasAbility(activeDoctrineId)) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(), "You no longer have that doctrine in your play area.");
-            return;
-        }
-
-        player.removeAbility(activeDoctrineId);
-        player.removeExhaustedAbility(activeDoctrineId);
-        player.addAbility(inactiveDoctrineId);
-        player.removeExhaustedAbility(inactiveDoctrineId);
-
+        tile.addToken(Constants.TOKEN_INGRESS, Constants.SPACE);
         MessageHelper.sendMessageToChannel(
-                game.getActionsChannel(),
-                player.getRepresentation() + " replaced "
-                        + Mapper.getAbility(activeDoctrineId).getNameRepresentation() + " with "
-                        + Mapper.getAbility(inactiveDoctrineId).getNameRepresentation() + ".");
-
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " placed an ingress token in "
+                        + tile.getRepresentationForButtons(game, player) + " with **Cataclysm**.");
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static boolean chainedIgnoresAnomalies(Player player, UnitKey unitKey) {
+        UnitModel unit = player.getUnitFromUnitKey(unitKey);
+        return unit != null && "natau_flagship".equals(unit.getId());
+    }
+
+    public static boolean hasNatauMech(Game game, Tile tile, Player player) {
+        if (player != null) {
+            return player.hasUnit("natau_mech") && hasNatauMech(tile, player);
+        }
+        return game != null
+                && game.getRealPlayers().stream().anyMatch(p -> p.hasUnit("natau_mech") && hasNatauMech(tile, p));
+    }
+
+    private static boolean hasNatauMech(Tile tile, Player player) {
+        return tile.getUnitHolders().values().stream()
+                .anyMatch(holder -> holder.getUnitCount(UnitType.Mech, player) > 0);
+    }
+
+    public static void addChaosTurbineAdjacencies(
+            Game game, Player player, String position, Set<String> adjacentPositions) {
+        Tile origin = game.getTileByPosition(position);
+        if (player == null || !player.hasTech("benatauct") || !isNonHomePrintedAnomaly(game, origin)) {
+            return;
+        }
+
+        game.getTileMap().values().stream()
+                .filter(tile -> !tile.getPosition().equals(position))
+                .filter(tile -> isNonHomePrintedAnomaly(game, tile))
+                .map(Tile::getPosition)
+                .forEach(adjacentPositions::add);
+    }
+
+    private static boolean isNonHomePrintedAnomaly(Game game, Tile tile) {
+        return tile != null
+                && !tile.isHomeSystem(game)
+                && tile.getTileModel() != null
+                && tile.getTileModel().isAnomaly();
     }
 }

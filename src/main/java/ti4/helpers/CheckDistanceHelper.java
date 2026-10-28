@@ -9,17 +9,20 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamFactionTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
+import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
 import ti4.service.planet.AsgardLegendaryService;
-import ti4.service.relic.AlluringThroneService;
+import ti4.service.tactical.movement.BelkoseaAgentService;
+import ti4.service.tactical.movement.RealityFieldImpactorService;
 
 @UtilityClass
 public class CheckDistanceHelper {
@@ -30,11 +33,17 @@ public class CheckDistanceHelper {
         if (distances.get(tilePosition2) != null) {
             return distances.get(tilePosition2);
         }
-        return countsRiftsAsNormal || !game.getTileByPosition(tilePosition1).isGravityRift(game, player) ? 100 : 99;
+        Tile origin = game.getTileByPosition(tilePosition1);
+        return countsRiftsAsNormal
+                        || origin == null
+                        || RealityFieldImpactorService.nullifies(game, origin)
+                        || !origin.isGravityRift(game, player)
+                ? 100
+                : 99;
     }
 
     private static boolean tileUnlockedForMoving(Game game, Player player, Tile tile) {
-        if (ButtonHelper.canMoveOutOfLockedSystems(player, game)
+        if (ButtonHelper.canMoveOutOfLockedSystems(player, game, tile)
                 || (game.isMonumentsMode() && MonumentsDSButtonHandler.canMoveOutOfFreeholdSystem(game, player, tile)))
             return true;
         return !CommandCounterHelper.hasCC(player, tile) || tile.getPosition().equalsIgnoreCase(game.getActiveSystem());
@@ -101,29 +110,34 @@ public class CheckDistanceHelper {
                 if (!existingPosition.equalsIgnoreCase(tilePosition)) {
                     if (tile == null
                             || (tile.isNebula(game)
+                                    && !RealityFieldImpactorService.nullifies(game, tile)
                                     && player != null
                                     && !DreamAbilitiesHandler.ignoresNebula(player, game, tile)
                                     && !DreamFactionTechHandler.treatsNebulasAsAdjacent(game, player, tile)
-                                    && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                                    && !DreamAgent.playerIgnoresAnomaly(game, player, tile)
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
-                                    && !AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile2)
                                     && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     && !player.hasAbility("voidborn")
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
-                                    && !ButtonHelper.isLawInPlay(game, "shared_research"))
+                                    && !ButtonHelper.isLawInPlay(game, "shared_research")
+                                    && !TheodisiLegendaryButtonHandler.ignoresAvarinAnomaly(game, player, tile)
+                                    && !IxthLegendaryButtonHandler.ignoresHoraceAnomaly(game, player, tile))
                             || (tile.isSupernova()
+                                    && !RealityFieldImpactorService.nullifies(game, tile)
                                     && player != null
-                                    && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                                    && !DreamAgent.playerIgnoresAnomaly(game, player, tile)
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
-                                    && !AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile2)
                                     && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !player.hasAbility("gashlai_physiology")
-                                    && !player.hasTech("tf-mr"))
+                                    && !player.hasTech("tf-mr")
+                                    && !TheodisiLegendaryButtonHandler.ignoresAvarinAnomaly(game, player, tile)
+                                    && !IxthLegendaryButtonHandler.ignoresHoraceAnomaly(game, player, tile))
                             || (player != null
                                     && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
+                                    && !BelkoseaAgentService.ignoresOtherShips(game, player, tile)
                                     && !player.hasTech("lwd")
                                     && !player.hasTech("absol_lwd")
                                     && !OnyxxaBreakthroughHandler.canMoveThroughIngressSystem(player, tile)
@@ -139,25 +153,30 @@ public class CheckDistanceHelper {
                                     && FoWHelper.otherPlayersHaveMovementBlockersInSystem(player, tile, game))
                             || (tile.isAsteroidField()
                                     && !tile.isZelianAsteroidField()
+                                    && !RealityFieldImpactorService.nullifies(game, tile)
                                     && player != null
-                                    && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                                    && !DreamAgent.playerIgnoresAnomaly(game, player, tile)
                                     && !player.hasTech("amd")
                                     && !player.hasTech("wavelength")
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
-                                    && !AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile2)
                                     && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     && !player.hasTech("absol_amd")
-                                    && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2))) {
+                                    && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
+                                    && !TheodisiLegendaryButtonHandler.ignoresAvarinAnomaly(game, player, tile)
+                                    && !IxthLegendaryButtonHandler.ignoresHoraceAnomaly(game, player, tile))) {
                         continue;
                     }
                 }
                 if (!forMap) {
                     if (tile != null
                             && tile.isGravityRift(game, player)
-                            && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                            && !RealityFieldImpactorService.nullifies(game, tile)
+                            && !DreamAgent.playerIgnoresAnomaly(game, player, tile)
                             && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
-                            && !AsgardLegendaryService.isBifrostBridgeActive(game, player)) {
+                            && !AsgardLegendaryService.isBifrostBridgeActive(game, player)
+                            && !TheodisiLegendaryButtonHandler.ignoresAvarinAnomaly(game, player, tile)
+                            && !IxthLegendaryButtonHandler.ignoresHoraceAnomaly(game, player, tile)) {
                         num = -1;
                         if (game.isCosmicPhenomenaeMode()) {
                             num = -2;

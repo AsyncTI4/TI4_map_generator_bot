@@ -1,0 +1,26 @@
+{
+    "id": "oceanus",
+    "name": "Oceanus",
+    "aliases": [
+        "oceanus"
+    ],
+    "resources": 4,
+    "influence": 1,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "legendaryAbilityName": "Edge of Tomorrow",
+    "legendaryAbilityText": "When exploring, you may treat planets in the fracture as if they had all traits.",
+    "legendaryAbilityFlavourText": "To find it, you must look beyond what you seek.",
+    "planetLayout": {
+        "unitHolderName": "oceanus",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 92,
+            "y": 66
+        },
+        "planetRadius": 60,
+        "extraIcons": 1
+    },
+    "source": "expanded_fracture"
+}

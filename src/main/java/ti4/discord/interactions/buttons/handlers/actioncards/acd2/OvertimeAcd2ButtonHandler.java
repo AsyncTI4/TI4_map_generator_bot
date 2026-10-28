@@ -14,11 +14,11 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
@@ -99,7 +99,7 @@ class OvertimeAcd2ButtonHandler {
         if (buttons.isEmpty()) {
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         String message = remainingComponents > 1
                 ? player.getRepresentationUnfogged() + ", choose a component to ready with _Overtime_."

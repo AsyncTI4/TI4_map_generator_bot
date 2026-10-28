@@ -9,11 +9,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -25,10 +27,10 @@ import ti4.game.UnitHolder;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
@@ -98,7 +100,7 @@ public class ButtonHelperCommanders {
             }
             buttons.add(Buttons.green("olradinCommanderStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         String msg = player.getRepresentationUnfogged()
                 + " you may exhaust 1 planet to gain trade goods equal to its influence or resources.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -446,7 +448,7 @@ public class ButtonHelperCommanders {
                             + " so you __may__ gain 1 trade good.";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1 Trade Good", MiscEmojis.tg));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), mMessage, buttons);
                 }
                 case RANGE_OPT_IN -> {
@@ -455,7 +457,7 @@ public class ButtonHelperCommanders {
                             + " so you __may__ gain 1 trade good, but since you are in **Pillage** range, this has not been done automatically.";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1 Trade Good", MiscEmojis.tg));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
                 }
                 case AUTO -> {
@@ -678,7 +680,7 @@ public class ButtonHelperCommanders {
                 }
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         return buttons;
     }
 
@@ -692,7 +694,7 @@ public class ButtonHelperCommanders {
                                     + " so you __may__ gain 1 trade good when you " + reason + ".";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1 Trade Good", MiscEmojis.tg));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), mMessage, buttons);
                 }
                 case RANGE_OPT_IN -> {
@@ -702,8 +704,9 @@ public class ButtonHelperCommanders {
                                     + ", but since you are in **Pillage** range, this has not been done automatically.";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1 Trade Good", MiscEmojis.tg));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
+                    buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
+                    MessageChannel channel = event == null ? player.getCorrectChannel() : event.getMessageChannel();
+                    MessageHelper.sendMessageToChannelWithButtons(channel, mMessage, buttons);
                 }
                 case AUTO -> {
                     String message = player.getRepresentationUnfogged()
@@ -736,7 +739,7 @@ public class ButtonHelperCommanders {
                 buttons.add(Buttons.green(
                         "freeSystemsBT_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmojiOrColor()));
             }
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
@@ -747,7 +750,7 @@ public class ButtonHelperCommanders {
             List<Button> buttons2 = ButtonHelperAbilities.getXxchaPeaceAccordsButtons(
                     game, player, event, player.factionButtonChecker());
             if (!buttons2.isEmpty()) {
-                buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                buttons2.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged() + ", please resolve _Peace Accords_.",
@@ -758,7 +761,7 @@ public class ButtonHelperCommanders {
             String msg = "Please choose the system in which you wish to produce a ship using ";
             msg += Mapper.getUnit("tk-sumerianrelay").getNameRepresentation() + ".";
             List<Button> buttons = PlayerTechService.getSlingRelayButtons(game, player);
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
     }
@@ -792,7 +795,7 @@ public class ButtonHelperCommanders {
                 }
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", please choose a planet to coexist on with "
@@ -818,12 +821,12 @@ public class ButtonHelperCommanders {
             buttons2.add(Buttons.green(
                     "getTech_" + Mapper.getTech(techID).getAlias() + "__noPay",
                     Mapper.getTech(techID).getName()));
-            buttons2.add(Buttons.red("deleteButtons", "Decline"));
+            buttons2.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(obsidian.getCardsInfoThread(), msg, buttons2);
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, obsidian, "res");
-            Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            Button doneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
             buttons.add(doneExhausting);
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     obsidian.getCardsInfoThread(), "You can use these buttons to pay the 4 resources.", buttons);
         }
@@ -836,8 +839,8 @@ public class ButtonHelperCommanders {
                     || !player.hasAbility("technological_singularity")) {
                 List<Button> buttons = new ArrayList<>();
 
-                buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
-                buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                buttons.add(Buttons.DRAW_1_ACTION_CARD_DELETE);
+                buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
@@ -862,7 +865,7 @@ public class ButtonHelperCommanders {
                         }
                     }
                     if (removeTechButtons.size() > 2) {
-                        removeTechButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                        removeTechButtons.add(Buttons.DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
                                 player.getRepresentationUnfogged()
@@ -966,6 +969,14 @@ public class ButtonHelperCommanders {
         String enemyFaction = buttonID.split("_")[1];
         Player enemy = game.getPlayerFromColorOrFaction(enemyFaction);
         if (enemy == null) return;
+        if (XinTechHandler.hasAstromanticCloakSteel(enemy)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", you cannot look at this player's Action Cards, Promissory Notes, or Secret Objectives"
+                            + " because they have _Astromantic Cloak (Steel)_!");
+            return;
+        }
         String message = player.getFactionEmoji() + " used So Ata, the Yssaril commander, to look at the ";
         String type = buttonID.split("_")[0];
         if ("ac".equalsIgnoreCase(type)) {
@@ -1009,17 +1020,35 @@ public class ButtonHelperCommanders {
 
         String message = player.getFactionEmojiOrColor() + " moved 1 " + mechorInf + " from " + planetRepresentation2
                 + " to " + planetRepresentation + " using G'hom Sek'kus, the Sardakk Commander.";
-        RemoveUnitService.removeUnits(
-                event, game.getTileFromPlanet(planet2), game, player.getColor(), "1 " + mechorInf + " " + planet2);
+        Tile origin = game.getTileFromPlanet(planet2);
+        planet1 = FlipTileService.unlockMalliceIfNeeded(event, planet1, game);
+        Tile destination = game.getTileFromPlanet(planet1);
+        if (origin == null || destination == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "Could not find " + planetRepresentation2 + " or " + planetRepresentation + " on the map.");
+            return;
+        }
+        RemoveUnitService.removeUnits(event, origin, game, player.getColor(), "1 " + mechorInf + " " + planet2);
+        AddUnitService.addUnits(event, destination, game, player.getColor(), "1 " + mechorInf + " " + planet1);
 
-        FlipTileService.flipTileIfNeeded(event, game.getTileFromPlanet(planet1), game);
-        planet1 = planet1.replace("lockedm", "m");
-        AddUnitService.addUnits(
-                event, game.getTileFromPlanet(planet1), game, player.getColor(), "1 " + mechorInf + " " + planet1);
-
+        rememberSardakkCommanderSource(game, player, planet2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    private static String sardakkCommanderMarker(String planet) {
+        return " Sardakk commander used " + planet + ".";
+    }
+
+    static void rememberSardakkCommanderSource(Game game, Player player, String planet) {
+        String key = "currentActionSummary" + player.getFaction();
+        game.setStoredValue(key, game.getStoredValue(key) + sardakkCommanderMarker(planet));
+    }
+
+    static boolean sardakkCommanderUsedThisActivation(Game game, Player player, String planet) {
+        String summary = game.getStoredValue("currentActionSummary" + player.getFaction());
+        return StringUtils.substringAfterLast(summary, " Activated ").contains(sardakkCommanderMarker(planet));
     }
 
     @ButtonHandler("ralnelMechPull_")
@@ -1073,6 +1102,7 @@ public class ButtonHelperCommanders {
                     }
                     String planetId2 = planetReal2.getName();
                     String planetName2 = Helper.getPlanetName(planetId2);
+                    if (sardakkCommanderUsedThisActivation(game, player, planetId2)) continue;
                     if (numInf > 0 && !planetId.equalsIgnoreCase(planetId2)) {
                         String id = "sardakkcommander_infantry_" + planetId + "_" + planetId2;
                         String label = "1 Inf From " + planetName2 + " To " + planetName + " With Commander";

@@ -5,7 +5,6 @@ import ti4.service.tactical.postmovement.AtokeraHeroButton;
 import ti4.service.tactical.postmovement.BombardmentButton;
 import ti4.service.tactical.postmovement.CombatDronesButton;
 import ti4.service.tactical.postmovement.GhostCommanderButton;
-import ti4.service.tactical.postmovement.IronHeroButton;
 import ti4.service.tactical.postmovement.KhraskCommanderButton;
 import ti4.service.tactical.postmovement.KolleccMonumentButton;
 import ti4.service.tactical.postmovement.MirvedaCommanderButton;
@@ -21,6 +20,7 @@ import ti4.service.tactical.postmovement.SardakkCommanderButton;
 import ti4.service.tactical.postmovement.SardakkHeroButton;
 import ti4.service.tactical.postmovement.ShroudOfLithButton;
 import ti4.service.tactical.postmovement.TnelisAgentButton;
+import ti4.service.tactical.postmovement.TnelisBrDeployButton;
 import ti4.service.tactical.postmovement.VaylerianBTButton;
 import ti4.service.tactical.postmovement.WeirdWormholeButton;
 import ti4.service.tactical.postmovement.ZelianAgentButton;
@@ -37,12 +37,12 @@ public final class PostMovementAbilityButtons {
             new CombatDronesButton(),
             new ShroudOfLithButton(),
             new MirvedaCommanderButton(),
-            new IronHeroButton(),
             new GhostCommanderButton(),
             new KhraskCommanderButton(),
             new KolleccMonumentButton(),
             new NokarAgentButton(),
             new TnelisAgentButton(),
+            new TnelisBrDeployButton(),
             new ZelianAgentButton(),
             new MoveAvernusButton(),
             new MoveIllustrionButton(),

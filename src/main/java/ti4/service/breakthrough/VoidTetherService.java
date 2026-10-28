@@ -16,11 +16,11 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RegexHelper;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
-import ti4.model.BorderAnomalyModel.BorderAnomalyType;
+import ti4.model.BorderAnomalyIds;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.regex.RegexService;
 
@@ -71,7 +71,7 @@ public class VoidTetherService {
     private List<BorderAnomalyHolder> getTethersOnMap(Game game) {
         List<BorderAnomalyHolder> tethers = new ArrayList<>();
         for (BorderAnomalyHolder b : game.getBorderAnomalies()) {
-            if (b != null && b.getType() == BorderAnomalyType.VOID_TETHER) {
+            if (b != null && b.isType(BorderAnomalyIds.VOID_TETHER)) {
                 tethers.add(b);
             }
         }
@@ -119,7 +119,7 @@ public class VoidTetherService {
         List<Button> buttons = new ArrayList<>();
         String prefix = player.factionButtonChecker() + "placeVoidTether_" + pos + "_";
 
-        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(pos);
+        List<String> directlyAdjacentTiles = MapPositionMapper.getAdjacentTilePositions(pos);
         if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {
             return buttons; // this tile doesn't have anything map-adjacent
         }
@@ -148,7 +148,7 @@ public class VoidTetherService {
     private String getVoidTetherBetweenText(Game game, Player player, String position, int direction) throws Exception {
         Tile t1 = game.getTileByPosition(position);
         Tile t2 = game.getTileByPosition(
-                PositionMapper.getAdjacentTilePositions(position).get(direction));
+                MapPositionMapper.getAdjacentTilePositions(position).get(direction));
         if (t1 == null || t2 == null) {
             RegexService.throwFailure();
             return null;
@@ -197,7 +197,7 @@ public class VoidTetherService {
         RegexService.runMatcher(pattern, buttonID, matcher -> {
             String position = matcher.group("pos");
             int direction = Integer.parseInt(matcher.group("dir"));
-            game.addBorderAnomaly(position, direction, BorderAnomalyType.VOID_TETHER);
+            game.addBorderAnomaly(position, direction, BorderAnomalyIds.VOID_TETHER);
             String msg = String.format(
                     "%s placed a %s token between %s.",
                     player.getRepresentationNoPing(),

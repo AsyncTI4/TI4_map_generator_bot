@@ -18,9 +18,9 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.image.TileGenerator;
-import ti4.image.TileHelper;
+import ti4.image.tile.SystemContextImage;
 import ti4.message.MessageHelper;
+import ti4.model.TileHelper;
 import ti4.service.combat.StartCombatService;
 
 class SystemInfo extends GameStateSubcommand {
@@ -31,9 +31,10 @@ class SystemInfo extends GameStateSubcommand {
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(new OptionData(
-                OptionType.INTEGER,
-                Constants.EXTRA_RINGS,
-                "Show additional rings around the selected system for context (Max 2)"));
+                        OptionType.INTEGER,
+                        Constants.EXTRA_RINGS,
+                        "Show additional rings around the selected system for context (Max 2)")
+                .setRequiredRange(0, 2));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.JUST_UNITS, "True to just get unit information."));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_2, "System/Tile name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_3, "System/Tile name").setAutoComplete(true));
@@ -93,8 +94,7 @@ class SystemInfo extends GameStateSubcommand {
             return;
         }
 
-        FileUpload systemWithContext =
-                new TileGenerator(game, event, null, context, tile.getPosition()).createFileUpload();
+        FileUpload systemWithContext = SystemContextImage.upload(game, event, context, tile.getPosition());
         MessageHelper.sendMessageToChannel(
                 channel, ButtonHelper.getTileSummaryMessage(game, justUnits, tile, ogPlayer, event));
         MessageHelper.sendMessageWithFile(channel, systemWithContext, tile.getRepresentationForButtons(), false);

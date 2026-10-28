@@ -12,12 +12,20 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EscapeClauseActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinPnHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorPromissoryHandler;
@@ -26,10 +34,10 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.thundersedge.TeHelperPromissories;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.abilities.MahactTokenService;
@@ -246,9 +254,28 @@ public class PromissoryNoteHelper {
         }
         PromissoryNoteModel pn = Mapper.getPromissoryNote(id);
         String pnName = pn.getName();
-        GameEventService.commit(game, GameEventType.CARD_PLAY_PROMISSORY_NOTE, player, Map.of("cardId", id));
-        // String pnOwner = Mapper.getPromissoryNoteOwner(id);
         Player owner = game.getPNOwner(id);
+        boolean keepingPromissoryNote = XinPnHandler.consumeReplacedReturn(game, player, id);
+        keepingPromissoryNote |= KaltrimBreakthroughHandler.consumeEchoOperativesReturn(game, player, id);
+
+        boolean wouldReturnPromissoryNote = !pn.getPlayArea() || player.isPlayerMemberOfAlliance(owner);
+
+        if (id.endsWith("_ta") && EscapeClauseActionCardHandler.triggerPreset(event, game, player, owner, id)) {
+            return;
+        }
+
+        if (wouldReturnPromissoryNote
+                && !keepingPromissoryNote
+                && KaltrimBreakthroughHandler.offerEchoOperatives(game, player, owner, id)) {
+            return;
+        }
+
+        if (wouldReturnPromissoryNote
+                && !keepingPromissoryNote
+                && XinPnHandler.offerStatecraftMentor(game, player, owner, id)) {
+            return;
+        }
+        GameEventService.commit(game, GameEventType.CARD_PLAY_PROMISSORY_NOTE, player, Map.of("cardId", id));
         if ("bepnta".equalsIgnoreCase(id)
                 && !TaPromissoryHandler.hasLegalAdvancedStructuralEngineeringTargets(player, game)) {
             MessageHelper.sendMessageToChannel(
@@ -257,9 +284,19 @@ public class PromissoryNoteHelper {
                             + ", there are no legal non-home planets for _Advanced Structural Engineering_.");
             return;
         }
+        if ("dspnphar".equalsIgnoreCase(id)) {
+            if (owner != null && owner.isPassed()) {
+                ButtonHelperFactionSpecific.resolveDeathBinding(game, player, event);
+            }
+            return;
+        }
+        if ("dspnkalt".equalsIgnoreCase(id)) {
+            ButtonHelperFactionSpecific.startKaltrimAmbassadors(game, player);
+            return;
+        }
         if (pn.getPlayArea() && !player.isPlayerMemberOfAlliance(owner)) {
             player.addPromissoryNoteToPlayArea(id);
-        } else {
+        } else if (!keepingPromissoryNote) {
             if (!"malevolency".equalsIgnoreCase(id)) {
                 player.removePromissoryNote(id);
                 if (!"dspncymi".equalsIgnoreCase(id)) {
@@ -299,6 +336,9 @@ public class PromissoryNoteHelper {
 
         if ("bepncryst".equalsIgnoreCase(id)) {
             CrystellumPromissoryHandler.resolveFracture(game, player, event);
+        }
+        if ("bepnnatau".equalsIgnoreCase(id)) {
+            NatauPromissoryHandler.offerRuptureSystems(game, player);
         }
         if ("thpnxytheris".equalsIgnoreCase(id)) {
             XytherisPromissoryHandler.activateSwarmSpawn(game, player);
@@ -464,14 +504,16 @@ public class PromissoryNoteHelper {
                     player.getCorrectChannel(),
                     player.getFactionEmojiOrColor() + " is paying 1 influence to pass _Malevolency_ to a neighbor.");
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-            Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            Button doneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
             buttons.add(doneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), "Please spend 1 influence.", buttons);
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             buttons = new ArrayList<>();
             for (Player p2 : player.getNeighbouringPlayers(true)) {
-                buttons.add(Buttons.green("passMalevolencyTo_" + p2.getFaction(), p2.getFactionNameOrColor()));
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + "passMalevolencyTo_" + p2.getFaction(),
+                        p2.getFactionNameOrColor()));
             }
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
@@ -503,6 +545,8 @@ public class PromissoryNoteHelper {
         }
         if ("fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
+            NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
+            NetrunnersTechHandler.resolveDataMining(event, game, player, "ws");
             ButtonHelperCommanders.resolveNekroCommanderCheck(player, "ws", game);
             CommanderUnlockCheckService.checkPlayer(player, "mirveda");
             MessageHelper.sendMessageToChannel(
@@ -650,7 +694,9 @@ public class PromissoryNoteHelper {
             ButtonHelperFactionSpecific.rollForBelkoseaPN(player);
         }
         if ("gift".equalsIgnoreCase(id)) {
-            StartPhaseService.startActionPhase(event, game, false);
+            if ("action".equalsIgnoreCase(game.getPhaseOfGame())) {
+                StartPhaseService.startActionPhase(event, game, false);
+            }
             // in case Naalu gets eliminated and the PN goes away
             game.setStoredValue("naaluPNUser", player.getFaction());
         }
@@ -774,6 +820,9 @@ public class PromissoryNoteHelper {
         if ("thpnthurviali".equalsIgnoreCase(id)) {
             ThurvialiPromissoryHandler.resolveRadiantAssembly(event, game, player);
         }
+        if ("thpnstoneborn".equalsIgnoreCase(id)) {
+            StonebornPromissoryHandler.offerPotentialChoices(player, game);
+        }
         // These PNs' text contains "action:" but describe a trigger on another player's action
         List<String> actionTextPNsNotOwnAction = List.of("acq", "bapnconc");
         if (pn.getText().toLowerCase().contains("action:") && !actionTextPNsNotOwnAction.contains(id)) {
@@ -794,6 +843,14 @@ public class PromissoryNoteHelper {
     }
 
     public void showAll(Player player, Player targetPlayer, Game game) {
+        if (XinTechHandler.hasAstromanticCloakSteel(player) && player != targetPlayer) {
+            MessageHelper.sendMessageToChannel(
+                    targetPlayer.getCorrectChannel(),
+                    targetPlayer.getRepresentation()
+                            + ", you cannot look at " + player.getRepresentationNoPing() + "'s"
+                            + " Promissory Notes because they have _Astromantic Cloak (Steel)!");
+            return;
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(game.getName()).append('\n');
         sb.append("Player: ").append(player.getUserName()).append('\n');

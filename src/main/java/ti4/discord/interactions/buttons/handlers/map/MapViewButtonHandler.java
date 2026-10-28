@@ -13,7 +13,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DisplayType;
-import ti4.image.TileGenerator;
+import ti4.image.tile.SystemContextImage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -40,9 +40,64 @@ class MapViewButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", buttons);
     }
 
+    @ButtonHandler(value = "checkWHView", save = false)
+    public static void showWormholes(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.wormholes);
+    }
+
+    @ButtonHandler(value = "checkAnomView", save = false)
+    public static void showAnomalies(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.anomalies);
+    }
+
+    @ButtonHandler(value = "checkLegendView", save = false)
+    public static void showLegendaries(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.legendaries);
+    }
+
+    @ButtonHandler(value = "checkEmptyView", save = false)
+    public static void showEmpties(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.empties);
+    }
+
     @ButtonHandler(value = "checkExileView", save = false)
     public static void calculateExileView(ButtonInteractionEvent event, Game game) {
         ButtonHelper.showFeatureType(event, game, DisplayType.exile);
+    }
+
+    @ButtonHandler(value = "checkAetherView", save = false)
+    public static void showAetherstreamable(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.aetherstream);
+    }
+
+    @ButtonHandler(value = "checkCannonView", save = false)
+    public static void showSpaceCannon(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.spacecannon);
+    }
+
+    @ButtonHandler(value = "checkTraitView", save = false)
+    public static void showTraits(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.traits);
+    }
+
+    @ButtonHandler(value = "checkTechSkipView", save = false)
+    public static void showTechSkips(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.techskips);
+    }
+
+    @ButtonHandler(value = "checkAttachmView", save = false)
+    public static void showAttachments(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.attachments);
+    }
+
+    @ButtonHandler(value = "checkShiplessView", save = false)
+    public static void showShipless(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.shipless);
+    }
+
+    @ButtonHandler(value = "checkUnlocked", save = false)
+    public static void showUnlocked(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.unlocked);
     }
 
     @ButtonHandler(value = "refreshViewOfSystem_", save = false)
@@ -52,7 +107,7 @@ class MapViewButtonHandler {
         Player p1 = game.getPlayerFromColorOrFaction(rest.split("_")[1]);
         Player p2 = game.getPlayerFromColorOrFaction(rest.split("_")[2]);
         String groundOrSpace = rest.split("_")[3];
-        try (FileUpload systemWithContext = new TileGenerator(game, event, null, 0, pos).createFileUpload()) {
+        try (FileUpload systemWithContext = SystemContextImage.upload(game, event, 0, pos)) {
             MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
             List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, pos, p1, p2, groundOrSpace);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);

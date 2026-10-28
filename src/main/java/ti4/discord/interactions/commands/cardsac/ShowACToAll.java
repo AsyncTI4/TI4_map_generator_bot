@@ -8,9 +8,8 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
-import ti4.service.actioncard.KnownActionCardsService;
+import ti4.model.Mapper;
 
 class ShowACToAll extends GameStateSubcommand {
 
@@ -18,6 +17,7 @@ class ShowACToAll extends GameStateSubcommand {
         super(Constants.SHOW_TO_ALL, "Show an action card to all players", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID, which is found between ()")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
     }
 
@@ -44,7 +44,7 @@ class ShowACToAll extends GameStateSubcommand {
                 + player.getUserName() + "\n" + "Shown Action Card:"
                 + "\n" + Mapper.getActionCard(acID).getRepresentation(game)
                 + "\n";
-        KnownActionCardsService.rememberShownActionCardToAll(game, player, acID);
+        player.setActionCard(acID);
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
     }
 }

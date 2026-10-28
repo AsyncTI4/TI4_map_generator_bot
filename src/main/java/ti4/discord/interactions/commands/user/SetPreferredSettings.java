@@ -19,6 +19,8 @@ class SetPreferredSettings extends Subcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, "pillage_msg", "True to get the Pillage flavor text"));
         addOptions(new OptionData(OptionType.BOOLEAN, "sarween_msg", "True to get the Sarween Tools flavor text"));
         addOptions(new OptionData(
+                OptionType.BOOLEAN, "join_strat_threads", "True to join strategy threads automatically"));
+        addOptions(new OptionData(
                         OptionType.STRING, Constants.VOLTRON_STYLE, "Choose what your Eidolon Maximum looks like")
                 .setAutoComplete(true));
         addOptions(new OptionData(
@@ -34,9 +36,10 @@ class SetPreferredSettings extends Subcommand {
                 "pass_on_agenda_stuff",
                 "True to pass on \"when\"s and \"after\"s if you have none"));
         addOptions(new OptionData(
-                OptionType.INTEGER,
-                "sabo_decline_median",
-                "Your median hours that the bot will wait for auto \"No Sabo\". Enter 0 to turn off."));
+                        OptionType.INTEGER,
+                        "sabo_decline_median",
+                        "Your median hours that the bot will wait for auto \"No Sabo\". Enter 0 to turn off.")
+                .setRequiredRange(0, 720));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 "auto_respond_no_secrets",
@@ -76,6 +79,9 @@ class SetPreferredSettings extends Subcommand {
 
         Boolean sarween = event.getOption("sarween_msg", null, OptionMapping::getAsBoolean);
         if (sarween != null) userSettings.setPrefersSarweenMsg(sarween);
+
+        Boolean strat = event.getOption("join_strat_threads", null, OptionMapping::getAsBoolean);
+        if (strat != null) userSettings.setPrefersStrategyThreadJoining(strat);
 
         String voltron = event.getOption(Constants.VOLTRON_STYLE, null, OptionMapping::getAsString);
         if (voltron != null) userSettings.setVoltronStyle(voltron);

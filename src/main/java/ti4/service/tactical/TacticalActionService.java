@@ -9,11 +9,11 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PirateHordeBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.CombatInitiativeLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.*;
@@ -26,7 +26,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CommandCounterHelper;
@@ -39,8 +38,8 @@ import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.helpers.twilight_kart.TkHelperStarflare;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -48,8 +47,11 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.LoreService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.MercerAgent;
 import ti4.service.planet.FlipTileService;
+import ti4.service.tactical.movement.BelkoseaAgentService;
 import ti4.service.tactical.movement.MoveAbilityButtons;
+import ti4.service.tactical.postmovement.AtokeraHeroButton;
 
 @UtilityClass
 public class TacticalActionService {
@@ -210,6 +212,7 @@ public class TacticalActionService {
     }
 
     public void finishMovement(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
+        BelkoseaAgentService.clear(game, player);
         // Pre-check: The Void
         if (FOWPlusService.isVoid(game, tile.getPosition())) {
             FOWPlusService.resolveVoidActivation(player, game);
@@ -243,14 +246,12 @@ public class TacticalActionService {
                 "tyris",
                 "lunarium",
                 "zephyrion",
-                "vyserix",
-                "natau");
+                "vyserix");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
 
         if (tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
-        NetrunnersUnitsHandler.offerTrojan(game, player, ctx.tile);
         if (!game.isL1Hero() && !ctx.playersWithPds2.isEmpty()) {
             ButtonHelperTacticalAction.tacticalActionSpaceCannonOffenceStep(
                     game, player, ctx.playersWithPds2, ctx.tile);
@@ -266,9 +267,6 @@ public class TacticalActionService {
             ButtonInteractionEvent event, Game game, Player player, Tile tile) {
         List<Player> playersWithPds2 = ButtonHelper.getPlayersWithPds2Cover(player, game, tile.getPosition());
 
-        if (player.hasLeader("ironhero")) {
-            IronLeadersHandler.updateIronHeroEligibility(game, player, tile);
-        }
         ArcanumBreakthroughHandler.movePowerWordWishUnitsToActiveSystem(game, player, tile);
         XytherisLeadersHandler.moveMyrixAgentShipToActiveSystem(game, player, tile);
         boolean unitsWereMoved = moveUnitsIntoActiveSystem(event, game, tile);
@@ -342,7 +340,7 @@ public class TacticalActionService {
             buttons.add(Buttons.red(
                     player.factionButtonChecker() + "doneLanding_" + tile.getPosition(), "Done Landing Troops"));
         } else {
-            buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Resolving"));
+            buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done"));
         }
         return buttons;
     }
@@ -369,11 +367,9 @@ public class TacticalActionService {
                     "Units Travelled Through Weird Wormhole",
                     MiscEmojis.WHalpha));
         }
-        if (player.hasUnexhaustedLeader("sardakkagent")) {
-            buttons.addAll(ButtonHelperAgents.getSardakkAgentButtons(game));
-        }
+
         if (player.hasUnexhaustedLeader("nomadagentmercer")) {
-            buttons.addAll(ButtonHelperAgents.getMercerAgentInitialButtons(game, player));
+            buttons.addAll(MercerAgent.buttons(game, player));
         }
         if (player.hasAbility("shroud_of_lith")
                 && ButtonHelperFactionSpecific.getKolleccReleaseButtons(player, game)
@@ -427,9 +423,14 @@ public class TacticalActionService {
             Tile tile = tileEntry.getValue();
             boolean movedFrom = TacticalActionDisplacementService.hasDisplacementFromPosition(game, tile.getPosition());
             boolean hasUnits = hasUnitsOrAlliedUnitsWithoutCC(player, game, event, tile);
+            if (PirateHordeBrActionCardHandler.isActive(game, player)
+                    && !movedFrom
+                    && !PirateHordeBrActionCardHandler.hasNeutralShips(game, tile)) {
+                continue;
+            }
             boolean canSelect = (movedFrom || hasUnits)
                     && (!CommandCounterHelper.hasCC(event, player.getColor(), tile)
-                            || ButtonHelper.canMoveOutOfLockedSystems(player, game)
+                            || ButtonHelper.canMoveOutOfLockedSystems(player, game, tile)
                             || MonumentsDSButtonHandler.canMoveOutOfFreeholdSystem(game, player, tile)
                             || tile.getPosition().equalsIgnoreCase(game.getActiveSystem()));
             if (canSelect) {
@@ -447,7 +448,13 @@ public class TacticalActionService {
         List<Button> unlandUnitButtons = new ArrayList<>();
 
         UnitHolder space = tile.getSpaceUnitHolder();
-        List<UnitType> committable = getCommittableGroundUnitTypes(player, space);
+        Player unitController = SarcosaHeroHandler.isControllingNeutralUnits(game, player)
+                ? game.getPlayerFromColorOrFaction("neutral")
+                : player;
+        if (unitController == null) {
+            return buttons;
+        }
+        List<UnitType> committable = getCommittableGroundUnitTypes(game, unitController, tile, space);
 
         String landPrefix = player.factionButtonChecker() + "landUnits_" + tile.getPosition() + "_";
         String unlandPrefix = player.factionButtonChecker() + "spaceUnits_" + tile.getPosition() + "_";
@@ -455,7 +462,7 @@ public class TacticalActionService {
             if (shouldSkipLandingOnPlanet(planet)) continue;
 
             LandingContext ctx =
-                    LandingContext.of(game, player, tile, space, planet, landPrefix, unlandPrefix, committable);
+                    LandingContext.of(game, unitController, tile, space, planet, landPrefix, unlandPrefix, committable);
 
             addLandingAndUnlandingButtonsForPlanet(ctx, buttons, unlandUnitButtons);
             for (PlanetAbilityButton ability : PlanetAbilityButtons.ABILITIES) {
@@ -466,14 +473,16 @@ public class TacticalActionService {
             unlandUnitButtons.clear();
         }
 
-        PostMovementButtonContext ctx = new PostMovementButtonContext(game, player, tile);
-        for (PostMovementAbilityButton ability : PostMovementAbilityButtons.ABILITIES) {
-            if (ability.enabled(ctx)) buttons.addAll(ability.build(ctx));
-        }
-        ArdentiaUnitHandler.addIronClawDeployButton(buttons, game, player, tile);
-        if (game.isMonumentsMode()) {
-            if (MonumentsService.isMonumentOnBoard(game, player, "celdauri_monument")) {
-                buttons.addAll(MonumentsDSButtonHandler.getCeldauriMonumentCommitButtons(game, player, tile));
+        if (unitController == player) {
+            PostMovementButtonContext ctx = new PostMovementButtonContext(game, player, tile);
+            for (PostMovementAbilityButton ability : PostMovementAbilityButtons.ABILITIES) {
+                if (ability.enabled(ctx)) buttons.addAll(ability.build(ctx));
+            }
+            ArdentiaUnitHandler.addIronClawDeployButton(buttons, game, player, tile);
+            if (game.isMonumentsMode()) {
+                if (MonumentsService.isMonumentOnBoard(game, player, "celdauri_monument")) {
+                    buttons.addAll(MonumentsDSButtonHandler.getCeldauriMonumentCommitButtons(game, player, tile));
+                }
             }
         }
 
@@ -512,7 +521,7 @@ public class TacticalActionService {
         return hasUnits;
     }
 
-    private List<UnitType> getCommittableGroundUnitTypes(Player player, UnitHolder space) {
+    private List<UnitType> getCommittableGroundUnitTypes(Game game, Player player, Tile tile, UnitHolder space) {
         List<UnitType> committable = new ArrayList<>(List.of(UnitType.Mech, UnitType.Infantry));
         boolean naaluFS = (player.hasUnit("naalu_flagship") || player.hasUnit("sigma_naalu_flagship_2"))
                 && space.getUnitCount(UnitType.Flagship, player) > 0;
@@ -525,6 +534,7 @@ public class TacticalActionService {
         if (player.hasUnlockedBreakthrough("xytherisbt") && player.hasUpgradedUnit("pds2")) {
             committable.add(UnitType.Pds);
         }
+        committable.addAll(AtokeraHeroButton.getCommittableShipTypes(game, player, tile, space));
         return committable;
     }
 

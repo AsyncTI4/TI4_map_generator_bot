@@ -10,18 +10,19 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.info.SecretObjectiveInfoService;
 
 class ShowSO extends GameStateSubcommand {
 
     ShowSO() {
-        super(Constants.SHOW_SO, "Show a Secret Objective to a player", true, true);
+        super(Constants.SHOW_SO, "Show a chosen Secret Objective to a player", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER,
                         Constants.SECRET_OBJECTIVE_ID,
                         "Secret objective ID, which is found between ()")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Target faction or color")
                 .setRequired(true)

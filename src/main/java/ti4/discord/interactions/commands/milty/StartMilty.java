@@ -10,10 +10,10 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.StringHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.milty.MiltyDraftSpec;
 import ti4.service.milty.MiltyService;
@@ -22,7 +22,8 @@ class StartMilty extends GameStateSubcommand {
 
     StartMilty() {
         super(Constants.QUICKSTART, "Start Milty Draft with default settings", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SLICE_COUNT, "Slice Count (default = players + 1)"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SLICE_COUNT, "Slice Count (default = players + 1)")
+                .setRequiredRange(1, 30));
         addOptions(new OptionData(OptionType.INTEGER, Constants.FACTION_COUNT, "Faction Count (default = players + 1)")
                 .setRequiredRange(1, 25));
         addOptions(

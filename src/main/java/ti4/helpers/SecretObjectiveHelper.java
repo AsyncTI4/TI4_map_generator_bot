@@ -11,18 +11,21 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.FowScoringStatusService;
 import ti4.service.game.EndedGameScoringGuardService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
@@ -98,7 +101,7 @@ public class SecretObjectiveHelper {
                     buttons.add(Buttons.green(
                             "tnelisHeroAttach_" + soStringID,
                             "Attach to " + Mapper.getSecretObjectivesJustNames().get(soStringID)));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                     String msg = p2.getRepresentationUnfogged()
                             + " you have the opportunity to attach Turra Sveyar, the Tnelis hero, to the recently scored secret objective "
                             + Mapper.getSecretObjectivesJustNames().get(soStringID) + ". Use buttons to resolve.";
@@ -110,6 +113,7 @@ public class SecretObjectiveHelper {
                 game.setStoredValue(
                         player.getFaction() + "round" + game.getRound() + "SO",
                         Mapper.getSecretObjective(entry.getKey()).getName());
+                FowScoringStatusService.refresh(game, player);
             }
             if (game.getPhaseOfGame().toLowerCase().contains("action")
                     && Mapper.getSecretObjective(entry.getKey()) != null
@@ -139,7 +143,9 @@ public class SecretObjectiveHelper {
                     StringBuilder message2 = new StringBuilder(player.getRepresentation() + " purged");
                     for (String fragId : fragmentsToPurge) {
                         player.removeFragment(fragId);
-                        game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+                        if (!StonebornAbilityHandler.returnPurgedFragment(game, fragId)) {
+                            game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+                        }
                         if (fragId.startsWith("supermassive")) {
                             ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, fragId);
                         }
@@ -153,6 +159,7 @@ public class SecretObjectiveHelper {
                             default -> message2.append(' ').append(fragId);
                         }
                     }
+                    StonebornAbilityHandler.offerFragmentumTokenPlacement(game, player, event, fragmentsToPurge);
                     CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
                     message2.append(" relic fragments.");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2.toString());
@@ -222,10 +229,10 @@ public class SecretObjectiveHelper {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
 
-        if (player.hasTech("tf-plausibled")) {
+        if (player.hasTech("tf-plausibled") || player.hasAbility("plausible_deniability_br")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
-            buttons.add(Buttons.red("deleteButtons", "Done"));
+            buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
@@ -240,10 +247,10 @@ public class SecretObjectiveHelper {
                     player.getCorrectChannel(),
                     player.getRepresentation() + " gains 1 splice card due to _Yin Ascendant_.");
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
-            buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
+            buttons.add(Buttons.DRAW_1_ABILITY);
+            buttons.add(Buttons.DRAW_1_UNIT_UPGRADE);
             buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
-            buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+            buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
             String message2 = player.getRepresentationUnfogged() + ", please use these buttons to resolve.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
@@ -256,6 +263,14 @@ public class SecretObjectiveHelper {
     }
 
     public static void showAll(Player player, Player player2, Game game) {
+        if (XinTechHandler.hasAstromanticCloakSteel(player) && player != player2) {
+            MessageHelper.sendMessageToChannel(
+                    player2.getCorrectChannel(),
+                    player2.getRepresentation()
+                            + ", you cannot look at " + player.getRepresentationNoPing() + "'s"
+                            + " Secret Objectives because they have _Astromantic Cloak (Steel)!");
+            return;
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(game.getName()).append('\n');
         sb.append("Player: ").append(player.getUserName()).append('\n');

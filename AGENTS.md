@@ -113,3 +113,54 @@ A single action row can hold **either** up to 5 buttons **or** one select menu �
   in. `SlashCommandLimitsTest` now fails the build first. Before adding a subcommand, check
   the parent's current count — if it is full, put the command under a different parent
   rather than freeing a slot.
+- **Reach Spring beans through a static `getBean()` on the bean's own class.** Non-Spring
+  code (static helpers, listeners, commands) should call `MyService.getBean()`, not
+  `SpringContext.getBean(MyService.class)` directly. Give the service
+  `public static MyService getBean() { return SpringContext.getBean(MyService.class); }`
+  (see `SavedBotMessagesService.getBean()` or `GameMessageService.getBean()`). Use this for
+  new code and when touching existing call sites.
+- **Agents, genomes and homebrew agents live apart.** Official agents are modules under
+  `ti4.service.leader.agent.modules`. The agent core in `ti4.service.leader.agent` and those modules never name
+  Twilight's Fall, genomes or homebrew. Genomes (Twilight's Fall and TK Nova) live in
+  `ti4.service.leader.genome` and lean on agent modules. Homebrew agents live in
+  `ti4.service.leader.agent.modules.homebrew`. `ti4.service.leader.LeaderAgents` is the only place that lists all
+  the catalogs, and `AgentSegregationTest` fails the build when the core or an official module mentions them.
+- **Keep new features fog safe.** Fog of War games must not leak factions, identities or hidden state
+  to other players. Before writing new messages or buttons, make some effort to use the fog-safe
+  helpers in [FoWHelper.java](src/main/java/ti4/helpers/FoWHelper.java) (`actorOrAnon`,
+  `fogSafeTargetButton`, `identityOrColorIfCanSeeStats`, `notifyPlayerAndAffectedInFog`, …) and
+  `Player.fogSafeEmoji()` / `getFactionEmojiOrColor()`. If none of them fits, suggest a cheap best-effort
+  fix (e.g. `game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel()`). If even that
+  isn't feasible, leave a compact TODO in the method saying what leaks, so it can be made fog safe later.
+- **Never ping other players into a private cards-info thread.** A player's `#cards-info` thread
+  (`getCardsInfoThread()`) is private: it shows their hand and secrets, and pinging someone in it adds them
+  to the thread. Buttons pressed there reply there by default, so when a message is for another player
+  (or is something everyone should see, like an agent being exhausted), send it to
+  that player's `getCorrectChannel()` instead (the actions channel, or their private channel in Fog of War). Agent
+  modules get this from `AgentLifecycle.deliver`; elsewhere, check
+  `event.getMessageChannel().getType() == ChannelType.GUILD_PRIVATE_THREAD`.
+- **Domain vocabulary lives in [GLOSSARY.md](GLOSSARY.md).** Use its terms in code, messages and
+  PR text, and check it for TI4 rules, table slang (wash, plastic, guac, X-1) and Discord surface
+  names. Add new terms there when you introduce a domain concept.
+- **The published TI4 rules live in [docs/rules/](docs/rules/README.md).** Living Rules Reference
+  text by topic, rulings per card type and per faction (files named by bot faction alias), setup,
+  Thunder's Edge rules and the designer FAQ. Grep it before implementing or changing rules logic,
+  and cite rule numbers as "LRR 41.2". Its README lists which source wins when they disagree.
+- **Component-specific rules live in [COMPONENT_RULES.md](COMPONENT_RULES.md).** Open it only
+  when your change touches a component listed below; otherwise skip it.
+  - Border anomalies: any file or class named `BorderAnomaly*` or `border_anomal*`.
+  - 30k Content Lab cards: source `thirtyk`, files or classes named `thirtyk` / `ThirtyK*`, card ids
+    ending in `30k` or `jmsc`.
+
+### Testing of new functionality and/or bug fixes
+The repo includes a testbed: a developer-only feature for testing on a live Discord dev bot
+run by the developer. It sets up games with virtual seats and drives them through JSON
+scripts, presets and shortcuts under `src/main/resources/data/testbed/`. See
+[DEVELOPER_TESTBED.md](DEVELOPER_TESTBED.md) and [TESTBED_AGENT_GUIDE.md](TESTBED_AGENT_GUIDE.md).
+
+- Do not create or edit testbed scripts, presets or shortcuts unless the developer explicitly
+  asks for it, or a private instruction set from the developer allows it.
+- You may suggest that a change would benefit from a testbed check.
+- This rule covers only the testbed. Writing JUnit tests in `src/test/java` and running the
+  normal Maven build (including `TestBedDataTest`) are always allowed and encouraged.
+

@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.info.SecretObjectiveInfoService;
 
 class ShowSOToAll extends GameStateSubcommand {
@@ -19,6 +19,7 @@ class ShowSOToAll extends GameStateSubcommand {
                         OptionType.INTEGER,
                         Constants.SECRET_OBJECTIVE_ID,
                         "Secret objective ID, which is found between ()")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,

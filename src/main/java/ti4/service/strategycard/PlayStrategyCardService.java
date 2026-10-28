@@ -21,8 +21,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaTechHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -35,14 +35,15 @@ import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
 import ti4.helpers.CryypterHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units;
 import ti4.helpers.thundersedge.TeHelperTechs;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.StrategyCardModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -55,14 +56,18 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.FowAutoDeclineService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.SpeakerService;
+import ti4.service.leader.agent.modules.MahactAgent;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
+import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 @UtilityClass
 public class PlayStrategyCardService {
@@ -176,19 +181,22 @@ public class PlayStrategyCardService {
                 }
             }
 
-            if (!gamePing.isEmpty()) {
+            if (!winnuHero && !gamePing.isEmpty()) {
                 message.append(gamePing).append(", please indicate your choice with these buttons.");
             } else {
                 message.append("Please indicate your choice with these buttons.");
             }
 
-            for (Player player2 : playersToFollow) {
-                player2.removeFollowedSC(scToPlay);
-                player2.getCardsInfoThread(); // force thread to open if closed
-            }
-
             if (!winnuHero) {
+                for (Player player2 : playersToFollow) {
+                    player2.removeFollowedSC(scToPlay);
+                    player2.getCardsInfoThread(); // force thread to open if closed
+                }
+
                 game.setSCPlayed(scToPlay, Boolean.TRUE);
+                if (game.getPhaseOfGame().contains("action")) {
+                    TurnActionLog.record(game, TurnActionLog.STRATEGIC);
+                }
                 GameEventService.commit(
                         game, GameEventType.SC_PLAYED, player, Map.of("scNumber", scToPlay, "scName", stratCardName));
                 // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
@@ -204,14 +212,13 @@ public class PlayStrategyCardService {
 
         // GET BUTTONS
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero, isOverrule, player));
+        if (isOverrule || winnuHero) {
+            removeFollowButtons(scButtons);
+        }
+        if ("br5trade".equals(scModel.getId())) {
+            scButtons.add(BRTradeStrategyCardService.getPlaceOrMoveStationButton(player));
+        }
         if (isOverrule) {
-            scButtons.removeIf(button -> {
-                String id = button.getCustomId();
-                return id != null
-                        && (id.startsWith("sc_follow_")
-                                || "sc_trade_follow".equals(id)
-                                || id.startsWith("sc_no_follow_"));
-            });
             String ffcc = player.factionButtonChecker();
             scButtons.replaceAll(button -> {
                 String id = button.getCustomId();
@@ -239,13 +246,7 @@ public class PlayStrategyCardService {
 
             Player titansMechPlayer = Helper.getPlayerFromUnit(game, "titans_mech");
             if (titansMechPlayer != null) {
-                boolean shouldAddTitansMechDeployButton = (scModel.usesAutomationForSCID("pok4construction")
-                                || scModel.usesAutomationForSCID("te4construction")
-                                || (game.isMonumentsMode()
-                                        && (scModel.usesAutomationForSCID("monuments4construction")
-                                                || scModel.usesAutomationForSCID("monumentstf4"))))
-                        && !game.isFowMode()
-                        && !ButtonHelper.isLawInPlay(game, "articles_war");
+                boolean shouldAddTitansMechDeployButton = allowsTitansMechDeploy(game, scModel) && !game.isFowMode();
                 if (shouldAddTitansMechDeployButton) {
                     String ffcc = titansMechPlayer.factionButtonChecker();
                     scButtons.add(Buttons.gray(
@@ -253,6 +254,10 @@ public class PlayStrategyCardService {
                             "Deploy Titan Mech + Infantry",
                             FactionEmojis.Titans));
                 }
+            }
+
+            if (FoWHelper.isFogQol01(game)) {
+                offerFactionFollowButtonsPrivately(game, scModel);
             }
 
             scButtons.add(Buttons.gray("requestAllFollow_" + scToPlay, "Request All Resolve Now"));
@@ -266,7 +271,8 @@ public class PlayStrategyCardService {
         sendAndHandleMessageResponse(baseMessageObject.build(), game, player, event, scToPlay, scModel, scButtons);
 
         // Trade Primary
-        if (scModel.usesAutomationForSCID("pok5trade")) {
+        if (scModel.usesAutomationForSCID("pok5trade")
+                && !OnyxxaAbilityHandler.isDetachmentCard(game, player, scToPlay)) {
             TradeStrategyCardService.doPrimary(game, event, player);
         }
 
@@ -405,12 +411,6 @@ public class PlayStrategyCardService {
                             player3.getRepresentation()
                                     + ", you have been elected as Minister of Sciences, so you do not need to pay resources to research off of technology. ");
                 }
-                if (player3 != player && player3.hasLeaderUnlocked("netrunnerscommander")) {
-                    MessageHelper.sendMessageToChannel(
-                            player3.getCardsInfoThread(),
-                            player3.getRepresentationUnfogged()
-                                    + ", Tek Mir-un, the Netrunners commander, lets you choose to follow **Technology** without spending a command token. Please select Get a Technology rather than Spend A Strategy Token.");
-                }
             }
         }
 
@@ -437,7 +437,7 @@ public class PlayStrategyCardService {
                 MindsieveService.serveMindsieveButtons(game, player3, scToPlay);
                 StoneEmbraceService.serveStoneEmbraceButtons(game, player3, scToPlay);
                 List<Button> empNMahButtons = new ArrayList<>();
-                Button deleteB = Buttons.red("deleteButtons", "Delete These Buttons");
+                Button deleteB = Buttons.DELETE_BUTTONS;
                 empNMahButtons.add(deleteB);
                 if (player3.hasRelic("emelpar") && !player3.getExhaustedRelics().contains("emelpar")) {
                     empNMahButtons.addFirst(emelpar);
@@ -459,12 +459,12 @@ public class PlayStrategyCardService {
                     List<Tile> tilesWithPrimaryPlayersCC = ButtonHelper.getTilesWithYourCC(player, game, event);
                     boolean primaryPlayerHasAnyCCInPlay = !tilesWithPrimaryPlayersCC.isEmpty();
                     boolean primaryPlayerHasExactlyOneCCInPlay = tilesWithPrimaryPlayersCC.size() == 1;
-                    if (!primaryPlayerHasAnyCCInPlay
-                            || scModel.usesAutomationForSCID("pok6warfare") && primaryPlayerHasExactlyOneCCInPlay) {
+                    boolean nothingToRemove = !primaryPlayerHasAnyCCInPlay
+                            || scModel.usesAutomationForSCID("pok6warfare") && primaryPlayerHasExactlyOneCCInPlay;
+                    if (nothingToRemove && !game.isFowMode()) {
                         continue;
                     }
-                    empNMahButtons.addFirst(
-                            Buttons.green("mahactA_follow_" + scToPlay, "Use Mahact Agent", FactionEmojis.Mahact));
+                    empNMahButtons.addFirst(MahactAgent.followButton(player3, scToPlay));
                     MessageHelper.sendMessageToChannelWithButtons(
                             player3.getCardsInfoThread(),
                             player3.getRepresentationUnfogged() + " You may follow **" + stratCardName + "** with "
@@ -558,7 +558,7 @@ public class PlayStrategyCardService {
             List<Button> graceButtons = new ArrayList<>();
             graceButtons.add(
                     Buttons.green(player.factionButtonChecker() + "resolveGrace_" + scToPlay, "Resolve Grace Ability"));
-            graceButtons.add(Buttons.red("deleteButtons", "Decline"));
+            graceButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " you may resolve **Grace** with the buttons.",
@@ -590,7 +590,7 @@ public class PlayStrategyCardService {
                                     + " you may use this button to play _Acquiescence_ to perform the secondary without spending a command token from your strategy pool.";
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Buttons.green("winnuPNPlay_" + scToPlay, "Use Acquiescence"));
-                            buttons.add(Buttons.red("deleteButtons", "Decline"));
+                            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                             MessageHelper.sendMessageToChannelWithButtons(
                                     player2.getCardsInfoThread(), acqMessage, buttons);
                         }
@@ -603,9 +603,7 @@ public class PlayStrategyCardService {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " may use _Lunar Eclipse_ after performing this strategic action.",
-                    List.of(
-                            AeternaAbilityHandler.getLunarEclipseButton(player),
-                            Buttons.red("deleteButtons", "Decline")));
+                    List.of(AeternaAbilityHandler.getLunarEclipseButton(player), Buttons.DECLINE_DELETE_BUTTONS));
         }
         if (player.hasPlayablePromissoryInHand("thpnverydith")) {
             VerydithPromissoryHandler.usePactRenewed(player);
@@ -634,6 +632,10 @@ public class PlayStrategyCardService {
         }
         for (Player p : Helper.getSpeakerOrFullPriorityOrderFromPlayer(scHolder, game)) {
             String representation = ping ? p.getRepresentation() : p.getRepresentationNoPing();
+            var userSettings = UserSettingsManager.get(p.getUserID());
+            if (!userSettings.isPrefersStrategyThreadJoining()) {
+                representation = p.getRepresentationNoPing();
+            }
             if (p.hasFollowedSC(scID)) {
                 if (p.getSCs().contains(scID)) {
                     followSummary.append(representation).append(" played the SC");
@@ -664,14 +666,14 @@ public class PlayStrategyCardService {
             List<Button> scButtons) {
         String stratCardName = Helper.getSCName(scToPlay, game);
         List<Player> playersToReact = new ArrayList<>();
-        if (!OnyxxaAbilityHandler.handleDetachmentOnPlay(game, player, scToPlay)) {
+        boolean isDetachmentCard = OnyxxaAbilityHandler.isDetachmentCard(game, player, scToPlay);
+        if (!isDetachmentCard) {
             playersToReact.add(player);
             player.addFollowedSC(scToPlay, event);
         }
         boolean isSpecialPbdGame =
                 "pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName());
         if (!game.isFowMode() && !isSpecialPbdGame && !game.isHomebrewSCMode()) {
-            boolean primaryHasAcq = player.ownsPromissoryNote("acq");
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
                     continue;
@@ -683,20 +685,7 @@ public class PlayStrategyCardService {
                 if (scToPlay == 5) {
                     continue;
                 }
-                List<Integer> unfollowedSCs = p2.getUnfollowedSCs();
-                if (!primaryHasAcq
-                        && p2.getStrategicCC() == 0
-                        && !unfollowedSCs.contains(1)
-                        && (!p2.getTechs().contains("iihq") || !unfollowedSCs.contains(8))
-                        && !p2.hasRelicReady("absol_emelpar")
-                        && !p2.hasRelicReady("emelpar")
-                        && !p2.hasUnexhaustedLeader("mahactagent")
-                        && !p2.hasUnexhaustedLeader("yssarilagent")
-                        && !AdministrativeExemptionLLButtonHandler.hasExemption(game, p2)
-                        && !MindsieveService.canUseMindsieve(p2, player, scModel)
-                        && !p2.hasTech(OnyxxaTechHandler.SACRIFICIAL_COMMAND)
-                        && !StoneEmbraceService.canUseStoneEmbrace(p2, player, scModel)
-                        && scToPlay != 1) {
+                if (lacksStrategyTokensToFollow(game, player, p2, scToPlay, scModel)) {
                     markPlayerAsAutoFollowing(playersToReact, game, p2, scToPlay, event);
                     MessageHelper.sendMessageToChannel(
                             p2.getCardsInfoThread(),
@@ -717,17 +706,7 @@ public class PlayStrategyCardService {
                                         + "** because the bot does not believe you have a space dock in your home system.");
                     }
                 }
-                if (!p2.hasFollowedSC(scToPlay)
-                        && !game.getStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction())
-                                .isEmpty()) {
-                    game.removeStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction());
-                    markPlayerAsAutoFollowing(playersToReact, game, p2, scToPlay, event);
-                    MessageHelper.sendMessageToChannel(
-                            p2.getCardsInfoThread(),
-                            "You were automatically marked as not following **"
-                                    + stratCardName
-                                    + "** because you told the bot earlier that you wished to pass on it.");
-                } else {
+                if (!applyPreDecline(playersToReact, game, p2, scToPlay, stratCardName, event)) {
                     if (scToPlay == 8 && p2.getSoScored() == p2.getMaxSOCount() && !game.isTwilightsFallMode()) {
                         markPlayerAsAutoFollowing(playersToReact, game, p2, 8, event);
                         MessageHelper.sendMessageToChannel(
@@ -736,6 +715,16 @@ public class PlayStrategyCardService {
                                         + "** because the bot believes you have already scored all "
                                         + p2.getSoScored() + " of your secret objectives.");
                     }
+                }
+            }
+        }
+        if (FoWHelper.isFogQol01(game) && !isSpecialPbdGame && !game.isHomebrewSCMode() && scToPlay != 5) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2 == player || applyPreDecline(playersToReact, game, p2, scToPlay, stratCardName, event)) {
+                    continue;
+                }
+                if (lacksStrategyTokensToFollow(game, player, p2, scToPlay, scModel)) {
+                    FowAutoDeclineService.schedule(game, p2, scToPlay);
                 }
             }
         }
@@ -750,7 +739,15 @@ public class PlayStrategyCardService {
                 .sendMessage(toSend)
                 .queue(
                         message -> handleScMessageResponse(
-                                message, game, player, scToPlay, playRound, scModel, scButtons, playersToReact),
+                                message,
+                                game,
+                                player,
+                                scToPlay,
+                                playRound,
+                                scModel,
+                                scButtons,
+                                playersToReact,
+                                isDetachmentCard),
                         BotLogger::catchRestError);
     }
 
@@ -762,10 +759,14 @@ public class PlayStrategyCardService {
             int playRound,
             StrategyCardModel scModel,
             List<Button> scButtons,
-            List<Player> playersToReact) {
+            List<Player> playersToReact,
+            boolean isDetachmentCard) {
         long messageCreationTime = message.getTimeCreated().toInstant().toEpochMilli();
         StrategyCardMessageService.replaceStrategyCardMessage(
                 game.getName(), message.getId(), playRound, scToPlay, messageCreationTime);
+        if (isDetachmentCard) {
+            OnyxxaAbilityHandler.sendDetachmentReminder(game, player, scToPlay);
+        }
         for (Player reactingPlayer : playersToReact) {
             Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, reactingPlayer, message);
             message.addReaction(reactionEmoji).queue(Consumers.nop(), BotLogger::catchRestError);
@@ -807,7 +808,7 @@ public class PlayStrategyCardService {
             }
 
             if (scModel.usesAutomationForSCID("pok5trade")) {
-                Button transaction = Buttons.blue("transaction", "Transaction");
+                Button transaction = Buttons.TRANSACTION;
                 scButtons.add(transaction);
                 scButtons.add(Buttons.green("sendTradeHolder_tg_" + player.getFaction(), "Send 1 Trade Good"));
                 String label = "Send 1 Debt";
@@ -876,6 +877,86 @@ public class PlayStrategyCardService {
         return gameName + "-round-" + round + "-" + strategyCardName;
     }
 
+    private static boolean allowsTitansMechDeploy(Game game, StrategyCardModel scModel) {
+        return (scModel.usesAutomationForSCID("pok4construction")
+                        || scModel.usesAutomationForSCID("te4construction")
+                        || (game.isMonumentsMode()
+                                && (scModel.usesAutomationForSCID("monuments4construction")
+                                        || scModel.usesAutomationForSCID("monumentstf4"))))
+                && !ButtonHelper.isLawInPlay(game, "articles_war");
+    }
+
+    private static void offerFactionFollowButtonsPrivately(Game game, StrategyCardModel scModel) {
+        Player zealousPlayer = Helper.getPlayerFromAbility(game, "zealousds");
+        if (zealousPlayer != null && scModel.usesAutomationForSCID("tf6")) {
+            offerPrivateFollowButton(
+                    zealousPlayer,
+                    scModel,
+                    Buttons.gray(
+                            zealousPlayer.factionButtonChecker() + "primaryOfWarfare",
+                            "Do Zealous",
+                            zealousPlayer.getFactionEmoji()));
+        }
+        Player titansMechPlayer = Helper.getPlayerFromUnit(game, "titans_mech");
+        if (titansMechPlayer != null && allowsTitansMechDeploy(game, scModel)) {
+            offerPrivateFollowButton(
+                    titansMechPlayer,
+                    scModel,
+                    Buttons.gray(
+                            titansMechPlayer.factionButtonChecker() + "titansConstructionMechDeployStep1",
+                            "Deploy Titan Mech + Infantry",
+                            FactionEmojis.Titans));
+        }
+    }
+
+    private static void offerPrivateFollowButton(Player player, StrategyCardModel scModel, Button button) {
+        if (player.getPrivateChannel() == null) return;
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getPrivateChannel(),
+                player.getRepresentationUnfogged() + ", **" + scModel.getName()
+                        + "** was played. You may use your faction ability with this button.",
+                List.of(button, Buttons.DONE_DELETE_BUTTONS));
+    }
+
+    public static boolean lacksStrategyTokensToFollow(
+            Game game, Player primary, Player p2, int scToPlay, StrategyCardModel scModel) {
+        List<Integer> unfollowedSCs = p2.getUnfollowedSCs();
+        return !primary.ownsPromissoryNote("acq")
+                && p2.getStrategicCC() == 0
+                && !unfollowedSCs.contains(1)
+                && (!p2.getTechs().contains("iihq") || !unfollowedSCs.contains(8))
+                && !p2.hasRelicReady("absol_emelpar")
+                && !p2.hasRelicReady("emelpar")
+                && !p2.hasUnexhaustedLeader("mahactagent")
+                && !p2.hasUnexhaustedLeader("yssarilagent")
+                && !AdministrativeExemptionLLButtonHandler.hasExemption(game, p2)
+                && !MindsieveService.canUseMindsieve(p2, primary, scModel)
+                && !p2.hasTech(OnyxxaTechHandler.SACRIFICIAL_COMMAND)
+                && !StoneEmbraceService.canUseStoneEmbrace(p2, primary, scModel)
+                && scToPlay != 1;
+    }
+
+    private static boolean applyPreDecline(
+            List<Player> playersToReact,
+            Game game,
+            Player p2,
+            int scToPlay,
+            String stratCardName,
+            GenericInteractionCreateEvent event) {
+        String key = "prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction();
+        if (p2.hasFollowedSC(scToPlay) || game.getStoredValue(key).isEmpty()) {
+            return false;
+        }
+        game.removeStoredValue(key);
+        markPlayerAsAutoFollowing(playersToReact, game, p2, scToPlay, event);
+        MessageHelper.sendMessageToChannel(
+                p2.getCardsInfoThread(),
+                "You were automatically marked as not following **"
+                        + stratCardName
+                        + "** because you told the bot earlier that you wished to pass on it.");
+        return true;
+    }
+
     private static void markPlayerAsAutoFollowing(
             List<Player> playersToReact, Game game, Player player, int scToPlay, GenericInteractionCreateEvent event) {
         playersToReact.add(player);
@@ -896,20 +977,33 @@ public class PlayStrategyCardService {
         game.setStoredValue(key, game.getStoredValue(key) + player.getFaction() + "*");
     }
 
+    private static void removeFollowButtons(List<Button> scButtons) {
+        scButtons.removeIf(button -> {
+            String id = button.getCustomId();
+            return id != null
+                    && (id.startsWith("sc_follow_") || "sc_trade_follow".equals(id) || id.startsWith("sc_no_follow_"));
+        });
+    }
+
     private static List<Button> getSCButtons(int sc, Game game, boolean winnuHero, boolean isOverrule, Player player) {
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
         if (scModel == null) {
             return getGenericButtons(sc);
         }
 
-        String scAutomationID = scModel.getBotSCAutomationID();
-
-        // Handle Special Cases
-        if (!isOverrule && "pok8imperial".equals(scAutomationID)) {
+        if (!isOverrule && "pok8imperial".equals(scModel.getBotSCAutomationID())) {
             handleSOQueueing(game, winnuHero);
         }
+        return getStrategyCardButtons(sc, game, player);
+    }
 
-        // Return Buttons
+    public static List<Button> getStrategyCardButtons(int sc, Game game, Player player) {
+        StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
+        if (scModel == null) {
+            return getGenericButtons(sc);
+        }
+
+        String scAutomationID = scModel.getBotSCAutomationID();
         return switch (scAutomationID) {
             case "pok1leadership" -> getLeadershipButtons(sc);
             case "pok2diplomacy" -> getDiplomacyButtons(sc, player);
@@ -964,11 +1058,11 @@ public class PlayStrategyCardService {
     private static List<Button> getThundersEdgeConstructionButtons(int sc, Game game) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button buildButton = Buttons.green("constructionPrimary_produce", "[Primary] Use Production");
-        Button sdButton = Buttons.green("construction_spacedock", "Place A Space Dock", UnitEmojis.spacedock);
-        Button pdsButton = Buttons.green("construction_pds", "Place a PDS", UnitEmojis.pds);
+        Button sdButton = Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK;
+        Button pdsButton = Buttons.CONSTRUCTION_PLACE_1_PDS;
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         if (game.isMonumentToTheAgesMode()) {
-            Button facilityButton = Buttons.green("construction_agesmonument", "Place A Monument (Cost 5 TG)");
+            Button facilityButton = Buttons.CONSTRUCTION_PLACE_A_MONUMENT;
             return List.of(followButton, buildButton, sdButton, pdsButton, facilityButton, noFollowButton);
         }
         return List.of(followButton, buildButton, sdButton, pdsButton, noFollowButton);
@@ -977,7 +1071,7 @@ public class PlayStrategyCardService {
     private static List<Button> getThundersEdgeWarfareButtons(int sc) {
         Button warfarePrimary = Buttons.blue("primaryOfTeWarfare", "Warfare Tactical Action");
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
-        Button homeBuild = Buttons.green("warfareTeBuild", "Build At Home");
+        Button homeBuild = Buttons.WARFARE_TE_BUILD_AT_HOME;
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         return List.of(warfarePrimary, followButton, homeBuild, noFollowButton);
     }
@@ -1042,16 +1136,14 @@ public class PlayStrategyCardService {
     }
 
     private static List<Button> getLeadershipButtons(int sc) {
-        Button leadershipGenerateCCButtons =
-                Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens");
+        Button leadershipGenerateCCButtons = Buttons.SPEND_AND_GAIN_COMMAND_TOKENS;
         // Button exhaust = Buttons.red("leadershipExhaust", "Spend");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         return List.of(leadershipGenerateCCButtons, noFollowButton);
     }
 
     private static List<Button> getAnarchy1Buttons(int sc) {
-        Button leadershipGenerateCCButtons =
-                Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens");
+        Button leadershipGenerateCCButtons = Buttons.SPEND_AND_GAIN_COMMAND_TOKENS;
         Button an1 = Buttons.green("primaryOfAnarchy1", "Resolve A Chosen And Unexhausted Secondary");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         return List.of(leadershipGenerateCCButtons, an1, noFollowButton);
@@ -1060,7 +1152,7 @@ public class PlayStrategyCardService {
     private static List<Button> getDiplomacyButtons(int sc, Player player) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button diploSystemButton = Buttons.blue(player.factionButtonChecker() + "diploSystem", "Diplo A System");
-        Button refreshButton = Buttons.green("diploRefresh2", "Ready 2 Planets");
+        Button refreshButton = Buttons.DIPLO_READY_2_PLANETS;
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, diploSystemButton, refreshButton, noFollowButton);
     }
@@ -1079,7 +1171,7 @@ public class PlayStrategyCardService {
         Button refreshButton =
                 Buttons.green(player.factionButtonChecker() + "primaryOfAnarchy7", "Resolve PRODUCTION In A System");
         Button participate = Buttons.blue("participateInSplice_6", "Participate In Splice");
-        Button homeBuild = Buttons.green("warfareTeBuild", "Build At Home");
+        Button homeBuild = Buttons.WARFARE_TE_BUILD_AT_HOME;
 
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
         return List.of(start, refreshButton, homeBuild, participate, noFollowButton);
@@ -1096,8 +1188,8 @@ public class PlayStrategyCardService {
 
     private static List<Button> getAnarchy2Buttons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
-        Button diploSystemButton = Buttons.gray("anarchy2secondary", "Ready a non-SC Card");
-        Button refreshButton = Buttons.green("diploRefresh2", "Ready Planets");
+        Button diploSystemButton = Buttons.READY_A_COMPONENT;
+        Button refreshButton = Buttons.DIPLO_READY_PLANETS;
 
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, diploSystemButton, refreshButton, noFollowButton);
@@ -1106,7 +1198,7 @@ public class PlayStrategyCardService {
     private static List<Button> getLuminous1Buttons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button diploSystemButton = Buttons.gray("anarchy2secondary", "Ready A Relic, Technology, Or Agent.");
-        Button refreshButton = Buttons.green("diploRefresh2", "Ready Planets");
+        Button refreshButton = Buttons.DIPLO_READY_PLANETS;
         Button redi = Buttons.green("redistributeCCButtons", "Redistribute Command Tokens");
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, redi, diploSystemButton, refreshButton, noFollowButton);
@@ -1143,7 +1235,7 @@ public class PlayStrategyCardService {
     private static List<Button> getPoliticsButtons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
-        Button draw2AC = Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", CardEmojis.ActionCard);
+        Button draw2AC = Buttons.SC_DRAW_2_ACTION_CARDS;
         return List.of(followButton, noFollowButton, draw2AC);
     }
 
@@ -1151,7 +1243,7 @@ public class PlayStrategyCardService {
         Button primaryButton = Buttons.green("resolveEvenFall3Primary", "Resolve Primary", ExploreEmojis.Relic);
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
-        Button draw2AC = Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", CardEmojis.ActionCard);
+        Button draw2AC = Buttons.SC_DRAW_2_ACTION_CARDS;
         return List.of(primaryButton, followButton, noFollowButton, draw2AC);
     }
 
@@ -1184,15 +1276,15 @@ public class PlayStrategyCardService {
      */
     private static List<Button> getConstructionButtons(int sc, Game game) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
-        Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock);
-        Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds);
+        Button sdButton = Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK;
+        Button pdsButton = Buttons.CONSTRUCTION_PLACE_1_PDS;
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         if (game.isFacilitiesMode()) {
             Button facilityButton = Buttons.green("construction_facility", "Place A Facility");
             return List.of(followButton, sdButton, pdsButton, facilityButton, noFollowButton);
         }
         if (game.isMonumentToTheAgesMode()) {
-            Button facilityButton = Buttons.green("construction_agesmonument", "Place A Monument (Cost 5 TG)");
+            Button facilityButton = Buttons.CONSTRUCTION_PLACE_A_MONUMENT;
             return List.of(followButton, sdButton, pdsButton, facilityButton, noFollowButton);
         }
         return List.of(followButton, sdButton, pdsButton, noFollowButton);
@@ -1203,14 +1295,14 @@ public class PlayStrategyCardService {
         Button followButton = Buttons.green("sc_trade_follow", "Spend A Strategy Token");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         Button refreshAndWash = Buttons.gray("sc_refresh_and_wash", "Replenish and Wash", MiscEmojis.Wash);
-        Button refresh = Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm);
+        Button refresh = Buttons.REPLENISH_COMMODITIES;
         return List.of(followButton, noFollowButton, refresh, refreshAndWash);
     }
 
     private static List<Button> getWarfareButtons(int sc) {
         Button warfarePrimary = Buttons.blue("primaryOfWarfare", "Do Warfare Primary");
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
-        Button homeBuild = Buttons.green("warfareBuild", "Build At Home");
+        Button homeBuild = Buttons.WARFARE_BUILD_AT_HOME;
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         return List.of(warfarePrimary, followButton, homeBuild, noFollowButton);
     }
@@ -1226,7 +1318,7 @@ public class PlayStrategyCardService {
     private static List<Button> getAnarchy7Buttons(int sc) {
         Button warfarePrimary = Buttons.blue("primaryOfAnarchy7", "Resolve PRODUCTION in a system");
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
-        Button homeBuild = Buttons.green("warfareBuild", "Build At Home");
+        Button homeBuild = Buttons.WARFARE_BUILD_AT_HOME;
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         return List.of(warfarePrimary, followButton, homeBuild, noFollowButton);
     }
@@ -1235,7 +1327,7 @@ public class PlayStrategyCardService {
         Button warfarePrimary = Buttons.blue("primaryOfWarfare", "Do Warfare Primary");
         Button warfarePrimary2 = Buttons.blue("primaryOfLumi7", "Resolve PRODUCTION in a system");
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
-        Button homeBuild = Buttons.green("warfareBuild", "Build At Home");
+        Button homeBuild = Buttons.WARFARE_BUILD_AT_HOME;
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         return List.of(warfarePrimary, warfarePrimary2, followButton, homeBuild, noFollowButton);
     }
@@ -1250,7 +1342,7 @@ public class PlayStrategyCardService {
     private static List<Button> getImperialButtons(int sc, Game game) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
-        Button drawSo = Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective);
+        Button drawSo = Buttons.SC_DRAW_SECRET_OBJECTIVE;
         Button scoreImperial = Buttons.gray("score_imperial", "Score Imperial", PlanetEmojis.Mecatol);
         if ("evenfall_sc".equalsIgnoreCase(game.getScSetID())) {
             scoreImperial = Buttons.gray("drawRelic_sc", "Draw Relic", ExploreEmojis.Relic);
@@ -1262,7 +1354,7 @@ public class PlayStrategyCardService {
     private static List<Button> getTF8Buttons(int sc, Player player) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
-        Button drawSo = Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective);
+        Button drawSo = Buttons.SC_DRAW_SECRET_OBJECTIVE;
         Button drawP = Buttons.gray("drawParadigm", "Draw Paradigm");
         Button scoreImperial =
                 Buttons.gray(player.factionButtonChecker() + "score_imperial", "Score Imperial", PlanetEmojis.Mecatol);
@@ -1282,7 +1374,7 @@ public class PlayStrategyCardService {
     private static List<Button> getAnarchy11Buttons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
-        Button drawSo = Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective);
+        Button drawSo = Buttons.SC_DRAW_SECRET_OBJECTIVE;
         Button scoreImperial = Buttons.gray("score_imperial", "Score Imperial", PlanetEmojis.Mecatol);
         Button scoreAnObjective = Buttons.blue("get_so_score_buttons", "Score A Secret Objective");
         Button reverseOrder = Buttons.gray("reverseSpeakerOrder", "Reverse Speaker Order", MiscEmojis.SpeakerToken);
@@ -1309,8 +1401,8 @@ public class PlayStrategyCardService {
     private static List<Button> getMonumentsConstructionButtons(int sc, Game game) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button buildButton = Buttons.green("constructionPrimary_produce", "[Primary] Use Production");
-        Button sdButton = Buttons.green("construction_spacedock", "Place A Space Dock", UnitEmojis.spacedock);
-        Button pdsButton = Buttons.green("construction_pds", "Place a PDS", UnitEmojis.pds);
+        Button sdButton = Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK;
+        Button pdsButton = Buttons.CONSTRUCTION_PLACE_1_PDS;
         Button monumentButton = Buttons.green("construction_monument", "Place 1 Monument", UnitEmojis.Monument);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         List<Button> buttons = new ArrayList<>(List.of(followButton, buildButton, sdButton, pdsButton, monumentButton));
@@ -1318,7 +1410,7 @@ public class PlayStrategyCardService {
             buttons.add(Buttons.green("construction_facility", "Place A Facility"));
         }
         if (game.isMonumentToTheAgesMode()) {
-            buttons.add(Buttons.green("construction_agesmonument", "Place A Monument (Cost 5 TG)"));
+            buttons.add(Buttons.CONSTRUCTION_PLACE_A_MONUMENT);
         }
         buttons.add(noFollowButton);
         return buttons;

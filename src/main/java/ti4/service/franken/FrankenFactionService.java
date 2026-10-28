@@ -10,17 +10,18 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.game.MonumentsService;
 
 @UtilityClass
 public class FrankenFactionService {
     private static Stream<String> getFactionUnits(FactionModel faction) {
-        return faction.getUnits().stream().filter(u -> faction.getAlias()
-                .equals(Mapper.getUnit(u).getFaction().orElse(null)));
+        return faction.getUnits().stream()
+                .filter(u ->
+                        faction.getAlias().equals(Mapper.getUnit(u).getFaction().orElse(null)));
     }
 
     private static void removeFactionComponents(

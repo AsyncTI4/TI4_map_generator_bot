@@ -17,6 +17,7 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.message.MessageHelper;
+import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.AddUnitService;
 
@@ -40,7 +41,7 @@ public class VanguardBreakthroughHandler {
                                 player.factionButtonChecker() + USE_TRAINING_DUMMIES_TG,
                                 "Gain 2 Trade Goods (On Win)",
                                 FactionEmojis.vanguard),
-                        Buttons.red("deleteButtons", "Decline")));
+                        Buttons.DECLINE_DELETE_BUTTONS));
     }
 
     @ButtonHandler(USE_TRAINING_DUMMIES_TG)
@@ -68,7 +69,7 @@ public class VanguardBreakthroughHandler {
         if (buttons.isEmpty()) {
             return;
         }
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 getTrainingDummiesInfantryMessage(player),
@@ -86,6 +87,7 @@ public class VanguardBreakthroughHandler {
         for (Tile tile : game.getTileMap().values()) {
             for (Planet planet : tile.getPlanetUnitHolders()) {
                 if (!tile.isFracture()
+                        && !planet.isLegendary()
                         && planet.getUnitKeysForPlayer(player).stream()
                                 .map(player::getUnitFromUnitKey)
                                 .anyMatch(unit -> unit != null && unit.getIsGroundForce())) {
@@ -102,14 +104,14 @@ public class VanguardBreakthroughHandler {
 
     private static String getTrainingDummiesInfantryMessage(Player player) {
         return player.getRepresentation()
-                + ", you spent a strategy token. You may place 1 neutral infantry into coexistence on a non-fracture planet containing your ground forces due to _Training Dummies_.";
+                + ", you spent a strategy token. You may place 1 neutral infantry into coexistence on a non-fracture, non-legendary planet containing your ground forces due to _Training Dummies_.";
     }
 
     @ButtonHandler(PLACE_TRAINING_DUMMIES_INFANTRY)
     public static void placeTrainingDummiesInfantry(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         List<Button> buttons = getTrainingDummiesInfantryButtons(game, player);
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event,
                 event.getMessageChannel(),
@@ -126,8 +128,10 @@ public class VanguardBreakthroughHandler {
         Planet planet = tile == null || payload.length != 2
                 ? null
                 : tile.getUnitHolders().get(payload[1]) instanceof Planet p ? p : null;
-        if (planet == null
+        if (!player.hasUnlockedBreakthrough(TRAINING_DUMMIES)
+                || planet == null
                 || tile.isFracture()
+                || planet.isLegendary()
                 || planet.getUnitKeysForPlayer(player).stream()
                         .map(player::getUnitFromUnitKey)
                         .noneMatch(unit -> unit != null && unit.getIsGroundForce())) {
@@ -137,6 +141,7 @@ public class VanguardBreakthroughHandler {
         game.setStoredValue("coexistFlag", "yes");
         AddUnitService.addUnits(event, tile, game, game.getNeutral().getColor(), "1 infantry " + planet.getName());
         game.removeStoredValue("coexistFlag");
+        StartCombatService.startGroundCombat(player, game.getNeutral(), game, event, planet, tile);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentation() + " placed 1 neutral infantry on " + planet.getRepresentation(game)

@@ -1,0 +1,18 @@
+{
+    "id": "fracture29",
+    "name": "Maahes",
+    "aliases": [
+        "fracture29",
+        "maahes",
+        "maa",
+        "frac29"
+    ],
+    "imagePath": "fracture29.png",
+    "planets": [
+        "maahes"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

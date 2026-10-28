@@ -11,8 +11,8 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.NewStuffHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.service.tech.PlayerTechService;
 
@@ -237,10 +237,13 @@ class DedicatedStudyLLButtonHandler {
                         && !tech.isUnitUpgrade()
                         && tech.getFirstType().toString().equals(type))
                 .toList();
-        return candidates.stream().anyMatch(first -> candidates.stream()
-                .anyMatch(second -> first != second
-                        && first.getRequirements().orElse("").length()
-                                        + second.getRequirements().orElse("").length()
-                                == totalRequirements));
+        return candidates.stream()
+                .anyMatch(first -> candidates.stream()
+                        .anyMatch(second -> first != second
+                                && first.getRequirements().orElse("").length()
+                                                + second.getRequirements()
+                                                        .orElse("")
+                                                        .length()
+                                        == totalRequirements));
     }
 }

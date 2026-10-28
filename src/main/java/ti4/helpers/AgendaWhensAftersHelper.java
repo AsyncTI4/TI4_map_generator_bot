@@ -12,16 +12,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.cron.AutoPingCron;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
+import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.Mapper;
+import ti4.model.PromissoryNoteModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionCheckService;
 import ti4.service.button.ReactionService;
@@ -31,6 +34,8 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.GMService;
 
 public final class AgendaWhensAftersHelper {
+
+    private static final String WHEN_QUEUE_HELD_BY_VETO = "whenQueueHeldByVeto";
 
     private AgendaWhensAftersHelper() {}
 
@@ -51,7 +56,7 @@ public final class AgendaWhensAftersHelper {
             List<Button> buttons = new ArrayList<>();
 
             buttons.add(Buttons.green("resolvePreassignment_Pass On Shenanigans", "Pre-Pass"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
     }
@@ -62,6 +67,7 @@ public final class AgendaWhensAftersHelper {
         game.removeStoredValue("whensResolved");
         game.removeStoredValue("lastPlayerToPlayAnAfter");
         game.removeStoredValue("lastPlayerToPlayAWhen");
+        game.removeStoredValue(WHEN_QUEUE_HELD_BY_VETO);
         game.removeStoredValue("declinedWhens");
         game.removeStoredValue("declinedAfters");
         game.removeStoredValue("queuedWhens");
@@ -71,6 +77,7 @@ public final class AgendaWhensAftersHelper {
             game.removeStoredValue("queuedWhensFor" + player.getFaction());
             game.removeStoredValue("queuedAftersFor" + player.getFaction());
             game.removeStoredValue("queuedAftersLockedFor" + player.getFaction());
+            game.removeStoredValue(hydromorphicWhenKey(player));
             List<String> whens = getPossibleWhenNames(player);
             List<String> afters = getPossibleAfterNames(player);
             if (!game.getStoredValue("executiveOrder").isEmpty() && whens.isEmpty() && afters.isEmpty()) {
@@ -82,7 +89,7 @@ public final class AgendaWhensAftersHelper {
                     && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
                 game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens") + player.getFaction() + "_");
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.red("queueAWhen", "Play A When"));
+                buttons.add(Buttons.PLAY_A_WHEN);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         "You have declined to queue a \"when\". You can change your mind with this button.",
@@ -154,7 +161,7 @@ public final class AgendaWhensAftersHelper {
         if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens") + player.getFaction() + "_");
             buttons = new ArrayList<>();
-            buttons.add(Buttons.red("queueAWhen", "Play A When"));
+            buttons.add(Buttons.PLAY_A_WHEN);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
                     "You have declined to queue a \"when\". You can change your mind with this button.",
@@ -200,17 +207,35 @@ public final class AgendaWhensAftersHelper {
                 names.add(actionCard.getName());
             }
         }
+        for (var hydromorphicCard : player.getHydromorphicCards().entrySet()) {
+            if (Mapper.getHydromorphicCard(hydromorphicCard.getKey())
+                    .getWindow()
+                    .contains("When an agenda is revealed")) {
+                names.add(Mapper.getHydromorphicCard(hydromorphicCard.getKey()).getName());
+            }
+        }
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId)
                     && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || "favor".equals(pnId))) {
-                names.add(StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")
-                        + Mapper.getPromissoryNote(pnId).getName());
+                names.add(whenPromissoryNoteLabel(pnId));
             }
+        }
+        if (player.hasRelic("culturalartifact")) {
+            names.add("Cultural Artifact");
         }
         return names;
     }
 
-    private static List<Button> getPossibleWhenButtons(Player player) {
+    private static String whenPromissoryNoteLabel(String pnId) {
+        PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnId);
+        String colorPrefix = promissoryNote
+                .getColor()
+                .map(color -> StringUtils.capitalize(color) + " ")
+                .orElse("");
+        return colorPrefix + promissoryNote.getName();
+    }
+
+    static List<Button> getPossibleWhenButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
         if (player.hasAbility("quash") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
             buttons.add(Buttons.red("queueWhen_ability_quash", "Quash"));
@@ -222,14 +247,24 @@ public final class AgendaWhensAftersHelper {
                 buttons.add(Buttons.green("queueWhen_ac_" + acId, actionCard.getName()));
             }
         }
+        for (var hydromorphicCard : player.getHydromorphicCards().entrySet()) {
+            if (Mapper.getHydromorphicCard(hydromorphicCard.getKey())
+                    .getWindow()
+                    .contains("When an agenda is revealed")) {
+                buttons.add(Buttons.green(
+                        "queueWhen_hydromorphic_" + hydromorphicCard.getValue(),
+                        Mapper.getHydromorphicCard(hydromorphicCard.getKey()).getName()));
+            }
+        }
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId)
                     && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || "favor".equals(pnId))) {
-                buttons.add(Buttons.red(
-                        "queueWhen_pn_" + pnId,
-                        StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")
-                                + Mapper.getPromissoryNote(pnId).getName()));
+                buttons.add(Buttons.red("queueWhen_pn_" + pnId, whenPromissoryNoteLabel(pnId)));
             }
+        }
+        Button culturalArtifactButton = BlueReverieArtifactRelicHandler.getCulturalArtifactButton(player);
+        if (culturalArtifactButton != null) {
+            buttons.add(culturalArtifactButton);
         }
         return buttons;
     }
@@ -243,7 +278,7 @@ public final class AgendaWhensAftersHelper {
         String msg = "Successfully queued '" + event.getButton().getLabel()
                 + "'. You can use this button to unqueue it and pass on \"when\"s.";
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"When\"s"));
+        buttons.add(Buttons.PASS_ON_WHENS);
         GMService.addForcePassWhenButtonForFowGM(game, player, buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         resolveWhenQueue(event, game);
@@ -283,7 +318,7 @@ public final class AgendaWhensAftersHelper {
         String msg = "Successfully queued '" + event.getButton().getLabel()
                 + "'. You can use this button to unqueue it and pass on \"afters\".";
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+        buttons.add(Buttons.PASS_ON_AFTERS);
         GMService.addForcePassAfterButtonForFowGM(game, player, buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
 
@@ -306,7 +341,8 @@ public final class AgendaWhensAftersHelper {
 
     public static List<String> getPossibleAfterNames(Player player) {
         List<String> names = new ArrayList<>();
-        List<String> abilities = new ArrayList<>(Arrays.asList("radiance", "galactic_threat", "conspirators"));
+        List<String> abilities =
+                new ArrayList<>(Arrays.asList("radiance", "galactic_threat", "conspirators", "radiance_br"));
         for (String ability : abilities) {
             if (player.hasAbility(ability)) {
                 if ("galactic_threat".equalsIgnoreCase(ability)
@@ -367,7 +403,8 @@ public final class AgendaWhensAftersHelper {
 
     private static List<Button> getPossibleAferButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
-        List<String> abilities = new ArrayList<>(Arrays.asList("radiance", "galactic_threat", "conspirators"));
+        List<String> abilities =
+                new ArrayList<>(Arrays.asList("radiance", "galactic_threat", "conspirators", "radiance_br"));
         for (String ability : abilities) {
             if (player.hasAbility(ability)) {
                 if ("galactic_threat".equalsIgnoreCase(ability)
@@ -454,14 +491,25 @@ public final class AgendaWhensAftersHelper {
             List<Button> buttons = new ArrayList<>();
 
             buttons.add(Buttons.gray("queueAWhen", "Play A \"When\""));
-            buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"When\"s"));
+            buttons.add(Buttons.PASS_ON_WHENS);
             GMService.addForcePassWhenButtonForFowGM(game, player, buttons);
             buttons.add(Buttons.gray("explainQueue", "How Does This Work?"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg.toString(), buttons);
         }
     }
 
+    public static void resumeWhenQueueAfterCanceledVeto(ButtonInteractionEvent event, Game game, Player vetoPlayer) {
+        boolean waiting = "agendawaiting".equalsIgnoreCase(game.getPhaseOfGame());
+        boolean whensOpen = game.getStoredValue("whensResolved").isEmpty();
+        boolean vetoHeldTheQueue = vetoPlayer.getFaction().equals(game.getStoredValue(WHEN_QUEUE_HELD_BY_VETO));
+        if (!waiting || !whensOpen || !vetoHeldTheQueue) return;
+        game.removeStoredValue(WHEN_QUEUE_HELD_BY_VETO);
+        resolveWhenQueue(event, game);
+        offerEveryoneWhensQueue(game);
+    }
+
     private static void resolveWhenQueue(ButtonInteractionEvent event, Game game) {
+        if (!game.getStoredValue(WHEN_QUEUE_HELD_BY_VETO).isEmpty()) return;
         String alreadyResolved = game.getStoredValue("whensResolved");
         if (alreadyResolved.isEmpty()) {
             String lastPlayerToPlayAWhen = game.getStoredValue("lastPlayerToPlayAWhen");
@@ -509,11 +557,29 @@ public final class AgendaWhensAftersHelper {
                             }
                             case "ac" -> {
                                 ActionCardHelper.playAC(event, game, player, when, game.getMainGameChannel());
-                                if (!when.contains("veto")) {
+                                if (when.contains("veto")) {
+                                    game.setStoredValue(WHEN_QUEUE_HELD_BY_VETO, player.getFaction());
+                                } else {
                                     resolveWhenQueue(event, game);
                                     offerEveryoneWhensQueue(game);
                                 }
                             }
+                            case "hydromorphic" -> {
+                                try {
+                                    if (HydromorphicHelper.beginCardResolution(game, player, Integer.parseInt(when))) {
+                                        game.setStoredValue(hydromorphicWhenKey(player), "pending");
+                                        return;
+                                    }
+                                } catch (NumberFormatException e) {
+                                    MessageHelper.sendMessageToChannel(
+                                            player.getCardsInfoThread(),
+                                            "That Hydromorphic card is no longer available.");
+                                }
+                                resolveWhenQueue(event, game);
+                                offerEveryoneWhensQueue(game);
+                            }
+                            case "relic" ->
+                                BlueReverieArtifactRelicHandler.resolveCulturalArtifact(event, game, player);
                         }
                     }
                     return;
@@ -523,6 +589,19 @@ public final class AgendaWhensAftersHelper {
             game.setStoredValue("whensResolved", "Yes");
             resolveAfterQueue(event, game);
         }
+    }
+
+    public static void resumeHydromorphicWhen(ButtonInteractionEvent event, Game game, Player player) {
+        if (!"pending".equals(game.getStoredValue(hydromorphicWhenKey(player)))) {
+            return;
+        }
+        game.removeStoredValue(hydromorphicWhenKey(player));
+        resolveWhenQueue(event, game);
+        offerEveryoneWhensQueue(game);
+    }
+
+    private static String hydromorphicWhenKey(Player player) {
+        return "hydromorphicWhen_" + player.getFaction();
     }
 
     private static void resolveAfterQueue(ButtonInteractionEvent event, Game game) {
@@ -703,7 +782,7 @@ public final class AgendaWhensAftersHelper {
                                 List<Button> buttons = new ArrayList<>();
 
                                 buttons.add(Buttons.gray("queueAnAfter", "Play An \"After\""));
-                                buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+                                buttons.add(Buttons.PASS_ON_AFTERS);
                                 GMService.addForcePassAfterButtonForFowGM(game, player, buttons);
                                 MessageHelper.sendMessageToChannelWithButtons(
                                         p2.getCardsInfoThread(), msg.toString(), buttons);
@@ -790,7 +869,7 @@ public final class AgendaWhensAftersHelper {
                             + " If this is a bug or unimplemented ability, please report it in the `#bot-bugs-and-feature-requests` channel.");
             return;
         }
-        buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"When\"s"));
+        buttons.add(Buttons.PASS_ON_WHENS);
         GMService.addForcePassWhenButtonForFowGM(game, player, buttons);
         game.setStoredValue(
                 "declinedWhens", game.getStoredValue("declinedWhens").replace(player.getFaction() + "_", ""));
@@ -805,7 +884,7 @@ public final class AgendaWhensAftersHelper {
         game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens") + player.getFaction() + "_");
         resolveWhenQueue(event, game);
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.red("queueAWhen", "Play A \"When\""));
+        buttons.add(Buttons.PLAY_A_WHEN);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 "You have declined to queue a \"when\". You can change your mind with this button.",
@@ -829,7 +908,7 @@ public final class AgendaWhensAftersHelper {
         buttons = new ArrayList<>();
 
         buttons.add(Buttons.gray("queueAnAfter", "Play An \"After\""));
-        buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+        buttons.add(Buttons.PASS_ON_AFTERS);
         GMService.addForcePassAfterButtonForFowGM(game, player, buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg.toString(), buttons);
     }
@@ -844,7 +923,7 @@ public final class AgendaWhensAftersHelper {
                             + " If this is a bug or unimplemented ability, please report it in the `#bot-bugs-and-feature-requests` channel.");
             return;
         }
-        buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+        buttons.add(Buttons.PASS_ON_AFTERS);
         GMService.addForcePassAfterButtonForFowGM(game, player, buttons);
         game.setStoredValue("queuedAftersLockedFor" + player.getFaction(), "");
         game.setStoredValue(
@@ -892,7 +971,7 @@ public final class AgendaWhensAftersHelper {
         buttons = new ArrayList<>();
 
         buttons.add(Buttons.green("resolvePreassignment_Pass On Shenanigans", "Pre-Pass"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -919,7 +998,7 @@ public final class AgendaWhensAftersHelper {
                 + " if you intend to preset an abstention or vote on this agenda, you have the option to preset it here."
                 + " Feel free not to, this is simply an optional way to resolve agendas faster. Any pre-votes will be automatically erased if someone plays an \"after\".";
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("preVote", "Pre-Vote"));
+        buttons.add(Buttons.PRE_VOTE);
         if (player.hasAbility("future_sight")
                 && game.getStoredValue("executiveOrder").isEmpty()) {
             msg += " Reminder that you have **Future Sight** and may wish to not abstain.";
@@ -975,8 +1054,8 @@ public final class AgendaWhensAftersHelper {
                             + " If you cannot vote due to playing a rider or having no votes just ignore this button.";
                 }
             }
-            buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-Abstain"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.PRE_ABSTAIN);
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         }
 
         if (!game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
@@ -1078,6 +1157,15 @@ public final class AgendaWhensAftersHelper {
 
         if (Helper.getPlayerFromAbility(game, "radiance") != null) {
             Player edyn = Helper.getPlayerFromAbility(game, "radiance");
+            String factionChecker = "FFCC_" + edyn.getFaction() + "_";
+            afterButtons.add(Buttons.gray(
+                    factionChecker + "play_after_Edyn Radiance Ability",
+                    "Use Edyn Radiance Ability",
+                    FactionEmojis.edyn));
+        }
+
+        if (Helper.getPlayerFromAbility(game, "radiance_br") != null) {
+            Player edyn = Helper.getPlayerFromAbility(game, "radiance_br");
             String factionChecker = "FFCC_" + edyn.getFaction() + "_";
             afterButtons.add(Buttons.gray(
                     factionChecker + "play_after_Edyn Radiance Ability",
@@ -1233,7 +1321,12 @@ public final class AgendaWhensAftersHelper {
         ReactionService.addReaction(event, game, player, message);
     }
 
-    public static void playWhen(
+    @ButtonHandler("play_when")
+    public static void playWhen(ButtonContext context) {
+        playWhen(context.getEvent(), context.getGame(), context.getPlayer(), context.getMainGameChannel());
+    }
+
+    private static void playWhen(
             ButtonInteractionEvent event, Game game, Player player, MessageChannel mainGameChannel) {
         ReactionCheckService.clearAllReactions(event);
         ReactionService.addReaction(event, game, player, true, true, "is playing a \"when\".");
@@ -1254,9 +1347,9 @@ public final class AgendaWhensAftersHelper {
         game.setStoredValue("preVoting" + player.getFaction(), "");
         player.resetSpentThings();
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("preVote", "Pre-Vote"));
-        buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
-        buttons.add(Buttons.red("deleteButtons", "Don't do anything"));
+        buttons.add(Buttons.PRE_VOTE);
+        buttons.add(Buttons.PRE_ABSTAIN);
+        buttons.add(Buttons.DONT_DO_ANYTHING);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation()

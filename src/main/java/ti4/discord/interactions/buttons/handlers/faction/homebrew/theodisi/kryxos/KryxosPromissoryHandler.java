@@ -14,8 +14,8 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
@@ -45,7 +45,7 @@ public class KryxosPromissoryHandler {
                         player.factionButtonChecker() + USE_EVOEDICT + techM.getAlias(),
                         "Use Evolutionary Edict",
                         FactionEmojis.kryxos),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),

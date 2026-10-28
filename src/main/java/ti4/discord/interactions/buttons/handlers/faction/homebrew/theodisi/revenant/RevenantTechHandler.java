@@ -6,6 +6,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.combat.CancelGroundHitsButtonId;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -52,7 +54,7 @@ public class RevenantTechHandler {
         String message = player.getRepresentation()
                 + ", you may produce up to 2 units in a system containing 1 of your ships due to _Lazarus Pods_. Please choose the system in which you wish to produce.";
         String prefix = player.factionButtonChecker() + SELECT_LAZARUS_SYSTEM;
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         List<Button> displayedButtons = new ArrayList<>(buttons);
         displayedButtons.addAll(extraButtons);
         if (displayedButtons.size() > 25) {
@@ -83,7 +85,7 @@ public class RevenantTechHandler {
         String message = player.getRepresentation()
                 + ", you may produce up to 2 units in a system containing 1 of your ships due to _Lazarus Pods_. Please choose the system in which you wish to produce.";
         String prefix = player.factionButtonChecker() + SELECT_LAZARUS_SYSTEM;
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, player.getCorrectChannel(), systemButtons, extraButtons, message, prefix, buttonID)) {
             return;
@@ -221,13 +223,15 @@ public class RevenantTechHandler {
         String assignmentMessage;
         if (combatOnHolder instanceof Planet) {
             buttons.add(Buttons.green(
-                    factionChecker + "autoAssignGroundHits_" + combatOnHolder.getName() + "_" + remainingHits,
+                    factionChecker + AutoAssignGroundHitsButtonIds.format(combatOnHolder.getName(), remainingHits),
                     "Auto-assign Hit" + (remainingHits == 1 ? "" : "s")));
             buttons.add(Buttons.red(
                     "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
                     "Manually Assign Hit" + (remainingHits == 1 ? "" : "s")));
             buttons.add(Buttons.gray(
-                    factionChecker + "cancelGroundHits_" + tile.getPosition() + "_" + remainingHits, "Cancel a Hit"));
+                    factionChecker
+                            + CancelGroundHitsButtonId.of(tile.getPosition(), remainingHits, combatOnHolder.getName()),
+                    "Cancel a Hit"));
             assignmentMessage = cancellationMessage + "\n" + player.getRepresentation() + " may autoassign "
                     + remainingHits + " hit" + (remainingHits == 1 ? "" : "s") + ".";
         } else {

@@ -10,8 +10,8 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.info.SecretObjectiveInfoService;
 
 class PeekAtSecretDeck extends GameStateSubcommand {
@@ -19,8 +19,10 @@ class PeekAtSecretDeck extends GameStateSubcommand {
     PeekAtSecretDeck() {
         super("peek_secret_objective_deck", "Peek at the top of the secret objective deck", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of secrets to peek at, default 1")
+                .setRequiredRange(1, 10)
                 .setRequired(true));
-        addOptions(new OptionData(OptionType.INTEGER, "index_to_draw", "Which of the secrets to draw (1, 2, 3, ...)"));
+        addOptions(new OptionData(OptionType.INTEGER, "index_to_draw", "Which of the secrets to draw (1, 2, 3, ...)")
+                .setRequiredRange(1, 10));
         addOptions(new OptionData(OptionType.BOOLEAN, "shuffle", "True to shuffle"));
     }
 

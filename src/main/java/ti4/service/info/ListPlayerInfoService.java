@@ -19,12 +19,15 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
-import ti4.image.Mapper;
+import ti4.helpers.thirtyk.ThirtyKCards;
+import ti4.helpers.thirtyk.ThirtyKSecrets;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source;
+import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ExploreEmojis;
@@ -126,7 +129,7 @@ public class ListPlayerInfoService {
             case "control_borderlands_omegaphase" -> 4;
             case "imperium_rex_omegaphase" -> 0;
 
-            default -> 0;
+            default -> ThirtyKSecrets.threshold(objID);
         };
     }
 
@@ -478,18 +481,37 @@ public class ListPlayerInfoService {
         return getPlayerProgressOnObjective(objID, game, player, false);
     }
 
+    public static int countAdaptNewStrategiesTechnologies(Player player, boolean twilightsFall) {
+        int count = 0;
+        for (String alias : player.getTechs()) {
+            if (countsForAdaptNewStrategies(alias, twilightsFall)) count++;
+        }
+        return count;
+    }
+
+    public static boolean countsForAdaptNewStrategies(String techAlias, boolean twilightsFall) {
+        if ("vax".equalsIgnoreCase(techAlias) || "vay".equalsIgnoreCase(techAlias)) return false;
+        TechnologyModel tech = Mapper.getTech(techAlias);
+        if (tech == null) return false;
+        boolean factionTech = !tech.getFaction().orElse("").isEmpty();
+        return factionTech != twilightsFall;
+    }
+
     public static int getPlayerProgressOnObjective(String objID, Game game, Player player, boolean plausibleD) {
         int comms = 0;
         if (player.hasUnexhaustedLeader("keleresagent")) {
             comms = player.getCommodities();
         }
-        if (!plausibleD && player.hasTech("tf-plausibled") && Mapper.getSecretObjective(objID) != null) {
+        if (!plausibleD
+                && (player.hasTech("tf-plausibled") || player.hasAbility("plausible_deniability_br"))
+                && Mapper.getSecretObjective(objID) != null) {
             int max = 0;
             for (Player p2 : game.getRealPlayers()) {
                 max = Math.max(max, getPlayerProgressOnObjective(objID, game, p2, true));
                 return max;
             }
         }
+        if (ThirtyKCards.isSecretObjective(objID)) return ThirtyKSecrets.progress(objID, game, player);
         switch (objID) {
             case "push_boundaries", "push_boundaries_omegaphase" -> {
                 int aboveN = 0;
@@ -970,20 +992,7 @@ public class ListPlayerInfoService {
                 return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false); // 5 dreads
             }
             case "ans" -> {
-                int count = 0;
-                for (String nekroTech : player.getTechs()) {
-                    if ("vax".equalsIgnoreCase(nekroTech) || "vay".equalsIgnoreCase(nekroTech)) {
-                        continue;
-                    }
-                    if (!Mapper.getTech(nekroTech).getFaction().orElse("").isEmpty() && !game.isTwilightsFallMode()) {
-                        count += 1;
-                    }
-                    if (game.isTwilightsFallMode()
-                            && Mapper.getTech(nekroTech).getFaction().orElse("").isEmpty()) {
-                        count += 1;
-                    }
-                }
-                return count;
+                return countAdaptNewStrategiesTechnologies(player, game.isTwilightsFallMode());
             }
             case "btgk" -> {
                 int alpha = 0;

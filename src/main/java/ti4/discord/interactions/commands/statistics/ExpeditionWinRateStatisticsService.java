@@ -56,28 +56,33 @@ class ExpeditionWinRateStatisticsService {
                 ExecutionLockType.READ);
 
         StringBuilder sb = new StringBuilder("__**Thunder's Edge Win Rate Correlations**__\n");
+        sb.append("_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario Thunder's Edge games"
+                + " with winners._\n");
 
         sb.append("\n**By expedition followed**\n");
-        expeditionFollowStats.entrySet().stream().sorted(Entry.comparingByKey()).forEach(e -> sb.append("- ")
-                .append(e.getKey())
-                .append(": ")
-                .append(e.getValue())
-                .append('\n'));
+        expeditionFollowStats.entrySet().stream()
+                .sorted(Entry.comparingByKey())
+                .forEach(e -> sb.append("- ")
+                        .append(e.getKey())
+                        .append(": ")
+                        .append(e.getValue())
+                        .append('\n'));
 
         sb.append("\n**By number of expeditions completed**\n");
-        expeditionCountStats.entrySet().stream().sorted(Entry.comparingByKey()).forEach(entry -> sb.append("- ")
-                .append(entry.getKey())
-                .append(" expeditions: ")
-                .append(entry.getValue())
-                .append('\n'));
-        int expeditionCountGameCount = expeditionCountStats.values().stream()
+        expeditionCountStats.entrySet().stream()
+                .sorted(Entry.comparingByKey())
+                .forEach(entry -> sb.append("- ")
+                        .append(entry.getKey())
+                        .append(" expeditions: ")
+                        .append(entry.getValue())
+                        .append('\n'));
+        int expeditionCountPlayerCount = expeditionCountStats.values().stream()
                 .mapToInt(count -> count.total)
                 .sum();
         double averageExpeditionsCompleted = expeditionCountStats.entrySet().stream()
                         .mapToInt(entry -> entry.getKey() * entry.getValue().total)
                         .sum()
-                / (double) expeditionCountGameCount;
-        sb.append("- Game count: ").append(expeditionCountGameCount).append('\n');
+                / (double) expeditionCountPlayerCount;
         sb.append("- Average: ")
                 .append(String.format("%.2f", averageExpeditionsCompleted))
                 .append('\n');

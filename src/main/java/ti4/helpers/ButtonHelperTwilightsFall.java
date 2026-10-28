@@ -34,7 +34,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -42,6 +41,7 @@ import ti4.message.componentsV2.MessageV2Builder;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 import ti4.model.MapTemplateModel;
+import ti4.model.Mapper;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
@@ -291,8 +291,9 @@ public final class ButtonHelperTwilightsFall {
             draft.setSlice(mslice);
         }
 
+        boolean mapChanged = false;
         try {
-            MiltyDraftHelper.buildPartialMap(game, event);
+            mapChanged = MiltyDraftHelper.buildPartialMap(game);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event, game), "err", e);
         }
@@ -311,6 +312,9 @@ public final class ButtonHelperTwilightsFall {
             }
         }
         game.setShowMapSetup(false);
+        if (mapChanged) {
+            ButtonHelper.updateMap(game, event);
+        }
     }
 
     @ButtonHandler("startFrankenMantisBuild")
@@ -327,6 +331,7 @@ public final class ButtonHelperTwilightsFall {
             }
         }
 
+        boolean mapChanged = false;
         try {
             // Ensure map template is set
             String mapTemplate = game.getMapTemplateID();
@@ -342,7 +347,7 @@ public final class ButtonHelperTwilightsFall {
             }
 
             // Place draft tiles
-            MiltyDraftHelper.buildPartialMap(game, event);
+            mapChanged = MiltyDraftHelper.buildPartialMap(game);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event, game), "err", e);
         }
@@ -350,6 +355,9 @@ public final class ButtonHelperTwilightsFall {
         // Send buttons for map build
         MantisMapBuildContext mapBuildContext = FrankenMapBuildContextHelper.createContext(game);
         MantisMapBuildService.initializeMapBuilding(mapBuildContext);
+        if (mapChanged) {
+            ButtonHelper.updateMap(game, event);
+        }
     }
 
     private static boolean setPositionAndSendHomeFleetButtons(Game game, Player player) {
@@ -597,7 +605,11 @@ public final class ButtonHelperTwilightsFall {
             if (game.getPlayerFromColorOrFaction(faction) != null)
                 participants.add(game.getPlayerFromColorOrFaction(faction));
         }
-        if (participants.get(0) == participants.get(1)) {
+        if (participants.isEmpty()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "There is no splice in progress to reverse.");
+            return;
+        }
+        if (participants.size() > 1 && participants.get(0) == participants.get(1)) {
             Collections.rotate(participants, -2);
         }
         Collections.reverse(participants);
@@ -704,7 +716,7 @@ public final class ButtonHelperTwilightsFall {
 
         if (splice == 7) {
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
-            Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
@@ -713,7 +725,7 @@ public final class ButtonHelperTwilightsFall {
         }
         if (splice == 6) {
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-            Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), player.getRepresentation() + ", please pay 4 resources.", buttons);
@@ -894,7 +906,7 @@ public final class ButtonHelperTwilightsFall {
                         buttons2.add(Buttons.green(
                                 "drawSingularNewSpliceCard_" + type,
                                 "Draw 1 " + StringUtils.capitalize(type) + " Card"));
-                        buttons2.add(Buttons.gray("deleteButtons", "Decline"));
+                        buttons2.add(Buttons.DECLINE_DELETE_BUTTONS_GRAY);
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),
                                 player.getRepresentation()
@@ -1072,7 +1084,7 @@ public final class ButtonHelperTwilightsFall {
             }
         }
         if (!buttons.isEmpty()) {
-            buttons.add(Buttons.red("deleteButtons", "Done"));
+            buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                     player.getCardsInfoThread(),
                     player.getRepresentation() + ", please choose a card to reveal.",
@@ -1110,7 +1122,7 @@ public final class ButtonHelperTwilightsFall {
                 player.getCorrectChannel(),
                 "The **Magus** holder has chosen to pay the 3 resources and 3 influence for an extra draw.");
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
-        Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+        Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
         buttons.add(DoneExhausting);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), "Please pay the 3 resources and 3 influence.", buttons);
@@ -1276,7 +1288,10 @@ public final class ButtonHelperTwilightsFall {
         }
         if ("units".equalsIgnoreCase(type)) {
             for (String card : cards) {
-                embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
+                UnitModel unit = Mapper.getUnit(card);
+                if (unit != null) {
+                    embeds.add(unit.getRepresentationEmbed());
+                }
             }
         }
         String message = String.format("These %d cards are left in the %s deck:", cards.size(), type);
@@ -1316,7 +1331,10 @@ public final class ButtonHelperTwilightsFall {
         }
         if ("units".equalsIgnoreCase(type)) {
             for (String card : cards) {
-                embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
+                UnitModel unit = Mapper.getUnit(card);
+                if (unit != null) {
+                    embeds.add(unit.getRepresentationEmbed());
+                }
             }
         }
         if (player != null && !player.hasTech("wavelength")) {

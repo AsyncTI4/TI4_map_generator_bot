@@ -1,4 +1,4 @@
-on: 
+on:
   repository_dispatch:
       types: [archive_game_channel]
 name: ArchiveGameChannel
@@ -9,17 +9,226 @@ jobs:
     name: Archive Game Channel
     runs-on: ubuntu-latest
     steps:
-    - name: executing remote ssh commands
+    - name: start or resume detached channel export on host
       uses: appleboy/ssh-action@master
       env:
         DISCORD_BOT_KEY: ${{ secrets.CHAT_EXPORT_BOT_KEY }}
         CHANNEL_ID: ${{ github.event.client_payload.channel }}
+        CHANNEL_IDS: ${{ github.event.client_payload.channels }}
+        EXPORT_ID: ${{ github.event.client_payload.export_id }}
+        EXPORT_FORMAT: ${{ github.event.client_payload.format }}
+        EXPORT_AFTER: ${{ github.event.client_payload.after }}
+        EXPORT_BEFORE: ${{ github.event.client_payload.before }}
+        EXPORT_MEDIA: ${{ github.event.client_payload.media }}
+        EXPORT_RESUME: ${{ github.event.client_payload.resume }}
+        EXPORT_MAX_SIZE_MB: ${{ github.event.client_payload.max_size_mb }}
+        EXPORT_ROOT: ${{ vars.HOST_TI4_SAVES_DIR }}/exported_channels
       with:
         host: ${{ secrets.HOSTINGER_SSH_HOST }}
         username: ${{ secrets.HOSTINGER_SSH_USER }}
         password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
         port: ${{ secrets.HOSTINGER_SSH_PORT }}
-        envs: DISCORD_BOT_KEY, CHANNEL_ID
+        envs: DISCORD_BOT_KEY,CHANNEL_ID,CHANNEL_IDS,EXPORT_ID,EXPORT_FORMAT,EXPORT_AFTER,EXPORT_BEFORE,EXPORT_MEDIA,EXPORT_RESUME,EXPORT_MAX_SIZE_MB,EXPORT_ROOT
+        # The export runs detached on the host, one part at a time: the main channel in 30-day
+        # windows and its threads in batches. Between parts it checks for a cancel request and for
+        # the optional size cap, so it can stop cleanly and be resumed later from the first
+        # unfinished part. A resume may pass a new max_size_mb (0 removes the cap).
+        # Layout under exported_channels/<channel id>/:
+        #   <export id>/            exported files while the export runs
+        #   <export id>.request     settings saved on first start, reused on resume
+        #   <export id>.progress    finished parts, one per line
+        #   <export id>.parts       total number of parts
+        #   <export id>.running     present while the exporter runs
+        #   <export id>.cancel      written by the bot to ask the exporter to stop
+        #   <export id>.cancelled   written when the exporter stopped on request
+        #   <export id>.paused      written when the export reached its size cap
+        #   <export id>.failed      written on any failure (with the reason)
+        #   <export id>.tar.gz      finished export, followed by <export id>.done
+        #   <export id>.log         exporter output
         script: |
-          docker version
-          docker run --rm -v ${{ vars.HOST_TI4_SAVES_DIR }}/exported_channels:/out --user $(id -u):$(id -g) tyrrrz/discordchatexporter:stable export -t $DISCORD_BOT_KEY -c $CHANNEL_ID
+          set -eu
+          is_digits() { case "$1" in ''|*[!0-9]*) return 1 ;; esac; return 0; }
+          is_optional_digits() { [ -z "$1" ] || is_digits "$1"; }
+          is_optional_date() { case "$1" in ''|[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) return 0 ;; esac; return 1; }
+
+          is_digits "$CHANNEL_ID" || { echo "Invalid channel id: $CHANNEL_ID"; exit 1; }
+          case "$EXPORT_ID" in ''|*[!0-9A-Za-z_-]*) echo "Invalid export id: $EXPORT_ID"; exit 1 ;; esac
+
+          EXPORT_DIR="$EXPORT_ROOT/$CHANNEL_ID"
+          EXPORT_BASE="$EXPORT_DIR/$EXPORT_ID"
+          mkdir -p "$EXPORT_DIR"
+          fail() { echo "$1" > "$EXPORT_BASE.failed"; echo "$1"; exit 1; }
+          saved_setting() { sed -n "s/^$1=//p" "$EXPORT_BASE.request" | head -n 1; }
+
+          if [ -f "$EXPORT_BASE.running" ]; then
+            echo "Export $EXPORT_ID is already running"
+            exit 1
+          fi
+
+          if [ "${EXPORT_RESUME:-false}" = "true" ]; then
+            [ -f "$EXPORT_BASE.request" ] || fail "Export $EXPORT_ID has no saved settings to resume from"
+            CHANNEL_IDS="$(saved_setting CHANNEL_IDS)"
+            EXPORT_FORMAT="$(saved_setting EXPORT_FORMAT)"
+            EXPORT_AFTER="$(saved_setting EXPORT_AFTER)"
+            EXPORT_BEFORE="$(saved_setting EXPORT_BEFORE)"
+            EXPORT_MEDIA="$(saved_setting EXPORT_MEDIA)"
+            rm -f "$EXPORT_BASE.failed" "$EXPORT_BASE.cancelled" "$EXPORT_BASE.paused" "$EXPORT_BASE.cancel"
+            if [ -n "${EXPORT_MAX_SIZE_MB:-}" ]; then
+              is_digits "$EXPORT_MAX_SIZE_MB" || fail "Invalid size cap: $EXPORT_MAX_SIZE_MB"
+              sed -i '/^MAX_SIZE_MB=/d' "$EXPORT_BASE.request"
+              echo "MAX_SIZE_MB=$EXPORT_MAX_SIZE_MB" >> "$EXPORT_BASE.request"
+            fi
+          fi
+
+          CHANNEL_IDS="${CHANNEL_IDS:-$CHANNEL_ID}"
+          for id in $CHANNEL_IDS; do
+            is_digits "$id" || fail "Invalid channel id in list: $id"
+          done
+          case "$EXPORT_FORMAT" in Json|HtmlDark) ;; *) fail "Invalid format: $EXPORT_FORMAT" ;; esac
+          is_optional_date "${EXPORT_AFTER:-}" || fail "Invalid after date: $EXPORT_AFTER"
+          is_optional_date "${EXPORT_BEFORE:-}" || fail "Invalid before date: $EXPORT_BEFORE"
+          case "${EXPORT_MEDIA:-false}" in true|false) ;; *) fail "Invalid media flag: $EXPORT_MEDIA" ;; esac
+          is_optional_digits "${EXPORT_MAX_SIZE_MB:-}" || fail "Invalid size cap: $EXPORT_MAX_SIZE_MB"
+
+          if [ ! -f "$EXPORT_BASE.request" ]; then
+            {
+              echo "CHANNEL_IDS=$CHANNEL_IDS"
+              echo "EXPORT_FORMAT=$EXPORT_FORMAT"
+              echo "EXPORT_AFTER=${EXPORT_AFTER:-}"
+              echo "EXPORT_BEFORE=${EXPORT_BEFORE:-}"
+              echo "EXPORT_MEDIA=${EXPORT_MEDIA:-false}"
+              echo "MAX_SIZE_MB=${EXPORT_MAX_SIZE_MB:-0}"
+              echo "END_MS=$(( $(date -u +%s) * 1000 ))"
+            } > "$EXPORT_BASE.request"
+          fi
+          END_MS="$(saved_setting END_MS)"
+          is_digits "$END_MS" || fail "Invalid saved end time: $END_MS"
+          MAX_SIZE_MB="$(saved_setting MAX_SIZE_MB)"
+          MAX_SIZE_MB="${MAX_SIZE_MB:-0}"
+          is_digits "$MAX_SIZE_MB" || fail "Invalid saved size cap: $MAX_SIZE_MB"
+
+          docker version > /dev/null || fail "Docker is not available on the host"
+
+          cat > "$EXPORT_BASE.sh" <<'WRAPPER'
+          set -u
+          DISCORD_EPOCH_MS=1420070400000
+          WINDOW_MS=$((30 * 24 * 60 * 60 * 1000))
+          THREADS_PER_PART=20
+          CONTAINER="chat-export-$CHANNEL_ID-$EXPORT_ID"
+          PROGRESS="$EXPORT_BASE.progress"
+          EXTENSION=json
+          [ "$EXPORT_FORMAT" = "HtmlDark" ] && EXTENSION=html
+          MEDIA_ARGS=""
+          [ "$EXPORT_MEDIA" = "true" ] && MEDIA_ARGS="--media --reuse-media --media-dir /out/media/"
+
+          trap 'rm -f "$EXPORT_BASE.running"' EXIT
+          touch "$PROGRESS"
+          mkdir -p "$EXPORT_BASE/channel" "$EXPORT_BASE/threads"
+
+          date_to_ms() { echo $(( $(date -u -d "$1" +%s) * 1000 )); }
+          ms_to_snowflake() { echo $(( ($1 - DISCORD_EPOCH_MS) << 22 )); }
+          snowflake_to_ms() { echo $(( ($1 >> 22) + DISCORD_EPOCH_MS )); }
+
+          stop_cancelled() {
+            echo "Stopped after $(wc -l < "$PROGRESS" | tr -d ' ') of $PART_COUNT parts" > "$EXPORT_BASE.cancelled"
+            rm -f "$EXPORT_BASE.cancel"
+            echo "Cancelled on request"
+            exit 0
+          }
+          stop_paused() {
+            echo "Reached the $MAX_SIZE_MB MB size cap with $(( $1 / 1024 )) MB exported, after $(wc -l < "$PROGRESS" | tr -d ' ') of $PART_COUNT parts" > "$EXPORT_BASE.paused"
+            echo "Paused at the size cap"
+            exit 0
+          }
+          stop_failed() { echo "$1" > "$EXPORT_BASE.failed"; echo "$1"; exit 1; }
+
+          run_part() {
+            key="$1"
+            shift
+            if grep -qx "$key" "$PROGRESS"; then return 0; fi
+            if [ -f "$EXPORT_BASE.cancel" ]; then stop_cancelled; fi
+            if [ "$MAX_SIZE_MB" -gt 0 ]; then
+              exported_kb=$(du -sk "$EXPORT_BASE" | cut -f1)
+              if [ "$exported_kb" -ge $(( MAX_SIZE_MB * 1024 )) ]; then stop_paused "$exported_kb"; fi
+            fi
+            echo "Exporting part $key"
+            docker run --rm --name "$CONTAINER" --cpus 1 --memory 1g --user "$(id -u):$(id -g)" \
+              -e DISCORD_TOKEN -v "$EXPORT_BASE":/out \
+              tyrrrz/discordchatexporter:stable export -f "$EXPORT_FORMAT" $MEDIA_ARGS "$@" \
+              || stop_failed "Part $key failed, see $EXPORT_ID.log"
+            echo "$key" >> "$PROGRESS"
+          }
+
+          START_MS=$(snowflake_to_ms "$CHANNEL_ID")
+          THREAD_RANGE_ARGS=""
+          if [ -n "$EXPORT_AFTER" ]; then
+            AFTER_MS=$(date_to_ms "$EXPORT_AFTER")
+            [ "$AFTER_MS" -gt "$START_MS" ] && START_MS=$AFTER_MS
+            THREAD_RANGE_ARGS="--after $(ms_to_snowflake "$AFTER_MS")"
+          fi
+          if [ -n "$EXPORT_BEFORE" ]; then
+            BEFORE_MS=$(date_to_ms "$EXPORT_BEFORE")
+            [ "$BEFORE_MS" -lt "$END_MS" ] && END_MS=$BEFORE_MS
+            THREAD_RANGE_ARGS="$THREAD_RANGE_ARGS --before $(ms_to_snowflake "$BEFORE_MS")"
+          fi
+
+          INCLUDES_MAIN=false
+          THREAD_IDS=""
+          for id in $CHANNEL_IDS; do
+            if [ "$id" = "$CHANNEL_ID" ]; then INCLUDES_MAIN=true; else THREAD_IDS="$THREAD_IDS $id"; fi
+          done
+          THREAD_COUNT=$(echo $THREAD_IDS | wc -w | tr -d ' ')
+          WINDOW_COUNT=0
+          if [ "$INCLUDES_MAIN" = "true" ] && [ "$END_MS" -gt "$START_MS" ]; then
+            WINDOW_COUNT=$(( (END_MS - START_MS + WINDOW_MS - 1) / WINDOW_MS ))
+          fi
+          THREAD_PART_COUNT=$(( (THREAD_COUNT + THREADS_PER_PART - 1) / THREADS_PER_PART ))
+          PART_COUNT=$(( WINDOW_COUNT + THREAD_PART_COUNT ))
+          echo "$PART_COUNT" > "$EXPORT_BASE.parts"
+
+          window=0
+          while [ "$window" -lt "$WINDOW_COUNT" ]; do
+            window_start=$(( START_MS + window * WINDOW_MS ))
+            window_end=$(( window_start + WINDOW_MS ))
+            [ "$window_end" -gt "$END_MS" ] && window_end=$END_MS
+            run_part "channel:$window" -c "$CHANNEL_ID" \
+              --after $(( $(ms_to_snowflake "$window_start") - 1 )) \
+              --before "$(ms_to_snowflake "$window_end")" \
+              -o "/out/channel/$(printf '%04d' "$window").$EXTENSION"
+            window=$(( window + 1 ))
+          done
+
+          part=0
+          batch=""
+          batch_size=0
+          for id in $THREAD_IDS; do
+            batch="$batch $id"
+            batch_size=$(( batch_size + 1 ))
+            if [ "$batch_size" -eq "$THREADS_PER_PART" ]; then
+              run_part "threads:$part" -c $batch $THREAD_RANGE_ARGS -o /out/threads/
+              part=$(( part + 1 ))
+              batch=""
+              batch_size=0
+            fi
+          done
+          if [ "$batch_size" -gt 0 ]; then
+            run_part "threads:$part" -c $batch $THREAD_RANGE_ARGS -o /out/threads/
+          fi
+
+          tar -czf "$EXPORT_BASE.tar.gz.partial" -C "$EXPORT_BASE" . \
+            && mv "$EXPORT_BASE.tar.gz.partial" "$EXPORT_BASE.tar.gz" \
+            || { rm -f "$EXPORT_BASE.tar.gz.partial"; stop_failed "Could not compress export $EXPORT_ID"; }
+          rm -rf "$EXPORT_BASE"
+          rm -f "$EXPORT_BASE.progress" "$EXPORT_BASE.parts" "$EXPORT_BASE.request" "$EXPORT_BASE.cancel" "$EXPORT_BASE.sh"
+          touch "$EXPORT_BASE.done"
+          echo "Export $EXPORT_ID finished"
+          WRAPPER
+
+          mkdir -p "$EXPORT_BASE"
+          touch "$EXPORT_BASE.running"
+          export CHANNEL_ID CHANNEL_IDS EXPORT_ID EXPORT_BASE EXPORT_FORMAT END_MS MAX_SIZE_MB
+          export EXPORT_AFTER="${EXPORT_AFTER:-}" EXPORT_BEFORE="${EXPORT_BEFORE:-}" EXPORT_MEDIA="${EXPORT_MEDIA:-false}"
+          export DISCORD_TOKEN="$DISCORD_BOT_KEY"
+          nohup sh "$EXPORT_BASE.sh" >> "$EXPORT_BASE.log" 2>&1 < /dev/null &
+
+          echo "Started export $EXPORT_ID for channel $CHANNEL_ID"

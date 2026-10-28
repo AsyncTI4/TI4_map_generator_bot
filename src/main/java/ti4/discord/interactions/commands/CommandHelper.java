@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Member;
@@ -29,10 +28,11 @@ import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
+import ti4.model.Mapper;
+import ti4.model.TileHelper;
 import ti4.service.game.GameNameService;
+import ti4.service.testbed.TestBedService;
 
 @UtilityClass
 public class CommandHelper {
@@ -120,7 +120,9 @@ public class CommandHelper {
         if (player != null) {
             return player;
         }
-        return getPlayerFromGame(game, event.getMember(), event.getUser().getId());
+        String userId = event.getUser().getId();
+        return TestBedService.resolveActingPlayer(
+                game, event.getMember(), userId, null, getPlayerFromGame(game, event.getMember(), userId));
     }
 
     @Nullable
@@ -207,11 +209,9 @@ public class CommandHelper {
         if (hasRole(event, acceptedRoles)) {
             return true;
         }
-        var acceptRolesStr =
-                acceptedRoles.stream().map(Role::getName).distinct().collect(Collectors.joining(", "));
         event.getHook()
-                .editOriginal("You are not authorized to use this command. You must have one of the following roles: "
-                        + acceptRolesStr)
+                .editOriginal(
+                        "You are not authorized to use this command. Ping bothelper if you think this is a mistake.")
                 .queue(Consumers.nop(), BotLogger::catchRestError);
         return false;
     }

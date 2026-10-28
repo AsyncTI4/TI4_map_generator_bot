@@ -34,17 +34,16 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperActionCards;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.VeiledHeartService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
-import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.regex.RegexService;
 import ti4.service.tech.PlayerTechService;
@@ -86,8 +85,8 @@ public class TkHelperActionCards {
             case "tk-evade" -> nop(); // No automation required, just ignore the hits :)
             case "tk-exhort" -> nop(); // Automated via the Combat Modifier system
             case "tk-fortify" -> {
-                buttons.add(Buttons.green("construction_spacedock", "Place A Space Dock", UnitEmojis.spacedock));
-                buttons.add(Buttons.green("construction_pds", "Place A PDS", UnitEmojis.pds));
+                buttons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
+                buttons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
                 buttons.add(Buttons.DONE_DELETE_BUTTONS);
             }
             case "tk-graft" -> {

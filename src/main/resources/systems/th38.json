@@ -1,0 +1,17 @@
+{
+    "id": "th38",
+    "name": "Merakha/Keth",
+    "aliases": [
+        "th38",
+        "merakha",
+        "keth"
+    ],
+    "imagePath": "th38.png",
+    "planets": [
+        "merakha",
+        "keth"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "blue",
+    "source": "theodisi"
+}

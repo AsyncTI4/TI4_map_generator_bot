@@ -30,7 +30,6 @@ public class CustomCommand implements ParentCommand {
                     new SwapStage2(),
                     new RevealSpecificStage1(),
                     new RevealSpecificStage2(),
-                    new SpinTilesInRings(),
                     new OfferAutoPassOptions(),
                     new ChangeToBaseGame(),
                     new CustomizationOptions())
@@ -43,7 +42,7 @@ public class CustomCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "Custom";
+        return "Customize decks and objectives: add/remove cards, peek, swap and reveal specific ones";
     }
 
     @Override

@@ -18,12 +18,15 @@ import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecBut
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
@@ -31,13 +34,14 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponth
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixLeaderHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanHeroHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.xan.XanHeroHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -61,19 +65,18 @@ import ti4.helpers.RelicHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.emoji.CardEmojis;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.explore.AddFrontierTokensService;
@@ -108,6 +111,7 @@ public class PlayHeroService {
         if (removed && (reason == LeaderRemovalReason.PURGED || reason == LeaderRemovalReason.STATUS_CLEANUP)) {
             DSHelperBreakthroughs.doLanefirBtCheck(game, player);
             OblivionUnitHandler.doOblivionMechCheck(game, player);
+            StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
         }
         if (removed && reason == LeaderRemovalReason.PURGED) {
             RevenantTechHandler.doLazarusPodsLeaderCheck(game, player);
@@ -131,11 +135,30 @@ public class PlayHeroService {
     }
 
     public static void playHero(GenericInteractionCreateEvent event, Game game, Player player, Leader playerLeader) {
+        if ("morphahero".equals(playerLeader.getId())
+                && !"resolve".equals(player.getStoredValue("morphaHeroPending"))) {
+            MorphaLeadersHandler.startMorphaHero(game, player);
+            return;
+        }
         if ("oblivionhero".equals(playerLeader.getId()) && !OblivionLeadersHandler.canStartOblivionHero(game)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     player.getRepresentation()
                             + ", Frontiersman Nothi, the Oblivion hero, cannot be played because there are not enough unused red-backed and blue-backed tiles or legal edge positions.");
+            return;
+        }
+        if (("stonebornherodormant".equals(playerLeader.getId())
+                        || "stonebornherounleashed".equals(playerLeader.getId()))
+                && game.getAllRelics().size() < 3) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing()
+                            + " cannot play _"
+                            + playerLeader
+                                    .getLeaderModel()
+                                    .map(LeaderModel::getName)
+                                    .orElse("Meteorime")
+                            + "_ because fewer than 3 relics remain.");
             return;
         }
 
@@ -214,6 +237,15 @@ public class PlayHeroService {
         }
 
         switch (playerLeader.getId()) {
+            case "stonebornherodormant" -> StonebornLeadersHandler.drawThreeRelicsAndOfferOne(game, player);
+            case "stonebornherounleashed" -> {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " drew the following relics with _Meteorime Unleashed_.");
+                RelicHelper.drawRelicAndNotify(player, event, game);
+                RelicHelper.drawRelicAndNotify(player, event, game);
+                RelicHelper.drawRelicAndNotify(player, event, game);
+            }
             case "scrapyardhero" ->
                 ScrapyardLeaderHandler.resolveScrapyardHero(
                         event instanceof ButtonInteractionEvent buttonEvent ? buttonEvent : null, game, player);
@@ -279,12 +311,14 @@ public class PlayHeroService {
                 }
             }
             case "vyserixhero" -> VyserixLeaderHandler.offerHeroAttachmentButtons(event, game, player);
+            case "xinhero" -> XinHeroHandler.startXinHero(game, player);
             case "onyxxahero" -> OnyxxaLeaderHandler.postHeroMoveShipButtons(game, player);
             case "xanhero" -> XanHeroHandler.postInitialButtons(game, player);
             case "ashenhero" -> AshenLeadersHandler.postHeroButtons(event, game, player);
             case "crystellumhero" -> CrystellumLeadersHandler.startCrystellumHero(event, game, player);
             case "dreamhero" -> DreamLeadersHandler.postDreamHeroButtons(game, player);
-            case "netrunnershero" -> NetrunnersLeadersHandler.offerHeroTechSelection(game, player);
+            case "ironhero" -> IronLeadersHandler.startAdmiralThalenHero(game, player);
+            case "netrunnershero" -> NetrunnersLeadersHandler.startNetrunnersHero(game, player);
             case "tahero" -> TaLeadersHandler.postHeroButtons(game, player, event);
             case "tyrishero" ->
                 game.setStoredValue("tyrisHeroRound" + game.getRound() + "_" + player.getFaction(), "true");
@@ -596,7 +630,7 @@ public class PlayHeroService {
                             + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
                             + " If you do, you will also choose another player, who will gain 2 trade goods.";
                     List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+                    buttons2.add(Buttons.USE_PRODUCTION_BIOMES);
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
                 }
             }
@@ -618,10 +652,10 @@ public class PlayHeroService {
             }
             case "brilliancehero" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
-                buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
+                buttons.add(Buttons.DRAW_1_ABILITY);
+                buttons.add(Buttons.DRAW_1_UNIT_UPGRADE);
                 buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
-                buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+                buttons.add(Buttons.DONE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText) + ", please use the buttons to resolve.",
@@ -703,7 +737,18 @@ public class PlayHeroService {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(
                         Buttons.blue(player.factionButtonChecker() + "yinHeroStart", "Invade A Planet With Yin Hero"));
-                buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
+                buttons.add(Buttons.DELETE_BUTTONS);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(),
+                        player.getRepresentation(true, showFlavourText)
+                                + ", use the button to do individual invasions, then delete the buttons when you have placed 3 total infantry.",
+                        buttons);
+            }
+            case "yinhero_br" -> {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.blue(
+                        player.factionButtonChecker() + "yinBrHeroStart", "Invade A Planet With Yin Hero"));
+                buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText)
@@ -750,7 +795,7 @@ public class PlayHeroService {
                         player.factionButtonChecker() + "augersHeroStart_" + 1, "Resolve Ilyxum Hero on Stage 1 Deck"));
                 buttons.add(Buttons.blue(
                         player.factionButtonChecker() + "augersHeroStart_" + 2, "Resolve Ilyxum Hero on Stage 2 Deck"));
-                buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
+                buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText)
@@ -758,7 +803,7 @@ public class PlayHeroService {
                         buttons);
             }
             case "empyreanhero" -> {
-                AddFrontierTokensService.addFrontierTokens(event, game);
+                AddFrontierTokensService.addFrontierTokensIncludingFracture(event, game);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added frontier tokens");
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),

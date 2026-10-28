@@ -30,7 +30,7 @@ public class AshenAbilityHandler {
 
     @ButtonHandler(USE_CINDERBORN)
     public static void resolveCinderborn(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (game == null || player == null) {
+        if (game == null || player == null || !player.hasTech("beasheninf")) {
             ButtonHelper.deleteMessage(event);
             return;
         }

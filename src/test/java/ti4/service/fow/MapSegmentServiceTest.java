@@ -14,9 +14,9 @@ import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
-import ti4.image.MapSegment;
-import ti4.image.Mapper;
+import ti4.image.map.MapSegment;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 
@@ -89,6 +89,17 @@ class MapSegmentServiceTest extends BaseTi4Test {
         game.getTileByPosition("1237")
                 .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, player.getColorID()), 1);
         assertEquals(sectors, MapSegmentService.viewableNames(game, player.getUserID(), true));
+    }
+
+    @Test
+    void sectorsOnAnExtraMapStillLeaveTheUnsectoredMainMapReachable() {
+        game.setTile(new Tile("21", "a000"));
+        game.getTileByPosition("a000")
+                .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, player.getColorID()), 1);
+        MapSegment.put(game, new MapSegment("outpost", "a000", 1));
+
+        assertEquals(
+                List.of(MapSegment.MAIN, "outpost"), MapSegmentService.viewableNames(game, player.getUserID(), true));
     }
 
     @Test

@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.franken;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
@@ -10,9 +11,9 @@ import ti4.draft.DraftCategory;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
+import ti4.model.Mapper;
 import ti4.service.draft.MantisMapBuildContext;
 import ti4.service.draft.MantisMapBuildService;
 import ti4.service.draft.PartialMapService;
@@ -22,7 +23,8 @@ class BuildMap extends GameStateSubcommand {
 
     public BuildMap() {
         super(Constants.FRANKEN_BUILD_MAP, "Send buttons to build map from drafted tiles", true, false);
-        addOption(OptionType.INTEGER, "mulligans", "Number of mulligans allowed (default: 1)", false);
+        addOptions(new OptionData(OptionType.INTEGER, "mulligans", "Number of mulligans allowed (default: 1)", false)
+                .setRequiredRange(0, 10));
     }
 
     public void execute(SlashCommandInteractionEvent event) {

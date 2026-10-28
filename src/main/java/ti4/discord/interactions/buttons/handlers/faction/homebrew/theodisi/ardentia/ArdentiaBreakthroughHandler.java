@@ -13,8 +13,8 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTacticalAction;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 @UtilityClass
 public class ArdentiaBreakthroughHandler {
@@ -38,7 +38,7 @@ public class ArdentiaBreakthroughHandler {
                         otherPlayer.getFactionEmojiOrColor()));
             }
         }
-        targets.add(Buttons.red("deleteButtons", "Done"));
+        targets.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),

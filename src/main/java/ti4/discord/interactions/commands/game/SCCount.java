@@ -13,8 +13,9 @@ class SCCount extends GameStateSubcommand {
 
     public SCCount() {
         super(Constants.SC_COUNT, "Strategy cards count in game", false, false);
-        addOptions(
-                new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card count").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card count")
+                .setRequiredRange(1, 99)
+                .setRequired(true));
     }
 
     @Override
@@ -28,6 +29,10 @@ class SCCount extends GameStateSubcommand {
         }
 
         int sc = scOption.getAsInt();
+        if (sc > 99) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy card count can be at most 99.");
+            return;
+        }
         if (sc < 8) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),

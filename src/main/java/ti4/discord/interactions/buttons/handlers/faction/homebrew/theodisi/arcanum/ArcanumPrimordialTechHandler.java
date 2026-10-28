@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -28,8 +29,8 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
@@ -531,9 +532,8 @@ public class ArcanumPrimordialTechHandler {
         } else {
             buttons.add(Buttons.green(
                     combat.opponent().factionButtonChecker()
-                            + "autoAssignGroundHits_"
-                            + combat.holder().getName()
-                            + "_1",
+                            + AutoAssignGroundHitsButtonIds.format(
+                                    combat.holder().getName(), 1),
                     "Auto-assign 1 Hit"));
             buttons.add(Buttons.red(
                     combat.opponent().factionButtonChecker()

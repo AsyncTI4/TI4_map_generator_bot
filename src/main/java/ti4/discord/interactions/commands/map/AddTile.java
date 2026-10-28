@@ -4,16 +4,16 @@ import java.util.Set;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.ResourceHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
+import ti4.image.io.ImageResources;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.service.map.AddTileService;
 
 class AddTile extends GameStateSubcommand {
@@ -33,7 +33,7 @@ class AddTile extends GameStateSubcommand {
         Set<String> positions = Helper.getSetFromCSV(positionOption);
 
         for (String position : positions) {
-            if (!PositionMapper.isTilePositionValid(position)) {
+            if (!MapPositionMapper.isTilePositionValid(getGame(), position)) {
                 MessageHelper.replyToMessage(event, "Position `" + position + "` not allowed");
                 return;
             }
@@ -44,7 +44,7 @@ class AddTile extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
             return;
         }
-        String tilePath = ResourceHelper.getTileFile(tileName);
+        String tilePath = ImageResources.tile(tileName);
         if (tilePath == null) {
             MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
             return;

@@ -16,9 +16,9 @@ import ti4.draft.items.FactionDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AliasHandler;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 
 final class FrankenDrazFactionHelper {
 
@@ -122,12 +122,14 @@ final class FrankenDrazFactionHelper {
         Map<DraftCategory, List<DraftItem>> byCategory =
                 items.stream().collect(Collectors.groupingBy(DraftItem::getItemCategory));
         StringBuilder summary = new StringBuilder();
-        byCategory.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(entry -> summary.append("\n> ")
-                .append(entry.getKey())
-                .append(": ")
-                .append(entry.getValue().stream()
-                        .map(DraftItem::getShortDescription)
-                        .collect(Collectors.joining(", "))));
+        byCategory.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(entry -> summary.append("\n> ")
+                        .append(entry.getKey())
+                        .append(": ")
+                        .append(entry.getValue().stream()
+                                .map(DraftItem::getShortDescription)
+                                .collect(Collectors.joining(", "))));
         return summary.toString();
     }
 

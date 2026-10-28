@@ -28,9 +28,9 @@ import ti4.game.UnitHolder;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.StringHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 
 @UtilityClass
@@ -404,13 +404,15 @@ public class PlanetWinRateStatisticsService {
         List<Entry<String, Integer>> byFaction = stats.skippedPlayersByFaction.entrySet().stream()
                 .sorted(Entry.<String, Integer>comparingByValue().reversed().thenComparing(Entry::getKey))
                 .toList();
-        byFaction.stream().limit(SKIPPED_FACTIONS_LISTED).forEach(entry -> sb.append("- `")
-                .append(entry.getKey())
-                .append("` - ")
-                .append(StringHelper.pluralize(entry.getValue(), "player"))
-                .append(", e.g. game `")
-                .append(stats.skippedGameNames.get(entry.getKey()))
-                .append("`\n"));
+        byFaction.stream()
+                .limit(SKIPPED_FACTIONS_LISTED)
+                .forEach(entry -> sb.append("- `")
+                        .append(entry.getKey())
+                        .append("` - ")
+                        .append(StringHelper.pluralize(entry.getValue(), "player"))
+                        .append(", e.g. game `")
+                        .append(stats.skippedGameNames.get(entry.getKey()))
+                        .append("`\n"));
         if (byFaction.size() > SKIPPED_FACTIONS_LISTED) {
             sb.append("- and ")
                     .append(StringHelper.pluralize(byFaction.size() - SKIPPED_FACTIONS_LISTED, "more faction"))

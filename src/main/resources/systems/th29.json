@@ -1,0 +1,17 @@
+{
+    "id": "th29",
+    "name": "Voska/Pelor",
+    "aliases": [
+        "th29",
+        "voska",
+        "pelor"
+    ],
+    "imagePath": "th29.png",
+    "planets": [
+        "voska",
+        "pelor"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "blue",
+    "source": "theodisi"
+}

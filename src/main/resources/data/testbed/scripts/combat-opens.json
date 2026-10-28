@@ -1,0 +1,10 @@
+{
+  "name": "combat-opens",
+  "description": "2p-combat opens a space combat between Letnev and Nekro above Mecatol Rex when applied.",
+  "preset": "2p-combat",
+  "steps": [
+    { "expect": { "state": "stored:factionsInCombat", "contains": ["letnev", "nekro"] } },
+    { "expect": { "state": "game.phase", "equals": "action" } },
+    { "expect": { "state": "you.leaders", "contains": "letnevcommander:ready" } }
+  ]
+}

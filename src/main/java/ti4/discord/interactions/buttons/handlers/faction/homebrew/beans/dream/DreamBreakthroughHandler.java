@@ -15,6 +15,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.NewStuffHelper;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.message.MessageHelper;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.emoji.FactionEmojis;
@@ -26,14 +27,14 @@ public class DreamBreakthroughHandler {
 
     public static boolean hasDreamBtNexusMove(Game game, Player player) {
         return player != null
-                && player.hasUnlockedBreakthrough(DREAM_SPACE_CONVERGENCE)
+                && player.hasReadyBreakthrough(DREAM_SPACE_CONVERGENCE)
                 && DreamUnitsHandler.getNexusTokenTiles(game).stream()
                         .anyMatch(tile ->
                                 !getDreamBtNexusDestinations(game, player, tile).isEmpty());
     }
 
     public static void postDreamBtMoveNexusButtons(GenericInteractionCreateEvent event, Game game, Player player) {
-        if (player == null || !player.hasUnlockedBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
+        if (player == null || !player.hasReadyBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
         List<Tile> sourceTiles = DreamUnitsHandler.getNexusTokenTiles(game);
         if (sourceTiles.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -54,7 +55,7 @@ public class DreamBreakthroughHandler {
                     player.getRepresentation() + ", has no valid destination for _Dream-Space Convergence_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", choose a nexus token to move with _Dream-Space Convergence_.",
@@ -64,7 +65,7 @@ public class DreamBreakthroughHandler {
     @ButtonHandler("dream_bt_move_nexus_from_")
     public static void offerDreamBtMoveNexusDestinations(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!player.hasUnlockedBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
+        if (!player.hasReadyBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
         String fromPosition = buttonID.replace("dream_bt_move_nexus_from_", "");
         Tile fromTile = game.getTileByPosition(fromPosition);
         if (!DreamAbilitiesHandler.hasNexusToken(fromTile)) {
@@ -82,7 +83,7 @@ public class DreamBreakthroughHandler {
                 event,
                 player.getCorrectChannel(),
                 destinationButtons,
-                List.of(Buttons.red("deleteButtons", "Decline")),
+                List.of(Buttons.DECLINE_DELETE_BUTTONS),
                 message,
                 pagePrefix,
                 buttonID)) {
@@ -102,7 +103,7 @@ public class DreamBreakthroughHandler {
     @ButtonHandler("dream_bt_move_nexus_destination_")
     public static void changeDreamBtMoveNexusDestinationPage(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!player.hasUnlockedBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
+        if (!player.hasReadyBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
         String sourceAndPage = buttonID.replace("dream_bt_move_nexus_destination_", "");
         int pageSeparator = sourceAndPage.lastIndexOf("_page");
         if (pageSeparator < 1) return;
@@ -120,7 +121,7 @@ public class DreamBreakthroughHandler {
                 event,
                 player.getCorrectChannel(),
                 destinationButtons,
-                List.of(Buttons.red("deleteButtons", "Decline")),
+                List.of(Buttons.DECLINE_DELETE_BUTTONS),
                 message,
                 "dream_bt_move_nexus_destination_" + fromPosition + "_",
                 buttonID);
@@ -129,7 +130,7 @@ public class DreamBreakthroughHandler {
     @ButtonHandler("dream_bt_move_nexus_")
     public static void resolveDreamBtMoveNexus(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!player.hasUnlockedBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
+        if (!player.hasReadyBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
         String[] parts = TO_.split(buttonID.replace("dream_bt_move_nexus_", ""), 2);
         if (parts.length != 2) {
             MessageHelper.sendMessageToEventChannel(event, "Could not parse that nexus move.");
@@ -147,6 +148,7 @@ public class DreamBreakthroughHandler {
             MessageHelper.sendMessageToEventChannel(event, "The source system does not contain a nexus token.");
             return;
         }
+        BreakthroughCommandHelper.exhaustBreakthrough(player, DREAM_SPACE_CONVERGENCE);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToEventChannel(
                 event,
@@ -167,16 +169,17 @@ public class DreamBreakthroughHandler {
     @ButtonHandler("dream_bt_remove_cc_")
     public static void resolveDreamBtRemoveCommandToken(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!player.hasUnlockedBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
+        if (!player.hasReadyBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
         Tile tile = game.getTileByPosition(buttonID.replace("dream_bt_remove_cc_", ""));
         if (tile == null
                 || !tile.getPosition().equals(game.getActiveSystem())
                 || !CommandCounterHelper.hasCC(player, tile)
-                || !DreamAbilitiesHandler.hasNexusTokenOrDreamFlagship(game, tile)) {
+                || !DreamAbilitiesHandler.hasNexusToken(tile)) {
             MessageHelper.sendMessageToEventChannel(event, "That is not a valid Dream-Space Convergence use.");
             return;
         }
         RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
+        BreakthroughCommandHelper.exhaustBreakthrough(player, DREAM_SPACE_CONVERGENCE);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 game.getActionsChannel(),
@@ -194,7 +197,7 @@ public class DreamBreakthroughHandler {
     }
 
     private static List<Button> getDreamBtDestinationButtons(List<Button> buttons, String pagePrefix, int page) {
-        List<Button> decline = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> decline = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         if (buttons.size() <= 25 - decline.size()) {
             List<Button> allButtons = new ArrayList<>(buttons);
             allButtons.addAll(decline);

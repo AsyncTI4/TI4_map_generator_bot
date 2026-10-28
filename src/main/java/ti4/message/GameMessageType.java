@@ -13,5 +13,6 @@ public enum GameMessageType {
     STATUS_SCORING,
     STRATEGY_FOLLOW,
     COMMAND_EVIDENCE,
-    VISIONARIA
+    VISIONARIA,
+    FOW_SCORING_STATUS
 }

@@ -10,7 +10,7 @@ import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.service.map.SpinService;
 
 class CustomizationOptions extends GameStateSubcommand {
@@ -91,9 +91,10 @@ class CustomizationOptions extends GameStateSubcommand {
                 Constants.INJECT_RULES_LINKS,
                 "Have the bot inject helpful links to rules within it's output"));
         addOptions(new OptionData(
-                OptionType.INTEGER,
-                Constants.FAST_SC_FOLLOW,
-                "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off"));
+                        OptionType.INTEGER,
+                        Constants.FAST_SC_FOLLOW,
+                        "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off")
+                .setRequiredRange(0, 720));
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.UNIT_SOURCE,

@@ -1,0 +1,27 @@
+{
+    "id": "ossletstation",
+    "tileId": "th45",
+    "name": "Osslet Station",
+    "aliases": [
+        "osslet",
+        "ossletstation"
+    ],
+    "resources": 0,
+    "influence": 1,
+    "planetTypes": [
+        "SPACESTATION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "ossletstation",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 142,
+            "y": 77
+        }
+    },
+    "positionInTile": {
+            "x": 142,
+            "y": 77
+    },
+    "source": "theodisi"
+}

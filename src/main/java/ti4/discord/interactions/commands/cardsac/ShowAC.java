@@ -8,10 +8,10 @@ import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
-import ti4.service.actioncard.KnownActionCardsService;
+import ti4.model.Mapper;
 
 class ShowAC extends GameStateSubcommand {
 
@@ -19,6 +19,7 @@ class ShowAC extends GameStateSubcommand {
         super(Constants.SHOW_AC, "Show an action card to one player", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color")
                 .setRequired(true)
@@ -58,7 +59,7 @@ class ShowAC extends GameStateSubcommand {
             return;
         }
 
-        KnownActionCardsService.rememberShownActionCard(playerToShowTo, player, acID);
+        ActionCardHelper.sendActionCardInfo(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(playerToShowTo, sb);
     }
 }

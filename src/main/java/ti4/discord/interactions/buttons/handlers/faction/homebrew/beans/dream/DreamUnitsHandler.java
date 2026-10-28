@@ -17,8 +17,8 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.unit.AddUnitService;
 
@@ -52,7 +52,7 @@ public class DreamUnitsHandler {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("dream_offer_add_nexus", "Add Nexus Token"));
         buttons.add(Buttons.blue("dream_offer_move_nexus", "Move Nexus Token"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -80,7 +80,7 @@ public class DreamUnitsHandler {
                     "Place Nexus in " + tileWithUnits.getRepresentationForButtons(game, player)));
         }
         List<Button> menuButtons =
-                List.of(Buttons.gray(LITURGY_MENU_BUTTON_ID, "Back"), Buttons.red("deleteButtons", "Decline"));
+                List.of(Buttons.gray(LITURGY_MENU_BUTTON_ID, "Back"), Buttons.DECLINE_DELETE_BUTTONS);
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event,
                 player.getCorrectChannel(),
@@ -125,7 +125,7 @@ public class DreamUnitsHandler {
             return;
         }
         buttons.add(Buttons.gray(LITURGY_MENU_BUTTON_ID, "Back"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), player.getRepresentation() + ", choose a nexus token to move:", buttons);
@@ -146,7 +146,7 @@ public class DreamUnitsHandler {
                         "Move Nexus to " + toTile.getRepresentationForButtons(game, player)))
                 .toList();
         List<Button> menuButtons =
-                List.of(Buttons.gray(LITURGY_MENU_BUTTON_ID, "Back"), Buttons.red("deleteButtons", "Decline"));
+                List.of(Buttons.gray(LITURGY_MENU_BUTTON_ID, "Back"), Buttons.DECLINE_DELETE_BUTTONS);
         String pagePrefix = "dream_liturgy_move_destination_" + fromTile.getPosition() + "_";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, player.getCorrectChannel(), destinationButtons, menuButtons, message, pagePrefix, buttonID)) {
@@ -183,7 +183,7 @@ public class DreamUnitsHandler {
                         "Move Nexus to " + toTile.getRepresentationForButtons(game, player)))
                 .toList();
         List<Button> menuButtons =
-                List.of(Buttons.gray(LITURGY_MENU_BUTTON_ID, "Back"), Buttons.red("deleteButtons", "Decline"));
+                List.of(Buttons.gray(LITURGY_MENU_BUTTON_ID, "Back"), Buttons.DECLINE_DELETE_BUTTONS);
         NewStuffHelper.checkAndHandlePaginationChange(
                 event,
                 player.getCorrectChannel(),
@@ -366,18 +366,18 @@ public class DreamUnitsHandler {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + ", has no valid planet they control for _The Recurring_ in a system with a nexus token or flagship.");
+                            + ", has no valid planet they control for _The Recurring_ in a system with a nexus token.");
             return;
         }
 
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
         buttons.add(Buttons.green("dream_recurring_mech_paid_" + amount + "_from_" + source, "Done Spending"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", may spend 1 influence to place "
                         + (amount == 1 ? "_The Recurring_" : "1 of " + amount + " destroyed _Recurring_ mechs")
-                        + " on another planet you control in a system that contains a nexus token or your flagship. After spending, click Done Spending to choose the destination.",
+                        + " in a system that contains a nexus token. After spending, click Done Spending to choose the destination.",
                 buttons);
     }
 
@@ -398,7 +398,7 @@ public class DreamUnitsHandler {
             return;
         }
 
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -443,10 +443,9 @@ public class DreamUnitsHandler {
             Game game, Player player, int remaining, String sourcePlanet) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (!DreamAbilitiesHandler.hasNexusTokenOrDreamFlagship(game, tile)) continue;
+            if (!DreamAbilitiesHandler.hasNexusToken(tile)) continue;
             for (var planet : tile.getPlanetUnitHolders()) {
-                if (planet.getName().equalsIgnoreCase(sourcePlanet)
-                        || !player.getPlanets().contains(planet.getName())) {
+                if (!player.getPlanets().contains(planet.getName())) {
                     continue;
                 }
                 buttons.add(Buttons.green(

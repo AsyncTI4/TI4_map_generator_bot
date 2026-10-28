@@ -14,9 +14,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Tile;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
+import ti4.model.Mapper;
 import ti4.service.draft.DraftSpec;
 import ti4.service.draft.DraftTileManager;
 import ti4.service.draft.NucleusSliceGeneratorService;
@@ -31,7 +31,8 @@ class ProduceNucleusGenStats extends GameStateSubcommand {
     ProduceNucleusGenStats() {
         super("nucleus_gen_stats", "Generate statistics for nucleus generation for the in-channel game.", false, false);
         addOptions(new OptionData(
-                OptionType.INTEGER, "num_iterations", "Number of iterations to run - default 1,000", false));
+                        OptionType.INTEGER, "num_iterations", "Number of iterations to run - default 1,000", false)
+                .setRequiredRange(1, 100_000));
     }
 
     @Override

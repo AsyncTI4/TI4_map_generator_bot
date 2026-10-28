@@ -19,9 +19,10 @@ class SCPlay extends GameStateSubcommand {
     SCPlay() {
         super(Constants.SC_PLAY, "Play a Strategy Card", true, true);
         addOptions(new OptionData(
-                OptionType.INTEGER,
-                Constants.STRATEGY_CARD,
-                "Which strategy card to play. If you have more than 1 strategy card, this is mandatory"));
+                        OptionType.INTEGER,
+                        Constants.STRATEGY_CARD,
+                        "Which strategy card to play. If you have more than 1 strategy card, this is mandatory")
+                .setRequiredRange(0, 99));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player"));
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));

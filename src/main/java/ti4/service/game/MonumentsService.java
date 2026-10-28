@@ -19,10 +19,10 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.UnitModel;
@@ -164,8 +164,9 @@ public class MonumentsService {
         if (game == null || player == null || !game.isMonumentsMode()) {
             return false;
         }
-        return game.getTileMap().values().stream().anyMatch(tile -> tile.getUnitHolders().values().stream()
-                .anyMatch(holder -> holder.getUnitCount(UnitType.Monument, player) > 0));
+        return game.getTileMap().values().stream()
+                .anyMatch(tile -> tile.getUnitHolders().values().stream()
+                        .anyMatch(holder -> holder.getUnitCount(UnitType.Monument, player) > 0));
     }
 
     public static boolean isMonumentOnBoard(Game game, Player player, String monumentId) {

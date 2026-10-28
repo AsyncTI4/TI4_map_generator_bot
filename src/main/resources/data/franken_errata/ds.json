@@ -397,15 +397,8 @@
         "itemCategory": "ABILITY",
         "itemId": "contagion",
         "additionalComponents": [
-            "ABILITY:plague_reservoir",
             "ABILITY:subversive"
         ],
-        "source": "ds"
-    },
-    {
-        "itemCategory": "ABILITY",
-        "itemId": "plague_reservoir",
-        "undraftable": true,
         "source": "ds"
     },
     {

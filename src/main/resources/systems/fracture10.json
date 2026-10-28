@@ -1,0 +1,21 @@
+{
+    "id": "fracture10",
+    "name": "Anibus/Sekhmet/Nile",
+    "aliases": [
+        "fracture10",
+        "anubius",
+        "sekhmet",
+        "nile",
+        "frac10"
+    ],
+    "imagePath": "fracture10.png",
+    "planets": [
+        "anubius",
+        "sekhmet",
+        "nile"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

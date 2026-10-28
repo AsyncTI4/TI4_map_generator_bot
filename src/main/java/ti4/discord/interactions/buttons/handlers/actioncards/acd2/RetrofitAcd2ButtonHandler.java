@@ -40,7 +40,7 @@ class RetrofitAcd2ButtonHandler {
                     player.getRepresentationUnfogged() + ", you have no non-fighter ships for _Retrofit_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose 1 of your non-fighter ships for _Retrofit_.",

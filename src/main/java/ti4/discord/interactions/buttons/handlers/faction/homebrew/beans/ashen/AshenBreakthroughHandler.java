@@ -23,6 +23,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.json.JsonMapperManager;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.BombardmentService;
@@ -30,7 +31,6 @@ import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
-import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class AshenBreakthroughHandler {
@@ -51,11 +51,10 @@ public class AshenBreakthroughHandler {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     player.getRepresentationUnfogged()
-                            + " has no non-flagship BOMBARDMENT unit that can target an adjacent planet.");
+                            + " has no BOMBARDMENT unit that can target an adjacent planet.");
             return;
         }
-        String message =
-                player.getRepresentationUnfogged() + ", choose 1 non-flagship unit to use _From Fire, Resolve_.";
+        String message = player.getRepresentationUnfogged() + ", choose 1 unit to use _From Fire, Resolve_.";
         String prefix = player.factionButtonChecker() + SELECT_UNIT;
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
@@ -66,8 +65,7 @@ public class AshenBreakthroughHandler {
     @ButtonHandler(SELECT_UNIT)
     public static void selectUnit(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         List<UnitChoice> choices = getEligibleBombardmentUnits(game, player);
-        String message =
-                player.getRepresentationUnfogged() + ", choose 1 non-flagship unit to use _From Fire, Resolve_.";
+        String message = player.getRepresentationUnfogged() + ", choose 1 unit to use _From Fire, Resolve_.";
         String prefix = player.factionButtonChecker() + SELECT_UNIT;
         List<Button> buttons = getUnitButtons(player, choices);
         if (NewStuffHelper.checkAndHandlePaginationChange(
@@ -140,7 +138,7 @@ public class AshenBreakthroughHandler {
                 getRollContextKey(player), "pending|" + selected.source().getPosition() + "|" + target.planet());
         game.setStoredValue(
                 "assignedBombardment" + player.getFaction(),
-                new ObjectMapper()
+                JsonMapperManager.basic()
                         .writeValueAsString(List.of(new BombardmentAssignment(
                                 selected.unit().getAsyncId(),
                                 target.planet(),
@@ -253,9 +251,7 @@ public class AshenBreakthroughHandler {
                         continue;
                     }
                     UnitModel unit = player.getUnitFromUnitKey(unitKey);
-                    if (unit != null
-                            && unit.getUnitType() != UnitType.Flagship
-                            && unit.getBombardDieCount(player) > 0) {
+                    if (unit != null && unit.getBombardDieCount(player) > 0) {
                         choices.add(new UnitChoice(tile, unit));
                     }
                 }

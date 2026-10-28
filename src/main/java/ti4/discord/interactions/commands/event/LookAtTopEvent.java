@@ -4,26 +4,35 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
+import ti4.model.Mapper;
 
 class LookAtTopEvent extends GameStateSubcommand {
 
     public LookAtTopEvent() {
         super(Constants.LOOK_AT_TOP, "Look at top Event from deck", true, true);
-        addOption(OptionType.INTEGER, Constants.COUNT, "Number of events to look at");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of events to look at")
+                .setRequiredRange(1, 60));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
+        if (game.getEvents().isEmpty()) {
+            MessageHelper.replyToMessage(event, "The event deck is empty.");
+            return;
+        }
+
+        int count = Math.min(
+                event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt),
+                game.getEvents().size());
 
         StringBuilder sb = new StringBuilder();
         sb.append("-----------\n");

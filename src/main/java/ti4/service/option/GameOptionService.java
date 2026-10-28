@@ -16,6 +16,9 @@ public class GameOptionService {
         sendFactionReactOptionButtons(channel);
         sendHexBorderOptionButtons(channel);
         sendShowOwnedPNsInPlayerAreaButton(game, channel);
+        if (!game.isFowMode()) {
+            sendRulesLinksButton(game, channel);
+        }
     }
 
     private static void sendFactionReactOptionButtons(MessageChannel channel) {
@@ -25,7 +28,7 @@ public class GameOptionService {
         factionReactButtons.add(Buttons.blue("enableAidReacts_strategy", "Enable Strategy Card Reactions"));
         factionReactButtons.add(Buttons.green("enableAidReacts_all", "Enable All Reactions"));
         factionReactButtons.add(Buttons.red("disableAidReacts", "No Reactions"));
-        factionReactButtons.add(Buttons.gray("deleteButtons", "Done"));
+        factionReactButtons.add(Buttons.DONE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
                 channel,
                 "Enable to have the bot react to player messages with their faction emoji, their colour emoji, their strategy card emoji, or all of the above.",
@@ -37,7 +40,7 @@ public class GameOptionService {
         hexBorderButtons.add(Buttons.green("showHexBorders_dash", "Dashed line"));
         hexBorderButtons.add(Buttons.blue("showHexBorders_solid", "Solid line"));
         hexBorderButtons.add(Buttons.red("showHexBorders_off", "Off (default)"));
-        hexBorderButtons.add(Buttons.gray("deleteButtons", "Done"));
+        hexBorderButtons.add(Buttons.DONE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
                 channel, "Show borders around systems with player's ships.", hexBorderButtons);
     }
@@ -52,8 +55,21 @@ public class GameOptionService {
         } else {
             buttons.add(showOwnedPNs_OFF);
         }
-        buttons.add(Buttons.gray("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
                 channel, "Show Owned Promissory Notes in Player Area?\n-# Click to toggle.", buttons);
+    }
+
+    public static final Button rulesLinks_ON = Buttons.green("injectRulesLinks_turnOFF", "ON");
+    public static final Button rulesLinks_OFF = Buttons.red("injectRulesLinks_turnON", "OFF");
+
+    private static void sendRulesLinksButton(Game game, MessageChannel channel) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(game.isInjectRulesLinks() ? rulesLinks_ON : rulesLinks_OFF);
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
+                channel,
+                "Link rules terms such as \"tactical action\" and \"production\" in bot messages to their entries on tirules2.com?\n-# Click to toggle.",
+                buttons);
     }
 }

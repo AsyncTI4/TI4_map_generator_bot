@@ -6,8 +6,8 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.game.Player;
 import ti4.game.UnitHolder;
-import ti4.image.Mapper;
 import ti4.model.CombatModifierModel;
+import ti4.model.Mapper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.TileModel;
@@ -27,6 +27,21 @@ public class CombatTempModHelper {
             player.addTempCombatMod(mod);
         }
         player.clearNewTempCombatModifiers();
+    }
+
+    public static void activateQueuedOpponentMods(Player modOwner, TileModel tile, UnitHolder holder) {
+        List<TemporaryCombatModifierModel> queued = modOwner.getNewTempCombatModifiers().stream()
+                .filter(mod -> mod.getUseInTurn() == modOwner.getNumberOfTurns())
+                .filter(mod -> mod.getModifier().getApplyToOpponent())
+                .filter(mod -> Constants.MOD_TEMP_ONE_TACTICAL_ACTION.equals(
+                        mod.getModifier().getPersistenceType()))
+                .toList();
+        for (TemporaryCombatModifierModel mod : queued) {
+            modOwner.getNewTempCombatModifiers().remove(mod);
+            mod.setUseInSystem(tile.getId());
+            mod.setUseInUnitHolder(holder.getName());
+            modOwner.addTempCombatMod(mod);
+        }
     }
 
     public static void ensureValidTempMods(Player player, TileModel tile, UnitHolder holder) {

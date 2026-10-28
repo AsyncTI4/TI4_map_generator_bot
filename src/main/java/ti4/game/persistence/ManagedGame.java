@@ -2,18 +2,22 @@ package ti4.game.persistence;
 
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import lombok.AccessLevel;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
+import ti4.game.Player;
+import ti4.helpers.FoWHelper;
 
 @Getter
 public class ManagedGame {
@@ -31,7 +35,10 @@ public class ManagedGame {
     private final boolean colorReactMode;
     private final boolean stratReactMode;
     private final boolean fastScFollowMode;
+    private final boolean fogQol01;
     private final boolean injectRules;
+    private final boolean autoPingEnabled;
+    private final boolean temporaryPingDisable;
     private final long creationDateTime;
     private final long lastModifiedDate;
     private final String activePlayerId;
@@ -43,7 +50,11 @@ public class ManagedGame {
     private final TextChannel tableTalkChannel;
     private final ThreadChannel launchPostThread;
     private final Set<ManagedPlayer> players;
-    private final Map<ManagedPlayer, Boolean> playerToIsReal;
+
+    @Getter(AccessLevel.NONE)
+    private final Map<ManagedPlayer, Status> playerToStatus;
+
+    private final Map<String, String> teamMateToPrimaryId;
 
     public ManagedGame(Game game) {
         name = game.getName();
@@ -57,7 +68,10 @@ public class ManagedGame {
         colorReactMode = game.isBotColorReacts();
         stratReactMode = game.isBotStratReacts();
         fastScFollowMode = game.isFastSCFollowMode();
+        fogQol01 = FoWHelper.isFogQol01(game);
         injectRules = game.isInjectRulesLinks();
+        autoPingEnabled = game.getAutoPingStatus();
+        temporaryPingDisable = game.isTemporaryPingDisable();
         creationDateTime = game.getCreationDateTime();
         lastModifiedDate = game.getLastModifiedDate();
         activePlayerId = sanitizeToNull(game.getActivePlayerID());
@@ -74,10 +88,30 @@ public class ManagedGame {
         players = game.getPlayers().values().stream()
                 .map(p -> GameManager.addOrMergePlayer(this, p))
                 .collect(toUnmodifiableSet());
-        playerToIsReal = game.getPlayers().values().stream()
+        playerToStatus = game.getPlayers().values().stream()
                 .collect(Collectors.toUnmodifiableMap(
-                        p -> getPlayer(p.getUserID()),
-                        p -> ((p.isRealPlayer() && !p.isNpc()) || (p.isEliminated() && game.isHasEnded()))));
+                        p -> getPlayer(p.getUserID()), p -> Status.of(p, game.isHasEnded())));
+        teamMateToPrimaryId = collectTeamMates(game);
+    }
+
+    private static Map<String, String> collectTeamMates(Game game) {
+        if (!game.isCommunityMode()) {
+            return Collections.emptyMap();
+        }
+        return game.getPlayers().values().stream()
+                .flatMap(player -> player.getTeamMateIDs().stream()
+                        .filter(id -> !id.equals(player.getUserID()))
+                        .map(id -> Map.entry(id, player.getUserID())))
+                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (first, _) -> first));
+    }
+
+    public String getSeatUserId(String id) {
+        if (hasPlayer(id)) return id;
+        return teamMateToPrimaryId.getOrDefault(id, id);
+    }
+
+    public boolean hasPlayerOrTeamMate(String id) {
+        return hasPlayer(id) || teamMateToPrimaryId.containsKey(id);
     }
 
     private static String sanitizeToNull(String str) {
@@ -108,10 +142,21 @@ public class ManagedGame {
     }
 
     public List<ManagedPlayer> getRealPlayers() {
-        return playerToIsReal.entrySet().stream()
-                .filter(Map.Entry::getValue)
+        return playerToStatus.entrySet().stream()
+                .filter(entry -> entry.getValue() == Status.REAL)
                 .map(Map.Entry::getKey)
                 .toList();
+    }
+
+    public long countRealAndEliminatedPlayers() {
+        return playerToStatus.values().stream()
+                .filter(Status::isRealOrEliminated)
+                .count();
+    }
+
+    public boolean isRealOrEliminatedPlayer(String userId) {
+        ManagedPlayer player = getPlayer(userId);
+        return player != null && playerToStatus.get(player).isRealOrEliminated();
     }
 
     public boolean matches(Game game) {
@@ -132,5 +177,25 @@ public class ManagedGame {
     @Override
     public int hashCode() {
         return Objects.hashCode(name);
+    }
+
+    private enum Status {
+        REAL,
+        REAL_OR_ELIMINATED,
+        OTHER;
+
+        static Status of(Player player, boolean gameHasEnded) {
+            if ((player.isRealPlayer() && !player.isNpc()) || (player.isEliminated() && gameHasEnded)) {
+                return REAL;
+            }
+            if (player.isRealPlayer() || player.isEliminated()) {
+                return REAL_OR_ELIMINATED;
+            }
+            return OTHER;
+        }
+
+        boolean isRealOrEliminated() {
+            return this != OTHER;
+        }
     }
 }

@@ -16,9 +16,9 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 
@@ -29,11 +29,7 @@ public class TaLeadersHandler {
     private static final String AGENT_CHOOSE_TRAIT_PREFIX = "taAgentChooseTrait_";
     private static final String AGENT_RESOLVE_TRAIT_PREFIX = "taAgentResolveTrait_";
 
-    public static void resolveTaAgentTarget(Game game, Player player) {
-        if (game == null || player == null) {
-            return;
-        }
-
+    public static List<Button> agentPlanetButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String planetName : player.getPlanets()) {
             Tile tile = game.getTileFromPlanet(planetName);
@@ -45,16 +41,9 @@ public class TaLeadersHandler {
             }
         }
         if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " has no explorable planets for Len, the Ta agent.");
-            return;
+            return buttons;
         }
-        String message = player.getRepresentationUnfogged() + ", choose a planet for Len, the Ta agent.";
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                message,
-                NewStuffHelper.buttonPagination(buttons, player.factionButtonChecker() + AGENT_CHOOSE_TRAIT_PREFIX, 0));
+        return NewStuffHelper.buttonPagination(buttons, player.factionButtonChecker() + AGENT_CHOOSE_TRAIT_PREFIX, 0);
     }
 
     @ButtonHandler(AGENT_CHOOSE_TRAIT_PREFIX)
@@ -187,7 +176,7 @@ public class TaLeadersHandler {
                     player.factionButtonChecker() + COMMANDER_CONVERT_PREFIX + tile.getPosition() + "|" + planetName,
                     "Convert Commodity to Trade Good",
                     MiscEmojis.comm)));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),

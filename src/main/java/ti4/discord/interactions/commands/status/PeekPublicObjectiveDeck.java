@@ -12,8 +12,8 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 
 class PeekPublicObjectiveDeck extends GameStateSubcommand {
@@ -22,7 +22,9 @@ class PeekPublicObjectiveDeck extends GameStateSubcommand {
 
     PeekPublicObjectiveDeck() {
         super("po_peek", "Peek Public Objective Deck", false, true);
-        addOptions(new OptionData(OptionType.INTEGER, STAGE_COMMAND_NAME, "1 or 2").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, STAGE_COMMAND_NAME, "1 or 2")
+                .setRequiredRange(1, 2)
+                .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COUNT, "Number of cards to peek."));
     }
 
