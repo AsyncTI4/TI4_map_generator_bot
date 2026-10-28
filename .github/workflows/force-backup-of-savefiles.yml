@@ -62,16 +62,29 @@ jobs:
           envs: DISCORD_WEBHOOK_URL
           script: ${{ env.BACKUP_SCRIPT }}
 
-  # The failures are TCP connect timeouts from one runner's IP; an immediate retry from the
-  # same runner fails the same way, so retry from a new runner after a pause.
+  # The failures are TCP connect timeouts to the SSH port that can last 10+ minutes, so retry
+  # from a new runner once the port answers again, giving up after about 15 minutes.
   retry:
     name: Retry Backup From A New Runner
     needs: save
     if: ${{ needs.save.outputs.ok != 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - name: wait before retrying
-        run: sleep 180
+      - name: wait for the SSH port to answer
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT }}
+        run: |
+          for attempt in $(seq 1 30); do
+            if timeout 5 bash -c "</dev/tcp/$SSH_HOST/$SSH_PORT" 2>/dev/null; then
+              echo "SSH port reachable on probe $attempt"
+              exit 0
+            fi
+            echo "SSH port unreachable on probe $attempt, waiting 25s"
+            sleep 25
+          done
+          echo "SSH port still unreachable after ~15 minutes"
+          exit 1
 
       - name: retry executing remote ssh commands using password
         uses: appleboy/ssh-action@master
