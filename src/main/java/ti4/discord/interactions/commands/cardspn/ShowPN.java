@@ -24,6 +24,7 @@ class ShowPN extends GameStateSubcommand {
                         OptionType.INTEGER,
                         Constants.PROMISSORY_NOTE_ID,
                         "Promissory Note ID which is found between ()")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color")
                 .setRequired(true)

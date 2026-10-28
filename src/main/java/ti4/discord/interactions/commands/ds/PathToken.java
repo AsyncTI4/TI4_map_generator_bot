@@ -11,7 +11,9 @@ class PathToken extends GameStateSubcommand {
 
     public PathToken() {
         super(Constants.PATH_TOKEN_COUNT, "Set path token amount", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, "count", "Count").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, "count", "Count")
+                .setRequiredRange(0, 99)
+                .setRequired(true));
     }
 
     @Override

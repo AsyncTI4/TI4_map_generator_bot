@@ -19,7 +19,8 @@ class ExploreDrawAndDiscard extends GameStateSubcommand {
                 new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.")
                         .setRequired(true)
                         .setAutoComplete(true),
-                new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of cards to draw (default 1)"));
+                new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of cards to draw (default 1)")
+                        .setRequiredRange(1, 20));
     }
 
     @Override

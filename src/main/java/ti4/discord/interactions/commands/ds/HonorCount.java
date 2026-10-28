@@ -13,7 +13,9 @@ class HonorCount extends GameStateSubcommand {
 
     public HonorCount() {
         super(Constants.HONOR_COUNT, "Set Honor amount", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, "count", "Count").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, "count", "Count")
+                .setRequiredRange(0, 99)
+                .setRequired(true));
     }
 
     @Override

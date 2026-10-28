@@ -11,7 +11,9 @@ class AdjustRoundNumber extends GameStateSubcommand {
 
     public AdjustRoundNumber() {
         super(Constants.ADJUST_ROUND_NUMBER, "Adjust round number of game", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ROUND, "Round number").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.ROUND, "Round number")
+                .setRequiredRange(0, 99)
+                .setRequired(true));
     }
 
     @Override

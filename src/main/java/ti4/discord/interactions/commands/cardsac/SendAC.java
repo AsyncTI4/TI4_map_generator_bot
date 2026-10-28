@@ -19,6 +19,7 @@ class SendAC extends GameStateSubcommand {
     public SendAC() {
         super(Constants.SEND_AC, "Send an action card to a player", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID to send")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to send to")
                 .setRequired(true)

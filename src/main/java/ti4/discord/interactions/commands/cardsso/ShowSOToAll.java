@@ -19,6 +19,7 @@ class ShowSOToAll extends GameStateSubcommand {
                         OptionType.INTEGER,
                         Constants.SECRET_OBJECTIVE_ID,
                         "Secret objective ID, which is found between ()")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,

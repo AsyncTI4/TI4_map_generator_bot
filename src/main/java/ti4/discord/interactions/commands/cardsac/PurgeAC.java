@@ -19,6 +19,7 @@ class PurgeAC extends GameStateSubcommand {
         super(Constants.PURGE_AC, "Purge an Action Card", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID, which is found between ()")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
     }
 
