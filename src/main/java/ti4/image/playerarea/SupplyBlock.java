@@ -10,6 +10,7 @@ import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.HydromorphicHelper;
 import ti4.image.draw.FactionIcons;
+import ti4.image.draw.InfinitySymbol;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.PaImage;
 import ti4.image.draw.ShapeDrawing;
@@ -103,10 +104,19 @@ final class SupplyBlock {
         } else {
             drawCardCount(g2, x + 280 - xOffset, y, "pa_cardbacks_pn.png", Integer.toString(player.getPnCount()), true);
         }
-        drawCardCount(g2, x + 345 - xOffset, y, tradeGoodImage, Integer.toString(player.getTg()), false);
+        if (player.isInfiniteTg()) {
+            drawInfiniteCard(g2, x + 345 - xOffset, y, tradeGoodImage);
+        } else {
+            drawCardCount(g2, x + 345 - xOffset, y, tradeGoodImage, Integer.toString(player.getTg()), false);
+        }
         String comms = player.getCommodities() + "/" + player.getCommoditiesTotal();
         drawCardCount(g2, x + 410 - xOffset, y, "pa_cardbacks_commodities.png", comms, false);
         return xOffset;
+    }
+
+    private static void drawInfiniteCard(Graphics2D g2, int x, int y, String image) {
+        Rectangle card = PaImage.draw(g2, x, y, image);
+        InfinitySymbol.draw(g2, (int) card.getCenterX(), y + 62, 34, Color.WHITE, Color.BLACK);
     }
 
     private static void drawCardCount(Graphics2D g2, int x, int y, String image, String count, boolean outlined) {

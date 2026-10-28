@@ -43,7 +43,14 @@ class SpaceTest extends BaseTi4Test {
         // Given
         Space space = buildSpace();
         Set<String> knownJsonAttributes = new HashSet<>(Arrays.asList(
-                "name", "javaClassType", "holderCenterPosition", "unitsByState", "ccList", "controlList", "tokenList"));
+                "name",
+                "javaClassType",
+                "holderCenterPosition",
+                "unitsByState",
+                "ccList",
+                "controlList",
+                "tokenList",
+                "infiniteUnits"));
 
         // When
         JsonValidator.assertAvailableJsonAttributes(space, knownJsonAttributes);

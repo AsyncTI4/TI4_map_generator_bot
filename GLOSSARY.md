@@ -316,6 +316,12 @@ The Combat between ships in the active System, which follows Space cannon offens
 **Ground combat**:
 The Combat between ground forces on a Planet during Invasion, which runs until at most one Player has ground forces left.
 
+**Infinite stack**:
+A bot-only stack of infantry on one unit holder that never runs out, placed with `infinity infantry` in a unit list (`infinite`, `inf` and `∞` also work). Removing or destroying some of it leaves it infinite; only removing `infinity infantry` takes it away. In Ground combat it rolls no dice and produces ∞ hits. Effects that target infantry, such as _Plague_, roll nothing and do nothing to it.
+
+**Infinite trade goods**:
+A bot-only Player state, set with `/player stats trade_goods:infinity`. Spending or trading trade goods away leaves it infinite, and a Transaction can give another Player infinite trade goods.
+
 **Attacker / Defender**:
 The active Player is the attacker in a Combat and the other Player is the defender.
 

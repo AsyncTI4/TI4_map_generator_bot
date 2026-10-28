@@ -62,7 +62,7 @@ public class Planet extends UnitHolder {
     private float radius;
 
     public Planet(String name, Point holderCenterPosition) {
-        this(name, holderCenterPosition, null, null, null, null);
+        this(name, holderCenterPosition, null, null, null, null, null);
     }
 
     @JsonCreator
@@ -72,8 +72,9 @@ public class Planet extends UnitHolder {
             @JsonProperty("unitsByState") Map<UnitKey, List<Integer>> unitsByState,
             @JsonProperty("ccList") Set<String> ccList,
             @JsonProperty("controlList") Set<String> controlList,
-            @JsonProperty("tokenList") Set<String> tokenList) {
-        super(name, holderCenterPosition, unitsByState, ccList, controlList, tokenList);
+            @JsonProperty("tokenList") Set<String> tokenList,
+            @JsonProperty("infiniteUnits") Set<UnitKey> infiniteUnits) {
+        super(name, holderCenterPosition, unitsByState, ccList, controlList, tokenList, infiniteUnits);
         PlanetModel planetInfo = Mapper.getPlanet(name);
         if (planetInfo != null) {
             if (planetInfo.getPlanetTypes() != null) {

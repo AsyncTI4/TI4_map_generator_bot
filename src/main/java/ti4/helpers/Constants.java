@@ -798,6 +798,7 @@ public final class Constants {
     public static final String FLEET = "fleet_cc";
     public static final String STRATEGY = "strategy_cc";
     public static final String TG = "trade_goods";
+    public static final String INFINITE_TG = "infinite_trade_goods";
     public static final String ACTUAL_HITS = "actual_hits";
     public static final String EXPECTED_HITS_TIMES_10 = "expected_hits_times_10";
     public static final String TOTAL_EXPENSES = "total_expenses";

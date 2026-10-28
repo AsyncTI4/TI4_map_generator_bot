@@ -48,6 +48,7 @@ public abstract class UnitHolder {
     private final Set<String> ccList = new LinkedHashSet<>();
     private final Set<String> controlList = new LinkedHashSet<>();
     protected final Set<String> tokenList = new LinkedHashSet<>();
+    private final Set<UnitKey> infiniteUnits = new LinkedHashSet<>();
 
     protected UnitHolder(String name, Point holderCenterPosition) {
         this.name = name;
@@ -61,7 +62,8 @@ public abstract class UnitHolder {
             @JsonProperty("unitsByState") Map<UnitKey, List<Integer>> unitsByState,
             @JsonProperty("ccList") Set<String> ccList,
             @JsonProperty("controlList") Set<String> controlList,
-            @JsonProperty("tokenList") Set<String> tokenList) {
+            @JsonProperty("tokenList") Set<String> tokenList,
+            @JsonProperty("infiniteUnits") Set<UnitKey> infiniteUnits) {
         this.name = name;
         this.holderCenterPosition = holderCenterPosition;
 
@@ -70,12 +72,14 @@ public abstract class UnitHolder {
         if (ccList != null) this.ccList.addAll(ccList);
         if (controlList != null) this.controlList.addAll(controlList);
         if (tokenList != null) this.tokenList.addAll(tokenList);
+        if (infiniteUnits != null) this.infiniteUnits.addAll(infiniteUnits);
     }
 
     public abstract String getRepresentation(Game game);
 
     public void inheritEverythingFrom(UnitHolder other) {
         unitsByState.putAll(other.unitsByState);
+        infiniteUnits.addAll(other.infiniteUnits);
 
         ccList.addAll(other.ccList);
         controlList.addAll(other.controlList);
@@ -133,6 +137,24 @@ public abstract class UnitHolder {
         return capped;
     }
 
+    public boolean isInfinite(UnitKey unit) {
+        return infiniteUnits.contains(unit) && unitsByState.containsKey(unit);
+    }
+
+    public boolean hasInfiniteUnits(String colorID) {
+        return infiniteUnits.stream().anyMatch(unit -> unit.colorID().equals(colorID) && isInfinite(unit));
+    }
+
+    public void makeInfinite(UnitKey unit) {
+        unitsByState.remove(unit);
+        addUnit(unit, SanityLimits.unitsInOneHolder(unit.unitType()));
+        infiniteUnits.add(unit);
+    }
+
+    public void clearInfinite(UnitKey unit) {
+        infiniteUnits.remove(unit);
+    }
+
     public void addCC(String cc) {
         ccList.add(cc);
     }
@@ -181,7 +203,8 @@ public abstract class UnitHolder {
     public List<Integer> removeUnit(UnitKey unit, int count, UnitState preferredState) {
         if (unit == null || count <= 0) return UnitState.emptyList();
 
-        List<Integer> counts = unitsByState.get(unit);
+        boolean infinite = isInfinite(unit);
+        List<Integer> counts = infinite ? new ArrayList<>(unitsByState.get(unit)) : unitsByState.get(unit);
         int totalCount = getTotalUnitCount(counts);
         if (totalCount <= 0) {
             unitsByState.remove(unit);
@@ -207,6 +230,8 @@ public abstract class UnitHolder {
                 counts.set(index, 0);
             }
         }
+
+        if (infinite) return unitsRemoved;
 
         int leftover = getTotalUnitCount(counts);
         if (leftover <= 0) {
@@ -423,8 +448,10 @@ public abstract class UnitHolder {
     }
 
     public String getPlayersUnitListOnHolder(Player player) {
-        return getUnitAsyncIdsOnHolder(player.getColorID()).entrySet().stream()
-                .map(e -> e.getValue() + " " + e.getKey())
+        return unitsByState.keySet().stream()
+                .filter(uk -> uk.colorID().equals(Mapper.getColorID(player.getColorID())))
+                .map(uk -> (isInfinite(uk) ? SanityLimits.INFINITY : String.valueOf(getUnitCount(uk))) + " "
+                        + uk.asyncID())
                 .collect(Collectors.joining(","));
     }
 

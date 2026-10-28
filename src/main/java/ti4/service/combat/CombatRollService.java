@@ -666,6 +666,10 @@ public class CombatRollService {
         }
         Map<UnitModel, Integer> opponentUnitsByQuantity =
                 getUnitsInCombat(tile, combatOnHolder, opponent, event, rollType, game);
+        if (InfiniteGroundForcesService.rollsInfinitely(player, combatOnHolder, rollType)) {
+            return InfiniteGroundForcesService.roll(
+                    game, player, opponent, tile, (Planet) combatOnHolder, opponentUnitsByQuantity, event);
+        }
 
         TileModel tileModel = TileHelper.getTileById(tile.getTileID());
         Map<UnitModel, Integer> playerUnitsFlat = new HashMap<>();

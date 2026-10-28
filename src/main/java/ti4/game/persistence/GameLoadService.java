@@ -896,6 +896,7 @@ class GameLoadService {
                 case Constants.FLEET -> player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STRATEGY -> player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TG -> player.setTg(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.INFINITE_TG -> player.setInfiniteTg(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.ACTUAL_HITS -> player.setActualHits(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.EXPECTED_HITS_TIMES_10 ->
                     player.setExpectedHitsTimes10(Integer.parseInt(tokenizer.nextToken()));
@@ -1245,7 +1246,9 @@ class GameLoadService {
                     "Invalid UnitHolder detected during load: " + tile.getTileID() + " / " + unitHolderName);
             return;
         }
-        tile.getUnitHolders().get(unitHolderName).getUnitsByState().put(uk, UnitHolder.capToHolderLimit(uk, counts));
+        UnitHolder unitHolder = tile.getUnitHolders().get(unitHolderName);
+        unitHolder.getUnitsByState().put(uk, UnitHolder.capToHolderLimit(uk, counts));
+        if (tokenizer.hasMoreTokens() && INFINITE.equals(tokenizer.nextToken())) unitHolder.makeInfinite(uk);
     }
 
     private static void readPlanetTokens(Tile tile, String data, String unitHolderName) {

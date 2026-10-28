@@ -54,6 +54,7 @@ public class PlayerProperties {
     private int strategicCC = 2;
     private int inRoundTurnCount;
     private int tg;
+    private boolean infiniteTg;
     private int commodities;
     public int commoditiesTotal;
     private int commoditiesBase;

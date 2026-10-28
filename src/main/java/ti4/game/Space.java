@@ -35,8 +35,9 @@ public class Space extends UnitHolder {
             @JsonProperty("unitsByState") Map<Units.UnitKey, List<Integer>> unitsByState,
             @JsonProperty("ccList") Set<String> ccList,
             @JsonProperty("controlList") Set<String> controlList,
-            @JsonProperty("tokenList") Set<String> tokenList) {
-        super(name, holderCenterPosition, unitsByState, ccList, controlList, tokenList);
+            @JsonProperty("tokenList") Set<String> tokenList,
+            @JsonProperty("infiniteUnits") Set<Units.UnitKey> infiniteUnits) {
+        super(name, holderCenterPosition, unitsByState, ccList, controlList, tokenList, infiniteUnits);
     }
 
     public String getRepresentation(Game game) {

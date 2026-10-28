@@ -16,6 +16,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.draw.FactionIcons;
 import ti4.image.draw.HorizontalAlign;
+import ti4.image.draw.InfinitySymbol;
 import ti4.image.draw.OutlinedText;
 import ti4.image.draw.VerticalAlign;
 import ti4.image.io.Fonts;
@@ -65,6 +66,14 @@ final class UnitBadges {
             case "mf", "pd", "sd", "csd", "plenaryorbital" -> new Point(-10, 20);
             default -> new Point(0, 0);
         };
+    }
+
+    static void drawInfiniteCount(Graphics2D g, UnitKey unitKey, ImagePosition imagePos) {
+        boolean blackText = "black".equals(Mapper.getColor(unitKey.colorID()).getTextColor());
+        Color color = blackText ? Color.BLACK : Color.WHITE;
+        Color outline = blackText ? Color.WHITE : Color.BLACK;
+        InfinitySymbol.draw(
+                g, imagePos.x() + COUNT_POSITION.x + 18, imagePos.y() + COUNT_POSITION.y - 10, 32, color, outline);
     }
 
     static void drawBulkCount(Graphics2D g, UnitKey unitKey, int count, ImagePosition imagePos) {

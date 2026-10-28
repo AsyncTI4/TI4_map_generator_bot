@@ -2699,6 +2699,19 @@ public final class ButtonHelperActionCards {
         int amount = uH.getUnitCount(UnitType.Infantry, p2.getColor());
         int hits = 0;
         UnitKey key = Units.getUnitKey(UnitType.Infantry, p2.getColor());
+        if (uH.isInfinite(key)) {
+            FoWHelper.notifyActorAndAffectedElsePublic(
+                    game,
+                    player,
+                    player.getRepresentationUnfogged() + ", _Plague_ does nothing to the infinite stack of infantry on "
+                            + planetRep + ". No dice were rolled.",
+                    p2,
+                    p2.getRepresentationUnfogged() + ", _Plague_ did nothing to your infinite stack of infantry on "
+                            + planetRep + ".",
+                    player.getRepresentationUnfogged() + " released a _Plague_ upon " + planetRep
+                            + ", which did nothing to the infinite stack of infantry there.");
+            return;
+        }
         if (amount > 0) {
             StringBuilder msg = new StringBuilder(UnitEmojis.infantry + " rolled ");
             if (game.isTwilightsFallMode()) {

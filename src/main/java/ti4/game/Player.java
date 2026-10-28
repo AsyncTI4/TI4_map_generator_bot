@@ -2406,14 +2406,24 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     @Override
+    public int getTg() {
+        return isInfiniteTg() ? SanityLimits.TRADE_GOODS : super.getTg();
+    }
+
+    @Override
     public void setTg(int tg) {
+        if (isInfiniteTg()) return;
         super.setTg(SanityLimits.cap(tg, SanityLimits.TRADE_GOODS));
     }
 
+    public String getTgRepresentation() {
+        return isInfiniteTg() ? "∞" : String.valueOf(getTg());
+    }
+
     public String gainTG(int count) {
-        int before = getTg();
-        setTg(SanityLimits.cappedSum(before, count, SanityLimits.TRADE_GOODS));
-        return "(" + before + " -> " + getTg() + ")";
+        String before = getTgRepresentation();
+        setTg(SanityLimits.cappedSum(getTg(), count, SanityLimits.TRADE_GOODS));
+        return "(" + before + " -> " + getTgRepresentation() + ")";
     }
 
     public String gainTG(int count, boolean checkForPillage) {

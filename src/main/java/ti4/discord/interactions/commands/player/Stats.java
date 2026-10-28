@@ -14,10 +14,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.function.Consumers;
+import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.SanityLimits;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperCommanders;
@@ -52,7 +54,9 @@ class Stats extends GameStateSubcommand {
                         Constants.STRATEGY,
                         "Strategy pool command token count - can use +1/-1 etc. to add/subtract"))
                 .addOptions(new OptionData(
-                        OptionType.STRING, Constants.TG, "Trade good count - can use +1/-1 etc. to add/subtract"))
+                        OptionType.STRING,
+                        Constants.TG,
+                        "Trade good count - can use +1/-1 etc. to add/subtract, or infinity"))
                 .addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.COMMODITIES,
@@ -183,9 +187,20 @@ class Stats extends GameStateSubcommand {
         MessageHelper.sendMessageToEventChannel(event, player.getRepresentationUnfogged() + " player stats changed:");
 
         OptionMapping optionTG = event.getOption(Constants.TG);
-        if (optionTG != null) {
+        if (optionTG != null && isInfinity(optionTG.getAsString().trim())) {
+            player.setInfiniteTg(true);
+            MessageHelper.sendMessageToEventChannel(event, "Set __trade goods__ to ∞.");
+        } else if (optionTG != null
+                && player.isInfiniteTg()
+                && (optionTG.getAsString().trim().startsWith("+")
+                        || optionTG.getAsString().trim().startsWith("-"))) {
+            MessageHelper.sendMessageToEventChannel(event, "__Trade goods__ stay ∞.");
+        } else if (optionTG != null) {
+            String tgValue = optionTG.getAsString().trim();
+            if (!tgValue.startsWith("+") && !tgValue.startsWith("-")) player.setInfiniteTg(false);
             int oldTg = player.getTg();
             PlayerStatsService.setValue(event, game, player, optionTG, player::setTg, player::getTg);
+            pointToInfinityIfOverCap(event, tgValue, oldTg);
             if (optionTG.getAsString().contains("+")) {
                 ButtonHelperAbilities.pillageCheck(player, game);
             } else if (player.getTg() > oldTg) {
@@ -385,5 +400,21 @@ class Stats extends GameStateSubcommand {
         return event.getOptions().stream()
                 .anyMatch(option -> SUS_OPTIONS.contains(option.getName())
                         && !option.getAsString().startsWith("-"));
+    }
+
+    private static void pointToInfinityIfOverCap(SlashCommandInteractionEvent event, String value, int oldTg) {
+        String number = (value.contains("?") ? value.substring(0, value.indexOf('?')) : value).replace(" ", "");
+        long amount = NumberUtils.toLong(number, 0);
+        long requested = value.startsWith("+") || value.startsWith("-") ? oldTg + amount : amount;
+        if (requested > SanityLimits.TRADE_GOODS) {
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "Trade goods stop at " + SanityLimits.TRADE_GOODS
+                            + ". For more, use `trade_goods:infinity` for infinite trade goods.");
+        }
+    }
+
+    private static boolean isInfinity(String value) {
+        return SanityLimits.isInfinity(value) || "inf".equalsIgnoreCase(value);
     }
 }

@@ -10,6 +10,7 @@ class GamePersistenceKeys {
     static final String UNITHOLDER = "-unitholder-";
     static final String ENDUNITHOLDER = "-endunitholder-";
     static final String ENDUNITS = "-endunits-";
+    static final String INFINITE = "infinite";
     static final String ENDTILE = "-endtile-";
     static final String TOKENS = "-tokens-";
     static final String ENDTOKENS = "-endtokens-";

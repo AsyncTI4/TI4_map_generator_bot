@@ -1,6 +1,8 @@
 package ti4.service.unit;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.game.Game;
@@ -8,6 +10,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
@@ -39,10 +42,12 @@ public class MoveUnitService {
                 player != null && player.getExhaustedPlanets().contains("aurelionstation");
         boolean stationAbilityWasExhausted =
                 player != null && player.getExhaustedPlanetsAbilities().contains("aurelionstation");
+        Set<UnitKey> infiniteBefore = infiniteUnitsIn(tile);
         List<RemovedUnit> removed = RemoveUnitService.removeUnits(event, tile, game, color, unitList, dmg);
         List<RemovedUnit> toAdd =
                 removed.stream().map(r -> r.onUnitHolder(dest, uhDest)).toList();
         AddUnitService.addUnits(event, dest, game, color, toAdd);
+        carryInfiniteStacks(infiniteBefore, tile, dest.getUnitHolders().get(uhDest));
 
         // Moving Aurelion briefly removes its attached station card; retain its prior exhausted state.
         if (player != null
@@ -54,6 +59,20 @@ public class MoveUnitService {
             if (stationAbilityWasExhausted) {
                 player.exhaustPlanetAbility("aurelionstation");
             }
+        }
+    }
+
+    private Set<UnitKey> infiniteUnitsIn(Tile tile) {
+        return tile.getUnitHolders().values().stream()
+                .flatMap(unitHolder -> unitHolder.getInfiniteUnits().stream().filter(unitHolder::isInfinite))
+                .collect(Collectors.toSet());
+    }
+
+    private void carryInfiniteStacks(Set<UnitKey> infiniteBefore, Tile source, UnitHolder destination) {
+        if (destination == null) return;
+        Set<UnitKey> stillInfinite = infiniteUnitsIn(source);
+        for (UnitKey unit : infiniteBefore) {
+            if (!stillInfinite.contains(unit)) destination.makeInfinite(unit);
         }
     }
 

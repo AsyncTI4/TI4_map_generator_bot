@@ -4157,7 +4157,8 @@ public final class Helper {
     public static Map<UnitType, Integer> getUnitList(String unitList) {
         Map<UnitType, Integer> unitCounts = new HashMap<>();
         for (UnitTypeAndCount utc : getUnitListEntries(unitList)) {
-            unitCounts.merge(utc.unitType(), utc.count(), Integer::sum);
+            int count = utc.count() < 0 ? SanityLimits.unitsInOneHolder(utc.unitType()) : utc.count();
+            unitCounts.merge(utc.unitType(), count, Integer::sum);
         }
         return unitCounts;
     }
@@ -4165,6 +4166,7 @@ public final class Helper {
     private record UnitTypeAndCount(UnitType unitType, int count) {
         public String emojis() {
             String emoji = unitType().getUnitTypeEmoji().toString();
+            if (count < 0) return "∞" + emoji;
             return StringUtils.repeat(emoji, Math.min(count, SanityLimits.unitsInOneHolder(unitType())));
         }
     }
@@ -4173,7 +4175,10 @@ public final class Helper {
         String[] split = desc.trim().split(" ");
         String alias;
         int count;
-        if (StringUtils.isNumeric(split[0])) {
+        if (SanityLimits.isInfinity(split[0]) && split.length > 1) {
+            count = -1;
+            alias = split[1];
+        } else if (StringUtils.isNumeric(split[0])) {
             count = Integer.parseInt(split[0]);
             alias = split[1];
         } else {

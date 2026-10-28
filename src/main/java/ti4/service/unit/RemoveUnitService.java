@@ -191,6 +191,13 @@ public class RemoveUnitService {
         }
 
         int toRemoveCount = parsedUnit.count();
+        if (parsedUnit.infinite()) {
+            unitHoldersToRemoveFrom.forEach(unitHolder -> unitHolder.clearInfinite(parsedUnit.unitKey()));
+            toRemoveCount = unitHoldersToRemoveFrom.stream()
+                    .mapToInt(unitHolder -> unitHolder.getUnitCount(parsedUnit.unitKey()))
+                    .sum();
+            if (toRemoveCount == 0) return Collections.emptyList();
+        }
         List<RemovedUnit> allUnitsRemoved = new ArrayList<>();
         for (UnitHolder unitHolder : unitHoldersToRemoveFrom) {
             List<Integer> unitsRemovedCount =

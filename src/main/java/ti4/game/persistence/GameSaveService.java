@@ -993,6 +993,8 @@ class GameSaveService {
 
             writer.write(Constants.TG + " " + player.getTg());
             writer.write(System.lineSeparator());
+            writer.write(Constants.INFINITE_TG + " " + player.isInfiniteTg());
+            writer.write(System.lineSeparator());
 
             writer.write(Constants.EXPECTED_HITS_TIMES_10 + " " + player.getExpectedHitsTimes10());
             writer.write(System.lineSeparator());
@@ -1267,7 +1269,8 @@ class GameSaveService {
                 if (entry.getKey() != null) {
                     String amtString = String.join(
                             ",", entry.getValue().stream().map(Object::toString).toList());
-                    writer.write(entry.getKey().outputForSave() + " " + amtString);
+                    writer.write(entry.getKey().outputForSave() + " " + amtString
+                            + (unitHolder.isInfinite(entry.getKey()) ? " " + INFINITE : ""));
                     writer.write(System.lineSeparator());
                 }
             }

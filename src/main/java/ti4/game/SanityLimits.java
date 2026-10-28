@@ -16,6 +16,11 @@ public class SanityLimits {
     public static final int DEBT_TOKENS_PER_COLOR = 99;
     public static final int STASIS_UNITS = 99;
     public static final int REPEATED_EMOJIS = 50;
+    public static final String INFINITY = "infinity";
+
+    public static boolean isInfinity(String token) {
+        return INFINITY.equalsIgnoreCase(token) || "infinite".equalsIgnoreCase(token) || "∞".equals(token);
+    }
 
     public static int unitsInOneHolder(UnitType unitType) {
         return isTokenBacked(unitType) ? INFANTRY_AND_FIGHTERS_PER_TILE : OTHER_UNITS_OF_A_KIND;

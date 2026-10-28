@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.math.NumberUtils;
 import ti4.game.Player;
+import ti4.game.SanityLimits;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
@@ -64,8 +65,13 @@ public class ParseUnitService {
 
         String firstToken = unitInfoTokenizer.nextToken();
         int count = 1;
+        boolean infinite = false;
         String originalUnit;
-        if (NumberUtils.isDigits(firstToken)) {
+        if (SanityLimits.isInfinity(firstToken) || isInfShorthand(firstToken, unitListToken, color)) {
+            infinite = true;
+            if (!unitInfoTokenizer.hasMoreTokens()) return null;
+            originalUnit = unitInfoTokenizer.nextToken();
+        } else if (NumberUtils.isDigits(firstToken)) {
             count = Math.max(Integer.parseInt(firstToken), 1);
             if (!unitInfoTokenizer.hasMoreTokens()) return null;
             originalUnit = unitInfoTokenizer.nextToken();
@@ -79,12 +85,18 @@ public class ParseUnitService {
 
         String planetName = parsePlanetName(unitInfoTokenizer, tile);
 
-        var parsedUnit = new ParsedUnit(unitKey, count, planetName);
+        var parsedUnit = new ParsedUnit(unitKey, count, planetName, infinite);
         if (event instanceof SlashCommandInteractionEvent
                 && !validateParsedUnit(parsedUnit, tile, unitListToken, event)) {
             return null;
         }
         return parsedUnit;
+    }
+
+    private boolean isInfShorthand(String firstToken, String unitListToken, String color) {
+        if (!"inf".equals(firstToken)) return false;
+        String[] words = unitListToken.trim().split("\\s+");
+        return words.length > 1 && Mapper.getUnitKey(AliasHandler.resolveUnit(words[1]), color) != null;
     }
 
     private String parsePlanetName(StringTokenizer tokenizer, Tile tile) {

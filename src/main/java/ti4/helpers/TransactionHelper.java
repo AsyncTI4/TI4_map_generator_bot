@@ -231,6 +231,10 @@ public class TransactionHelper {
             String detail = parts[3];
             switch (thing) {
                 case "TGs" -> tgDemand += Integer.parseInt(detail);
+                case "InfiniteTGs" -> {
+                    if (!sender.isInfiniteTg())
+                        shortfalls.add(new Shortfall(sender, "infinite trade goods no longer held"));
+                }
                 case "Comms" -> commDemand += Integer.parseInt(detail);
                 case "Frags" -> {
                     if (detail.startsWith("supermassive")) {
@@ -599,7 +603,7 @@ public class TransactionHelper {
 
     private static String hiddenCategoryLabel(String thingToTransact) {
         return switch (thingToTransact) {
-            case "TGs" -> "trade goods";
+            case "TGs", "InfiniteTGs" -> "trade goods";
             case "Comms" -> "commodities";
             case "SendDebt", "ClearDebt" -> "debt tokens";
             case "ACs" -> "action cards";
@@ -667,6 +671,7 @@ public class TransactionHelper {
                     furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
                 }
                 switch (thingToTransact) {
+                    case "InfiniteTGs" -> trans.append("∞").append(MiscEmojis.tg);
                     case "TGs" -> {
                         amountToTransact = Integer.parseInt(furtherDetail);
                         if (amountToTransact > 4) {
@@ -1214,6 +1219,10 @@ public class TransactionHelper {
                     Button transact = Buttons.green(
                             "offerToTransact_TGs_" + p1.getColor() + "_" + p2.getColor() + "_" + x, "" + x);
                     stuffToTransButtons.add(transact);
+                }
+                if (seeP1 && p1.isInfiniteTg()) {
+                    stuffToTransButtons.add(Buttons.green(
+                            "offerToTransact_InfiniteTGs_" + p1.getColor() + "_" + p2.getColor() + "_1", "∞"));
                 }
             }
             case "Comms" -> {
@@ -1997,6 +2006,10 @@ public class TransactionHelper {
                     Button transact = Buttons.green(factionChecker + "send_TGs_" + p2.getFaction() + "_" + x, "" + x);
                     stuffToTransButtons.add(transact);
                 }
+                if (p1.isInfiniteTg()) {
+                    stuffToTransButtons.add(
+                            Buttons.green(factionChecker + "send_InfiniteTGs_" + p2.getFaction() + "_1", "∞"));
+                }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
             }
             case "Comms" -> {
@@ -2257,6 +2270,11 @@ public class TransactionHelper {
         String ident = p1.getRepresentation();
         String ident2 = p2.getRepresentation();
         switch (thingToTrans) {
+            case "InfiniteTGs" -> {
+                if (!p1.isInfiniteTg()) return;
+                p2.setInfiniteTg(true);
+                message2 = ident + " sent ∞ trade goods to " + ident2 + ".";
+            }
             case "TGs" -> {
                 int tgAmount = Integer.parseInt(amountToTrans);
                 tgAmount = Math.min(p1.getTg(), tgAmount);

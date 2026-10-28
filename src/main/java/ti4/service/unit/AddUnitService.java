@@ -91,6 +91,7 @@ public class AddUnitService {
         }
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit requested : parsedUnits) {
+            if (placeInfiniteStack(event, game, tile, requested)) continue;
             ParsedUnit parsedUnit =
                     limitToSupply(event, game, tile, requested, unreturned(requested.unitKey(), removed));
             if (parsedUnit.count() <= 0) continue;
@@ -117,6 +118,7 @@ public class AddUnitService {
         }
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit requested : parsedUnits) {
+            if (placeInfiniteStack(event, game, tile, requested)) continue;
             ParsedUnit parsedUnit = limitToSupply(event, game, tile, requested, 0);
             if (parsedUnit.count() <= 0) continue;
             tile.addUnit(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count());
@@ -229,6 +231,22 @@ public class AddUnitService {
         checkFleetCapacity(tile, color, game);
     }
 
+    private static boolean placeInfiniteStack(
+            GenericInteractionCreateEvent event, Game game, Tile tile, ParsedUnit requested) {
+        if (!requested.infinite()) return false;
+        if (requested.unitKey().unitType() != UnitType.Infantry) {
+            if (event != null) {
+                MessageHelper.sendMessageToEventChannel(event, "Only infantry can form an infinite stack.");
+            }
+            return true;
+        }
+        UnitHolder unitHolder = tile.getUnitHolders().get(requested.location());
+        if (unitHolder == null) return true;
+        unitHolder.makeInfinite(requested.unitKey());
+        AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, requested.location(), game);
+        return true;
+    }
+
     private static int unreturned(Units.UnitKey unitKey, List<RemovedUnit> removed) {
         return removed.stream()
                 .filter(unit -> unit.unitKey().equals(unitKey))
@@ -248,7 +266,10 @@ public class AddUnitService {
                             + requested.unitKey().unitType().humanReadableName() + " units were placed: "
                             + (tokenBacked
                                     ? "a system can hold at most " + SanityLimits.INFANTRY_AND_FIGHTERS_PER_TILE + "."
-                                    : "that is all that is left in reinforcements."));
+                                    : "that is all that is left in reinforcements.")
+                            + (requested.unitKey().unitType() == UnitType.Infantry
+                                    ? " For an infinite stack, use `infinity infantry`."
+                                    : ""));
         }
         return new ParsedUnit(requested.unitKey(), allowed, requested.location());
     }

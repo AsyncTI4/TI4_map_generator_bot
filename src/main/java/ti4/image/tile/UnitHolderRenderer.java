@@ -178,7 +178,9 @@ final class UnitHolderRenderer {
                 UnitDecals.drawOverlay(g, tile, unitKey, player, overlay, imageX, imageY);
                 UnitDecals.drawLawDecals(g, game, unitKey, imageX, imageY);
                 UnitBadges.drawTag(g, game, unitKey, player, imagePos, unitRenderCt);
-                if (bulkUnitCount != null) {
+                if (bulkUnitCount != null && unitHolder.isInfinite(unitKey)) {
+                    UnitBadges.drawInfiniteCount(g, unitKey, imagePos);
+                } else if (bulkUnitCount != null) {
                     UnitBadges.drawBulkCount(g, unitKey, bulkUnitCount, imagePos);
                 }
                 if (stateToRender.isDamaged() && dmgImage != null) {
