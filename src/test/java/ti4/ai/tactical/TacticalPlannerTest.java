@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.ValueScale;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.strategy.MecatolCash;
@@ -1089,7 +1090,9 @@ class TacticalPlannerTest extends BaseTi4Test {
 
     // Taking Mecatol Rex lets the Imperial point be cashed: the point Imperial gives for holding it, once with its own
     // unplayed Imperial and once more through Overrule, which performs Imperial's primary again. Each point counts as
-    // the offense outlook's own-Imperial share of a victory point (0.8 of 8).
+    // the offense outlook's own-Imperial share of a victory point (0.8 of 8). Holding Mecatol is only credited with the
+    // later Imperial rounds when a point can be cashed at all, so the first cashable point brings that hold value
+    // along.
     @Test
     void takingMecatolRexIsWorthTheImperialPointsItCanCash() {
         lateGame();
@@ -1098,18 +1101,19 @@ class TacticalPlannerTest extends BaseTi4Test {
         carrierWithInfantryNextTo("000", 2);
         double plain = expansionTo("000").orElseThrow().score();
         double point = 0.8 * ObjectiveValue.VICTORY_POINT_VALUE;
+        double hold = MecatolStake.holdValue(test.game, test.nekro);
 
         test.nekro.setActionCard("overrule", 1);
         double withOverrule = expansionTo("000").orElseThrow().score();
-        assertThat(withOverrule - plain).isCloseTo(point, within(EXACT));
+        assertThat(withOverrule - plain).isCloseTo(hold + point, within(EXACT));
 
         test.nekro.addSC(IMPERIAL);
         double withBoth = expansionTo("000").orElseThrow().score();
-        assertThat(withBoth - plain).isCloseTo(2 * point, within(EXACT));
+        assertThat(withBoth - plain).isCloseTo(hold + 2 * point, within(EXACT));
 
         test.nekro.getActionCards().clear();
         double withImperial = expansionTo("000").orElseThrow().score();
-        assertThat(withImperial - plain).isCloseTo(point, within(EXACT));
+        assertThat(withImperial - plain).isCloseTo(hold + point, within(EXACT));
     }
 
     // Early in the game the Overrule is being saved, so it cashes no point yet.

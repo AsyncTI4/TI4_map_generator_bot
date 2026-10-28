@@ -20,8 +20,11 @@ public class MecatolStake {
     }
 
     public static double ownHoldValue(Game game, Player seat) {
-        double redraw = redrawsSecrets(game) ? SecretDraws.redrawValue(game, seat) : 0;
-        return holdValue(game, seat) + redraw;
+        return holdValue(game, seat) + redrawValue(game, seat);
+    }
+
+    public static double redrawValue(Game game, Player seat) {
+        return redrawsSecrets(game) ? SecretDraws.redrawValue(game, seat) : 0;
     }
 
     private static boolean redrawsSecrets(Game game) {

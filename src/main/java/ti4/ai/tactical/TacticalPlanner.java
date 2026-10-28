@@ -963,7 +963,7 @@ public class TacticalPlanner {
                     + context.exploreValue(tile, planet, split[INFANTRY], split[MECH]);
             if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
             if (isMecatol(context.game, planet)) {
-                value += MecatolStake.ownHoldValue(context.game, seat) + context.mecatolCash();
+                value += context.mecatolTakeValue() + context.mecatolCash();
             }
             value += context.expansionZoneBonus(tile);
         }
@@ -1039,7 +1039,7 @@ public class TacticalPlanner {
                     + planetTempo(context.game)
                     + context.exploreValue(tile, planet, landing[INFANTRY], landing[MECH]);
             if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
-            if (isMecatol(context.game, planet)) value += MecatolStake.ownHoldValue(context.game, context.seat);
+            if (isMecatol(context.game, planet)) value += context.mecatolTakeValue();
             value += context.expansionZoneBonus(tile);
         }
         return value;
@@ -3862,6 +3862,12 @@ public class TacticalPlanner {
                         .min()
                         .orElse(Integer.MAX_VALUE);
             });
+        }
+
+        double mecatolTakeValue() {
+            return MecatolCash.points(game, seat) > 0
+                    ? MecatolStake.ownHoldValue(game, seat)
+                    : MecatolStake.redrawValue(game, seat);
         }
 
         double mecatolCash() {
