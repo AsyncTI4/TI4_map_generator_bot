@@ -106,12 +106,13 @@ class AgentLifecycleTest extends BaseTi4Test {
     }
 
     @Test
-    void spendingACleverCleverCopyExhaustsTheYssarilAgentWithoutTheSpringContext() {
+    void usingACleverCleverCopyExhaustsTheYssarilAgentWithoutTheSpringContext() {
         Player yssaril = game.addPlayer("yssarilUser", "Yssaril Player");
         yssaril.setFaction(game, "yssaril");
         yssaril.setColor("blue");
 
-        AgentLifecycle.spend(game, yssaril, "mentakagent");
+        assertThat(AgentLifecycle.use(game, yssaril, "mentakagent", "red", null))
+                .isTrue();
 
         assertThat(yssaril.getLeader("yssarilagent").orElseThrow().isExhausted())
                 .isTrue();
