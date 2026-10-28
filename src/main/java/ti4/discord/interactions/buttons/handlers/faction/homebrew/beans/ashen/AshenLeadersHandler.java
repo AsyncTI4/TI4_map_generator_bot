@@ -24,19 +24,18 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units;
+import ti4.json.JsonMapperManager;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.FactionEmojis;
-import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class AshenLeadersHandler {
 
     private static final String COMMANDER_ID = "ashencommander";
     private static final String HERO_TARGET_SYSTEM_PREFIX = "ashenHeroTargetSystem_";
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public static void postHeroButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         if (event == null || game == null || player == null) {
@@ -102,8 +101,9 @@ public class AshenLeadersHandler {
         for (Planet targetPlanet : targetTile.getPlanetUnitHolders()) {
             game.setStoredValue(
                     "assignedBombardment" + player.getFaction(),
-                    MAPPER.writeValueAsString(
-                            buildHeroBombardmentAssignments(player, bombardmentTile, targetPlanet.getName())));
+                    JsonMapperManager.basic()
+                            .writeValueAsString(
+                                    buildHeroBombardmentAssignments(player, bombardmentTile, targetPlanet.getName())));
             game.setStoredValue("bombardmentTarget" + player.getFaction(), targetPlanet.getName());
             CombatRollService.secondHalfOfCombatRoll(
                     player, game, event, bombardmentTile, "space", CombatRollType.bombardment, false);
