@@ -5247,7 +5247,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isOplusplusRegularMode()
                 || isOplusplusCouncilMode()
                 || isCptiExploreMode()
-                || hasAnyPriorityTrackMode()
                 || !checkAllDecksAreOfficial()
                 || !checkAllTilesAreOfficial()
                 || getRealAndEliminatedPlayers().size() < 3
