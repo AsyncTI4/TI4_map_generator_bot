@@ -11,6 +11,7 @@ import ti4.service.leader.agent.modules.homebrew.bluereverie.EdynBrAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.KaltrimAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.XinAgent;
+import ti4.service.leader.agent.modules.homebrew.wftv.ArvaxiAgent;
 
 public final class HomebrewAgents implements AgentCatalog {
 
@@ -67,6 +68,8 @@ public final class HomebrewAgents implements AgentCatalog {
                             new XinAgent(),
                             new KaltrimAgent(),
                             new NatauAgent(),
+                            new ArvaxiAgent(),
+                            new ToldarAgent(),
                             new QhetAgent(),
                             new BelkoseaAgent(),
                             new AtokeraAgent(),

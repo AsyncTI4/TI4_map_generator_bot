@@ -19,8 +19,5 @@ public class HomebrewExhaustOnlyAgents {
     public static final ExhaustOnlyAgent LANEFIR =
             new ExhaustOnlyAgent("lanefiragent", "Vassa Hagi, the Lanefir", "Lanefir Agent", FactionEmojis.lanefir);
 
-    public static final ExhaustOnlyAgent TOLDAR =
-            new ExhaustOnlyAgent("toldaragent", "Maertin Donaais, the Toldar", "Toldar Agent", FactionEmojis.toldar);
-
-    public static final List<ExhaustOnlyAgent> ALL = List.of(GHEMINA, XAN, NIVYN, EDYN, LANEFIR, TOLDAR);
+    public static final List<ExhaustOnlyAgent> ALL = List.of(GHEMINA, XAN, NIVYN, EDYN, LANEFIR);
 }

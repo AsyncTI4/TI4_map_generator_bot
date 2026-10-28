@@ -28,10 +28,8 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
-import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.explore.ExploreService;
@@ -43,6 +41,7 @@ import ti4.service.leader.agent.modules.ArtunoAgent;
 import ti4.service.leader.agent.modules.CabalAgent;
 import ti4.service.leader.agent.modules.SardakkAgent;
 import ti4.service.leader.agent.modules.homebrew.FlorzenAgent;
+import ti4.service.leader.agent.modules.homebrew.ToldarAgent;
 import ti4.service.leader.genome.homebrew.tknova.InvestmentGenome;
 import ti4.service.planet.PlanetService;
 import ti4.service.turn.StartTurnService;
@@ -70,70 +69,12 @@ public final class ButtonHelperAgents {
                 buttons.add(Buttons.red(cabal.factionButtonChecker() + "deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
             }
-            if (cabal.hasUnexhaustedLeader("toldaragent")) {
-                List<Button> buttons = new ArrayList<>();
-                String msg = cabal.getRepresentationUnfogged() + ", you may use "
-                        + (cabal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                        + "Maertin Donaais, the Toldar" + (cabal.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                        + " agent, on "
-                        + p2.getFactionEmojiOrColor() + ", who has "
-                        + p2.getCommoditiesTotal() + " commodit" + (p2.getCommoditiesTotal() == 1 ? "y" : "ies") + ".";
-                buttons.add(Buttons.green(
-                        "toldarAgent_" + p2.getFaction() + "_" + p2.getCommoditiesTotal(), "Use Toldar Agent"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
-            }
         }
+        toldarAgentInitiation(game, p2, p2.getCommoditiesTotal());
     }
 
     public static void toldarAgentInitiation(Game game, Player p2, int amount) {
-        for (Player toldar : game.getRealPlayers()) {
-            if (toldar == p2) {
-                continue;
-            }
-            if (toldar.hasUnexhaustedLeader("toldaragent")) {
-                List<Button> buttons = new ArrayList<>();
-                String msg = toldar.getRepresentationUnfogged() + ", you may use "
-                        + (toldar.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                        + "Maertin Donaais, the Toldar"
-                        + (toldar.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on "
-                        + p2.getFactionEmojiOrColor() + " for " + amount + " commodit" + (amount == 1 ? "y" : "ies")
-                        + ".";
-                buttons.add(Buttons.green("toldarAgent_" + p2.getFaction() + "_" + amount, "Use Toldar Agent"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(toldar.getCardsInfoThread(), msg, buttons);
-            }
-        }
-    }
-
-    @ButtonHandler("toldarAgent_")
-    public static void toldarAgent(Player toldar, Game game, String buttonID, GenericInteractionCreateEvent event) {
-        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        if (p2 == null || !AgentLifecycle.use(game, toldar, "toldaragent", p2.getFaction(), event)) {
-            return;
-        }
-        int commodities = p2.getCommodities();
-        MessageHelper.sendMessageToChannel(
-                p2.getCorrectChannel(),
-                p2.getRepresentationUnfogged() + ", your " + commodities + " commodit"
-                        + (commodities == 1 ? "y" : "ies") + " have been washed by "
-                        + (toldar.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                        + "Maertin Donaais, the Toldar"
-                        + (toldar.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
-        p2.setTg(p2.getTg() + commodities);
-        p2.setCommodities(0);
-
-        List<Button> buttons = new ArrayList<>();
-        if (p2 != toldar) {
-            buttons.add(Buttons.green(
-                    toldar.factionButtonChecker() + "draw_1_ACDelete", "Draw 1 Action Card", CardEmojis.ActionCard));
-            buttons.add(Buttons.blue(
-                    toldar.factionButtonChecker() + "gain_2_comms", "Gain 2 Commodities", MiscEmojis.comm));
-            MessageHelper.sendMessageToChannel(
-                    toldar.getCorrectChannel(),
-                    toldar.getRepresentation() + " please choose to either gain 2 commodities or draw 1 AC",
-                    buttons);
-        }
+        ToldarAgent.offerOnCommoditiesReplenished(game, p2, amount);
     }
 
     public static List<Button> getUnitsToArboAgent(Player player, Tile tile) {

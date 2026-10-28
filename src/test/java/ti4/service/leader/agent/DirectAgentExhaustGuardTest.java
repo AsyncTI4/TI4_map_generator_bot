@@ -46,7 +46,6 @@ class DirectAgentExhaustGuardTest {
     private static final Set<String> STILL_SPEND_WITHOUT_A_MODULE = Set.of(
             // Homebrew handlers that have not been moved into agent modules yet. Shrink this list, never grow it.
             "ArcanumLeadersHandler.java",
-            "ArvaxiLeaderHandler.java",
             "AshenLeadersHandler.java",
             "CrystellumLeadersHandler.java",
             "DreamLeadersHandler.java",
