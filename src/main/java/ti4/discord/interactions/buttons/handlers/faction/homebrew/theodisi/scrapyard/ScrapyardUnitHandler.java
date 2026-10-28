@@ -126,7 +126,7 @@ public class ScrapyardUnitHandler {
         List<Button> buttons = new ArrayList<>();
         buttons.add(
                 Buttons.green(player.factionButtonChecker() + USE_FUEL_CELL, "Use " + fuelCell, UnitEmojis.fighter));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), player.getRepresentation() + ", you may use _" + fuelCell + "_.", buttons);
     }
@@ -157,7 +157,7 @@ public class ScrapyardUnitHandler {
                 event,
                 event.getMessageChannel(),
                 amounts,
-                List.of(Buttons.gray("deleteButtons", "Decline")),
+                List.of(Buttons.DECLINE_DELETE_BUTTONS_GRAY),
                 message,
                 prefix,
                 buttonID)) return;
@@ -285,7 +285,7 @@ public class ScrapyardUnitHandler {
                 message,
                 NewStuffHelper.buttonPagination(
                         getFuelCellAmountButtons(player, fighters),
-                        List.of(Buttons.gray("deleteButtons", "Decline")),
+                        List.of(Buttons.DECLINE_DELETE_BUTTONS_GRAY),
                         player.factionButtonChecker() + SELECT_FUEL_CELL_AMOUNT,
                         25,
                         page,

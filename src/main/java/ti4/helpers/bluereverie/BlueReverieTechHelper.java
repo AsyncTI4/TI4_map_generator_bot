@@ -170,7 +170,7 @@ public class BlueReverieTechHelper {
 
         game.removeStoredValue(VIRAL_ENTANGLEMENT_INFANTRY_REMAINING + player.getFaction());
         List<Button> buttons = TeHelperActionCards.getReadiedStrategyCardSecondaryButtons(game, player);
-        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing()

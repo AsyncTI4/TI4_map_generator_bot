@@ -1169,6 +1169,7 @@ class GameLoadService {
                     player.setAutoPassOnWhensAfters(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BOT_PLAYER -> player.setBotPlayer(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.NPC -> player.setNpc(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.BENTOR_HAS_FOUND_CFRAG ->
                     player.setHasFoundCulFrag(Boolean.parseBoolean(tokenizer.nextToken()));
@@ -1245,7 +1246,7 @@ class GameLoadService {
                     "Invalid UnitHolder detected during load: " + tile.getTileID() + " / " + unitHolderName);
             return;
         }
-        tile.getUnitHolders().get(unitHolderName).getUnitsByState().put(uk, counts);
+        tile.getUnitHolders().get(unitHolderName).getUnitsByState().put(uk, UnitHolder.capToHolderLimit(uk, counts));
     }
 
     private static void readPlanetTokens(Tile tile, String data, String unitHolderName) {

@@ -16,9 +16,10 @@ class AssignPlayerPriority extends GameStateSubcommand {
                 true,
                 true);
         addOptions(new OptionData(
-                        OptionType.INTEGER,
-                        Constants.PRIORITY_POSITION,
-                        "Position on priority track (uses lowest available position if not set)"))
+                                OptionType.INTEGER,
+                                Constants.PRIORITY_POSITION,
+                                "Position on priority track (uses lowest available position if not set)")
+                        .setRequiredRange(1, 30))
                 .addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
                 .addOptions(new OptionData(
                                 OptionType.STRING, Constants.FACTION_COLOR, "Set stats for another Faction or Color")

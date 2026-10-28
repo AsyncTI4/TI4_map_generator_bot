@@ -18,6 +18,7 @@ class ShuffleACFromHand extends GameStateSubcommand {
         super(Constants.SHUFFLE_AC_FROM_HAND, "Shuffle an action card from your hand back into the deck.", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
     }
 

@@ -138,7 +138,7 @@ class ThirtyKRelicBoardButtonHandler {
         if ("add".equals(parts[0])) {
             AddUnitService.addUnits(event, tile, game, player.getColor(), "4 inf " + planetName);
             List<Button> pay = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, player, "res"));
-            pay.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
+            pay.add(Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT);
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     player.getRepresentationUnfogged() + " packed 4 more infantry onto " + planetRep

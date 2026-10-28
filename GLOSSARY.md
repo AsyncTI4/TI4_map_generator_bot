@@ -242,6 +242,13 @@ A Thunder's Edge Faction card that is unlocked and then used for a powerful effe
 **Expedition**:
 A Thunder's Edge shared objective that one Faction completes first for a reward.
 
+**Genome**:
+A Twilight's Fall splice card that plays like a Faction's agent under a new name; in the bot it is a separate module that leans on the matching agent module instead of being one.
+_Avoid_: Agent (when the game is Twilight's Fall)
+
+**TK Nova genome**:
+A homebrew genome from the TK Nova Cup that replaces an official agent with its own text and works in any game it is drafted into.
+
 **Splice**:
 A Twilight's Fall card (ability, genome, paradigm or unit) drawn and distributed to shape a Faction.
 

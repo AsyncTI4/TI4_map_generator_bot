@@ -12,11 +12,13 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AgendaRiderHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.service.leader.LeaderAgents;
 import ti4.service.leader.agent.AgentOutcome.Message;
 
 public abstract class PlayerPickerAgent extends AgentModule<PlayerPickerAgent.Choice> {
 
     static final String PICK_STEP = "agentPick_";
+    // TODO: drop these once games started before the agent-module migration (2026-10-27) have finished.
     private static final Map<String, String> LEGACY_PICK_STEPS = Map.of(
             "nekroAgentRes_", "nekroagent",
             "kolleccAgentRes_", "kolleccagent",
@@ -34,6 +36,11 @@ public abstract class PlayerPickerAgent extends AgentModule<PlayerPickerAgent.Ch
 
     protected PlayerPickerAgent(String agentId, String displayName) {
         super(agentId, displayName);
+    }
+
+    @Override
+    public final Optional<PlayerPickerAgent> picker() {
+        return Optional.of(this);
     }
 
     protected abstract AgentOutcome resolveFor(AgentUse<Player> use);
@@ -104,9 +111,7 @@ public abstract class PlayerPickerAgent extends AgentModule<PlayerPickerAgent.Ch
             agentId = legacy.get().getValue();
             targetPayload = id.substring(legacy.get().getKey().length());
         }
-        Optional<PlayerPickerAgent> picker = AgentModules.find(agentId)
-                .filter(PlayerPickerAgent.class::isInstance)
-                .map(PlayerPickerAgent.class::cast);
+        Optional<PlayerPickerAgent> picker = LeaderAgents.findAgent(agentId).flatMap(AgentModule::picker);
         Optional<Player> target = AgentTargets.player(game, targetPayload);
         if (picker.isEmpty() || target.isEmpty()) {
             return Optional.empty();

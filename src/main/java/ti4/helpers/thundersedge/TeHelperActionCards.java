@@ -145,7 +145,7 @@ public class TeHelperActionCards {
                             + ", no other player has a readied strategy card, so there is no legal target for _Extreme Duress_ right now.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", choose the player who will experience _Extreme Duress_.",
@@ -482,8 +482,8 @@ public class TeHelperActionCards {
             buttons.add(Buttons.green("draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game)));
         }
         if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
-            buttons.add(Buttons.green("construction_spacedock", "Place A Space Dock", UnitEmojis.spacedock));
-            buttons.add(Buttons.green("construction_pds", "Place A PDS", UnitEmojis.pds));
+            buttons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
+            buttons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
         }
         if (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5)) {
             buttons.add(Buttons.green("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
@@ -521,7 +521,7 @@ public class TeHelperActionCards {
             msg2 = player.getRepresentation()
                     + ", you have no strategy tokens to deduct, so the bot did not deduct one. You should probably only resolve leadership.";
         }
-        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         ButtonHelper.deleteMessage(event);
@@ -633,7 +633,7 @@ public class TeHelperActionCards {
         String message = player.getRepresentation() + " choose a system to place the pirates! 🦜☠";
         if (allowRes) {
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-            Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), "Please pay the kind pirates.", buttons);

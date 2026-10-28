@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.game.Leader;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -24,17 +23,11 @@ import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
-import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
 public class CrystellumLeadersHandler {
-    private static final String AGENT_ID = "crystellumagent";
-    private static final String USE_AGENT = "useCrystellumAgent_";
-    private static final String SELECT_OTHER_TARGET = "selectOtherCrystellumAgentTarget";
-    private static final String SELECT_TARGET = "selectCrystellumAgentTarget_";
-    private static final String PLACE_FIGHTERS = "placeCrystellumAgentFighters_";
     private static final String HERO_BUDGET = "crystellumHeroBudget_";
     private static final String HERO_RETURN = "crystellumHeroReturn_";
     private static final String HERO_SYSTEM = "crystellumHeroSystem_";
@@ -62,159 +55,6 @@ public class CrystellumLeadersHandler {
         }
 
         return buttons;
-    }
-
-    public static void addCrystellumAgentEndTurnButton(List<Button> buttons, Game game, Player player) {
-        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
-        if (!player.hasUnexhaustedLeader(AGENT_ID)
-                || activeSystem == null
-                || ButtonHelper.checkNumberNonFighterShips(player, activeSystem, false) < 1) {
-            return;
-        }
-        buttons.add(Buttons.green(
-                player.factionButtonChecker() + USE_AGENT + player.getFaction(),
-                "Use Crystellum Agent",
-                FactionEmojis.crystellum));
-    }
-
-    public static void addCrystellumAgentCardsInfoButton(List<Button> buttons, Player player) {
-        if (player.hasUnexhaustedLeader(AGENT_ID)) {
-            buttons.add(Buttons.gray(
-                    player.factionButtonChecker() + SELECT_OTHER_TARGET,
-                    "Use Crystellum Agent",
-                    FactionEmojis.crystellum));
-        }
-    }
-
-    @ButtonHandler(USE_AGENT)
-    public static void useCrystellumAgent(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        Player target = game.getPlayerFromColorOrFaction(buttonID.replace(USE_AGENT, ""));
-        if (target == null || !target.getFaction().equals(player.getFaction())) {
-            return;
-        }
-        sendFighterPlacementButtons(event, game, player, target);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-    }
-
-    @ButtonHandler(SELECT_OTHER_TARGET)
-    public static void selectOtherCrystellumAgentTarget(ButtonInteractionEvent event, Game game, Player player) {
-        if (!player.hasUnexhaustedLeader(AGENT_ID)) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        List<Button> buttons = game.getRealPlayersExcludingThis(player).stream()
-                .map(target -> Buttons.gray(
-                        player.factionButtonChecker() + SELECT_TARGET + target.getFaction(),
-                        target.getColorDisplayName(),
-                        target.fogSafeEmoji()))
-                .toList();
-        if (buttons.isEmpty()) {
-            return;
-        }
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                player.getRepresentationUnfogged()
-                        + ", please choose the player on whom you wish to use Shardwright Veyla, the Crystellum agent.",
-                buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(SELECT_TARGET)
-    public static void selectCrystellumAgentTarget(
-            ButtonInteractionEvent event, Game game, Player agentOwner, String buttonID) {
-        Player target = game.getPlayerFromColorOrFaction(buttonID.replace(SELECT_TARGET, ""));
-        if (target == null || target.getFaction().equals(agentOwner.getFaction())) {
-            return;
-        }
-        sendFighterPlacementButtons(event, game, agentOwner, target);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    private static void sendFighterPlacementButtons(
-            ButtonInteractionEvent event, Game game, Player agentOwner, Player target) {
-        if (!agentOwner.hasUnexhaustedLeader(AGENT_ID)) {
-            return;
-        }
-        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
-        if (activeSystem == null) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "There is no active system for Shardwright Veyla.");
-            return;
-        }
-
-        int nonFighterShips = ButtonHelper.checkNumberNonFighterShips(target, activeSystem, false);
-        if (nonFighterShips < 1) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event,
-                    target.getRepresentationUnfoggedNoPing()
-                            + " has no non-fighter ships in the active system for Shardwright Veyla.");
-            return;
-        }
-
-        List<Button> buttons = new ArrayList<>();
-        for (int amount = 1; amount <= nonFighterShips; amount++) {
-            buttons.add(Buttons.green(
-                    target.factionButtonChecker() + PLACE_FIGHTERS + agentOwner.getFaction() + "|" + target.getFaction()
-                            + "|" + activeSystem.getPosition() + "|" + amount,
-                    "Place " + amount + " Fighter" + (amount == 1 ? "" : "s")));
-        }
-        buttons.add(Buttons.red(target.factionButtonChecker() + "deleteButtons", "Decline"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                target.getCorrectChannel(),
-                target.getRepresentationUnfogged()
-                        + ", choose how many fighters to place in "
-                        + activeSystem.getRepresentationForButtons(game, target)
-                        + " with Shardwright Veyla, the Crystellum agent.",
-                buttons);
-    }
-
-    @ButtonHandler(PLACE_FIGHTERS)
-    public static void placeCrystellumAgentFighters(
-            ButtonInteractionEvent event, Game game, Player target, String buttonID) {
-        String[] parts = buttonID.replace(PLACE_FIGHTERS, "").split("\\|", 4);
-        if (parts.length != 4) {
-            return;
-        }
-        Player agentOwner = game.getPlayerFromColorOrFaction(parts[0]);
-        Player selectedTarget = game.getPlayerFromColorOrFaction(parts[1]);
-        Tile activeSystem = game.getTileByPosition(parts[2]);
-        int amount;
-        try {
-            amount = Integer.parseInt(parts[3]);
-        } catch (NumberFormatException e) {
-            return;
-        }
-        if (agentOwner == null
-                || selectedTarget == null
-                || !selectedTarget.getFaction().equals(target.getFaction())
-                || activeSystem == null
-                || !agentOwner.hasUnexhaustedLeader(AGENT_ID)
-                || amount < 1
-                || amount > ButtonHelper.checkNumberNonFighterShips(target, activeSystem, false)) {
-            return;
-        }
-
-        Leader agent = agentOwner.getLeader(AGENT_ID).orElse(null);
-        if (agent == null) {
-            return;
-        }
-        ExhaustLeaderService.exhaustLeader(game, agentOwner, agent);
-        AddUnitService.addUnits(event, activeSystem, game, target.getColor(), amount + " fighter");
-        if (!target.getFaction().equals(agentOwner.getFaction())) {
-            AddUnitService.addUnits(
-                    event, agentOwner.getNomboxTile(), game, agentOwner.getColor(), amount + " fighter");
-        }
-        ButtonHelper.deleteMessage(event);
-
-        String message =
-                agentOwner.getRepresentation() + " exhausted Shardwright Veyla, the Crystellum agent, allowing "
-                        + target.getRepresentation() + " to place " + amount + " fighter" + (amount == 1 ? "" : "s")
-                        + " in " + activeSystem.getRepresentationForButtons(game, target) + ".";
-        if (!target.getFaction().equals(agentOwner.getFaction())) {
-            message += " " + agentOwner.getRepresentation() + " captured " + amount + " fighter"
-                    + (amount == 1 ? "" : "s") + " from the supply.";
-        }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
     }
 
     public static void startCrystellumHero(GenericInteractionCreateEvent event, Game game, Player player) {

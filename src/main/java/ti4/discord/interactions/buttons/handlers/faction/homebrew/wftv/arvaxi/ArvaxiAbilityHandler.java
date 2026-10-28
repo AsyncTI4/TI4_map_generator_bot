@@ -62,7 +62,7 @@ public class ArvaxiAbilityHandler {
                 player.factionButtonChecker() + "underhandedManeuverPickNeighbor",
                 "Use Underhanded Maneuver",
                 FactionEmojis.arvaxi));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + ", use buttons to resolve _Underhanded Maneuver_.",
@@ -73,7 +73,7 @@ public class ArvaxiAbilityHandler {
         Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
         if (planet != null && planet.getUnitCount(player.getColorID()) >= 3) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
+            buttons.add(Buttons.DRAW_1_ACTION_CARD_DELETE);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", please draw an action card because of **Ultimate Authority**.",

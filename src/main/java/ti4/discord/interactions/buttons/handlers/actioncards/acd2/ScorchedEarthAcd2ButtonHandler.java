@@ -45,7 +45,7 @@ class ScorchedEarthAcd2ButtonHandler {
                             + " another player's units on it for _Scorched Earth_. Please resolve it manually.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose the planet to target with _Scorched Earth_.",

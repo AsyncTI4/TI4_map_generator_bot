@@ -3,8 +3,14 @@ package ti4.service.leader.agent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ti4.service.leader.agent.modules.AgentModuleFixture.assertOwnedStep;
 
+import java.util.Arrays;
 import java.util.List;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.junit.jupiter.api.Test;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.service.leader.LeaderAgents;
 import ti4.service.leader.agent.PlayerPickerAgent.Pick;
 import ti4.service.leader.agent.modules.AgentModuleFixture;
 import ti4.testUtils.BaseTi4Test;
@@ -12,7 +18,7 @@ import ti4.testUtils.BaseTi4Test;
 class PlayerPickerAgentTest extends BaseTi4Test {
 
     private static List<PlayerPickerAgent> pickers() {
-        return AgentModules.ALL.stream()
+        return LeaderAgents.all().stream()
                 .filter(PlayerPickerAgent.class::isInstance)
                 .map(PlayerPickerAgent.class::cast)
                 .toList();
@@ -55,6 +61,26 @@ class PlayerPickerAgentTest extends BaseTi4Test {
 
         assertThat(PlayerPickerAgent.parsePick(fixture.game, "agentPick_hacanagent_" + AgentModuleFixture.TARGET_COLOR))
                 .hasValueSatisfying(pick -> assertThat(pick.target()).isSameAs(fixture.target));
+    }
+
+    @Test
+    void everyLegacyPickStepStillRoutesToItsPicker() throws NoSuchMethodException {
+        // Old async games keep these buttons on screen; remove them on purpose, together with this test.
+        List<String> handled = Arrays.stream(PlayerPickerAgent.class
+                        .getDeclaredMethod(
+                                "resolvePick", String.class, ButtonInteractionEvent.class, Game.class, Player.class)
+                        .getAnnotationsByType(ButtonHandler.class))
+                .map(ButtonHandler::value)
+                .toList();
+
+        assertThat(handled)
+                .containsExactlyInAnyOrder(
+                        "agentPick_",
+                        "nekroAgentRes_",
+                        "kolleccAgentRes_",
+                        "hacanAgentRefresh_",
+                        "pharadnAgentSelect_",
+                        "vaylerianAgent_");
     }
 
     @Test

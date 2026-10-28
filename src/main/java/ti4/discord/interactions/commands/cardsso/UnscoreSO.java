@@ -19,6 +19,7 @@ class UnscoreSO extends GameStateSubcommand {
                         OptionType.INTEGER,
                         Constants.SECRET_OBJECTIVE_ID,
                         "Scored secret objective ID, which is found between ()")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")

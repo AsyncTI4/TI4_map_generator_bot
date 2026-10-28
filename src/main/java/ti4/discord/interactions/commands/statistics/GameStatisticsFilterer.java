@@ -49,9 +49,12 @@ public class GameStatisticsFilterer {
 
     public static List<OptionData> gameStatsFilters() {
         List<OptionData> filters = new ArrayList<>();
-        filters.add(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Player count e.g. 3-8"));
-        filters.add(new OptionData(OptionType.INTEGER, MIN_PLAYER_COUNT_FILTER, "Minimum player count, e.g. 3-8"));
-        filters.add(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Victory point goal, e.g. 10-14"));
+        filters.add(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Player count e.g. 3-8")
+                .setRequiredRange(1, 30));
+        filters.add(new OptionData(OptionType.INTEGER, MIN_PLAYER_COUNT_FILTER, "Minimum player count, e.g. 3-8")
+                .setRequiredRange(1, 30));
+        filters.add(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Victory point goal, e.g. 10-14")
+                .setRequiredRange(1, 99));
         filters.add(new OptionData(
                         OptionType.STRING,
                         GAME_TYPES_FILTER,

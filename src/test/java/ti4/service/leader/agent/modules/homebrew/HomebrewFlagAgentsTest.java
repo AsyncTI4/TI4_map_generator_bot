@@ -31,9 +31,9 @@ class HomebrewFlagAgentsTest extends BaseTi4Test {
     }
 
     @Test
-    void toldarIsRegisteredAsExhaustOnlyAndNamesItsTarget() {
+    void toldarNamesItsTarget() {
         AgentModuleFixture fixture = new AgentModuleFixture("toldar");
-        var toldar = HomebrewExhaustOnlyAgents.TOLDAR;
+        var toldar = new ToldarAgent();
         var choice = toldar.decode(fixture.game, fixture.user, "pi_hacan").orElseThrow();
 
         assertThat(toldar.exhaustAnnouncementAfterName(fixture.use(toldar, choice)))

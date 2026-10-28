@@ -748,6 +748,7 @@ public final class Constants {
     public static final String SEND_TG = "send_tg";
     public static final String SEND_COMMODITIES = "send_commodities";
     public static final String SETUP = "setup";
+    public static final String SETUP_BOT_PLAYER = "setup_bot_player";
     public static final String SETUP_STARTING_FLEET = "setup_starting_fleet";
     public static final String WEIRD_GAME_SETUP = "weird_game_setup";
     public static final String GALACTIC_EVENTS_SETUP = "galactic_events_setup";
@@ -833,6 +834,7 @@ public final class Constants {
     public static final String SC6 = "6th_choice";
     public static final String STRAT_PINGS = "strat_pings";
     public static final String DUMMY = "dummy";
+    public static final String BOT_PLAYER = "bot_player";
     public static final String NPC = "npc";
 
     public static final String NUMBER_OF_TURNS = "number_of_turns";

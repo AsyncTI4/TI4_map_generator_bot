@@ -17,6 +17,7 @@ class ShowACToAll extends GameStateSubcommand {
         super(Constants.SHOW_TO_ALL, "Show an action card to all players", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID, which is found between ()")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
     }
 

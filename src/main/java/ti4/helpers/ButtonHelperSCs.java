@@ -18,9 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.AdministrativeExemptionLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.commandcounter.CommandCounterButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimAgentHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
@@ -52,14 +50,11 @@ import ti4.model.StrategyCardModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
-import ti4.service.emoji.FactionEmojis;
-import ti4.service.emoji.MiscEmojis;
-import ti4.service.emoji.UnitEmojis;
-import ti4.service.fow.FogTokenRemovalService;
 import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.KaltrimAgent;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.strategycard.StrategyCardMessageService;
@@ -118,7 +113,7 @@ public final class ButtonHelperSCs {
                     + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
                     + " If you do, you will also choose another player, who will gain 2 trade goods.";
             List<Button> buttons2 = new ArrayList<>();
-            buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+            buttons2.add(Buttons.USE_PRODUCTION_BIOMES);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
         }
     }
@@ -182,7 +177,7 @@ public final class ButtonHelperSCs {
                     + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
                     + " If you do, you will also choose another player, who will gain 2 trade goods.";
             List<Button> buttons2 = new ArrayList<>();
-            buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+            buttons2.add(Buttons.USE_PRODUCTION_BIOMES);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
         }
     }
@@ -264,7 +259,7 @@ public final class ButtonHelperSCs {
             List<Button> buttons2 = ButtonHelperAbilities.getXxchaPeaceAccordsButtons(
                     game, player, event, player.factionButtonChecker());
             if (!buttons2.isEmpty()) {
-                buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                buttons2.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged() + ", please resolve **Peace Accords**.",
@@ -756,7 +751,7 @@ public final class ButtonHelperSCs {
                     + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
                     + " If you do, you will also choose another player, who will gain 2 trade goods.";
             List<Button> buttons2 = new ArrayList<>();
-            buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+            buttons2.add(Buttons.USE_PRODUCTION_BIOMES);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
         }
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -795,12 +790,12 @@ public final class ButtonHelperSCs {
         List<Button> scButtons = new ArrayList<>();
         if (!Helper.getRemainingSCs(game).contains(1)
                 || (game.getScPlayed().get(1) != null && game.getScPlayed().get(1))) {
-            scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
+            scButtons.add(Buttons.SPEND_AND_GAIN_COMMAND_TOKENS);
         }
         if (!Helper.getRemainingSCs(game).contains(2)
                 || (game.getScPlayed().get(2) != null && game.getScPlayed().get(2))) {
-            scButtons.add(Buttons.gray("anarchy2secondary", "Ready a Card (Other Than Strategy Card)"));
-            scButtons.add(Buttons.green("diploRefresh2", "Ready Planets"));
+            scButtons.add(Buttons.READY_A_COMPONENT);
+            scButtons.add(Buttons.DIPLO_READY_PLANETS);
         }
         if (!Helper.getRemainingSCs(game).contains(4)
                 || (game.getScPlayed().get(4) != null && game.getScPlayed().get(4))) {
@@ -808,16 +803,16 @@ public final class ButtonHelperSCs {
         }
         if (!Helper.getRemainingSCs(game).contains(5)
                 || (game.getScPlayed().get(5) != null && game.getScPlayed().get(5))) {
-            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
-            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
+            scButtons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
+            scButtons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
         }
         if (!Helper.getRemainingSCs(game).contains(6)
                 || (game.getScPlayed().get(6) != null && game.getScPlayed().get(6))) {
-            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
+            scButtons.add(Buttons.REPLENISH_COMMODITIES);
         }
         if (!Helper.getRemainingSCs(game).contains(7)
                 || (game.getScPlayed().get(7) != null && game.getScPlayed().get(7))) {
-            scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
+            scButtons.add(Buttons.WARFARE_BUILD_AT_HOME);
         }
         if (!Helper.getRemainingSCs(game).contains(8)
                 || (game.getScPlayed().get(8) != null && game.getScPlayed().get(8))) {
@@ -829,9 +824,9 @@ public final class ButtonHelperSCs {
         }
         if (!Helper.getRemainingSCs(game).contains(11)
                 || (game.getScPlayed().get(11) != null && game.getScPlayed().get(11))) {
-            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
+            scButtons.add(Buttons.NON_SC_DRAW_SECRET_OBJECTIVE);
         }
-        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+        scButtons.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         return scButtons;
     }
@@ -929,8 +924,8 @@ public final class ButtonHelperSCs {
         scButtons.add(followButton);
         if (Helper.getRemainingSCs(game).contains(2)
                 && (game.getScPlayed().get(2) == null || !game.getScPlayed().get(2))) {
-            scButtons.add(Buttons.gray("anarchy2secondary", "Ready a Card (Other Than Strategy Card)"));
-            scButtons.add(Buttons.green("diploRefresh2", "Ready Planets"));
+            scButtons.add(Buttons.READY_A_COMPONENT);
+            scButtons.add(Buttons.DIPLO_READY_PLANETS);
         }
         if (Helper.getRemainingSCs(game).contains(3)
                 && (game.getScPlayed().get(3) == null || !game.getScPlayed().get(3))) {
@@ -942,16 +937,16 @@ public final class ButtonHelperSCs {
         }
         if (Helper.getRemainingSCs(game).contains(5)
                 && (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5))) {
-            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
-            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
+            scButtons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
+            scButtons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
         }
         if (Helper.getRemainingSCs(game).contains(6)
                 && (game.getScPlayed().get(6) == null || !game.getScPlayed().get(6))) {
-            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
+            scButtons.add(Buttons.REPLENISH_COMMODITIES);
         }
         if (Helper.getRemainingSCs(game).contains(7)
                 && (game.getScPlayed().get(7) == null || !game.getScPlayed().get(7))) {
-            scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
+            scButtons.add(Buttons.WARFARE_BUILD_AT_HOME);
         }
         if (Helper.getRemainingSCs(game).contains(8)
                 && (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8))) {
@@ -963,9 +958,9 @@ public final class ButtonHelperSCs {
         }
         if (Helper.getRemainingSCs(game).contains(11)
                 && (game.getScPlayed().get(11) == null || !game.getScPlayed().get(11))) {
-            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
+            scButtons.add(Buttons.NON_SC_DRAW_SECRET_OBJECTIVE);
         }
-        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+        scButtons.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         return scButtons;
     }
@@ -1522,7 +1517,7 @@ public final class ButtonHelperSCs {
                 .sendMessageEmbeds(po.getRepresentationEmbed())
                 .queue(m -> m.pin().queue(Consumers.nop(), BotLogger::catchRestError));
         buttons.add(Buttons.green("cutTape_" + objID, "Reveal Objective"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation() + ", please choose whether to reveal the objective or not.",
@@ -1614,9 +1609,9 @@ public final class ButtonHelperSCs {
     }
 
     @ButtonHandler("scepterE_follow_")
-    @ButtonHandler("mahactA_follow_")
     @ButtonHandler("thardentiag_follow_")
-    public static void mahactAndScepterFollow(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+    public static void scepterAndCognitiveParallaxFollow(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String lastChar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
         boolean setStatus = true;
         int scNum = 1;
@@ -1629,11 +1624,6 @@ public final class ButtonHelperSCs {
                 setStatus = false;
             }
         }
-        if (setStatus && game.isFowMode() && buttonID.contains("mahact")) {
-            FogTokenRemovalService.startMahactAgent(event, game, player, scNum);
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
         if (setStatus) {
             if (!player.getFollowedSCs().contains(scNum)) {
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
@@ -1641,37 +1631,7 @@ public final class ButtonHelperSCs {
             player.addFollowedSC(scNum, event);
         }
         MessageChannel channel = ButtonHelper.getSCFollowChannel(game, player, scNum);
-        if (buttonID.contains("mahact")) {
-            MessageHelper.sendMessageToChannel(
-                    channel,
-                    player.getFactionEmojiOrColor() + " exhausted "
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                            + "Jae Mir Kan, the Mahact"
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " Agent, to follow **"
-                            + Helper.getSCName(scNum, game) + "**.");
-            Leader playerLeader = player.unsafeGetLeader("mahactagent");
-            if (playerLeader != null) {
-                playerLeader.setExhausted(true);
-                RevenantBreakthroughHandler.exhaustRevenantRisingForAttachedAgent(game, player, playerLeader);
-                for (Player p2 : game.getPlayers().values()) {
-                    for (Integer sc2 : p2.getSCs()) {
-                        if (sc2 == scNum) {
-                            List<Button> buttonsToRemoveCC = new ArrayList<>();
-                            for (Tile tile : ButtonHelper.getTilesWithYourCC(p2, game, event)) {
-                                buttonsToRemoveCC.add(Buttons.green(
-                                        player.factionButtonChecker() + "removeCCFromBoard_mahactAgent"
-                                                + p2.getFaction() + "_" + tile.getPosition(),
-                                        tile.getRepresentationForButtons(game, player)));
-                            }
-                            MessageHelper.sendMessageToChannelWithButtons(
-                                    channel,
-                                    player.getRepresentationUnfogged() + " Use buttons to remove a command token.",
-                                    buttonsToRemoveCC);
-                        }
-                    }
-                }
-            }
-        } else if (buttonID.contains("scepterE")) {
+        if (buttonID.contains("scepterE")) {
             MessageHelper.sendMessageToChannel(
                     channel,
                     player.getRepresentationUnfogged() + " exhausted the _" + RelicHelper.sillySpelling()
@@ -1695,6 +1655,11 @@ public final class ButtonHelperSCs {
             ButtonHelper.deleteMessage(event);
             return;
         }
+        reactToFollowedStrategyCard(game, player, channel);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void reactToFollowedStrategyCard(Game game, Player player, MessageChannel channel) {
         Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
 
         if (channel instanceof ThreadChannel) {
@@ -1706,7 +1671,6 @@ public final class ButtonHelperSCs {
                     channel,
                     "Hey, something went wrong leaving a react. Try following anyways and if it spends a strategy token, given yourself one back with `/player cc`.");
         }
-        ButtonHelper.deleteMessage(event);
     }
 
     public static void reactToStrategyCardMessage(Game game, Player player, int scNum, String message) {
@@ -1930,7 +1894,7 @@ public final class ButtonHelperSCs {
         ReactionService.addReaction(event, game, player, message);
         ActionCardHelper.drawActionCardsSilent(player, 2);
         if (followedPolitics) {
-            KaltrimAgentHandler.offerAfterPoliticsSecondary(game, player);
+            KaltrimAgent.offerAfterPoliticsSecondary(game, player);
         }
 
         if (player.hasAbility("contagion")) {

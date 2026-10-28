@@ -340,7 +340,7 @@ public class TacticalActionService {
             buttons.add(Buttons.red(
                     player.factionButtonChecker() + "doneLanding_" + tile.getPosition(), "Done Landing Troops"));
         } else {
-            buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Resolving"));
+            buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done"));
         }
         return buttons;
     }

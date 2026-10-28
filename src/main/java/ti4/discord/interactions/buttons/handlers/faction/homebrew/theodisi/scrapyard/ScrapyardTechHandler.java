@@ -25,7 +25,7 @@ public class ScrapyardTechHandler {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
                 player.factionButtonChecker() + USE_HOTSWAPPING, "Use Hotswapping", FactionEmojis.scrapyard));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         return buttons;
     }

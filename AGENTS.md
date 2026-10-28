@@ -119,6 +119,12 @@ A single action row can hold **either** up to 5 buttons **or** one select menu â
   `public static MyService getBean() { return SpringContext.getBean(MyService.class); }`
   (see `SavedBotMessagesService.getBean()` or `GameMessageService.getBean()`). Use this for
   new code and when touching existing call sites.
+- **Agents, genomes and homebrew agents live apart.** Official agents are modules under
+  `ti4.service.leader.agent.modules`. The agent core in `ti4.service.leader.agent` and those modules never name
+  Twilight's Fall, genomes or homebrew. Genomes (Twilight's Fall and TK Nova) live in
+  `ti4.service.leader.genome` and lean on agent modules. Homebrew agents live in
+  `ti4.service.leader.agent.modules.homebrew`. `ti4.service.leader.LeaderAgents` is the only place that lists all
+  the catalogs, and `AgentSegregationTest` fails the build when the core or an official module mentions them.
 - **Keep new features fog safe.** Fog of War games must not leak factions, identities or hidden state
   to other players. Before writing new messages or buttons, make some effort to use the fog-safe
   helpers in [FoWHelper.java](src/main/java/ti4/helpers/FoWHelper.java) (`actorOrAnon`,

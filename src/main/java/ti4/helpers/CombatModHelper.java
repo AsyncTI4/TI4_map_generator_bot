@@ -28,6 +28,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.json.JsonMapperManager;
 import ti4.model.AbilityModel;
 import ti4.model.AgendaModel;
 import ti4.model.BreakthroughModel;
@@ -42,9 +43,10 @@ import ti4.service.breakthrough.ValefarZService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.game.MonumentsService;
+import ti4.service.leader.genome.homebrew.tknova.AristocraticGenome;
+import ti4.service.leader.genome.homebrew.tknova.HumanGenome;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
 import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class CombatModHelper {
@@ -364,6 +366,22 @@ public class CombatModHelper {
                 modifier, onTile, player, opponent, unitsByQuantity, opponentUnitsByQuantity, null, game);
     }
 
+    private static boolean genomeBoostsSeveralUnits(
+            Game game, Player player, String genomeId, Map<UnitModel, Integer> unitsByQuantity) {
+        return game.getStoredValue(genomeId).contains(player.getFaction()) && unitCount(unitsByQuantity) >= 2;
+    }
+
+    private static boolean genomeBoostsOneUnit(
+            Game game, Player player, String genomeId, Map<UnitModel, Integer> unitsByQuantity) {
+        return game.getStoredValue(genomeId).contains(player.getFaction()) && unitCount(unitsByQuantity) == 1;
+    }
+
+    private static int unitCount(Map<UnitModel, Integer> unitsByQuantity) {
+        return unitsByQuantity == null
+                ? 0
+                : unitsByQuantity.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
     private static Boolean checkModPassesCondition(
             CombatModifierModel modifier,
             TileModel onTile,
@@ -567,6 +585,14 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "tknovahumanagent" ->
+                meetsCondition = genomeBoostsSeveralUnits(game, player, HumanGenome.ID, unitsByQuantity);
+            case "tknovahumanagentSingle" ->
+                meetsCondition = genomeBoostsOneUnit(game, player, HumanGenome.ID, unitsByQuantity);
+            case "tknovaaristocraticagent" ->
+                meetsCondition = genomeBoostsSeveralUnits(game, player, AristocraticGenome.ID, unitsByQuantity);
+            case "tknovaaristocraticagentSingle" ->
+                meetsCondition = genomeBoostsOneUnit(game, player, AristocraticGenome.ID, unitsByQuantity);
             case "letnevagent" -> {
                 if (game.getStoredValue("letnevagent").contains(player.getFaction())) {
                     meetsCondition = true;
@@ -1100,7 +1126,7 @@ public class CombatModHelper {
 
         if (isBombardment) {
             String bombardmentTarget = game.getStoredValue("bombardmentTarget" + player.getFaction());
-            List<BombardmentAssignment> bombardmentAssignments = new ObjectMapper()
+            List<BombardmentAssignment> bombardmentAssignments = JsonMapperManager.basic()
                     .readValue(
                             game.getStoredValue("assignedBombardment" + player.getFaction()), new TypeReference<>() {});
             return bombardmentAssignments.stream()

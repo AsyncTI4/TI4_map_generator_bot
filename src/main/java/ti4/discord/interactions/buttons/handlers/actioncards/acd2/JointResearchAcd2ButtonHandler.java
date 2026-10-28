@@ -37,7 +37,7 @@ class JointResearchAcd2ButtonHandler {
                             + " Research_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose the technology you just gained to share for _Joint"
@@ -71,7 +71,7 @@ class JointResearchAcd2ButtonHandler {
                             + "_ for _Joint Research_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose which player gains _" + tech.getName()

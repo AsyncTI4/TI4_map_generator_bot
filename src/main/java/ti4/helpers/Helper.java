@@ -49,7 +49,6 @@ import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExp
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.AtokeraAgentHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
@@ -58,7 +57,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.HydromorphicCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
@@ -81,6 +79,7 @@ import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
 import ti4.game.Player;
+import ti4.game.SanityLimits;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.game.persistence.GameManager;
@@ -121,6 +120,11 @@ import ti4.service.game.MonumentsService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.agent.modules.ArgentAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
+import ti4.service.leader.genome.homebrew.tknova.BrutalGenome;
+import ti4.service.leader.genome.homebrew.tknova.RavenousGenome;
+import ti4.service.leader.genome.homebrew.tknova.ScornfulGenome;
 import ti4.service.map.TokenPlanetService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
@@ -223,9 +227,9 @@ public final class Helper {
         List<Button> proceedButtons = new ArrayList<>();
         String msg = "These buttons can help with bugs/issues that occur during the Agenda Phase.";
         proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
-        proceedButtons.add(Buttons.blue("transaction", "Transaction"));
-        proceedButtons.add(Buttons.red("eraseMyVote", "Erase My Vote And Have Me Vote Again"));
-        proceedButtons.add(Buttons.red("eraseMyRiders", "Erase My Riders"));
+        proceedButtons.add(Buttons.TRANSACTION);
+        proceedButtons.add(Buttons.ERASE_MY_VOTE);
+        proceedButtons.add(Buttons.ERASE_MY_RIDERS);
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, proceedButtons);
     }
 
@@ -1243,7 +1247,7 @@ public final class Helper {
                     msg.append("Got 4 votes from voting the same way as another _Blood Pact_ member.\n");
             }
         }
-        int atokeraVotes = AtokeraAgentHandler.getVotes(player, game);
+        int atokeraVotes = AtokeraAgent.getVotes(player, game);
         if (atokeraVotes > 0) {
             votes += atokeraVotes;
             if (!justVoteTotal) {
@@ -2620,7 +2624,7 @@ public final class Helper {
         if (hasExactlyOneShipInSystem && player.hasAbility("rallying_cry")) {
             productionValueTotal += 2;
         }
-        productionValueTotal += MyrrLeadersHandler.getMyrrAgentProduction(game, player, tile);
+        productionValueTotal += MyrrAgent.production(game, player, tile);
         productionValueTotal += RevenantLeadersHandler.getRevMyrrProduction(game, player, tile);
         if (player.hasTech("thverydithy")) {
             int numberOfCCInSystem = 0;
@@ -2986,6 +2990,15 @@ public final class Helper {
 
             if (player.hasUnexhaustedLeader("argentagent")) {
                 unitButtons.add(ArgentAgent.button(player, tile));
+            }
+            if (player.hasUnexhaustedLeader("tknovascornfulagent")) {
+                unitButtons.add(ScornfulGenome.button(player, tile));
+            }
+            if (player.hasUnexhaustedLeader("tknovabrutalagent")) {
+                unitButtons.add(BrutalGenome.button(player, tile));
+            }
+            if (player.hasUnexhaustedLeader("tknovaravenousagent")) {
+                unitButtons.add(RavenousGenome.button(player, tile));
             }
             if (player.hasTechReady("sar")) {
                 unitButtons.add(Buttons.blue(
@@ -4164,7 +4177,7 @@ public final class Helper {
     private record UnitTypeAndCount(UnitType unitType, int count) {
         public String emojis() {
             String emoji = unitType().getUnitTypeEmoji().toString();
-            return StringUtils.repeat(emoji, count);
+            return StringUtils.repeat(emoji, Math.min(count, SanityLimits.unitsInOneHolder(unitType())));
         }
     }
 

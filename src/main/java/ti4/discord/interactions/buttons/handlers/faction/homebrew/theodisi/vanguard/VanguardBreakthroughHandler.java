@@ -41,7 +41,7 @@ public class VanguardBreakthroughHandler {
                                 player.factionButtonChecker() + USE_TRAINING_DUMMIES_TG,
                                 "Gain 2 Trade Goods (On Win)",
                                 FactionEmojis.vanguard),
-                        Buttons.red("deleteButtons", "Decline")));
+                        Buttons.DECLINE_DELETE_BUTTONS));
     }
 
     @ButtonHandler(USE_TRAINING_DUMMIES_TG)
@@ -69,7 +69,7 @@ public class VanguardBreakthroughHandler {
         if (buttons.isEmpty()) {
             return;
         }
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 getTrainingDummiesInfantryMessage(player),
@@ -111,7 +111,7 @@ public class VanguardBreakthroughHandler {
     public static void placeTrainingDummiesInfantry(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         List<Button> buttons = getTrainingDummiesInfantryButtons(game, player);
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event,
                 event.getMessageChannel(),

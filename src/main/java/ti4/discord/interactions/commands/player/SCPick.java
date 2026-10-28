@@ -26,6 +26,7 @@ class SCPick extends GameStateSubcommand {
     public SCPick() {
         super(Constants.SC_PICK, "Pick a strategy card", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number")
+                .setRequiredRange(0, 99)
                 .setRequired(true));
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")

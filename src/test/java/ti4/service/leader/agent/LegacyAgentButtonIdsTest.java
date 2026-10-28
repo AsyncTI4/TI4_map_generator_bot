@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.discord.interactions.routing.ComponentIdEnvelope;
+import ti4.service.leader.LeaderAgents;
 import ti4.service.leader.agent.modules.AgentModuleFixture;
 import ti4.testUtils.BaseTi4Test;
 
@@ -43,7 +44,7 @@ class LegacyAgentButtonIdsTest extends BaseTi4Test {
         String handlerId = ComponentIdEnvelope.decode(rawId).handlerId();
         AgentButtonIds.Parsed parsed = AgentButtonIds.parse(handlerId);
 
-        assertThat(AgentModules.find(parsed.agentId()))
+        assertThat(LeaderAgents.findAgent(parsed.agentId()))
                 .as(rawId)
                 .hasValueSatisfying(module -> assertThat(module.decode(fixture.game, fixture.user, parsed.payload()))
                         .as(rawId)

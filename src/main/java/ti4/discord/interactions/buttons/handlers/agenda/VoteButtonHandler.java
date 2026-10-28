@@ -42,9 +42,9 @@ class VoteButtonHandler {
             bEvent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("preVote", "Pre-Vote"));
-        buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
-        buttons.add(Buttons.red("deleteButtons", "Don't do anything"));
+        buttons.add(Buttons.PRE_VOTE);
+        buttons.add(Buttons.PRE_ABSTAIN);
+        buttons.add(Buttons.DONT_DO_ANYTHING);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Erased the pre-vote", buttons);
     }
 

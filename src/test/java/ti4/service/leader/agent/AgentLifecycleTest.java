@@ -19,6 +19,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
+import ti4.service.leader.LeaderAgents;
 import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.testUtils.BaseTi4Test;
 
@@ -69,80 +70,73 @@ class AgentLifecycleTest extends BaseTi4Test {
 
     @Test
     void namesTheRealCardByItsDisplayName() {
-        assertThat(AgentLifecycle.agentName("Clodho, the Ilyxum", false)).isEqualTo("Clodho, the Ilyxum agent");
+        assertThat(LeaderAgents.find(game, "mentakagent").reference("Clodho, the Ilyxum", false))
+                .isEqualTo("Clodho, the Ilyxum agent");
     }
 
     @Test
     void namesAYssarilCopyAsCleverClever() {
-        assertThat(AgentLifecycle.agentName("Clodho, the Ilyxum", true))
+        assertThat(LeaderAgents.find(game, "mentakagent").reference("Clodho, the Ilyxum", true))
                 .isEqualTo("Clever Clever Clodho, the Ilyxum/Yssaril agent");
     }
 
     @Test
-    void theYssarilAgentStandingInForAnotherAgentIsACopy() {
-        assertThat(AgentLifecycle.isYssarilCopy("yssarilagent", "augersagent")).isTrue();
-    }
-
-    @Test
-    void theYssarilAgentUsedAsItselfIsNotACopy() {
-        assertThat(AgentLifecycle.isYssarilCopy("yssarilagent", "yssarilagent")).isFalse();
-        assertThat(AgentLifecycle.isYssarilCopy("augersagent", "augersagent")).isFalse();
-    }
-
-    @Test
-    void anAgentWithAModuleIsHandledByTheLifecycle() {
+    void aPressedAgentWithAModuleIsHandledByTheLifecycle() {
         // Exhausting needs the Spring context, so the agent is already exhausted and the press is refused.
         mentak.getLeader("mentakagent").orElseThrow().setExhausted(true);
 
-        assertThat(AgentLifecycle.resolve("exhaustAgent_mentakagent_pi_hacan", null, game, mentak))
+        AgentLifecycle.press("exhaustAgent_mentakagent_pi_hacan", null, game, mentak);
+
+        assertThat(mentak.getLeader("mentakagent").orElseThrow().isExhausted()).isTrue();
+    }
+
+    @Test
+    void anAgentWithoutAModuleFallsBackToAPlainExhaust() {
+        assertThat(LeaderAgents.findRegistered(game, NOT_AN_AGENT_MODULE)).isEmpty();
+        assertThat(LeaderAgents.find(game, NOT_AN_AGENT_MODULE)).isInstanceOf(PlainExhaustAgent.class);
+    }
+
+    @Test
+    void anAgentWithoutAModuleIsNamedFromItsLeaderCardAndFaction() {
+        assertThat(LeaderAgents.find(game, "mahactagent").displayName("mahactagent"))
+                .isEqualTo("Jae Mir Kan, the Mahact");
+        assertThat(AgentLifecycle.agentName(game, "naaluagent-te", false))
+                .startsWith("Z'eu")
+                .endsWith(", the Naalu agent");
+    }
+
+    @Test
+    void usingACleverCleverCopyExhaustsTheYssarilAgentWithoutTheSpringContext() {
+        Player yssaril = game.addPlayer("yssarilUser", "Yssaril Player");
+        yssaril.setFaction(game, "yssaril");
+        yssaril.setColor("blue");
+
+        assertThat(AgentLifecycle.use(game, yssaril, "mentakagent", "red", null))
                 .isTrue();
-    }
 
-    @Test
-    void anAgentWithoutAModuleIsLeftToTheLegacyChain() {
-        assertThat(AgentLifecycle.resolve("exhaustAgent_" + NOT_AN_AGENT_MODULE, null, game, mentak))
-                .isFalse();
-    }
-
-    @Test
-    void namesBlueReverieYssarilCopiesAsCopies() {
-        assertThat(AgentLifecycle.isYssarilCopy("yssarilagent_br", "mentakagent"))
+        assertThat(yssaril.getLeader("yssarilagent").orElseThrow().isExhausted())
                 .isTrue();
-        assertThat(AgentLifecycle.isYssarilCopy("yssarilagent_br", "yssarilagent_br"))
+        assertThat(mentak.getLeader("mentakagent").orElseThrow().isExhausted()).isFalse();
+    }
+
+    @Test
+    void anAgentIsHiddenFromOtherPlayersInFogOfWar() {
+        game.setFowMode(true);
+        Player other = game.addPlayer("otherUser", "Other Player");
+        assertThat(AgentLifecycle.agentNameShownTo(game, other, mentak, "mentakagent", false))
+                .isEqualTo("an agent");
+    }
+
+    @Test
+    void aPlayerHoldingOnlyTheYssarilAgentHoldsACopy() {
+        Player yssaril = game.addPlayer("yssarilUser", "Yssaril Player");
+        yssaril.setFaction(game, "yssaril");
+        yssaril.setColor("blue");
+
+        assertThat(AgentLifecycle.holdsOnlyAYssarilCopy(yssaril, "mentakagent")).isTrue();
+        assertThat(AgentLifecycle.holdsOnlyAYssarilCopy(yssaril, "yssarilagent"))
                 .isFalse();
-    }
-
-    @Test
-    void namesGenomesWithoutTheAgentSuffix() {
-        assertThat(AgentLifecycle.agentName("Captain's Genome", false)).isEqualTo("the _Captain's Genome_");
-        assertThat(AgentLifecycle.agentName("Captain's Genome", true))
-                .isEqualTo("the Clever Clever _Captain's Genome_");
-    }
-
-    @Test
-    void usesTheTwilightsFallNameInTwilightsFallGames() {
-        game.setTwilightsFallMode(true);
-
-        assertThat(AgentLifecycle.agentNameForHolder(game, mentak, "saaragent")).isEqualTo("the _Captain's Genome_");
-    }
-
-    @Test
-    void noGenomeIsCalledAnAgentInTwilightsFall() {
-        game.setTwilightsFallMode(true);
-
-        for (AgentModule<?> module : AgentModules.ALL) {
-            for (String leaderId : leaderIds(module)) {
-                String cardName = AgentLifecycle.cardName(game, module, leaderId);
-                if (cardName.endsWith("Genome")) {
-                    assertThat(AgentLifecycle.agentName(cardName, false))
-                            .as(leaderId)
-                            .doesNotContain("agent");
-                    assertThat(AgentLifecycle.agentName(cardName, true))
-                            .as(leaderId)
-                            .doesNotContain("agent");
-                }
-            }
-        }
+        assertThat(AgentLifecycle.holdsOnlyAYssarilCopy(mentak, "mentakagent")).isFalse();
     }
 
     @Test
@@ -150,8 +144,6 @@ class AgentLifecycleTest extends BaseTi4Test {
         assertThat(AgentLifecycle.agentName(game, "crimsonagent", false)).isEqualTo("Ahk Ravin, the Rebellion agent");
         assertThat(AgentLifecycle.agentName(game, "redcreussagent", false))
                 .isEqualTo("\"Who Knows?\", the Rebellion agent");
-        game.setTwilightsFallMode(true);
-        assertThat(AgentLifecycle.agentName(game, "crimsonagent", false)).isEqualTo("the _Breach Genome_");
     }
 
     @Test

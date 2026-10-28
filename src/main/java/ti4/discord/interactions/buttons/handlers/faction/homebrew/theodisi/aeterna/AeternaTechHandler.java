@@ -133,9 +133,7 @@ public class AeternaTechHandler {
                     player.getRepresentation()
                             + ", you may use the _Thanatocyte Lattice_ technology to assign 1 hit to an opposing "
                             + "ship that matches a ship destroyed during this combat.",
-                    List.of(
-                            Buttons.red(buttonID, "Use Thanatocyte Lattice"),
-                            Buttons.gray("deleteButtons", "Decline")));
+                    List.of(Buttons.red(buttonID, "Use Thanatocyte Lattice"), Buttons.DECLINE_DELETE_BUTTONS_GRAY));
         }
     }
 
@@ -214,7 +212,7 @@ public class AeternaTechHandler {
             return;
         }
 
-        buttons.add(Buttons.gray("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS_GRAY);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),

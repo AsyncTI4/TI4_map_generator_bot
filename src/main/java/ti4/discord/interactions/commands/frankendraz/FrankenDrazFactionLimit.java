@@ -14,7 +14,9 @@ class FrankenDrazFactionLimit extends GameStateSubcommand {
 
     FrankenDrazFactionLimit() {
         super("faction_limit", "Set the number of factions each player drafts", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, LIMIT, "Faction draft limit").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, LIMIT, "Faction draft limit")
+                .setRequiredRange(1, 30)
+                .setRequired(true));
     }
 
     @Override
