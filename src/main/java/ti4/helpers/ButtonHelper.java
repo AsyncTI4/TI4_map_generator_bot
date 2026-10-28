@@ -55,7 +55,6 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
@@ -69,7 +68,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiTechHandler;
@@ -174,8 +172,11 @@ import ti4.service.leader.agent.modules.NaazAgent;
 import ti4.service.leader.agent.modules.homebrew.CheiranAgent;
 import ti4.service.leader.agent.modules.homebrew.FreeSystemsAgent;
 import ti4.service.leader.agent.modules.homebrew.KhraskAgent;
+import ti4.service.leader.agent.modules.homebrew.LanefirAgent;
 import ti4.service.leader.agent.modules.homebrew.LiZhoAgent;
 import ti4.service.leader.agent.modules.homebrew.OlradinAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.CrystellumAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantStratumAgent;
 import ti4.service.leader.genome.ExperimentalGenome;
 import ti4.service.leader.genome.homebrew.tknova.SwarmGenome;
 import ti4.service.map.SystemPickerService;
@@ -5233,7 +5234,7 @@ public class ButtonHelper {
             FreeSystemsAgent.button(game, player).ifPresent(endButtons::add);
         }
         if (player.hasUnexhaustedLeader("crystellumagent")) {
-            CrystellumLeadersHandler.addCrystellumAgentEndTurnButton(endButtons, game, player);
+            CrystellumAgent.addEndTurnButton(endButtons, game, player);
         }
         SwarmGenome.endOfTurnOffer(player).ifPresent(endButtons::add);
 
@@ -6276,20 +6277,12 @@ public class ButtonHelper {
             msg2 += name1 + ": " + card1.getText() + "\n";
             msg2 += name2 + ": " + card2.getText() + "\n";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
-        } else if (player.hasUnexhaustedLeader("lanefiragent")) {
+        } else if (LanefirAgent.canRedraw(player)) {
             String cardID = game.drawExplore(Constants.FRONTIER);
             ExploreModel card = Mapper.getExplore(cardID);
             String name1 = card.getName();
-            Button resolveExplore1 = Buttons.green(
-                    "lanefirAgentRes_Decline_frontier_" + cardID + "_" + tile.getPosition(), "Choose " + name1);
-            Button resolveExplore2 =
-                    Buttons.green("lanefirAgentRes_Accept_frontier_" + tile.getPosition(), "Use Lanefir Agent");
-            List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
-            String message = player.getRepresentationUnfogged()
-                    + " You have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "Vassa Hagi , the Lanefir"
-                    + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                    + " agent, and thus may decline this exploration to draw another one instead.";
+            List<Button> buttons = LanefirAgent.frontierButtons(player, cardID, tile);
+            String message = LanefirAgent.offerMessage(game, player);
             if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                 String pF = player.getFactionEmoji();
                 MessageHelper.sendMessageToChannel(
@@ -6592,7 +6585,7 @@ public class ButtonHelper {
                 buttons.add(MonumentsDSButtonHandler.getAiConclaveButton(game, player));
             }
         }
-        RevenantLeadersHandler.addRevStratumExploreButtons(buttons, game, player, planet);
+        RevenantStratumAgent.addExploreButtons(buttons, game, player, planet);
         return buttons;
     }
 

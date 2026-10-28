@@ -7,7 +7,6 @@ import java.util.WeakHashMap;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
@@ -20,6 +19,8 @@ import ti4.model.Mapper;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.NaaluTeAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantArdentiaAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantVerydithAgent;
 
 public final class CommandCounterHelper {
 
@@ -70,8 +71,7 @@ public final class CommandCounterHelper {
                         event, player, tile, ping, useTactic)) {
             return;
         }
-        if (!skipKeleresMonumentPrompt
-                && RevenantLeadersHandler.offerRevVerydithAgentPrompt(event, player, tile, ping, useTactic)) {
+        if (!skipKeleresMonumentPrompt && RevenantVerydithAgent.offerPrompt(event, player, tile, ping, useTactic)) {
             return;
         }
         if (useTactic) {
@@ -127,7 +127,7 @@ public final class CommandCounterHelper {
                 NaaluTeAgent.offerTokenRemoval(player.getGame(), p, tile, player);
             }
         }
-        RevenantLeadersHandler.offerRevArdentiaAgentButtons(player.getGame(), player, tile);
+        RevenantArdentiaAgent.offerAfterCommandTokenPlaced(player.getGame(), player, tile);
     }
 
     public static boolean hasCC(@Nullable GenericInteractionCreateEvent event, String color, Tile tile) {

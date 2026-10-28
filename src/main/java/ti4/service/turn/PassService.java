@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.planet.NiflheimLegendaryButtonHandler;
@@ -33,6 +32,7 @@ import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.game.MonumentsService;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantArcanumAgent;
 import ti4.service.unit.AddUnitService;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
@@ -58,7 +58,7 @@ public class PassService {
         SarcosaHeroHandler.offerPassAbility(game, player);
         NiflheimLegendaryButtonHandler.offerHvergelmirsHaze(event, game, player);
         VerydithAbilitiesHandler.getMandateButtons(event, player, game);
-        RevenantLeadersHandler.offerRevArcanumAgentButtons(game, player);
+        RevenantArcanumAgent.offerAfterPass(game, player);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
             ButtonHelperCommanders.olradinCommanderStep1(player, game);
         }

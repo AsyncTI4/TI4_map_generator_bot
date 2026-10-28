@@ -25,14 +25,11 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.ExploreModel;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
-import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
-import ti4.service.explore.ExploreService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
@@ -44,7 +41,6 @@ import ti4.service.leader.agent.modules.homebrew.FlorzenAgent;
 import ti4.service.leader.agent.modules.homebrew.ToldarAgent;
 import ti4.service.leader.genome.homebrew.tknova.InvestmentGenome;
 import ti4.service.planet.PlanetService;
-import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
@@ -344,14 +340,6 @@ public final class ButtonHelperAgents {
         MessageHelper.sendMessageToChannel(event.getChannel(), message + ".");
     }
 
-    @ButtonHandler("presetEdynAgentStep1")
-    public static void presetEdynAgentStep1(Game game, Player player) {
-        List<Button> buttons = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "presetEdynAgentStep2", null);
-        String msg = player.getRepresentationUnfogged()
-                + ", please choose the player who you wish to take the action when the time comes (probably yourself).";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
-    }
-
     @ButtonHandler("redcreussAgentPart1_")
     public static void redcreussAgentPart1(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
@@ -392,81 +380,6 @@ public final class ButtonHelperAgents {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("presetEdynAgentStep2_")
-    public static void presetEdynAgentStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String faction = buttonID.split("_")[1];
-        List<Button> buttons =
-                AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "presetEdynAgentStep3_" + faction, null);
-        String msg = player.getRepresentationUnfogged()
-                + ", please choose the passing player who will set off the trigger. When this player passes, the player you chose in the last step will get an action.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("presetEdynAgentStep3_")
-    public static void presetEdynAgentStep3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String faction1 = buttonID.split("_")[1];
-        String faction2 = buttonID.split("_")[2];
-        String msg = player.getRepresentationUnfogged() + " you set " + faction1 + " up to take an action once "
-                + faction2 + " passes";
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-        ButtonHelper.deleteMessage(event);
-        String messageID = "edynAgentPreset";
-        String part2 = faction1 + "_" + faction2 + "_" + player.getFaction();
-        game.setStoredValue(messageID, part2);
-        ButtonHelper.deleteMessage(event);
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.red("removePreset_" + messageID, "Remove The Preset"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                player.getRepresentation() + " you may use this button to undo the preset. Ignore it otherwise.",
-                buttons);
-    }
-
-    public static boolean checkForEdynAgentPreset(
-            Game game, Player passedPlayer, Player upNextPlayer, GenericInteractionCreateEvent event) {
-        String preset = game.getStoredValue("edynAgentPreset");
-        if (preset.isEmpty() || !preset.split("_")[1].equalsIgnoreCase(passedPlayer.getFaction())) {
-            return false;
-        }
-        Player edyn = game.getPlayerFromColorOrFaction(preset.split("_")[2]);
-        Player newActivePlayer = game.getPlayerFromColorOrFaction(preset.split("_")[0]);
-        game.setStoredValue("edynAgentPreset", "");
-        if (edyn == null || newActivePlayer == null) {
-            return false;
-        }
-        if (!AgentLifecycle.use(game, edyn, "edynagent", "", event)) {
-            return false;
-        }
-        game.setStoredValue(
-                "edynAgentInAction",
-                newActivePlayer.getFaction() + "_" + edyn.getFaction() + "_" + upNextPlayer.getFaction());
-        List<Button> buttons = StartTurnService.getStartOfTurnButtons(newActivePlayer, game, true, event);
-        MessageHelper.sendMessageToChannelWithButtons(
-                newActivePlayer.getCorrectChannel(),
-                newActivePlayer.getRepresentationUnfogged() + " you may take 1 action now due to "
-                        + AgentLifecycle.agentNameForHolder(game, edyn, "edynagent") + ".",
-                buttons);
-        game.updateActivePlayer(newActivePlayer);
-        return true;
-    }
-
-    public static boolean checkForEdynAgentActive(Game game, GenericInteractionCreateEvent event) {
-        String preset = game.getStoredValue("edynAgentInAction");
-        if (!preset.isEmpty()) {
-            Player edyn2 = game.getPlayerFromColorOrFaction(preset.split("_")[1]);
-            if (edyn2 == null) return false;
-            AgendaHelper.drawAgenda(1, false, game, edyn2, true);
-            Player newActivePlayer = game.getPlayerFromColorOrFaction(preset.split("_")[2]);
-            game.setStoredValue("edynAgentInAction", "");
-            if (newActivePlayer != null) {
-                StartTurnService.turnStart(event, game, newActivePlayer);
-            }
-            return true;
-        }
-        return false;
-    }
-
     public static boolean doesTileHaveAStructureInIt(Player player, Tile tile) {
         boolean present = false;
         for (UnitHolder uH : tile.getUnitHolders().values()) {
@@ -487,100 +400,6 @@ public final class ButtonHelperAgents {
             }
         }
         return present;
-    }
-
-    @ButtonHandler("lanefirAgentRes_")
-    public static void resolveLanefirAgent(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        if (buttonID.contains("Decline")) {
-            if (buttonID.contains("frontier")) {
-                String cardChosen = buttonID.split("_")[3];
-                String pos = buttonID.split("_")[4];
-                ExploreService.expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player, cardChosen);
-            } else {
-                String drawColor = buttonID.split("_")[2];
-                String cardID = buttonID.split("_")[3];
-                String planetName = buttonID.split("_")[4];
-                Tile tile = game.getTileFromPlanet(planetName);
-                String messageText = player.getRepresentation() + " explored the planet "
-                        + ExploreEmojis.getTraitEmoji(drawColor)
-                        + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " in tile "
-                        + tile.getPosition() + ":";
-                ExploreService.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
-                        && game.getPhaseOfGame().contains("agenda")) {
-                    PlanetService.refreshPlanet(player, planetName);
-                    MessageHelper.sendMessageToChannel(
-                            event.getChannel(),
-                            "Planet has been readied because of Quaxdol Junitas, the Florzen Commander.");
-                    AgendaHelper.listVoteCountIfUnfogged(game);
-                }
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
-                    UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
-                    game.getTileFromPlanet(planetName)
-                            .getUnitHolders()
-                            .get(planetName)
-                            .addUnit(infKey, 1);
-                    MessageHelper.sendMessageToChannel(
-                            event.getChannel(),
-                            "Added 1 infantry to planet because of Master Halbert, the Lanefir Commander.");
-                }
-                if (player.hasTech("dslaner")) {
-                    player.setAtsCount(player.getAtsCount() + 1);
-                    MessageHelper.sendMessageToChannel(
-                            event.getMessageChannel(),
-                            player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
-                }
-            }
-        } else {
-            if (!AgentLifecycle.use(game, player, "lanefiragent", "", event)) {
-                return;
-            }
-            if (buttonID.contains("frontier")) {
-                String cardChosen = game.drawExplore(Constants.FRONTIER);
-                String pos = buttonID.split("_")[3];
-                ExploreModel card = Mapper.getExplore(cardChosen);
-                String name = card.getName();
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "Found a " + name + " in " + game.getTileByPosition(pos).getRepresentation());
-                ExploreService.expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player, cardChosen);
-            } else {
-                String drawColor = buttonID.split("_")[2];
-                String planetName = buttonID.split("_")[3];
-                Tile tile = game.getTileFromPlanet(planetName);
-                String cardID = game.drawExplore(drawColor);
-                String messageText = player.getRepresentation() + " explored " + ExploreEmojis.getTraitEmoji(drawColor)
-                        + "Planet "
-                        + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile "
-                        + tile.getPosition() + ")*:";
-                ExploreService.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
-                        && game.getPhaseOfGame().contains("agenda")) {
-                    PlanetService.refreshPlanet(player, planetName);
-                    MessageHelper.sendMessageToChannel(
-                            event.getChannel(),
-                            "Planet has been readied because of Quaxdol Junitas, the Florzen Commander.");
-                    AgendaHelper.listVoteCountIfUnfogged(game);
-                }
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
-                    UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
-                    game.getTileFromPlanet(planetName)
-                            .getUnitHolders()
-                            .get(planetName)
-                            .addUnit(infKey, 1);
-                    MessageHelper.sendMessageToChannel(
-                            event.getChannel(),
-                            "Added 1 infantry to planet because of Master Halbert, the Lanefir Commander.");
-                }
-                if (player.hasTech("dslaner")) {
-                    player.setAtsCount(player.getAtsCount() + 1);
-                    MessageHelper.sendMessageToChannel(
-                            event.getMessageChannel(),
-                            player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
-                }
-            }
-        }
-        ButtonHelper.deleteMessage(event);
     }
 
     public static List<Tile> getAdjacentTilesWithStructuresInThem(Player player, Game game, Tile origTile) {

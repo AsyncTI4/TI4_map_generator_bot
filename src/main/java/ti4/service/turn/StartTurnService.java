@@ -27,17 +27,13 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisLeaderHandler;
@@ -99,6 +95,11 @@ import ti4.service.leader.agent.modules.homebrew.FlorzenAgent;
 import ti4.service.leader.agent.modules.homebrew.KolleccAgent;
 import ti4.service.leader.agent.modules.homebrew.PharadnAgent;
 import ti4.service.leader.agent.modules.homebrew.VadenAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.ArcanumAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.HazorusAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.HopeOfTheCosmosAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.OblivionAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantScrapyardAgent;
 import ti4.service.leader.genome.homebrew.tknova.DeploymentGenome;
 import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
 import ti4.service.map.PlayerAreaWarningService;
@@ -574,7 +575,7 @@ public class StartTurnService {
         Button economicBoonButton = LostLegaciesRelicHandler.getEconomicBoonStartTurnButton(game, player);
         if (economicBoonButton != null) startButtons.add(economicBoonButton);
         if (!doneActionThisTurn) {
-            Button hazorusButton = StonebornLeadersHandler.getHazorusStartTurnButton(player);
+            Button hazorusButton = HazorusAgent.startTurnButton(player);
             if (hazorusButton != null) {
                 startButtons.add(hazorusButton);
             }
@@ -594,7 +595,7 @@ public class StartTurnService {
             startButtons.add(AeternaAbilityHandler.getWaxingMoonButton(player));
         }
         if (!doneActionThisTurn) {
-            Button veylaButton = ArcanumLeadersHandler.getVeylaStartTurnButton(game, player);
+            Button veylaButton = ArcanumAgent.startTurnButton(game, player);
             if (veylaButton != null) {
                 startButtons.add(veylaButton);
             }
@@ -639,7 +640,7 @@ public class StartTurnService {
             }
         }
         if (!doneActionThisTurn) {
-            Button thurvialiAgentButton = ThurvialiLeadersHandler.getHopeStartTurnButton(game, player);
+            Button thurvialiAgentButton = HopeOfTheCosmosAgent.startTurnButton(game, player);
             if (thurvialiAgentButton != null) {
                 startButtons.add(thurvialiAgentButton);
             }
@@ -655,7 +656,7 @@ public class StartTurnService {
             startButtons.add(OblivionAbilityHandler.getReflectionLedgerButton(player));
         }
         if (player.hasUnexhaustedLeader("revenantscrapyardagent")) {
-            startButtons.add(RevenantLeadersHandler.getRevScrapyardAgentButton(player));
+            startButtons.add(RevenantScrapyardAgent.startTurnButton(player));
         }
         if (player.hasPlanet("skarnath")
                 && !player.getExhaustedPlanetsAbilities().contains("skarnath")) {
@@ -985,7 +986,7 @@ public class StartTurnService {
                 startButtons.add(KolleccAgent.button(player));
             }
             if (player.hasUnexhaustedLeader("oblivionagent")) {
-                startButtons.add(OblivionLeadersHandler.getOblivionAgentButton(player));
+                startButtons.add(OblivionAgent.startTurnButton(player));
             }
 
             DeploymentGenome.startOfTurnOffer(player).ifPresent(startButtons::add);

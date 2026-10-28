@@ -57,7 +57,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.HydromorphicCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
@@ -122,6 +121,7 @@ import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.agent.modules.ArgentAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
 import ti4.service.leader.genome.homebrew.tknova.BrutalGenome;
 import ti4.service.leader.genome.homebrew.tknova.RavenousGenome;
 import ti4.service.leader.genome.homebrew.tknova.ScornfulGenome;
@@ -2624,7 +2624,7 @@ public final class Helper {
         if (hasExactlyOneShipInSystem && player.hasAbility("rallying_cry")) {
             productionValueTotal += 2;
         }
-        productionValueTotal += MyrrLeadersHandler.getMyrrAgentProduction(game, player, tile);
+        productionValueTotal += MyrrAgent.production(game, player, tile);
         productionValueTotal += RevenantLeadersHandler.getRevMyrrProduction(game, player, tile);
         if (player.hasTech("thverydithy")) {
             int numberOfCCInSystem = 0;
