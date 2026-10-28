@@ -16,6 +16,7 @@ import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonH
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.SanityLimits;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
@@ -112,7 +113,9 @@ public class AddUnitService {
             return;
         }
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
-        for (ParsedUnit parsedUnit : parsedUnits) {
+        for (ParsedUnit requested : parsedUnits) {
+            ParsedUnit parsedUnit = limitToSupply(event, game, tile, requested);
+            if (parsedUnit.count() <= 0) continue;
             tile.addUnit(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count());
             tile = FlipTileService.flipTileIfNeeded(tile, game);
             AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
@@ -221,6 +224,36 @@ public class AddUnitService {
 
         handleFogOfWar(tile, color, game, unitListBuilder.toString());
         checkFleetCapacity(tile, color, game);
+    }
+
+    private static ParsedUnit limitToSupply(
+            GenericInteractionCreateEvent event, Game game, Tile tile, ParsedUnit requested) {
+        int allowed = spawnableCount(game, tile, requested.unitKey());
+        if (requested.count() <= allowed) return requested;
+        if (event != null) {
+            boolean tokenBacked = SanityLimits.isTokenBacked(requested.unitKey().unitType());
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "Only " + allowed + " of the " + requested.count() + " requested "
+                            + requested.unitKey().unitType().humanReadableName() + " units were placed: "
+                            + (tokenBacked
+                                    ? "a system can hold at most " + SanityLimits.INFANTRY_AND_FIGHTERS_PER_TILE + "."
+                                    : "that is all that is left in reinforcements."));
+        }
+        return new ParsedUnit(requested.unitKey(), allowed, requested.location());
+    }
+
+    private static int spawnableCount(Game game, Tile tile, Units.UnitKey unitKey) {
+        if (SanityLimits.isTokenBacked(unitKey.unitType())) {
+            int inTile = tile.getUnitHolders().values().stream()
+                    .mapToInt(unitHolder -> unitHolder.getUnitCount(unitKey))
+                    .sum();
+            return Math.max(0, SanityLimits.INFANTRY_AND_FIGHTERS_PER_TILE - inTile);
+        }
+        return Math.max(
+                0,
+                SanityLimits.reinforcementLimit(game, unitKey)
+                        - ButtonHelper.getNumberOfUnitsOnTheBoard(game, unitKey));
     }
 
     private static void handleFogOfWar(Tile tile, String color, Game game, String unitList) {

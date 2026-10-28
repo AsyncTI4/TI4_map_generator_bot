@@ -28,7 +28,9 @@ class LookAtBottomEvent extends GameStateSubcommand {
         sb.append("Game: ").append(game.getName()).append('\n');
         sb.append(event.getUser().getAsMention()).append('\n');
         sb.append('`').append(event.getCommandString()).append('`').append('\n');
-        int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
+        int count = Math.min(
+                event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt),
+                game.getEvents().size());
         if (count > 1) {
             sb.append("__**Bottom ").append(count).append(" events:**__\n");
         } else {

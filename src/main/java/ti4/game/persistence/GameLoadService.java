@@ -1245,7 +1245,7 @@ class GameLoadService {
                     "Invalid UnitHolder detected during load: " + tile.getTileID() + " / " + unitHolderName);
             return;
         }
-        tile.getUnitHolders().get(unitHolderName).getUnitsByState().put(uk, counts);
+        tile.getUnitHolders().get(unitHolderName).getUnitsByState().put(uk, UnitHolder.capToHolderLimit(uk, counts));
     }
 
     private static void readPlanetTokens(Tile tile, String data, String unitHolderName) {

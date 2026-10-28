@@ -24,8 +24,7 @@ class ExploreDrawAndDiscard extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
-        count = Math.max(count, 1);
+        int count = Math.clamp(event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt), 1, 20);
 
         StringBuilder sb = new StringBuilder();
         Game game = getGame();
