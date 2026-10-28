@@ -12,6 +12,8 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 
 class ShowAC extends GameStateSubcommand {
 
@@ -59,6 +61,8 @@ class ShowAC extends GameStateSubcommand {
             return;
         }
 
+        KnownCardsService.recordCardShown(
+                playerToShowTo, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
         ActionCardHelper.sendActionCardInfo(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(playerToShowTo, sb);
     }

@@ -117,6 +117,8 @@ import ti4.service.draft.DraftTileManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.game.MonumentsService;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -3383,6 +3385,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!acID.isEmpty()) {
             player.removeActionCard(acIDNumber);
+            KnownCardsService.recordCardLeftHandPublicly(
+                    this, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
             ACStatus status = shouldPutCardOnRalnel(player) ? ACStatus.ralnelbt : null;
             setDiscardActionCard(acID, status, played);
             if (!played) {
@@ -3425,7 +3429,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
         if (!acID.isEmpty()) {
+            boolean wasInHand = actionCards.containsKey(acID);
             player.removeActionCard(acIDNumber);
+            if (wasInHand) {
+                KnownCardsService.recordCardLeftHandPublicly(
+                        this, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
+            }
             setPurgedActionCard(acID, played);
             return true;
         }
@@ -3536,6 +3545,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!soID.isEmpty()) {
             player.removeSecret(soIDNumber);
+            KnownCardsService.recordCardLeftHandPublicly(
+                    this, player, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
             player.setSecretScored(soID);
             return true;
         }

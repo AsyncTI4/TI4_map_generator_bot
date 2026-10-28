@@ -642,6 +642,7 @@ public class CardsInfoService {
         buttons.add(Buttons.POST_NOTEPAD);
         buttons.add(Buttons.EDIT_NOTEPAD);
         buttons.add(Buttons.green("cardsInfo", "Cards Info Refresh"));
+        buttons.add(Buttons.gray("showKnownCardHands", "Show Known Card Hands", CardEmojis.ActionCard));
         RiftSetModeService.addCapturedUnitsButton(buttons, game);
 
         String message = "You may use these buttons to do various things:";

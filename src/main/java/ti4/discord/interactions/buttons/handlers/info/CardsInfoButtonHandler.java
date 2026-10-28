@@ -8,8 +8,10 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.info.CardsInfoService;
+import ti4.service.info.KnownCardsService;
 
 @UtilityClass
 class CardsInfoButtonHandler {
@@ -26,5 +28,14 @@ class CardsInfoButtonHandler {
         }
         CardsInfoService.sendCardsInfo(game, player, event);
         EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
+    }
+
+    @ButtonHandler(value = "showKnownCardHands", save = false)
+    public static void showKnownCardHands(Game game, Player player) {
+        if (player == null) {
+            return;
+        }
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(
+                player, "__Known Card Hands__", KnownCardsService.getKnownCardHandEmbeds(game, player));
     }
 }
