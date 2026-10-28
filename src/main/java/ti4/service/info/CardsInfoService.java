@@ -67,6 +67,10 @@ import ti4.service.leader.agent.modules.homebrew.KolleccAgent;
 import ti4.service.leader.agent.modules.homebrew.MykoMentoriAgent;
 import ti4.service.leader.agent.modules.homebrew.PharadnAgent;
 import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.BelkoseaAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.XinAgent;
 import ti4.service.leader.genome.ResearchGenome;
 import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
 
@@ -151,7 +155,7 @@ public class CardsInfoService {
             buttons.add(HacanAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("atokeraagent")) {
-            buttons.add(Buttons.gray("useAtokeraAgent", "Use Magruda, the Atokera Agent", FactionEmojis.atokera));
+            buttons.add(AtokeraAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("kairnagent")) {
             buttons.add(KairnLeadershandler.getKairnAgentCardsInfoButton(player));
@@ -393,16 +397,13 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("getAxisOrderReturns", "Un-Buy Axis Order (Fix Mistake)", FactionEmojis.axis));
         }
         if (player.hasUnexhaustedLeader("belkoseaagent")) {
-            buttons.add(Buttons.gray(
-                    player.factionButtonChecker() + "useBelkoseaAgent", "Use Belkosea Agent", FactionEmojis.belkosea));
+            buttons.add(BelkoseaAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("qhetagent")) {
-            buttons.add(
-                    Buttons.gray(player.factionButtonChecker() + "useQhetAgent", "Use Qhet Agent", FactionEmojis.qhet));
+            buttons.add(QhetAgent.button(player));
         }
         if (player.hasUnexhaustedLeader("xinagent")) {
-            buttons.add(
-                    Buttons.gray(player.factionButtonChecker() + "useXinAgent", "Use Xin Agent", FactionEmojis.xin));
+            buttons.add(XinAgent.button(player));
         }
         if (player.hasAbility("hired_guns")) {
             buttons.add(Buttons.gray("fakeHiredGuns", "Sell Ships Via Hired Guns", FactionEmojis.nokar));

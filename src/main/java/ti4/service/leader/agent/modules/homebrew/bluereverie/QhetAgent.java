@@ -1,9 +1,10 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie;
+package ti4.service.leader.agent.modules.homebrew.bluereverie;
 
 import java.util.ArrayList;
 import java.util.List;
-import lombok.experimental.UtilityClass;
+import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -15,43 +16,55 @@ import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.agent.AgentLifecycle;
+import ti4.service.leader.agent.AgentModule;
+import ti4.service.leader.agent.AgentOutcome;
+import ti4.service.leader.agent.AgentUse;
 import ti4.service.tech.ListTechService;
 import ti4.service.tech.PlayerTechService;
 
-@UtilityClass
-public class QhetAgentHandler {
-    private static final String AGENT = "qhetagent";
-    private static final String USE_AGENT = "useQhetAgent";
+public final class QhetAgent extends AgentModule<Player> {
+
+    static final String ID = "qhetagent";
     private static final String SELECT_TECH = "selectQhetAgentTech_";
     private static final String STATE = "qhetAgentTech_";
 
-    @ButtonHandler(USE_AGENT)
-    public static void useQhetAgent(ButtonInteractionEvent event, Game game, Player agentOwner) {
-        Player activePlayer = game.getActivePlayer();
-        if (!agentOwner.hasUnexhaustedLeader(AGENT)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Zhroth Khuvad must be ready to use this ability.");
-            return;
-        }
+    public QhetAgent() {
+        super(ID, "Zhroth Khuvad, the Qhet");
+    }
 
-        List<TechnologyModel> upgrades = getEligibleUnitUpgrades(game, activePlayer);
-        if (upgrades.isEmpty()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "The active player has no eligible non-faction unit upgrades.");
-            return;
-        }
+    public static Button button(Player holder) {
+        return useButton(holder, ID, "Qhet Agent", FactionEmojis.qhet);
+    }
 
-        AgentLifecycle.spend(game, agentOwner, AGENT);
-        ButtonHelper.deleteTheOneButton(event);
-        MessageHelper.sendMessageToChannel(
-                agentOwner.getCorrectChannel(),
-                agentOwner.getRepresentation() + " exhausted Zhroth Khuvad, the Qhet agent, for "
-                        + activePlayer.getRepresentationNoPing() + ".");
-        sendUnitUpgradeButtons(activePlayer.getCorrectChannel(), game, agentOwner, activePlayer, upgrades);
+    @Override
+    public Optional<Player> decode(Game game, Player user, String payload) {
+        return Optional.ofNullable(game.getActivePlayer());
+    }
+
+    @Override
+    public Optional<String> unusableReason(Game game, Player user, Player activePlayer) {
+        if (eligibleUnitUpgrades(game, activePlayer).isEmpty()) {
+            return Optional.of("The active player has no eligible non-faction unit upgrades");
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public String exhaustAnnouncementAfterName(AgentUse<Player> use) {
+        return " has exhausted " + use.agentName() + " for " + use.payload().getRepresentationNoPing() + ".";
+    }
+
+    @Override
+    public AgentOutcome resolve(AgentUse<Player> use) {
+        Game game = use.game();
+        Player activePlayer = use.payload();
+        sendUnitUpgradeButtons(
+                activePlayer.getCorrectChannel(), use.user(), activePlayer, eligibleUnitUpgrades(game, activePlayer));
+        return AgentOutcome.none();
     }
 
     @ButtonHandler(SELECT_TECH)
-    public static void selectQhetAgentTech(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    static void selectTech(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] payload = buttonID.substring(SELECT_TECH.length()).split("\\|", 2);
         if (payload.length != 2) {
             ButtonHelper.deleteMessage(event);
@@ -59,13 +72,13 @@ public class QhetAgentHandler {
         }
         Player agentOwner = game.getPlayerFromColorOrFaction(payload[0]);
         String techId = payload[1];
-        List<TechnologyModel> upgrades = getEligibleUnitUpgrades(game, player);
+        List<TechnologyModel> upgrades = eligibleUnitUpgrades(game, player);
         String message = player.getRepresentationNoPing()
                 + ", choose a non-faction unit upgrade to gain until this tactical action ends.";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event,
                 event.getMessageChannel(),
-                getUnitUpgradeButtons(player, agentOwner, upgrades),
+                unitUpgradeButtons(player, agentOwner, upgrades),
                 message,
                 player.factionButtonChecker() + SELECT_TECH + payload[0] + "|",
                 buttonID)) {
@@ -107,30 +120,26 @@ public class QhetAgentHandler {
         }
     }
 
-    private static List<TechnologyModel> getEligibleUnitUpgrades(Game game, Player player) {
+    private static List<TechnologyModel> eligibleUnitUpgrades(Game game, Player player) {
         return ListTechService.getAllNonFactionUnitUpgradeTech(game).stream()
                 .filter(tech -> !player.hasTech(tech.getAlias()))
                 .toList();
     }
 
     private static void sendUnitUpgradeButtons(
-            net.dv8tion.jda.api.entities.channel.middleman.MessageChannel channel,
-            Game game,
-            Player agentOwner,
-            Player activePlayer,
-            List<TechnologyModel> upgrades) {
+            MessageChannel channel, Player agentOwner, Player activePlayer, List<TechnologyModel> upgrades) {
         String message = activePlayer.getRepresentation()
                 + ", choose a non-faction unit upgrade to gain until this tactical action ends.";
         MessageHelper.sendMessageToChannelWithButtons(
                 channel,
                 message,
                 NewStuffHelper.buttonPagination(
-                        getUnitUpgradeButtons(activePlayer, agentOwner, upgrades),
+                        unitUpgradeButtons(activePlayer, agentOwner, upgrades),
                         activePlayer.factionButtonChecker() + SELECT_TECH + agentOwner.getFaction() + "|",
                         0));
     }
 
-    private static List<Button> getUnitUpgradeButtons(
+    private static List<Button> unitUpgradeButtons(
             Player activePlayer, Player agentOwner, List<TechnologyModel> upgrades) {
         List<Button> buttons = new ArrayList<>();
         for (TechnologyModel tech : upgrades) {

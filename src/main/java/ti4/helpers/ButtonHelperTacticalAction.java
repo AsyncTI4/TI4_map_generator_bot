@@ -32,7 +32,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBre
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.QhetAgentHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
@@ -123,6 +122,7 @@ import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.modules.EmpyreanAgent;
 import ti4.service.leader.agent.modules.L1z1xAgent;
 import ti4.service.leader.agent.modules.homebrew.CeldauriAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
@@ -151,7 +151,7 @@ public final class ButtonHelperTacticalAction {
         UydaiHeroService.clear(game);
         XinCommanderHandler.clearCombat(game);
         XinTechHandler.clearVeiledNetworkingStarProduction(game, player);
-        QhetAgentHandler.returnTemporaryUnitUpgrades(game);
+        QhetAgent.returnTemporaryUnitUpgrades(game);
         RealityFieldImpactorService.clear(game);
         LostLegaciesRelicHandler.clearNaturesBoon(game, player);
         RevenantLeadersHandler.resolvePendingRevVerydithAgent(game, player, event);

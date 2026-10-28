@@ -49,7 +49,6 @@ import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExp
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.AtokeraAgentHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
@@ -121,6 +120,7 @@ import ti4.service.game.MonumentsService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.agent.modules.ArgentAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
 import ti4.service.leader.genome.homebrew.tknova.BrutalGenome;
 import ti4.service.leader.genome.homebrew.tknova.RavenousGenome;
 import ti4.service.leader.genome.homebrew.tknova.ScornfulGenome;
@@ -1246,7 +1246,7 @@ public final class Helper {
                     msg.append("Got 4 votes from voting the same way as another _Blood Pact_ member.\n");
             }
         }
-        int atokeraVotes = AtokeraAgentHandler.getVotes(player, game);
+        int atokeraVotes = AtokeraAgent.getVotes(player, game);
         if (atokeraVotes > 0) {
             votes += atokeraVotes;
             if (!justVoteTotal) {

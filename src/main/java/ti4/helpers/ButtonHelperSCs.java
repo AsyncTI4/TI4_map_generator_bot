@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.AdministrativeExemptionLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.commandcounter.CommandCounterButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimAgentHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
@@ -58,6 +57,7 @@ import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.KaltrimAgent;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.strategycard.StrategyCardMessageService;
@@ -1897,7 +1897,7 @@ public final class ButtonHelperSCs {
         ReactionService.addReaction(event, game, player, message);
         ActionCardHelper.drawActionCardsSilent(player, 2);
         if (followedPolitics) {
-            KaltrimAgentHandler.offerAfterPoliticsSecondary(game, player);
+            KaltrimAgent.offerAfterPoliticsSecondary(game, player);
         }
 
         if (player.hasAbility("contagion")) {

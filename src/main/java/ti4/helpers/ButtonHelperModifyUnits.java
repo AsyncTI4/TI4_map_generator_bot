@@ -23,7 +23,6 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionTargetingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.EdynAgentHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.TnelisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousUnitHandler;
@@ -74,6 +73,7 @@ import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.homebrew.GhotiAgent;
 import ti4.service.leader.agent.modules.homebrew.MortheusAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.EdynBrAgent;
 import ti4.service.leader.genome.ExperimentalGenome;
 import ti4.service.planet.FlipTileService;
 import ti4.service.planet.PlanetService;
@@ -1525,12 +1525,12 @@ public final class ButtonHelperModifyUnits {
                     TnelisUnitHandler.consumeDeployCoexistence(game, player, tile, unitHolder);
             if (player != player2 && players.contains(player) && !deployedDaedalonIntoCoexistence) {
                 boolean edynAgentCanBeUsedByLandingPlayer =
-                        EdynAgentHandler.canUseToAllowCoexistence(game, player, player, unitHolder);
+                        EdynBrAgent.canUseToAllowCoexistence(game, player, player, unitHolder);
                 boolean anotherEdynAgentCanBeUsed = game.getRealPlayers().stream()
                         .anyMatch(agentOwner ->
-                                EdynAgentHandler.canUseToAllowCoexistence(game, agentOwner, player, unitHolder));
+                                EdynBrAgent.canUseToAllowCoexistence(game, agentOwner, player, unitHolder));
                 if (anotherEdynAgentCanBeUsed) {
-                    EdynAgentHandler.offerCoexistence(game, player, unitHolder);
+                    EdynBrAgent.offerCoexistence(game, player, unitHolder);
                 }
                 if (!TwilightsFallMonumentsButtonHandler.preventsCoexistence(game, tile)
                         && (player2.hasUnlockedBreakthrough("titansbt")
@@ -1578,7 +1578,7 @@ public final class ButtonHelperModifyUnits {
                         buttons.add(Buttons.green(player.factionButtonChecker() + "deleteButtons", "Coexistence"));
                     }
                     if (edynAgentCanBeUsedByLandingPlayer) {
-                        buttons.add(EdynAgentHandler.getCoexistenceButton(player, player, unitHolder.getName()));
+                        buttons.add(EdynBrAgent.coexistenceButton(player, player, unitHolder.getName()));
                     }
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
                     if (player2.getPlanets().contains(unitHolder.getName())
@@ -1605,7 +1605,7 @@ public final class ButtonHelperModifyUnits {
 
                 } else if (edynAgentCanBeUsedByLandingPlayer) {
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(EdynAgentHandler.getCoexistenceButton(player, player, unitHolder.getName()));
+                    buttons.add(EdynBrAgent.coexistenceButton(player, player, unitHolder.getName()));
                     buttons.add(Buttons.red(
                             player.factionButtonChecker() + "startCombatOn_" + unitHolder.getName(),
                             "Engage in Combat"));
