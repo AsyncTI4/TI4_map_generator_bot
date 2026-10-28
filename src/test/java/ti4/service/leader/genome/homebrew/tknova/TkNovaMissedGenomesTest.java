@@ -119,8 +119,10 @@ class TkNovaMissedGenomesTest extends BaseTi4Test {
 
         assertThat(handlerIds(outcome.messages().getFirst().buttons()))
                 .containsExactly(
-                        "place_2ff_" + AgentModuleFixture.ACTIVE_SYSTEM, "place_2gf_" + LODOR, "deleteButtons");
-        assertThat(outcome.messages().getFirst().text()).contains("6 fighters or infantry");
+                        "tknovaRavenousPlace_ff_" + AgentModuleFixture.ACTIVE_SYSTEM,
+                        "tknovaRavenousPlace_gf_" + LODOR,
+                        "deleteButtons");
+        assertThat(outcome.messages().getFirst().text()).contains("up to 6 fighters or infantry");
     }
 
     @Test
@@ -139,6 +141,8 @@ class TkNovaMissedGenomesTest extends BaseTi4Test {
         ActionGenome action = new ActionGenome();
 
         assertThat(action.decode(fixture.game, fixture.user, "")).contains(fixture.user);
+        assertThat(action.unusableReason(fixture.game, fixture.user, fixture.user))
+                .isPresent();
         assertThat(action.decode(fixture.game, fixture.user, AgentModuleFixture.TARGET_FACTION))
                 .contains(fixture.target);
     }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
@@ -61,6 +62,10 @@ public abstract class AgentModule<P> {
             return "Clever Clever " + cardName + "/Yssaril agent";
         }
         return cardName + " agent";
+    }
+
+    public Optional<MessageChannel> announcementChannel(AgentUse<P> use) {
+        return Optional.empty();
     }
 
     public String exhaustAnnouncementAfterName(AgentUse<P> use) {

@@ -6,6 +6,8 @@ import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -29,6 +31,7 @@ import ti4.service.leader.agent.AgentUse;
 public final class MahactAgent extends AgentModule<Integer> {
 
     static final String ID = "mahactagent";
+    private static final String LEGACY_FOLLOW = "mahactA_follow_";
     private static final String CONSTRUCTION_PLACEMENT = "placeHolderOfConInSystem_";
     private static final int CONSTRUCTION = 4;
 
@@ -59,13 +62,27 @@ public final class MahactAgent extends AgentModule<Integer> {
     }
 
     @Override
+    public Optional<MessageChannel> announcementChannel(AgentUse<Integer> use) {
+        if (use.game().isFowMode()) {
+            return Optional.empty();
+        }
+        return Optional.of(ButtonHelper.getSCFollowChannel(use.game(), use.user(), use.payload()));
+    }
+
+    // TODO: drop this once games started before the agent-module migration (2026-10-27) have finished.
+    @ButtonHandler(LEGACY_FOLLOW)
+    static void legacyFollow(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        AgentLifecycle.pressLegacyButton(event, game, player, ID, StringUtils.substringAfterLast(buttonID, "_"));
+    }
+
+    @Override
     public AgentOutcome resolve(AgentUse<Integer> use) {
         Game game = use.game();
         Player mahact = use.user();
         int strategyCard = use.payload();
         if (game.isFowMode()) {
             FogTokenRemovalService.startMahactAgent(use.event(), game, mahact, strategyCard);
-            return AgentOutcome.none();
+            return AgentOutcome.none().deletingPressedMessage();
         }
         if (!mahact.getFollowedSCs().contains(strategyCard)) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(mahact, strategyCard, game, use.event());
@@ -74,7 +91,7 @@ public final class MahactAgent extends AgentModule<Integer> {
         offerTokenRemoval(use, strategyCard);
         ButtonHelperSCs.reactToFollowedStrategyCard(
                 game, mahact, ButtonHelper.getSCFollowChannel(game, mahact, strategyCard));
-        return AgentOutcome.none();
+        return AgentOutcome.none().deletingPressedMessage();
     }
 
     private static void offerTokenRemoval(AgentUse<Integer> use, int strategyCard) {

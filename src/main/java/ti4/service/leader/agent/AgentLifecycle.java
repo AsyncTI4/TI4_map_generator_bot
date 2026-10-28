@@ -57,6 +57,12 @@ public class AgentLifecycle {
         });
     }
 
+    public static void pressLegacyButton(
+            GenericInteractionCreateEvent event, Game game, Player player, String agentId, String payload) {
+        String buttonId = payload.isEmpty() ? AgentButtonIds.format(agentId) : AgentButtonIds.format(agentId, payload);
+        press(buttonId, event, game, player);
+    }
+
     public static boolean use(
             Game game, Player player, String agentId, String payload, GenericInteractionCreateEvent event) {
         AgentModule<?> module = LeaderAgents.findRegistered(game, agentId)
@@ -170,11 +176,7 @@ public class AgentLifecycle {
         exhaust(game, player, leader, agentId, parsed.hasPayload() ? parsed.payload() : null);
         AgentUse<P> use = new AgentUse<>(game, player, payload.get(), agentName, viaYssaril, event);
         GenericInteractionCreateEvent pressedButton = pressedAgentButton ? event : null;
-        deliver(
-                AgentOutcome.of(Message.addressedTo(player, module.exhaustAnnouncementAfterName(use))
-                        .forEveryone()),
-                pressedButton,
-                player);
+        announceExhaustion(module, use, pressedButton);
         AgentOutcome outcome = module.resolve(use);
         deliver(outcome, pressedButton, player);
         if (pressedAgentButton) {
@@ -183,6 +185,20 @@ public class AgentLifecycle {
             TemporalCommandSuiteService.offer(game, player, agentId, viaYssaril);
         }
         return true;
+    }
+
+    private static <P> void announceExhaustion(
+            AgentModule<P> module, AgentUse<P> use, GenericInteractionCreateEvent pressedButton) {
+        String announcement = module.exhaustAnnouncementAfterName(use);
+        Optional<MessageChannel> channel = module.announcementChannel(use);
+        if (channel.isPresent()) {
+            MessageHelper.sendMessageToChannel(channel.get(), use.user().getRepresentationNoPing() + announcement);
+            return;
+        }
+        deliver(
+                AgentOutcome.of(Message.addressedTo(use.user(), announcement).forEveryone()),
+                pressedButton,
+                use.user());
     }
 
     private static MessageChannel replyChannel(Player player, GenericInteractionCreateEvent pressedButton) {
@@ -285,7 +301,7 @@ public class AgentLifecycle {
 
     private static void cleanUpPressedButton(ButtonInteractionEvent buttonEvent, boolean deleteWholeMessage) {
         if (deletesWholeMessage(buttonEvent.getMessage().getContentRaw(), deleteWholeMessage)) {
-            buttonEvent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            ButtonHelper.deleteMessage(buttonEvent);
         } else {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(buttonEvent);
         }

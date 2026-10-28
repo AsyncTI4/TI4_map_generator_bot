@@ -13,6 +13,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentTargets;
@@ -21,6 +22,7 @@ import ti4.service.leader.agent.AgentUse;
 public final class NatauAgent extends AgentModule<Player> {
 
     static final String ID = "natauagent";
+    private static final String LEGACY_OFFER = "natauAgentOffer_";
     private static final String ACTIVE_PLAYER = "active";
     private static final String AGENT_CHOOSE = "natauAgentChoose_";
     private static final String AGENT_ANOMALY = "natauAgentAnomaly_";
@@ -54,6 +56,12 @@ public final class NatauAgent extends AgentModule<Player> {
                                     FactionEmojis.natau),
                             Buttons.red("deleteButtons", "Decline")));
         }
+    }
+
+    // TODO: drop this once games started before the agent-module migration (2026-10-27) have finished.
+    @ButtonHandler(LEGACY_OFFER)
+    static void legacyOffer(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        AgentLifecycle.pressLegacyButton(event, game, player, ID, buttonID.substring(LEGACY_OFFER.length()));
     }
 
     @Override

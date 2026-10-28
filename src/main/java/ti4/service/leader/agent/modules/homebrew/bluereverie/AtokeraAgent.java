@@ -15,6 +15,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
@@ -34,6 +35,12 @@ public final class AtokeraAgent extends AgentModule<Player> {
 
     public static Button button(Player holder) {
         return useButton(holder, ID, "Magruda, the Atokera Agent", FactionEmojis.atokera);
+    }
+
+    // TODO: drop this once games started before the agent-module migration (2026-10-27) have finished.
+    @ButtonHandler("useAtokeraAgent")
+    static void legacyUse(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        AgentLifecycle.pressLegacyButton(event, game, player, ID, "");
     }
 
     @Override
@@ -68,6 +75,10 @@ public final class AtokeraAgent extends AgentModule<Player> {
                 .inCardsInfoThread());
     }
 
+    private static boolean holdsOrCopies(Player agentOwner) {
+        return agentOwner.hasLeader(ID) || agentOwner.hasExternalAccessToLeader(ID);
+    }
+
     private static List<Player> voters(Game game) {
         return game.getRealPlayers().stream()
                 .filter(voter ->
@@ -80,7 +91,7 @@ public final class AtokeraAgent extends AgentModule<Player> {
         Player voter = game.getPlayerFromColorOrFaction(
                 AgentStepIds.parse(buttonID).id().substring(SELECT_PLAYER.length()));
         if (!"yes".equals(game.getStoredValue(pendingKey(agentOwner)))
-                || !agentOwner.hasLeader(ID)
+                || !holdsOrCopies(agentOwner)
                 || agentOwner.hasUnexhaustedLeader(ID)
                 || !game.getPhaseOfGame().startsWith("agenda")
                 || voter == null
@@ -108,7 +119,7 @@ public final class AtokeraAgent extends AgentModule<Player> {
         Planet planet = game.getPlanetsInfo().get(planetId);
         if (agentOwner == null
                 || !"yes".equals(game.getStoredValue(pendingKey(agentOwner)))
-                || !agentOwner.hasLeader(ID)
+                || !holdsOrCopies(agentOwner)
                 || agentOwner.hasUnexhaustedLeader(ID)
                 || !game.getPhaseOfGame().startsWith("agenda")
                 || planet == null

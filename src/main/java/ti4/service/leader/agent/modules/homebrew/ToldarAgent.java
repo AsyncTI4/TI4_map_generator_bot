@@ -3,7 +3,10 @@ package ti4.service.leader.agent.modules.homebrew;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.StringHelper;
@@ -20,6 +23,7 @@ import ti4.service.leader.agent.TargetedAgent;
 public final class ToldarAgent extends TargetedAgent {
 
     static final String ID = "toldaragent";
+    private static final String LEGACY_USE = "toldarAgent_";
 
     public ToldarAgent() {
         super(ID, "Maertin Donaais, the Toldar");
@@ -44,6 +48,13 @@ public final class ToldarAgent extends TargetedAgent {
                             + StringHelper.pluralize(commodities, "commodity", "commodities") + ".",
                     buttons);
         }
+    }
+
+    // TODO: drop this once games started before the agent-module migration (2026-10-27) have finished.
+    @ButtonHandler(LEGACY_USE)
+    static void legacyUse(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        AgentLifecycle.pressLegacyButton(
+                event, game, player, ID, StringUtils.substringBeforeLast(buttonID.substring(LEGACY_USE.length()), "_"));
     }
 
     @Override

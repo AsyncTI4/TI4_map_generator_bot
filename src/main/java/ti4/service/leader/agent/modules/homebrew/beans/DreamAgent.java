@@ -13,6 +13,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
@@ -27,6 +28,7 @@ public final class DreamAgent extends AgentModule<Player> {
     private static final String PENDING_PLAYER_KEY = "dreamAgentPendingPlayer";
     private static final String PENDING_OWNER_KEY = "dreamAgentPendingOwner";
     private static final String DECLINE = "dream_agent_decline";
+    private static final String LEGACY_OFFER = "dream_agent_offer_";
     private static final String SELECT_PLAYER = "dream_agent_select_player";
     private static final String CHOOSE_ANOMALY = "dream_agent_choose_";
 
@@ -87,6 +89,20 @@ public final class DreamAgent extends AgentModule<Player> {
                 buttons);
     }
 
+    // TODO: drop this once games started before the agent-module migration (2026-10-27) have finished.
+    @ButtonHandler(LEGACY_OFFER)
+    static void legacyOffer(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String offered = buttonID.substring(LEGACY_OFFER.length());
+        String ownerSuffix = "_" + player.getFaction();
+        if (!offered.toLowerCase().endsWith(ownerSuffix.toLowerCase())) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "Only the Dreaming Throne player may use Xal'thuun, the Dreaming Throne agent.");
+            return;
+        }
+        String activeFaction = offered.substring(0, offered.length() - ownerSuffix.length());
+        AgentLifecycle.pressLegacyButton(event, game, player, ID, activeFaction);
+    }
+
     @Override
     public Optional<Player> decode(Game game, Player user, String payload) {
         return AgentTargets.player(game, payload).or(() -> Optional.ofNullable(game.getActivePlayer()));
@@ -115,9 +131,10 @@ public final class DreamAgent extends AgentModule<Player> {
         }
         buttons.add(Buttons.red(DECLINE, "Decline"));
         return AgentOutcome.of(Message.addressedTo(
-                activePlayer,
-                ", choose the anomaly whose movement effects you will ignore during this tactical action.",
-                buttons));
+                        activePlayer,
+                        ", choose the anomaly whose movement effects you will ignore during this tactical action.",
+                        buttons))
+                .deletingPressedMessage();
     }
 
     @ButtonHandler(CHOOSE_ANOMALY)

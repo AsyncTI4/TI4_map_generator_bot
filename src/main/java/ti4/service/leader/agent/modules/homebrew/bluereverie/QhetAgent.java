@@ -16,6 +16,7 @@ import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentUse;
@@ -34,6 +35,12 @@ public final class QhetAgent extends AgentModule<Player> {
 
     public static Button button(Player holder) {
         return useButton(holder, ID, "Qhet Agent", FactionEmojis.qhet);
+    }
+
+    // TODO: drop this once games started before the agent-module migration (2026-10-27) have finished.
+    @ButtonHandler("useQhetAgent")
+    static void legacyUse(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        AgentLifecycle.pressLegacyButton(event, game, player, ID, "");
     }
 
     @Override

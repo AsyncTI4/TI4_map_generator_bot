@@ -15,6 +15,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentTargets;
@@ -23,6 +24,7 @@ import ti4.service.leader.agent.AgentUse;
 public final class ArvaxiAgent extends AgentModule<ArvaxiAgent.Retrieval> {
 
     static final String ID = "arvaxiagent";
+    private static final String LEGACY_PICK_TARGET = "arvaxiAgentPickTarget_";
     private static final String OFFER = "arvaxiAgentOffer_";
 
     public record Retrieval(int actionCardIndex, Player target) {}
@@ -86,6 +88,12 @@ public final class ArvaxiAgent extends AgentModule<ArvaxiAgent.Retrieval> {
         ButtonHelper.deleteMessage(event);
     }
 
+    // TODO: drop this once games started before the agent-module migration (2026-10-27) have finished.
+    @ButtonHandler(LEGACY_PICK_TARGET)
+    static void legacyPickTarget(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        AgentLifecycle.pressLegacyButton(event, game, player, ID, buttonID.substring(LEGACY_PICK_TARGET.length()));
+    }
+
     @Override
     public Optional<Retrieval> decode(Game game, Player user, String payload) {
         String index = StringUtils.substringBefore(payload, "_");
@@ -128,7 +136,7 @@ public final class ArvaxiAgent extends AgentModule<ArvaxiAgent.Retrieval> {
                 target.getRepresentationUnfogged() + ", " + use.agentNameFor(target)
                         + " has been used. You have received _" + acName + "_. Please spend 3 influence.",
                 spendButtons);
-        return AgentOutcome.none();
+        return AgentOutcome.none().deletingPressedMessage();
     }
 
     private static String cardName(Game game, Retrieval retrieval) {

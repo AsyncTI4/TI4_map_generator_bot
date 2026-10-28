@@ -15,6 +15,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentUse;
@@ -24,6 +25,7 @@ public final class BelkoseaAgent extends AgentModule<Tile> {
 
     static final String ID = "belkoseaagent";
     private static final String CHOOSE_SYSTEM = "useBelkoseaAgent";
+    private static final String LEGACY_SELECT_SYSTEM = "selectBelkoseaAgentSystem_";
 
     public BelkoseaAgent() {
         super(ID, "Razalka Gris, the Belkosea");
@@ -58,6 +60,12 @@ public final class BelkoseaAgent extends AgentModule<Tile> {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    // TODO: drop this once games started before the agent-module migration (2026-10-27) have finished.
+    @ButtonHandler(LEGACY_SELECT_SYSTEM)
+    static void legacySelectSystem(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        AgentLifecycle.pressLegacyButton(event, game, player, ID, buttonID.substring(LEGACY_SELECT_SYSTEM.length()));
+    }
+
     @Override
     public Optional<Tile> decode(Game game, Player user, String payload) {
         return Optional.ofNullable(game.getTileByPosition(payload));
@@ -83,7 +91,7 @@ public final class BelkoseaAgent extends AgentModule<Tile> {
     @Override
     public AgentOutcome resolve(AgentUse<Tile> use) {
         BelkoseaAgentService.ignoreOtherShips(use.game(), use.game().getActivePlayer(), use.payload());
-        return AgentOutcome.none();
+        return AgentOutcome.none().deletingPressedMessage();
     }
 
     private static List<Button> systemButtons(Game game, Player player) {

@@ -11,6 +11,7 @@ import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.Mapper;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.service.leader.agent.AgentUse;
@@ -19,6 +20,7 @@ import ti4.service.leader.agent.TargetedAgent;
 public final class KaltrimAgent extends TargetedAgent {
 
     static final String ID = "kaltrimagent";
+    private static final String LEGACY_USE = "useKaltrimAgent_";
     private static final String DISCARD_AGENDA = "discardKaltrimAgentAgenda_";
     private static final String DECLINE = "declineKaltrimAgent";
 
@@ -42,6 +44,12 @@ public final class KaltrimAgent extends TargetedAgent {
         }
     }
 
+    // TODO: drop this once games started before the agent-module migration (2026-10-27) have finished.
+    @ButtonHandler(LEGACY_USE)
+    static void legacyUse(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        AgentLifecycle.pressLegacyButton(event, game, player, ID, buttonID.substring(LEGACY_USE.length()));
+    }
+
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
         Game game = use.game();
@@ -51,9 +59,10 @@ public final class KaltrimAgent extends TargetedAgent {
             offerToDiscardTopAgenda(game, agentOwner);
         }
         return AgentOutcome.of(Message.addressedTo(
-                target,
-                ", gain 1 command token due to " + use.agentNameFor(target) + ".",
-                ButtonHelper.getGainCCButtons(target)));
+                        target,
+                        ", gain 1 command token due to " + use.agentNameFor(target) + ".",
+                        ButtonHelper.getGainCCButtons(target)))
+                .deletingPressedMessage();
     }
 
     private static void offerToDiscardTopAgenda(Game game, Player agentOwner) {
