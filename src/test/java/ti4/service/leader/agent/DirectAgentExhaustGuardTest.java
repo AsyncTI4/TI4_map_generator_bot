@@ -48,7 +48,6 @@ class DirectAgentExhaustGuardTest {
             "ArcanumLeadersHandler.java",
             "AshenLeadersHandler.java",
             "CrystellumLeadersHandler.java",
-            "DreamLeadersHandler.java",
             "KairnLeadershandler.java",
             "MorphaLeadersHandler.java",
             "MyrrLeadersHandler.java",

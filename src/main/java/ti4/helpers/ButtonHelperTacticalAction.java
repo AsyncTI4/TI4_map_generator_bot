@@ -21,7 +21,6 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExpl
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TacticalRetreatLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
@@ -121,6 +120,7 @@ import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.modules.EmpyreanAgent;
 import ti4.service.leader.agent.modules.L1z1xAgent;
 import ti4.service.leader.agent.modules.homebrew.CeldauriAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
 import ti4.service.relic.AlluringThroneService;
@@ -755,7 +755,7 @@ public final class ButtonHelperTacticalAction {
         FrameShiftBrActionCardHandler.clear(game);
         MyrrTechHandler.clearSegmentedStructuring(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
-        DreamLeadersHandler.clearDreamAgentAnomaly(game);
+        DreamAgent.clearIgnoredAnomaly(game);
         TaBreakthroughHandler.clearSafeHavens(game);
         RevenantLeadersHandler.clearRedLeaderTacticalWindow(game);
         RevenantTechHandler.clearLazarusProduction(game);
@@ -1359,8 +1359,8 @@ public final class ButtonHelperTacticalAction {
         }
         if (!game.isL1Hero()
                 && player.hasUnexhaustedLeader("dreamagent")
-                && !DreamLeadersHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
-            DreamLeadersHandler.offerDreamAgentButtons(game, player, player);
+                && !DreamAgent.anomalyTiles(game).isEmpty()) {
+            DreamAgent.offerBeforeTacticalAction(game, player, player);
         }
         NatauAgent.offerAfterActivation(game, player);
         KairnPromissoryHandler.offerArchaeologicalOutpostExplore(game, tile);

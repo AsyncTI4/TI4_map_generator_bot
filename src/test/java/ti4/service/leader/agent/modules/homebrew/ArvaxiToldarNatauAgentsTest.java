@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import ti4.service.leader.LeaderAgents;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.modules.AgentModuleFixture;
+import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
 import ti4.service.leader.agent.modules.homebrew.wftv.ArvaxiAgent;
 import ti4.testUtils.BaseTi4Test;
@@ -59,5 +60,18 @@ class ArvaxiToldarNatauAgentsTest extends BaseTi4Test {
                 .isEmpty();
         assertOwnedAgentButton(
                 NatauAgent.cardsInfoButton(fixture.user), fixture.user, "exhaustAgent_natauagent_active");
+    }
+
+    @Test
+    void dreamTargetsTheActivePlayerUnlessAPlayerIsNamed() {
+        AgentModuleFixture fixture = new AgentModuleFixture("dream");
+        DreamAgent dream = new DreamAgent();
+        fixture.game.updateActivePlayer(fixture.target);
+
+        assertThat(LeaderAgents.findAgent("dreamagent")).containsInstanceOf(DreamAgent.class);
+        assertThat(dream.decode(fixture.game, fixture.user, "")).contains(fixture.target);
+        assertThat(dream.decode(fixture.game, fixture.user, fixture.user.getFaction()))
+                .contains(fixture.user);
+        assertOwnedAgentButton(DreamAgent.cardsInfoButton(fixture.user), fixture.user, "dream_agent_select_player");
     }
 }

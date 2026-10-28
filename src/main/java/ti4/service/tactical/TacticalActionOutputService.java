@@ -18,7 +18,6 @@ import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PirateH
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamFactionTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -47,6 +46,7 @@ import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
+import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
 import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
@@ -450,7 +450,7 @@ public class TacticalActionOutputService {
         if (tile.isNebula(game)
                 && !RealityFieldImpactorService.nullifies(game, tile)
                 && !DreamAbilitiesHandler.ignoresNebula(player, game, tile)
-                && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                && !DreamAgent.playerIgnoresAnomaly(game, player, tile)
                 && !player.hasAbility("voidborn")
                 && !player.hasTech("absol_amd")
                 && !player.getRelics().contains("circletofthevoid")
