@@ -158,6 +158,26 @@ class KnownCardsServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void publiclyRevealedTransferIsKnownToEveryone() {
+        // Public Outrage names the taken card publicly, so nobody counts it as a hidden steal.
+        target.setActionCard("sh1");
+        target.setActionCard("sabo1");
+        KnownCardsService.recordHandShown(bystander, target, KnownCardType.ACTION_CARD);
+
+        target.removeActionCard(target.getActionCards().get("sh1"));
+        viewer.setActionCard("sh1");
+        KnownCardsService.recordCardPassedPublicly(game, target, viewer, KnownCardType.ACTION_CARD, "Shields Holding");
+
+        List<MessageEmbed> bystanderEmbeds = KnownCardsService.getKnownCardHandEmbeds(game, bystander);
+        assertThat(bystanderEmbeds).hasSize(2);
+        String bystanderView =
+                bystanderEmbeds.stream().map(MessageEmbed::getDescription).reduce("", String::concat);
+        assertThat(StringUtils.countMatches(bystanderView, "- Shields Holding")).isEqualTo(1);
+        assertThat(bystanderView).contains("- Sabotage").doesNotContain("since reveal");
+        assertThat(onlyEmbedDescription(target)).contains("- Shields Holding");
+    }
+
+    @Test
     void cardShownToAllIsKnownByEveryoneButTheOwner() {
         target.setActionCard("sh1");
 

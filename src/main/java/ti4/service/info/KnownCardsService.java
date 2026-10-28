@@ -83,6 +83,12 @@ public class KnownCardsService {
         recordCardShown(from, to, type, cardName);
     }
 
+    public static void recordCardPassedPublicly(
+            Game game, Player from, Player to, KnownCardType type, String cardName) {
+        recordCardLeftHandPublicly(game, from, type, cardName);
+        recordCardShownToAll(game, to, type, cardName);
+    }
+
     public static void recordCardShown(Player viewer, Player target, KnownCardType type, String cardName) {
         if (viewer == null || viewer == target || cardName == null) {
             return;
