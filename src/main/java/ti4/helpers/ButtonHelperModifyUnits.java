@@ -1921,7 +1921,7 @@ public final class ButtonHelperModifyUnits {
             Button sustain = ButtonHelper.buildAssignHitButton(player, tile, uh, state, key, 1, true);
             buttons.add(sustain.withCustomId(sustain.getCustomId() + "deleteThisMessage"));
         }
-        buttons.add(Buttons.gray("deleteButtons", "Cancel The Hit"));
+        buttons.add(Buttons.CANCEL_THE_HIT);
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, buttons);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -1974,7 +1974,7 @@ public final class ButtonHelperModifyUnits {
             buttons.add(ButtonHelper.buildAssignHitButton(player, tile, space, state, key, 1, true));
         }
 
-        buttons.add(Buttons.gray("deleteButtons", "Cancel The Hit"));
+        buttons.add(Buttons.CANCEL_THE_HIT);
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, buttons);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -3073,7 +3073,7 @@ public final class ButtonHelperModifyUnits {
                 buttons.add(Buttons.green("combatDroneConvert_" + x, "" + x));
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Delete These"));
+        buttons.add(Buttons.DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
@@ -3096,7 +3096,7 @@ public final class ButtonHelperModifyUnits {
                 buttons.add(Buttons.green("resolveMirvedaCommander_" + x, "" + x));
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Delete These"));
+        buttons.add(Buttons.DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()

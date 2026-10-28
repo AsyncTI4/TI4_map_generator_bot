@@ -483,7 +483,7 @@ public class TeHelperActionCards {
         }
         if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
             buttons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
-            buttons.add(Buttons.green("construction_pds", "Place A PDS", UnitEmojis.pds));
+            buttons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
         }
         if (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5)) {
             buttons.add(Buttons.green("sc_refresh", "Replenish Commodities", MiscEmojis.comm));

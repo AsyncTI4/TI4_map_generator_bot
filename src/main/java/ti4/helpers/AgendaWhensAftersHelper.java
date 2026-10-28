@@ -89,7 +89,7 @@ public final class AgendaWhensAftersHelper {
                     && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
                 game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens") + player.getFaction() + "_");
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.red("queueAWhen", "Play A When"));
+                buttons.add(Buttons.PLAY_A_WHEN);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         "You have declined to queue a \"when\". You can change your mind with this button.",
@@ -161,7 +161,7 @@ public final class AgendaWhensAftersHelper {
         if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens") + player.getFaction() + "_");
             buttons = new ArrayList<>();
-            buttons.add(Buttons.red("queueAWhen", "Play A When"));
+            buttons.add(Buttons.PLAY_A_WHEN);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
                     "You have declined to queue a \"when\". You can change your mind with this button.",
@@ -884,7 +884,7 @@ public final class AgendaWhensAftersHelper {
         game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens") + player.getFaction() + "_");
         resolveWhenQueue(event, game);
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.red("queueAWhen", "Play A \"When\""));
+        buttons.add(Buttons.PLAY_A_WHEN);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 "You have declined to queue a \"when\". You can change your mind with this button.",
@@ -1054,7 +1054,7 @@ public final class AgendaWhensAftersHelper {
                             + " If you cannot vote due to playing a rider or having no votes just ignore this button.";
                 }
             }
-            buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-Abstain"));
+            buttons.add(Buttons.PRE_ABSTAIN);
             buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         }
 
@@ -1348,8 +1348,8 @@ public final class AgendaWhensAftersHelper {
         player.resetSpentThings();
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.PRE_VOTE);
-        buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
-        buttons.add(Buttons.red("deleteButtons", "Don't do anything"));
+        buttons.add(Buttons.PRE_ABSTAIN);
+        buttons.add(Buttons.DONT_DO_ANYTHING);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation()

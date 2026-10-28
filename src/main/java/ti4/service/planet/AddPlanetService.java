@@ -541,7 +541,7 @@ public class AddPlanetService {
                 && !setup) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("removeCCFromBoard_zealotsbt_" + tile.getPosition(), "Remove Command Token"));
-            buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research a Technology"));
+            buttons.add(Buttons.RESEARCH_A_TECHNOLOGY);
             buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
             MessageHelper.sendMessageToChannel(

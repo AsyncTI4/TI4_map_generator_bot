@@ -451,7 +451,7 @@ public final class ButtonHelperFactionSpecific {
     public static void getTechFromGlory(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("getAllTechOfType_unitupgrade_noPay", "Get A Unit Upgrade Technology"));
-        buttons.add(Buttons.red("deleteButtons", "Delete This"));
+        buttons.add(Buttons.DELETE_BUTTONS);
         player.setStrategicCC(player.getStrategicCC() - 1);
         MessageChannel channel = player.getCorrectChannel();
         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "used **Glory**");

@@ -8,7 +8,6 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
-import ti4.service.emoji.UnitEmojis;
 import ti4.service.strategycard.PlayStrategyCardService;
 
 public class CrisisAgendaResolver implements AgendaResolver {
@@ -26,7 +25,7 @@ public class CrisisAgendaResolver implements AgendaResolver {
             case "2" -> scButtons.add(Buttons.DIPLO_READY_2_PLANETS);
             case "3" -> scButtons.add(Buttons.SC_DRAW_2_ACTION_CARDS);
             case "4" -> {
-                scButtons.add(Buttons.green("construction_spacedock", "Place 1 Space Dock", UnitEmojis.spacedock));
+                scButtons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
                 scButtons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
             }
             case "5" -> scButtons.add(Buttons.REPLENISH_COMMODITIES);

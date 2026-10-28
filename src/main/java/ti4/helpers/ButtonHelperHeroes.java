@@ -1977,7 +1977,7 @@ public class ButtonHelperHeroes {
             scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game)));
         }
         if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
-            scButtons.add(Buttons.green("construction_spacedock", "Place 1 Space Dock", UnitEmojis.spacedock));
+            scButtons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
             scButtons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
         }
         if (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5)) {

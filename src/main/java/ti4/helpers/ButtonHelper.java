@@ -7474,7 +7474,7 @@ public class ButtonHelper {
             }
         }
         buttons.add(Buttons.blue("rollThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Now"));
-        buttons.add(Buttons.red("deleteButtons", "Don't Roll Anything"));
+        buttons.add(Buttons.DONT_ROLL_ANYTHING);
         deleteButtonAndDeleteMessageIfEmpty(event);
         String message = player.getRepresentation()
                 + ", please choose the units for which you wish to reroll. Units that fail and did not have extra rolls will be automatically removed.";
@@ -7498,7 +7498,7 @@ public class ButtonHelper {
             }
         }
         buttons.add(Buttons.blue("rollThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Now"));
-        buttons.add(Buttons.red("deleteButtons", "Don't roll anything"));
+        buttons.add(Buttons.DONT_ROLL_ANYTHING);
         String id = buttonID.replace("setForThalnos_", "");
         game.setSpecificThalnosUnit(id, game.getSpecificThalnosUnit(id) + 1);
 

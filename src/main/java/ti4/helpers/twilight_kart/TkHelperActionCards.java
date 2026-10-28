@@ -44,7 +44,6 @@ import ti4.service.RemoveCommandCounterService;
 import ti4.service.VeiledHeartService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
-import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.regex.RegexService;
 import ti4.service.tech.PlayerTechService;
@@ -87,7 +86,7 @@ public class TkHelperActionCards {
             case "tk-exhort" -> nop(); // Automated via the Combat Modifier system
             case "tk-fortify" -> {
                 buttons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
-                buttons.add(Buttons.green("construction_pds", "Place A PDS", UnitEmojis.pds));
+                buttons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
                 buttons.add(Buttons.DONE_DELETE_BUTTONS);
             }
             case "tk-graft" -> {

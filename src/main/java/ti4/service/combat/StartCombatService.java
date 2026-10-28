@@ -1119,7 +1119,7 @@ public class StartCombatService {
             }
             if (ButtonHelper.doesPlayerHaveFSHere("cymiae_flagship", player, tile)) {
                 buttons.add(Buttons.green("resolveSpyStep1", "Resolve Cymiae Flagship"));
-                buttons.add(Buttons.red("deleteButtons", "Delete These"));
+                buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         msg

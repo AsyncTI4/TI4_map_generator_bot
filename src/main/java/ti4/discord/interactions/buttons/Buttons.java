@@ -78,6 +78,17 @@ public final class Buttons {
     public static final Button GAIN_1_COMMODITY = blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm);
     public static final Button FLIP_AGENDA = blue("flip_agenda", "Flip Agenda");
     public static final Button PRE_VOTE = green("preVote", "Pre-Vote");
+    public static final Button PRE_ABSTAIN = blue("resolvePreassignment_Abstain On Agenda", "Pre-Abstain");
+    public static final Button ERASE_MY_VOTE = red("eraseMyVote", "Erase my vote & have me vote again");
+    public static final Button ERASE_MY_RIDERS = red("eraseMyRiders", "Erase my riders");
+    public static final Button DONT_DO_ANYTHING = red("deleteButtons", "Don't do anything");
+    public static final Button DONT_ROLL_ANYTHING = red("deleteButtons", "Don't Roll Anything");
+    public static final Button PLAY_A_WHEN = red("queueAWhen", "Play A \"When\"");
+    public static final Button CANCEL_THE_HIT = gray("deleteButtons", "Cancel The Hit");
+    public static final Button PROCEED_TO_SCORING_OBJECTIVES =
+            gray("proceed_to_scoring", "Proceed to Scoring Objectives");
+    public static final Button RESEARCH_A_TECHNOLOGY = gray("acquireATech_deleteThisMessage", "Research a Technology");
+    public static final Button PLACE_A_TOMB_TOKEN = green("startAncientEmpire", "Place a Tomb Token");
     public static final Button FACTION_EMBED = green("factionEmbedRefresh", "Refresh Faction Display");
     public static final Button DEAL_2_SO =
             green("deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt);

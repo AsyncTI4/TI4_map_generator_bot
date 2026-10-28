@@ -403,8 +403,8 @@ public class AutoPingCron {
                 if (AgendaHelper.getPlayersWhoNeedToPreVoted(game).contains(p2)) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.PRE_VOTE);
-                    buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-Abstain"));
-                    buttons.add(Buttons.red("deleteButtons", "Don't Do Anything"));
+                    buttons.add(Buttons.PRE_ABSTAIN);
+                    buttons.add(Buttons.DONT_DO_ANYTHING);
                     MessageHelper.sendMessageToChannelWithButtons(
                             p2.getCardsInfoThread(),
                             p2.getRepresentation(true, true) + ", this is a reminder to decide on voting.",

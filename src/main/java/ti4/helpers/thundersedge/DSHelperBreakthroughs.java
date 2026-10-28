@@ -251,7 +251,7 @@ public final class DSHelperBreakthroughs {
     public static void kolumeBTStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 Command Token"));
-        buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research A Technology"));
+        buttons.add(Buttons.RESEARCH_A_TECHNOLOGY);
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),

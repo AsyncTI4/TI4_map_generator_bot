@@ -1059,7 +1059,7 @@ public class PlayStrategyCardService {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button buildButton = Buttons.green("constructionPrimary_produce", "[Primary] Use Production");
         Button sdButton = Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK;
-        Button pdsButton = Buttons.green("construction_pds", "Place a PDS", UnitEmojis.pds);
+        Button pdsButton = Buttons.CONSTRUCTION_PLACE_1_PDS;
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         if (game.isMonumentToTheAgesMode()) {
             Button facilityButton = Buttons.CONSTRUCTION_PLACE_A_MONUMENT;
@@ -1402,7 +1402,7 @@ public class PlayStrategyCardService {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button buildButton = Buttons.green("constructionPrimary_produce", "[Primary] Use Production");
         Button sdButton = Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK;
-        Button pdsButton = Buttons.green("construction_pds", "Place a PDS", UnitEmojis.pds);
+        Button pdsButton = Buttons.CONSTRUCTION_PLACE_1_PDS;
         Button monumentButton = Buttons.green("construction_monument", "Place 1 Monument", UnitEmojis.Monument);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         List<Button> buttons = new ArrayList<>(List.of(followButton, buildButton, sdButton, pdsButton, monumentButton));

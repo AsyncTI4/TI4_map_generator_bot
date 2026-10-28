@@ -437,7 +437,7 @@ public final class AgendaHelper {
             AtokeraAgent.clearVotes(player, game);
 
             if (!game.isFowMode()) {
-                Button eraseAndReVote = Buttons.red("eraseMyVote", "Erase my vote & have me vote again");
+                Button eraseAndReVote = Buttons.ERASE_MY_VOTE;
                 String revoteMsg = "You may press this button to revote if you made a mistake, ignore it otherwise.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), revoteMsg, eraseAndReVote);
             }
@@ -2061,9 +2061,8 @@ public final class AgendaHelper {
 
         proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
         proceedButtons.add(Buttons.TRANSACTION);
-        if (!game.isHiddenAgendaMode())
-            proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
-        proceedButtons.add(Buttons.red("eraseMyRiders", "Erase my riders"));
+        if (!game.isHiddenAgendaMode()) proceedButtons.add(Buttons.ERASE_MY_VOTE);
+        proceedButtons.add(Buttons.ERASE_MY_RIDERS);
         proceedButtons.add(Buttons.gray("refreshAgenda", "Refresh Agenda"));
         proceedButtons.add(Buttons.blue("pingNonresponders", "Ping Non-Responders"));
 
@@ -2981,9 +2980,8 @@ public final class AgendaHelper {
             msg = "These buttons can help with bugs/issues that occur during the Agenda Phase";
             proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
             proceedButtons.add(Buttons.TRANSACTION);
-            if (!game.isHiddenAgendaMode())
-                proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
-            proceedButtons.add(Buttons.red("eraseMyRiders", "Erase my riders"));
+            if (!game.isHiddenAgendaMode()) proceedButtons.add(Buttons.ERASE_MY_VOTE);
+            proceedButtons.add(Buttons.ERASE_MY_RIDERS);
             proceedButtons.add(Buttons.gray("refreshAgenda", "Refresh Agenda"));
             proceedButtons.add(Buttons.blue("pingNonresponders", "Ping Non-Responders"));
         }

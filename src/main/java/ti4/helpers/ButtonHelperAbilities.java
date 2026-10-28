@@ -619,7 +619,7 @@ public final class ButtonHelperAbilities {
         }
         if (scPlayed > 4
                 && (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4))) {
-            scButtons.add(Buttons.green("construction_spacedock", "Place 1 Space Dock", UnitEmojis.spacedock));
+            scButtons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
             scButtons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
         }
         if (scPlayed > 5
@@ -1754,7 +1754,7 @@ public final class ButtonHelperAbilities {
                 }
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Delete these buttons"));
+        buttons.add(Buttons.DELETE_BUTTONS);
 
         return buttons;
     }
@@ -1786,7 +1786,7 @@ public final class ButtonHelperAbilities {
                         "Return " + Mapper.getRelic(orderName).getName() + " held by " + p3.getColor()));
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Delete these buttons"));
+        buttons.add(Buttons.DELETE_BUTTONS);
 
         return buttons;
     }
