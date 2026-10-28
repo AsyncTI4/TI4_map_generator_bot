@@ -1097,7 +1097,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("HomebrewSC", isHomebrewSCMode());
         gameModes.put("AC Deck 2", isAcd2());
         gameModes.put("Omega Phase", isOmegaPhaseMode());
-        gameModes.put("Priority Track", hasAnyPriorityTrackMode());
 
         // Twilight Kart Cups
         List<String> tkCups = new ArrayList<>();
