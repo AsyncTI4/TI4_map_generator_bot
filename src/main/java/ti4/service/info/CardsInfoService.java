@@ -71,6 +71,10 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.HopeOfTheCosmosAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.KairnAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.OblivionAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantScrapyardAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantStratumAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantVerydithAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ThronesAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.VerydithAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
@@ -553,16 +557,16 @@ public class CardsInfoService {
             buttons.add(AeternaUnitsHandler.getCryptCapacityInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("revenantagent")) {
-            buttons.add(RevenantLeadersHandler.getRevenantAgentButton(player));
+            buttons.add(RevenantAgent.cardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("revenantscrapyardagent")) {
-            buttons.add(RevenantLeadersHandler.getRevScrapyardCardsInfoButton(game, player));
+            buttons.add(RevenantScrapyardAgent.cardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("revenantstonebornagent")) {
-            buttons.add(RevenantLeadersHandler.getRevStratumCardsInfoButton(player));
+            buttons.add(RevenantStratumAgent.cardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("revenantverydithagent")) {
-            buttons.add(RevenantLeadersHandler.getRevVerydithCardsInfoButton(player));
+            buttons.add(RevenantVerydithAgent.cardsInfoButton(player));
         }
         if (player.hasLeaderUnlocked("revenantmyrrhero")) {
             buttons.add(RevenantLeadersHandler.getRevMyrrHeroButton(player));

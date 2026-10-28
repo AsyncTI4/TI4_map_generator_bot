@@ -23,6 +23,12 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.KairnAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.OblivionAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.PonthousAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantArcanumAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantArdentiaAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantScrapyardAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantStratumAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantVerydithAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ScrapyardAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ThronesAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.VerydithAgent;
@@ -107,7 +113,13 @@ public final class HomebrewAgents implements AgentCatalog {
                             new KairnAgent(),
                             new ArcanumAgent(),
                             new XytherisAgent(),
-                            new OblivionAgent()),
+                            new OblivionAgent(),
+                            new RevenantAgent(),
+                            new RevenantVerydithAgent(),
+                            new RevenantStratumAgent(),
+                            new RevenantArdentiaAgent(),
+                            new RevenantScrapyardAgent(),
+                            new RevenantArcanumAgent()),
                     HomebrewExhaustOnlyAgents.ALL)
             .<AgentModule<?>>flatMap(List::stream)
             .toList();

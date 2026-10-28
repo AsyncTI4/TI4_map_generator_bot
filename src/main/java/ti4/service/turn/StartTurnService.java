@@ -99,6 +99,7 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.ArcanumAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.HazorusAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.HopeOfTheCosmosAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.OblivionAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantScrapyardAgent;
 import ti4.service.leader.genome.homebrew.tknova.DeploymentGenome;
 import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
 import ti4.service.map.PlayerAreaWarningService;
@@ -655,7 +656,7 @@ public class StartTurnService {
             startButtons.add(OblivionAbilityHandler.getReflectionLedgerButton(player));
         }
         if (player.hasUnexhaustedLeader("revenantscrapyardagent")) {
-            startButtons.add(RevenantLeadersHandler.getRevScrapyardAgentButton(player));
+            startButtons.add(RevenantScrapyardAgent.startTurnButton(player));
         }
         if (player.hasPlanet("skarnath")
                 && !player.getExhaustedPlanetsAbilities().contains("skarnath")) {

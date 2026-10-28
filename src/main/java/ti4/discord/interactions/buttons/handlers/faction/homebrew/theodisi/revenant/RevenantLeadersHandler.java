@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -23,11 +22,8 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
@@ -43,14 +39,13 @@ import ti4.model.NamedCombatModifierModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollType;
-import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.PurgeHeroService;
-import ti4.service.leader.agent.AgentLifecycle;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantVerydithAgent;
 import ti4.service.tech.ListTechService;
 import ti4.service.tech.PlayerTechService;
 import ti4.service.unit.AddUnitService;
@@ -59,30 +54,16 @@ import ti4.service.unit.ParsedUnit;
 
 @UtilityClass
 public class RevenantLeadersHandler {
-    // Revenant of Stratum
-    private static final String REVSTRATUMAGENT = "revenantstonebornagent";
-    private static final String USE_REVSTRATUM_OTHER = "useRevenantStratumAgentOther";
-    private static final String SELECT_REVSTRATUM_TARGET = "selectRevenantStratumTarget_";
-    private static final String SELECT_REVSTRATUM_PLANET = "selectRevenantStratumPlanet_";
-    private static final String EXPLORE_REVSTRATUM = "exploreRevenantStratum_";
-    // Revenant of Ardentia
-    private static final String REVARDENTIAAGENT = "revenantardentiaagent";
-    private static final String USE_REVARDENTIA_AGENT = "useRevenantArdentiaAgent_";
-    private static final String MOVE_REVARDENTIA_TOKEN = "moveRevenantArdentiaToken_";
     // Revenant of Ruin
     private static final String REVTHRONESHERO = "revenantthroneshero";
     private static final String USE_REVTHRONES_HERO = "useRevenantThronesHero_";
     private static final String RESOLVE_REVTHRONES_HERO = "resolveRevenantThronesHero_";
-    // Revenant of Arcanum
-    private static final String REVARCAGENT = "revenantarcanumagent";
-    private static final String USE_REVARCAGENT = "useRevenantArcanumAgent_";
-    private static final String SELECT_REVARCAGENT_TECH = "selectRevenantArcanumReturnTech_";
-    private static final Set<String> EXPLORATION_TRAITS =
-            Set.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL);
     // Revenant of Oblivion
     private static final String REVOBLCOMMANDER = "revenantoblivioncommander";
     private static final String USE_ARLIR_MIRRORED = "useArlirMirrored_";
     // Revenant of Kairn
+    private static final Set<String> EXPLORATION_TRAITS =
+            Set.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL);
     private static final String CHOOSE_EXP_DECK = "chooseRevKairnExpDeck_";
     private static final String CHOOSE_EXP_CARD = "chooseRevKairnExpCard_";
     private static final String BACK_TO_REV_KAIRN_DECKS = "backToRevKairnDecks";
@@ -94,22 +75,11 @@ public class RevenantLeadersHandler {
     private static final String REV_KAIRN_HERO_TRAITS = "revKairnHeroTraits_";
     private static final List<String> EXPLORE_DECK_TYPES =
             List.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL, Constants.FRONTIER);
-    // Revenant Base Agent
-    private static final String REVBASE = "revenantagent";
-    private static final String USE_REVBASE = "readyTechWithRevBase_";
-    private static final String SELECT_REVBASE_TARGET = "selectRevenantAgentTarget";
-    private static final String USE_REVBASE_TARGET = "useRevenantAgentOn_";
     // Revenant Base Hero
     private static final String REVENANT_HERO = "revenanthero";
     private static final String SELECT_REVENANT_HERO = "selectRevenantHero_";
     private static final String REVENANT_HERO_CHOICES = "revenantHeroChoices_";
     private static final String REVENANT_UNAVAILABLE_HEROES = "revenantUnavailableHeroes";
-    // Revenant of Scrapyard
-    private static final String REVSCRAPYARD = "revenantscrapyardagent";
-    private static final String SELECT_REVSCRAPYARD_TARGET = "selectRevenantTarget";
-    private static final String RESOLVE_REVSCRAPYARD_TARGET = "resolveRevenantTarget_";
-    private static final String PRODUCE_WITH_REVSCRAPYARD = "produceUsingRevScrapyardAgent";
-    private static final String PAGE_REVSCRAPYARD_SYSTEMS = "pageRevenantScrapyardSystems_";
     // Revenant of Ponthous
     private static final String REVPONTHOUS = "revenantponthouscommander";
     private static final String SELECT_REVPONTHOUS_INFANTRY = "selectRevenantPonthousInfantry_";
@@ -121,12 +91,7 @@ public class RevenantLeadersHandler {
     private static final String REVMYRR_PRODUCTION = "revenantMyrrProduction_";
     private static final String REVMYRR_USED = "revenantMyrrHeroUsed_";
     // Revenant of Xytheris
-    private static final String REVXYTHERIS = "revenantxytherisagent";
     private static final String REVXYTHERISCOMMANDER = "revenantxytheriscommander";
-    private static final String USE_REVXYTHERIS = "useRevenantXytherisAgent_";
-    private static final String SELECT_REVXYTHERIS_TARGET = "selectRevenantXytherisTarget";
-    private static final String REVXYTHERIS_WINDOW = "revenantXytherisAgentWindow";
-    private static final String REVXYTHERIS_TARGET = "revenantXytherisAgentTarget_";
     // Revenant of Kryxos
     private static final String REVKRYXOS = "revenantkryxoshero";
     private static final String USE_REVKRYXOS = "useRevenantKryxosHero_";
@@ -136,151 +101,11 @@ public class RevenantLeadersHandler {
     private static final String REVKRYXOS_FIRST_TECH = "revenantKryxosHeroFirstTech_";
     // Revenant of Veylor
     private static final String REVVEYLORCOMMANDER = "revenantveylorcommander";
-    // Revenant of Verydith
-    private static final String REVVERYDITHAGENT = "revenantverydithagent";
-    private static final String USE_REVVERYDITH_AGENT = "useRevenantVerydithAgent_";
-    private static final String DECLINE_REVVERYDITH_AGENT = "declineRevenantVerydithAgent_";
-    private static final String SELECT_REVVERYDITH_TARGET = "selectRevenantVerydithTarget";
-    private static final String REVVERYDITH_PENDING = "revenantVerydithPending_";
     // Revenant of Thurviali
     private static final String SELECT_REVTHURVIALI_TARGET = "selectRevenantThurvialiTarget_";
     private static final String PLACE_REVTHURVIALI_INFANTRY = "placeRevenantThurvialiInfantry_";
     private static final String FINISH_REVTHURVIALI_HERO = "finishRevenantThurvialiHero";
     private static final String REVTHURVIALI_REMAINING = "revenantThurvialiHeroRemaining_";
-    private static final Pattern PAGE = Pattern.compile("_page");
-
-    public static Button getRevStratumCardsInfoButton(Player player) {
-        return Buttons.gray(
-                player.factionButtonChecker() + USE_REVSTRATUM_OTHER,
-                "Use Revenant Stratum Agent",
-                FactionEmojis.revenant);
-    }
-
-    public static Button getRevVerydithCardsInfoButton(Player player) {
-        return Buttons.gray(
-                player.factionButtonChecker() + SELECT_REVVERYDITH_TARGET,
-                "Use Revenant Verydith Agent",
-                FactionEmojis.revenant);
-    }
-
-    public static boolean offerRevVerydithAgentPrompt(
-            GenericInteractionCreateEvent event, Player player, Tile tile, boolean ping, boolean useTactic) {
-        if (player == null
-                || tile == null
-                || !useTactic
-                || !player.hasUnexhaustedLeader(REVVERYDITHAGENT)
-                || !player.getGame()
-                        .getStoredValue(REVVERYDITH_PENDING + player.getFaction())
-                        .isEmpty()) {
-            return false;
-        }
-        String payload = tile.getPosition() + "|" + (ping ? "1" : "0");
-        player.getGame().setStoredValue(REVVERYDITH_PENDING + player.getFaction(), payload);
-        List<Button> buttons = List.of(
-                Buttons.green(
-                        player.factionButtonChecker() + USE_REVVERYDITH_AGENT + payload,
-                        "Use Revenant Verydith Agent",
-                        FactionEmojis.revenant),
-                Buttons.red(player.factionButtonChecker() + DECLINE_REVVERYDITH_AGENT + payload, "Decline"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                event == null ? player.getCorrectChannel() : event.getMessageChannel(),
-                player.getRepresentationNoPing()
-                        + ", you are about to spend a tactical command token to place one in "
-                        + tile.getRepresentationForButtons(player.getGame(), player)
-                        + ". You may exhaust **Koral Vel**, the Revenant of Verydith agent, to place it from reinforcements instead.",
-                buttons);
-        return true;
-    }
-
-    @ButtonHandler(USE_REVVERYDITH_AGENT)
-    public static void useRevVerydithAgent(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String payload = buttonID.substring(USE_REVVERYDITH_AGENT.length());
-        if (payload.startsWith("other|")) {
-            Player target = game.getPlayerFromColorOrFaction(payload.substring("other|".length()));
-            Leader agent = player.getLeader(REVVERYDITHAGENT).orElse(null);
-            if (target == null || agent == null || !player.hasUnexhaustedLeader(REVVERYDITHAGENT)) {
-                ButtonHelper.deleteMessage(event);
-                return;
-            }
-            AgentLifecycle.spend(game, player, REVVERYDITHAGENT);
-            target.setTacticalCC(target.getTacticalCC() + 1);
-            MessageHelper.sendMessageToChannel(
-                    target.getCorrectChannel(),
-                    player.getRepresentationNoPing()
-                            + " exhausted **Koral Vel**, the Revenant of Verydith agent, allowing "
-                            + target.getRepresentationNoPing()
-                            + " to spend a command token from reinforcements instead. "
-                            + target.getRepresentationNoPing()
-                            + " gained 1 tactical command token.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        Tile tile = payload.contains("|") ? game.getTileByPosition(payload.substring(0, payload.indexOf('|'))) : null;
-        boolean ping = payload.endsWith("|1");
-        Leader agent = player.getLeader(REVVERYDITHAGENT).orElse(null);
-        if (tile == null
-                || agent == null
-                || !player.hasUnexhaustedLeader(REVVERYDITHAGENT)
-                || !payload.equals(game.getStoredValue(REVVERYDITH_PENDING + player.getFaction()))) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        game.removeStoredValue(REVVERYDITH_PENDING + player.getFaction());
-        AgentLifecycle.spend(game, player, REVVERYDITHAGENT);
-        CommandCounterHelper.addCC(event, player, tile, ping, false, true);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(DECLINE_REVVERYDITH_AGENT)
-    public static void declineRevVerydithAgent(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String payload = buttonID.substring(DECLINE_REVVERYDITH_AGENT.length());
-        Tile tile = payload.contains("|") ? game.getTileByPosition(payload.substring(0, payload.indexOf('|'))) : null;
-        boolean ping = payload.endsWith("|1");
-        if (tile == null || !payload.equals(game.getStoredValue(REVVERYDITH_PENDING + player.getFaction()))) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        game.removeStoredValue(REVVERYDITH_PENDING + player.getFaction());
-        CommandCounterHelper.addCC(event, player, tile, ping, true, true);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    public static void resolvePendingRevVerydithAgent(Game game, Player player, ButtonInteractionEvent event) {
-        String payload = game.getStoredValue(REVVERYDITH_PENDING + player.getFaction());
-        if (payload.isEmpty()) {
-            return;
-        }
-        game.removeStoredValue(REVVERYDITH_PENDING + player.getFaction());
-        int separator = payload.indexOf('|');
-        Tile tile = separator < 0 ? null : game.getTileByPosition(payload.substring(0, separator));
-        if (tile != null) {
-            CommandCounterHelper.addCC(event, player, tile, payload.endsWith("|1"), true, true);
-        }
-    }
-
-    @ButtonHandler(SELECT_REVVERYDITH_TARGET)
-    public static void selectRevVerydithTarget(ButtonInteractionEvent event, Game game, Player player) {
-        if (!player.hasUnexhaustedLeader(REVVERYDITHAGENT)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Koral Vel cannot be used right now.");
-            return;
-        }
-        List<Button> buttons = game.getRealPlayersExcludingThis(player).stream()
-                .map(target -> Buttons.green(
-                        player.factionButtonChecker() + USE_REVVERYDITH_AGENT + "other|" + target.getFaction(),
-                        target.getFactionNameOrColor(),
-                        target.fogSafeEmoji()))
-                .toList();
-        if (buttons.isEmpty()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "There are no other players to choose.");
-            return;
-        }
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                player.getRepresentationNoPing()
-                        + ", choose a player to use **Koral Vel**, the Revenant of Verydith agent on.",
-                buttons);
-    }
 
     public static void startRevThurvialiHero(GenericInteractionCreateEvent event, Game game, Player player) {
         List<Player> targets = game.getRealPlayers().stream()
@@ -442,262 +267,6 @@ public class RevenantLeadersHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void addRevStratumExploreButtons(List<Button> buttons, Game game, Player player, Planet planet) {
-        if (buttons == null
-                || game == null
-                || player == null
-                || planet == null
-                || !player.hasUnexhaustedLeader(REVSTRATUMAGENT)
-                || !player.getPlanetsAllianceMode().contains(planet.getName())) {
-            return;
-        }
-        for (String trait : EXPLORATION_TRAITS) {
-            if (!planet.getPlanetTypes().contains(trait)) {
-                buttons.add(Buttons.gray(
-                        player.factionButtonChecker() + EXPLORE_REVSTRATUM + planet.getName() + "|" + trait,
-                        "Explore as " + StringUtils.capitalize(trait),
-                        FactionEmojis.revenant));
-            }
-        }
-    }
-
-    @ButtonHandler(USE_REVSTRATUM_OTHER)
-    public static void offerRevStratumTargetButtons(ButtonInteractionEvent event, Game game, Player player) {
-        if (game == null || player == null || !player.hasUnexhaustedLeader(REVSTRATUMAGENT)) {
-            ButtonHelper.deleteTheOneButton(event);
-            return;
-        }
-        List<Button> buttons = game.getRealPlayersExcludingThis(player).stream()
-                .filter(target -> !target.getPlanetsAllianceMode().isEmpty())
-                .map(target -> Buttons.gray(
-                        player.factionButtonChecker() + SELECT_REVSTRATUM_TARGET + target.getFaction(),
-                        "Use on " + target.getColor(),
-                        target.fogSafeEmoji()))
-                .toList();
-        if (buttons.isEmpty()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "No other player controls a planet.");
-            return;
-        }
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentation() + ", choose a player to explore a planet with **Necrolith**.",
-                buttons);
-        ButtonHelper.deleteTheOneButton(event);
-    }
-
-    @ButtonHandler(SELECT_REVSTRATUM_TARGET)
-    public static void offerRevStratumPlanetButtons(
-            ButtonInteractionEvent event, Game game, Player agentOwner, String buttonID) {
-        Player target = game == null
-                ? null
-                : game.getPlayerFromColorOrFaction(buttonID.substring(SELECT_REVSTRATUM_TARGET.length()));
-        if (target == null
-                || agentOwner == null
-                || target == agentOwner
-                || !agentOwner.hasUnexhaustedLeader(REVSTRATUMAGENT)
-                || target.getPlanetsAllianceMode().isEmpty()) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        List<Button> buttons = target.getPlanetsAllianceMode().stream()
-                .map(game::getUnitHolderFromPlanet)
-                .filter(Objects::nonNull)
-                .map(planet -> Buttons.gray(
-                        target.factionButtonChecker() + SELECT_REVSTRATUM_PLANET + agentOwner.getFaction() + "|"
-                                + planet.getName(),
-                        "Explore " + planet.getRepresentation(game)))
-                .toList();
-        if (buttons.isEmpty()) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        MessageHelper.sendMessageToChannelWithButtons(
-                target.getCorrectChannel(),
-                target.getRepresentation() + ", choose a planet to explore with **Necrolith**.",
-                buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(SELECT_REVSTRATUM_PLANET)
-    public static void offerRevStratumTraitButtons(
-            ButtonInteractionEvent event, Game game, Player target, String buttonID) {
-        String[] values = buttonID.substring(SELECT_REVSTRATUM_PLANET.length()).split("\\|", 2);
-        Player agentOwner = values.length == 2 && game != null ? game.getPlayerFromColorOrFaction(values[0]) : null;
-        Planet planet = values.length == 2 && game != null ? game.getUnitHolderFromPlanet(values[1]) : null;
-        if (agentOwner == null
-                || target == null
-                || planet == null
-                || !agentOwner.hasUnexhaustedLeader(REVSTRATUMAGENT)
-                || !target.getPlanetsAllianceMode().contains(planet.getName())) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        List<Button> buttons = EXPLORATION_TRAITS.stream()
-                .map(trait -> Buttons.gray(
-                        target.factionButtonChecker() + EXPLORE_REVSTRATUM + agentOwner.getFaction() + "|"
-                                + planet.getName() + "|" + trait,
-                        "Explore as " + StringUtils.capitalize(trait),
-                        ExploreEmojis.getTraitEmoji(trait)))
-                .toList();
-        MessageHelper.sendMessageToChannelWithButtons(
-                target.getCorrectChannel(),
-                target.getRepresentation() + ", choose an exploration trait for " + planet.getRepresentation(game)
-                        + ".",
-                buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(EXPLORE_REVSTRATUM)
-    public static void exploreWithRevStratum(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] values = buttonID.substring(EXPLORE_REVSTRATUM.length()).split("\\|", 3);
-        Player agentOwner = values.length == 3 && game != null ? game.getPlayerFromColorOrFaction(values[0]) : player;
-        Planet planet = game == null || values.length < 2
-                ? null
-                : game.getUnitHolderFromPlanet(values.length == 3 ? values[1] : values[0]);
-        String trait = values.length == 3 ? values[2] : (values.length == 2 ? values[1] : "");
-        if (agentOwner == null
-                || player == null
-                || planet == null
-                || !EXPLORATION_TRAITS.contains(trait)
-                || !agentOwner.hasUnexhaustedLeader(REVSTRATUMAGENT)
-                || !player.getPlanetsAllianceMode().contains(planet.getName())) {
-            ButtonHelper.deleteTheOneButton(event);
-            return;
-        }
-        Leader agent = agentOwner.getLeader(REVSTRATUMAGENT).orElse(null);
-        Tile tile = game.getTileFromPlanet(planet.getName());
-        if (agent == null || tile == null) {
-            ButtonHelper.deleteTheOneButton(event);
-            return;
-        }
-        AgentLifecycle.spend(game, agentOwner, REVSTRATUMAGENT);
-        if (agentOwner != player) {
-            ActionCardHelper.drawActionCards(agentOwner, 1);
-        }
-        ExploreService.explorePlanet(event, tile, planet.getName(), trait, player, false, game, 1, true);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    public static void offerRevArdentiaAgentButtons(Game game, Player tokenOwner, Tile sourceTile) {
-        if (game == null || tokenOwner == null || sourceTile == null) {
-            return;
-        }
-        for (Player agentOwner : game.getRealPlayers()) {
-            if (agentOwner == tokenOwner || !agentOwner.hasUnexhaustedLeader(REVARDENTIAAGENT)) {
-                continue;
-            }
-            List<Button> buttons = List.of(
-                    Buttons.green(
-                            agentOwner.factionButtonChecker() + USE_REVARDENTIA_AGENT + tokenOwner.getFaction() + "|"
-                                    + sourceTile.getPosition(),
-                            "Move " + tokenOwner.getColor() + " Command Token",
-                            FactionEmojis.revenant),
-                    Buttons.red(agentOwner.factionButtonChecker() + "deleteButtons", "No Thanks"));
-            MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
-                    agentOwner.getCardsInfoThread(),
-                    agentOwner.getRepresentationNoPing() + ", " + tokenOwner.getRepresentationNoPing()
-                            + " placed a command token in " + sourceTile.getRepresentationForButtons(game, agentOwner)
-                            + ". You may exhaust **Kruth Torrious, the Revenant agent** to move it.",
-                    buttons);
-        }
-    }
-
-    @ButtonHandler(USE_REVARDENTIA_AGENT)
-    public static void useRevArdentiaAgent(
-            ButtonInteractionEvent event, Game game, Player agentOwner, String buttonID) {
-        String[] values = buttonID.substring(USE_REVARDENTIA_AGENT.length()).split("\\|", 2);
-        Player tokenOwner = values.length == 2 && game != null ? game.getPlayerFromColorOrFaction(values[0]) : null;
-        Tile sourceTile = values.length == 2 && game != null ? game.getTileByPosition(values[1]) : null;
-        if (agentOwner == null
-                || tokenOwner == null
-                || sourceTile == null
-                || tokenOwner == agentOwner
-                || !agentOwner.hasUnexhaustedLeader(REVARDENTIAAGENT)
-                || !sourceTile.hasCC(Mapper.getCCID(tokenOwner.getColor()))) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        List<Button> buttons = getRevArdentiaDestinationButtons(game, agentOwner, tokenOwner);
-        if (buttons.isEmpty()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "There are no eligible systems for that command token.");
-            return;
-        }
-        Leader agent = agentOwner.getLeader(REVARDENTIAAGENT).orElse(null);
-        if (agent == null) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        AgentLifecycle.spend(game, agentOwner, REVARDENTIAAGENT);
-        ti4.service.RemoveCommandCounterService.fromTile(tokenOwner.getColor(), sourceTile, game);
-        String prefix = agentOwner.factionButtonChecker() + MOVE_REVARDENTIA_TOKEN + tokenOwner.getFaction() + "|";
-        List<Button> extraButtons =
-                List.of(Buttons.red(agentOwner.factionButtonChecker() + "deleteButtons", "Decline"));
-        List<Button> displayedButtons = new ArrayList<>(buttons);
-        displayedButtons.addAll(extraButtons);
-        if (displayedButtons.size() > 25) {
-            displayedButtons = NewStuffHelper.buttonPagination(buttons, extraButtons, prefix, 25, 0, false);
-        }
-        MessageHelper.sendMessageToChannelWithButtons(
-                agentOwner.getCorrectChannel(),
-                agentOwner.getRepresentation() + ", choose where to move " + tokenOwner.getRepresentationNoPing()
-                        + "'s command token with **Kruth Torrious**.",
-                displayedButtons);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(MOVE_REVARDENTIA_TOKEN)
-    public static void moveRevArdentiaToken(
-            ButtonInteractionEvent event, Game game, Player agentOwner, String buttonID) {
-        String[] values = buttonID.substring(MOVE_REVARDENTIA_TOKEN.length()).split("\\|", 2);
-        Player tokenOwner = values.length == 2 && game != null ? game.getPlayerFromColorOrFaction(values[0]) : null;
-        if (agentOwner == null || tokenOwner == null || !agentOwner.hasLeader(REVARDENTIAAGENT)) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        List<Button> buttons = getRevArdentiaDestinationButtons(game, agentOwner, tokenOwner);
-        String message = agentOwner.getRepresentation() + ", choose where to move "
-                + tokenOwner.getRepresentationNoPing() + "'s command token with **Kruth Torrious**.";
-        String prefix = agentOwner.factionButtonChecker() + MOVE_REVARDENTIA_TOKEN + tokenOwner.getFaction() + "|";
-        List<Button> extraButtons =
-                List.of(Buttons.red(agentOwner.factionButtonChecker() + "deleteButtons", "Decline"));
-        if (NewStuffHelper.checkAndHandlePaginationChange(
-                event, event.getMessageChannel(), buttons, extraButtons, message, prefix, buttonID)) {
-            return;
-        }
-        Tile destinationTile = values.length == 2 ? game.getTileByPosition(values[1]) : null;
-        if (destinationTile == null
-                || buttons.stream()
-                        .noneMatch(button -> button.getCustomId().endsWith("|" + destinationTile.getPosition()))) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        destinationTile.addCC(Mapper.getCCID(tokenOwner.getColor()));
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                agentOwner.getRepresentationNoPing() + " moved " + tokenOwner.getRepresentationNoPing()
-                        + "'s command token to " + destinationTile.getRepresentationForButtons(game, agentOwner)
-                        + " with **Kruth Torrious**.");
-        ButtonHelper.deleteMessage(event);
-    }
-
-    private static List<Button> getRevArdentiaDestinationButtons(Game game, Player agentOwner, Player tokenOwner) {
-        if (game == null || agentOwner == null || tokenOwner == null) {
-            return List.of();
-        }
-        String token = Mapper.getCCID(tokenOwner.getColor());
-        return game.getTileMap().values().stream()
-                .filter(tile -> !tile.isHomeSystem(game))
-                .filter(tile -> FoWHelper.playerHasUnitsInSystem(agentOwner, tile))
-                .filter(tile -> tile.getPlanetUnitHolders().stream().noneMatch(Planet::isLegendary))
-                .filter(tile -> !tile.hasCC(token))
-                .map(tile -> Buttons.green(
-                        agentOwner.factionButtonChecker() + MOVE_REVARDENTIA_TOKEN + tokenOwner.getFaction() + "|"
-                                + tile.getPosition(),
-                        "Move to " + tile.getRepresentationForButtons(game, agentOwner)))
-                .toList();
-    }
-
     public static void addRevThronesHeroButton(
             List<Button> buttons, Game game, Player player, Player opponent, Tile tile, String unitHolderName) {
         if (buttons == null
@@ -831,154 +400,6 @@ public class RevenantLeadersHandler {
     }
 
     // Pantheon of Production
-    // Revenant of Scrapyard
-    public static Button getRevScrapyardAgentButton(Player player) {
-        return Buttons.gray(
-                player.factionButtonChecker() + PRODUCE_WITH_REVSCRAPYARD,
-                "Use Revenant Scrapyard Agent",
-                FactionEmojis.revenant);
-    }
-
-    public static Button getRevScrapyardCardsInfoButton(Game game, Player player) {
-        return Buttons.gray(
-                player.factionButtonChecker() + SELECT_REVSCRAPYARD_TARGET,
-                "Use Revenant Scrapyard Agent",
-                FactionEmojis.revenant);
-    }
-
-    @ButtonHandler(SELECT_REVSCRAPYARD_TARGET)
-    public static void offerRevScrapyardTargetButtons(
-            ButtonInteractionEvent event, Game game, Player componentOwner, String buttonID) {
-        if (!componentOwner.hasUnexhaustedLeader(REVSCRAPYARD)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Thrash \"Feral\" Burner, the Revenant of Scrapyard agent, is no longer available.");
-            return;
-        }
-
-        List<Button> buttons = game.getRealPlayers().stream()
-                .filter(target -> target != componentOwner) // Remove to include self
-                .map(target -> Buttons.green(
-                        componentOwner.factionButtonChecker() + RESOLVE_REVSCRAPYARD_TARGET + target.getFaction(),
-                        target.getFactionNameOrColor(),
-                        target.fogSafeEmoji()))
-                .toList();
-
-        if (buttons.isEmpty()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "There are no eligible players.");
-            return;
-        }
-
-        String message = componentOwner.getRepresentation() + ", choose the player who will produce 1 unit with "
-                + "Thrash \"Feral\" Burner, the Revenant of Scrapyard agent.";
-        String prefix = componentOwner.factionButtonChecker() + SELECT_REVSCRAPYARD_TARGET;
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
-        if (NewStuffHelper.checkAndHandlePaginationChange(
-                event, componentOwner.getCorrectChannel(), buttons, extraButtons, message, prefix, buttonID)) {
-            return;
-        }
-        List<Button> displayedButtons = new ArrayList<>(buttons);
-        displayedButtons.addAll(extraButtons);
-        if (displayedButtons.size() > 25) {
-            displayedButtons = NewStuffHelper.buttonPagination(buttons, extraButtons, prefix, 25, 0, false);
-        }
-        MessageHelper.sendMessageToChannelWithButtons(componentOwner.getCorrectChannel(), message, displayedButtons);
-    }
-
-    @ButtonHandler(RESOLVE_REVSCRAPYARD_TARGET)
-    public static void chooseRevenantTarget(
-            ButtonInteractionEvent event, Game game, Player componentOwner, String buttonID) {
-
-        String targetFaction = buttonID.substring(RESOLVE_REVSCRAPYARD_TARGET.length());
-        Player target = game.getPlayerFromColorOrFaction(targetFaction);
-
-        if (target == null) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not find that player.");
-            return;
-        }
-
-        if (useRevScrapyardAgent(event, game, componentOwner, target)) {
-            ButtonHelper.deleteMessage(event);
-        }
-    }
-
-    @ButtonHandler(PRODUCE_WITH_REVSCRAPYARD)
-    public static void offerRevScrapyardChoices(ButtonInteractionEvent event, Game game, Player target) {
-        if (useRevScrapyardAgent(event, game, target, target)) {
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-        }
-    }
-
-    private static boolean useRevScrapyardAgent(
-            ButtonInteractionEvent event, Game game, Player agentOwner, Player target) {
-        if (game == null || agentOwner == null || target == null || !agentOwner.hasUnexhaustedLeader(REVSCRAPYARD)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Thrash \"Feral\" Burner, the Revenant of Scrapyard agent, is no longer available.");
-            return false;
-        }
-        List<Button> buttons = getProduceOneUnitInSystemsWithShipsButtons(game, target);
-
-        if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    target.getCorrectChannel(),
-                    target.getRepresentation() + " does not have any ships on the game board.");
-            return false;
-        }
-
-        Leader agent = agentOwner.getLeader(REVSCRAPYARD).orElse(null);
-        if (agent == null) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Could not find Thrash \"Feral\" Burner, the Revenant of Scrapyard agent.");
-            return false;
-        }
-        AgentLifecycle.spend(game, agentOwner, REVSCRAPYARD);
-        sendRevScrapyardSystemButtons(null, game, target, "", buttons);
-        return true;
-    }
-
-    @ButtonHandler(PAGE_REVSCRAPYARD_SYSTEMS)
-    public static void pageRevScrapyardSystemButtons(
-            ButtonInteractionEvent event, Game game, Player target, String buttonID) {
-        String targetFaction = PAGE.split(buttonID.substring(PAGE_REVSCRAPYARD_SYSTEMS.length()), 2)[0];
-        if (!target.getFaction().equals(targetFaction)) {
-            return;
-        }
-        sendRevScrapyardSystemButtons(
-                event, game, target, buttonID, getProduceOneUnitInSystemsWithShipsButtons(game, target));
-    }
-
-    private static void sendRevScrapyardSystemButtons(
-            ButtonInteractionEvent event, Game game, Player target, String buttonID, List<Button> buttons) {
-        String message = target.getRepresentation()
-                + ", choose a system containing 1 or more of your ships in which to produce 1 unit due to Thrash \"Feral\" Burner, the Revenant of Scrapyard agent.";
-        String prefix = target.factionButtonChecker() + PAGE_REVSCRAPYARD_SYSTEMS + target.getFaction() + "_";
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
-        if (event != null
-                && NewStuffHelper.checkAndHandlePaginationChange(
-                        event, target.getCorrectChannel(), buttons, extraButtons, message, prefix, buttonID)) {
-            return;
-        }
-        List<Button> displayedButtons = new ArrayList<>(buttons);
-        displayedButtons.addAll(extraButtons);
-        if (displayedButtons.size() > 25) {
-            displayedButtons = NewStuffHelper.buttonPagination(buttons, extraButtons, prefix, 25, 0, false);
-        }
-        MessageHelper.sendMessageToChannelWithButtons(target.getCorrectChannel(), message, displayedButtons);
-    }
-
-    public static List<Button> getProduceOneUnitInSystemsWithShipsButtons(Game game, Player target) {
-        if (game == null || target == null) {
-            return List.of();
-        }
-
-        return game.getTileMap().values().stream()
-                .filter(tile -> FoWHelper.playerHasActualShipsInSystem(target, tile))
-                .map(tile -> Buttons.green(
-                        target.factionButtonChecker() + "produceOneUnitInTile_" + tile.getPosition()
-                                + "_revenantScrapyard",
-                        tile.getRepresentationForButtons(game, target)))
-                .toList();
-    }
-
     // Revenant of Ponthous
     public static void offerRevPonthousCommander(Game game, Player player, Tile tile) {
         if (game == null
@@ -1192,16 +613,12 @@ public class RevenantLeadersHandler {
             return;
         }
         String faction = player.getFaction();
-        if (game.getStoredValue(REVXYTHERIS_WINDOW).startsWith(faction + "|")) {
-            game.removeStoredValue(REVXYTHERIS_WINDOW);
-        }
-        game.removeStoredValue(REVXYTHERIS_TARGET + faction);
         game.removeStoredValue(REVKRYXOS_CONTEXT + faction);
         game.removeStoredValue(REVKRYXOS_FIRST_TECH + faction);
         game.removeStoredValue(REVPONTHOUS_USED + faction);
         game.removeStoredValue(REVMYRR_USED + faction);
         game.removeStoredValue(REVMYRR_PRODUCTION + faction);
-        game.removeStoredValue(REVVERYDITH_PENDING + faction);
+        RevenantVerydithAgent.clearPending(game, player);
         game.removeStoredValue(REVTHURVIALI_REMAINING + faction);
     }
 
@@ -1240,87 +657,6 @@ public class RevenantLeadersHandler {
     }
 
     // Revenant of Xytheris
-    public static void openRevXytherisAgentWindow(Game game, Player activePlayer) {
-        if (game == null
-                || activePlayer == null
-                || game.getRealPlayers().stream().noneMatch(player -> player.hasUnexhaustedLeader(REVXYTHERIS))) {
-            return;
-        }
-
-        game.setStoredValue(REVXYTHERIS_WINDOW, activePlayer.getFaction() + "|" + game.getActiveSystem());
-        if (!activePlayer.hasUnexhaustedLeader(REVXYTHERIS)) {
-            return;
-        }
-
-        List<Button> buttons = List.of(
-                Buttons.green(
-                        activePlayer.factionButtonChecker() + USE_REVXYTHERIS + activePlayer.getFaction(),
-                        "Use Revenant Xytheris Agent",
-                        FactionEmojis.revenant),
-                Buttons.red("deleteButtons", "Decline"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                activePlayer.getCorrectChannel(),
-                activePlayer.getRepresentation()
-                        + ", you may exhaust Zexan Myrix, the Revenant of Xytheris agent, to apply +1 to your combat rolls during this tactical action.",
-                buttons);
-    }
-
-    public static Button getRevXytherisCardsInfoButton(Player player) {
-        return Buttons.gray(
-                player.factionButtonChecker() + SELECT_REVXYTHERIS_TARGET,
-                "Use Revenant Xytheris Agent",
-                FactionEmojis.revenant);
-    }
-
-    public static void offerRevXytherisTargetButtons(ButtonInteractionEvent event, Game game, Player agentOwner) {
-        if (!canUseRevXytherisAgent(game, agentOwner)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Zexan Myrix, the Revenant of Xytheris agent, cannot be used right now.");
-            return;
-        }
-
-        List<Button> buttons = game.getRealPlayersExcludingThis(agentOwner).stream()
-                .map(target -> Buttons.green(
-                        agentOwner.factionButtonChecker() + USE_REVXYTHERIS + target.getFaction(),
-                        target.getFactionNameOrColor(),
-                        target.fogSafeEmoji()))
-                .toList();
-        if (buttons.isEmpty()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "There are no other players to choose.");
-            return;
-        }
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                agentOwner.getCardsInfoThread(),
-                agentOwner.getRepresentationUnfogged()
-                        + ", choose a player to receive +1 to their combat rolls from Zexan Myrix, the Revenant of Xytheris agent, during this tactical action.",
-                buttons);
-    }
-
-    public static void useRevXytherisAgent(
-            ButtonInteractionEvent event, Game game, Player agentOwner, String buttonID) {
-        if (!canUseRevXytherisAgent(game, agentOwner)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Zexan Myrix, the Revenant of Xytheris agent, cannot be used right now.");
-            return;
-        }
-
-        Player target = game.getPlayerFromColorOrFaction(buttonID.substring(USE_REVXYTHERIS.length()));
-        Leader agent = agentOwner.getLeader(REVXYTHERIS).orElse(null);
-        if (target == null || agent == null) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not find the selected player or agent.");
-            return;
-        }
-
-        AgentLifecycle.spend(game, agentOwner, REVXYTHERIS);
-        game.setStoredValue(REVXYTHERIS_TARGET + agentOwner.getFaction(), target.getFaction());
-        MessageHelper.sendMessageToChannel(
-                target.getCorrectChannel(),
-                target.getRepresentation()
-                        + " will apply +1 to their combat rolls during this tactical action due to Zexan Myrix, the Revenant of Xytheris agent.");
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-    }
-
     public static void addRevXytherisCommanderModifier(
             List<NamedCombatModifierModel> modifiers, Game game, Player player, CombatRollType rollType) {
         if (modifiers == null
@@ -1340,16 +676,6 @@ public class RevenantLeadersHandler {
             modifiers.add(
                     new NamedCombatModifierModel(modifier, "+1 from Zexan Mythis, the Revenant of Xytheris commander"));
         }
-    }
-
-    private static boolean canUseRevXytherisAgent(Game game, Player agentOwner) {
-        if (game == null || agentOwner == null || !agentOwner.hasUnexhaustedLeader(REVXYTHERIS)) {
-            return false;
-        }
-        Player activePlayer = game.getActivePlayer();
-        return activePlayer != null
-                && (activePlayer.getFaction() + "|" + game.getActiveSystem())
-                        .equals(game.getStoredValue(REVXYTHERIS_WINDOW));
     }
 
     // Revenant of Kryxos
@@ -1504,7 +830,6 @@ public class RevenantLeadersHandler {
         if (game == null) {
             return;
         }
-        game.removeStoredValue(REVXYTHERIS_WINDOW);
         game.getStoredValueMap().keySet().stream()
                 .filter(key -> key.startsWith(REVKRYXOS_CONTEXT) || key.startsWith(REVKRYXOS_FIRST_TECH))
                 .toList()
@@ -1516,10 +841,6 @@ public class RevenantLeadersHandler {
             return;
         }
         clearRedLeaderTacticalWindow(game);
-        game.getStoredValueMap().keySet().stream()
-                .filter(key -> key.startsWith(REVXYTHERIS_TARGET))
-                .toList()
-                .forEach(game::removeStoredValue);
     }
 
     public static void offerRevVeylorCommanderPlanets(Game game) {
@@ -1585,142 +906,6 @@ public class RevenantLeadersHandler {
     }
 
     // Base Revenant Leader Set
-    // Agent
-    public static void offerRevenantAgentButtons(Player player, String tech) {
-        if (player == null || !player.hasUnexhaustedLeader(REVBASE)) {
-            return;
-        }
-        TechnologyModel techM = Mapper.getTech(tech);
-        if (techM == null) {
-            return;
-        }
-        String technologyRepresentation = techM.getNameRepresentation();
-
-        List<Button> buttons = List.of(
-                Buttons.green(
-                        player.factionButtonChecker() + USE_REVBASE + techM.getID(),
-                        "Ready " + technologyRepresentation),
-                Buttons.red("deleteButtons", "Decline"));
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentation()
-                        + ", you may exhaust Xythis the Whispering, the Revenant agent, to ready "
-                        + technologyRepresentation + ".",
-                buttons);
-    }
-
-    public static Button getRevenantAgentButton(Player player) {
-        return Buttons.green(
-                player.factionButtonChecker() + SELECT_REVBASE_TARGET, "Use Revenant Agent", FactionEmojis.revenant);
-    }
-
-    @ButtonHandler(SELECT_REVBASE_TARGET)
-    public static void offerRevBaseTargetButtons(ButtonInteractionEvent event, Game game, Player player) {
-        if (game == null || player == null || !player.hasUnexhaustedLeader(REVBASE)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Xythis the Whispering, the Revenant agent, is no longer available.");
-            return;
-        }
-
-        List<Button> targets = game.getRealPlayersExcludingThis(player).stream()
-                .filter(target ->
-                        target.getExhaustedTechs().stream().anyMatch(techId -> Mapper.getTech(techId) != null))
-                .map(target -> Buttons.green(
-                        player.factionButtonChecker() + USE_REVBASE_TARGET + target.getFaction(),
-                        target.getFactionNameOrColor(),
-                        target.fogSafeEmoji()))
-                .toList();
-        if (targets.isEmpty()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "No other player has an exhausted technology.");
-            return;
-        }
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                player.getRepresentationUnfogged()
-                        + ", choose a player on whom to use Xythis the Whispering, the Revenant agent.",
-                targets);
-    }
-
-    @ButtonHandler(USE_REVBASE_TARGET)
-    public static void offerRevBaseTechButtons(
-            ButtonInteractionEvent event, Game game, Player agentOwner, String buttonID) {
-        if (game == null || agentOwner == null || !agentOwner.hasUnexhaustedLeader(REVBASE)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Xythis the Whispering, the Revenant agent, is no longer available.");
-            return;
-        }
-
-        Player target = game.getPlayerFromColorOrFaction(buttonID.substring(USE_REVBASE_TARGET.length()));
-        if (target == null || target == agentOwner) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not find that player.");
-            return;
-        }
-
-        List<Button> techButtons = target.getExhaustedTechs().stream()
-                .map(Mapper::getTech)
-                .filter(Objects::nonNull)
-                .map(tech -> Buttons.green(
-                        target.factionButtonChecker() + USE_REVBASE + agentOwner.getFaction() + "~" + tech.getAlias(),
-                        "Ready " + tech.getNameRepresentation()))
-                .toList();
-        if (techButtons.isEmpty()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "That player no longer has an exhausted technology.");
-            return;
-        }
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                target.getCorrectChannel(),
-                target.getRepresentationUnfogged()
-                        + ", choose the technology that Xythis the Whispering, the Revenant agent, should ready.",
-                techButtons);
-        MessageHelper.sendEphemeralMessageToEventChannel(
-                event, "Sent technology choices to " + target.getRepresentationUnfoggedNoPing() + ".");
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(USE_REVBASE)
-    public static void resolveRevenantAgent(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (game == null || player == null) {
-            return;
-        }
-
-        String[] payload = buttonID.substring(USE_REVBASE.length()).split("~", 2);
-        Player agentOwner = payload.length == 2 ? game.getPlayerFromColorOrFaction(payload[0]) : player;
-        String techId = payload.length == 2 ? payload[1] : payload[0];
-        if (agentOwner == null || !agentOwner.hasUnexhaustedLeader(REVBASE)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Xythis the Whispering, the Revenant agent, is no longer available.");
-            return;
-        }
-
-        TechnologyModel techM = Mapper.getTech(techId);
-        if (techM == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Unable to resolve the technology ID.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        Leader agent = agentOwner.getLeaderByID(REVBASE).orElse(null);
-        if (agent == null) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Could not find Xythis the Whispering, the Revenant agent.");
-            return;
-        }
-
-        AgentLifecycle.spend(game, agentOwner, REVBASE);
-        player.refreshTech(techId);
-
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getRepresentationUnfogged() + " readied " + techM.getNameRepresentation()
-                        + " using Xythis the Whispering, the Revenant agent.");
-
-        ButtonHelper.deleteMessage(event);
-    }
-
     // Hero
     public static void offerRevenantHeroChoices(Game game, Player player) {
         if (game == null || player == null || !player.hasLeaderUnlocked(REVENANT_HERO)) {
@@ -1876,118 +1061,6 @@ public class RevenantLeadersHandler {
     }
 
     // Green Revenant Leader Set
-    // Revenant of Arcanum
-    public static void offerRevArcanumAgentButtons(Game game, Player passedPlayer) {
-        if (game == null || passedPlayer == null) {
-            return;
-        }
-        for (Player agentOwner : game.getRealPlayers()) {
-            if (!agentOwner.hasUnexhaustedLeader(REVARCAGENT)
-                    || getRevArcanumReturnTechButtons(game, agentOwner, passedPlayer)
-                            .isEmpty()) {
-                continue;
-            }
-            MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
-                    agentOwner.getCardsInfoThread(),
-                    agentOwner.getRepresentationNoPing() + ", " + passedPlayer.getRepresentationNoPing()
-                            + " passed. You may exhaust **Lothos Yvollus** to let them return a technology and research one with exactly 1 fewer prerequisite.",
-                    List.of(
-                            Buttons.green(
-                                    agentOwner.factionButtonChecker() + USE_REVARCAGENT + passedPlayer.getFaction(),
-                                    "Use Revenant Arcanum Agent",
-                                    FactionEmojis.revenant),
-                            Buttons.red(agentOwner.factionButtonChecker() + "deleteButtons", "No Thanks")));
-        }
-    }
-
-    @ButtonHandler(USE_REVARCAGENT)
-    public static void useRevArcanumAgent(ButtonInteractionEvent event, Game game, Player agentOwner, String buttonID) {
-        Player target =
-                game == null ? null : game.getPlayerFromColorOrFaction(buttonID.substring(USE_REVARCAGENT.length()));
-        Leader agent =
-                agentOwner == null ? null : agentOwner.getLeader(REVARCAGENT).orElse(null);
-        List<Button> buttons = getRevArcanumReturnTechButtons(game, agentOwner, target);
-        if (agent == null || !agentOwner.hasUnexhaustedLeader(REVARCAGENT) || buttons.isEmpty()) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        AgentLifecycle.spend(game, agentOwner, REVARCAGENT);
-        MessageHelper.sendMessageToChannelWithButtons(
-                target.getCorrectChannel(),
-                target.getRepresentation()
-                        + ", choose a non-faction, non-unit technology to return to its deck with **Lothos Yvollus**.",
-                buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(SELECT_REVARCAGENT_TECH)
-    public static void selectRevArcanumAgentTech(
-            ButtonInteractionEvent event, Game game, Player target, String buttonID) {
-        String techId = buttonID.substring(SELECT_REVARCAGENT_TECH.length());
-        TechnologyModel returnedTech = Mapper.getTech(techId);
-        if (target == null
-                || returnedTech == null
-                || !target.hasTech(techId)
-                || returnedTech.isFactionTech()
-                || returnedTech.isUnitUpgrade()) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        target.removeTech(techId);
-        List<TechnologyModel> researchableTechs = getRevArcanumResearchableTechs(game, target, returnedTech);
-        if (researchableTechs.isEmpty()) {
-            target.addTech(techId);
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "No researchable technology has exactly 1 fewer prerequisite.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        MessageHelper.sendMessageToChannelWithButtons(
-                target.getCorrectChannel(),
-                target.getRepresentation() + " returned " + returnedTech.getNameRepresentation()
-                        + " to the technology deck. Research a technology with exactly 1 fewer prerequisite.",
-                ListTechService.getTechButtons(new ArrayList<>(researchableTechs), target));
-        ButtonHelper.deleteMessage(event);
-    }
-
-    private static List<Button> getRevArcanumReturnTechButtons(Game game, Player agentOwner, Player target) {
-        if (game == null || agentOwner == null || target == null) {
-            return List.of();
-        }
-        return target.getTechs().stream()
-                .map(Mapper::getTech)
-                .filter(Objects::nonNull)
-                .filter(tech -> !tech.isFactionTech() && !tech.isUnitUpgrade())
-                .filter(tech ->
-                        !getRevArcanumResearchableTechs(game, target, tech).isEmpty())
-                .map(tech -> Buttons.green(
-                        target.factionButtonChecker() + SELECT_REVARCAGENT_TECH + tech.getAlias(),
-                        "Return " + tech.getName(),
-                        tech.getCondensedReqsEmojis(true)))
-                .toList();
-    }
-
-    private static List<TechnologyModel> getRevArcanumResearchableTechs(
-            Game game, Player target, TechnologyModel returnedTech) {
-        if (game == null || target == null || returnedTech == null) {
-            return List.of();
-        }
-        int prerequisites = returnedTech.getRequirements().orElse("").length() - 1;
-        if (prerequisites < 0) {
-            return List.of();
-        }
-        return Mapper.getTechs().values().stream()
-                .filter(tech -> game.getTechnologyDeck().contains(tech.getAlias()))
-                .filter(tech -> !target.hasTech(tech.getAlias()))
-                .filter(tech -> !target.getPurgedTechs().contains(tech.getAlias()))
-                .filter(tech -> tech.getFaction().isEmpty()
-                        || tech.getFaction().get().isBlank()
-                        || target.getNotResearchedFactionTechs().contains(tech.getAlias()))
-                .filter(tech -> tech.getRequirements().orElse("").length() == prerequisites)
-                .filter(tech -> ListTechService.isTechResearchable(tech, target))
-                .toList();
-    }
-
     // Revenant of Oblivion
     public static void addArlirMirroredButton(
             List<Button> buttons, Game game, Player player, String planetName, String cardId, String drawColor) {

@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 /**
- * Agents are spent through AgentLifecycle (press, use or spend), which records the use, mirrors it to combat
+ * Agents are spent through AgentLifecycle (press or use), which records the use, mirrors it to combat
  * replays and offers Temporal Command Suite. Exhausting a leader any other way skips all of that, so only the files
  * below may still do it, each for a stated reason.
  */
@@ -43,28 +43,17 @@ class DirectAgentExhaustGuardTest {
             // Developer testbed setup.
             "TestBedApplyService.java");
 
-    private static final Set<String> STILL_SPEND_WITHOUT_A_MODULE = Set.of(
-            // Homebrew handlers that have not been moved into agent modules yet. Shrink this list, never grow it.
-            "RevenantLeadersHandler.java");
-
-    @Test
-    void onlyTheUnmigratedHomebrewHandlersStillCallSpend() throws IOException {
-        assertThat(filesContaining("AgentLifecycle.spend("))
-                .as("an agent with a module resolves through AgentLifecycle.use or press, never spend")
-                .containsExactlyInAnyOrderElementsOf(STILL_SPEND_WITHOUT_A_MODULE);
-    }
-
     @Test
     void onlyTheKnownFilesCallExhaustLeaderService() throws IOException {
         assertThat(filesContaining("ExhaustLeaderService.exhaustLeader("))
-                .as("spend an agent with AgentLifecycle.spend so the use is recorded and TCS is offered")
+                .as("spend an agent with AgentLifecycle.use or press so the use is recorded and TCS is offered")
                 .containsExactlyInAnyOrderElementsOf(MAY_CALL_EXHAUST_LEADER_SERVICE);
     }
 
     @Test
     void onlyTheKnownFilesSetALeaderExhausted() throws IOException {
         assertThat(filesContaining(".setExhausted(true)"))
-                .as("spend an agent with AgentLifecycle.spend so the use is recorded and TCS is offered")
+                .as("spend an agent with AgentLifecycle.use or press so the use is recorded and TCS is offered")
                 .containsExactlyInAnyOrderElementsOf(MAY_SET_A_LEADER_EXHAUSTED);
     }
 

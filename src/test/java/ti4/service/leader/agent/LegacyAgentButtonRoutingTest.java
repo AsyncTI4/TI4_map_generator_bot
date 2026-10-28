@@ -98,7 +98,25 @@ class LegacyAgentButtonRoutingTest extends BaseTi4Test {
             "useOblivionAgent_other",
             "oblivionAgentTarget_",
             "addOblivionFrontierToken_",
-            "discardPeekedFrontier_");
+            "discardPeekedFrontier_",
+            "readyTechWithRevBase_",
+            "selectRevenantAgentTarget",
+            "useRevenantAgentOn_",
+            "useRevenantVerydithAgent_",
+            "declineRevenantVerydithAgent_",
+            "selectRevenantVerydithTarget",
+            "useRevenantStratumAgentOther",
+            "selectRevenantStratumTarget_",
+            "selectRevenantStratumPlanet_",
+            "exploreRevenantStratum_",
+            "useRevenantArdentiaAgent_",
+            "moveRevenantArdentiaToken_",
+            "selectRevenantTarget",
+            "resolveRevenantTarget_",
+            "produceUsingRevScrapyardAgent",
+            "pageRevenantScrapyardSystems_",
+            "useRevenantArcanumAgent_",
+            "selectRevenantArcanumReturnTech_");
 
     @Test
     void everyLegacyAgentButtonPrefixStillHasAHandler() {
