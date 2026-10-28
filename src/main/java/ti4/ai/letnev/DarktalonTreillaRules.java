@@ -89,7 +89,7 @@ public class DarktalonTreillaRules {
 
     static boolean assaultsMecatol(Game game, Player seat) {
         Tile mecatol = game.getMecatolTile();
-        if (mecatol == null || !GravleashPlan.assaultRound(game) || seat.controlsMecatol(true)) return false;
+        if (mecatol == null || seat.controlsMecatol(true)) return false;
         boolean imperial = GravleashPlan.holdsUnplayed(game, seat, StrategyCard.IMPERIAL);
         boolean warfare =
                 GravleashPlan.hasBreakthrough(seat) && GravleashPlan.holdsUnplayed(game, seat, StrategyCard.WARFARE);

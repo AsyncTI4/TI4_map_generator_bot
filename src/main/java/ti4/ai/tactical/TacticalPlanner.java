@@ -726,15 +726,15 @@ public class TacticalPlanner {
     private static TacticalPlan massedAtMecatol(Context context, Tile target, TacticalPlan plan) {
         Player seat = context.seat;
         boolean assault = FleetLimit.heroLiftsLimit(seat)
-                && GravleashPlan.assaultRound(context.game)
                 && target == context.game.getMecatolTile()
                 && !seat.controlsMecatol(true)
                 && (plan.kind() == Kind.EXPAND || plan.kind() == Kind.ATTACK);
         if (!assault) return plan;
+        List<UnitMove> reserved = reservedForScoring(context, target);
         List<UnitMove> moves = new ArrayList<>(plan.moves());
         for (Tile origin : context.origins()) {
             if (origin == target) continue;
-            massFrom(context, origin, target, plan.moves()).ifPresent(legal -> {
+            massFrom(context, origin, target, plan.moves(), reserved).ifPresent(legal -> {
                 moves.removeIf(move -> move.origin().equals(origin.getPosition()));
                 moves.addAll(legal);
             });
@@ -743,35 +743,31 @@ public class TacticalPlanner {
     }
 
     private static Optional<List<UnitMove>> massFrom(
-            Context context, Tile origin, Tile target, List<UnitMove> planned) {
+            Context context, Tile origin, Tile target, List<UnitMove> planned, List<UnitMove> reserved) {
         Player seat = context.seat;
         UnitHolder space = BoardView.space(origin);
         List<UnitMove> here = new ArrayList<>(movesFrom(origin, planned));
+        List<UnitMove> held = movesFrom(origin, reserved);
         for (UnitType type : BoardView.MOVING_SHIPS) {
-            int spare = BoardView.count(space, seat, type) - countOf(here, type);
+            int spare = BoardView.count(space, seat, type) - countOf(here, type) - countOf(held, type);
             if (spare > 0 && context.linkedReaches(origin, target, type)) {
                 here.add(new UnitMove(origin.getPosition(), BoardView.SPACE, type, spare));
             }
         }
         List<UnitMove> group = merge(here);
-        List<UnitMove> kept = keepingOneBehind(context, origin, target, group);
-        if (!context.carriesItsOwnSpeed(origin, target, kept)) return Optional.empty();
-        return legalMoves(context, origin, target, kept, true);
+        if (!context.carriesItsOwnSpeed(origin, target, group)) return Optional.empty();
+        return legalMoves(context, origin, target, group, true);
     }
 
-    private static List<UnitMove> keepingOneBehind(Context context, Tile origin, Tile target, List<UnitMove> group) {
-        if (origin != context.seat.getHomeSystemTile()) return group;
-        for (UnitType type : List.of(UnitType.Destroyer, UnitType.Cruiser)) {
-            if (countOf(group, type) == 0) continue;
-            List<UnitMove> fewer = new ArrayList<>();
-            for (UnitMove move : group) {
-                boolean lighter = move.type() == type && move.count() > 0;
-                if (lighter && move.count() == 1) continue;
-                fewer.add(lighter ? new UnitMove(move.origin(), move.holder(), type, move.count() - 1) : move);
-            }
-            return context.carriesItsOwnSpeed(origin, target, fewer) ? fewer : group;
-        }
-        return group;
+    private static List<UnitMove> reservedForScoring(Context context, Tile target) {
+        return context.game.getTileMap().values().stream()
+                .filter(tile -> tile != target && activatable(context.game, context.seat, tile))
+                .map(tile -> bestFor(context, tile))
+                .flatMap(Optional::stream)
+                .filter(plan -> scoringValue(context.game, context.seat, plan) > 0)
+                .max(Comparator.comparingDouble(TacticalPlan::score))
+                .map(TacticalPlan::moves)
+                .orElse(List.of());
     }
 
     private static Optional<TacticalPlan> moving(

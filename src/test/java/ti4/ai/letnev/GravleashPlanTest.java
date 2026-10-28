@@ -63,7 +63,7 @@ class GravleashPlanTest extends BaseTi4Test {
     }
 
     @Test
-    void imperialAndWarfareAreWorthMoreToAHeroHolderInRoundsFourAndFive() {
+    void imperialAndWarfareAreWorthMoreToAHeroHolderInAnyRound() {
         unlockHero();
 
         assertThat(GravleashPlan.cardBonus(test.game, letnev, StrategyCard.IMPERIAL))
@@ -75,9 +75,9 @@ class GravleashPlanTest extends BaseTi4Test {
                 .isPositive();
         assertThat(GravleashPlan.cardBonus(test.game, letnev, StrategyCard.TRADE))
                 .isZero();
-        test.game.setRound(3);
+        test.game.setRound(2);
         assertThat(GravleashPlan.cardBonus(test.game, letnev, StrategyCard.IMPERIAL))
-                .isZero();
+                .isPositive();
     }
 
     private Set<UnitType> shipTypes(BuildPlan plan) {

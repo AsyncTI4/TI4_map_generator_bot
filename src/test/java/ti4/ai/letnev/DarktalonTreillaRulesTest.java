@@ -196,12 +196,12 @@ class DarktalonTreillaRulesTest extends BaseTi4Test {
     }
 
     @Test
-    void keepsTheHeroForMecatolOutsideRoundsFourAndFive() {
-        test.game.setRound(3);
+    void sendsTheFleetAtMecatolInAnyRoundOnceTheHeroIsUnlocked() {
+        test.game.setRound(2);
         test.nekro.addSC(8);
         fleetBesideMecatol(5);
 
-        assertThat(DarktalonTreillaRules.assaultsMecatol(test.game, test.nekro)).isFalse();
+        assertThat(DarktalonTreillaRules.assaultsMecatol(test.game, test.nekro)).isTrue();
     }
 
     // With the hero in play the Mecatol strike takes every ship that reaches, not just the carrier and its infantry.
