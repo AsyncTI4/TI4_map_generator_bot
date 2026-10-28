@@ -17,6 +17,8 @@ import ti4.helpers.AgendaRiderHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 
 @UtilityClass
 public class PublicOutrageAcd2ButtonHandler {
@@ -146,6 +148,8 @@ public class PublicOutrageAcd2ButtonHandler {
         if (acID != null) {
             target.removeActionCard(takenNum);
             player.setActionCard(acID);
+            KnownCardsService.recordCardPassed(
+                    target, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
             ActionCardHelper.sendActionCardInfo(game, target);
             ActionCardHelper.sendActionCardInfo(game, player);
             MessageHelper.sendMessageToChannel(

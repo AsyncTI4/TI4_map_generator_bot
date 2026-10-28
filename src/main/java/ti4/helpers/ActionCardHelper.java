@@ -2713,6 +2713,8 @@ public class ActionCardHelper {
 
         player.removeActionCard(handIndex);
         p2.setActionCard(acID);
+        KnownCardsService.recordCardPassed(
+                player, p2, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
         ButtonHelper.checkACLimit(game, p2);
         sendActionCardInfo(game, player);
         sendActionCardInfo(game, p2);
@@ -2738,6 +2740,8 @@ public class ActionCardHelper {
         }
         player.removeActionCard(actionCardsMap.get(acID));
         player2.setActionCard(acID);
+        KnownCardsService.recordCardPassed(
+                player, player2, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
         sendActionCardInfo(game, player2);
         ButtonHelper.checkACLimit(game, player2);
         sendActionCardInfo(game, player);

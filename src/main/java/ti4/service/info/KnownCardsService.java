@@ -74,6 +74,15 @@ public class KnownCardsService {
         }
     }
 
+    public static void recordCardPassed(Player from, Player to, KnownCardType type, String cardName) {
+        if (from == null || to == null || from == to || cardName == null) {
+            return;
+        }
+        forgetOneCopy(to, from, type, cardName);
+        excludeLatestRemovalFromHiddenCount(to, from, type);
+        recordCardShown(from, to, type, cardName);
+    }
+
     public static void recordCardShown(Player viewer, Player target, KnownCardType type, String cardName) {
         if (viewer == null || viewer == target || cardName == null) {
             return;
@@ -171,6 +180,17 @@ public class KnownCardsService {
                 viewer.removeFromStoredList(key, stored);
                 return;
             }
+        }
+    }
+
+    private static void excludeLatestRemovalFromHiddenCount(Player viewer, Player target, KnownCardType type) {
+        String key = knownCardsKey(target, type);
+        String[] shifted = getKnownCards(viewer, target, type).stream()
+                .map(card -> new KnownCard(card.name(), card.hiddenRemovalsAtReveal() + 1).serialize())
+                .toArray(String[]::new);
+        viewer.removeStoredValue(key);
+        if (shifted.length > 0) {
+            viewer.addToStoredList(key, shifted);
         }
     }
 

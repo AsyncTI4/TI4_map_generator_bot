@@ -17,6 +17,8 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 
 @UtilityClass
 class EspionageAcd2ButtonHandler {
@@ -154,6 +156,8 @@ class EspionageAcd2ButtonHandler {
 
         target.removeActionCard(acIndex);
         initiator.setActionCard(actionCardId);
+        KnownCardsService.recordCardPassed(
+                target, initiator, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(actionCardId));
         ActionCardHelper.sendActionCardInfo(game, target);
         ActionCardHelper.sendActionCardInfo(game, initiator);
         ButtonHelper.checkACLimit(game, initiator);

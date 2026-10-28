@@ -130,6 +130,34 @@ class KnownCardsServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void stealIsKnownToBothThiefAndVictimButHiddenFromBystanders() {
+        target.setActionCard("sh1");
+        target.setActionCard("sabo1");
+        KnownCardsService.recordHandShown(viewer, target, KnownCardType.ACTION_CARD);
+        KnownCardsService.recordHandShown(bystander, target, KnownCardType.ACTION_CARD);
+
+        // The viewer steals Shields Holding from the target.
+        target.removeActionCard(target.getActionCards().get("sh1"));
+        viewer.setActionCard("sh1");
+        KnownCardsService.recordCardPassed(target, viewer, KnownCardType.ACTION_CARD, "Shields Holding");
+
+        // The thief knows exactly which card left, so no steal is counted for them.
+        String thiefView = onlyEmbedDescription(viewer);
+        assertThat(thiefView).contains("- Sabotage").doesNotContain("Shields Holding");
+        assertThat(thiefView).doesNotContain("since reveal");
+
+        // The victim now knows the thief holds the stolen card.
+        assertThat(onlyEmbedDescription(target)).contains("- Shields Holding");
+
+        // A bystander only knows that some card was taken.
+        List<MessageEmbed> bystanderEmbeds = KnownCardsService.getKnownCardHandEmbeds(game, bystander);
+        assertThat(bystanderEmbeds).hasSize(1);
+        assertThat(bystanderEmbeds.getFirst().getDescription())
+                .contains("- Shields Holding (1 steal since reveal)")
+                .contains("- Sabotage (1 steal since reveal)");
+    }
+
+    @Test
     void cardShownToAllIsKnownByEveryoneButTheOwner() {
         target.setActionCard("sh1");
 
