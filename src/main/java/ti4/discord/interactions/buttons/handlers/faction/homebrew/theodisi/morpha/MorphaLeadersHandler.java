@@ -151,7 +151,7 @@ public class MorphaLeadersHandler {
         ActionCardHelper.sendActionCard(event, game, player, heroOwner, actionCard);
         List<Button> buttons =
                 new ArrayList<>(StrategyCardSecondaryButtonService.getSecondaryAbilityButtons(game, strategyCard));
-        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " may resolve the secondary ability of **"

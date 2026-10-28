@@ -169,7 +169,7 @@ public final class ButtonHelperTacticalAction {
                     player.factionButtonChecker() + "planetAbilityExhaust_petraunleashed",
                     "Use " + Mapper.getPlanet("petraunleashed").getLegendaryAbilityName(),
                     FactionEmojis.stoneborn));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
@@ -195,7 +195,7 @@ public final class ButtonHelperTacticalAction {
                                 Buttons.gray("setTrapStep3_" + planet, Helper.getPlanetRepresentation(planet, game)));
                     }
                 }
-                trapButtons.add(Buttons.red("deleteButtons", "Decline"));
+                trapButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 String msg =
                         player.getRepresentationUnfogged() + " you can use the buttons to place a trap on a planet";
                 if (trapButtons.size() > 1) {
@@ -210,7 +210,7 @@ public final class ButtonHelperTacticalAction {
                                         + " you may use "
                                         + AgentLifecycle.agentNameForHolder(game, player, "celdauriagent")
                                         + " to place 1 space dock for 2 trade goods or 2 commodities.",
-                                List.of(button, Buttons.red("deleteButtons", "Decline"))));
+                                List.of(button, Buttons.DECLINE_DELETE_BUTTONS)));
             }
             if (player.hasAbility("miniaturization")
                     || player.hasUnit("tk-keshnu")
@@ -291,7 +291,7 @@ public final class ButtonHelperTacticalAction {
 
                     if (!excavatorPlanets.isEmpty()
                             && !"yes".equals(game.getStoredValue(player.getFaction() + "usedExcavatorThisAction"))) {
-                        excavatorPlanets.add(Buttons.red("deleteButtons", "Decline"));
+                        excavatorPlanets.add(Buttons.DECLINE_DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
                                 player.getRepresentation()
@@ -308,7 +308,7 @@ public final class ButtonHelperTacticalAction {
                         + ", you may use the button to explore a planet using _The Crown of Emphidia_.";
                 List<Button> systemButtons2 = new ArrayList<>();
                 systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
-                systemButtons2.add(Buttons.red("deleteButtons", "Decline"));
+                systemButtons2.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
             }
             if (game.isWarfareAction()
@@ -444,7 +444,7 @@ public final class ButtonHelperTacticalAction {
                     + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
                     + " If you do, you will also choose another player, who will gain 2 trade goods.";
             List<Button> buttons2 = new ArrayList<>();
-            buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+            buttons2.add(Buttons.USE_PRODUCTION_BIOMES);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
         }
         ButtonHelper.deleteMessage(event);
@@ -466,7 +466,7 @@ public final class ButtonHelperTacticalAction {
         if (unitsWereMoved && tile.getPlanetUnitHolders().isEmpty() && player.hasUnexhaustedLeader("empyreanagent")) {
             List<Button> empyButtons = new ArrayList<>();
             empyButtons.add(EmpyreanAgent.button(player));
-            empyButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+            empyButtons.add(Buttons.DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     player.getRepresentationUnfogged() + ", use button to exhaust "
@@ -543,7 +543,7 @@ public final class ButtonHelperTacticalAction {
                     player.factionButtonChecker() + "deployOoze_" + tile.getPosition(),
                     "Deploy The Ooze",
                     FactionEmojis.morpha));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation()
@@ -1110,7 +1110,7 @@ public final class ButtonHelperTacticalAction {
                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
                         .contains(tile)) {
             List<Button> buttons = new ArrayList<>();
-            Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm);
+            Button getCommButton = Buttons.GAIN_1_COMMODITY;
             buttons.add(getCommButton);
             String msg = player.getRepresentation()
                     + " you have Henry Storcher, the Celdauri Commander, and activated a system with your space dock. Please use the button to get a commodity.";

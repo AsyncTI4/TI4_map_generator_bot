@@ -323,7 +323,7 @@ public class StartTurnService {
                             player.factionButtonChecker() + "redCreussWashPartial_" + p2.getUserID(),
                             "Partial Wash",
                             MiscEmojis.Wash));
-                    buttonsRedCreuss.add(Buttons.red("deleteButtons", "Decline"));
+                    buttonsRedCreuss.add(Buttons.DECLINE_DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCorrectChannel(),
                             player.getRepresentationUnfogged() + ", both you and " + p2.getRepresentationNoPing()
@@ -814,7 +814,7 @@ public class StartTurnService {
 
                     List<Button> ralnelHeroButtons = new ArrayList<>();
                     ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset Ral Nel Hero"));
-                    ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                    ralnelHeroButtons.add(Buttons.DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
                 }
@@ -827,7 +827,7 @@ public class StartTurnService {
                                 + " Don't worry, you can always unset the preset later if you decide you don't want to use it.";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("resolvePreassignment_Puppets On A String", "Pre-Play Puppets On A String"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
 
@@ -1012,7 +1012,7 @@ public class StartTurnService {
                     factionChecker + "exhaustTech_dsuydag", "Exhaust Messiah Protocols", TechEmojis.BioticTech));
         }
 
-        Button transaction = Buttons.blue("transaction", "Transaction");
+        Button transaction = Buttons.TRANSACTION;
         startButtons.add(transaction);
         Button modify = Buttons.gray("getModifyTiles", "Modify Units");
         startButtons.add(modify);

@@ -141,7 +141,7 @@ public class CardsInfoService {
         if (game.isMonumentsMode() && player.hasUnit("nekro_monument")) {
             buttons.add(NekroMonumentService.getCopyMonumentButton(player));
         }
-        Button transaction = Buttons.blue("transaction", "Transaction");
+        Button transaction = Buttons.TRANSACTION;
         buttons.add(transaction);
         Button modify = Buttons.gray("getModifyTiles", "Modify Units");
         buttons.add(modify);

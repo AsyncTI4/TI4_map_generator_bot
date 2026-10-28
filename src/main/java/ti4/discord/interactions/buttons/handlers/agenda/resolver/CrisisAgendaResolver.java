@@ -8,9 +8,6 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
-import ti4.service.emoji.CardEmojis;
-import ti4.service.emoji.MiscEmojis;
-import ti4.service.emoji.UnitEmojis;
 import ti4.service.strategycard.PlayStrategyCardService;
 
 public class CrisisAgendaResolver implements AgendaResolver {
@@ -24,15 +21,15 @@ public class CrisisAgendaResolver implements AgendaResolver {
         if (game.isHomebrewSCMode()) return;
         List<Button> scButtons = new ArrayList<>();
         switch (winner) {
-            case "1" -> scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
-            case "2" -> scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
-            case "3" -> scButtons.add(Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", CardEmojis.ActionCard));
+            case "1" -> scButtons.add(Buttons.SPEND_AND_GAIN_COMMAND_TOKENS);
+            case "2" -> scButtons.add(Buttons.DIPLO_READY_2_PLANETS);
+            case "3" -> scButtons.add(Buttons.SC_DRAW_2_ACTION_CARDS);
             case "4" -> {
-                scButtons.add(Buttons.green("construction_spacedock", "Place 1 Space Dock", UnitEmojis.spacedock));
-                scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
+                scButtons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
+                scButtons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
             }
-            case "5" -> scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
-            case "6" -> scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
+            case "5" -> scButtons.add(Buttons.REPLENISH_COMMODITIES);
+            case "6" -> scButtons.add(Buttons.WARFARE_BUILD_AT_HOME);
             case "7" -> {
                 scButtons.add(Buttons.GET_A_TECH);
                 if (!game.isFowMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
@@ -41,7 +38,7 @@ public class CrisisAgendaResolver implements AgendaResolver {
             }
             case "8" -> {
                 PlayStrategyCardService.handleSOQueueing(game, false);
-                scButtons.add(Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
+                scButtons.add(Buttons.SC_DRAW_SECRET_OBJECTIVE);
             }
         }
         scButtons.add(Buttons.blue("sc_no_follow_" + winner, "Not Following"));

@@ -52,7 +52,7 @@ public final class RevenantAgent extends AgentModule<RevenantAgent.Readying> {
                 Buttons.green(
                         ownedButtonId(player, ID, player.getFaction() + SEPARATOR + tech.getAlias()),
                         "Ready " + tech.getNameRepresentation()),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
     }
 
     public static Button cardsInfoButton(Player player) {

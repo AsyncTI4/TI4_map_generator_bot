@@ -48,7 +48,7 @@ public class LunariumAbilityHandler {
         List<Button> buttons = List.of(
                 Buttons.green("lunariumMoveCCToSheet", "Move Token to Faction Sheet", FactionEmojis.lunarium),
                 Buttons.red("lunariumMoveCCFromSheet", "Move Token from Faction Sheet", FactionEmojis.lunarium),
-                Buttons.gray("deleteButtons", "Done"));
+                Buttons.DONE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(), buildButtonMessage(player, getFactionSheetCCs(game, player)), buttons);
     }

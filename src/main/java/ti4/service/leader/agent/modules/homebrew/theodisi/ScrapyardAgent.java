@@ -44,7 +44,7 @@ public final class ScrapyardAgent extends AgentModule<Player> {
                         ownedButtonId(agentOwner, ID, activePlayer.getFaction()),
                         "Declare Rikka",
                         FactionEmojis.scrapyard),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
     }
 
     // TODO: drop this once games started before the agent-module migration (2026-10-27) have finished.

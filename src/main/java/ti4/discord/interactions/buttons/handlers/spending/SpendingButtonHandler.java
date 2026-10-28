@@ -33,7 +33,6 @@ import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
-import ti4.service.emoji.MiscEmojis;
 import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.unit.AddUnitService;
 
@@ -145,7 +144,7 @@ class SpendingButtonHandler {
                         + planetName
                         + ") for its technology speciality.";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm));
+                buttons.add(Buttons.GAIN_1_COMMODITY);
                 buttons.add(Buttons.red("deleteButtons", "N/A"));
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),

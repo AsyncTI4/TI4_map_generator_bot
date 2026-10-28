@@ -407,7 +407,7 @@ class DeleteButtonsButtonHandler {
                 if (!buttonID.contains("deleteButtons")) {
                     doneExhausting = Buttons.red("deleteButtons_" + buttonID, "Done Exhausting Planets");
                 } else {
-                    doneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
+                    doneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS;
                 }
                 if (warM) {
                     player.addSpentThing("warmachine");
@@ -450,7 +450,7 @@ class DeleteButtonsButtonHandler {
                             + " but does not contain a legendary planet or another player's units. Please use the button to resolve.";
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green("startRallyToTheCause", "Rally To The Cause"));
-                    buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons2.add(Buttons.DECLINE_DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
                 }
                 if (player.hasTech("tf-rallythehorde")) {
@@ -459,7 +459,7 @@ class DeleteButtonsButtonHandler {
                             + " you may place a neutral ship of that type in any system which does not possess any non-neutral ships. Press button to resolve";
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green("startRallyTheHorde", "Rally The Horde"));
-                    buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons2.add(Buttons.DECLINE_DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
                 }
             }
@@ -519,7 +519,7 @@ class DeleteButtonsButtonHandler {
                     String message = player.getRepresentationNoPing() + ", you may use "
                             + AgentLifecycle.agentNameForHolder(game, player, "nomadagentmercer") + ".";
                     systemButtons2.addAll(MercerAgent.buttons(game, player));
-                    systemButtons2.add(Buttons.red("deleteButtons", "Decline"));
+                    systemButtons2.add(Buttons.DECLINE_DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
                 }
 

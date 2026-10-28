@@ -1119,7 +1119,7 @@ public class StartCombatService {
             }
             if (ButtonHelper.doesPlayerHaveFSHere("cymiae_flagship", player, tile)) {
                 buttons.add(Buttons.green("resolveSpyStep1", "Resolve Cymiae Flagship"));
-                buttons.add(Buttons.red("deleteButtons", "Delete These"));
+                buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         msg
@@ -1200,7 +1200,7 @@ public class StartCombatService {
                                         player.factionButtonChecker() + "useVanguardReinforce",
                                         "Use Reinforce (On Win)",
                                         FactionEmojis.vanguard),
-                                Buttons.red("deleteButtons", "Decline")));
+                                Buttons.DECLINE_DELETE_BUTTONS));
             }
             if (!"space".equalsIgnoreCase(type) && player.hasAbility("enhanced_fundamentals") && player.getTg() >= 2) {
                 VanguardAbilitiesHandler.sendFundamentalsButton(player);

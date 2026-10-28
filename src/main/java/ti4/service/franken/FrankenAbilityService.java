@@ -111,7 +111,7 @@ public class FrankenAbilityService {
             }
             if ("ancient_empire".equalsIgnoreCase(abilityID)) {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("startAncientEmpire", "Place a Tomb Token"));
+                buttons.add(Buttons.PLACE_A_TOMB_TOKEN);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentation() + ", please place up to 14 Tomb tokens for **Ancient Empire**.",

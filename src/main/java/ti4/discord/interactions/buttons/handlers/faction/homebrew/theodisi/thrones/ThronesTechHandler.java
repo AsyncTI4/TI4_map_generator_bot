@@ -45,7 +45,7 @@ public class ThronesTechHandler {
     public static List<Button> getSpecterStepButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(player.factionButtonChecker() + USE_SS, "Use Specter Step", FactionEmojis.thrones));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         return buttons;
     }
 
@@ -107,7 +107,7 @@ public class ThronesTechHandler {
         }
 
         String message = player.getRepresentation() + ", please choose the system to which to move the ship.";
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         String pagePrefix = player.factionButtonChecker() + SS_DESTINATION_PAGE + asyncId + "_";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), destinationButtons, extraButtons, message, pagePrefix, buttonID)) {
@@ -134,7 +134,7 @@ public class ThronesTechHandler {
                 event,
                 event.getMessageChannel(),
                 destinationButtons,
-                List.of(Buttons.red("deleteButtons", "Decline")),
+                List.of(Buttons.DECLINE_DELETE_BUTTONS),
                 player.getRepresentation() + ", please choose the system to which to move the ship.",
                 player.factionButtonChecker() + SS_DESTINATION_PAGE + asyncId + "_",
                 buttonID);
@@ -366,7 +366,7 @@ public class ThronesTechHandler {
                                     player.factionButtonChecker() + USE_RTB,
                                     "Use Rift-Touched Bastion",
                                     FactionEmojis.thrones),
-                            Buttons.red("deleteButtons", "Decline")));
+                            Buttons.DECLINE_DELETE_BUTTONS));
         }
     }
 

@@ -212,7 +212,7 @@ public class SilverFlameService {
             String ffcc = player.factionButtonChecker();
             scoreButtons.add(Buttons.green(
                     ffcc + "scoreSilverFlameBAM", "Score Become A Martyr", CardEmojis.SecretObjectiveAlt));
-            scoreButtons.add(Buttons.red("deleteButtons", "Decline"));
+            scoreButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
                     "You have _Become A Martyr_, and have just catastrophically lost control of a planet in your home system. "

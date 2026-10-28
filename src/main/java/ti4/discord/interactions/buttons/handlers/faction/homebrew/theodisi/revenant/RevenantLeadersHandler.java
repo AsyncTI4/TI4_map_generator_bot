@@ -433,7 +433,7 @@ public class RevenantLeadersHandler {
         if (buttons.isEmpty()) {
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -473,7 +473,7 @@ public class RevenantLeadersHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", choose where to place the infantry with Melloh Terras.",
@@ -758,7 +758,7 @@ public class RevenantLeadersHandler {
                 event,
                 event.getMessageChannel(),
                 getRevKryxosTechButtons(player, availableTechs, step),
-                List.of(Buttons.red("deleteButtons", "Decline")),
+                List.of(Buttons.DECLINE_DELETE_BUTTONS),
                 menuMessage,
                 paginationPrefix,
                 buttonID)) {

@@ -56,7 +56,7 @@ public final class AgendaWhensAftersHelper {
             List<Button> buttons = new ArrayList<>();
 
             buttons.add(Buttons.green("resolvePreassignment_Pass On Shenanigans", "Pre-Pass"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
     }
@@ -89,7 +89,7 @@ public final class AgendaWhensAftersHelper {
                     && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
                 game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens") + player.getFaction() + "_");
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.red("queueAWhen", "Play A When"));
+                buttons.add(Buttons.PLAY_A_WHEN);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         "You have declined to queue a \"when\". You can change your mind with this button.",
@@ -161,7 +161,7 @@ public final class AgendaWhensAftersHelper {
         if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens") + player.getFaction() + "_");
             buttons = new ArrayList<>();
-            buttons.add(Buttons.red("queueAWhen", "Play A When"));
+            buttons.add(Buttons.PLAY_A_WHEN);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
                     "You have declined to queue a \"when\". You can change your mind with this button.",
@@ -278,7 +278,7 @@ public final class AgendaWhensAftersHelper {
         String msg = "Successfully queued '" + event.getButton().getLabel()
                 + "'. You can use this button to unqueue it and pass on \"when\"s.";
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"When\"s"));
+        buttons.add(Buttons.PASS_ON_WHENS);
         GMService.addForcePassWhenButtonForFowGM(game, player, buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         resolveWhenQueue(event, game);
@@ -318,7 +318,7 @@ public final class AgendaWhensAftersHelper {
         String msg = "Successfully queued '" + event.getButton().getLabel()
                 + "'. You can use this button to unqueue it and pass on \"afters\".";
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+        buttons.add(Buttons.PASS_ON_AFTERS);
         GMService.addForcePassAfterButtonForFowGM(game, player, buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
 
@@ -491,7 +491,7 @@ public final class AgendaWhensAftersHelper {
             List<Button> buttons = new ArrayList<>();
 
             buttons.add(Buttons.gray("queueAWhen", "Play A \"When\""));
-            buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"When\"s"));
+            buttons.add(Buttons.PASS_ON_WHENS);
             GMService.addForcePassWhenButtonForFowGM(game, player, buttons);
             buttons.add(Buttons.gray("explainQueue", "How Does This Work?"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg.toString(), buttons);
@@ -782,7 +782,7 @@ public final class AgendaWhensAftersHelper {
                                 List<Button> buttons = new ArrayList<>();
 
                                 buttons.add(Buttons.gray("queueAnAfter", "Play An \"After\""));
-                                buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+                                buttons.add(Buttons.PASS_ON_AFTERS);
                                 GMService.addForcePassAfterButtonForFowGM(game, player, buttons);
                                 MessageHelper.sendMessageToChannelWithButtons(
                                         p2.getCardsInfoThread(), msg.toString(), buttons);
@@ -869,7 +869,7 @@ public final class AgendaWhensAftersHelper {
                             + " If this is a bug or unimplemented ability, please report it in the `#bot-bugs-and-feature-requests` channel.");
             return;
         }
-        buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"When\"s"));
+        buttons.add(Buttons.PASS_ON_WHENS);
         GMService.addForcePassWhenButtonForFowGM(game, player, buttons);
         game.setStoredValue(
                 "declinedWhens", game.getStoredValue("declinedWhens").replace(player.getFaction() + "_", ""));
@@ -884,7 +884,7 @@ public final class AgendaWhensAftersHelper {
         game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens") + player.getFaction() + "_");
         resolveWhenQueue(event, game);
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.red("queueAWhen", "Play A \"When\""));
+        buttons.add(Buttons.PLAY_A_WHEN);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 "You have declined to queue a \"when\". You can change your mind with this button.",
@@ -908,7 +908,7 @@ public final class AgendaWhensAftersHelper {
         buttons = new ArrayList<>();
 
         buttons.add(Buttons.gray("queueAnAfter", "Play An \"After\""));
-        buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+        buttons.add(Buttons.PASS_ON_AFTERS);
         GMService.addForcePassAfterButtonForFowGM(game, player, buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg.toString(), buttons);
     }
@@ -923,7 +923,7 @@ public final class AgendaWhensAftersHelper {
                             + " If this is a bug or unimplemented ability, please report it in the `#bot-bugs-and-feature-requests` channel.");
             return;
         }
-        buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+        buttons.add(Buttons.PASS_ON_AFTERS);
         GMService.addForcePassAfterButtonForFowGM(game, player, buttons);
         game.setStoredValue("queuedAftersLockedFor" + player.getFaction(), "");
         game.setStoredValue(
@@ -971,7 +971,7 @@ public final class AgendaWhensAftersHelper {
         buttons = new ArrayList<>();
 
         buttons.add(Buttons.green("resolvePreassignment_Pass On Shenanigans", "Pre-Pass"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -998,7 +998,7 @@ public final class AgendaWhensAftersHelper {
                 + " if you intend to preset an abstention or vote on this agenda, you have the option to preset it here."
                 + " Feel free not to, this is simply an optional way to resolve agendas faster. Any pre-votes will be automatically erased if someone plays an \"after\".";
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("preVote", "Pre-Vote"));
+        buttons.add(Buttons.PRE_VOTE);
         if (player.hasAbility("future_sight")
                 && game.getStoredValue("executiveOrder").isEmpty()) {
             msg += " Reminder that you have **Future Sight** and may wish to not abstain.";
@@ -1054,8 +1054,8 @@ public final class AgendaWhensAftersHelper {
                             + " If you cannot vote due to playing a rider or having no votes just ignore this button.";
                 }
             }
-            buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-Abstain"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.PRE_ABSTAIN);
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         }
 
         if (!game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
@@ -1347,9 +1347,9 @@ public final class AgendaWhensAftersHelper {
         game.setStoredValue("preVoting" + player.getFaction(), "");
         player.resetSpentThings();
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("preVote", "Pre-Vote"));
-        buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
-        buttons.add(Buttons.red("deleteButtons", "Don't do anything"));
+        buttons.add(Buttons.PRE_VOTE);
+        buttons.add(Buttons.PRE_ABSTAIN);
+        buttons.add(Buttons.DONT_DO_ANYTHING);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation()

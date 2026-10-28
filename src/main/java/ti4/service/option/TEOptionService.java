@@ -351,7 +351,7 @@ public class TEOptionService {
         // game, press this button and it will be added to the map when secrets are dealt.";
         // List<Button> buttons = new ArrayList<>();
         // buttons.add(Buttons.green("addLegendaryMecatol", "Use Legendary Mecatol Rex"));
-        // buttons.add(Buttons.red("deleteButtons", "Decline"));
+        // buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         // MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
 
         // msg =
@@ -360,7 +360,7 @@ public class TEOptionService {
         // (and other TE tiles), press this button.";
         // buttons = new ArrayList<>();
         // buttons.add(Buttons.green("addEntropicScar", "Use Entropic Scar & Other Tiles"));
-        // buttons.add(Buttons.red("deleteButtons", "Decline"));
+        // buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         // MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
 
         // msg =
@@ -496,7 +496,7 @@ public class TEOptionService {
             galacticEventButtons.add(Buttons.green("enableDaneMode_ageOfCommerce_enable", "Enable Age of Commerce"));
         }
 
-        galacticEventButtons.add(Buttons.gray("deleteButtons", "Done"));
+        galacticEventButtons.add(Buttons.DONE_DELETE_BUTTONS);
 
         return galacticEventButtons;
     }

@@ -552,7 +552,7 @@ public class PlayerTechService {
             case "baarvag" -> { // Mageon
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
+                buttons.add(Buttons.DRAW_1_ACTION_CARD_DELETE);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         player.getRepresentationUnfogged() + ", use buttons to discard.",
@@ -580,7 +580,7 @@ public class PlayerTechService {
                 deleteTheOneButtonIfButtonEvent(event);
                 ActionCardHelper.doRise(player, event, game);
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-                Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+                Button doneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
                 buttons.add(doneExhausting);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),

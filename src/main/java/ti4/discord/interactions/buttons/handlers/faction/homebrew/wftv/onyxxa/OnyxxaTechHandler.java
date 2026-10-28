@@ -47,7 +47,7 @@ public class OnyxxaTechHandler {
                     "Secondary of " + game.getSCName(scNum)));
         }
         if (scButtons.isEmpty()) return;
-        scButtons.add(Buttons.red("deleteButtons", "Decline"));
+        scButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + ", choose the strategy card whose secondary ability you will"
@@ -75,7 +75,7 @@ public class OnyxxaTechHandler {
         ButtonHelper.deleteMessage(event);
         List<Button> scButtons =
                 new ArrayList<>(StrategyCardSecondaryButtonService.getSecondaryAbilityButtons(game, scNum));
-        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+        scButtons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + payment + " is using _Strategic Inversion_ to resolve the secondary"

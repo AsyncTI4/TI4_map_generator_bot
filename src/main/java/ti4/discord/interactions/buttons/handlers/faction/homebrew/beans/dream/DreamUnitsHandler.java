@@ -52,7 +52,7 @@ public class DreamUnitsHandler {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("dream_offer_add_nexus", "Add Nexus Token"));
         buttons.add(Buttons.blue("dream_offer_move_nexus", "Move Nexus Token"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -80,7 +80,7 @@ public class DreamUnitsHandler {
                     "Place Nexus in " + tileWithUnits.getRepresentationForButtons(game, player)));
         }
         List<Button> menuButtons =
-                List.of(Buttons.gray(LITURGY_MENU_BUTTON_ID, "Back"), Buttons.red("deleteButtons", "Decline"));
+                List.of(Buttons.gray(LITURGY_MENU_BUTTON_ID, "Back"), Buttons.DECLINE_DELETE_BUTTONS);
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event,
                 player.getCorrectChannel(),
@@ -125,7 +125,7 @@ public class DreamUnitsHandler {
             return;
         }
         buttons.add(Buttons.gray(LITURGY_MENU_BUTTON_ID, "Back"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), player.getRepresentation() + ", choose a nexus token to move:", buttons);
@@ -146,7 +146,7 @@ public class DreamUnitsHandler {
                         "Move Nexus to " + toTile.getRepresentationForButtons(game, player)))
                 .toList();
         List<Button> menuButtons =
-                List.of(Buttons.gray(LITURGY_MENU_BUTTON_ID, "Back"), Buttons.red("deleteButtons", "Decline"));
+                List.of(Buttons.gray(LITURGY_MENU_BUTTON_ID, "Back"), Buttons.DECLINE_DELETE_BUTTONS);
         String pagePrefix = "dream_liturgy_move_destination_" + fromTile.getPosition() + "_";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, player.getCorrectChannel(), destinationButtons, menuButtons, message, pagePrefix, buttonID)) {
@@ -183,7 +183,7 @@ public class DreamUnitsHandler {
                         "Move Nexus to " + toTile.getRepresentationForButtons(game, player)))
                 .toList();
         List<Button> menuButtons =
-                List.of(Buttons.gray(LITURGY_MENU_BUTTON_ID, "Back"), Buttons.red("deleteButtons", "Decline"));
+                List.of(Buttons.gray(LITURGY_MENU_BUTTON_ID, "Back"), Buttons.DECLINE_DELETE_BUTTONS);
         NewStuffHelper.checkAndHandlePaginationChange(
                 event,
                 player.getCorrectChannel(),
@@ -372,7 +372,7 @@ public class DreamUnitsHandler {
 
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
         buttons.add(Buttons.green("dream_recurring_mech_paid_" + amount + "_from_" + source, "Done Spending"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", may spend 1 influence to place "
@@ -398,7 +398,7 @@ public class DreamUnitsHandler {
             return;
         }
 
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

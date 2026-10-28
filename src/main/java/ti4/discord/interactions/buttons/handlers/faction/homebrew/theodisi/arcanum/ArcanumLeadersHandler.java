@@ -52,7 +52,7 @@ public class ArcanumLeadersHandler {
         if (buttons.isEmpty()) {
             return;
         }
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         List<Button> displayedButtons = buttons.size() <= 24
                 ? new ArrayList<>(buttons)
                 : NewStuffHelper.buttonPagination(
@@ -80,7 +80,7 @@ public class ArcanumLeadersHandler {
             return;
         }
         List<Button> techButtons = getArcanumCommanderTechPurgeButtons(player);
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         String message = player.getRepresentation()
                 + ", you may use Orthis Lithon, the Arcanum commander, to purge 1 technology as a relic fragment.";
         if (NewStuffHelper.checkAndHandlePaginationChange(
@@ -106,7 +106,7 @@ public class ArcanumLeadersHandler {
                 Buttons.gray(
                         player.factionButtonChecker() + CHOOSE_COMMANDER_FRAGMENT_TYPE + techID + "|frontier",
                         "Frontier"),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", choose the relic fragment type for "

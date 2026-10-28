@@ -67,7 +67,7 @@ public final class NetrunnersAgent extends AgentModule<NetrunnersAgent.TechSwap>
                                 holder.factionButtonChecker() + SELECT_SELF_TECH + gainedTech,
                                 useLabel(holder, ID, AGENT_LABEL),
                                 FactionEmojis.netrunners),
-                        Buttons.red("deleteButtons", "Decline")));
+                        Buttons.DECLINE_DELETE_BUTTONS));
     }
 
     @ButtonHandler(USE_ON_OTHER)

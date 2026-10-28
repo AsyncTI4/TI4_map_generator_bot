@@ -39,7 +39,7 @@ public final class ToldarAgent extends TargetedAgent {
                     ownedButtonId(toldar, ID, replenisher.getFaction()),
                     useLabel(toldar, ID, "Toldar Agent"),
                     FactionEmojis.toldar));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     toldar.getCardsInfoThread(),
                     toldar.getRepresentationUnfogged() + ", you may use "

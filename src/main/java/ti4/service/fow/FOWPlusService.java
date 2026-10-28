@@ -389,7 +389,7 @@ public final class FOWPlusService {
                                 Buttons.gray(
                                         "fowplus_sacrifice_" + planetID,
                                         "Destroy ground forces on " + Helper.getPlanetRepresentation(planetID, game)),
-                                Buttons.red("deleteButtons", "Done Resolving")));
+                                Buttons.DONE_RED_DELETE_BUTTONS));
                 break;
         }
     }

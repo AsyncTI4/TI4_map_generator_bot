@@ -59,7 +59,7 @@ public final class RevenantScrapyardAgent extends AgentModule<Player> {
         String message = agentOwner.getRepresentation() + ", choose the player who will produce 1 unit with "
                 + "Thrash \"Feral\" Burner, the Revenant of Scrapyard agent.";
         String prefix = agentOwner.factionButtonChecker() + SELECT_TARGET;
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, agentOwner.getCorrectChannel(), buttons, extraButtons, message, prefix, buttonID)) {
             return;
@@ -125,7 +125,7 @@ public final class RevenantScrapyardAgent extends AgentModule<Player> {
     }
 
     private static List<Button> declineButtons() {
-        return List.of(Buttons.red("deleteButtons", "Decline"));
+        return List.of(Buttons.DECLINE_DELETE_BUTTONS);
     }
 
     private static List<Button> firstPage(List<Button> buttons, List<Button> extraButtons, String prefix) {

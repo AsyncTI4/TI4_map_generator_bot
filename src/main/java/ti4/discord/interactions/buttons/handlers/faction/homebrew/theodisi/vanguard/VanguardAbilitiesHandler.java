@@ -35,7 +35,7 @@ public class VanguardAbilitiesHandler {
                 player.factionButtonChecker() + GET_FUNDAMENTAL_TECH,
                 "Research Tech (On Win)",
                 FactionEmojis.vanguard));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
