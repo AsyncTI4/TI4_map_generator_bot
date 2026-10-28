@@ -43,6 +43,34 @@ class DirectAgentExhaustGuardTest {
             // Developer testbed setup.
             "TestBedApplyService.java");
 
+    private static final Set<String> STILL_SPEND_WITHOUT_A_MODULE = Set.of(
+            // Homebrew handlers that have not been moved into agent modules yet. Shrink this list, never grow it.
+            "ArcanumLeadersHandler.java",
+            "ArvaxiLeaderHandler.java",
+            "AshenLeadersHandler.java",
+            "CrystellumLeadersHandler.java",
+            "DreamLeadersHandler.java",
+            "KairnLeadershandler.java",
+            "MorphaLeadersHandler.java",
+            "MyrrLeadersHandler.java",
+            "NetrunnersLeadersHandler.java",
+            "OblivionLeadersHandler.java",
+            "PonthousLeadersHandler.java",
+            "RevenantLeadersHandler.java",
+            "ScrapyardLeaderHandler.java",
+            "StonebornLeadersHandler.java",
+            "ThronesLeadersHandler.java",
+            "ThurvialiLeadersHandler.java",
+            "VerydithLeadersHandler.java",
+            "XytherisLeadersHandler.java");
+
+    @Test
+    void onlyTheUnmigratedHomebrewHandlersStillCallSpend() throws IOException {
+        assertThat(filesContaining("AgentLifecycle.spend("))
+                .as("an agent with a module resolves through AgentLifecycle.use or press, never spend")
+                .containsExactlyInAnyOrderElementsOf(STILL_SPEND_WITHOUT_A_MODULE);
+    }
+
     @Test
     void onlyTheKnownFilesCallExhaustLeaderService() throws IOException {
         assertThat(filesContaining("ExhaustLeaderService.exhaustLeader("))

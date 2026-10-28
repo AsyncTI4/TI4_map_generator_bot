@@ -27,8 +27,16 @@ import ti4.testUtils.BaseTi4Test;
  */
 class LegacyAgentFallThroughGuardTest extends BaseTi4Test {
 
-    private static final Set<String> ACTION_AGENTS_WITHOUT_A_MODULE =
-            Set.of("arachneraagent", "bsp_xxchaagent", "horatioagent", "lumerisagent", "psmagent", "uchoiragent");
+    private static final Set<String> ACTION_AGENTS_WITHOUT_A_MODULE = Set.of(
+            "arachianagent",
+            "arachneraagent",
+            "bsp_xxchaagent",
+            "horatioagent",
+            "ironhullagent",
+            "lumerisagent",
+            "psmagent",
+            "uchoiragent",
+            "zooidagent");
 
     private static final Path SOURCES = Path.of("src", "main", "java");
     private static final Pattern AGENT_SELECTION = Pattern.compile("getAgentSelection_([a-z0-9]+)");
