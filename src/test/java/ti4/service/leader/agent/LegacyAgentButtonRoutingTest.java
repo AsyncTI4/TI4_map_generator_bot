@@ -39,7 +39,26 @@ class LegacyAgentButtonRoutingTest extends BaseTi4Test {
             "useCrystellumAgent_",
             "selectOtherCrystellumAgentTarget",
             "selectCrystellumAgentTarget_",
-            "placeCrystellumAgentFighters_");
+            "placeCrystellumAgentFighters_",
+            "thronesAgentSelectTarget",
+            "thronesAgentUseOn_",
+            "thronesAgentChooseShip_",
+            "thronesAgentPlaceShip_",
+            "ponthousagent_",
+            "ponthousAgentTarget_",
+            "sendRikkaReminderMessage",
+            "useHazorusOnSelf_",
+            "selectHazorusTarget",
+            "useHazorusOnOther_",
+            "purgeHazorusFragment_",
+            "useMorphaAgent",
+            "morphaAgentTarget_",
+            "morphaAgentTakeDiscard_",
+            "useThurvialiAgentOnSelf",
+            "useThurvialiAgentOnOther",
+            "selectThurvialiAgentTarget_",
+            "selectThurvialiAgentSource_",
+            "selectThurvialiAgentDestination_");
 
     @Test
     void everyLegacyAgentButtonPrefixStillHasAHandler() {

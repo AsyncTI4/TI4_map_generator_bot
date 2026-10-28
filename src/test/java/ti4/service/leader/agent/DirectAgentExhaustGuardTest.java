@@ -48,16 +48,10 @@ class DirectAgentExhaustGuardTest {
             "ArcanumLeadersHandler.java",
             "AshenLeadersHandler.java",
             "KairnLeadershandler.java",
-            "MorphaLeadersHandler.java",
             "MyrrLeadersHandler.java",
             "NetrunnersLeadersHandler.java",
             "OblivionLeadersHandler.java",
-            "PonthousLeadersHandler.java",
             "RevenantLeadersHandler.java",
-            "ScrapyardLeaderHandler.java",
-            "StonebornLeadersHandler.java",
-            "ThronesLeadersHandler.java",
-            "ThurvialiLeadersHandler.java",
             "VerydithLeadersHandler.java",
             "XytherisLeadersHandler.java");
 

@@ -123,6 +123,7 @@ import ti4.service.leader.agent.modules.homebrew.CeldauriAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.ScrapyardAgent;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
@@ -1048,7 +1049,7 @@ public final class ButtonHelperTacticalAction {
         KaltrimTechHandler.offerKaldurArrestField(player, game, tile);
         Player agentOwner = game.getPlayerFromLeader("scrapyardagent");
         if (agentOwner != null && agentOwner.hasUnexhaustedLeader("scrapyardagent")) {
-            ScrapyardLeaderHandler.sendRikkaButtons(player, agentOwner);
+            ScrapyardAgent.offer(player, agentOwner);
         }
         DreamPromissoryHandler.returnVisionsOnSystemActivation(event, game, player, tile);
         AlluringThroneService.offerIllustrionLegendaryAbility(game, tile, player);

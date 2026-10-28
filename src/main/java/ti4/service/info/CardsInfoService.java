@@ -19,16 +19,12 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
@@ -71,6 +67,10 @@ import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.BelkoseaAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.XinAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.GolgiAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.HazorusAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.HopeOfTheCosmosAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.ThronesAgent;
 import ti4.service.leader.genome.ResearchGenome;
 import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
 
@@ -164,7 +164,7 @@ public class CardsInfoService {
             buttons.add(MyrrLeadersHandler.getMyrrAgentCardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("morphaagent")) {
-            buttons.add(MorphaLeadersHandler.getGolgiCardsInfoButton(player));
+            buttons.add(GolgiAgent.cardsInfoButton(player));
         }
         if (KairnAbilityHandler.canOfferSharedDiscoveriesCardsInfoButton(game, player)) {
             buttons.add(KairnAbilityHandler.getSharedDiscoveriesButton(player));
@@ -547,10 +547,10 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("stonebornagentdormant")
                 || player.hasUnexhaustedLeader("stonebornagentunleashed")) {
-            buttons.add(StonebornLeadersHandler.getHazorusCardsInfoButton(player));
+            buttons.add(HazorusAgent.cardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("thronesagent")) {
-            buttons.add(ThronesLeadersHandler.getThronesAgentButton(player));
+            buttons.add(ThronesAgent.button(player));
         }
         if (player.hasUnit("aeterna_flagship")) {
             buttons.add(AeternaUnitsHandler.getCryptCapacityInfoButton(player));
@@ -578,7 +578,7 @@ public class CardsInfoService {
             buttons.add(VerydithLeadersHandler.getVerydithAgentCardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("thurvialiagent")) {
-            buttons.add(ThurvialiLeadersHandler.getHopeCardsInfoButton(player));
+            buttons.add(HopeOfTheCosmosAgent.cardsInfoButton(player));
         }
         buttons.addAll(KaltrimBreakthroughHandler.getEchoOperativesRepairButtons(game, player));
         if (player.hasReadyBreakthrough("sarcosabt")) {

@@ -13,6 +13,12 @@ import ti4.service.leader.agent.modules.homebrew.bluereverie.EdynBrAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.KaltrimAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.XinAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.GolgiAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.HazorusAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.HopeOfTheCosmosAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.PonthousAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.ScrapyardAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.ThronesAgent;
 import ti4.service.leader.agent.modules.homebrew.wftv.ArvaxiAgent;
 
 public final class HomebrewAgents implements AgentCatalog {
@@ -77,7 +83,13 @@ public final class HomebrewAgents implements AgentCatalog {
                             new BelkoseaAgent(),
                             new AtokeraAgent(),
                             new EdynBrAgent(),
-                            new CrystellumAgent()),
+                            new CrystellumAgent(),
+                            new ThronesAgent(),
+                            new PonthousAgent(),
+                            new ScrapyardAgent(),
+                            new HazorusAgent(),
+                            new GolgiAgent(),
+                            new HopeOfTheCosmosAgent()),
                     HomebrewExhaustOnlyAgents.ALL)
             .<AgentModule<?>>flatMap(List::stream)
             .toList();
