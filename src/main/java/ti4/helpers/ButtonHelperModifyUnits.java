@@ -66,6 +66,7 @@ import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.agenda.MonumentsAgendaService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
+import ti4.service.combat.InfiniteGroundForcesService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
@@ -279,6 +280,14 @@ public final class ButtonHelperModifyUnits {
         boolean haveGroundForces = true;
         Tile tile = game.getTileFromPlanet(planet);
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        if (InfiniteGroundForcesService.bothSidesAreInfinite(unitHolder, p1, p2)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Both sides have an infinite stack of infantry on "
+                            + Helper.getPlanetRepresentation(planet, game)
+                            + ", so this ground combat can never end. Remove one stack to finish it.");
+            return;
+        }
         int count = 0;
         while (haveGroundForces) {
             int hitP1 = CombatRollService.secondHalfOfCombatRoll(

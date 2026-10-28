@@ -27,16 +27,21 @@ public class InfiniteGroundForcesService {
             Tile tile,
             Planet planet,
             Map<UnitModel, Integer> opponentUnits,
-            GenericInteractionCreateEvent event) {
+            GenericInteractionCreateEvent event,
+            boolean automated) {
         MessageHelper.sendMessageToEventChannel(
                 event,
                 player.getRepresentation() + " fights with an infinite stack of infantry on "
                         + planet.getRepresentation(game) + ". No dice are rolled: it produces ∞ hits.");
         int hits = hitsToDestroyEverything(opponentUnits);
-        if (opponent == player || hits == 0) return hits;
+        if (automated || opponent == player || hits == 0) return hits;
         CombatRollService.sendGroundCombatHitAssignment(
                 game, player, opponent, tile, planet, hits, event, "an infinite stack of infantry (∞ hits).");
         return hits;
+    }
+
+    public static boolean bothSidesAreInfinite(UnitHolder planet, Player p1, Player p2) {
+        return planet.hasInfiniteUnits(p1.getColorID()) && planet.hasInfiniteUnits(p2.getColorID());
     }
 
     private static int hitsToDestroyEverything(Map<UnitModel, Integer> opponentUnits) {

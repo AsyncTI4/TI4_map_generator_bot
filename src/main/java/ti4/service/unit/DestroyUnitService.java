@@ -172,7 +172,10 @@ public class DestroyUnitService {
     }
 
     private static void handleDestroyedUnits(
-            GenericInteractionCreateEvent event, Game game, List<RemovedUnit> units, boolean combat) {
+            GenericInteractionCreateEvent event, Game game, List<RemovedUnit> destroyed, boolean combat) {
+        List<RemovedUnit> units = destroyed.stream()
+                .filter(unit -> unit.uh() == null || !unit.uh().isInfinite(unit.unitKey()))
+                .toList();
         if (units.isEmpty()) {
             return;
         }
