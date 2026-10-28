@@ -25,6 +25,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.json.JsonMapperManager;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
@@ -35,7 +36,6 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class AshenUnitHandler {
@@ -129,7 +129,7 @@ public class AshenUnitHandler {
 
         List<BombardmentAssignment> assignments;
         try {
-            assignments = new ObjectMapper().readValue(assignedUnits, new TypeReference<>() {});
+            assignments = JsonMapperManager.basic().readValue(assignedUnits, new TypeReference<>() {});
         } catch (RuntimeException e) {
             return;
         }
