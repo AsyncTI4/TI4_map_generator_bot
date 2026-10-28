@@ -37,6 +37,7 @@ import ti4.ai.legendary.LegendaryRules;
 import ti4.ai.letnev.DarktalonTreillaRules;
 import ti4.ai.letnev.LetnevCombatRules;
 import ti4.ai.letnev.RearAdmiralFarranRules;
+import ti4.ai.letnev.ViscountUnlennSale;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.promissory.ConvoysRules;
@@ -251,6 +252,9 @@ public class NekroBrain implements FactionBrain {
             CombatCardRules::afterSpaceCannon,
             CombatCardRules::cancelHits,
             SolCommanderRules::next,
+            ViscountUnlennSale::answer,
+            ViscountUnlennSale::holdRoll,
+            ViscountUnlennSale::offer,
             context -> CombatRules.next(context, NekroBrain::atRoundStart),
             ActionSecretRules::next,
             SecretRules::scoreAgendaSecret,

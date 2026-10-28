@@ -6,14 +6,15 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Tile;
+import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
 // Letnev's whole fleet sits in one system with the hero in play, the breakthrough unlocked and Styx three systems
 // away. The destroyer moves 2, so only Gravity Drive on the destroyer (3) carries the dreadnoughts and the carrier
 // that far: Gravleash gives every ship in the system the destroyer's boosted move. The carrier and the dreadnoughts
-// carry six infantry (four fighters would fill the carrier and leave nothing to land on Styx); the system is the
-// ingress one, which is three moves from Styx.
+// carry six infantry (four fighters would fill the carrier and leave nothing to land on Styx). The system is Mecatol
+// Rex, already taken, with an ingress token, which is three moves from Styx.
 class GravleashStyxTest extends BaseTi4Test {
 
     private FractureScenario fracture;
@@ -23,7 +24,9 @@ class GravleashStyxTest extends BaseTi4Test {
     void setUp() {
         fracture = new FractureScenario();
         fracture.board.test.aiIsActive("action");
-        launch = fracture.ingress;
+        launch = fracture.board.test.place("18", "000");
+        launch.addToken(Constants.TOKEN_INGRESS, "space");
+        fracture.nekro().addPlanet("mr");
         fracture.ships(launch, UnitType.Dreadnought, 2);
         fracture.ships(launch, UnitType.Carrier, 1);
         fracture.ships(launch, UnitType.Destroyer, 1);

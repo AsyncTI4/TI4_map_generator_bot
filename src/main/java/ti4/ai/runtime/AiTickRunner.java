@@ -50,6 +50,7 @@ import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.service.game.GameUndoNameService;
 
 @UtilityClass
@@ -225,6 +226,10 @@ class AiTickRunner {
                 if (AiRuntime.mayMutate()) HumanAiDealMessage.post(tick.game(), propose.deal());
                 yield SeatResult.act();
             }
+            case AiDecision.Post post -> {
+                if (AiRuntime.mayMutate()) post(post);
+                yield SeatResult.act();
+            }
         };
     }
 
@@ -329,7 +334,14 @@ class AiTickRunner {
             case AiDecision.Idle idle -> "idle";
             case AiDecision.Announce announce -> "announce";
             case AiDecision.Propose propose -> "propose";
+            case AiDecision.Post post -> "post";
         };
+    }
+
+    private static void post(AiDecision.Post post) {
+        if (JdaService.jda == null) return;
+        GuildMessageChannel channel = JdaService.jda.getChannelById(GuildMessageChannel.class, post.channelId());
+        MessageHelper.sendMessageToChannelWithButtons(channel, post.text(), post.buttons());
     }
 
     private static SeatResult handlePress(SeatTick tick, AiDecision.Press press) {
