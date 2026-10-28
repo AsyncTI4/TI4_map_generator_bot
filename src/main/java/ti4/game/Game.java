@@ -3569,6 +3569,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (!soID.isEmpty()) {
             player.removeSecretScored(soIDNumber);
             player.setSecret(soID);
+            KnownCardsService.recordCardShownToAll(
+                    this, player, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
             return true;
         }
         return false;

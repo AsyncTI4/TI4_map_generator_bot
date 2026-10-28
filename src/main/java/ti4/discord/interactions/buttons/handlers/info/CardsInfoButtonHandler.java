@@ -1,6 +1,8 @@
 package ti4.discord.interactions.buttons.handlers.info;
 
+import java.util.List;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
@@ -32,10 +34,14 @@ class CardsInfoButtonHandler {
 
     @ButtonHandler(value = "showKnownCardHands", save = false)
     public static void showKnownCardHands(Game game, Player player) {
-        if (player == null) {
+        if (player == null || !KnownCardsService.isEnabled(game)) {
             return;
         }
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(
-                player, "__Known Card Hands__", KnownCardsService.getKnownCardHandEmbeds(game, player));
+        List<MessageEmbed> embeds = KnownCardsService.getKnownCardHandEmbeds(game, player);
+        if (embeds.isEmpty()) {
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, "No known cards.");
+            return;
+        }
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "__Known Card Hands__", embeds);
     }
 }

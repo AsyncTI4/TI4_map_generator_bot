@@ -181,12 +181,8 @@ public class PublicOutrageAcd2ButtonHandler {
     }
 
     private static void recordTakenCard(Game game, Player target, Player taker, String acID) {
-        String cardName = KnownCardsService.actionCardName(acID);
-        if (game.isFowMode()) {
-            KnownCardsService.recordCardPassed(target, taker, KnownCardType.ACTION_CARD, cardName);
-        } else {
-            KnownCardsService.recordCardPassedPublicly(game, target, taker, KnownCardType.ACTION_CARD, cardName);
-        }
+        KnownCardsService.recordCardPassedPublicly(
+                game, target, taker, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
     }
 
     private static String acIDFor(Player player, int numericalID) {

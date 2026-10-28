@@ -4,12 +4,12 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.StringHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.Mapper;
@@ -48,6 +48,10 @@ public class KnownCardsService {
         }
     }
 
+    public static boolean isEnabled(Game game) {
+        return game != null && !game.isFowMode();
+    }
+
     public static String actionCardName(String actionCardId) {
         ActionCardModel model = Mapper.getActionCard(actionCardId);
         return model == null ? null : model.getName();
@@ -59,15 +63,20 @@ public class KnownCardsService {
     }
 
     public static void recordCardLeftHand(Player target, KnownCardType type) {
-        incrementCounter(target, leftHandKey(type));
+        if (isTracked(target)) {
+            incrementCounter(target, leftHandKey(type));
+        }
     }
 
     public static void recordCardLeftHandPublicly(Game game, Player target, KnownCardType type, String cardName) {
+        if (!isTracked(target)) {
+            return;
+        }
         incrementCounter(target, leftHandPubliclyKey(type));
         if (cardName == null) {
             return;
         }
-        for (Player viewer : game.getPlayers().values()) {
+        for (Player viewer : game.getRealPlayers()) {
             if (viewer != target) {
                 forgetOneCopy(viewer, target, type, cardName);
             }
@@ -75,7 +84,7 @@ public class KnownCardsService {
     }
 
     public static void recordCardPassed(Player from, Player to, KnownCardType type, String cardName) {
-        if (from == null || to == null || from == to || cardName == null) {
+        if (from == null || to == null || from == to || cardName == null || !isTracked(from)) {
             return;
         }
         forgetOneCopy(to, from, type, cardName);
@@ -90,9 +99,10 @@ public class KnownCardsService {
     }
 
     public static void recordCardShown(Player viewer, Player target, KnownCardType type, String cardName) {
-        if (viewer == null || viewer == target || cardName == null) {
+        if (viewer == null || viewer == target || cardName == null || !isTracked(target)) {
             return;
         }
+        forgetOneCopy(viewer, target, type, cardName);
         viewer.addToStoredList(
                 knownCardsKey(target, type), new KnownCard(cardName, hiddenRemovals(target, type)).serialize());
     }
@@ -104,7 +114,7 @@ public class KnownCardsService {
     }
 
     public static void recordHandShown(Player viewer, Player target, KnownCardType type) {
-        if (viewer == null || viewer == target) {
+        if (viewer == null || viewer == target || !isTracked(target)) {
             return;
         }
         String key = knownCardsKey(target, type);
@@ -126,16 +136,19 @@ public class KnownCardsService {
 
     public static List<MessageEmbed> getKnownCardHandEmbeds(Game game, Player viewer) {
         List<MessageEmbed> embeds = new ArrayList<>();
+        if (!isEnabled(game)) {
+            return embeds;
+        }
         for (Player target : game.getRealPlayers()) {
             if (target == viewer) {
                 continue;
             }
-            String description = knownCardsDescription(game, viewer, target);
+            String description = knownCardsDescription(viewer, target);
             if (description.isEmpty()) {
                 continue;
             }
             embeds.add(new EmbedBuilder()
-                    .setTitle(embedTitle(game, viewer, target))
+                    .setTitle(target.getUserName() + " - " + target.getFactionNameOrColor())
                     .setDescription(description)
                     .setColor(Color.GRAY)
                     .build());
@@ -143,12 +156,7 @@ public class KnownCardsService {
         return embeds;
     }
 
-    private static String embedTitle(Game game, Player viewer, Player target) {
-        String unfogged = target.getUserName() + " - " + target.getFactionNameOrColor();
-        return FoWHelper.identityOrColorIfCanSeeStats(game, target, viewer, unfogged);
-    }
-
-    private static String knownCardsDescription(Game game, Player viewer, Player target) {
+    private static String knownCardsDescription(Player viewer, Player target) {
         List<String> sections = new ArrayList<>();
         for (KnownCardType type : KnownCardType.values()) {
             List<KnownCard> knownCards = getKnownCards(viewer, target, type);
@@ -159,8 +167,7 @@ public class KnownCardsService {
         if (sections.isEmpty()) {
             return "";
         }
-        String factionLine = game.isFowMode() ? "" : target.getFactionEmoji() + "\n";
-        return factionLine + String.join("\n\n", sections);
+        return target.getFactionEmoji() + "\n" + String.join("\n\n", sections);
     }
 
     private static String section(Player target, KnownCardType type, List<KnownCard> knownCards) {
@@ -212,8 +219,12 @@ public class KnownCardsService {
                 : target.getSecrets().keySet();
         return ids.stream()
                 .map(id -> type == KnownCardType.ACTION_CARD ? actionCardName(id) : secretObjectiveName(id))
-                .filter(name -> name != null)
+                .filter(Objects::nonNull)
                 .toList();
+    }
+
+    private static boolean isTracked(Player player) {
+        return player != null && isEnabled(player.getGame());
     }
 
     private static int hiddenRemovals(Player target, KnownCardType type) {
@@ -230,7 +241,12 @@ public class KnownCardsService {
     }
 
     private static String knownCardsKey(Player target, KnownCardType type) {
-        return "knownCards_" + type.key + "_" + target.getUserID();
+        return "knownCards_" + type.key + "_" + seatKey(target);
+    }
+
+    private static String seatKey(Player target) {
+        String faction = target.getFaction();
+        return "obsidian".equals(faction) ? "firmament" : faction;
     }
 
     private static String leftHandKey(KnownCardType type) {

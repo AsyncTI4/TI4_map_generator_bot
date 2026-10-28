@@ -203,6 +203,82 @@ class KnownCardsServiceTest extends BaseTi4Test {
         assertThat(embeds.getFirst().getDescription()).contains("Action Cards:").doesNotContain("Secret Objectives:");
     }
 
+    @Test
+    void fogOfWarGamesTrackNothing() {
+        game.setFowMode(true);
+        target.setActionCard("sh1");
+        target.setActionCard("sabo1");
+
+        KnownCardsService.recordHandShown(viewer, target, KnownCardType.ACTION_CARD);
+        KnownCardsService.recordCardShownToAll(game, target, KnownCardType.ACTION_CARD, "Shields Holding");
+        target.removeActionCard(target.getActionCards().get("sabo1"));
+
+        assertThat(KnownCardsService.getKnownCardHandEmbeds(game, viewer)).isEmpty();
+        assertThat(viewer.getStoredValueMap()).isEmpty();
+        assertThat(target.getStoredValueMap()).isEmpty();
+    }
+
+    @Test
+    void showingTheSameCardAgainDoesNotListItTwice() {
+        target.setSecret("baf");
+        target.setSecret("bam");
+        KnownCardsService.recordCardShown(viewer, target, KnownCardType.SECRET_OBJECTIVE, "Betray a Friend");
+        game.discardSecretObjective(target.getUserID(), target.getSecrets().get("bam"));
+
+        KnownCardsService.recordCardShown(viewer, target, KnownCardType.SECRET_OBJECTIVE, "Betray a Friend");
+
+        // One entry, and the fresh reveal clears the discard count.
+        String description = onlyEmbedDescription(viewer);
+        assertThat(StringUtils.countMatches(description, "- Betray a Friend")).isEqualTo(1);
+        assertThat(description).doesNotContain("since reveal");
+    }
+
+    @Test
+    void reshowingOneCopyKeepsBothKnownCopiesFromAFullView() {
+        target.setActionCard("sh1");
+        target.setActionCard("sh2");
+        KnownCardsService.recordHandShown(viewer, target, KnownCardType.ACTION_CARD);
+
+        KnownCardsService.recordCardShown(viewer, target, KnownCardType.ACTION_CARD, "Shields Holding");
+
+        assertThat(StringUtils.countMatches(onlyEmbedDescription(viewer), "- Shields Holding"))
+                .isEqualTo(2);
+    }
+
+    @Test
+    void knowledgeStaysWithTheSeatWhenPlayersSwap() {
+        // Swapping or replacing players changes user ids, not factions; the cards stay with the seat.
+        target.setActionCard("sh1");
+        KnownCardsService.recordCardShown(viewer, target, KnownCardType.ACTION_CARD, "Shields Holding");
+
+        target.setUserID("someoneElse");
+
+        assertThat(onlyEmbedDescription(viewer)).contains("- Shields Holding");
+    }
+
+    @Test
+    void knowledgeSurvivesTheFirmamentFlippingToObsidian() {
+        target.setFaction("firmament");
+        target.setActionCard("sh1");
+        KnownCardsService.recordCardShown(viewer, target, KnownCardType.ACTION_CARD, "Shields Holding");
+
+        target.setFaction("obsidian");
+
+        assertThat(onlyEmbedDescription(viewer)).contains("- Shields Holding");
+    }
+
+    @Test
+    void unscoredSecretObjectiveIsKnownToEveryone() {
+        target.setSecret("baf");
+        game.scoreSecretObjective(target.getUserID(), target.getSecrets().get("baf"));
+
+        game.unscoreSecretObjective(
+                target.getUserID(), target.getSecretsScored().get("baf"));
+
+        assertThat(onlyEmbedDescription(viewer)).contains("- Betray a Friend").doesNotContain("since reveal");
+        assertThat(onlyEmbedDescription(bystander)).contains("- Betray a Friend");
+    }
+
     private String onlyEmbedDescription(Player knower) {
         List<MessageEmbed> embeds = KnownCardsService.getKnownCardHandEmbeds(game, knower);
         assertThat(embeds).hasSize(1);
