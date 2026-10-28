@@ -35,7 +35,11 @@ class LegacyAgentButtonRoutingTest extends BaseTi4Test {
             "selectAtokeraAgentPlayer_",
             "arvaxiAgentOffer_",
             "dream_agent_choose_",
-            "useEdynAgentBr_");
+            "useEdynAgentBr_",
+            "useCrystellumAgent_",
+            "selectOtherCrystellumAgentTarget",
+            "selectCrystellumAgentTarget_",
+            "placeCrystellumAgentFighters_");
 
     @Test
     void everyLegacyAgentButtonPrefixStillHasAHandler() {

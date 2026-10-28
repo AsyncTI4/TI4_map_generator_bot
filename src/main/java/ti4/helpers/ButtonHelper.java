@@ -55,7 +55,6 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
@@ -176,6 +175,7 @@ import ti4.service.leader.agent.modules.homebrew.FreeSystemsAgent;
 import ti4.service.leader.agent.modules.homebrew.KhraskAgent;
 import ti4.service.leader.agent.modules.homebrew.LiZhoAgent;
 import ti4.service.leader.agent.modules.homebrew.OlradinAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.CrystellumAgent;
 import ti4.service.leader.genome.ExperimentalGenome;
 import ti4.service.leader.genome.homebrew.tknova.SwarmGenome;
 import ti4.service.map.SystemPickerService;
@@ -5233,7 +5233,7 @@ public class ButtonHelper {
             FreeSystemsAgent.button(game, player).ifPresent(endButtons::add);
         }
         if (player.hasUnexhaustedLeader("crystellumagent")) {
-            CrystellumLeadersHandler.addCrystellumAgentEndTurnButton(endButtons, game, player);
+            CrystellumAgent.addEndTurnButton(endButtons, game, player);
         }
         SwarmGenome.endOfTurnOffer(player).ifPresent(endButtons::add);
 

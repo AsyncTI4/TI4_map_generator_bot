@@ -47,7 +47,6 @@ class DirectAgentExhaustGuardTest {
             // Homebrew handlers that have not been moved into agent modules yet. Shrink this list, never grow it.
             "ArcanumLeadersHandler.java",
             "AshenLeadersHandler.java",
-            "CrystellumLeadersHandler.java",
             "KairnLeadershandler.java",
             "MorphaLeadersHandler.java",
             "MyrrLeadersHandler.java",
