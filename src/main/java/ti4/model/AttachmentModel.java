@@ -7,6 +7,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.model.Source.ComponentSource;
+import ti4.model.WormholeModel.Wormhole;
 import ti4.service.emoji.ExploreEmojis;
 
 @Data
@@ -24,6 +25,7 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
     private int spaceCannonHitsOn;
     private int spaceCannonDieCount;
     private String abilityText;
+    private List<Wormhole> wormholes;
     private ComponentSource source;
 
     @Override
@@ -54,6 +56,11 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
 
     public boolean isLegendary() {
         return Optional.ofNullable(isLegendary).orElse(false);
+    }
+
+    public List<Wormhole> getWormholes() {
+        if (wormholes == null) return new ArrayList<>();
+        return new ArrayList<>(wormholes);
     }
 
     private Optional<String> getToken() {

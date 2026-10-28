@@ -4,6 +4,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +20,11 @@ public final class ImageHelper {
             return null;
         }
         return ImageCache.getOrLoadStaticImage(filePath, _ -> readImage(filePath));
+    }
+
+    @Nullable
+    public static BufferedImage cached(String key, Supplier<BufferedImage> builder) {
+        return ImageCache.getOrLoadStaticImage(key, _ -> builder.get());
     }
 
     @Nullable

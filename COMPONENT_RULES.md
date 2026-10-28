@@ -51,3 +51,26 @@ Action cards, explores, relics and secret objectives may carry an optional `auto
   - A 30k card added by hand to such a game shows its text but is not automated.
 - **"More than 5 hexes away"** is adjacency distance on the map: use `ThirtyKDistance`.
 - **"The Fracture"** is any tile where `Tile.isFracture()` is true.
+
+## Wormholes
+
+A system's wormholes come only from data: the `wormholes` field of the tile JSON, of the token JSON
+(`data/tokens/`) and of the attachment JSON (`data/attachments/`). `Tile.getWormholes(game)` adds
+them up, plus the Creuss flagship's delta. `Mapper.getTokenWormholes` maps a stored token file name
+to its wormholes.
+
+- **Never detect a wormhole from a file name or id.** No `contains("alpha")` on tokens. Read
+  `Tile.getWormholes`, `FoWHelper.getTileWHs` or `Mapper.getTokenWormholes`, and compare
+  `WormholeModel.Wormhole` values, not strings.
+- **A new wormhole token or attachment declares `wormholes` in its JSON.** Without it the token is
+  only a picture. `WormholeDataTest` fails for wormhole-looking token images without wormholes.
+- **Entries that share an image declare the same wormholes.** The lookup is by image file name.
+- **Renamed images go in `legacyImagePaths`** on the token, because saves keep the old file name.
+- **Renamed enum constants keep their old name as `@JsonAlias`.** Custom tiles in storage may still
+  use it.
+- **One entry per source.** Two alpha tokens are two alpha wormholes (LRR 101, note II).
+- **Merged token icons are display only.** With the game option `wormhole_token_merge` set to N (2-9), `SpaceTokens` draws
+  the plain wormhole tokens of a space area as wedge icons once it holds at least N of them (`WormholeTokenMerge`,
+  at most 3 per icon, split evenly, far-apart colours dealt into the same icon). Game state
+  keeps the single tokens. A token with its own identity (Creuss, Ion Storm, Vortex) sets
+  `"wormholeIconMerge": false` and stays a separate icon.

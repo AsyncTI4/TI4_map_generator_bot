@@ -4,8 +4,8 @@ import java.util.Set;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.model.WormholeModel.Wormhole;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentUse;
@@ -28,8 +28,8 @@ public final class GhostAgent extends UntargetedAgent {
     public AgentOutcome resolve(AgentUse<Player> use) {
         Game game = use.game();
         if (game.isFowMode()) {
-            Set<String> wormholes = FoWHelper.getTileWHs(game, game.getActiveSystem());
-            if (!wormholes.isEmpty() && !wormholes.contains(Constants.DELTA)) {
+            Set<Wormhole> wormholes = FoWHelper.getTileWHs(game, game.getActiveSystem());
+            if (!wormholes.isEmpty() && !wormholes.contains(Wormhole.DELTA)) {
                 game.setStoredValue(ACTIVE_KEY, game.getActiveSystem());
             }
         }
