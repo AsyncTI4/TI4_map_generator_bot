@@ -89,6 +89,7 @@ public final class Buttons {
             gray("proceed_to_scoring", "Proceed to Scoring Objectives");
     public static final Button RESEARCH_A_TECHNOLOGY = gray("acquireATech_deleteThisMessage", "Research a Technology");
     public static final Button PLACE_A_TOMB_TOKEN = green("startAncientEmpire", "Place a Tomb Token");
+    public static final Button READY_A_COMPONENT = gray("anarchy2secondary", "Ready a Component");
     public static final Button FACTION_EMBED = green("factionEmbedRefresh", "Refresh Faction Display");
     public static final Button DEAL_2_SO =
             green("deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt);

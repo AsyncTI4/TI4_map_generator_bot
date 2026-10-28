@@ -1188,7 +1188,7 @@ public class PlayStrategyCardService {
 
     private static List<Button> getAnarchy2Buttons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
-        Button diploSystemButton = Buttons.gray("anarchy2secondary", "Ready a non-SC Card");
+        Button diploSystemButton = Buttons.READY_A_COMPONENT;
         Button refreshButton = Buttons.DIPLO_READY_PLANETS;
 
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");

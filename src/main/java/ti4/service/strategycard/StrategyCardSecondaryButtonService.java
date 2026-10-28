@@ -35,10 +35,7 @@ public class StrategyCardSecondaryButtonService {
         return switch (scModel.getBotSCAutomationID()) {
             case "pok1leadership", "anarchy1" -> List.of(Buttons.SPEND_AND_GAIN_COMMAND_TOKENS);
             case "pok2diplomacy", "base2", "luminous1" -> List.of(Buttons.DIPLO_READY_2_PLANETS);
-            case "anarchy2" ->
-                List.of(
-                        Buttons.gray("anarchy2secondary", "Ready a Card (Other Than Strategy Card)"),
-                        Buttons.DIPLO_READY_PLANETS);
+            case "anarchy2" -> List.of(Buttons.READY_A_COMPONENT, Buttons.DIPLO_READY_PLANETS);
             case "anarchy3", "luminous9" ->
                 List.of(Buttons.gray("anarchy3secondary", "Perform Unchosen Or Exhausted Secondary"));
             case "luminous2" ->

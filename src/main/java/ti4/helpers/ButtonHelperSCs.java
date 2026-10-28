@@ -794,7 +794,7 @@ public final class ButtonHelperSCs {
         }
         if (!Helper.getRemainingSCs(game).contains(2)
                 || (game.getScPlayed().get(2) != null && game.getScPlayed().get(2))) {
-            scButtons.add(Buttons.gray("anarchy2secondary", "Ready a Card (Other Than Strategy Card)"));
+            scButtons.add(Buttons.READY_A_COMPONENT);
             scButtons.add(Buttons.DIPLO_READY_PLANETS);
         }
         if (!Helper.getRemainingSCs(game).contains(4)
@@ -924,7 +924,7 @@ public final class ButtonHelperSCs {
         scButtons.add(followButton);
         if (Helper.getRemainingSCs(game).contains(2)
                 && (game.getScPlayed().get(2) == null || !game.getScPlayed().get(2))) {
-            scButtons.add(Buttons.gray("anarchy2secondary", "Ready a Card (Other Than Strategy Card)"));
+            scButtons.add(Buttons.READY_A_COMPONENT);
             scButtons.add(Buttons.DIPLO_READY_PLANETS);
         }
         if (Helper.getRemainingSCs(game).contains(3)
