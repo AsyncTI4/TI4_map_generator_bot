@@ -95,10 +95,6 @@ public abstract class AgentModule<P> {
         return Buttons.gray(ownedButtonId(owner, agentId), useLabel(owner, agentId, agentLabel), emoji);
     }
 
-    protected static String cardLabel(Player owner, String agentId, String officialLabel) {
-        return twilightsFallName(owner.getGame(), agentId).orElse(officialLabel);
-    }
-
     static Optional<String> twilightsFallName(Game game, String agentId) {
         if (game == null || !game.isTwilightsFallMode()) {
             return Optional.empty();
@@ -107,6 +103,17 @@ public abstract class AgentModule<P> {
     }
 
     protected static String useLabel(Player owner, String agentId, String agentLabel) {
-        return (AgentLifecycle.holdsOnlyAYssarilCopy(owner, agentId) ? "Use Clever Clever " : "Use ") + agentLabel;
+        return useLabel(owner, agentId, agentLabel, "");
+    }
+
+    protected static String useLabel(Player owner, String agentId, String agentLabel, String suffix) {
+        String label = gameCardName(owner.getGame(), agentId).orElse(agentLabel);
+        return (AgentLifecycle.holdsOnlyAYssarilCopy(owner, agentId) ? "Use Clever Clever " : "Use ") + label + suffix;
+    }
+
+    private static Optional<String> gameCardName(Game game, String agentId) {
+        return Optional.ofNullable(Mapper.getLeader(agentId))
+                .map(leader -> leader.getName(game))
+                .filter(name -> !name.equals(Mapper.getLeader(agentId).getName()));
     }
 }

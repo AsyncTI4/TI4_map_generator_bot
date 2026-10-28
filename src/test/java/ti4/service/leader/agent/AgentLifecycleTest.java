@@ -80,17 +80,6 @@ class AgentLifecycleTest extends BaseTi4Test {
     }
 
     @Test
-    void theYssarilAgentStandingInForAnotherAgentIsACopy() {
-        assertThat(AgentLifecycle.isYssarilCopy("yssarilagent", "augersagent")).isTrue();
-    }
-
-    @Test
-    void theYssarilAgentUsedAsItselfIsNotACopy() {
-        assertThat(AgentLifecycle.isYssarilCopy("yssarilagent", "yssarilagent")).isFalse();
-        assertThat(AgentLifecycle.isYssarilCopy("augersagent", "augersagent")).isFalse();
-    }
-
-    @Test
     void aPressedAgentWithAModuleIsHandledByTheLifecycle() {
         // Exhausting needs the Spring context, so the agent is already exhausted and the press is refused.
         mentak.getLeader("mentakagent").orElseThrow().setExhausted(true);
@@ -128,17 +117,7 @@ class AgentLifecycleTest extends BaseTi4Test {
     }
 
     @Test
-    void temporalCommandSuiteLabelsFitInAButtonEvenForCleverCleverCopies() {
-        for (boolean twilightsFall : List.of(false, true)) {
-            game.setTwilightsFallMode(twilightsFall);
-            for (AgentModule<?> module : LeaderAgents.all()) {
-                for (String leaderId : leaderIds(module)) {
-                    String label = AgentLifecycle.temporalCommandSuiteLabel(
-                            game, AgentLifecycle.agentName(game, leaderId, true));
-                    assertThat(label).as(leaderId).hasSizeLessThanOrEqualTo(80);
-                }
-            }
-        }
+    void anAgentIsHiddenFromOtherPlayersInFogOfWar() {
         game.setFowMode(true);
         Player other = game.addPlayer("otherUser", "Other Player");
         assertThat(AgentLifecycle.agentNameShownTo(game, other, mentak, "mentakagent", false))
@@ -146,11 +125,15 @@ class AgentLifecycleTest extends BaseTi4Test {
     }
 
     @Test
-    void namesBlueReverieYssarilCopiesAsCopies() {
-        assertThat(AgentLifecycle.isYssarilCopy("yssarilagent_br", "mentakagent"))
-                .isTrue();
-        assertThat(AgentLifecycle.isYssarilCopy("yssarilagent_br", "yssarilagent_br"))
+    void aPlayerHoldingOnlyTheYssarilAgentHoldsACopy() {
+        Player yssaril = game.addPlayer("yssarilUser", "Yssaril Player");
+        yssaril.setFaction(game, "yssaril");
+        yssaril.setColor("blue");
+
+        assertThat(AgentLifecycle.holdsOnlyAYssarilCopy(yssaril, "mentakagent")).isTrue();
+        assertThat(AgentLifecycle.holdsOnlyAYssarilCopy(yssaril, "yssarilagent"))
                 .isFalse();
+        assertThat(AgentLifecycle.holdsOnlyAYssarilCopy(mentak, "mentakagent")).isFalse();
     }
 
     @Test

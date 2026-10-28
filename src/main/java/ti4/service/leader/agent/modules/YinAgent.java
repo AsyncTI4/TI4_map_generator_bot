@@ -35,9 +35,7 @@ public final class YinAgent extends AgentModule<YinAgent.Replacement> {
 
     public static Button offerButton(Player yin, String position) {
         return Buttons.gray(
-                yin.factionButtonChecker() + OFFER_STEP + position,
-                useLabel(yin, ID, cardLabel(yin, ID, "Yin Agent")),
-                FactionEmojis.Yin);
+                yin.factionButtonChecker() + OFFER_STEP + position, useLabel(yin, ID, "Yin Agent"), FactionEmojis.Yin);
     }
 
     public static List<Button> fightersOrInfantryButtons(Game game, Player owner, Tile system) {

@@ -38,11 +38,7 @@ public final class MercerAgent extends AgentModule<String> {
             if (mercer.getPlanetsAllianceMode().contains(planetName)) {
                 buttons.add(Buttons.green(
                         ownedButtonId(mercer, ID, activeSystem.getPosition(), planetName),
-                        useLabel(
-                                mercer,
-                                ID,
-                                cardLabel(mercer, ID, "Mercer") + " on "
-                                        + Helper.getPlanetRepresentation(planetName, game)),
+                        useLabel(mercer, ID, "Mercer", " on " + Helper.getPlanetRepresentation(planetName, game)),
                         FactionEmojis.Nomad));
             }
         }

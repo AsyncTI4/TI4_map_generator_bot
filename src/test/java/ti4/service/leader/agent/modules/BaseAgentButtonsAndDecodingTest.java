@@ -38,6 +38,7 @@ class BaseAgentButtonsAndDecodingTest extends BaseTi4Test {
     @Test
     void aPlayerWhoOnlyHasTheYssarilCopyIsOfferedCleverClever() {
         AgentModuleFixture fixture = new AgentModuleFixture("yssaril");
+        fixture.target.addLeader("sardakkagent");
 
         assertThat(SardakkAgent.button(fixture.user, "101", "lodor", "Lodor").getLabel())
                 .isEqualTo("Use Clever Clever N'orr Agent on Lodor");
