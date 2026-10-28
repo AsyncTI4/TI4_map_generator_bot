@@ -538,7 +538,7 @@ class CabalButtonHandler {
                     }
                 }
             }
-            buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+            buttons.add(Buttons.DONE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     p2.getCorrectChannel(),
                     p2.getRepresentation() + ", you are exceeding your fleet pool "
@@ -592,7 +592,7 @@ class CabalButtonHandler {
                     }
                 }
             }
-            buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+            buttons.add(Buttons.DONE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     p2.getCorrectChannel(),
                     p2.getRepresentation() + ", you are exceeding your capacity limit in tile "

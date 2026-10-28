@@ -17,7 +17,6 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitHandler;
@@ -84,6 +83,7 @@ import ti4.service.leader.agent.modules.JolNarAgent;
 import ti4.service.leader.agent.modules.homebrew.MirvedaAgent;
 import ti4.service.leader.agent.modules.homebrew.VeldyrAgent;
 import ti4.service.leader.agent.modules.homebrew.ZealotsAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.NetrunnersAgent;
 import ti4.service.leader.genome.ExperimentalGenome;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.EndTurnService;
@@ -139,7 +139,7 @@ public class PlayerTechService {
                 player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum", "revenantvanguard");
         MessageHelper.sendMessageToEventChannel(event, message);
         if (gainedTech) {
-            NetrunnersLeadersHandler.offerZorNoAhnForOwner(event, game, player, techID);
+            NetrunnersAgent.offerAfterGainingTech(event, game, player, techID);
             NetrunnersUnitHandler.offerNimdaDeploy(game, player);
         }
     }
@@ -552,7 +552,7 @@ public class PlayerTechService {
             case "baarvag" -> { // Mageon
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
+                buttons.add(Buttons.DRAW_1_ACTION_CARD_DELETE);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         player.getRepresentationUnfogged() + ", use buttons to discard.",
@@ -580,7 +580,7 @@ public class PlayerTechService {
                 deleteTheOneButtonIfButtonEvent(event);
                 ActionCardHelper.doRise(player, event, game);
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-                Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+                Button doneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
                 buttons.add(doneExhausting);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
@@ -873,7 +873,7 @@ public class PlayerTechService {
         BlueReverieHelper.checkXinHarmony(game, player);
         NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
         NetrunnersTechHandler.resolveDataMining(event, game, player, techID);
-        NetrunnersLeadersHandler.offerZorNoAhnForOwner(event, game, player, techID);
+        NetrunnersAgent.offerAfterGainingTech(event, game, player, techID);
         NetrunnersUnitHandler.offerNimdaDeploy(game, player);
         if (isResearch) {
             MonumentsTEButtonHandler.offerEpiphanyResearchButtons(game, player, techM);

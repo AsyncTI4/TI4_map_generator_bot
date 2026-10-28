@@ -45,7 +45,7 @@ public final class ArvaxiAgent extends AgentModule<ArvaxiAgent.Retrieval> {
                     p.factionButtonChecker() + OFFER + acIndex + "_" + discarder.getFaction(),
                     useLabel(p, ID, "Arvaxi Agent") + " on " + acName,
                     CardEmojis.getACEmoji(game)));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     p.getCardsInfoThread(),
                     p.getRepresentationUnfoggedNoPing() + ", " + discarder.getFactionNameOrColor() + " discarded _"
@@ -130,7 +130,7 @@ public final class ArvaxiAgent extends AgentModule<ArvaxiAgent.Retrieval> {
         ActionCardHelper.sendActionCardInfo(game, target);
 
         List<Button> spendButtons = ButtonHelper.getExhaustButtonsWithTG(game, target, "inf");
-        spendButtons.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
+        spendButtons.add(Buttons.DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCardsInfoThread(),
                 target.getRepresentationUnfogged() + ", " + use.agentNameFor(target)

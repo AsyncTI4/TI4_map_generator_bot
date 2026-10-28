@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -16,7 +15,6 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperExplore;
 import ti4.helpers.ButtonHelperStats;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.RelicHelper;
 import ti4.message.MessageHelper;
@@ -24,14 +22,10 @@ import ti4.model.Mapper;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
-import ti4.service.leader.agent.AgentLifecycle;
 
 @UtilityClass
 public class StonebornLeadersHandler {
     private static final String PURGE_HAZORUS_FRAGMENT = "purgeHazorusFragment_";
-    private static final String USE_HAZORUS_ON_SELF = "useHazorusOnSelf_";
-    private static final String SELECT_HAZORUS_TARGET = "selectHazorusTarget";
-    private static final String USE_HAZORUS_ON_OTHER = "useHazorusOnOther_";
     private static final String GAIN_TEMPUS_UNLEASHED_TG = "gainTempusUnleashedTG";
     private static final String EXPLORE_TEMPUS_UNLEASHED = "exploreTempusUnleashed";
     private static final String CHOOSE_METEORIME_RELIC = "chooseMeteorimeRelic_";
@@ -60,84 +54,6 @@ public class StonebornLeadersHandler {
                 buttons,
                 List.of(),
                 target.factionButtonChecker() + PURGE_HAZORUS_FRAGMENT + agentOwner.getFaction() + "|" + agent + "|");
-    }
-
-    public static Button getHazorusStartTurnButton(Player player) {
-        String agent = getReadyHazorusAgent(player);
-        if (agent == null || player.getFragments().isEmpty()) {
-            return null;
-        }
-        return Buttons.gray(
-                player.factionButtonChecker() + USE_HAZORUS_ON_SELF + agent,
-                "Use Hazorus Agent",
-                FactionEmojis.stoneborn);
-    }
-
-    public static Button getHazorusCardsInfoButton(Player player) {
-        return Buttons.gray(
-                player.factionButtonChecker() + SELECT_HAZORUS_TARGET,
-                "Use Hazorus Agent on Another Player",
-                FactionEmojis.stoneborn);
-    }
-
-    @ButtonHandler(USE_HAZORUS_ON_SELF)
-    public static void useHazorusOnSelf(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        useHazorus(game, player, player, event, buttonID.substring(USE_HAZORUS_ON_SELF.length()));
-    }
-
-    @ButtonHandler(SELECT_HAZORUS_TARGET)
-    public static void selectHazorusTarget(Game game, Player player, ButtonInteractionEvent event) {
-        if (getReadyHazorusAgent(player) == null) {
-            ButtonHelper.deleteTheOneButton(event);
-            return;
-        }
-        List<Button> buttons = game.getRealPlayers().stream()
-                .filter(target -> target != player)
-                .map(target -> FoWHelper.fogSafeTargetButton(
-                        player.factionButtonChecker() + USE_HAZORUS_ON_OTHER + target.getFaction(),
-                        "gray",
-                        target,
-                        player))
-                .toList();
-        MessageHelper.sendMessageToChannelWithButtons(
-                getOutputChannel(game, player, event),
-                player.getRepresentationNoPing() + ", choose a player for Hazorus.",
-                buttons);
-        ButtonHelper.deleteTheOneButton(event);
-    }
-
-    @ButtonHandler(USE_HAZORUS_ON_OTHER)
-    public static void useHazorusOnOther(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        Player target = game.getPlayerFromColorOrFaction(buttonID.substring(USE_HAZORUS_ON_OTHER.length()));
-        if (target == null) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        useHazorus(game, player, target, event, getReadyHazorusAgent(player));
-    }
-
-    private static void useHazorus(
-            Game game, Player agentOwner, Player target, ButtonInteractionEvent event, String agentID) {
-        if (!HAZORUS_AGENTS.contains(agentID)
-                || (agentOwner == target && target.getFragments().isEmpty())) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        Leader agent = agentOwner.getLeader(agentID).orElse(null);
-        if (agent == null || agent.isExhausted()) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        AgentLifecycle.spend(game, agentOwner, agentID);
-        offerHazorusFragmentPurge(game, agentOwner, target, agentID);
-        ButtonHelper.deleteTheOneButton(event);
-    }
-
-    private static String getReadyHazorusAgent(Player player) {
-        return HAZORUS_AGENTS.stream()
-                .filter(player::hasUnexhaustedLeader)
-                .findFirst()
-                .orElse(null);
     }
 
     public static void offerTempusUnleashedChoice(Game game, Player player, ButtonInteractionEvent event) {
@@ -349,9 +265,5 @@ public class StonebornLeadersHandler {
     private static String getHazorusMessage(Player target) {
         return target.getRepresentation()
                 + ", you may purge 1 relic fragment to replenish your commodities with Hazorus.";
-    }
-
-    private static MessageChannel getOutputChannel(Game game, Player player, ButtonInteractionEvent event) {
-        return game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel();
     }
 }

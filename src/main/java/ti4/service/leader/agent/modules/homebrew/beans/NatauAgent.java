@@ -54,7 +54,7 @@ public final class NatauAgent extends AgentModule<Player> {
                                     ownedButtonId(agentOwner, ID, activePlayer.getFaction()),
                                     useLabel(agentOwner, ID, "Natau Agent"),
                                     FactionEmojis.natau),
-                            Buttons.red("deleteButtons", "Decline")));
+                            Buttons.DECLINE_DELETE_BUTTONS));
         }
     }
 

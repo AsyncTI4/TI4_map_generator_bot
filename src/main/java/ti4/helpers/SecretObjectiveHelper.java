@@ -101,7 +101,7 @@ public class SecretObjectiveHelper {
                     buttons.add(Buttons.green(
                             "tnelisHeroAttach_" + soStringID,
                             "Attach to " + Mapper.getSecretObjectivesJustNames().get(soStringID)));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                     String msg = p2.getRepresentationUnfogged()
                             + " you have the opportunity to attach Turra Sveyar, the Tnelis hero, to the recently scored secret objective "
                             + Mapper.getSecretObjectivesJustNames().get(soStringID) + ". Use buttons to resolve.";
@@ -232,7 +232,7 @@ public class SecretObjectiveHelper {
         if (player.hasTech("tf-plausibled") || player.hasAbility("plausible_deniability_br")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
-            buttons.add(Buttons.red("deleteButtons", "Done"));
+            buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
@@ -247,10 +247,10 @@ public class SecretObjectiveHelper {
                     player.getCorrectChannel(),
                     player.getRepresentation() + " gains 1 splice card due to _Yin Ascendant_.");
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
-            buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
+            buttons.add(Buttons.DRAW_1_ABILITY);
+            buttons.add(Buttons.DRAW_1_UNIT_UPGRADE);
             buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
-            buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+            buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
             String message2 = player.getRepresentationUnfogged() + ", please use these buttons to resolve.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }

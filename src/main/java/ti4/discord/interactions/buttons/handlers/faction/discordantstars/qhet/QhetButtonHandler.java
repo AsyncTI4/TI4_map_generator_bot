@@ -30,7 +30,7 @@ class QhetButtonHandler {
                 player.getFactionEmoji() + " produced 2 infantry on " + Helper.getPlanetRepresentation(planet, game));
         ButtonHelper.deleteMessage(event);
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-        Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+        Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
         buttons.add(DoneExhausting);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Please pay one resource.", buttons);
         if (player.hasTech("yso")) {

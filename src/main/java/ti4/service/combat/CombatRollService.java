@@ -106,6 +106,7 @@ import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.helpers.thundersedge.TeHelperUnits;
+import ti4.json.JsonMapperManager;
 import ti4.message.MessageHelper;
 import ti4.model.CombatModifierModel;
 import ti4.model.Mapper;
@@ -128,11 +129,9 @@ import ti4.service.unit.HacanFlagshipService;
 import ti4.service.unit.UnitModelValueInjectionService;
 import ti4.spring.context.SpringContext;
 import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class CombatRollService {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Pattern TOTAL_HITS_LINE_PATTERN = Pattern.compile("\\n\\*\\*Total hits \\d+\\*\\*[^\\n]*\\n");
 
     public void sendSpaceCannonOffenceHitAssignment(
@@ -278,8 +277,9 @@ public class CombatRollService {
             if (game.getStoredValue("assignedBombardment" + player.getFaction()).isEmpty()) {
                 BombardmentService.autoAssignAllBombardmentToAPlanet(player, game, tile);
             }
-            List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
-                    game.getStoredValue("assignedBombardment" + player.getFaction()), new TypeReference<>() {});
+            List<BombardmentAssignment> assignedUnits = JsonMapperManager.basic()
+                    .readValue(
+                            game.getStoredValue("assignedBombardment" + player.getFaction()), new TypeReference<>() {});
 
             boolean hasValidBombardment = false;
             List<String> bombardedPlanets = new ArrayList<>();
@@ -506,8 +506,9 @@ public class CombatRollService {
             if (player.hasUnit("ashen_flagship")) {
                 AshenUnitHandler.prepareFlagshipBombardmentContext(game, player, bombardPlanet);
             }
-            List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
-                    game.getStoredValue("assignedBombardment" + player.getFaction()), new TypeReference<>() {});
+            List<BombardmentAssignment> assignedUnits = JsonMapperManager.basic()
+                    .readValue(
+                            game.getStoredValue("assignedBombardment" + player.getFaction()), new TypeReference<>() {});
             Map<String, Integer> remainingAssignedByAsyncId = new HashMap<>();
             for (BombardmentAssignment assignedUnit : assignedUnits) {
                 if (assignedUnit.planet().equals(bombardPlanet) && assignedUnit.sourceId() != null) {
@@ -699,7 +700,7 @@ public class CombatRollService {
         String gameAssignedBombardment = game.getStoredValue("assignedBombardment" + player.getFaction());
         if (!gameAssignedBombardment.isEmpty() && rollType == CombatRollType.bombardment) {
             List<BombardmentAssignment> assignedBombardment =
-                    MAPPER.readValue(gameAssignedBombardment, new TypeReference<>() {});
+                    JsonMapperManager.basic().readValue(gameAssignedBombardment, new TypeReference<>() {});
             String tempBombardPlanet = bombardPlanet;
             for (NamedCombatModifierModel mod : extraRollsDup) {
                 if ("plus1_roll_plasmascoring"
@@ -922,7 +923,7 @@ public class CombatRollService {
         if (message.contains("adding +1, at the risk of your")) {
             Button thalnosButton = Buttons.green(
                     "startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos", ExploreEmojis.Relic);
-            Button decline = Buttons.gray("deleteButtons", "Decline");
+            Button decline = Buttons.DECLINE_DELETE_BUTTONS_GRAY;
             String thalnosMessage =
                     "Use this button to roll for Thalnos.\n-# Note that if it matters, the dice were just rolled in the following format: (normal dice for unit 1)+(normal dice for unit 2)...etc...+(extra dice for unit 1)+(extra dice for unit 2)...etc.\n-# Sol and Letnev agents automatically are given as extra dice for unit 1.";
             MessageHelper.sendMessageToChannelWithButtons(
@@ -1396,7 +1397,7 @@ public class CombatRollService {
                             player.factionButtonChecker() + "meteorSlings_" + planet,
                             "Infantry on " + Helper.getPlanetRepresentation(planet, game)));
 
-                    buttons.add(Buttons.red("deleteButtons", "Done"));
+                    buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
                     String msg2 = player.getRepresentation() + " you could potentially cancel "
                             + (h == 1 ? "the BOMBARDMENT hit" : "some BOMBARDMENT hits")
                             + " to place infantry instead. Use these buttons to do so, and press done when done. The bot did not track how many hits you got. ";
@@ -1486,7 +1487,7 @@ public class CombatRollService {
                 : "autoAssignSpaceHits_" + tile.getPosition() + "_0";
         List<Button> buttons = List.of(
                 Buttons.green(buttonPrefix + repairId, "Repair With Duranium Armor"),
-                Buttons.gray("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS_GRAY);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 opponent.getRepresentationUnfogged()

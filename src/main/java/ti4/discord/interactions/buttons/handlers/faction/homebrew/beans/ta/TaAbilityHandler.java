@@ -116,7 +116,7 @@ public class TaAbilityHandler {
                             + design,
                     "Attach " + getDesignName(design)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         String message = player.getRepresentationUnfogged()
                 + ", you may attach 1 design from your reinforcements to "

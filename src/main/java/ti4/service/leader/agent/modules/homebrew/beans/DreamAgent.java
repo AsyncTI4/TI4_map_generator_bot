@@ -50,7 +50,7 @@ public final class DreamAgent extends AgentModule<Player> {
                 ownedButtonId(dreamPlayer, ID, activePlayer.getFaction()),
                 useLabel(dreamPlayer, ID, "Dream Agent"),
                 FactionEmojis.dream));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
                 dreamPlayer.getRepresentation()

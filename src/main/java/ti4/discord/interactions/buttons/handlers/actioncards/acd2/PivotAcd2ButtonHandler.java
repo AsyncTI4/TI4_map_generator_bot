@@ -84,7 +84,7 @@ class PivotAcd2ButtonHandler {
         }
         buttons.add(Buttons.green(
                 player.factionButtonChecker() + "pivotToSecret_" + discarded, "Continue to Secret Objective step"));
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         String remainingText = remaining == 1 ? "1 discard remaining" : remaining + " discards remaining";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),

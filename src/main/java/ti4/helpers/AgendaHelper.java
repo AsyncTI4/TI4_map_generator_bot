@@ -130,7 +130,7 @@ public final class AgendaHelper {
                 if (p2.getDebtTokenCount(player.getColor()) >= 3) {
                     buttons.add(Buttons.blue("sendTGTo_" + p2.getFaction() + "_debt3", "Erase 3 Debt"));
                 }
-                buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
         }
@@ -210,7 +210,7 @@ public final class AgendaHelper {
                                 p2.getColor()));
                     }
                 }
-                buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                buttons2.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons2);
             }
         }
@@ -437,7 +437,7 @@ public final class AgendaHelper {
             AtokeraAgent.clearVotes(player, game);
 
             if (!game.isFowMode()) {
-                Button eraseAndReVote = Buttons.red("eraseMyVote", "Erase my vote & have me vote again");
+                Button eraseAndReVote = Buttons.ERASE_MY_VOTE;
                 String revoteMsg = "You may press this button to revote if you made a mistake, ignore it otherwise.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), revoteMsg, eraseAndReVote);
             }
@@ -1676,7 +1676,7 @@ public final class AgendaHelper {
                     && IsPlayerElectedService.isPlayerElected(game, player, "committee")) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("presetCommitteeFormation", "Preset Committee Formation"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         player.getRepresentation()
@@ -2060,10 +2060,9 @@ public final class AgendaHelper {
         }
 
         proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
-        proceedButtons.add(Buttons.blue("transaction", "Transaction"));
-        if (!game.isHiddenAgendaMode())
-            proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
-        proceedButtons.add(Buttons.red("eraseMyRiders", "Erase my riders"));
+        proceedButtons.add(Buttons.TRANSACTION);
+        if (!game.isHiddenAgendaMode()) proceedButtons.add(Buttons.ERASE_MY_VOTE);
+        proceedButtons.add(Buttons.ERASE_MY_RIDERS);
         proceedButtons.add(Buttons.gray("refreshAgenda", "Refresh Agenda"));
         proceedButtons.add(Buttons.blue("pingNonresponders", "Ping Non-Responders"));
 
@@ -2980,10 +2979,9 @@ public final class AgendaHelper {
             listVoteCount(game, channel);
             msg = "These buttons can help with bugs/issues that occur during the Agenda Phase";
             proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
-            proceedButtons.add(Buttons.blue("transaction", "Transaction"));
-            if (!game.isHiddenAgendaMode())
-                proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
-            proceedButtons.add(Buttons.red("eraseMyRiders", "Erase my riders"));
+            proceedButtons.add(Buttons.TRANSACTION);
+            if (!game.isHiddenAgendaMode()) proceedButtons.add(Buttons.ERASE_MY_VOTE);
+            proceedButtons.add(Buttons.ERASE_MY_RIDERS);
             proceedButtons.add(Buttons.gray("refreshAgenda", "Refresh Agenda"));
             proceedButtons.add(Buttons.blue("pingNonresponders", "Ping Non-Responders"));
         }

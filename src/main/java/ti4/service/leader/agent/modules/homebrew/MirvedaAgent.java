@@ -50,6 +50,6 @@ public final class MirvedaAgent extends TargetedAgent {
                 Message.addressedTo(
                         target,
                         ", please research a technology of a color which matches one of the prerequisites on the unit upgrade you just gained.",
-                        List.of(Buttons.GET_A_TECH, Buttons.red("deleteButtons", "Delete This"))));
+                        List.of(Buttons.GET_A_TECH, Buttons.DELETE_BUTTONS)));
     }
 }

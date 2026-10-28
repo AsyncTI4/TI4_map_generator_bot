@@ -49,14 +49,6 @@ public class AgentLifecycle {
         run(LeaderAgents.find(game, parsed.agentId()), parsed, event, game, player, true);
     }
 
-    public static void spend(Game game, Player holder, String agentId) {
-        holder.getLeader(agentId).ifPresent(agent -> {
-            exhaust(game, holder, agent, agentId, null);
-            TemporalCommandSuiteService.offer(
-                    game, holder, agentId, !agent.getId().equalsIgnoreCase(agentId));
-        });
-    }
-
     public static void pressLegacyButton(
             GenericInteractionCreateEvent event, Game game, Player player, String agentId, String payload) {
         String buttonId = payload.isEmpty() ? AgentButtonIds.format(agentId) : AgentButtonIds.format(agentId, payload);

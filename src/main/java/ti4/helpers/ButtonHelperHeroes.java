@@ -36,7 +36,6 @@ import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
-import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.BlindSelectionService;
@@ -64,7 +63,7 @@ public class ButtonHelperHeroes {
             buttons.add(Buttons.green(
                     "argentHeroStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Done resolving"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         String msg = player.getRepresentation()
                 + ", please choose the system you wish to move stuff to using Mirik Aun Sissiri, the Argent hero.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -130,7 +129,7 @@ public class ButtonHelperHeroes {
                         tile.getRepresentationForButtons(game, player)));
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done resolving"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         return buttons;
     }
 
@@ -698,7 +697,7 @@ public class ButtonHelperHeroes {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.red(
                             "xxchaAgentRemoveInfantry_" + p2.getFaction() + "_" + planet, "Remove Infantry"));
-                    buttons.add(Buttons.gray("deleteButtons", "Decline"));
+                    buttons.add(Buttons.DECLINE_DELETE_BUTTONS_GRAY);
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCorrectChannel(),
                             player.getRepresentation()
@@ -1114,7 +1113,7 @@ public class ButtonHelperHeroes {
                 }
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         return buttons;
     }
 
@@ -1196,7 +1195,7 @@ public class ButtonHelperHeroes {
         player.setTg(player.getCommodities() + player.getTg());
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
-        Button tgButton = Buttons.red("deleteButtons", "Delete Buttons");
+        Button tgButton = Buttons.DELETE_BUTTONS;
         for (UnitHolder uH : tile.getPlanetUnitHolders()) {
             if (player.getPlanets().contains(uH.getName())) {
                 String planet = uH.getName();
@@ -1482,7 +1481,7 @@ public class ButtonHelperHeroes {
                     "stealRelic_" + victim.getFaction() + "_" + relic,
                     "Steal " + Mapper.getRelic(relic).getName()));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         String msg = player.getRepresentationUnfogged() + ", please choose the relic you wish to steal.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
@@ -1625,7 +1624,7 @@ public class ButtonHelperHeroes {
         buttons.add(Buttons.green("olradinHeroFlip_people", "People Policy"));
         buttons.add(Buttons.green("olradinHeroFlip_environment", "Environment Policy"));
         buttons.add(Buttons.green("olradinHeroFlip_economy", "Economy Policy"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         String msg = player.getRepresentation() + " you may flip one policy.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
@@ -1723,7 +1722,7 @@ public class ButtonHelperHeroes {
                 buttons.add(Buttons.gray(factionChecker + "jnHeroSwapOut_" + tech, techM.getName()));
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done resolving"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         return buttons;
     }
 
@@ -1885,7 +1884,7 @@ public class ButtonHelperHeroes {
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("mykoheroSteal_" + hero, "Copy " + hero));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         for (Player p2 : game.getRealPlayers()) {
             if (p2.hasLeaderUnlocked("mykomentorihero")) {
                 String msg = p2.getRepresentationUnfogged()
@@ -1968,57 +1967,57 @@ public class ButtonHelperHeroes {
     public static List<Button> getNRAHeroButtons(Game game) {
         List<Button> scButtons = new ArrayList<>();
         if (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1)) {
-            scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
+            scButtons.add(Buttons.SPEND_AND_GAIN_COMMAND_TOKENS);
             // scButtons.add(Buttons.red("leadershipExhaust", "Exhaust Planets"));
         }
         if (game.getScPlayed().get(2) == null || !game.getScPlayed().get(2)) {
-            scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
+            scButtons.add(Buttons.DIPLO_READY_2_PLANETS);
         }
         if (game.getScPlayed().get(3) == null || !game.getScPlayed().get(3)) {
             scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game)));
         }
         if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
-            scButtons.add(Buttons.green("construction_spacedock", "Place 1 Space Dock", UnitEmojis.spacedock));
-            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
+            scButtons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
+            scButtons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
         }
         if (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5)) {
-            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
+            scButtons.add(Buttons.REPLENISH_COMMODITIES);
         }
         if (game.getScPlayed().get(6) == null || !game.getScPlayed().get(6)) {
-            scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
+            scButtons.add(Buttons.WARFARE_BUILD_AT_HOME);
         }
         if (game.getScPlayed().get(7) == null || !game.getScPlayed().get(7)) {
             scButtons.add(Buttons.GET_A_TECH);
         }
         if (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8)) {
-            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
+            scButtons.add(Buttons.NON_SC_DRAW_SECRET_OBJECTIVE);
         }
-        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+        scButtons.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         return scButtons;
     }
 
     public static List<Button> getSecondaryButtons(Game game) {
         List<Button> scButtons = new ArrayList<>();
-        scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
+        scButtons.add(Buttons.SPEND_AND_GAIN_COMMAND_TOKENS);
         // scButtons.add(Buttons.red("leadershipExhaust", "Exhaust Planets"));
 
-        scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
+        scButtons.add(Buttons.DIPLO_READY_2_PLANETS);
 
         scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game)));
 
-        scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
-        scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
+        scButtons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
+        scButtons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
 
-        scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
+        scButtons.add(Buttons.REPLENISH_COMMODITIES);
 
-        scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
+        scButtons.add(Buttons.WARFARE_BUILD_AT_HOME);
 
         scButtons.add(Buttons.GET_A_TECH);
 
-        scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
+        scButtons.add(Buttons.NON_SC_DRAW_SECRET_OBJECTIVE);
 
-        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+        scButtons.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         return scButtons;
     }

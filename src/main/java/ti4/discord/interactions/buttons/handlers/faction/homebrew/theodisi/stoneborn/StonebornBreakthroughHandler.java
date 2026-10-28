@@ -64,7 +64,7 @@ public class StonebornBreakthroughHandler {
                 event,
                 getOutputChannel(game, player, event),
                 buttons,
-                List.of(Buttons.red("deleteButtons", "Decline")),
+                List.of(Buttons.DECLINE_DELETE_BUTTONS),
                 message,
                 prefix,
                 buttonID)) {
@@ -273,7 +273,7 @@ public class StonebornBreakthroughHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 getOutputChannel(game, player, event),
                 message,
-                paginate(buttons, List.of(Buttons.red("deleteButtons", "Decline")), prefix));
+                paginate(buttons, List.of(Buttons.DECLINE_DELETE_BUTTONS), prefix));
     }
 
     private static List<Button> fragmentButtons(Player player) {

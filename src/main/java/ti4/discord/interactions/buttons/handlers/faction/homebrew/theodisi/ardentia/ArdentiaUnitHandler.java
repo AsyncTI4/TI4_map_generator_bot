@@ -41,7 +41,7 @@ public class ArdentiaUnitHandler {
                 event,
                 player.getRepresentation()
                         + ", you may spend 1 command token from your strategy pool to produce 2 hits using _Sovereign's Gavel_.",
-                List.of(useGavel, Buttons.gray("deleteButtons", "Decline")));
+                List.of(useGavel, Buttons.DECLINE_DELETE_BUTTONS_GRAY));
     }
 
     @ButtonHandler(USE_SOVEREIGN)
@@ -117,7 +117,7 @@ public class ArdentiaUnitHandler {
                     player.factionButtonChecker() + DEPLOY_IRON_CLAW_ON + tile.getPosition() + "|" + planet.getName(),
                     "Deploy on " + Helper.getPlanetRepresentation(planet.getName(), game)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
@@ -145,7 +145,7 @@ public class ArdentiaUnitHandler {
         }
 
         List<Button> paymentButtons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, player, "inf"));
-        paymentButtons.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
+        paymentButtons.add(Buttons.DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()

@@ -504,7 +504,7 @@ public class PromissoryNoteHelper {
                     player.getCorrectChannel(),
                     player.getFactionEmojiOrColor() + " is paying 1 influence to pass _Malevolency_ to a neighbor.");
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-            Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            Button doneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
             buttons.add(doneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), "Please spend 1 influence.", buttons);

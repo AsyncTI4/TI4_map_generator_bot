@@ -56,7 +56,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Sa
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
@@ -123,6 +122,7 @@ import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
 import ti4.service.franken.FrankenUnitService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantAgent;
 import ti4.service.map.FractureService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.turn.EndTurnService;
@@ -3043,7 +3043,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
             if (game != null) {
                 if (hasUnexhaustedLeader("revenantagent")) {
-                    RevenantLeadersHandler.offerRevenantAgentButtons(this, tech);
+                    RevenantAgent.offerAfterExhaustingTech(this, tech);
                 }
             }
         }
@@ -3113,7 +3113,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 && !getExhaustedPlanetsAbilities().contains(planet)) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("planetAbilityExhaust_" + planet, "Use Nano-Forge Ability"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     getCorrectChannel(),
                     getRepresentation()

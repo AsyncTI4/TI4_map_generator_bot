@@ -65,7 +65,7 @@ public class ArdentiaLeadersHandler {
                         otherPlayer.getFactionEmojiOrColor()));
             }
         }
-        targets.add(Buttons.red("deleteButtons", "Done"));
+        targets.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),

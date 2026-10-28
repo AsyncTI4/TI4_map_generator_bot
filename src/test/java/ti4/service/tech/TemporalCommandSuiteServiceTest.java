@@ -37,6 +37,15 @@ class TemporalCommandSuiteServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void anOverlongCleverCleverLabelFallsBackToTcsAndDropsTheYssarilSuffix() {
+        game.setTwilightsFallMode(true);
+        String longName = "Clever Clever Thrash \"Feral\" Burner, the Revenant of Scrapyard/Yssaril agent";
+
+        assertThat(TemporalCommandSuiteService.label(game, longName))
+                .isEqualTo("TCS: Ready Clever Clever Thrash \"Feral\" Burner, the Revenant of Scrapyard");
+    }
+
+    @Test
     void labelsFitInAButtonEvenForCleverCleverCopies() {
         for (boolean twilightsFall : List.of(false, true)) {
             game.setTwilightsFallMode(twilightsFall);

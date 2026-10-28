@@ -158,7 +158,7 @@ public class ThirtyKPoliticsAcButtonHandler {
         }
         ButtonHelper.deleteMessage(event);
         List<Button> buttons = new ArrayList<>(StrategyCardSecondaryButtonService.getSecondaryAbilityButtons(game, sc));
-        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done"));
         ThirtyKAcTargets.send(
                 player,
                 player.getRepresentationUnfogged() + ", your agents subvert " + game.getSCName(sc)

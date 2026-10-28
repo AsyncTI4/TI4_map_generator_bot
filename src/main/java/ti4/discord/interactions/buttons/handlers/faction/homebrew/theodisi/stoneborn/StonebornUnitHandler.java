@@ -46,7 +46,7 @@ public class StonebornUnitHandler {
             return;
         }
 
-        List<Button> pinned = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> pinned = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation()
@@ -67,7 +67,7 @@ public class StonebornUnitHandler {
                 event,
                 getOutputChannel(game, player, event),
                 buttons,
-                List.of(Buttons.red("deleteButtons", "Decline")),
+                List.of(Buttons.DECLINE_DELETE_BUTTONS),
                 message,
                 prefix,
                 buttonID)) {

@@ -56,7 +56,7 @@ class OracleAcd2ButtonHandler {
                     player.factionButtonChecker() + "oracleDeck_" + deck.name(),
                     "Draw from the " + deck.label + " deck"));
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose which deck you are drawing from with " + CARD + ".",

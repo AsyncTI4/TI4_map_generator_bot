@@ -34,7 +34,6 @@ import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -52,6 +51,7 @@ import ti4.service.fow.GMService;
 import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.leader.agent.modules.homebrew.EdynAgent;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.planet.JotunheimLegendaryService;
@@ -283,10 +283,10 @@ public class EndTurnService {
                         "You were the last player to pass, and so you may score _Prove Endurance_.");
             }
             CommanderUnlockCheckService.checkPlayer(mainPlayer, "ralnel");
-            if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event)) {
+            if (!EdynAgent.triggerPresetOnPass(game, mainPlayer, mainPlayer, event)) {
                 EndPhaseService.EndActionPhase(event, game, gameChannel);
                 game.updateActivePlayer(null);
-                ButtonHelperAgents.checkForEdynAgentActive(game, event);
+                EdynAgent.endPresetAction(game, event);
             }
 
             return;
@@ -324,11 +324,11 @@ public class EndTurnService {
             sendFogTurnSummary(game, mainPlayer);
         }
         if (justPassed) {
-            if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {
+            if (!EdynAgent.triggerPresetOnPass(game, mainPlayer, nextPlayer, event)) {
                 StartTurnService.turnStart(event, game, nextPlayer);
             }
         } else {
-            if (!ButtonHelperAgents.checkForEdynAgentActive(game, event)) {
+            if (!EdynAgent.endPresetAction(game, event)) {
                 StartTurnService.turnStart(event, game, nextPlayer);
             }
         }

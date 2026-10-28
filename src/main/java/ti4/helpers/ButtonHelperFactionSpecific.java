@@ -376,7 +376,7 @@ public final class ButtonHelperFactionSpecific {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("drawRelic", "Relic"));
                 buttons.add(Buttons.blue("non_sc_draw_so", "Secret Objective"));
-                buttons.add(Buttons.red("deleteButtons", "Done"));
+                buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         p2.getCorrectChannel(),
                         p2.getRepresentationUnfogged()
@@ -451,7 +451,7 @@ public final class ButtonHelperFactionSpecific {
     public static void getTechFromGlory(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("getAllTechOfType_unitupgrade_noPay", "Get A Unit Upgrade Technology"));
-        buttons.add(Buttons.red("deleteButtons", "Delete This"));
+        buttons.add(Buttons.DELETE_BUTTONS);
         player.setStrategicCC(player.getStrategicCC() - 1);
         MessageChannel channel = player.getCorrectChannel();
         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "used **Glory**");
@@ -493,7 +493,7 @@ public final class ButtonHelperFactionSpecific {
         }
 
         buttons.add(Buttons.gray("resetSpend_" + whatIsItFor, "Reset Spent Planets and Trade Goods"));
-        Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+        Button doneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
         buttons.add(doneExhausting);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), "Click how many trade goods you wish to spend.", buttons);
@@ -1230,7 +1230,7 @@ public final class ButtonHelperFactionSpecific {
                 }
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 player.getRepresentation()
@@ -1617,7 +1617,7 @@ public final class ButtonHelperFactionSpecific {
         UnitHolder space = tile.getUnitHolders().get(unitHolderName);
         space.removeDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p2.getColorID()), 1);
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-        Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+        Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
         buttons.add(DoneExhausting);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
@@ -1877,7 +1877,7 @@ public final class ButtonHelperFactionSpecific {
                         + activePlayer.getFactionEmojiOrColor() + ".";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("stymiePlayerStep1_" + activePlayer.getFaction(), "Play Stymie"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
             }
         }
@@ -1935,7 +1935,7 @@ public final class ButtonHelperFactionSpecific {
             buttons.add(Buttons.green(
                     "asnStep2_" + tile.getPosition() + "_" + warfareOrTactical, tile.getRepresentation()));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -1965,7 +1965,7 @@ public final class ButtonHelperFactionSpecific {
                     + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
                     + " If you do, you will also choose another player, who will gain 2 trade goods.";
             List<Button> buttons2 = new ArrayList<>();
-            buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+            buttons2.add(Buttons.USE_PRODUCTION_BIOMES);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons2);
         }
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -2305,7 +2305,7 @@ public final class ButtonHelperFactionSpecific {
                         + "Feel free to ignore this message if you don't intend to play it any time soon.";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("resolvePreassignment_Play Naalu PN", "Pre-play Gift of Prescience"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
         }
@@ -2330,7 +2330,7 @@ public final class ButtonHelperFactionSpecific {
                     game.getTileFromPlanet(planet));
         }
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-        options.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
+        options.add(Buttons.DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + ", please pay 3 resources for the mech.",
@@ -2881,7 +2881,7 @@ public final class ButtonHelperFactionSpecific {
                 }
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+        buttons.add(Buttons.DELETE_BUTTONS);
         return buttons;
     }
 
@@ -2897,7 +2897,7 @@ public final class ButtonHelperFactionSpecific {
                 }
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+        buttons.add(Buttons.DELETE_BUTTONS);
         return buttons;
     }
 
@@ -2974,7 +2974,7 @@ public final class ButtonHelperFactionSpecific {
                 }
             }
         }
-        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done"));
         return buttons;
     }
 
@@ -3208,7 +3208,7 @@ public final class ButtonHelperFactionSpecific {
                     + " that may replace infantry.";
         }
         buttons.add(Buttons.green("resolveMykoMech", "Replace Infantry With Mech"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         if (amount > 0) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
@@ -3318,7 +3318,7 @@ public final class ButtonHelperFactionSpecific {
                     Buttons.green(ffcc + "convertComms_1_stay", "Convert 1 Commodity to Trade Good", MiscEmojis.Wash));
             buttons.add(Buttons.blue(ffcc + "gainComms_1_stay", "Gain 1 Commodity", MiscEmojis.comm));
         }
-        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         return buttons;
     }
 
@@ -3409,7 +3409,7 @@ public final class ButtonHelperFactionSpecific {
                 }
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         return buttons;
     }
 
@@ -3477,7 +3477,7 @@ public final class ButtonHelperFactionSpecific {
             buttons.add(Buttons.blue(
                     "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
                     "Manually Assign Hit" + (h == 1 ? "" : "s")));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         }
 
@@ -3717,7 +3717,7 @@ public final class ButtonHelperFactionSpecific {
                     "Acquire " + Mapper.getTech(AliasHandler.resolveTech(tech)).getName());
             List<Button> buttons = new ArrayList<>();
             buttons.add(transact);
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
         }
     }
@@ -3740,7 +3740,7 @@ public final class ButtonHelperFactionSpecific {
             Button transact = Buttons.green("resolvePNPlay_ms", "Play Military Support");
             List<Button> buttons = new ArrayList<>();
             buttons.add(transact);
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
         }
     }
@@ -3829,7 +3829,7 @@ public final class ButtonHelperFactionSpecific {
             buttons1.add(transact1);
             buttons1.add(transact2);
             buttons1.add(transact3);
-            buttons1.add(Buttons.red("deleteButtons", "Decline"));
+            buttons1.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons1);
 
             Button transact =
@@ -3837,7 +3837,7 @@ public final class ButtonHelperFactionSpecific {
             msg2 = player.getRepresentation() + ", you may also look at the top card of the relic deck.";
             List<Button> buttons2 = new ArrayList<>();
             buttons2.add(transact);
-            buttons2.add(Buttons.red("deleteButtons", "Decline"));
+            buttons2.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons2);
         }
         if (player.getPromissoryNotes().containsKey("dspnkoll") && !player.ownsPromissoryNote("dspnkoll")) {
@@ -3845,7 +3845,7 @@ public final class ButtonHelperFactionSpecific {
             Button transact = Buttons.green("resolvePNPlay_dspnkoll", "Play AI Survey");
             List<Button> buttons = new ArrayList<>();
             buttons.add(transact);
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
     }
@@ -3856,7 +3856,7 @@ public final class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         buttons.add(transact1);
         buttons.add(transact2);
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         String message = "Please choose how to use _AI Survey_.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
@@ -4087,7 +4087,7 @@ public final class ButtonHelperFactionSpecific {
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " replaced 1 of their infantry with 1 " + unit + " on "
                         + Helper.getPlanetRepresentation(planet, game) + " using the mech's DEPLOY ability.");
-        options.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
+        options.add(Buttons.DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + ", please pay two resources for your mech.",
@@ -5161,7 +5161,7 @@ public final class ButtonHelperFactionSpecific {
             List<Button> buttons;
             buttons = Helper.getPlaceUnitButtons(
                     event, player, game, game.getTileByPosition(pos), type, "placeOneNDone_dontskip");
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             String message = player.getRepresentation()
                     + " Use the buttons to produce 1 ship that was destroyed in the combat. "
                     + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
@@ -5203,7 +5203,7 @@ public final class ButtonHelperFactionSpecific {
         String toRemove = buttonID.split("_")[2];
         String planet = toRemove.split(" ")[1];
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-        Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+        Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
         buttons.add(DoneExhausting);
         AddUnitService.addUnits(event, game.getTileByPosition(tilePos), game, player.getColor(), "warsun");
         RemoveUnitService.removeUnits(event, game.getTileByPosition(tilePos), game, player.getColor(), toRemove);

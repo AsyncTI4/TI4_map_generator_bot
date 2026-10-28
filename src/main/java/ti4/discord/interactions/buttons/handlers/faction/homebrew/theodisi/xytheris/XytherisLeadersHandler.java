@@ -1,12 +1,8 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
@@ -22,120 +18,16 @@ import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
-import ti4.service.leader.agent.AgentLifecycle;
 
 @UtilityClass
 public class XytherisLeadersHandler {
     public static final String MYRIX_AGENT_WINDOW = "myrixAgentWindow";
     public static final String MYRIX_AGENT_UNIT = "myrixAgentUnit_";
-    private static final String MYRIX_AGENT_PENDING = "myrixAgentPending";
-    private static final String AGENT_ID = "xytherisagent";
-    private static final String USE_MYRIX_AGENT = "useMyrixAgent";
-    private static final String MYRIX_SHIP = "myrixAgentShip_";
+    public static final String MYRIX_AGENT_PENDING = "myrixAgentPending";
     private static final String HERO_ID = "xytherishero";
     private static final String HERO_ROLL_KEY = "xytherisHeroRoll_";
     private static final String USE_HERO_ROLL = "useXytherisHeroRoll_";
     private static final String DECLINE_HERO_ROLL = "declineXytherisHeroRoll_";
-
-    // Agent
-    public void offerMyrixAgentButtons(Game game, Player activPlayer, Tile activeTile) {
-        game.setStoredValue(MYRIX_AGENT_WINDOW, activPlayer.getFaction());
-
-        if (!activPlayer.hasUnexhaustedLeader(AGENT_ID)) {
-            return;
-        }
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                activPlayer.getCorrectChannel(),
-                activPlayer.getRepresentationUnfogged() + ", you may exhaust Myrix, the Xytheris agent.",
-                List.of(
-                        Buttons.green(activPlayer.factionButtonChecker() + USE_MYRIX_AGENT, "Use Myrix"),
-                        Buttons.red(activPlayer.factionButtonChecker() + "deleteButtons", "Decline")));
-    }
-
-    @ButtonHandler(USE_MYRIX_AGENT)
-    public static void useMyrixAgent(ButtonInteractionEvent event, Game game, Player player) {
-        Leader agent = player.getLeader(AGENT_ID).orElse(null);
-        Player target = game.getPlayerFromColorOrFaction(game.getStoredValue(MYRIX_AGENT_WINDOW));
-        if (agent == null
-                || !player.hasUnexhaustedLeader(AGENT_ID)
-                || target == null
-                || target != game.getActivePlayer()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event,
-                    "Myrix, the Xytheris agent, can only be used immediately after a player activates a system.");
-            return;
-        }
-
-        Map<String, Button> buttonsByUnitLocation = new LinkedHashMap<>();
-        for (Tile tile : game.getTileMap().values()) {
-            for (UnitHolder holder : tile.getUnitHolders().values()) {
-                for (UnitKey unitKey : holder.getUnitKeysForPlayer(target)) {
-                    UnitModel unit = target.getPriorityUnitByAsyncID(unitKey.asyncID(), holder);
-                    if (unit == null || !unit.getIsShip()) {
-                        continue;
-                    }
-                    String unitLocation = tile.getPosition() + ";" + holder.getName() + ";" + unitKey.asyncID();
-                    buttonsByUnitLocation.put(
-                            unitLocation,
-                            Buttons.green(
-                                    target.factionButtonChecker() + MYRIX_SHIP + unitLocation,
-                                    "Choose 1 " + unitKey.humanReadableName() + " in " + tile.getPosition(),
-                                    unitKey.unitEmoji()));
-                }
-            }
-        }
-
-        if (buttonsByUnitLocation.isEmpty()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "That player has no ships to select.");
-            return;
-        }
-
-        AgentLifecycle.spend(game, player, AGENT_ID);
-        game.removeStoredValue(MYRIX_AGENT_WINDOW);
-        game.setStoredValue(MYRIX_AGENT_PENDING, target.getFaction());
-        List<Button> buttons = new ArrayList<>(buttonsByUnitLocation.values());
-        String prompt = target.getRepresentationUnfogged()
-                + ", please choose a ship to gain capacity and PRODUCTION from Myrix, the Xytheris agent.";
-        for (int index = 0; index < buttons.size(); index += 25) {
-            MessageHelper.sendMessageToChannelWithButtons(
-                    target.getCorrectChannel(), prompt, buttons.subList(index, Math.min(index + 25, buttons.size())));
-        }
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(MYRIX_SHIP)
-    public static void selectMyrixAgentShip(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (game.getActivePlayer() != player || !player.getFaction().equals(game.getStoredValue(MYRIX_AGENT_PENDING))) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        String[] unitLocation = buttonID.substring(MYRIX_SHIP.length()).split(";", 3);
-        Tile tile = unitLocation.length == 3 ? game.getTileByPosition(unitLocation[0]) : null;
-        UnitHolder holder = tile == null ? null : tile.getUnitHolders().get(unitLocation[1]);
-        UnitKey unitKey = holder == null
-                ? null
-                : holder.getUnitKeysForPlayer(player).stream()
-                        .filter(key -> key.asyncID().equals(unitLocation[2]))
-                        .findFirst()
-                        .orElse(null);
-        UnitModel unit = unitKey == null ? null : player.getPriorityUnitByAsyncID(unitKey.asyncID(), holder);
-        if (unit == null || !unit.getIsShip()) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        int abilityCount = getUnitAbilityCount(unit);
-        game.setStoredValue(MYRIX_AGENT_UNIT + player.getFaction(), String.join(";", unitLocation));
-        game.removeStoredValue(MYRIX_AGENT_PENDING);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getRepresentationUnfogged() + " selected " + unit.getUnitEmoji() + " " + unit.getName()
-                        + " for Myrix, the Xytheris agent (+" + abilityCount
-                        + " capacity and PRODUCTION; it will move before identical ships).");
-        ButtonHelper.deleteMessage(event);
-    }
 
     public static int getMyrixAgentBonus(Game game, Player player, Tile tile, UnitHolder holder, UnitKey unitKey) {
         String[] values =

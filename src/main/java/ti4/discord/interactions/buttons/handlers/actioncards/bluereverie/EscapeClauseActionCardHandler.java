@@ -28,7 +28,7 @@ public class EscapeClauseActionCardHandler {
                         + ", you may preset _Escape Clause_ to play when another player resolves your _Trade Agreement_.",
                 List.of(
                         Buttons.green(player.factionButtonChecker() + "presetEscapeClause", "Preset Escape Clause"),
-                        Buttons.red("deleteButtons", "Decline")));
+                        Buttons.DECLINE_DELETE_BUTTONS));
     }
 
     @ButtonHandler("presetEscapeClause")

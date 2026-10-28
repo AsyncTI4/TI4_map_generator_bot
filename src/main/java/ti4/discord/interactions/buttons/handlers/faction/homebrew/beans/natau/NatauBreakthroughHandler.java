@@ -77,7 +77,7 @@ public class NatauBreakthroughHandler {
                         tile.getRepresentationForButtons(game, player),
                         tile.getTileEmoji(player)))
                 .toList());
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing()
