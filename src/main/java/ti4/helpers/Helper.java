@@ -3803,6 +3803,7 @@ public final class Helper {
         List<Integer> hsLocations = new ArrayList<>();
         LinkedHashMap<Integer, Player> unsortedPlayers = new LinkedHashMap<>();
         boolean different = false;
+        List<Player> unplacedPlayers = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
             Tile tile = game.getTile(AliasHandler.resolveTile(player.getFaction()));
             if (tile == null) {
@@ -3827,15 +3828,16 @@ public final class Helper {
                     tile = tile94;
                 }
             }
-            if (tile != null) {
-                int parsedLocation = 9999;
-                try {
-                    parsedLocation = Integer.parseInt(tile.getPosition());
-                } catch (Exception ignored) {
-                }
-                hsLocations.add(parsedLocation);
-                unsortedPlayers.put(parsedLocation, player);
+            if (tile == null && player.getPlayerStatsAnchorPosition() != null) {
+                tile = game.getTileByPosition(player.getPlayerStatsAnchorPosition());
             }
+            Integer parsedLocation = tile == null ? null : parseTilePosition(tile);
+            if (parsedLocation == null || unsortedPlayers.containsKey(parsedLocation)) {
+                unplacedPlayers.add(player);
+                continue;
+            }
+            hsLocations.add(parsedLocation);
+            unsortedPlayers.put(parsedLocation, player);
         }
         MapTemplateModel template = Mapper.getMapTemplate(game.getMapTemplateID());
         Collections.sort(hsLocations);
@@ -3854,13 +3856,15 @@ public final class Helper {
             hsLocations = template.getSortedHomeSystemLocations();
         }
 
-        StringBuilder msg = new StringBuilder(game.getPing() + " set order in the following way: \n");
-        if (!different || template != null) {
-            List<Player> sortedPlayers = new ArrayList<>();
-            for (Integer location : hsLocations) {
-                sortedPlayers.add(unsortedPlayers.get(location));
-            }
+        List<Player> sortedPlayers = new ArrayList<>();
+        for (Integer location : hsLocations) {
+            sortedPlayers.add(unsortedPlayers.get(location));
+        }
 
+        StringBuilder msg = new StringBuilder(game.getPing() + " set order in the following way: \n");
+        if (!unplacedPlayers.isEmpty() || sortedPlayers.contains(null)) {
+            msg = new StringBuilder(unplacedOrderMessage(unplacedPlayers));
+        } else if (!different || template != null) {
             Map<String, Player> newPlayerOrder = new LinkedHashMap<>();
             Map<String, Player> players = new LinkedHashMap<>(game.getPlayers());
             Map<String, Player> playersBackup = new LinkedHashMap<>(game.getPlayers());
@@ -3902,6 +3906,28 @@ public final class Helper {
                 }
             }
         }
+    }
+
+    private static Integer parseTilePosition(Tile tile) {
+        try {
+            return Integer.parseInt(tile.getPosition());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private static String unplacedOrderMessage(List<Player> unplacedPlayers) {
+        StringBuilder msg = new StringBuilder("Could not work out the seat of every player");
+        if (!unplacedPlayers.isEmpty()) {
+            msg.append(" (")
+                    .append(unplacedPlayers.stream()
+                            .map(Player::getRepresentationNoPing)
+                            .collect(Collectors.joining(", ")))
+                    .append(")");
+        }
+        return msg.append(", so did not assign speaker order automatically."
+                        + " Set the speaker order with `/game set_order`, with the speaker as the first player.")
+                .toString();
     }
 
     public static void checkEndGameCivilizedSociety(Game game) {
