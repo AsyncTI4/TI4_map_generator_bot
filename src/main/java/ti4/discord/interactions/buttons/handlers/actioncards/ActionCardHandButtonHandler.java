@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -27,6 +26,7 @@ import ti4.model.Mapper;
 import ti4.service.button.ReactionService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.homebrew.CymiaeAgent;
+import ti4.service.leader.agent.modules.homebrew.wftv.ArvaxiAgent;
 import ti4.service.turn.StartTurnService;
 
 @UtilityClass
@@ -211,7 +211,7 @@ class ActionCardHandButtonHandler {
                         buttons2);
             }
             ActionCardHelper.serveReverseEngineerButtons(game, player, List.of(acID));
-            ArvaxiLeaderHandler.postAgentOfferButtons(game, player, acID);
+            ArvaxiAgent.postAgentOfferButtons(game, player, acID);
             if (player.hasAbility("scrap_metal")) {
                 String message2 =
                         player.getRepresentationUnfogged() + ", please **Scrap Metal** by using these buttons.";

@@ -174,7 +174,7 @@ public class InnovativeOfficerBrActionCardHandler {
         if (buttons.isEmpty()) {
             return;
         }
-        buttons.add(Buttons.gray("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS_GRAY);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + ", you may assign 1 hit from _Innovative Officer_:",

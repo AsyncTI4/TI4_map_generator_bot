@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.SanityLimits;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
@@ -146,6 +147,7 @@ final class UnitHolderRenderer {
             List<Integer> unitStates = unitHolder.getUnitStates(unitKey);
             List<UnitState> states = UnitState.unitRenderOrder().stream()
                     .flatMap(st -> Collections.nCopies(unitStates.get(st.ordinal()), st).stream())
+                    .limit(SanityLimits.unitsInOneHolder(unitKey.unitType()))
                     .toList();
             int unitRenderCt = 0;
             UnitState prevState = null;

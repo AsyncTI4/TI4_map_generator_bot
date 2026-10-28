@@ -13,6 +13,7 @@ class PeekAtStage1 extends GameStateSubcommand {
     PeekAtStage1() {
         super(Constants.PEEK_AT_STAGE1, "Peek at a stage 1 objective", false, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.LOCATION1, "Location Of Objective (typical 1-5)")
+                .setRequiredRange(1, 30)
                 .setRequired(true));
     }
 

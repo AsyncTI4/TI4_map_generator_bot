@@ -69,6 +69,7 @@ class HomebrewAgentButtonsAndDecodingTest extends BaseTi4Test {
     @Test
     void aPlayerWhoOnlyHasTheYssarilCopyIsOfferedCleverClever() {
         AgentModuleFixture fixture = new AgentModuleFixture("yssaril");
+        fixture.target.addLeader("cymiaeagent");
 
         assertThat(CymiaeAgent.button(fixture.user).getLabel()).isEqualTo("Use Clever Clever Cymiae Agent");
         assertThat(CymiaeAgent.button(fixture.target).getLabel()).isEqualTo("Use Cymiae Agent");

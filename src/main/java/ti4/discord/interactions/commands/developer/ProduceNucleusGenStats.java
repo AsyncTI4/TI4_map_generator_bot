@@ -31,7 +31,8 @@ class ProduceNucleusGenStats extends GameStateSubcommand {
     ProduceNucleusGenStats() {
         super("nucleus_gen_stats", "Generate statistics for nucleus generation for the in-channel game.", false, false);
         addOptions(new OptionData(
-                OptionType.INTEGER, "num_iterations", "Number of iterations to run - default 1,000", false));
+                        OptionType.INTEGER, "num_iterations", "Number of iterations to run - default 1,000", false)
+                .setRequiredRange(1, 100_000));
     }
 
     @Override

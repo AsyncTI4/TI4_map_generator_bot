@@ -65,6 +65,7 @@ import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.relic.BookOfLatviniaService;
 import ti4.service.relic.MutagenService;
 import ti4.service.relic.QuantumEntanglerService;
@@ -655,7 +656,7 @@ public class ComponentActionHelper {
         // Generic
         Button genButton = Buttons.gray(factionChecker + prefix + "generic_", "Generic Component Action");
         compButtons.add(genButton);
-        compButtons.add(Buttons.red("deleteButtons", "Cancel"));
+        compButtons.add(Buttons.CANCEL_DELETE_BUTTONS);
 
         return compButtons;
     }
@@ -709,7 +710,7 @@ public class ComponentActionHelper {
                         String message = p1.getRepresentationUnfogged() + ", please choose the user of the agent.";
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     } else {
-                        ButtonHelperAgents.exhaustAgent(buttonID, event, game, p1);
+                        AgentLifecycle.press(buttonID, event, game, p1);
                     }
                 } else if (buttonID.contains("hero")) {
                     PlayHeroService.playHero(
@@ -1360,7 +1361,7 @@ public class ComponentActionHelper {
                     buttons3.add(Buttons.green(
                             "exhaustTCS_" + relicID + "_" + player.getFaction(),
                             "Exhaust Temporal Command Suite to Ready " + relicID));
-                    buttons3.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons3.add(Buttons.DECLINE_DELETE_BUTTONS);
                     String msg = p2.getRepresentationUnfogged()
                             + " you have the opportunity to exhaust _Temporal Command Suite_ to ready " + relicID
                             + " and potentially resolve a transaction.";
@@ -1387,7 +1388,7 @@ public class ComponentActionHelper {
             player.addExhaustedRelic(relicID);
             purgeOrExhaust = "exhausted";
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-            Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
+            Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_FINISH_COMPONENT_ACTION;
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -1451,7 +1452,7 @@ public class ComponentActionHelper {
             case "enigmaticdevice" -> {
                 if (game.isTwilightsFallMode()) {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-                    Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
+                    Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_FINISH_COMPONENT_ACTION;
                     buttons.add(DoneExhausting);
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(), "Use this to spend 6 resources.", buttons);

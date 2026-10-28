@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.relic;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
@@ -25,7 +26,8 @@ class RelicSendFragments extends GameStateSubcommand {
                 true,
                 true);
         addOption(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color (defaults to you)", false, true);
-        addOption(OptionType.INTEGER, Constants.COUNT, "Number of fragments (default 1)");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments (default 1)")
+                .setRequiredRange(1, 20));
     }
 
     @Override

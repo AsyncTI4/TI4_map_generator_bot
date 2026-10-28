@@ -20,7 +20,8 @@ class RotateHyperlane extends GameStateSubcommand {
         super(Constants.ROTATE_HYPERLANE, "Rotate hyperlane", true, false);
         addOptions(new OptionData(
                 OptionType.STRING, Constants.POSITION, "Tile position on map. Accepts comma separated list", true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ROTATION, "Rotation in degrees, default = 60", false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.ROTATION, "Rotation in degrees, default = 60", false)
+                .setRequiredRange(-360, 360));
     }
 
     @Override

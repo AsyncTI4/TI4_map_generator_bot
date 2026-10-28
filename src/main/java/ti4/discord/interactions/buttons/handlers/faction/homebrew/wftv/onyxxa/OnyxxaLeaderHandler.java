@@ -66,7 +66,7 @@ public class OnyxxaLeaderHandler {
                         tile.getRepresentationForButtons(game, player)));
             }
         }
-        buttons.add(Buttons.red("onyxxaHeroDone", "Done Resolving"));
+        buttons.add(Buttons.red("onyxxaHeroDone", "Done"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", please use buttons to resolve your _Continental Drift_ hero ability.",

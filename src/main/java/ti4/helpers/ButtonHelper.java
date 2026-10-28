@@ -55,7 +55,6 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
@@ -69,7 +68,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiTechHandler;
@@ -115,7 +113,6 @@ import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.helpers.thundersedge.TeHelperUnits;
-import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.io.ImageResources;
 import ti4.image.map.MapRenderPipeline;
 import ti4.image.tile.SystemContextImage;
@@ -175,9 +172,13 @@ import ti4.service.leader.agent.modules.NaazAgent;
 import ti4.service.leader.agent.modules.homebrew.CheiranAgent;
 import ti4.service.leader.agent.modules.homebrew.FreeSystemsAgent;
 import ti4.service.leader.agent.modules.homebrew.KhraskAgent;
+import ti4.service.leader.agent.modules.homebrew.LanefirAgent;
 import ti4.service.leader.agent.modules.homebrew.LiZhoAgent;
 import ti4.service.leader.agent.modules.homebrew.OlradinAgent;
-import ti4.service.leader.agent.modules.twilightsfall.ExperimentalGenomeAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.CrystellumAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantStratumAgent;
+import ti4.service.leader.genome.ExperimentalGenome;
+import ti4.service.leader.genome.homebrew.tknova.SwarmGenome;
 import ti4.service.map.SystemPickerService;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.planet.AddPlanetService;
@@ -820,7 +821,7 @@ public class ButtonHelper {
             buttons.add(Buttons.gray("getReleaseButtons", "Release captured units", FactionEmojis.Cabal));
         }
         if (player.hasUnexhaustedLeader("experimentalagent") && !whatIsItFor.contains("inf")) {
-            buttons.add(ExperimentalGenomeAgent.button(player));
+            buttons.add(ExperimentalGenome.button(player));
         }
         if (player.getNombox().hasUnits() && player.hasAbility("mark_of_pharadn")) {
             buttons.add(Buttons.gray("getReleaseButtons", "Release captured units", FactionEmojis.pharadn));
@@ -1356,7 +1357,7 @@ public class ButtonHelper {
                 buttons.add(button);
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         return buttons;
     }
 
@@ -1929,7 +1930,7 @@ public class ButtonHelper {
                     numberOfAbilities++;
                 } else {
                     List<Button> buttons = getExhaustButtonsWithTG(game, player, "inf");
-                    Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+                    Button doneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
                     buttons.add(doneExhausting);
                     MessageHelper.sendMessageToChannel(
                             channel,
@@ -1994,7 +1995,7 @@ public class ButtonHelper {
                                 + counterstrokeValue + "_counterstroke_"
                                 + activeSystem.getPosition(),
                         "Counterstroke in " + activeSystem.getRepresentationForButtons(game, nonActivePlayer)));
-                reverseButtons.add(Buttons.red("deleteButtons", "Decline"));
+                reverseButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 String cyberMessage = nonActivePlayer.getRepresentationUnfogged()
                         + ", a reminder that you may use _Counterstroke_ in "
                         + activeSystem.getRepresentationForButtons(game, nonActivePlayer) + ".";
@@ -2012,7 +2013,7 @@ public class ButtonHelper {
                 reverseButtons.add(Buttons.green(
                         Constants.AC_PLAY_FROM_HAND + riposteValue + "_riposte_" + activeSystem.getPosition(),
                         "Riposte in " + activeSystem.getRepresentationForButtons(game, nonActivePlayer)));
-                reverseButtons.add(Buttons.red("deleteButtons", "Decline"));
+                reverseButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 String msg = nonActivePlayer.getRepresentationUnfogged()
                         + ", a reminder that you may use _Riposte_ in "
                         + activeSystem.getRepresentationForButtons(game, nonActivePlayer) + ".";
@@ -2033,7 +2034,7 @@ public class ButtonHelper {
                 buttons.add(Buttons.green(
                         Constants.AC_PLAY_FROM_HAND + incubateValue + "_incubate_" + activeSystem.getPosition(),
                         "Incubate in " + activeSystem.getRepresentationForButtons(game, nonActivePlayer)));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 String msg = nonActivePlayer.getRepresentationUnfogged()
                         + ", a reminder that you may use _Incubate_ in "
                         + activeSystem.getRepresentationForButtons(game, nonActivePlayer) + ".";
@@ -2443,7 +2444,7 @@ public class ButtonHelper {
                         "psychoExhaust_" + planet, "Exhaust " + Helper.getPlanetRepresentation(planet, game)));
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
+        buttons.add(Buttons.DELETE_BUTTONS);
         return buttons;
     }
 
@@ -3218,7 +3219,7 @@ public class ButtonHelper {
                         "Replace Sleeper on " + Helper.getPlanetRepresentation(planet, game)
                                 + " With 1 Mech & Infantry."));
             }
-            planetsWithSleepers.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+            planetsWithSleepers.add(Buttons.DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     "Use buttons to resolve the replacement of the Sleeper token on "
@@ -3242,7 +3243,7 @@ public class ButtonHelper {
                         "Replace PDS on " + planet + " With the Ouranos (the Ul flagship)."));
             }
         }
-        planetsWithPDS.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+        planetsWithPDS.add(Buttons.DELETE_BUTTONS);
         return planetsWithPDS;
     }
 
@@ -3254,7 +3255,7 @@ public class ButtonHelper {
                     factionChecker + "removeSleeperFromPlanet_" + planet,
                     "Remove Sleeper on " + Helper.getPlanetRepresentation(planet, game)));
         }
-        planetsWithSleepers.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+        planetsWithSleepers.add(Buttons.DELETE_BUTTONS);
         return planetsWithSleepers;
     }
 
@@ -3577,7 +3578,7 @@ public class ButtonHelper {
             AddPlanetService.addPlanet(player, planet, game);
         }
         List<Button> buttons = getExhaustButtonsWithTG(game, player, "both");
-        Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+        Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
         buttons.add(DoneExhausting);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), player.getRepresentation() + ", please pay for the planet.", buttons);
@@ -3992,7 +3993,7 @@ public class ButtonHelper {
             }
         }
         if (fromButton) {
-            buttonsToRemoveCC.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+            buttonsToRemoveCC.add(Buttons.DELETE_BUTTONS);
         }
 
         return buttonsToRemoveCC;
@@ -5233,9 +5234,9 @@ public class ButtonHelper {
             FreeSystemsAgent.button(game, player).ifPresent(endButtons::add);
         }
         if (player.hasUnexhaustedLeader("crystellumagent")) {
-            CrystellumLeadersHandler.addCrystellumAgentEndTurnButton(endButtons, game, player);
+            CrystellumAgent.addEndTurnButton(endButtons, game, player);
         }
-        endButtons.addAll(TkHelperGenomes.getEndOfTurnButtons(game, player));
+        SwarmGenome.endOfTurnOffer(player).ifPresent(endButtons::add);
 
         // OTHER stuff
         if (!player.hasAbility("arms_dealers")) {
@@ -5673,7 +5674,7 @@ public class ButtonHelper {
         String message2 = player.getRepresentationUnfogged()
                 + ", please choose the planets you wish to exhaust to spend " + MiscEmojis.Resources_6 + ".";
         List<Button> buttons = getExhaustButtonsWithTG(game, player, "res");
-        Button doneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
+        Button doneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS;
         buttons.add(doneExhausting);
 
         Tile tile = getTileWithCoatl(game);
@@ -5722,7 +5723,7 @@ public class ButtonHelper {
                     + ", you have the option to pre-pass, which means on your next turn, the bot automatically passes for you, no matter what happens. This is entirely optional and reversible.";
             List<Button> scButtons = new ArrayList<>();
             scButtons.add(Buttons.green("resolvePreassignment_Pre Pass " + player.getFaction(), "Pass on Next Turn"));
-            scButtons.add(Buttons.red("deleteButtons", "Decline"));
+            scButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, scButtons);
         }
     }
@@ -5986,7 +5987,7 @@ public class ButtonHelper {
                 }
             }
             if (!buttons.isEmpty()) {
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation()
@@ -6132,7 +6133,7 @@ public class ButtonHelper {
             Button transact = Buttons.green("resolvePNPlay_malevolency", "Play Malevolency");
             List<Button> buttons = new ArrayList<>();
             buttons.add(transact);
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
@@ -6154,7 +6155,7 @@ public class ButtonHelper {
                             "winnuStructure_pds_" + planet,
                             "Place 1 PDS on " + Helper.getPlanetRepresentation(planet, game),
                             UnitEmojis.pds));
-                    buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
+                    buttons.add(Buttons.DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCorrectChannel(),
                             player.getRepresentationUnfogged() + ", please place "
@@ -6171,7 +6172,7 @@ public class ButtonHelper {
                 && ButtonHelperAgents.getSardakkAgentButtons(game, player).size() > 0) {
             List<Button> buttons = new ArrayList<>();
             buttons.addAll(ButtonHelperAgents.getSardakkAgentButtons(game, player));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + ", you can use these buttons to resolve sardakk agent.",
@@ -6188,7 +6189,7 @@ public class ButtonHelper {
                                 "qhetMechProduce_" + planet,
                                 "Produce 2 infantry on " + Helper.getPlanetRepresentation(planet, game),
                                 UnitEmojis.infantry));
-                        buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
+                        buttons.add(Buttons.DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
                                 player.getRepresentationUnfogged()
@@ -6213,7 +6214,7 @@ public class ButtonHelper {
                                 "Capture 1 Infantry on " + Helper.getPlanetRepresentation(planet, game),
                                 UnitEmojis.infantry));
                     }
-                    Button tgButton = Buttons.red("deleteButtons", "Delete Buttons");
+                    Button tgButton = Buttons.DELETE_BUTTONS;
                     buttons.add(tgButton);
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCorrectChannel(),
@@ -6276,20 +6277,12 @@ public class ButtonHelper {
             msg2 += name1 + ": " + card1.getText() + "\n";
             msg2 += name2 + ": " + card2.getText() + "\n";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
-        } else if (player.hasUnexhaustedLeader("lanefiragent")) {
+        } else if (LanefirAgent.canRedraw(player)) {
             String cardID = game.drawExplore(Constants.FRONTIER);
             ExploreModel card = Mapper.getExplore(cardID);
             String name1 = card.getName();
-            Button resolveExplore1 = Buttons.green(
-                    "lanefirAgentRes_Decline_frontier_" + cardID + "_" + tile.getPosition(), "Choose " + name1);
-            Button resolveExplore2 =
-                    Buttons.green("lanefirAgentRes_Accept_frontier_" + tile.getPosition(), "Use Lanefir Agent");
-            List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
-            String message = player.getRepresentationUnfogged()
-                    + " You have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "Vassa Hagi , the Lanefir"
-                    + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                    + " agent, and thus may decline this exploration to draw another one instead.";
+            List<Button> buttons = LanefirAgent.frontierButtons(player, cardID, tile);
+            String message = LanefirAgent.offerMessage(game, player);
             if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                 String pF = player.getFactionEmoji();
                 MessageHelper.sendMessageToChannel(
@@ -6518,7 +6511,7 @@ public class ButtonHelper {
                         FactionEmojis.Argent));
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         return buttons;
     }
 
@@ -6592,7 +6585,7 @@ public class ButtonHelper {
                 buttons.add(MonumentsDSButtonHandler.getAiConclaveButton(game, player));
             }
         }
-        RevenantLeadersHandler.addRevStratumExploreButtons(buttons, game, player, planet);
+        RevenantStratumAgent.addExploreButtons(buttons, game, player, planet);
         return buttons;
     }
 
@@ -6967,6 +6960,13 @@ public class ButtonHelper {
     }
 
     public static void resolveTransitDiodesStep1(Game game, Player player) {
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", use buttons to choose the planet you wish to move troops to.",
+                getTransitDiodesPlanetButtons(game, player));
+    }
+
+    public static List<Button> getTransitDiodesPlanetButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanetsAllianceMode()) {
             if (planet.toLowerCase().contains("custodia")
@@ -6980,13 +6980,12 @@ public class ButtonHelper {
                 continue;
             }
 
-            buttons.add(Buttons.green("transitDiodes_" + planet, Helper.getPlanetRepresentation(planet, game)));
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "transitDiodes_" + planet,
+                    Helper.getPlanetRepresentation(planet, game)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentation() + ", use buttons to choose the planet you wish to move troops to.",
-                buttons);
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done"));
+        return buttons;
     }
 
     @ButtonHandler("transitDiodes_")
@@ -7475,7 +7474,7 @@ public class ButtonHelper {
             }
         }
         buttons.add(Buttons.blue("rollThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Now"));
-        buttons.add(Buttons.red("deleteButtons", "Don't Roll Anything"));
+        buttons.add(Buttons.DONT_ROLL_ANYTHING);
         deleteButtonAndDeleteMessageIfEmpty(event);
         String message = player.getRepresentation()
                 + ", please choose the units for which you wish to reroll. Units that fail and did not have extra rolls will be automatically removed.";
@@ -7499,7 +7498,7 @@ public class ButtonHelper {
             }
         }
         buttons.add(Buttons.blue("rollThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Now"));
-        buttons.add(Buttons.red("deleteButtons", "Don't roll anything"));
+        buttons.add(Buttons.DONT_ROLL_ANYTHING);
         String id = buttonID.replace("setForThalnos_", "");
         game.setSpecificThalnosUnit(id, game.getSpecificThalnosUnit(id) + 1);
 
@@ -7715,7 +7714,7 @@ public class ButtonHelper {
             buttons.add(Buttons.green(
                     factionChecker + AutoAssignGroundHitsButtonIds.format(combatOnHolder.getName(), h),
                     "Auto-assign Hit" + (h == 1 ? "" : "s")));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         } else {
             if (!game.isFowMode() && opponent != player) {
@@ -9010,14 +9009,14 @@ public class ButtonHelper {
     public static List<Button> getMawButtons() {
         List<Button> playerButtons = new ArrayList<>();
         playerButtons.add(Buttons.green("resolveMaw", "Purge Maw of Worlds"));
-        playerButtons.add(Buttons.red("deleteButtons", "Decline"));
+        playerButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
         return playerButtons;
     }
 
     public static List<Button> getCrownButtons() {
         List<Button> playerButtons = new ArrayList<>();
         playerButtons.add(Buttons.green("resolveCrownOfE", "Purge Crown of Emphidia"));
-        playerButtons.add(Buttons.red("deleteButtons", "Decline"));
+        playerButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
         return playerButtons;
     }
 
@@ -9252,7 +9251,7 @@ public class ButtonHelper {
                             Buttons.gray("resolvePreassignment_Public Disgrace Only_" + p2.getColor(), p2.getColor()));
                 }
             }
-            buttons2.add(Buttons.red("deleteButtons", "Decline"));
+            buttons2.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons2);
         }
     }

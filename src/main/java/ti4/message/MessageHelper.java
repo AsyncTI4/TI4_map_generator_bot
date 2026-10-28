@@ -1,12 +1,7 @@
 package ti4.message;
 
-import static ti4.discord.utility.ButtonEmojiStripper.hasButtonEmoji;
-import static ti4.discord.utility.ButtonEmojiStripper.withoutButtonEmoji;
-import static ti4.discord.utility.DiscordErrorUtility.isDiscordServerError;
-import static ti4.discord.utility.DiscordErrorUtility.isIgnorableError;
-import static ti4.discord.utility.DiscordErrorUtility.isInvalidComponentEmojiError;
-import static ti4.discord.utility.DiscordErrorUtility.isUnknownEmojiError;
-import static ti4.discord.utility.DiscordErrorUtility.isUnknownMessageError;
+import static ti4.discord.utility.ButtonEmojiStripper.*;
+import static ti4.discord.utility.DiscordErrorUtility.*;
 
 import java.io.File;
 import java.net.SocketTimeoutException;
@@ -420,13 +415,17 @@ public class MessageHelper {
             BotLogger.error(new LogOrigin(event), "FileUpload null");
             return;
         }
-        if (event instanceof ButtonInteractionEvent button)
+        if (event instanceof ButtonInteractionEvent button) {
+            String msg = "Here is your requested image";
+            if (button.getButton().getCustomId().contains("ringTile")) {
+                msg = "Here is a picture of the active system";
+            }
             button.getHook()
-                    .sendMessage("Here is your requested image")
+                    .sendMessage(msg)
                     .addFiles(fileUpload)
                     .setEphemeral(true)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
-        else if (event instanceof SlashCommandInteractionEvent slash)
+        } else if (event instanceof SlashCommandInteractionEvent slash)
             slash.getHook()
                     .sendMessage("Here is your requested image")
                     .addFiles(fileUpload)

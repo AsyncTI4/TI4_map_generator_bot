@@ -35,9 +35,10 @@ class RelicPurgeFragments extends GameStateSubcommand {
                         .setAutoComplete(true)
                         .setRequired(true),
                 new OptionData(
-                        OptionType.INTEGER,
-                        Constants.COUNT,
-                        "Number of fragments to purge (default 3, use this for NRA Fabrication or Black Market Forgery)."),
+                                OptionType.INTEGER,
+                                Constants.COUNT,
+                                "Number of fragments to purge (default 3, use this for NRA Fabrication or Black Market Forgery).")
+                        .setRequiredRange(1, 20),
                 new OptionData(OptionType.BOOLEAN, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"),
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }

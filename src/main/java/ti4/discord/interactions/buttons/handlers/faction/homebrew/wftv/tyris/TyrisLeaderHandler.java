@@ -50,7 +50,7 @@ public class TyrisLeaderHandler {
     public static void offerInfantry(Game game, Player player) {
         List<Button> buttons =
                 new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "gf", "placeOneNDone_skipbuild"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentationUnfogged()
@@ -70,7 +70,7 @@ public class TyrisLeaderHandler {
                 player.factionButtonChecker() + "leader_tyrishero",
                 "Use Fatebreaker Azhurak (Unlimited Actions)",
                 FactionEmojis.tyris));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentationUnfogged()

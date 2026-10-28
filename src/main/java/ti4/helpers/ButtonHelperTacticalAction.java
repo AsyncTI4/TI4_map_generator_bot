@@ -10,6 +10,7 @@ import java.util.Set;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.FrameShiftBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PirateHordeBrActionCardHandler;
@@ -20,18 +21,15 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExpl
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TacticalRetreatLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.QhetAgentHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
@@ -51,7 +49,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxo
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.HydromorphicCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
@@ -99,6 +96,7 @@ import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.helpers.thundersedge.TeHelperPromissories;
 import ti4.helpers.thundersedge.TeHelperTechs;
+import ti4.image.tile.SystemContextImage;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
@@ -121,6 +119,13 @@ import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.modules.EmpyreanAgent;
 import ti4.service.leader.agent.modules.L1z1xAgent;
 import ti4.service.leader.agent.modules.homebrew.CeldauriAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantVerydithAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.ScrapyardAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
@@ -145,14 +150,14 @@ public final class ButtonHelperTacticalAction {
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
         ScrapyardTechHandler.clearHotswapping(game);
         SarcosaCommanderHandler.clearAdjacency(game, player);
-        NatauLeadersHandler.clearAgentAdjacency(game, player);
+        NatauAgent.clearAgentAdjacency(game, player);
         UydaiHeroService.clear(game);
         XinCommanderHandler.clearCombat(game);
         XinTechHandler.clearVeiledNetworkingStarProduction(game, player);
-        QhetAgentHandler.returnTemporaryUnitUpgrades(game);
+        QhetAgent.returnTemporaryUnitUpgrades(game);
         RealityFieldImpactorService.clear(game);
         LostLegaciesRelicHandler.clearNaturesBoon(game, player);
-        RevenantLeadersHandler.resolvePendingRevVerydithAgent(game, player, event);
+        RevenantVerydithAgent.resolvePending(game, player, event);
         RetrofittingLLButtonHandler.returnRetrofittedTechs(game);
         XytherisAbilityHandler.clearStingOfTheHiveRollState(game);
         OblivionAbilityHandler.offerReflectionExplore(event, game);
@@ -164,7 +169,7 @@ public final class ButtonHelperTacticalAction {
                     player.factionButtonChecker() + "planetAbilityExhaust_petraunleashed",
                     "Use " + Mapper.getPlanet("petraunleashed").getLegendaryAbilityName(),
                     FactionEmojis.stoneborn));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
@@ -190,7 +195,7 @@ public final class ButtonHelperTacticalAction {
                                 Buttons.gray("setTrapStep3_" + planet, Helper.getPlanetRepresentation(planet, game)));
                     }
                 }
-                trapButtons.add(Buttons.red("deleteButtons", "Decline"));
+                trapButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 String msg =
                         player.getRepresentationUnfogged() + " you can use the buttons to place a trap on a planet";
                 if (trapButtons.size() > 1) {
@@ -205,7 +210,7 @@ public final class ButtonHelperTacticalAction {
                                         + " you may use "
                                         + AgentLifecycle.agentNameForHolder(game, player, "celdauriagent")
                                         + " to place 1 space dock for 2 trade goods or 2 commodities.",
-                                List.of(button, Buttons.red("deleteButtons", "Decline"))));
+                                List.of(button, Buttons.DECLINE_DELETE_BUTTONS)));
             }
             if (player.hasAbility("miniaturization")
                     || player.hasUnit("tk-keshnu")
@@ -286,7 +291,7 @@ public final class ButtonHelperTacticalAction {
 
                     if (!excavatorPlanets.isEmpty()
                             && !"yes".equals(game.getStoredValue(player.getFaction() + "usedExcavatorThisAction"))) {
-                        excavatorPlanets.add(Buttons.red("deleteButtons", "Decline"));
+                        excavatorPlanets.add(Buttons.DECLINE_DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
                                 player.getRepresentation()
@@ -303,7 +308,7 @@ public final class ButtonHelperTacticalAction {
                         + ", you may use the button to explore a planet using _The Crown of Emphidia_.";
                 List<Button> systemButtons2 = new ArrayList<>();
                 systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
-                systemButtons2.add(Buttons.red("deleteButtons", "Decline"));
+                systemButtons2.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
             }
             if (game.isWarfareAction()
@@ -362,7 +367,7 @@ public final class ButtonHelperTacticalAction {
         AeternaUnitsHandler.clearGraveyardActionState(game);
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         KryxosBreakthroughHandler.clearPrototypeInnovators(game);
-        MyrrLeadersHandler.clearMyrrAgent(game);
+        MyrrAgent.clearProduction(game);
         ThronesUnitHandler.clearPendingGholaWindows(game);
         RevenantLeadersHandler.clearRedLeaderTacticalState(game);
         ThronesTechHandler.clearRiftTouchedBastion(game);
@@ -439,7 +444,7 @@ public final class ButtonHelperTacticalAction {
                     + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
                     + " If you do, you will also choose another player, who will gain 2 trade goods.";
             List<Button> buttons2 = new ArrayList<>();
-            buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+            buttons2.add(Buttons.USE_PRODUCTION_BIOMES);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
         }
         ButtonHelper.deleteMessage(event);
@@ -461,7 +466,7 @@ public final class ButtonHelperTacticalAction {
         if (unitsWereMoved && tile.getPlanetUnitHolders().isEmpty() && player.hasUnexhaustedLeader("empyreanagent")) {
             List<Button> empyButtons = new ArrayList<>();
             empyButtons.add(EmpyreanAgent.button(player));
-            empyButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+            empyButtons.add(Buttons.DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     player.getRepresentationUnfogged() + ", use button to exhaust "
@@ -538,7 +543,7 @@ public final class ButtonHelperTacticalAction {
                     player.factionButtonChecker() + "deployOoze_" + tile.getPosition(),
                     "Deploy The Ooze",
                     FactionEmojis.morpha));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation()
@@ -548,7 +553,7 @@ public final class ButtonHelperTacticalAction {
         }
         EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
         if (unitsWereMoved && player.hasUnexhaustedLeader("myrragent")) {
-            MyrrLeadersHandler.offerMyrrAgent(game, player, tile);
+            MyrrAgent.offerAfterMove(game, player, tile);
         }
         if (unitsWereMoved) {
             IronSalvageRelicHandler.offerCruiserSalvageAfterMovement(event, game, tile);
@@ -748,12 +753,12 @@ public final class ButtonHelperTacticalAction {
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         KairnUnitHandler.clearExcavatorMechExplore(game);
         KryxosBreakthroughHandler.clearPrototypeInnovators(game);
-        MyrrLeadersHandler.clearMyrrAgent(game);
+        MyrrAgent.clearProduction(game);
         ThronesUnitHandler.clearPendingGholaWindows(game);
         FrameShiftBrActionCardHandler.clear(game);
         MyrrTechHandler.clearSegmentedStructuring(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
-        DreamLeadersHandler.clearDreamAgentAnomaly(game);
+        DreamAgent.clearIgnoredAnomaly(game);
         TaBreakthroughHandler.clearSafeHavens(game);
         RevenantLeadersHandler.clearRedLeaderTacticalWindow(game);
         RevenantTechHandler.clearLazarusProduction(game);
@@ -1046,12 +1051,12 @@ public final class ButtonHelperTacticalAction {
         KaltrimTechHandler.offerKaldurArrestField(player, game, tile);
         Player agentOwner = game.getPlayerFromLeader("scrapyardagent");
         if (agentOwner != null && agentOwner.hasUnexhaustedLeader("scrapyardagent")) {
-            ScrapyardLeaderHandler.sendRikkaButtons(player, agentOwner);
+            ScrapyardAgent.offer(player, agentOwner);
         }
         DreamPromissoryHandler.returnVisionsOnSystemActivation(event, game, player, tile);
         AlluringThroneService.offerIllustrionLegendaryAbility(game, tile, player);
         ArcanumTechHandler.offerSigilOfTransmutation(event, game, player, tile);
-        XytherisLeadersHandler.offerMyrixAgentButtons(game, player, tile);
+        XytherisAgent.offerAfterActivation(game, player);
         game.setStoredValue("possiblyUsedRift", "");
         ThronesTechHandler.offerRiftTouchedBastion(game, tile);
         game.setStoredValue("lastActiveSystem", pos);
@@ -1105,7 +1110,7 @@ public final class ButtonHelperTacticalAction {
                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
                         .contains(tile)) {
             List<Button> buttons = new ArrayList<>();
-            Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm);
+            Button getCommButton = Buttons.GAIN_1_COMMODITY;
             buttons.add(getCommButton);
             String msg = player.getRepresentation()
                     + " you have Henry Storcher, the Celdauri Commander, and activated a system with your space dock. Please use the button to get a commodity.";
@@ -1357,13 +1362,19 @@ public final class ButtonHelperTacticalAction {
         }
         if (!game.isL1Hero()
                 && player.hasUnexhaustedLeader("dreamagent")
-                && !DreamLeadersHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
-            DreamLeadersHandler.offerDreamAgentButtons(game, player, player);
+                && !DreamAgent.anomalyTiles(game).isEmpty()) {
+            DreamAgent.offerBeforeTacticalAction(game, player, player);
         }
-        NatauLeadersHandler.offerNatauAgentButtons(game, player);
+        NatauAgent.offerAfterActivation(game, player);
         KairnPromissoryHandler.offerArchaeologicalOutpostExplore(game, tile);
 
         // Send buttons to move
+
+        // send ephemeral image
+        FileUpload file = SystemContextImage.upload(game, event, 1, tile.getPosition(), player);
+
+        MessageHelper.sendEphemeralFileInResponseToButtonPress(file, event);
+
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + ", please choose the first system you wish to move from.",

@@ -149,7 +149,7 @@ class SpendingButtonHandlerPagingTest {
     }
 
     private static Button done() {
-        return Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+        return Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
     }
 
     private static Button resetButton() {

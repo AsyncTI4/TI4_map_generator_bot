@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,13 +14,14 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import ti4.model.LeaderModel;
 import ti4.model.Mapper;
+import ti4.service.leader.LeaderAgents;
 import ti4.testUtils.BaseTi4Test;
 
 /**
- * Pins which agents still fall through to the legacy exhaustAgent code, which only exhausts the card.
+ * Pins which agents have no module, so a press only exhausts and announces the card.
  *
- * <p>An agent whose ability window mentions an action can be pressed from the component-action menu, which calls
- * exhaustAgent with the bare leader id. Without a module that press exhausts the card and does nothing else, so a
+ * <p>An agent whose ability window is "ACTION:" is listed in the component-action menu, which calls
+ * AgentLifecycle.press with the bare leader id. Without a module that press does nothing more, so a
  * new action agent must either get a module or be added here on purpose. Remove ids from this list as they get
  * modules.
  */
@@ -30,22 +30,11 @@ class LegacyAgentFallThroughGuardTest extends BaseTi4Test {
     private static final Set<String> ACTION_AGENTS_WITHOUT_A_MODULE = Set.of(
             "arachianagent",
             "arachneraagent",
-            "arvaxiagent",
-            "bsp_mentakagent",
-            "bsp_sardakkagent",
             "bsp_xxchaagent",
-            "councilorsagent",
-            "craveragent",
-            "crystellumagent",
-            "dreamagent",
             "horatioagent",
             "ironhullagent",
             "lumerisagent",
-            "mahactagent",
-            "morphaagent",
             "psmagent",
-            "revenantagent",
-            "tknovarecursiveagent",
             "uchoiragent",
             "zooidagent");
 
@@ -56,10 +45,9 @@ class LegacyAgentFallThroughGuardTest extends BaseTi4Test {
     void onlyTheKnownActionAgentsLackAModule() {
         List<String> withoutModule = Mapper.getLeaders().values().stream()
                 .filter(leader -> "agent".equals(leader.getType()))
-                .filter(leader -> leader.getAbilityWindow() != null
-                        && leader.getAbilityWindow().toLowerCase(Locale.ROOT).contains("action"))
+                .filter(leader -> "ACTION:".equalsIgnoreCase(leader.getAbilityWindow()))
                 .map(LeaderModel::getId)
-                .filter(id -> AgentModules.find(id).isEmpty())
+                .filter(id -> !LeaderAgents.isRegistered(id))
                 .toList();
 
         assertThat(withoutModule).containsExactlyInAnyOrderElementsOf(ACTION_AGENTS_WITHOUT_A_MODULE);
@@ -78,7 +66,7 @@ class LegacyAgentFallThroughGuardTest extends BaseTi4Test {
         assertThat(selectedAgents).isNotEmpty();
         assertThat(selectedAgents)
                 .as("a getAgentSelection_<id> picker sends exhaustAgent_<id>_<faction>, which needs a module")
-                .allSatisfy(id -> assertThat(AgentModules.find(id)).isPresent());
+                .allSatisfy(id -> assertThat(LeaderAgents.isRegistered(id)).isTrue());
     }
 
     private static Stream<String> agentSelections(Path file) {

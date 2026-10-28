@@ -87,7 +87,7 @@ public class TyrisAbilityHandler {
         List<Button> buttons = new ArrayList<>();
         CardEmojis emoji = stage == 1 ? CardEmojis.Public1 : CardEmojis.Public2;
         buttons.add(Buttons.green("rewriteDestiny;" + poID + ";" + stage, "Use Rewrite Destiny", emoji));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -137,7 +137,7 @@ public class TyrisAbilityHandler {
                         "temporalDisplacement_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", use buttons to choose the system you wish to move fighters to.",

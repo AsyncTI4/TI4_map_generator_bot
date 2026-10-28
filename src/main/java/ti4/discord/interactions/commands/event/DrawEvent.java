@@ -13,14 +13,15 @@ class DrawEvent extends GameStateSubcommand {
 
     public DrawEvent() {
         super(Constants.DRAW, "Draw Event", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1")
+                .setRequiredRange(1, 10));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         Player player = getPlayer();
-        int count = Math.max(1, event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt));
+        int count = Math.clamp(event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt), 1, 10);
         for (int i = 0; i < count; i++) {
             game.drawEvent(player.getUserID());
         }

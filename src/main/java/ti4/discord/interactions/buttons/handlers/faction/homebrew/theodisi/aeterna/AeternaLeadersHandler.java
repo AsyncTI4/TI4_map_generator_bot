@@ -244,7 +244,7 @@ public class AeternaLeadersHandler {
             return buttons;
         }
         String prefix = player.factionButtonChecker() + SELECT_AGENT_SHIP;
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         List<Button> paginatedButtons = NewStuffHelper.buttonPagination(buttons, extraButtons, prefix, 25, 0, false);
         if (buttons.size() <= 24) {
             paginatedButtons = new ArrayList<>(buttons);
@@ -262,7 +262,7 @@ public class AeternaLeadersHandler {
         String message = player.getRepresentationNoPing()
                 + ", please choose a non-fighter ship to destroy for Morwen Deyth, the Aeterna agent.";
         String prefix = player.factionButtonChecker() + SELECT_AGENT_SHIP;
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), buttons, extraButtons, message, prefix, buttonID)) {
             return;
@@ -296,7 +296,7 @@ public class AeternaLeadersHandler {
         } else {
             String systemPrefix = player.factionButtonChecker() + SELECT_AGENT_SYSTEM + sourceTile.getPosition() + "|"
                     + unit.getBaseType() + "|";
-            List<Button> systemExtraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+            List<Button> systemExtraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
             List<Button> paginatedButtons =
                     NewStuffHelper.buttonPagination(systemButtons, systemExtraButtons, systemPrefix, 25, 0, false);
             if (systemButtons.size() <= 24) {
@@ -322,7 +322,7 @@ public class AeternaLeadersHandler {
         String systemMessage = player.getRepresentationNoPing() + ", please choose an eligible adjacent system in which"
                 + " to place 1 neutral " + payload[1] + ".";
         String systemPrefix = player.factionButtonChecker() + SELECT_AGENT_SYSTEM + payload[0] + "|" + payload[1] + "|";
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), systemButtons, extraButtons, systemMessage, systemPrefix, buttonID)) {
             return;

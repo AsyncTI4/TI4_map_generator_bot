@@ -49,11 +49,7 @@ public final class L1z1xAgent extends AgentModule<L1z1xAgent.Choice> {
                     && FoWHelper.playerHasInfantryOnPlanet(l1z1x, activeSystem, planetName)) {
                 buttons.add(Buttons.green(
                         ownedButtonId(l1z1x, ID, activeSystem.getPosition(), planetName),
-                        useLabel(
-                                l1z1x,
-                                ID,
-                                cardLabel(l1z1x, ID, "L1Z1X Agent") + " on "
-                                        + Helper.getPlanetRepresentation(planetName, game)),
+                        useLabel(l1z1x, ID, "L1Z1X Agent", " on " + Helper.getPlanetRepresentation(planetName, game)),
                         FactionEmojis.L1Z1X));
             }
         }

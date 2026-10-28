@@ -397,7 +397,7 @@ public class PlayerSetupService {
         }
         if (player.hasAbility("ancient_empire")) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("startAncientEmpire", "Place a tomb token"));
+            buttons.add(Buttons.PLACE_A_TOMB_TOKEN);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", please place up to 14 Tomb tokens for **Ancient Empire**.",

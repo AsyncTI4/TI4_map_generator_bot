@@ -16,7 +16,9 @@ class KyroHero extends GameStateSubcommand {
 
     public KyroHero() {
         super(Constants.KYRO_HERO, "Mark a strategy card as the target of Speygh, the Kyro Hero.", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy Card Number").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy Card Number")
+                .setRequiredRange(0, 99)
+                .setRequired(true));
         // addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALL_ASYNC_TILES, "True to include all async
         // blue back tiles in this list (not just PoK + DS). Default: false)"));
     }

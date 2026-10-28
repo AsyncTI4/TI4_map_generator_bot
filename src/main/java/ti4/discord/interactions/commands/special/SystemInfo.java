@@ -31,9 +31,10 @@ class SystemInfo extends GameStateSubcommand {
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(new OptionData(
-                OptionType.INTEGER,
-                Constants.EXTRA_RINGS,
-                "Show additional rings around the selected system for context (Max 2)"));
+                        OptionType.INTEGER,
+                        Constants.EXTRA_RINGS,
+                        "Show additional rings around the selected system for context (Max 2)")
+                .setRequiredRange(0, 2));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.JUST_UNITS, "True to just get unit information."));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_2, "System/Tile name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_3, "System/Tile name").setAutoComplete(true));

@@ -355,7 +355,7 @@ public class TwilightsFallMonumentsButtonHandler {
                         player.factionButtonChecker() + "placeYellowTfMonumentCommandToken",
                         "Place a Command Token on Aura Vault",
                         FactionEmojis.yellowtf),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing()

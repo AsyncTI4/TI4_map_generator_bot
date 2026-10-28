@@ -176,7 +176,7 @@ public class IxthLegendaryButtonHandler {
                         List.of(
                                 Buttons.green(
                                         owner.factionButtonChecker() + GIFT_ACCEPT_PREFIX + "ac", "Gain 1 Action Card"),
-                                Buttons.red("deleteButtons", "Decline")));
+                                Buttons.DECLINE_DELETE_BUTTONS));
             }
         }
     }
@@ -399,7 +399,7 @@ public class IxthLegendaryButtonHandler {
                 List.of(
                         Buttons.green(
                                 target.factionButtonChecker() + GIFT_ACCEPT_PREFIX + gift, "Gain 1 " + giftName(gift)),
-                        Buttons.red("deleteButtons", "Decline")));
+                        Buttons.DECLINE_DELETE_BUTTONS));
     }
 
     @ButtonHandler(GIFT_ACCEPT_PREFIX)

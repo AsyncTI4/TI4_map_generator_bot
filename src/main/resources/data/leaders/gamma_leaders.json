@@ -379,7 +379,7 @@
         "type": "agent",
         "name": "Lorroth Calamex",
         "title": "Deputy Investigator",
-        "abilityWindow": "Action",
+        "abilityWindow": "ACTION:",
         "abilityText": "Exhaust this card and choose a planet another player controls. That player may allow you to capture up to 2 infantry from that planet; they gain 1 trade good for each infantry captured.",
         "unlockCondition": "Always Unlocked",
         "source": "gamma"

@@ -15,11 +15,9 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
-import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
@@ -43,8 +41,7 @@ public class FogTokenRemovalService {
     private static final String MAHACT = "mahact";
     private static final String FLUX = "flux";
 
-    public static void startMahactAgent(ButtonInteractionEvent event, Game game, Player mahact, int sc) {
-        exhaustMahactAgent(game, mahact);
+    public static void startMahactAgent(GenericInteractionCreateEvent event, Game game, Player mahact, int sc) {
         offer(event, game, mahact, MAHACT, String.valueOf(sc));
     }
 
@@ -52,7 +49,8 @@ public class FogTokenRemovalService {
         offer(event, game, remover, FLUX, owner.getFaction());
     }
 
-    private static void offer(ButtonInteractionEvent event, Game game, Player remover, String kind, String target) {
+    private static void offer(
+            GenericInteractionCreateEvent event, Game game, Player remover, String kind, String target) {
         Player owner = owner(game, kind, target);
         List<Tile> ownerTokens = owner == null ? List.of() : ButtonHelper.getTilesWithYourCC(owner, game, event);
         if (ownerTokens.isEmpty()) {
@@ -212,12 +210,5 @@ public class FogTokenRemovalService {
 
     private static String effectName(String kind) {
         return MAHACT.equals(kind) ? "Jae Mir Kan" : "Flux";
-    }
-
-    private static void exhaustMahactAgent(Game game, Player mahact) {
-        Leader agent = mahact.unsafeGetLeader("mahactagent");
-        if (agent == null) return;
-        agent.setExhausted(true);
-        RevenantBreakthroughHandler.exhaustRevenantRisingForAttachedAgent(game, mahact, agent);
     }
 }

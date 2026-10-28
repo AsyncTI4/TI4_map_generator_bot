@@ -22,7 +22,7 @@ class FlawlessStrategyAcd2ButtonHandler {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         List<Button> scButtons =
                 new ArrayList<>(StrategyCardSecondaryButtonService.getSecondaryAbilityButtons(game, player.getSCs()));
-        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+        scButtons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), player.getRepresentation() + ", use the buttons to resolve.", scButtons);
     }

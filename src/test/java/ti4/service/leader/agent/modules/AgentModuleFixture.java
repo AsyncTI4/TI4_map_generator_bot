@@ -8,11 +8,9 @@ import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentUse;
 import ti4.service.leader.agent.PlayerPickerAgent;
-import ti4.service.leader.agent.TargetedAgent;
 
 /**
  * A two-player game for agent module tests: the agent's owner and a target whose Project Pi faction id
@@ -52,7 +50,7 @@ public final class AgentModuleFixture {
     }
 
     public <P> AgentUse<P> use(AgentModule<P> module, P payload) {
-        return new AgentUse<>(game, user, payload, AgentLifecycle.agentName(module.displayName(), false), false, null);
+        return new AgentUse<>(game, user, payload, module.reference(module.displayName(), false), false, null);
     }
 
     public PlayerPickerAgent.Choice playerPicker(PlayerPickerAgent agent) {
@@ -64,7 +62,7 @@ public final class AgentModuleFixture {
     }
 
     public <P> AgentUse<P> useAsYssarilCopy(AgentModule<P> module, P payload) {
-        return new AgentUse<>(game, user, payload, AgentLifecycle.agentName(module.displayName(), true), true, null);
+        return new AgentUse<>(game, user, payload, module.reference(module.displayName(), true), true, null);
     }
 
     // Only the owner can press the button, and the router still hands the exact legacy id to the handler.
@@ -91,7 +89,7 @@ public final class AgentModuleFixture {
         assertThat(button.getLabel()).hasSizeLessThanOrEqualTo(DISCORD_LABEL_LIMIT);
     }
 
-    public void assertDecodesTargets(TargetedAgent module) {
+    public void assertDecodesTargets(AgentModule<Player> module) {
         assertThat(module.decode(game, user, TARGET_FACTION))
                 .as(module.agentId() + " with a pi_ faction")
                 .contains(target);
