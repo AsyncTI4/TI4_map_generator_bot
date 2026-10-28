@@ -18,9 +18,11 @@ class SetUpPeakableObjectives extends GameStateSubcommand {
                 true,
                 true);
         addOptions(new OptionData(
-                OptionType.INTEGER, Constants.NUMBER_OF_STAGE1_OBJECTIVES, "How many unrevealed stage 1s"));
+                        OptionType.INTEGER, Constants.NUMBER_OF_STAGE1_OBJECTIVES, "How many unrevealed stage 1s")
+                .setRequiredRange(0, 30));
         addOptions(new OptionData(
-                OptionType.INTEGER, Constants.NUMBER_OF_STAGE2_OBJECTIVES, "How many unrevealed stage 2s"));
+                        OptionType.INTEGER, Constants.NUMBER_OF_STAGE2_OBJECTIVES, "How many unrevealed stage 2s")
+                .setRequiredRange(0, 30));
     }
 
     @Override

@@ -13,7 +13,9 @@ class SetGameLimit extends Subcommand {
     SetGameLimit() {
         super(Constants.SET_GAME_LIMIT, "Set a game limit for a user");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player @playername").setRequired(true));
-        addOptions(new OptionData(OptionType.INTEGER, "count", "Count (0 = no limit)").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, "count", "Count (0 = no limit)")
+                .setRequiredRange(0, 999)
+                .setRequired(true));
     }
 
     @Override

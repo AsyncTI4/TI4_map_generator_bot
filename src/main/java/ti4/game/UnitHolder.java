@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -88,7 +89,7 @@ public abstract class UnitHolder {
 
         unitsByState.compute(unit, (uk, ls) -> {
             if (ls == null) ls = UnitState.emptyList();
-            ls.set(0, ls.getFirst() + count);
+            ls.set(0, ls.getFirst() + Math.min(count, roomFor(uk, ls)));
             return ls;
         });
     }
@@ -100,15 +101,36 @@ public abstract class UnitHolder {
 
         unitsByState.compute(unit, (uk, ls) -> {
             if (ls == null) ls = UnitState.emptyList();
-            for (int i = 0; i < ls.size(); i++) {
-                if (i < counts.size()) {
-                    ls.set(i, ls.get(i) + counts.get(i));
-                } else {
-                    break;
+            int room = roomFor(uk, ls);
+            for (int i = 0; i < ls.size() && i < counts.size(); i++) {
+                int added = counts.get(i);
+                if (added > 0) {
+                    added = Math.min(added, room);
+                    room -= added;
                 }
+                ls.set(i, ls.get(i) + added);
             }
             return ls;
         });
+    }
+
+    private static int roomFor(UnitKey unit, List<Integer> states) {
+        return Math.max(0, SanityLimits.unitsInOneHolder(unit.unitType()) - getTotalUnitCount(states));
+    }
+
+    public static List<Integer> capToHolderLimit(UnitKey unit, List<Integer> states) {
+        return capStates(states, SanityLimits.unitsInOneHolder(unit.unitType()));
+    }
+
+    public static List<Integer> capStates(List<Integer> states, int max) {
+        int room = max;
+        List<Integer> capped = new ArrayList<>();
+        for (Integer count : states) {
+            int kept = count == null ? 0 : Math.clamp(count, 0, room);
+            capped.add(kept);
+            room -= kept;
+        }
+        return capped;
     }
 
     public void addCC(String cc) {
@@ -421,9 +443,9 @@ public abstract class UnitHolder {
 
     private static int getTotalUnitCount(List<Integer> counts) {
         if (counts == null) return 0;
-        int tot = 0;
+        long tot = 0;
         for (UnitState state : UnitState.values()) tot += getUnitStateCount(counts, state);
-        return tot;
+        return (int) Math.clamp(tot, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
     private static int getDamagedUnitStateCount(List<Integer> counts) {

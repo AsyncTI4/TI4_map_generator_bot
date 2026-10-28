@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
@@ -13,7 +14,9 @@ class RevealEvent extends GameStateSubcommand {
 
     public RevealEvent() {
         super(Constants.REVEAL, "Reveal top Event from deck", true, false);
-        addOption(OptionType.INTEGER, Constants.COUNT, "Number of cards to reveal (Default = 1, Min 1, Max 2)");
+        addOptions(new OptionData(
+                        OptionType.INTEGER, Constants.COUNT, "Number of cards to reveal (Default = 1, Min 1, Max 2)")
+                .setRequiredRange(1, 2));
         addOption(
                 OptionType.BOOLEAN,
                 Constants.REVEAL_FROM_BOTTOM,

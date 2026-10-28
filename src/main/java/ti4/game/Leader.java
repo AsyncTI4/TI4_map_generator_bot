@@ -23,7 +23,6 @@ public class Leader {
     private final String id;
     private final String type;
 
-    @Setter
     private int tgCount;
 
     @Setter
@@ -34,6 +33,10 @@ public class Leader {
 
     @Setter
     private boolean active;
+
+    public void setTgCount(int tgCount) {
+        this.tgCount = SanityLimits.cap(tgCount, SanityLimits.TRADE_GOODS_ON_CARD);
+    }
 
     @JsonCreator
     public Leader(

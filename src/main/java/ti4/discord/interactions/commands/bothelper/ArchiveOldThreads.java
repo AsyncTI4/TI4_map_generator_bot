@@ -15,6 +15,7 @@ class ArchiveOldThreads extends Subcommand {
         super(Constants.ARCHIVE_OLD_THREADS, "Archive a number of the oldest active threads");
         addOptions(
                 new OptionData(OptionType.INTEGER, Constants.THREAD_COUNT, "Number of threads to archive (1 to 1000)")
+                        .setRequiredRange(1, 1000)
                         .setRequired(true));
     }
 

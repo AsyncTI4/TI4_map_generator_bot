@@ -18,7 +18,8 @@ import ti4.service.emoji.CardEmojis;
 class HydromorphicDraw extends GameStateSubcommand {
     HydromorphicDraw() {
         super("hc_draw", "Draw Hydromorphic cards", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Cards to draw, default 1, max 10"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Cards to draw, default 1, max 10")
+                .setRequiredRange(1, 10));
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color").setAutoComplete(true));
     }
@@ -54,6 +55,7 @@ class HydromorphicDiscard extends GameStateSubcommand {
     HydromorphicDiscard() {
         super("hc_discard", "Discard a Hydromorphic card without resolving it", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.HYDROMORPHIC_CARD_ID, "Hydromorphic card ID")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color").setAutoComplete(true));
@@ -82,6 +84,7 @@ class HydromorphicSend extends GameStateSubcommand {
     HydromorphicSend() {
         super("hc_send", "Send a Hydromorphic card to a player", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.HYDROMORPHIC_CARD_ID, "Hydromorphic card ID")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or color to send to")
                 .setRequired(true)

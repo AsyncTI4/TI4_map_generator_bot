@@ -19,7 +19,9 @@ class SetUnitCap extends GameStateSubcommand {
                 .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAME, "Unit that you're setting the cap for")
                 .setRequired(true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.UNIT_CAP, "Unit Cap").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.UNIT_CAP, "Unit Cap")
+                .setRequiredRange(0, 99)
+                .setRequired(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.EVERYONE, "Apply Cap to everyone?").setRequired(true));
     }
 
