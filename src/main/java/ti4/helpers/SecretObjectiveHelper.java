@@ -27,6 +27,8 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FowScoringStatusService;
 import ti4.service.game.EndedGameScoringGuardService;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -143,9 +145,7 @@ public class SecretObjectiveHelper {
                     StringBuilder message2 = new StringBuilder(player.getRepresentation() + " purged");
                     for (String fragId : fragmentsToPurge) {
                         player.removeFragment(fragId);
-                        if (!StonebornAbilityHandler.returnPurgedFragment(game, fragId)) {
-                            game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-                        }
+                        game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
                         if (fragId.startsWith("supermassive")) {
                             ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, fragId);
                         }
@@ -271,6 +271,7 @@ public class SecretObjectiveHelper {
                             + " Secret Objectives because they have _Astromantic Cloak (Steel)!");
             return;
         }
+        KnownCardsService.recordHandShown(player2, player, KnownCardType.SECRET_OBJECTIVE);
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(game.getName()).append('\n');
         sb.append("Player: ").append(player.getUserName()).append('\n');
@@ -470,6 +471,8 @@ public class SecretObjectiveHelper {
                 + SecretObjectiveInfoService.getSecretObjectiveRepresentation(soID) + "\n";
 
         player.setSecret(soID);
+        KnownCardsService.recordCardShown(
+                otherPlayer, player, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
 
         MessageHelper.sendMessageToEventChannel(
                 event, "Random secret objective shown to " + otherPlayer.getColorIfCanSeeStats(player) + ".");

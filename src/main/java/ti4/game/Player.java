@@ -56,6 +56,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Sa
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
@@ -121,6 +122,8 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
 import ti4.service.franken.FrankenUnitService;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantAgent;
 import ti4.service.map.FractureService;
@@ -1370,7 +1373,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 break;
             }
         }
-        actionCards.remove(idToRemove);
+        if (actionCards.remove(idToRemove) != null) {
+            KnownCardsService.recordCardLeftHand(this, KnownCardType.ACTION_CARD);
+        }
     }
 
     public void removePromissoryNote(Integer identifier) {
@@ -1427,7 +1432,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 break;
             }
         }
-        secrets.remove(idToRemove);
+        if (secrets.remove(idToRemove) != null) {
+            KnownCardsService.recordCardLeftHand(this, KnownCardType.SECRET_OBJECTIVE);
+        }
     }
 
     public SecretObjectiveModel getSecret(Integer identifier) {
@@ -3047,7 +3054,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 }
             }
         }
-        if (hasReadyBreakthrough("kolumebt")) {
+        if (hasUnlockedBreakthrough("kolumebt")) {
             gainCommodities(1);
             MessageHelper.sendMessageToChannel(
                     getCorrectChannel(), getRepresentationNoPing() + " gained 1 commodity due to Kolume breakthrough.");
@@ -3102,6 +3109,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             TheodisiOutpostActionCardHandler.offerOutpostEffects(game, this, planet);
             TaBreakthroughHandler.offerSafeHavensInfantry(game, this, planet);
             ThirtyKRelicHooks.onPlanetExhausted(game, this, planet);
+            if ("mobilemountain".equals(planet)) {
+                StonebornUnitHandler.damageMobileMountain(game, this);
+            }
             IxthLegendaryButtonHandler.onPlanetExhausted(game, this, planet);
         }
         Game game = this.game;

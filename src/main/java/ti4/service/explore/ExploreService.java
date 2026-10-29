@@ -32,6 +32,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
@@ -215,116 +216,115 @@ public class ExploreService {
             return;
         }
 
-        if (player.hasAbility("distant_suns")) {
-            if (Helper.mechCheck(planetName, game, player)) {
-                if (!nraCheck) {
-                    if (player.hasTech("pfa")) { // Pre-Fab Arcologies
-                        PlanetService.refreshPlanet(player, planetName);
-                        MessageHelper.sendMessageToChannel(
-                                (MessageChannel) event.getChannel(),
-                                Mapper.getPlanet(planetName).getName()
-                                        + " has been automatically readied because you have _Pre-Fab Arcologies_.");
-                    }
-                    String message = "Please decide whether or not to use your " + FactionEmojis.Naaz
-                            + "**Distant Suns** ability.";
-                    Button resolveExplore1 = Buttons.green(
-                            "distant_suns_accept_" + planetName + "_" + drawColor, "Choose from 2 Exploration Cards");
-                    Button resolveExplore2 = Buttons.red(
-                            "distant_suns_decline_" + planetName + "_" + drawColor,
-                            "Resolve First Exploration Card Only");
-                    List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-                    return;
-                } else if (numExplores == 2) {
-                    String cardID1 = game.drawExplore(drawColor);
-                    String cardID2 = game.drawExplore(drawColor);
+        if (!nraCheck && StonebornUnitHandler.offerGolemExplore(game, player, tile, planetName, drawColor, event)) {
+            return;
+        }
+        if (player.hasAbility("distant_suns") && Helper.mechCheck(planetName, game, player) && !nraCheck) {
+            if (player.hasTech("pfa")) { // Pre-Fab Arcologies
+                PlanetService.refreshPlanet(player, planetName);
+                MessageHelper.sendMessageToChannel(
+                        (MessageChannel) event.getChannel(),
+                        Mapper.getPlanet(planetName).getName()
+                                + " has been automatically readied because you have _Pre-Fab Arcologies_.");
+            }
+            String message =
+                    "Please decide whether or not to use your " + FactionEmojis.Naaz + "**Distant Suns** ability.";
+            Button resolveExplore1 = Buttons.green(
+                    "distant_suns_accept_" + planetName + "_" + drawColor, "Choose from 2 Exploration Cards");
+            Button resolveExplore2 = Buttons.red(
+                    "distant_suns_decline_" + planetName + "_" + drawColor, "Resolve First Exploration Card Only");
+            List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+            return;
+        }
+        if (numExplores == 2) {
+            String cardID1 = game.drawExplore(drawColor);
+            String cardID2 = game.drawExplore(drawColor);
 
-                    if (cardID1 == null) {
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Planet cannot be explored.");
-                        return;
-                    }
-                    if (cardID2.equalsIgnoreCase(cardID1)) {
-                        cardID2 = game.drawExplore(drawColor);
-                    }
-                    if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
-                        Units.UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
-                        Tile tileWithPlanet = game.getTileFromPlanet(planetName);
-                        if (tileWithPlanet == null) {
-                            MessageHelper.sendMessageToEventChannel(
-                                    event, "An error occurred while placing 1 infantry. Resolve manually.");
-                            return;
-                        }
-                        tileWithPlanet.getUnitHolders().get(planetName).addUnit(infKey, 1);
-                        MessageHelper.sendMessageToChannel(
-                                (MessageChannel) event.getChannel(),
-                                "Added infantry to " + planetName
-                                        + " because of Master Halbert, the Lanefir Commander.");
-                    }
-                    ExploreModel exploreModel1 = Mapper.getExplore(cardID1);
-                    ExploreModel exploreModel2 = Mapper.getExplore(cardID2);
-
-                    String indefiniteArticle1;
-                    String exploreName1 = exploreModel1.getName();
-                    if ("Freelancers".equalsIgnoreCase(exploreName1)
-                            || "Local Fabricators".equalsIgnoreCase(exploreName1)
-                            || "mirage".equalsIgnoreCase(cardID1)) {
-                        indefiniteArticle1 = "";
-                    } else if ("dmz".equalsIgnoreCase(cardID1) || "toe".equalsIgnoreCase(cardID1)) {
-                        indefiniteArticle1 = "the ";
-                    } else if ("ls".equalsIgnoreCase(cardID1)) {
-                        indefiniteArticle1 = "some ";
-                    } else if ("aeiou".indexOf(exploreName1.toLowerCase().charAt(0)) >= 0) {
-                        indefiniteArticle1 = "an ";
-                    } else {
-                        indefiniteArticle1 = "a ";
-                    }
-
-                    String indefiniteArticle2;
-                    String exploreName2 = exploreModel2.getName();
-                    if ("Freelancers".equalsIgnoreCase(exploreName2)
-                            || "Local Fabricators".equalsIgnoreCase(exploreName2)
-                            || "mirage".equalsIgnoreCase(cardID2)) {
-                        indefiniteArticle2 = "";
-                    } else if ("dmz".equalsIgnoreCase(cardID2) || "toe".equalsIgnoreCase(cardID2)) {
-                        indefiniteArticle2 = "the ";
-                    } else if ("ls".equalsIgnoreCase(cardID2)) {
-                        indefiniteArticle2 = "some ";
-                    } else if ("aeiou".indexOf(exploreName2.toLowerCase().charAt(0)) >= 0) {
-                        indefiniteArticle2 = "an ";
-                    } else {
-                        indefiniteArticle2 = "a ";
-                    }
-
-                    // Report to common channel
-                    String reportMessage = player.getFactionEmoji() + " used their " + FactionEmojis.Naaz
-                            + "**Distant Suns** ability and found " + indefiniteArticle1 + "_" + exploreName1
-                            + "_ and " + indefiniteArticle2 + "_" + exploreName2 + "_ on "
-                            + Helper.getPlanetRepresentationPlusEmoji(planetName) + ".";
-
-                    if (exploreName1.equals(exploreName2)) {
-                        reportMessage += " Auto-resolving.";
-                    }
-
-                    MessageHelper.sendMessageToChannel(FoWHelper.actionsChannelOrLocal(game, event), reportMessage);
-
-                    if (exploreName1.equals(exploreName2)) {
-                        resolveExploreAuto(event, player, cardID1, planetName, game);
-                        return;
-                    }
-
-                    Button resolveExplore1 = Buttons.green(
-                            "resolve_explore_" + cardID1 + "_" + planetName + "_distantSuns", exploreModel1.getName());
-                    Button resolveExplore2 = Buttons.green(
-                            "resolve_explore_" + cardID2 + "_" + planetName + "_distantSuns", exploreModel2.getName());
-                    List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
-                    List<MessageEmbed> embeds =
-                            List.of(exploreModel1.getRepresentationEmbed(), exploreModel2.getRepresentationEmbed());
-                    String message = player.getRepresentation() + " please choose 1 exploration card to resolve.";
-                    MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-                            event.getMessageChannel(), message, embeds, buttons);
+            if (cardID1 == null) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Planet cannot be explored.");
+                return;
+            }
+            if (cardID2.equalsIgnoreCase(cardID1)) {
+                cardID2 = game.drawExplore(drawColor);
+            }
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
+                Units.UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
+                Tile tileWithPlanet = game.getTileFromPlanet(planetName);
+                if (tileWithPlanet == null) {
+                    MessageHelper.sendMessageToEventChannel(
+                            event, "An error occurred while placing 1 infantry. Resolve manually.");
                     return;
                 }
+                tileWithPlanet.getUnitHolders().get(planetName).addUnit(infKey, 1);
+                MessageHelper.sendMessageToChannel(
+                        (MessageChannel) event.getChannel(),
+                        "Added infantry to " + planetName + " because of Master Halbert, the Lanefir Commander.");
             }
+            ExploreModel exploreModel1 = Mapper.getExplore(cardID1);
+            ExploreModel exploreModel2 = Mapper.getExplore(cardID2);
+
+            String indefiniteArticle1;
+            String exploreName1 = exploreModel1.getName();
+            if ("Freelancers".equalsIgnoreCase(exploreName1)
+                    || "Local Fabricators".equalsIgnoreCase(exploreName1)
+                    || "mirage".equalsIgnoreCase(cardID1)) {
+                indefiniteArticle1 = "";
+            } else if ("dmz".equalsIgnoreCase(cardID1) || "toe".equalsIgnoreCase(cardID1)) {
+                indefiniteArticle1 = "the ";
+            } else if ("ls".equalsIgnoreCase(cardID1)) {
+                indefiniteArticle1 = "some ";
+            } else if ("aeiou".indexOf(exploreName1.toLowerCase().charAt(0)) >= 0) {
+                indefiniteArticle1 = "an ";
+            } else {
+                indefiniteArticle1 = "a ";
+            }
+
+            String indefiniteArticle2;
+            String exploreName2 = exploreModel2.getName();
+            if ("Freelancers".equalsIgnoreCase(exploreName2)
+                    || "Local Fabricators".equalsIgnoreCase(exploreName2)
+                    || "mirage".equalsIgnoreCase(cardID2)) {
+                indefiniteArticle2 = "";
+            } else if ("dmz".equalsIgnoreCase(cardID2) || "toe".equalsIgnoreCase(cardID2)) {
+                indefiniteArticle2 = "the ";
+            } else if ("ls".equalsIgnoreCase(cardID2)) {
+                indefiniteArticle2 = "some ";
+            } else if ("aeiou".indexOf(exploreName2.toLowerCase().charAt(0)) >= 0) {
+                indefiniteArticle2 = "an ";
+            } else {
+                indefiniteArticle2 = "a ";
+            }
+
+            String source = player.hasAbility("distant_suns")
+                    ? FactionEmojis.Naaz + "**Distant Suns** ability"
+                    : "a Golem (Stoneborn mech)";
+            String reportMessage = player.getFactionEmoji() + " used " + source + " and found " + indefiniteArticle1
+                    + "_" + exploreName1
+                    + "_ and " + indefiniteArticle2 + "_" + exploreName2 + "_ on "
+                    + Helper.getPlanetRepresentationPlusEmoji(planetName) + ".";
+
+            if (exploreName1.equals(exploreName2)) {
+                reportMessage += " Auto-resolving.";
+            }
+
+            MessageHelper.sendMessageToChannel(FoWHelper.actionsChannelOrLocal(game, event), reportMessage);
+
+            if (exploreName1.equals(exploreName2)) {
+                resolveExploreAuto(event, player, cardID1, planetName, game);
+                return;
+            }
+
+            Button resolveExplore1 = Buttons.green(
+                    "resolve_explore_" + cardID1 + "_" + planetName + "_distantSuns", exploreModel1.getName());
+            Button resolveExplore2 = Buttons.green(
+                    "resolve_explore_" + cardID2 + "_" + planetName + "_distantSuns", exploreModel2.getName());
+            List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
+            List<MessageEmbed> embeds =
+                    List.of(exploreModel1.getRepresentationEmbed(), exploreModel2.getRepresentationEmbed());
+            String message = player.getRepresentation() + " please choose 1 exploration card to resolve.";
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
+            return;
         }
         if ((player.hasAbility("deep_mining") || player.hasTech("tf-deepinstallations")) && tile != null) {
             UnitHolder unitHolder = tile.getUnitHolders().get(planetName);

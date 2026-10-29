@@ -24,6 +24,8 @@ import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.button.ReactionService;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.homebrew.CymiaeAgent;
 import ti4.service.leader.agent.modules.homebrew.wftv.ArvaxiAgent;
@@ -91,6 +93,8 @@ class ActionCardHandButtonHandler {
         }
         player.removeActionCard(acIndex);
         receiver.setActionCard(acID);
+        KnownCardsService.recordCardPassed(
+                player, receiver, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(),
                 player.getRepresentationNoPing() + " gave an action card to " + receiver.getRepresentationNoPing()

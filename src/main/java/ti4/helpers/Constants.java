@@ -193,6 +193,7 @@ public final class Constants {
     public static final String SHOW_BUBBLES = "show_bubbles";
     public static final String TRANSACTION_METHOD = "transaction_method";
     public static final String SHOW_GEARS = "show_gears";
+    public static final String WORMHOLE_TOKEN_MERGE = "wormhole_token_merge";
     public static final String SHOW_BANNERS = "show_banners";
     public static final String SHOW_HEX_BORDERS = "show_hex_borders";
     public static final String VOLTRON_STYLE = "voltron_style";
@@ -268,23 +269,6 @@ public final class Constants {
     public static final String TOKEN_BREACH_ACTIVE = "token_breachActive.png";
     public static final String TOKEN_BREACH_INACTIVE = "token_breachInactive.png";
     public static final String TOKEN_SEVERED = "token_severed.png";
-
-    public static final String ALPHA = "alpha";
-    public static final String BETA = "beta";
-    public static final String GAMMA = "gamma";
-    public static final String DELTA = "delta";
-    public static final String EPSILON = "whepsilon";
-    public static final String NARROWS = "whnarrows";
-    public static final String PROBABILITY = "whprobability";
-    public static final String CHAMPION = "whchampion";
-    public static final String VOYAGE = "whvoyage";
-    public static final String ZETA = "whzeta";
-    public static final String ETA = "wheta";
-    public static final String CUSTOM_ERONOUS_WHEPSILON = "custom_eronous_whepsilon";
-    public static final String CUSTOM_ERONOUS_WHETA = "custom_eronous_wheta";
-    public static final String CUSTOM_ERONOUS_WHIOTA = "custom_eronous_whiota";
-    public static final String CUSTOM_ERONOUS_WHTHETA = "custom_eronous_whtheta";
-    public static final String CUSTOM_ERONOUS_WHZETA = "custom_eronous_whzeta";
 
     public static final String DRAW_SPECIFIC_SO_FOR_PLAYER = "draw_specific_so_for_player";
     public static final String DRAW_SPECIFIC_SO = "draw_specific_so";

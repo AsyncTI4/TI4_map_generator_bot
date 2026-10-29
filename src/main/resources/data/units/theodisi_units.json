@@ -814,7 +814,6 @@
     "source": "theodisi",
     "faction": "stoneborn",
     "moveValue": 1,
-    "capacityValue": 3,
     "capacityUsed": 1,
     "cost": 8,
     "combatHitsOn": 9,
@@ -822,7 +821,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "While you control this unit, gain the \"Mobile Mountain\" planet card."
+    "ability": "This unit is also a planet of any trait. When you would exhaust this planet's planet card, damage this unit instead. Structures cannot be placed on or committed to this planet."
   },
   {
     "id": "stoneborn_mechdormant",
@@ -837,7 +836,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "At the end of the status phase, you may remove 3 of your mechs from the same planet to draw 1 random Stoneborn relic fragment.\n\n**UNLEASH**: Return 2 red fragmentum tokens from your player sheet."
+    "ability": "**UNLEASH**: Return 1 red and 1 blue fragmentum token from your faction sheet.\n\nWhen you explore a planet that contains this unit, you may damage this unit to draw 1 additional exploration card. Choose 1 of the drawn cards to resolve and shuffle the remaining card into that exploration deck."
   },
   {
     "id": "stoneborn_mechunleashed",
@@ -852,7 +851,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "At the end of the status phase, you may remove 2 of your mechs from the same planet to draw 1 random Stoneborn relic fragment."
+    "ability": "When you explore a planet that contains this unit, you may draw 1 additional exploration card. Choose 1 of the drawn cards to resolve and shuffle the remaining card into that exploration deck."
   },
   {
     "id": "stoneborn_dreadnought",
@@ -873,7 +872,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "DEPLOY: At the start of your turn, you may purge 2 relic fragments to place 1 dreadnought in a system containing your ships."
+    "ability": "DEPLOY: Once per turn, at the end of your turn, you may purge 2 of your relic fragments to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships."
   },
   {
     "id": "stoneborn_dreadnought2dormant",
@@ -895,7 +894,7 @@
     "sustainDamage": true,
     "canBeDirectHit": false,
     "isShip": true,
-    "ability": "DEPLOY: At the start of your turn, you may purge 1 relic fragment to place 1 dreadnought in a system containing your ships. This unit cannot be destroyed by \"Direct Hit\" Action Cards.\nUNLEASH: Return 2 blue fragmentum tokens from your player sheet."
+    "ability": "**UNLEASH**: Return 2 blue fragmentum tokens from your faction sheet.\n\nDEPLOY: Once per turn, at the end of your turn, you may purge 1 of your relic fragments to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships. This unit cannot be destroyed by \"Direct Hit\" action cards."
   },
   {
     "id": "stoneborn_dreadnought2unleashed",
@@ -913,11 +912,11 @@
     "combatHitsOn": 5,
     "combatDieCount": 2,
     "bombardHitsOn": 5,
-    "bombardDieCount": 1,
+    "bombardDieCount": 2,
     "sustainDamage": true,
     "canBeDirectHit": false,
     "isShip": true,
-    "ability": "DEPLOY: At the start of your turn, you may purge 1 relic fragment to place 1 dreadnought in a system containing your ships. This unit cannot be destroyed by \"Direct Hit\" Action Cards."
+    "ability": "DEPLOY: Once per turn, at the end of your turn, you may purge 1 of your relic fragments to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships. This unit cannot be destroyed by \"Direct Hit\" action cards."
   },
   {
     "id": "morpha_flagship",

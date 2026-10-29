@@ -61,6 +61,8 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.info.CardsInfoService;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.info.LeaderInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.info.TechInfoService;
@@ -2394,6 +2396,8 @@ public class TransactionHelper {
                 } else {
                     p1.removeActionCard(acNum);
                     p2.setActionCard(acID);
+                    KnownCardsService.recordCardPassed(
+                            p1, p2, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
                 }
                 ButtonHelper.checkACLimit(game, p2);
                 ActionCardHelper.sendActionCardInfo(game, p2);
@@ -2483,6 +2487,8 @@ public class TransactionHelper {
 
                 p1.removeSecret(soNum);
                 p2.setSecret(soID);
+                KnownCardsService.recordCardPassed(
+                        p1, p2, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
 
                 if (oldWay) {
                     SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p1, event);

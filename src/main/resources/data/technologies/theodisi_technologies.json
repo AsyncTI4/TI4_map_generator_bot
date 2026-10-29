@@ -409,7 +409,7 @@
     "requirements": "G",
     "faction": "stoneborn",
     "source": "theodisi",
-    "text": "**UNLEASH**: Return 2 Green Fragmentum Tokens from your player sheet.\nWhen you would explore a planet you control or the frontier deck, you may exhaust this card and instead reveal cards from that deck until you reveal a relic fragment. Resolve that exploration and shuffle the remaining revealed cards back into that exploration deck."
+    "text": "**UNLEASH**: Return 2 Green fragmentum tokens from your faction sheet.\nWhen you would draw an exploration card, you may exhaust this card to instead reveal cards from that exploration deck until you reveal a relic fragment. Resolve that relic fragment as if it were the drawn card, then shuffle the remaining revealed cards into that exploration deck."
   },
   {
     "alias": "thstoneborngu",
@@ -420,11 +420,11 @@
     "requirements": "null",
     "faction": "stoneborn",
     "source": "theodisi",
-    "text": "After you explore a planet you control or the frontier deck, you may exhaust this card and reveal cards from that deck until you reveal a relic fragment. Resolve that exploration and shuffle the remaining revealed cards back into that exploration deck."
+    "text": "After you draw an exploration card, you may exhaust this card to reveal cards from that exploration deck until you reveal a relic fragment. Gain that relic fragment, then shuffle the remaining revealed cards into that exploration deck."
   },
   {
     "alias": "thstoneborndn",
-    "name": "Stalactium II",
+    "name": "Stalactium II Dormant",
     "types": [
         "UNITUPGRADE"
     ],
@@ -432,7 +432,7 @@
     "requirements": "BBY",
     "faction": "stoneborn",
     "source": "theodisi",
-    "text": "**UNLEASH**: Return 2 Blue Fragmentum Tokens from your player sheet.\nDEPLOY: At the start of your turn, you may purge 1 relic fragment to place 1 dreadnought in a system containing your ships. This unit cannot be destroyed by \"Direct Hit\" Action Cards."
+    "text": "**UNLEASH**: Return 2 Blue fragmentum tokens from your faction sheet.\nDEPLOY: Once per turn, at the end of your turn, you may purge 1 of your relic fragments to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships. This unit cannot be destroyed by \"Direct Hit\" Action Cards."
   },
   {
     "alias": "thstoneborndnu",
@@ -444,7 +444,7 @@
     "requirements": "null",
     "faction": "stoneborn",
     "source": "theodisi",
-    "text": "DEPLOY: At the start of your turn, you may purge 1 relic fragment to place 1 dreadnought in a system containing your ships. This unit cannot be destroyed by \"Direct Hit\" Action Cards."
+    "text": "DEPLOY: Once per turn, at the end of your turn, you may purge 1 of your relic fragments to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships. This unit cannot be destroyed by \"Direct Hit\" Action Cards."
   },
   {
     "alias": "thmorphag",

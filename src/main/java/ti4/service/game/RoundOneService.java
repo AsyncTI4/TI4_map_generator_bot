@@ -96,7 +96,11 @@ public class RoundOneService {
         if (game.isCulturalExchangeProgramMode()) {
             List<String> factions = new ArrayList<>(game.getRealFactions());
             Collections.shuffle(factions);
+            factions.remove("firmament");
             for (Player player : game.getRealPlayers()) {
+                if ("firmament".equalsIgnoreCase(player.getFaction())) {
+                    continue;
+                }
                 player.setLeaders(new ArrayList<>());
                 String faction = factions.removeFirst();
                 player.initLeadersForFaction(faction);

@@ -9,6 +9,8 @@ import ti4.game.Tile;
 import ti4.helpers.FoWHelper;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
+import ti4.model.Mapper;
+import ti4.model.WormholeModel.Wormhole;
 
 final class WormholesStep implements TileStepPainter {
 
@@ -19,15 +21,15 @@ final class WormholesStep implements TileStepPainter {
         if (HighlightGuards.isHiddenOrHyperlane(scene, tile) || HighlightGuards.isTileImageMissing(tile)) {
             return;
         }
-        if (!FoWHelper.doesTileHaveWHs(game, tile.getPosition())) {
+        Set<Wormhole> wormholes = FoWHelper.getTileWHs(game, tile.getPosition());
+        if (wormholes.isEmpty()) {
             HighlightGuards.fogOut(layer);
             return;
         }
-        int count = FoWHelper.getTileWHs(game, tile.getPosition()).size();
+        int count = wormholes.size();
         int x = TILE_PADDING + layer.spiralOffsetX() + (count == 1 ? 76 : 30);
         int y = TILE_PADDING + layer.spiralOffsetY() + (count == 1 ? 52 : 26);
-        Set<String> wormholes = FoWHelper.getTileWHs(game, tile.getPosition());
-        for (String wormhole : wormholes) {
+        for (Wormhole wormhole : wormholes) {
             String wormholeFile = wormholeTokenFile(wormhole);
             if (wormholeFile != null) {
                 BufferedImage bufferedImage = ImageHelper.readScaled(wormholeFile, 3);
@@ -38,11 +40,10 @@ final class WormholesStep implements TileStepPainter {
         }
     }
 
-    private static String wormholeTokenFile(String wormhole) {
+    private static String wormholeTokenFile(Wormhole wormhole) {
         String file = ImageResources.token("token_wh" + wormhole + ".png");
-        if (file == null) {
-            file = ImageResources.token("token_custom_eronous_wh" + wormhole + ".png");
-        }
-        return file;
+        if (file != null) return file;
+        String dataImage = Mapper.getWormholeTokenImagePath(wormhole);
+        return dataImage == null ? null : ImageResources.token(dataImage);
     }
 }

@@ -49,6 +49,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
@@ -78,6 +79,8 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.game.StartPhaseService;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.HeroUnlockCheckService;
@@ -386,6 +389,7 @@ public final class ButtonHelperFactionSpecific {
         }
         BlueReverieHelper.checkXinHarmony(game);
         ButtonHelper.deleteMessage(event);
+        DSHelperBreakthroughs.doLanefirBtCheck(player.getGame(), player);
     }
 
     @ButtonHandler("useNekroNullRef")
@@ -678,6 +682,8 @@ public final class ButtonHelperFactionSpecific {
         }
         player.removeActionCard(actionCardIndex);
         neighbor.setActionCard(actionCard);
+        KnownCardsService.recordCardPassed(
+                player, neighbor, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(actionCard));
         game.removeStoredValue(REFLECT_PENDING + player.getFaction());
         ButtonHelper.checkACLimit(game, neighbor);
         ActionCardHelper.sendActionCardInfo(game, player);
@@ -4412,6 +4418,8 @@ public final class ButtonHelperFactionSpecific {
         }
         player2.removeActionCard(acNum);
         player.setActionCard(acID);
+        KnownCardsService.recordCardPassed(
+                player2, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
         GameEventService.commit(
                 game,
                 GameEventType.CARD_STOLEN,

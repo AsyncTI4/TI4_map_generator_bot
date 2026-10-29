@@ -11,7 +11,9 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
+import ti4.game.Planet;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperExplore;
 import ti4.helpers.ButtonHelperStats;
@@ -21,11 +23,13 @@ import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
 public class StonebornLeadersHandler {
     private static final String PURGE_HAZORUS_FRAGMENT = "purgeHazorusFragment_";
+    private static final String EXPLORE_HAZORUS = "exploreHazorus_";
     private static final String GAIN_TEMPUS_UNLEASHED_TG = "gainTempusUnleashedTG";
     private static final String EXPLORE_TEMPUS_UNLEASHED = "exploreTempusUnleashed";
     private static final String CHOOSE_METEORIME_RELIC = "chooseMeteorimeRelic_";
@@ -240,14 +244,76 @@ public class StonebornLeadersHandler {
         if (!player.getFragments().contains(payload[2])) {
             return;
         }
-        int commoditiesBefore = player.getCommodities();
         ButtonHelperExplore.resolvePurgedFragments(game, player, event, List.of(payload[2]));
-        ButtonHelperStats.replenishComms(event, game, player, false);
-        if ("stonebornagentunleashed".equals(payload[1])) {
-            ButtonHelperStats.gainTGs(
-                    event, game, agentOwner, (player.getCommodities() - commoditiesBefore) / 2, false);
+        offerHazorusExploration(game, player, agentOwner, payload[1], payload[2], event);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(EXPLORE_HAZORUS)
+    public static void exploreHazorus(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String[] payload = buttonID.substring(EXPLORE_HAZORUS.length()).split("\\|", 4);
+        if (payload.length != 4) {
+            return;
+        }
+        Player agentOwner = game.getPlayerFromColorOrFaction(payload[0]);
+        Leader agent =
+                agentOwner == null ? null : agentOwner.getLeader(payload[1]).orElse(null);
+        Planet planet = game.getPlanetsInfo().get(payload[3]);
+        Tile tile = game.getTileFromPlanet(payload[3]);
+        if (agent == null
+                || !agent.isExhausted()
+                || planet == null
+                || !player.getPlanetsAllianceMode().contains(payload[3])
+                || planet.getPlanetTypes().stream().noneMatch(payload[2]::equalsIgnoreCase)) {
+            return;
+        }
+        int explorationCount = "stonebornagentunleashed".equals(payload[1]) ? 2 : 1;
+        for (int i = 0; i < explorationCount; i++) {
+            ExploreService.explorePlanet(event, tile, payload[3], payload[2], player, true, game, 1, false);
         }
         ButtonHelper.deleteMessage(event);
+    }
+
+    private static void offerHazorusExploration(
+            Game game, Player target, Player agentOwner, String agent, String fragment, ButtonInteractionEvent event) {
+        var fragmentModel = Mapper.getExplore(fragment);
+        if (fragmentModel == null) {
+            return;
+        }
+        List<String> traits = fragmentModel.getAlias().contains("unknown")
+                ? List.of("cultural", "hazardous", "industrial")
+                : List.of(fragmentModel.getType().toLowerCase());
+        List<Button> buttons = new ArrayList<>();
+        traits.forEach(trait -> game.getPlanetsInfo().values().stream()
+                .filter(planet -> target.getPlanetsAllianceMode().contains(planet.getName()))
+                .filter(planet -> planet.getPlanetTypes().stream().anyMatch(trait::equalsIgnoreCase))
+                .forEach(planet -> {
+                    buttons.add(Buttons.gray(
+                            target.factionButtonChecker() + EXPLORE_HAZORUS + agentOwner.getFaction() + "|" + agent
+                                    + "|" + trait + "|" + planet.getName(),
+                            "Explore " + planet.getRepresentation(game) + (traits.size() > 1 ? " As " + trait : ""),
+                            ExploreEmojis.getTraitEmoji(trait)));
+                    StonebornTechHandler.addDormantXenolithExploreButton(
+                            buttons,
+                            target,
+                            planet.getName(),
+                            trait,
+                            "Explore " + planet.getRepresentation(game) + " With Xenolith"
+                                    + (traits.size() > 1 ? " As " + trait : ""));
+                }));
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    target.getCorrectChannel(),
+                    target.getRepresentationNoPing() + " has no eligible planet to explore with Hazorus.");
+            return;
+        }
+        String twice = "stonebornagentunleashed".equals(agent) ? " twice" : "";
+        NewStuffHelper.sendPaginated(
+                target.getCorrectChannel(),
+                target.getRepresentation() + ", choose a planet to explore" + twice + " with Hazorus.",
+                buttons,
+                List.of(),
+                target.factionButtonChecker() + EXPLORE_HAZORUS + agentOwner.getFaction() + "|" + agent + "|");
     }
 
     private static List<Button> getHazorusFragmentButtons(Player target, Player agentOwner, String agent) {
@@ -264,6 +330,6 @@ public class StonebornLeadersHandler {
 
     private static String getHazorusMessage(Player target) {
         return target.getRepresentation()
-                + ", you may purge 1 relic fragment to replenish your commodities with Hazorus.";
+                + ", you may purge 1 relic fragment to explore a matching planet with Hazorus.";
     }
 }

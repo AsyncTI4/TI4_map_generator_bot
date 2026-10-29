@@ -21,7 +21,8 @@ public class TestBedScript {
             "actAs",
             "sendAnonComms",
             "stackExplore",
-            "removeToken");
+            "removeToken",
+            "setGameOption");
 
     private String name;
     private String description;
