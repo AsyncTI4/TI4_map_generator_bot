@@ -30,7 +30,6 @@ import ti4.service.fow.FogViewer;
 import ti4.service.fow.MapOverviewService;
 import ti4.service.fow.MapSegmentService;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
-import ti4.service.testbed.TestBedService;
 import ti4.spring.api.image.GameImageService;
 import ti4.spring.context.SpringContext;
 
@@ -134,8 +133,7 @@ public class ShowGameService {
 
     @Nullable
     private static Player actingPlayer(Game game, GenericInteractionCreateEvent event) {
-        return TestBedService.resolveActingPlayer(
-                game, event, game.getPlayer(event.getUser().getId()));
+        return FogViewer.seatOf(game, event);
     }
 
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event) {
@@ -165,7 +163,7 @@ public class ShowGameService {
                 : null;
 
         // For FoW games: persist the player-specific map message ID
-        String playerId = event.getUser().getId();
+        String playerId = MapSegmentService.viewerId(game, event);
         Consumer<Message> persistFowMessageId = shouldPersistFowMapMessageId
                 ? msg -> SpringContext.getBean(GameImageService.class)
                         .savePlayerDiscordMessageId(

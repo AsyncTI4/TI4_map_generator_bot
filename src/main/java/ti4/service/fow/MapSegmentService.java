@@ -22,7 +22,6 @@ import ti4.message.MessageHelper;
 import ti4.model.SegmentNames;
 import ti4.service.ShowGameService;
 import ti4.service.option.FOWOptionService.FOWOption;
-import ti4.service.testbed.TestBedService;
 
 @UtilityClass
 public class MapSegmentService {
@@ -96,8 +95,8 @@ public class MapSegmentService {
     }
 
     public static String viewerId(Game game, GenericInteractionCreateEvent event) {
-        Player acting = TestBedService.resolveActingPlayer(game, event, null);
-        return acting != null ? acting.getUserID() : event.getUser().getId();
+        Player seat = FogViewer.seatOf(game, event);
+        return seat != null ? seat.getUserID() : event.getUser().getId();
     }
 
     @ButtonHandler(value = SWITCH_PREFIX, save = false)
