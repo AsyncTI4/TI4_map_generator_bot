@@ -190,6 +190,8 @@ class ShowGameFogAccessTest extends BaseTi4Test {
         assertEquals(
                 FogMapAccess.PLAYER_VIEW, ShowGameService.fogMapAccess(game, teamMemberIn("fogtest-lobby", teamRole)));
         assertEquals("555", MapSegmentService.viewerId(game, teamMemberIn("fogtest-lobby", teamRole)));
+        // The seat's own user still counts without the role: getTeamMateIDs() always includes them.
+        assertEquals(FogMapAccess.AS_ASKED, access("555", "fogtest-orange-private"));
         assertEquals(FogMapAccess.REFUSED, access(OUTSIDER, "fogtest-lobby"));
     }
 
