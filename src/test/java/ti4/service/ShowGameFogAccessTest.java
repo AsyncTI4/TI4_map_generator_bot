@@ -6,10 +6,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -20,6 +22,7 @@ import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.service.ShowGameService.FogMapAccess;
+import ti4.service.fow.MapSegmentService;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.testUtils.BaseTi4Test;
 import ti4.testUtils.FogEvents;
@@ -168,6 +171,35 @@ class ShowGameFogAccessTest extends BaseTi4Test {
         assertEquals(FogMapAccess.FULL_MAP, access(SEATLESS_GM, "general"));
         // Nothing could redirect this player's vision out of the shared channel.
         assertEquals(FogMapAccess.REFUSED, access(NO_PRIVATE_CHANNEL, commonChannel));
+    }
+
+    @Test
+    void communityRoleMembersActForTheirTeamSeat() {
+        // Community seats are bound to a Discord role; the members pressing buttons are not the seat's user.
+        Player team = seat(game, "555", "letnev", "orange");
+        team.setRoleIDForCommunity("team-role-id");
+        team.setPrivateChannelID("orange-private-id");
+        Role teamRole = mock(Role.class);
+        when(JdaService.jda.getRoleById("team-role-id")).thenReturn(teamRole);
+        when(JdaService.jda.getTextChannelById("orange-private-id")).thenReturn(mock(TextChannel.class));
+        game.setCommunityMode(true);
+
+        assertEquals(
+                FogMapAccess.AS_ASKED,
+                ShowGameService.fogMapAccess(game, teamMemberIn("fogtest-orange-private", teamRole)));
+        assertEquals(
+                FogMapAccess.PLAYER_VIEW, ShowGameService.fogMapAccess(game, teamMemberIn("fogtest-lobby", teamRole)));
+        assertEquals("555", MapSegmentService.viewerId(game, teamMemberIn("fogtest-lobby", teamRole)));
+        // The seat's own user still counts without the role: getTeamMateIDs() always includes them.
+        assertEquals(FogMapAccess.AS_ASKED, access("555", "fogtest-orange-private"));
+        assertEquals(FogMapAccess.REFUSED, access(OUTSIDER, "fogtest-lobby"));
+    }
+
+    private GenericInteractionCreateEvent teamMemberIn(String channelName, Role role) {
+        GenericInteractionCreateEvent event = eventIn("666", channelName, gameGuild);
+        // Seats without a community role compare against null, which List.of() rejects but JDA's list allows.
+        when(event.getMember().getRoles()).thenReturn(Collections.singletonList(role));
+        return event;
     }
 
     @Test
