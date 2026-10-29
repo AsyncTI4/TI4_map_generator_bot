@@ -137,6 +137,7 @@ import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
+import ti4.service.ShowGameService;
 import ti4.service.VeiledHeartService;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -8436,6 +8437,10 @@ public class ButtonHelper {
     }
 
     public static void showFeatureType(GenericInteractionCreateEvent event, Game game, DisplayType feature) {
+        if (game.isFowMode()) {
+            ShowGameService.showFeature(game, event, feature);
+            return;
+        }
         MapRenderPipeline.queue(
                 game,
                 event,

@@ -221,10 +221,7 @@ class ImageGeneratorsGoldenHarness extends BaseTi4Test {
                 name + "/banner-alt", save, game -> BannerGenerator.drawPhaseBanner("status", 12, null, "Scoring"));
         record(name + "/compact-gm", save, CompactOverviewGenerator::gmImage);
         if (probe.isFowMode() && !players.isEmpty()) {
-            record(
-                    name + "/compact-player",
-                    save,
-                    game -> CompactOverviewGenerator.playerImage(game, real(game, 0), null));
+            record(name + "/compact-player", save, game -> CompactOverviewGenerator.playerImage(game, real(game, 0)));
         }
         record(name + "/overview", save, game -> MapOverviewGenerator.render(game, false));
         if (probe.isFowMode()) {

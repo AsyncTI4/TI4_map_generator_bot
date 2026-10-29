@@ -15,12 +15,11 @@ final class ExileStep implements TileStepPainter {
 
     @Override
     public void paint(TileScene scene, TileLayer layer) {
-        Game game = scene.game();
         Tile tile = layer.tile();
-        if (HighlightGuards.isFogOrHyperlane(game, tile)) {
+        if (HighlightGuards.isHiddenOrHyperlane(scene, tile)) {
             return;
         }
-        boolean inRangeOfExile = isInRangeOfAnyExile(game, tile);
+        boolean inRangeOfExile = isInRangeOfAnyExile(scene, tile);
         if (HighlightGuards.isTileImageMissing(tile)) {
             return;
         }
@@ -38,9 +37,14 @@ final class ExileStep implements TileStepPainter {
         }
     }
 
-    private static boolean isInRangeOfAnyExile(Game game, Tile tile) {
+    private static boolean isInRangeOfAnyExile(TileScene scene, Tile tile) {
+        Game game = scene.game();
         for (Player p : game.getRealPlayers()) {
-            if (FoWHelper.isTileInExileRange(game, tile, p) || FoWHelper.isTileInUpgradedExileRange(game, tile, p)) {
+            if (scene.showsGeneric(p)) {
+                continue;
+            }
+            if (FoWHelper.isTileInExileRange(game, tile, p, scene::seesPosition)
+                    || FoWHelper.isTileInUpgradedExileRange(game, tile, p, scene::seesPosition)) {
                 return true;
             }
         }
