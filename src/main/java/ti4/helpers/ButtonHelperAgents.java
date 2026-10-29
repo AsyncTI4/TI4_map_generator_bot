@@ -26,6 +26,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Sa
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaLeaderHandler;
@@ -1669,6 +1670,16 @@ public final class ButtonHelperAgents {
             if (target != null) {
                 SarcosaAgentHandler.offerSarcosaAgentSystemButtons(game, target, event);
             }
+            return;
+        }
+        if ("stonebornagentdormant".equalsIgnoreCase(agent) || "stonebornagentunleashed".equalsIgnoreCase(agent)) {
+            Player target =
+                    rest.contains("_") ? game.getPlayerFromColorOrFaction(rest.substring(rest.indexOf('_') + 1)) : null;
+            if (target == null) {
+                MessageHelper.sendMessageToChannel(channel, "Could not find the selected Stoneborn Agent target.");
+                return;
+            }
+            StonebornLeadersHandler.offerHazorusFragmentPurge(game, player, target, agent);
             return;
         }
         TkHelperGenomes.onExhaust(event, game, player, agent, ssruuClever, rest);

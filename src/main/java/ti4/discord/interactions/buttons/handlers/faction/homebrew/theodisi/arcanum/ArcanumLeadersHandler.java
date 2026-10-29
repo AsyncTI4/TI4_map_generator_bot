@@ -272,14 +272,7 @@ public class ArcanumLeadersHandler {
         player.removeFragment(payload[2]);
         game.purgeExplore(payload[1]);
         game.purgeExplore(payload[2]);
-        int standardFragmentsPurged = 0;
-        if (!StonebornAbilityHandler.returnPurgedFragment(game, payload[1])) {
-            standardFragmentsPurged++;
-        }
-        if (!StonebornAbilityHandler.returnPurgedFragment(game, payload[2])) {
-            standardFragmentsPurged++;
-        }
-        game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + standardFragmentsPurged);
+        game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 2);
         StonebornAbilityHandler.offerFragmentumTokenPlacement(game, player, event, List.of(payload[1], payload[2]));
         ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, payload[1]);
         ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, payload[2]);

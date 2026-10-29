@@ -87,18 +87,6 @@ public class StonebornAbilityHandler {
                 .toList();
     }
 
-    public static boolean returnPurgedFragment(Game game, String fragment) {
-        if (!FRAGMENTS.contains(fragment)) {
-            return false;
-        }
-
-        List<String> drawnFragments =
-                new ArrayList<>(List.of(game.getStoredValue(DRAWN_FRAGMENTS).split(",")));
-        drawnFragments.removeIf(fragment::equals);
-        game.setStoredValue(DRAWN_FRAGMENTS, String.join(",", drawnFragments));
-        return true;
-    }
-
     public static void offerFragmentumTokenPlacement(
             Game game, Player player, GenericInteractionCreateEvent event, List<String> fragments) {
         if (!player.hasAbility(FRAGMENTUM_UNLEASHED) || fragments.isEmpty()) {
@@ -313,6 +301,7 @@ public class StonebornAbilityHandler {
         List<List<String>> costs = new ArrayList<>();
         buildCosts(tokens, cost.count, cost.different, cost.same, new ArrayList<>(), costs);
         return costs.stream()
+                .filter(selection -> isValidCost(cost, selection))
                 .distinct()
                 .sorted(Comparator.comparing(StonebornAbilityHandler::formatCost))
                 .toList();
@@ -351,7 +340,17 @@ public class StonebornAbilityHandler {
         }
         return (expected.requiredTrait == null || cost.stream().allMatch(expected.requiredTrait::equals))
                 && (!expected.different || cost.stream().distinct().count() == cost.size())
-                && (!expected.same || cost.stream().distinct().count() == 1);
+                && (!expected.same || cost.stream().distinct().count() == 1)
+                && matchesRequiredTraits(expected, cost);
+    }
+
+    private static boolean matchesRequiredTraits(AdaptiveCost expected, List<String> cost) {
+        return switch (expected) {
+            case RED_BLUE -> cost.contains("hazardous") && cost.contains("cultural");
+            case GREEN_BLUE -> cost.contains("industrial") && cost.contains("cultural");
+            case GREEN_RED -> cost.contains("industrial") && cost.contains("hazardous");
+            default -> true;
+        };
     }
 
     private static String formatCost(List<String> cost) {
@@ -364,11 +363,12 @@ public class StonebornAbilityHandler {
     }
 
     private static void unleash(Game game, Player player, AdaptiveComponent component) {
+        StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
         switch (component) {
             case AGENT, COMMANDER, HERO -> replaceLeader(player, component.dormant, component.unleashed);
             case XENOLITH, STALACTIUM -> replaceTech(player, component.dormant, component.unleashed);
             case GOLEM -> replaceUnit(player, component.dormant, component.unleashed);
-            case REFRAGMENT -> player.changeBreakthrough(component.dormant, component.unleashed);
+            case REFRAGMENT -> replaceBreakthrough(player, component.dormant, component.unleashed);
             case PETRA -> unleashPetra(game, player);
         }
     }
@@ -399,10 +399,21 @@ public class StonebornAbilityHandler {
     }
 
     private static void replaceTech(Player player, String dormant, String unleashed) {
+        boolean exhausted = player.getExhaustedTechs().contains(dormant);
         player.purgeTech(dormant);
         player.addTech(unleashed);
+        if (exhausted) {
+            player.exhaustTech(unleashed);
+        }
         if ("thstoneborndn".equals(dormant)) {
             replaceUnit(player, "stoneborn_dreadnought2dormant", "stoneborn_dreadnought2unleashed");
+        }
+    }
+
+    private static void replaceBreakthrough(Player player, String dormant, String unleashed) {
+        boolean exhausted = player.isBreakthroughExhausted(dormant);
+        if (player.changeBreakthrough(dormant, unleashed)) {
+            player.setBreakthroughExhausted(unleashed, exhausted);
         }
     }
 
@@ -436,19 +447,19 @@ public class StonebornAbilityHandler {
     }
 
     private enum AdaptiveComponent {
-        AGENT("agent", "Hazorus", "stonebornagentdormant", "stonebornagentunleashed", AdaptiveCost.ONE),
+        AGENT("agent", "Hazorus", "stonebornagentdormant", "stonebornagentunleashed", AdaptiveCost.TWO_RED),
         COMMANDER(
                 "commander",
                 "Tempus",
                 "stoneborncommanderdormant",
                 "stoneborncommanderunleashed",
-                AdaptiveCost.TWO_DIFFERENT),
-        HERO("hero", "Meteorime", "stonebornherodormant", "stonebornherounleashed", AdaptiveCost.THREE_DIFFERENT),
+                AdaptiveCost.GREEN_BLUE),
+        HERO("hero", "Meteorime", "stonebornherodormant", "stonebornherounleashed", AdaptiveCost.FOUR_DIFFERENT),
         XENOLITH("xenolith", "Xenolith", "thstoneborng", "thstoneborngu", AdaptiveCost.TWO_GREEN),
         STALACTIUM("stalactium", "Stalactium II", "thstoneborndn", "thstoneborndnu", AdaptiveCost.TWO_BLUE),
-        GOLEM("golem", "Golem", "stoneborn_mechdormant", "stoneborn_mechunleashed", AdaptiveCost.TWO_RED),
+        GOLEM("golem", "Golem", "stoneborn_mechdormant", "stoneborn_mechunleashed", AdaptiveCost.RED_BLUE),
         REFRAGMENT("refragment", "Refragment", "stonebornbt", "stonebornbtunleashed", AdaptiveCost.TWO_SAME),
-        PETRA("petra", "Petra", "petra", "petraunleashed", AdaptiveCost.TWO_DIFFERENT);
+        PETRA("petra", "Petra", "petra", "petraunleashed", AdaptiveCost.GREEN_RED);
 
         private final String id;
         private final String name;
@@ -479,10 +490,14 @@ public class StonebornAbilityHandler {
         TWO_GREEN(2, false, false, "industrial"),
         TWO_BLUE(2, false, false, "cultural"),
         TWO_RED(2, false, false, "hazardous"),
+        RED_BLUE(2, true, false, null),
+        GREEN_BLUE(2, true, false, null),
+        GREEN_RED(2, true, false, null),
         TWO_SAME(2, false, true, null),
         TWO_DIFFERENT(2, true, false, null),
         THREE(3, false, false, null),
-        THREE_DIFFERENT(3, true, false, null);
+        THREE_DIFFERENT(3, true, false, null),
+        FOUR_DIFFERENT(4, true, false, null);
 
         private final int count;
         private final boolean different;

@@ -57,6 +57,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
@@ -3078,6 +3079,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             TheodisiOutpostActionCardHandler.offerOutpostEffects(game, this, planet);
             TaBreakthroughHandler.offerSafeHavensInfantry(game, this, planet);
             ThirtyKRelicHooks.onPlanetExhausted(game, this, planet);
+            if ("mobilemountain".equals(planet)) {
+                StonebornUnitHandler.damageMobileMountain(game, this);
+            }
         }
         Game game = this.game;
         if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null

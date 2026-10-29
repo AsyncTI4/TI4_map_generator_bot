@@ -143,9 +143,7 @@ public class SecretObjectiveHelper {
                     StringBuilder message2 = new StringBuilder(player.getRepresentation() + " purged");
                     for (String fragId : fragmentsToPurge) {
                         player.removeFragment(fragId);
-                        if (!StonebornAbilityHandler.returnPurgedFragment(game, fragId)) {
-                            game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-                        }
+                        game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
                         if (fragId.startsWith("supermassive")) {
                             ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, fragId);
                         }

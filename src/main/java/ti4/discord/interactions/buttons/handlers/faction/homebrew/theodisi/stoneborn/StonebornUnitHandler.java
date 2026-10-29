@@ -15,16 +15,19 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperExplore;
+import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
+import ti4.model.ExploreModel;
 import ti4.model.Mapper;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.explore.ExploreService;
 import ti4.service.unit.AddUnitService;
-import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
 public class StonebornUnitHandler {
@@ -33,91 +36,153 @@ public class StonebornUnitHandler {
     private static final String PURGE_STALACTIUM_FRAGMENT = "purgeStalactiumFragment_";
     private static final String STALACTIUM_TARGET = "stalactiumTarget_";
     private static final String STALACTIUM_FRAGMENTS = "stalactiumFragments_";
-    private static final String USE_GOLEM = "useGolem_";
+    private static final String STALACTIUM_USED = "stalactiumUsed_";
+    private static final String CANCEL_STALACTIUM = "cancelStalactium";
+    private static final String USE_GOLEM_EXPLORE = "useGolemExplore_";
+    private static final String RESOLVE_GOLEM_EXPLORE = "resolveGolemExplore_";
+    private static final String GOLEM_EXPLORE_CARDS = "golemExploreCards_";
 
-    public static void offerGolemStatusPhase(Game game, Player player) {
-        int cost = getGolemCost(player);
-        if (cost == 0) {
-            return;
+    public static boolean offerGolemExplore(
+            Game game, Player player, Tile tile, String planetName, String trait, GenericInteractionCreateEvent event) {
+        Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
+        int availableGolems = getAvailableGolemCount(player, planet);
+        if (availableGolems == 0) {
+            return false;
         }
-
-        List<Button> buttons = getGolemButtons(game, player, cost);
-        if (buttons.isEmpty()) {
-            return;
+        resetGolemExplore(game, player);
+        List<Button> buttons = new ArrayList<>();
+        for (int golemCount = 1; golemCount <= availableGolems; golemCount++) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + USE_GOLEM_EXPLORE + golemCount + "|" + planetName + "|" + trait,
+                    "Use " + golemCount + " Golem" + (golemCount == 1 ? "" : "s")));
         }
-
-        List<Button> pinned = List.of(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.red(
+                player.factionButtonChecker() + USE_GOLEM_EXPLORE + "0|" + planetName + "|" + trait,
+                "Explore Normally"));
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
+                getOutputChannel(game, player, event),
                 player.getRepresentation()
-                        + ", you may remove " + cost
-                        + " Golems from the same planet to draw 1 random Stoneborn relic fragment.",
-                paginateGolemButtons(buttons, pinned, player));
+                        + ", you may use each Golem on this planet to draw 1 additional exploration card.",
+                buttons);
+        return true;
     }
 
-    @ButtonHandler(USE_GOLEM)
-    public static void useGolem(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        int cost = getGolemCost(player);
-        List<Button> buttons = getGolemButtons(game, player, cost);
-        String message = player.getRepresentation()
-                + ", you may remove " + cost
-                + " Golems from the same planet to draw 1 random Stoneborn relic fragment.";
-        String prefix = player.factionButtonChecker() + USE_GOLEM;
-        if (NewStuffHelper.checkAndHandlePaginationChange(
-                event,
-                getOutputChannel(game, player, event),
-                buttons,
-                List.of(Buttons.red("deleteButtons", "Decline")),
-                message,
-                prefix,
-                buttonID)) {
+    @ButtonHandler(USE_GOLEM_EXPLORE)
+    public static void useGolemExplore(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String[] payload = buttonID.substring(USE_GOLEM_EXPLORE.length()).split("\\|", 3);
+        if (payload.length != 3) {
             return;
         }
-        String planetName = buttonID.substring(USE_GOLEM.length());
-        Tile tile = game.getTileFromPlanet(planetName);
-        Planet planet = game.getUnitHolderFromPlanet(planetName);
-        if (cost == 0 || tile == null || planet == null || planet.getUnitCount(UnitType.Mech, player) < cost) {
-            ButtonHelper.deleteTheOneButton(event);
+        Tile tile = game.getTileFromPlanet(payload[1]);
+        Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(payload[1]);
+        int golemCount = parseCost(payload[0]);
+        if (planet == null
+                || !player.getPlanetsAllianceMode().contains(payload[1])
+                || (golemCount > 0 && golemCount > getAvailableGolemCount(player, planet))) {
             return;
         }
-
-        int removed = RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Mech, cost).stream()
-                .mapToInt(RemoveUnitService.RemovedUnit::getTotalRemoved)
-                .sum();
-        if (removed == cost) {
-            StonebornAbilityHandler.drawRandomStonebornFragment(game, player, "Golem");
+        if (golemCount == 0) {
+            ExploreService.explorePlanet(event, tile, payload[1], payload[2], player, true, game, 1, false);
+            ButtonHelper.deleteMessage(event);
+            return;
         }
+        if (player.hasUnit("stoneborn_mechdormant")) {
+            tile.addUnitDamage(planet.getName(), Units.getUnitKey(UnitType.Mech, player.getColorID()), golemCount);
+        }
+        offerGolemExploreResolution(game, player, event, payload[1], payload[2], golemCount + 1);
         ButtonHelper.deleteMessage(event);
     }
 
-    private static int getGolemCost(Player player) {
+    @ButtonHandler(RESOLVE_GOLEM_EXPLORE)
+    public static void resolveGolemExplore(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        int selectedCardIndex = parseCost(buttonID.substring(RESOLVE_GOLEM_EXPLORE.length()));
+        String[] state = game.getStoredValue(getGolemExploreCardsKey(player)).split("\\|", 2);
+        if (state.length != 2) {
+            return;
+        }
+        List<String> cards = new ArrayList<>(List.of(state[1].split(",")));
+        if (selectedCardIndex < 0 || selectedCardIndex >= cards.size()) {
+            return;
+        }
+        String selectedCard = cards.remove(selectedCardIndex);
+        cards.forEach(game::addExplore);
+        game.shuffleExplores();
+        game.removeStoredValue(getGolemExploreCardsKey(player));
+        Tile tile = game.getTileFromPlanet(state[0]);
+        ExploreService.resolveExplore(
+                event,
+                selectedCard,
+                tile,
+                state[0],
+                player.getRepresentationNoPing() + " chose to resolve _"
+                        + Mapper.getExplore(selectedCard).getName() + "_.",
+                player,
+                game);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static int getAvailableGolemCount(Player player, Planet planet) {
+        if (planet == null || planet.getUnitCount(UnitType.Mech, player) < 1) {
+            return 0;
+        }
+        int golemCount = Math.min(4, planet.getUnitCount(UnitType.Mech, player));
         if (player.hasUnit("stoneborn_mechunleashed")) {
-            return 2;
+            return golemCount;
         }
-        return player.hasUnit("stoneborn_mechdormant") ? 3 : 0;
+        if (!player.hasUnit("stoneborn_mechdormant")) {
+            return 0;
+        }
+        return golemCount - planet.getDamagedUnitCount(UnitType.Mech, player.getColorID());
     }
 
-    private static List<Button> getGolemButtons(Game game, Player player, int cost) {
-        if (cost == 0) {
-            return List.of();
+    private static void offerGolemExploreResolution(
+            Game game, Player player, ButtonInteractionEvent event, String planetName, String trait, int exploreCount) {
+        List<String> cards = new ArrayList<>();
+        for (int i = 0; i < exploreCount; i++) {
+            String card = game.drawExplore(trait);
+            if (card == null) {
+                break;
+            }
+            cards.add(card);
         }
-        return game.getTileMap().values().stream()
-                .flatMap(tile -> tile.getPlanetUnitHolders().stream())
-                .filter(planet -> planet.getUnitCount(UnitType.Mech, player) >= cost)
-                .map(planet -> Buttons.green(
-                        player.factionButtonChecker() + USE_GOLEM + planet.getName(),
-                        "Remove " + cost + " Golems From " + planet.getRepresentation(game)))
-                .toList();
+        if (cards.isEmpty()) {
+            MessageHelper.sendMessageToChannel(getOutputChannel(game, player, event), "Planet cannot be explored.");
+            return;
+        }
+        game.setStoredValue(getGolemExploreCardsKey(player), planetName + "|" + String.join(",", cards));
+        List<ExploreModel> explores = cards.stream().map(Mapper::getExplore).toList();
+        List<Button> buttons = new ArrayList<>();
+        for (int i = 0; i < explores.size(); i++) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + RESOLVE_GOLEM_EXPLORE + i,
+                    explores.get(i).getName()));
+        }
+        String foundCards = explores.stream()
+                .map(ExploreModel::getName)
+                .map(name -> "_" + name + "_")
+                .collect(java.util.stream.Collectors.joining(", "));
+        MessageHelper.sendMessageToChannel(
+                getOutputChannel(game, player, event),
+                player.getRepresentationNoPing() + " used Golems and found " + foundCards + " on "
+                        + Helper.getPlanetRepresentationPlusEmoji(planetName) + ".");
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                getOutputChannel(game, player, event),
+                player.getRepresentation() + " please choose 1 exploration card to resolve.",
+                explores.stream().map(ExploreModel::getRepresentationEmbed).toList(),
+                buttons);
     }
 
-    private static List<Button> paginateGolemButtons(List<Button> buttons, List<Button> pinned, Player player) {
-        if (buttons.size() + pinned.size() <= 25) {
-            List<Button> result = new ArrayList<>(buttons);
-            result.addAll(pinned);
-            return result;
+    private static String getGolemExploreCardsKey(Player player) {
+        return GOLEM_EXPLORE_CARDS + player.getFaction();
+    }
+
+    public static void resetGolemExplore(Game game, Player player) {
+        String[] state = game.getStoredValue(getGolemExploreCardsKey(player)).split("\\|", 2);
+        if (state.length == 2 && !state[1].isEmpty()) {
+            List.of(state[1].split(",")).forEach(game::addExplore);
+            game.shuffleExplores();
         }
-        return NewStuffHelper.buttonPagination(
-                buttons, pinned, player.factionButtonChecker() + USE_GOLEM, 25, 0, false);
+        game.removeStoredValue(getGolemExploreCardsKey(player));
     }
 
     public static void syncMobileMountain(Game game, Player player) {
@@ -132,6 +197,21 @@ public class StonebornUnitHandler {
         }
     }
 
+    public static void damageMobileMountain(Game game, Player player) {
+        if (game == null
+                || player == null
+                || !player.hasPlanet("mobilemountain")
+                || !player.hasUnit("stoneborn_flagship")) {
+            return;
+        }
+        UnitKey mobileMountain = Units.getUnitKey(UnitType.Flagship, player.getColorID());
+        game.getTileMap().values().stream()
+                .filter(tile -> tile.getSpaceUnitHolder().getUnitCount(mobileMountain)
+                        > tile.getSpaceUnitHolder().getDamagedUnitCount(mobileMountain))
+                .findFirst()
+                .ifPresent(tile -> tile.addUnitDamage(Constants.SPACE, mobileMountain, 1));
+    }
+
     private static boolean isMobileMountainOnBoard(Game game, Player player) {
         UnitKey mm = Units.getUnitKey(UnitType.Flagship, player.getColorID());
         return game.getTileMap().values().stream()
@@ -139,9 +219,10 @@ public class StonebornUnitHandler {
                 .anyMatch(unitHolder -> unitHolder.getUnitCount(mm) > 0);
     }
 
-    public static Button getStalactiumStartTurnButton(Game game, Player player) {
+    public static Button getStalactiumEndTurnButton(Game game, Player player) {
         int cost = getStalactiumCost(player);
         if (cost == 0
+                || !game.getStoredValue(STALACTIUM_USED + player.getFaction()).isEmpty()
                 || player.getFragments().size() < cost
                 || ButtonHelper.getTilesWithShipsInTheSystem(player, game).isEmpty()) {
             return null;
@@ -157,6 +238,7 @@ public class StonebornUnitHandler {
         if (cost == 0 || player.getFragments().size() < cost || tiles.isEmpty()) {
             return;
         }
+        game.setStoredValue(STALACTIUM_USED + player.getFaction(), "pending");
         List<Button> buttons = tiles.stream()
                 .map(tile -> Buttons.green(
                         player.factionButtonChecker() + SELECT_STALACTIUM_SYSTEM + cost + "|" + tile.getPosition(),
@@ -231,6 +313,13 @@ public class StonebornUnitHandler {
                 getOutputChannel(game, player, event),
                 player.getRepresentationNoPing() + " placed 1 dreadnought with _Stalactium_.");
         clearStalactiumState(game, player);
+        game.setStoredValue(STALACTIUM_USED + player.getFaction(), "used");
+    }
+
+    @ButtonHandler(CANCEL_STALACTIUM)
+    public static void cancelStalactium(Game game, Player player, ButtonInteractionEvent event) {
+        clearStalactiumState(game, player);
+        ButtonHelper.deleteMessage(event);
     }
 
     private static void offerStalactiumFragmentButtons(Game game, Player player, GenericInteractionCreateEvent event) {
@@ -245,7 +334,12 @@ public class StonebornUnitHandler {
                 getOutputChannel(game, player, event),
                 getStalactiumFragmentMessage(game, player),
                 NewStuffHelper.buttonPagination(
-                        buttons, null, player.factionButtonChecker() + PURGE_STALACTIUM_FRAGMENT, 24, 0, true));
+                        buttons,
+                        List.of(Buttons.red(player.factionButtonChecker() + CANCEL_STALACTIUM, "Cancel")),
+                        player.factionButtonChecker() + PURGE_STALACTIUM_FRAGMENT,
+                        24,
+                        0,
+                        true));
     }
 
     private static List<Button> getStalactiumFragmentButtons(Game game, Player player) {
@@ -294,6 +388,11 @@ public class StonebornUnitHandler {
     private static void clearStalactiumState(Game game, Player player) {
         game.removeStoredValue(getTargetKey(player));
         game.removeStoredValue(getFragmentsKey(player));
+        game.removeStoredValue(STALACTIUM_USED + player.getFaction());
+    }
+
+    public static void resetStalactiumTurnUse(Game game, Player player) {
+        clearStalactiumState(game, player);
     }
 
     private static String getTargetKey(Player player) {

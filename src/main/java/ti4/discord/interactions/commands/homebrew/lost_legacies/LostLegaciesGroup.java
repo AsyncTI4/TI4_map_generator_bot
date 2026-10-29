@@ -12,6 +12,7 @@ public class LostLegaciesGroup extends SubcommandGroup {
                     new RevLeaderFix(),
                     new RelicTradingHub(),
                     new ViewStonebornFragments(),
+                    new ViewPurgedStonebornFragments(),
                     new HydromorphicDraw(),
                     new HydromorphicDiscard(),
                     new HydromorphicSend(),
