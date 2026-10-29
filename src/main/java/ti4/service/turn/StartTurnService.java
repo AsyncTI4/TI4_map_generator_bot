@@ -96,7 +96,6 @@ import ti4.service.leader.agent.modules.homebrew.KolleccAgent;
 import ti4.service.leader.agent.modules.homebrew.PharadnAgent;
 import ti4.service.leader.agent.modules.homebrew.VadenAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ArcanumAgent;
-import ti4.service.leader.agent.modules.homebrew.theodisi.HazorusAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.HopeOfTheCosmosAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.OblivionAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantScrapyardAgent;
