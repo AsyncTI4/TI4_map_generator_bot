@@ -185,11 +185,16 @@ public abstract class DraftItem {
      */
     @JsonIgnore
     public List<TextDisplay> getTextDisplays(Game game, Player player, boolean showDescr) {
+        return getTextDisplays(game, player, showDescr, false);
+    }
+
+    @JsonIgnore
+    public List<TextDisplay> getTextDisplays(Game game, Player player, boolean showDescr, boolean useAlternateText) {
         List<TextDisplay> textFields = new ArrayList<>();
 
         String details = getTitle(game);
         if (showDescr || DraftCategory.showDescrByDefault()) {
-            String descr = getDisplayDescription(game, getLongDescriptionImpl(game));
+            String descr = getDisplayDescription(game, getLongDescriptionImpl(game), useAlternateText);
             descr = descr.trim().replace("\n> ", "\n").replace("\n", "\n> ");
             details += System.lineSeparator() + "> " + descr;
         }
@@ -245,7 +250,7 @@ public abstract class DraftItem {
 
     @JsonIgnore
     public String getLongDescription(Game game) {
-        StringBuilder sb = new StringBuilder(getDisplayDescription(game, getLongDescriptionImpl(game)));
+        StringBuilder sb = new StringBuilder(getDisplayDescription(game, getLongDescriptionImpl(game), false));
         if (hasAdditionalComponents()) {
             sb.append("\n>  - *Also adds: ");
             for (DraftErrataModel i : Errata.getAdditionalComponents()) {
@@ -276,8 +281,8 @@ public abstract class DraftItem {
                 .toList();
     }
 
-    private String getDisplayDescription(Game game, String defaultDescription) {
-        if (game == null || !game.isFrankenGame()) {
+    private String getDisplayDescription(Game game, String defaultDescription, boolean useAlternateText) {
+        if (!useAlternateText && (game == null || !game.isFrankenGame())) {
             return defaultDescription;
         }
         String alternateText = Errata.getAlternateText();

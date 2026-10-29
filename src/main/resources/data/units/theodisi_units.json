@@ -814,6 +814,7 @@
     "source": "theodisi",
     "faction": "stoneborn",
     "moveValue": 1,
+    "capacityValue": 3,
     "capacityUsed": 1,
     "cost": 8,
     "combatHitsOn": 9,
@@ -821,7 +822,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "This unit is also a planet of any trait. When you would exhaust this planet's planet card, damage this unit instead. Structures cannot be placed on or committed to this planet."
+    "ability": "This unit is also a planet of any trait. When you would exhaust this planet's planet card, damage this unit instead. Units cannot be placed on or committed to this planet. You cannot lose control of this planet while you control this unit."
   },
   {
     "id": "stoneborn_mechdormant",
