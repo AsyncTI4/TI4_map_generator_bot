@@ -96,7 +96,6 @@ import ti4.service.leader.agent.modules.homebrew.KolleccAgent;
 import ti4.service.leader.agent.modules.homebrew.PharadnAgent;
 import ti4.service.leader.agent.modules.homebrew.VadenAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ArcanumAgent;
-import ti4.service.leader.agent.modules.homebrew.theodisi.HazorusAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.HopeOfTheCosmosAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.OblivionAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantScrapyardAgent;
@@ -124,6 +123,8 @@ public class StartTurnService {
         }
         game.removeStoredValue("currentActionSummary" + player.getFaction());
         game.removeStoredValue("stonebornTempusUsedAction_" + player.getFaction());
+        StonebornUnitHandler.resetStalactiumTurnUse(game, player);
+        StonebornUnitHandler.resetGolemExplore(game, player);
 
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         Map<String, String> maps = new HashMap<>(game.getStoredValueMap());
@@ -575,17 +576,9 @@ public class StartTurnService {
         Button economicBoonButton = LostLegaciesRelicHandler.getEconomicBoonStartTurnButton(game, player);
         if (economicBoonButton != null) startButtons.add(economicBoonButton);
         if (!doneActionThisTurn) {
-            Button hazorusButton = HazorusAgent.startTurnButton(player);
-            if (hazorusButton != null) {
-                startButtons.add(hazorusButton);
-            }
             Button adaptiveButton = StonebornAbilityHandler.getAdaptiveStartTurnButton(game, player);
             if (adaptiveButton != null) {
                 startButtons.add(adaptiveButton);
-            }
-            Button stalactiumButton = StonebornUnitHandler.getStalactiumStartTurnButton(game, player);
-            if (stalactiumButton != null) {
-                startButtons.add(stalactiumButton);
             }
         }
         if (!doneActionThisTurn) startButtons.addAll(ThirtyKExploreHooks.getStartOfTurnButtons(player));

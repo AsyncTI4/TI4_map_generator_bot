@@ -721,8 +721,7 @@ public final class ButtonHelperSCs {
         ButtonHelperAbilities.pillageCheck(player, game);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationNoPing() + " gained 2 trade goods " + tradeGoodChange
-                        + " from the Trade secondary.");
+                player.getRepresentation() + " gained 2 trade goods " + tradeGoodChange + " from the Trade secondary.");
 
         int oldCommodities = tradeOwner.getCommodities();
         tradeOwner.gainCommodities(1);
@@ -730,7 +729,7 @@ public final class ButtonHelperSCs {
         ButtonHelperStats.afterGainCommsChecks(game, tradeOwner, commoditiesGained);
         MessageHelper.sendMessageToChannel(
                 tradeOwner.getCorrectChannel(),
-                tradeOwner.getRepresentationNoPing() + " gained " + commoditiesGained + " "
+                tradeOwner.getRepresentation() + " gained " + commoditiesGained + " "
                         + (commoditiesGained == 1 ? "commodity" : "commodities") + " due to "
                         + player.getRepresentationNoPing() + " following the Trade secondary.");
     }

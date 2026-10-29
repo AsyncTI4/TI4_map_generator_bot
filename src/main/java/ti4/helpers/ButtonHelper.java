@@ -70,6 +70,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardUnitHandler;
@@ -5122,6 +5123,10 @@ public class ButtonHelper {
 
         if (player.hasRelicReady("full_moonphase")) {
             endButtons.add(AeternaAbilityHandler.getFullMoonButton(player));
+        }
+        Button stalactiumButton = StonebornUnitHandler.getStalactiumEndTurnButton(game, player);
+        if (stalactiumButton != null) {
+            endButtons.add(stalactiumButton);
         }
         Button cosmicBoonButton = LostLegaciesRelicHandler.getCosmicBoonTokenButton(game, player);
         if (cosmicBoonButton != null) endButtons.add(cosmicBoonButton);
