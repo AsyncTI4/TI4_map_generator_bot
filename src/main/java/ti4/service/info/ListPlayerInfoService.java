@@ -181,6 +181,10 @@ public class ListPlayerInfoService {
         if (index >= planets.size()) {
             // Try using remaining trade goods for resources
             int additionalResources = additionalResources2;
+            if (player.hasTech("mc") && (remainingTradeGoods - additionalResources) % 2 == 1) {
+                remainingTradeGoods--; // mirror computing needs to allocate in chunks of 2, so this is basically
+                // assigning it to the resource
+            }
             int additionalInfluence = Math.clamp(goal - currentInfluence, 0, remainingTradeGoods - additionalResources);
 
             int newResources = currentResources + additionalResources;
