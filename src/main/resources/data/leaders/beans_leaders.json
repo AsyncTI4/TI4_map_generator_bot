@@ -236,5 +236,42 @@
     "abilityText": "Place this card near the game board. During this game round, your ships may move out of anomalies that contain your command tokens. At the end of this game round, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans"
+  },
+  {
+    "id": "valhavnagent",
+    "faction": "valhavn",
+    "type": "agent",
+    "name": "Thorberg Skafhógg",
+    "title": "Höfuthsmithur",
+    "abilityWindow": "At the end of a player's turn:",
+    "abilityText": "You may exhaust this card to allow that player to either place 1 PDS from their reinforcements onto a planet they control, or place 2 infantry from their reinforcements onto a planet that contains 1 or more of their PDS units. If that player was another player, gain 1 command token.",
+    "unlockCondition": "Always Unlocked",
+    "source": "beans",
+    "flavorText": "Hvert vígi hefst með einum steini, og hver steinn með einu hamarshöggi."
+  },
+  {
+    "id": "valhavncommander",
+    "faction": "valhavn",
+    "type": "commander",
+    "name": "Styrmir Ragnarsson",
+    "title": "Fylkir",
+    "abilityWindow": "After you take control of a planet that was controlled by another player:",
+    "abilityText": "Place 1 infantry from your reinforcements onto that planet.\n\nOther players cannot use their units SPACE CANNON ability against your infantry.",
+    "unlockCondition": "Have 3 infantry on each of 3 planets that contain your PDS units.",
+    "source": "beans",
+    "flavorText": "Fylking stendur sem einn maður, og enginn fellur einn."
+  },
+  {
+    "id": "valhavnhero",
+    "faction": "valhavn",
+    "type": "hero",
+    "name": "Brünnhilde Buthladóttir",
+    "title": "Skaldmær",
+    "abilityName": "Gjallarhorn - Hearth-Call",
+    "abilityWindow": "At the start of a ground combat you are participating in:",
+    "abilityText": "You may purge this card to move up to 3 ground forces from each system that contains 1 or more of your PDS units.",
+    "unlockCondition": "Have 3 scored objectives.",
+    "source": "beans",
+    "flavorText": "Ég yrki ekki um sigra. Ég kalla þá fram."
   }
 ]

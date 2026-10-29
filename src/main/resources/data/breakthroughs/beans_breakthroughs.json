@@ -82,5 +82,17 @@
         ],
         "text": "After another player activates an anomaly that contains your command token and 1 or more of your units, you may exhaust this card to remove your command token from that system. Then, you may remove 1 of your non-fighter ships from another system that contains an anomaly and place it in the active system.",
         "source": "beans"
+    },
+    {
+        "alias": "valhavnbt",
+        "name": "Yggdrasil Cannon",
+        "shortName": "Yggdrasil\nCannon",
+        "faction": "valhavn",
+        "synergy": [
+            "CYBERNETIC",
+            "PROPULSION"
+        ],
+        "text": "After 1 of your units produces at least 1 hit using their SPACE CANNON ability during movement in a system that contains your ships: You may cancel  1 of those hits to move 1 ship from that unit's system into the active system. ",
+        "source": "beans"
     }
 ]

@@ -131,5 +131,21 @@
         "faction": "natau",
         "permanentEffect": "Apply +1 to the result of each of your units' combat rolls in The Fracture or in a system that contains an ingress token.",
         "source": "beans"
+    },
+    {
+        "id": "valholls_call",
+        "name": "Valhöll's Call",
+        "faction": "valhavn",
+        "window": "After 1 or more of your infantry are destroyed during a round of ground combat",
+        "windowEffect": "You may place 1 infantry from your reinforcements on a planet you control that contains 1 of your PDS units.",
+        "source": "beans"
+    },
+    {
+        "id": "reave",
+        "name": "Reave",
+        "faction": "valhavn",
+        "window": "Once per turn, when you would gain control of a planet controlled by another player",
+        "windowEffect": "You may choose to not gain control instead. If you do, destroy all of your ground forces on that planet and gain trade goods equal to its resource value.",
+        "source": "beans"
     }
 ]

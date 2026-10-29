@@ -156,5 +156,28 @@
         "faction": "natau",
         "source": "beans",
         "text": "You may treat non-home systems that contain printed anomalies as adjacent to each other for the purposes of movement."
+    },
+    {
+        "alias": "bevalhavng",
+        "name": "Völundr Protocol",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "valhavn",
+        "source": "beans",
+        "text": "ACTION: Exhaust this card to ready a planet that contains one of your PDS units.\n\nAfter you win a ground combat, ready this card."
+    },
+    {
+        "alias": "bevalhavnpd",
+        "name": "Bilröst II",
+        "baseUpgrade": "pds2",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RY",
+        "faction": "valhavn",
+        "source": "beans",
+        "text": "You may use this unit’s SPACE CANNON against ships in adjacent systems.\n\nDuring the “Commit Ground Forces” step of an invasion in this or an adjacent system, you may commit up to 1 ground force from this unit’s planet or an adjacent planet."
     }
 ]
