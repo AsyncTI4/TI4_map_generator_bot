@@ -19,6 +19,7 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.TnelisUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisAbilityHandler;
@@ -1486,6 +1487,7 @@ public final class ButtonHelperAbilities {
                     int totalUnits = unitEntry.getValue() - damagedUnits;
                     if (totalUnits > 0 && unitModel.getSustainDamage()) {
                         tile.addUnitDamage(unitHolder.getName(), unitKey, totalUnits);
+                        StonebornUnitHandler.syncMobileMountainDamage(game, player, unitKey);
                     }
                 }
             }

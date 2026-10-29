@@ -616,9 +616,7 @@ public class CardsInfoService {
         buttons.add(Buttons.gray("offerPlayerPref", "Player Settings"));
         buttons.add(Buttons.gray("searchMyGames", "List My Games"));
         buttons.add(Buttons.green("showObjInfo_both", "Scoring Info"));
-        if (!game.isFowMode()) {
-            buttons.add(Buttons.gray("chooseMapView", "Map Features"));
-        }
+        buttons.add(Buttons.gray("chooseMapView", "Map Features"));
         boolean hadAnyUnplayedSCs = false;
         for (Integer SC : player.getSCs()) {
             if (!game.getPlayedSCs().contains(SC)) {

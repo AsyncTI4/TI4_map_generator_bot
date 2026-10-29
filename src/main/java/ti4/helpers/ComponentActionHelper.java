@@ -704,6 +704,8 @@ public class ComponentActionHelper {
                             "taagent",
                             "vanguardagent",
                             "sarcosaagent",
+                            "stonebornagentdormant",
+                            "stonebornagentunleashed",
                             "ironagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);

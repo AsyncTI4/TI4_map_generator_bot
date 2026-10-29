@@ -70,6 +70,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardUnitHandler;
@@ -136,6 +137,7 @@ import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
+import ti4.service.ShowGameService;
 import ti4.service.VeiledHeartService;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -5123,6 +5125,10 @@ public class ButtonHelper {
         if (player.hasRelicReady("full_moonphase")) {
             endButtons.add(AeternaAbilityHandler.getFullMoonButton(player));
         }
+        Button stalactiumButton = StonebornUnitHandler.getStalactiumEndTurnButton(game, player);
+        if (stalactiumButton != null) {
+            endButtons.add(stalactiumButton);
+        }
         Button cosmicBoonButton = LostLegaciesRelicHandler.getCosmicBoonTokenButton(game, player);
         if (cosmicBoonButton != null) endButtons.add(cosmicBoonButton);
         Button celyonButton = TheodisiLegendaryButtonHandler.getCelyonEndTurnButton(player);
@@ -8431,6 +8437,10 @@ public class ButtonHelper {
     }
 
     public static void showFeatureType(GenericInteractionCreateEvent event, Game game, DisplayType feature) {
+        if (game.isFowMode()) {
+            ShowGameService.showFeature(game, event, feature);
+            return;
+        }
         MapRenderPipeline.queue(
                 game,
                 event,

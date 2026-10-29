@@ -303,7 +303,7 @@ public class FrankenDrazDraft extends FrankenDraft {
         builder.append("## " + item.getTitle(player.getGame()) + " Components");
         for (DraftItem component : components) {
             List<ContainerChildComponent> cardComponents =
-                    new ArrayList<>(component.getTextDisplays(player.getGame(), player, true));
+                    new ArrayList<>(component.getTextDisplays(player.getGame(), player, true, true));
             builder.append(Container.of(cardComponents).withAccentColor(accents.getFirst()));
             Collections.rotate(accents, -1);
         }
@@ -324,7 +324,8 @@ public class FrankenDrazDraft extends FrankenDraft {
         MessageV2Builder builder = new MessageV2Builder(event.getMessageChannel());
         builder.append("## " + item.getTitle(null) + " Components");
         for (DraftItem component : components) {
-            List<ContainerChildComponent> cardComponents = new ArrayList<>(component.getTextDisplays(null, null, true));
+            List<ContainerChildComponent> cardComponents =
+                    new ArrayList<>(component.getTextDisplays(null, null, true, true));
             builder.append(Container.of(cardComponents).withAccentColor(accents.getFirst()));
             Collections.rotate(accents, -1);
         }

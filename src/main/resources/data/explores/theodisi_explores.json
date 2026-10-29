@@ -219,7 +219,7 @@
         "name": "Stoneborn Cultural Relic Fragment",
         "type": "Cultural",
         "resolution": "Fragment",
-        "text": "This card is always considered a Cultural Relic Fragment. This card may be exchanged as part of a transaction. When this card is purged, return it to the Fragmentum relic fragment deck.",
+        "text": "This card is always considered a Cultural Relic Fragment. This card may be exchanged as part of a transaction.",
         "source": "theodisi"
     },
     {
@@ -227,7 +227,7 @@
         "name": "Stoneborn Hazardous Relic Fragment",
         "type": "Hazardous",
         "resolution": "Fragment",
-        "text": "This card is always considered a Hazardous Relic Fragment. This card may be exchanged as part of a transaction. When this card is purged, return it to the Fragmentum relic fragment deck.",
+        "text": "This card is always considered a Hazardous Relic Fragment. This card may be exchanged as part of a transaction.",
         "source": "theodisi"
     },
     {
@@ -235,7 +235,7 @@
         "name": "Stoneborn Industrial Relic Fragment",
         "type": "Industrial",
         "resolution": "Fragment",
-        "text": "This card is always considered an Industrial Relic Fragment. This card may be exchanged as part of a transaction. When this card is purged, return it to the Fragmentum relic fragment deck.",
+        "text": "This card is always considered an Industrial Relic Fragment. This card may be exchanged as part of a transaction.",
         "source": "theodisi"
     },
     {
@@ -243,7 +243,7 @@
         "name": "Stoneborn Unknown Relic Fragment",
         "type": "Frontier",
         "resolution": "Fragment",
-        "text": "This card may be considered a Relic Fragment of any type. This card may be exchanged as part of a transaction. When this card is purged, return it to the Fragmentum relic fragment deck.",
+        "text": "This card may be considered a Relic Fragment of any type. This card may be exchanged as part of a transaction.",
         "source": "theodisi"
     },
     {
@@ -251,7 +251,7 @@
         "name": "Stoneborn Cultural Relic Fragment",
         "type": "Cultural",
         "resolution": "Fragment",
-        "text": "This card is always considered a Cultural Relic Fragment. This card may be exchanged as part of a transaction. When this card is purged, return it to the Fragmentum relic fragment deck.",
+        "text": "This card is always considered a Cultural Relic Fragment. This card may be exchanged as part of a transaction.",
         "source": "theodisi"
     },
     {
@@ -259,7 +259,7 @@
         "name": "Stoneborn Hazardous Relic Fragment",
         "type": "Hazardous",
         "resolution": "Fragment",
-        "text": "This card is always considered a Hazardous Relic Fragment. This card may be exchanged as part of a transaction. When this card is purged, return it to the Fragmentum relic fragment deck.",
+        "text": "This card is always considered a Hazardous Relic Fragment. This card may be exchanged as part of a transaction.",
         "source": "theodisi"
     },
     {
@@ -267,7 +267,7 @@
         "name": "Stoneborn Industrial Relic Fragment",
         "type": "Industrial",
         "resolution": "Fragment",
-        "text": "This card is always considered an Industrial Relic Fragment. This card may be exchanged as part of a transaction. When this card is purged, return it to the Fragmentum relic fragment deck.",
+        "text": "This card is always considered an Industrial Relic Fragment. This card may be exchanged as part of a transaction.",
         "source": "theodisi"
     },
     {
@@ -275,7 +275,7 @@
         "name": "Stoneborn Unknown Relic Fragment",
         "type": "Frontier",
         "resolution": "Fragment",
-        "text": "This card may be considered a Relic Fragment of any type. This card may be exchanged as part of a transaction. When this card is purged, return it to the Fragmentum relic fragment deck.",
+        "text": "This card may be considered a Relic Fragment of any type. This card may be exchanged as part of a transaction.",
         "source": "theodisi"
     }
 ]

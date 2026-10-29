@@ -27,6 +27,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Tn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
@@ -266,6 +267,7 @@ public final class ButtonHelperModifyUnits {
                             .append(" sustained\n");
                     hits -= min;
                     tile.addUnitDamage("space", unitKey, min);
+                    StonebornUnitHandler.syncMobileMountainDamage(game, player, unitKey);
                     CommanderUnlockCheckService.checkPlayer(player, "ponthous");
                 }
             }
@@ -513,6 +515,7 @@ public final class ButtonHelperModifyUnits {
                 if (!usedDuraniumAlready && damagedUnits > 0 && duraniumMsg.contains(unitName)) {
                     msg.append("> Repaired 1 ").append(unitModel.getUnitEmoji()).append(" due to _Duranium Armor_\n");
                     tile.removeUnitDamage(unitHolder.getName(), unitKey, 1);
+                    StonebornUnitHandler.syncMobileMountainDamage(game, player, unitKey);
                     usedDuraniumAlready = true;
                 }
             }
@@ -733,6 +736,7 @@ public final class ButtonHelperModifyUnits {
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                         tile.addUnitDamage("space", unitKey, min);
+                        StonebornUnitHandler.syncMobileMountainDamage(game, player, unitKey);
                         CommanderUnlockCheckService.checkPlayer(player, "ponthous");
                         sustainedShip = true;
                         if ("vanguard_flagship".equals(unitModel.getId())) {
@@ -817,6 +821,7 @@ public final class ButtonHelperModifyUnits {
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                         tile.addUnitDamage("space", unitKey, min);
+                        StonebornUnitHandler.syncMobileMountainDamage(game, player, unitKey);
                         CommanderUnlockCheckService.checkPlayer(player, "ponthous");
                         if (unitModel.getIsShip()) {
                             sustainedShip = true;
@@ -978,6 +983,7 @@ public final class ButtonHelperModifyUnits {
 
                     if (!justSummarizing) {
                         tile.addUnitDamage("space", unitKey, min);
+                        StonebornUnitHandler.syncMobileMountainDamage(game, player, unitKey);
                         CommanderUnlockCheckService.checkPlayer(player, "ponthous");
                         sustainedShip = true;
                         if ("vanguard_flagship".equals(unitModel.getId())) {
@@ -1102,6 +1108,7 @@ public final class ButtonHelperModifyUnits {
                                 .append(unitModel.getUnitEmoji())
                                 .append(" due to _Duranium Armor_\n");
                         tile.removeUnitDamage("space", unitKey, 1);
+                        StonebornUnitHandler.syncMobileMountainDamage(game, player, unitKey);
                     } else {
                         msg.append("> Would repair 1 ")
                                 .append(unitModel.getUnitEmoji())

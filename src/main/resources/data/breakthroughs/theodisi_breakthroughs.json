@@ -200,7 +200,7 @@
       "PROPULSION",
       "BIOTIC"
     ],
-    "text": "ACTION: Purge 1 relic fragment in your play area and explore up to 1 planet of the same trait as that purged relic fragment. Then, you may gain 1 purged relic fragment of any other color.\n\n**UNLEASH**: Remove 2 fragmentum tokens of the same color from your player sheet.",
+    "text": "**UNLEASH**: Remove 2 fragmentum tokens of the same color from your faction sheet.\n\nACTION: Purge 1 relic fragment in your play area. Then, you may gain 1 purged relic fragment of any other color.",
     "source": "theodisi"
   },
   {
@@ -211,7 +211,7 @@
     "synergy": [
       "NONE"
     ],
-    "text": "ACTION: Purge 1 relic fragment in your play area and explore up to 1 planet of the same trait as that purged relic fragment. Then, you may gain 2 purged relic fragments of any other color.",
+    "text": "ACTION: Purge 1 relic fragment in your play area. Then, you may gain 2 purged relic fragments of any other color.",
     "notes": "This breakthrough has synergy with all technology types. Bot can't show 4 synergies on the model.",
     "source": "theodisi"
   },

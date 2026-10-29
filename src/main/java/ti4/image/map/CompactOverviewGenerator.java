@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.annotation.Nullable;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
@@ -34,11 +33,11 @@ import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
 import ti4.logging.BotLogger;
 import ti4.service.fow.FogMemoryService;
+import ti4.service.fow.FogViewer;
 
 public final class CompactOverviewGenerator {
 
-    static final int GM_MAX_SIZE = 4000;
-    static final int PLAYER_MAX_SIZE = 2000;
+    static final int MAX_SIZE = 4000;
     static final int GAP = 120;
     static final int TITLE_BAND = 90;
     static final int HEADER = 70;
@@ -95,36 +94,80 @@ public final class CompactOverviewGenerator {
 
     private CompactOverviewGenerator() {}
 
-    public static FileUpload gmOverview(Game game) {
-        return ImageUploads.createFileUpload(gmImage(game), game.getName() + "_overview", "webp");
+    public static boolean drawsOverlay(DisplayType displayType) {
+        return BoardSection.displayTypeStep(displayType) != null;
     }
 
-    public static FileUpload playerOverview(Game game, Player player, @Nullable GenericInteractionCreateEvent event) {
-        return ImageUploads.createFileUpload(playerImage(game, player, event), game.getName() + "_my_overview", "webp");
+    public static FileUpload gmOverview(Game game) {
+        return gmOverview(game, null);
+    }
+
+    public static FileUpload gmOverview(Game game, @Nullable DisplayType overlay) {
+        return ImageUploads.createFileUpload(gmImage(game, overlay), game.getName() + "_overview", "webp");
+    }
+
+    public static FileUpload playerOverview(Game game, Player player) {
+        return playerOverview(game, player, null);
+    }
+
+    public static FileUpload playerOverview(Game game, Player player, @Nullable DisplayType overlay) {
+        return ImageUploads.createFileUpload(
+                playerImage(game, player, overlay), game.getName() + "_my_overview", "webp");
     }
 
     public static BufferedImage gmImage(Game game) {
+        return gmImage(game, null);
+    }
+
+    public static BufferedImage gmImage(Game game, @Nullable DisplayType overlay) {
         return render(
                 game,
                 gmPanels(game),
                 new HashMap<>(game.getTileMap()),
-                TileLayers.of(game, null, DisplayType.map),
-                GM_STEPS,
-                GM_MAX_SIZE,
-                game.getName() + " - GM overview");
+                TileLayers.of(game, null, displayTypeFor(overlay)),
+                withOverlay(GM_STEPS, overlay),
+                MAX_SIZE,
+                header(game, "GM overview", overlay));
     }
 
-    public static BufferedImage playerImage(Game game, Player player, @Nullable GenericInteractionCreateEvent event) {
+    public static BufferedImage playerImage(Game game, Player player) {
+        return playerImage(game, player, null);
+    }
+
+    public static BufferedImage playerImage(Game game, Player player, @Nullable DisplayType overlay) {
         FogMemoryService.refreshForPlayerOverview(game, player);
         Map<String, Tile> tiles = knownTiles(game, player);
+        FogViewer viewer = new FogViewer(game, true, player);
         return render(
                 game,
                 playerPanels(game, player, tiles.keySet()),
                 tiles,
-                TileLayers.of(game, event, DisplayType.map, player),
-                PLAYER_STEPS,
-                PLAYER_MAX_SIZE,
-                game.getName() + " - " + player.getFaction() + " overview");
+                TileLayers.forPreparedViewer(game, viewer, displayTypeFor(overlay)),
+                withOverlay(PLAYER_STEPS, overlay),
+                MAX_SIZE,
+                header(game, player.getFaction() + " overview", overlay));
+    }
+
+    private static DisplayType displayTypeFor(@Nullable DisplayType overlay) {
+        return overlay == null ? DisplayType.map : overlay;
+    }
+
+    private static List<TileStep> withOverlay(List<TileStep> steps, @Nullable DisplayType overlay) {
+        TileStep overlayStep = overlay == null ? null : BoardSection.displayTypeStep(overlay);
+        if (overlayStep == null) {
+            return steps;
+        }
+        List<TileStep> withOverlay = new ArrayList<>(steps);
+        withOverlay.add(withOverlay.indexOf(TileStep.TileNumber), overlayStep);
+        return withOverlay;
+    }
+
+    private static String header(Game game, String view, @Nullable DisplayType overlay) {
+        String header = game.getName() + " - " + view;
+        if (overlay == null) {
+            return header;
+        }
+        return header + " - " + StringUtils.capitalize(overlay.getValue().replace('_', ' '));
     }
 
     static List<Panel> gmPanels(Game game) {
