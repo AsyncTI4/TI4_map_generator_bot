@@ -57,6 +57,7 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
+import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.logging.BotLogger;
@@ -215,6 +216,7 @@ public class PlayerTechService {
                 event,
                 player.getRepresentation(false, false) + " purged technology: "
                         + Mapper.getTech(techID).getRepresentation(false) + ".");
+        DSHelperBreakthroughs.doLanefirBtCheck(player.getGame(), player);
     }
 
     public static void unpurgeTech(GenericInteractionCreateEvent event, Player player, String techID) {
