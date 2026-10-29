@@ -76,19 +76,20 @@
         ],
         "requirements": "YY",
         "faction": "iron",
+        "baseUpgrade": "sd2",
         "source": "beans",
-        "text": "DEPLOY: At the end of a tactical action, you may remove 1 of your mechs from the active system to place 1 space dock from your reinforcements on a planet you control in the active system. Up to 8 fighters in that system do not count against your ships' capacity. PRODUCTION 7."
+        "text": "DEPLOY: At the end of a tactical action, you may remove 2 of your mechs from the active system to place 1 space dock from your reinforcements on a planet you control in the active system. Up to 8 fighters in that system do not count against your ships' capacity. PRODUCTION 7."
     },
     {
         "alias": "beironmf",
         "name": "Modular Fleet",
         "types": [
-            "WARFARE"
+            "CYBERNETIC"
         ],
         "requirements": "Y",
         "faction": "iron",
         "source": "beans",
-        "text": "ACTION: Choose 1 of your non-fighter ships in a system that contains 1 or more of your units with PRODUCTION. You may spend resources equal to the difference between that ship's cost and the cost of another non-fighter ship in your reinforcements with a higher cost to replace the chosen ship with that ship."
+        "text": "At the start of your turn, you may choose 1 of your non-fighter ships in a system that contains 1 or more of your units with PRODUCTION. Spend resources equal to the difference between that ship’s cost and the cost of another non-fighter ship in your reinforcements with a higher cost than the chosen ship to replace the chosen ship with that ship."
     },
     {
         "alias": "betaqr",
@@ -138,22 +139,22 @@
         "alias": "benataudm",
         "name": "Divine Manifestation",
         "types": [
-            "BIOTIC"
+            "CYBERNETIC"
         ],
         "requirements": "YY",
         "faction": "natau",
         "source": "beans",
-        "text": "Each anomaly that contains 1 or more of your units gains PRODUCTION 1 as if it were a unit you control."
+        "text": "Each system that contains 1 or more of your units and an anomaly gains PRODUCTION 2 as if it were a unit you control."
     },
     {
         "alias": "benatauct",
         "name": "Chaos Turbines",
         "types": [
-            "WARFARE"
+            "PROPULSION"
         ],
         "requirements": "BB",
         "faction": "natau",
         "source": "beans",
-        "text": "You may treat non-home anomalies as adjacent to each other for the purposes of movement."
+        "text": "You may treat non-home systems that contain printed anomalies as adjacent to each other for the purposes of movement."
     }
 ]

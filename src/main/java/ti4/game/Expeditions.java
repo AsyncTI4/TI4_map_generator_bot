@@ -175,7 +175,7 @@ public class Expeditions {
             String msg = getExpeditionMessage(exp.getKey());
             buttons.add(Buttons.green(id, msg, getExpeditionEmoji(exp.getKey(), player.getGame())));
         }
-        buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+        buttons.add(Buttons.DELETE_BUTTONS);
         return buttons;
     }
 
@@ -213,7 +213,7 @@ public class Expeditions {
             case "techSkip" -> {
                 success = true;
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "skips");
-                buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
+                buttons.add(Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(), String.format(whichExp, "technology specialty"));
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -241,7 +241,7 @@ public class Expeditions {
             case "fiveRes" -> {
                 success = true;
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-                buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
+                buttons.add(Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT);
                 MessageHelper.sendMessageToChannel(channel, String.format(whichExp, "5 resources"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel, "Use these buttons to spend 5 resources.", buttons);
@@ -249,7 +249,7 @@ public class Expeditions {
             case "fiveInf" -> {
                 success = true;
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-                buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
+                buttons.add(Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT);
                 MessageHelper.sendMessageToChannel(channel, String.format(whichExp, "5 influence"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel, "Use these buttons to spend 5 influence.", buttons);

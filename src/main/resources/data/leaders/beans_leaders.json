@@ -108,7 +108,7 @@
     "name": "Shipwright Kastel",
     "title": "Master of Supply",
     "abilityWindow": "ACTION:",
-    "abilityText": "Choose a player and exhaust this card to allow that player to resolve PRODUCTION with 1 of their units in a system that contains one of their units with PRODUCTION. Reduce the combined cost of the produced units by 1.",
+    "abilityText": "Choose a player and exhaust this card. You may allow that player to produce 1 unit in a system that contains one of their units with PRODUCTION, reducing the cost of the produced unit by 1.",
     "unlockCondition": "Always Unlocked",
     "source": "beans"
   },
@@ -120,7 +120,7 @@
     "title": "Master of Logistics",
     "abilityWindow": "Ongoing",
     "abilityText": "Your mechs do not count against capacity when being transported or when in a space area that contains 1 or more of your ships with capacity. While your mechs are in the space area of a system they have PRODUCTION 1.",
-    "unlockCondition": "Have all of your mechs on the game board.",
+    "unlockCondition": "Have a salvage card in your play area.",
     "source": "beans"
   },
   {
@@ -129,7 +129,7 @@
     "type": "hero",
     "name": "Admiral Thalen",
     "title": "Master of Iron",
-    "abilityName": "Apex Frame - Mecha Prime",
+    "abilityName": "Hyper Forge - Mecha Prime",
     "abilityWindow": "ACTION:",
     "abilityText": "Ready each planet that contains 1 of your units with PRODUCTION. Then, resolve PRODUCTION in one of those systems. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
@@ -220,8 +220,8 @@
     "type": "commander",
     "name": "Kaethos",
     "title": "The Unyielding",
-    "abilityWindow": "You may treat anomalies as if they contained an ingress token.",
-    "abilityText": "Ongoing",
+    "abilityWindow": "Ongoing",
+    "abilityText": "You may treat anomalies as if they contained an ingress token.",
     "unlockCondition": "Take control of a planet in The Fracture.",
     "source": "beans"
   },

@@ -46,12 +46,14 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.AncientMap
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.ExtensionRefitLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShieldingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.HydromorphicCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousTechHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
@@ -115,6 +117,8 @@ import ti4.service.draft.DraftTileManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.game.MonumentsService;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -126,6 +130,7 @@ import tools.jackson.databind.json.JsonMapper;
 public class Game extends GameProperties implements StoredValueHelper, TwilightFallDeckFuncs {
     private static final JsonMapper mapper = JsonMapperManager.basic();
     private static final String RECORDED_WINNER_KEY = "recordedWinner";
+    private static final String STYX_PLANET = "styx";
 
     // TODO (Jazz): Sort through these and add to GameProperties
     @Getter
@@ -1135,6 +1140,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 && !isRapidMobilizationMode()
                 && !isMonumentToTheAgesMode()
                 && !isWeirdWormholesMode()
+                && !isCallOfTheVoidMode()
                 && !isCosmicPhenomenaeMode()
                 && !isWildWildGalaxyMode()
                 && !isZealousOrthodoxyMode()
@@ -1579,6 +1585,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         MirrorShieldingLLButtonHandler.clearMirrorShielding(this);
         RaisedMoraleLLButtonHandler.clearRaisedMorale(this);
         HydromorphicCardHandler.clearCombatEffects(this);
+        IronPromissoryHandler.returnRetrofitting(this);
         PonthousPromissoryHandler.clearThunderbirdPrototype(this);
         PonthousTechHandler.clearThunderbirdProtocol(this);
         KryxosBreakthroughHandler.clearPrototypeInnovators(this);
@@ -3378,6 +3385,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!acID.isEmpty()) {
             player.removeActionCard(acIDNumber);
+            KnownCardsService.recordCardLeftHandPublicly(
+                    this, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
             ACStatus status = shouldPutCardOnRalnel(player) ? ACStatus.ralnelbt : null;
             setDiscardActionCard(acID, status, played);
             if (!played) {
@@ -3420,7 +3429,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
         if (!acID.isEmpty()) {
+            boolean wasInHand = actionCards.containsKey(acID);
             player.removeActionCard(acIDNumber);
+            if (wasInHand) {
+                KnownCardsService.recordCardLeftHandPublicly(
+                        this, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
+            }
             setPurgedActionCard(acID, played);
             return true;
         }
@@ -3531,6 +3545,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!soID.isEmpty()) {
             player.removeSecret(soIDNumber);
+            KnownCardsService.recordCardLeftHandPublicly(
+                    this, player, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
             player.setSecretScored(soID);
             return true;
         }
@@ -3553,6 +3569,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (!soID.isEmpty()) {
             player.removeSecretScored(soIDNumber);
             player.setSecret(soID);
+            KnownCardsService.recordCardShownToAll(
+                    this, player, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
             return true;
         }
         return false;
@@ -4510,6 +4528,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public boolean playerHasLeaderUnlockedOrAlliance(Player player, String leaderID) {
         if (player.hasLeaderUnlocked(leaderID)) return true;
         if (!leaderID.contains("commander")) return false;
+        if (IxthLegendaryButtonHandler.hasKwonCommander(this, player, leaderID)) return true;
 
         if (leaderIsFake(leaderID) && !"gateteen".equalsIgnoreCase(getName())) {
             if (!player.getAllianceMembers().isEmpty()) {
@@ -5211,6 +5230,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isTkNovaCup()
                 || isTfBr()
                 || isTwilightDS()
+                || isProphecyOfKingsGameWithStyx()
                 || isMuaatManiaMode()
                 || isCosmicConvergenceMode()
                 || isLiberationC4Mode()
@@ -5222,6 +5242,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || getSpinMode() != null && !"OFF".equalsIgnoreCase(getSpinMode())
                 || isHomebrewSCMode()
                 || isCommunityMode()
+                || isMonumentsMode()
+                || isOmegaPhaseMode()
+                || isOplusplusRegularMode()
+                || isOplusplusCouncilMode()
+                || isCptiExploreMode()
                 || !checkAllDecksAreOfficial()
                 || !checkAllTilesAreOfficial()
                 || getRealAndEliminatedPlayers().size() < 3
@@ -5236,6 +5261,18 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                         .map(Mapper::getLeader)
                         .filter(Objects::nonNull)
                         .anyMatch(leader -> !leader.getSource().isOfficial());
+    }
+
+    private boolean isProphecyOfKingsGameWithStyx() {
+        return isProphecyOfKings() && !isThundersEdge() && includesStyx();
+    }
+
+    private boolean includesStyx() {
+        return getTileMap().values().stream()
+                        .flatMap(tile -> tile.getPlanetUnitHolders().stream())
+                        .anyMatch(planet -> STYX_PLANET.equals(planet.getName()))
+                || getRealAndEliminatedPlayers().stream()
+                        .anyMatch(player -> player.getPlanets().contains(STYX_PLANET));
     }
 
     private boolean checkAllDecksAreOfficial() {

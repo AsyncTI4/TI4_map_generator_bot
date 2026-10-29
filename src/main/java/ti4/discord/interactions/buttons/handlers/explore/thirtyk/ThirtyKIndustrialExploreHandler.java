@@ -192,7 +192,7 @@ public class ThirtyKIndustrialExploreHandler {
             GenericInteractionCreateEvent event, Game game, Player player, String resOrInf, String message) {
         player.resetSpentThings();
         List<Button> buttons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, player, resOrInf));
-        buttons.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
+        buttons.add(Buttons.DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS);
         MessageHelper.sendMessageToEventChannelWithButtons(event, message, buttons);
     }
 }

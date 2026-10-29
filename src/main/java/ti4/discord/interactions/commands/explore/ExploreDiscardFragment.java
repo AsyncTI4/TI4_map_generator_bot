@@ -28,7 +28,7 @@ class ExploreDiscardFragment extends GameStateSubcommand {
                 .setAutoComplete(true)
                 .setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to discard (default 1)")
-                .setMinValue(1));
+                .setRequiredRange(1, 20));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color (default you)")
                 .setAutoComplete(true));
     }

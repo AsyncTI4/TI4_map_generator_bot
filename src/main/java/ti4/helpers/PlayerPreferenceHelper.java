@@ -176,7 +176,7 @@ public final class PlayerPreferenceHelper {
         buttons.add(Buttons.gray("setAutoPassMedian_" + x, "" + x));
         x = 36;
         buttons.add(Buttons.gray("setAutoPassMedian_" + x, "" + x));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         x = 0;
         buttons.add(Buttons.red("setAutoPassMedian_" + x, "Turn off (if already on)"));
         if (player2 == null) {
@@ -238,7 +238,7 @@ public final class PlayerPreferenceHelper {
         for (int x = 0; x < 24; x++) {
             buttons.add(Buttons.gray("setHourAsAFK_" + x, "" + x));
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         return buttons;
     }
 
@@ -284,7 +284,7 @@ public final class PlayerPreferenceHelper {
                 buttons.add(Buttons.green("riskDirectHit_" + unit + "_no", "Don't Risk " + capitalize(unit)));
             }
         }
-        buttons.add(Buttons.gray("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         return buttons;
     }
 

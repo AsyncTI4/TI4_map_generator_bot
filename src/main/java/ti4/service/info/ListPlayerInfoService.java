@@ -156,6 +156,9 @@ public class ListPlayerInfoService {
             return new ObjectiveResult(true, goal * 2);
         }
         int additionalResources2 = Math.clamp(goal - currentResources, 0, remainingTradeGoods);
+        if (player.hasTech("mc") && additionalResources2 > 0 && (remainingTradeGoods - additionalResources2) % 2 == 1) {
+            remainingTradeGoods--;
+        }
         int additionalInfluence2 = Math.clamp(goal - currentInfluence, 0, remainingTradeGoods - additionalResources2);
 
         int newResources2 = currentResources + additionalResources2;
@@ -181,6 +184,7 @@ public class ListPlayerInfoService {
         if (index >= planets.size()) {
             // Try using remaining trade goods for resources
             int additionalResources = additionalResources2;
+
             int additionalInfluence = Math.clamp(goal - currentInfluence, 0, remainingTradeGoods - additionalResources);
 
             int newResources = currentResources + additionalResources;

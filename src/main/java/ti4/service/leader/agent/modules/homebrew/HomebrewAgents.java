@@ -1,0 +1,133 @@
+package ti4.service.leader.agent.modules.homebrew;
+
+import java.util.List;
+import java.util.stream.Stream;
+import ti4.service.leader.agent.AgentCatalog;
+import ti4.service.leader.agent.AgentModule;
+import ti4.service.leader.agent.modules.homebrew.beans.AshenAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.CrystellumAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.NetrunnersAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.BelkoseaAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.EdynBrAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.KaltrimAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
+import ti4.service.leader.agent.modules.homebrew.bluereverie.XinAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.ArcanumAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.GolgiAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.HazorusAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.HopeOfTheCosmosAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.KairnAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.OblivionAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.PonthousAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantArcanumAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantArdentiaAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantScrapyardAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantStratumAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantVerydithAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.ScrapyardAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.ThronesAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.VerydithAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
+import ti4.service.leader.agent.modules.homebrew.wftv.ArvaxiAgent;
+
+public final class HomebrewAgents implements AgentCatalog {
+
+    public static final HomebrewAgents CATALOG = new HomebrewAgents();
+
+    private static final List<AgentModule<?>> MODULES = Stream.of(
+                    List.<AgentModule<?>>of(
+                            new AugersAgent(),
+                            new BentorAgent(),
+                            new CymiaeAgent(),
+                            new GledgeAgent(),
+                            new KhraskAgent(),
+                            new KortaliAgent(),
+                            new KyroAgent(),
+                            new MirvedaAgent(),
+                            new NokarAgent(),
+                            new VadenAgent(),
+                            new VaylerianAgent(),
+                            new VeldyrAgent(),
+                            new KaloraAgent(),
+                            new LunariumAgent(),
+                            new ZelianAgent(),
+                            new TnelisAgent(),
+                            new UydaiAgent(),
+                            new RohDhnaAgent(),
+                            new LiZhoAgent(),
+                            new TyrisAgent(),
+                            new ZephyrionAgent(),
+                            new MykoMentoriAgent(),
+                            new GhotiAgent(),
+                            new KolumeAgent(),
+                            new AxisAgent(),
+                            new MortheusAgent(),
+                            new OnyxxaAgent(),
+                            new IronAgent(),
+                            new ArdentiaAgent(),
+                            new KryxosAgent(),
+                            new AeternaAgent(),
+                            new VeylorAgent(),
+                            new TaAgent(),
+                            new VanguardAgent(),
+                            new SarcosaAgent(),
+                            new KolleccAgent(),
+                            new PharadnAgent(),
+                            new OlradinAgent(),
+                            new KjalengardAgent(),
+                            new DihmohnAgent(),
+                            new CheiranAgent(),
+                            new FreeSystemsAgent(),
+                            new FlorzenAgent(),
+                            new CeldauriAgent(),
+                            new ZealotsAgent(),
+                            new FogAllianceAgent(),
+                            new XinAgent(),
+                            new KaltrimAgent(),
+                            new NatauAgent(),
+                            new DreamAgent(),
+                            new ArvaxiAgent(),
+                            new ToldarAgent(),
+                            new QhetAgent(),
+                            new BelkoseaAgent(),
+                            new AtokeraAgent(),
+                            new EdynBrAgent(),
+                            new CrystellumAgent(),
+                            new ThronesAgent(),
+                            new PonthousAgent(),
+                            new ScrapyardAgent(),
+                            new HazorusAgent(),
+                            new GolgiAgent(),
+                            new HopeOfTheCosmosAgent(),
+                            new AshenAgent(),
+                            new NetrunnersAgent(),
+                            new EdynAgent(),
+                            new LanefirAgent(),
+                            new VerydithAgent(),
+                            new MyrrAgent(),
+                            new KairnAgent(),
+                            new ArcanumAgent(),
+                            new XytherisAgent(),
+                            new OblivionAgent(),
+                            new RevenantAgent(),
+                            new RevenantVerydithAgent(),
+                            new RevenantStratumAgent(),
+                            new RevenantArdentiaAgent(),
+                            new RevenantScrapyardAgent(),
+                            new RevenantArcanumAgent()),
+                    HomebrewExhaustOnlyAgents.ALL)
+            .<AgentModule<?>>flatMap(List::stream)
+            .toList();
+
+    private HomebrewAgents() {}
+
+    @Override
+    public List<AgentModule<?>> modules() {
+        return MODULES;
+    }
+}

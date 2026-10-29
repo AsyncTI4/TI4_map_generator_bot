@@ -72,7 +72,9 @@ public class TestBedStateResolver {
             "breakthroughs",
             "exhaustedTechs",
             "purgedTechs",
-            "exhaustedRelics");
+            "exhaustedRelics",
+            "commodityValue",
+            "exhaustedPlanetAbilities");
 
     @Nullable
     public static String validatePath(String path) {
@@ -162,6 +164,8 @@ public class TestBedStateResolver {
             case "relics" -> joinSorted(seat.getRelics());
             case "planets" -> joinSorted(seat.getPlanets());
             case "exhaustedPlanets" -> joinSorted(seat.getExhaustedPlanets());
+            case "commodityValue" -> String.valueOf(seat.getCommoditiesTotal());
+            case "exhaustedPlanetAbilities" -> joinSorted(seat.getExhaustedPlanetsAbilities());
             case "techs" -> joinSorted(seat.getTechs());
             case "passed" -> String.valueOf(seat.isPassed());
             case "followed" ->

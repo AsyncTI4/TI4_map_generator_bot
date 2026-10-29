@@ -21,6 +21,8 @@ import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.info.SecretObjectiveInfoService;
 
 @UtilityClass
@@ -225,6 +227,8 @@ class ConcordAcd2ButtonHandler {
 
         giver.removeActionCard(identifier);
         receiver.setActionCard(actionCardId);
+        KnownCardsService.recordCardPassed(
+                giver, receiver, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(actionCardId));
         ActionCardHelper.sendActionCardInfo(game, giver);
         ActionCardHelper.sendActionCardInfo(game, receiver);
         ButtonHelper.checkACLimit(game, receiver);
@@ -244,6 +248,8 @@ class ConcordAcd2ButtonHandler {
 
         giver.removeSecret(identifier);
         receiver.setSecret(secretId);
+        KnownCardsService.recordCardPassed(
+                giver, receiver, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(secretId));
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, giver);
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, receiver);
         Game.checkSOLimit(receiver);

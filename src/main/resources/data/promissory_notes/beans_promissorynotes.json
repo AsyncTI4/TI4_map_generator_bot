@@ -28,12 +28,13 @@
     },
     {
         "alias": "bepniron",
-        "name": "Ejection",
+        "name": "Retrofitting",
         "faction": "iron",
         "color": "",
-        "playArea": false,
+        "playArea": true,
+        "playImmediately": false,
         "source": "beans",
-        "text": "During a combat against a player other than the Iron Tide player: When one of your mechs is destroyed, you may place 1 infantry from your reinforcements on that planet. If you do, return this card to the Iron Tide player."
+        "text": "At the start of a space combat against a player other than the Iron Tide player: You may replace 1 of your ships participating in that combat with a ship from your reinforcements that has a cost of 1 more than the replaced ship. At the end of this combat, return this promissory note to the Iron Tide player."
     },
     {
         "alias": "bepnta",
@@ -57,11 +58,11 @@
     },
     {
         "alias": "bepnnatau",
-        "name": "Disciple",
+        "name": "Rupture",
         "faction": "natau",
         "color": "",
-        "playArea": true,
-        "text": "ACTION: Place an ingress token in a system that contains 1 or more of your ships. Then, purge this card.",
+        "playArea": false,
+        "text": "ACTION: Place or move an ingress token into a system that contains 1 or more of your ships. Then, purge this card.",
         "source": "beans"
     }
 ]

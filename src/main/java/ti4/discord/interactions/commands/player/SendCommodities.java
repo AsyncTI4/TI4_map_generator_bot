@@ -20,7 +20,9 @@ class SendCommodities extends GameStateSubcommand {
 
     SendCommodities() {
         super(Constants.SEND_COMMODITIES, "Send commodities to player/faction", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Commodities count").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Commodities count")
+                .setRequiredRange(1, 999)
+                .setRequired(true));
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.TARGET_FACTION_OR_COLOR,

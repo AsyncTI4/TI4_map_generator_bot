@@ -118,7 +118,7 @@ public class StartPhaseService {
                             event.getMessageChannel(),
                             "Agenda reveal is waiting for a preset _Relitigate_ to resolve.");
                 } else {
-                    Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
+                    Button flipAgenda = Buttons.FLIP_AGENDA;
                     List<Button> buttons = List.of(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(
                             event.getMessageChannel(), "Please flip the agenda.", buttons);
@@ -706,7 +706,7 @@ public class StartPhaseService {
                             "resolvePNPlay_" + pn, "Play " + promissoryNote.getName(), owner.getFactionEmoji());
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(transact);
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                     String cyberMessage = player2.getRepresentationUnfogged()
                             + ", reminder that this is the window to play _Scepter of Dominion_ if you wish.";
                     MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), cyberMessage, buttons);
@@ -804,7 +804,7 @@ public class StartPhaseService {
                 && !playerLeader.isLocked()) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("naaluHeroInitiation", "Play Naalu Hero", LeaderEmojis.NaaluHero));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
@@ -817,7 +817,7 @@ public class StartPhaseService {
                 && !playerLeader.isLocked()) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("poisonHeroInitiation", "Play Poison Hero", LeaderEmojis.NaaluHero));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
@@ -864,7 +864,7 @@ public class StartPhaseService {
                     player.getRepresentationUnfogged() + ", a reminder this is the window to purge _Twilight Mirror_.");
             List<Button> playerButtons = new ArrayList<>();
             playerButtons.add(Buttons.green("resolveTwilightMirror", "Purge Twilight Mirror", ExploreEmojis.Relic));
-            playerButtons.add(Buttons.red("deleteButtons", "Decline"));
+            playerButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + " You may use these buttons to resolve _Twilight Mirror_.",
@@ -913,7 +913,7 @@ public class StartPhaseService {
                     player.factionButtonChecker() + "resolveAmendmentStep1",
                     "Resolve Amendment",
                     CardEmojis.ActionCard));
-            amendmentButtons.add(Buttons.red("deleteButtons", "Decline"));
+            amendmentButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
@@ -956,7 +956,7 @@ public class StartPhaseService {
                                     player.factionButtonChecker() + "winnuMonumentSpendResources",
                                     "Spend Resources for Imperial Vault",
                                     UnitEmojis.Monument),
-                            Buttons.red("deleteButtons", "Decline")));
+                            Buttons.DECLINE_DELETE_BUTTONS));
         } else if (game.isMonumentsMode() && MonumentsService.isMonumentOnBoard(game, player, "winnu_monument")) {
             int gainedTg = MonumentsService.getWinnuMonumentTradeGoodCount(game, player);
             player.setTg(player.getTg() + gainedTg);
@@ -1324,7 +1324,7 @@ public class StartPhaseService {
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("startQDN", "Use Quantum Datahub Node", TechEmojis.CyberneticTech));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(
                             p2.getCorrectChannel(),
                             "# " + p2.getRepresentationUnfogged()
@@ -1362,7 +1362,7 @@ public class StartPhaseService {
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("startQDN", "Use Quantum Datahub Node", TechEmojis.CyberneticTech));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(
                             p2.getCorrectChannel(),
                             p2.getRepresentationUnfogged()
@@ -1373,7 +1373,7 @@ public class StartPhaseService {
                 if (IsPlayerElectedService.isPlayerElected(game, p2, "arbiter")) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("startArbiter", "Use Imperial Arbiter", CardEmojis.Agenda));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(
                             p2.getCorrectChannel(),
                             p2.getRepresentationUnfogged() + ", you have the opportunity to use _Imperial Arbiter_.",

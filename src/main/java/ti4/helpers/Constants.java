@@ -193,6 +193,7 @@ public final class Constants {
     public static final String SHOW_BUBBLES = "show_bubbles";
     public static final String TRANSACTION_METHOD = "transaction_method";
     public static final String SHOW_GEARS = "show_gears";
+    public static final String WORMHOLE_TOKEN_MERGE = "wormhole_token_merge";
     public static final String SHOW_BANNERS = "show_banners";
     public static final String SHOW_HEX_BORDERS = "show_hex_borders";
     public static final String VOLTRON_STYLE = "voltron_style";
@@ -268,23 +269,6 @@ public final class Constants {
     public static final String TOKEN_BREACH_ACTIVE = "token_breachActive.png";
     public static final String TOKEN_BREACH_INACTIVE = "token_breachInactive.png";
     public static final String TOKEN_SEVERED = "token_severed.png";
-
-    public static final String ALPHA = "alpha";
-    public static final String BETA = "beta";
-    public static final String GAMMA = "gamma";
-    public static final String DELTA = "delta";
-    public static final String EPSILON = "whepsilon";
-    public static final String NARROWS = "whnarrows";
-    public static final String PROBABILITY = "whprobability";
-    public static final String CHAMPION = "whchampion";
-    public static final String VOYAGE = "whvoyage";
-    public static final String ZETA = "whzeta";
-    public static final String ETA = "wheta";
-    public static final String CUSTOM_ERONOUS_WHEPSILON = "custom_eronous_whepsilon";
-    public static final String CUSTOM_ERONOUS_WHETA = "custom_eronous_wheta";
-    public static final String CUSTOM_ERONOUS_WHIOTA = "custom_eronous_whiota";
-    public static final String CUSTOM_ERONOUS_WHTHETA = "custom_eronous_whtheta";
-    public static final String CUSTOM_ERONOUS_WHZETA = "custom_eronous_whzeta";
 
     public static final String DRAW_SPECIFIC_SO_FOR_PLAYER = "draw_specific_so_for_player";
     public static final String DRAW_SPECIFIC_SO = "draw_specific_so";
@@ -534,6 +518,9 @@ public final class Constants {
     public static final String SLICE_TILE_WIN_RATES = "slice_tile_win_rates";
     public static final String PLANET_WIN_RATES = "planet_win_rates";
     public static final String SUPPORT_WIN_RATES = "support_win_rates";
+    public static final String SCORING = "scoring";
+    public static final String POK_ONLY = "pok_only";
+    public static final String POK_COMPARE = "pok_compare";
     public static final String SEND_DEBT = "send_debt";
     public static final String DEBT_COUNT = "debt_count";
     public static final String REMOVE_DEBT = "remove_debt";
@@ -761,6 +748,7 @@ public final class Constants {
     public static final String SEND_TG = "send_tg";
     public static final String SEND_COMMODITIES = "send_commodities";
     public static final String SETUP = "setup";
+    public static final String SETUP_BOT_PLAYER = "setup_bot_player";
     public static final String SETUP_STARTING_FLEET = "setup_starting_fleet";
     public static final String WEIRD_GAME_SETUP = "weird_game_setup";
     public static final String GALACTIC_EVENTS_SETUP = "galactic_events_setup";
@@ -846,6 +834,7 @@ public final class Constants {
     public static final String SC6 = "6th_choice";
     public static final String STRAT_PINGS = "strat_pings";
     public static final String DUMMY = "dummy";
+    public static final String BOT_PLAYER = "bot_player";
     public static final String NPC = "npc";
 
     public static final String NUMBER_OF_TURNS = "number_of_turns";
@@ -1436,6 +1425,8 @@ public final class Constants {
     public static final String SARWEEN_COUNT = "sarween_count";
     public static final String GHOST_COMMANDER_COUNT = "ghost_commander_count";
     public static final String MAGEN_INFANTRY_COUNT = "magen_infantry_count";
+    public static final String DACXIVE_COUNT = "dacxive_count";
+    public static final String YIN_SPINNER_COUNT = "yin_spinner_count";
     public static final String PATH_TOKEN_COUNT = "path_token_count";
     public static final String HONOR_COUNT = "honor_count";
     public static final String DISHONOR_COUNT = "dishonor_count";

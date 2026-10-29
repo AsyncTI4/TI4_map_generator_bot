@@ -9,7 +9,7 @@
     },
     "id": "widmore",
     "tileId": "c01",
-    "name": "widmore",
+    "name": "Widmore",
     "aliases": [
         "widmore",
         "weedmore",
@@ -25,8 +25,10 @@
     "planetType": "CULTURAL",
     "cardImagePath": null,
     "techSpecialties": null,
-    "legendaryAbilityName": "placeholder",
-    "legendaryAbilityText": "foo bar",
+    "legendaryAbilityName": "Tyrrel Syndicate",
+    "legendaryAbilityText": "This card enters play with this side faceup. ACTION: Gain 2 action cards or 1 secret objective. Flip this card.\n\nBACK: At the start of the agenda phase another player at random may gain 2 action cards or 1 secret objective. Flip this card.",
+    "legendaryAbilityFlavourText": "The Tyrrel autonomous space is ruled by a loose confederation of influential criminal families.",
+    "legendaryNotes": "The front face is a Component Action; the back face triggers when the first agenda of the agenda phase is revealed. If another effect lets you use this ability, resolve it manually.",
     "unitPositions": {
         "unitHolderName": "widmore",
         "coordinateMap": {

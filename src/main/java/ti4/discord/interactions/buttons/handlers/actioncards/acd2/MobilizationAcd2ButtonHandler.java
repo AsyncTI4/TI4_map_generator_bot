@@ -43,7 +43,7 @@ class MobilizationAcd2ButtonHandler {
                             + " for _Mobilization_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose the system to produce in for _Mobilization_. It must"

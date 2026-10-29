@@ -14,7 +14,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stone
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperExplore;
@@ -26,10 +25,8 @@ import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.Mapper;
-import ti4.model.TechnologyModel;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.tech.PlayerTechService;
 
 @UtilityClass
@@ -41,11 +38,6 @@ public class ArcanumLeadersHandler {
     private static final String CHOOSE_COMMANDER_RELIC_FIRST_FRAGMENT = "arcanumCommanderRelicFirstFragment_";
     private static final String CHOOSE_COMMANDER_RELIC_SECOND_FRAGMENT = "arcanumCommanderRelicSecondFragment_";
     private static final String GAIN_HERO_FRAGMENT = "arcanumHeroGainFragment_";
-    private static final String USE_VEYLA_ON_SELF = "arcanumVeylaUseSelf";
-    private static final String USE_VEYLA_ON_OTHER = "arcanumVeylaUseOnOther";
-    private static final String CHOOSE_VEYLA_TARGET = "arcanumVeylaTarget_";
-    private static final String SELECT_VEYLA_RETURN_TECH = "arcanumVeylaReturnTech_";
-    private static final String GAIN_VEYLA_TECH = "arcanumVeylaGainTech_";
     // Commander
     public static void offerArcanumCommanderTechPurge(
             Game game, Player player, GenericInteractionCreateEvent event, int purgedFragmentCount) {
@@ -60,7 +52,7 @@ public class ArcanumLeadersHandler {
         if (buttons.isEmpty()) {
             return;
         }
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         List<Button> displayedButtons = buttons.size() <= 24
                 ? new ArrayList<>(buttons)
                 : NewStuffHelper.buttonPagination(
@@ -88,7 +80,7 @@ public class ArcanumLeadersHandler {
             return;
         }
         List<Button> techButtons = getArcanumCommanderTechPurgeButtons(player);
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         String message = player.getRepresentation()
                 + ", you may use Orthis Lithon, the Arcanum commander, to purge 1 technology as a relic fragment.";
         if (NewStuffHelper.checkAndHandlePaginationChange(
@@ -114,7 +106,7 @@ public class ArcanumLeadersHandler {
                 Buttons.gray(
                         player.factionButtonChecker() + CHOOSE_COMMANDER_FRAGMENT_TYPE + techID + "|frontier",
                         "Frontier"),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", choose the relic fragment type for "
@@ -285,264 +277,6 @@ public class ArcanumLeadersHandler {
         StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
         ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         ButtonHelper.deleteMessage(event);
-    }
-
-    // Agent
-    public static Button getVeylaCardsInfoButton(Player player) {
-        return Buttons.gray(player.factionButtonChecker() + USE_VEYLA_ON_OTHER, "Use Arcanum Agent on Another Player");
-    }
-
-    public static Button getVeylaStartTurnButton(Game game, Player player) {
-        if (game == null
-                || player == null
-                || !player.hasUnexhaustedLeader("arcanumagent")
-                || getVeylaReturnTechButtons(game, player, player).isEmpty()) {
-            return null;
-        }
-        return Buttons.gray(
-                player.factionButtonChecker() + USE_VEYLA_ON_SELF, "Use Arcanum Agent", FactionEmojis.arcanum);
-    }
-
-    @ButtonHandler(USE_VEYLA_ON_SELF)
-    public static void useVeylaOnSelf(ButtonInteractionEvent event, Game game, Player player) {
-        if (game == null || player == null || !player.hasUnexhaustedLeader("arcanumagent")) {
-            ButtonHelper.deleteTheOneButton(event);
-            return;
-        }
-
-        List<Button> returnTechButtons = getVeylaReturnTechButtons(game, player, player);
-        if (returnTechButtons.isEmpty()) {
-            ButtonHelper.deleteTheOneButton(event);
-            return;
-        }
-        String message = player.getRepresentation()
-                + ", choose a non-faction, non-unit technology to return with _Veyla, the Arcanum agent_.";
-        String buttonPrefix = player.factionButtonChecker() + SELECT_VEYLA_RETURN_TECH + player.getFaction() + "|";
-        List<Button> buttons = returnTechButtons.size() <= 25
-                ? returnTechButtons
-                : NewStuffHelper.buttonPagination(returnTechButtons, buttonPrefix, 0);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-        ButtonHelper.deleteTheOneButton(event);
-    }
-
-    @ButtonHandler(USE_VEYLA_ON_OTHER)
-    public static void selectVeylaTarget(ButtonInteractionEvent event, Game game, Player agentOwner) {
-        if (game == null
-                || agentOwner == null
-                || "setup".equalsIgnoreCase(game.getPhaseOfGame())
-                || !agentOwner.hasUnexhaustedLeader("arcanumagent")) {
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-            return;
-        }
-
-        List<Button> targetButtons = game.getRealPlayers().stream()
-                .filter(target -> target != agentOwner)
-                .filter(target ->
-                        !getVeylaReturnTechButtons(game, agentOwner, target).isEmpty())
-                .map(target -> Buttons.green(
-                        agentOwner.factionButtonChecker() + CHOOSE_VEYLA_TARGET + target.getFaction(),
-                        target.getFactionNameOrColor(),
-                        target.getFactionEmojiOrColor()))
-                .toList();
-        if (targetButtons.isEmpty()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "No other player has an eligible technology to return.");
-            ButtonHelper.deleteTheOneButton(event);
-            return;
-        }
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                agentOwner.getCardsInfoThread(),
-                agentOwner.getRepresentationUnfogged() + ", choose a player to use _Veyla, the Arcanum agent_ on.",
-                targetButtons);
-        ButtonHelper.deleteTheOneButton(event);
-    }
-
-    @ButtonHandler(CHOOSE_VEYLA_TARGET)
-    public static void chooseVeylaTarget(ButtonInteractionEvent event, Game game, Player agentOwner, String buttonID) {
-        if (game == null
-                || agentOwner == null
-                || "setup".equalsIgnoreCase(game.getPhaseOfGame())
-                || !agentOwner.hasUnexhaustedLeader("arcanumagent")) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        Player target = game.getPlayerFromColorOrFaction(buttonID.substring(CHOOSE_VEYLA_TARGET.length()));
-        List<Button> returnTechButtons = getVeylaReturnTechButtons(game, agentOwner, target);
-        if (target == null || returnTechButtons.isEmpty()) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        if (returnTechButtons.size() == 1) {
-            String returnedTechID = getVeylaReturnedTechID(returnTechButtons.getFirst());
-            resolveVeylaTheKeeper(event, game, agentOwner, target, returnedTechID);
-            return;
-        }
-
-        String message = target.getRepresentation()
-                + ", _Veyla, the Arcanum agent_ is being used on you. Choose a non-faction technology to return.";
-        String buttonPrefix = target.factionButtonChecker() + SELECT_VEYLA_RETURN_TECH + agentOwner.getFaction() + "|";
-        List<Button> buttons = returnTechButtons.size() <= 25
-                ? returnTechButtons
-                : NewStuffHelper.buttonPagination(returnTechButtons, buttonPrefix, 0);
-        MessageHelper.sendMessageToChannelWithButtons(target.getCorrectChannel(), message, buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(SELECT_VEYLA_RETURN_TECH)
-    public static void selectVeylaTechToReturn(
-            ButtonInteractionEvent event, Game game, Player target, String buttonID) {
-        String[] payload = buttonID.substring(SELECT_VEYLA_RETURN_TECH.length()).split("\\|", 2);
-        if (game == null || target == null || payload.length != 2) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        Player agentOwner = game.getPlayerFromColorOrFaction(payload[0]);
-        if (agentOwner == null
-                || "setup".equalsIgnoreCase(game.getPhaseOfGame())
-                || !agentOwner.hasUnexhaustedLeader("arcanumagent")) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        List<Button> returnTechButtons = getVeylaReturnTechButtons(game, agentOwner, target);
-        String message = target.getRepresentation()
-                + ", _Veyla, the Arcanum agent_ is being used on you. Choose a non-faction technology to return.";
-        String buttonPrefix = target.factionButtonChecker() + SELECT_VEYLA_RETURN_TECH + agentOwner.getFaction() + "|";
-        if (NewStuffHelper.checkAndHandlePaginationChange(
-                event, event.getMessageChannel(), returnTechButtons, message, buttonPrefix, buttonID)) {
-            return;
-        }
-
-        resolveVeylaTheKeeper(event, game, agentOwner, target, payload[1]);
-    }
-
-    @ButtonHandler(GAIN_VEYLA_TECH)
-    public static void gainVeylaTheKeeperTech(ButtonInteractionEvent event, Game game, Player target, String buttonID) {
-        String[] payload = buttonID.substring(GAIN_VEYLA_TECH.length()).split("\\|", 3);
-        if (game == null || target == null || payload.length != 3 || !Objects.equals(target.getFaction(), payload[0])) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        String returnedTechID = payload[1];
-        String selectedTechID = payload[2];
-        List<Button> replacementButtons = getVeylaReplacementButtons(game, target, returnedTechID);
-        String message = target.getRepresentation()
-                + ", choose a non-unit-upgrade technology to gain from _Veyla, the Arcanum agent_.";
-        String buttonPrefix =
-                target.factionButtonChecker() + GAIN_VEYLA_TECH + target.getFaction() + "|" + returnedTechID + "|";
-        if (NewStuffHelper.checkAndHandlePaginationChange(
-                event, event.getMessageChannel(), replacementButtons, message, buttonPrefix, buttonID)) {
-            return;
-        }
-
-        if (!game.getTechnologyDeck().contains(selectedTechID)
-                || replacementButtons.stream()
-                        .noneMatch(button -> button.getCustomId().endsWith("|" + selectedTechID))) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        PlayerTechService.addTech(event, game, target, selectedTechID);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    private static List<Button> getVeylaReplacementButtons(Game game, Player target, String returnedTechID) {
-        TechnologyModel returnedTech = Mapper.getTech(returnedTechID);
-        if (game == null || target == null || returnedTech == null) {
-            return List.of();
-        }
-
-        int maximumRequirements = returnedTech.getRequirements().orElse("").length() + 1;
-        return game.getTechnologyDeck().stream()
-                .map(Mapper::getTech)
-                .filter(Objects::nonNull)
-                .filter(tech -> !tech.isUnitUpgrade())
-                .filter(tech -> !tech.isFactionTech()
-                        || tech.getFaction()
-                                .filter(faction -> faction.equalsIgnoreCase(target.getFaction()))
-                                .isPresent())
-                .filter(tech -> !target.hasTech(tech.getAlias()))
-                .filter(tech -> tech.getRequirements().orElse("").length() <= maximumRequirements)
-                .map(tech -> Buttons.green(
-                        target.factionButtonChecker()
-                                + GAIN_VEYLA_TECH
-                                + target.getFaction()
-                                + "|"
-                                + returnedTechID
-                                + "|"
-                                + tech.getAlias(),
-                        tech.getName(),
-                        tech.getCondensedReqsEmojis(true)))
-                .toList();
-    }
-
-    private static List<Button> getVeylaReturnTechButtons(Game game, Player agentOwner, Player target) {
-        if (game == null || agentOwner == null || target == null) {
-            return List.of();
-        }
-
-        return target.getTechs().stream()
-                .map(Mapper::getTech)
-                .filter(Objects::nonNull)
-                .filter(tech -> !tech.isFactionTech())
-                .filter(tech -> !tech.isUnitUpgrade())
-                .filter(tech -> !getVeylaReplacementButtons(game, target, tech.getAlias())
-                        .isEmpty())
-                .map(tech -> Buttons.green(
-                        target.factionButtonChecker()
-                                + SELECT_VEYLA_RETURN_TECH
-                                + agentOwner.getFaction()
-                                + "|"
-                                + tech.getAlias(),
-                        "Return " + tech.getName(),
-                        tech.getCondensedReqsEmojis(true)))
-                .toList();
-    }
-
-    private static String getVeylaReturnedTechID(Button button) {
-        int payloadStart = button.getCustomId().indexOf(SELECT_VEYLA_RETURN_TECH) + SELECT_VEYLA_RETURN_TECH.length();
-        String[] payload = button.getCustomId().substring(payloadStart).split("\\|", 2);
-        return payload.length == 2 ? payload[1] : "";
-    }
-
-    private static void resolveVeylaTheKeeper(
-            ButtonInteractionEvent event, Game game, Player agentOwner, Player target, String returnedTechID) {
-        TechnologyModel returnedTech = Mapper.getTech(returnedTechID);
-        Leader agent = agentOwner.getLeader("arcanumagent").orElse(null);
-        List<Button> replacementButtons = getVeylaReplacementButtons(game, target, returnedTechID);
-        if (target == null
-                || agent == null
-                || agent.isExhausted()
-                || returnedTech == null
-                || returnedTech.isFactionTech()
-                || returnedTech.isUnitUpgrade()
-                || !target.hasTech(returnedTechID)
-                || replacementButtons.isEmpty()) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        ExhaustLeaderService.exhaustLeader(game, agentOwner, agent);
-        target.removeTech(returnedTechID);
-        ButtonHelper.deleteMessage(event);
-
-        String message = target.getRepresentation()
-                + ", _Veyla, the Arcanum agent_ returned "
-                + returnedTech.getNameRepresentation()
-                + " to the technology deck. Choose a non-unit-upgrade technology with at most "
-                + (returnedTech.getRequirements().orElse("").length() + 1)
-                + " prerequisites to gain.";
-        String buttonPrefix =
-                target.factionButtonChecker() + GAIN_VEYLA_TECH + target.getFaction() + "|" + returnedTechID + "|";
-        List<Button> buttons = replacementButtons.size() <= 25
-                ? replacementButtons
-                : NewStuffHelper.buttonPagination(replacementButtons, buttonPrefix, 0);
-        MessageHelper.sendMessageToChannelWithButtons(target.getCorrectChannel(), message, buttons);
     }
 
     public static void startArcanumHero(GenericInteractionCreateEvent event, Game game, Player player) {

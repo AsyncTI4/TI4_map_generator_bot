@@ -309,7 +309,7 @@ public class HydromorphicCardHandler {
     private static void resolveChartedCurrents(Game game, Player player) {
         List<Button> buttons =
                 new ArrayList<>(TeHelperActionCards.getReadiedStrategyCardSecondaryButtons(game, player));
-        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()

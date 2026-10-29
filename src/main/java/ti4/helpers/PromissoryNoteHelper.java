@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EscapeClauseActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
@@ -336,6 +337,9 @@ public class PromissoryNoteHelper {
         if ("bepncryst".equalsIgnoreCase(id)) {
             CrystellumPromissoryHandler.resolveFracture(game, player, event);
         }
+        if ("bepnnatau".equalsIgnoreCase(id)) {
+            NatauPromissoryHandler.offerRuptureSystems(game, player);
+        }
         if ("thpnxytheris".equalsIgnoreCase(id)) {
             XytherisPromissoryHandler.activateSwarmSpawn(game, player);
         }
@@ -500,7 +504,7 @@ public class PromissoryNoteHelper {
                     player.getCorrectChannel(),
                     player.getFactionEmojiOrColor() + " is paying 1 influence to pass _Malevolency_ to a neighbor.");
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-            Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            Button doneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
             buttons.add(doneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), "Please spend 1 influence.", buttons);

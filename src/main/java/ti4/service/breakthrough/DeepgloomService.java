@@ -164,7 +164,7 @@ public final class DeepgloomService {
                 buttons.add(Buttons.green(id, "Allow " + model.getName() + " For " + name, p2.fogSafeEmoji()));
             }
         }
-        buttons.add(Buttons.gray("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         return buttons;
     }
 

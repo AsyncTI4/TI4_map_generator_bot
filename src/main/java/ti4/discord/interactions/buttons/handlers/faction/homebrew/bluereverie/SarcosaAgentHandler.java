@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -24,19 +23,12 @@ public class SarcosaAgentHandler {
     private static final String SELECT_SYSTEM = "selectSarcosaAgentSystem_";
     private static final String PLACE_UNITS = "placeSarcosaAgentUnits_";
 
-    public static void offerSarcosaAgentSystemButtons(Game game, Player target, GenericInteractionCreateEvent event) {
+    public static List<Button> agentSystemButtons(Game game, Player target) {
         List<Button> buttons = getEligibleSystemButtons(game, target);
-        String message = target.getRepresentation() + ", choose a system in or adjacent to one containing your units.";
-        String prefix = target.factionButtonChecker() + SELECT_SYSTEM;
         if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    target.getCorrectChannel(), target.getRepresentationNoPing() + " has no eligible systems.");
-            ButtonHelper.deleteMessage(event);
-            return;
+            return buttons;
         }
-        MessageHelper.sendMessageToChannelWithButtons(
-                target.getCorrectChannel(), message, NewStuffHelper.buttonPagination(buttons, prefix, 0));
-        ButtonHelper.deleteMessage(event);
+        return NewStuffHelper.buttonPagination(buttons, target.factionButtonChecker() + SELECT_SYSTEM, 0);
     }
 
     @ButtonHandler(SELECT_SYSTEM)

@@ -47,7 +47,7 @@ public class ArcanumBreakthroughHandler {
         List<Button> buttons = List.of(
                 Buttons.green(
                         player.factionButtonChecker() + FLIP_ON_GAIN, "Flip Power Word: Wish", FactionEmojis.arcanum),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),

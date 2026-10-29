@@ -176,7 +176,7 @@ public class MonumentsDSButtonHandler {
                                         + (wasWashed ? "|washed" : ""),
                                 "Take 1 Commodity from " + target.getColor(),
                                 FactionEmojis.vaden),
-                        Buttons.red("deleteButtons", "Decline")));
+                        Buttons.DECLINE_DELETE_BUTTONS));
     }
 
     @ButtonHandler(RESOLVE_BB)
@@ -223,7 +223,7 @@ public class MonumentsDSButtonHandler {
     public static List<Button> getVaultFlipButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(player.factionButtonChecker() + FLIP_VAULT, "Flip Vault", FactionEmojis.zealots));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         return buttons;
     }
@@ -299,7 +299,7 @@ public class MonumentsDSButtonHandler {
                 player.factionButtonChecker() + "placeOneNDone_skipbuild_1ff_" + monumentTile.getPosition(),
                 "Produce 1 Fighter",
                 UnitEmojis.fighter));
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         return buttons;
     }
@@ -1724,7 +1724,7 @@ public class MonumentsDSButtonHandler {
                             "Place 1 " + unit.getName(),
                             unit.getUnitEmoji()));
                 });
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged()

@@ -86,6 +86,9 @@ import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.AgentLifecycle;
+import ti4.service.leader.agent.modules.homebrew.AugersAgent;
+import ti4.service.leader.agent.modules.homebrew.LanefirAgent;
 import ti4.service.map.FractureService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.PlanetService;
@@ -361,18 +364,11 @@ public class ExploreService {
                 player.getRepresentation() + " explored " + ExploreEmojis.getTraitEmoji(drawColor) + "Planet "
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " in tile "
                         + position_ + ":";
-        if (player.hasUnexhaustedLeader("lanefiragent")) {
+        if (LanefirAgent.canRedraw(player)) {
             ExploreModel exploreModel = Mapper.getExplore(cardID);
             String name1 = exploreModel.getName();
-            Button resolveExplore1 = Buttons.green(
-                    "lanefirAgentRes_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Choose " + name1);
-            Button resolveExplore2 =
-                    Buttons.green("lanefirAgentRes_Accept_" + drawColor + "_" + planetName, "Use Lanefir Agent");
-            List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
-            String message = player.getRepresentationUnfogged() + " You have "
-                    + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "Vassa Hagi, the Lanefir" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                    + " agent, and thus may decline this exploration to draw another one instead.";
+            List<Button> buttons = LanefirAgent.planetButtons(player, drawColor, cardID, planetName);
+            String message = LanefirAgent.offerMessage(game, player);
             FoWHelper.announcePublicOrLocal(
                     game,
                     event,
@@ -519,15 +515,11 @@ public class ExploreService {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2.hasUnexhaustedLeader("augersagent")) {
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.green(
-                            "exhaustAgent_augersagent_" + player.getFaction(),
-                            "Use Ilyxum Agent on " + player.getColor(),
-                            FactionEmojis.augers));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(AugersAgent.button(p2, player));
+                    buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                     String msg2 = p2.getRepresentationUnfogged() + " you may use "
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                            + "Clodho, the Ilyxum" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                            + " agent, on " + player.getFactionEmojiOrColor() + " to give them 2 trade goods.";
+                            + AgentLifecycle.agentNameForHolder(game, p2, "augersagent") + ", on "
+                            + player.getFactionEmojiOrColor() + " to give them 2 trade goods.";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg2, buttons);
                 }
             }
@@ -982,7 +974,7 @@ public class ExploreService {
                             "saarMechRes_" + "mirage",
                             "Pay 1 Trade Good for Mech on " + Helper.getPlanetRepresentation("mirage", game),
                             MiscEmojis.tg));
-                    saarButton.add(Buttons.red("deleteButtons", "Decline"));
+                    saarButton.add(Buttons.DECLINE_DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCorrectChannel(),
                             player.getRepresentationUnfogged() + " you may pay 1 trade good to place 1 "
@@ -1007,7 +999,7 @@ public class ExploreService {
                         "comm_for_AC",
                         "Spend 1 Trade Good or 1 Commodity For 1 Action Card",
                         CardEmojis.getACEmoji(game));
-                Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm);
+                Button getCommButton = Buttons.GAIN_1_COMMODITY;
                 List<Button> buttons = List.of(getACButton, getCommButton);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
             }
@@ -1080,7 +1072,7 @@ public class ExploreService {
                         Buttons.blue("discardExploreTop_cultural", "Discard Top Cultural", ExploreEmojis.Cultural));
                 discardButtons.add(
                         Buttons.gray("discardExploreTop_frontier", "Discard Top Frontier", ExploreEmojis.Frontier));
-                discardButtons.add(Buttons.red("deleteButtons", "Done Resolving"));
+                discardButtons.add(Buttons.DONE_RED_DELETE_BUTTONS);
                 message = new StringBuilder(player.getRepresentation()
                         + " you may use the buttons to discard the top of the exploration decks if you choose.");
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -1117,7 +1109,7 @@ public class ExploreService {
                         "resolveLocalFab_" + planetID,
                         "Spend 1 Commodity or Trade Good for a Mech on " + planetName,
                         UnitEmojis.mech);
-                Button getCommButton3 = Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm);
+                Button getCommButton3 = Buttons.GAIN_1_COMMODITY;
                 List<Button> buttons = List.of(getMechButton, getCommButton3);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
             }
@@ -1533,7 +1525,7 @@ public class ExploreService {
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + "brExploreCoexistenceBegin",
                         "Place 1 Infantry Into Coexistence"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
@@ -1625,7 +1617,7 @@ public class ExploreService {
                                     + Helper.getPlanetRepresentation(planetID, game),
                             UnitEmojis.infantry));
                 }
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
@@ -1671,7 +1663,7 @@ public class ExploreService {
                                 player.factionButtonChecker() + "spendForStruct_tg|" + planetID,
                                 "Spend 2 Trade Goods"));
                     }
-                    buttons.add(Buttons.red("deleteButtons", "Done"));
+                    buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
                 }
 
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -1688,7 +1680,7 @@ public class ExploreService {
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + "gainComms_3", "Gain 3 Commodities", MiscEmojis.comm));
                 buttons.add(Buttons.green(player.factionButtonChecker() + "useCacheProduction", "Use PRODUCTION"));
-                buttons.add(Buttons.red("deleteButtons", "Done"));
+                buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
@@ -1761,7 +1753,7 @@ public class ExploreService {
                 && game.getStoredValue("fortuneSeekers").isEmpty()) {
             List<Button> gainComm = new ArrayList<>();
             gainComm.add(Buttons.green("gain_1_comms", "Gain 1 Comm", MiscEmojis.comm));
-            gainComm.add(Buttons.red("deleteButtons", "Decline"));
+            gainComm.add(Buttons.DECLINE_DELETE_BUTTONS);
             String sb = player.getFactionEmoji() + " may use their **Fortune Seekers** ability\n"
                     + player.getRepresentationUnfogged()
                     + ", after resolving the exploration, you may use this button to get your commodity from your **Fortune Seekers** ability.";
@@ -1799,7 +1791,7 @@ public class ExploreService {
                     player.factionButtonChecker() + "hiddenVaultsProduce_" + planetID,
                     "Produce 1 Infantry on " + Helper.getPlanetRepresentation(planetID, game),
                     UnitEmojis.infantry));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),

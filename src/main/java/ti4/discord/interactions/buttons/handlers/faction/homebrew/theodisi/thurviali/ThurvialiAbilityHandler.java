@@ -57,10 +57,10 @@ public class ThurvialiAbilityHandler {
         List<Button> displayedButtons;
         if (buttons.size() <= 24) {
             displayedButtons = new ArrayList<>(buttons);
-            displayedButtons.add(Buttons.red("deleteButtons", "Decline"));
+            displayedButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
         } else {
             displayedButtons = NewStuffHelper.buttonPagination(
-                    buttons, List.of(Buttons.red("deleteButtons", "Decline")), buttonPrefix, 25, 0, false);
+                    buttons, List.of(Buttons.DECLINE_DELETE_BUTTONS), buttonPrefix, 25, 0, false);
         }
         MessageHelper.sendMessageToChannelWithButtons(owner.getCorrectChannel(), message, displayedButtons);
     }
@@ -91,7 +91,7 @@ public class ThurvialiAbilityHandler {
                 event,
                 event.getMessageChannel(),
                 buttons,
-                List.of(Buttons.red("deleteButtons", "Decline")),
+                List.of(Buttons.DECLINE_DELETE_BUTTONS),
                 message,
                 buttonPrefix,
                 buttonID)) {

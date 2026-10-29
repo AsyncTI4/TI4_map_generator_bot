@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,6 +21,7 @@ import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.helpers.AliasHandler;
@@ -630,29 +630,32 @@ public class Tile {
 
     @JsonIgnore
     public List<WormholeModel.Wormhole> getWormholes(Game game) {
-        Set<WormholeModel.Wormhole> whs = EnumSet.noneOf(WormholeModel.Wormhole.class);
-        List<WormholeModel.Wormhole> whs2 = new ArrayList<>(whs);
-        if (getTileModel().getWormholes() != null) {
-            Set<WormholeModel.Wormhole> tileWhs = getTileModel().getWormholes();
-            whs2.addAll(tileWhs.stream().filter(Objects::nonNull).toList());
-        }
-        for (String token : getSpaceUnitHolder().getTokenList()) {
-            if (token.contains("alpha") || token.contains("sigma_weirdway")) whs2.add(WormholeModel.Wormhole.ALPHA);
-            if (token.contains("beta") || token.contains("sigma_weirdway")) whs2.add(WormholeModel.Wormhole.BETA);
-            if (token.contains("gamma")) whs2.add(WormholeModel.Wormhole.GAMMA);
-        }
-        String ghostFlagshipColor;
-        for (Player p : game.getPlayers().values()) {
-            if (p.ownsUnit("ghost_flagship")
-                    || p.ownsUnit("sigma_creuss_flagship_1")
-                    || p.ownsUnit("sigma_creuss_flagship_2")) {
-                ghostFlagshipColor = p.getColor();
-                if (getSpaceUnitHolder().getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
-                    whs2.add(WormholeModel.Wormhole.DELTA);
-                }
+        return getWormholes(creussFlagshipColors(game));
+    }
+
+    @JsonIgnore
+    public List<WormholeModel.Wormhole> getWormholes(Collection<String> creussFlagshipColors) {
+        List<WormholeModel.Wormhole> wormholes = new ArrayList<>(Mapper.getWormholes(tileID));
+        for (UnitHolder unitHolder : unitHolders.values()) {
+            for (String token : unitHolder.getTokenList()) {
+                wormholes.addAll(Mapper.getTokenWormholes(token));
             }
         }
-        return whs2;
+        for (String color : creussFlagshipColors) {
+            if (unitHolders.values().stream().anyMatch(holder -> holder.getUnitCount(UnitType.Flagship, color) > 0)) {
+                wormholes.add(WormholeModel.Wormhole.DELTA);
+            }
+        }
+        return wormholes;
+    }
+
+    public static List<String> creussFlagshipColors(Game game) {
+        return game.getPlayers().values().stream()
+                .filter(p -> p.ownsUnit("ghost_flagship")
+                        || p.ownsUnit("sigma_creuss_flagship_1")
+                        || p.ownsUnit("sigma_creuss_flagship_2"))
+                .map(Player::getColor)
+                .toList();
     }
 
     @JsonIgnore
@@ -710,6 +713,9 @@ public class Tile {
                 && ThronesAbilityHandler.tracesOfRuinIsActive(game)
                 && getPlanetUnitHolders().stream()
                         .anyMatch(planet -> ThronesAbilityHandler.isThronePlanet(planet.getName()))) {
+            return true;
+        }
+        if (NatauAbilityHandler.hasNatauMech(game, this, player)) {
             return true;
         }
         return hasAnyToken("token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png");

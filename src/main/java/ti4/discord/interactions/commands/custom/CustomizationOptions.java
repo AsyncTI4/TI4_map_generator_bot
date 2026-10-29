@@ -80,6 +80,11 @@ class CustomizationOptions extends GameStateSubcommand {
         // anti-bombardment planets"));
         addOptions(
                 new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
+        addOptions(new OptionData(
+                        OptionType.INTEGER,
+                        Constants.WORMHOLE_TOKEN_MERGE,
+                        "Combine a system's wormhole tokens once it has this many (0 = off, 2-9)")
+                .setRequiredRange(0, 9));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TRANSACTION_METHOD, "Use the new transaction method"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BANNERS, "Show faction banner at start of turn"));
         addOptions(new OptionData(
@@ -91,9 +96,10 @@ class CustomizationOptions extends GameStateSubcommand {
                 Constants.INJECT_RULES_LINKS,
                 "Have the bot inject helpful links to rules within it's output"));
         addOptions(new OptionData(
-                OptionType.INTEGER,
-                Constants.FAST_SC_FOLLOW,
-                "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off"));
+                        OptionType.INTEGER,
+                        Constants.FAST_SC_FOLLOW,
+                        "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off")
+                .setRequiredRange(0, 720));
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.UNIT_SOURCE,
@@ -176,6 +182,9 @@ class CustomizationOptions extends GameStateSubcommand {
 
         Boolean showG = event.getOption(Constants.SHOW_GEARS, null, OptionMapping::getAsBoolean);
         if (showG != null) game.setShowGears(showG);
+
+        Integer mergeWormholesFrom = event.getOption(Constants.WORMHOLE_TOKEN_MERGE, null, OptionMapping::getAsInt);
+        if (mergeWormholesFrom != null) game.setWormholeTokenMergeFrom(mergeWormholesFrom);
 
         Boolean showBa = event.getOption(Constants.SHOW_BANNERS, null, OptionMapping::getAsBoolean);
         if (showBa != null) game.setShowBanners(showBa);

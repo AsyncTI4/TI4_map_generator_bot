@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesCommanderUnlockHandler;
 import ti4.game.Game;
@@ -310,6 +311,8 @@ public class CommanderUnlockCheckService {
 
                 shouldBeUnlocked = eligibleSystems >= 2;
             }
+            case "iron" ->
+                shouldBeUnlocked = player.getRelics().stream().anyMatch(IronSalvageRelicHandler::isSalvageRelic);
             case "ta" -> {
                 int eligiblePlanets = 0;
                 for (String planetName : player.getPlanets()) {
@@ -337,16 +340,11 @@ public class CommanderUnlockCheckService {
 
                 shouldBeUnlocked = sharedTechColors == TechnologyType.mainFour.size();
             }
-            case "natau" -> {
-                int qualifyingSystems = 0;
-                for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player)) {
-                    if (tile.isAnomaly(game, player)
-                            || FoWHelper.isTileAdjacentToAnAnomaly(game, tile.getPosition(), player)) {
-                        qualifyingSystems++;
-                    }
-                }
-                shouldBeUnlocked = (qualifyingSystems >= 3);
-            }
+            case "natau" ->
+                shouldBeUnlocked = player.getPlanets().stream()
+                        .map(game::getTileFromPlanet)
+                        .filter(Objects::nonNull)
+                        .anyMatch(Tile::isFracture);
 
             // theodisi
             case "ardentia",

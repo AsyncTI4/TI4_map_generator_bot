@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -26,6 +27,23 @@ import ti4.service.option.FOWOptionService.FOWOption;
 @UtilityClass
 public class TestBedComponentService {
 
+    static final Map<String, BiConsumer<Game, Integer>> GAME_OPTIONS =
+            Map.of(Constants.WORMHOLE_TOKEN_MERGE, Game::setWormholeTokenMergeFrom);
+
+    static String gameOptionProblem(String key, String value) {
+        if (!GAME_OPTIONS.containsKey(key)) {
+            return "unknown game option `" + key + "`; use " + GAME_OPTIONS.keySet() + ".";
+        }
+        if (!value.matches("[0-9]")) {
+            return "game option `" + key + "` takes a number from 0 to 9.";
+        }
+        return null;
+    }
+
+    static void setGameOption(Game game, String key, String value) {
+        GAME_OPTIONS.get(key).accept(game, Integer.parseInt(value));
+    }
+
     static void applyGameState(Game game, TestBedPreset preset, List<String> warnings) {
         for (String option : preset.getFowOptions()) {
             FOWOption fowOption = FOWOption.fromString(option);
@@ -36,6 +54,7 @@ public class TestBedComponentService {
             }
         }
         preset.getStored().forEach(game::setStoredValue);
+        preset.getGameOptions().forEach((key, value) -> setGameOption(game, key, value));
         for (String objective : preset.getRevealedObjectives()) {
             if (!game.revealSpecificStage1(objective) && !game.revealSpecificStage2(objective)) {
                 warnings.add("Objective `" + objective + "` is not in this game's objective decks.");
@@ -173,6 +192,19 @@ public class TestBedComponentService {
             }
         }
         return receiver.getFaction() + ": nobody holds promissory note `" + noteId + "`.";
+    }
+
+    @Nullable
+    static String removeToken(Game game, String where, String token) {
+        boolean space = MapPositionMapper.isTilePositionValid(where);
+        String holder = space ? Constants.SPACE : AliasHandler.resolvePlanet(where.toLowerCase());
+        Tile tile = space ? game.getTileByPosition(where) : game.getTileFromPlanet(holder);
+        if (tile == null) return "No tile at `" + where + "` for token `" + token + "`.";
+        String file = Mapper.getAttachmentImagePath(token);
+        if (file == null) file = Mapper.getTokenID(AliasHandler.resolveToken(token));
+        if (file == null) return "Unknown token `" + token + "`.";
+        if (!tile.removeToken(file, holder)) return "No token `" + token + "` at `" + where + "`.";
+        return null;
     }
 
     @Nullable

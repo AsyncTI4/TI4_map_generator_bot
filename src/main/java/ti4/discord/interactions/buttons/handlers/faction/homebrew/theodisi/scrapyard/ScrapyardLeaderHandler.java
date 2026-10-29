@@ -13,7 +13,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -28,62 +27,18 @@ import ti4.model.NamedCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 
 @UtilityClass
 public class ScrapyardLeaderHandler {
-    private static final String DECLARE_RIKKA = "sendRikkaReminderMessage";
     private static final String SCRAPYARD_COMMANDER = "scrapyardcommander";
     private static final String DESTROY_HERO_UNIT = "scrapyardHeroDestroyUnit_";
     private static final String PAGE_HERO_DESTROY = "scrapyardHeroDestroyPage_";
     private static final String PLACE_HERO_WARSUN = "scrapyardHeroPlaceWarsun_";
     private static final String USE_COMMANDER = "useScrapyardCommander_";
     private static final String SELECT_COMMANDER_UNIT = "selectScrapyardCommanderUnit_";
-
-    public static void sendRikkaButtons(Player target, Player agentOwner) {
-        if (target == null || agentOwner == null || !agentOwner.hasUnexhaustedLeader("scrapyardagent")) {
-            return;
-        }
-
-        List<Button> buttons = new ArrayList<>(List.of(
-                Buttons.green(
-                        agentOwner.factionButtonChecker() + DECLARE_RIKKA + target.getFaction(),
-                        "Declare Rikka",
-                        FactionEmojis.scrapyard),
-                Buttons.red("deleteButtons", "Decline")));
-        MessageHelper.sendMessageToChannelWithButtons(
-                target == agentOwner ? target.getCorrectChannel() : agentOwner.getCardsInfoThread(),
-                agentOwner.getRepresentation()
-                        + ", you may exhaust _Rikka \"Razor Fang\" Corvin_ to let the active player swap the movement and combat values "
-                        + "of 2 of their units until the end of this tactical action.",
-                buttons);
-    }
-
-    @ButtonHandler(DECLARE_RIKKA)
-    public static void declareRikkaUsage(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String factionName = buttonID.substring(DECLARE_RIKKA.length());
-        Player target = game.getPlayerFromColorOrFaction(factionName);
-        if (target == null) {
-            return;
-        }
-
-        Player agentOwner = game.getPlayerFromLeader("scrapyardagent");
-        if (agentOwner == null || agentOwner != player || !agentOwner.hasUnexhaustedLeader("scrapyardagent")) {
-            return;
-        }
-        Leader agent = agentOwner.getLeader("scrapyardagent").orElse(null);
-        if (agent == null) return;
-
-        ExhaustLeaderService.exhaustLeader(game, agentOwner, agent);
-        MessageHelper.sendMessageToChannel(
-                target.getCorrectChannel(),
-                target.getRepresentation() + " is using _Rikka \"Razor Fang\" Corvin_ to swap the movement and combat "
-                        + "values of 2 of their units until the end of this tactical action. They will declare which units.");
-        ButtonHelper.deleteMessage(event);
-    }
 
     public static void addCommanderButton(
             List<Button> buttons, Game game, Player player, Tile tile, String unitHolderName) {
@@ -144,7 +99,7 @@ public class ScrapyardLeaderHandler {
             return;
         }
         buttons.sort(Comparator.comparing(Button::getLabel));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", choose a unit type for Nix \"Stray\" Calder.",

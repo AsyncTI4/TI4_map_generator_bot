@@ -9,6 +9,8 @@ import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.info.SecretObjectiveInfoService;
 
 class ShowSOToAll extends GameStateSubcommand {
@@ -19,6 +21,7 @@ class ShowSOToAll extends GameStateSubcommand {
                         OptionType.INTEGER,
                         Constants.SECRET_OBJECTIVE_ID,
                         "Secret objective ID, which is found between ()")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
@@ -69,6 +72,10 @@ class ShowSOToAll extends GameStateSubcommand {
         sb.append(info).append('\n');
         if (!scored) {
             player.setSecret(soID);
+            if (!onlyPhase) {
+                KnownCardsService.recordCardShownToAll(
+                        getGame(), player, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
+            }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }

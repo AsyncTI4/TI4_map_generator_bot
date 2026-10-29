@@ -11,6 +11,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
 import ti4.service.game.GameUndoNameService;
+import ti4.service.game.MegagameUndoService;
 
 class Undo extends GameStateSubcommand {
 
@@ -32,6 +33,11 @@ class Undo extends GameStateSubcommand {
         String gameName = game.getName();
         if (!event.getChannel().getName().startsWith(gameName + "-")) {
             MessageHelper.replyToMessage(event, "Undo must be executed in game channel only!");
+            return;
+        }
+
+        if (!MegagameUndoService.mayUndo(game, event.getMember())) {
+            MegagameUndoService.pingGmsForUndo(event, game);
             return;
         }
 

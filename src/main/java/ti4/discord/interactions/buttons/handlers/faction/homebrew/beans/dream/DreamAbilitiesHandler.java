@@ -96,7 +96,7 @@ public class DreamAbilitiesHandler {
                         "dream_remove_nexus_" + tile.getPosition(),
                         "Remove Nexus From " + tile.getRepresentationForButtons(game, player)));
             }
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation()
@@ -163,7 +163,7 @@ public class DreamAbilitiesHandler {
                     "Remove Dream Flagship",
                     FactionEmojis.dream));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToEventChannelWithButtons(
                 event,

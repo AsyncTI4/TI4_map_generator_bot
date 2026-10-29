@@ -112,7 +112,8 @@ class TestBedDataTest extends BaseTi4Test {
                     { "expect": { "state": "sol.mood", "equals": "happy" } },
                     { "as": "sol", "press": "ac_play_from_hand_{ac:sabo2}" },
                     { "do": "setStored", "key": "a", "value": "b,c" },
-                    { "as": "sol", "pressId": "%s" }
+                    { "as": "sol", "pressId": "%s" },
+                    { "do": "setGameOption", "key": "show_mood", "value": "true" }
                   ] }""".formatted("x".repeat(101))));
         assertContains(
                 scriptErrors,
@@ -122,7 +123,8 @@ class TestBedDataTest extends BaseTi4Test {
                 "step 4: unknown seat field `mood`",
                 "step 5: `{ac:sabo2}` but nothing gives `sabo2` to sol",
                 "step 6: `setStored` key and value may not contain",
-                "step 7: `pressId` is longer than Discord's 100-character limit");
+                "step 7: `pressId` is longer than Discord's 100-character limit",
+                "step 8: unknown game option `show_mood`");
 
         // Fields that a kind of check would silently ignore, typos in scopes, and checks with nothing to check.
         List<String> expectErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
@@ -264,6 +266,16 @@ class TestBedDataTest extends BaseTi4Test {
         assertTrue(
                 scriptErrors.stream().noneMatch(error -> error.contains("tourismbureau30k")),
                 String.join("\n", scriptErrors));
+
+        // removeToken needs both the location (key) and the token (value).
+        List<String> removeTokenErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
+                { "preset": "30k-2p",
+                  "steps": [
+                    { "do": "removeToken", "value": "frontier" },
+                    { "do": "removeToken", "key": "318", "value": "frontier" }
+                  ] }"""));
+        assertContains(removeTokenErrors, "needs `key`");
+        assertEquals(1, removeTokenErrors.size(), String.join("\n", removeTokenErrors));
     }
 
     // Short forms parse, typos in field names are rejected, steps survive the JSON round trip the runner uses, and

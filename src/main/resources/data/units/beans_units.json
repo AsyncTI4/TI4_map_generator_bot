@@ -240,14 +240,12 @@
     "capacityValue": 3,
     "capacityUsed": 1,
     "cost": 8,
-    "combatHitsOn": 5,
+    "combatHitsOn": 7,
     "combatDieCount": 2,
-    "afbHitsOn": 5,
-    "afbDieCount": 3,
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "Your mechs in the space area of this system gain Anti-Fighter Barrage 7(x2)."
+    "ability": "Once per combat round, after 1 of your other non-fighter ships is destroyed in this system, you may repair 1 of your damaged units in this system."
   },
   {
     "id": "iron_mech",
@@ -273,7 +271,6 @@
     "source": "beans",
     "faction": "iron",
     "productionValue": 5,
-    "capacityValue": 4,
     "isStructure": true,
     "ability": "DEPLOY: At the end of a tactical action, you may remove 2 of your mechs from the active system to place 1 space dock from your reinforcements on a planet you control in the active system. Up to 4 fighters in that system do not count against your ships' capacity."
   },
@@ -287,8 +284,7 @@
     "source": "beans",
     "faction": "iron",
     "productionValue": 7,
-    "capacityValue": 8,
-    "ability": "DEPLOY: At the end of a tactical action, you may remove 1 of your mechs from the active system to place 1 space dock from your reinforcements on a planet you control in the active system. Up to 8 fighters in that system do not count against your ships' capacity."
+    "ability": "DEPLOY: At the end of a tactical action, you may remove 2 of your mechs from the active system to place 1 space dock from your reinforcements on a planet you control in the active system. Up to 8 fighters in that system do not count against your ships' capacity."
   },
   {
     "id": "ta_flagship",
@@ -378,7 +374,7 @@
     "id": "natau_mech",
     "baseType": "mech",
     "asyncId": "mf",
-    "name": "Penitent",
+    "name": "Schism",
     "source": "beans",
     "faction": "natau",
     "capacityUsed": 1,

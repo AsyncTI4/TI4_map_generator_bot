@@ -26,7 +26,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CommandCounterHelper;
@@ -48,6 +47,7 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.LoreService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.MercerAgent;
 import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.movement.BelkoseaAgentService;
 import ti4.service.tactical.movement.MoveAbilityButtons;
@@ -246,8 +246,7 @@ public class TacticalActionService {
                 "tyris",
                 "lunarium",
                 "zephyrion",
-                "vyserix",
-                "natau");
+                "vyserix");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
 
         if (tile.isFracture()) {
@@ -341,7 +340,7 @@ public class TacticalActionService {
             buttons.add(Buttons.red(
                     player.factionButtonChecker() + "doneLanding_" + tile.getPosition(), "Done Landing Troops"));
         } else {
-            buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Resolving"));
+            buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done"));
         }
         return buttons;
     }
@@ -370,7 +369,7 @@ public class TacticalActionService {
         }
 
         if (player.hasUnexhaustedLeader("nomadagentmercer")) {
-            buttons.addAll(ButtonHelperAgents.getMercerAgentInitialButtons(game, player));
+            buttons.addAll(MercerAgent.buttons(game, player));
         }
         if (player.hasAbility("shroud_of_lith")
                 && ButtonHelperFactionSpecific.getKolleccReleaseButtons(player, game)
@@ -431,7 +430,7 @@ public class TacticalActionService {
             }
             boolean canSelect = (movedFrom || hasUnits)
                     && (!CommandCounterHelper.hasCC(event, player.getColor(), tile)
-                            || ButtonHelper.canMoveOutOfLockedSystems(player, game)
+                            || ButtonHelper.canMoveOutOfLockedSystems(player, game, tile)
                             || MonumentsDSButtonHandler.canMoveOutOfFreeholdSystem(game, player, tile)
                             || tile.getPosition().equalsIgnoreCase(game.getActiveSystem()));
             if (canSelect) {

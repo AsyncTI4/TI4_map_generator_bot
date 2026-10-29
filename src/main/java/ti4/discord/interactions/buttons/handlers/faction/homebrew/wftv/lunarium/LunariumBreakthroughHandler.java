@@ -56,7 +56,7 @@ public class LunariumBreakthroughHandler {
                     Helper.getPlanetRepresentation(planet, game)));
         }
         if (buttons.isEmpty()) return;
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         String msg = player.getRepresentation()
                 + ", if you discarded that secret objective to use _Dark Side Exploitation_, you may ready 1 planet you control.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);

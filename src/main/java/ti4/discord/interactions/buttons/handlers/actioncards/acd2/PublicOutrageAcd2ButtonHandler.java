@@ -17,6 +17,8 @@ import ti4.helpers.AgendaRiderHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 
 @UtilityClass
 public class PublicOutrageAcd2ButtonHandler {
@@ -146,6 +148,7 @@ public class PublicOutrageAcd2ButtonHandler {
         if (acID != null) {
             target.removeActionCard(takenNum);
             player.setActionCard(acID);
+            recordTakenCard(game, target, player, acID);
             ActionCardHelper.sendActionCardInfo(game, target);
             ActionCardHelper.sendActionCardInfo(game, player);
             MessageHelper.sendMessageToChannel(
@@ -175,6 +178,11 @@ public class PublicOutrageAcd2ButtonHandler {
             }
         }
         game.removeStoredValue(revealedKey(player));
+    }
+
+    private static void recordTakenCard(Game game, Player target, Player taker, String acID) {
+        KnownCardsService.recordCardPassedPublicly(
+                game, target, taker, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
     }
 
     private static String acIDFor(Player player, int numericalID) {

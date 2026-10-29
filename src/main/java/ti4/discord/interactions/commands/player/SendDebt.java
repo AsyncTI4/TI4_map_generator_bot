@@ -18,8 +18,9 @@ class SendDebt extends GameStateSubcommand {
 
     public SendDebt() {
         super(Constants.SEND_DEBT, "Send a debt token (control token) to player/faction", true, true);
-        addOptions(
-                new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of tokens to send").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of tokens to send")
+                .setRequiredRange(1, 99)
+                .setRequired(true));
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.TARGET_FACTION_OR_COLOR,

@@ -36,9 +36,10 @@ class SetPreferredSettings extends Subcommand {
                 "pass_on_agenda_stuff",
                 "True to pass on \"when\"s and \"after\"s if you have none"));
         addOptions(new OptionData(
-                OptionType.INTEGER,
-                "sabo_decline_median",
-                "Your median hours that the bot will wait for auto \"No Sabo\". Enter 0 to turn off."));
+                        OptionType.INTEGER,
+                        "sabo_decline_median",
+                        "Your median hours that the bot will wait for auto \"No Sabo\". Enter 0 to turn off.")
+                .setRequiredRange(0, 720));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 "auto_respond_no_secrets",

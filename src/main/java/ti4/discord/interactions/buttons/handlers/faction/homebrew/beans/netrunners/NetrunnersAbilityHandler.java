@@ -18,6 +18,7 @@ import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.tech.ListTechService;
 import ti4.service.tech.PlayerTechService;
 import ti4.service.transaction.SendDebtService;
 
@@ -68,28 +69,28 @@ public class NetrunnersAbilityHandler {
 
     @ButtonHandler("useProxyNetwork")
     public static void useProxyNetwork(ButtonInteractionEvent event, Game game, Player player) {
+        ButtonHelper.deleteMessage(event);
         offerProxyNetwork(game, player);
     }
 
     public static boolean offerProxyNetwork(Game game, Player player) {
         if (!hasAvailableProxyNetwork(player)) return false;
-        List<Button> buttons = new ArrayList<>();
-        for (Player tokenOwner : game.getRealPlayers()) {
-            if (player.getDebtTokenCount(tokenOwner.getColor(), Constants.NETRUNNERS_DEBT_POOL) > 0) {
-                buttons.add(Buttons.gray(
-                        player.factionButtonChecker() + PROXY_NETWORK_TOKEN + tokenOwner.getColor(),
-                        tokenOwner.getFactionNameOrColor(),
-                        tokenOwner.getFactionEmojiOrColor()));
-            }
-        }
-        if (buttons.isEmpty()) {
-            return false;
-        }
+        List<Button> buttons = getResearchableFactionTechButtons(player);
+        buttons.add(getProxyNetworkButton(player));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + ", choose a control token to return with **Proxy Network**.",
+                player.getRepresentationUnfogged()
+                        + ", choose a faction technology to research or use **Proxy Network**.",
                 buttons);
         return true;
+    }
+
+    private static List<Button> getResearchableFactionTechButtons(Player player) {
+        List<TechnologyModel> techs = player.getNotResearchedFactionTechs().stream()
+                .map(Mapper::getTech)
+                .filter(tech -> tech != null && ListTechService.isTechResearchable(tech, player))
+                .toList();
+        return ListTechService.getTechButtons(new ArrayList<>(techs), player);
     }
 
     @ButtonHandler(PROXY_NETWORK_TOKEN)
